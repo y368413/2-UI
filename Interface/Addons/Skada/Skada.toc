@@ -1,0 +1,41 @@
+## Interface: 80300
+## Title: Skada
+## Notes: Modular damage meter.
+## Title-zhCN:|cff8000ff[战斗]|r伤害统计
+## Title-zhTW:|cff8000ff[戰鬥]|r傷害统计
+## Notes-zhCN: 模块化伤害统计。
+## Notes-zhTW: 模組化的傷害統計。
+## Author: Zarnivoop, OwnlyMe
+## Version: 1.7.7
+## SavedVariables: SkadaDB, PermanentActivity
+## SavedVariablesPerCharacter: SkadaPerCharDB, SessionActivity
+## Dependencies: _ShiGuang
+## X-License: MIT/X
+## X-Category: Combat
+
+## X-Repple: 2 UI
+
+lib\SpecializedLibBars-1.0.lua
+lib\LibWindow-1.1.lua
+lib\LibBossIDs-1.0.lua
+lib\LibGroupInSpecT-1.1.lua
+
+locale\enUS.lua
+locale\zhCN.lua
+locale\zhTW.lua
+
+Skada.lua
+Menus.lua
+Options.lua
+BarDisplay.lua
+InlineDisplay.lua
+BrokerDisplay.lua
+
+modules.xml
+
+SkadaExplosiveOrbs.lua
+SkadaStagger.lua
+## SkadaActivity.lua
+## SkadaPlus.lua
+
+BossesKilled.lua

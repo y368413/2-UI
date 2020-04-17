@@ -1,0 +1,29 @@
+## Interface: 80300
+## Title:|cFFBF00FF[H]|r Something About Pet Battle
+## Notes:Something About Pet Battle,Type /hpq to config
+## Title-zhCN: |cFFBF00FF[宠物]|r对战增强
+## Notes-zhCN: 提醒野生宠物品质等,输入/hpq设置
+## Title-zhTW: |cFFBF00FF[寵物]|r對戰增強
+## Notes-zhTW: 提醒野生寵物品質等,輸入/hpq設置
+## Author: Qshine
+## Author-zhCN: 上官晓雾
+## Author-zhTW: 上官曉霧
+## X-Date: 2018-08-05
+## Version: 2.2.14
+## DefaultState: disabled
+
+## X-Repple: 2 UI
+
+## SavedVariables: HPetSaves
+
+Localization.lua
+
+HPetBattleAny.lua
+modules\PetData.lua
+modules\PetDataFrame.lua
+modules\Config.lua
+modules\Hook.lua
+modules\Search.lua
+modules\Ability.lua
+
+modules\AutoSelectPet.lua

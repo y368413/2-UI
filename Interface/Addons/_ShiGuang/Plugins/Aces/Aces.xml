@@ -1,0 +1,15 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+  <Script file="Castbars.lua"/>
+  <!--Script file="DialogKey.lua"/-->
+  <Script file="LegionToDo.lua"/>
+  <Script file="WQAchievements.lua"/>
+  <Script file="EssenceSetManager.lua"/>
+  <!--Script file="CorruptionTooltips.lua"/-->
+  <Script file="AzeritePowerWeights.lua"/>
+  <Script file="TomeOfIllusionsCheck.lua"/>
+  <Include file="DaisyCosp\DaisyCosp.xml"/>
+	<Include file="InboxMailBag\InboxMailBag.xml"/>
+	<Include file="Simulationcraft\Simulationcraft.xml"/>
+	<Include file="CurrencyTracking\CurrencyTracking.xml"/>
+	<Include file="TomeOfTeleportation\TomeOfTeleportation.xml"/>
+</Ui>

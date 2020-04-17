@@ -1,0 +1,13 @@
+## Interface: 80300
+## Title: WorldFlightMap
+## Title-zhCN:|cff0080ff[地图]|r公交增强
+## Title-zhTW:|cff0080ff[地图]|r公交增强
+## Notes: Replaces the regular flight map with the world map
+## Notes-zhCN: 替换自带飞行地图，使之更加方便详细。
+## Notes-zhTW: 替换自带飞行地图，使之更加方便详细。
+## Author: Semlar
+## Version: 8.3.0.1
+## Dependencies: Blizzard_FlightMap
+
+LinePool.lua
+WorldFlightMap.lua

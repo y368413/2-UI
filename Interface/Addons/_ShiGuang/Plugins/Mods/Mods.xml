@@ -1,0 +1,41 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Charms.lua"/>
+	<Script file="MacroMr.lua"/>
+	<Script file="rlTools.lua"/>
+	<Script file="SubSpec.lua"/>
+	<Script file="Merchant.lua"/>
+	<Script file="kAutoOpen.lua"/>
+	<Script file="HardYards.lua"/>
+	<Script file="NomiCakes.lua"/>
+	<Script file="Talentless.lua"/>
+	<Script file="nReputation.lua"/>
+	<Script file="WallpaperKit.lua"/>
+	<!--Script file="FriendGroups.lua"/-->
+	<Script file="AlterCurrencies.lua"/>
+	<Script file="ItemTooltipProfession.lua"/>
+	<CheckButton name="nReputation" parent="ReputationFrame" mixin="nReputationMixin">
+		<Size x="24" y="24"/>
+		<Anchors>
+			<Anchor point="TOPRIGHT" x="-5" y="-25"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" parentKey="Text" text="TRACK_QUEST_ABBREV" inherits="SystemFont_Shadow_Med1">
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT" x="-2" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnEvent method="OnEvent"/>
+			<OnClick method="OnClick"/>
+		</Scripts>
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+		<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+	</CheckButton>
+</Ui>

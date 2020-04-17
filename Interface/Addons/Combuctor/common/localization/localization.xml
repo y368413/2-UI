@@ -1,0 +1,5 @@
+<Ui>
+	<Script file="en.lua"/>
+	<Script file="cn.lua"/>
+	<Script file="tw.lua"/>
+</Ui>

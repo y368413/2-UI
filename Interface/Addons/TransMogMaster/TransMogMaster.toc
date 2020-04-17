@@ -1,0 +1,29 @@
+## Interface: 80300
+## Title: TransMog Master
+## Title-zhCN: |cff8080ff[幻化]|r功能增强
+## Title-zhTW: |cff8080ff[幻化]|r功能增强
+## Version: 0.8 + 8.2.0v1.15 + 0.5.0
+## Notes: Makes Your TransMog Work Easier.
+## Notes-zhCN: 当你解锁幻化外观时，将添加一个提示到物品信息 + 出售物品界面和鼠标提示界面，使你幻化时便捷。
+## Notes-zhTW: 加入到物品提示顯示你已經收藏一個塑形外觀 + 出售物品界面和鼠标提示界面，使你幻化时便捷。
+## X-Category: Transmogrify
+## Author: TorelTwiddler, Ami Yuy + Elvador + Kruithne + Kemayo + romdeau23
+## SavedVariables: CanIMogItOptions, CanIMogItDatabase, AppearanceTooltipDB, MogPartialSetsAddonConfig
+## SavedVariablesPerCharacter: AppearanceTooltipDBPC
+## RequiredDeps: _ShiGuang
+## DefaultState: disabled
+
+## X-Repple: 2 UI
+
+Locale\_locales.xml
+CanIMogIt.lua
+Overlay\_overlays.xml
+
+LibArmorToken-1.0.lua
+LibAppropriateItems-1.0.lua
+AppearanceTooltip.lua
+
+TransmogTokens.lua
+
+MogPartialSets.lua
+MogPartialSets.xml

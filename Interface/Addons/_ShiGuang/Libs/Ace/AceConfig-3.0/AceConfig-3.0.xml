@@ -1,0 +1,6 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="AceConfigRegistry-3.0.lua"/>
+	<Script file="AceConfigCmd-3.0.lua"/>
+	<Script file="AceConfigDialog-3.0.lua"/>
+	<Script file="AceConfig-3.0.lua"/>
+</Ui>

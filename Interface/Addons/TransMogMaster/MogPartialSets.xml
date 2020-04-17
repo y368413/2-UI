@@ -1,0 +1,193 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Button name="MogPartialSetsFilterButton" inherits="UIMenuButtonStretchTemplate" text="FILTER" hidden="true">
+        <Size x="93" y="22"/>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Icon" file="Interface\ChatFrame\ChatFrameExpandArrow">
+                    <Size x="10" y="12"/>
+                    <Anchors>
+                        <Anchor point="RIGHT" relativeKey="$parent.Right" x="-5"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnClick>
+                PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+
+                if MogPartialSetsFilter:IsVisible() then
+                    MogPartialSetsFilter:Hide()
+                else
+                    MogPartialSetsFilter:Show()
+                end
+            </OnClick>
+        </Scripts>
+    </Button>
+
+    <Frame name="MogPartialSetsFilter" hidden="true" frameStrata="DIALOG">
+        <Size x="170" y="164"/>
+        <Anchors>
+            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="MogPartialSetsFilterButton" x="-10" y="-5"/>
+        </Anchors>
+        <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+            <EdgeSize>
+                <AbsValue val="16"/>
+            </EdgeSize>
+            <TileSize>
+                <AbsValue val="16"/>
+            </TileSize>
+            <BackgroundInsets>
+                <AbsInset left="5" right="5" top="5" bottom="4"/>
+            </BackgroundInsets>
+        </Backdrop>
+        <Scripts>
+            <OnLoad>
+                self:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b)
+                self:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b)
+            </OnLoad>
+            <OnShow>
+                -- anchor relative to the filter button but make sure it is not offscreen
+                local xOffscreenOffset = math.max(0, MogPartialSetsFilterButton:GetRight() + self:GetWidth() - GetScreenWidth())
+
+                local xOffset = -10 - xOffscreenOffset
+                local yOffset = -5
+
+                if xOffscreenOffset > 10 then
+                    yOffset = yOffset - 15
+                end
+
+                self:ClearAllPoints()
+                self:SetPoint('TOPLEFT', MogPartialSetsFilterButton, 'TOPRIGHT', xOffset, yOffset)
+            </OnShow>
+        </Scripts>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString name="$parentToggleText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT" text="show partial sets">
+                    <Size x="0" y="10"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="37" y="-16"/>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentOnlyFavoriteText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT" text="only favorite sets">
+                    <Size x="0" y="10"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="37" y="-39"/>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentFavoriteVariantsText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT" text="show favorite variants">
+                    <Size x="0" y="10"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="37" y="-62"/>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentIgnoreBracersText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT" text="ignore bracers">
+                    <Size x="0" y="10"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="37" y="-85"/>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentMaxMissingPiecesText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT" text="max. missing pieces">
+                    <Size>
+                        <AbsDimension x="0" y="10"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="37" y="-108"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <CheckButton name="$parentToggleButton" inherits="OptionsCheckButtonTemplate" checked="true">
+                <Size x="24" y="24"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="12" y="-10"/>
+                </Anchors>
+                <Scripts>
+                    <OnShow>self:SetChecked(MogPartialSetsAddonConfig.enabled)</OnShow>
+                    <OnClick>
+                        MogPartialSetsAddonConfig.enabled = self:GetChecked()
+                        MogPartialSetsAddon:notifyConfigUpdated()
+                    </OnClick>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="$parentOnlyFavoriteButton" inherits="OptionsCheckButtonTemplate" checked="true">
+                <Size x="24" y="24"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="12" y="-35"/>
+                </Anchors>
+                <Scripts>
+                    <OnShow>self:SetChecked(MogPartialSetsAddonConfig.onlyFavorite)</OnShow>
+                    <OnClick>
+                        MogPartialSetsAddonConfig.onlyFavorite = self:GetChecked()
+                        MogPartialSetsAddon:notifyConfigUpdated()
+                    </OnClick>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="$parentFavoriteVariantsButton" inherits="OptionsCheckButtonTemplate" checked="true">
+                <Size x="24" y="24"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="12" y="-58"/>
+                </Anchors>
+                <Scripts>
+                    <OnShow>self:SetChecked(MogPartialSetsAddonConfig.favoriteVariants)</OnShow>
+                    <OnClick>
+                        MogPartialSetsAddonConfig.favoriteVariants = self:GetChecked()
+                        MogPartialSetsAddon:notifyConfigUpdated()
+                    </OnClick>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="$parentIgnoreBracersButton" inherits="OptionsCheckButtonTemplate" checked="true">
+                <Size x="24" y="24"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="12" y="-81"/>
+                </Anchors>
+                <Scripts>
+                    <OnShow>self:SetChecked(MogPartialSetsAddonConfig.ignoreBracers)</OnShow>
+                    <OnClick>
+                        MogPartialSetsAddonConfig.ignoreBracers = self:GetChecked()
+                        MogPartialSetsAddon:notifyConfigUpdated()
+                    </OnClick>
+                </Scripts>
+            </CheckButton>
+            <EditBox name="$parentMaxMissingPiecesEditBox" inherits="InputBoxTemplate" autoFocus="false" letters="1" numeric="true" propagateKeyBoardInput="false">
+                <Size>
+                    <AbsDimension x="13" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-104"/>
+                </Anchors>
+                <Scripts>
+                    <OnShow>self:SetText(tostring(MogPartialSetsAddonConfig.maxMissingPieces))</OnShow>
+                    <OnEscapePressed>self:ClearFocus()</OnEscapePressed>
+                    <OnEnterPressed>self:ClearFocus()</OnEnterPressed>
+                    <OnTextChanged>
+                        local maxMissingPieces = tonumber(self:GetText())
+
+                        if maxMissingPieces ~= nil then
+                            MogPartialSetsAddonConfig.maxMissingPieces = maxMissingPieces
+                            MogPartialSetsAddon:notifyConfigUpdated()
+                        end
+                    </OnTextChanged>
+                </Scripts>
+            </EditBox>
+            <Button name="$parentOkButton" inherits="UIPanelButtonTemplate" text="OK">
+                <Size x="71" y="20"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="12" y="-130"/>
+                </Anchors>
+                <Scripts>
+                    <OnClick>MogPartialSetsFilter:Hide()</OnClick>
+                </Scripts>
+            </Button>
+            <Button name="$parentRefreshButton" inherits="UIPanelButtonTemplate" text="Refresh">
+                <Size x="71" y="20"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="87" y="-130"/>
+                </Anchors>
+                <Scripts>
+                    <OnClick>MogPartialSetsAddon:forceRefresh()</OnClick>
+                </Scripts>
+            </Button>
+        </Frames>
+    </Frame>
+</Ui>

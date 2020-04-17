@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+$Id: CurrencyTracking_Options.xml 60 2017-04-05 15:50:17Z arith $
+-->
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+   <Script file="LibCurrencyInfo.lua"/>
+   <Script file="Core.lua"/>
+	<Button name="CurrencyTrackingButtonTemplate" movable="true" enableMouse="true" virtual="true">
+		<Size>
+			<AbsDimension x="50" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentTexture" parentKey="Texture" />
+			</Layer>
+			<Layer level="BORDER">
+				<FontString name="$parentCount" parentKey="Count" inherits="GameFontHighlightRight" text="100">
+					<Anchors>
+						<Anchor point="LEFT" >
+							<Offset x="0" y="0"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="$parentIcon">
+					<Size>
+						<AbsDimension x="15" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCount" relativePoint="RIGHT">
+							<Offset x="2" y="0"/>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button enableMouse="true" parentKey="LinkButton">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentIcon">
+						<Offset x="0" y="0"/>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parentIcon">
+						<Offset x="0" y="0"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:RegisterForClicks("LeftButtonDown", "RightButtonDown");
+						self.orig_tooltipScale = GameTooltip:GetScale();
+					</OnLoad>
+					<OnEnter>
+						local p = self:GetParent();
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+						GameTooltip:SetScale(CurrencyTracking.db.profile.tooltip_scale);
+						GameTooltip:SetBackdropColor(0, 0, 0, CurrencyTracking.db.profile.tooltip_alpha);
+						if (self.tooltipText) then
+							if (p.isItem and p.itemLink) then 
+								GameTooltip:SetHyperlink(self.tooltipText);
+							elseif (p.isCurrency) then 
+								GameTooltip:SetText(self.tooltipText);
+							else
+							end
+						elseif (p.isItem) then
+							GameTooltip:SetText(p.itemName, 1, 1, 1, nil, false);
+						end
+					</OnEnter>
+					<OnClick>
+						if (button == "RightButton") then
+							CurrencyTracking:OpenOptions(self:GetParent().isItem);
+							GameTooltip_Hide();
+						elseif (IsModifiedClick("CHATLINK")) then
+							local p = self:GetParent();
+							if (p.isItem and p.itemLink) then
+								HandleModifiedItemClick(p.itemLink);
+							elseif (p.isCurrency and p.currencyID) then
+								HandleModifiedItemClick(GetCurrencyLink(p.currencyID, 0));
+							else
+							end
+						else
+						end
+					</OnClick>
+					<OnLeave>
+						GameTooltip:SetScale(self.orig_tooltipScale);
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				local name = self:GetName();
+				self.count = _G[name.."Count"];
+				self.icon = _G[name.."Icon"];
+				self.highlight = _G[name.."Highlight"];
+				self:RegisterForDrag("LeftButton");
+				self:RegisterForClicks("LeftButtonDown", "RightButtonDown");
+			</OnLoad>
+		</Scripts>
+		<ButtonText>
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</ButtonText>
+		<NormalFont style="GameFontNormal"/>
+		<HighlightTexture name="$parentHighlight" file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset x="0" y="0"/>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT">
+					<Offset x="0" y="0"/>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
+	<Script file="Config.lua"/>
+</Ui>

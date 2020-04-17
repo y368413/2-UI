@@ -1,0 +1,19 @@
+## Interface: 80300
+## Version: 8.3.0
+## Author: Kaminaris
+## Title: MaxDps
+## Title-zhCN:|CFFD74DE1[输出]|rMaxDps
+## Title-zhTW:|CFFD74DE1[输出]|rMaxDps
+## Notes: Rotation helper framework.
+## Notes-zhCN: 输出循环提示助手。
+## Notes-zhTW: 輸出迴圈提示助手。
+## SavedVariables: MaxDpsOptions
+## Dependencies: _ShiGuang
+ForAllIndentsAndPurposes.lua
+
+Core.lua
+Buttons.lua
+Helper.lua
+TimeToDie.lua
+
+Modules\Roles.xml

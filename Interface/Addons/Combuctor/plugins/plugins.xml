@@ -1,0 +1,7 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="BagBrother.lua"/>
+  <Script file="CaerdonWardrobe.lua"/>
+  <Script file="Combuctor_ShiGuang.lua"/>
+  <Script file="Combuctor_Binding.lua"/>
+  <Script file="Combuctor_ItemInfo.lua"/>
+</Ui>
