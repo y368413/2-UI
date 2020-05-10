@@ -83,18 +83,6 @@ function MISC:TradeTabs_Update()
 	end
 end
 
-function MISC:TradeTabs_Reskin()
-	if not MaoRUIPerDB["Skins"]["BlizzardSkins"] then return end
-
-	for _, tab in pairs(tabList) do
-		tab:SetCheckedTexture(I.textures.pushed)
-		tab:GetRegions():Hide()
-		M.CreateBDFrame(tab)
-		local texture = tab:GetNormalTexture()
-		if texture then texture:SetTexCoord(unpack(I.TexCoord)) end
-	end
-end
-
 function MISC:TradeTabs_OnClick()
 	CastSpell(self.slotID, BOOKTYPE_PROFESSION)
 end
@@ -179,7 +167,6 @@ function MISC:TradeTabs_OnLoad()
 	TradeSkillFrame.SearchBox:SetWidth(268)
 	MISC:UpdateProfessions()
 
-	MISC:TradeTabs_Reskin()
 	MISC:TradeTabs_Update()
 	M:RegisterEvent("TRADE_SKILL_SHOW", MISC.TradeTabs_Update)
 	M:RegisterEvent("TRADE_SKILL_CLOSE", MISC.TradeTabs_Update)

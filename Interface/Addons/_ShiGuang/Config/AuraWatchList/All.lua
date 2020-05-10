@@ -70,7 +70,6 @@ local list = {
 	["Absorb"] = {		-- 吸收
 		{AuraID = 190456, UnitID = "player", Value = true}, 	--无视痛苦	
 		{AuraID =  77535, UnitID = "player", Value = true},		--鲜血护盾
-		{AuraID = 227225, UnitID = "player", Value = true},		--灵魂屏障
 		{AuraID = 209388, UnitID = "player", Value = true},		--秩序堡垒
 		{AuraID =  11426, UnitID = "player", Value = true},		--寒冰护体
 		{AuraID = 235313, UnitID = "player", Value = true},		--烈焰护体
@@ -240,6 +239,7 @@ local list = {
 		{AuraID = 311203, UnitID = "player"},	-- 光荣时刻
 		{AuraID = 311202, UnitID = "player"},	-- 收割火焰
 		{AuraID = 312915, UnitID = "player"},	-- 共生姿态
+		{AuraID = 295354, UnitID = "player"},	-- 精华协议
 		-- 腐蚀
 		{AuraID = 316823, UnitID = "player"},	-- 虚空仪式
 		{AuraID = 318211, UnitID = "player"},	-- 活力涌动
@@ -324,6 +324,7 @@ local list = {
 		{AuraID = 314308, UnitID = "player", Flash = true},	-- 灵魂毁灭
 		{AuraID = 209858, UnitID = "player"},	-- 死疽溃烂
 		{AuraID = 240559, UnitID = "player"},	-- 重伤
+		{AuraID = 314531, UnitID = "player"},	-- 撕扯血肉
 		{AuraID = 302420, UnitID = "player"},	-- 女王法令：隐藏
 		{AuraID = 240443, UnitID = "player", Flash = true},	-- 爆裂
 		{AuraID = 226512, UnitID = "player"},	-- 血池
@@ -354,8 +355,10 @@ local list = {
 		{AuraID = 293724, UnitID = "player"},	-- 护盾发生器
 		{AuraID = 297257, UnitID = "player"},	-- 电荷充能
 		{AuraID = 303885, UnitID = "player"},	-- 爆裂喷发
+		{AuraID = 291928, UnitID = "player"},	-- 超荷电磁炮
 		{AuraID = 292267, UnitID = "player"},	-- 超荷电磁炮
 		{AuraID = 305699, UnitID = "player"},	-- 锁定
+		{AuraID = 302274, UnitID = "player"},	-- 爆裂冲击
 		{AuraID = 259533, UnitID = "player", Flash = true},	-- 艾泽里特催化剂，暴富
 	-- 尼奥罗萨
 		-- 黑龙帝王拉希奥

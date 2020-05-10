@@ -105,7 +105,7 @@ local function Update(self)
 	if element.ProgressText then
 		local text
 		if maxRank then
-			text = L["Max Rank"]
+			text = U["Max Rank"]
 		elseif rank then
 			text = format("|cFFFFFF00%d |r %d/%d", rank, cur, toNext)
 		else

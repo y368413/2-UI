@@ -203,21 +203,11 @@ function module.OnChatWhisper(event, ...)
 	end
 end
 
-function module:WhipserInvite()
+function module:WhisperInvite()
 	if not MaoRUIPerDB["Chat"]["Invite"] then return end
 	self:UpdateWhisperList()
 	M:RegisterEvent("CHAT_MSG_WHISPER", module.OnChatWhisper)
 	M:RegisterEvent("CHAT_MSG_BN_WHISPER", module.OnChatWhisper)
-end
-
--- Timestamp
-function module:UpdateTimestamp()
-	local greyStamp = I.GreyColor.."[%H:%M]|r" --"[%H:%M:%S]|r "
-	if MaoRUIDB["Timestamp"] then
-		SetCVar("showTimestamps", greyStamp)
-	elseif GetCVar("showTimestamps") == greyStamp then
-		SetCVar("showTimestamps", "none")
-	end
 end
 
 -- Sticky whisper
@@ -288,13 +278,12 @@ function module:OnLogin()
 	CombatLogQuickButtonFrame_CustomTexture:SetTexture(nil)
 
 	-- Add Elements
-	self:UpdateTimestamp()
 	self:ChatWhisperSticky()
 	self:ChatFilter()
 	self:ChannelRename()
 	self:Chatbar()
 	self:UrlCopy()
-	self:WhipserInvite()
+	self:WhisperInvite()
 	self:ChatFrameBackground()
 
 	-- Lock chatframe

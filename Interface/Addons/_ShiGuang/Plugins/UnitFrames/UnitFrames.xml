@@ -1,5 +1,0 @@
-﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="UnitFramesStyle.lua"/>
-	<!--Script file="PartyFramesStyle.lua"/-->
-	<Script file="ColorFrames.lua"/>
-</Ui>

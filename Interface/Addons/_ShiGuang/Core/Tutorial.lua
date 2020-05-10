@@ -12,19 +12,16 @@ print("--------------- 有你们的魔兽,才是世界 -->>>")
 local function DefaultSettings()
 	SetCVar("scriptErrors", 0)     --0是屏蔽错误1是不屏蔽错误
 	SetCVar("autoQuestWatch", 1)  
-	SetCVar("alwaysCompareItems", 1)
 	SetCVar("synchronizeSettings", 1)
 	SetCVar("synchronizeMacros", 1)
-	SetCVar("ShowClassColorInNameplate", 1)
 	SetCVar("screenshotQuality", 10)
 	SetCVar("showTutorials", 0)
 	SetCVar("overrideArchive", 0)
 	SetCVar("showQuestTrackingTooltips", 1)
-	SetCVar("showTargetOfTarget",1) --目标的目标
 	--SetCVar("fstack_preferParentKeys", 0)
 	SetCVar("missingTransmogSourceInItemTooltips", 1)
 	--setglobal("MAX_EQUIPMENT_SETS_PER_PLAYER",100)
-  PlayerFrame:SetScale(MaoRUIPerDB["UFs"]["PlayerFrameScale"]) 
+	PlayerFrame:SetScale(MaoRUIPerDB["UFs"]["PlayerFrameScale"]) 
 	TargetFrame:SetScale(MaoRUIPerDB["UFs"]["PlayerFrameScale"])
 end
 
@@ -52,6 +49,7 @@ local function ForceDefaultSettings()
   SetCVar("nameplateSelectedScale", 1.25)
   SetCVar("nameplateLargerScale", 1.25)
 	SetCVar("autoLootDefault", 1)
+	SetCVar("alwaysCompareItems", 1)
 	SetCVar("lootUnderMouse", 1)
 	SetCVar("autoSelfCast", 1)
 	SetCVar("nameplateShowEnemies", 1)
@@ -74,6 +72,8 @@ local function ForceDefaultSettings()
   InterfaceOptions_UpdateMultiActionBars() --刷新动作条
 	SetCVar("enableFloatingCombatText", 0)
 	SetCVar("floatingCombatTextCombatState", 0)
+	SetCVar("showTargetOfTarget",1) --目标的目标
+	SetCVar("ShowClassColorInNameplate", 1)
 	--SetCVar("floatingCombatTextCombatDamage", 0)
 	--SetCVar("floatingCombatTextCombatHealing", 0)
 	SetCVar("floatingCombatTextCombatDamageDirectionalScale", 1)
@@ -103,7 +103,7 @@ local function ForceDefaultSettings()
 	SetCVar("statusText",1) --状态文字
 	SetCVar("statusTextDisplay","NUMERIC")--头像状态文字形式："NUMERIC"数值"PERCENT"百分比"BOTH"同时显示
 	SetCVar("autoLootDefault",1) --自动拾取
-	SetCVar("worldPreloadNonCritical", 1) --0加快蓝条，读完蓝条再载入游戏模组
+	--SetCVar("worldPreloadNonCritical", 1) --0加快蓝条，读完蓝条再载入游戏模组
 end
 
 local function ForceRaidFrame()

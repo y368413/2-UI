@@ -1,5 +1,4 @@
-﻿local strfind, strrep, strmatch, pairs, C_Timer_After, ChatTypeInfo = string.find, string.rep, string.match, pairs, C_Timer.After, ChatTypeInfo
---[[--------------------------------------------------------------------
+﻿--[[--------------------------------------------------------------------
 align
 ----------------------------------------------------------------------]]
 SLASH_EA1 = "/align"
@@ -39,7 +38,7 @@ local function AddLootIcons(self, event, message, ...)
 	message = message:gsub("(\124c%x+\124Hitem:.-\124h\124r)", Icon)
 	return false, message, ...
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", AddLootIcons)]]
+ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", AddLootIcons)
 	
 --------------------------------------- 支持上下箭頭選取历史-- Author:M-------------------------------------
 local ChatHistory = {}
@@ -47,7 +46,7 @@ local function AddHistoryLine(self, text)
     if (not text or text == "") then return end
     local type = self:GetAttribute("chatType")
     if (type == "WHISPER") then text = text:gsub("^/%w+%s*%S+%s*", "")
-    elseif (strfind(text, "^/script")) then
+    elseif (string.find(text, "^/script")) then
     else text = text:gsub("^/%w+%s*", "") end
     if (text == "") then return end
     for i, v in ipairs(ChatHistory[self]) do
@@ -81,7 +80,7 @@ for i = 1, NUM_CHAT_WINDOWS do
     editbox:HookScript("OnEditFocusLost", ResetHistoryIndex)
     editbox:HookScript("OnArrowPressed", GetHistoryLine)
     hooksecurefunc(editbox, "AddHistoryLine", AddHistoryLine)
-end
+end]]
 
 --------------------------------------- 聊天信息複製-- Author:M-------------------------------------
 local CHAT_WHISPER_GET = CHAT_WHISPER_GET or ">>%s:"
@@ -108,43 +107,41 @@ local rules = {
     { pat = "^%s+",                         repl = "" },    --去掉空格
 }
 --替換字符
-local function clearMessage(msg, button)
+local function ClearMessage(msg, button)
     for _, rule in ipairs(rules) do
         if (not rule.button or rule.button == button) then msg = msg:gsub(rule.pat, rule.repl) end
     end
     return msg
 end
 --顯示信息
-local function showMessage(msg, button)
+local function ShowMessage(msg, button)
     local editBox = ChatEdit_ChooseBoxForSend()
-    msg = clearMessage(msg, button)
+    msg = ClearMessage(msg, button)
     ChatEdit_ActivateChat(editBox)
     editBox:SetText(editBox:GetText() .. msg)
     editBox:HighlightText()
 end
 --獲取複製的信息
-local function getMessage(...)
+local function GetMessage(...)
+    local object
     for i = 1, select("#", ...) do
-        if (select(i, ...):IsObjectType("FontString") and MouseIsOver(select(i, ...))) then return select(i, ...):GetText() end
+        object = select(i, ...)
+        if (object:IsObjectType("FontString") and MouseIsOver(object)) then
+            return object:GetText()
+        end
     end
     return ""
 end
 --HACK
 local _SetItemRef = SetItemRef
 SetItemRef = function(link, text, button, chatFrame)
-    if (link:sub(1,8) == "ChatCopy") then
-        local msg = getMessage(chatFrame.FontStringContainer:GetRegions())
-        return showMessage(msg, button)
+    if (chatFrame and link:sub(1,8) == "ChatCopy") then
+        local msg = GetMessage(chatFrame.FontStringContainer:GetRegions())
+        return ShowMessage(msg, button)
     end
     _SetItemRef(link, text, button, chatFrame)
 end
 
---HACK
-if (CHAT_TIMESTAMP_FORMAT) then
-    if (not string.find(CHAT_TIMESTAMP_FORMAT, "ChatCopy")) then
-        CHAT_TIMESTAMP_FORMAT = "|cff68ccef|HChatCopy|h"..CHAT_TIMESTAMP_FORMAT.."|h|r"
-    end
-end
 local function AddMessage(self, text, ...)
     if (type(text) ~= "string") then
         text = tostring(text)
@@ -157,7 +154,7 @@ local function AddMessage(self, text, ...)
             text = format("|cff68ccef|HChatCopy|h%s|h|r%s", BetterDate(CHAT_TIMESTAMP_FORMAT, time()), text)
         end
     else
-    text = format("|cff68ccef|HChatCopy|h%s|h|r %s", ">", text)
+        text = format("|cff68ccef|HChatCopy|h%s|h|r%s", ">", text)
     end
     self.OrigAddMessage(self, text, ...)
 end
@@ -169,51 +166,3 @@ for i = 1, NUM_CHAT_WINDOWS do
         chatFrame.AddMessage = AddMessage
     end
 end
-
---AchievementFilter
-local achievements = {}
-local function SendMessage(event, msg)
-	local info = ChatTypeInfo[event:sub(10)]
-	for i = 1, NUM_CHAT_WINDOWS do
-		local ChatFrames = _G["ChatFrame"..i]
-		if ChatFrames and ChatFrames:IsEventRegistered(event) then
-			ChatFrames:AddMessage(msg, info.r, info.g, info.b)
-		end
-	end
-end
-local function achievementReady(id)
-	local area, guild = achievements[id].CHAT_MSG_ACHIEVEMENT, achievements[id].CHAT_MSG_GUILD_ACHIEVEMENT
-	if area and guild then -- merge area to guild
-		for name,class in pairs(area) do
-			if guild[name] == class then area[name] = nil end
-		end
-	end
-	for event,players in pairs(achievements[id]) do
-		if next(players) ~= nil then -- skip empty
-			local list = {}
-			for name,class in pairs(players) do
-				list[#list+1] = format("|c%s|Hplayer:%s|h%s|h|r", RAID_CLASS_COLORS[class].colorStr, name, name)
-			end
-			SendMessage(event, format("[%s]获得了成就%s！", table.concat(list, "、"), GetAchievementLink(id)))
-		end
-	end
-	achievements[id] = nil
-end
-
-local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _, guid)
-	if not guid or not guid:find("Player") then return end
-	local id = tonumber(msg:match("|Hachievement:(%d+)"))
-	if not id then return end
-	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
-	if not name then return end -- check nil
-	if server ~= "" and server ~= playerServer then name = name.."-"..server end
-	if not achievements[id] then
-		achievements[id] = {}
-		C_Timer_After(0.5, function() achievementReady(id) end)
-	end
-	achievements[id][event] = achievements[id][event] or {}
-	achievements[id][event][name] = class
-	return true
-end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", achievementFilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", achievementFilter)

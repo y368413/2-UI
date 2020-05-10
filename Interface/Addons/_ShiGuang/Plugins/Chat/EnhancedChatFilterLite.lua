@@ -1,4 +1,4 @@
--- ECF-lite 8.3.0-3, @Rubgrsch
+-- ECF-lite 8.3.0-5, @Rubgrsch
 
 -- Lua
 local _G = _G
@@ -6,7 +6,6 @@ local format, ipairs, max, min, next, pairs, tconcat, tonumber, tremove = format
 -- WoW
 local Ambiguate, C_BattleNet_GetGameAccountInfoByGUID, C_Item_GetItemQualityByID, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetPlayerInfoByGUID, GetTime, C_FriendList_IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS = Ambiguate, C_BattleNet.GetGameAccountInfoByGUID, C_Item.GetItemQualityByID, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetPlayerInfoByGUID, GetTime, C_FriendList.IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS
 
--- GLOBALS: NUM_CHAT_WINDOWS
 local playerName, playerServer = GetUnitName("player"), GetRealmName()
 
 -- Some UTF-8 symbols that will be auto-changed
@@ -68,10 +67,10 @@ local function SendMessage(event, msg)
 	end
 end
 
---------------- Filters ---------------
---strDiff for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
---This function is not utf8 awared, currently not nessesary
---strsub(s,i,i) is really SLOW. Don't use it.
+-- strDiff for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
+-- This function is not utf8 awared, currently not nessesary
+-- This function dosen't support empty string "".
+-- strsub(s,i,i) is really SLOW. Don't use it.
 local last, this = {}, {}
 local function strDiff(sA, sB) -- arrays of bytes
 	local len_a, len_b = #sA, #sB
@@ -92,22 +91,21 @@ setmetatable(blockedPlayers, {__index=function() return 0 end})
 local chatLines = {}
 local chatEvents = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_EMOTE"] = 2, ["CHAT_MSG_TEXT_EMOTE"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 5}
 
---Store which type of channels enabled which filters, [eventIdx] = {filters}
+-- Store which type of channels enabled which filters, [eventIdx] = {filters}
 local eventStatus = {
---	aggr, 	dnd,	raid,	quest,	normal,	repeat
-	{true,	true,	true,	true,	true,	true},
-	{true,	true,	true,	true,	false,	true},
-	{true,	true,	false,	false,	false,	true},
-	{false,	false,	true,	true,	false,	true},
-	{false,	false,	false,	false,	false,	true},
-	{false,	true,	false,	false,	false,	false},
+--	aggr, 	dnd,	black,	raid,	quest,	repeat
+	{false,	false,	true,	false,	false,	false},
+	{false,	false,	true,	false,	false,	false},
+	{false,	false,	true,	false,	false,	false},
+	{false,	false,	false,	false,	false,	false},
+	{false,	false,	false,	false,	false,	false},
 }
 
 local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- don't filter player/GM/DEV
 	if player == playerName or flags == "GM" or flags == "DEV" then return end
 
-	-- filter bad players
+	-- filter blocked players
 	if not good and blockedPlayers[player] >= 3 then return true end
 
 	-- remove color/hypelink
@@ -117,15 +115,15 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	filterString = utf8replace(filterString):gsub("{rt%d}","")
 	-- use upper to help repeatFilter, non-regex only
 	local msgLine = filterString:gsub(RegexCharList, ""):upper()
-	--If it has only symbols, don't change it
+	-- If it has only symbols, don't change it
 	if msgLine == "" then msgLine = msg end
 	local annoying = (oriLen - #msgLine) / oriLen
 
-	--filter status for each channel
+	-- filter status for each channel
 	local filtersStatus = eventStatus[Event]
 
 	-- AggressiveFilter: Filter strings that has too much symbols
-	-- AggressiveFilter: Filter AggressiveTags, currently only journal link
+	-- AggressiveFilter: Filter journal link and club link
 	if filtersStatus[1] and not IsMyFriend then
 		if annoying >= 0.25 and oriLen >= 30 then return true end
 		if msg:find("|Hjournal") or msg:find("|HclubTicket") then return true end
@@ -135,34 +133,30 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if filtersStatus[2] and (flags == "DND" or Event == 5) and not IsMyFriend then return true end
 
 	-- raidAlert
-	if filtersStatus[3] then
+	if filtersStatus[4] then
 		for _,tag in ipairs(RaidAlertTagList) do
 			if msg:find(tag) then return true end
 		end
 	end
 	-- questReport and partyAnnounce
-	if filtersStatus[4] then
+	if filtersStatus[5] then
 		for _,tag in ipairs(QuestReportTagList) do
 			if msg:find(tag) then return true end
 		end
 	end
 
-	-- Fk LFG
-	if filtersStatus[5] then
-		if msg:find("<LFG>") then return true end
-	end
-
-	--Repeat Filter
+	-- Repeat Filter
 	if filtersStatus[6] and not IsMyFriend then
 		local msgtable = {player, {}, GetTime()}
 		for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
+
 		local chatLines = chatLines
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
 		for i=1, chatLinesSize do
 			local line = chatLines[i]
-			--if there is not much difference between msgs, filter it
-			--if multiple msgs in 0.6s, filter it (channel & emote only)
+			-- if there is not much difference between msgs, filter it
+			-- if multiple msgs in 0.6s, filter it (channel & emote only)
 			if line[1] == msgtable[1] and ((Event == 3 and msgtable[3] - line[3] < 0.6) or strDiff(line[2],msgtable[2]) <= 0.1) then
 				tremove(chatLines, i)
 				return true
@@ -173,7 +167,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 end
 
 local prevLineID, filterResult = 0, false
-local function preECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,guid)
+local function PreECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,guid)
 	-- With multiple chat tabs one msg can trigger filters multiple times and repeatFilter will return wrong result
 	-- lineID returned by "CHAT_MSG_TEXT_EMOTE" is always 0
 	if lineID == 0 or lineID ~= prevLineID then
@@ -191,10 +185,10 @@ local function preECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,gui
 	end
 	return filterResult
 end
-for event in pairs(chatEvents) do ChatFrame_AddMessageEventFilter(event, preECFfilter) end
+for event in pairs(chatEvents) do ChatFrame_AddMessageEventFilter(event, PreECFfilter) end
 
---MonsterSayFilter
---Turn off MSF in certain quests. Chat msg are repeated but important in these quests.
+-- MonsterSayFilter
+-- Turn off MSF in certain quests. Chat msg are repeated but important in these quests.
 local MSFOffQuestT = {[42880] = true, [54090]=true,} -- 42880: Meeting their Quota; 54090: Toys For Destruction
 local MSFOffQuestFlag = false
 
@@ -208,17 +202,17 @@ Questf:SetScript("OnEvent", function(self,event,arg1,arg2)
 end)
 
 local MSL, MSLPos = {}, 1
-local function monsterFilter(self,_,msg)
+local function MonsterFilter(self,_,msg)
 	if MSFOffQuestFlag then return end
 	for _, v in ipairs(MSL) do if v == msg then return true end end
 	MSL[MSLPos] = msg
 	MSLPos = MSLPos + 1
 	if MSLPos > 7 then MSLPos = MSLPos - 7 end
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", monsterFilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", monsterFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", MonsterFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", MonsterFilter)
 
---SystemMessage
+-- System Message
 local SystemFilterTag = {
 	-- !!! Always add parentheses since gsub() has two return values !!!
 	(AZERITE_ISLANDS_XP_GAIN:gsub("%%.-s",".+"):gsub("%%.-d","%%d+")), -- Azerite gain in islands
@@ -237,18 +231,18 @@ if UnitLevel("player") == GetMaxPlayerLevel() then -- spell learn, only when max
 	for j, s in ipairs(SSFilterStrings) do SystemFilterTag[i+j] = s end
 end
 
-local function systemMsgFilter(self,_,msg)
+local function SystemMsgFilter(self,_,msg)
 	for _, s in ipairs(SystemFilterTag) do if msg:find(s) then return true end end
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", systemMsgFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", SystemMsgFilter)
 
---AchievementFilter
+-- Achievement Filter
 local achievements = {}
-local function achievementReady(id)
+local function AchievementReady(id)
 	local area, guild = achievements[id].CHAT_MSG_ACHIEVEMENT, achievements[id].CHAT_MSG_GUILD_ACHIEVEMENT
 	if area and guild then -- merge area to guild
-		for name,class in pairs(area) do
-			if guild[name] == class then area[name] = nil end
+		for name in pairs(area) do
+			if guild[name] then area[name] = nil end
 		end
 	end
 	for event,players in pairs(achievements[id]) do
@@ -267,7 +261,7 @@ local function achievementReady(id)
 	achievements[id] = nil
 end
 
-local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _, guid)
+local function AchievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _, guid)
 	if not guid or not guid:find("Player") then return end
 	local id = tonumber(msg:match("|Hachievement:(%d+)"))
 	if not id then return end
@@ -276,11 +270,11 @@ local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	if server ~= "" and server ~= playerServer then name = name.."-"..server end
 	if not achievements[id] then
 		achievements[id] = {}
-		C_Timer_After(0.5, function() achievementReady(id) end)
+		C_Timer_After(0.5, function() AchievementReady(id) end)
 	end
 	achievements[id][event] = achievements[id][event] or {}
 	achievements[id][event][name] = class
 	return true
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", achievementFilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", achievementFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", AchievementFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", AchievementFilter)

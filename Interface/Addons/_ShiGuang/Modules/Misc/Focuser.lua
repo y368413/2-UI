@@ -58,6 +58,11 @@ function MISC.Focuser_OnEvent(event)
 				MISC.Focuser_Setup(object)
 			end
 		end
+		for _, object in next, duf do
+			if not object.focuser then
+				MISC.Focuser_Setup(object)
+			end
+		end
 	end
 end
 

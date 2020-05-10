@@ -73,7 +73,7 @@ end
 
 -- Init
 local function GetBestScale()
-	return max(.4, min(1.15, 768 / I.ScreenHeight, 5))
+	return max(.4, min(1.15, 768 / I.ScreenHeight))
 end
 
 function M:SetupUIScale(init)

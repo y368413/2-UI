@@ -78,6 +78,8 @@ end
 local function animIn_OnPlay(group)
 	local frame = group:GetParent()
 	local frameWidth, frameHeight = frame:GetSize()
+	frame.spark:SetSize(frameWidth, frameHeight)
+	frame.spark:SetAlpha(0.3)
 	frame.innerGlow:SetSize(frameWidth / 2, frameHeight / 2)
 	frame.innerGlow:SetAlpha(1)
 	frame.innerGlowOver:SetAlpha(1)
@@ -92,6 +94,7 @@ end
 local function animIn_OnFinished(group)
 	local frame = group:GetParent()
 	local frameWidth, frameHeight = frame:GetSize()
+	frame.spark:SetAlpha(0)
 	frame.innerGlow:SetAlpha(0)
 	frame.innerGlow:SetSize(frameWidth, frameHeight)
 	frame.innerGlowOver:SetAlpha(0)
@@ -107,6 +110,13 @@ local function createOverlayGlow()
 	-- create frame and textures
 	local name = "ButtonGlowOverlay"..tostring(numOverlays)
 	local overlay = CreateFrame("Frame", name, UIParent)
+
+	-- spark
+	overlay.spark = overlay:CreateTexture(name .. "Spark", "BACKGROUND")
+	overlay.spark:SetPoint("CENTER")
+	overlay.spark:SetAlpha(0)
+	overlay.spark:SetTexture(iconAlertTexture)
+	overlay.spark:SetTexCoord(0.00781250, 0.61718750, 0.00390625, 0.26953125)
 
 	-- inner glow
 	overlay.innerGlow = overlay:CreateTexture(name.."InnerGlow", "ARTWORK")
@@ -146,11 +156,16 @@ local function createOverlayGlow()
 
 	-- setup antimations
 	overlay.animIn = overlay:CreateAnimationGroup()
+	createScaleAnim(overlay.animIn, overlay.spark,          1, 0.2, 1.5, 1.5)
+	createAlphaAnim(overlay.animIn, overlay.spark,          1, 0.2, 0, 1)
 	createScaleAnim(overlay.animIn, overlay.innerGlow, 1, .3, 2, 2)
 	createScaleAnim(overlay.animIn, overlay.innerGlowOver, 1, .3, 2, 2)
 	createAlphaAnim(overlay.animIn, overlay.innerGlowOver, 1, .3, 1, 0)
+	createScaleAnim(overlay.animIn, overlay.outerGlow,      1, 0.3, 0.5, 0.5)
 	createScaleAnim(overlay.animIn, overlay.outerGlowOver, 1, .3, .5, .5)
 	createAlphaAnim(overlay.animIn, overlay.outerGlowOver, 1, .3, 1, 0)
+	createScaleAnim(overlay.animIn, overlay.spark,          1, 0.2, 2/3, 2/3, 0.2)
+	createAlphaAnim(overlay.animIn, overlay.spark,          1, 0.2, 1, 0, 0.2)
 	createAlphaAnim(overlay.animIn, overlay.innerGlow, 1, .2, 1, 0, .3)
 	createAlphaAnim(overlay.animIn, overlay.ants, 1, .2, 0, 1, .3)
 	overlay.animIn:SetScript("OnPlay", animIn_OnPlay)

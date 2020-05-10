@@ -16,7 +16,7 @@ local defaultSettings = {
 	RaidClickSets = {},
 	TempAnchor = {},
 	AuraWatchList = {
-	Switcher = {},
+		Switcher = {},
 	},
 	Actionbar = {
 		Enable = true,
@@ -67,7 +67,6 @@ local defaultSettings = {
 		InstanceAuras = true,
 		RaidDebuffScale = 1,
 		SpecRaidPos = false,
-		--RaidClassColor = true,
 		RaidHealthColor = 2,
 		HorizonRaid = false,
 		HorizonParty = false,
@@ -117,7 +116,7 @@ local defaultSettings = {
 		FocusCBHeight = 18,
 		PlayerFrameScale = 0.9,
 		UFPctText = true,
-		UFClassIcon = true,
+		UFClassIcon = false,
 		UFFade = true,
 	},
 	Chat = {
@@ -278,7 +277,7 @@ local defaultSettings = {
 		RMRune = false,
 		DBMCount = "10",
 		EasyMarking = true,
-		BlockWQT = true,
+		BlockInvite = false,
 		QuickQueue = true,
 		--AltTabLfgNotification = false,
 		--CrazyCatLady = true,
@@ -305,7 +304,7 @@ local defaultSettings = {
 
 local accountSettings = {
 	ChatFilterList = "%*",
-	Timestamp = false,
+	TimestampFormat = 1,
 	NameplateFilter = {[1]={}, [2]={}},
 	RaidDebuffs = {},
 	Changelog = {},
@@ -429,10 +428,6 @@ end
 
 local function updateChatSticky()
 	M:GetModule("Chat"):ChatWhisperSticky()
-end
-
-local function updateTimestamp()
-	M:GetModule("Chat"):UpdateTimestamp()
 end
 
 local function updateWhisperList()
@@ -561,8 +556,18 @@ local function updateSkinAlpha()
 	end
 end
 
+StaticPopupDialogs["RESET_DETAILS"] = {
+	text = U["Reset Details check"],
+	button1 = YES,
+	button2 = NO,
+	OnAccept = function()
+		MaoRUIDB["ResetDetails"] = true
+		ReloadUI()
+	end,
+	whileDead = 1,
+}
 local function resetDetails()
-	MaoRUIDB["ResetDetails"] = true
+	StaticPopup_Show("RESET_DETAILS")
 end
 
 -- Config
@@ -723,8 +728,9 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	},
 	[5] = {
 		{1, "Chat", "Outline", U["Font Outline"]},
-		{1, "ACCOUNT", "Timestamp", U["Timestamp"], true, false, nil, updateTimestamp},
-		{1, "Chat", "Sticky", U["Chat Sticky"].."*", true, true, nil, updateChatSticky},
+		{1, "Chat", "Sticky", U["Chat Sticky"].."*", true, false, nil, updateChatSticky},
+	{4, "ACCOUNT", "TimestampFormat", U["TimestampFormat"].."*", true, true, {DISABLE, "03:27 PM", "03:27:32 PM", "15:27", "15:27:32"}},
+		--{1, "ACCOUNT", "Timestamp", U["Timestamp"], true, true, nil, updateTimestamp},
 		--{1, "Chat", "WhisperColor", U["Differ WhipserColor"].."*"},
 		--{1, "Chat", "Freedom", U["Language Filter"]},
 		{1, "Chat", "EnableFilter", "|cff00cc4c"..U["Enable Chatfilter"]},
@@ -753,9 +759,9 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "UFs", "UFClassIcon", U["UFClassIcon"], true},
 	  {1, "UFs", "UFPctText", U["UFPctText"], true, true},
 	  --{1, "Skins", "InfobarLine", "底部职业着色条"},
-	  {1, "Skins", "BarLine", U["Bar Line"]},
-	  {1, "Misc", "xMerchant", U["xMerchant"], true},
-	  {1, "Misc", "WallpaperKit", U["WallpaperKit"], true, true},
+	  --{1, "Skins", "BarLine", U["Bar Line"]},
+	  {1, "Misc", "xMerchant", U["xMerchant"]},
+	  {1, "Misc", "WallpaperKit", U["WallpaperKit"], true},
 		{},--blank
 		{1, "Map", "Coord", U["Map Coords"]},
 		{1, "Map", "Clock", U["Minimap Clock"].."*", true, false, nil, showMinimapClock},
@@ -1307,7 +1313,6 @@ local function createDataFrame()
 	scrollArea:SetPoint("TOPLEFT", 10, -30)
 	scrollArea:SetPoint("BOTTOMRIGHT", -28, 40)
 	M.CreateBDFrame(scrollArea, .25)
-	--M.ReskinScroll(scrollArea.ScrollBar)
 
 	local editBox = CreateFrame("EditBox", nil, dataFrame)
 	editBox:SetMultiLine(true)
@@ -1358,7 +1363,6 @@ local function createDataFrame()
 end
 
 local function OpenGUI()
-	if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
 	if f then f:Show() return end
 
 	-- Main Frame
@@ -1374,7 +1378,6 @@ local function OpenGUI()
 	f:SetFrameStrata("HIGH")
 	f:SetFrameLevel(10)
 	M.CreateMF(f)
-	--M.SetBD(f)
 	M.CreateFS(f, 43, "2 UI", true, "TOP", 0, -62)
 	M.CreateFS(f, 21, "v"..I.Version, false, "TOP", 80, -80)
 
@@ -1472,11 +1475,11 @@ function G:OnLogin()
 	end)
 
 	gui:SetScript("OnClick", function()
+		if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
 		OpenGUI()
 		HideUIPanel(GameMenuFrame)
 		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
 	end)
-
 end
 
 SlashCmdList["MAORUIGUI"] = OpenGUI

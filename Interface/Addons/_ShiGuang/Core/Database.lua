@@ -1,5 +1,6 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
+
 local bit_band, bit_bor = bit.band, bit.bor
 local COMBATLOG_OBJECT_AFFILIATION_MINE = COMBATLOG_OBJECT_AFFILIATION_MINE or 0x00000001
 local GetSpecialization, GetSpecializationInfo = GetSpecialization, GetSpecializationInfo
@@ -43,7 +44,6 @@ I.QualityColors[LE_ITEM_QUALITY_COMMON] = {r = 0, g = 0, b = 0}
 
 -- Fonts
 I.Font = {STANDARD_TEXT_FONT, 12, "OUTLINE"}
-I.TipFont = {GameTooltipText:GetFont(), 14, "OUTLINE"}
 I.LineString = I.GreyColor.."---------------"
 
 -- Textures
@@ -54,9 +54,11 @@ I.normTex = Media.."normTex"
 I.gradTex = Media.."gradTex"
 I.flatTex = Media.."flatTex"
 I.bgTex = Media.."bgTex"
-I.MicroTex = Media.."Hutu\\"
 I.arrowTex = Media.."Modules\\Raid\\Arrow"  --"Interface\\BUTTONS\\UI-MicroStream-Red.blp"
+I.MicroTex = Media.."Hutu\\"
 I.rolesTex = Media.."UI-LFG-ICON-ROLES"
+I.chatLogo = Media.."2UI.blp"
+I.logoTex = Media.."2UI.blp"
 I.arrowUp = Media.."arrow-up-active"
 I.arrowDown = Media.."arrow-down-active"
 I.arrowLeft = Media.."arrow-left-active"

@@ -176,6 +176,6 @@ hooksecurefunc(GameTooltip, "SetHyperlink", onSetHyperlink)
     ObjectiveTrackerFrame:SetPoint("TOPLEFT","UIParent","TOPLEFT",26,-21)
     ObjectiveTrackerFrame.SetPoint = function() end
     ObjectiveTrackerFrame:SetHeight(GetScreenHeight()*.75)
-    ObjectiveTrackerFrame:SetClampedToScreen(true)
+    ObjectiveTrackerFrame:SetClampedToScreen(false)
     ObjectiveTrackerFrame:SetMovable(true)
     if ObjectiveTrackerFrame:IsMovable() then ObjectiveTrackerFrame:SetUserPlaced(true) end

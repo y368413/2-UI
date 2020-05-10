@@ -55,7 +55,7 @@ function MISC:OnLogin()
 	self:TradeTargetInfo()
 	self:TradeTabs()
 	self:CreateRM()
-	self:BlockWQTInvite()
+	self:BlockStrangerInvite()
 	self:OverrideAWQ()
 	self:FreeMountCD()
 	self:xMerchant()
@@ -655,46 +655,13 @@ do
 	M:RegisterEvent("ADDON_LOADED", fixCommunitiesNews)
 end
 
--- Button to block auto invite addons
-function MISC:BlockWQTInvite()
-	if not MaoRUIPerDB["Misc"]["BlockWQT"] then return end
-
-	local frame = CreateFrame("Frame", nil, StaticPopup1)
-	frame:SetPoint("TOP", StaticPopup1, "BOTTOM", 0, -3)
-	frame:SetSize(200, 31)
-	M.CreateBD(frame)
-	M.CreateTex(frame)
-	M.CreateSD(frame)
-	frame:Hide()
-
-	local WQTUsers = {}
-	local currentName
-
-	local bu = CreateFrame("Button", nil, frame)
-	bu:SetInside(frame, 5, 5)
-	M.CreateFS(bu, 15, U["DeclineNBlock"], "system")
-	bu.title = U["Tips"]
-	M.AddTooltip(bu, "ANCHOR_TOP", U["DeclineNBlockTips"], "info")
-	M.Reskin(bu)
-	bu:SetScript("OnClick", function()
-		if currentName then
-			WQTUsers[currentName] = true
-		end
-		StaticPopup_Hide("PARTY_INVITE")
-	end)
-
-	M:RegisterEvent("PARTY_INVITE_REQUEST", function(_, name)
-		if WQTUsers[name] then
+-- Block invite from strangers
+function MISC:BlockStrangerInvite()
+	M:RegisterEvent("PARTY_INVITE_REQUEST", function(_, _, _, _, _, _, _, guid)
+		if MaoRUIPerDB["Misc"]["BlockInvite"] and not (C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGuildMember(guid)) then
+			DeclineGroup()
 			StaticPopup_Hide("PARTY_INVITE")
-			return
 		end
-		frame:Show()
-		currentName = name
-	end)
-
-	hooksecurefunc("StaticPopup_OnHide", function()
-		frame:Hide()
-		currentName = nil
 	end)
 end
 

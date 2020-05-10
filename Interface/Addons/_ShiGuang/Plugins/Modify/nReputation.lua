@@ -1,3 +1,4 @@
+--## Author: Grimsbain ## Version: 2.0-release
 nReputationMixin = {}
 
 function nReputationMixin:OnLoad()

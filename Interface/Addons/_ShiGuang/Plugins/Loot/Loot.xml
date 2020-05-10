@@ -3,7 +3,7 @@
 	<Script file="RollHistory.lua"/>
 	<!--Script file="ChatLoot.lua"/-->
 	<Include file="AtlasLootReverse\AtlasLootReverse.xml"/>
-	<Script file="MasterGypsy.lua"/>
+	<!--Script file="MasterGypsy.lua"/-->
 	<Script file="EncounterJournalPlusInstanceInfo.lua"/>
 	<Frame name="EncounterJournalPlus_InstanceInfo">
     <Scripts>
@@ -11,4 +11,16 @@
       <OnEvent function="EncounterJournalPlus_InstanceInfo_OnEvent"></OnEvent>
     </Scripts>
   </Frame>
+  <Script file="TokenRewardHelper.lua"/>
+   <Frame name="TokenRewardHelper"></Frame>
+	<GameTooltip name="RewardTooltip1" frameStrata="TOOLTIP" hidden="false" parent="UIParent" inherits="GameTooltipTemplate"/>
+	<GameTooltip name="RewardTooltip2" frameStrata="TOOLTIP" hidden="false" parent="UIParent" inherits="GameTooltipTemplate"/>
+	<GameTooltip name="RewardTooltip3" frameStrata="TOOLTIP" hidden="false" parent="UIParent" inherits="GameTooltipTemplate"/>
+	<GameTooltip name="RewardTooltip4" frameStrata="TOOLTIP" hidden="false" parent="UIParent" inherits="GameTooltipTemplate"/>
+	<GameTooltip name="RewardTooltip5" frameStrata="TOOLTIP" hidden="false" parent="UIParent" inherits="GameTooltipTemplate"/>
+	<GameTooltip name="RewardRefTooltip1" frameStrata="TOOLTIP" hidden="false" parent="UIParent" inherits="GameTooltipTemplate"/>
+	<GameTooltip name="RewardRefTooltip2" frameStrata="TOOLTIP" hidden="false" parent="UIParent" inherits="GameTooltipTemplate"/>
+	<GameTooltip name="RewardRefTooltip3" frameStrata="TOOLTIP" hidden="false" parent="UIParent" inherits="GameTooltipTemplate"/>
+	<GameTooltip name="RewardRefTooltip4" frameStrata="TOOLTIP" hidden="false" parent="UIParent" inherits="GameTooltipTemplate"/>
+	<GameTooltip name="RewardRefTooltip5" frameStrata="TOOLTIP" hidden="false" parent="UIParent" inherits="GameTooltipTemplate"/>
 </Ui>

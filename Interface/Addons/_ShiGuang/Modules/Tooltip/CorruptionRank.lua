@@ -5,6 +5,7 @@ local TT = M:GetModule("Tooltip")
 local select, strmatch, gmatch, format, next, wipe, max = select, strmatch, gmatch, format, next, wipe, max
 local IsCorruptedItem, GetSpellInfo = IsCorruptedItem, GetSpellInfo
 local GetInventoryItemLink, UnitGUID = GetInventoryItemLink, UnitGUID
+local IsShiftKeyDown = IsShiftKeyDown
 local ITEM_MOD_CORRUPTION = ITEM_MOD_CORRUPTION
 local CORRUPTION_TOOLTIP_TITLE = CORRUPTION_TOOLTIP_TITLE
 local CORRUPTION_DESCRIPTION = CORRUPTION_DESCRIPTION
@@ -119,7 +120,11 @@ function TT:Corruption_Convert(name, icon, level)
 		local line = _G[self:GetName().."TextLeft"..i]
 		local text = line:GetText()
 		if text and strmatch(text, ITEM_MOD_CORRUPTION) then
-			line:SetText(getIconString(icon)..name.." "..level)  -- text.." / "..
+			if IsShiftKeyDown() then
+				line:SetText(text.." / "..getIconString(icon)..name.." "..level)
+			else
+				line:SetText(getIconString(icon)..name.." "..level)  --"+"..
+			end
 			return
 		end
 	end
@@ -185,7 +190,7 @@ function TT:Corruption_PlayerSummary()
 end
 
 local tip = _G.NDui_iLvlTooltip
-local cloakResString = "(%d+) "..ITEM_MOD_CORRUPTION_RESISTANCE
+local cloakResString = "(%d+)%s?"..ITEM_MOD_CORRUPTION_RESISTANCE
 
 local essenceTextureIDs = {
 	[2967101] = true,

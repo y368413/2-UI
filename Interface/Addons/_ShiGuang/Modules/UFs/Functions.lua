@@ -371,15 +371,6 @@ function UF:CreateCastBar(self)
 	cb:SetWidth(self:GetWidth() - 21)
 	M.CreateSB(cb, true, .2, .8, 1)
 
-	--if mystyle == "player" then
-		--cb:SetSize(MaoRUIPerDB["UFs"]["PlayerCBWidth"], MaoRUIPerDB["UFs"]["PlayerCBHeight"])
-		--createBarMover(cb, U["Player Castbar"], "PlayerCB", R.UFs.Playercb)
-	--elseif mystyle == "target" then
-		--cb:SetSize(MaoRUIPerDB["UFs"]["TargetCBWidth"], MaoRUIPerDB["UFs"]["TargetCBHeight"])
-		--createBarMover(cb, U["Target Castbar"], "TargetCB", R.UFs.Targetcb)
-	--elseif mystyle == "focus" then
-		--cb:SetSize(MaoRUIPerDB["UFs"]["FocusCBWidth"], MaoRUIPerDB["UFs"]["FocusCBHeight"])
-		--createBarMover(cb, U["Focus Castbar"], "FocusCB", R.UFs.Focuscb)
 	if mystyle == "boss" or mystyle == "arena" then
 		cb:SetPoint("TOPRIGHT", self.Power, "BOTTOMRIGHT", 0, -8)
 		cb:SetSize(self:GetWidth(), 10)
@@ -1037,4 +1028,26 @@ function UF:CreatePVPClassify(self)
 	bu:SetPoint("LEFT", self, "RIGHT", 5, -2)
 
 	self.PvPClassificationIndicator = bu
+end
+
+local function updatePartySync(self)
+	local hasJoined = C_QuestSession.HasJoined()
+	if(hasJoined) then
+		self.QuestSyncIndicator:Show()
+	else
+		self.QuestSyncIndicator:Hide()
+	end
+end
+
+function UF:CreateQuestSync(self)
+	local sync = self:CreateTexture(nil, "OVERLAY")
+	sync:SetPoint("CENTER", self, "BOTTOMLEFT", 16, 0)
+	sync:SetSize(28, 28)
+	sync:SetAtlas("QuestSharing-DialogIcon")
+	sync:Hide()
+
+	self.QuestSyncIndicator = sync
+	self:RegisterEvent("QUEST_SESSION_LEFT", updatePartySync, true)
+	self:RegisterEvent("QUEST_SESSION_JOINED", updatePartySync, true)
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", updatePartySync, true)
 end

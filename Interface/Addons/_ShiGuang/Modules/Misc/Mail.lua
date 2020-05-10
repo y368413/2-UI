@@ -345,13 +345,6 @@ function MISC:MailBox()
 		InboxTooMuchMail:SetPoint("BOTTOM", MailFrame, "TOP", 0, 5)
 	end
 
-	if not MaoRUIPerDB["Skins"]["BlizzardSkins"] then
-		M.Reskin(button1)
-		M.Reskin(button2)
-		M.Reskin(button3)
-		M.Reskin(button4)
-	end
-
 	-- Hide Blizz
 	M.HideObject(OpenAllMail)
 end

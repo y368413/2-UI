@@ -17,8 +17,6 @@ function S:LoadDefaultSkins()
 	end
 	wipe(R.defaultThemes)
 
-	--if not MaoRUIPerDB["Skins"]["BlizzardSkins"] then return end
-
 	for addonName, func in pairs(R.themes) do
 		local isLoaded, isFinished = IsAddOnLoaded(addonName)
 		if isLoaded and isFinished then
@@ -53,7 +51,6 @@ function S:OnLogin()
 	-- Add Skins
 	self:QuestTracker()
 	self:QuestTrackerSkinTitle()
-	self:PetBattleUI()
 	self:DBMSkin()
 	self:BigWigsSkin()
 	self:LootEx()		-- 拾取增强
@@ -104,7 +101,6 @@ local function CreateToggleButton(parent)
 	local bu = CreateFrame("Button", nil, parent)
 	bu:SetSize(20, 80)
 	bu.text = M.CreateFS(bu, 18, nil, true)
-	--M.ReskinMenuButton(bu)
 
 	return bu
 end

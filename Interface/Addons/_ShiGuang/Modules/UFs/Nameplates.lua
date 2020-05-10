@@ -706,7 +706,7 @@ function UF:UpdateClassPowerAnchor()
 	local nameplate = C_NamePlate.GetNamePlateForUnit("target")
 	if nameplate then
 		bar:SetParent(nameplate.unitFrame)
-		bar:SetScale(MaoRUIDB["UIScale"])  --.85
+		bar:SetScale(.85)
 		bar:ClearAllPoints()
 		bar:SetPoint("TOP", nameplate.unitFrame, "BOTTOM", 0, 1)
 		bar:Show()
@@ -742,9 +742,9 @@ function UF:RefreshAllPlates()
 		nameplate.healthValue:SetFont(I.Font[1], MaoRUIPerDB["Nameplate"]["HealthTextSize"], I.Font[3])
 		nameplate.healthValue:UpdateTag()
 		nameplate.Auras.showDebuffType = MaoRUIPerDB["Nameplate"]["ColorBorder"]
-		UF:UpdateClickableSize()
 		UF:UpdateTargetIndicator(nameplate)
 	end
+	UF:UpdateClickableSize()
 end
 
 function UF:PostUpdatePlates(event, unit)

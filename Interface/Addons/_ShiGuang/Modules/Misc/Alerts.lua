@@ -16,7 +16,7 @@ local C_MythicPlus_GetCurrentAffixes = C_MythicPlus.GetCurrentAffixes
 
 function MISC:AddAlerts()
 	self:SoloInfo()
-	--self:RareAlert()
+	self:RareAlert()
 	self:InterruptAlert()
 	--self:VersionCheck()
 	--self:ExplosiveAlert()
@@ -101,7 +101,7 @@ function MISC:RareAlert_Update(id)
 		local tex = format("|T%s:%d:%d:0:0:%d:%d:%d:%d:%d:%d|t", filename, 0, 0, atlasWidth, atlasHeight, atlasWidth*txLeft, atlasWidth*txRight, atlasHeight*txTop, atlasHeight*txBottom)
 			RaidNotice_AddMessage(RaidWarningFrame, "----------   "..tex..(info.name or "").."   ----------", ChatTypeInfo["RAID_WARNING"])
 			if MaoRUIPerDB["Misc"]["AlertinChat"] then
-			local currrentTime = "|cff00ff00["..date("%H:%M:%S").."]|r"
+			local currrentTime = MaoRUIDB["TimestampFormat"] == 1 and "|cff00ff00["..date("%H:%M:%S").."]|r"
 				print(currrentTime.." -> "..I.InfoColor.." → "..tex..(info.name or ""))
 			end
 		if not MaoRUIPerDB["Misc"]["RareAlertInWild"] or instType == "none" then

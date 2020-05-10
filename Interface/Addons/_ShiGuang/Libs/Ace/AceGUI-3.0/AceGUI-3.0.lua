@@ -1,4 +1,4 @@
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 39
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 41
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -111,6 +111,8 @@ function AceGUI:Create(type)
 end
 
 function AceGUI:Release(widget)
+	if widget.isQueuedForRelease then return end
+	widget.isQueuedForRelease = true
 	safecall(widget.PauseLayout, widget)
 	widget.frame:Hide()
 	widget:Fire("OnRelease")
@@ -139,8 +141,26 @@ function AceGUI:Release(widget)
 		widget.content.width = nil
 		widget.content.height = nil
 	end
+	widget.isQueuedForRelease = nil
 	delWidget(widget, widget.type)
 end
+
+function AceGUI:IsReleasing(widget)
+	if widget.isQueuedForRelease then
+		return true
+	end
+
+	if widget.parent and widget.parent.AceGUIWidgetVersion then
+		return AceGUI:IsReleasing(widget.parent)
+	end
+
+	return false
+end
+
+-----------
+-- Focus --
+-----------
+
 
 function AceGUI:SetFocus(widget)
 	if self.FocusedWidget and self.FocusedWidget ~= widget then
@@ -216,7 +236,11 @@ do
 	WidgetBase.Release = function(self)
 		AceGUI:Release(self)
 	end
-	
+
+	WidgetBase.IsReleasing = function(self)
+		return AceGUI:IsReleasing(self)
+	end
+
 	WidgetBase.SetPoint = function(self, ...)
 		return self.frame:SetPoint(...)
 	end
@@ -385,6 +409,12 @@ do
 	end
 end
 
+
+
+
+------------------
+-- Widget API   --
+------------------
 function AceGUI:RegisterWidgetType(Name, Constructor, Version)
 	assert(type(Constructor) == "function")
 	assert(type(Version) == "number") 
@@ -429,6 +459,9 @@ function AceGUI:GetWidgetVersion(type)
 	return WidgetVersions[type]
 end
 
+-------------
+-- Layouts --
+-------------
 AceGUI:RegisterLayout("List",
 	function(content, children)
 		local height = 0

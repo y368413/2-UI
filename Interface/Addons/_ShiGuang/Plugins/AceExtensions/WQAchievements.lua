@@ -1,4 +1,4 @@
---## Author: Urtgard  ## Version: v8.3.0-2release
+--## Author: Urtgard  ## Version: v8.3.0-3release
 WQAchievements = LibStub("AceAddon-3.0"):NewAddon("WQAchievements", "AceConsole-3.0", "AceTimer-3.0")
 local WQA = WQAchievements
 WQA.data = {}
@@ -180,11 +180,11 @@ end
 
 local function GetTaskLink(task)
 	if task.type == "WORLD_QUEST" then
-		if WQA.questPinList[task.id] or WQA.questFlagList[task.id] then
+	--	if WQA.questPinList[task.id] or WQA.questFlagList[task.id] then
 			return GetQuestLink(task.id) or C_QuestLog.GetQuestInfo(task.id)
-		else
-			return GetQuestLink(task.id)
-		end
+	--	else
+	--		return GetQuestLink(task.id)
+	--	end
 	else
 		return C_Garrison.GetMissionLink(task.id)
 	end

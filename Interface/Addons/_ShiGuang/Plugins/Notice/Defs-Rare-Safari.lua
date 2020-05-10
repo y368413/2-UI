@@ -207,7 +207,7 @@ local function AcquireAlertFrame(guid)
 		return
 	elseif not DRS.AlertFrame1 then
 		PlaySoundAlert(guid)
-		PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
+		--PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
 		DRS.AlertFrame1 = MakeAlertFrame(guid)
 		DRS.AlertFrame1:SetMovable(true)
 		DRS.AlertFrame1:SetClampedToScreen(true)
@@ -230,7 +230,7 @@ local function AcquireAlertFrame(guid)
 		end
 	elseif not DRS.AlertFrame1:IsShown() then
 		PlaySoundAlert(guid)
-		PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
+		--PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
 		DRS.AlertFrame1.unitguid = guid
 		DRS.AlertFrame1:Show()
 		if rareTable[guid].x and rareTable[guid].y then
@@ -241,13 +241,13 @@ local function AcquireAlertFrame(guid)
 		end
 	elseif not DRS.AlertFrame2 and not (DRS.AlertFrame1.unitguid == guid) then
 		PlaySoundAlert(guid)
-		PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
+		--PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
 		DRS.AlertFrame2 = MakeAlertFrame(guid)
 		DRS.AlertFrame2:ClearAllPoints()
 		DRS.AlertFrame2:SetPoint("TOP", DRS.AlertFrame1, "BOTTOM", 0, -8)
 	elseif not DRS.AlertFrame2:IsShown() and not (DRS.AlertFrame1.unitguid == guid) then
 		PlaySoundAlert(guid)
-		PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
+		--PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
 		DRS.AlertFrame2.unitguid = guid
 		DRS.AlertFrame2:Show()
 		if rareTable[guid].x and rareTable[guid].y then
@@ -258,13 +258,13 @@ local function AcquireAlertFrame(guid)
 		end
 	elseif not DRS.AlertFrame3 and not (DRS.AlertFrame1.unitguid == guid) and not (DRS.AlertFrame2.unitguid == guid) then
 		PlaySoundAlert(guid)
-		PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
+		--PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
 		DRS.AlertFrame3 = MakeAlertFrame(guid)
 		DRS.AlertFrame3:ClearAllPoints()
 		DRS.AlertFrame3:SetPoint("TOP", DRS.AlertFrame2, "BOTTOM", 0, -8)
 	elseif not DRS.AlertFrame3:IsShown() and not (DRS.AlertFrame1.unitguid == guid) and not (DRS.AlertFrame2.unitguid == guid) then
 		PlaySoundAlert(guid)
-		PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
+		--PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
 		DRS.AlertFrame3.unitguid = guid
 		DRS.AlertFrame3:Show()
 		if rareTable[guid].x and rareTable[guid].y then
@@ -275,7 +275,7 @@ local function AcquireAlertFrame(guid)
 		end	
 	elseif (rareTable[guid].unittype == "Creature") and DRS.AlertFrame1:IsShown() and DRS.AlertFrame1.unitguid and rareTable[DRS.AlertFrame1.unitguid] and (rareTable[DRS.AlertFrame1.unitguid].unittype == "GameObject") and DRS.AlertFrame2:IsShown() and DRS.AlertFrame2.unitguid and not (DRS.AlertFrame2.unitguid == guid) and DRS.AlertFrame3:IsShown() and DRS.AlertFrame3.unitguid and not (DRS.AlertFrame3.unitguid == guid) then
 		PlaySoundAlert(guid)
-		PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
+		--PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
 		DRS.AlertFrame1.unitguid = guid
 		DRS.AlertFrame1.fontString:SetText(rareTable[guid].unitname or "Def's Rare Safari")
 		DRS.AlertFrame1.MacroBtn:SetAttribute("macrotext", "/target "..rareTable[guid].unitname)
@@ -288,7 +288,7 @@ local function AcquireAlertFrame(guid)
 		end
 	elseif (rareTable[guid].unittype == "Creature") and DRS.AlertFrame2 and DRS.AlertFrame2:IsShown() and DRS.AlertFrame2.unitguid and rareTable[DRS.AlertFrame2.unitguid] and (rareTable[DRS.AlertFrame2.unitguid].unittype == "GameObject") and DRS.AlertFrame1:IsShown() and DRS.AlertFrame1.unitguid and not (DRS.AlertFrame1.unitguid == guid) and DRS.AlertFrame3:IsShown() and DRS.AlertFrame3.unitguid and not (DRS.AlertFrame3.unitguid == guid) then
 		PlaySoundAlert(guid)
-		PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
+		--PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
 		DRS.AlertFrame2.unitguid = guid
 		DRS.AlertFrame2.fontString:SetText(rareTable[guid].unitname or "Def's Rare Safari")
 		DRS.AlertFrame2.MacroBtn:SetAttribute("macrotext", "/target "..rareTable[guid].unitname)
@@ -302,7 +302,7 @@ local function AcquireAlertFrame(guid)
 		DRS.AlertFrame2.MacroBtn.texture:SetTexture("Interface\\MINIMAP\\Minimap_skull_elite.blp")
 	elseif (rareTable[guid].unittype == "Creature") and DRS.AlertFrame3 and DRS.AlertFrame3:IsShown() and DRS.AlertFrame3.unitguid and rareTable[DRS.AlertFrame3.unitguid] and (rareTable[DRS.AlertFrame3.unitguid].unittype == "GameObject") and DRS.AlertFrame1:IsShown() and DRS.AlertFrame1.unitguid and not (DRS.AlertFrame1.unitguid == guid) and DRS.AlertFrame2:IsShown() and DRS.AlertFrame2.unitguid and not (DRS.AlertFrame2.unitguid == guid) then
 		PlaySoundAlert(guid)
-		PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
+		--PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
 		DRS.AlertFrame3.unitguid = guid
 		DRS.AlertFrame3.fontString:SetText(rareTable[guid].unitname or "Def's Rare Safari")
 		DRS.AlertFrame3.MacroBtn:SetAttribute("macrotext", "/target "..rareTable[guid].unitname)

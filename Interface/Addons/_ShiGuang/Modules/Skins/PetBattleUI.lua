@@ -1,8 +1,7 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
-local S = M:GetModule("Skins")
 
-function S:PetBattleUI()
+tinsert(R.defaultThemes, function()
 	if not MaoRUIPerDB["Skins"]["PetBattle"] then return end
 
 	local r, g, b, pairs = I.r, I.g, I.b, pairs
@@ -305,4 +304,4 @@ function S:PetBattleUI()
 	lineRight:SetPoint("BOTTOMLEFT", bgRight, "TOPLEFT")
 	M.CreateGF(lineRight, 180, R.mult, "Horizontal", r, g, b, .7, 0)
 	RegisterStateDriver(bgRight, "visibility", visibleState)
-end
+end)

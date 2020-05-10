@@ -299,7 +299,7 @@ SLASH_MOUSEOVERBIND1 = "/hb"
 SLASH_MOUSEOVERBIND2 = "/hoverbind"
 
 
--- ## Author: Gello## Version: 1.0.7
+-- ## Author: Gello## Version: 1.0.8
 
 local FlyoutBindings=CreateFrame("Button",nil,SpellFlyout,"SecureHandlerShowHideTemplate")
 FlyoutBindings:SetAttribute("_onshow",[[

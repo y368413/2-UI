@@ -1,6 +1,5 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
-local S = M:GetModule("Skins")
 
 tinsert(R.defaultThemes, function()
 	hooksecurefunc("EquipmentFlyout_CreateButton", function()

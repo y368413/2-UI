@@ -15,6 +15,7 @@ end
 local function CreatePlayerStyle(self)
 	self.mystyle = "player"
 	--UF:CreateCastBar(self)
+	UF:CreateQuestSync(self)
 	--if MaoRUIPerDB["UFs"]["Castbars"] then
 		--UF:ReskinMirrorBars()
 		--UF:ReskinTimerTrakcer(self)

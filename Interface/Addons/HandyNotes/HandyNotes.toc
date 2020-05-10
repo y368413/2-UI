@@ -1,6 +1,6 @@
 ## Interface: 80300
 ## Author: Xinhuan
-## Version: v1.5.9
+## Version: v1.5.10
 ## Title: HandyNotes
 ## Title-zhCN:|cff0080ff[地图]|r宝藏稀有
 ## Title-zhTW:|cff0080ff[地图]|r寶藏稀有
@@ -57,7 +57,7 @@ Mode\HandyNotes_TravelGuide.lua
 Mode\HandyNotes_AzerothsTopTunes.lua
 Mode\HandyNotes_BFA_Jelly.lua
 Mode\HandyNotes_HigherDimensionalLearning.lua
-# Mode\HandyNotes_PetDailies.lua
+Mode\HandyNotes_PetDailies.lua
 
 # Others files
 CandyBuckets.lua
