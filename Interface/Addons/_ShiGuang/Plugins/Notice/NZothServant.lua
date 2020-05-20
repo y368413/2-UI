@@ -1,5 +1,6 @@
 --## Author: JANY ## Version: 8.3.0
 local FirstTime = 0
+local FirstTime_ = 0
 local chuxu = 0
 local zmhx = 0
 local fhzy = 0
@@ -8,6 +9,9 @@ local bkyydzx = 0
 local sum = 0
 local flag = 0
 local i = 0
+local sum_ = 0
+local flag_ = 0
+local j = 0
 
 local eventSwitch = {
 	["SPELL_AURA_APPLIED"] = true,
@@ -59,24 +63,40 @@ function lrnFrame:SpellDamage(timestamp, eventType, srcGUID, srcName, srcFlags, 
 			flag =1
 		end
 
+	elseif srcName == GetUnitName("player",true) and spellId == 317265 then
+		--SendChatMessage("流星 "..string.format("%.1f", aAmount*0.001).."k", "EMOTE")--("SAY", "WHISPER", "EMOTE", "CHANNEL", "PARTY", "INSTANCE_CHAT", "GUILD", "OFFICER", "YELL", "RAID", "RAID_WARNING", "AFK", "DND")
+		RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000流星 |r"..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
+		--PlaySoundFile("Interface/AddOns/NZothServant/kaipao.ogg")
+    elseif srcName == player1 and spellId == 317291 then --317159
+		sum_ = sum_ + aAmount
+		j = j + 1
+		if flag_ == 0 then 
+			FirstTime_ = timestamp
+			flag_ =1
+		end	    
+    end
+
 	if timestamp - FirstTime > 2 and flag == 1 then
 		flag = 0
 		--SendChatMessage("暮光炮击中了"..string.format("%.d",i ).."个敌人，打出了" ..string.format("%.1f", sum*0.0001).."万的伤害，太香啦", "EMOTE")
 		RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000开炮|r - "..string.format("%.d",i ).."个 - "..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
 		sum = 0
 		i = 0
-	end
-	elseif srcName == GetUnitName("player",true) and spellId == 316835 then
-		if chuxu < timestamp - 10 then
-			chuxu = timestamp
+	--end
+	--elseif srcName == GetUnitName("player",true) and spellId == 316835 then
+		--if chuxu < timestamp - 10 then
+			--chuxu = timestamp
 			--SendChatMessage("触须 "..string.format("%.1f", aAmount*0.001).."k", "EMOTE")--("SAY", "WHISPER", "EMOTE", "CHANNEL", "PARTY", "INSTANCE_CHAT", "GUILD", "OFFICER", "YELL", "RAID", "RAID_WARNING", "AFK", "DND")
-			RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000触须 |r"..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
+			--RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000触须 |r"..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
 			--PlaySoundFile("Interface/AddOns/NZothServant/kaipao.ogg")
-		end		
-	elseif srcName == GetUnitName("player",true) and spellId == 317265 then
-		--SendChatMessage("流星 "..string.format("%.1f", aAmount*0.001).."k", "EMOTE")--("SAY", "WHISPER", "EMOTE", "CHANNEL", "PARTY", "INSTANCE_CHAT", "GUILD", "OFFICER", "YELL", "RAID", "RAID_WARNING", "AFK", "DND")
-		RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000流星 |r"..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
-		--PlaySoundFile("Interface/AddOns/NZothServant/kaipao.ogg")
+		--end		
+	elseif timestamp - FirstTime_ > 1 and flag_ == 1 then
+		flag_ = 0
+		--SendChatMessage("龍の鞭笞"..string.format("%.d",j ).."杀，打出了" ..string.format("%.1f", sum_*0.0001).."万吨的伤害！！！", "EMOTE")--("SAY", "WHISPER", "EMOTE", "CHANNEL", "PARTY", "INSTANCE_CHAT", "GUILD", "OFFICER", "YELL", "RAID", "RAID_WARNING", "AFK", "DND")
+		RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000触须|r - "..string.format("%.d",j ).."个 - "..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
+		sum_ = 0
+		j = 0
+		--PlaySoundFile("Interface/AddOns/NZothServant/kaipao.ogg")	
 	end
 end
 

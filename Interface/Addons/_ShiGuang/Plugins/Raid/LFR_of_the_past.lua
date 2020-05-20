@@ -1,10 +1,8 @@
-
 local MAJOR, MINOR = "LibColors-1.0", 107
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 local _G,string,match,tonumber,rawset,type = _G,string,match,tonumber,rawset,type
 local hex = "%02x";
 
-if not lib then return end
 
 lib.num2hex = function(num)
 	return hex:format( (tonumber(num) or 0)*255 );

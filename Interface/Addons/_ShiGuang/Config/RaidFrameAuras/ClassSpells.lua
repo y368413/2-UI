@@ -525,7 +525,10 @@ R.PartysSpells = {
     --["ALL"] = {
         [305252] = 120, --type = "all",       item = 172672, item2 = 165806 },
         [286342] = 180, --type = "all",       item = 172673, item2 = 165807 },
-        [315362] = 60, --type = "all",       item = 174472 },
+        [315362] = 60,  --type = "all",       item = 174472 },
+        [314517] = 120, --type = "all",       item = 174276 },    -- Corrupted Gladiator's Breach
+        [313148] = 120, --type = "all",       item = 173944 },    -- Forbidden Obsidian Claw (trinket textureID = 1508487)
+        [313113] = 80,  --type = "all",       item = 173946 },    -- Writhing Segment of Drest'agath
     --},
     --["ESSENCES"] = {
         [295373] = 30,  --type = "essence",   item = 295373 },

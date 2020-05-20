@@ -147,9 +147,7 @@ BlinkRogueHelperFrame.holdTime = 1.0;		-- hold time(sec)
 BlinkRogueHelperFrame.fadeOutTime = 0.8;		-- fade out time(sec)
 BlinkRogueHelperFrame.flowTime = BlinkRogueHelperFrame.fadeInTime + BlinkRogueHelperFrame.holdTime +BlinkRogueHelperFrame.fadeOutTime;
 BlinkRogueHelperFrame.PI = 3.141592;
-
 BlinkRogueHelperFrame:Hide();
-
 BlinkRogueHelperFrame:SetScript("OnEvent", function(self, event, unit, powerType, spellId)
 	if ( event == "PLAYER_SPECIALIZATION_CHANGED" or event == "PLAYER_ENTERING_WORLD") then
 		if ( class == "ROGUE" ) then

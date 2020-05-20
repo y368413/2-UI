@@ -190,7 +190,7 @@ QuestCompleteNotification:SetScript("OnEvent", function(self, event, unit)
 		QuestCompleteNotification.queue = unit
 	elseif event == "UNIT_QUEST_LOG_CHANGED" and QuestCompleteNotification.queue and unit == "player" then
 		local title, level, tag, header, collapsed, complete = GetQuestLogTitle(QuestCompleteNotification.queue)
-		if complete then
+		if complete and MaoRUIPerDB["Misc"]["QuestCompleteAnnoce"] then
 			libnotify:ShowPopup(title, nil, nil, tag)  --title, level, nil, tag
 			PlaySoundFile("Interface\\AddOns\\ShaguNotify\\textures\\complete.ogg", "Master")
 		end

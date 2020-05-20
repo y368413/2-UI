@@ -525,7 +525,7 @@ function Shaman:EnhancementPriority()
 	end
 
 	-- sundering,if=active_enemies>=3;
-	if cooldown[EH.Sundering].ready and maelstrom >= 20 and targets >= 3 then
+	if talents[EH.Sundering] and cooldown[EH.Sundering].ready and maelstrom >= 20 and targets >= 3 then
 		return EH.Sundering;
 	end
 

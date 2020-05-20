@@ -3,7 +3,7 @@
 	<Script file="RollHistory.lua"/>
 	<!--Script file="ChatLoot.lua"/-->
 	<Include file="AtlasLootReverse\AtlasLootReverse.xml"/>
-	<!--Script file="MasterGypsy.lua"/-->
+	<Script file="MasterGypsy.lua"/>
 	<Script file="EncounterJournalPlusInstanceInfo.lua"/>
 	<Frame name="EncounterJournalPlus_InstanceInfo">
     <Scripts>

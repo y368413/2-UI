@@ -238,6 +238,7 @@ local defaultSettings = {
 		AzeriteArmor = true,
 		OnlyArmorIcons = true,
 		CorruptionRank = true,
+		QuestCompleteAnnoce = false,
 	},
 	Misc = {
 		Mail = true,
