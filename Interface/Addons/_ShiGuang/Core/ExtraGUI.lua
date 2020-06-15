@@ -769,6 +769,7 @@ function G:SetupRaidFrame(parent)
 		["Party"] = {80, 25},
 		["PartyPet"] = {80, 8},
 		["Raid"] = {60, 12},
+		["Focus"] = {120, 16},
 		["Boss"] = {100, 16},
 	}
 
@@ -776,6 +777,7 @@ function G:SetupRaidFrame(parent)
 		["Party"] = {100, 32, 2},
 		["PartyPet"] = {100, 22, 2},
 		["Raid"] = {80, 32, 2},
+		["Focus"] = {120, 21, 3},
 		["Boss"] = {120, 21, 3},
 	}
 
@@ -824,6 +826,14 @@ function G:SetupRaidFrame(parent)
 		end
 	end
 	createOptionGroup(scroll.child, U["PartyPetFrame"], -600, "PartyPet", resizePartyPetFrame)
+
+	local function updateFocusSize()
+		local frame = _G.oUF_Focus
+		if frame then
+			SetUnitFrameSize(frame, "Focus")
+		end
+	end
+	createOptionGroup(scroll.child, U["FocusUF"], -860, "Focus", updateFocusSize)
 	
 	local function updateBossSize()
 		for _, frame in next, ns.oUF.objects do
@@ -832,7 +842,7 @@ function G:SetupRaidFrame(parent)
 			end
 		end
 	end
-	createOptionGroup(scroll.child, U["Boss&Arena"], -860, "Boss", updateBossSize)
+	createOptionGroup(scroll.child, U["Boss&Arena"], -1120, "Boss", updateBossSize)
 end
 
 local function createOptionSwatch(parent, name, value, x, y)

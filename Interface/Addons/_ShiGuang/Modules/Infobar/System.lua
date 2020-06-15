@@ -1,26 +1,98 @@
 ﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
+local oUF = ns.oUF
 if not R.Infobar.System then return end
 
 local module = M:GetModule("Infobar")
 local info = module:RegisterInfobar("System", R.Infobar.SystemPos)
-local min, max, floor, mod, format, sort, select = math.min, math.max, math.floor, mod, string.format, table.sort, select
-local GetFramerate, GetNetStats, GetTime, GetCVarBool, SetCVar = GetFramerate, GetNetStats, GetTime, GetCVarBool, SetCVar
-local GetNumAddOns, GetAddOnInfo, IsShiftKeyDown, IsAddOnLoaded = GetNumAddOns, GetAddOnInfo, IsShiftKeyDown, IsAddOnLoaded
-local UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage = UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage
-local VIDEO_OPTIONS_ENABLED, VIDEO_OPTIONS_DISABLED, FRAMERATE_LABEL = VIDEO_OPTIONS_ENABLED, VIDEO_OPTIONS_DISABLED, FRAMERATE_LABEL
 
-local usageTable, showMode, entered = {}, 0
-local usageString = "%.1f Ms"
+local ipairs, tinsert, wipe, sort = ipairs, tinsert, wipe, sort
+local format, floor, min, max = format, floor, min, max
+local GetFramerate, GetTime = GetFramerate, GetTime
+local GetNumAddOns, GetAddOnInfo, GetCVarBool, SetCVar = GetNumAddOns, GetAddOnInfo, GetCVarBool, SetCVar
+local UpdateAddOnCPUUsage, GetAddOnCPUUsage = UpdateAddOnCPUUsage, GetAddOnCPUUsage
+local UpdateAddOnMemoryUsage, GetAddOnMemoryUsage = UpdateAddOnMemoryUsage, GetAddOnMemoryUsage
+local IsShiftKeyDown, IsAddOnLoaded = IsShiftKeyDown, IsAddOnLoaded
+local ResetCPUUsage, collectgarbage, gcinfo = ResetCPUUsage, collectgarbage, gcinfo
 
-local function colorLatency(latency)
-	if latency < 250 then
-		return "|cff0CD809"..latency
-	elseif latency < 500 then
-		return "|cffE8DA0F"..latency
+local maxAddOns = R.Infobar.MaxAddOns
+local showMoreString = "%d %s (%s)"
+local usageString = "%.3f ms"
+local enableString = "|cff55ff55"..VIDEO_OPTIONS_ENABLED
+local disableString = "|cffff5555"..VIDEO_OPTIONS_DISABLED
+local scriptProfileStatus = GetCVarBool("scriptProfile")
+local entered
+
+local function formatMemory(value)
+	if value > 1024 then
+		return format("%.1fm", value / 1024)
 	else
-		return "|cffD80909"..latency
+		return format("%.0fk", value)
 	end
+end
+
+local function sortByMemory(a, b)
+	if a and b then
+		return (a[3] == b[3] and a[2] < b[2]) or a[3] > b[3]
+	end
+end
+
+local function sortByCPU(a, b)
+	if a and b then
+		return (a[4] == b[4] and a[2] < b[2]) or a[4] > b[4]
+	end
+end
+
+local usageColor = {0, 1, 0, 1, 1, 0, 1, 0, 0}
+local function smoothColor(cur, max)
+	local r, g, b = oUF:RGBColorGradient(cur, max, unpack(usageColor))
+	return r, g, b
+end
+
+local infoTable = {}
+local function BuildAddonList()
+	local numAddons = GetNumAddOns()
+	if numAddons == #infoTable then return end
+
+	wipe(infoTable)
+	for i = 1, numAddons do
+		local _, title, _, loadable = GetAddOnInfo(i)
+		if loadable then
+			tinsert(infoTable, {i, title, 0, 0})
+		end
+	end
+end
+
+local function UpdateMemory()
+	UpdateAddOnMemoryUsage()
+
+	local total = 0
+	for _, data in ipairs(infoTable) do
+		if IsAddOnLoaded(data[1]) then
+			local mem = GetAddOnMemoryUsage(data[1])
+			data[3] = mem
+			total = total + mem
+		end
+	end
+	sort(infoTable, sortByMemory)
+
+	return total
+end
+
+local function UpdateCPU()
+	UpdateAddOnCPUUsage()
+
+	local total = 0
+	for _, data in ipairs(infoTable) do
+		if IsAddOnLoaded(data[1]) then
+			local addonCPU = GetAddOnCPUUsage(data[1])
+			data[4] = addonCPU
+			total = total + addonCPU
+		end
+	end
+	sort(infoTable, sortByCPU)
+
+	return total
 end
 
 local function colorFPS(fps)
@@ -33,104 +105,86 @@ local function colorFPS(fps)
 	end
 end
 
+local function setFrameRate(self)
+	local fps = floor(GetFramerate())
+	self.text:SetText(colorFPS(fps).."|rFps")
+end
+
 info.onUpdate = function(self, elapsed)
 	self.timer = (self.timer or 0) + elapsed
 	if self.timer > 1 then
-			local fps = floor(GetFramerate())
-			local _, _, latencyHome, latencyWorld = GetNetStats()
-			local latency = max(latencyHome, latencyWorld)
-			self.text:SetText(colorFPS(fps).."|rFps "..colorLatency(latency).."|rMs")
+		setFrameRate(self)
 		if entered then self:onEnter() end
 
 		self.timer = 0
 	end
 end
 
-local function updateUsageTable()
-	local numAddons = GetNumAddOns()
-	if numAddons == #usageTable then return end
-
-	wipe(usageTable)
-	for i = 1, numAddons do
-		usageTable[i] = {i, select(2, GetAddOnInfo(i)), 0}
-	end
-end
-
-local function sortUsage(a, b)
-	if a and b then
-		return a[3] > b[3]
-	end
-end
-
-local function updateUsage()
-	UpdateAddOnCPUUsage()
-
-	local total = 0
-	for i = 1, #usageTable do
-		local value = usageTable[i]
-		value[3] = GetAddOnCPUUsage(value[1])
-		total = total + value[3]
-	end
-	sort(usageTable, sortUsage)
-
-	return total
-end
-
-local systemText = {
-	[0] = "|cff55ff55"..U["Rotation"],
-	[1] = "|cffff9900"..U["FPS"],
-	[2] = "|cffffff55"..U["Latency"]
-}
-
 info.onEnter = function(self)
 	entered = true
+
+	if not next(infoTable) then BuildAddonList() end
+	local isShiftKeyDown = IsShiftKeyDown()
+	local maxShown = isShiftKeyDown and #infoTable or min(maxAddOns, #infoTable)
+
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -15)
 	GameTooltip:ClearLines()
-	GameTooltip:AddLine(U["System"], 0,.6,1)
-	GameTooltip:AddLine(" ")
 
-	local scriptProfile = GetCVarBool("scriptProfile")
-	if scriptProfile then
-		updateUsageTable()
-		local totalCPU = updateUsage()
-		if totalCPU > 0 then
-			local maxAddOns = R.Infobar.MaxAddOns
-			local isShiftKeyDown = IsShiftKeyDown()
-			local maxShown = isShiftKeyDown and #usageTable or min(maxAddOns, #usageTable)
-			local numEnabled = 0
-			for i = 1, #usageTable do
-				local value = usageTable[i]
-				if value and IsAddOnLoaded(value[1]) then
-					numEnabled = numEnabled + 1
-					if numEnabled <= maxShown then
-						local r = value[3] / totalCPU
-						local g = 1.5 - r
-						GameTooltip:AddDoubleLine(value[2], format(usageString, value[3] / max(1, GetTime() - module.loginTime)), 1,1,1, r,g,0)
-					end
+	if self.showMemory or not scriptProfileStatus then
+		local totalMemory = UpdateMemory()
+		GameTooltip:AddDoubleLine(U["System"], formatMemory(totalMemory), 0,.6,1, .6,.8,1)
+		GameTooltip:AddLine(" ")
+
+		local numEnabled = 0
+		for _, data in ipairs(infoTable) do
+			if IsAddOnLoaded(data[1]) then
+				numEnabled = numEnabled + 1
+				if numEnabled <= maxShown then
+					local r, g, b = smoothColor(data[3], totalMemory)
+					GameTooltip:AddDoubleLine(data[2], formatMemory(data[3]), 1,1,1, r,g,b)
 				end
 			end
+		end
 
-			if not isShiftKeyDown and (numEnabled > maxAddOns) then
-				local hiddenUsage = 0
-				for i = (maxAddOns + 1), numEnabled do
-					hiddenUsage = hiddenUsage + usageTable[i][3]
-				end
-				GameTooltip:AddDoubleLine(format("%d %s (%s)", numEnabled - maxAddOns, U["Hidden"], U["Hold Shift"]), format(usageString, hiddenUsage), .6,.8,1, .6,.8,1)
+		if not isShiftKeyDown and (numEnabled > maxAddOns) then
+			local hiddenMemory = 0
+			for i = (maxAddOns + 1), numEnabled do
+				hiddenMemory = hiddenMemory + infoTable[i][3]
 			end
-			GameTooltip:AddLine(" ")
+			GameTooltip:AddDoubleLine(format(showMoreString, numEnabled - maxAddOns, U["Hidden"], U["Hold Shift"]), formatMemory(hiddenMemory), .6,.8,1, .6,.8,1)
+		end
+	else
+		local totalCPU = UpdateCPU()
+		local passedTime = max(1, GetTime() - module.loginTime)
+		GameTooltip:AddDoubleLine(U["System"], format(usageString, totalCPU / passedTime, 0,.6,1, .6,.8,1))
+		GameTooltip:AddLine(" ")
+
+		local numEnabled = 0
+		for _, data in ipairs(infoTable) do
+			if IsAddOnLoaded(data[1]) then
+				numEnabled = numEnabled + 1
+				if numEnabled <= maxShown then
+					local r, g, b = smoothColor(data[4], totalCPU)
+					GameTooltip:AddDoubleLine(data[2], format(usageString, data[4] / passedTime), 1,1,1, r,g,b)
+				end
+			end
+		end
+
+		if not isShiftKeyDown and (numEnabled > maxAddOns) then
+			local hiddenUsage = 0
+			for i = (maxAddOns + 1), numEnabled do
+				hiddenUsage = hiddenUsage + infoTable[i][4]
+			end
+			GameTooltip:AddDoubleLine(format(showMoreString, numEnabled - maxAddOns, U["Hidden"], U["Hold Shift"]), format(usageString, hiddenUsage / passedTime), .6,.8,1, .6,.8,1)
 		end
 	end
 
-	local _, _, latencyHome, latencyWorld = GetNetStats()
-	local fps = floor(GetFramerate())
-	GameTooltip:AddDoubleLine(U["Home Latency"]..":", colorLatency(latencyHome).."|r Ms", .6,.8,1, 1,1,1)
-	GameTooltip:AddDoubleLine(U["World Latency"]..":", colorLatency(latencyWorld).."|r Ms", .6,.8,1, 1,1,1)
-	GameTooltip:AddDoubleLine(FRAMERATE_LABEL, colorFPS(fps).."|r Fps", .6,.8,1, 1,1,1)
 	GameTooltip:AddDoubleLine(" ", I.LineString)
-	if scriptProfile then
-		GameTooltip:AddDoubleLine(" ", I.RightButton..U["ResetCPUUsage"].." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", I.LeftButton..U["Collect Memory"].." ", 1,1,1, .6,.8,1)
+	if scriptProfileStatus then
+		GameTooltip:AddDoubleLine(" ", I.RightButton..U["SwitchSystemInfo"].." ", 1,1,1, .6,.8,1)
 	end
-	GameTooltip:AddDoubleLine(" ", I.LeftButton..U["CPU Usage"]..": "..(scriptProfile and "|cff55ff55"..VIDEO_OPTIONS_ENABLED or "|cffff5555"..VIDEO_OPTIONS_DISABLED).." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", I.ScrollButton..U["CPU Usage"]..": "..(GetCVarBool("scriptProfile") and enableString or disableString).." ", 1,1,1, .6,.8,1)
 	GameTooltip:Show()
 end
 
@@ -147,26 +201,31 @@ StaticPopupDialogs["CPUUSAGE"] = {
 	whileDead = 1,
 }
 
-local status = GetCVarBool("scriptProfile")
 info.onMouseUp = function(self, btn)
-	local scriptProfile = GetCVarBool("scriptProfile")
-	if btn == "RightButton" and scriptProfile then
-		ResetCPUUsage()
-		module.loginTime = GetTime()
+	if btn == "LeftButton" then
+		if scriptProfileStatus then
+			ResetCPUUsage()
+			module.loginTime = GetTime()
+		end
+		local before = gcinfo()
+		collectgarbage("collect")
+		print(format("|cff66C6FF%s:|r %s", U["Collect Memory"], formatMemory(before - gcinfo())))
+		self:onEnter()
+	elseif btn == "RightButton" and scriptProfileStatus then
+		self.showMemory = not self.showMemory
+		self:onEnter()
 	elseif btn == "MiddleButton" then
-		MaoRUIDB["SystemInfoType"] = mod(MaoRUIDB["SystemInfoType"] + 1, 3)
-	elseif btn == "LeftButton" then
-		if scriptProfile then
+		if GetCVarBool("scriptProfile") then
 			SetCVar("scriptProfile", 0)
 		else
 			SetCVar("scriptProfile", 1)
 		end
 
-		if GetCVarBool("scriptProfile") == status then
+		if GetCVarBool("scriptProfile") == scriptProfileStatus then
 			StaticPopup_Hide("CPUUSAGE")
 		else
 			StaticPopup_Show("CPUUSAGE")
 		end
+		self:onEnter()
 	end
-	self:onEnter()
 end

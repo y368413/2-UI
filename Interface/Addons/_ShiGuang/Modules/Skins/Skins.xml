@@ -1,15 +1,13 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="Skins.lua"/>
-	<Script file="PetBattleUI.lua"/>
-	<Script file="CharacterFrame.lua"/>
-	<Script file="EquipmentFlyout.lua"/>
-	<Script file="Blizzard_InspectUI.lua"/>
-
-	<Script file="ObjectiveTracker.lua"/>
 	<Script file="Loot.lua"/>
-	
+
+	<Include file="Blizzard\Blizzard.xml"/>
+	<Include file="Blizzard\FrameXML\FrameXML.xml"/>
+
 	<Script file="AddOns\Bigwigs.lua"/>
 	<Script file="AddOns\DBM.lua"/>
+	
 	<Script file="AddOns\TMW.lua"/>
 	<Script file="AddOns\WeakAuras.lua"/>
 	<Script file="AddOns\Details.lua"/>

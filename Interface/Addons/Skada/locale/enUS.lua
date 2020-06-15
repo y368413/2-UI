@@ -520,3 +520,10 @@ L["List of damaging spells"] = true
 L["spells"] = true
 L["targets"] = true
 L["Shows damage done on players by friendly players."] = true
+
+L["AvoidableDamageTaken"] = "AvoidableDamageTaken"
+L["Avoidable damage taken"] = "Avoidable damage taken"
+L["List of avoidable damaging spells"] = "List of avoidable damaging spells"
+L["Damage taken by avoidable spell"] = "Damage taken by avoidable spell"
+L["List of damaged players by avoidable spells"] = "List of damaged players by avoidable spells"
+L["'s Avoidable damage taken"] = "'s Avoidable damage taken"

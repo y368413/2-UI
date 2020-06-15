@@ -606,8 +606,7 @@ do
 end
 
 function HLHandler:OnLeave(uiMapID, coord)
-
-        GameTooltip:Hide()
+    GameTooltip:Hide()
     ShoppingTooltip1:Hide()
 end
 

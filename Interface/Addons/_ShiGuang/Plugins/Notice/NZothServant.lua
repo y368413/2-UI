@@ -1,17 +1,7 @@
---## Author: JANY ## Version: 8.3.0
-local FirstTime = 0
-local FirstTime_ = 0
-local chuxu = 0
-local zmhx = 0
-local fhzy = 0
-local tlcx = 0
-local bkyydzx = 0 
-local sum = 0
-local flag = 0
-local i = 0
-local sum_ = 0
-local flag_ = 0
-local j = 0
+--## Author: JANY ## Version: 8.3.0 
+--("SAY", "WHISPER", "EMOTE", "CHANNEL", "PARTY", "INSTANCE_CHAT", "GUILD", "OFFICER", "YELL", "RAID", "RAID_WARNING", "AFK", "DND")
+local j, i, sum, sum_, flag, flag_, FirstTime, FirstTime_, zmhx, fhzy, tlcx, bkyydzx, lldky, xkbttime = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+local player1 = GetUnitName("player",true)
 
 local eventSwitch = {
 	["SPELL_AURA_APPLIED"] = true,
@@ -48,55 +38,57 @@ lrnFrame:SetScript("OnEvent", function(self, event_name, ...)
 	end
 end)
 
+function lrnFrame:DisgustingTentacles(srcName,dstName,a13)
+	if srcName == player1 and dstName == "扭曲的附肢" then
+		--SendChatMessage("触须!", "EMOTE")
+		UIErrorsFrame:AddMessage("!触须!",1,0,0,5)
+	end	
+end
+
 function lrnFrame:SpellDamage(timestamp, eventType, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, spellId, spellName, spellSchool, aAmount)
-	if srcName == GetUnitName("player",true) and spellId == 317159 then --317159
-		--if FirstTime < timestamp - 2 then
-			--FirstTime = timestamp
-			--SendChatMessage("开炮 "..string.format("%.1f", aAmount*0.001).."k", "EMOTE")--("SAY", "WHISPER", "EMOTE", "CHANNEL", "PARTY", "INSTANCE_CHAT", "GUILD", "OFFICER", "YELL", "RAID", "RAID_WARNING", "AFK", "DND")
-			--RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000开炮 |r"..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
-			--PlaySoundFile("Interface/AddOns/NZothServant/kaipao.ogg")
-		--end
+	if srcName == player1 and spellId == 317159 then --317159
 		sum = sum + aAmount
 		i = i + 1
 		if flag == 0 then 
 			FirstTime = timestamp
 			flag =1
 		end
-
-	elseif srcName == GetUnitName("player",true) and spellId == 317265 then
-		--SendChatMessage("流星 "..string.format("%.1f", aAmount*0.001).."k", "EMOTE")--("SAY", "WHISPER", "EMOTE", "CHANNEL", "PARTY", "INSTANCE_CHAT", "GUILD", "OFFICER", "YELL", "RAID", "RAID_WARNING", "AFK", "DND")
-		RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000流星 |r"..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
-		--PlaySoundFile("Interface/AddOns/NZothServant/kaipao.ogg")
-    elseif srcName == player1 and spellId == 317291 then --317159
+  elseif srcName == player1 and spellId == 317265 then
+		--SendChatMessage("流星 "..string.format("%.1f", aAmount*0.001).."k", "EMOTE")
+		RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000无尽之星 |r"..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
+  --elseif srcName == player1 and spellId == 295261 then
+		--RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000聚焦之虹 |r"..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
+  --elseif srcName == player1 and spellId == 317291 then
+		--if xkbttime == 0 then xkbttime = timestamp end
+		--SendChatMessage("虚空鞭笞 "..string.format("%.1f万",aAmount*0.0001), "EMOTE")
+		--RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000虚空鞭笞 |r"..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
+		--xkbttime = timestamp
+	elseif srcName == player1 and spellId == 316661 then
+		if xkbttime == 0 then xkbttime = timestamp end
+		--SendChatMessage("黑曜毁灭 "..string.format("%.1f万",aAmount*0.0001), "EMOTE")
+		RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000黑曜毁灭 |r"..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
+		xkbttime = timestamp
+	elseif srcName == player1 and spellId == 317291 then --317159
 		sum_ = sum_ + aAmount
 		j = j + 1
 		if flag_ == 0 then 
 			FirstTime_ = timestamp
 			flag_ =1
 		end	    
-    end
+  end
 
 	if timestamp - FirstTime > 2 and flag == 1 then
 		flag = 0
+		RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000暮光炮 |r - "..string.format("%.d",i ).."个 - "..string.format("%.1f", sum*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
 		--SendChatMessage("暮光炮击中了"..string.format("%.d",i ).."个敌人，打出了" ..string.format("%.1f", sum*0.0001).."万的伤害，太香啦", "EMOTE")
-		RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000开炮|r - "..string.format("%.d",i ).."个 - "..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
 		sum = 0
 		i = 0
-	--end
-	--elseif srcName == GetUnitName("player",true) and spellId == 316835 then
-		--if chuxu < timestamp - 10 then
-			--chuxu = timestamp
-			--SendChatMessage("触须 "..string.format("%.1f", aAmount*0.001).."k", "EMOTE")--("SAY", "WHISPER", "EMOTE", "CHANNEL", "PARTY", "INSTANCE_CHAT", "GUILD", "OFFICER", "YELL", "RAID", "RAID_WARNING", "AFK", "DND")
-			--RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000触须 |r"..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
-			--PlaySoundFile("Interface/AddOns/NZothServant/kaipao.ogg")
-		--end		
 	elseif timestamp - FirstTime_ > 1 and flag_ == 1 then
 		flag_ = 0
 		--SendChatMessage("龍の鞭笞"..string.format("%.d",j ).."杀，打出了" ..string.format("%.1f", sum_*0.0001).."万吨的伤害！！！", "EMOTE")--("SAY", "WHISPER", "EMOTE", "CHANNEL", "PARTY", "INSTANCE_CHAT", "GUILD", "OFFICER", "YELL", "RAID", "RAID_WARNING", "AFK", "DND")
-		RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000触须|r - "..string.format("%.d",j ).."个 - "..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
-		sum_ = 0
+		RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000触须|r - "..string.format("%.d",j ).."个 - "..string.format("%.1f", sum_*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
+		sum = 0
 		j = 0
-		--PlaySoundFile("Interface/AddOns/NZothServant/kaipao.ogg")	
 	end
 end
 
@@ -107,29 +99,27 @@ function lrnFrame:lrdebuff()
 	  	zmhx = etime
 	    --print(("%d=%s, %s, %.2f."):format(i,name,icon,(etime-GetTime())))
 	    --SendChatMessage("壮美幻象!", "EMOTE")
-	    UIErrorsFrame:AddMessage("壮美幻象!",1,0,0,5)
+	    UIErrorsFrame:AddMessage("!壮美幻象!",1,0,0,5)
 	    --PlaySoundFile("Interface/AddOns/NZothServant/BassDrop.ogg")
 	  end
 	  if name == "腐化之眼" and fhzy < etime - 8 and false then
 	  	fhzy = etime	
-	    --SendChatMessage("腐化之眼!", "EMOTE")
-	    UIErrorsFrame:AddMessage("腐化之眼!",1,0,0,5)
-	    --PlaySoundFile("Interface/AddOns/NZothServant/BassDrop.ogg")
+	    UIErrorsFrame:AddMessage("!腐化之眼!",1,0,0,5)
 	  end
 	  if name == "贪婪触须" and tlcx < etime - 5 and false then
 	  	tlcx = etime
-	    --SendChatMessage("贪婪触须!", "EMOTE")
-	    UIErrorsFrame:AddMessage("贪婪触须!",1,0,0,5)
-	    --PlaySoundFile("Interface/AddOns/NZothServant/BassDrop.ogg")
+	    UIErrorsFrame:AddMessage("!贪婪触须!",1,0,0,5)
 	  end
-	end
-	for i=1,40 do
+		---------------------------------------------------------------------
 	  local name, icon, _, _, _, etime = UnitBuff("player",i)
 	  if name == "不可言喻的真相" and bkyydzx < etime - 10 then
 	  	bkyydzx = etime
-	  	--SendChatMessage("不可言喻的真相!", "EMOTE")
-	  	UIErrorsFrame:AddMessage("不可言喻的真相!",1,0,0,5)
+	  	UIErrorsFrame:AddMessage("!不可言喻的真相!",1,0,0,5)
 	    --print(("%d=%s, %s, %.2f minutes left."):format(i,name,icon,(etime-GetTime())/60))
+	  end
+	  if name == "力量的考验" and lldky < etime - 10 then
+	  	lldky = etime
+	  	UIErrorsFrame:AddMessage("!力量的考验!",1,0,0,5)
 	  end
 	end
 end
@@ -137,7 +127,9 @@ end
 function lrnFrame:COMBAT_LOG_EVENT_UNFILTERED(event,...)
 	local timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, srcFlags2, dstGUID, dstName, dstFlags, dstFlags2,a12,a13,a14,a15,a16,a17,a18,a19,a20 = CombatLogGetCurrentEventInfo(); -- Those arguments appear for all combat event variants.
 	local eventPrefix, eventSuffix = eventType:match("^(.-)_?([^_]*)$");
-	--print(dstFlags, dstFlags2,a12,a13,a14,a15,a16,a17,a18,a19,a20)
+	if eventType == 'SPELL_SUMMON' then 
+		lrnFrame:DisgustingTentacles(srcName,dstName,a13)
+	end
 	if (eventPrefix:match("^SPELL") or eventPrefix:match("^RANGE")) and eventSuffix == "DAMAGE" then
 		local spellId, spellName, spellSchool, sAmount, aOverkill, sSchool, sResisted, sBlocked, sAbsorbed, sCritical, sGlancing, sCrushing, sOffhand, _ = select(12,CombatLogGetCurrentEventInfo())
 		lrnFrame:SpellDamage(timestamp, eventType, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, spellId, spellName, spellSchool, sAmount)

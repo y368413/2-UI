@@ -67,7 +67,7 @@ R.CornerBuffs = {
 }
 
 -- 小队框体的技能监控CD [spellID] = duration in seconds
-R.PartysSpells = {
+R.PartySpells = {
 	[57994]  = 12,	-- 风剪
 	[1766]   = 15,	-- 脚踢
 	[6552]   = 15,	-- 拳击
@@ -173,7 +173,6 @@ R.PartysSpells = {
         [202246] = 25,  --type = "cc",        spec = true  },
         [132469] = 30,  --type = "cc",        spec = true  },
         [102793] = 60,  --type = "cc",        spec = { 105 } },
-        [102793] = 60,  --type = "cc",        spec = true  },
         --[22812] = { default = 60, [104] = 90 }, --type = "defensive", spec = { 102, 104, 105 }, default = true },
         [201664] = 30,  --type = "defensive", spec = true  },
         [209749] = 30,  --type = "defensive", spec = true  },
@@ -472,7 +471,6 @@ R.PartysSpells = {
         [97462] = 180, --type = "defensive"              },
         [871] = 240, --type = "defensive", spec = { 73 } },
         [107574] = 90,  --type = "offensive", spec = { 73 } },
-        [107574] = 90,  --type = "offensive", spec = true },
         [227847] = 90,  --type = "offensive", spec = { 71 } },
         [46924] = 60,  --type = "offensive", spec = true },
         [152277] = 60,  --type = "offensive", spec = true, parent = 227847 },
@@ -529,6 +527,7 @@ R.PartysSpells = {
         [314517] = 120, --type = "all",       item = 174276 },    -- Corrupted Gladiator's Breach
         [313148] = 120, --type = "all",       item = 173944 },    -- Forbidden Obsidian Claw (trinket textureID = 1508487)
         [313113] = 80,  --type = "all",       item = 173946 },    -- Writhing Segment of Drest'agath
+	[314585] = 60,  --type = "all",       item = 174277 },    -- Lingering Psychic Shell
     --},
     --["ESSENCES"] = {
         [295373] = 30,  --type = "essence",   item = 295373 },

@@ -14,16 +14,6 @@ local C_ChatInfo_SendAddonMessage = C_ChatInfo.SendAddonMessage
 local C_ChatInfo_RegisterAddonMessagePrefix = C_ChatInfo.RegisterAddonMessagePrefix
 local C_MythicPlus_GetCurrentAffixes = C_MythicPlus.GetCurrentAffixes
 
-function MISC:AddAlerts()
-	self:SoloInfo()
-	self:RareAlert()
-	self:InterruptAlert()
-	--self:VersionCheck()
-	--self:ExplosiveAlert()
-	self:PlacedItemAlert()
-	--self:UunatAlert()
-end
-
 --[[
 	SoloInfo是一个告知你当前副本难度的小工具，防止我有时候单刷时进错难度了。
 	instList左侧是副本ID，你可以使用"/getid"命令来获取当前副本的ID；右侧的是副本难度，常用的一般是：2为5H，4为25普通，6为25H。
@@ -232,6 +222,80 @@ function MISC:InterruptAlert()
 end
 
 --[[
+	大米完成时，通报打球统计
+]]
+local eventList = {
+	["SWING_DAMAGE"] = 13,
+	["RANGE_DAMAGE"] = 16,
+	["SPELL_DAMAGE"] = 16,
+	["SPELL_PERIODIC_DAMAGE"] = 16,
+	["SPELL_BUILDING_DAMAGE"] = 16,
+}
+
+function MISC:Explosive_Update(...)
+	local _, eventType, _, _, sourceName, _, _, destGUID = ...
+	local index = eventList[eventType]
+	if index and M.GetNPCID(destGUID) == 120651 then
+		local overkill = select(index, ...)
+		if overkill and overkill > 0 then
+			local name = strsplit("-", sourceName or UNKNOWN)
+			local cache = MaoRUIPerDB["Misc"]["ExplosiveCache"]
+			if not cache[name] then cache[name] = 0 end
+			cache[name] = cache[name] + 1
+		end
+	end
+end
+
+local function startCount()
+	wipe(MaoRUIPerDB["Misc"]["ExplosiveCache"])
+	M:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.Explosive_Update)
+end
+
+local function endCount()
+	local text
+	for name, count in pairs(MaoRUIPerDB["Misc"]["ExplosiveCache"]) do
+		text = (text or U["ExplosiveCount"])..name.."("..count..") "
+	end
+	--if text then SendChatMessage(text, "PARTY") end
+	if text then print(text) end
+	M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.Explosive_Update)
+end
+
+local function pauseCount()
+	local name, _, instID = GetInstanceInfo()
+	if name and instID == 8 then
+		M:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.Explosive_Update)
+	else
+		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.Explosive_Update)
+	end
+end
+
+function MISC.Explosive_CheckAffixes(event)
+	local affixes = C_MythicPlus_GetCurrentAffixes()
+	if not affixes then return end
+
+	if affixes[3] and affixes[3].id == 13 then
+		M:RegisterEvent("CHALLENGE_MODE_START", startCount)
+		M:RegisterEvent("CHALLENGE_MODE_COMPLETED", endCount)
+		M:RegisterEvent("UPDATE_INSTANCE_INFO", pauseCount)
+	end
+	M:UnregisterEvent("PLAYER_ENTERING_WORLD", MISC.Explosive_CheckAffixes)
+end
+
+function MISC:ExplosiveAlert()
+	if MaoRUIPerDB["Misc"]["ExplosiveCount"] then
+		self:Explosive_CheckAffixes()
+		M:RegisterEvent("PLAYER_ENTERING_WORLD", self.Explosive_CheckAffixes)
+	else
+		M:UnregisterEvent("CHALLENGE_MODE_START", startCount)
+		M:UnregisterEvent("CHALLENGE_MODE_COMPLETED", endCount)
+		M:UnregisterEvent("UPDATE_INSTANCE_INFO", pauseCount)
+		M:UnregisterEvent("PLAYER_ENTERING_WORLD", self.Explosive_CheckAffixes)
+		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", self.Explosive_Update)
+	end
+end
+
+--[[
 	放大餐时叫一叫
 ]]
 local lastTime = 0
@@ -273,6 +337,118 @@ function MISC:PlacedItemAlert()
 	M:RegisterEvent("GROUP_JOINED", self.ItemAlert_CheckGroup)
 end
 
+-- 大幻象水晶及箱子计数
+function MISC:NVision_Create()
+	if MISC.VisionFrame then MISC.VisionFrame:Show() return end
+
+	local frame = CreateFrame("Frame", nil, UIParent)
+	frame:SetSize(24, 24)
+	frame.bars = {}
+
+	local mover = M.Mover(frame, U["NzothVision"], "NzothVision", {"TOP", PlayerPowerBarAlt, "BOTTOM"}, 216, 24)
+	frame:ClearAllPoints()
+	frame:SetPoint("CENTER", mover)
+
+	local barData = {
+		[1] = {
+			anchorF = "RIGHT", anchorT = "LEFT", offset = -3,
+			texture = "Interface\\ICONS\\INV_Misc_Gem_FlameSpessarite_02",
+			color = {1, .8, 0}, reverse = false, maxValue = 10,
+		},
+		[2] = {
+			anchorF = "LEFT", anchorT = "RIGHT", offset = 3,
+			texture = 2000861,
+			color = {.8, 0, 1}, reverse = true, maxValue = 12,
+		}
+	}
+
+	for i, v in ipairs(barData) do
+		local bar = CreateFrame("StatusBar", nil, frame)
+		bar:SetSize(80, 20)
+		bar:SetPoint(v.anchorF, frame, "CENTER", v.offset, 0)
+		bar:SetMinMaxValues(0, v.maxValue)
+		bar:SetValue(0)
+		bar:SetReverseFill(v.reverse)
+		M:SmoothBar(bar)
+		M.CreateSB(bar, nil, unpack(v.color))
+		bar.text = M.CreateFS(bar, 16, "0/"..v.maxValue, nil, "CENTER", 0, 0)
+
+		local icon = CreateFrame("Frame", nil, bar)
+		icon:SetSize(22, 22)
+		icon:SetPoint(v.anchorF, bar, v.anchorT, v.offset, 0)
+		M.PixelIcon(icon, v.texture)
+		M.CreateSD(icon)
+
+		bar.count = 0
+		bar.__max = v.maxValue
+		frame.bars[i] = bar
+	end
+
+	MISC.VisionFrame = frame
+end
+
+function MISC:NVision_Update(index, reset)
+	local frame = MISC.VisionFrame
+	local bar = frame.bars[index]
+	if reset then bar.count = 0 end
+	bar:SetValue(bar.count)
+	bar.text:SetText(bar.count.."/"..bar.__max)
+end
+
+local castSpellIndex = {[143394] = 1, [306608] = 2}
+function MISC:NVision_OnEvent(unit, _, spellID)
+	local index = castSpellIndex[spellID]
+	if index and (index == 1 or unit == "player") then
+		local frame = MISC.VisionFrame
+		local bar = frame.bars[index]
+		bar.count = bar.count + 1
+		MISC:NVision_Update(index)
+	end
+end
+
+function MISC:NVision_Check()
+	local diffID = select(3, GetInstanceInfo())
+	if diffID == 152 then
+		MISC:NVision_Create()
+		M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", MISC.NVision_OnEvent, "player")
+
+		if not RaidBossEmoteFrame.__isOff then
+			RaidBossEmoteFrame:UnregisterAllEvents()
+			RaidBossEmoteFrame.__isOff = true
+		end
+	else
+		if MISC.VisionFrame then
+			MISC:NVision_Update(1, true)
+			MISC:NVision_Update(2, true)
+			MISC.VisionFrame:Hide()
+			M:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", MISC.NVision_OnEvent)
+		end
+
+		if RaidBossEmoteFrame.__isOff then
+			RaidBossEmoteFrame:RegisterEvent("RAID_BOSS_EMOTE")
+			RaidBossEmoteFrame:RegisterEvent("RAID_BOSS_WHISPER")
+			RaidBossEmoteFrame:RegisterEvent("CLEAR_BOSS_EMOTES")
+			RaidBossEmoteFrame.__isOff = nil
+		end
+	end
+end
+
+function MISC:NVision_Init()
+	if not MaoRUIPerDB["Misc"]["NzothVision"] then return end
+	MISC:NVision_Check()
+	M:RegisterEvent("UPDATE_INSTANCE_INFO", MISC.NVision_Check)
+end
+
+-- Init
+function MISC:AddAlerts()
+	MISC:SoloInfo()
+	MISC:RareAlert()
+	MISC:InterruptAlert()
+	MISC:ExplosiveAlert()
+	MISC:PlacedItemAlert()
+	MISC:NVision_Init()
+end
+MISC:RegisterMisc("Notifications", MISC.AddAlerts)
 
 --[[## Author: Nick Melancon  ## Version: 0.1
 local JaniFailedBonusRoll = CreateFrame("FRAME");

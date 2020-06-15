@@ -148,3 +148,4 @@ function MISC:AlertFrame_Setup()
 		M:RegisterEvent("ADDON_LOADED", TalkingHeadOnLoad)
 	end
 end
+MISC:RegisterMisc("AlertFrame", MISC.AlertFrame_Setup)

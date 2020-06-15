@@ -107,16 +107,17 @@ end
 
 function MISC:QuestNotifier()
 	if MaoRUIPerDB["Misc"]["QuestNotifier"] then
-		self:FindQuestComplete()
-		M:RegisterEvent("QUEST_ACCEPTED", self.FindQuestAccept)
-		M:RegisterEvent("QUEST_LOG_UPDATE", self.FindQuestComplete)
-		M:RegisterEvent("QUEST_TURNED_IN", self.FindWorldQuestComplete)
-		M:RegisterEvent("UI_INFO_MESSAGE", self.FindQuestProgress)
+		MISC:FindQuestComplete()
+		M:RegisterEvent("QUEST_ACCEPTED", MISC.FindQuestAccept)
+		M:RegisterEvent("QUEST_LOG_UPDATE", MISC.FindQuestComplete)
+		M:RegisterEvent("QUEST_TURNED_IN", MISC.FindWorldQuestComplete)
+		M:RegisterEvent("UI_INFO_MESSAGE", MISC.FindQuestProgress)
 	else
 		wipe(completedQuest)
-		M:UnregisterEvent("QUEST_ACCEPTED", self.FindQuestAccept)
-		M:UnregisterEvent("QUEST_LOG_UPDATE", self.FindQuestComplete)
-		M:UnregisterEvent("QUEST_TURNED_IN", self.FindWorldQuestComplete)
-		M:UnregisterEvent("UI_INFO_MESSAGE", self.FindQuestProgress)
+		M:UnregisterEvent("QUEST_ACCEPTED", MISC.FindQuestAccept)
+		M:UnregisterEvent("QUEST_LOG_UPDATE", MISC.FindQuestComplete)
+		M:UnregisterEvent("QUEST_TURNED_IN", MISC.FindWorldQuestComplete)
+		M:UnregisterEvent("UI_INFO_MESSAGE", MISC.FindQuestProgress)
 	end
 end
+MISC:RegisterMisc("QuestNotifier", MISC.QuestNotifier)

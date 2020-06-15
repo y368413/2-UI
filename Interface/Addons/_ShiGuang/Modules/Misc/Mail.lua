@@ -348,6 +348,7 @@ function MISC:MailBox()
 	-- Hide Blizz
 	M.HideObject(OpenAllMail)
 end
+MISC:RegisterMisc("MailBox", MISC.MailBox)
 
 -- LockboxMailer ## Version: 0.1.5
 local LockboxMailer = CreateFrame("Frame")

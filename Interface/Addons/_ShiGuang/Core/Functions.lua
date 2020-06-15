@@ -412,7 +412,9 @@ do
 		if self.title then
 			GameTooltip:AddLine(self.title)
 		end
-		if tonumber(self.text) then
+		if self.text and strfind(self.text, "|H.+|h") then
+			GameTooltip:SetHyperlink(self.text)
+		elseif tonumber(self.text) then
 			GameTooltip:SetSpellByID(self.text)
 		elseif self.text then
 			local r, g, b = 1, 1, 1
@@ -806,17 +808,6 @@ do
 		self.forceSaturation = forceSaturation
 	end
 
-	hooksecurefunc("TriStateCheckbox_SetState", function(_, checkButton)
-		if checkButton.forceSaturation then
-			local tex = checkButton:GetCheckedTexture()
-			if checkButton.state == 2 then
-				tex:SetDesaturated(true)
-				tex:SetVertexColor(cr, cg, cb)
-			elseif checkButton.state == 1 then
-				tex:SetVertexColor(1, .8, 0, .8)
-			end
-		end
-	end)
 
 	-- Handle slider
 	function M:ReskinSlider(verticle)

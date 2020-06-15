@@ -194,6 +194,7 @@ function Bar:StyleActionButton(button, cfg)
 	local count = _G[buttonName.."Count"]
 	local name = _G[buttonName.."Name"]
 	local border = _G[buttonName.."Border"]
+	local autoCastable = _G[buttonName.."AutoCastable"]
 	local NewActionTexture = button.NewActionTexture
 	local cooldown = _G[buttonName.."Cooldown"]
 	local normalTexture = button:GetNormalTexture()
@@ -221,6 +222,8 @@ function Bar:StyleActionButton(button, cfg)
 	SetupTexture(pushedTexture, cfg.pushedTexture, "SetPushedTexture", button)
 	SetupTexture(highlightTexture, cfg.highlightTexture, "SetHighlightTexture", button)
 	SetupTexture(checkedTexture, cfg.checkedTexture, "SetCheckedTexture", button)
+
+	checkedTexture:SetColorTexture(1, .8, 0, .35)
 	highlightTexture:SetColorTexture(1, 1, 1, .25)
 
 	--cooldown
@@ -255,6 +258,11 @@ function Bar:StyleActionButton(button, cfg)
 		end
 	end
 
+	if autoCastable then
+		autoCastable:SetTexCoord(.217, .765, .217, .765)
+		autoCastable:SetInside()
+	end
+
 	button.__styled = true
 end
 
@@ -270,6 +278,7 @@ function Bar:StyleExtraActionButton(cfg)
 	local buttonstyle = button.style --artwork around the button
 	local cooldown = _G[buttonName.."Cooldown"]
 
+	button:SetPushedTexture(I.textures.pushed) --force it to gain a texture
 	local normalTexture = button:GetNormalTexture()
 	local pushedTexture = button:GetPushedTexture()
 	local highlightTexture = button:GetHighlightTexture()
@@ -377,13 +386,25 @@ function Bar:ReskinBars()
 			texCoord = I.TexCoord,
 			color = {.3, .3, .3},
 			points = {
-				{"TOPLEFT", 0, 0},
-				{"BOTTOMRIGHT", 0, 0},
+				{"TOPLEFT", R.mult, -R.mult},
+				{"BOTTOMRIGHT", -R.mult, R.mult},
 			},
 		},
 		flash = {file = I.textures.flash},
-		pushedTexture = {file = I.textures.pushed},
-		checkedTexture = {file = I.textures.checked},
+		pushedTexture = {
+			file = I.textures.pushed,
+			points = {
+				{"TOPLEFT", R.mult, -R.mult},
+				{"BOTTOMRIGHT", -R.mult, R.mult},
+			},
+		},
+		checkedTexture = {
+			file = "",
+			points = {
+				{"TOPLEFT", R.mult, -R.mult},
+				{"BOTTOMRIGHT", -R.mult, R.mult},
+			},
+		},
 		highlightTexture = {
 			file = "",
 			points = {
@@ -393,8 +414,8 @@ function Bar:ReskinBars()
 		},
 		cooldown = {
 			points = {
-				{"TOPLEFT", 0, 0},
-				{"BOTTOMRIGHT", 0, 0},
+				{"TOPLEFT", R.mult, -R.mult},
+				{"BOTTOMRIGHT", -R.mult, R.mult},
 			},
 		},
 		name = {

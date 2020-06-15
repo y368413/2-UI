@@ -114,6 +114,7 @@ function module:OnLogin()
 		self:LoadInfobar(info)
 	end
 
+	self:BackgroundLines()
 	self.loginTime = GetTime()
 
 	if not R.Infobar.AutoAnchor then return end
@@ -124,6 +125,4 @@ function module:OnLogin()
 			info.text:SetPoint("LEFT", self.modules[index-1], "RIGHT", 6, 0)
 		end
 	end
-
-	self:BackgroundLines()
 end

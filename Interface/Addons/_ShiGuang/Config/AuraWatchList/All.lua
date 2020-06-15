@@ -206,10 +206,10 @@ local list = {
 		{AuraID = 280433, UnitID = "player"},	-- 呼啸狂沙
 		{AuraID = 271711, UnitID = "player"},	-- 压倒能量
 		{AuraID = 272733, UnitID = "player"},	-- 弦之韵律
-		{AuraID = 268953, UnitID = "player", Text = U["Crit"]},	-- 元素回旋 爆击
-		{AuraID = 268954, UnitID = "player", Text = U["Haste"]},	-- 急速
-		{AuraID = 268955, UnitID = "player", Text = U["Mastery"]},	-- 精通
-		{AuraID = 268956, UnitID = "player", Text = U["Versa"]},	-- 全能
+		--{AuraID = 268953, UnitID = "player", Text = U["Crit"]},	-- 元素回旋 爆击
+		--{AuraID = 268954, UnitID = "player", Text = U["Haste"]},	-- 急速
+		--{AuraID = 268955, UnitID = "player", Text = U["Mastery"]},	-- 精通
+		--{AuraID = 268956, UnitID = "player", Text = U["Versa"]},	-- 全能
 		{AuraID = 280780, UnitID = "player"},	-- 战斗荣耀
 		{AuraID = 280787, UnitID = "player"},	-- 反击之怒
 		{AuraID = 280385, UnitID = "player"},	-- 压力渐增
@@ -359,6 +359,8 @@ local list = {
 		{AuraID = 292267, UnitID = "player"},	-- 超荷电磁炮
 		{AuraID = 305699, UnitID = "player"},	-- 锁定
 		{AuraID = 302274, UnitID = "player"},	-- 爆裂冲击
+		{AuraID = 298669, UnitID = "player"},	-- 跳电
+		{AuraID = 294929, UnitID = "player"},	-- 烈焰撕咬
 		{AuraID = 259533, UnitID = "player", Flash = true},	-- 艾泽里特催化剂，暴富
 	-- 尼奥罗萨
 		-- 黑龙帝王拉希奥
@@ -428,6 +430,7 @@ local list = {
 		{AuraID = 310019, UnitID = "player"},	-- 充能锁链
 		{AuraID = 310022, UnitID = "player"},	-- 充能锁链
 		{AuraID = 315252, UnitID = "player"},	-- 恐怖炼狱
+		{AuraID = 316065, UnitID = "player"},	-- 腐化存续
 		-- 恩佐斯的外壳
 		{AuraID = 307832, UnitID = "player"},	-- 恩佐斯的仆从
 		{AuraID = 313334, UnitID = "player"},	-- 恩佐斯之赐

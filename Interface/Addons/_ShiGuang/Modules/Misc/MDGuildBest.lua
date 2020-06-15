@@ -171,8 +171,9 @@ function MISC:KeystoneInfo_Update()
 end
 
 function MISC:GuildBest()
-	M:RegisterEvent("ADDON_LOADED", self.GuildBest_OnLoad)
+	M:RegisterEvent("ADDON_LOADED", MISC.GuildBest_OnLoad)
 
-	self:KeystoneInfo_Update()
-	M:RegisterEvent("BAG_UPDATE", self.KeystoneInfo_Update)
+	MISC:KeystoneInfo_Update()
+	M:RegisterEvent("BAG_UPDATE", MISC.KeystoneInfo_Update)
 end
+MISC:RegisterMisc("GuildBest", MISC.GuildBest)

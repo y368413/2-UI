@@ -1141,47 +1141,47 @@ Pandaria.achievementData = {
         {
           id = 69471,
           index = 1,
-          description = 'Needs 3x Shan\'ze Ritual Stone] to summon',
+          description = 'Needs 3x Shan\'ze Ritual Stone to summon',
         },
         {
           id = 69633,
           index = 2,
-          description = 'Needs 3x Shan\'ze Ritual Stone] to summon',
+          description = 'Needs 3x Shan\'ze Ritual Stone to summon',
         },
         {
           id = 69341,
           index = 3,
-          description = 'Needs 3x Shan\'ze Ritual Stone] to summon',
+          description = 'Needs 3x Shan\'ze Ritual Stone to summon',
         },
         {
           id = 69339,
           index = 4,
-          description = 'Needs 3x Shan\'ze Ritual Stone] to summon',
+          description = 'Needs 3x Shan\'ze Ritual Stone to summon',
         },
         {
           id = 69749,
           index = 5,
-          description = 'Needs 3x Shan\'ze Ritual Stone] to summon',
+          description = 'Needs 3x Shan\'ze Ritual Stone to summon',
         },
         {
           id = 69767,
           index = 6,
-          description = 'Needs 3x Shan\'ze Ritual Stone] to summon',
+          description = 'Needs 3x Shan\'ze Ritual Stone to summon',
         },
         {
           id = 70080,
           index = 7,
-          description = 'Needs 3x Shan\'ze Ritual Stone] to summon',
+          description = 'Needs 3x Shan\'ze Ritual Stone to summon',
         },
         {
           id = 69396,
           index = 8,
-          description = 'Needs 3x Shan\'ze Ritual Stone] to summon',
+          description = 'Needs 3x Shan\'ze Ritual Stone to summon',
         },
         {
           id = 69347,
           index = 9,
-          description = 'Needs 3x Shan\'ze Ritual Stone] to summon',
+          description = 'Needs 3x Shan\'ze Ritual Stone to summon',
         },
       }
     }

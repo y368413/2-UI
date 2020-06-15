@@ -474,3 +474,221 @@ MountsSource:SetScript("OnEvent", function(self, event, ...)
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")
     end
 end)
+
+------------------
+--[[------------------------------------------------------------
+兑换信息
+---------------------------------------------------------------]]
+local success, CharIcon = pcall(function() return CharacterStatsPane.ItemLevelFrame.Corruption end)
+function SetOrHookScript(target,eventName,func)
+	if target:GetScript(eventName) then
+		return target:HookScript(eventName,func)
+	else
+		return target:SetScript(eventName,func)
+	end
+end
+
+    LOCALES = {
+        PATTERN_INFO = "%d级%s",
+        UNKNOWN = "其他或专有",
+        special = "专有",
+
+        passive_crit_dam = "爆伤",
+        passive_mastery = "渠精",
+        passive_haste = "渠急",
+        passive_versatility = "渠全",
+        passive_crit = "渠暴",
+        passive_avoidance = "闪避",
+        passive_leech = "吸血",
+
+        proc_haste = "急速",
+        proc_crit = "暴击",
+        proc_mastery = "精通",
+        proc_versatility = "全能",
+
+        twilight = "暮光",
+        ritual = "仪式",
+        twisted = "触须",
+        clarity = "洞察",
+        truth = "真相",
+        echo = "回响",
+        star = "无尽",
+        bleed = "龟裂",
+    }
+
+local data = {
+  affixes = {
+    [6437] = { key = "passive_crit_dam", level = 1, },
+    [6438] = { key = "passive_crit_dam", level = 2, },
+    [6439] = { key = "passive_crit_dam", level = 3, },
+    [6471] = { key = "passive_mastery", level = 1, },
+    [6472] = { key = "passive_mastery", level = 2, },
+    [6473] = { key = "passive_mastery", level = 3, },
+    [6474] = { key = "passive_haste", level = 1, },
+    [6475] = { key = "passive_haste", level = 2, },
+    [6476] = { key = "passive_haste", level = 3, },
+    [6477] = { key = "passive_versatility", level = 1, },
+    [6478] = { key = "passive_versatility", level = 2, },
+    [6479] = { key = "passive_versatility", level = 3, },
+    [6480] = { key = "passive_crit", level = 1, },
+    [6481] = { key = "passive_crit", level = 2, },
+    [6482] = { key = "passive_crit", level = 3, },
+    [6483] = { key = "passive_avoidance", level = 1, },
+    [6484] = { key = "passive_avoidance", level = 2, },
+    [6485] = { key = "passive_avoidance", level = 3, },
+    [6493] = { key = "passive_leech", level = 1, },
+    [6494] = { key = "passive_leech", level = 2, },
+    [6495] = { key = "passive_leech", level = 3, },
+    [6537] = { key = "twilight", level = 1, },
+    [6538] = { key = "twilight", level = 2, },
+    [6539] = { key = "twilight", level = 3, },
+    [6540] = { key = "ritual", level = 1, },
+    [6541] = { key = "ritual", level = 2, },
+    [6542] = { key = "ritual", level = 3, },
+    [6543] = { key = "twisted", level = 1, },
+    [6544] = { key = "twisted", level = 2, },
+    [6545] = { key = "twisted", level = 3, },
+    [6546] = { key = "clarity", level = 1, },
+    [6547] = { key = "truth", level = 1, },
+    [6548] = { key = "truth", level = 2, },
+    [6549] = { key = "echo", level = 1, },
+    [6550] = { key = "echo", level = 2, },
+    [6551] = { key = "echo", level = 3, },
+    [6552] = { key = "star", level = 1, },
+    [6553] = { key = "star", level = 2, },
+    [6554] = { key = "star", level = 3, },
+    [6555] = { key = "proc_haste", level = 1, },
+    [6556] = { key = "proc_crit", level = 1, },
+    [6557] = { key = "proc_mastery", level = 1, },
+    [6558] = { key = "proc_versatility", level = 1, },
+    [6559] = { key = "proc_haste", level = 2, },
+    [6560] = { key = "proc_haste", level = 3, },
+    [6561] = { key = "proc_crit", level = 2, },
+    [6562] = { key = "proc_crit", level = 3, },
+    [6563] = { key = "proc_mastery", level = 2, },
+    [6564] = { key = "proc_mastery", level = 3, },
+    [6565] = { key = "proc_versatility", level = 2, },
+    [6566] = { key = "proc_versatility", level = 3, },
+    [6573] = { key = "bleed", level = 1, },
+  },
+  corrupts = {
+    bleed = { 15, },
+    clarity = { 15, },
+    echo = { 25, 35, 60, },
+    passive_avoidance = { 10, 15, 20, },
+    passive_crit = { 10, 15, 20, },
+    passive_crit_dam = { 10, 15, 20, },
+    passive_haste = { 10, 15, 20, },
+    passive_leech = { 10, 15, 20, },
+    passive_mastery = { 10, 15, 20, },
+    passive_versatility = { 10, 15, 20, },
+    proc_crit = { 15, 20, 35, },
+    proc_haste = { 15, 20, 35, },
+    proc_mastery = { 15, 20, 35, },
+    proc_versatility = { 15, 20, 35, },
+    ritual = { 15, 35, 66, },
+    star = { 20, 50, 75, },
+    truth = { 12, 30, },
+    twilight = { 25, 50, 75, },
+    twisted = { 10, 35, 66, },
+  },
+}
+
+local icons = {
+  bleed = "Interface/Icons/Ability_IronMaidens_CorruptedBlood",
+  clarity = "Interface/Icons/ability_warlock_soulswap",
+  echo = "Interface/Icons/Ability_Priest_VoidEntropy",
+  passive_avoidance = "Interface/Icons/spell_warlock_demonsoul",
+  passive_crit = "Interface/Icons/Ability_Priest_ShadowyApparition",
+  passive_crit_dam = "Interface/Icons/Achievement_Profession_Fishing_FindFish",
+  passive_haste = "Interface/Icons/Ability_Mage_NetherWindPresence",
+  passive_leech = "Interface/Icons/Spell_Shadow_LifeDrain02_purple",
+  passive_mastery = "Interface/Icons/Ability_Rogue_SinisterCalling",
+  passive_versatility = "Interface/Icons/Spell_Arcane_ArcaneTactics",
+  proc_crit = "Interface/Icons/Ability_Hunter_RaptorStrike",
+  proc_haste = "Interface/Icons/Ability_Warrior_BloodFrenzy",
+  proc_mastery = "Interface/Icons/Spell_Nature_FocusedMind",
+  proc_versatility = "Interface/Icons/Ability_Hunter_OneWithNature",
+  ritual = "Interface/Icons/Spell_Shadow_Shadesofdarkness",
+  star = "Interface/Icons/Ability_Druid_Starfall",
+  truth = "Interface/Icons/INV_Wand_1H_NzothRaid_D_01",
+  twilight = "Interface/Icons/Spell_Priest_VoidSear",
+  twisted = "Interface/Icons/Achievement_Boss_YoggSaron_01",
+  special = "INterface\\Icons\\INV_Misc_QuestionMark",
+}
+
+if success and GetCVar("portal") == "CN" then
+    local prices = { [10] = 3000, [12] = 3300, [15] = 4125, [16] = 4250, [17] = 4250, [20] = 5000, [28] = 6300, [30] = 6750, [35] = 7875, [45] = 9000, [50] = 10000, [66] = 13200, [75] = 15000, }
+    local vendors = {
+        { { "truth", 1, }, { "proc_mastery", 1, }, { "passive_crit_dam", 2, }, { "passive_mastery", 2, }, { "passive_haste", 3, }, { "twisted", 3, }, },
+        { { "passive_mastery", 1, }, { "ritual", 1, }, { "proc_crit", 2, }, { "passive_leech", 2, }, { "truth", 2, }, { "passive_versatility", 3, }, { "passive_avoidance", 2, }, },
+        { { "star", 1, }, { "proc_versatility", 1, }, { "clarity", 1, }, { "passive_crit", 2, }, { "proc_haste", 3, }, { "passive_leech", 3, }, { "passive_avoidance", 3, }, },
+        { { "passive_crit", 1, }, { "passive_leech", 1, }, { "passive_haste", 2, }, { "twilight", 2, }, { "proc_mastery", 3, }, { "passive_crit_dam", 3, }, },
+        { { "passive_haste", 1, }, { "twisted", 1, }, { "proc_haste", 2, }, { "echo", 2, }, { "star", 3, }, { "passive_crit", 3, }, },
+    }
+    local firstTime = time({ year =2020, month=5, day=21, hour=7})
+    local interval = 60*60*24*7/2
+    local timeFormat = "%m月%d日%H:%M"
+
+    local tip = CorruptionVendorTooltip or CreateFrame("GameTooltip", "CorruptionVendorTooltip", UIParent, "GameTooltipTemplate")
+    SetOrHookScript(GameTooltip, "OnHide", function() tip:Hide() end)
+
+    local function formatOne(key, level)
+        if not key then return " " end
+        return format("\124T%s:11\124t %d级%s %s", icons[key] or icons.special, level, LOCALES[key] or LOCALES.UNKNOWN, data.corrupts[key] and prices[data.corrupts[key][level]] or "????")
+    end
+
+    local function addVendorTip(list, color)
+        for i=1, #list, 2 do
+            local left = formatOne(list[i][1], list[i][2])
+            local right = list[i+1] and formatOne(list[i+1][1], list[i+1][2]) or " "
+            GameTooltip_AddColoredDoubleLine(tip, left, right, color or HIGHLIGHT_FONT_COLOR, color or HIGHLIGHT_FONT_COLOR, true);
+        end
+    end
+
+    CharIcon:HookScript("OnEnter", function()
+        local round = floor((time()-firstTime)/interval)
+        round = round % 8 + 1 --0->1 7->8 8->1
+        local nextDate = date("%m月%d日 %H:%M", firstTime + round * interval)
+
+        tip:SetOwner(GameTooltip, "ANCHOR_NONE")
+        tip:ClearAllPoints()
+        tip:SetMinimumWidth(100)
+        tip:SetPoint("TOPLEFT", GameTooltip, "TOPRIGHT", 5, 0)
+        GameTooltip_AddColoredLine(tip, "腐蚀兑换情况", HIGHLIGHT_FONT_COLOR);
+        GameTooltip_AddColoredLine(tip, "心之密室纯净圣母处可以用回响换腐蚀附魔，因为国服更新时间晚于美服，所以北京时间每周二晚23:00可以预知周四早7:00、每周六中午11:00可以预知周日晚19:00刷新的腐蚀", NORMAL_FONT_COLOR);
+
+        GameTooltip_AddBlankLineToTooltip(tip);
+        GameTooltip_AddColoredLine(tip, "当前 至 " .. date(timeFormat, firstTime + round * interval), NORMAL_FONT_COLOR);
+        local list = vendors[round]
+        if not list then
+            GameTooltip_AddColoredLine(tip, "暂时没有数据", HIGHLIGHT_FONT_COLOR)
+        else
+            addVendorTip(list)
+        end
+
+        GameTooltip_AddBlankLineToTooltip(tip);
+        GameTooltip_AddColoredLine(tip, "下一轮 " .. date(timeFormat, firstTime + round * interval) .. " 至 " .. date(timeFormat, firstTime + (round+1) * interval), NORMAL_FONT_COLOR);
+        list = vendors[round+1]
+        if not list then
+            local round2 = floor((time()+32*60*60-firstTime)/interval) --提前32小时
+            round2 = round2 % 8 + 1
+            GameTooltip_AddColoredLine(tip, round == round2 and "美服尚未更新，请等待并及时更新爱不易" or "没有数据，请等待并及时更新爱不易", GRAY_FONT_COLOR)
+        else
+            addVendorTip(list, GRAY_FONT_COLOR)
+        end
+
+        for i=2,7 do
+            GameTooltip_AddBlankLineToTooltip(tip);
+            GameTooltip_AddColoredLine(tip, date(timeFormat, firstTime + (round+i) * interval) .. " 至 " .. date(timeFormat, firstTime + (round+i+1) * interval), NORMAL_FONT_COLOR);
+            local list = vendors[(round+i-1)%8+1]
+            if not list then
+                GameTooltip_AddColoredLine(tip, "尚未轮换", GRAY_FONT_COLOR)
+            else
+                addVendorTip(list, GRAY_FONT_COLOR)
+            end
+        end
+
+        tip:Show()
+    end)
+end

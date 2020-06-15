@@ -1,4 +1,4 @@
---## Author: Kalief   ## Version: 2.3   ## Notes: Writes a chat message if you pick up a BoE item with transmog that you havent collected yet
+--## Author: Kalief   ## Version: 2.5   ## Notes: Writes a chat message if you pick up a BoE item with transmog that you havent collected yet
 local TransmogHeadsUp = CreateFrame("FRAME", "AddonFrame");
 TransmogHeadsUp:RegisterEvent("CHAT_MSG_LOOT");
 
@@ -37,6 +37,25 @@ local function collectedApperance(itemLink)
 	return ScanForTransmogState(itemLink)
 end
 
+
+local function IsJewelery(ItemSlot)
+	if ItemSlot == "INVTYPE_NECK" or ItemSlot == "INVTYPE_TRINKET" or ItemSlot == "INVTYPE_FINGER" or ItemSlot == "INVTYPE_RELIC" then
+		--print("Is jewelery");
+		return true;
+	else
+		--print("Is NOT jewelery");
+		return false;
+	end
+end
+
+local function ItemIsBoE(ItemBoE)
+	if ItemBoE == 2 then
+		return true;
+	else
+		return false;
+	end
+end
+
 TransmogHeadsUp:SetScript("OnEvent", function(self, event, ...)
 	local message = select(1, ...);
 	local playername = select(5, ...);  	--find playername
@@ -45,6 +64,7 @@ TransmogHeadsUp:SetScript("OnEvent", function(self, event, ...)
 	local newPlayername = playername1 .. "-" .. realmName;
 	if playername == newPlayername then		
 		local itemID = message:match("|%x-|Hitem:(%d-):.-|h.-|h|r")	
+		if(itemID ~= nil)then
 		local ItemBoE = select(14,GetItemInfo(itemID));
 		local ItemType = select(6,GetItemInfo(itemID));
 		local ItemSlot = select(9,GetItemInfo(itemID));
@@ -75,9 +95,12 @@ TransmogHeadsUp:SetScript("OnEvent", function(self, event, ...)
 					elseif info == 4 then
 						--PlaySound(17341, "Master", false);
 						--print(itemLink .. "??!!** ERROR: Unusable transmog **!!??");
+						end
+					else
+						--print("|cffff0000 Transmog "  .. itemLink ..  " |cffff0000 allready known");
 					end
 				end
 			end
-		--end
-	end
+		end
+	--end
 end);

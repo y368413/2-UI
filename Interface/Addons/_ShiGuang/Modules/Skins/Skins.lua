@@ -49,8 +49,8 @@ function S:OnLogin()
 
 	self:LoadDefaultSkins()
 	-- Add Skins
-	self:QuestTracker()
-	self:QuestTrackerSkinTitle()
+	--self:QuestTracker()
+	--self:QuestTrackerSkinTitle()
 	self:DBMSkin()
 	self:BigWigsSkin()
 	self:LootEx()		-- 拾取增强

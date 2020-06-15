@@ -111,7 +111,7 @@ end
 -- Party watcher spells
 function module:UpdatePartyWatcherSpells()
 	if not next(MaoRUIDB["PartyWatcherSpells"]) then
-		for spellID, duration in pairs(R.PartysSpells) do
+		for spellID, duration in pairs(R.PartySpells) do
 			local name = GetSpellInfo(spellID)
 			if name then
 				MaoRUIDB["PartyWatcherSpells"][spellID] = duration

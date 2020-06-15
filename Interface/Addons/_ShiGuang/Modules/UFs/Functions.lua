@@ -139,7 +139,9 @@ function UF:CreateHealthText(self)
 		name:SetWidth(self:GetWidth()*.55)
 	end
 
-	if mystyle == "nameplate" then
+	if mystyle == "focus" then
+		self:Tag(name, "[color][name][afkdnd]")
+	elseif mystyle == "nameplate" then
 		self:Tag(name, "[nplevel][name]")
 	elseif mystyle == "arena" then
 		self:Tag(name, "[arenaspec] [color][name]")
@@ -371,7 +373,10 @@ function UF:CreateCastBar(self)
 	cb:SetWidth(self:GetWidth() - 21)
 	M.CreateSB(cb, true, .2, .8, 1)
 
-	if mystyle == "boss" or mystyle == "arena" then
+	if mystyle == "focus" then
+		cb:SetSize(MaoRUIPerDB["UFs"]["FocusCBWidth"], MaoRUIPerDB["UFs"]["FocusCBHeight"])
+		createBarMover(cb, U["Focus Castbar"], "FocusCB", R.UFs.Focuscb)
+	elseif mystyle == "boss" or mystyle == "arena" then
 		cb:SetPoint("TOPRIGHT", self.Power, "BOTTOMRIGHT", 0, -8)
 		cb:SetSize(self:GetWidth(), 10)
 	elseif mystyle == "nameplate" then
@@ -601,7 +606,12 @@ function UF:CreateAuras(self)
 	bu.initialAnchor = "TOPLEFT"
 	bu["growth-y"] = "DOWN"
 	bu.spacing = 3
-	if mystyle == "raid" then
+	if mystyle == "focus" then
+		bu:SetPoint("TOPLEFT", self.Power, "BOTTOMLEFT", 0, -10)
+		bu.numBuffs = 0
+		bu.numDebuffs = 14
+		bu.iconsPerRow = 7
+	elseif mystyle == "raid" then
 		if MaoRUIPerDB["UFs"]["RaidBuffIndicator"] then
 			bu.initialAnchor = "LEFT"
 			bu:SetPoint("LEFT", self, 15, 0)

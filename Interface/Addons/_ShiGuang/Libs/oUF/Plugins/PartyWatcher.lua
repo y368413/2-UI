@@ -39,43 +39,41 @@ local function Update(self, event, unit, _, spellID)
 	if unit ~= self.unit then return end
 
 	local element = self.PartyWatcher
-	local maxButtons = #element
+	local maxButtons = element.maxButtons
 	local index = element.index
 	local duration = element.PartySpells[spellID]
 	local talentCDFix = element.TalentCDFix[spellID]
 
-	if duration and index <= maxButtons then
+	if duration then
 		local thisTime = GetTime()
-		for i = 1, maxButtons do
-			local button = element[i]
-			if button.spellID and button.spellID == spellID then
-				if talentCDFix and (thisTime-button.lastTime+1) <= duration then -- 1s latency
-					duration = talentCDFix
-				end
-				button.lastTime = thisTime
-				button.CD:SetCooldown(thisTime, duration)
-				return
-			end
+		local button = element.spellToButton[spellID]
+		if not button then
+			if index == maxButtons then print("full limit") return end
+			index = index + 1
+			button = element[index]
+			button.lastTime = thisTime
+			button.Icon:SetTexture(GetSpellTexture(spellID))
+			button.spellID = spellID
+			button:Show()
+
+			element.index = index
+			element.spellToButton[spellID] = button
 		end
 
-		index = index + 1
-		if index > maxButtons then return end
-		element.index = index
-
-		local button = element[index]
+		if talentCDFix and (duration >= thisTime-button.lastTime + 1) then -- allow 1s latency
+			duration = talentCDFix
+		end
 		button.lastTime = thisTime
 		button.CD:SetCooldown(thisTime, duration)
-		button.Icon:SetTexture(GetSpellTexture(spellID))
-		button.spellID = spellID
-		button:Show()
-	end
 
-	if self.PostUpdate then self:PostUpdate(event, unit, spellID) end
+		if element.PostUpdate then element:PostUpdate(button, unit, spellID) end
+	end
 end
 
 local function ResetButtons(self)
 	local element = self.PartyWatcher
 	element.index = 0
+	wipe(element.spellToButton)
 	for i = 1, element.__max do
 		local button = element[i]
 		button.spellID = nil
@@ -88,6 +86,8 @@ local function Enable(self)
 
 	if element then
 		element.index = 0
+		element.maxButtons = #element
+		element.spellToButton = {}
 		self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", Update)
 		self:RegisterEvent("GROUP_ROSTER_UPDATE", ResetButtons, true)
 		self:RegisterEvent("GROUP_LEFT", ResetButtons, true)

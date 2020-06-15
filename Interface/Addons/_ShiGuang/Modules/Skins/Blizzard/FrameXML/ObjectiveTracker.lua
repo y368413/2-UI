@@ -1,7 +1,7 @@
 ﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
-local S = M:GetModule("Skins")
-function S:QuestTracker()
+
+tinsert(R.defaultThemes, function()
 	local r, g, b = I.r, I.g, I.b
 	local LE_QUEST_FREQUENCY_DAILY = LE_QUEST_FREQUENCY_DAILY or 2
 	local C_QuestLog_IsQuestReplayable = C_QuestLog.IsQuestReplayable
@@ -17,14 +17,7 @@ function S:QuestTracker()
 		bg:SetPoint("BOTTOMLEFT", -30, -4)
 		bg:SetSize(250, 30)
 	end
-  -- Move Headers 
-  local function Moveit(header) 
-    header:EnableMouse(true)	
-	  header:RegisterForDrag("LeftButton")
-    header:SetHitRectInsets(-15, -15, -5, -5)
- 	  header:HookScript("OnDragStart", function() ObjectiveTrackerFrame:StartMoving() end) 
-	  header:HookScript("OnDragStop", function() ObjectiveTrackerFrame:StopMovingOrSizing() end)
-  end
+
 	local headers = {
 		ObjectiveTrackerBlocksFrame.QuestHeader,
 		ObjectiveTrackerBlocksFrame.AchievementHeader,
@@ -33,11 +26,12 @@ function S:QuestTracker()
 		WORLD_QUEST_TRACKER_MODULE.Header,
 		ObjectiveTrackerFrame.BlocksFrame.UIWidgetsHeader
 	}
-	for _, header in pairs(headers) do Moveit(header) reskinHeader(header) end
-	
+	for _, header in pairs(headers) do reskinHeader(header) end
+
 	-- Show quest color and level
-	hooksecurefunc("QuestLogQuests_AddQuestButton", function(_, _, _, title, level, _, isHeader, _, isComplete, frequency, questID)
+	local function Showlevel(_, _, _, title, level, _, isHeader, _, isComplete, frequency, questID)
 		if ENABLE_COLORBLIND_MODE == "1" then return end
+
 		for button in pairs(QuestScrollFrame.titleFramePool.activeObjects) do
 			if title and not isHeader and button.questID == questID then
 				local title = "["..level.."] "..title
@@ -54,8 +48,10 @@ function S:QuestTracker()
 				button.Text:SetWordWrap(false)
 				button.Check:SetPoint("LEFT", button.Text, button.Text:GetWrappedWidth(), 0)
 			end
-	  end
-  end)
+		end
+	end
+	hooksecurefunc("QuestLogQuests_AddQuestButton", Showlevel)
+
 	-- Hook objective tracker
 	hooksecurefunc(QUEST_TRACKER_MODULE, "Update", function()
 		for i = 1, GetNumQuestWatches() do
@@ -78,7 +74,7 @@ function S:QuestTracker()
 				if QuestInfoFrame.questLog then
 					if GetQuestLogSelection() > 0 then QuestInfoTitleHeader:SetText("["..select(2, GetQuestLogTitle(GetQuestLogSelection())).."] "..QuestInfoTitleHeader:GetText()) end
 	end end end end)
-end
+
 ----------------------------------------------------------------------------------------
 --	Ctrl+Click to abandon a quest or Alt+Click to share a quest(by Suicidal Katt)
 ----------------------------------------------------------------------------------------
@@ -103,10 +99,8 @@ hooksecurefunc(QUEST_TRACKER_MODULE, "OnBlockHeaderClick", function(_, block)
 	end
 end)
 
-
 -- 任务名称职业着色 -------------------------------------------------------
-function S:QuestTrackerSkinTitle()
- if not MaoRUIPerDB["Skins"]["QuestTrackerSkinTitle"] then return end
+ if  MaoRUIPerDB["Skins"]["QuestTrackerSkinTitle"] then
     hooksecurefunc(QUEST_TRACKER_MODULE, "SetBlockHeader", function(_, block)
         --for i = 1, GetNumQuestWatches() do
 		    --local questID = GetQuestWatchInfo(i)
@@ -130,7 +124,8 @@ function S:QuestTrackerSkinTitle()
     hooksecurefunc(QUEST_TRACKER_MODULE, "OnBlockHeaderEnter", hoverquest)  
     hooksecurefunc(QUEST_TRACKER_MODULE, "OnBlockHeaderLeave", hoverquest)
  end   
-    
+  
+ end)   
  -- numQuests -------------------------------------------------------
 local numQuests=CreateFrame('frame')
 numQuests:RegisterEvent('PLAYER_LOGIN')
@@ -167,15 +162,3 @@ local function onSetHyperlink(self, link)
 end
 hooksecurefunc(ItemRefTooltip, "SetHyperlink", onSetHyperlink)
 hooksecurefunc(GameTooltip, "SetHyperlink", onSetHyperlink)
-
-
-  -------------ObjectiveTrackerFrame-------------
-    --ObjectiveTrackerFrame:SetFrameStrata("BACKGROUND")
-    ObjectiveTrackerFrame:ClearAllPoints()
-    ObjectiveTrackerFrame.ClearAllPoints = function() end
-    ObjectiveTrackerFrame:SetPoint("TOPLEFT","UIParent","TOPLEFT",26,-21)
-    ObjectiveTrackerFrame.SetPoint = function() end
-    ObjectiveTrackerFrame:SetHeight(GetScreenHeight()*.75)
-    ObjectiveTrackerFrame:SetClampedToScreen(false)
-    ObjectiveTrackerFrame:SetMovable(true)
-    if ObjectiveTrackerFrame:IsMovable() then ObjectiveTrackerFrame:SetUserPlaced(true) end

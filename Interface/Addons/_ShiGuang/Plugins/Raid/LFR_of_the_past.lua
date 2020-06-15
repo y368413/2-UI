@@ -1,147 +1,3 @@
-local MAJOR, MINOR = "LibColors-1.0", 107
-local lib = LibStub:NewLibrary(MAJOR, MINOR)
-local _G,string,match,tonumber,rawset,type = _G,string,match,tonumber,rawset,type
-local hex = "%02x";
-
-
-lib.num2hex = function(num)
-	return hex:format( (tonumber(num) or 0)*255 );
-end
-
-lib.colorTable2HexCode = function(cT)
-	local _ = lib.num2hex;
-	return _(cT[4] or cT["a"] or 1).._(cT[1] or cT["r"] or 1).._(cT[2] or cT["g"] or 1).._(cT[3] or cT["b"] or 1);
-end
-
-lib.hexCode2ColorTable = function(colorStr)
-	local codes = {string.sub(colorStr,3,4), string.sub(colorStr,5,6), string.sub(colorStr,7,8), string.sub(colorStr,1,2)};
-	for i,v in pairs(codes) do
-		v = string.format("%d","0x"..v);
-		if v~=0 then
-			codes[i] = ((100/255) * v) / 100;
-		end
-	end
-	return codes;
-end
-
-lib.colorset = setmetatable({},{
-	__index=function(t,k)
-		if k:find("^%x+$") then
-			return k;
-		end
-		return "ffffffff"; -- fallback color
-	end,
-	__call=function(t,a,b)
-		assert(type(a)=="string" or type(a)=="table","Usage: lib.colorset(<string|table>[, <string>])");
-
-		if type(a)=="table" then
-			for i,v in pairs(a) do
-				if type(i)=="string" and (type(v)=="string" or type(v)=="table") then
-					lib.colorset(i,v);
-				end
-			end
-			return;
-		end
-
-		if type(b)=="table" then
-			b = lib.colorTable2HexCode(b);
-		end
-
-		if type(b)=="string" then
-			rawset(t,a,strrep("f",8-strlen(b))..b);
-			return;
-		end
-		return;
-	end
-})
-
-lib.color = function(reqColor, str)
-	local Str,color = tostring(str);
-	assert(type(reqColor)=="string" or type(reqColor)=="table","Usage: lib.color(<string|table>[, <string>])")
-
-	-- empty string don't need color
-	if Str=="" then
-		return "";
-	end
-
-	-- convert table to string
-	if type(reqColor)=="table" then
-		reqColor = lib.colorTable2HexCode(reqColor)
-
-	-- or replace special color keywords
-	elseif reqColor=="playerclass" then
-		reqColor = UnitName("player")
-	end
-
-	-- get color code from lib.colorset
-	color = lib.colorset[reqColor:lower()]
-
-	if not color:find("^%x+$") then
-		color = lib.colorset.white;
-	end
-
-	 -- return color as color table
-	if str=="colortable" then
-		return lib.hexCode2ColorTable(color)
-	end
-
-	-- return string with color or color code
-	return (str==nil and color) or ("|c%s%s|r"):format(color, Str)
-end
-
-lib.getNames = function(pattern)
-	local names,_ = {}
-	for name,_ in pairs(lib.colorset) do
-		if pattern==nil or (pattern~=nil and name:match(pattern)) then
-			tinsert(names,name)
-		end
-	end
-	return names
-end
-
-do --[[ basic set of colors ]]
-	local tmp = {
-		-- basic colors
-		yellow = "ffff00",
-		orange = "ff8000",
-		red    = "ff0000",
-		violet = "ff00ff",
-		blue   = "0000ff",
-		cyan   = "00ffff",
-		green  = "00ff00",
-		black  = "000000",
-		gray   = "808080",
-		white  = "ffffff",
-		-- wow money colors
-		money_gold   = "ffd700",
-		money_silver = "eeeeef",
-		money_copper = "f0a55f",
-	};
-
-	-- add class names with english and localized names
-	for n, c in pairs(CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS) do
-		tmp[n:lower()] = c.colorStr;
-		if LOCALIZED_CLASS_NAMES_MALE[n] then
-			tmp[LOCALIZED_CLASS_NAMES_MALE[n]:lower()] = c.colorStr;
-		end
-		if LOCALIZED_CLASS_NAMES_FEMALE[n] then
-			tmp[LOCALIZED_CLASS_NAMES_FEMALE[n]:lower()] = c.colorStr;
-		end
-	end
-
-	-- add item quality colors [currently from -1 to 7]
-	for i,v in pairs(_G.ITEM_QUALITY_COLORS) do
-		tmp["quality"..i] = v;
-		if (_G["ITEM_QUALITY"..i.."_DESC"]) then
-			tmp[_G["ITEM_QUALITY"..i.."_DESC"]:lower()] = v;
-		end
-	end
-
-	lib.colorset(tmp)
-end
-
---[[ space for more colors later... ]]
-
 
 
 local LFRofthepast = {};
@@ -253,72 +109,15 @@ LFRofthepast.lfrID = {
 -- bosskill tracking das am mittwoch zurückgesetzt wird.
 -- broker und optionpanel seite mit namen und orten wo die npcs zu finden sind.
 local realm,character,faction = GetRealmName();
-local buttons,hookedButton,died,NPC_ID = {},{},{},false,(UnitGUID("target"));
+local buttons,hookedButton,NPC_ID = {},{},{},(UnitGUID("target"));
 local name, typeID, subtypeID, minLevel, maxLevel, recLevel, minRecLevel, maxRecLevel, expansionLevel, groupID, texture = 1,2,3,4,5,6,7,8,9,10,11; -- GetLFGDungeonInfo
 local difficulty, maxPlayers, description, isHoliday, bonusRepAmount, minPlayers, isTimeWalker, name2, minGearLevel = 12,13,14,15,16,17,18,19,20; -- GetLFGDungeonInfo
 local iconTexCoords,killedEncounter,BossKillQueryUpdate,UpdateInstanceInfoLock,currentInstance = {},{},false,false,{};
-local pat = {
-	RAID_INSTANCE_WELCOME = _G.RAID_INSTANCE_WELCOME_LOCKED:gsub("%%s","(.*)"),
-	RAID_INSTANCE_WELCOME_LOCKED = _G.RAID_INSTANCE_WELCOME_LOCKED:gsub("%%s","(.*)")
-};
-
-local LC = LibStub("LibColors-1.0");
-local C = LC.color;
-LC.colorset({
-	["ltyellow"]	= "fff569",
-	["dkyellow"]	= "ffcc00",
-	["ltorange"]	= "ff9d6a",
-	["dkorange"]	= "905d0a",
-	["ltred"]		= "ff8080",
-	["dkred"]		= "800000",
-	["violet"]		= "f000f0",
-	["ltviolet"]	= "f060f0",
-	["dkviolet"]	= "800080",
-	["ltblue"]		= "69ccf0",
-	["dkblue"]		= "000088",
-	["dailyblue"]	= "00b3ff",
-	["ltcyan"]		= "80ffff",
-	["dkcyan"]		= "008080",
-	["ltgreen"]		= "80ff80",
-	["dkgreen"]		= "00aa00",
-	["dkgray"]		= "404040",
-	["gray2"]		= "A0A0A0",
-	["ltgray"]		= "b0b0b0",
-	["gold"]		= "ffd700",
-	["silver"]		= "eeeeef",
-	["copper"]		= "f0a55f",
-	["unknown"]		= "ee0000",
-});
-
-local bossIs = {
-	--dead="|Tinterface/minimap/ObjectIconsAtlas: |t "..C("gray","%s"),
-	--alive="|Tinterface\\lfgframe\\ui-lfg-icon-heroic:12:12:0:0:32:32:0:16:0:16|t "..C("ltyellow","%s")
-	dead="|Tinterface/questtypeicons:18:18:0:0:128:64:108:126:18:36|t"..C("gray","%s"),
-	alive="|Tinterface/questtypeicons:18:18:0:0:128:64:0:18:36:54|t"..C("ltyellow","%s")
-}
-
-do
-	local colors = {"0099ff","00ff00","ff6060","44ffff","ffff00","ff8800","ff44ff","ffffff"};
-	local function colorize(...)
-		local t,c,a1 = {tostringall(...)},1,...;
-		if type(a1)=="boolean" then tremove(t,1); end
-		if a1~=false then
-			tinsert(t,1,"|cff0099ff"..((a1==true and "LFRotp") or (a1=="||" and "||") or "_ShiGuang").."|r"..(a1~="||" and HEADER_COLON or ""));
-			c=2;
-		end
-		for i=c, #t do
-			if not t[i]:find("\124c") then
-				t[i],c = "|cff"..colors[c]..t[i].."|r", c<#colors and c+1 or 1;
-			end
-		end
-		return unpack(t);
-	end
-end
 
 ------------------------------------------------
 -- GameTooltip to get localized names and other informations
 
-LFRofthepast.scanTT = CreateFrame("GameTooltip","_ShiGuang_ScanTT",UIParent,"GameTooltipTemplate");
+LFRofthepast.scanTT = CreateFrame("GameTooltip","LFRofthepast_ScanTT",UIParent,"GameTooltipTemplate");
 LFRofthepast.scanTT:SetScale(0.0001); LFRofthepast.scanTT:SetAlpha(0); LFRofthepast.scanTT:Hide();
 -- unset script functions shipped by GameTooltipTemplate to prevent errors
 for _,v in ipairs({"OnLoad","OnHide","OnTooltipAddMoney","OnTooltipSetDefaultAnchor","OnTooltipCleared"})do LFRofthepast.scanTT:SetScript(v,nil); end
@@ -430,7 +229,7 @@ local function buttonHook_OnEnter(self)
 
 		-- instance group name (for raids splitted into multible lfr instances)
 		if not LFRofthepast.noSubtitle[NPC_ID] and buttons[buttonID].instance[name]~=buttons[buttonID].instance[name2] then
-			GameTooltip:AddLine(C("gray",buttons[buttonID].instance[name2]));
+			GameTooltip:AddLine("|cFFA0A0A0"..buttons[buttonID].instance[name2].."|r");
 		end
 
 		-- instance description
@@ -458,7 +257,7 @@ local function buttonHook_OnEnter(self)
 				if not isKilled and killedEncounter[n] and killedEncounter[n][boss] then
 					isKilled = true;
 				end
-				GameTooltip:AddDoubleLine(C("ltblue",boss),isKilled and C("red",BOSS_DEAD) or C("green",BOSS_ALIVE));
+				GameTooltip:AddDoubleLine("|cFF69ccf0"..boss.."|r",isKilled and "|cFFff8080"..BOSS_DEAD.."|r" or "|cFF80ff80"..BOSS_ALIVE.."|r");
 			end
 		end
 		GameTooltip:Show();
@@ -474,9 +273,9 @@ local function raidButton(button,icon,data)
 	icon:SetTexture("interface\\minimap\\raid");
 	iconTexCoords[icon] = {icon:GetTexCoord()};
 	icon:SetTexCoord(0.20,0.80,0.20,0.80);
-	local label = data.instance[name].."\n|Tinterface\\lfgframe\\ui-lfg-icon-heroic:12:12:0:0:32:32:0:16:0:16|t "..C("dkred",_G.GENERIC_FRACTION_STRING:format(data.numEncounters[1],data.numEncounters[2]));
+	local label = data.instance[name].."\n|Tinterface\\lfgframe\\ui-lfg-icon-heroic:12:12:0:0:32:32:0:16:0:16|t ".."|cFF800000".._G.GENERIC_FRACTION_STRING:format(data.numEncounters[1],data.numEncounters[2]).."|r";
 	if data.instance[name]~=data.instance[name2] then
-		label = label .. " || ".. C("dkgray",data.instance[name2]);
+		label = label .. " || ".. "|cFF404040"..data.instance[name2].."|r";
 	end
 	button:SetText(label);
 end
@@ -487,7 +286,7 @@ local function szenarioButton(button,icon,data)
 	icon:SetTexCoord(0.20,0.80,0.20,0.80);
 	local label = {data.instance[name]};
 	if data.instance[difficulty]==1 then
-		tinsert(label,C("dkblue"," ("..PLAYER_DIFFICULTY2..")"));
+		tinsert(label,"|cFF000088".." ("..PLAYER_DIFFICULTY2..")".."|r");
 	end
 	button:SetText(table.concat(label,"\n"));
 end

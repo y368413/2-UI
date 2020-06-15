@@ -120,3 +120,4 @@ function MISC:MissingStats()
 		PaperDollFrame_SetLabelAndText(statFrame, STAT_AVERAGE_ITEM_LEVEL, displayItemLevel, false, displayItemLevel)
 	end)
 end
+MISC:RegisterMisc("MissingStats", MISC.MissingStats)

@@ -173,7 +173,7 @@ module:RegisterDebuff(TIER, INSTANCE, 0, 258875, 6) -- 眩晕酒桶
 module:RegisterDebuff(TIER, INSTANCE, 0, 274389) -- 捕鼠陷阱
 module:RegisterDebuff(TIER, INSTANCE, 0, 258323) -- 感染之伤
 module:RegisterDebuff(TIER, INSTANCE, 0, 257775) -- 瘟疫步
-module:RegisterDebuff(TIER, INSTANCE, 0, 257908) -- 浸油之刃
+module:RegisterDebuff(TIER, INSTANCE, 0, 257908, 6) -- 浸油之刃
 module:RegisterDebuff(TIER, INSTANCE, 0, 257436) -- 毒性打击
 module:RegisterDebuff(TIER, INSTANCE, 0, 274555) -- 污染之咬
 module:RegisterDebuff(TIER, INSTANCE, 0, 256363) -- 裂伤拳
@@ -279,3 +279,5 @@ module:RegisterDebuff(TIER, INSTANCE, 0, 305699) -- 锁定
 module:RegisterDebuff(TIER, INSTANCE, 0, 285443) -- 烈焰火炮
 module:RegisterDebuff(TIER, INSTANCE, 0, 301712) -- 突袭
 module:RegisterDebuff(TIER, INSTANCE, 0, 302274) -- 爆裂冲击
+module:RegisterDebuff(TIER, INSTANCE, 0, 298669) -- 跳电
+module:RegisterDebuff(TIER, INSTANCE, 0, 294929) -- 烈焰撕咬

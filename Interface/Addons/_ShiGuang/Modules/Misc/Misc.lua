@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 local MISC = M:RegisterModule("Misc")
 
 local _G = getfenv(0)
-local tonumber, select = tonumber, select
+local tonumber, select, strmatch = tonumber, select, strmatch
 local InCombatLockdown, IsModifiedClick, IsAltKeyDown = InCombatLockdown, IsModifiedClick, IsAltKeyDown
 local GetNumArchaeologyRaces = GetNumArchaeologyRaces
 local GetNumArtifactsByRace = GetNumArtifactsByRace
@@ -26,37 +26,43 @@ local GetSavedInstanceInfo = GetSavedInstanceInfo
 local SetSavedInstanceExtend = SetSavedInstanceExtend
 local RequestRaidInfo, RaidInfoFrame_Update = RequestRaidInfo, RaidInfoFrame_Update
 local IsGuildMember, C_BattleNet_GetGameAccountInfoByGUID, C_FriendList_IsFriend = IsGuildMember, C_BattleNet.GetGameAccountInfoByGUID, C_FriendList.IsFriend
+local GetMerchantNumItems, GetMerchantItemID = GetMerchantNumItems, GetMerchantItemID
+local HEADER_COLON, MERCHANT_ITEMS_PER_PAGE = HEADER_COLON, MERCHANT_ITEMS_PER_PAGE
 
 --[[
 	Miscellaneous 各种有用没用的小玩意儿
 ]]
+local MISC_LIST = {}
+
+function MISC:RegisterMisc(name, func)
+	if not MISC_LIST[name] then
+		MISC_LIST[name] = func
+	end
+end
+
 function MISC:OnLogin()
-	self:AddAlerts()
-	self:Expbar()
-	self:Focuser()
-	self:MailBox()
-	self:MissingStats()
-	self:ShowItemLevel()
-	self:QuickJoin()
-	self:QuestNotifier()
-	self:GuildBest()
-	self:ParagonReputationSetup()
+	for name, func in next, MISC_LIST do
+		if name and type(func) == "function" then
+			func()
+		end
+	end
+
+	-- Init
 	self:NakedIcon()
 	self:ExtendInstance()
 	self:VehicleSeatMover()
 	self:UIWidgetFrameMover()
 	self:MoveDurabilityFrame()
 	self:MoveTicketStatusFrame()
-	self:PetFilterTab()
-	self:AlertFrame_Setup()
 	self:UpdateScreenShot()
 	self:UpdateFasterLoot()
 	self:UpdateErrorBlocker()
 	self:TradeTargetInfo()
-	self:TradeTabs()
-	self:CreateRM()
+	self:MoverQuestTracker()
 	self:BlockStrangerInvite()
 	self:OverrideAWQ()
+	self:ReplaceContaminantName()
+	self:CreateRM()
 	self:FreeMountCD()
 	self:xMerchant()
 	
@@ -219,6 +225,21 @@ function MISC:MoveTicketStatusFrame()
 	end)
 end
 
+-- Reanchor ObjectiveTracker
+function MISC:MoverQuestTracker()
+	local frame = CreateFrame("Frame", "NDuiQuestMover", UIParent)
+	frame:SetSize(240, 43)
+	M.Mover(frame, U["QuestTracker"], "QuestTracker", {"TOPLEFT","UIParent","TOPLEFT",26,-21})
+
+	local tracker = ObjectiveTrackerFrame
+	tracker:ClearAllPoints()
+	tracker:SetPoint("TOPRIGHT", frame)
+	tracker:SetHeight(GetScreenHeight()*.75)
+	tracker:SetClampedToScreen(false)
+	tracker:SetMovable(true)
+	if tracker:IsMovable() then tracker:SetUserPlaced(true) end
+end
+
 -- Achievement screenshot
 function MISC:ScreenShotOnEvent()
 	MISC.ScreenShotFrame.delay = 1
@@ -357,6 +378,135 @@ function MISC:TradeTargetInfo()
 		infoText:SetText(text)
 	end
 	hooksecurefunc("TradeFrame_Update", updateColor)
+end
+
+-- Block invite from strangers
+function MISC:BlockStrangerInvite()
+	M:RegisterEvent("PARTY_INVITE_REQUEST", function(_, _, _, _, _, _, _, guid)
+		if MaoRUIPerDB["Misc"]["BlockInvite"] and not (C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGuildMember(guid)) then
+			DeclineGroup()
+			StaticPopup_Hide("PARTY_INVITE")
+		end
+	end)
+end
+
+-- Override default settings for AngryWorldQuests
+function MISC:OverrideAWQ()
+	if not IsAddOnLoaded("AngryWorldQuests") then return end
+
+	AngryWorldQuests_Config = AngryWorldQuests_Config or {}
+	AngryWorldQuests_CharacterConfig = AngryWorldQuests_CharacterConfig or {}
+
+	local settings = {
+		hideFilteredPOI = true,
+		showContinentPOI = true,
+		sortMethod = 2,
+	}
+	local function overrideOptions(_, key)
+		local value = settings[key]
+		if value then
+			AngryWorldQuests_Config[key] = value
+			AngryWorldQuests_CharacterConfig[key] = value
+		end
+	end
+	hooksecurefunc(AngryWorldQuests.Modules.Config, "Set", overrideOptions)
+end
+
+-- Replace contaminant name
+local contaminantsLevel = {
+	[177955] = "I",		-- 致命之势
+	[177965] = "II",	-- 致命之势
+	[177966] = "III",	-- 致命之势
+	[177967] = "III",	-- 虚空回响
+	[177968] = "II",	-- 虚空回响
+	[177969] = "I",		-- 虚空回响
+	[177970] = "I",		-- 闪避者
+	[177971] = "II",	-- 闪避者
+	[177972] = "III",	-- 闪避者
+	[177973] = "I",		-- 权宜之计
+	[177974] = "II",	-- 权宜之计
+	[177975] = "III",	-- 权宜之计
+	[177976] = "",		-- 须臾洞察
+	[177977] = "",		-- 龟裂创伤
+	[177978] = "I",		-- 磨砺心灵
+	[177979] = "II",	-- 磨砺心灵
+	[177980] = "III",	-- 磨砺心灵
+	[177981] = "I",		-- 不可言喻的真相
+	[177982] = "II",	-- 不可言喻的真相
+	[177983] = "I",		-- 无尽之星
+	[177984] = "II",	-- 无尽之星
+	[177985] = "III",	-- 无尽之星
+	[177986] = "I",		-- 娴熟
+	[177987] = "II",	-- 娴熟
+	[177988] = "III",	-- 娴熟
+	[177989] = "I",		-- 急速脉搏
+	[177990] = "II",	-- 急速脉搏
+	[177991] = "III",	-- 急速脉搏
+	[177992] = "I",		-- 暴戾
+	[177993] = "II",	-- 暴戾
+	[177994] = "III",	-- 暴戾
+	[177995] = "I",		-- 虹吸者
+	[177996] = "II",	-- 虹吸者
+	[177997] = "III",	-- 虹吸者
+	[177998] = "I",		-- 击穿
+	[177999] = "II",	-- 击穿
+	[178000] = "III",	-- 击穿
+	[178001] = "I",		-- 活力涌动
+	[178002] = "II",	-- 活力涌动
+	[178003] = "III",	-- 活力涌动
+	[178004] = "I",		-- 暮光毁灭
+	[178005] = "II",	-- 暮光毁灭
+	[178006] = "III",	-- 暮光毁灭
+	[178007] = "I",		-- 扭曲的附肢
+	[178008] = "II",	-- 扭曲的附肢
+	[178009] = "III",	-- 扭曲的附肢
+	[178010] = "I",		-- 多才多艺
+	[178011] = "II",	-- 多才多艺
+	[178012] = "III",	-- 多才多艺
+	[178013] = "I",		-- 虚空仪式
+	[178014] = "II",	-- 虚空仪式
+	[178015] = "III",	-- 虚空仪式
+}
+function MISC:ReplaceContaminantName()
+	local itemString
+
+	local function updateItemString()
+		local itemName = GetItemInfo(177981)
+		if itemName then
+			return strmatch(itemName, "(.+"..HEADER_COLON..")").."(.+)"
+		end
+	end
+
+	local function setupMisc()
+		if not itemString then
+			itemString = updateItemString()
+		end
+		if not itemString then return end
+
+		local numItems = GetMerchantNumItems()
+		for i = 1, MERCHANT_ITEMS_PER_PAGE do
+			local index = (MerchantFrame.page - 1) * MERCHANT_ITEMS_PER_PAGE + i
+			if index > numItems then return end
+
+			local button = _G["MerchantItem"..i.."ItemButton"]
+			if button and button:IsShown() then
+				local name = _G["MerchantItem"..i.."Name"]
+				local text = name and name:GetText()
+				local newString = text and strmatch(text, itemString)
+				if newString then
+					name:SetText(newString)
+				end
+
+				local id = GetMerchantItemID(index)
+				local level = id and contaminantsLevel[id]
+				if not button.levelString then
+					button.levelString = M.CreateFS(button, 14, "", nil, "TOPLEFT", 3, -3)
+				end
+				button.levelString:SetText(level or "")
+			end
+		end
+	end
+	hooksecurefunc("MerchantFrame_UpdateMerchantInfo", setupMisc)
 end
 
 -- Archaeology counts
@@ -653,38 +803,6 @@ do
 
 	M:RegisterEvent("ADDON_LOADED", fixGuildNews)
 	M:RegisterEvent("ADDON_LOADED", fixCommunitiesNews)
-end
-
--- Block invite from strangers
-function MISC:BlockStrangerInvite()
-	M:RegisterEvent("PARTY_INVITE_REQUEST", function(_, _, _, _, _, _, _, guid)
-		if MaoRUIPerDB["Misc"]["BlockInvite"] and not (C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGuildMember(guid)) then
-			DeclineGroup()
-			StaticPopup_Hide("PARTY_INVITE")
-		end
-	end)
-end
-
--- Override default settings for AngryWorldQuests
-function MISC:OverrideAWQ()
-	if not IsAddOnLoaded("AngryWorldQuests") then return end
-
-	AngryWorldQuests_Config = AngryWorldQuests_Config or {}
-	AngryWorldQuests_CharacterConfig = AngryWorldQuests_CharacterConfig or {}
-
-	local settings = {
-		hideFilteredPOI = true,
-		showContinentPOI = true,
-		sortMethod = 2,
-	}
-	local function overrideOptions(_, key)
-		local value = settings[key]
-		if value then
-			AngryWorldQuests_Config[key] = value
-			AngryWorldQuests_CharacterConfig[key] = value
-		end
-	end
-	hooksecurefunc(AngryWorldQuests.Modules.Config, "Set", overrideOptions)
 end
 
 --[[hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self,textString,value,_,maxValue)  ---	Custom status text format.

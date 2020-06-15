@@ -51,6 +51,7 @@ function MISC:QuickJoin()
 		if PVEFrame:IsShown() then HideUIPanel(PVEFrame) end
 	end)
 
-	hooksecurefunc("StaticPopup_Show", self.HookDialogOnShow)
-	hooksecurefunc("LFGListInviteDialog_Show", self.HookDialogOnShow)
+	hooksecurefunc("StaticPopup_Show", MISC.HookDialogOnShow)
+	hooksecurefunc("LFGListInviteDialog_Show", MISC.HookDialogOnShow)
 end
+MISC:RegisterMisc("QuickJoin", MISC.QuickJoin)

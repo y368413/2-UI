@@ -250,7 +250,7 @@ function MISC:SetupScript(bar)
 	bar:SetScript("OnMouseUp", function(_, btn)
 	  if btn == "LeftButton" then
 		if not HasArtifactEquipped() then return end
-		   if not ArtifactFrame or not ArtifactFrame:IsShown() then SocketInventoryItem(16) else M:TogglePanel(ArtifactFrame) end
+		if not ArtifactFrame or not ArtifactFrame:IsShown() then SocketInventoryItem(16) else M:TogglePanel(ArtifactFrame) end
 	  elseif btn == "RightButton" then
         if (UnitLevel("player") ~= MAX_PLAYER_LEVEL) then sendReports() else return end
       end
@@ -263,9 +263,9 @@ end
 function MISC:Expbar()
 	if not MaoRUIPerDB["Misc"]["ExpRep"] then return end
 
-	local bar = CreateFrame("StatusBar", nil, Minimap)
+	local bar = CreateFrame("StatusBar", "NDuiMinimapDataBar", MinimapCluster)
 	bar:SetPoint("TOP", Minimap, "BOTTOM", 0, 0)
-	bar:SetSize(Minimap:GetWidth()-2, 3)
+	bar:SetSize(Minimap:GetWidth()-2*MaoRUIPerDB["Map"]["MinimapScale"], 3)
 	bar:SetHitRectInsets(0, 0, 0, -10)
 	M.CreateSB(bar)
 	
@@ -280,9 +280,11 @@ function MISC:Expbar()
 	rest:SetFrameLevel(bar:GetFrameLevel() - 1)
 	bar.restBar = rest
 
-	self:SetupScript(bar)
+	MISC:SetupScript(bar)
 end
+MISC:RegisterMisc("ExpRep", MISC.Expbar)
 
+-- Paragon reputation info
 function MISC:HookParagonRep()
 	local numFactions = GetNumFactions()
 	local factionOffset = FauxScrollFrame_GetOffset(ReputationListScrollFrame)
@@ -313,5 +315,6 @@ end
 
 function MISC:ParagonReputationSetup()
 	if not MaoRUIPerDB["Misc"]["ParagonRep"] then return end
-	hooksecurefunc("ReputationFrame_Update", self.HookParagonRep)
+	hooksecurefunc("ReputationFrame_Update", MISC.HookParagonRep)
 end
+MISC:RegisterMisc("ParagonRep", MISC.ParagonReputationSetup)

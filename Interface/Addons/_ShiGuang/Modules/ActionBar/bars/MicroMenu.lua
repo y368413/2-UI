@@ -15,7 +15,7 @@ function Bar:MicroButton_SetupTexture(icon, texture)
 end
 
 function Bar:MicroButton_Create(parent, data)
-	local texture, method, tooltip = unpack(data)
+	local texture, method = unpack(data)
 
 	local bu = CreateFrame("Frame", nil, parent)
 	tinsert(buttonList, bu)
@@ -35,7 +35,7 @@ function Bar:MicroButton_Create(parent, data)
 		button:SetNormalTexture(nil)
 		button:SetPushedTexture(nil)
 		button:SetDisabledTexture(nil)
-		if tooltip then M.AddTooltip(button, "ANCHOR_RIGHT", tooltip) end
+		--if tooltip then M.AddTooltip(button, "ANCHOR_RIGHT", tooltip) end
 
 		local hl = button:GetHighlightTexture()
 		Bar:MicroButton_SetupTexture(hl, texture)
@@ -46,7 +46,7 @@ function Bar:MicroButton_Create(parent, data)
 		if not MaoRUIPerDB["Skins"]["ClassLine"] then flash:SetVertexColor(1, 1, 1) end
 	else
 		bu:SetScript("OnMouseUp", method)
-		M.AddTooltip(bu, "ANCHOR_RIGHT", tooltip)
+		--M.AddTooltip(bu, "ANCHOR_RIGHT", tooltip)
 
 		local hl = bu:CreateTexture(nil, "HIGHLIGHT")
 		hl:SetBlendMode("ADD")
@@ -68,14 +68,14 @@ function Bar:MicroMenu()
 		--{"UI-MicroButton-Help-Up", "MainMenuMicroButton", MicroButtonTooltipText(MAINMENU_BUTTON, "TOGGLEGAMEMENU")},
 		--{"UI-MicroButton-Abilities-Up", function() ToggleAllBags() end, MicroButtonTooltipText(BAGSLOT, "OPENALLBAGS")},
 		--{"UI-MICROBUTTON-QUEST-UP", "QuestLogMicroButton"},
-		{"UI-MicroButton-Spellbook-Up", "SpellbookMicroButton", string},
-		{"UI-MICROBUTTON-SOCIALS-UP", "GuildMicroButton",string },
-		{"UI-MicroButton-Achievement-Up", "AchievementMicroButton",string },
-		{"UI-MicroButton-LFG-Up", "LFDMicroButton",string },
-		{"UI-MicroButton-Talents-Up", "TalentMicroButton",string },
-		{"UI-MicroButton-Mounts-Up", "CollectionsMicroButton",string },
-		{"UI-MicroButton-EJ-Up", "EJMicroButton",string },
-		{"UI-MicroButton-Raid-Up", "CharacterMicroButton",string },
+		{"UI-MicroButton-Spellbook-Up", "SpellbookMicroButton"},
+		{"UI-MICROBUTTON-SOCIALS-UP", "GuildMicroButton"},
+		{"UI-MicroButton-Achievement-Up", "AchievementMicroButton"},
+		{"UI-MicroButton-LFG-Up", "LFDMicroButton"},
+		{"UI-MicroButton-Talents-Up", "TalentMicroButton"},
+		{"UI-MicroButton-Mounts-Up", "CollectionsMicroButton"},
+		{"UI-MicroButton-EJ-Up", "EJMicroButton"},
+		{"UI-MicroButton-Raid-Up", "CharacterMicroButton"},
 	}
 	for _, info in pairs(buttonInfo) do
 		Bar:MicroButton_Create(menubar, info)

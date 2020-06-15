@@ -436,3 +436,9 @@ L["Healing: Personal HPS"] = "治疗:个人HPS"
 L["Healing: Raid HPS"] = "治疗:团队HPS"
 L["RHPS"] = true
 
+L["AvoidableDamageTaken"] = "AvoidableDamageTaken"
+L["Avoidable damage taken"] = "Avoidable damage taken"
+L["List of damaging avoidable spells"] = "List of damaging avoidable spells"
+L["Damage taken by avoidable spell"] = "Damage taken by avoidable spell"
+L["List of damaged players by avoidable spells"] = "List of damaged players by avoidable spells"
+L["'s Avoidable damage taken"] = "'s Avoidable damage taken"

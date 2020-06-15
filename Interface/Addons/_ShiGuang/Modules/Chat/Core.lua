@@ -26,6 +26,16 @@ function module:UpdateChatSize()
 	if isScaling then return end
 	isScaling = true
 
+	if ChatFrame1:IsMovable() then
+		ChatFrame1:SetUserPlaced(true)
+	end
+	if ChatFrame1.FontStringContainer then
+		ChatFrame1.FontStringContainer:SetOutside(ChatFrame1)
+	end
+	if ChatFrame1:IsShown() then
+		ChatFrame1:Hide()
+		ChatFrame1:Show()
+	end
 	ChatFrame1:ClearAllPoints()
 	ChatFrame1:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 21)
 	ChatFrame1:SetWidth(MaoRUIPerDB["Chat"]["ChatWidth"])
@@ -80,10 +90,10 @@ function module:SkinChat()
 	tabFs:SetFont(I.Font[1], I.Font[2]+2, I.Font[3])
 	tabFs:SetShadowColor(0, 0, 0, 0)
 	tabFs:SetTextColor(1, .8, 0)
-	M.StripTextures(tab, 7)
+	M.StripTextures(tab, 6)
 	--hooksecurefunc(tab, "SetAlpha", module.TabSetAlpha)
 
-	if MaoRUIPerDB["Chat"]["Lock"] then M.StripTextures(self) end
+	--if MaoRUIPerDB["Chat"]["Lock"] then M.StripTextures(self) end
 	M.HideObject(self.buttonFrame)
 	M.HideObject(self.ScrollBar)
 	M.HideObject(self.ScrollToBottomButton)

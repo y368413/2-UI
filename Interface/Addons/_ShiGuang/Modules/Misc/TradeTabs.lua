@@ -164,7 +164,6 @@ function MISC:TradeTabs_FilterIcons()
 	M:RegisterEvent("TRADE_SKILL_LIST_UPDATE", updateFilterStatus)
 end
 function MISC:TradeTabs_OnLoad()
-	TradeSkillFrame.SearchBox:SetWidth(268)
 	MISC:UpdateProfessions()
 
 	MISC:TradeTabs_Update()
@@ -192,3 +191,4 @@ function MISC:TradeTabs()
 	if not MaoRUIPerDB["Misc"]["TradeTabs"] then return end
 	M:RegisterEvent("ADDON_LOADED", MISC.TradeTabs_OnEvent)
 end
+MISC:RegisterMisc("TradeTabs", MISC.TradeTabs)

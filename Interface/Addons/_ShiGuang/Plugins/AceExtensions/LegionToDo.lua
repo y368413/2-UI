@@ -1,6 +1,6 @@
 --## Author: ykiigor  ## SavedVariables: VLegionToDo
-local LegionToDoVersion = "4.0"
-local VERSION_NUMERIC = 40
+local LegionToDoVersion = "4.1"
+local VERSION_NUMERIC = 41
 
 local GetCurrentRegion
 do
@@ -111,6 +111,9 @@ end
 
 local ToDoFunc = {}
 _G.LegionToDo = {ToDoFunc = ToDoFunc,}
+
+local inspectScantip = CreateFrame("GameTooltip", "LegToDoScanningTooltip", nil, "GameTooltipTemplate")
+inspectScantip:SetOwner(UIParent, "ANCHOR_NONE")
 
 local isLevel110 = UnitLevel'player' <= 110
 local isLevel120 = UnitLevel'player' > 110
@@ -280,6 +283,17 @@ tinsert(ToDoFunc,function(self,collect)
 	collect.wtrainingweek = floor((time() - wArmyDay0) / days3val)
 end)
 
+local visionQuestReward = {
+      57841,"420",
+      57845,"430",
+      57842,"445",
+      57846,"450",
+      57843,"455",
+      57847,"460",
+      57844,"465",
+      57848,"470"
+}
+
 tinsert(ToDoFunc,function(self,collect)
 	local arguniteQuest = IsQuestFlaggedCompleted(48799)
 
@@ -359,6 +373,23 @@ tinsert(ToDoFunc,function(self,collect)
 		self:AddDoubleLine("Mini-Vision:", isMiniVisionDone and "|cff00ff00Done" or "|cffff0000Not completed",1,1,1)
 	end
 	collect.miniVision = isMiniVisionDone
+
+
+	collect.visionReward = nil
+	if not isLevel110 then
+		local minLvl
+		for i=#visionQuestReward,1,-2 do
+			if not IsQuestFlaggedCompleted(visionQuestReward[i-1]) then
+				minLvl = visionQuestReward[i]
+				break
+			end
+		end
+		minLvl = minLvl or "all done"
+		
+		self:AddDoubleLine("Horrific vision current reward:",minLvl,1,1,1)
+
+		collect.visionReward = minLvl
+	end
 end)
 
 
@@ -759,6 +790,12 @@ local LFRInstancesShowStatus = {
 	isLevel120,
 	isLevel120,
 }
+local raidToHide = {
+	true,true,true,false,false,
+	true,true,true,
+	false,
+	false,
+}
 
 tinsert(ToDoFunc,function(self,collect)
 	local res = {}
@@ -801,7 +838,7 @@ tinsert(ToDoFunc,function(self,collect)
 				
 				str = str .. (str ~= "" and "/" or "") .. (encountersCompleted == totalEncounters and "|cff00ff00" or encountersCompleted > 0 and "|cffffff00" or "|cffff0000") .. encountersCompleted .. "|r"
 			end
-			if LFRInstancesShowStatus[i] then
+			if LFRInstancesShowStatus[i] and not raidToHide[i] then
 				self:AddDoubleLine(raids[i].." "..PLAYER_DIFFICULTY3, str .. " ["..def.."]",1,1,1)
 			end
 			collect["raid"..i.."_lfr"] = def
@@ -809,7 +846,7 @@ tinsert(ToDoFunc,function(self,collect)
 		for j=1,#raidsDiffs do
 			if res[i] and res[i][ raidsDiffs[j] ] then
 				local defeatedBosses = res[i][ raidsDiffs[j] ][1]
-				if LFRInstancesShowStatus[i] then
+				if LFRInstancesShowStatus[i] and not raidToHide[i] then
 					self:AddDoubleLine(raids[i].." "..raidsDiffsNames[j], format("|cff%s%d/%d",raids_max_bosses[i]==defeatedBosses and "00ff00" or "ff0000",defeatedBosses,raids_max_bosses[i]) ,1,1,1)
 				end
 				collect["raid"..i.."_"..j] = defeatedBosses
@@ -823,7 +860,7 @@ tinsert(ToDoFunc,function(self,collect)
 					end
 				end
 			else
-				if LFRInstancesShowStatus[i] then
+				if LFRInstancesShowStatus[i] and not raidToHide[i] then
 					self:AddDoubleLine(raids[i].." "..raidsDiffsNames[j], "|cffff0000---",1,1,1)
 				end
 				collect["raid"..i.."_"..j] = 0
@@ -916,8 +953,6 @@ tinsert(ToDoFunc,function(self,collect)
 	end
 end)
 
-local inspectScantip = CreateFrame("GameTooltip", "LegToDoScanningTooltip", nil, "GameTooltipTemplate")
-inspectScantip:SetOwner(UIParent, "ANCHOR_NONE")
 
 tinsert(ToDoFunc,function(self,collect)
 
@@ -945,6 +980,30 @@ tinsert(ToDoFunc,function(self,collect)
 	
 	self:AddDoubleLine("Key", key or "---")
 	collect.mkey = key
+end)
+
+tinsert(ToDoFunc,function(self,collect)
+	collect.cloak_res = nil
+
+	local itemLink = GetInventoryItemLink("player", 15)
+
+	if itemLink and itemLink:find("item:169223:") then
+		inspectScantip:SetInventoryItem("player", 15)
+		if inspectScantip:NumLines() > 0 then
+			for j=2, inspectScantip:NumLines() do
+				local text = _G["LegToDoScanningTooltipTextLeft"..j]:GetText()
+				if text and text ~= "" then
+					local res = text:gsub("[,]",""):gsub("(%d+)[ ]+(%d+)","%1%2"):match("%+(%d+) ?"..(ITEM_MOD_CORRUPTION_RESISTANCE or "Corruption resistance").."$")
+
+					if res then
+						collect.cloak_res = res
+						break
+					end
+				end
+			end
+		end
+		inspectScantip:ClearLines()
+	end
 end)
 
 
@@ -1957,8 +2016,10 @@ LegionToDo:SetScript("OnShow",function(self)
 	count = LineUpdate(count,"mementos",name,texturePath)
 
 	count = LineUpdate(count,"miniVision","Mini Vision")
+	count = LineUpdate(count,"visionReward","Vision Reward")
 
 	count = LineUpdate(count,"cloak_lvl","Cloak level")
+	count = LineUpdate(count,"cloak_res","Cloak resistance")
 	
 	count = LineUpdate(count,"argunitequest","Argunite quest")
 	
@@ -2244,11 +2305,25 @@ LegionToDo:SetScript("OnShow",function(self)
 						lines[lineCount].cols[col]:SetText("|cffff0000Not done")
 					end			
 				end
+			end
+
+			if not optData["visionReward"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				if needReset then
+					lines[lineCount].cols[col]:SetText("470")
+				else
+					lines[lineCount].cols[col]:SetText(db.visionReward or "")
+				end
 			end	
 
 			if not optData["cloak_lvl"] or OPTIONS_TOGGLED  then
 				lineCount = lineCount + 1
 				lines[lineCount].cols[col]:SetText(db.cloak_lvl or "-")
+			end
+
+			if not optData["cloak_res"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				lines[lineCount].cols[col]:SetText(db.cloak_res or "-")
 			end
 			
 			if not optData["argunitequest"] or OPTIONS_TOGGLED  then

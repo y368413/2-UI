@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 local G = M:RegisterModule("GUI")
 
 local tonumber, tostring, pairs, ipairs, next, select, type = tonumber, tostring, pairs, ipairs, next, select, type
-local tinsert, format, strsplit = table.insert, string.format, string.split
+local tinsert, format, strsplit, strfind = table.insert, string.format, string.split, string.find
 local cr, cg, cb = I.r, I.g, I.b
 local guiTab, guiPage, f, dataFrame = {}, {}
 
@@ -63,7 +63,8 @@ local defaultSettings = {
 		AutoRes = true,
 		NumGroups = 8,
 		SimpleMode = true,
-		SimpleModeSortByRole = true,
+		SMUnitsPerColumn = 25,
+		SMGroupByIndex = 3,
 		InstanceAuras = true,
 		RaidDebuffScale = 1,
 		SpecRaidPos = false,
@@ -77,6 +78,7 @@ local defaultSettings = {
 		RaidPowerHeight = 2,
 		RaidHPMode = 1,
 		AurasClickThrough = false,
+		AutoAttack = true,
 		RaidClickSets = true,
 		ShowTeamIndex = false,
 		ClassPower = true,
@@ -99,10 +101,17 @@ local defaultSettings = {
 		BuffIndicatorScale = 1,
 		UFTextScale = 1,
 		PartyAltPower = true,
+		PartyWatcherSync = true,
 		SmoothAmount = .3,
 		RaidTextScale = 0.85, 
 		PlayerWidth = 245,
 		PlayerHeight = 24,
+		FocusWidth = 160,
+		FocusHeight = 21,
+		FocusPowerHeight = 3,
+		PetWidth = 100,
+		PetHeight = 16,
+		PetPowerHeight = 2,
 		BossWidth = 120,
 		BossHeight = 21,
 		BossPowerHeight = 3,
@@ -202,7 +211,6 @@ local defaultSettings = {
 		TMW = true,
 		PetBattle = true,
 		WeakAuras = true,
-		BarLine = false,
 		InfobarLine = true,
 		ChatLine = false,
 		MenuLine = true,
@@ -219,6 +227,7 @@ local defaultSettings = {
 		FontOutline = true,
 		Loot = true,
 		Shadow = true,
+		FontScale = 1,
 		CastBarstyle = true,
 		QuestTrackerSkinTitle = true,
 	},
@@ -272,13 +281,13 @@ local defaultSettings = {
 		PlacedItemAlert = false,
 		RareAlertInWild = false,
 		ParagonRep = true,
-		UunatAlert = false,
 		InstantDelete = true,
 		RaidTool = true,
 		RMRune = false,
 		DBMCount = "10",
 		EasyMarking = true,
 		BlockInvite = false,
+		NzothVision = true,
 		QuickQueue = true,
 		--AltTabLfgNotification = false,
 		--CrazyCatLady = true,
@@ -305,6 +314,7 @@ local defaultSettings = {
 
 local accountSettings = {
 	ChatFilterList = "%*",
+	ChatFilterWhiteList = "",
 	TimestampFormat = 1,
 	NameplateFilter = {[1]={}, [2]={}},
 	RaidDebuffs = {},
@@ -328,10 +338,10 @@ local accountSettings = {
 	TexStyle = 3,
 	KeystoneInfo = {},
 	AutoBubbles = false,
-	SystemInfoType = 1,
 	DisableInfobars = false,
 	PartyWatcherSpells = {},
 	ContactList = {},
+	CustomJunkList = {},
 }
 
 -- Initial settings
@@ -439,6 +449,10 @@ local function updateFilterList()
 	M:GetModule("Chat"):UpdateFilterList()
 end
 
+local function updateFilterWhiteList()
+	M:GetModule("Chat"):UpdateFilterWhiteList()
+end
+
 local function updateChatSize()
 	M:GetModule("Chat"):UpdateChatSize()
 end
@@ -499,6 +513,13 @@ local function refreshRaidFrameIcons()
 	M:GetModule("UnitFrames"):RefreshRaidFrameIcons()
 end
 
+local function updateSimpleModeGroupBy()
+	local UF = M:GetModule("UnitFrames")
+	if UF.UpdateSimpleModeHeader then
+		UF:UpdateSimpleModeHeader()
+	end
+end
+
 local function updateSmoothingAmount()
 	M:SetSmoothingAmount(MaoRUIPerDB["UFs"]["SmoothAmount"])
 end
@@ -517,10 +538,6 @@ end
 
 local function updateInterruptAlert()
 	M:GetModule("Misc"):InterruptAlert()
-end
-
-local function updateUunatAlert()
-	M:GetModule("Misc"):UunatAlert()
 end
 
 local function updateExplosiveAlert()
@@ -663,28 +680,32 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		--{3, "Nameplate", "Height", U["NP Height"], true, true, {3, 16, 0}},
 	},
 	[3] = {
+		{1, "UFs", "SimpleMode", "|cff00cc4c"..U["SimpleRaidFrame"], false, false, nil, nil, U["SimpleRaidFrameTip"]},
+		{3, "UFs", "SMUnitsPerColumn", U["SimpleMode Column"], true, false, {10, 40, 0}},
+		{4, "UFs", "SMGroupByIndex", U["SimpleMode GroupBy"].."*", true, true, {GROUP, CLASS, ROLE}, updateSimpleModeGroupBy},
+		--{1, "UFs", "SMSortByRole", U["SimpleMode SortByRole"], true},
+		--{3, "UFs", "SMUnitsPerColumn", U["SimpleMode Column"], true, true, {10, 40, 0}},
 		{1, "UFs", "RaidFrame", "|cff00cc4c"..U["UFs RaidFrame"], false, false, setupRaidFrame, nil, U["RaidFrameTip"]},
 		{1, "UFs", "PartyFrame", "|cff00cc4c"..U["UFs PartyFrame"], true},
 		{1, "UFs", "Arena", U["Arena Frame"], true, true},
 		--{3, "UFs", "NumGroups", U["Num Groups"], true, true, {4, 8, 0}},
 		{1, "UFs", "PartyPetFrame", "|cff00cc4c"..U["UFs PartyPetFrame"]},
-		{1, "UFs", "SimpleMode", "|cff00cc4c"..U["Simple RaidFrame"], true},
-		{1, "UFs", "SimpleModeSortByRole", U["SimpleMode SortByRole"], true, true},
-		{1, "UFs", "ShowTeamIndex", U["RaidFrame TeamIndex"]},
 		--{1, "UFs", "RaidClassColor", U["ClassColor RaidFrame"]},
-		{1, "UFs", "PartyWatcher", U["UFs PartyWatcher"], true, nil, setupPartyWatcher},
+		{1, "UFs", "PartyWatcher", "|cff00cc4c"..U["UFs PartyWatcher"], true, nil, setupPartyWatcher, nil, U["PartyWatcherTip"]},
+		--{1, "UFs", "PartyWatcherSync", U["PartyWatcherSync"], nil, nil, nil, nil, U["PartyWatcherSyncTip"]},
 		{1, "UFs", "PWOnRight", U["PartyWatcherOnRight"], true, true},
 		{1, "UFs", "HorizonParty", U["Horizon PartyFrame"]},
 		{1, "UFs", "HorizonRaid", U["Horizon RaidFrame"], true},		
 		{1, "UFs", "ReverseRaid", U["Reverse RaidFrame"], true, true},
-		{1, "UFs", "PartyAltPower", U["UFs PartyAltPower"]},
+		{1, "UFs", "PartyAltPower", U["UFs PartyAltPower"], false, false, nil, nil, U["PartyAltPowerTip"]},
 		{1, "UFs", "SpecRaidPos", U["Spec RaidPos"], true},
 		{1, "UFs", "AutoRes", U["UFs AutoRes"], true, true},
 		{1, "UFs", "RaidClickSets", "|cff00cc4c"..U["Enable ClickSets"], nil, nil, setupClickCast},
 		{1, "UFs", "InstanceAuras", "|cff00cc4c"..U["Instance Auras"], true, nil, setupRaidDebuffs},
 		{1, "UFs", "RaidBuffIndicator", "|cff00cc4c"..U["RaidBuffIndicator"], true, true, setupBuffIndicator, nil, U["RaidBuffIndicatorTip"]},
-		{1, "UFs", "AurasClickThrough", U["RaidAuras ClickThrough"]},
+		{1, "UFs", "AurasClickThrough", U["RaidAuras ClickThrough"], nil, nil, nil, nil, U["ClickThroughTip"]},
 		{1, "UFs", "RuneTimer", U["UFs RuneTimer"], true},
+		{1, "UFs", "ShowTeamIndex", U["RaidFrame TeamIndex"], true, true},
 		{4, "UFs", "RaidHPMode", U["RaidHPMode"].."*", false, false, {U["DisableRaidHP"], U["RaidHPPercent"], U["RaidHPCurrent"], U["RaidHPLost"]}, updateRaidNameText},
 		{4, "UFs", "RaidHealthColor", U["HealthColor"], true, false, {U["Default Dark"], U["ClassColorHP"], U["GradientHP"]}},
 		{4, "UFs", "BuffIndicatorType", U["BuffIndicatorType"].."*", true, true, {U["BI_Blocks"], U["BI_Icons"], U["BI_Numbers"]}, refreshRaidFrameIcons},
@@ -697,7 +718,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "AuraWatch", "Enable", "|cff00cc4c"..U["Enable AuraWatch"], false, false, setupAuraWatch},
 		{1, "AuraWatch", "DeprecatedAuras", U["DeprecatedAuras"], true},
 		--{1, "AuraWatch", "QuakeRing", U["QuakeRing"].."*"},
-		{1, "AuraWatch", "ClickThrough", U["AuraWatch ClickThrough"], true, true},
+		{1, "AuraWatch", "ClickThrough", U["AuraWatch ClickThrough"], true, true, nil, nil, U["ClickThroughTip"]},
 		--{1, "Auras", "Stagger", U["Enable Stagger"]},
 		--{1, "Auras", "BloodyHell", U["Enable BloodyHell"], true},
 		--{1, "Auras", "HunterTool", U["Enable Marksman"], true, true},
@@ -745,22 +766,22 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "HideBanner", U["Hide Bossbanner"], true},
 		{1, "Misc", "HideErrors", U["Hide Error"].."*", true, true, nil, updateErrorBlocker},
 		{1, "Chat", "AllowFriends", U["AllowFriendsSpam"].."*", false, false, nil, nil, U["AllowFriendsSpamTip"]},
+		{1, "Chat", "Lock", "|cff00cc4c"..U["Lock Chat"], true, false},
 		{},--blank
-		{1, "Chat", "Lock", "|cff00cc4c"..U["Lock Chat"]},
+		{3, "Chat", "Matches", U["Keyword Match"].."*", false, false, {1, 3, 0}},
 		{3, "Chat", "ChatWidth", U["LockChatWidth"].."*", true, false, {200, 600, 0}, updateChatSize},
 		{3, "Chat", "ChatHeight", U["LockChatHeight"].."*", true, true, {100, 500, 0}, updateChatSize},			
 		--{1, "Chat", "Chatbar", U["ShowChatbar"], true},
 		--{1, "Chat", "ChatItemLevel", U["ShowChatItemLevel"]},
-		{3, "Chat", "Matches", U["Keyword Match"].."*", false, false, {1, 3, 0}},
-		{2, "ACCOUNT", "ChatFilterList", U["Filter List"].."*", true, false, nil, updateFilterList},
-		{2, "Chat", "Keyword", U["Whisper Keyword"].."*", true, true, nil, updateWhisperList},
+		{2, "ACCOUNT", "ChatFilterList", U["Filter List"].."*", false, false, nil, updateFilterList},
+		{2, "Chat", "Keyword", U["Whisper Keyword"].."*", true, false, nil, updateWhisperList},
+		{2, "ACCOUNT", "ChatFilterWhiteList", "|cff00cc4c"..U["ChatFilterWhiteList"].."*", true, true, nil, updateFilterWhiteList, U["ChatFilterWhiteListTip"]},
 	},
 	[6] = {
 		{1, "UFs", "UFFade", U["UFFade"]},
 		{1, "UFs", "UFClassIcon", U["UFClassIcon"], true},
 	  {1, "UFs", "UFPctText", U["UFPctText"], true, true},
 	  --{1, "Skins", "InfobarLine", "底部职业着色条"},
-	  --{1, "Skins", "BarLine", U["Bar Line"]},
 	  {1, "Misc", "xMerchant", U["xMerchant"]},
 	  {1, "Misc", "WallpaperKit", U["WallpaperKit"], true},
 		{},--blank
@@ -1059,9 +1080,11 @@ local function CreateOption(i)
 			end
 		-- Blank, no optType
 		else
+			if not key then
 			local l = CreateFrame("Frame", nil, parent)
 			l:SetPoint("TOPLEFT", 26, -offset - 12)
 			M.CreateGF(l, 550, R.mult, "Horizontal", 1, 1, 1, .25, .25)
+			end
 			offset = offset + 32
 		end
 	end
@@ -1121,7 +1144,7 @@ local function exportData()
 	end
 
 	for KEY, VALUE in pairs(MaoRUIDB) do
-		if KEY == "RaidAuraWatch" then
+		if KEY == "RaidAuraWatch" or KEY == "CustomJunkList" then
 			text = text..";ACCOUNT:"..KEY
 			for spellID in pairs(VALUE) do
 				text = text..":"..spellID
@@ -1192,7 +1215,7 @@ local function importData()
 			MaoRUIPerDB[key][value] = toBoolean(arg1)
 		elseif arg1 == "EMPTYTABLE" then
 			MaoRUIPerDB[key][value] = {}
-		elseif arg1 == "r" or arg1 == "g" or arg1 == "b" then
+		elseif strfind(value, "Color") and (arg1 == "r" or arg1 == "g" or arg1 == "b") then
 			local color = select(4, strsplit(":", option))
 			if MaoRUIPerDB[key][value] then
 				MaoRUIPerDB[key][value][arg1] = tonumber(color)
@@ -1236,7 +1259,7 @@ local function importData()
 			itemID = tonumber(itemID)
 			MaoRUIPerDB[key][spellID] = {spellID, duration, indicator, unit, itemID}
 		elseif key == "ACCOUNT" then
-			if value == "RaidAuraWatch" then
+			if value == "RaidAuraWatch" or value == "CustomJunkList" then
 				local spells = {select(3, strsplit(":", option))}
 				for _, spellID in next, spells do
 					MaoRUIDB[value][tonumber(spellID)] = true

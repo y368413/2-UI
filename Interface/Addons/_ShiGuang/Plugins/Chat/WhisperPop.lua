@@ -8,7 +8,7 @@ WhisperSoundTip:RegisterEvent("CHAT_MSG_WHISPER")]]
 
 -------------------- WhisperPop.lua-- Abin--2010-9-28------------------------------------------------------------
 WhisperPop = {}
-WhisperPop.IGNORED_MESSAGES = { "<DBM>", "<BWS>", "<BigWigs>", "<BIGWIGS>" } -- Add your ignore tags
+WhisperPop.IGNORED_MESSAGES = { "<DBM>", "<BWS>", "<BigWigs>", "<BIGWIGS>", "LVBM" } -- Add your ignore tags
 WhisperPop.db = { sound = 1, time = 1, help = 1 }
 WhisperPop.newNames = {}
 WhisperPop.filter = {"<LFG>", "任务进度提示%s?[:：]", "%[接受任务%]", "%(任务完成%)", "<大脚组队提示>", "<大脚团队提示>", "<大脚团队提示>", "【网%.易%.有%.爱】", "EUI:", "EUI_RaidCD", "EUI[:_]", "打断:.+|Hspell", "PS 死亡: .+>", "%*%*.+%*%*", "受伤源自 |Hspell ", "Fatality:.+> ", "成功打断>.+<的%-", "<iLvl>", ("%-"):rep(30), "<小队物品等级:.+>", "祝您"}
@@ -323,7 +323,6 @@ list:RegisterEvent("CHAT_MSG_WHISPER")
 list:RegisterEvent("CHAT_MSG_WHISPER_INFORM")
 list:RegisterEvent("CHAT_MSG_BN_WHISPER")
 list:RegisterEvent("CHAT_MSG_BN_WHISPER_INFORM")
---list:RegisterEvent("CHAT_MSG_BN_CONVERSATION")
 
 list:SetScript("OnEvent", function (self, event, text, name, _, _, _, status, _, _, _, _, _, guid, BNguid)
 	if type(text) ~= "string" or type(name) ~= "string" or (BNguid == 0 and (type(guid) ~= "string")) or WhisperPop:IsIgnoredMessage(text) or WhisperPop:IsFilterMessage(text) or status == "DND" then
@@ -587,12 +586,8 @@ downButton:SetPoint("BOTTOM", endButton, "TOP", 0, -6)
 
 local upButton = CreateScrollButton("Up", "ScrollUp")
 upButton:SetPoint("BOTTOM", downButton, "TOP", 0, -6)
+
 --------------------- OptionFrame.lua---- Abin--------------------------------------------------------------
---<Bindings>
---	<Binding name="WHISPERPOP_TOGGLE" header="WHISPERPOP_TITLE" category="BINDING_MAORUI_BUTTONCLICK">
---	 WhisperPop:ToggleFrame()
---  </Binding>
---</Bindings>
 --BINDING_HEADER_WHISPERPOPTITLE = WHISPERPOP_LOCALE["title"]
 --BINDING_NAME_WHISPERPOPTOGGLE = WHISPERPOP_LOCALE["toggle frame"]
 
@@ -746,6 +741,7 @@ frame:SetScript("OnEvent", function(self, event)
         keepButton:SetChecked(WhisperPop.db.keep)
 	end
 end)
+
 -------------------------------------------------- Slash handler-------------------------------------------------
 SLASH_WHISPERPOP1 = "/whisperpop"
 SlashCmdList["WHISPERPOP"] = function() WhisperPop:ToggleFrame() end

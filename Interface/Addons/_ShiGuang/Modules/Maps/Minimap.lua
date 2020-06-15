@@ -94,7 +94,7 @@ function module:ReskinRegions()
 	for _, v in pairs(flags) do
 		local flag = _G[v]
 		flag:ClearAllPoints()
-		flag:SetPoint("TOPRIGHT" ,Minimap, "TOPRIGHT", 3, 3)
+		flag:SetPoint("TOPLEFT" ,Minimap, "TOPLEFT", -6, 6)
 		flag:SetScale(0.85)
 	end
 	
@@ -118,7 +118,7 @@ function module:ReskinRegions()
 	GameTimeCalendarInvitesTexture:SetPoint("TOPRIGHT")
 	local Invt = CreateFrame("Button", nil, UIParent)
 	Invt:SetPoint("TOPRIGHT", Minimap, "BOTTOMLEFT", -20, -20)
-	Invt:SetSize(300, 80)
+	Invt:SetSize(250, 80)
 	Invt:Hide()
 	M.SetBD(Invt)
 	M.CreateFS(Invt, 16, I.InfoColor..GAMETIME_TOOLTIP_CALENDAR_INVITES)
@@ -277,9 +277,14 @@ function module:WhoPingsMyMap()
 end
 
 function module:UpdateMinimapScale()
+	local size = Minimap:GetWidth()
 	local scale = MaoRUIPerDB["Map"]["MinimapScale"]
 	Minimap:SetScale(scale)
-	Minimap.mover:SetSize(Minimap:GetWidth()*scale, Minimap:GetHeight()*scale)
+	Minimap.mover:SetSize(size*scale, size*scale)
+	-- Other elements
+	if _G.NDuiMinimapDataBar then
+		_G.NDuiMinimapDataBar:SetWidth((size-2)*scale)
+	end
 end
 
 function module:ShowMinimapClock()

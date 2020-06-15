@@ -7,6 +7,8 @@ local strmatch, format, wipe, tinsert = string.match, string.format, table.wipe,
 local pairs, ipairs, next, tonumber, unpack, gsub = pairs, ipairs, next, tonumber, unpack, gsub
 local UnitAura, GetSpellInfo = UnitAura, GetSpellInfo
 local InCombatLockdown = InCombatLockdown
+local GetTime, GetSpellCooldown, IsInRaid, IsInGroup, IsPartyLFG = GetTime, GetSpellCooldown, IsInRaid, IsInGroup, IsPartyLFG
+local C_ChatInfo_SendAddonMessage = C_ChatInfo.SendAddonMessage
 
 -- RaidFrame Elements
 function UF:CreateRaidIcons(self)
@@ -46,7 +48,7 @@ end
 function UF:CreateTargetBorder(self)
 	local border = M.CreateSD(self, 3, true)
 	border:SetOutside(self.Health.backdrop, R.mult+3, R.mult+3, self.Power.backdrop)
-	border:SetBackdropBorderColor(.8, .8, .8)
+	border:SetBackdropBorderColor(1, 1, 1)
 	border:Hide()
 	self.Shadow = nil
 
@@ -485,6 +487,76 @@ function UF:RefreshRaidFrameIcons()
 	end
 end
 
+local watchingList = {}
+function UF:PartyWatcherPostUpdate(button, unit, spellID)
+	local guid = UnitGUID(unit)
+	if not watchingList[guid] then watchingList[guid] = {} end
+	watchingList[guid][spellID] = button
+end
+
+function UF:HandleCDMessage(...)
+	local prefix, msg, distType, author = ...
+	if prefix ~= "ZenTracker" then return end
+
+	local _, msgType, guid, spellID, duration, remaining = strsplit(":", msg)
+	if msgType == "U" then
+		spellID = tonumber(spellID)
+		duration = tonumber(duration)
+		remaining = tonumber(remaining)
+		local button = watchingList[guid] and watchingList[guid][spellID]
+		if button then
+			local start = GetTime() + remaining - duration
+			if start > 0 and duration > 1.5 then
+				button.CD:SetCooldown(start, duration)
+			end
+		end
+	end
+end
+
+local lastUpdate = 0
+function UF:SendCDMessage()
+	local thisTime = GetTime()
+	if thisTime - lastUpdate >= 5 then
+		local value = watchingList[UF.myGUID]
+		if value then
+			for spellID, button in pairs(value) do
+				local start, duration, enabled = GetSpellCooldown(spellID)
+				if enabled ~= 0 and start ~= 0 then
+					local remaining = start + duration - thisTime
+					if remaining < 0 then remaining = 0 end
+					C_ChatInfo_SendAddonMessage("ZenTracker", format("3:U:%s:%d:%.2f:%.2f:%s", UF.myGUID, spellID, duration, remaining, "-"), IsPartyLFG() and "INSTANCE_CHAT" or "PARTY") -- sync to others
+				end
+			end
+		end
+		lastUpdate = thisTime
+	end
+end
+
+local lastSyncTime = 0
+function UF:UpdateSyncStatus()
+	if IsInGroup() and not IsInRaid() and MaoRUIPerDB["UFs"]["PartyFrame"] then
+		local thisTime = GetTime()
+		if thisTime - lastSyncTime > 5 then
+			C_ChatInfo_SendAddonMessage("ZenTracker", format("3:H:%s:0::0:1", UF.myGUID), IsPartyLFG() and "INSTANCE_CHAT" or "PARTY") -- handshake to ZenTracker
+			lastSyncTime = thisTime
+		end
+		M:RegisterEvent("SPELL_UPDATE_COOLDOWN", UF.SendCDMessage)
+	else
+		M:UnregisterEvent("SPELL_UPDATE_COOLDOWN", UF.SendCDMessage)
+	end
+end
+
+function UF:SyncWithZenTracker()
+	if not MaoRUIPerDB["UFs"]["PartyWatcherSync"] then return end
+
+	UF.myGUID = UnitGUID("player")
+	C_ChatInfo.RegisterAddonMessagePrefix("ZenTracker")
+	M:RegisterEvent("CHAT_MSG_ADDON", UF.HandleCDMessage)
+
+	UF:UpdateSyncStatus()
+	M:RegisterEvent("GROUP_ROSTER_UPDATE", UF.UpdateSyncStatus)
+end
+
 function UF:InterruptIndicator(self)
 	if not MaoRUIPerDB["UFs"]["PartyWatcher"] then return end
 
@@ -530,6 +602,9 @@ function UF:InterruptIndicator(self)
 	buttons.PartySpells = MaoRUIDB["PartyWatcherSpells"]
 	buttons.TalentCDFix = R.TalentCDFix
 	self.PartyWatcher = buttons
+	if MaoRUIPerDB["UFs"]["PartyWatcherSync"] then
+		self.PartyWatcher.PostUpdate = UF.PartyWatcherPostUpdate
+	end
 end
 
 function UF:CreatePartyAltPower(self)

@@ -346,7 +346,7 @@ VisionsOfNZoth.icons = {
     gpeg_green = { icon=ICONS, coords=coords(1, 7) },
     gpeg_yellow = { icon=ICONS, coords=coords(2, 7) },
 
-    envelope = { icon=ICONS, coords=coords(0, 8) },
+    envelope = { icon=ICONS, coords=coords(6, 7) },
     orange_crystal = { icon=ICONS, coords=coords(2, 6) },
 
     door_down = { icon=ICONS, coords=coords(2, 0) },

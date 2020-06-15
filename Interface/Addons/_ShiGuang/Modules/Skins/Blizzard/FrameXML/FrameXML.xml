@@ -1,0 +1,7 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="CharacterFrame.lua"/>
+	<Script file="EquipmentFlyout.lua"/>
+	<Script file="Fonts.lua"/>
+	<Script file="ObjectiveTracker.lua"/>
+	<Script file="PetBattleUI.lua"/>
+</Ui>

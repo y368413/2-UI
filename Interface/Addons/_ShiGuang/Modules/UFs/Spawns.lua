@@ -36,7 +36,29 @@ end
 
 local function CreateFocusStyle(self)
 	self.mystyle = "focus"
-	--UF:CreateCastBar(self)
+	SetUnitFrameSize(self, "Focus")
+
+	UF:CreateHeader(self)
+	UF:CreateHealthBar(self)
+	UF:CreateHealthText(self)
+	UF:CreatePowerBar(self)
+	UF:CreatePowerText(self)
+	UF:CreateCastBar(self)
+	UF:CreateRaidMark(self)
+	UF:CreateIcons(self)
+	UF:CreatePrediction(self)
+	UF:CreateAuras(self)
+end
+
+local function CreateFocusTargetStyle(self)
+	self.mystyle = "focustarget"
+	SetUnitFrameSize(self, "Pet")
+
+	UF:CreateHeader(self)
+	UF:CreateHealthBar(self)
+	UF:CreateHealthText(self)
+	UF:CreatePowerBar(self)
+	UF:CreateRaidMark(self)
 end
 
 local function CreateBossStyle(self)
@@ -157,14 +179,24 @@ function UF:OnLogin()
 	self:DefaultClickSets()
 		oUF:RegisterStyle("Player", CreatePlayerStyle)
 		oUF:RegisterStyle("Target", CreateTargetStyle)
+		if (ShiGuangPerDB["BHT"] == true) then
 		oUF:RegisterStyle("Focus", CreateFocusStyle)
+		oUF:RegisterStyle("FocusTarget", CreateFocusTargetStyle)
+		end
 		-- Loader
 		oUF:SetActiveStyle("Player")
 		local player = oUF:Spawn("player", "oUF_Player")
 		oUF:SetActiveStyle("Target")
 		local target = oUF:Spawn("target", "oUF_Target")
+		if (ShiGuangPerDB["BHT"] == true) then
 		oUF:SetActiveStyle("Focus")
 		local focus = oUF:Spawn("focus", "oUF_Focus")
+		M.Mover(focus, U["FocusUF"], "FocusUF", R.UFs.FocusPos)
+		oUF:SetActiveStyle("FocusTarget")
+		local focustarget = oUF:Spawn("focustarget", "oUF_FocusTarget")
+		M.Mover(focustarget, U["FotUF"], "FotUF", {"TOPLEFT", oUF_Focus, "TOPRIGHT", 5, 0})
+		end
+
 		oUF:RegisterStyle("Boss", CreateBossStyle)
 		oUF:SetActiveStyle("Boss")
 		local boss = {}
@@ -201,6 +233,8 @@ function UF:OnLogin()
 
 		-- Group Styles
 		if showPartyFrame then
+			UF:SyncWithZenTracker()
+
 			oUF:RegisterStyle("Party", CreatePartyStyle)
 			oUF:SetActiveStyle("Party")
 
@@ -266,10 +300,14 @@ function UF:OnLogin()
 
 		local raidMover
 		if MaoRUIPerDB["UFs"]["SimpleMode"] then
-			local groupingOrder, groupBy, sortMethod = "1,2,3,4,5,6,7,8", "GROUP", "INDEX"
-			if MaoRUIPerDB["UFs"]["SimpleModeSortByRole"] then
-				groupingOrder, groupBy, sortMethod = "TANK,HEALER,DAMAGER,NONE", "ASSIGNEDROLE", "NAME"
-			end
+			local unitsPerColumn = MaoRUIPerDB["UFs"]["SMUnitsPerColumn"]
+			local maxColumns = M:Round(numGroups*5 / unitsPerColumn)
+			local groupByIndex = MaoRUIPerDB["UFs"]["SMGroupByIndex"]
+			local groupByTypes = {
+				[1] = {"1,2,3,4,5,6,7,8", "GROUP", "INDEX"},
+				[2] = {"DEATHKNIGHT,WARRIOR,DEMONHUNTER,ROGUE,MONK,PALADIN,DRUID,SHAMAN,HUNTER,PRIEST,MAGE,WARLOCK", "CLASS", "NAME"},
+				[3] = {"TANK,HEALER,DAMAGER,NONE", "ASSIGNEDROLE", "NAME"},
+			}
 
 			local function CreateGroup(name, i)
 				local group = oUF:SpawnHeader(name, nil, "solo,party,raid",
@@ -277,15 +315,12 @@ function UF:OnLogin()
 				"showSolo", false,
 				"showParty", not showPartyFrame,
 				"showRaid", true,
-				"xoffset", 6,
-				"yOffset", -6,
+				"xoffset", 5,
+				"yOffset", -5,
 				"groupFilter", tostring(i),
-				"groupingOrder", groupingOrder,
-				"groupBy", groupBy,
-				"sortMethod", sortMethod,
-				"maxColumns", 2,
-				"unitsPerColumn", 25,
-				"columnSpacing", 6,
+				"maxColumns", maxColumns,
+				"unitsPerColumn", unitsPerColumn,
+				"columnSpacing", 5,
 				"point", "TOP",
 				"columnAnchorPoint", "LEFT",
 				"oUF-initialConfigFunction", ([[
@@ -309,9 +344,17 @@ function UF:OnLogin()
 			end
 
 			local group = CreateGroup("oUF_Raid", groupFilter)
-			local moverWidth = numGroups > 4 and (100*scale*2 + 5) or 100
-			local moverHeight = 25*scale*20 + 10*19
+			local moverWidth = (100*scale*maxColumns + 5*(maxColumns-1))
+			local moverHeight = 25*scale*unitsPerColumn + 5*(unitsPerColumn-1)
 			raidMover = M.Mover(group, U["RaidFrame"], "RaidFrame", {"TOPLEFT", UIParent, 3, -26}, moverWidth, moverHeight)
+
+			function UF:UpdateSimpleModeHeader()
+				local groupByIndex = MaoRUIPerDB["UFs"]["SMGroupByIndex"]
+				group:SetAttribute("groupingOrder", groupByTypes[groupByIndex][1])
+				group:SetAttribute("groupBy", groupByTypes[groupByIndex][2])
+				group:SetAttribute("sortMethod", groupByTypes[groupByIndex][3])
+			end
+			UF:UpdateSimpleModeHeader()
 		else
 			local raidFrameHeight = raidHeight + MaoRUIPerDB["UFs"]["RaidPowerHeight"] + R.mult
 
@@ -321,15 +364,15 @@ function UF:OnLogin()
 				"showSolo", false,
 				"showParty", not showPartyFrame,
 				"showRaid", true,
-				"xoffset", 6,
-				"yOffset", -6,
+				"xoffset", 5,
+				"yOffset", -5,
 				"groupFilter", tostring(i),
 				"groupingOrder", "1,2,3,4,5,6,7,8",
 				"groupBy", "GROUP",
 				"sortMethod", "INDEX",
 				"maxColumns", 1,
 				"unitsPerColumn", 5,
-				"columnSpacing", 6,
+				"columnSpacing", 5,
 				"point", horizonRaid and "LEFT" or "TOP",
 				"columnAnchorPoint", "LEFT",
 				"oUF-initialConfigFunction", ([[
@@ -344,13 +387,13 @@ function UF:OnLogin()
 				groups[i] = CreateGroup("oUF_Raid"..i, i)
 				if i == 1 then
 					if horizonRaid then
-						raidMover = M.Mover(groups[i], U["RaidFrame"], "RaidFrame", {"BOTTOMLEFT", UIParent, 3, 160}, (raidWidth+5)*5-6, (raidFrameHeight+(showTeamIndex and 25 or 6))*numGroups - (showTeamIndex and 25 or 6))
+						raidMover = M.Mover(groups[i], U["RaidFrame"], "RaidFrame", {"BOTTOMLEFT", UIParent, 3, 160}, (raidWidth+5)*5-5, (raidFrameHeight+(showTeamIndex and 25 or 5))*numGroups - (showTeamIndex and 25 or 5))
 						if reverse then
 							groups[i]:ClearAllPoints()
 							groups[i]:SetPoint("BOTTOMLEFT", raidMover)
 						end
 					else
-						raidMover = M.Mover(groups[i], U["RaidFrame"], "RaidFrame", {"BOTTOMLEFT", UIParent, 3, 160}, (raidWidth+5)*numGroups-6, (raidFrameHeight+6)*5-6)
+						raidMover = M.Mover(groups[i], U["RaidFrame"], "RaidFrame", {"BOTTOMLEFT", UIParent, 3, 160}, (raidWidth+5)*numGroups-5, (raidFrameHeight+5)*5-5)
 						if reverse then
 							groups[i]:ClearAllPoints()
 							groups[i]:SetPoint("TOPRIGHT", raidMover)
@@ -359,15 +402,15 @@ function UF:OnLogin()
 				else
 					if horizonRaid then
 						if reverse then
-							groups[i]:SetPoint("BOTTOMLEFT", groups[i-1], "TOPLEFT", 0, showTeamIndex and 21 or 6)
+							groups[i]:SetPoint("BOTTOMLEFT", groups[i-1], "TOPLEFT", 0, showTeamIndex and 20 or 5)
 						else
-							groups[i]:SetPoint("TOPLEFT", groups[i-1], "BOTTOMLEFT", 0, showTeamIndex and -21 or -6)
+							groups[i]:SetPoint("TOPLEFT", groups[i-1], "BOTTOMLEFT", 0, showTeamIndex and -20 or -5)
 						end
 					else
 						if reverse then
-							groups[i]:SetPoint("TOPRIGHT", groups[i-1], "TOPLEFT", -6, 0)
+							groups[i]:SetPoint("TOPRIGHT", groups[i-1], "TOPLEFT", -5, 0)
 						else
-							groups[i]:SetPoint("TOPLEFT", groups[i-1], "TOPRIGHT", 6, 0)
+							groups[i]:SetPoint("TOPLEFT", groups[i-1], "TOPRIGHT", 5, 0)
 						end
 					end
 				end
