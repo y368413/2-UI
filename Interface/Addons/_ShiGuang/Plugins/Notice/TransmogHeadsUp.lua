@@ -37,25 +37,6 @@ local function collectedApperance(itemLink)
 	return ScanForTransmogState(itemLink)
 end
 
-
-local function IsJewelery(ItemSlot)
-	if ItemSlot == "INVTYPE_NECK" or ItemSlot == "INVTYPE_TRINKET" or ItemSlot == "INVTYPE_FINGER" or ItemSlot == "INVTYPE_RELIC" then
-		--print("Is jewelery");
-		return true;
-	else
-		--print("Is NOT jewelery");
-		return false;
-	end
-end
-
-local function ItemIsBoE(ItemBoE)
-	if ItemBoE == 2 then
-		return true;
-	else
-		return false;
-	end
-end
-
 TransmogHeadsUp:SetScript("OnEvent", function(self, event, ...)
 	local message = select(1, ...);
 	local playername = select(5, ...);  	--find playername

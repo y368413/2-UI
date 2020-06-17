@@ -63,11 +63,11 @@ function lrnFrame:SpellDamage(timestamp, eventType, srcGUID, srcName, srcFlags, 
 		--SendChatMessage("虚空鞭笞 "..string.format("%.1f万",aAmount*0.0001), "EMOTE")
 		--RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000虚空鞭笞 |r"..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
 		--xkbttime = timestamp
-	elseif srcName == player1 and spellId == 316661 then
-		if xkbttime == 0 then xkbttime = timestamp end
+	--elseif srcName == player1 and spellId == 316661 then
+		--if xkbttime == 0 then xkbttime = timestamp end
 		--SendChatMessage("黑曜毁灭 "..string.format("%.1f万",aAmount*0.0001), "EMOTE")
-		RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000黑曜毁灭 |r"..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
-		xkbttime = timestamp
+		--RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000黑曜毁灭 |r"..string.format("%.1f", aAmount*0.0001).."万", ChatTypeInfo["RAID_WARNING"])
+		--xkbttime = timestamp
 	elseif srcName == player1 and spellId == 317291 then --317159
 		sum_ = sum_ + aAmount
 		j = j + 1

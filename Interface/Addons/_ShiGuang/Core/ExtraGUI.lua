@@ -17,21 +17,26 @@ end
 local extraGUIs = {}
 local function createExtraGUI(parent, name, title, bgFrame)
 	local frame = CreateFrame("Frame", name, parent)
-	frame:SetSize(300, 600)
-	frame:SetPoint("LEFT", parent:GetParent(), "RIGHT", -92, -16)
-	M.SetBD(frame)
+		 local bgTexture = frame:CreateTexture("name", "BACKGROUND")
+    bgTexture:SetTexture("Interface\\Destiny\\EndscreenBG");  --FontStyles\\FontStyleGarrisons
+    --bgTexture:SetTexCoord(740,950,0,600/1024);
+    bgTexture:SetAllPoints();
+    bgTexture:SetAlpha(1)
+	frame:SetSize(300, 580)
+	frame:SetPoint("LEFT", parent:GetParent(), "RIGHT", -360, -16)
+	--M.SetBD(frame)
 	parent:HookScript("OnHide", function()
 		if frame:IsShown() then frame:Hide() end
 	end)
 
 	if title then
-		M.CreateFS(frame, 14, title, "system", "TOPLEFT", 20, -25)
+		M.CreateFS(frame, 14, title, "system", "TOPLEFT", 20, -5)
 	end
 
 	if bgFrame then
 		frame.bg = CreateFrame("Frame", nil, frame)
 		frame.bg:SetSize(280, 540)
-		frame.bg:SetPoint("TOPLEFT", 10, -50)
+		frame.bg:SetPoint("TOPLEFT", 10, -30)
 		M.CreateBD(frame.bg, .3)
 	end
 
@@ -72,7 +77,7 @@ function G:SetupRaidDebuffs(parent)
 	local frame = raidDebuffsGUI.bg
 	local bars, options = {}, {}
 
-	local iType = G:CreateDropdown(frame, U["Type*"], 10, -30, {DUNGEONS, RAID}, U["Instance Type"])
+	--[[local iType = G:CreateDropdown(frame, U["Type*"], 10, -30, {DUNGEONS, RAID}, U["Instance Type"])
 	for i = 1, 2 do
 		iType.options[i]:HookScript("OnClick", function()
 			for j = 1, 2 do
@@ -88,7 +93,7 @@ function G:SetupRaidDebuffs(parent)
 				bars[k]:Hide()
 			end
 		end)
-	end
+	end]]
 
 	local dungeons = {}
 	for _, dungeonID in next, C_ChallengeMode.GetMapTable() do
@@ -108,13 +113,13 @@ function G:SetupRaidDebuffs(parent)
 		[5] = EJ_GetInstanceInfo(1180),
 	}
 
-	options[1] = G:CreateDropdown(frame, DUNGEONS.."*", 120, -30, dungeons, U["Dungeons Intro"], 130, 30)
-	options[1]:Hide()
-	options[2] = G:CreateDropdown(frame, RAID.."*", 120, -30, raids, U["Raid Intro"], 130, 30)
-	options[2]:Hide()
+	options[1] = G:CreateDropdown(frame, DUNGEONS.."*", 10, -30, dungeons, U["Dungeons Intro"], 110, 30)
+	--options[1]:Hide()
+	options[2] = G:CreateDropdown(frame, RAID.."*", 140, -30, raids, U["Raid Intro"], 110, 30)
+	--options[2]:Hide()
 
-	options[3] = G:CreateEditbox(frame, "ID*", 10, -90, U["ID Intro"])
-	options[4] = G:CreateEditbox(frame, U["Priority"], 120, -90, U["Priority Intro"])
+	options[3] = G:CreateEditbox(frame, "ID*", 10, -80, U["ID Intro"])
+	options[4] = G:CreateEditbox(frame, U["Priority"], 120, -80, U["Priority Intro"])
 
 	local function analyzePrio(priority)
 		priority = priority or 2
@@ -147,9 +152,9 @@ function G:SetupRaidDebuffs(parent)
 		G:ClearEdit(options[4])
 	end
 
-	local scroll = G:CreateScroll(frame, 240, 350)
+	local scroll = G:CreateScroll(frame, 240, 370)
 	scroll.reset = M.CreateButton(frame, 70, 25, RESET)
-	scroll.reset:SetPoint("TOPLEFT", 10, -140)
+	scroll.reset:SetPoint("TOPLEFT", 10, -120)
 	StaticPopupDialogs["RESET_NDUI_RAIDDEBUFFS"] = {
 		text = U["Reset your raiddebuffs list?"],
 		button1 = YES,
@@ -164,7 +169,7 @@ function G:SetupRaidDebuffs(parent)
 		StaticPopup_Show("RESET_NDUI_RAIDDEBUFFS")
 	end)
 	scroll.add = M.CreateButton(frame, 70, 25, ADD)
-	scroll.add:SetPoint("TOPRIGHT", -10, -140)
+	scroll.add:SetPoint("TOPRIGHT", -10, -120)
 	scroll.add:SetScript("OnClick", function()
 		addClick(options)
 	end)
@@ -512,8 +517,8 @@ function G:SetupNameplateFilter(parent)
 	plateGUI = createExtraGUI(parent, "NDuiGUI_NameplateFilter")
 
 	local frameData = {
-		[1] = {text = U["WhiteList"].."*", offset = -25, barList = {}},
-		[2] = {text = U["BlackList"].."*", offset = -315, barList = {}},
+		[1] = {text = U["WhiteList"].."*", offset = -5, barList = {}},
+		[2] = {text = U["BlackList"].."*", offset = -295, barList = {}},
 	}
 
 	local function createBar(parent, index, spellID)
@@ -579,8 +584,8 @@ function G:SetupBuffIndicator(parent)
 	buffIndicatorGUI = createExtraGUI(parent, "NDuiGUI_BuffIndicator")
 
 	local frameData = {
-		[1] = {text = U["RaidBuffWatch"].."*", offset = -25, width = 160, barList = {}},
-		[2] = {text = U["BuffIndicator"].."*", offset = -315, width = 50, barList = {}},
+		[1] = {text = U["RaidBuffWatch"].."*", offset = -5, width = 160, barList = {}},
+		[2] = {text = U["BuffIndicator"].."*", offset = -295, width = 50, barList = {}},
 	}
 	local decodeAnchor = {
 		["TL"] = "TOPLEFT",
@@ -932,42 +937,4 @@ local function createOptionCheck(parent, offset, text)
 	box:SetPoint("TOPLEFT", 10, -offset)
 	M.CreateFS(box, 14, text, false, "LEFT", 30, 0)
 	return box
-end
-
-function G:SetupBagFilter(parent)
-	toggleExtraGUI("NDuiGUI_BagFilterSetup")
-	if bagFilterGUI then return end
-
-	bagFilterGUI = createExtraGUI(parent, "NDuiGUI_BagFilterSetup", U["BagFilterSetup"].."*")
-
-	local scroll = G:CreateScroll(bagFilterGUI, 260, 540)
-
-	local filterOptions = {
-		[1] = "FilterJunk",
-		[2] = "FilterConsumble",
-		[3] = "FilterAzerite",
-		[4] = "FilterEquipment",
-		[5] = "FilterLegendary",
-		[6] = "FilterMount",
-		[7] = "FilterFavourite",
-		[8] = "FilterGoods",
-	}
-
-	local Bags = M:GetModule("Bags")
-	local function filterOnClick(self)
-		local value = self.__value
-		MaoRUIPerDB["Bags"][value] = not MaoRUIPerDB["Bags"][value]
-		self:SetChecked(MaoRUIPerDB["Bags"][value])
-		Bags:UpdateAllBags()
-	end
-
-	local offset = 10
-	for _, value in ipairs(filterOptions) do
-		local box = createOptionCheck(scroll, offset, U[value])
-		box:SetChecked(MaoRUIPerDB["Bags"][value])
-		box.__value = value
-		box:SetScript("OnClick", filterOnClick)
-
-		offset = offset + 35
-	end
 end

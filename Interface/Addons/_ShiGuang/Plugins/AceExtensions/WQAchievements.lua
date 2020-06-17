@@ -1,4 +1,4 @@
---## Author: Urtgard  ## Version: v8.3.0-4release
+--## Author: Urtgard  ## Version: v8.3.0-5release
 WQAchievements = LibStub("AceAddon-3.0"):NewAddon("WQAchievements", "AceConsole-3.0", "AceTimer-3.0")
 local WQA = WQAchievements
 WQA.data = {}
@@ -54,14 +54,15 @@ local questZoneIDList = {
 }
 
 local function GetQuestZoneID(questID)
-	if WQA.questList[questID].isEmissary then return BOUNTY_BOARD_LOCKED_TITLE end  --"Emissary"
-	if not WQA.questList[questID].info then	WQA.questList[questID].info = {} end
-	if WQA.questList[questID].info.zoneID then
-		return WQA.questList[questID].info.zoneID
-	else
-		WQA.questList[questID].info.zoneID = questZoneIDList[questID] or C_TaskQuest.GetQuestZoneID(questID)
-		return WQA.questList[questID].info.zoneID
-	end
+	if WQA.questList[questID] and WQA.questList[questID].isEmissary then return BOUNTY_BOARD_LOCKED_TITLE end  --"Emissary"
+	--if not WQA.questList[questID].info then	WQA.questList[questID].info = {} end
+	--if WQA.questList[questID].info.zoneID then
+	--	return WQA.questList[questID].info.zoneID
+	--else
+	--	WQA.questList[questID].info.zoneID = questZoneIDList[questID] or C_TaskQuest.GetQuestZoneID(questID)
+	--	return WQA.questList[questID].info.zoneID
+	--end
+	return questZoneIDList[questID] or C_TaskQuest.GetQuestZoneID(questID)
 end
 
 local function GetMissionZoneID(missionID)
@@ -117,21 +118,21 @@ ExpansionByZoneID = {
 }
 
 local function GetExpansionByQuestID(questID)
-	if not WQA.questList[questID].info then	WQA.questList[questID].info = {} end
-	if WQA.questList[questID].info.expansion then
-		return WQA.questList[questID].info.expansion
-	else
+	--if not WQA.questList[questID].info then	WQA.questList[questID].info = {} end
+	--if WQA.questList[questID].info.expansion then
+	--	return WQA.questList[questID].info.expansion
+	--else
 		local zoneID = GetQuestZoneID(questID)
 
 		if ExpansionByZoneID[zoneID] then
-			WQA.questList[questID].info.expansion = ExpansionByZoneID[zoneID]
+		--	WQA.questList[questID].info.expansion = ExpansionByZoneID[zoneID]
 			return ExpansionByZoneID[zoneID]
 		end
 
 		for expansion,zones in pairs(WQA.ZoneIDList) do
 			for _, v in pairs(zones) do
 				if zoneID == v then
-					WQA.questList[questID].info.expansion = expansion
+		--			WQA.questList[questID].info.expansion = expansion
 					return expansion
 				end
 			end
@@ -141,12 +142,12 @@ local function GetExpansionByQuestID(questID)
 			for _,id in pairs(v) do
 				if type(id) == "table" then id = id.id end
 				if id == questID then
-					WQA.questList[questID].info.expansion = expansion
+--					WQA.questList[questID].info.expansion = expansion
 					return expansion
 				end
 			end
 		end
-	end
+	--end
 	return -1
 end
 
@@ -1370,8 +1371,8 @@ function WQA:Reward()
 											end
 										end
 									end
-
-									if not self.db.char[exp+5].profession[tradeskillLineID].isMaxLevel and self.db.profile.options.reward[exp+5].profession[tradeskillLineID].skillup then
+									
+									if not self.db.char[exp].profession[tradeskillLineID].isMaxLevel and self.db.profile.options.reward[exp].profession[tradeskillLineID].skillup then
 										self:AddRewardToQuest(questID, "PROFESSION_SKILLUP", professionName)
 									end
 								end
@@ -1426,7 +1427,8 @@ function WQA:CheckItems(questID, isEmissary)
 				retry = true
 			end
 			
-			local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice, itemClassID, itemSubClassID, _, expacID = GetItemInfo(itemLink)
+			local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice, itemClassID, itemSubClassID = GetItemInfo(itemLink)
+			local expacID = GetExpansionByQuestID(questID)
 
 			-- Ask Pawn if this is an Upgrade
 			if PawnIsItemAnUpgrade and self.db.profile.options.reward.gear.PawnUpgrade then
@@ -1819,7 +1821,7 @@ function WQA:UpdateQTip(tasks)
 					else
 						GameTooltip:SetText(C_Garrison.GetMissionName(id))
 						GameTooltip:AddLine(string.format(GARRISON_MISSION_TOOLTIP_NUM_REQUIRED_FOLLOWERS, C_Garrison.GetMissionMaxFollowers(id)), 1, 1, 1)
-						--GarrisonMissionButton_AddThreatsToTooltip(id, WQA.missionList[task.id].followerType, false, C_Garrison.GetFollowerAbilityCountersForMechanicTypes(WQA.missionList[task.id].followerType))
+						GarrisonMissionButton_AddThreatsToTooltip(id, WQA.missionList[task.id].followerType, false, C_Garrison.GetFollowerAbilityCountersForMechanicTypes(WQA.missionList[task.id].followerType))
 						GameTooltip:AddLine(GARRISON_MISSION_AVAILABILITY)
 						GameTooltip:AddLine(WQA.missionList[task.id].offerTimeRemaining, 1, 1, 1)
 						if not C_Garrison.IsPlayerInGarrison(WQA.missionList[task.id].followerType) then
@@ -1946,6 +1948,7 @@ end
 function WQA:AnnouncePopUp(quests, silent)
 	if not self.PopUp then
 		local PopUp = CreateFrame("Frame", "WQAchievementsPopUp", UIParent, "UIPanelDialogTemplate")
+		tinsert(UISpecialFrames, "WQAchievementsPopUp")
 		self.PopUp = PopUp
 		PopUp:SetMovable(true)
 		PopUp:EnableMouse(true)

@@ -784,47 +784,6 @@ do
 	end
 	hooksecurefunc("PanelTemplates_DeselectTab", resetTabAnchor)
 	hooksecurefunc("PanelTemplates_SelectTab", resetTabAnchor)
-	-- Handle checkbox and radio
-	function M:ReskinCheck(forceSaturation)
-		self:SetNormalTexture("")
-		self:SetPushedTexture("")
-		self:SetHighlightTexture(I.bdTex)
-		local hl = self:GetHighlightTexture()
-		hl:SetPoint("TOPLEFT", 5, -5)
-		hl:SetPoint("BOTTOMRIGHT", -5, 5)
-		hl:SetVertexColor(cr, cg, cb, .25)
-
-		local bg = M.CreateBDFrame(self, 0)
-		bg:SetPoint("TOPLEFT", 4, -4)
-		bg:SetPoint("BOTTOMRIGHT", -4, 4)
-		M.CreateGradient(bg)
-
-		local ch = self:GetCheckedTexture()
-		ch:SetTexture("Interface\\Buttons\\UI-CheckBox-Check")
-		ch:SetTexCoord(0, 1, 0, 1)
-		ch:SetDesaturated(true)
-		ch:SetVertexColor(cr, cg, cb)
-
-		self.forceSaturation = forceSaturation
-	end
-
-
-	-- Handle slider
-	function M:ReskinSlider(verticle)
-		self:SetBackdrop(nil)
-		M.StripTextures(self)
-
-		local bg = M.CreateBDFrame(self, 0)
-		bg:SetPoint("TOPLEFT", 14, -2)
-		bg:SetPoint("BOTTOMRIGHT", -15, 3)
-		M.CreateGradient(bg)
-
-		local thumb = self:GetThumbTexture()
-		thumb:SetTexture(I.sparkTex)
-		thumb:SetBlendMode("ADD")
-		if verticle then thumb:SetRotation(rad(90)) end
-	end
-
 end
 
 -- GUI elements
@@ -845,7 +804,7 @@ do
 
 	function M:CreateCheckBox()
 		local cb = CreateFrame("CheckButton", nil, self, "InterfaceOptionsCheckButtonTemplate")
-		M.ReskinCheck(cb)
+		--M.ReskinCheck(cb)
 
 		cb.Type = "CheckBox"
 		return cb
@@ -925,8 +884,8 @@ do
 	bu:SetPoint("LEFT", dd, "RIGHT", -8, 3)
 		local list = CreateFrame("Frame", nil, dd)
 		list:SetPoint("TOP", dd, "BOTTOM", 0, -2)
-		M.CreateBD(list, 1)
-		list:SetBackdropBorderColor(1, 1, 1, .2)
+		M.CreateBD(list, 0.85)
+		list:SetBackdropBorderColor(1, 1, 1, .85)
 		list:Hide()
 		bu.__list = list
 		bu:SetScript("OnShow", buttonOnShow)
@@ -1017,7 +976,7 @@ do
 		slider:SetWidth(width or 200)
 		slider:SetMinMaxValues(minValue, maxValue)
 		slider:SetHitRectInsets(0, 0, 0, 0)
-		M.ReskinSlider(slider)
+		--M.ReskinSlider(slider)
 
 		slider.Low:SetText(minValue)
 		slider.Low:SetPoint("TOPLEFT", slider, "BOTTOMLEFT", 10, -2)

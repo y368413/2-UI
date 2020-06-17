@@ -263,7 +263,7 @@ end
 function MISC:Expbar()
 	if not MaoRUIPerDB["Misc"]["ExpRep"] then return end
 
-	local bar = CreateFrame("StatusBar", "NDuiMinimapDataBar", MinimapCluster)
+	local bar = CreateFrame("StatusBar", "NDuiMinimapDataBar", Minimap)
 	bar:SetPoint("TOP", Minimap, "BOTTOM", 0, 0)
 	bar:SetSize(Minimap:GetWidth()-2*MaoRUIPerDB["Map"]["MinimapScale"], 3)
 	bar:SetHitRectInsets(0, 0, 0, -10)
@@ -271,7 +271,7 @@ function MISC:Expbar()
 	
     bar.ArtifactText=bar:CreateFontString("ShowArtifactText", "OVERLAY")
     bar.ArtifactText:SetFont("Interface\\AddOns\\_ShiGuang\\Media\\Fonts\\Infinity.ttf", 11, "OUTLINE")  --STANDARD_TEXT_FONT
-    bar.ArtifactText:SetPoint("BOTTOMRIGHT", Minimap,"BOTTOMRIGHT",2, -1)  
+    bar.ArtifactText:SetPoint("BOTTOMRIGHT", Minimap,"BOTTOMRIGHT",2, 0)  
 
 	local rest = CreateFrame("StatusBar", nil, bar)
 	rest:SetAllPoints()
