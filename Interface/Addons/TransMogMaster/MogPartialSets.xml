@@ -1,4 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Script file="MogPartialSets.lua"/>
     <Button name="MogPartialSetsFilterButton" inherits="UIMenuButtonStretchTemplate" text="FILTER" hidden="true">
         <Size x="93" y="22"/>
         <Layers>

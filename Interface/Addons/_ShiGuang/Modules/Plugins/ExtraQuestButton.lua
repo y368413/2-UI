@@ -211,7 +211,7 @@ function ExtraQuestButton:PLAYER_LOGIN()
 	self.Icon = Icon
 
 	local HotKey = self:CreateFontString("$parentHotKey", nil, "NumberFontNormal")
-	HotKey:SetPoint("TOP", 0, -5)
+	HotKey:SetPoint("TOPLEFT", -3, -3)
 	self.HotKey = HotKey
 
 	local Count = self:CreateFontString("$parentCount", nil, "NumberFont_Shadow_Med")

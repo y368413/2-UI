@@ -1,5 +1,11 @@
 ﻿--## Version: v18  ## Author: Kemayo
-local AppearanceTooltip = {}    --local _, AppearanceTooltip = ...
+local AppearanceTooltip = {}
+local GetScreenWidth = GetScreenWidth
+local GetScreenHeight = GetScreenHeight
+local IsDressableItem = IsDressableItem
+
+local setDefaults, db
+
 local LAT = LibStub("LibArmorToken-1.0")
 local LAI = LibStub("LibAppropriateItems-1.0")
 
@@ -37,7 +43,7 @@ function tooltip:ADDON_LOADED(addon)
         byComparison = true, -- whether to show by the comparison, or fall back to vertical if needed
         tokens = true, -- try to preview tokens?
     })
-    local db = _G["AppearanceTooltipDB"]
+    db = _G["AppearanceTooltipDB"]
     AppearanceTooltip.db = db
 
     self:UnregisterEvent("ADDON_LOADED")
@@ -557,28 +563,31 @@ function setDefaults(options, defaults)
 end
 
 
-
 local races = {
-    [1] = "Human",
-    [3] = "Dwarf",
-    [4] = "NightElf",
-    [11] = "Draenei",
-    [22] = "Worgen",
-    [7] = "Gnome",
-    [24] = "Pandaren",
-    [2] = "Orc",
-    [5] = "Scourge",
-    [10] = "BloodElf",
-    [8] = "Troll",
-    [6] = "Tauren",
-    [9] = "Goblin",
-    -- Allied!
-    [27] = "Nightborne", -- "Nightborne",
-    [28] = "Tauren", -- "HighmountainTauren",
-    [29] = "BloodElf", -- "VoidElf",
-    [30] = "Draenei", -- "LightforgedDraenei",
-    [34] = "Dwarf", -- "DarkIronDwarf",
-    [36] = "Orc", -- "MagharOrc",
+	--[0]	= "Pet",
+	[1] = "Human",
+	[2] = "Orc",
+	[3] = "Dwarf",
+	[4] = "NightElf",
+	[5] = "Scourge",
+	[6] = "Tauren",
+	[7] = "Gnome",
+	[8] = "Troll",
+	[9] = "Goblin",
+	[10] = "BloodElf",
+	[11] = "Draenei",
+	[22] = "Worgen",
+	[24] = "Pandaren",
+	[27] = "Nightborne",
+	[28] = "HighmountainTauren",
+	[29] = "VoidElf",
+	[30] = "LightforgedDraenei",
+	[31] = "ZandalariTroll",
+	[32] = "KulTiranHuman",
+	[34] = "DarkIronDwarf",
+	[35] = "Vulpera",
+	[36] = "MagharOrc",
+	[37] = "Mechagnome",
 }
 local genders = {
     [0] = "Male",
@@ -675,9 +684,9 @@ function AppearanceTooltip:GetCameraID(itemid, race, gender)
         if not gender then
             gender = playerSex
         end
-        if raceMap[race] then
-            race = raceMap[race]
-        end
+        --if raceMap[race] then
+            --race = raceMap[race]
+        --end
         key = ("%s-%s-%s"):format(race, gender, slot_override[itemid] or slots[slot] or "Default")
     end
     return slots_to_cameraids[key], itemcamera
@@ -1230,26 +1239,30 @@ UIDropDownMenu_SetWidth(anchor, 100)
 local modelBox = newBox(panel, "自定义模型种族", 48)
 local customModel = newCheckbox(modelBox, 'customModel', '使用不同的模型', "Instead of your current character, use a specific race/gender")
 local customRaceDropdown = newDropdown(modelBox, 'modelRace', "选择你要的种族模型", {
-    [1] = "人类",
-    [3] = "矮人",
-    [4] = "暗夜精灵",
-    [11] = "德莱尼",
-    [22] = "狼人",
-    [7] = "侏儒",
-    [24] = "熊猫人",
-    [2] = "兽人",
-    [5] = "亡灵",
-    [10] = "血精灵",
-    [8] = "巨魔",
-    [6] = "牛头人",
-    [9] = "地精",
-    -- Allied!
-    [27] = "夜之子",
-    [28] = "至高岭牛头人",
-    [29] = "虚空精灵",
-    [30] = "光铸德莱尼",
-    [34] = "Dark Iron Dwarf",
-    [36] = "Mag'har Orc",
+	--[0]	= "Pet",
+	[1] = "人类",
+	[2] = "兽人",
+	[3] = "矮人",
+	[4] = "暗夜精灵",
+	[5] = "亡灵",
+	[6] = "牛头人",
+	[7] = "侏儒",
+	[8] = "巨魔",
+	[9] = "地精",
+	[10] = "血精灵",
+	[11] = "德莱尼",
+	[22] = "狼人",
+	[24] = "熊猫人",
+	[27] = "夜之子",
+	[28] = "至高岭牛头人",
+	[29] = "虚空精灵",
+	[30] = "光铸德莱尼",
+	[31] = "赞达拉巨魔",
+	[32] = "库尔提拉斯人",
+	[34] = "黑铁矮人",
+	[35] = "狐人",
+	[36] = "玛格汉兽人",
+	[37] = "机械侏儒",
 })
 UIDropDownMenu_SetWidth(customRaceDropdown, 100)
 local customGenderDropdown = newDropdown(modelBox, 'modelGender', "选择你要的性别", {

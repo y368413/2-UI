@@ -182,7 +182,7 @@ function BlinkHealth:CreateAnchorFrame()
 	self.anchor:SetHeight(80);
 	self.anchor:EnableMouse(true);
 	self.anchor:SetMovable(true);
-	self.anchor:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 235);
+	self.anchor:SetPoint("CENTER", UIParent, "CENTER", 0, -200);
 	local backdrop = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
 		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -260,28 +260,31 @@ function BlinkHealth:UpdateComboPoints()
     self.hitPoint.text:SetText("");
     self.hitPoint.hit:SetText("");
 	end
+
+	--if (self.castBar and self.castBar:IsShown()) then
+		--self:CastingBarAdjustPosition();
+	--end
 end
 
 function BlinkHealth:UpdateUnitValues()
 	local heal, maxheal, perh, petheal, petmax, name;
 	local power, maxpower, powertype, _;
 	-- player
-	--if (UnitHasVehicleUI("player")) then
-		--heal, maxheal = UnitHealth("pet"), UnitHealthMax("pet");
-		--power, maxpower = UnitPower("pet"), UnitPowerMax("pet");
-		--petheal, petmax = UnitHealth("player"), UnitHealthMax("player");
-		--name = UnitName("player");	-- petName
-		--_, powertype = UnitPowerType("pet");
-	--else
+	if (UnitHasVehicleUI("player")) then
+		heal, maxheal = UnitHealth("pet"), UnitHealthMax("pet");
+		power, maxpower = UnitPower("pet"), UnitPowerMax("pet");
+		petheal, petmax = UnitHealth("player"), UnitHealthMax("player");
+		name = UnitName("player");	-- petName
+		_, powertype = UnitPowerType("pet");
+	else
 		heal, maxheal = UnitHealth("player"), UnitHealthMax("player");
 		power, maxpower = UnitPower("player"), UnitPowerMax("player");
 		petheal, petmax = UnitHealth("pet"), UnitHealthMax("pet");
 		name = UnitName("pet");
 		_, powertype = UnitPowerType("player");
-	--end
-	if maxheal<1 then 
-		maxheal =1
 	end
+	--if maxheal<1 then maxheal =1 end
+    if maxheal == 0 or maxpower == 0 then return end
 	self:SetPercentText("player", heal/maxheal * 100 + 0.5);
 	local hexColor = self:ToHexColor(1, 0.65, 0.16);  --0.49,0.99,0
 	heal, maxheal = self:FormatDigit(heal), self:FormatDigit(maxheal);
@@ -314,19 +317,11 @@ function BlinkHealth:UpdateUnitValues()
 	-- target
 	local hexH, hexP;
 	if (UnitExists("target")) then
-		if RealMobHealth and RealMobHealth.GetUnitHealth then 
-			heal, maxheal = RealMobHealth.GetUnitHealth("target")
-		else
-			heal = UnitHealth("target") or 0
-			maxheal = UnitHealthMax("target") or 1
-		end
-		--heal, maxheal = UnitHealth("target"), UnitHealthMax("target");
+		heal, maxheal = UnitHealth("target") or 0, UnitHealthMax("target") or 1;
 		power, maxpower = UnitPower("target"), UnitPowerMax("target");
 		_, powertype = UnitPowerType("target");
 		name = UnitName("target");
-		if maxheal < 1 then
-		maxheal =1
-		end
+		--if maxheal < 1 then maxheal =1 end
 		self:SetPercentText("target", heal/maxheal * 100 + 0.5);		
 		heal, maxheal = self:FormatDigit(heal), self:FormatDigit(maxheal);
 		local hexH = self:ToHexColor(1, 0.65, 0.16);   --0.49,0.99,0
@@ -358,9 +353,7 @@ function BlinkHealth:UpdateUnitValues()
 	
 		if (UnitExists("targettarget")) then
 			heal, maxheal = UnitHealth("targettarget"), UnitHealthMax("targettarget");
-			if maxheal < 1 then
-				maxheal =1
-			end
+			--if maxheal < 1 then maxheal =1 end
 			hexColor = self:ToHexColor(1, 0.65, 0.16);
 			name = UnitName("targettarget");
 			if (UnitIsUnit("targettarget", "player")) then
@@ -697,6 +690,93 @@ function BlinkHealth:DisableRune()
 end
 end
 ----------------------
+--[[ 施法条
+do
+local function OnEvent(self, event, ...)
+	local arg1 = ...;
+	if ( event == "PLAYER_TARGET_CHANGED" ) then
+		-- check if the new target is casting a spell
+		local nameChannel  = UnitChannelInfo("target");
+		local nameSpell  = UnitCastingInfo("target");
+		if ( nameChannel ) then
+			event = "UNIT_SPELLCAST_CHANNEL_START";
+			arg1 = "target";
+		elseif ( nameSpell ) then
+			event = "UNIT_SPELLCAST_START";
+			arg1 = "target";
+		else
+			self.casting = nil;
+			self.channeling = nil;
+			self:SetMinMaxValues(0, 0);
+			self:SetValue(0);
+			self:Hide();
+			return;
+		end		
+	end
+
+	S:CastingBarAdjustPosition();
+	CastingBarFrame_OnEvent(self, event, arg1, select(2, ...));
+end
+
+function S:CastingBarAdjustPosition()
+	if (self.Combo) then
+		self.castBar:ClearAllPoints();
+		if (self.Combo[1]:IsVisible()) then
+			self.castBar:SetPoint("TOPLEFT", self.Combo, "BOTTOMLEFT", 24, -5);
+		else
+			self.castBar:SetPoint("TOPLEFT", self.frame["target"].heal, "BOTTOMLEFT", 26, -5);
+		end
+	end
+end
+
+function S:ConstructCastingBar()	
+	self.castBar = CreateFrame("StatusBar", "SimpleInfoTargetCastingBar", UIParent, "CastingBarFrameTemplate");
+	self.castBar:SetWidth(120);
+	self.castBar:SetHeight(15);
+	self.castBar:Hide();
+	self.castBar:SetPoint("TOPLEFT", self.frame["target"].heal, "BOTTOMLEFT", 26, -5);
+	
+	local name = self.castBar
+	self.castBar:SetStatusBarTexture("Interface\\AddOns\\BlinkHealthText\\textures\\flat");
+	name.Border:SetAlpha(0);
+	name.BorderShield:SetAlpha(0);
+	name.Flash:SetTexture("");
+	self.castBar.bg = CreateFrame("Frame", nil, self.castBar);
+	self.castBar.bg:SetFrameStrata("BACKGROUND");
+	self.castBar.bg:SetPoint("TOPLEFT", self.castBar, "TOPLEFT", -5, 5);
+	self.castBar.bg:SetPoint("BOTTOMRIGHT", self.castBar, "BOTTOMRIGHT", 5, -5);
+		
+	local backdrop = {
+		bgFile = "Interface\\AddOns\\BlinkHealthText\\textures\\flat",
+		edgeFile = "Interface\\AddOns\\BlinkHealthText\\textures\\2px_glow",
+		tileSize = 16, edgeSize = 16, tile = true,
+		insets = {left = 4, right = 4, top = 4, bottom = 4}
+	};
+		
+	self.castBar.bg:SetBackdrop(backdrop);
+	self.castBar.bg:SetBackdropColor(0.22, 0.22, 0.19);
+	self.castBar.bg:SetBackdropBorderColor(0, 0, 0, 1);
+	self.castBar.bg:SetAlpha(0.6);
+
+	self.castBar:RegisterEvent("PLAYER_TARGET_CHANGED");
+	CastingBarFrame_OnLoad(self.castBar, "target", false, true);
+	self.castBar:SetScript("OnEvent", OnEvent);
+	
+	
+
+	local barIcon = name.Icon
+	barIcon:SetWidth(18);
+	barIcon:SetHeight(18);
+	barIcon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+	barIcon:Show();
+
+	name.Text:SetFontObject(SystemFont_Shadow_Small);	
+	name.Text:ClearAllPoints();
+	name.Text:SetPoint("LEFT", self.castBar, "LEFT", 4, 1);
+	name.Text:SetJustifyH("LEFT");
+	name.Text:SetWidth(100);
+end
+end]]
 function BlinkHealth:ConstructFrame(unit)
 	self.frame[unit] = CreateFrame("Frame", "SimpleInfoPlayerFrame" .. unit, UIParent);
 	self.frame[unit]:SetWidth(200);
@@ -805,6 +885,14 @@ function BlinkHealth:ConstructHitPoints()
 	end	
 end
 
+--[[function S:ToggleCastingBar(switch)
+	if (switch) then
+		self.castBar.showCastbar = true;
+	else
+		self.castBar.showCastbar = false;
+		self.castBar:Hide();
+	end
+end]]
 
 function BlinkHealth:ShowAnchor()
 	self.anchor:Show();

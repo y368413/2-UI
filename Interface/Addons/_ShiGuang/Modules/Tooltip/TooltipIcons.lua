@@ -54,31 +54,20 @@ function TT:HookTooltipMethod()
 	self:HookScript("OnTooltipCleared", TT.HookTooltipCleared)
 end
 
-local function updateBackdropColor(self, r, g, b)
-	self:GetParent().bg:SetBackdropBorderColor(r, g, b)
-end
-
-local function resetBackdropColor(self)
-	self:GetParent().bg:SetBackdropBorderColor(0, 0, 0)
-end
-
 function TT:ReskinRewardIcon()
 	self.Icon:SetTexCoord(unpack(I.TexCoord))
-	self.bg = M.CreateBDFrame(self, 0)
-	self.bg:SetOutside(self.Icon)
-
-	local iconBorder = self.IconBorder
-	iconBorder:SetAlpha(0)
-	hooksecurefunc(iconBorder, "SetVertexColor", updateBackdropColor)
-	hooksecurefunc(iconBorder, "Hide", resetBackdropColor)
+	self.bg = M.CreateBDFrame(self.Icon, 0)
+	M.HookIconBorderColor(self.IconBorder)
 end
 
 function TT:ReskinTooltipIcons()
 	TT.HookTooltipMethod(GameTooltip)
 	TT.HookTooltipMethod(ItemRefTooltip)
+
 	hooksecurefunc(GameTooltip, "SetUnitAura", function(self)
 		TT.SetupTooltipIcon(self)
 	end)
+
 	hooksecurefunc(GameTooltip, "SetAzeriteEssence", function(self)
 		TT.SetupTooltipIcon(self)
 	end)

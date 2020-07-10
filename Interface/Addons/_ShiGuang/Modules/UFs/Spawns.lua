@@ -25,6 +25,7 @@ local function CreatePlayerStyle(self)
 		--UF:StaggerBar(self)
 	--end
 	if not MaoRUIPerDB["Misc"]["ExpRep"] then UF:CreateExpRepBar(self) end
+	--if MaoRUIPerDB["UFs"]["PlayerDebuff"] then UF:CreateDebuffs(self) end
 	if MaoRUIPerDB["UFs"]["SwingBar"] then UF:CreateSwing(self) end
 	if MaoRUIPerDB["UFs"]["QuakeTimer"] then UF:CreateQuakeTimer(self) end
 end
@@ -188,10 +189,12 @@ function UF:OnLogin()
 		local player = oUF:Spawn("player", "oUF_Player")
 		oUF:SetActiveStyle("Target")
 		local target = oUF:Spawn("target", "oUF_Target")
+
 		if (ShiGuangPerDB["BHT"] == true) then
 		oUF:SetActiveStyle("Focus")
 		local focus = oUF:Spawn("focus", "oUF_Focus")
 		M.Mover(focus, U["FocusUF"], "FocusUF", R.UFs.FocusPos)
+
 		oUF:SetActiveStyle("FocusTarget")
 		local focustarget = oUF:Spawn("focustarget", "oUF_FocusTarget")
 		M.Mover(focustarget, U["FotUF"], "FotUF", {"TOPLEFT", oUF_Focus, "TOPRIGHT", 5, 0})
@@ -302,12 +305,6 @@ function UF:OnLogin()
 		if MaoRUIPerDB["UFs"]["SimpleMode"] then
 			local unitsPerColumn = MaoRUIPerDB["UFs"]["SMUnitsPerColumn"]
 			local maxColumns = M:Round(numGroups*5 / unitsPerColumn)
-			local groupByIndex = MaoRUIPerDB["UFs"]["SMGroupByIndex"]
-			local groupByTypes = {
-				[1] = {"1,2,3,4,5,6,7,8", "GROUP", "INDEX"},
-				[2] = {"DEATHKNIGHT,WARRIOR,DEMONHUNTER,ROGUE,MONK,PALADIN,DRUID,SHAMAN,HUNTER,PRIEST,MAGE,WARLOCK", "CLASS", "NAME"},
-				[3] = {"TANK,HEALER,DAMAGER,NONE", "ASSIGNEDROLE", "NAME"},
-			}
 
 			local function CreateGroup(name, i)
 				local group = oUF:SpawnHeader(name, nil, "solo,party,raid",
@@ -348,6 +345,11 @@ function UF:OnLogin()
 			local moverHeight = 25*scale*unitsPerColumn + 5*(unitsPerColumn-1)
 			raidMover = M.Mover(group, U["RaidFrame"], "RaidFrame", {"TOPLEFT", UIParent, 3, -26}, moverWidth, moverHeight)
 
+			local groupByTypes = {
+				[1] = {"1,2,3,4,5,6,7,8", "GROUP", "INDEX"},
+				[2] = {"DEATHKNIGHT,WARRIOR,DEMONHUNTER,ROGUE,MONK,PALADIN,DRUID,SHAMAN,HUNTER,PRIEST,MAGE,WARLOCK", "CLASS", "NAME"},
+				[3] = {"TANK,HEALER,DAMAGER,NONE", "ASSIGNEDROLE", "NAME"},
+			}
 			function UF:UpdateSimpleModeHeader()
 				local groupByIndex = MaoRUIPerDB["UFs"]["SMGroupByIndex"]
 				group:SetAttribute("groupingOrder", groupByTypes[groupByIndex][1])
@@ -424,6 +426,8 @@ function UF:OnLogin()
 				end
 			end
 		end
+
+		UF:UpdateRaidHealthMethod()
 
 		if raidMover then
 			if not MaoRUIPerDB["UFs"]["SpecRaidPos"] then return end

@@ -1,7 +1,6 @@
-﻿--## Author: Vladinator  ## Version: 8.1.5.190625
+﻿--## Author: Vladinator  ## Version: 8.3.0.200703
 
 local CandyBuckets = {}
-
 CandyBuckets.modules = CandyBuckets.modules or {}
 CandyBuckets.modules["hallow"] = {
 	event = "hallow",
@@ -280,7 +279,7 @@ CandyBuckets.modules["lunar"] = {
 		{ quest = 8713, side = 3, [220] = {62.40, 34.40} },
 		{ quest = 8675, side = 3, [52] = {56.60, 47.00} },
 		{ quest = 8866, side = 3, [87] = {29.40, 17.20} },
-		{ quest = 8648, side = 3, [998] = {66.60, 38.00} },
+		{ quest = 8648, side = 3, [90] = {66.50, 37.30}, [998] = {66.60, 38.00} },
 		{ quest = 29738, side = 3, [205] = {57.20, 86.20} },
 		{ quest = 8674, side = 3, [210] = {40.00, 72.40} },
 		{ quest = 29737, side = 3, [241] = {50.80, 70.40} },
@@ -677,7 +676,7 @@ do
 
 		for _, child in pairs(children) do
 			if not CandyBuckets.PARENT_MAP[uiMapID] then
-				CandyBuckets.PARENT_MAP[uiMapID] = {}
+				CandyBuckets.PARENT_MAP[uiMapID] = { [uiMapID] = true }
 			end
 
 			CandyBuckets.PARENT_MAP[uiMapID][child.mapID] = true
@@ -824,14 +823,22 @@ function CandyBucketsDataProviderMixin:OnEvent(event, ...)
 end
 
 function CandyBucketsDataProviderMixin:RemoveAllData()
-	self:GetMap():RemoveAllPinsByTemplate("CandyBucketsPinTemplate")
+	local map = self:GetMap()
+	map:RemoveAllPinsByTemplate("CandyBucketsPinTemplate")
+	map:RemoveAllPinsByTemplate("CandyBucketsStatsTemplate")
 end
 
 function CandyBucketsDataProviderMixin:RefreshAllData(fromOnShow)
 	self:RemoveAllData()
 
-	local uiMapID = self:GetMap():GetMapID()
+	local map = self:GetMap()
+	local uiMapID = map:GetMapID()
 	local childUiMapIDs = CandyBuckets.PARENT_MAP[uiMapID]
+	local questPOIs
+
+	if IsModifierKeyDown() then
+		questPOIs = {}
+	end
 
 	for i = 1, #CandyBuckets.QUESTS do
 		local quest = CandyBuckets.QUESTS[i]
@@ -874,12 +881,15 @@ function CandyBucketsDataProviderMixin:RefreshAllData(fromOnShow)
 		end
 
 		if poi then
-			self:GetMap():AcquirePin("CandyBucketsPinTemplate", quest, poi)
+			map:AcquirePin("CandyBucketsPinTemplate", quest, poi)
+			if questPOIs then
+				questPOIs[quest] = poi
+			end
 		end
 	end
 
-	if uiMapID == 947 then
-		-- TODO: Azeroth map overlay of sorts with statistics per continent?
+	if questPOIs and next(questPOIs) then
+		map:AcquirePin("CandyBucketsStatsTemplate", questPOIs)
 	end
 end
 
@@ -935,10 +945,102 @@ function CandyBucketsPinMixin:OnReleased()
 	self.quest, self.name, self.description = nil
 end
 
+--[[function CandyBucketsPinMixin:OnMouseEnter()
+	if not self.hasTooltip then return end
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	self.UpdateTooltip = self.OnMouseEnter
+	GameTooltip_SetTitle(GameTooltip, self.name)
+	if self.description and self.description ~= "" then
+		GameTooltip_AddNormalLine(GameTooltip, self.description, true)
+	end
+	GameTooltip_AddNormalLine(GameTooltip, "Quest ID: " .. self.quest.quest, false)
+	if CandyBuckets:GetWaypointAddon() then
+		GameTooltip_AddNormalLine(GameTooltip, "<Click to show waypoint.>", false)
+	end
+	GameTooltip:Show()
+end
+
+function CandyBucketsPinMixin:OnMouseLeave()
+	if not self.hasTooltip then return end
+	GameTooltip:Hide()
+end]]
 
 function CandyBucketsPinMixin:OnClick(button)
 	if button ~= "LeftButton" then return end
 	CandyBuckets:AutoWaypoint(self, IsModifierKeyDown())
+end
+
+---- Stats--
+
+CandyBucketsStatsMixin = CreateFromMixins(MapCanvasPinMixin)
+
+function CandyBucketsStatsMixin:OnLoad()
+	self:SetScalingLimits(1, 1.0, 1.2)
+	self.HighlightTexture:Hide()
+	self.hasTooltip = false
+	self:EnableMouse(self.hasTooltip)
+	self.Texture:Hide()
+end
+
+function CandyBucketsStatsMixin:OnAcquired(questPOIs)
+	local map = self:GetMap()
+	self:UseFrameLevelType("PIN_FRAME_LEVEL_GOSSIP", map:GetNumActivePinsByTemplate("CandyBucketsStatsTemplate"))
+	self:SetSize(map:GetSize())
+	self:SetPosition(.5, .5)
+	--self:ClearAllPoints()
+	--self:SetPoint("TOPLEFT", map:GetCanvasContainer(), "TOPLEFT", 0, 0)
+	self.name = nil
+	self.description = nil
+	local text
+	local i = 0
+	local uiMapID = map:GetMapID()
+	if uiMapID then
+		text = {}
+		for quest, poi in pairs(questPOIs) do
+			local x, y
+			if poi.GetXY then
+				x, y = poi:GetXY()
+			else
+				x, y = poi[1]/100, poi[2]/100
+			end
+			local childUiMapID, childX, childY = GetLowestLevelMapFromMapID(uiMapID, x, y)
+			local mapInfo = C_Map.GetMapInfo(childUiMapID)
+			i = i + 1
+			if mapInfo and mapInfo.name then
+				text[i] = string.format("%s (%.2f, %.2f)", mapInfo.name, childX * 100, childY * 100)
+			else
+				text[i] = string.format("#%d", quest.quest)
+			end
+		end
+		table.sort(text)
+		text = table.concat(text, "\r\n")
+	end
+	self.Text:SetText(text)
+end
+
+function CandyBucketsStatsMixin:OnReleased()
+	self.name, self.description = nil -- TODO: ?
+end
+
+--[[function CandyBucketsStatsMixin:OnMouseEnter()
+	if not self.hasTooltip then return end
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	self.UpdateTooltip = self.OnMouseEnter
+	GameTooltip_SetTitle(GameTooltip, self.name)
+	if self.description and self.description ~= "" then
+		GameTooltip_AddNormalLine(GameTooltip, self.description, true)
+	end
+	GameTooltip:Show()
+end
+
+function CandyBucketsStatsMixin:OnMouseLeave()
+	if not self.hasTooltip then return end
+	GameTooltip:Hide()
+end]]
+
+function CandyBucketsStatsMixin:OnClick(button)
+	if button ~= "LeftButton" then return end
+	-- TODO: ?
 end
 
 ---- Modules--

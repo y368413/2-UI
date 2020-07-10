@@ -56,7 +56,7 @@ local Cache_ItemBind = {}
 local Cache_ItemGarbage = {}
 local Cache_ItemLevel = {}
 local Cache_Uncollected = {}
-local Cache_CorruptionItems = {}
+--local Cache_CorruptionItems = {}
 
 -----------------------------------------------------------
 -- Utility Functions
@@ -149,8 +149,10 @@ end
 local Cache_GetItemLevel = function(button)
 	local ItemLevel = GetPluginContainter(button):CreateFontString()
 	ItemLevel:SetDrawLayer("ARTWORK", 1)
-	ItemLevel:SetPoint("TOPLEFT", 2, -2)
-	ItemLevel:SetFontObject(_G.NumberFont_Outline_Large or _G.NumberFontNormal) 
+	ItemLevel:SetPoint("TOPRIGHT", 2, 0)
+	--ItemLevel:SetFontObject(_G.NumberFont_Outline_Large or _G.NumberFontNormal) 
+	ItemLevel:SetFont("Interface\\Addons\\_ShiGuang\\Media\\Fonts\\Loli.ttf", 14, "OUTLINE");
+	ItemLevel:SetTextColor(1, 0.65, 0.16);
 	ItemLevel:SetShadowOffset(1, -1)
 	ItemLevel:SetShadowColor(0, 0, 0, .5)
 
@@ -232,19 +234,19 @@ local Cache_GetUncollected = function(button)
 	return Uncollected
 end
 
-local Cache_CorruptionRank = function(button)
-	local CorruptionItems = GetPluginContainter(button):CreateTexture()
-	CorruptionItems:SetDrawLayer("OVERLAY")
-	CorruptionItems:SetPoint("BOTTOMLEFT", 0, 0)
-	CorruptionItems:SetSize(16, 16)
-	CorruptionItems:SetTexture([[Interface\ICONS\INV_DARKMOON_EYE]])  --INV_EyeofNzothPet
-	CorruptionItems:Hide()
+--local Cache_CorruptionRank = function(button)
+	--local CorruptionItems = GetPluginContainter(button):CreateTexture()
+	--CorruptionItems:SetDrawLayer("OVERLAY")
+	--CorruptionItems:SetPoint("BOTTOMLEFT", 0, 0)
+	--CorruptionItems:SetSize(16, 16)
+	--CorruptionItems:SetTexture([[Interface\ICONS\INV_DARKMOON_EYE]])  --INV_EyeofNzothPet
+	--CorruptionItems:Hide()
 
 	-- Store the reference for the next time
-	Cache_CorruptionItems[button] = CorruptionItems
+	--Cache_CorruptionItems[button] = CorruptionItems
 
-	return CorruptionItems
-end
+	--return CorruptionItems
+--end
 
 -----------------------------------------------------------
 -- Main Update
@@ -266,7 +268,7 @@ local Update = function(self)
 		RefreshScanner(self)
 
 		---------------------------------------------------
-		-- CorruptionRank
+		--[[ CorruptionRank
 		---------------------------------------------------
 		if (itemRarity and itemRarity > 1) then 
 		if IsItemCorruption(self) then  --		if IsCorruptedItem(button) then
@@ -277,7 +279,7 @@ local Update = function(self)
 				Cache_CorruptionItems[self]:Hide()
 			end	
 		end
-		end
+		end]]
 
 		---------------------------------------------------
 		-- Uncollected Appearance
@@ -451,9 +453,9 @@ local Update = function(self)
 		if Cache_Uncollected[self] then 
 			Cache_Uncollected[self]:Hide()
 		end	
-		if Cache_CorruptionItems[self] then 
-			Cache_CorruptionItems[self]:Hide()
-		end	
+		--if Cache_CorruptionItems[self] then 
+			--Cache_CorruptionItems[self]:Hide()
+		--end	
 		if Cache_ItemLevel[self] then
 			Cache_ItemLevel[self]:SetText("")
 		end

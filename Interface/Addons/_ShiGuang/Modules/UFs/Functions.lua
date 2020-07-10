@@ -105,12 +105,22 @@ function UF:CreateHealthBar(self)
 	self.Health.bg = bg
 end
 
+function UF:UpdateRaidHealthMethod()
+	for _, frame in pairs(oUF.objects) do
+		if frame.mystyle == "raid" then
+			frame:SetHealthUpdateMethod(MaoRUIPerDB["UFs"]["FrequentHealth"])
+			frame:SetHealthUpdateSpeed(MaoRUIPerDB["UFs"]["HealthFrequency"])
+			frame.Health:ForceUpdate()
+		end
+	end
+end
+
 function UF:CreateHealthText(self)
 	local mystyle = self.mystyle
 	local textFrame = CreateFrame("Frame", nil, self)
 	textFrame:SetAllPoints(self.Health)
 
-	local name = M.CreateFS(textFrame, retVal(self, 13, 12, 12, 12, MaoRUIPerDB["Nameplate"]["NameTextSize"]), "", false, "LEFT", 3, -1)
+	local name = M.CreateFS(textFrame, retVal(self, 13, 12, 12, 12, MaoRUIPerDB["Nameplate"]["NameTextSize"]), "", false, "LEFT", 3, 0)
 	name:SetJustifyH("LEFT")
 	if mystyle == "raid" then
 		name:SetWidth(self:GetWidth()*.95)
@@ -145,11 +155,13 @@ function UF:CreateHealthText(self)
 		self:Tag(name, "[nplevel][name]")
 	elseif mystyle == "arena" then
 		self:Tag(name, "[arenaspec] [color][name]")
+	elseif mystyle == "raid" and MaoRUIPerDB["UFs"]["SimpleMode"] and MaoRUIPerDB["UFs"]["ShowTeamIndex"] and not self.isPartyPet and not self.isPartyFrame then
+		self:Tag(name, "[group].[color][name]")
 	else
 		self:Tag(name, "[color][name]")
 	end
 
-	local hpval = M.CreateFS(textFrame, retVal(self, 14, 13, 13, 13, MaoRUIPerDB["Nameplate"]["HealthTextSize"]), "", false, "RIGHT", -3, -1)
+	local hpval = M.CreateFS(textFrame, retVal(self, 14, 13, 13, 13, MaoRUIPerDB["Nameplate"]["HealthTextSize"]), "", false, "RIGHT", -3, 0)
 	if mystyle == "raid" then
 		self:Tag(hpval, "[raidhp]")
 		if self.isPartyPet then
@@ -259,8 +271,11 @@ function UF:CreatePowerText(self)
 	textFrame:SetAllPoints(self.Power)
 
 	local ppval = M.CreateFS(textFrame, retVal(self, 13, 12, 12, 12), "", false, "RIGHT", -3, 2)
-	if self.mystyle == "raid" then
+	local mystyle = self.mystyle
+	if mystyle == "raid" then
 		ppval:SetScale(MaoRUIPerDB["UFs"]["RaidTextScale"])
+	elseif mystyle == "focus" then
+		ppval:SetPoint("RIGHT", -3, MaoRUIPerDB["UFs"]["FocusPowerOffset"])
 	end
 	self:Tag(ppval, "[color][power]")
 	self.powerText = ppval
@@ -271,7 +286,6 @@ local textScaleFrames = {
 	["target"] = true,
 	["focus"] = true,
 	["pet"] = true,
-	["tot"] = true,
 	["focustarget"] = true,
 	["boss"] = true,
 	["arena"] = true,

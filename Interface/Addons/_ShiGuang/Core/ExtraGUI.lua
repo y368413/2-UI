@@ -745,21 +745,27 @@ local function sliderValueChanged(self, v)
 	self.__update()
 end
 
-local function createOptionSlider(parent, title, minV, maxV, x, y, value, func)
-	local slider = M.CreateSlider(parent, title, minV, maxV, x, y)
+local function createOptionSlider(parent, title, minV, maxV, defaultV, x, y, value, func)
+	local slider = M.CreateSlider(parent, title, minV, maxV, 1, x, y)
 	slider:SetValue(MaoRUIPerDB["UFs"][value])
 	slider.value:SetText(MaoRUIPerDB["UFs"][value])
 	slider.__value = value
 	slider.__update = func
+	slider.__default = defaultV
 	slider:SetScript("OnValueChanged", sliderValueChanged)
 end
 
 local function SetUnitFrameSize(self, unit)
 	local width = MaoRUIPerDB["UFs"][unit.."Width"]
-	local height = MaoRUIPerDB["UFs"][unit.."Height"] + MaoRUIPerDB["UFs"][unit.."PowerHeight"] + R.mult
+	local healthHeight = MaoRUIPerDB["UFs"][unit.."Height"]
+	local powerHeight = MaoRUIPerDB["UFs"][unit.."PowerHeight"]
+	local height = healthHeight + powerHeight + R.mult
 	self:SetSize(width, height)
-	self.Health:SetHeight(MaoRUIPerDB["UFs"][unit.."Height"])
-	self.Power:SetHeight(MaoRUIPerDB["UFs"][unit.."PowerHeight"])
+	self.Health:SetHeight(healthHeight)
+	self.Power:SetHeight(powerHeight)
+	if self.powerText then
+		self.powerText:SetPoint("RIGHT", -3, MaoRUIPerDB["UFs"][unit.."PowerOffset"])
+	end
 end
 
 function G:SetupRaidFrame(parent)
@@ -788,9 +794,9 @@ function G:SetupRaidFrame(parent)
 
 	local function createOptionGroup(parent, title, offset, value, func)
 		createOptionTitle(parent, title, offset)
-		createOptionSlider(parent, U["Health Width"].."("..defaultValue[value][1]..")", minRange[value][1], 300, 30, offset-60, value.."Width", func)
-		createOptionSlider(parent, U["Health Height"].."("..defaultValue[value][2]..")", minRange[value][2], 60, 30, offset-130, value.."Height", func)
-		createOptionSlider(parent, U["Power Height"].."("..defaultValue[value][3]..")", 2, 20, 30, offset-200, value.."PowerHeight", func)
+		createOptionSlider(parent, U["Health Width"], minRange[value][1], 300, defaultValue[value][1], 30, offset-60, value.."Width", func)
+		createOptionSlider(parent, U["Health Height"], minRange[value][2], 60, defaultValue[value][2], 30, offset-130, value.."Height", func)
+		createOptionSlider(parent, U["Power Height"], 2, 20, defaultValue[value][3], 30, offset-200, value.."PowerHeight", func)
 	end
 
 	local function resizeRaidFrame()
@@ -812,7 +818,7 @@ function G:SetupRaidFrame(parent)
 		end
 	end
 	createOptionGroup(scroll.child, U["RaidFrame"], -10, "Raid", resizeRaidFrame)
-	createOptionSlider(scroll.child, "|cff00cc4c"..U["SimpleMode Scale"], 8, 15, 30, -280, "SimpleRaidScale", resizeRaidFrame)
+	createOptionSlider(scroll.child, "|cff00cc4c"..U["SimpleMode Scale"], 8, 15, 10, 30, -280, "SimpleRaidScale", resizeRaidFrame)
 
 	local function resizePartyFrame()
 		for _, frame in pairs(ns.oUF.objects) do
@@ -876,8 +882,8 @@ function G:SetupCastbar(parent)
 
 	local function createOptionGroup(parent, title, offset, value, func)
 		createOptionTitle(parent, title, offset)
-		createOptionSlider(parent, U["Castbar Width"].."("..defaultValue[value][1]..")", 200, 400, 30, offset-60, value.."CBWidth", func)
-		createOptionSlider(parent, U["Castbar Height"].."("..defaultValue[value][2]..")", 10, 50, 30, offset-130, value.."CBHeight", func)
+		createOptionSlider(parent, U["Castbar Width"], 200, 400, defaultValue[value][1], 30, offset-60, value.."CBWidth", func)
+		createOptionSlider(parent, U["Castbar Height"], 10, 50, defaultValue[value][2], 30, offset-130, value.."CBHeight", func)
 	end
 
 	local function updatePlayerCastbar()

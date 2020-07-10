@@ -2273,7 +2273,6 @@ function CanIMogIt:GetIconText(itemLink, bag, slot)
 end
 
 
-
 -----------------------------
 -- Adding to tooltip       --
 -----------------------------

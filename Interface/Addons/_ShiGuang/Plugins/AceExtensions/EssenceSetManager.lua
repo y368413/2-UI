@@ -102,19 +102,26 @@ esm.updateBtnSaturation = function()
 	esm.updateTomeButton()
 end
 
+esm.getTomeInfo = function()
+	local tranquilCount = GetItemCount("item:"..141446)
+	local quietCount =  GetItemCount("item:"..153647)
+	local totalCount = tranquilCount + quietCount
+	local itemID
+	if tranquilCount > 0 then
+		itemID = 141446
+	else
+		itemID = 153647
+	end
+	return totalCount, itemID
+end
+
 esm.updateTomeButton = function()
 	if esm.itemBtn then
-		local tranquilCount = GetItemCount("item:"..141446)
-		local quietCount =  GetItemCount("item:"..153647)
-		local totalCount = tranquilCount + quietCount
-		esm.itemBtn:SetText(totalCount)
+		local tomeCount, itemID = esm.getTomeInfo()
+		esm.itemBtn:SetText(tomeCount)
 		if InCombatLockdown() then return end
-		if tranquilCount > 0 then
-			esm.itemBtn:SetAttribute("item", "item:"..141446);
-		else
-			esm.itemBtn:SetAttribute("item", "item:"..153647);
-		end
-		if esm.saturation == 1 and totalCount > 0 then
+		esm.itemBtn:SetAttribute("item", "item:"..itemID);
+		if esm.saturation == 1 and tomeCount > 0 then
 			esm.itemBtn:Enable()
 		else
 			esm.itemBtn:Disable()
@@ -180,6 +187,11 @@ esm.createFonts = function()
 	esm.fontWhite:CopyFontObject("GameFontNormal");
 	esm.fontWhite:SetTextColor(1, 1, 1, 1.0);
 	esm.fontWhite:SetFont(STANDARD_TEXT_FONT, 13, "OUTLINE")
+	
+	esm.fontTome = CreateFont("Tome")
+	esm.fontTome:CopyFontObject("GameFontNormal");
+	esm.fontTome:SetTextColor(1, 1, 1, 1.0);
+	esm.fontTome:SetFont(STANDARD_TEXT_FONT, 16, "OUTLINE")
 	
 	esm.fontGreen = CreateFont("Match")
 	esm.fontGreen:CopyFontObject("GameFontNormal");

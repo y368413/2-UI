@@ -1,5 +1,4 @@
 ﻿--## Author: Kruithne ## Version: 1.4.9
-
 TransmogTokens = {
 	["REDEEM_DATA"] = {},
 	["BONUS_LOOKUP"] = {},
@@ -706,13 +705,10 @@ local function onSetHyperlink(self, link)
 		t.processTooltip(self, link);
 	end
 end
-
 hooksecurefunc(GameTooltip, "SetHyperlink", onSetHyperlink);
 
 ---------------------------------------------------------------------------------
 -- zhTW localization by GitHub user mcc1
-local L = TransmogTokens.L
-
 if (GetLocale() == "zhCN") or (GetLocale() == "zhTW") then
 	L["Loading item information..."] = "讀取物品資訊中...";
 	L["Can be exchanged for %d appearances you need."] = "你需要的 %d 個外觀可被兌換。";
@@ -950,10 +946,7 @@ else
 		}
 	};
 end
-
 ---------------------------------------------------------------------------------
-local t = TransmogTokens;
-local L = t.L;
 
 t.INVENTORY_SLOTS = {
     ["INVTYPE_HEAD"] = {1},

@@ -412,9 +412,7 @@ do
 		if self.title then
 			GameTooltip:AddLine(self.title)
 		end
-		if self.text and strfind(self.text, "|H.+|h") then
-			GameTooltip:SetHyperlink(self.text)
-		elseif tonumber(self.text) then
+		if tonumber(self.text) then
 			GameTooltip:SetSpellByID(self.text)
 		elseif self.text then
 			local r, g, b = 1, 1, 1
@@ -498,7 +496,7 @@ end
 -- UI skins
 do
 	-- ls, Azil, and Simpy made this to replace Blizzard's SetBackdrop API while the textures can't snap
-	local PIXEL_BORDERS = {"TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT", "TOP", "BOTTOM", "LEFT", "RIGHT"}
+	local PIXEL_BORDERS = {"TOP", "BOTTOM", "LEFT", "RIGHT"}
 
 	function M:SetBackdrop(frame, a)
 		local borders = frame.pixelBorders
@@ -508,11 +506,6 @@ do
 
 		borders.CENTER:SetPoint("TOPLEFT", frame)
 		borders.CENTER:SetPoint("BOTTOMRIGHT", frame)
-
-		borders.TOPLEFT:SetSize(size, size)
-		borders.TOPRIGHT:SetSize(size, size)
-		borders.BOTTOMLEFT:SetSize(size, size)
-		borders.BOTTOMRIGHT:SetSize(size, size)
 
 		borders.TOP:SetHeight(size)
 		borders.BOTTOM:SetHeight(size)
@@ -556,22 +549,17 @@ do
 			borders.CENTER = frame:CreateTexture(nil, "BACKGROUND", nil, -1)
 			borders.CENTER:SetTexture(I.bdTex)
 
-			borders.TOPLEFT:Point("BOTTOMRIGHT", borders.CENTER, "TOPLEFT", R.mult, -R.mult)
-			borders.TOPRIGHT:Point("BOTTOMLEFT", borders.CENTER, "TOPRIGHT", -R.mult, -R.mult)
-			borders.BOTTOMLEFT:Point("TOPRIGHT", borders.CENTER, "BOTTOMLEFT", R.mult, R.mult)
-			borders.BOTTOMRIGHT:Point("TOPLEFT", borders.CENTER, "BOTTOMRIGHT", -R.mult, R.mult)
+			borders.TOP:Point("BOTTOMLEFT", borders.CENTER, "TOPLEFT", R.mult, -R.mult)
+			borders.TOP:Point("BOTTOMRIGHT", borders.CENTER, "TOPRIGHT", -R.mult, -R.mult)
 
-			borders.TOP:Point("TOPLEFT", borders.TOPLEFT, "TOPRIGHT", 0, 0)
-			borders.TOP:Point("TOPRIGHT", borders.TOPRIGHT, "TOPLEFT", 0, 0)
+			borders.BOTTOM:Point("TOPLEFT", borders.CENTER, "BOTTOMLEFT", R.mult, R.mult)
+			borders.BOTTOM:Point("TOPRIGHT", borders.CENTER, "BOTTOMRIGHT", -R.mult, R.mult)
 
-			borders.BOTTOM:Point("BOTTOMLEFT", borders.BOTTOMLEFT, "BOTTOMRIGHT", 0, 0)
-			borders.BOTTOM:Point("BOTTOMRIGHT", borders.BOTTOMRIGHT, "BOTTOMLEFT", 0, 0)
+			borders.LEFT:Point("TOPRIGHT", borders.TOP, "TOPLEFT", 0, 0)
+			borders.LEFT:Point("BOTTOMRIGHT", borders.BOTTOM, "BOTTOMLEFT", 0, 0)
 
-			borders.LEFT:Point("TOPLEFT", borders.TOPLEFT, "BOTTOMLEFT", 0, 0)
-			borders.LEFT:Point("BOTTOMLEFT", borders.BOTTOMLEFT, "TOPLEFT", 0, 0)
-
-			borders.RIGHT:Point("TOPRIGHT", borders.TOPRIGHT, "BOTTOMRIGHT", 0, 0)
-			borders.RIGHT:Point("BOTTOMRIGHT", borders.BOTTOMRIGHT, "TOPRIGHT", 0, 0)
+			borders.RIGHT:Point("TOPLEFT", borders.TOP, "TOPRIGHT", 0, 0)
+			borders.RIGHT:Point("BOTTOMLEFT", borders.BOTTOM, "BOTTOMRIGHT", 0, 0)
 
 			hooksecurefunc(frame, "SetBackdropColor", M.SetBackdropColor_Hook)
 			hooksecurefunc(frame, "SetBackdropBorderColor", M.SetBackdropBorderColor_Hook)
@@ -674,6 +662,21 @@ do
 		bu:GetHighlightTexture():SetTexCoord(0, .5, 0, .5)
 
 		return bu
+	end
+
+	local function updateIconBorderColor(self, r, g, b)
+		if r == .65882 then r, g, b = 0, 0, 0 end
+		self.__owner.bg:SetBackdropBorderColor(r, g, b)
+	end
+	local function resetIconBorderColor(self)
+		self.__owner.bg:SetBackdropBorderColor(0, 0, 0)
+	end
+	function M:HookIconBorderColor()
+		self:SetAlpha(0)
+		self.__owner = self:GetParent()
+		if not self.__owner.bg then return end
+		hooksecurefunc(self, "SetVertexColor", updateIconBorderColor)
+		hooksecurefunc(self, "Hide", resetIconBorderColor)
 	end
 
 	-- Handle statusbar
@@ -970,11 +973,20 @@ do
 		self:ClearFocus()
 	end
 
-	function M:CreateSlider(name, minValue, maxValue, x, y, width)
+	local function resetSliderValue(self)
+		local slider = self.__owner
+		if slider.__default then
+			slider:SetValue(slider.__default)
+		end
+	end
+
+	function M:CreateSlider(name, minValue, maxValue, step, x, y, width)
 		local slider = CreateFrame("Slider", nil, self, "OptionsSliderTemplate")
 		slider:SetPoint("TOPLEFT", x, y)
 		slider:SetWidth(width or 200)
 		slider:SetMinMaxValues(minValue, maxValue)
+		slider:SetValueStep(step)
+		slider:SetObeyStepOnDrag(true)
 		slider:SetHitRectInsets(0, 0, 0, 0)
 		--M.ReskinSlider(slider)
 
@@ -991,6 +1003,11 @@ do
 		slider.value:SetJustifyH("CENTER")
 		slider.value.__owner = slider
 		slider.value:SetScript("OnEnterPressed", updateSliderEditBox)
+
+		slider.clicker = CreateFrame("Button", nil, slider)
+		slider.clicker:SetAllPoints(slider.Text)
+		slider.clicker.__owner = slider
+		slider.clicker:SetScript("OnDoubleClick", resetSliderValue)
 
 		return slider
 	end

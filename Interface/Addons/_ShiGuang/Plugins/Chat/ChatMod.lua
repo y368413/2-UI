@@ -158,9 +158,9 @@ local function AddMessage(self, text, ...)
     end
     self.OrigAddMessage(self, text, ...)
 end
-local chatFrame
+
 for i = 1, NUM_CHAT_WINDOWS do
-    chatFrame = _G["ChatFrame" .. i]
+    local chatFrame = _G["ChatFrame" .. i]
     if (chatFrame) then
         chatFrame.OrigAddMessage = chatFrame.AddMessage
         chatFrame.AddMessage = AddMessage

@@ -1,4 +1,4 @@
-﻿-- $Id: Config.lua 167 2018-11-13 13:28:02Z arith $
+﻿-- $Id: Config.lua 189 2020-06-28 09:59:57Z arith $
 -----------------------------------------------------------------------
 -- Upvalued Lua API.
 -----------------------------------------------------------------------
@@ -14,6 +14,7 @@ local format = string.format
 -- WoW
 local GetSpellTexture, GetSpellInfo, GetItemInfo, GetItemCount = _G.GetSpellTexture, _G.GetSpellInfo, _G.GetItemInfo, _G.GetItemCount
 local GetLocale = _G.GetLocale
+local WoWClassic = select(4, GetBuildInfo()) < 20000
 -- ----------------------------------------------------------------------------
 -- AddOn namespace.
 -- ----------------------------------------------------------------------------
@@ -26,6 +27,8 @@ local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local AceDBOptions = LibStub("AceDBOptions-3.0")
 
 local profile
+local item_list
+
 
 local function orderednext(t, n)
 	local key = t[t.__next]
@@ -425,6 +428,40 @@ end
 
 local function getItemOptions()
 	if not profile then profile = CurrencyTracking.db.profile end
+	if not item_list then item_list = CurrencyTracking.db.item_list end
+	
+	local function getProfOptions(tp, itemID, n)
+		local itemName, icon, _
+	
+		if (item_list[itemID] and item_list[itemID][1] and item_list[itemID][2]) then
+			itemName, icon = item_list[itemID][1], item_list[itemID][2]
+		else
+			itemName, _, _, _, _, _, _, _, _, icon = GetItemInfo(itemID)
+			if not (itemName) then 
+				itemName, _, _, _, _, _, _, _, _, icon = GetItemInfo(itemID)
+			end
+			if ( itemName and icon ) then
+				item_list[itemID] = { itemName, icon, }
+			end
+		end
+		local count = GetItemCount(itemID, true)
+		
+		if icon and itemName then
+			local displayString = format("|T%d:16:16:2:0|t %s%s|r", icon, count > 0 and HIGHLIGHT_FONT_COLOR_CODE or GRAY_FONT_COLOR_CODE, itemName)
+			tp["item"..n] = {}
+			tp["item"..n].order = n
+			tp["item"..n].type = "toggle"
+			tp["item"..n].name = displayString
+			tp["item"..n].desc = format(NORMAL_FONT_COLOR_CODE..CURRENCY_TOTAL, HIGHLIGHT_FONT_COLOR_CODE, count or 0)
+			tp["item"..n].get = (function() return profile["items"][itemID] end)
+			tp["item"..n].set = (function() itemButton_ToggleTrack(itemID) end)
+		
+			n = n + 1
+		end
+		
+		return tp, n
+	end
+	
 	if not itemOptions then
 		itemOptions = {
 			type = "group",
@@ -438,42 +475,48 @@ local function getItemOptions()
 			itemOptions.args["group"..i].type = "group"
 			itemOptions.args["group"..i].name = CurrencyTracking.constants.itemCategories[k]
 			itemOptions.args["group"..i].args = { }
-			local j = 1
 			local t = itemOptions.args["group"..i].args
 			if k == "professions" then
+				local j = 1
 				for ka, profs in pairs(v) do
-					t["group"..j] = {}
-					t["group"..j].order = j
-					t["group"..j].type = "group"
-					t["group"..j].name = format("|T%d:16:16:2:0|t |cffffffff%s|r", GetSpellTexture(ka), GetSpellInfo(ka))
-					--t["group"..j].inline = true
-					t["group"..j].args = { }
-					--local n = 1
-					local tp = t["group"..j].args
-					for n, itemID in ipairs(profs) do
-						--item_cache = {}
-						local itemName, itemLink, _, _, _, _, _, _, _, icon = GetItemInfo(itemID)
-						local count = GetItemCount(itemID, true)
-						
-						if icon and itemName then
-							local displayString = format("|T%d:16:16:2:0|t %s%s|r", icon, count > 0 and HIGHLIGHT_FONT_COLOR_CODE or GRAY_FONT_COLOR_CODE, itemName)
-							tp["item"..n] = {}
-							tp["item"..n].order = n
-							tp["item"..n].type = "toggle"
-							tp["item"..n].name = displayString
-							tp["item"..n].desc = format(NORMAL_FONT_COLOR_CODE..CURRENCY_TOTAL, HIGHLIGHT_FONT_COLOR_CODE, count or 0)
-							tp["item"..n].get = (function() return profile["items"][itemID] end)
-							tp["item"..n].set = (function() itemButton_ToggleTrack(itemID) end)
-						
-							n = n + 1
+					local spellInfo = GetSpellInfo(ka)
+					local spellTexture = GetSpellTexture(ka)
+					if (spellInfo ~= nil) then
+						t["group"..j] = {}
+						t["group"..j].order = j
+						t["group"..j].type = "group"
+						t["group"..j].name = format("|T%d:16:16:2:0|t |cffffffff%s|r", spellTexture, spellInfo)
+						--t["group"..j].inline = true
+						t["group"..j].args = { }
+						local n = 1
+						local tp = t["group"..j].args
+						for kb, vb in ipairs(profs) do
+							if (type(vb) == "number") then
+								tp, n = getProfOptions(tp, vb, n)
+							end
 						end
-					end
 
-					j = j + 1
+						j = j + 1
+					end
 				end
 			else
+				local j = 1
+				--Query:AddItemInfoList(v)
 				for ka, itemID in ipairs(v) do
-					local itemName, itemLink, _, _, _, _, _, _, _, icon = GetItemInfo(itemID)
+--					t, j = getProfOptions(t, itemID, j)
+					local itemName, icon, _
+				
+					if (item_list[itemID] and item_list[itemID][1] and item_list[itemID][2]) then
+						itemName, icon = item_list[itemID][1], item_list[itemID][2]
+					else
+						itemName, _, _, _, _, _, _, _, _, icon = GetItemInfo(itemID)
+						if not (itemName) then 
+							itemName, _, _, _, _, _, _, _, _, icon = GetItemInfo(itemID)
+						end
+						if ( itemName and icon ) then
+							item_list[itemID] = { itemName, icon, }
+						end
+					end
 					local count = GetItemCount(itemID, true)
 					if icon and itemName then
 						local displayString = format("|T%d:16:16:2:0|t %s%s|r", icon, count > 0 and HIGHLIGHT_FONT_COLOR_CODE or GRAY_FONT_COLOR_CODE, itemName)
@@ -503,8 +546,11 @@ local function openOptions(openItems)
 	if (openItems) then
 		InterfaceOptionsFrame_OpenToCategory(CurrencyTracking.optionsFrames.Items)
 	else
-		--InterfaceOptionsFrame_OpenToCategory(myaddon.panel)
-		InterfaceOptionsFrame_OpenToCategory(CurrencyTracking.optionsFrames.Currencies)
+		if (WoWClassic) then
+			InterfaceOptionsFrame_OpenToCategory(CurrencyTracking.optionsFrames.General)
+		else
+			InterfaceOptionsFrame_OpenToCategory(CurrencyTracking.optionsFrames.Currencies)
+		end
 	end
 	InterfaceOptionsFrame:Raise()
 end
@@ -526,7 +572,9 @@ function CurrencyTracking:SetupOptions()
 	self:RegisterModuleOptions("Options", getOptions, BASE_SETTINGS )
 	self:RegisterModuleOptions("Items", getItemOptions, CurrencyTracking_TRACKED_ITEMS)
 	--addTokenOptionFrame()
+	if (not WoWClassic) then
 	self:RegisterModuleOptions("Currencies", getCurrenciesOptions, CurrencyTracking_TRACKED_CURRENCY)
+	end
 	self:RegisterModuleOptions("Profiles", giveProfiles, CurrencyTracking_PROFILE_OPTIONS)
 end
 

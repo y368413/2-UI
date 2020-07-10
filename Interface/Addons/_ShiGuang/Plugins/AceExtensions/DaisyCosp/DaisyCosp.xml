@@ -1,5 +1,0 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="HuanHuaData.lua"/>
-	<Script file="LibHuanHuaData-1.0.lua"/>
-	<Script file="DaisyCosp.lua"/>
-</Ui>

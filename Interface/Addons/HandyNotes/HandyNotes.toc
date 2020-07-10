@@ -13,7 +13,7 @@
 ## X-Repple: 2 UI
 
 # Lib files
-HereBeDragons\HereBeDragons.xml
+# HereBeDragons\HereBeDragons.xml
 
 # Locale files
 Locales\Locales.xml

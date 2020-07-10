@@ -372,7 +372,7 @@ local function BuildButtons()
 		for k,v in pairs(Buttons) do
 			local button = _G["MFB_"..k]
 			if Filter == v.filter or Filter == LE_LOOT_FILTER_ALL then
-				SetDesaturation(_G["MFB_"..k.."_Overlay"], nil)
+				SetDesaturation(_G["MFB_"..k.."_Overlay"], 0)
 			else
 				SetDesaturation(_G["MFB_"..k.."_Overlay"], 1)			
 			end

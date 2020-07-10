@@ -268,7 +268,6 @@ local function PlayerCanCollectAppearance(appearanceID, itemID, itemLink)
 		classArmor = LE_ITEM_ARMOR_MAIL
 	end
 
-
 	if playerLevel >= reqLevel then
 	    local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
 	    if sources then
@@ -302,7 +301,9 @@ end
 local function GetItemInfoLocal(itemID, bag, slot)
 	local name = GetItemInfo(itemID)
 	if name then
-		if bag == "MerchantFrame" then
+		if bag == "AuctionFrame" then
+			name = GetAuctionItemInfo("list", slot)
+		elseif bag == "MerchantFrame" then
 			if MerchantFrame.selectedTab == 1 then
 				name = GetMerchantItemInfo(slot)
 			else
@@ -315,7 +316,10 @@ local function GetItemInfoLocal(itemID, bag, slot)
 end
 
 local function GetItemLinkLocal(bag, slot)
-	if bag == "MerchantFrame" then
+	if bag == "AuctionFrame" then
+		local _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, hasAllInfo =  GetAuctionItemInfo("list", slot);
+		return hasAllInfo and GetAuctionItemLink("list", slot)
+	elseif bag == "MerchantFrame" then
 		if MerchantFrame.selectedTab == 1 then
 			return GetMerchantItemLink(slot)
 		else
@@ -349,7 +353,7 @@ end
 
 local function GetItemKey(bag, slot, itemLink)
 	local itemKey
-	if bag == "MerchantFrame" then
+	if bag == "AuctionFrame" or bag == "MerchantFrame" then
 		itemKey = itemLink
 	elseif bag == "GuildBankFrame" then
 		itemKey = itemLink .. slot.tab .. slot.index
@@ -416,7 +420,9 @@ local function GetBindingStatus(bag, slot, itemID, itemLink)
 	elseif not shouldRetry then
 		needsItem = true
 		scanTip:SetOwner(WorldFrame, "ANCHOR_NONE")
-		if bag == "MerchantFrame" then
+		if bag == "AuctionFrame" then
+			scanTip:SetAuctionItem("list", slot)
+		elseif bag == "MerchantFrame" then
 			if MerchantFrame.selectedTab == 1 then
 				scanTip:SetMerchantItem(slot)
 			else
@@ -693,7 +699,8 @@ end
 local function IsBankOrBags(bag)
 	local isBankOrBags = false
 
-	if bag ~= "MerchantFrame" and 
+	if bag ~= "AuctionFrame" and 
+	   bag ~= "MerchantFrame" and 
 	   bag ~= "GuildBankFrame" and
 	   bag ~= "EncounterJournal" and
 	   bag ~= "QuestButton" and
@@ -707,6 +714,10 @@ end
 
 local function ShouldHideBindingStatus(bag, bindingStatus)
 	local shouldHide = false
+
+	if bag == "AuctionFrame" then
+		shouldHide = true
+	end
 
 	if not CaerdonWardrobeConfig.Binding.ShowStatus.BankAndBags and IsBankOrBags(bag) then
 		shouldHide = true
@@ -746,6 +757,10 @@ local function ShouldHideOwnIcon(bag)
 		shouldHide = true
 	end
 
+	if not CaerdonWardrobeConfig.Icon.ShowLearnable.Auction and bag == "AuctionFrame" then
+		shouldHide = true
+	end
+
 	return shouldHide
 end
 
@@ -764,6 +779,10 @@ local function ShouldHideOtherIcon(bag)
 		shouldHide = true
 	end
 
+	if not CaerdonWardrobeConfig.Icon.ShowLearnableByOther.Auction and bag == "AuctionFrame" then
+		shouldHide = true
+	end
+
 	return shouldHide
 end
 
@@ -779,6 +798,10 @@ local function ShouldHideSellableIcon(bag)
 	end
 
 	if bag == "MerchantFrame" then
+		shouldHide = true
+	end
+
+	if bag == "AuctionFrame" then
 		shouldHide = true
 	end
 
@@ -1048,9 +1071,6 @@ local function SetItemButtonBindType(button, mogStatus, bindingStatus, options, 
 			if (button.count and button.count > 1) then
 				bindsOnText:SetPoint("BOTTOMRIGHT", 0, offset)
 			end
-			if(options.bindingScale) then
-				bindsOnText:SetScale(options.bindingScale)
-			end
 		end
 	elseif bindingPosition == "CENTER" then
 		bindsOnText:SetPoint("CENTER", 0, 0)
@@ -1058,6 +1078,9 @@ local function SetItemButtonBindType(button, mogStatus, bindingStatus, options, 
 		bindsOnText:SetPoint("TOPRIGHT", 0, -2)
 	else
 		bindsOnText:SetPoint(bindingPosition, options.bindingOffsetX or 2, options.bindingOffsetY or 2)
+	end
+	if(options.bindingScale) then
+		bindsOnText:SetScale(options.bindingScale)
 	end
 
 	local bindingText
@@ -1535,6 +1558,40 @@ local function OnGuildBankFrameUpdate()
 	isGuildBankFrameUpdateRequested = true
 end
 
+local function OnAuctionBrowseUpdate()
+	local offset = FauxScrollFrame_GetOffset(BrowseScrollFrame);
+
+	for i=1, NUM_BROWSE_TO_DISPLAY do
+		local auctionIndex = offset + i
+		local index = auctionIndex + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page);
+		local buttonName = "BrowseButton"..i.."Item";
+		local button = _G[buttonName];
+
+		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
+		local shouldHide = index > (numBatchAuctions + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page));
+		if ( not shouldHide ) then
+			name, texture, count, quality, canUse, level, levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, owner, ownerFullName, saleStatus, itemId, hasAllInfo =  GetAuctionItemInfo("list", auctionIndex);
+			
+			if ( not hasAllInfo ) then --Bug  145328
+				shouldHide = true;
+			end
+		end
+
+		if not shouldHide then
+			local bag = "AuctionFrame"
+			local slot = auctionIndex
+
+			local itemLink = GetAuctionItemLink("list", auctionIndex)
+			if(itemLink) then
+				local itemID = GetItemID(itemLink)
+				if itemID and button then
+					ProcessOrWaitItem(itemID, bag, slot, button, { showMogIcon=true, showBindStatus=false, showSellables=false })
+				end
+			end
+		end
+	end
+end
+
 local function OnMerchantUpdate()
 	for i=1, MERCHANT_ITEMS_PER_PAGE, 1 do
 		local index = (((MerchantFrame.page - 1) * MERCHANT_ITEMS_PER_PAGE) + i)
@@ -1734,6 +1791,7 @@ function CaerdonWardrobeNS:GetDefaultConfig()
 				BankAndBags = true,
 				GuildBank = true,
 				Merchant = true,
+				Auction = true,
 				SameLookDifferentItem = false,
 			},
 
@@ -1741,6 +1799,7 @@ function CaerdonWardrobeNS:GetDefaultConfig()
 				BankAndBags = true,
 				GuildBank = true,
 				Merchant = true,
+				Auction = true,
 				EncounterJournal = true,
 				SameLookDifferentItem = false,
 			},
@@ -1786,6 +1845,8 @@ function CaerdonWardrobeFrame:ADDON_LOADED(name)
 		else
 			CaerdonWardrobeFrame:RegisterEvent("PLAYER_LOGIN")
 		end
+	elseif name == "Blizzard_AuctionUI" then
+		hooksecurefunc("AuctionFrameBrowse_Update", OnAuctionBrowseUpdate)
 	elseif name == "Blizzard_GuildBankUI" then
 		hooksecurefunc("GuildBankFrame_Update", OnGuildBankFrameUpdate)
 	elseif name == "Blizzard_EncounterJournal" then
@@ -1957,6 +2018,10 @@ local function RefreshItems()
 		else
 			OnBuybackUpdate()
 		end
+	end
+
+	if AuctionFrame and AuctionFrame:IsShown() then
+		OnAuctionBrowseUpdate()
 	end
 
 	if BankFrame:IsShown() then
@@ -2296,6 +2361,14 @@ function configFrame:CreateComponents()
 	components.showLearnableOnMerchantLabel:SetWidth(80)
 	components.showLearnableOnMerchantLabel:SetText("商人")
 
+	components.showLearnableOnAuction = CreateFrame("CheckButton", "CaerdonWardrobeConfig_showLearnableOnAuction", self, "InterfaceOptionsCheckButtonTemplate")
+	components.showLearnableOnAuction:SetPoint("LEFT", components.showLearnableOnMerchantLabel, "RIGHT", 20, 0)
+	components.showLearnableOnAuction:SetPoint("TOP", components.showLearnableOnMerchant, "TOP", 0, 0)
+	components.showLearnableOnAuctionLabel = _G[components.showLearnableOnAuction:GetName() .. "Text"]
+	components.showLearnableOnAuctionLabel:SetWidth(100)
+	components.showLearnableOnAuctionLabel:SetText("Auction House")
+
+
 	components.showLearnableOtherLabel = self:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
 	components.showLearnableOtherLabel:SetText("在其它物品上显示可学:")
 	components.showLearnableOtherLabel:SetPoint("TOPLEFT", components.showLearnableOnBags, "BOTTOMLEFT", -15, -15)
@@ -2319,6 +2392,13 @@ function configFrame:CreateComponents()
 	components.showLearnableOtherOnMerchantLabel = _G[components.showLearnableOtherOnMerchant:GetName() .. "Text"]
 	components.showLearnableOtherOnMerchantLabel:SetWidth(80)
 	components.showLearnableOtherOnMerchantLabel:SetText("商人")
+
+	components.showLearnableOtherOnAuction = CreateFrame("CheckButton", "CaerdonWardrobeConfig_showLearnableOtherOnAuction", self, "InterfaceOptionsCheckButtonTemplate")
+	components.showLearnableOtherOnAuction:SetPoint("LEFT", components.showLearnableOtherOnMerchantLabel, "RIGHT", 20, 0)
+	components.showLearnableOtherOnAuction:SetPoint("TOP", components.showLearnableOtherOnMerchant, "TOP", 0, 0)
+	components.showLearnableOtherOnAuctionLabel = _G[components.showLearnableOtherOnAuction:GetName() .. "Text"]
+	components.showLearnableOtherOnAuctionLabel:SetWidth(100)
+	components.showLearnableOtherOnAuctionLabel:SetText("Auction House")
 
 	components.showSellableLabel = self:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
 	components.showSellableLabel:SetText("显示可卖出物品:")
@@ -2412,10 +2492,12 @@ function configFrame:RefreshComponents()
 	components.showLearnableOnBags:SetChecked(config.Icon.ShowLearnable.BankAndBags)
 	components.showLearnableOnGuildBank:SetChecked(config.Icon.ShowLearnable.GuildBank)
 	components.showLearnableOnMerchant:SetChecked(config.Icon.ShowLearnable.Merchant)
+	components.showLearnableOnAuction:SetChecked(config.Icon.ShowLearnable.Auction)
 
 	components.showLearnableOtherOnBags:SetChecked(config.Icon.ShowLearnableByOther.BankAndBags)
 	components.showLearnableOtherOnGuildBank:SetChecked(config.Icon.ShowLearnableByOther.GuildBank)
 	components.showLearnableOtherOnMerchant:SetChecked(config.Icon.ShowLearnableByOther.Merchant)
+	components.showLearnableOtherOnAuction:SetChecked(config.Icon.ShowLearnableByOther.Auction)
 
 	components.showSellableOnBags:SetChecked(config.Icon.ShowSellable.BankAndBags)
 	components.showSellableOnGuildBank:SetChecked(config.Icon.ShowSellable.GuildBank)
@@ -2441,10 +2523,12 @@ function configFrame:UpdatePendingValues()
 	config.Icon.ShowLearnable.BankAndBags = components.showLearnableOnBags:GetChecked()
 	config.Icon.ShowLearnable.GuildBank = components.showLearnableOnGuildBank:GetChecked()
 	config.Icon.ShowLearnable.Merchant = components.showLearnableOnMerchant:GetChecked()
+	config.Icon.ShowLearnable.Auction = components.showLearnableOnAuction:GetChecked()
 
 	config.Icon.ShowLearnableByOther.BankAndBags = components.showLearnableOtherOnBags:GetChecked()
 	config.Icon.ShowLearnableByOther.GuildBank = components.showLearnableOtherOnGuildBank:GetChecked()
 	config.Icon.ShowLearnableByOther.Merchant = components.showLearnableOtherOnMerchant:GetChecked()
+	config.Icon.ShowLearnableByOther.Auction = components.showLearnableOtherOnAuction:GetChecked()
 
 	config.Icon.ShowSellable.BankAndBags = components.showSellableOnBags:GetChecked()
 	config.Icon.ShowSellable.GuildBank = components.showSellableOnGuildBank:GetChecked()

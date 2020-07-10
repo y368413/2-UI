@@ -192,7 +192,7 @@ local SetMrbarMicromenu = {
     { text = MINIMAP_MENU_BARSTYLE,  icon = 'Interface\\MINIMAP\\TRACKING\\BattleMaster',
          func = function() sendCmd("/mr");  end, notCheckable = true},
     { text = MINIMAP_MENU_KEYBIND, icon = 'Interface\\MacroFrame\\MacroFrame-Icon.blp',
-        func = function() sendCmd("/hb"); end, notCheckable = true},
+        func = function() sendCmd("/Keybind"); end, notCheckable = true},
     { text = "|cFF00DDFF ----- "..BINDING_NAME_MOVEANDSTEER.." -----|r", isTitle = true, notCheckable = true },
     { text = MINIMAP_MENU_SPECIALBUTTON, icon = 'Interface\\Icons\\INV_Inscription_RunescrollOfFortitude_Red',
         func = function() sendCmd("/moveit"); end, notCheckable = true},
@@ -281,10 +281,6 @@ function module:UpdateMinimapScale()
 	local scale = MaoRUIPerDB["Map"]["MinimapScale"]
 	Minimap:SetScale(scale)
 	Minimap.mover:SetSize(size*scale, size*scale)
-	-- Other elements
-	if _G.NDuiMinimapDataBar then
-		_G.NDuiMinimapDataBar:SetWidth((size-2)*scale)
-	end
 end
 
 function module:ShowMinimapClock()

@@ -251,6 +251,16 @@ function WorldFlightMapProvider:AddFlightNode(taxiNodeData)
 				
 				self.slotIndexToPin[taxiNodeData.slotIndex] = pin;
 
+                --[[
+                if self.worldMap.mapID == 895 and taxiNodeData.textureKitPrefix == "FlightMaster_Ferry" then
+                    --print(taxiNodeData.textureKitPrefix, taxiNodeData.nodeID, self.worldMap.mapInfo.mapType, self.worldMap.mapID)
+                    local A = 7414.582/13106.25 --WorldFlightMapProvider.worldMap.width
+                    local X, Y = 0.2, 0.36
+                    taxiNodeData.position.x = taxiNodeData.position.x * (A or 1) + (X or 0)
+                    taxiNodeData.position.y = taxiNodeData.position.y * (A or 1) + (Y or 0)
+                end
+                --]]
+
 				pin:SetPosition(taxiNodeData.position:GetXY());
 				pin.taxiNodeData = taxiNodeData;
 				pin.owner = self;

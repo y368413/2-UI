@@ -1,6 +1,6 @@
 --[[
 Name: LibCurrencyInfo
-Revision: $Rev: 34 $
+Revision: $Rev: 36 $
 Maintainers: Arith
 Website: https://www.wowace.com/projects/libcurrencyinfo
 Dependencies: None
@@ -195,12 +195,27 @@ data.CurrencyByCategory = {
 		1721,	 -- Prismatic Manapearl
 --		1743,	 -- 8.2 NOT CURRENTLY USED
 		1755, 	 -- Coalescing Visions
-		1803, 	 -- Echoes of NY
+		1803,	 -- Echoes of Ny'alotha
 	},
 	[144] = { -- Virtual
 		1553, -- Azerite
 		1585, -- Honor
 		1586, -- Honor Level
+	},
+	[245] = { -- Shadowlands
+		1751, -- Freed Soul
+		1754, -- Soul Ash
+		1767, -- Stygia
+		1791, -- Shadowlands PvP Rated
+		1792, -- Shadowlands PvP Honor
+		1802, -- Shadowlands PvP Weekly Reward Progress
+		1810, -- Sanctum Artisan
+		1811, -- Sanctum Architect
+		1812, -- Sanctum Anima Weaver
+		1813, -- Reservoir Anima
+		1816, -- Sinstone Fragments
+		1819, -- Ascension Token
+		1820, -- Infused Ruby
 	},
 }
 
@@ -220,6 +235,7 @@ data.CurrencyCategories = {
 	[142] = { enUS="Hidden",zhCN="隐藏",zhTW="隱藏" },
 	[143] = { enUS="Battle for Azeroth",zhCN="争霸艾泽拉斯",zhTW="決戰艾澤拉斯" },
 	[144] = { enUS="Virtual",zhCN="兑换",zhTW="兑换" },
+	[245] = { enUS="Shadowlands",},
 }
 
 data.Currencies = {
@@ -387,7 +403,21 @@ data.Currencies = {
 	[1757] = { id=1757, category=142 }, -- Uldum Accord
 	[1758] = { id=1758, category=142 }, -- Rajani
 	[1755] = { id=1755, category=143 }, -- Coalescing Visions
-	[1803] = { id=1803, category=143 }, -- Coalescing Visions
+	[1803] = { id=1803, category=143 }, -- Echoes of Ny'alotha
+	[1751] = { id=1751, category=245 }, -- Freed Soul
+	[1754] = { id=1754, category=245 }, -- Soul Ash
+	[1767] = { id=1767, category=245 }, -- Stygia
+	[1791] = { id=1791, category=245 }, -- Shadowlands PvP Rated
+	[1792] = { id=1792, category=245 }, -- Shadowlands PvP Honor
+	[1802] = { id=1802, category=245 }, -- Shadowlands PvP Weekly Reward Progress
+	[1810] = { id=1810, category=245 }, -- Sanctum Artisan
+	[1811] = { id=1811, category=245 }, -- Sanctum Architect
+	[1812] = { id=1812, category=245 }, -- Sanctum Anima Weaver
+	[1813] = { id=1813, category=245 }, -- Reservoir Anima
+	[1816] = { id=1816, category=245 }, -- Sinstone Fragments
+	[1819] = { id=1819, category=245 }, -- Ascension Token
+	[1820] = { id=1820, category=245 }, -- Infused Ruby
+
 }
 
 
@@ -420,7 +450,6 @@ local LANGS = {
 	["zhCN"] = true,
 	["zhTW"] = true,
 }
-
 
 local function CheckLang(lang)
 	if not lang then return end
