@@ -26,19 +26,19 @@ end)
 hooksecurefunc("SetItemButtonQuality", function(button, quality, itemIDOrLink, suppressOverlays)
 	if itemIDOrLink then
 		if IsArtifactRelicItem(itemIDOrLink) then
-			button.IconBorder:SetTexture([[Interface\Artifacts\RelicIconFrame]]);
+			button.IconBorder:SetTexture("Interface\\Artifacts\\RelicIconFrame");
 		else
-			button.IconBorder:SetTexture([[Interface\AddOns\_ShiGuang\Media\WhiteIconFrame]]);
+			button.IconBorder:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\WhiteIconFrame");
 		end
 		
 		if not suppressOverlays and C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(itemIDOrLink) then
-			button.IconOverlay:SetAtlas([[AzeriteIconFrame]]);
+			button.IconOverlay:SetAtlas("AzeriteIconFrame");
 			button.IconOverlay:Show();
 		else
 			button.IconOverlay:Hide();
 		end
 	else
-		button.IconBorder:SetTexture([[Interface\AddOns\_ShiGuang\Media\WhiteIconFrame]]);
+		button.IconBorder:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\WhiteIconFrame");
 		button.IconOverlay:Hide();
 	end
 

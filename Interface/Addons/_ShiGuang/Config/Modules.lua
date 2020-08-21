@@ -2,6 +2,9 @@
 local _, ns = ...
 local _, R = unpack(ns)
 
+R.mult = 1
+R.margin = 3
+
 -- BUFF/DEBUFF相关
 R.Auras = {
 	IconSize		= 32,											-- BUFF图标大小

@@ -15,4 +15,5 @@
 	<Script file="TradeTabs.lua"/>
 	<Script file="FreeMountCD.lua"/>
 	<Script file="xMerchant.lua"/>
+	<Script file="BlinkRogueHelper.lua"/>
 </Ui>

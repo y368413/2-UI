@@ -148,6 +148,21 @@ end)]]
 local waitTable = {};
 local waitFrame = nil;
 local Dressingbuttons = {}
+local SLOTS = {
+	"HeadSlot",
+	"ShoulderSlot",
+	"BackSlot",
+	"ChestSlot",
+	"ShirtSlot",
+	"TabardSlot",
+	"WristSlot",
+	"HandsSlot",
+	"WaistSlot",
+	"LegsSlot",
+	"FeetSlot",
+	"MainHandSlot",
+	"SecondaryHandSlot",
+}
 local HIDDEN_SOURCES = {
 	[77344] = true, -- head
 	[77343] = true, -- shoulder
@@ -278,21 +293,7 @@ local buttonSizeWithPadding = buttonSize + 5
 local sideInsetLeft = 10
 local sideInsetRight = 12
 local topInset = -80
-local SLOTS = {
-	"HeadSlot",
-	"ShoulderSlot",
-	"BackSlot",
-	"ChestSlot",
-	"ShirtSlot",
-	"TabardSlot",
-	"WristSlot",
-	"HandsSlot",
-	"WaistSlot",
-	"LegsSlot",
-	"FeetSlot",
-	"MainHandSlot",
-	"SecondaryHandSlot",
-}
+
 -- Create item slot buttons
 for i, slot in ipairs(SLOTS) do
     local button = CreateFrame("Button", nil, DressUpFrame)

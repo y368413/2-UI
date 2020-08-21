@@ -1,6 +1,9 @@
+local _G = getfenv(0)
 local TravelGuide = {}
+local constants = {}
+TravelGuide.constants = constants
 
-TravelGuide_defaults = {
+constants.defaults = {
 	profile = {
 		icon_scale = 1.5,
 		icon_alpha = 1.0,
@@ -15,6 +18,7 @@ TravelGuide_defaults = {
 		show_hzepplin = true,
 --		show_others = true,
 		show_note = true,
+		easy_waypoint = true,
 	},
 	char = {
 		hidden = {
@@ -25,7 +29,7 @@ TravelGuide_defaults = {
 
 local left, right, top, bottom = GetObjectIconTextureCoords("4772") --MagePortalAlliance
 local left2, right2, top2, bottom2 = GetObjectIconTextureCoords("4773") --MagePortalHorde
-TravelGuide_icon_texture = {
+constants.icon_texture = {
 	portal = {
 					icon = [[Interface\MINIMAP\OBJECTICONSATLAS]],
 					tCoordLeft = left,
@@ -78,6 +82,7 @@ local UIDropDownMenu_CreateInfo, CloseDropDownMenus, UIDropDownMenu_AddButton, T
 -- AddOn namespace.
 -- ----------------------------------------------------------------------------
 local LibStub = _G.LibStub
+local pairs = _G.pairs
 local L = LibStub("AceLocale-3.0"):GetLocale("HandyNotes")
 local AceDB = LibStub("AceDB-3.0")
 
@@ -132,15 +137,15 @@ local function work_out_texture(point)
 	if (point.tram) then icon_key = "tram" end
 	if (point.flightmaster) then icon_key = "flightmaster" end
 
-	if (icon_key and TravelGuide_icon_texture[icon_key]) then
-		return TravelGuide_icon_texture[icon_key]
-	elseif (point.type and TravelGuide_icon_texture[point.type]) then
-		return TravelGuide_icon_texture[point.type]
+	if (icon_key and TravelGuide.constants.icon_texture[icon_key]) then
+		return TravelGuide.constants.icon_texture[icon_key]
+	elseif (point.type and TravelGuide.constants.icon_texture[point.type]) then
+		return TravelGuide.constants.icon_texture[point.type]
 	-- use the icon specified in point data
 	elseif (point.icon) then
 		return point.icon
 	else
-		return TravelGuide_defaultIcon
+		return TravelGuide.constants.defaultIcon
 	end
 end
 
@@ -157,12 +162,19 @@ local get_point_info = function(point)
 	local icon
 	if point then
 		local label = point.label or point.label2 or UNKNOWN
-		if (point.portal == true and (point.lvl or point.quest)) then
-		if (point.quest) then
+		if ((point.portal or point.boat) == true and (point.lvl or point.quest)) then
+		if (point.portal and point.quest) then
 			if IsQuestFlaggedCompleted(point.quest) then
 				icon = work_out_texture(point)
 			else
-				icon = MagePortalHorde
+				icon = MagePortalHorde	
+			end
+		end
+		if (point.boat and point.quest) then
+			if IsQuestFlaggedCompleted(point.quest) then
+				icon = work_out_texture(point)
+			else
+				icon = "Interface\\AddOns\\HandyNotes\\Icons\\XBoatgrey"
 			end
 		end
 		if (point.lvl) then
@@ -197,7 +209,7 @@ local get_point_info = function(point)
 end 
 
 local get_point_info_by_coord = function(uMapID, coord)
-	return get_point_info(TravelGuide_DB.points[uMapID] and TravelGuide_DB.points[uMapID][coord])
+	return get_point_info(TravelGuide.DB.points[uMapID] and TravelGuide.DB.points[uMapID][coord])
 end
 
 local function handle_tooltip(tooltip, point)
@@ -277,7 +289,7 @@ end
 end
 
 local handle_tooltip_by_coord = function(tooltip, uMapID, coord)
-	return handle_tooltip(tooltip, TravelGuide_DB.points[uMapID] and TravelGuide_DB.points[uMapID][coord])
+	return handle_tooltip(tooltip, TravelGuide.DB.points[uMapID] and TravelGuide.DB.points[uMapID][coord])
 end
 
 -- //////////////////////////////////////////////////////////////////////////
@@ -303,7 +315,7 @@ function PluginHandler:OnLeave(uMapID, coord)
 end
 
 local function hideNode(button, uMapID, coord)
-	TravelGuide_hidden[uMapID][coord] = true
+	TravelGuide.hidden[uMapID][coord] = true
 	HandyNotes_TravelGuide:Refresh()
 end
 
@@ -340,7 +352,7 @@ do
 			
 --			UIDropDownMenu_AddButton(spacer, level)
 			
-			if TomTom then
+			if TomTom and not profile.easy_waypoint then
 				-- Waypoint menu item
 				info = UIDropDownMenu_CreateInfo()
 				info.text = L["Add to TomTom"]
@@ -375,10 +387,22 @@ do
 	HL_Dropdown.initialize = generateMenu
 
 	function PluginHandler:OnClick(button, down, uMapID, coord)
-		if (button == "RightButton" and not down) then
+		if ((down or button ~= "RightButton") and profile.easy_waypoint) then
+			return
+		end
+		if ((button == "RightButton" and not down) and not profile.easy_waypoint) then
 			currentMapID = uMapID
 			currentCoord = coord
 			ToggleDropDownMenu(1, nil, HL_Dropdown, self, 0, 0)
+		end
+		if (IsControlKeyDown() and profile.easy_waypoint) then
+			currentMapID = uMapID
+			currentCoord = coord
+			ToggleDropDownMenu(1, nil, HL_Dropdown, self, 0, 0)
+		else
+		if profile.easy_waypoint then
+			addTomTomWaypoint(button, uMapID, coord)
+		end
 		end
 	end
 end
@@ -402,10 +426,10 @@ local currentMapID = nil
 	end
 	function PluginHandler:GetNodes2(uMapID, minimap)
 		currentMapID = uMapID
-		return iter, TravelGuide_DB.points[uMapID], nil
+		return iter, TravelGuide.DB.points[uMapID], nil
 	end
 	function TravelGuide:ShouldShow(coord, point, currentMapID)
-		if (TravelGuide_hidden[currentMapID] and TravelGuide_hidden[currentMapID][coord]) then
+		if (TravelGuide.hidden[currentMapID] and TravelGuide.hidden[currentMapID][coord]) then
 			return false
 		end
 		-- this will check if any node is for specific class
@@ -416,31 +440,31 @@ local currentMapID = nil
 		if (point.faction and point.faction ~= select(1, UnitFactionGroup("player"))) then
 			return false
 		end
-		if (point.portal and not TravelGuide_db.show_portal) then return false; end
-		if (point.orderhall and not TravelGuide_db.show_orderhall) then return false; end
-		if (point.worderhall and not TravelGuide_db.show_orderhall) then return false; end
-		if (point.warfront and not TravelGuide_db.show_warfront) then return false; end
-		if (point.mixedportal and not TravelGuide_db.show_warfront) then return false; end
-		if (point.flightmaster and not TravelGuide_db.show_orderhall) then return false; end
-		if (point.tram and not TravelGuide_db.show_tram) then return false; end
-		if (point.boat and not TravelGuide_db.show_boat) then return false; end
-		if (point.aboat and not TravelGuide_db.show_aboat) then return false; end
-		if (point.zeppelin and not TravelGuide_db.show_zepplin) then return false; end
-		if (point.hzeppelin and not TravelGuide_db.show_hzepplin) then return false; end
+		if (point.portal and not TravelGuide.db.show_portal) then return false; end
+		if (point.orderhall and not TravelGuide.db.show_orderhall) then return false; end
+		if (point.worderhall and not TravelGuide.db.show_orderhall) then return false; end
+		if (point.warfront and not TravelGuide.db.show_warfront) then return false; end
+		if (point.mixedportal and not TravelGuide.db.show_warfront) then return false; end
+		if (point.flightmaster and not TravelGuide.db.show_orderhall) then return false; end
+		if (point.tram and not TravelGuide.db.show_tram) then return false; end
+		if (point.boat and not TravelGuide.db.show_boat) then return false; end
+		if (point.aboat and not TravelGuide.db.show_aboat) then return false; end
+		if (point.zeppelin and not TravelGuide.db.show_zepplin) then return false; end
+		if (point.hzeppelin and not TravelGuide.db.show_hzepplin) then return false; end
 		return true
 	end
 end
 
 -- //////////////////////////////////////////////////////////////////////////
 function HandyNotes_TravelGuide:OnInitialize()
-	self.db = AceDB:New("HandyNotes_TravelGuideDB", TravelGuide_defaults)
+	self.db = AceDB:New("HandyNotes_TravelGuideDB", TravelGuide.constants.defaults)
 
 	profile = self.db.profile
-	TravelGuide_db = profile
-	TravelGuide_hidden = self.db.char.hidden
+	TravelGuide.db = profile
+	TravelGuide.hidden = self.db.char.hidden
 
 	-- Initialize database with HandyNotes
-	HandyNotes:RegisterPluginDB(HandyNotes_TravelGuide.pluginName, PluginHandler, TravelGuide_config.options)
+	HandyNotes:RegisterPluginDB(HandyNotes_TravelGuide.pluginName, PluginHandler, TravelGuide.config.options)
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "WorldEnter");
 end
 
@@ -495,7 +519,7 @@ end
 
 
 local config = {}
-TravelGuide_config = config
+TravelGuide.config = config
 
 config.options = {
 	type = "group",
@@ -599,6 +623,12 @@ config.options = {
 					desc = L["Show the node's additional notes when it's available."],
 					order = 29,
 				},
+				easy_waypoint = {
+					type = "toggle",
+					name = L["Easy waypoints"],
+					desc = L["easy_waypoints_desc"],
+					order = 30,
+				},
 --[[				
 				show_others = {
 					type = "toggle",
@@ -626,8 +656,9 @@ config.options = {
 					type = "execute",
 					name = L["Restore hidden nodes"],
 					desc = L["Show all nodes that you manually hid by right-clicking on them and choosing \"Hide this node\"."],
+					width = "full",
 					func = function()
-						for map,coords in pairs(TravelGuide_hidden) do
+						for map,coords in pairs(TravelGuide.hidden) do
 							wipe(coords)
 						end
 						HandyNotes_TravelGuide:Refresh()
@@ -781,11 +812,15 @@ local PtoCavernsofTime = L["Portal to Caverns of Time"]
 local Tanaris = L["Kalimdor, Tanaris"]
 local ArathiHighlands = L["Eastern Kingdoms, Arathi Highlands"]
 local Darkshore = L["Kalimdor, Darkshore"]
+local PtoDalaCrater = L["Portal to Dalaran Crater"]
+local HillsbradFoothills = L["Eastern Kingdoms, Hillsbrad Foothills"]
+local Ptotomb = L["Portal to Tombs"]
+local SilverpineForest = L["Eastern Kingdoms, Silverpine Forest"]
 
 --LOCAL END--------------------------------------------------------------------------------
 local DB = {}
 
-TravelGuide_DB = DB
+TravelGuide.DB = DB
 
 DB.points = {
 -- MAPID from https://wow.gamepedia.com/UiMapID
@@ -871,8 +906,8 @@ DB.points = {
 
 		},	
 	[942] = { -- Stormsong Valley
-		[51902450] = { boat=true, label=returntoZuldazar, note=Zandalar, faction="Horde" }, --Stormsong valley 51902450 boat Grok Seahandler
-		[51403370] = { boat=true, label=returntoZuldazar, note=Zandalar, faction="Horde" }, --Stormsong Valley 51403370 Flightmaster Muka Stormbreaker
+		[51902450] = { boat=true, label=returntoZuldazar, note=Zandalar, quest=51696, faction="Horde" }, --Stormsong valley 51902450 boat Grok Seahandler
+		[51403370] = { boat=true, label=returntoZuldazar, note=Zandalar, quest=51696, faction="Horde" }, --Stormsong Valley 51403370 Flightmaster Muka Stormbreaker
 		},	
 	[1161] = { -- Boralus
 		[70401600] = { portal=true, label1=PtoSW.." ("..ElwynnForest..")\n"..format(PtoIF.." ("..DunMorogh..")\n"..PtoExodar.." ("..AzuremystIsle..")\n"..PtoSilithus.." ("..Kalimdor..")\n"..PtoNazjatar..""),
@@ -1197,9 +1232,10 @@ DB.points = {
 		[52803270] = { portal=true, label1=PtoUC.." ("..Tirisfal..")\n"..format(PtoOG.." ("..Durotar..")"),
 									label2=PtoUC.."\n"..format(PtoOG..""), faction="Horde" },
 		},
---	[17] = { -- Blasted Lands
+--[[	[17] = { -- Blasted Lands
 --		[72644947] = { portal=true, label=PtoOG, note=Durotar, faction="Horde" },
---		},
+		},
+]]--
 
 --Vanilla-------------------------------------------------------------------------------------------------------------------------------------------------------
 	[12] = { -- Kalimdor
@@ -1296,7 +1332,7 @@ DB.points = {
 		[06216261] = { aboat=true, label=BtoTheramore, note=DustwallowMarsh, faction="Horde" },
 		[04415718] = { aboat=true, label=BtoHowlingFjord, note=Valgarde, faction="Horde" },
 		},
---[[	
+--[[	NOT USED
 	[10] = { --Northern Barrens 
 		[70307341] = { boat=true, label=format(BtoBootyBay) },
 		},
@@ -1319,8 +1355,8 @@ DB.points = {
 		[42999362] = { boat=true, label=BtoRatchet, note=NorthernBarrens },
 		[56161316] = { portal=true, label1=PtoOG.." ("..Durotar..")\n"..format(PtoUC.." ("..Tirisfal..")"),
 									label2=PtoOG.."\n"..format(PtoUC..""), faction="Horde" },
-		[43637155] = { portal=true, label1=PtoTolBarad.." ("..EasternKingdoms..")\n"..format(PtoUldum.." ("..Kalimdor..")\n"..PtoDeepholm.." ("..Maelstrom..")\n"..PtoVashjir.." ("..EasternKingdoms..")\n"..PtoHyjal.." ("..Kalimdor..")\n"..PtoTwilightHighlands.." ("..EasternKingdoms..")\n"..DrTtoIF.." ("..DunMorogh..")\n"..PtoDarnassus.." ("..Teldrassil..")\n"..PtoDala.." ("..CrystalsongForest..")\n"..PtoJadeForest.." ("..Pandaria..")\n"..PtoBoralus.." ("..TiragardeSound..")\n"..PtoAzsuna.." ("..BrokenIsles..")\n"..PtoStormshield.." ("..Ashran..")\n"..PtoShattrath.." ("..TerokkarForest..")\n"..PtoExodar.." ("..AzuremystIsle..")\n"..PtoCavernsofTime.." ("..Tanaris..")"),
-									label2=PtoTolBarad.."\n"..format(PtoUldum.."\n"..PtoDeepholm.."\n"..PtoVashjir.."\n"..PtoHyjal.."\n"..PtoTwilightHighlands.."\n"..DrTtoIF.."\n"..PtoDarnassus.."\n"..PtoDala.."\n"..PtoJadeForest.."\n"..PtoBoralus.."\n"..PtoAzsuna.."\n"..PtoStormshield.."\n"..PtoShattrath.."\n"..PtoExodar.."\n"..PtoCavernsofTime..""), faction="Alliance" },
+		--[43637155] = { portal=true, label1=PtoTolBarad.." ("..EasternKingdoms..")\n"..format(PtoUldum.." ("..Kalimdor..")\n"..PtoDeepholm.." ("..Maelstrom..")\n"..PtoVashjir.." ("..EasternKingdoms..")\n"..PtoHyjal.." ("..Kalimdor..")\n"..PtoTwilightHighlands.." ("..EasternKingdoms..")\n"..DrTtoIF.." ("..DunMorogh..")\n"..PtoDarnassus.." ("..Teldrassil..")\n"..PtoDala.." ("..CrystalsongForest..")\n"..PtoJadeForest.." ("..Pandaria..")\n"..PtoBoralus.." ("..TiragardeSound..")\n"..PtoAzsuna.." ("..BrokenIsles..")\n"..PtoStormshield.." ("..Ashran..")\n"..PtoShattrath.." ("..TerokkarForest..")\n"..PtoExodar.." ("..AzuremystIsle..")\n"..PtoCavernsofTime.." ("..Tanaris..")"),
+									--label2=PtoTolBarad.."\n"..format(PtoUldum.."\n"..PtoDeepholm.."\n"..PtoVashjir.."\n"..PtoHyjal.."\n"..PtoTwilightHighlands.."\n"..DrTtoIF.."\n"..PtoDarnassus.."\n"..PtoDala.."\n"..PtoJadeForest.."\n"..PtoBoralus.."\n"..PtoAzsuna.."\n"..PtoStormshield.."\n"..PtoShattrath.."\n"..PtoExodar.."\n"..PtoCavernsofTime..""), faction="Alliance" },
 		[43337195] = { tram=true, label=DrTtoIF, note=DunMorogh, faction="Horde" },
 		[43863354] = { spell= 290245, portal=true, label1=PtoHowlingFjord.." ("..VengeanceLanding..")\n"..format(PtoOG.." ("..Durotar..")\n"..PtoStranglethornVale.." ("..GromgolBaseCamp..")\n"..PtoSM.." ("..EversongWoods..")\n"..PtoHellfirePeninsula.." ("..Outland..")"),
 												   label2=PtoHowlingFjord.."\n"..format(PtoOG.."\n"..PtoStranglethornVale.."\n"..PtoSM.."\n"..PtoHellfirePeninsula..""), faction="Horde" },
@@ -1332,6 +1368,8 @@ DB.points = {
 		[57663241] = { orderhall=true, label=PtoDala, note=BrokenIsles, class="PALADIN" },
 		[49714419] = { portal=true, label=PtoPortofZandalar, note=Zuldazar, lvl=120, faction="Horde", warfront="arathi" },
 		[49244725] = { portal=true, label=PtoPortofBoralus, note=TiragardeSound, lvl=120, faction="Alliance", warfront="arathi" },
+--		[41003949] = { portal=true, label=PtoDalaCrater, note=HillsbradFoothills, faction="Horde" },
+--		[43674008] = { portal=true, label=Ptotomb, note=SilverpineForest, faction="Horde" },
 		},
 	[84] = { -- Stormwind City
 		[74481841] = { portal=true, label1=PtoTolBarad.." ("..EasternKingdoms..")\n"..format(PtoUldum.." ("..Kalimdor..")\n"..PtoDeepholm.." ("..Maelstrom..")\n"..PtoVashjir.." ("..EasternKingdoms..")\n"..PtoHyjal.." ("..Kalimdor..")\n"..PtoTwilightHighlands.." ("..EasternKingdoms..")"),
@@ -1366,6 +1404,12 @@ DB.points = {
 		[60475885] = { spell= 290245, portal=true, label=PtoOG, note=Durotar, faction="Horde" },
 		[62035926] = { spell= 290245, portal=true, label=PtoStranglethornVale, note=GromgolBaseCamp, faction="Horde" },
 		[58875901] = { spell= 290245, portal=true, label=PtoHowlingFjord, note=VengeanceLanding, faction="Horde" },
+		},
+	[21] = { -- Silverpine Forest
+--		[47254337] = { portal=true, label=PtoDalaCrater, note=HillsbradFoothills, faction="Horde" }, --questid missing
+		},
+	[25] = { -- Hillsbrad Foothills
+--		[30293662] = { portal=true, label=Ptotomb, note=SilverpineForest, faction="Horde" }, --questid missing
 		},
 	[14] = { -- Arathi Highlands
 		[27432937] = { portal=true, label=PtoPortofZandalar, note=Zuldazar, lvl=120, faction="Horde", warfront="arathi" },

@@ -91,49 +91,6 @@ SlashCmdList["NDUI_CHECK_QUEST"] = function(msg)
 end
 SLASH_NDUI_CHECK_QUEST1 = "/ncq"
 
-do
-	local versionList = {}
-	C_ChatInfo.RegisterAddonMessagePrefix("NDuiFVC")
-
-	local function PrintVerCheck()
-		print("----------")
-		for name, version in pairs(versionList) do
-			print(name.." "..version)
-		end
-	end
-
-	local function SendVerCheck(channel)
-		wipe(versionList)
-		C_ChatInfo.SendAddonMessage("NDuiFVC", "VersionCheck", channel)
-		C_Timer.After(3, PrintVerCheck)
-	end
-
-	local function VerCheckListen(_, ...)
-		local prefix, msg, distType, sender = ...
-
-		if prefix == "NDuiFVC" then
-			if msg == "VersionCheck" then
-				C_ChatInfo.SendAddonMessage("NDuiFVC", "MyVer-"..I.Version, distType)
-			elseif strfind(msg, "MyVer") then
-				local _, version = strsplit("-", msg)
-				versionList[sender] = version.." - "..distType
-			end
-		end
-	end
-	M:RegisterEvent("CHAT_MSG_ADDON", VerCheckListen)
-
-	SlashCmdList["NDUI_VER_CHECK"] = function(msg)
-		local channel
-		if IsInRaid() then
-			channel = "RAID"
-		elseif IsInGuild() then
-			channel = "GUILD"
-		end
-		if msg ~= "" then channel = msg end
-		if channel then SendVerCheck(channel) end
-	end
-	SLASH_NDUI_VER_CHECK1 = "/nduiver"
-end
 
 SlashCmdList["NDUI_GET_ENCOUNTERS"] = function()
 	if not EncounterJournal then return end

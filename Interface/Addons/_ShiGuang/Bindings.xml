@@ -14,5 +14,5 @@
 		end
 	</Binding>
 	<Binding name="TARGETCLASSBUTTON_FOLLOW" category="BINDING_HEADER_ACE3"> FollowUnit("target") </Binding>
-	<Binding name="TARGETCLASSBUTTON_COMPARE_ACHIEVEMENTS" category="ADDONS"> InspectAchievements("target") </Binding>
+	<Binding name="TARGETCLASSBUTTON_COMPARE_ACHIEVEMENTS" category="BINDING_HEADER_ACE3"> InspectAchievements("target") </Binding>
 </Bindings>

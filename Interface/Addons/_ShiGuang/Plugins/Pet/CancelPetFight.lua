@@ -1,4 +1,4 @@
-﻿--## Title: CancelPetFight ## Author: Znuff ## Version: v1.0.2
+﻿--## Title: CancelPetFight ## Author: Znuff ## Version: v1.0.3
 
 -- Table & Variables for "known" wild pets.
 local CPF = {}

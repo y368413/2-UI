@@ -2,8 +2,7 @@ local LegionTreasures = {}
 
 local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes")
 local HL = LibStub("AceAddon-3.0"):NewAddon("HandyNotes_LegionTreasures", "AceEvent-3.0")
--- local L = LibStub("AceLocale-3.0"):GetLocale(HandyNotes_LegionTreasures, true)
-LegionTreasures_HL = HL
+LegionTreasures.HL = HL
 
 local next = next
 local GameTooltip = GameTooltip
@@ -117,7 +116,7 @@ local function work_out_texture(point)
         end
         return icon_cache[point.atlas]
     end
-    if LegionTreasures_db.icon_item then
+    if LegionTreasures.db.icon_item then
         if point.item then
             local texture = select(10, GetItemInfo(point.item))
             if texture then
@@ -182,7 +181,7 @@ local get_point_info = function(point)
     end
 end
 local get_point_info_by_coord = function(uiMapID, coord)
-    return get_point_info(LegionTreasures_points[uiMapID] and LegionTreasures_points[uiMapID][coord])
+    return get_point_info(LegionTreasures.points[uiMapID] and LegionTreasures.points[uiMapID][coord])
 end
 
 local function handle_tooltip(tooltip, point)
@@ -226,7 +225,7 @@ local function handle_tooltip(tooltip, point)
         if point.note then
             tooltip:AddLine(point.note, nil, nil, nil, true)
         end
-        if point.quest and LegionTreasures_db.tooltip_questid then
+        if point.quest and LegionTreasures.db.tooltip_questid then
             local quest = point.quest
             if type(quest) == 'table' then
                 quest = string.join(", ", unpack(quest))
@@ -234,7 +233,7 @@ local function handle_tooltip(tooltip, point)
             tooltip:AddDoubleLine("QuestID", quest or UNKNOWN)
         end
 
-        if (LegionTreasures_db.tooltip_item or IsShiftKeyDown()) and (point.item or point.npc) then
+        if (LegionTreasures.db.tooltip_item or IsShiftKeyDown()) and (point.item or point.npc) then
             local comparison = ShoppingTooltip1
 
             do
@@ -292,7 +291,7 @@ local function handle_tooltip(tooltip, point)
     tooltip:Show()
 end
 local handle_tooltip_by_coord = function(tooltip, uiMapID, coord)
-    return handle_tooltip(tooltip, LegionTreasures_points[uiMapID] and LegionTreasures_points[uiMapID][coord])
+    return handle_tooltip(tooltip, LegionTreasures.points[uiMapID] and LegionTreasures.points[uiMapID][coord])
 end
 
 ---------------------------------------------------------
@@ -323,7 +322,7 @@ local function createWaypoint(button, uiMapID, coord)
 end
 
 local function hideNode(button, uiMapID, coord)
-    LegionTreasures_hidden[uiMapID][coord] = true
+    LegionTreasures.hidden[uiMapID][coord] = true
     HL:Refresh()
 end
 
@@ -380,7 +379,7 @@ do
         currentZone = uiMapID
         currentCoord = coord
         -- given we're in a click handler, this really *should* exist, but just in case...
-        local point = LegionTreasures_points[currentZone] and LegionTreasures_points[currentZone][currentCoord]
+        local point = LegionTreasures.points[currentZone] and LegionTreasures.points[currentZone][currentCoord]
         if button == "RightButton" and not down then
             ToggleDropDownMenu(1, nil, HL_Dropdown, self, 0, 0)
         end
@@ -399,10 +398,10 @@ do
         if not t then return nil end
         local state, value = next(t, prestate)
         while state do -- Have we reached the end of this zone?
-            if value and LegionTreasures_should_show_point(state, value, currentZone, currentLevel) then
+            if value and LegionTreasures.should_show_point(state, value, currentZone, currentLevel) then
                 local label, icon, _, _, _, scale, alpha = get_point_info(value)
-                scale = (scale or 1) * (icon and icon.scale or 1) * LegionTreasures_db.icon_scale
-                return state, nil, icon, scale, LegionTreasures_db.icon_alpha * alpha
+                scale = (scale or 1) * (icon and icon.scale or 1) * LegionTreasures.db.icon_scale
+                return state, nil, icon, scale, LegionTreasures.db.icon_alpha * alpha
             end
             state, value = next(t, state) -- Get next data
         end
@@ -424,15 +423,15 @@ do
     function HLHandler:GetNodes2(uiMapID, minimap)
         currentZone = uiMapID
         isMinimap = minimap
-        if minimap and LegionTreasures_map_spellids[uiMapID] then
-            if LegionTreasures_map_spellids[uiMapID] == true then
+        if minimap and LegionTreasures.map_spellids[uiMapID] then
+            if LegionTreasures.map_spellids[uiMapID] == true then
                 return iter
             end
-            if UnitHasBuff("player", LegionTreasures_map_spellids[uiMapID]) then
+            if UnitHasBuff("player", LegionTreasures.map_spellids[uiMapID]) then
                 return iter
             end
         end
-        return iter, LegionTreasures_points[uiMapID], nil
+        return iter, LegionTreasures.points[uiMapID], nil
     end
 end
 
@@ -441,11 +440,11 @@ end
 
 function HL:OnInitialize()
     -- Set up our database
-    self.db = LibStub("AceDB-3.0"):New("HandyNotes_LegionTreasuresDB", LegionTreasures_defaults)
-    LegionTreasures_db = self.db.profile
-    LegionTreasures_hidden = self.db.char.hidden
+    self.db = LibStub("AceDB-3.0"):New("HandyNotes_LegionTreasuresDB", LegionTreasures.defaults)
+    LegionTreasures.db = self.db.profile
+    LegionTreasures.hidden = self.db.char.hidden
     -- Initialize our database with HandyNotes
-    HandyNotes:RegisterPluginDB("HandyNotes_LegionTreasures", HLHandler, LegionTreasures_options)
+    HandyNotes:RegisterPluginDB("HandyNotes_LegionTreasures", HLHandler, LegionTreasures.options)
 
     -- watch for LOOT_CLOSED
     self:RegisterEvent("LOOT_CLOSED", "Refresh")
@@ -457,7 +456,7 @@ function HL:Refresh()
 end
 
 
-LegionTreasures_defaults = {
+LegionTreasures.defaults = {
     profile = {
         show_on_world = true,
         show_on_minimap = true,
@@ -479,13 +478,13 @@ LegionTreasures_defaults = {
     },
 }
 
-LegionTreasures_options = {
+LegionTreasures.options = {
     type = "group",
     name = "LegionTreasures",
-    get = function(info) return LegionTreasures_db[info[#info]] end,
+    get = function(info) return LegionTreasures.db[info[#info]] end,
     set = function(info, v)
-        LegionTreasures_db[info[#info]] = v
-        LegionTreasures_HL:SendMessage("HandyNotes_NotifyUpdate", "HandyNotes_LegionTreasures")
+        LegionTreasures.db[info[#info]] = v
+        LegionTreasures.HL:SendMessage("HandyNotes_NotifyUpdate", "HandyNotes_LegionTreasures")
     end,
     args = {
         icon = {
@@ -584,10 +583,10 @@ LegionTreasures_options = {
                     name = "Reset hidden nodes",
                     desc = "Show all nodes that you manually hid by right-clicking on them and choosing \"hide\".",
                     func = function()
-                        for map,coords in pairs(LegionTreasures_hidden) do
+                        for map,coords in pairs(LegionTreasures.hidden) do
                             wipe(coords)
                         end
-                        LegionTreasures_HL:Refresh()
+                        LegionTreasures.HL:Refresh()
                     end,
                     order = 50,
                 },
@@ -612,23 +611,23 @@ end
 
 local player_faction = UnitFactionGroup("player")
 local player_name = UnitName("player")
-LegionTreasures_should_show_point = function(coord, point, currentZone, currentLevel)
+LegionTreasures.should_show_point = function(coord, point, currentZone, currentLevel)
     if point.level and point.level ~= currentLevel then
         return false
     end
-    if LegionTreasures_hidden[currentZone] and LegionTreasures_hidden[currentZone][coord] then
+    if LegionTreasures.hidden[currentZone] and LegionTreasures.hidden[currentZone][coord] then
         return false
     end
-    if LegionTreasures_outdoors_only and IsIndoors() then
+    if LegionTreasures.outdoors_only and IsIndoors() then
         return false
     end
-    if point.junk and not LegionTreasures_db.show_junk then
+    if point.junk and not LegionTreasures.db.show_junk then
         return false
     end
     if point.faction and point.faction ~= player_faction then
         return false
     end
-    if (not LegionTreasures_db.found) then
+    if (not LegionTreasures.db.found) then
         if point.quest then
             if allQuestsComplete(point.quest) then
                 return false
@@ -652,22 +651,22 @@ LegionTreasures_should_show_point = function(coord, point, currentZone, currentL
             return false
         end
     end
-    -- if (not LegionTreasures_db.repeatable) and point.repeatable then
+    -- if (not LegionTreasures.db.repeatable) and point.repeatable then
     --     return false
     -- end
     if not point.follower then
         if point.npc then
-            if not LegionTreasures_db.show_npcs then
+            if not LegionTreasures.db.show_npcs then
                 return false
             end
         else
             -- Not an NPC, not a follower, must be treasure
-            if not LegionTreasures_db.show_treasure then
+            if not LegionTreasures.db.show_treasure then
                 return false
             end
         end
     end
-    if point.hide_before and not LegionTreasures_db.upcoming and not allQuestsComplete(point.hide_before) then
+    if point.hide_before and not LegionTreasures.db.upcoming and not allQuestsComplete(point.hide_before) then
         return false
     end
     return true
@@ -695,14 +694,14 @@ local path = function(questid, label, atlas, note, scale)
         note = note,
     }
 end
-LegionTreasures_path = path
+LegionTreasures.path = path
 local grapple = function(questid, note)
     -- 'Vehicle-SilvershardMines-Arrow'
     return path(questid, "Grapple start point", 'MiniMap-DeadArrow', note, 1.5)
 end
-LegionTreasures_grapple = grapple
+LegionTreasures.grapple = grapple
 
-LegionTreasures_map_spellids = {
+LegionTreasures.map_spellids = {
     [630] = 182958, -- Azsuna
     [650] = 188741, -- Highmountain
     [634] = 182957, -- Stormheim
@@ -713,7 +712,7 @@ LegionTreasures_map_spellids = {
     [830] = true, -- Krokuun
 }
 
-LegionTreasures_points = {
+LegionTreasures.points = {
     --[[ structure:
     [mapFile] = { -- "_terrain1" etc will be stripped from attempts to fetch this
         [coord] = {
@@ -1365,7 +1364,7 @@ local merge = function(t1, t2)
     end
 end
 
-merge(LegionTreasures_points[630], { -- Azsuna
+merge(LegionTreasures.points[630], { -- Azsuna
     [29255365] = {quest=42417, npc=107327, item=129079}, -- Bilebrain
     [30784800] = {quest=42286, npc=107136, item=141873}, -- Houndmaster Stroxis
     [32302970] = {quest=38238, npc=91187, item=129067, note="Patrols the beach"}, -- Beacher
@@ -1397,7 +1396,7 @@ merge(LegionTreasures_points[630], { -- Azsuna
     [65555680] = {quest=42221, npc=106990, item=129073}, -- Chief Bitterbrine
     [67105140] = {quest=37989, npc=90505, item=129064}, -- Syphonus
 })
-merge(LegionTreasures_points[650], { -- Highmountain
+merge(LegionTreasures.points[650], { -- Highmountain
     [36751635] = {quest=40084, npc=98299, item=131799}, -- Bodash the Hoarder
     [37704570] = {quest=40405, npc=97449, item=131761}, -- Bristlemaul
     [40955775] = {quest=39963, npc=97793, item=131773, note="Abandoned Fishing Pole"}, -- Flamescale
@@ -1418,14 +1417,14 @@ merge(LegionTreasures_points[650], { -- Highmountain
     [51453190] = {quest=39465, npc=95872, item=131769}, -- Skullhat
     [53755125] = {quest=39872, npc=97653, item=131800, note="Loot chest afterwards"}, -- Taurson
     [54404110] = {quest=40414, npc=100495, item=131780, note="Cave entrance @ 55.1, 44.3. Blow out candles."}, -- Devouring Darkness
-    [55104430] = LegionTreasures_path(40414),
+    [55104430] = LegionTreasures.path(40414),
     [54447454] = {quest=40773, npc=101649, item=1220}, -- Frostshard
     [54504060] = {quest=39866, npc=97593, item=131792, note="Top of mountain"}, -- Mynta Talonscreech
     [56357250] = {quest=39235, npc=94877, item=138396}, -- Brogrul the Mighty
     [56406050] = {quest=40347, npc=96590, item=131775, note="Wanders a bit"}, -- Gurbog da Basher
     [52405850] = {quest=40423, npc=109498, item=131767, note="Use the Seemingly Unguarded Treasure to summon the Unethical Adventurers"}, -- Unethical Adventurers
 })
-merge(LegionTreasures_points[634], { -- Stormheim
+merge(LegionTreasures.points[634], { -- Stormheim
     [36505250] = {quest=38472, npc=92152, item=138418}, -- Whitewater Typhoon
     [38454305] = {quest=38626, npc=92599, item=129101}, -- Bloodstalker Alpha
     [40657240] = {quest=38424, npc=91892, item=129113}, -- Thane Irglov the Merciless
@@ -1450,7 +1449,7 @@ merge(LegionTreasures_points[634], { -- Stormheim
     [73906060] = {quest=43343, npc=94347, item=130134, faction="Alliance"}, -- Dread-Rider Cortis
     [78606115] = {quest=40113, npc=98503, item=138421}, -- Grrvrgull the Conqueror
 })
-merge(LegionTreasures_points[680], { -- Suramar
+merge(LegionTreasures.points[680], { -- Suramar
     --[67065161] = {quest=99999, npc=, item=1220, note="marked as rare but seems to have no questID yet"}, -- Broodmother Shu'malis
     [13555345] = {quest=44124, npc=112802, item=140949}, -- Mar'tura
     [16552655] = {quest=43996, npc=103841, item=140401}, -- Shadowquill
@@ -1462,7 +1461,7 @@ merge(LegionTreasures_points[680], { -- Suramar
     [26104075] = {quest=42831, npc=109054, item=139926}, -- Shal'an
     [27756545] = {quest=43992, npc=110832, item=121747, note="Portal Key"}, -- Gorgroth
     [29405330] = {quest=44676, npc=113368, item=138839, note="Cave entrance @ 29.3, 50.7"}, -- Llorian
-    [29305070] = LegionTreasures_path(44676),
+    [29305070] = LegionTreasures.path(44676),
     [33705125] = {quest=43954, npc=111197, item=140934}, -- Anax
     [33801510] = {quest=43717, npc=106351, item=140372}, -- Artificer Lothaire
     [34156100] = {quest=43351, npc=110024, item=140386}, -- Mal'Dreth the Corruptor
@@ -1484,14 +1483,14 @@ merge(LegionTreasures_points[680], { -- Suramar
     [65555915] = {quest=43481, npc=110656, item=140403}, -- Arcanist Lylandre
     [66656715] = {quest=43968, npc=107846, item=140314, toy=true}, -- Pinchshank
     [67657105] = {quest=41136, npc=103214, item=140381, note="Cave entrance @ 72.4, 68.1"}, -- Har'kess the Insatiable
-    [72406810] = LegionTreasures_path(41136),
+    [72406810] = LegionTreasures.path(41136),
     [68155895] = {quest=41135, npc=100864, item=139952, note="Cave entrance @ 69.9, 57.0"}, -- Cora'Kar
-    [69905700] = LegionTreasures_path(41135),
+    [69905700] = LegionTreasures.path(41135),
     [75505730] = {quest=44003, npc=103575, item=121801}, -- Reef Lord Raj'his
     [80157000] = {quest=40680, npc=103183, item=140019, note="Wanders along the underwater trench"}, -- Rok'nash
     [87856250] = {quest=41786, npc=103827, item=140384}, -- King Morgalash
 })
-merge(LegionTreasures_points[641], { -- Val'sharah
+merge(LegionTreasures.points[641], { -- Val'sharah
     [34405830] = {quest=39121, npc=94414, item=141876}, -- Kiranys Duskwhisper
     [38055280] = {quest=38772, npc=92423, item=130136}, -- Theryssia
     [41657825] = {quest=38479, npc=92180, item=130171}, -- Seersei
@@ -1511,19 +1510,19 @@ merge(LegionTreasures_points[641], { -- Val'sharah
     [67156960] = {quest=43176, npc=109708, item=130133}, -- Undergrell Attack
     [67504510] = {quest=39130, npc=94485, item=130168}, -- Pollous the Fetid
 })
-merge(LegionTreasures_points[649], { -- Helheim
+merge(LegionTreasures.points[649], { -- Helheim
     [28156375] = {quest=39870, npc=97630, item=129188, pet=true}, -- Soulthirster
     [85105030] = {quest=38461, npc=92040, item=129044}, -- Fenri
 })
-merge(LegionTreasures_points[633], { -- TempleofaThousandLights
+merge(LegionTreasures.points[633], { -- TempleofaThousandLights
     [62303090] = {quest=42699, npc=108255, item=141877}, -- Coura, Mistress of Arcana
 })
-merge(LegionTreasures_points[658], { -- Path of Huln, floor 2, Highmountain
+merge(LegionTreasures.points[658], { -- Path of Huln, floor 2, Highmountain
     [54508400] = {quest=48381, npc=125951, item=141708}, -- Obsidian Deathwarder
 })
 
 -- Broken Shore:
-merge(LegionTreasures_points[646], { -- Broken Shore
+merge(LegionTreasures.points[646], { -- Broken Shore
     [31315933] = {quest=47028, npc=121112}, -- Somber Dawn
     [39194241] = {quest=46095, npc=117091}, -- Felmaw Emberfiend
     [39553265] = {quest=46965, npc=121029, note="Inside Blood Nest", alpha=0.4}, -- Brood Mother Nix
@@ -1554,7 +1553,7 @@ merge(LegionTreasures_points[646], { -- Broken Shore
 })
 
 -- Argus:
-merge(LegionTreasures_points[830], { -- Krokuun
+merge(LegionTreasures.points[830], { -- Krokuun
     [33007600] = {quest=48562, npc=122912}, -- Commander Sathrenael
     [38145920] = {quest=48563, npc=122911, item=153299, note="Either go through the Xenedar, or climb up from 42, 57.1"}, -- Commander Vecaya
     [41707020] = {quest=48666, npc=125820}, -- Imp Mother Laglath
@@ -1709,7 +1708,7 @@ merge(LegionTreasures_points[830], { -- Krokuun
 	[47604190] = { },
 })
 
-merge(LegionTreasures_points[885], { -- Antoran Wastes
+merge(LegionTreasures.points[885], { -- Antoran Wastes
     [50905530] = {quest=48820, npc=127118}, -- Worldsplitter Skuul
     [52702950] = {quest=48822, npc=127291}, -- Watcher Aival
     [53103580] = {quest=48810, npc=126199, item=152903, mount=true}, -- Vrax'thul
@@ -1800,11 +1799,11 @@ merge(LegionTreasures_points[885], { -- Antoran Wastes
 	[72504210] = { },
 	[73504670] = { },
 })
-merge(LegionTreasures_points[833], { -- Nath'raxas Spire
+merge(LegionTreasures.points[833], { -- Nath'raxas Spire
     [38954032] = {quest=48561, npc=125824, item=153316}, -- Khazaduum
 })
 
-merge(LegionTreasures_points[882], { -- MacAree
+merge(LegionTreasures.points[882], { -- MacAree
     [27202980] = {quest=48707, npc=126869}, -- Captain Faruq
     [30304040] = {quest=48709, npc=127323, item=153056, pet=true}, -- Ataxon
     [33704750] = {quest=48705, npc=126867, item=152844, mount=true}, -- Venomtail Skyfin
@@ -1965,17 +1964,17 @@ merge(LegionTreasures_points[882], { -- MacAree
 })
 
 -- DH starter:
-merge(LegionTreasures_points[672], { -- MardumtheShatteredAbyss
+merge(LegionTreasures.points[672], { -- MardumtheShatteredAbyss
     [63502350] = {quest=40231, npc=97058, item=128948}, -- Count Nefarious
     [68852760] = {quest=40234, npc=82877, item=128947}, -- General Volroth
     [74455730] = {quest=40232, npc=97059, item=128944}, -- King Voras
     [81054125] = {quest=40233, npc=97057, item=133580}, -- Overseer Brutarg
 
 })
-merge(LegionTreasures_points[674], { -- SoulEngine
+merge(LegionTreasures.points[674], { -- SoulEngine
     [51255740] = {quest=40231, npc=97058, item=128948}, -- Count Nefarious
 })
-merge(LegionTreasures_points[677], { -- VaultOfTheWardensDH
+merge(LegionTreasures.points[677], { -- VaultOfTheWardensDH
     [49553285] = {quest=40251, npc=96997, item=128945}, -- Kethrazor
     [68753630] = {quest=40301, npc=97069, item=128958}, -- Wrath-Lord Lekos
 })

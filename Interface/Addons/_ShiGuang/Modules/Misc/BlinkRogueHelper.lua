@@ -1,20 +1,13 @@
-local _, class = UnitClass("player")
-if class ~= "ROGUE" and class ~= "DRUID" and class ~= "PALADIN" and class ~= "MONK" then return end
--------------------------------------------------------------------------------
---
---  Mod Name : BlinkRogueHelper 3.0a
---  Author   : Blink
---  Date     : 2004/10/11
---  LastUpdate : 2008/10/16
---
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
---
---  Version : BlinkRogueHelper 8.15
---  Continued by : Jovan
---  Date     : 2019/04/28
---
--------------------------------------------------------------------------------
+local _, ns = ...
+local M, R, U, I = unpack(ns)
+local MISC = M:GetModule("Misc")
+
+function MISC:BlinkRogueHelper()
+if not MaoRUIPerDB["Misc"]["BlinkRogueHelper"] then return end
+
+local MyClass = select(2, UnitClass("player"))
+if MyClass ~= "ROGUE" and MyClass ~= "DRUID" and MyClass ~= "PALADIN" and MyClass ~= "MONK" then return end
+
 local BRH = {
 	["x"] 					= 0,   	-- position
 	["y"] 					= 88,
@@ -23,7 +16,6 @@ local BRH = {
 	["Font"] 				= "Interface\\Addons\\_ShiGuang\\Media\\Fonts\\Edo.ttf",  --RedCircl
 }
 
-BRHDB = BRHDB or {}
 local BRHPowerType = {
 	["ROGUE"] = {"COMBO_POINTS", 4},
 	["DRUID"] = {"COMBO_POINTS", 4},
@@ -66,7 +58,7 @@ local CPSkills = {
 
 local UnitPower = UnitPower
 local lastCPUpdate, r, g, b
-local combo, maxcp = UnitPower("player", BRHPowerType[class][2]), UnitPowerMax("player", BRHPowerType[class][2])
+local combo, maxcp = UnitPower("player", BRHPowerType[MyClass][2]), UnitPowerMax("player", BRHPowerType[MyClass][2])
 
 local function BlinkRogueHelper_Show()
 	BlinkRogueHelperFrame.startTime = GetTime();
@@ -103,36 +95,15 @@ end
 
 local maxcpFresher = CreateFrame("Frame")
 maxcpFresher:SetScript("OnEvent", function(self)
-		maxcp = UnitPowerMax("player", BRHPowerType[class][2])
+		maxcp = UnitPowerMax("player", BRHPowerType[MyClass][2])
 		self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 end)
 maxcpFresher:RegisterEvent("PLAYER_REGEN_DISABLED")
 
-local Anchor = CreateFrame("Frame", "BRHAnchor", UIParent)
-Anchor:SetSize(BRH.FontSize, BRH.FontSize)
-Anchor:SetPoint("CENTER", UIParent, BRHDB.x and "BOTTOMLEFT" or "CENTER", BRHDB.x or BRH.x, BRHDB.y or BRH.y)
-Anchor.bg = Anchor:CreateTexture(nil, "OVERLAY")
-Anchor.bg:SetAllPoints(Anchor)
-Anchor.bg:SetColorTexture(.2, 1, .2, .4)
-Anchor.text = Anchor:CreateFontString(nil, "OVERLAY")
-Anchor.text:SetFont(BRH.Font, BRH.FontSize/4, "OUTLINE")
-Anchor.text:SetAllPoints(Anchor)
-Anchor.text:SetText("Dragme")
-Anchor:SetMovable(true)
-Anchor:EnableMouse(true)
-Anchor:RegisterForDrag("LeftButton")
-Anchor:Hide()
-Anchor:SetScript("OnEvent", function(self) self:Hide() end)
-Anchor:RegisterEvent("PLAYER_REGEN_DISABLED")
-Anchor:SetScript("OnDragStart", function(self) self:StartMoving() end)
-Anchor:SetScript("OnDragStop", function(self)
-	self:StopMovingOrSizing()
-	BRHDB.x, BRHDB.y = self:GetCenter()
-end)
-
 local BlinkRogueHelperFrame = CreateFrame("Frame","BlinkRogueHelperFrame",UIParent)
 BlinkRogueHelperFrame:SetSize(BRH.FontSize,BRH.FontSize)
-BlinkRogueHelperFrame:SetPoint("TOP", Anchor, "CENTER")
+M.Mover(BlinkRogueHelperFrame, U["BlinkRogueHelper"], "BlinkRogueHelperFrame", {"CENTER", UIParent, "CENTER", BRH.x, BRH.y})
+--BlinkRogueHelperFrame:SetPoint("CENTER", Anchor, "CENTER")
 -- BlinkRogueHelperFrame:SetPoint("CENTER",UIParent,"CENTER",BRH.x,BRH.y+BRH.FontSize)
 BlinkRogueHelperFrame.TextString = BlinkRogueHelperFrame:CreateFontString(nil,"OVERLAY")
 BlinkRogueHelperFrame.TextString:SetFont(BRH.Font, BRH.FontSize, "OUTLINE");
@@ -150,10 +121,10 @@ BlinkRogueHelperFrame.PI = 3.141592;
 BlinkRogueHelperFrame:Hide();
 BlinkRogueHelperFrame:SetScript("OnEvent", function(self, event, unit, powerType, spellId)
 	if ( event == "PLAYER_SPECIALIZATION_CHANGED" or event == "PLAYER_ENTERING_WORLD") then
-		if ( class == "ROGUE" ) then
+		if ( MyClass == "ROGUE" ) then
 			BlinkRogueHelperFrame:RegisterEvent("UNIT_POWER_UPDATE")
 		else
-			if ( BRHSpec[class] == GetSpecialization() ) then
+			if ( BRHSpec[MyClass] == GetSpecialization() ) then
 				BlinkRogueHelperFrame:RegisterEvent("UNIT_POWER_UPDATE")
 			else
 				BlinkRogueHelperFrame:UnregisterEvent("UNIT_POWER_UPDATE")
@@ -164,8 +135,8 @@ BlinkRogueHelperFrame:SetScript("OnEvent", function(self, event, unit, powerType
     	if (alive and alive > 0)  then BRHUpdateComboPoints(combo) end
 	elseif ( not unit == "player" ) then return
 	else
-		combo = UnitPower("player", BRHPowerType[class][2])
-		if ( event == "UNIT_POWER_UPDATE" and powerType == BRHPowerType[class][1]) then
+		combo = UnitPower("player", BRHPowerType[MyClass][2])
+		if ( event == "UNIT_POWER_UPDATE" and powerType == BRHPowerType[MyClass][1]) then
 		if ( combo ~= lastCPUpdate ) then
 			BRHUpdateComboPoints(combo)
 		end
@@ -179,12 +150,11 @@ BlinkRogueHelperFrame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED");
 BlinkRogueHelperFrame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED");
 BlinkRogueHelperFrame:RegisterEvent("PLAYER_TARGET_CHANGED");
 BlinkRogueHelperFrame:RegisterEvent("PLAYER_ENTERING_WORLD");
-
 BlinkRogueHelperFrame:SetScript("OnUpdate", function()
 	local elapsed = 1.75 * (GetTime() - BlinkRogueHelperFrame.startTime);
 	local flowTime = elapsed / BlinkRogueHelperFrame.flowTime;
 	local fadeInTime = BlinkRogueHelperFrame.fadeInTime;
-	-- local combo = UnitPower("player", BRHPowerType[class][2])
+	-- local combo = UnitPower("player", BRHPowerType[MyClass][2])
 	local scale = combo==maxcp and 1 or .7;
 	local cos, sin, rand = math.cos, math.sin, math.random;
 	local xshake, yshake, zshake = rand(-BRH.Shake,BRH.Shake), rand(-(BRH.Shake-3),(BRH.Shake-3)), rand(-BRH.Shake,BRH.Shake);
@@ -196,7 +166,7 @@ BlinkRogueHelperFrame:SetScript("OnUpdate", function()
 		local alpha = (elapsed / fadeInTime);
 		BlinkRogueHelperFrame:SetAlpha(alpha);
 		BlinkRogueHelperFrame.TextString:SetTextHeight(BRH.FontSize * alpha * scale + 1);
-		BlinkRogueHelperFrame:SetPoint("TOP", Anchor, "CENTER", 0, BRH.FontSize*alpha );
+		--BlinkRogueHelperFrame:SetPoint("TOP", self, "CENTER", 0, BRH.FontSize*alpha );
 		return;
 	end
 
@@ -204,7 +174,7 @@ BlinkRogueHelperFrame:SetScript("OnUpdate", function()
 	if ( elapsed < (fadeInTime + holdTime) ) then
 		BlinkRogueHelperFrame:SetAlpha(1.0);
 		BlinkRogueHelperFrame.TextString:SetTextHeight( zpos + BRH.FontSize * scale  + 1);
-		BlinkRogueHelperFrame:SetPoint("TOP", Anchor, "CENTER", xpos, ypos + BRH.FontSize );
+		--BlinkRogueHelperFrame:SetPoint("TOP", self, "CENTER", xpos, ypos + BRH.FontSize );
 		return;
 	end
 
@@ -213,26 +183,9 @@ BlinkRogueHelperFrame:SetScript("OnUpdate", function()
 		local alpha = 1.0 - ((elapsed - holdTime - fadeInTime) / fadeOutTime);
 		BlinkRogueHelperFrame:SetAlpha(alpha);
 		BlinkRogueHelperFrame.TextString:SetTextHeight(BRH.FontSize * alpha * scale + 1);
-		BlinkRogueHelperFrame:SetPoint("TOP", Anchor, "CENTER", 0, BRH.FontSize * alpha );
+		--BlinkRogueHelperFrame:SetPoint("TOP", self, "CENTER", 0, BRH.FontSize * alpha );
 		return;
 	end
 	BlinkRogueHelperFrame:Hide();
 end)
-
-
-SlashCmdList["BRH"] = function()
-	if Anchor:IsVisible() then
-		Anchor:Hide()
-	elseif ( not InCombatLockdown() ) then
-		Anchor:Show()
-	end
 end
-SLASH_BRH1 = "/brh"
-SlashCmdList["BRHReset"] = function()
-	BRHDB.x, BRHDB.y = BRH.x, BRH.y
-	Anchor:ClearAllPoints()
-	Anchor:SetPoint("CENTER", UIParent, "CENTER", BRH.x, BRH.y)
-	BlinkRogueHelperFrame:SetPoint("CENTER", Anchor)
-	Anchor:Hide()
-end
-SLASH_BRHReset1 = "/brhreset"

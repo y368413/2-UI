@@ -926,6 +926,13 @@ L["Warfront portal"] = true
 L["Show the Warfront portal locations."] = true
 L["Deeprun Tram"] = true
 L["Show the Deeprun Tram locations in Stormwind and Ironforge."] = true
+
+L["Note"] = true
+L["Show the node's additional notes when it's available."] = true
+
+L["Easy waypoints"] = true
+L["easy_waypoints_desc"] = "Activates simplified waypoint creation. \nAllows you to set a waypoint by right-clicking and access to more options by CTRL + right-clicking."
+
 L["Others"] = true
 L["Show all the other POIs."] = true
 --Plugin_config
@@ -984,6 +991,7 @@ L["Val'sharah"] = true
 L["Suramar"] = true
 L["Highmountain"] = true
 L["Stormheim"] = true
+L["Broken Shore"] = true
 --WoD
 L["Portal to Warspear"] = true
 L["Portal to Stormshield"] = true
@@ -1077,3 +1085,8 @@ L["Kalimdor, Tanaris"] = true
 L["Portal to Caverns of Time"] = true
 L["Eastern Kingdoms, Arathi Highlands"] = true
 L["Kalimdor, Darkshore"] = true
+
+L["Portal to Dalaran Crater"] = true
+L["Eastern Kingdoms, Hillsbrad Foothills"] = true
+L["Portal to Tombs"] = true
+L["Eastern Kingdoms, Silverpine Forest"] = true

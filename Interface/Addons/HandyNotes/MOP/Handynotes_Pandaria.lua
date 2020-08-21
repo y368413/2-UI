@@ -1,15 +1,16 @@
+--## Version: 1.4.2  ## Author: syndenbock  ## SavedVariables: Handynotes_PandariaDB
 local Pandaria = {}
+local Handynotes_Pandaria = {};
 
 Pandaria.HandyNotes = LibStub('AceAddon-3.0'):GetAddon('HandyNotes', true)
 if Pandaria.HandyNotes == nil then return end
-local HandyNotes_Pandaria = {};
 
 -- event handling
 do
   local events = {};
   local addonFrame = CreateFrame('frame');
 
-  HandyNotes_Pandaria.on = function (eventList, callback)
+  Handynotes_Pandaria.on = function (eventList, callback)
     if (type(eventList) ~= 'table') then
       eventList = {eventList};
     end
@@ -37,7 +38,7 @@ do
 end
 
 -- event funnel
-HandyNotes_Pandaria.funnel = function (eventList, timeSpan, callback)
+Handynotes_Pandaria.funnel = function (eventList, timeSpan, callback)
   local flag = false;
 
   local funnel = function (...)
@@ -53,7 +54,7 @@ HandyNotes_Pandaria.funnel = function (eventList, timeSpan, callback)
     end
   end
 
-  HandyNotes_Pandaria.on(eventList, funnel);
+  Handynotes_Pandaria.on(eventList, funnel);
 
   -- returning funnel for manual call
   return funnel;
@@ -63,11 +64,11 @@ end
 do
   local modules = {};
 
-  HandyNotes_Pandaria.export = function (moduleName, module)
+  Handynotes_Pandaria.export = function (moduleName, module)
     modules[moduleName] = module;
   end
 
-  HandyNotes_Pandaria.import = function (moduleName)
+  Handynotes_Pandaria.import = function (moduleName)
     return modules[moduleName];
   end
 end
@@ -76,13 +77,13 @@ end
 do
   local callbacks = {};
 
-  HandyNotes_Pandaria.listen = function (message, callback)
+  Handynotes_Pandaria.listen = function (message, callback)
     callbacks[message] = callbacks[message] or {};
 
     table.insert(callbacks[message], callback);
   end
 
-  HandyNotes_Pandaria.yell = function (message, ...)
+  Handynotes_Pandaria.yell = function (message, ...)
     local callbackList = callbacks[message];
 
     if (callbackList == nil) then return end
@@ -113,158 +114,158 @@ Pandaria.nodeData = {
       ["rare"] = 69161,
     },
   },
-  [MAP_IDS.timelessisle] = {
-    [65605680] = {
-      ["rare"] = 73167,
-    },
-    [64602860] = {
-      ["rare"] = 73282,
-    },
-    [44203100] = {
-      ["rare"] = 73157,
-    },
-    [33808580] = {
-      ["rare"] = 72193,
-    },
-    [70805260] = {
-      ["rare"] = 73171,
-    },
-    [43806960] = {
-      ["rare"] = 73854,
-    },
-    [66004260] = {
-      ["rare"] = 73171,
-    },
-    [35003240] = {
-      ["rare"] = 72898,
-    },
-    [56005960] = {
-      ["rare"] = 72896,
-    },
-    [57602640] = {
-      ["rare"] = 72898,
-    },
-    [31004920] = {
-      ["rare"] = 73158,
-    },
-    [34802940] = {
-      ["rare"] = 72898,
-    },
-    [50602340] = {
-      ["rare"] = 72898,
-    },
-    [54002400] = {
-      ["rare"] = 72896,
-    },
-    [41603020] = {
-      ["rare"] = 72896,
-    },
-    [63807300] = {
-      ["rare"] = 72775,
-    },
-    [62804360] = {
-      ["rare"] = 73171,
-    },
-    [47608780] = {
-      ["rare"] = 72245,
-    },
-    [67604400] = {
-      ["rare"] = 73277,
-    },
-    [46603960] = {
-      ["rare"] = 73172,
-    },
-    [35603620] = {
-      ["rare"] = 72896,
-    },
-    [72808480] = {
-      ["rare"] = 73279,
-    },
-    [55803560] = {
-      ["rare"] = 72898,
-    },
-    [59605280] = {
-      ["rare"] = 73171,
-    },
-    [61606400] = {
-      ["rare"] = 72970,
-    },
-    [25802320] = {
-      ["rare"] = 73281,
-    },
-    [44803880] = {
-      ["rare"] = 72769,
-    },
-    [71408140] = {
-      ["rare"] = 73704,
-    },
-    [56003820] = {
-      ["rare"] = 72896,
-    },
-    [50202290] = {
-      ["rare"] = 73666,
-    },
-    [22803240] = {
-      ["rare"] = 73166,
-    },
-    [40607960] = {
-      ["rare"] = 72909,
-    },
-    [37807720] = {
-      ["rare"] = 71919,
-    },
-    [57607720] = {
-      ["rare"] = 73170,
-    },
-    [54005240] = {
-      ["rare"] = 73175,
-    },
-    [54204280] = {
-      ["rare"] = 72808,
-    },
-    [59004880] = {
-      ["rare"] = 71864,
-    },
-    [60608780] = {
-      ["rare"] = 72048,
-    },
-    [68005740] = {
-      ["rare"] = 73171,
-    },
-    [45002600] = {
-      ["rare"] = 72898,
-    },
-    [68803440] = {
-      ["rare"] = 72896,
-    },
-    [70604580] = {
-      ["rare"] = 73171,
-    },
-    [24605760] = {
-      ["rare"] = 73161,
-    },
-    [44202660] = {
-      ["rare"] = 73173,
-    },
-    [34207340] = {
-      ["rare"] = 73163,
-    },
-    [49603360] = {
-      ["rare"] = 72898,
-    },
-    [34803120] = {
-      ["rare"] = 73174,
-    },
-    [29804560] = {
-      ["rare"] = 73160,
-    },
-    [25203600] = {
-      ["rare"] = 72045,
-    },
-    [53608300] = {
-      ["rare"] = 73169,
-    },
-  },
+--  [MAP_IDS.timelessisle] = {
+--    [65605680] = {
+--      ["rare"] = 73167,
+--    },
+--    [64602860] = {
+--      ["rare"] = 73282,
+--    },
+--    [44203100] = {
+--      ["rare"] = 73157,
+--    },
+--    [33808580] = {
+--      ["rare"] = 72193,
+--    },
+--    [70805260] = {
+--      ["rare"] = 73171,
+--    },
+--    [43806960] = {
+--      ["rare"] = 73854,
+--    },
+--    [66004260] = {
+--      ["rare"] = 73171,
+--    },
+--    [35003240] = {
+--      ["rare"] = 72898,
+--    },
+--    [56005960] = {
+--      ["rare"] = 72896,
+--    },
+--    [57602640] = {
+--      ["rare"] = 72898,
+--    },
+--    [31004920] = {
+--      ["rare"] = 73158,
+--    },
+--    [34802940] = {
+--      ["rare"] = 72898,
+--    },
+--    [50602340] = {
+--      ["rare"] = 72898,
+--    },
+--    [54002400] = {
+--      ["rare"] = 72896,
+--    },
+--    [41603020] = {
+--      ["rare"] = 72896,
+--    },
+--    [63807300] = {
+--      ["rare"] = 72775,
+--    },
+--    [62804360] = {
+--      ["rare"] = 73171,
+--    },
+--    [47608780] = {
+--      ["rare"] = 72245,
+--    },
+--    [67604400] = {
+--      ["rare"] = 73277,
+--    },
+--    [46603960] = {
+--      ["rare"] = 73172,
+--    },
+--    [35603620] = {
+--      ["rare"] = 72896,
+--    },
+--    [72808480] = {
+--      ["rare"] = 73279,
+--    },
+--    [55803560] = {
+--      ["rare"] = 72898,
+--    },
+--    [59605280] = {
+--      ["rare"] = 73171,
+--    },
+--    [61606400] = {
+--      ["rare"] = 72970,
+--    },
+--    [25802320] = {
+--      ["rare"] = 73281,
+--    },
+--    [44803880] = {
+--      ["rare"] = 72769,
+--    },
+--    [71408140] = {
+--      ["rare"] = 73704,
+--    },
+--    [56003820] = {
+--      ["rare"] = 72896,
+--    },
+--    [50202290] = {
+--      ["rare"] = 73666,
+--    },
+--    [22803240] = {
+--      ["rare"] = 73166,
+--    },
+--    [40607960] = {
+--      ["rare"] = 72909,
+--    },
+--    [37807720] = {
+--      ["rare"] = 71919,
+--    },
+--    [57607720] = {
+--      ["rare"] = 73170,
+--    },
+--    [54005240] = {
+--      ["rare"] = 73175,
+--    },
+--    [54204280] = {
+--      ["rare"] = 72808,
+--    },
+--    [59004880] = {
+--      ["rare"] = 71864,
+--    },
+--    [60608780] = {
+--      ["rare"] = 72048,
+--    },
+--    [68005740] = {
+--      ["rare"] = 73171,
+--    },
+--    [45002600] = {
+--      ["rare"] = 72898,
+--    },
+--    [68803440] = {
+--      ["rare"] = 72896,
+--    },
+--    [70604580] = {
+--      ["rare"] = 73171,
+--    },
+--    [24605760] = {
+--      ["rare"] = 73161,
+--    },
+--    [44202660] = {
+--      ["rare"] = 73173,
+--    },
+--    [34207340] = {
+--      ["rare"] = 73163,
+--    },
+--    [49603360] = {
+--      ["rare"] = 72898,
+--    },
+--    [34803120] = {
+--      ["rare"] = 73174,
+--    },
+--    [29804560] = {
+--      ["rare"] = 73160,
+--    },
+--    [25203600] = {
+--      ["rare"] = 72045,
+--    },
+--    [53608300] = {
+--      ["rare"] = 73169,
+--    },
+--  },
   [MAP_IDS.isleofthunder] = {
     [60503730] = {
       ["rare"] = 69099,
@@ -1248,7 +1249,7 @@ end
 local module = {};
 local hiddenNodes;
 
-HandyNotes_Pandaria.on('PLAYER_LOGIN', function ()
+Handynotes_Pandaria.on('PLAYER_LOGIN', function ()
   if (Handynotes_PandariaDB == nil) then
       Handynotes_PandariaDB = {
         hiddenNodes = {},
@@ -1277,9 +1278,7 @@ module.restoreAllNodes = function (zone)
   table.wipe(hiddenNodes);
 end
 
-HandyNotes_Pandaria.export('nodeHider', module);
-
-
+Handynotes_Pandaria.export('nodeHider', module);
 
 local function parseData ()
   local rareInfo = Pandaria.rareData;
@@ -1472,7 +1471,7 @@ local function parseData ()
   Pandaria.mountData = nil;
 end
 
-HandyNotes_Pandaria.on('PLAYER_LOGIN', parseData);
+Handynotes_Pandaria.on('PLAYER_LOGIN', parseData);
 
 
 local rareData = Pandaria.rareData;
@@ -1483,11 +1482,11 @@ local dataCache;
 local settings = {};
 local pendingData = {};
 
-local nodeHider = HandyNotes_Pandaria.import('nodeHider');
+local nodeHider = Handynotes_Pandaria.import('nodeHider');
 
 local ICON_MAP = {
   question = 'Interface\\Icons\\inv_misc_questionmark',
-  skullGray = 'Interface\\Worldmap\\Skull_64Grey',
+  skullGray = 'Interface\\MINIMAP\\Minimap_skull_normal',  --Interface\\Worldmap\\Skull_64Grey
   skullGreen = 'Interface\\Worldmap\\Skull_64Green',
   skullBlue = 'Interface\\Worldmap\\Skull_64Blue',
   skullOrange = 'Interface\\Worldmap\\Skull_64Red',
@@ -1503,15 +1502,15 @@ local COLOR_MAP = {
   yellow = '|cFFFFFF00',
 };
 
-HandyNotes_Pandaria.listen('SETTINGS_LOADED', function (_settings)
+Handynotes_Pandaria.listen('SETTINGS_LOADED', function (_settings)
   settings = _settings;
 end);
 
-HandyNotes_Pandaria.on('PLAYER_LOGIN', function ()
+Handynotes_Pandaria.on('PLAYER_LOGIN', function ()
   playerFaction = UnitFactionGroup('player');
 end);
 
-HandyNotes_Pandaria.on('GET_ITEM_INFO_RECEIVED', function (itemId, success)
+Handynotes_Pandaria.on('GET_ITEM_INFO_RECEIVED', function (itemId, success)
   local info = pendingData[itemId];
 
   if (info == nil) then return end
@@ -1520,7 +1519,7 @@ HandyNotes_Pandaria.on('GET_ITEM_INFO_RECEIVED', function (itemId, success)
     local itemInfo = {GetItemInfo(itemId)};
 
     info.name = itemInfo[1];
-    HandyNotes_Pandaria.yell('DATA_READY', info);
+    Handynotes_Pandaria.yell('DATA_READY', info);
   end
 
   pendingData[itemId] = nil;
@@ -1854,7 +1853,7 @@ local module = {
   flush = flush,
 };
 
-HandyNotes_Pandaria.export('infoProvider', module);
+Handynotes_Pandaria.export('infoProvider', module);
 
 local HandyNotes = Pandaria.HandyNotes;
 local nodes = Pandaria.nodeData;
@@ -1863,8 +1862,8 @@ local settings;
 local tooltip;
 local dropdown;
 
-local infoProvider = HandyNotes_Pandaria.import('infoProvider');
-local nodeHider = HandyNotes_Pandaria.import('nodeHider');
+local infoProvider = Handynotes_Pandaria.import('infoProvider');
+local nodeHider = Handynotes_Pandaria.import('nodeHider');
 
 local function makeIterator (zones, isMinimap)
   local zoneIndex, zone = next(zones, nil);
@@ -1973,7 +1972,7 @@ function handler:OnLeave(uiMapId, coords)
   tooltip:Hide();
 end
 
-HandyNotes_Pandaria.listen('DATA_READY', function (info, id)
+Handynotes_Pandaria.listen('DATA_READY', function (info, id)
   if (currentInfo == info) then
     displayTooltip(nodeInfo);
   end
@@ -2122,7 +2121,7 @@ local function registerWithHandyNotes ()
   settings = Handynotes_PandariaDB.settings;
   validateSettings(settings, defaults);
 
-  HandyNotes_Pandaria.yell('SETTINGS_LOADED', settings);
+  Handynotes_Pandaria.yell('SETTINGS_LOADED', settings);
 
   local options = {
     type = "group",
@@ -2248,8 +2247,8 @@ local function registerWithHandyNotes ()
 end
 
 
-HandyNotes_Pandaria.on('PLAYER_LOGIN', function ()
+Handynotes_Pandaria.on('PLAYER_LOGIN', function ()
   registerWithHandyNotes();
-  HandyNotes_Pandaria.funnel({'CRITERIA_UPDATE'}, 2, updateNodes);
-  HandyNotes_Pandaria.on({'NEW_TOY_ADDED', 'NEW_MOUNT_ADDED'}, updateNodes);
+  Handynotes_Pandaria.funnel({'CRITERIA_UPDATE'}, 2, updateNodes);
+  Handynotes_Pandaria.on({'NEW_TOY_ADDED', 'NEW_MOUNT_ADDED'}, updateNodes);
 end);

@@ -202,13 +202,13 @@ local SetMrbarMicromenu = {
         --func = function() sendCmd("/eqb"); end, notCheckable = true},
     { text = MINIMAP_MENU_CASTBAR, icon = 'Interface\\Icons\\INV_Misc_Bone_HumanSkull_02',
         func = function() sendCmd("/cbs"); end, notCheckable = true},
+    { text = MINIMAP_MENU_DAMAGESTYLE, icon = 'Interface\\PaperDollInfoFrame\\UI-EquipmentManager-Toggle',
+        func = function() sendCmd("/dex"); end, notCheckable = true },
     --{ text = MINIMAP_MENU_BOSSFRAME, icon = 'Interface\\MINIMAP\\TRACKING\\QuestBlob',
         --func = function() sendCmd("/sb test"); end, notCheckable = true},
     --{ text = "聊天屏蔽", icon = 'Interface\\Calendar\\UI-Calendar-Button',
         --func = function() sendCmd("/ecf"); end, notCheckable = true},
     { text = "|cFF00DDFF ------- "..MINIMAP_MENU_ONOFF.." -------|r", isTitle = true, notCheckable = true},
-    { text = MINIMAP_MENU_DAMAGESTYLE, icon = 'Interface\\PaperDollInfoFrame\\UI-EquipmentManager-Toggle',
-        func = function() sendCmd("/dex"); end, notCheckable = true },
     --{ text = MINIMAP_MENU_INTERRUPT, icon = 'Interface\\MINIMAP\\TRACKING\\BattleMaster',
         --func = function() sendCmd("/esi"); end, notCheckable = true},
     {text = MINIMAP_MENU_DISTANCE, hasArrow = true, notCheckable = true,
@@ -217,18 +217,18 @@ local SetMrbarMicromenu = {
             { text = NO, func = function() sendCmd("/hardyards hid") end, notCheckable = true}
         }
     },
-    {text = MINIMAP_MENU_COMBOPOINTS, hasArrow = true, notCheckable = true,
-        menuList={  
-            { text = YES, func = function() sendCmd("/bht hiton") end, notCheckable = true},
-            { text = NO, func = function() sendCmd("/bht hitoff") end, notCheckable = true}
-        }
-    },
-    {text = MINIMAP_MENU_COMPAREITEMS, hasArrow = true, notCheckable = true,
-        menuList={  
-            { text = YES, func = function() sendCmd("/run SetCVar('alwaysCompareItems', 1)") end, notCheckable = true},
-            { text = NO, func = function() sendCmd("/run SetCVar('alwaysCompareItems', 0)") end, notCheckable = true}
-        }
-    },
+    --{text = MINIMAP_MENU_COMBOPOINTS, hasArrow = true, notCheckable = true,
+        --menuList={  
+            --{ text = YES, func = function() sendCmd("/bht hiton") end, notCheckable = true},
+            --{ text = NO, func = function() sendCmd("/bht hitoff") end, notCheckable = true}
+        --}
+    --},
+    --{text = MINIMAP_MENU_COMPAREITEMS, hasArrow = true, notCheckable = true,
+        --menuList={  
+            --{ text = YES, func = function() sendCmd("/run SetCVar('alwaysCompareItems', 1)") end, notCheckable = true},
+            --{ text = NO, func = function() sendCmd("/run SetCVar('alwaysCompareItems', 0)") end, notCheckable = true}
+        --}
+    --},
     { text = "|cFF00DDFF ------- Style -------|r", isTitle = true, notCheckable = true },
     { text = MINIMAP_MENU_SWITCHUF, icon = 'Interface\\Icons\\Spell_Holy_Crusade',
         func = function() sendCmd("/loadmr"); end, notCheckable = true},
@@ -236,8 +236,8 @@ local SetMrbarMicromenu = {
         --func = function() sendCmd("/wallpaperkit"); end, notCheckable = true},
     --{ text = MINIMAP_MENU_CHECKFOODSSS, icon = 'Interface\\MINIMAP\\TRACKING\\Reagents',
         --func = function() sendCmd("/hj"); end, notCheckable = true  },
-    { text = MINIMAP_MENU_WORLDQUESTREWARD, icon = 'Interface\\Calendar\\UI-Calendar-Button',
-        func = function() sendCmd("/wqa popup"); end, notCheckable = true},
+    --{ text = MINIMAP_MENU_WORLDQUESTREWARD, icon = 'Interface\\Calendar\\UI-Calendar-Button',
+        --func = function() sendCmd("/wqa popup"); end, notCheckable = true},
     --{ text = "|cFF00DDFF -- OneKeyMacro --|r", func = function() sendCmd("/MacroHelp"); end, notCheckable = true},
     { text = "  |cFFBF00FFSimc|r", func = function() sendCmd("/simc"); end, notCheckable = true},
     { text = "  |cFFBF00FFWe Love WOW|r", func = function() sendCmd("/welovewow"); end, notCheckable = true},

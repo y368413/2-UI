@@ -103,7 +103,7 @@ local function ForceDefaultSettings()
 	SetCVar("statusText",1) --状态文字
 	SetCVar("statusTextDisplay","NUMERIC")--头像状态文字形式："NUMERIC"数值"PERCENT"百分比"BOTH"同时显示
 	SetCVar("autoLootDefault",1) --自动拾取
-	--SetCVar("worldPreloadNonCritical", 1) --0加快蓝条，读完蓝条再载入游戏模组
+	SetCVar("worldPreloadNonCritical", 1) --0加快蓝条，读完蓝条再载入游戏模组
 end
 
 local function ForceRaidFrame()

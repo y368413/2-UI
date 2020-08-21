@@ -24,9 +24,9 @@ local function TooltipAppend(tip, item)
       table.sort(temp)
       local list = ""
       for i, player2 in ipairs(temp) do
-        list = list..player2..(i == #temp - 1 and " and " or ", ")
+        list = list..player2..(i == #temp - 1 and ", " or ", ")
       end
-      tip:AddLine(NEED..list:sub(0, list:trim():len()-1)..".", 0, 1, 1, true)
+      tip:AddLine(NEED..": "..list:sub(0, list:trim():len()-1)..".", 0, 1, 1, true)
     end
   end
 end

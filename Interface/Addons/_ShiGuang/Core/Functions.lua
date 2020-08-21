@@ -170,7 +170,8 @@ do
 	local essenceDescription = GetSpellDescription(277253)
 	local ITEM_SPELL_TRIGGER_ONEQUIP = ITEM_SPELL_TRIGGER_ONEQUIP
 	local RETRIEVING_ITEM_INFO = RETRIEVING_ITEM_INFO
-	local tip = CreateFrame("GameTooltip", "NDui_iLvlTooltip", nil, "GameTooltipTemplate")
+	local tip = CreateFrame("GameTooltip", "NDui_ScanTooltip", nil, "GameTooltipTemplate")
+	M.ScanTip = tip
 
 	function M:InspectItemTextures()
 		if not tip.gems then
@@ -279,7 +280,7 @@ do
 				tip:SetHyperlink(link)
 			end
 
-			local firstLine = _G.NDui_iLvlTooltipTextLeft1:GetText()
+			local firstLine = _G.NDui_ScanTooltipTextLeft1:GetText()
 			if firstLine == RETRIEVING_ITEM_INFO then
 				return "tooSoon"
 			end
@@ -644,7 +645,7 @@ do
 
 	function M:AuraIcon(highlight)
 		self.CD = CreateFrame("Cooldown", nil, self, "CooldownFrameTemplate")
-		self.CD:SetAllPoints()
+		self.CD:SetInside()
 		self.CD:SetReverse(true)
 		M.PixelIcon(self, nil, highlight)
 		M.CreateSD(self)
@@ -664,6 +665,21 @@ do
 		return bu
 	end
 
+	local AtlasToQuality = {
+		["auctionhouse-itemicon-border-gray"] = LE_ITEM_QUALITY_POOR,
+		["auctionhouse-itemicon-border-white"] = LE_ITEM_QUALITY_COMMON,
+		["auctionhouse-itemicon-border-green"] = LE_ITEM_QUALITY_UNCOMMON,
+		["auctionhouse-itemicon-border-blue"] = LE_ITEM_QUALITY_RARE,
+		["auctionhouse-itemicon-border-purple"] = LE_ITEM_QUALITY_EPIC,
+		["auctionhouse-itemicon-border-orange"] = LE_ITEM_QUALITY_LEGENDARY,
+		["auctionhouse-itemicon-border-artifact"] = LE_ITEM_QUALITY_ARTIFACT,
+		["auctionhouse-itemicon-border-account"] = LE_ITEM_QUALITY_HEIRLOOM,
+	}
+	local function updateIconBorderColorByAtlas(self, atlas)
+		local quality = AtlasToQuality[atlas]
+		local color = I.QualityColors[quality or 1]
+		self.__owner.bg:SetBackdropBorderColor(color.r, color.g, color.b)
+	end
 	local function updateIconBorderColor(self, r, g, b)
 		if r == .65882 then r, g, b = 0, 0, 0 end
 		self.__owner.bg:SetBackdropBorderColor(r, g, b)
@@ -675,7 +691,11 @@ do
 		self:SetAlpha(0)
 		self.__owner = self:GetParent()
 		if not self.__owner.bg then return end
-		hooksecurefunc(self, "SetVertexColor", updateIconBorderColor)
+		if self.__owner.useCircularIconBorder then
+			hooksecurefunc(self, "SetAtlas", updateIconBorderColorByAtlas)
+		else
+			hooksecurefunc(self, "SetVertexColor", updateIconBorderColor)
+		end
 		hooksecurefunc(self, "Hide", resetIconBorderColor)
 	end
 
@@ -787,6 +807,55 @@ do
 	end
 	hooksecurefunc("PanelTemplates_DeselectTab", resetTabAnchor)
 	hooksecurefunc("PanelTemplates_SelectTab", resetTabAnchor)
+	-- Handle close button
+	function M:Texture_OnEnter()
+		if self:IsEnabled() then
+			if self.bg then
+				self.bg:SetBackdropColor(cr, cg, cb, .25)
+			else
+				self.bgTex:SetVertexColor(cr, cg, cb)
+			end
+		end
+	end
+
+	function M:Texture_OnLeave()
+		if self.bg then
+			self.bg:SetBackdropColor(0, 0, 0, .25)
+		else
+			self.bgTex:SetVertexColor(1, 1, 1)
+		end
+	end
+	-- Handle arrows
+	local arrowDegree = {
+		["up"] = 0,
+		["down"] = 180,
+		["left"] = 90,
+		["right"] = -90,
+	}
+	function M:SetupArrow(direction)
+		self:SetTexture(I.ArrowUp)
+		self:SetRotation(rad(arrowDegree[direction]))
+	end
+
+	function M:ReskinArrow(direction)
+		self:SetSize(16, 16)
+		--M.Reskin(self, true)
+
+		self:SetDisabledTexture(I.bdTex)
+		local dis = self:GetDisabledTexture()
+		dis:SetVertexColor(0, 0, 0, .3)
+		dis:SetDrawLayer("OVERLAY")
+		dis:SetAllPoints()
+
+		local tex = self:CreateTexture(nil, "ARTWORK")
+		tex:SetAllPoints()
+		M.SetupArrow(tex, direction)
+		tex:SetVertexColor(1, 0, 0, 1)
+		self.bgTex = tex
+
+		self:HookScript("OnEnter", function() if self:IsEnabled() then self.bgTex:SetVertexColor(0, 1, 0, 1) end end)
+		self:HookScript("OnLeave", function() self.bgTex:SetVertexColor(1, 0, 0, 1) end)
+	end
 end
 
 -- GUI elements
@@ -796,7 +865,6 @@ do
 		bu:SetSize(width, height)
 		if type(text) == "boolean" then
 			M.PixelIcon(bu, fontSize, true)
-			M.CreateBD(bu, .3)
 		else
 			M.Reskin(bu)
 			bu.text = M.CreateFS(bu, fontSize or 14, text, true)
@@ -876,15 +944,11 @@ do
 		dd.Text:SetPoint("RIGHT", -5, 0)
 		dd.options = {}
 
-	local bu = CreateFrame("Button", dd, self)
-	bu:SetSize(26, 26)
-	bu.Icon = bu:CreateTexture(nil, "ARTWORK")
-	bu.Icon:SetAllPoints()
-	bu.Icon:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\Raid\\ArrowLarge")
-	bu.Icon:SetVertexColor(1, 0, 0, 1)
-	bu:SetHighlightTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\Raid\\ArrowLarge")
-	bu:GetHighlightTexture():SetVertexColor(0, 1, 0, 1)
-	bu:SetPoint("LEFT", dd, "RIGHT", -8, 3)
+		local bu = CreateFrame("Button", nil, dd)
+		bu:SetPoint("RIGHT", 12, 5)
+		M.ReskinArrow(bu, "down")
+		bu:SetSize(26, 26)
+
 		local list = CreateFrame("Frame", nil, dd)
 		list:SetPoint("TOP", dd, "BOTTOM", 0, -2)
 		M.CreateBD(list, 0.85)

@@ -232,10 +232,10 @@ end
 function Bar:Bind_Deactivate(save)
 	if save == true then
 		SaveBindings(MaoRUIPerDB["Actionbar"]["BindType"])
-		print("|cff0080ffNDui|r: |cff00ff00"..U["Save keybinds"].."|r")
+		print("|cff00ff00"..U["Save keybinds"].."|r")
 	else
 		LoadBindings(MaoRUIPerDB["Actionbar"]["BindType"])
-		print("|cff0080ffNDui|r: |cffffff00"..U["Discard keybinds"].."|r")
+		print("|cffffff00"..U["Discard keybinds"].."|r")
 	end
 
 	Bar:Bind_HideFrame()
@@ -276,7 +276,7 @@ function Bar:Bind_CreateDialog()
 	Bar.keybindDialog = frame
 end
 
-SlashCmdList["NDUI_KEYBIND"] = function(msg)
+SlashCmdList["UI_KEYBIND"] = function(msg)
 	if msg ~= "" then return end -- don't mess up with this
 	if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
 
@@ -284,4 +284,22 @@ SlashCmdList["NDUI_KEYBIND"] = function(msg)
 	Bar:Bind_Activate()
 	Bar:Bind_CreateDialog()
 end
-SLASH_NDUI_KEYBIND1 = "/Keybind"
+SLASH_UI_KEYBIND1 = "/Keybind"
+
+-- ## Author: Gello ## Version: 1.0.8
+local FlyoutBindings = CreateFrame("Button",nil,SpellFlyout,"SecureHandlerShowHideTemplate")
+FlyoutBindings:SetAttribute("_onshow",[[
+	for i=1,10 do
+		self:SetBindingClick(false,i<10 and tostring(i) or "0","SpellFlyoutButton"..i)
+	end
+]])
+FlyoutBindings:SetAttribute("_onhide",[[
+	self:ClearBindings()
+]])
+SpellFlyout:HookScript("OnShow",function()
+  local i=1
+  while _G["SpellFlyoutButton"..i] and i<=10 do
+    _G["SpellFlyoutButton"..i.."HotKey"]:SetText(i<10 and i or 0)
+    i=i+1
+  end
+end)

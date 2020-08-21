@@ -27,7 +27,7 @@ local SetSavedInstanceExtend = SetSavedInstanceExtend
 local RequestRaidInfo, RaidInfoFrame_Update = RequestRaidInfo, RaidInfoFrame_Update
 local IsGuildMember, C_BattleNet_GetGameAccountInfoByGUID, C_FriendList_IsFriend = IsGuildMember, C_BattleNet.GetGameAccountInfoByGUID, C_FriendList.IsFriend
 local GetMerchantNumItems, GetMerchantItemID = GetMerchantNumItems, GetMerchantItemID
-local HEADER_COLON, MERCHANT_ITEMS_PER_PAGE = HEADER_COLON, MERCHANT_ITEMS_PER_PAGE
+local MERCHANT_ITEMS_PER_PAGE = MERCHANT_ITEMS_PER_PAGE
 
 --[[
 	Miscellaneous 各种有用没用的小玩意儿
@@ -65,6 +65,7 @@ function MISC:OnLogin()
 	self:CreateRM()
 	self:FreeMountCD()
 	self:xMerchant()
+	self:BlinkRogueHelper()
 	
 	----------------QuickQueue.lua----------------------
 	if MaoRUIPerDB["Misc"]["QuickQueue"] then
@@ -293,12 +294,6 @@ end
 local erList = {
 	[ERR_ABILITY_COOLDOWN] = true,
 	[ERR_ATTACK_MOUNTED] = true,
-	[ERR_BADATTACKFACING] = true,
-	[ERR_BADATTACKPOS] = true,
-	[ERR_ITEM_COOLDOWN] = true,
-	[ERR_INVALID_ATTACK_TARGET] = true,      -- You cannot attack that target.
-	[ERR_NO_ATTACK_TARGET] = true,
-	[ERR_NOT_IN_COMBAT] = true,
 	[ERR_OUT_OF_ENERGY] = true,
 	[ERR_OUT_OF_FOCUS] = true,
 	[ERR_OUT_OF_HEALTH] = true,
@@ -314,21 +309,13 @@ local erList = {
 	[ERR_OUT_OF_CHI] = true,
 	[ERR_OUT_OF_POWER_DISPLAY] = true,
 	[ERR_SPELL_COOLDOWN] = true,
-	[SPELL_FAILED_AFFECTING_COMBAT] = true,
 	[ERR_ITEM_COOLDOWN] = true,
 	[SPELL_FAILED_BAD_IMPLICIT_TARGETS] = true,
 	[SPELL_FAILED_BAD_TARGETS] = true,
 	[SPELL_FAILED_CASTER_AURASTATE] = true,
-	[SPELL_FAILED_MOVING] = true,
 	[SPELL_FAILED_NO_COMBO_POINTS] = true,
-	[SPELL_FAILED_UNIT_NOT_INFRONT] = true,
-	[SPELL_FAILED_NO_ENDURANCE] = true,      -- Not enough endurance
-	[SPELL_FAILED_NOT_MOUNTED] = true,       -- You are mounted
-	[SPELL_FAILED_NOT_ON_TAXI] = true,       -- You are in flight
 	[SPELL_FAILED_SPELL_IN_PROGRESS] = true,
 	[SPELL_FAILED_TARGET_AURASTATE] = true,
-	[SPELL_FAILED_TARGETS_DEAD] = true,      -- Your target is dead.
-	[SPELL_FAILED_TOO_CLOSE] = true,
 	[ERR_NO_ATTACK_TARGET] = true,
 }
 
@@ -468,41 +455,32 @@ local contaminantsLevel = {
 	[178015] = "III",	-- 虚空仪式
 }
 function MISC:ReplaceContaminantName()
-	local itemString
-
-	local function updateItemString()
-		local itemName = GetItemInfo(177981)
-		if itemName then
-			return strmatch(itemName, "(.+"..HEADER_COLON..")").."(.+)"
-		end
-	end
+	local itemString = HEADER_COLON.."(.+)"
 
 	local function setupMisc()
-		if not itemString then
-			itemString = updateItemString()
-		end
-		if not itemString then return end
-
 		local numItems = GetMerchantNumItems()
 		for i = 1, MERCHANT_ITEMS_PER_PAGE do
 			local index = (MerchantFrame.page - 1) * MERCHANT_ITEMS_PER_PAGE + i
 			if index > numItems then return end
 
-			local button = _G["MerchantItem"..i.."ItemButton"]
+			local item = _G["MerchantItem"..i]
+			local button = item.ItemButton
 			if button and button:IsShown() then
-				local name = _G["MerchantItem"..i.."Name"]
-				local text = name and name:GetText()
-				local newString = text and strmatch(text, itemString)
-				if newString then
-					name:SetText(newString)
-				end
-
 				local id = GetMerchantItemID(index)
 				local level = id and contaminantsLevel[id]
 				if not button.levelString then
 					button.levelString = M.CreateFS(button, 14, "", nil, "TOPLEFT", 3, -3)
 				end
 				button.levelString:SetText(level or "")
+
+				if level then
+					local name = item.Name
+					local nameText = name and name:GetText()
+					local newString = nameText and strmatch(nameText, itemString)
+					if newString then
+						name:SetText(newString)
+					end
+				end
 			end
 		end
 	end

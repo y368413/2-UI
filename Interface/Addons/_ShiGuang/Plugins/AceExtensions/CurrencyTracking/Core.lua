@@ -1,4 +1,4 @@
-﻿-- $Id: Constants.lua 194 2020-07-07 15:33:16Z arith $
+﻿-- $Id: Constants.lua 197 2020-08-09 12:23:46Z arith $
 local _G = getfenv(0)
 local constants = {}
 
@@ -2386,7 +2386,667 @@ constants.items = {
 		729, --  Stringy Vulture Meat
 		723, --  Goretusk Liver
 	},
-
+	quest = { -- quest item which is stable
+		22892, -- Dim Necrotic Stone
+		22529, -- Savage Frond
+		22528, -- Dark Iron Scraps
+		22527, -- Core of Elements
+		22526, -- Bone Fragments
+		22525, -- Crypt Fiend Parts
+		22444, -- Putrid Vine
+		22435, -- Gorishi Sting
+		22434, -- Bloodcap
+		22432, -- Devilsaur Barb
+		22381, -- Silithus Venom Sample
+		22338, -- Volcanic Ash
+		22258, -- Love Potion
+		22138, -- Blackrock Bracer
+		22094, -- Bloodkelp
+		21982, -- Ogre Warbeads
+		21937, -- Scorched Ectoplasm
+		21936, -- Frozen Ectoplasm
+		21935, -- Stable Ectoplasm
+		21928, -- Winterspring Blood Sample
+		21515, -- Mark of Remulos
+		21508, -- Mark of Cenarius
+		21383, -- Winterfall Spirit Beads
+		21377, -- Deadwood Headdress Feather
+		21229, -- Qiraji Lord's Insignia
+		21100, -- Coin of Ancestry
+		20890, -- Qiraji Ornate Hilt
+		20889, -- Qiraji Regal Drape
+		20888, -- Qiraji Ceremonial Ring
+		20886, -- Qiraji Spiked Hilt
+		20885, -- Qiraji Martial Drape
+		20884, -- Qiraji Magisterial Ring
+		20882, -- Idol of War
+		20881, -- Idol of Strife
+		20879, -- Idol of Life
+		20878, -- Idol of Rebirth
+		20877, -- Idol of the Sage
+		20876, -- Idol of Death
+		20875, -- Idol of Night
+		20874, -- Idol of the Sun
+		20873, -- Alabaster Idol
+		20872, -- Vermillion Idol
+		20871, -- Obsidian Idol
+		20870, -- Jasper Idol
+		20869, -- Amber Idol
+		20868, -- Lambent Idol
+		20867, -- Onyx Idol
+		20866, -- Azure Idol
+		20865, -- Ivory Scarab
+		20864, -- Bone Scarab
+		20863, -- Clay Scarab
+		20862, -- Crystal Scarab
+		20861, -- Bronze Scarab
+		20860, -- Silver Scarab
+		20859, -- Gold Scarab
+		20858, -- Stone Scarab
+		20802, -- Cenarion Combat Badge
+		20801, -- Cenarion Tactical Badge
+		20800, -- Cenarion Logistics Badge
+		20737, -- Singed Corestone
+		20614, -- Bloodvenom Essence
+		20613, -- Rotting Wood
+		20612, -- Inert Scourgestone
+		20611, -- Thick Black Claw
+		20610, -- Bloodshot Spider Eye
+		20609, -- Voodoo Feathers
+		20608, -- Green Voodoo Feather
+		20607, -- Blue Voodoo Feather
+		20606, -- Amber Voodoo Feather
+		20519, -- Southsea Pirate Hat
+		20515, -- Abyssal Scepter
+		20514, -- Abyssal Signet
+		20513, -- Abyssal Crest
+		20404, -- Encrypted Twilight Text
+		20384, -- Silithid Carapace Fragment
+		20378, -- Twilight Tablet Fragment
+		20377, -- Rock Stalker Fang
+		20376, -- Sand Skitterer Fang
+		20375, -- Stonelash Flayer Stinger
+		20374, -- Stonelash Pincer Stinger
+		20373, -- Stonelash Scorpid Stinger
+		20256, -- Warsong Gulch Ribbon of Sacrifice
+		20087, -- Wavethrasher Scales
+		20029, -- Enchanted Coral
+		20028, -- Glittering Dust
+		20027, -- Healthy Courser Gland
+		20026, -- Rotting Flesh
+		20024, -- Putrid Bile Duct
+		20023, -- Encoded Fragment
+		20021, -- Gold Pirate Earring
+		20018, -- Angerclaw Grizzly Hide
+		20017, -- Perfect Courser Antler
+		19933, -- Glowing Scorpid Blood
+		19911, -- Whipweed Heart
+		19882, -- The Hexxer's Head
+		19881, -- Channeler's Head
+		19858, -- Zandalar Honor Token
+		19807, -- Speckled Tastyfish
+		19806, -- Dezian Queenfish
+		19805, -- Keefer's Angelfish
+		19803, -- Brownell's Blue Striped Racer
+		19725, -- Arathi Resource Crate
+		19706, -- Bloodscalp Coin
+		19705, -- Skullsplitter Coin
+		19704, -- Sandfury Coin
+		19703, -- Witherbark Coin
+		19702, -- Vilebranch Coin
+		19701, -- Gurubashi Coin
+		19700, -- Hakkari Coin
+		19699, -- Razzashi Coin
+		19698, -- Zulian Coin
+		19482, -- LeCraft Rabbit Pelt
+		19322, -- Warsong Mark of Honor
+		19213, -- Silverwing Talisman of Merit
+		19071, -- Vessel of Tainted Blood
+		18961, -- Zukk'ash Carapace
+		18958, -- Water Elemental Core
+		18956, -- Miniaturization Residue
+		18947, -- Rage Scar Yeti Hide
+		18945, -- Dark Iron Residue
+		18944, -- Incendosaur Scale
+		18943, -- Dark Iron Pillow
+		18604, -- Tears of the Hederine
+		18603, -- Satyr Blood
+		18590, -- Raging Beast's Blood
+		18335, -- Pristine Black Diamond
+		17756, -- Shadowshard Fragment
+		17684, -- Theradric Crystal Carving
+		17643, -- Frostwolf Hide
+		17642, -- Alterac Ram Hide
+		17542, -- Coldtooth Supplies
+		17522, -- Irondeep Supplies
+		17504, -- Frostwolf Commander's Medal
+		17503, -- Frostwolf Lieutenant's Medal
+		17502, -- Frostwolf Soldier's Medal
+		17423, -- Storm Crystal
+		17422, -- Armor Scraps
+		17345, -- Silithid Goo
+		17328, -- Stormpike Commander's Flesh
+		17327, -- Stormpike Lieutenant's Flesh
+		17326, -- Stormpike Soldier's Flesh
+		17309, -- Discordant Bracers
+		17306, -- Stormpike Soldier's Blood
+		17124, -- Syndicate Emblem
+		16786, -- Black Dragonspawn Eye
+		16784, -- Sapphire of Aku'Mai
+		16783, -- Bundle of Reports
+		16746, -- Warsong Report
+		16744, -- Warsong Oil
+		16743, -- Logging Rope
+		16602, -- Troll Charm
+		16581, -- Resonite Crystal
+		16312, -- Incendrites
+		16205, -- Gaea Seed
+		15924, -- Soft-shelled Clam Meat
+		15852, -- Kodo Horn
+		15851, -- Lunar Fungus
+		15849, -- Ghost-o-plasm
+		15586, -- Fast-growing Flower
+		15043, -- Plagueland Termites
+		14619, -- Skeletal Fragments
+		13872, -- Bundle of Wood
+		13853, -- Slab of Carrion Worm Meat
+		13702, -- Doom Weed
+		13545, -- Shellfish
+		13357, -- Osseous Agitator
+		13356, -- Somatic Intensifier
+		13354, -- Ectoplasmic Resonator
+		13180, -- Stratholme Holy Water
+		13174, -- Plagued Flesh Sample
+		13157, -- Fetid Skull
+		12938, -- Blood of Heroes
+		12844, -- Argent Dawn Valor Token
+		12843, -- Corruptor's Scourgestone
+		12841, -- Invader's Scourgestone
+		12840, -- Minion's Scourgestone
+		12822, -- Toxic Horror Droplet
+		12753, -- Skin of Shadow
+		12737, -- Gloom Weed
+		12736, -- Frostwhisper's Embalming Fluid
+		12735, -- Frayed Abomination Stitching
+		12734, -- Enchanted Scarlet Thread
+		12732, -- Incendia Agave
+		12638, -- Andorhal Watch
+		12623, -- Chillwind Meat
+		12622, -- Shardtooth Meat
+		12607, -- Brilliant Chromatic Scale
+		12530, -- Spire Spider Egg
+		12444, -- Uncracked Chillwind Horn
+		12436, -- Frostmaul E'ko
+		12435, -- Ice Thistle E'ko
+		12434, -- Chillwind E'ko
+		12433, -- Wildkin E'ko
+		12432, -- Shardtooth E'ko
+		12431, -- Winterfall E'ko
+		12430, -- Frostsaber E'ko
+		12383, -- Moontouched Feather
+		12367, -- Pristine Yeti Horn
+		12366, -- Thick Yeti Fur
+		12356, -- Highperch Wyvern Egg
+		12334, -- Frostmaul Shards
+		12283, -- Broodling Essence
+		12241, -- Collected Dragon Egg
+		12237, -- Fine Crab Chunks
+		12236, -- Pure Un'Goro Sample
+		12235, -- Un'Goro Slime Sample
+		12234, -- Corrupted Felwood Sample
+		12230, -- Felwood Slime Sample
+		12220, -- Intact Elemental Bracer
+		11954, -- Filled Pure Sample Jar
+		11949, -- Filled Tainted Ooze Jar
+		11947, -- Filled Cursed Ooze Jar
+		11834, -- Super Sticky Tar
+		11831, -- Webbed Pterrordax Scale
+		11830, -- Webbed Diemetradon Scale
+		11829, -- Un'Goro Ash
+		11754, -- Black Diamond
+		11752, -- Black Blood of the Tormented
+		11751, -- Burning Essence
+		11725, -- Solid Crystal Leg Shaft
+		11674, -- Jadefire Felbind
+		11583, -- Cactus Apple
+		11567, -- Crystal Spire
+		11564, -- Crystal Ward
+		11563, -- Crystal Force
+		11562, -- Crystal Restore
+		11516, -- Cenarion Plant Salve
+		11515, -- Corrupted Soul Shard
+		11514, -- Fel Creep
+		11513, -- Tainted Vitriol
+		11512, -- Patch of Tainted Skin
+		11509, -- Ravasaur Pheromone Gland
+		11507, -- Spotted Hyena Pelt
+		11503, -- Blood Amber
+		11480, -- Un'Goro Thunderer Pelt
+		11479, -- Un'Goro Stomper Pelt
+		11478, -- Un'Goro Gorilla Pelt
+		11477, -- White Ravasaur Claw
+		11472, -- Silvermane Stalker Flank
+		11468, -- Dark Iron Fanny Pack
+		11467, -- Blackrock Medallion
+		11407, -- Torn Bear Pelt
+		11404, -- Evil Bat Eye
+		11318, -- Atal'ai Haze
+		11316, -- Bloodpetal
+		11315, -- Bloodpetal Sprout
+		11269, -- Intact Elemental Core
+		11266, -- Fractured Elemental Shard
+		11243, -- Videre Elixir
+		11188, -- Yellow Power Crystal
+		11186, -- Red Power Crystal
+		11185, -- Green Power Crystal
+		11184, -- Blue Power Crystal
+		11172, -- Silvery Claws
+		11171, -- Fel Iron
+		11143, -- Nugget Slug
+		11129, -- Essence of the Elements
+		11127, -- Scavenged Goods
+		11119, -- Milly's Harvest
+		11114, -- Dinosaur Bone
+		11018, -- Un'Goro Soil
+		10819, -- Wildkin Feather
+		10714, -- Crystallized Azsharite
+		10650, -- Plague-Infested Quilboar Mane
+		10641, -- Moonpetal Lily
+		10640, -- Webwood Ichor
+		10639, -- Hyacinth Mushroom
+		10593, -- Imperfect Draenethyst Fragment
+		10551, -- Thorium Plated Dagger
+		10511, -- Golem Oil
+		10509, -- Heart of Flame
+		10450, -- Undamaged Hippogryph Feather
+		9741, -- Gem of Serpentis
+		9740, -- Gem of Pythas
+		9739, -- Gem of Anacondra
+		9738, -- Gem of Cobrahn
+		9597, -- Mountain Giant Muisek
+		9596, -- Faerie Dragon Muisek
+		9595, -- Hippogryph Muisek
+		9594, -- Wildkin Muisek
+		9593, -- Treant Muisek
+		9592, -- Metallic Fragments
+		9591, -- Resilient Sinew
+		9590, -- Splintered Log
+		9589, -- Encrusted Minerals
+		9523, -- Troll Temper
+		9463, -- Gordunni Cobalt
+		9460, -- Grimtotem Horn
+		9442, -- Untested Scorpid Sample
+		9441, -- Acceptable Hyena Sample
+		9440, -- Acceptable Basilisk Sample
+		9439, -- Untested Hyena Sample
+		9438, -- Acceptable Scorpid Sample
+		9437, -- Untested Basilisk Sample
+		9369, -- Iridescent Sprite Darter Wing
+		9322, -- Undamaged Venom Sac
+		9320, -- Witherbark Skull
+		9309, -- Robo-mechanical Guts
+		9308, -- Grime-Encrusted Object
+		9278, -- Essential Artificial
+		9259, -- Troll Tribal Necklace
+		9247, -- Hatecrest Naga Scale
+		9238, -- Uncracked Scarab Shell
+		9237, -- Woodpaw Gnoll Mane
+		8973, -- Thick Yeti Hide
+		8684, -- Hinterlands Honey Ripple
+		8683, -- Clara's Fresh Apple
+		8587, -- Centipaar Insect Parts
+		8483, -- Wastewander Water Pouch
+		8443, -- Gahz'ridian Ornament
+		8396, -- Vulture Gizzard
+		8394, -- Basilisk Brain
+		8393, -- Scorpok Pincer
+		8392, -- Blasted Boar Lung
+		8391, -- Snickerfang Jowl
+		8244, -- Flawless Draenethyst Sphere
+		8052, -- An'Alleum Power Stone
+		8047, -- Magenta Fungus Cap
+		8009, -- Dentrium Power Stone
+		7867, -- Vessel of Dragon's Blood
+		7848, -- Rock Elemental Shard
+		7847, -- Buzzard Gizzard
+		7846, -- Crag Coyote Fang
+		7681, -- Obsidian Golem Shard
+		7680, -- Jadespine Basilisk Scale
+		7679, -- Shrike Bat Fang
+		7293, -- Dalaran Mana Gem
+		7292, -- Filled Containment Coffer
+		7273, -- Witherbark Totem Stick
+		7271, -- Flawless Ivory Tusk
+		7270, -- Laughing Sister's Hair
+		7267, -- Pristine Spider Silk
+		7249, -- Charged Rift Gem
+		7134, -- Sturdy Dragonmaw Shinbone
+		7131, -- Dragonmaw Shinbone
+		7128, -- Uncloven Satyr Hoof
+		7126, -- Smoky Iron Ingot
+		6991, -- Smoldering Coal
+		6989, -- Vial of Hatefury Blood
+		6952, -- Thick Bear Fur
+		6930, -- Rod of Channeling
+		6914, -- Soran'ruk Fragment
+		6850, -- Bloodscalp Scalp
+		6849, -- Sunscorched Shell
+		6848, -- Searing Coral
+		6845, -- Burning Rock
+		6844, -- Burning Blood
+		6840, -- Galvanized Horn
+		6839, -- Charred Horn
+		6838, -- Scorched Spider Fang
+		6808, -- Elunite Ore
+		6800, -- Umbral Ore
+		6753, -- Feather Charm
+		6718, -- Electropeller
+		6717, -- Gaffer Jack
+		6640, -- Felstalker Hoof
+		6634, -- Ritual Salve
+		6487, -- Vile Familiar Head
+		6443, -- Deviate Hide
+		6435, -- Infused Burning Gem
+		6288, -- Atal'ai Tablet
+		6281, -- Rattlecage Skull
+		6259, -- Groddoc Liver
+		6258, -- Ironfur Liver
+		6257, -- Roc Gizzard
+		6252, -- Doomwarder Blood
+		6251, -- Nether Wing
+		6250, -- Felhound Brain
+		6249, -- Aged Kodo Hide
+		6248, -- Scorpashi Venom
+		6247, -- Hatefury Horn
+		6246, -- Hatefury Claw
+		6184, -- Monstrous Crawler Leg
+		6181, -- Fetish of Hakkar
+		6175, -- Atal'ai Artifact
+		6169, -- Unprepared Sawtooth Flank
+		6168, -- Sawtooth Snapper Claw
+		6166, -- Coyote Jawbone
+		6146, -- Sundried Driftwood
+		6083, -- Broken Tears
+		6080, -- Shadow Panther Heart
+		6079, -- Crude Charm
+		6071, -- Draenethyst Crystal
+		6069, -- Crudely Dried Meat
+		6067, -- Centaur Ear
+		5959, -- Acidic Venom Sac
+		5952, -- Corrupted Brain Stem
+		5938, -- Pristine Crawler Leg
+		5884, -- Unpopped Darkmist Eye
+		5883, -- Forked Mudrock Tongue
+		5879, -- Twilight Pendant
+		5876, -- Blueleaf Tuber
+		5855, -- Silithid Heart
+		5854, -- Silithid Talon
+		5853, -- Intact Silithid Carapace
+		5848, -- Hollow Vulture Bone
+		5847, -- Mirefin Head
+		5841, -- Searing Heart
+		5840, -- Searing Tongue
+		5809, -- Highperch Venom Sac
+		5808, -- Pridewing Venom Sac
+		5805, -- Heart of Zeal
+		5803, -- Speck of Dream Dust
+		5801, -- Kraul Guano
+		5798, -- Rocket Car Parts
+		5797, -- Indurium Flake
+		5796, -- Encrusted Tail Fin
+		5795, -- Hardened Tortoise Shell
+		5794, -- Salty Scorpid Venom
+		5675, -- Crystalized Scales
+		5664, -- Corroded Shrapnel
+		5659, -- Smoldering Embers
+		5620, -- Vial of Innocent Blood
+		5585, -- Courser Eye
+		5584, -- Twilight Whisker
+		5583, -- Fey Dragon Scale
+		5582, -- Stonetalon Sap
+		5570, -- Deepmoss Egg
+		5494, -- Handful of Stardust
+		5490, -- Wrathtail Head
+		5481, -- Satyr Horns
+		5438, -- OLDPlague Vials
+		5437, -- Bathran's Hair
+		5414, -- Grizzled Scalp
+		5413, -- Moonstalker Fang
+		5412, -- Thresher Eye
+		5386, -- Fine Moonstalker Pelt
+		5385, -- Crawler Leg
+		5360, -- Highborne Relic
+		5348, -- Worn Parchment
+		5339, -- Serpentbloom
+		5336, -- Grell Earring
+		5330, -- Elven Cup Relic
+		5273, -- Mathystra Relic
+		5271, -- Scaber Stalk
+		5270, -- Death Cap
+		5220, -- Gnarlpine Fang
+		5204, -- Bloodfeather Belt
+		5203, -- Flatland Prowler Claw
+		5170, -- Mossy Tumor
+		5169, -- Timberling Sprout
+		5168, -- Timberling Seed
+		5167, -- Webwood Egg
+		5166, -- Webwood Venom Sac
+		5165, -- Sunscale Feather
+		5143, -- Thunder Lizard Blood
+		5134, -- Small Furry Paw
+		5117, -- Vibrant Plume
+		5098, -- Altered Snapjaw Shell
+		5096, -- Prowler Claws
+		5087, -- Plainstrider Beak
+		5086, -- Zhevra Hooves
+		5085, -- Bristleback Quilboar Tusk
+		5080, -- Gazlowe's Ledger
+		5078, -- Theramore Medal
+		5077, -- Telescopic Lens
+		5076, -- Shipment of Boots
+		5075, -- Blood Shard
+		5065, -- Harpy Lieutenant Ring
+		5064, -- Witchwing Talon
+		5062, -- Raptor Head
+		5061, -- Stolen Silver
+		5058, -- Silithid Egg
+		5056, -- Root Sample
+		5055, -- Intact Raptor Horn
+		5051, -- Dig Rat
+		5030, -- Centaur Bracers
+		5019, -- Sodium Nitrate
+		5018, -- Wood Pulp
+		5017, -- Nitroglycerin
+		5012, -- Fungal Spores
+		4918, -- Sack of Supplies
+		4904, -- Venomtail Antidote
+		4898, -- Lightning Gland
+		4897, -- Thunderhawk Saliva Gland
+		4896, -- Kodo Liver
+		4894, -- Plainstrider Kidney
+		4893, -- Savannah Lion Tusk
+		4892, -- Durotar Tiger Fur
+		4890, -- Taillasher Egg
+		4888, -- Crawler Mucus
+		4887, -- Intact Makrura Eye
+		4886, -- Venomtail Poison Sac
+		4871, -- Searing Collar
+		4870, -- Canvas Scraps
+		4864, -- Minshina's Skull
+		4863, -- Gnomish Tools
+		4862, -- Scorpid Worker Tail
+		4849, -- Battleboar Flank
+		4848, -- Battleboar Snout
+		4809, -- Ambercorn
+		4808, -- Well Stone
+		4803, -- Prairie Alpha Tooth
+		4802, -- Cougar Claws
+		4801, -- Stalker Claws
+		4770, -- Bristleback Belt
+		4769, -- Trophy Swoop Quill
+		4759, -- Plainstrider Talon
+		4758, -- Prairie Wolf Paw
+		4753, -- Bronze Feather
+		4752, -- Azure Feather
+		4751, -- Windfury Talon
+		4742, -- Mountain Cougar Pelt
+		4740, -- Plainstrider Feather
+		4739, -- Plainstrider Meat
+		4703, -- Broken Tools
+		4702, -- Prospector's Pick
+		4630, -- Scrap Metal
+		4629, -- Supply Crate
+		4628, -- Bracers of Rock Binding
+		4627, -- Large Stone Slab
+		4626, -- Small Stone Shard
+		4612, -- Black Drake's Heart
+		4610, -- Carved Stone Urn
+		4589, -- Long Elegant Feather
+		4582, -- Soft Bushy Tail
+		4522, -- Witherbark Medicine Pouch
+		4521, -- Alterac Granite
+		4513, -- Raptor Heart
+		4512, -- Highland Raptor Eye
+		4506, -- Stromgarde Badge
+		4503, -- Witherbark Tusk
+		4495, -- Bloodstone Amulet
+		4492, -- Elven Gem
+		4450, -- Sigil Fragment
+		4435, -- Mote of Myzrael
+		4278, -- Lesser Bloodstone Ore
+		4106, -- Tumbled Crystal
+		4105, -- Elder Crocolisk Skin
+		4104, -- Snapjaw Crocolisk Skin
+		4053, -- Large River Crocolisk Skin
+		4029, -- Akiris Reed
+		4016, -- Zanzil's Mixture
+		3923, -- Water Elemental Bracers
+		3919, -- Mistvale Giblets
+		3918, -- Singing Crystal Shard
+		3917, -- Singing Blue Crystal
+		3916, -- Split Bone Necklace
+		3915, -- Bloody Bone Necklace
+		3911, -- Pulsing Blue Shard
+		3910, -- Snuff
+		3908, -- Zul'Mamwe Trophy
+		3907, -- Ziata'jai Trophy
+		3906, -- Balia'mah Trophy
+		3901, -- Bloodscalp Tusk
+		3900, -- Pupellyverbos Port
+		3863, -- Jungle Stalker Feather
+		3838, -- Shadowmaw Claw
+		3720, -- Yeti Fur
+		3716, -- Murloc Head
+		3715, -- Bracers of Earth Binding
+		3714, -- Worn Stone Token
+		3692, -- Hillsbrad Human Skull
+		3658, -- Recovered Tome
+		3510, -- Torn Fin Eye
+		3509, -- Daggerspine Scale
+		3505, -- Alterac Signet Ring
+		3502, -- Mudsnout Blossoms
+		3496, -- Mountain Lion Blood
+		3476, -- Gray Bear Tongue
+		3418, -- Fel Cone
+		3412, -- Webwood Spider Silk
+		3411, -- Strigid Owl Feather
+		3409, -- Nightsaber Fang
+		3397, -- Young Crocolisk Skin
+		3354, -- Dalaran Pendant
+		3348, -- Giant Crocolisk Skin
+		3337, -- Dragonmaw War Banner
+		3297, -- Fel Moss
+		3266, -- Scarlet Armband
+		3265, -- Scavenger Paw
+		3264, -- Duskbat Wing
+		3257, -- Lake Creeper Moss
+		3256, -- Lake Skulker Moss
+		3254, -- Skittering Blood
+		3253, -- Grizzled Bear Heart
+		3236, -- Rot Hide Ichor
+		3218, -- Pyrewood Shackle
+		3163, -- Blackened Skull
+		3162, -- Notched Rib
+		3157, -- Darksoul Shackle
+		3156, -- Glutton Shackle
+		3110, -- Tunnel Rat Ear
+		3084, -- Gyromechanic Gear
+		3083, -- Restabilization Cog
+		3014, -- Battleworn Axe
+		2925, -- Crocolisk Skin
+		2909, -- Red Wool Bandana
+		2876, -- Duskbat Pelt
+		2875, -- Scarlet Insignia Ring
+		2872, -- Vicious Night Web Spider Venom
+		2859, -- Vile Fin Scale
+		2858, -- Darkhound Blood
+		2856, -- Iron Pike
+		2855, -- Putrid Claw
+		2846, -- Tirisfal Pumpkin
+		2843, -- Dirty Knucklebones
+		2834, -- Embalming Ichor
+		2799, -- Gorilla Fang
+		2798, -- Rethban Ore
+		2751, -- Green Hills of Stranglethorn - Page 27
+		2750, -- Green Hills of Stranglethorn - Page 26
+		2749, -- Green Hills of Stranglethorn - Page 25
+		2748, -- Green Hills of Stranglethorn - Page 24
+		2745, -- Green Hills of Stranglethorn - Page 21
+		2744, -- Green Hills of Stranglethorn - Page 20
+		2742, -- Green Hills of Stranglethorn - Page 18
+		2740, -- Green Hills of Stranglethorn - Page 16
+		2738, -- Green Hills of Stranglethorn - Page 14
+		2735, -- Green Hills of Stranglethorn - Page 11
+		2734, -- Green Hills of Stranglethorn - Page 10
+		2732, -- Green Hills of Stranglethorn - Page 8
+		2730, -- Green Hills of Stranglethorn - Page 6
+		2728, -- Green Hills of Stranglethorn - Page 4
+		2725, -- Green Hills of Stranglethorn - Page 1
+		2702, -- Lightforge Ingot
+		2676, -- Shimmerweed
+		2671, -- Wendigo Mane
+		2669, -- Threshadon Claw
+		2668, -- Threshadon Tooth
+		2640, -- Miners' Gear
+		2636, -- Carved Stone Idol
+		2611, -- Crude Flint
+		2536, -- Trogg Stone Tooth
+		2477, -- Ravager's Skull
+		2476, -- Chilled Basilisk Haunch
+		2466, -- Skullsplitter Fetish
+		2378, -- Skeleton Finger
+		1894, -- Miners' Union Card
+		1598, -- Rot Blossom
+		1532, -- Shrunken Head
+		1528, -- Handful of Oats
+		1524, -- Skullsplitter Tusk
+		1519, -- Bloodscalp Ear
+		1467, -- Spotted Sunfish
+		1356, -- Commendation - Elwynn Forest
+		1261, -- Midnight Orb
+		1256, -- Crystal Kelp Frond
+		1221, -- Underbelly Whelp Scale
+		1130, -- Vial of Spider Venom
+		1129, -- Ghoul Fang
+		1075, -- Shadowhide Pendant
+		1019, -- Red Linen Bandana
+		1013, -- Iron Rivet
+		915, -- Red Silk Bandana
+		896, -- Worgen Fang
+		895, -- Worgen Skull
+		884, -- Ghoul Rib
+		829, -- Red Leather Bandana
+		782, -- Painted Gnoll Armband
+		780, -- Torn Murloc Fin
+		773, -- Gold Dust
+		772, -- Large Candle
+		752, -- Red Burlap Bandana
+		750, -- Tough Wolf Meat
+		740, -- Sack of Rye
+		739, -- Sack of Corn
+		738, -- Sack of Barley
+		725, -- Gnoll Paw
+	},
 --[[	quest = {
 		166682, -- Blight Specialist Mask
 		166459, -- Xibek's Key
@@ -3223,7 +3883,7 @@ constants.itemCategories = {
 	["elemental"] = CurrencyTracking_Elemental,
 	["meat"] = CurrencyTracking_Meat, 
 	["others"] = MISCELLANEOUS,
---	["quest"] = ITEM_BIND_QUEST,
+	["quest"] = ITEM_BIND_QUEST,
 	["professions"] = TRADE_SKILLS,
 }
 
@@ -3283,7 +3943,7 @@ else
 end
 
 
--- $Id: Core.lua 191 2020-07-02 16:19:06Z arith $
+-- $Id: Core.lua 198 2020-08-16 14:02:54Z arith $
 -----------------------------------------------------------------------
 -- Upvalued Lua API.
 -----------------------------------------------------------------------
@@ -3295,13 +3955,33 @@ local string, tonumber = _G.string, _G.tonumber
 local format, strsub, strlen, strgmatch = string.format, string.sub, string.len, string.gmatch
 local floor, fmod = math.floor, math.fmod
 -- WoW
+local GetAddOnInfo, GetAddOnMetadata = _G.GetAddOnInfo, _G.GetAddOnMetadata
 local GameTooltip = _G.GameTooltip
 local BreakUpLargeNumbers = _G.BreakUpLargeNumbers
 local GetCurrencyListSize, GetCurrencyListInfo, GetCurrencyInfo = _G.GetCurrencyListSize, _G.GetCurrencyListInfo, _G.GetCurrencyInfo
 local GetItemInfoInstant, GetItemCount, GetItemInfo, GetItemIcon = _G.GetItemInfoInstant, _G.GetItemCount, _G.GetItemInfo, _G.GetItemIcon
 local UnitName, GetRealmName = _G.UnitName, _G.GetRealmName
 local GetMoney = _G.GetMoney
+local GetLocale = _G.GetLocale
 
+local GetBuildInfo = _G.GetBuildInfo
+
+-- Determine WoW TOC Version
+local WoWClassic, WoWRetail, WoWShadowlands
+local wowtocversion  = select(4, GetBuildInfo())
+if wowtocversion < 19999 then
+	WoWClassic = true
+elseif wowtocversion > 19999 and wowtocversion < 90000 then 
+	WoWRetail = true
+else
+	WoWShadowlands = true
+end
+
+if WoWClassic or WoWRetail then
+	GetCurrencyListSize, GetCurrencyListInfo, GetCurrencyInfo = _G.GetCurrencyListSize, _G.GetCurrencyListInfo, _G.GetCurrencyInfo
+else -- Shadowlands
+	GetCurrencyListSize, GetCurrencyListInfo, GetCurrencyInfo = C_CurrencyInfo.GetCurrencyListSize, C_CurrencyInfo.GetCurrencyListInfo, C_CurrencyInfo.GetCurrencyInfo
+end
 -- ----------------------------------------------------------------------------
 -- AddOn namespace.
 -- ----------------------------------------------------------------------------
@@ -3412,7 +4092,16 @@ local function getTooltipText()
 		-- // GetCurrencyListInfo() syntax:
 		-- // name, isHeader, isExpanded, isUnused, isWatched, count, icon = GetCurrencyListInfo(index)
 		local name, isHeader, isUnused, count, icon, _
-		name, isHeader, _, isUnused, _, count, icon = GetCurrencyListInfo(i)
+		if WoWClassic or WoWRetail then
+			name, isHeader, _, isUnused, _, count, icon = GetCurrencyListInfo(i)
+		else
+			local curr = GetCurrencyListInfo(i)
+			name = curr.name
+			isHeader = curr.isHeader
+			isUnused = curr.isTypeUnused
+			count = curr.quantity
+			icon = curr.iconFileID
+		end
 		if ( isHeader ) then
 			tooltip = tooltip..name.."\n"
 		elseif ( (count >= 0) and not isUnused ) then
@@ -3509,7 +4198,13 @@ local function handleTrackedButtons(button, currencyID, itemID)
 	local itemName, itemLink, count, icon, _
 	local width = 15
 	if (currencyID) then 
-		_, count, icon = GetCurrencyInfo(currencyID) 
+		if WoWClassic or WoWRetail then
+			_, count, icon = GetCurrencyInfo(currencyID) 
+		else
+			local curr = GetCurrencyInfo(currencyID)
+			count = curr.quantity
+			icon = curr.iconFileID
+		end
 	elseif (itemID) then
 		if (item_list[itemID] and item_list[itemID][1] and item_list[itemID][2] and item_list[itemID][3]) then
 			itemName, icon, itemLink = item_list[itemID][1], item_list[itemID][2], item_list[itemID][3]
@@ -3617,7 +4312,13 @@ local function currencyButton_Update()
 	-- tracked currencies
 	for currencyID, v in pairs(profile["currencies"]) do
 		if (currencyID and type(currencyID) == "number" and profile["currencies"][currencyID] == true) then
-			local _, count = GetCurrencyInfo(currencyID)
+			local _, count
+			if WoWClassic or WoWRetail then
+				_, count = GetCurrencyInfo(currencyID)
+			else
+				local curr = GetCurrencyInfo(currencyID)
+				count = curr.quantity
+			end
 
 			if (count >= 0) then
 				if (profile.hide_zero and count == 0) then
@@ -3691,7 +4392,14 @@ local function currencyString_Update()
 	-- tracked currencies
 	for currencyID, v in pairs(profile["currencies"]) do
 		if (currencyID and type(currencyID) == "number" and profile["currencies"][currencyID] == true) then
-			local _, count, icon = GetCurrencyInfo(currencyID)
+			local _, count, icon
+			if WoWClassic or WoWRetail then
+				_, count, icon = GetCurrencyInfo(currencyID)
+			else
+				local curr = GetCurrencyInfo(currencyID)
+				count = curr.quantity
+				icon = curr.iconFileID
+			end
 			if not icon then icon = 0 end -- somehow Legionfall War Supplies' icon is not available in 7.2.5.23959, this should temporary resolve the blocking issue
 			
 			if (count >= 0) then

@@ -10,5 +10,4 @@
 	
 	<Script file="AddOns\TMW.lua"/>
 	<Script file="AddOns\WeakAuras.lua"/>
-	<Script file="AddOns\Details.lua"/>
 </Ui>

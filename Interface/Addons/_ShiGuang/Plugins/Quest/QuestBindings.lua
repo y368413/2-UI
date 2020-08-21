@@ -1,12 +1,4 @@
--- This addon binds keys 1-9 to important elements of the quest pickup and turn-in windows and gossip frames.
--- 03/21/2020 2.0.0 rework for 8.3 client
--- 07/17/2018 1.0.5 toc update for 8.0 patch
--- 08/29/2017 1.0.4 toc update for 7.3 patch
--- 03/28/2017 1.0.3 toc update for 7.2 patch
--- 07/16/2016 1.0.2 toc update for 7.0 patch
--- 06/22/2015 1.0.1 toc update for 6.2 patch
--- 05/07/2015 1.0.0 initial release
-
+-- ## Author: Gello ## Version 2.0.0
 local qb = {}
 local qbFont = CreateFont("qb_NumberFont")
 qbFont:CopyFontObject("GameFontHighlightSmall")

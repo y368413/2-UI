@@ -2,7 +2,7 @@
 local M, R, U, I = unpack(ns)
 local module = M:RegisterModule("Chat")
 
-local maxLines = 1024
+local maxLines = 2048
 local maxWidth, maxHeight = UIParent:GetWidth(), UIParent:GetHeight()
 local tostring, pairs, ipairs, strsub, strlower = tostring, pairs, ipairs, string.sub, string.lower
 local IsInGroup, IsInRaid, IsPartyLFG, IsInGuild, IsShiftKeyDown, IsControlKeyDown = IsInGroup, IsInRaid, IsPartyLFG, IsInGuild, IsShiftKeyDown, IsControlKeyDown
@@ -15,8 +15,8 @@ local InviteToGroup = C_PartyInfo.InviteUnit
 function module:TabSetAlpha(alpha)
 	if alpha ~= 1 and (not self.isDocked or GeneralDockManager.selected:GetID() == self:GetID()) then
 		self:SetAlpha(1)
-	elseif alpha < .6 then
-		self:SetAlpha(.6)
+	elseif alpha < .2 then
+		self:SetAlpha(.2)
 	end
 end
 
@@ -85,13 +85,13 @@ function module:SkinChat()
 	M.SetBD(lang)
 
 	local tab = _G[name.."Tab"]
-	--tab:SetAlpha(1)
+	tab:SetAlpha(0.2)
 	local tabFs = tab:GetFontString()
 	tabFs:SetFont(I.Font[1], I.Font[2]+2, I.Font[3])
 	tabFs:SetShadowColor(0, 0, 0, 0)
 	tabFs:SetTextColor(1, .8, 0)
-	M.StripTextures(tab, 6)
-	--hooksecurefunc(tab, "SetAlpha", module.TabSetAlpha)
+	M.StripTextures(tab, 0)
+	hooksecurefunc(tab, "SetAlpha", module.TabSetAlpha)
 
 	--if MaoRUIPerDB["Chat"]["Lock"] then M.StripTextures(self) end
 	M.HideObject(self.buttonFrame)

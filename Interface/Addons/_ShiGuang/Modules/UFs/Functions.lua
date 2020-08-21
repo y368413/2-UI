@@ -61,7 +61,7 @@ function UF:CreateHealthBar(self)
 	health:SetPoint("TOPRIGHT", self)
 	local healthHeight
 	if mystyle == "PlayerPlate" then
-		healthHeight = MaoRUIPerDB["Nameplate"]["PPHeight"]
+		healthHeight = MaoRUIPerDB["Nameplate"]["PPHealthHeights"]
 	elseif mystyle == "raid" then
 		if self.isPartyFrame then
 			healthHeight = MaoRUIPerDB["UFs"]["PartyHeight"]
@@ -224,7 +224,7 @@ function UF:CreatePowerBar(self)
 	power:SetPoint("BOTTOMRIGHT", self)
 	local powerHeight
 	if mystyle == "PlayerPlate" then
-		powerHeight = MaoRUIPerDB["Nameplate"]["PPPHeight"]
+		powerHeight = MaoRUIPerDB["Nameplate"]["PPPowerHeight"]
 	elseif mystyle == "raid" then
 		if self.isPartyFrame then
 			powerHeight = MaoRUIPerDB["UFs"]["PartyPowerHeight"]
@@ -327,9 +327,11 @@ end
 
 function UF:CreateIcons(self)
 	local mystyle = self.mystyle
-
-	local phase = self:CreateTexture(nil, "OVERLAY")
-	phase:SetPoint("TOP", self, 0, 12)
+	local parentFrame = CreateFrame("Frame", nil, self)
+	parentFrame:SetAllPoints()
+	parentFrame:SetFrameLevel(5)
+	local phase = parentFrame:CreateTexture(nil, "OVERLAY")
+	phase:SetPoint("TOP", self.Health, 0, 12)
 	phase:SetSize(22, 22)
 	self.PhaseIndicator = phase
 
@@ -594,14 +596,17 @@ function UF.CustomFilter(element, unit, button, name, _, _, _, _, _, caster, isS
 			return (button.isPlayer or caster == "pet") and MaoRUIDB["CornerBuffs"][I.MyClass][spellID] or R.RaidBuffs["ALL"][spellID] or R.RaidBuffs["WARNING"][spellID]
 		end
 	elseif style == "nameplate" or style == "boss" or style == "arena" then
-		if MaoRUIDB["NameplateFilter"][2][spellID] or R.BlackList[spellID] then
+		if element.__owner.isNameOnly then
+			return MaoRUIDB["NameplateFilter"][1][spellID] or R.WhiteList[spellID]
+		elseif MaoRUIDB["NameplateFilter"][2][spellID] or R.BlackList[spellID] then
 			return false
 		elseif element.showStealableBuffs and isStealable and not UnitIsPlayer(unit) then
 			return true
 		elseif MaoRUIDB["NameplateFilter"][1][spellID] or R.WhiteList[spellID] then
 			return true
 		else
-			return nameplateShowAll or (caster == "player" or caster == "pet" or caster == "vehicle")
+			local auraFilter = MaoRUIPerDB["Nameplate"]["AuraFilter"]
+			return (auraFilter == 3 and nameplateShowAll) or (auraFilter ~= 1 and (caster == "player" or caster == "pet" or caster == "vehicle"))
 		end
 	elseif (element.onlyShowPlayer and button.isPlayer) or (not element.onlyShowPlayer and name) then
 		return true
@@ -644,7 +649,7 @@ function UF:CreateAuras(self)
 		bu.initialAnchor = "BOTTOMLEFT"
 		bu["growth-y"] = "UP"
 		--if MaoRUIPerDB["Nameplate"]["ShowPlayerPlate"] and MaoRUIPerDB["Nameplate"]["NameplateClassPower"] then
-			--bu:SetPoint("BOTTOMLEFT", self.nameText, "TOPLEFT", 0, 5 + _G.oUF_ClassPowerBar:GetHeight())
+			--bu:SetPoint("BOTTOMLEFT", self.nameText, "TOPLEFT", 0, 10 + _G.oUF_ClassPowerBar:GetHeight())
 		--else
 			bu:SetPoint("BOTTOMLEFT", self.nameText, "TOPLEFT", 0, 5)
 		--end
@@ -722,7 +727,6 @@ function UF:CreateDebuffs(self)
 end
 
 -- Class Powers
-local margin = R.UFs.BarMargin
 local barWidth, barHeight = unpack(R.UFs.BarSize)
 
 function UF.PostUpdateClassPower(element, cur, max, diff, powerType)
@@ -738,7 +742,7 @@ function UF.PostUpdateClassPower(element, cur, max, diff, powerType)
 
 	if diff then
 		for i = 1, max do
-			element[i]:SetWidth((barWidth - (max-1)*margin)/max)
+			element[i]:SetWidth((barWidth - (max-1)*R.margin)/max)
 		end
 		for i = max + 1, 6 do
 			element[i].bg:Hide()
@@ -795,7 +799,8 @@ end
 
 function UF:CreateClassPower(self)
 	if self.mystyle == "PlayerPlate" then
-		barWidth, barHeight = self:GetWidth(), self.Health:GetHeight()+2
+		barWidth = MaoRUIPerDB["Nameplate"]["NameplateClassPower"] and MaoRUIPerDB["Nameplate"]["PlateWidth"] or MaoRUIPerDB["Nameplate"]["PPWidth"]
+		barHeight = MaoRUIPerDB["Nameplate"]["PPBarHeight"]
 		R.UFs.BarPoint = {"BOTTOMLEFT", self, "TOPLEFT", 0, 3}
 	end
 
@@ -807,14 +812,14 @@ function UF:CreateClassPower(self)
 	for i = 1, 6 do
 		bars[i] = CreateFrame("StatusBar", nil, bar)
 		bars[i]:SetHeight(barHeight)
-		bars[i]:SetWidth((barWidth - 5*margin) / 6)
+		bars[i]:SetWidth((barWidth - 5*R.margin) / 6)
 		bars[i]:SetStatusBarTexture(I.normTex)
 		bars[i]:SetFrameLevel(self:GetFrameLevel() + 5)
 		M.CreateBDFrame(bars[i], 0, true)
 		if i == 1 then
 			bars[i]:SetPoint("BOTTOMLEFT")
 		else
-			bars[i]:SetPoint("LEFT", bars[i-1], "RIGHT", margin, 0)
+			bars[i]:SetPoint("LEFT", bars[i-1], "RIGHT", R.margin, 0)
 		end
 
 		bars[i].bg = bar:CreateTexture(nil, "BACKGROUND")

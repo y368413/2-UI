@@ -196,13 +196,19 @@ function MISC:MailBox_ContactList()
 	local barIndex = 0
 
 	local bu = M.CreateGear(SendMailFrame)
-	bu:SetPoint("LEFT", SendMailNameEditBox, "RIGHT", 0, 0)
+	bu:SetPoint("LEFT", SendMailNameEditBox, "RIGHT", -3, 0)
 
 	local list = CreateFrame("Frame", nil, bu)
 	list:SetSize(210, 421)
 	list:SetPoint("TOPLEFT", MailFrame, "TOPRIGHT", 5, 0)
 	list:SetFrameStrata("Tooltip")
-	M.SetBD(list)
+	--M.SetBD(list)
+    list.Tex = list:CreateTexture(nil, "BACKGROUND")
+		list.Tex:SetAllPoints(list)
+		list.Tex:SetTexture("Interface\\ENCOUNTERJOURNAL\\AdventureGuide")
+		list.Tex:SetTexCoord(0,335/512,160/512,500/512);
+		list.Tex:SetAllPoints();
+    list.Tex:SetAlpha(0.85)
 	M.CreateFS(list, 14, U["ContactList"], "system", "TOP", 0, -6)
 
 	local editbox = M.CreateEditBox(list, 121, 26)

@@ -69,7 +69,6 @@ local Spells = {
 	[268443] = 20,		--- Dread Volley (Dread Captain Lockwood)
 	[272713] = 20,		--- Crushing Slam (Bilge Rat Demolisher)
 	[274941] = 20,		--- Banana Rampage swirlies(Bilge Rat Buccaneer)
-	[257883] = 20,		--- Break Water (Hadal Darkfathom)
 	[276068] = 20,		--- Tidal Surge (Hadal Darkfathom)
 	[257886] = 20,		--- Brine Pool (Hadal Darkfathom)
 	[261565] = 20,		--- Crashing Tide (Hadal Darkfathom)
@@ -155,7 +154,6 @@ local Spells = {
 	[263425] = 20,		--- Arc Dash (Adderis)
 	[268851] = 20,		--- Lightning Shield (Aspix and Adderis)
 	[263573] = 20,		--- Cyclone Strike (Adderis)
-	[272658] = 20,		--- Electrified Scales (Scaled Krolusk Rider)
 	[273225] = 20,		--- Volley (Sandswept Marksman)
 	[272655] = 20,		--- Scouring Sand (Mature Krolusk)
 	[273995] = 20,		--- Pyrrhic Blast (Crazed Incubator)
@@ -163,7 +161,6 @@ local Spells = {
 	[264206] = 20,		--- Burrow (Merektha)
 	[272657] = 20,		--- Noxious Breath (Merektha)
 	[272821] = 20,		--- Call Lightning (Imbued Stormcaller)
-	[264763] = 20,		--- Spark (Static-charged Dervish)
 	[279014] = 20,		--- Cardiac Shock (Avatar, Environment)
 	
 	-- Underrot
@@ -175,6 +172,7 @@ local Spells = {
 	[260312] = 20,		--- Charge (Cragmaw the Infested)
 	[265511] = 20,		--- Spirit Drain (Spirit Drain Totem)
 	[259720] = 20,		--- Upheaval (Sporecaller Zancha)
+	[270108] = 20,		--- Rotting Spore (Unbound Abomination)
 	[272609] = 20,		--- Maddenin Gaze (Faceless Corruptor)
 	[272469] = 20,		--- Abyssal Slam (Faceless Corruptor)
 	[270108] = 20,		--- Rotting Spore (Unbound Abomination)
@@ -365,24 +363,83 @@ function generateMaybeOutput(user)
 end
 
 SLASH_ELITISMHELPER1 = "/eh"
+SLASH_ELITISMHELPER2 = "/dmj"
 
 SlashCmdList["ELITISMHELPER"] = function(msg,editBox)
-	if msg == "activeuser" then
-		print("activeUser is "..activeUser)
-		if activeUser == playerUser then
-			print("You are the activeUser")
+	actions = {
+		["activeuser"] = function()
+			print("activeUser is "..activeUser)
+			if activeUser == playerUser then
+				print("You are the activeUser")
+			end
+		end,
+		["resync"] = function()
+			ElitismFrame:RebuildTable()
+		end,
+		["table"] = function()
+			for k,v in pairs(Users) do
+				print(k.." ;;; "..v)
+			end
+		end,
+		["start"] = function()
+			ElitismFrame:CHALLENGE_MODE_START()
+		end,
+		["eod"] = function()
+			ElitismFrame:CHALLENGE_MODE_COMPLETED()
+		end,
+		["help"] = function()
+			print("Elitism Helper options:")
+			print(" start: Start logging failure damage")
+			print(" eod: Dungeon is complete")
+			print(" table: Prints users")
+			print(" resync: Rebuilts table")
+			print(" activeUser: Prints active user")
+			print(" output: Define output channel between default | party | raid | yell | self")
+		end,
+		["messageTest"] = function()
+			print("Testing output for self")
+			maybeSendChatMessage("This is a test message")
+		end,
+		["list"] = function(args)
+			local name = args
+						
+			if FailByAbility[name] == nil then
+				name = GetUnitName(args, true)
+			end
+						
+			if name == nil or FailByAbility[name] == nil then
+				name = GetUnitName(args)
+			end
+				
+			if name == nil or FailByAbility[name] == nil then
+				for player,fails in pairs(FailByAbility) do
+					print("Hits for "..player)
+					for k,v in pairs(fails) do
+						print("  " .. v.cnt .. "x" .. GetSpellLink(k) .. " = " .. round(v.sum / 1000, 1) .. "k")
+					end
+				end
+			else
+				--print("hits for " .. name)
+				maybeSendChatMessage("Hits for "..name)
+				
+				local delay = 0;
+				
+				for k,v in pairs(FailByAbility[name]) do
+					--print(v.cnt .. "x" .. GetSpellLink(k) .. " = " .. round(v.sum / 1000, 1) .. "k; " .. delay)
+					--maybeSendChatMessage(v.cnt .. "x" .. GetSpellLink(k) .. " = " .. round(v.sum / 1000, 1) .. "k")
+					delayMaybeSendChatMessage(v.cnt .. "x" .. GetSpellLink(k) .. " = " .. round(v.sum / 1000, 1) .. "k", delay * 0.1)
+					delay = delay + 1
+				end
+			end
 		end
-	elseif msg == "resync" then
-		ElitismFrame:RebuildTable()
-	elseif msg == "table" then
-		for k,v in pairs(Users) do
-			print(k.." ;;; "..v)
-		end
-	elseif msg == "start" then
-	        ElitismFrame:CHALLENGE_MODE_START()	
-	elseif msg == "end" then
-		ElitismFrame:CHALLENGE_MODE_COMPLETED()
+	}
+
+	local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
+	local commandFunction = actions[cmd]
+	if not commandFunction then
+		commandFunction = actions["help"]
 	end
+	commandFunction(args)
 end
 
 function maybeSendAddonMessage(prefix, message)

@@ -1,5 +1,3 @@
-
-
 local LFRofthepast = {};
 LFRofthepast.npcID = {};
 LFRofthepast.npcs = {};
@@ -109,7 +107,7 @@ LFRofthepast.lfrID = {
 -- bosskill tracking das am mittwoch zurückgesetzt wird.
 -- broker und optionpanel seite mit namen und orten wo die npcs zu finden sind.
 local realm,character,faction = GetRealmName();
-local buttons,hookedButton,NPC_ID = {},{},{},(UnitGUID("target"));
+local buttons,hookedButton,died,NPC_ID,db = {},{},{},false,(UnitGUID("target"));
 local name, typeID, subtypeID, minLevel, maxLevel, recLevel, minRecLevel, maxRecLevel, expansionLevel, groupID, texture = 1,2,3,4,5,6,7,8,9,10,11; -- GetLFGDungeonInfo
 local difficulty, maxPlayers, description, isHoliday, bonusRepAmount, minPlayers, isTimeWalker, name2, minGearLevel = 12,13,14,15,16,17,18,19,20; -- GetLFGDungeonInfo
 local iconTexCoords,killedEncounter,BossKillQueryUpdate,UpdateInstanceInfoLock,currentInstance = {},{},false,false,{};

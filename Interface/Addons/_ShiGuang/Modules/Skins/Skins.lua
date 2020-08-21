@@ -9,7 +9,7 @@ R.defaultThemes = {}
 R.themes = {}
 
 function S:LoadDefaultSkins()
-	if IsAddOnLoaded("AuroraClassic") or IsAddOnLoaded("Aurora") then return end
+	--if IsAddOnLoaded("AuroraClassic") or IsAddOnLoaded("Aurora") then return end
 
 	-- Reskin Blizzard UIs
 	for _, func in pairs(R.defaultThemes) do
@@ -96,7 +96,6 @@ function S:GetToggleDirection()
 end
 
 local toggleFrames = {}
-
 local function CreateToggleButton(parent)
 	local bu = CreateFrame("Button", nil, parent)
 	bu:SetSize(20, 80)

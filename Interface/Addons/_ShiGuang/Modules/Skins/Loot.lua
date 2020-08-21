@@ -101,13 +101,15 @@ end)
 			--SendChatMessage(format("*** %s%s ***", UnitName("target"), "的战利品"), chn)
 		--end
 		for i = 1, GetNumLootItems() do
-			local link
-			if(LootSlotHasItem(i)) then     --判断，只发送物品
-				link = GetLootSlotLink(i)
-			else
-				_, link = GetLootSlotInfo(i)
-			end
-			if link then
+			-- local link
+			-- if (LootSlotHasItem(i)) then     --判断，只发送物品
+				-- link = GetLootSlotLink(i)
+			-- else
+				-- _, link = GetLootSlotInfo(i)
+			-- end
+			local link = GetLootSlotLink(i)
+			local quality = select(5, GetLootSlotInfo(i))
+			if link and quality and quality >= 1 then
 				local messlink = "- %s"
 				SendChatMessage(format(messlink, link), chn)
 			end

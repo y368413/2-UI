@@ -155,14 +155,15 @@ function UF:OnLogin()
 	local showTeamIndex = MaoRUIPerDB["UFs"]["ShowTeamIndex"]
 
 	if MaoRUIPerDB["Nameplate"]["Enable"] then
-		self:SetupCVars()
-		self:BlockAddons()
-		self:CreateUnitTable()
-		self:CreatePowerUnitTable()
-		self:CheckExplosives()
-		self:AddInterruptInfo()
-		self:UpdateGroupRoles()
-		self:QuestIconCheck()
+		UF:SetupCVars()
+		UF:BlockAddons()
+		UF:CreateUnitTable()
+		UF:CreatePowerUnitTable()
+		UF:CheckExplosives()
+		UF:AddInterruptInfo()
+		UF:UpdateGroupRoles()
+		UF:QuestIconCheck()
+		UF:RefreshPlateOnFactionChanged()
 
 		oUF:RegisterStyle("Nameplates", UF.CreatePlates)
 		oUF:SetActiveStyle("Nameplates")
@@ -173,11 +174,11 @@ function UF:OnLogin()
 		oUF:RegisterStyle("PlayerPlate", UF.CreatePlayerPlate)
 		oUF:SetActiveStyle("PlayerPlate")
 		local plate = oUF:Spawn("player", "oUF_PlayerPlate", true)
-		M.Mover(plate, U["PlayerNP"], "PlayerPlate", R.UFs.PlayerPlate, plate:GetWidth(), plate:GetHeight())
+		plate.mover = M.Mover(plate, U["PlayerNP"], "PlayerPlate", R.UFs.PlayerPlate)
 	end
 
 	-- Default Clicksets for RaidFrame
-	self:DefaultClickSets()
+	UF:DefaultClickSets()
 		oUF:RegisterStyle("Player", CreatePlayerStyle)
 		oUF:RegisterStyle("Target", CreateTargetStyle)
 		if (ShiGuangPerDB["BHT"] == true) then

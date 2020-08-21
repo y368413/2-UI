@@ -4,7 +4,6 @@
 	<Script file="Mingy.lua"/>
 	<Script file="BarrelsOEasy.lua"/>
 	<Script file="DarkmoonFaire.lua"/>
-	<!--Script file="Quest_Complete.lua"/-->
 	<Script file="AngryWorldQuest.lua"/>
 	<Script file="WorldmapRewardIcon.lua"/>
 	<CheckButton name="ClassicQuestLogCheckButtonTemplate" inherits="UICheckButtonTemplate" virtual="true">
@@ -477,6 +476,7 @@
 			</OnMouseUp>
 		</Scripts>
 	</Frame>
+	<Script file="ClassicQuestLog.lua"/>
     <Button name="QuestBindingsButtonTemplate" virtual="true">
         <Size x="16" y="16"/>
         <Layers>
@@ -495,5 +495,4 @@
         </Scripts>
     </Button>
   <Script file="QuestBindings.lua"/>
-	<Script file="ClassicQuestLog.lua"/>
 </Ui>

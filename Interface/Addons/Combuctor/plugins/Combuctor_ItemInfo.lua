@@ -110,18 +110,18 @@ local IsItemAccount = function(button)
 	end
 end
 
-local IsItemCorruption = function(button)
-	for i = 5, 12 do 
-		local line = _G[ScannerTipName.."TextLeft"..i]
-		if (not line) then
-			break
-		end
-		local msg = line:GetText()
-		if msg and strmatch(msg, ITEM_MOD_CORRUPTION) then 
-			return true
-		end
-	end
-end
+--local IsItemCorruption = function(button)
+	--for i = 5, 12 do 
+		--local line = _G[ScannerTipName.."TextLeft"..i]
+		--if (not line) then
+			--break
+		--end
+		--local msg = line:GetText()
+		--if msg and strmatch(msg, ITEM_MOD_CORRUPTION) then 
+			--return true
+		--end
+	--end
+--end
 
 -- Check if it's a caged battle pet
 local GetBattlePetInfo = function(itemLink)
@@ -151,7 +151,7 @@ local Cache_GetItemLevel = function(button)
 	ItemLevel:SetDrawLayer("ARTWORK", 1)
 	ItemLevel:SetPoint("TOPRIGHT", 2, 0)
 	--ItemLevel:SetFontObject(_G.NumberFont_Outline_Large or _G.NumberFontNormal) 
-	ItemLevel:SetFont("Interface\\Addons\\_ShiGuang\\Media\\Fonts\\Loli.ttf", 14, "OUTLINE");
+	ItemLevel:SetFont("Interface\\Addons\\_ShiGuang\\Media\\Fonts\\Pixel.ttf", 14, "OUTLINE");
 	ItemLevel:SetTextColor(1, 0.65, 0.16);
 	ItemLevel:SetShadowOffset(1, -1)
 	ItemLevel:SetShadowColor(0, 0, 0, .5)

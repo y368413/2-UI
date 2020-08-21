@@ -2,14 +2,10 @@ local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes")
 local TimelessIsleChest = LibStub("AceAddon-3.0"):NewAddon("TimelessIsleChest", "AceBucket-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("HandyNotes")
 
---TimelessIsleChest = HandyNotes:NewModule("TimelessIsleChest", "AceConsole-3.0", "AceEvent-3.0")
---local db
 local iconDefault = "Interface\\Icons\\TRADE_ARCHAEOLOGY_CHESTOFTINYGLASSANIMALS"
 local iconRareElite = "Interface\\MINIMAP\\Minimap_skull_normal"
 
-TimelessIsleChest.nodes = { }
-local nodes = TimelessIsleChest.nodes
---nodes["Pandaria"] = { }
+local nodes = {}
 
 function TimelessIsleChest:AddNodes()
 	table.wipe(nodes)
@@ -195,15 +191,15 @@ local options = {
 function TimelessIsleChest:OnInitialize()
  local defaults = {
   profile = {
-   icon_scale = 1.0,
+   icon_scale = 1.2,
    icon_alpha = 1.0,
    alwaysshow = false,
-   rareelites = false,
+   rareelites = true,
    save = true,
   },
  }
 
- self.db = LibStub("AceDB-3.0"):New("TimelessIsleChestsDB", defaults, true)
+ self.db = LibStub("AceDB-3.0"):New("HandyNotes_TimelessIsleChestsDB", defaults, true)
  self:RegisterEvent("PLAYER_ENTERING_WORLD", "WorldEnter")
  self:AddNodes()
 end

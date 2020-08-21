@@ -874,7 +874,7 @@ xMerchant_InitItemsButtons()
 
 hooksecurefunc("MerchantFrame_Update", function()
 	if ( MerchantFrame.selectedTab == 1 ) then
-		for i=1, 10, 1 do _G["MerchantItem"..i]:Hide(); end
+		for i=1, 10, 1 do _G["MerchantItem"..i]:Hide(); end  --for i=1, 12
 		frame:Show();
 		CurrencyUpdate();
 		-- DONEY
@@ -882,7 +882,7 @@ hooksecurefunc("MerchantFrame_Update", function()
 		MerchantUpdate();
 	else
 		frame:Hide();
-		for i=1, 10, 1 do _G["MerchantItem"..i]:Show(); end
+		for i=1, 10, 1 do _G["MerchantItem"..i]:Show(); end  --for i=1, 12
 		if (StackSplitFrame:IsShown()) then StackSplitFrame:Hide(); end
 	end
 end);
