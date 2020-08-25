@@ -617,8 +617,8 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "UFs", "SwingTimer", U["UFs SwingTimer"], true, true, nil, nil, U["SwingTimer Tip"]},
 		{},--blank	
 		{3, "ACCOUNT", "UIScale", U["Setup UIScale"], false, false, {.4, 1.15, .01}},
-		{3, "Misc", "WorldQusetRewardIconsSize", "WorldQusetRewardIconsSize", true, false, {21, 66, 0}},
-		{3, "UFs", "PlayerFrameScale", U["PlayerFrame Scale"], true, true, {0.6, 1.2, 1}},
+		{3, "Misc", "WorldQusetRewardIconsSize", "WorldQusetRewardIconsSize", true, false, {21, 66, 1}},
+		{3, "UFs", "PlayerFrameScale", U["PlayerFrame Scale"], true, true, {0.6, 1.2, .1}},
 		{3, "Tooltip", "Scale", U["Tooltip Scale"].."*", false, false, {.5, 1.5, .1}},
 		{3, "Map", "MapScale", U["Map Scale"], true, false, {1, 2, .1}},
 		{3, "Map", "MinimapScale", U["Minimap Scale"].."*", true, true, {1, 2, .1}, updateMinimapScale},
