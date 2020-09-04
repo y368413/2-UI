@@ -264,7 +264,7 @@ function lib:PLAYER_LOGIN ()
   frame:RegisterEvent ("UNIT_NAME_UPDATE")
   frame:RegisterEvent ("UNIT_AURA")
   frame:RegisterEvent ("CHAT_MSG_ADDON")
-  C_ChatInfo.RegisterAddonMessagePrefix (COMMS_PREFIX)  --RegisterAddonMessagePrefix (COMMS_PREFIX)
+  RegisterAddonMessagePrefix (COMMS_PREFIX)
 
   local guid = UnitGUID ("player")
   local info = self:BuildInfo ("player")

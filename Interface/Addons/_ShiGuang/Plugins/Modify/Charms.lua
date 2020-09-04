@@ -144,10 +144,11 @@ DESTROY:SetScript("OnEvent", function(_, event, ...)
 end)]]
 
 ------------------------------------------------------------------------------- 
---## Version: 1.2.0 ## Author: Crinseth
+--## Version: 1.2.2 ## Author: Crinseth
 local waitTable = {};
 local waitFrame = nil;
 local Dressingbuttons = {}
+if DressMode == nil then DressMode = 1 end
 local SLOTS = {
 	"HeadSlot",
 	"ShoulderSlot",
@@ -331,26 +332,35 @@ end
 -- Hook onto PlayerActor creation in order to hook onto its functions
 local _SetupPlayerForModelScene = SetupPlayerForModelScene
 function SetupPlayerForModelScene(...)
-    showButtons(true)
     local resultSetupPlayerForModelScene = _SetupPlayerForModelScene(...)
     local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
+    if playerActor ~= nil then
+        showButtons(true)
 
-    -- Update slots when a gear piece has changed
-    local _TryOn = playerActor.TryOn
-    playerActor.TryOn = function (...)
-        local resultTryOn = _TryOn(...)
-        updateSlots()
-        return resultTryOn
-    end
+        if DressMode == 2 then
+            DressUpFrame.ModelScene:GetPlayerActor():Undress()
+        end
 
-    -- Update slots when reset button has been pressed
-    local _Dress = playerActor.Dress
-    playerActor.Dress = function (...)
-        local resultDress = _Dress(...)
-        updateSlots()
-        return resultDress
+        -- Update slots when a gear piece has changed
+        local _TryOn = playerActor.TryOn
+        playerActor.TryOn = function (...)
+          if DressMode == 3 then
+                DressUpFrame.ModelScene:GetPlayerActor():Undress()
+            end
+            local resultTryOn = _TryOn(...)
+            updateSlots()
+            return resultTryOn
+        end
+
+        -- Update slots when reset button has been pressed
+        local _Dress = playerActor.Dress
+        playerActor.Dress = function (...)
+            local resultDress = _Dress(...)
+            updateSlots()
+            return resultDress
+        end
+        DressingWait(0.1, updateSlots, nil)
     end
-    DressingWait(0.1, updateSlots, nil)
     return resultSetupPlayerForModelScene
 end
 

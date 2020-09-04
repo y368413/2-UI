@@ -1,5 +1,5 @@
 
-local Type, Version = "Keybinding", 25
+local Type, Version = "Keybinding", 26
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -198,7 +198,7 @@ local function Constructor()
 	label:SetJustifyH("CENTER")
 	label:SetHeight(18)
 
-	local msgframe = CreateFrame("Frame", nil, UIParent)
+	local msgframe = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate" or nil)
 	msgframe:SetHeight(30)
 	msgframe:SetBackdrop(ControlBackdrop)
 	msgframe:SetBackdropColor(0,0,0)

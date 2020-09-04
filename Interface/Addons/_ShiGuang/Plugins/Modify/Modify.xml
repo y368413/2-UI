@@ -13,6 +13,7 @@
 	<Script file="nReputation.lua"/>
 	<Script file="WallpaperKit.lua"/>
 	<Script file="AlterCurrencies.lua"/>
+	<Script file="TransmogSetProgress.lua"/>
 	<Script file="ItemTooltipProfession.lua"/>
 	<CheckButton name="nReputation" parent="ReputationFrame" mixin="nReputationMixin">
 		<Size x="24" y="24"/>

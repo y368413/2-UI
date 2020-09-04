@@ -1,4 +1,4 @@
-local Type, Version = "Slider", 22
+local Type, Version = "Slider", 23
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -120,6 +120,8 @@ local methods = {
 		self.slider:EnableMouseWheel(false)
 	end,
 
+	-- ["OnRelease"] = nil,
+
 	["SetDisabled"] = function(self, disabled)
 		self.disabled = disabled
 		if disabled then
@@ -206,7 +208,7 @@ local function Constructor()
 	label:SetJustifyH("CENTER")
 	label:SetHeight(15)
 
-	local slider = CreateFrame("Slider", nil, frame)
+	local slider = CreateFrame("Slider", nil, frame, BackdropTemplateMixin and "BackdropTemplate" or nil)
 	slider:SetOrientation("HORIZONTAL")
 	slider:SetHeight(15)
 	slider:SetHitRectInsets(0, 0, -10, 0)
@@ -228,7 +230,7 @@ local function Constructor()
 	local hightext = slider:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
 	hightext:SetPoint("TOPRIGHT", slider, "BOTTOMRIGHT", -2, 3)
 
-	local editbox = CreateFrame("EditBox", nil, frame)
+	local editbox = CreateFrame("EditBox", nil, frame, BackdropTemplateMixin and "BackdropTemplate" or nil)
 	editbox:SetAutoFocus(false)
 	editbox:SetFontObject(GameFontHighlightSmall)
 	editbox:SetPoint("TOP", slider, "BOTTOM")

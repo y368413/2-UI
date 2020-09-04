@@ -26,7 +26,7 @@ function Paladin:Enable()
 	elseif MaxDps.Spec == 3 then
 		MaxDps.NextSpell = Paladin.Retribution;
 		MaxDps:Print(MaxDps.Colors.Info .. 'Paladin Retribution');
-	end ;
+	end
 
 	return true;
 end

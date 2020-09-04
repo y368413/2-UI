@@ -207,7 +207,8 @@ local function CreateDropDownList(name, parent)
     DropDownList:SetFrameStrata("DIALOG")
     DropDownList:EnableMouse(true)
 
-    local frame1 = _G[name.."Backdrop"] or CreateFrame("Frame", name.."Backdrop", DropDownList)
+    --local frame1 = _G[name.."Backdrop"] or CreateFrame("Frame", name.."Backdrop", DropDownList)
+      local frame1 = _G[name.."Backdrop"] or CreateFrame("Frame", name.."Backdrop", DropDownList, BackdropTemplateMixin and "BackdropTemplate")
     frame1:SetAllPoints()
     frame1:SetBackdrop({
         bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background-Dark",
@@ -223,7 +224,8 @@ local function CreateDropDownList(name, parent)
         },
     })
 
-    local frame2 = _G[name.."MenuBackdrop"] or CreateFrame("Frame", name.."MenuBackdrop", DropDownList)
+    --local frame2 = _G[name.."MenuBackdrop"] or CreateFrame("Frame", name.."MenuBackdrop", DropDownList)
+    local frame2 = _G[name.."MenuBackdrop"] or CreateFrame("Frame", name.."MenuBackdrop", DropDownList, BackdropTemplateMixin and "BackdropTemplate")
     frame2:SetAllPoints()
     frame2:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -499,7 +501,7 @@ end
 
 function MSA_DropDownMenu_RefreshDropDownSize(self)
     self.maxWidth = MSA_DropDownMenu_GetMaxButtonWidth(self);
-    self:SetWidth(self.maxWidth + 25);
+   -- self:SetWidth(self.maxWidth + 25);
 
     for i=1, MSA_DROPDOWNMENU_MAXBUTTONS, 1 do
         local icon = _G[self:GetName().."Button"..i.."Icon"];
@@ -589,19 +591,11 @@ info.minWidth = [nil, NUMBER] -- Minimum width for this line
 
 local MSA_DropDownMenu_ButtonInfo = {};
 
---Until we get around to making this betterz...
---local MSA_DropDownMenu_SecureInfo = {};
-
 local wipe = table.wipe;
 
 function MSA_DropDownMenu_CreateInfo()
     -- Reuse the same table to prevent memory churn
-	--if ( issecure() ) then
-		--securecall(wipe, MSA_DropDownMenu_SecureInfo);
-		--return MSA_DropDownMenu_SecureInfo;
-	--else
-		return wipe(MSA_DropDownMenu_ButtonInfo);
-	--end
+    return wipe(MSA_DropDownMenu_ButtonInfo);
 end
 
 function MSA_DropDownMenu_CreateFrames(level, index)

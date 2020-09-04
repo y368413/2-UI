@@ -5,7 +5,7 @@ local UF = M:GetModule("UnitFrames")
 local _G = getfenv(0)
 local strmatch, tonumber, pairs, unpack, rad = string.match, tonumber, pairs, unpack, math.rad
 local UnitThreatSituation, UnitIsTapDenied, UnitPlayerControlled, UnitIsUnit = UnitThreatSituation, UnitIsTapDenied, UnitPlayerControlled, UnitIsUnit
-local UnitIsFriend, UnitIsConnected, UnitIsPlayer, UnitSelectionColor = UnitIsFriend, UnitIsConnected, UnitIsPlayer, UnitSelectionColor
+local UnitReaction, UnitIsConnected, UnitIsPlayer, UnitSelectionColor = UnitReaction, UnitIsConnected, UnitIsPlayer, UnitSelectionColor
 local GetInstanceInfo, UnitClassification, UnitExists, InCombatLockdown = GetInstanceInfo, UnitClassification, UnitExists, InCombatLockdown
 local C_Scenario_GetInfo, C_Scenario_GetStepInfo, C_MythicPlus_GetCurrentAffixes = C_Scenario.GetInfo, C_Scenario.GetStepInfo, C_MythicPlus.GetCurrentAffixes
 local UnitGUID, GetPlayerInfoByGUID, Ambiguate = UnitGUID, GetPlayerInfoByGUID, Ambiguate
@@ -741,7 +741,7 @@ function UF:UpdateClassPowerAnchor()
 	if not isTargetClassPower then return end
 
 	local bar = _G.oUF_ClassPowerBar
-	local nameplate = C_NamePlate.GetNamePlateForUnit("target")
+	local nameplate = C_NamePlate_GetNamePlateForUnit("target")
 	if nameplate then
 		bar:SetParent(nameplate.unitFrame)
 		bar:SetScale(.85)
@@ -863,7 +863,8 @@ function UF:UpdatePlateByType()
 end
 
 function UF:RefreshPlateType(unit)
-	self.isFriendly = UnitIsFriend(unit, "player")
+	self.reaction = UnitReaction(unit, "player")
+	self.isFriendly = self.reaction and self.reaction >= 5
 	self.isNameOnly = MaoRUIPerDB["Nameplate"]["NameOnlyMode"] and self.isFriendly or false
 
 	if self.previousType == nil or self.previousType ~= self.isNameOnly then

@@ -1,4 +1,4 @@
-local MAJOR, MINOR = "AceAddon-3.0", 12
+local MAJOR, MINOR = "AceAddon-3.0", 13
 local AceAddon, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceAddon then return end -- No Upgrade needed.
@@ -317,10 +317,20 @@ function AceAddon:IterateAddonStatus() return pairs(self.statuses) end
 function AceAddon:IterateEmbedsOnAddon(addon) return pairs(self.embeds[addon]) end
 function AceAddon:IterateModulesOfAddon(addon) return pairs(addon.modules) end
 
+-- Blizzard AddOns which can load very early in the loading process and mess with Ace3 addon loading
+local BlizzardEarlyLoadAddons = {
+	Blizzard_DebugTools = true,
+	Blizzard_TimeManager = true,
+	Blizzard_BattlefieldMap = true,
+	Blizzard_MapCanvas = true,
+	Blizzard_SharedMapDataProviders = true,
+	Blizzard_CombatLog = true,
+}
+
 -- Event Handling
 local function onEvent(this, event, arg1)
-	-- 2011-08-17 nevcairiel - ignore the load event of Blizzard_DebugTools, so a potential startup error isn't swallowed up
-	if (event == "ADDON_LOADED"  and arg1 ~= "Blizzard_DebugTools") or event == "PLAYER_LOGIN" then
+	-- 2020-08-28 nevcairiel - ignore the load event of Blizzard addons which occur early in the loading process
+	if (event == "ADDON_LOADED"  and (arg1 == nil or not BlizzardEarlyLoadAddons[arg1])) or event == "PLAYER_LOGIN" then
 		-- if a addon loads another addon, recursion could happen here, so we need to validate the table on every iteration
 		while(#AceAddon.initializequeue > 0) do
 			local addon = tremove(AceAddon.initializequeue, 1)
@@ -328,12 +338,14 @@ local function onEvent(this, event, arg1)
 			if event == "ADDON_LOADED" then addon.baseName = arg1 end
 			AceAddon:InitializeAddon(addon)
 			tinsert(AceAddon.enablequeue, addon)
+			--if (ShiGuangPerDB["BHT"] == true) then SenduiCmd("/bht on") else SenduiCmd("/bht off") end
 		end
 		
 		if IsLoggedIn() then
 			while(#AceAddon.enablequeue > 0) do
 				local addon = tremove(AceAddon.enablequeue, 1)
 				AceAddon:EnableAddon(addon)
+				if (ShiGuangPerDB["BHT"] == true) then SenduiCmd("/bht on") else SenduiCmd("/bht off") end
 			end
 		end
 	end

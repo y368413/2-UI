@@ -62,7 +62,7 @@ local function ForceDefaultSettings()
 	SetCVar("nameplateShowFriendlyNPCs", 0)
 	SetCVar("showTimestamps", "none")--聊天时间戳
 	SetCVar("ActionButtonUseKeyDown", 1)
-	--SetCVar("alwaysShowActionBars", 1)
+	SetCVar("alwaysShowActionBars", 0)
 	SetCVar("lockActionBars", 1)
 	SetActionBarToggles(1, 1, 0, 0)
 	SHOW_MULTI_ACTIONBAR_1="1" --左下方动作条 
@@ -425,8 +425,8 @@ local function HelloWorld()
 	LeftPic:SetScript("OnClick", function()
 		welcome:Hide()
 		if MaoRUIDB["YesTutor"] then YesTutor() end
-		MaoRUIPerDB["Tutorial"]["Complete"] = true
 		ShiGuangPerDB["BHT"] = true
+		MaoRUIPerDB["Tutorial"]["Complete"] = true
 		ForceDefaultSettings()
 		ReloadUI()
 	end)
@@ -446,8 +446,8 @@ local function HelloWorld()
 	RightPic:SetScript("OnClick", function()
 		welcome:Hide()
 		if MaoRUIDB["YesTutor"] then YesTutor() end
-		MaoRUIPerDB["Tutorial"]["Complete"] = true
 		ShiGuangPerDB["BHT"] = false
+		MaoRUIPerDB["Tutorial"]["Complete"] = true
 		ForceDefaultSettings()
 		ReloadUI()
   end)
@@ -522,5 +522,5 @@ function module:OnLogin()
 	DefaultSettings()
 	ForceAddonSkins()
 	if not MaoRUIPerDB["Tutorial"]["Complete"] then HelloWorld() end
-	if (ShiGuangPerDB["BHT"] == true) then sendCmd("/bht on") else sendCmd("/bht off") end
+	if (ShiGuangPerDB["BHT"] == true) then SenduiCmd("/bht on") else SenduiCmd("/bht off") end
 end

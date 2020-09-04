@@ -84,7 +84,7 @@ local DefaultOptions =
 	["maximumHeight"] = 520,
 	["fontHeight"] = 10,
 	["buttonInset"] = 12,
-	["background"] = "Interface/DialogFrame/UI-DialogBox-Gold-Background",
+	["background"] = "Interface\\ACHIEVEMENTFRAME\\UI-Achievement-Parchment-Horizontal-Desaturated",
 	["backgroundR"] = 0,
 	["backgroundG"] = 0,
 	["backgroundB"] = 0,
@@ -999,11 +999,7 @@ function TeleporterOpenFrame()
 		end
 		
 		TeleporterParentFrame:SetBackdrop({bgFile = GetOption("background"), tile = false, insets = { left = buttonInset, right = buttonInset, top = buttonInset, bottom = buttonInset }});
-		TeleporterParentFrame:SetBackdropColor(
-				GetOption("backgroundR"),
-				GetOption("backgroundG"),
-				GetOption("backgroundB"),
-				GetOption("backgroundA"))
+		--TeleporterParentFrame:SetBackdropColor(GetOption("backgroundR"), GetOption("backgroundG"), GetOption("backgroundB"), GetOption("backgroundA"))
 		
 		-- UI scale may have changed, resize
 		TeleporterCloseButton:SetWidth( buttonHeight )

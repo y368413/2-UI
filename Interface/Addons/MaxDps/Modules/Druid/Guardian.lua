@@ -2,8 +2,6 @@ if select(2, UnitClass("player")) ~= "DRUID" then return end
 
 local _, MaxDps_DruidTable = ...;
 
---- @type MaxDps
-if not MaxDps then return end
 
 local Druid = MaxDps_DruidTable.Druid;
 local MaxDps = MaxDps;

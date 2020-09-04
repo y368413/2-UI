@@ -40,7 +40,7 @@ end
 Methods
 -------------------------------------------------------------------------------]]
 local methods = {
-	["OnAcquire"] = function(self) 
+	["OnAcquire"] = function(self)
 		self:SetScroll(0)
 		self.scrollframe:SetScript("OnUpdate", FixScrollOnUpdate)
 	end,

@@ -281,7 +281,7 @@ function module:Chatbar()
 	Voice.Icon:SetAllPoints()
 	Voice.Icon:SetTexture("Interface\\AddOns\\_ShiGuang\\media\\Emotes\\zhuan_push_frame")
 	Voice:RegisterForClicks("AnyUp")
-	Voice:SetScript("OnClick",function(self, btn) if btn == "RightButton" then sendCmd("/whisperpop") else M:TogglePanel(VoiceFrame) MaoRUIPerDB["Chat"]["ChatMenu"] = VoiceFrame:IsShown() end end)
+	Voice:SetScript("OnClick",function(self, btn) if btn == "RightButton" then SenduiCmd("/whisperpop") else M:TogglePanel(VoiceFrame) MaoRUIPerDB["Chat"]["ChatMenu"] = VoiceFrame:IsShown() end end)
 
 	Emote_CallButton=CreateFrame("Button","Emote_CallButton",Chatbar)
  	Emote_CallButton:SetSize(16, 16)

@@ -2,8 +2,6 @@ if select(2, UnitClass("player")) ~= "HUNTER" then return end
 
 local _, MaxDps_HunterTable = ...;
 
---- @type MaxDps
-if not MaxDps then return end
 local MaxDps = MaxDps;
 local Hunter = MaxDps_HunterTable.Hunter;
 
@@ -24,17 +22,18 @@ local BM = {
 	BarbedShot       = 217200,
 	Barrage          = 120360,
 	PrimalInstincts  = 279810,
+	OneWithThePack   = 199528,
 
 	-- Player Auras
-	BestialWrathAura = 186254,
-	BeastCleave      = 268877,
-	Frenzy           = 272790,
+	DanceOfDeath     = 274443,
 	--BestialWrath   = 19574,
 	--BarbedShot     = 246152,
 	--DireBeast      = 281036,
 	--BarbedShot     = 246852,
 
 	-- Pet Auras
+	BeastCleave      = 268877,
+	Frenzy           = 272790,
 
 	-- Target Auras
 	BarbedShotAura   = 217200,
@@ -42,10 +41,13 @@ local BM = {
 
 local A = {
 	PrimalInstincts    = 279806,
+	RapidReload        = 278530,
+	DanceOfDeath       = 274441,
 }
 
 
 setmetatable(BM, Hunter.spellMeta);
+setmetatable(A, Hunter.spellMeta);
 
 local auraMetaTable = {
 	__index = function()
@@ -61,18 +63,19 @@ local auraMetaTable = {
 
 function Hunter:BeastMastery()
 	local fd = MaxDps.FrameData;
+	local cooldown = fd.cooldown;
+	local buff = fd.buff;
+	local talents = fd.talents;
+	local timeShift = fd.timeShift;
+	local focusTimeToMax = Hunter:FocusTimeToMax();
+	fd.focusTimeToMax = focusTimeToMax;
+
 	local targets;
 	if Hunter.db.advancedAoeBM then
 		targets = Hunter:TargetsInPetRange();
 	else
 		targets = MaxDps:SmartAoe();
 	end
-
-	local timeShift = fd.timeShift;
-	local cooldown = fd.cooldown;
-	local talents = fd.talents;
-	local buff = fd.buff;
-	local bw, bwCd = cooldown[BM.BestialWrath].ready, cooldown[BM.BestialWrath].remains;
 
 	if not fd.pet then
 		fd.pet = {};
@@ -93,11 +96,12 @@ function Hunter:BeastMastery()
 		MaxDps:GlowCooldown(BM.Stampede, cooldown[BM.Stampede].ready and (buff[BM.AspectOfTheWild].up and buff[BM.BestialWrath].up));
 	end
 
+	-- call_action_list,name=st,if=active_enemies<2;
 	-- call_action_list,name=cleave,if=active_enemies>1;
-	if targets > 1 then
-		return Hunter:BeastMasteryCleave();
-	else
+	if targets < 2 then
 		return Hunter:BeastMasterySt();
+	else
+		return Hunter:BeastMasteryCleave();--BeastMasteryCleave();
 	end
 end
 
@@ -106,40 +110,32 @@ function Hunter:BeastMasteryCleave()
 	local cooldown = fd.cooldown;
 	local azerite = fd.azerite;
 	local buff = fd.buff;
+	local debuff = fd.debuff;
 	local talents = fd.talents;
-	local timeShift = fd.timeShift;
+	local targets = fd.targets;
 	local gcd = fd.gcd;
-	local pet = fd.pet;
+	local timeToDie = fd.timeToDie;
 	local focus = fd.focus;
-	local focusTimeToMax = Hunter:FocusTimeToMax();
+	local pet = fd.pet;
+	local focusTimeToMax = fd.focusTimeToMax;
 
-	local realFrenzyRemains = pet[BM.Frenzy].remains + timeShift;
-
-	-- just in case we know its going to be in time
-	if realFrenzyRemains < 2 and cooldown[BM.BarbedShot].remains <= pet[BM.Frenzy].remains then
+	-- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max;
+	if cooldown[BM.BarbedShot].ready and pet[BM.Frenzy].up and pet[BM.Frenzy].remains <= gcd then
 		return BM.BarbedShot;
 	end
 
-	-- barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max;
-	--print(pet[BM.Frenzy].remains);
-	if pet[BM.Frenzy].up and pet[BM.Frenzy].remains <= gcd
-			and cooldown[BM.BarbedShot].remains <= gcd
-	then
-		return BM.BarbedShot;
-	end
-
-	-- multishot,if=gcd.max-pet.cat.buff.beast_cleave.remains>0.25;
-	if gcd - buff[BM.BeastCleave].remains > 0.25 then
+	-- multishot,if=gcd.max-pet.turtle.buff.beast_cleave.remains>0.25;
+	if buff[BM.BeastCleave].remains < gcd then
 		return BM.MultiShot;
 	end
 
-	-- barbed_shot,if=full_recharge_time<gcd.max&cooldown.bestial_wrath.remains;
+	-- barbed_shot,target_if=min:dot.barbed_shot.remains,if=full_recharge_time<gcd.max&cooldown.bestial_wrath.remains;
 	if cooldown[BM.BarbedShot].fullRecharge < gcd and not cooldown[BM.BestialWrath].ready then
 		return BM.BarbedShot;
 	end
 
-	-- bestial_wrath,if=cooldown.aspect_of_the_wild.remains>20|target.time_to_die<15;
-	if cooldown[BM.BestialWrath].ready and (cooldown[BM.AspectOfTheWild].remains > 20 or cooldown[BM.AspectOfTheWild].ready) then
+	-- bestial_wrath,if=cooldown.aspect_of_the_wild.remains_guess>20|talent.one_with_the_pack.enabled|target.time_to_die<15;
+	if cooldown[BM.BestialWrath].ready and (cooldown[BM.AspectOfTheWild].remains > 20 or talents[BM.OneWithThePack] or timeToDie < 15) then
 		return BM.BestialWrath;
 	end
 
@@ -158,8 +154,8 @@ function Hunter:BeastMasteryCleave()
 		return BM.Barrage;
 	end
 
-	-- kill_command;
-	if cooldown[BM.KillCommand].ready and focus >= 30 then
+	-- kill_command,if=active_enemies<4|!azerite.rapid_reload.enabled;
+	if cooldown[BM.KillCommand].remains < 0.5 and (targets < 4 or azerite[A.RapidReload] == 0) then
 		return BM.KillCommand;
 	end
 
@@ -168,19 +164,24 @@ function Hunter:BeastMasteryCleave()
 		return BM.DireBeast;
 	end
 
-	if cooldown[BM.BarbedShot].fullRecharge < gcd then
+	-- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.turtle.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.turtle.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|charges_fractional>1.4|target.time_to_die<9;
+	if cooldown[BM.BarbedShot].ready and (
+		not pet[BM.Frenzy].up and (cooldown[BM.BarbedShot].charges > 1.8 or buff[BM.BestialWrath].up) or
+		(cooldown[BM.AspectOfTheWild].remains < pet[BM.Frenzy].duration - gcd and azerite[A.PrimalInstincts] > 0) or
+		(cooldown[BM.BarbedShot].charges > 1.4 or timeToDie < 9)
+	) then
 		return BM.BarbedShot;
 	end
 
-	-- barbed_shot,if=pet.cat.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.cat.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|target.time_to_die<9;
-	if not pet[BM.Frenzy].up and (cooldown[BM.BarbedShot].charges > 1.8 or buff[BM.BestialWrath].up) --or
-	--cooldown[BM.AspectOfTheWild].remains < pet[BM.Frenzy].duration - gcd and azerite[A.PrimalInstincts] > 0
-	then
-		return BM.BarbedShot;
+	-- multishot,if=azerite.rapid_reload.enabled&active_enemies>2;
+	if azerite[A.RapidReload] > 0 and targets > 2 then
+		return BM.MultiShot;
 	end
 
-	-- cobra_shot,if=cooldown.kill_command.remains>focus.time_to_max;
-	if focus >= 35 and (cooldown[BM.KillCommand].remains > focusTimeToMax) then
+	-- cobra_shot,if=cooldown.kill_command.remains>focus.time_to_max&(active_enemies<3|!azerite.rapid_reload.enabled);
+	if focus >= 35 and (
+			cooldown[BM.KillCommand].remains > focusTimeToMax and (targets < 3 or azerite[A.RapidReload] == 0)
+	) then
 		return BM.CobraShot;
 	end
 
@@ -202,20 +203,16 @@ function Hunter:BeastMasterySt()
 	local pet = fd.pet;
 	local timeToDie = fd.timeToDie;
 	local focusRegen = fd.focusRegen;
+	local spellHistory = fd.spellHistory;
+	local focusTimeToMax = fd.focusTimeToMax;
 
-	local realFrenzyRemains = pet[BM.Frenzy].remains + timeShift;
-
-	-- just in case we know its going to be in time
-	if realFrenzyRemains < 2 and cooldown[BM.BarbedShot].remains < pet[BM.Frenzy].remains then
-		return BM.BarbedShot;
-	end
-
-	-- barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max|full_recharge_time<gcd.max&cooldown.bestial_wrath.remains|azerite.primal_instincts.enabled&cooldown.aspect_of_the_wild.remains<gcd;
-
-	if pet[BM.Frenzy].up and pet[BM.Frenzy].remains <= gcd or
-			cooldown[BM.BarbedShot].fullRecharge < gcd and not cooldown[BM.BestialWrath].ready --or
-	--azerite[A.PrimalInstincts] > 0 and cooldown[BM.AspectOfTheWild].remains < gcd
-	then
+	-- barbed_shot,if=pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<gcd|cooldown.bestial_wrath.remains&(full_recharge_time<gcd|azerite.primal_instincts.enabled&cooldown.aspect_of_the_wild.remains<gcd);
+	if cooldown[BM.BarbedShot].ready and (
+		pet[BM.Frenzy].up and pet[BM.Frenzy].remains < gcd or
+		cooldown[BM.BestialWrath].remains > 0 and (
+		cooldown[BM.BarbedShot].fullRecharge < gcd
+		-- or azerite[A.PrimalInstincts] > 0 and cooldown[BM.AspectOfTheWild].remains < gcd
+	)) then
 		return BM.BarbedShot;
 	end
 
@@ -224,14 +221,22 @@ function Hunter:BeastMasterySt()
 		return BM.AMurderOfCrows;
 	end
 
-
-	-- bestial_wrath,if=cooldown.aspect_of_the_wild.remains>20|target.time_to_die<15;
-	if cooldown[BM.BestialWrath].ready and (cooldown[BM.AspectOfTheWild].remains > 20 or cooldown[BM.AspectOfTheWild].ready) then
+	-- bestial_wrath,if=talent.one_with_the_pack.enabled&buff.bestial_wrath.remains<gcd|buff.bestial_wrath.down&cooldown.aspect_of_the_wild.remains>15|target.time_to_die<15+gcd;
+	if cooldown[BM.BestialWrath].ready and (
+		talents[BM.OneWithThePack] and buff[BM.BestialWrath].remains < gcd or
+		not buff[BM.BestialWrath].up and cooldown[BM.AspectOfTheWild].remains > 15 or
+		timeToDie < 15 + gcd
+	) then
 		return BM.BestialWrath;
 	end
 
+	-- barbed_shot,if=azerite.dance_of_death.rank>1&buff.dance_of_death.remains<gcd;
+	if cooldown[BM.BarbedShot].ready and azerite[A.DanceOfDeath] > 1 and buff[BM.DanceOfDeath].remains < gcd and spellHistory[1] ~= BM.BarbedShot then
+		return BM.BarbedShot;
+	end
+
 	-- kill_command;
-	if cooldown[BM.KillCommand].ready and focus >= 30 then
+	if cooldown[BM.KillCommand].remains < 0.7 then
 		return BM.KillCommand;
 	end
 
@@ -241,13 +246,16 @@ function Hunter:BeastMasterySt()
 	end
 
 	-- dire_beast;
-	if talents[BM.DireBeast] and cooldown[BM.DireBeast].ready and focus >= 25 then
+	if talents[BM.DireBeast] and cooldown[BM.DireBeast].ready then
 		return BM.DireBeast;
 	end
 
-	-- barbed_shot,if=pet.cat.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.cat.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|target.time_to_die<9;
-	if not pet[BM.Frenzy].up and (cooldown[BM.BarbedShot].charges > 1.8 or buff[BM.BestialWrath].up) -- or
-	--cooldown[BM.AspectOfTheWild].remains < pet[BM.Frenzy].duration - gcd and azerite[A.PrimalInstincts] > 0
+	-- barbed_shot,if=talent.one_with_the_pack.enabled&charges_fractional>1.5|charges_fractional>1.8|cooldown.aspect_of_the_wild.remains<pet.turtle.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|target.time_to_die<9;
+	if cooldown[BM.BarbedShot].charges > 1.7 and talents[BM.OneWithThePack] or
+		cooldown[BM.BarbedShot].charges > 1.8 --or
+		--cooldown[BM.BarbedShot].charges >= 1 and cooldown[BM.AspectOfTheWild].remains < pet[BM.Frenzy].duration - gcd and azerite[A.PrimalInstincts] > 0
+			--or
+		--cooldown[BM.BarbedShot].charges >= 1 and timeToDie < 9
 	then
 		return BM.BarbedShot;
 	end
@@ -257,14 +265,16 @@ function Hunter:BeastMasterySt()
 		return BM.Barrage;
 	end
 
-	local CobraShotCost = 35;
-	local KillCommandCost = 30;
-	-- cobra_shot,if=(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd)&cooldown.kill_command.remains>1;
-	if (
-			focus - CobraShotCost + focusRegen * ( cooldown[BM.KillCommand].remains - 1 ) > KillCommandCost or
-					cooldown[BM.KillCommand].remains > 1 + gcd
-	) and cooldown[BM.KillCommand].remains > 1
-	then
+	-- cobra_shot,if=(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd&cooldown.bestial_wrath.remains_guess>focus.time_to_max|buff.memory_of_lucid_dreams.up)&cooldown.kill_command.remains>1|target.time_to_die<3;
+	if focus >= 40 and cooldown[BM.KillCommand].remains > 2 and (
+			(
+				focus - 35 + focusRegen * (cooldown[BM.KillCommand].remains - 1) > 30 or
+				cooldown[BM.KillCommand].remains > 1 + gcd and cooldown[BM.BestialWrath].remains > focusTimeToMax
+				--or buff[BM.MemoryOfLucidDreams].up
+			) and
+		cooldown[BM.KillCommand].remains > 1.2 or
+		timeToDie < 3
+	) then
 		return BM.CobraShot;
 	end
 
@@ -272,75 +282,9 @@ function Hunter:BeastMasterySt()
 	if talents[BM.SpittingCobra] and cooldown[BM.SpittingCobra].ready then
 		return BM.SpittingCobra;
 	end
+
+	-- barbed_shot,if=pet.turtle.buff.frenzy.duration-gcd>full_recharge_time;
+	--if pet[BM.Frenzy].duration - gcd > cooldown[BM.BarbedShot].fullRecharge then
+	--	return BM.BarbedShot;
+	--end
 end
-
---[[ Old rotation
-
-function Hunter:BeastMastery()
-	local fd = MaxDps.FrameData;
-	local cooldown, buff, debuff, timeShift, talents, azerite, currentSpell =
-		fd.cooldown, fd.buff, fd.debuff, fd.timeShift, fd.talents, fd.azerite, fd.currentSpell;
-
-	local minus = 0;
-	local focus, focusMax, focusRegen = Hunter:Focus(minus, timeShift);
-
-	-- Cooldowns
-
-	local bw, bwCd = cooldown[BM.BestialWrath].ready, cooldown[BM.BestialWrath].remains;
-
-	MaxDps:GlowCooldown(BM.AspectOfTheWild, cooldown[BM.AspectOfTheWild].ready and (bw or bwCd > 82));
-
-	if talents[BM.SpittingCobra] then
-		MaxDps:GlowCooldown(BM.SpittingCobra, cooldown[BM.SpittingCobra].ready);
-	end
-
-	if talents[BM.Stampede] then
-		MaxDps:GlowCooldown(BM.Stampede, cooldown[BM.Stampede].ready);
-	end
-
-	if talents[BM.Barrage] then
-		MaxDps:GlowCooldown(BM.Barrage, cooldown[BM.Barrage].ready);
-	end
-
-	-- Auras
-
-	local bwAura = buff[BM.BestialWrathAura].up;
-
-	local frenzyAura, frenzyCount, frenzyCd = MaxDps:UnitAura(BM.Frenzy, timeShift, 'pet');
-
-	-- Rotation start
-	if frenzyAura and cooldown[BM.BarbedShot].charges >= 1 and frenzyCd < 2 then
-		return BM.BarbedShot;
-	end
-
-	if talents[BM.AMurderOfCrows] and cooldown[BM.AMurderOfCrows].ready then
-		return BM.AMurderOfCrows;
-	end
-
-	if cooldown[BM.BarbedShot].charges >= 1.8 then
-		return BM.BarbedShot;
-	end
-
-	if bw then
-		return BM.BestialWrath;
-	end
-
-	if talents[BM.ChimaeraShot] and cooldown[BM.ChimaeraShot].ready then
-		return BM.ChimaeraShot;
-	end
-
-	if cooldown[BM.KillCommand].remains < 0.5 then
-		return BM.KillCommand;
-	end
-
-	if talents[BM.DireBeast] and cooldown[BM.DireBeast].ready then
-		return BM.DireBeast;
-	end
-
-	if focus > 50 and cooldown[BM.KillCommand].remains > 2 then
-		return BM.CobraShot;
-	else
-		return nil;
-	end
-end
-]]--

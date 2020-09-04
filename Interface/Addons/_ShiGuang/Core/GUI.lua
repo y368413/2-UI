@@ -26,7 +26,7 @@ local defaultSettings = {
 		Classcolor = false,
 		Cooldown = true,
 		DecimalCD = true,
-		Style = 6,
+		Style = 8,
 		Bar4Fade = false,
 		Bar5Fade = false,
 		Scale = 1,
@@ -598,7 +598,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	[1] = {
 		{1, "Actionbar", "Enable", "|cff00cc4c"..U["Enable Actionbar"]},
 		{3, "Actionbar", "Scale", U["Actionbar Scale"].."*", true, false, {.8, 1.5, .1}, updateActionbarScale},
-		{4, "Actionbar", "Style", U["Actionbar Style"], true, true, {"-- 2*(3+12+3) --", "-- 2*(6+12+6) --", "-- 2*6+3*12+2*6 --", "-- 3*12 --", "-- 2*(12+6) --", "-- MR --", "-- PVP --", "-- 3*(4+12+4) --", "-- PVP2 --", "-- JK --"}},
+		{4, "Actionbar", "Style", U["Actionbar Style"], true, true, {"-- 2*(3+12+3) --", "-- 2*(6+12+6) --", "-- 2*6+3*12+2*6 --", "-- 3*12 --", "-- 2*(12+6) --", "-- 3*(4+12+4) --", "-- What --", "-- MR --", "-- PVP2 --", "-- Cool --"}},
 		{},--blank
 		{1, "Actionbar", "Cooldown", "|cff00cc4c"..U["Show Cooldown"]},
 		{1, "Actionbar", "DecimalCD", U["Decimal Cooldown"].."*", true},

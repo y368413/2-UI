@@ -114,7 +114,7 @@ function Warrior:FurySingleTarget()
 	local rampageCost = fd.rampageCost;
 
 	local tgtPctHp = MaxDps:TargetPercentHealth();
-	local canExecute = buff[FR.SuddenDeathAura].up or tgtPctHp < (talents[FR.Massacre] and 0.35 or 0.2);
+	local canExecute = tgtPctHp < (talents[FR.Massacre] and 0.35 or 0.2);
 	local Execute = talents[FR.Massacre] and FR.ExecuteMassacre or FR.Execute;
 
 	-- siegebreaker;
@@ -134,7 +134,7 @@ function Warrior:FurySingleTarget()
 	end
 
 	-- execute;
-	if cooldown[FR.Execute].ready and canExecute then
+	if buff[FR.SuddenDeathAura].up or cooldown[FR.Execute].ready and canExecute then
 		return Execute;
 	end
 

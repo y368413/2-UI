@@ -217,7 +217,7 @@ function Druid:FeralGenerators()
 	local energy = fd.energy;
 	local Incarnation = fd.Incarnation;
 	local desiredTargets = 2;
-	local Swipe = MaxDps:FindSpell(FR.Swipe) and FR.Swipe or FR.Swipe2;
+	local Swipe = MaxDps:FindSpell(FR.Swipe2) and FR.Swipe2 or FR.Swipe;
 
 	-- regrowth,if=talent.bloodtalons.enabled&buff.predatory_swiftness.up&buff.bloodtalons.down&combo_points=4&dot.rake.remains<4;
 	if currentSpell ~= FR.Regrowth and

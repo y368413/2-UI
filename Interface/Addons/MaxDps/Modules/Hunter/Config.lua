@@ -1,9 +1,6 @@
 if select(2, UnitClass("player")) ~= "HUNTER" then return end
 
 local _, MaxDps_HunterTable = ...;
-
---- @type MaxDps
-if not MaxDps then return end
 local MaxDps = MaxDps;
 local Hunter = MaxDps_HunterTable.Hunter;
 

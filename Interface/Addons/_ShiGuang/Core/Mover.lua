@@ -237,7 +237,7 @@ local function CreateConsole()
 	bu[1]:SetScript("OnClick", MISC.LockElements)
 	-- Grids
 	bu[2]:SetScript("OnClick", function()
-		sendCmd("/align") --SlashCmdList["TOGGLEGRID"]("64")
+		SenduiCmd("/align") --SlashCmdList["TOGGLEGRID"]("64")
 	end)
 	-- Cancel
 	bu[3]:SetScript("OnClick", function(self)

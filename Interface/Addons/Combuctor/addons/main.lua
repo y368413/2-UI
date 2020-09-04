@@ -7,7 +7,7 @@ local ADDON, Addon = ...
 Addon.ItemSlot = Addon.Item -- deprecated behavior
 Addon.FrameTemplate = true
 Addon.canSearch = true
-Addon.FrameScale = 0.85
+Addon.FrameScale = 1
 Addon.ItemScale = 1.6
 Addon.Slash = 'cbt'
 

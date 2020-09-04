@@ -1256,8 +1256,8 @@ BFA_HF_Tracker_points = {
         [81203857] = {quest=50728, junk=true, label=CHEST,},
         [80135512] = {quest=51346, junk=true, label=CHEST,},
         [82465431] = {quest=51346, junk=true, label=CHEST,},
-        [71684127] = {quest=50308, junk=true, label="Mysterious trashpile", achievement=12482, note="Jani"},
-        [63963171] = {quest=50720, junk=true, label="Mysterious trashpile", achievement=12482, note="Jani"},
+        --[71684127] = {quest=50308, junk=true, label="Mysterious trashpile", achievement=12482, note="Jani"},
+        --[63963171] = {quest=50720, junk=true, label="Mysterious trashpile", achievement=12482, note="Jani"},
     },
     [863] = { -- Nazmir
         [77903634] = {quest=49867, achievement=12771, criteria=40857,}, -- Lucky Horace's Lucky Chest
@@ -1287,8 +1287,8 @@ BFA_HF_Tracker_points = {
         [41575046] = {quest=49916, junk=true, label=CHEST,},
         [41596574] = {quest=49916, junk=true, label=CHEST,},
         [28048187] = {quest=50895, junk=true, label=CHEST,},
-        [33957512] = {quest=50437, junk=true, label="Mysterious trashpile", achievement=12482, note="Jani"},
-        [68573280] = {quest=50441, junk=true, label="Mysterious trashpile", achievement=12482, note="Jani"},
+        --[33957512] = {quest=50437, junk=true, label="Mysterious trashpile", achievement=12482, note="Jani"},
+        --[68573280] = {quest=50441, junk=true, label="Mysterious trashpile", achievement=12482, note="Jani"},
     },
     [864] = { -- Vol'dun
         [46598801] = {quest=50237, achievement=12849, criteria=40966, note="Use mine cart",}, -- Ashvane Spoils
@@ -1300,7 +1300,7 @@ BFA_HF_Tracker_points = {
         [40578574] = {quest=52994, achievement=12849, criteria=41003,}, -- Deadwood Chest
         [38848290] = path{quest=52994},
         [48186469] = {quest=51093, achievement=12849, criteria=40967, note="Door on East side", hide_before=50550, faction="Horde",}, -- Grayal's Last Offering
-        [48176469] = {quest=51093, achievement=12849, criteria=40967, note="Door on East side", faction="Alliance",}, -- Grayal's Last Offering
+        --[48176469] = {quest=51093, achievement=12849, criteria=40967, note="Door on East side", faction="Alliance",}, -- Grayal's Last Offering
         [49166469] = path{quest=51093},
         [47195846] = {quest=51133, achievement=12849, criteria=40969, note="Path from South side",}, -- Sandfury Reserve
         [47445984] = path{quest=51133},
@@ -1326,7 +1326,7 @@ BFA_HF_Tracker_points = {
         [62832267] = {quest=53145, minimap=true, atlas="VignetteLootElite", scale=1.2, achievement=13016, criteria=41355, note="Down from Tortaka Refuge",}, -- Kurt's Ornate Key
         -- junk
         [46984656] = {quest=50883, junk=true, label="Mysterious trashpile", achievement=12482, note="In alcove, Summon Jani, give her Charged Ranishu Antennae"},
-        [49398446] = {quest=50892, junk=true, label="Mysterious trashpile", achievement=12482, note="Under bridge, Summon Jani, give her Sturdy Redrock Jaw"},
+        --[49398446] = {quest=50892, junk=true, label="Mysterious trashpile", achievement=12482, note="Under bridge, Summon Jani, give her Sturdy Redrock Jaw"},
         [59631517] = {quest=50914, junk=true, label=CHEST,},
         [61071734] = {quest=50914, junk=true, label=CHEST,},
         [53841481] = {quest=50915, junk=true, label=CHEST,},
@@ -1561,20 +1561,6 @@ local skull = "Interface\\Worldmap\\Skull_64Purple" -- violet
 -----------------------
 
 local merge = BFA_HF_Tracker_merge
-
-local path = function(questid, label, atlas, note, scale)
-    label = label or L["Entrance "]
-    atlas = atlas or "map-icon-SuramarDoor.tga"
-    return {
-        quest = questid,
-        label = label,
-        atlas = atlas,
-        path = true,
-        scale = scale,
-        note = note,
-    }
-end
-BFA_HF_Tracker_path = path
 
 --[[ structure:
     [uiMapID] = { -- "_terrain1" etc will be stripped from attempts to fetch this
@@ -2018,15 +2004,6 @@ local path = function(achievement, criteria, questid, label, atlas, note, scale)
 end
 BFA_HF_Tracker_path = path
 
-BFA_HF_Tracker_map_spellids = {
-    -- [862] = 0, -- Zuldazar
-    -- [863] = 0, -- Nazmir
-    -- [864] = 0, -- Vol'dun
-    -- [895] = 0, -- Tiragarde Sound
-    -- [896] = 0, -- Drustvar
-    -- [942] = 0, -- Stormsong Valley
-}
-
 --[[ structure:
     [uiMapID] = { -- "_terrain1" etc will be stripped from attempts to fetch this
         [coord] = {
@@ -2121,7 +2098,7 @@ merge(BFA_HF_Tracker_points[864], { -- Vol'dun
 	[47906249] = {hf=true, atlasHf=planche, label=nameAchievement(13018, 1), achievement=13018, criteria=41360,},
 	[32126908] = {hf=true, atlasHf=planche, label=nameAchievement(13018, 1), achievement=13018, criteria=41361,},
 	[54902136] = {hf=true, atlasHf=planche, label=nameAchievement(13018, 1), achievement=13018, criteria=41362, note=L["On top of the slither snake"],},
-	[54703160] = path(13018, 41362, _, L["Start "]..nameAchievement(13018, 1), _, _, 1.2),
+	--[54703160] = path(13018, 41362, _, L["Start "]..nameAchievement(13018, 1), _, _, 1.2),
 	[42226211] = {achievement=13036, criteria=41564, note= L["In the pond"],},
 	[27706212] = {achievement=13036, criteria=41570, note= L["Next to the withered tree"],},
     [49572457] = {achievement=13036, criteria=41574, note= L["Scroll next to the altar, behind the mobs"],},
@@ -2165,14 +2142,14 @@ merge(BFA_HF_Tracker_points[896], { -- Drustvar
 	[19065787] = {hf=true, atlas="Reagents", achievement=13064, criteria=41443, note=L["Behind the scrub"],},
     [46453723] = {hf=true, atlas="Reagents", achievement=13064, criteria=41445, note=L["At the destroyed wall"],},
 	[56558583] = {hf=true, atlas="Reagents", achievement=13064, criteria=41446, note=L["On the mountain, a bit difficult to find the way up (see path)"],},
-    [62707005] = path(13064, 41446, _, L["Path to The Flayed Man: Start"], "MiniMap-VignetteArrow", _, 1.2),
-    [59207210] = path(13064, 41446, _, L["Path to The Flayed Man: Step 1"], "MiniMap-QuestArrow", _, 1.2),
-    [58507420] = path(13064, 41446, _, L["Path to The Flayed Man: Step 2"], "MiniMap-QuestArrow", _, 1.2),
-    [60307950] = path(13064, 41446, _, L["Path to The Flayed Man: Step 3"], "MiniMap-QuestArrow", _, 1.2),
-    [57708100] = path(13064, 41446, _, L["Path to The Flayed Man: Step 4"], "MiniMap-DeadArrow", _, 1.2),
-    [56608480] = path(13064, 41446, _, L["Path to The Flayed Man: End, jump down carefully"], "MiniMap-DeadArrow", _, 1.2),
+    --[62707005] = path(13064, 41446, _, L["Path to The Flayed Man: Start"], "MiniMap-VignetteArrow", _, 1.2),
+    --[59207210] = path(13064, 41446, _, L["Path to The Flayed Man: Step 1"], "MiniMap-QuestArrow", _, 1.2),
+    --[58507420] = path(13064, 41446, _, L["Path to The Flayed Man: Step 2"], "MiniMap-QuestArrow", _, 1.2),
+    --[60307950] = path(13064, 41446, _, L["Path to The Flayed Man: Step 3"], "MiniMap-QuestArrow", _, 1.2),
+    --[57708100] = path(13064, 41446, _, L["Path to The Flayed Man: Step 4"], "MiniMap-DeadArrow", _, 1.2),
+    --[56608480] = path(13064, 41446, _, L["Path to The Flayed Man: End, jump down carefully"], "MiniMap-DeadArrow", _, 1.2),
     [44584566] = {hf=true, atlas="Reagents", achievement=13064, criteria=41449, note=L["In a cave, at the very back of the wall"],},
-    [46304510] = path(13064, 41449, _, L["Path to Protectors of the Forest: cave entrance"]),
+    --[46304510] = path(13064, 41449, _, L["Path to Protectors of the Forest: cave entrance"]),
 	-- HF 13082 - Du neuf avec du vieux
 	[35525187] = {hf=true, item=163749, achievement=13082, criteria=41636, note=L["Near the cliff under the trees west of Arom's Stand flight master."],},
 	[64876779] = {hf=true, item=163746, achievement=13082, criteria=41637, note=L["Between the rocks mid level of the waterfall"],},

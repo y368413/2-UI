@@ -15,7 +15,11 @@ function Bar:CreateBar2()
 	frame:SetHeight(cfg.size + 2*padding)
 	if layout == 5 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -108, 40}
-	elseif (layout == 6) or (layout == 9) or (layout == 10) then
+	elseif layout == 8 then
+		frame:SetWidth(12*(cfg.size-7) + (num-1)*margin + 2*padding)
+		frame:SetHeight(cfg.size + padding)
+		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 4}
+	elseif (layout == 9) or (layout == 10) then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 4}
 	else
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 42}
@@ -31,8 +35,14 @@ function Bar:CreateBar2()
 		button:SetSize(cfg.size, cfg.size)
 		button:ClearAllPoints()
 		if i == 1 then
+			if layout == 8 then
+			  button:SetSize(cfg.size-7, cfg.size-7)
+			end
 			button:SetPoint("BOTTOMLEFT", frame, padding, padding)
 		else
+			if layout == 8 then
+			  button:SetSize(cfg.size-7, cfg.size-7)
+			end
 			local previous = _G["MultiBarBottomLeftButton"..i-1]
 			button:SetPoint("LEFT", previous, "RIGHT", margin, 0)
 		end

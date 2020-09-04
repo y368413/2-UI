@@ -549,6 +549,13 @@ CreateDestination(
 		CreateItem(64457), 									-- The Last Relic of Argus
 		CreateConditionalItem(136849, IsClass("DRUID")),	-- Nature's Beacon
 	})
+	
+--返回营地312372
+CreateDestination(
+	"Fox",		-- No localization.
+	{
+		CreateSpell(312372),								-- 返回营地
+	})
 
 CreateDestination(
 	LocArea("Ravenholdt", 0),

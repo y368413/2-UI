@@ -38,9 +38,12 @@ function DeathKnight:Frost()
 	local runic = UnitPower('player', RunicPower);
 	local runicMax = UnitPowerMax('player', RunicPower);
 	local runes, runeCd = DeathKnight:Runes(timeShift);
+	local targets = MaxDps:SmartAoe();
 
 	local fever = debuff[FR.FrostFever].remains > 6;
 	local FSCost = 25;
+
+	fd.targets = targets;
 
 	MaxDps:GlowEssences();
 	MaxDps:GlowCooldown(FR.BreathOfSindragosa, talents[FR.BreathOfSindragosa] and cooldown[FR.BreathOfSindragosa].ready);
@@ -57,6 +60,10 @@ function DeathKnight:Frost()
 
 			if runes >= 1 and (buff[FR.Rime].up or not fever) then
 				return FR.HowlingBlast;
+			end
+
+			if talents[FR.Frostscythe] and runes >= 2 and targets >= 2 then
+				return FR.Frostscythe;
 			end
 
 			if runes >= 2 then
@@ -85,6 +92,10 @@ function DeathKnight:Frost()
 				return FR.HowlingBlast;
 			end
 
+			if talents[FR.Frostscythe] and runes >= 4 and targets >= 2 then
+				return FR.Frostscythe;
+			end
+
 			if runes >= 4 then
 				return FR.Obliterate;
 			end
@@ -93,12 +104,20 @@ function DeathKnight:Frost()
 				return FR.FrostStrike;
 			end
 
+			if talents[FR.Frostscythe] and buff[FR.KillingMachine].up and runes >= 2 and targets >= 2 then
+				return FR.Frostscythe;
+			end
+
 			if buff[FR.KillingMachine].up and runes >= 2 then
 				return FR.Obliterate;
 			end
 
 			if runic >= 80 then
 				return FR.FrostStrike;
+			end
+
+			if talents[FR.Frostscythe] and runes >= 2 and targets >= 2 then
+				return FR.Frostscythe;
 			end
 
 			if runes >= 2 then
@@ -117,6 +136,10 @@ function DeathKnight:Frost()
 				return FR.RemorselessWinter;
 			end
 
+			if talents[FR.Frostscythe] and buff[FR.KillingMachine].up and runes >= 2 and targets >= 2 then
+				return FR.Frostscythe;
+			end
+
 			if buff[FR.KillingMachine].up and runes >= 2 then
 				return FR.Obliterate;
 			end
@@ -131,6 +154,10 @@ function DeathKnight:Frost()
 
 			if not buff[FR.KillingMachine].up and runic >= 25 then
 				return FR.FrostStrike;
+			end
+
+			if talents[FR.Frostscythe] and not buff[FR.KillingMachine].up and runes >= 2 and targets >= 2 then
+				return FR.Frostscythe;
 			end
 
 			if not buff[FR.KillingMachine].up and runes >= 2 then
@@ -149,6 +176,10 @@ function DeathKnight:Frost()
 				return FR.HowlingBlast;
 			end
 
+			if talents[FR.Frostscythe] and  runes >= 4  and targets >= 2 then
+				return FR.Frostscythe;
+			end
+
 			if runes >= 4 then
 				return FR.Obliterate;
 			end
@@ -157,12 +188,20 @@ function DeathKnight:Frost()
 				return FR.FrostStrike;
 			end
 
+			if talents[FR.Frostscythe] and  buff[FR.KillingMachine].up and runes >= 2 and targets >= 2 then
+				return FR.Frostscythe;
+			end
+
 			if buff[FR.KillingMachine].up and runes >= 2 then
 				return FR.Obliterate;
 			end
 
 			if runic >= 75 then
 				return FR.FrostStrike;
+			end
+
+			if talents[FR.Frostscythe] and runes >= 2 and targets >= 2 then
+				return FR.Frostscythe;
 			end
 
 			if runes >= 2 then

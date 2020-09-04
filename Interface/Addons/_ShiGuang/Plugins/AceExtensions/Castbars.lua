@@ -1280,7 +1280,7 @@ function Castbars:OnInitialize()
                 ShowCooldownSpark = true,
                 Width = 245,
                 Height = 16,
-                Position = {point = "CENTER", relpoint = "CENTER", x = 10, y = -250},
+                Position = {point = "CENTER", relpoint = "CENTER", x = 10, y = -270},
                 Blacklist = {},
             },
             PetCastingBarFrame =

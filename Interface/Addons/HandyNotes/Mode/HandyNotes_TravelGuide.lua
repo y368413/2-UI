@@ -28,7 +28,6 @@ constants.defaults = {
 }
 
 local left, right, top, bottom = GetObjectIconTextureCoords("4772") --MagePortalAlliance
-local left2, right2, top2, bottom2 = GetObjectIconTextureCoords("4773") --MagePortalHorde
 constants.icon_texture = {
 	portal = {
 					icon = [[Interface\MINIMAP\OBJECTICONSATLAS]],
@@ -265,13 +264,14 @@ end
 		if (point.spell) then
 			local spellName = GetSpellInfo(point.spell)
 			if (spellName) then
-				tooltip:AddLine(spellName, 1, 1, 1)
+				if IsPlayerSpell(point.spell) then
+				--	tooltip:AddLine(spellName, 0, 1, 0)
+				else
+					tooltip:AddLine(spellName, 1, 1, 1) 
+				end
 			end
-		end	
-		if (point.warfront and point.warfront == "arathi" and asetnote == 1) then
-			tooltip:AddLine(notavailable, 1, 0, 0)
 		end
-		if (point.warfront and point.warfront == "darkshore" and dsetnote == 1) then
+		if (point.warfront and (point.warfront == "arathi" and asetnote == 1) or (point.warfront == "darkshore" and dsetnote == 1)) then
 			tooltip:AddLine(notavailable, 1, 0, 0)
 		end
 		if (point.lvl and UnitLevel("player") < point.lvl) then
@@ -525,9 +525,9 @@ config.options = {
 	type = "group",
 	name = HandyNotes_TravelGuide.pluginName,
 	desc = HandyNotes_TravelGuide.description,
-	get = function(info) return TravelGuide_db[info[#info]] end,
+	get = function(info) return TravelGuide.db[info[#info]] end,
 	set = function(info, v)
-		TravelGuide_db[info[#info]] = v
+		TravelGuide.db[info[#info]] = v
 		HandyNotes_TravelGuide:SendMessage("HandyNotes_NotifyUpdate", HandyNotes_TravelGuide.pluginName)
 	end,
 	args = {
@@ -655,7 +655,7 @@ config.options = {
 				unhide = {
 					type = "execute",
 					name = L["Restore hidden nodes"],
-					desc = L["Show all nodes that you manually hid by right-clicking on them and choosing \"Hide this node\"."],
+					desc = L["Show all nodes that you have manually hidden by right-clicking on them and choosing \"Hide this node\"."],
 					width = "full",
 					func = function()
 						for map,coords in pairs(TravelGuide.hidden) do
@@ -705,7 +705,10 @@ local PtoStormheim = L["Portal to Stormheim"]
 local PtoHelheim = L["Portal to Helheim"]
 local PtoDala = L["Portal to Dalaran"]
 local PtoAzsuna = L["Portal to Azsuna"]
+local PtoValsharah = L["Portal to Val'sharah"]
 local PtoEmeraldDreamway = L["Portal to Emerald Dreamway"]
+local PtoSuramar = L["Portal to Suramar"]
+local PtoHighmountain = L["Portal to Highmountain"]
 local GEtoTrueshotLodge = L["Great Eagle to Trueshot Lodge"]
 local JtoSkyhold = L["Jump to Skyhold"]
 local dalaran = L["Dalaran"]
@@ -840,8 +843,38 @@ DB.points = {
 			type= [string], 		-- the pre-define icon type which can be found in Constant.lua
 		},
 	},
-
---]]
+--SHADOWLANDS--------------------------------------------------------------------------------------------------------------------------------------------------
+	[1550] = { -- Shadowlands
+	
+		},
+	[1525] = { -- Revendreth
+	
+		},
+	[1565] = { -- Ardenweald
+	
+		},
+	[1533] = { -- Bastion
+	
+		},
+	[1536] = { -- Maldraxxus
+	
+		},
+	[1670] = { -- Oribos - Ring der Schicksale
+	
+		},
+	[1671] = { -- Oribos - Ring der Übertragung
+	
+		},
+	[1672] = { -- Oribos - Der Unterschlupf des Mittlers
+	
+		},
+	[1673] = { -- Oribos - Der Schmelztiegel
+	
+		},
+	[1543] = { -- Der Schlund
+	
+		},
+--]]	
 --BFA----------------------------------------------------------------------------------------------------------------------------------------------------------
 	[875] = { -- Zandalar
 		[58206200] = { portal=true, label1=PtoSM.." ("..EversongWoods..")\n"..format(PtoOG.." ("..Durotar..")\n"..PtoTB.." ("..Mulgore..")\n"..PtoSilithus.." ("..Kalimdor..")\n"..PtoNazjatar..""), 
@@ -1006,11 +1039,11 @@ DB.points = {
 		},	
 	[734] = { -- Hall of the Guardian  *MAGE*
 		[57299056] = { orderhall=true, label=PtoDala, note=BrokenIsles, class="MAGE" },
---		[66784670] = { orderhall=true, label=PtoValsharah, note=BrokenIsles, class="MAGE" },
---		[67214172] = { orderhall=true, label=PtoStormheim, note=BrokenIsles, class="MAGE" },
---		[60235191] = { orderhall=true, label=PtoSuramar, note=BrokenIsles, class="MAGE" },
---		[54684456] = { orderhall=true, label=PtoHighmountain, note=BrokenIsles, class="MAGE" },
---		[54993963] = { orderhall=true, label=PtoAzsuna, note=BrokenIsles, class="MAGE" },
+		[66784670] = { orderhall=true, spell=223413, label=PtoValsharah, note=BrokenIsles, class="MAGE" },
+		[67214172] = { orderhall=true, spell=223413, label=PtoStormheim, note=BrokenIsles, class="MAGE" },
+		[60235191] = { orderhall=true, spell=223413, label=PtoSuramar, note=BrokenIsles, class="MAGE" },
+		[54684456] = { orderhall=true, spell=223413, label=PtoHighmountain, note=BrokenIsles, class="MAGE" },
+		[54993963] = { orderhall=true, spell=223413, label=PtoAzsuna, note=BrokenIsles, class="MAGE" },
 		},
 	[726] = { -- The Maelstrom  *SHAMAN*
 		[29835200] = { orderhall=true, label=PtoDala, note=BrokenIsles, class="SHAMAN" },
@@ -1341,8 +1374,7 @@ DB.points = {
 		},
 ]]--
 	[13] = { -- Eastern Kingdom
-		[44068694] = { zeppelin=true, label1=ZtoOG.." ("..Durotar..")\n"..format(PtoUC.." ("..Tirisfal..")"),
-									  label2=ZtoOG.."\n"..format(PtoUC..""), faction="Horde" },
+		[44068694] = { zeppelin=true, label1=ZtoOG.." ("..Durotar..")\n"..format(PtoUC.." ("..Tirisfal..")"), label2=ZtoOG.."\n"..format(PtoUC..""), faction="Horde" },
 		[44068695] = { hzeppelin=true, label=ZtoOG, note=Durotar, faction="Alliance" },
 		[41107209] = { aboat=true, label1=BtoBoralus.." ("..KulTiras..")\n"..format(BtoBoreanTundra.." ("..ValianceKeep..")"),
 								   label2=BtoBoralus.."\n"..format(BtoBoreanTundra..""), faction="Horde" },
@@ -1355,10 +1387,10 @@ DB.points = {
 		[42999362] = { boat=true, label=BtoRatchet, note=NorthernBarrens },
 		[56161316] = { portal=true, label1=PtoOG.." ("..Durotar..")\n"..format(PtoUC.." ("..Tirisfal..")"),
 									label2=PtoOG.."\n"..format(PtoUC..""), faction="Horde" },
-		--[43637155] = { portal=true, label1=PtoTolBarad.." ("..EasternKingdoms..")\n"..format(PtoUldum.." ("..Kalimdor..")\n"..PtoDeepholm.." ("..Maelstrom..")\n"..PtoVashjir.." ("..EasternKingdoms..")\n"..PtoHyjal.." ("..Kalimdor..")\n"..PtoTwilightHighlands.." ("..EasternKingdoms..")\n"..DrTtoIF.." ("..DunMorogh..")\n"..PtoDarnassus.." ("..Teldrassil..")\n"..PtoDala.." ("..CrystalsongForest..")\n"..PtoJadeForest.." ("..Pandaria..")\n"..PtoBoralus.." ("..TiragardeSound..")\n"..PtoAzsuna.." ("..BrokenIsles..")\n"..PtoStormshield.." ("..Ashran..")\n"..PtoShattrath.." ("..TerokkarForest..")\n"..PtoExodar.." ("..AzuremystIsle..")\n"..PtoCavernsofTime.." ("..Tanaris..")"),
-									--label2=PtoTolBarad.."\n"..format(PtoUldum.."\n"..PtoDeepholm.."\n"..PtoVashjir.."\n"..PtoHyjal.."\n"..PtoTwilightHighlands.."\n"..DrTtoIF.."\n"..PtoDarnassus.."\n"..PtoDala.."\n"..PtoJadeForest.."\n"..PtoBoralus.."\n"..PtoAzsuna.."\n"..PtoStormshield.."\n"..PtoShattrath.."\n"..PtoExodar.."\n"..PtoCavernsofTime..""), faction="Alliance" },
+		[43637155] = { portal=true, label1=PtoTolBarad.." ("..EasternKingdoms..")\n"..format(PtoUldum..")\n"..PtoDeepholm.." ("..Maelstrom..")\n"..PtoVashjir..")\n"..PtoHyjal..")\n"..PtoTwilightHighlands..")\n"..DrTtoIF.." ("..DunMorogh..")\n"..PtoDarnassus.." ("..Teldrassil..")\n"..PtoDala.." ("..CrystalsongForest..")\n"..PtoJadeForest.." ("..Pandaria..")\n"..PtoBoralus.." ("..TiragardeSound..")\n"..PtoAzsuna.." ("..BrokenIsles..")\n"..PtoStormshield.." ("..Ashran..")\n"..PtoShattrath.." ("..TerokkarForest..")\n"..PtoExodar.." ("..AzuremystIsle..")\n"..PtoCavernsofTime.." ("..Tanaris..")"), 
+		label2=PtoTolBarad.."\n"..format(PtoUldum.."\n"..PtoDeepholm.."\n"..PtoVashjir.."\n"..PtoHyjal.."\n"..PtoTwilightHighlands.."\n"..DrTtoIF.."\n"..PtoDarnassus.."\n"..PtoDala.."\n"..PtoJadeForest.."\n"..PtoBoralus.."\n"..PtoAzsuna.."\n"..PtoStormshield.."\n"..PtoShattrath.."\n"..PtoExodar.."\n"..PtoCavernsofTime..""), faction="Alliance" },
 		[43337195] = { tram=true, label=DrTtoIF, note=DunMorogh, faction="Horde" },
-		[43863354] = { spell= 290245, portal=true, label1=PtoHowlingFjord.." ("..VengeanceLanding..")\n"..format(PtoOG.." ("..Durotar..")\n"..PtoStranglethornVale.." ("..GromgolBaseCamp..")\n"..PtoSM.." ("..EversongWoods..")\n"..PtoHellfirePeninsula.." ("..Outland..")"),
+		[43863354] = { spell= 276824, portal=true, label1=PtoHowlingFjord.." ("..VengeanceLanding..")\n"..format(PtoOG.." ("..Durotar..")\n"..PtoStranglethornVale.." ("..GromgolBaseCamp..")\n"..PtoSM.." ("..EversongWoods..")\n"..PtoHellfirePeninsula.." ("..Outland..")"),
 												   label2=PtoHowlingFjord.."\n"..format(PtoOG.."\n"..PtoStranglethornVale.."\n"..PtoSM.."\n"..PtoHellfirePeninsula..""), faction="Horde" },
 		[47835898] = { tram=true, label=DrTtoSW, note=ElwynnForest, },
 		[60835906] = { portal=true, label=PtoSW, note=ElwynnForest, quest=27537, faction="Alliance" },
@@ -1396,14 +1428,14 @@ DB.points = {
 		[29251812] = { tram=true, label=DrTtoIF, note=DunMorogh },
 		},
 	[90] = { -- Undercity
-		[85301700] = { spell= 290245, portal=true, label=PtoHellfirePeninsula, note=Outland, faction="Horde" },
+		[85301700] = { spell= 276824, portal=true, label=PtoHellfirePeninsula, note=Outland, faction="Horde" },
 		},
 	[18] = { -- Tirisfal Glades
-		[65906865] = { spell= 290245, portal=true, label=PtoHellfirePeninsula, note=Outland..")\n("..inUCMq.."", faction="Horde" },
-		[59416743] = { spell= 290245, portal=true, label=PtoSM, note=EversongWoods..")\n("..Orboftranslocation.."", faction="Horde" },
-		[60475885] = { spell= 290245, portal=true, label=PtoOG, note=Durotar, faction="Horde" },
-		[62035926] = { spell= 290245, portal=true, label=PtoStranglethornVale, note=GromgolBaseCamp, faction="Horde" },
-		[58875901] = { spell= 290245, portal=true, label=PtoHowlingFjord, note=VengeanceLanding, faction="Horde" },
+		[65906865] = { spell= 276824, portal=true, label=PtoHellfirePeninsula, note=Outland..")\n("..inUCMq.."", faction="Horde" },
+		[59416743] = { spell= 276824, portal=true, label=PtoSM, note=EversongWoods..")\n("..Orboftranslocation.."", faction="Horde" },
+		[60475885] = { spell= 276824, portal=true, label=PtoOG, note=Durotar, faction="Horde" },
+		[62035926] = { spell= 276824, portal=true, label=PtoStranglethornVale, note=GromgolBaseCamp, faction="Horde" },
+		[58875901] = { spell= 276824, portal=true, label=PtoHowlingFjord, note=VengeanceLanding, faction="Horde" },
 		},
 	[21] = { -- Silverpine Forest
 --		[47254337] = { portal=true, label=PtoDalaCrater, note=HillsbradFoothills, faction="Horde" }, --questid missing

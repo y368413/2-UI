@@ -110,7 +110,7 @@ function BlinkHealth:OnInitialize()
 	self:UpdateUnitFrame();
 	SlashCmdList["BLINKHEALTH"] = BlinkHealth_SlashHandler;
 	SLASH_BLINKHEALTH1 = "/bht";
-	--if (ShiGuangPerDB.BHTHit == true) then sendCmd("/bht hiton") else sendCmd("/bht hitoff") end
+	--if (ShiGuangPerDB.BHTHit == true) then SenduiCmd("/bht hiton") else SenduiCmd("/bht hitoff") end
 end
 
 function BlinkHealth:OnEnable()
@@ -782,8 +782,8 @@ function BlinkHealth:ConstructFrame(unit)
      RightClickPlayer:SetPoint("TOPLEFT",0,0)
      RightClickPlayer:SetPoint("BOTTOMRIGHT",0,-16)
      RightClickPlayer:SetScript("OnMouseDown", function(self, button)
-		    --if button == "LeftButton" then sendCmd("/click PlayerFrame LeftButton")
-		    if button == "RightButton" then sendCmd("/click PlayerFrame RightButton") 
+		    --if button == "LeftButton" then SenduiCmd("/click PlayerFrame LeftButton")
+		    if button == "RightButton" then SenduiCmd("/click PlayerFrame RightButton") 
 		    end
     end)
 -------------------------------------------------------------
@@ -797,7 +797,7 @@ function BlinkHealth:ConstructFrame(unit)
     --if button == "LeftButton" then
 		  --if CheckInteractDistance("target",1) then InspectUnit("target") end
 		if button == "RightButton" then
-        sendCmd("/click TargetFrame RightButton")
+        SenduiCmd("/click TargetFrame RightButton")
 		elseif button == "MiddleButton" then
 			--if CheckInteractDistance("target",2) then InitiateTrade("target") end
 			if CheckInteractDistance("target",1) then InspectUnit("target") end
@@ -927,14 +927,14 @@ function BlinkHealth_SlashHandler(msg)
 	--local BHT_1 = "输入 /bht on 或 /bht off 开关插件\n";
 	--local BHT_2 = "输入 /bht m 调整位置\n";
 	--local BHT_3 = "输入 /bht hiton 或 /bht hitoff 是否显示数字连击点数\n";
-	local cmdtype, para1 = strsplit(" ", string.lower(msg))
+	--local cmdtype, para1 = strsplit(" ", string.lower(msg))
 	--local MyClass = select(2, UnitClass("player"))
-	local listSec = 0;
-	if para1 ~= nil then
-		listSec = tonumber(para1);
-	end
-	if (cmdtype == "on") then BlinkHealth:OnEnable();
-	elseif (cmdtype == "off") then BlinkHealth:OnDisable();
+	--local listSec = 0;
+	--if para1 ~= nil then
+		--listSec = tonumber(para1);
+	--end
+	if (msg == "on") then BlinkHealth:OnEnable();
+	elseif (msg == "off") then BlinkHealth:OnDisable();
 	--elseif (cmdtype == "rune") then if (MyClass == "DEATHKNIGHT") then BlinkHealth:ToggleRuneFrameVisible(true); end
 	else--if (cmdtype == "move" or cmdtype == "m") then
 			BlinkHealth:ShowAnchor();
@@ -964,7 +964,7 @@ local function PowerTypeAscending()
 end
 
 local function AutoHidePlayerFrame(self,event, ...)
-	if (not MaoRUIPerDB["UFs"]["UFFade"]) or (ShiGuangPerDB.BHT == true) then return end
+	if (not MaoRUIPerDB["UFs"]["UFFade"]) or (ShiGuangPerDB["BHT"] == true) then return end
 	--if (event == nil) then event = "TargetFrame or CharacterModelFrame toggled" end
 	if UnitHealth("player") < UnitHealthMax("player") * 0.99 or (powerTypeAscending and UnitPower("player") <= UnitPowerMax("player") * 0.99) or TargetFrame:IsShown() or UnitAffectingCombat("player") or CharacterFrame:IsShown() or ContainerFrame1:IsShown() then
 		if (not PlayerFrame:IsShown()) then

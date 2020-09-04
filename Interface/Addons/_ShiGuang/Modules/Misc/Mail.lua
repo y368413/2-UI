@@ -338,7 +338,7 @@ function MISC:MailBox()
 	
 	-------DelMailbutton----------------
 	button4 = MISC:CreatButton(InboxFrame, MAIL_DELETEEMPTYMAILS, 100, 26, "LEFT", button2, "RIGHT", 2, 0)
-	button4:SetScript("OnClick", function() sendCmd("/mbclean") end)
+	button4:SetScript("OnClick", function() SenduiCmd("/mbclean") end)
 
 	hooksecurefunc("InboxFrame_Update", MISC.InboxFrame_Hook)
 	hooksecurefunc("InboxFrameItem_OnEnter", MISC.InboxItem_OnEnter)

@@ -1,9 +1,12 @@
-﻿--## SavedVariables: CaerdonWardrobeConfig  ## Version: v2.4.0
+﻿--## SavedVariables: CaerdonWardrobeConfig  ## Version: v2.5.1
 
 local isBagUpdate = false
 local ignoreDefaultBags = false
 CaerdonWardrobe = {}
 CaerdonWardrobeNS = {}
+
+local version, build, date, tocversion = GetBuildInfo()
+local isShadowlands = tonumber(build) > 35700
 
 if GetLocale() == "zhCN" then
   CaerdonWardrobeBoA = "|cffe6cc80战网|r";
@@ -62,22 +65,51 @@ local function GetItemID(itemLink)
 end
 
 local function IsPetLink(itemLink)
-	local isPet = false
-	local itemName, itemLinkInfo, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
-itemEquipLoc, iconFileDataID, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, 
-isCraftingReagent = GetItemInfo(itemLink)
-
 	local itemID = GetItemID(itemLink)
 	if itemID == 82800 then
-		isPet = true -- probably at the guild bank
-	elseif itemClassID == LE_ITEM_CLASS_MISCELLANEOUS and itemSubClassID == LE_ITEM_MISCELLANEOUS_COMPANION_PET then
-		isPet = true
-	elseif not itemClassID then
-		local link, name = string.match(itemLink, "|H(.-)|h(.-)|h")
-		isPet = strsub(link, 1, 9) == "battlepet"
+		return true -- It's showing up as [Pet Cage] for whatever reason
+	elseif( itemLink ) then 
+		local _, _, _, linkType, linkID, _, _, _, _, _, battlePetID, battlePetDisplayID = strsplit(":|H", itemLink);
+		if ( linkType == "item") then
+			local _, _, _, creatureID, _, _, _, _, _, _, _, displayID, speciesID = C_PetJournal.GetPetInfoByItemID(tonumber(linkID));
+			if (creatureID and displayID) then
+				return true;
+			end
+		elseif ( linkType == "battlepet" ) then
+			local speciesID, _, _, _, _, displayID, _, _, _, _, creatureID = C_PetJournal.GetPetInfoByPetID(battlePetID);
+			if ( speciesID == tonumber(linkID)) then
+				if (creatureID and displayID) then
+					return true;
+				end	
+			else
+				speciesID = tonumber(linkID);
+				local _, _, _, creatureID, _, _, _, _, _, _, _, displayID = C_PetJournal.GetPetInfoBySpeciesID(speciesID);
+				displayID = (battlePetDisplayID and battlePetDisplayID ~= "0") and battlePetDisplayID or displayID;
+				if (creatureID and displayID) then
+					return true;
+				end	
+			end
+		end
 	end
+	return false
 
-	return isPet
+
+-- 	local isPet = false
+-- 	local itemName, itemLinkInfo, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
+-- itemEquipLoc, iconFileDataID, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, 
+-- isCraftingReagent = GetItemInfo(itemLink)
+
+-- 	local itemID = GetItemID(itemLink)
+-- 	if itemID == 82800 then
+-- 		isPet = true -- probably at the guild bank
+-- 	elseif itemClassID == LE_ITEM_CLASS_MISCELLANEOUS and itemSubClassID == LE_ITEM_MISCELLANEOUS_COMPANION_PET then
+-- 		isPet = true
+-- 	elseif not itemClassID then
+-- 		local link, name = string.match(itemLink, "|H(.-)|h(.-)|h")
+-- 		isPet = strsub(link, 1, 9) == "battlepet"
+-- 	end
+
+-- 	return isPet
 end
 
 local function IsMountLink(itemLink)
@@ -206,7 +238,7 @@ local function GetItemAppearance(itemID, itemLink)
         if sourceItemLink then
 			local _, _, quality = GetItemInfo(sourceItemLink)
 			-- Skip artifact weapons and common for now
-			if quality == LE_ITEM_QUALITY_COMMON then
+			if quality == Enum.ItemQuality.Common then
 	 			appearanceID = nil
 	 			isCollected = false
 	 			sourceID = NO_TRANSMOG_SOURCE_ID
@@ -317,8 +349,9 @@ end
 
 local function GetItemLinkLocal(bag, slot)
 	if bag == "AuctionFrame" then
-		local _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, hasAllInfo =  GetAuctionItemInfo("list", slot);
-		return hasAllInfo and GetAuctionItemLink("list", slot)
+		local browseResults = C_AuctionHouse.GetBrowseResults()
+		local _, itemLink = GetItemInfo(browseResults[slot].itemKey.itemID);
+		return itemLink
 	elseif bag == "MerchantFrame" then
 		if MerchantFrame.selectedTab == 1 then
 			return GetMerchantItemLink(slot)
@@ -334,6 +367,18 @@ local function GetItemLinkLocal(bag, slot)
 		return slot.link
 	elseif bag == "LootFrame" or bag == "GroupLootFrame" then
 		return slot.link
+	elseif bag == "OpenMailFrame" then
+		local name, itemID, itemTexture, count, quality, canUse = GetInboxItem(InboxFrame.openMailID, slot);
+		local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
+		itemEquipLoc, iconFileDataID, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, 
+		isCraftingReagent = GetItemInfo(itemID)
+		return itemLink
+	elseif bag == "SendMailFrame" then
+		local itemName, itemID, itemTexture, stackCount, quality = GetSendMailItem(slot);
+		local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
+		itemEquipLoc, iconFileDataID, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, 
+		isCraftingReagent = GetItemInfo(itemID)
+		return itemLink
 	elseif bag == "QuestButton" then
 		if slot.itemLink then
 			return slot.itemLink
@@ -363,6 +408,8 @@ local function GetItemKey(bag, slot, itemLink)
 		itemKey = itemLink .. bag
 	elseif bag == "LootFrame" or bag == "GroupLootFrame" then
 		itemKey = itemLink
+	elseif bag == "OpenMailFrame" or bag == "SendMailFrame" then
+		itemKey = itemLink .. slot
 	else
 		itemKey = itemLink .. bag .. slot
 	end
@@ -384,7 +431,9 @@ local function GetBindingStatus(bag, slot, itemID, itemLink)
 	local isCompletionistItem = false
 	local matchesLootSpec = true
 	local unusableItem = false
-    local isDressable, shouldRetry
+	local isDressable, shouldRetry
+	
+	local tooltipSpeciesID = 0
 
     local isCollectionItem = IsCollectibleLink(itemLink)
 
@@ -421,7 +470,8 @@ local function GetBindingStatus(bag, slot, itemID, itemLink)
 		needsItem = true
 		scanTip:SetOwner(WorldFrame, "ANCHOR_NONE")
 		if bag == "AuctionFrame" then
-			scanTip:SetAuctionItem("list", slot)
+			local itemKey = C_AuctionHouse.MakeItemKey(itemID)
+			scanTip:SetItemKey(itemKey.itemID, itemKey.itemLevel, itemKey.itemSuffix)
 		elseif bag == "MerchantFrame" then
 			if MerchantFrame.selectedTab == 1 then
 				scanTip:SetMerchantItem(slot)
@@ -439,6 +489,12 @@ local function GetBindingStatus(bag, slot, itemID, itemLink)
 			scanTip:SetLootItem(slot.index)
 		elseif bag == "GroupLootFrame" then
 			scanTip:SetLootRollItem(slot.index)
+		elseif bag == "OpenMailFrame" then
+			local hasCooldown, speciesID, level, breedQuality, maxHealth, power, speed, name = scanTip:SetInboxItem(InboxFrame.openMailID, slot)
+			tooltipSpeciesID = speciesID
+		elseif bag == "SendMailFrame" then
+			local hasCooldown, speciesID, level, breedQuality, maxHealth, power, speed, name = scanTip:SetSendMailItem(slot)
+			tooltipSpeciesID = speciesID
 		elseif bag == "EncounterJournal" then
 			local classID, specID = EJ_GetLootFilter();
 			if (specID == 0) then
@@ -627,7 +683,6 @@ local function GetBindingStatus(bag, slot, itemID, itemLink)
 						if petID ~= 82800 then -- generic pet cage
 							local numCollected = C_PetJournal.GetNumCollectedInfo(petID)
 							if numCollected == nil then
-								-- TODO: Not sure what else to do here
 								needsItem = false
 							elseif numCollected > 0 then				
 								needsItem = false
@@ -635,8 +690,19 @@ local function GetBindingStatus(bag, slot, itemID, itemLink)
 								needsItem = true
 							end
 						else
-							-- TODO: Can we do something here?
-							needsItem = false
+							if tooltipSpeciesID > 0 then
+								-- Pet cages have some magic info that comes back from tooltip setup
+								local numCollected = C_PetJournal.GetNumCollectedInfo(tooltipSpeciesID)
+								if numCollected == nil then
+									needsItem = false
+								elseif numCollected > 0 then
+									needsItem = false
+								else
+									needsItem = true
+								end
+							else
+								needsItem = false
+							end
 						end
 					end
 				elseif needsCollectionItem then
@@ -705,7 +771,9 @@ local function IsBankOrBags(bag)
 	   bag ~= "EncounterJournal" and
 	   bag ~= "QuestButton" and
 	   bag ~= "LootFrame" and
-	   bag ~= "GroupLootFrame" then
+	   bag ~= "GroupLootFrame" and
+	   bag ~= "OpenMailFrame" and
+	   bag ~= "SendMailFrame" then
 		isBankOrBags = true
 	end
 
@@ -1091,7 +1159,7 @@ local function SetItemButtonBindType(button, mogStatus, bindingStatus, options, 
 	else
 		if mogStatus == "own" then
 			if bindingStatus == CaerdonWardrobeBoA then
-				local color = BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_HEIRLOOM]
+				local color = BAG_ITEM_QUALITY_COLORS[Enum.ItemQuality.Heirloom]
 				bindsOnText:SetTextColor(color.r, color.g, color.b, 1)
 				bindingText = bindingStatus
 			else
@@ -1101,7 +1169,7 @@ local function SetItemButtonBindType(button, mogStatus, bindingStatus, options, 
 			bindingText = "|cFFFF0000" .. bindingStatus .. "|r"
 		elseif mogStatus == "collected" then
 			if bindingStatus == CaerdonWardrobeBoA then
-				local color = BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_HEIRLOOM]
+				local color = BAG_ITEM_QUALITY_COLORS[Enum.ItemQuality.Heirloom]
 				bindsOnText:SetTextColor(color.r, color.g, color.b, 1)
 				bindingText = bindingStatus
 			elseif bindingStatus == CaerdonWardrobeBoE then
@@ -1111,7 +1179,7 @@ local function SetItemButtonBindType(button, mogStatus, bindingStatus, options, 
 			end
 		else
 			if bindingStatus == CaerdonWardrobeBoA then
-				local color = BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_HEIRLOOM]
+				local color = BAG_ITEM_QUALITY_COLORS[Enum.ItemQuality.Heirloom]
 				bindsOnText:SetTextColor(color.r, color.g, color.b, 1)
 				bindingText = bindingStatus
 			else
@@ -1389,7 +1457,8 @@ function CaerdonWardrobe:RegisterAddon(name, addonOptions)
 					addonList = key
 				end	
 			end
-			StaticPopup_Show("CAERDON_WARDROBE_MULTIPLE_BAG_ADDONS", addonList)
+			--StaticPopup_Show("CAERDON_WARDROBE_MULTIPLE_BAG_ADDONS", addonList)
+			RaidNotice_AddMessage(RaidWarningFrame, "It looks like multiple bag addons are currently running! You should only have one bag addon enabled!", ChatTypeInfo["RAID_WARNING"])
 		end
 		if not options.hookDefaultBags then
 			ignoreDefaultBags = true
@@ -1559,36 +1628,42 @@ local function OnGuildBankFrameUpdate()
 end
 
 local function OnAuctionBrowseUpdate()
-	local offset = FauxScrollFrame_GetOffset(BrowseScrollFrame);
+	-- Event pump since first load won't have UI ready
+	C_Timer.After(0, function() 
+		local browseResults = C_AuctionHouse.GetBrowseResults()
+		local offset = AuctionHouseFrame.BrowseResultsFrame.ItemList:GetScrollOffset();
 
-	for i=1, NUM_BROWSE_TO_DISPLAY do
-		local auctionIndex = offset + i
-		local index = auctionIndex + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page);
-		local buttonName = "BrowseButton"..i.."Item";
-		local button = _G[buttonName];
-
-		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
-		local shouldHide = index > (numBatchAuctions + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page));
-		if ( not shouldHide ) then
-			name, texture, count, quality, canUse, level, levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, owner, ownerFullName, saleStatus, itemId, hasAllInfo =  GetAuctionItemInfo("list", auctionIndex);
-			
-			if ( not hasAllInfo ) then --Bug  145328
-				shouldHide = true;
-			end
-		end
-
-		if not shouldHide then
+		local buttons = HybridScrollFrame_GetButtons(AuctionHouseFrame.BrowseResultsFrame.ItemList.ScrollFrame);
+		for i, button in ipairs(buttons) do
 			local bag = "AuctionFrame"
-			local slot = auctionIndex
+			local slot = i + offset
 
-			local itemLink = GetAuctionItemLink("list", auctionIndex)
+			local item = browseResults[slot]
+			local _, itemLink
+			if (item) then
+				_, itemLink = GetItemInfo(browseResults[slot].itemKey.itemID);
+			end
+
 			if(itemLink) then
 				local itemID = GetItemID(itemLink)
 				if itemID and button then
-					ProcessOrWaitItem(itemID, bag, slot, button, { showMogIcon=true, showBindStatus=false, showSellables=false })
+					ProcessOrWaitItem(itemID, bag, slot, button, 
+						{
+							iconOffset = 10,
+							iconSize = 30,				
+							showMogIcon=true, 
+							showBindStatus=false, 
+							showSellables=false
+						})
 				end
 			end
 		end
+	end)
+end
+
+local function OnAuctionBrowseClick(self, buttonName, isDown)
+	if (buttonName == "LeftButton" and isDown) then
+		OnAuctionBrowseUpdate()
 	end
 end
 
@@ -1625,49 +1700,6 @@ end
 hooksecurefunc("MerchantFrame_UpdateMerchantInfo", OnMerchantUpdate)
 hooksecurefunc("MerchantFrame_UpdateBuybackInfo", OnBuybackUpdate)
 
-local ignoreEvents = {
-	["APPEARANCE_SEARCH_UPDATED"] = {},
-	["ACTIONBAR_UPDATE_COOLDOWN"] = {},
-	["BAG_UPDATE_COOLDOWN"] = {},
-	["BN_FRIEND_INFO_CHANGED"] = {},
-	["CHAT_MSG_BN_WHISPER"] = {},
-	["CHAT_MSG_BN_WHISPER_INFORM"] = {},
-	["CHAT_MSG_CHANNEL"] = {},
-	["CHAT_MSG_SYSTEM"] = {},
-	["CHAT_MSG_TRADESKILLS"] = {},
-	["COMBAT_LOG_EVENT_UNFILTERED"] = {},
-	["COMPANION_UPDATE"] = {},
-	["CRITERIA_UPDATE"] = {},
-	["CURSOR_UPDATE"] = {},
-	["FRIENDLIST_UPDATE"] = {},
-	["GET_ITEM_INFO_RECEIVED"] = {},
-	["GUILDBANKBAGSLOTS_CHANGED"] = {},
-	["GUILD_ROSTER_UPDATE"] = {},
-	["ITEM_LOCK_CHANGED"] = {},
-	["ITEM_LOCKED"] = {},
-	["ITEM_UNLOCKED"] = {},
-	["MODIFIER_STATE_CHANGED"] = {},
-	["NAME_PLATE_UNIT_REMOVED"] = {},
-	["RECEIVED_ACHIEVEMENT_LIST"] = {},
-	["QUEST_LOG_UPDATE"] = {},
-	["SPELL_UPDATE_COOLDOWN"] = {},
-	["SPELL_UPDATE_USABLE"] = {},
-	["UNIT_ABSORBE_AMOUNT_CHANGED"] = {},
-	["UNIT_AURA"] = {},
-	["UNIT_POWER"] = {},
-	["UNIT_POWER_FREQUENT"] = {},
-	["UPDATE_INVENTORY_DURABILITY"] = {},
-	["UNIT_ATTACK_SPEED"] = {},
-	["UNIT_SPELL_HASTE"] = {},
-	["UNIT_TARGET"] = {},
-	["UPDATE_MOUSEOVER_UNIT"] = {},
-	["UPDATE_PENDING_MAIL"] = {},
-	["UPDATE_UI_WIDGET"] = {},
-	["UPDATE_WORLD_STATES"] = {},
-	["QUESTLINE_UPDATE"] = {},
-	["WORLD_MAP_UPDATE"] = {}
-}
-
 local function OnEvent(self, event, ...)
 	local handler = self[event]
 	if(handler) then
@@ -1681,6 +1713,8 @@ local GUILDBANKFRAMEUPDATE_INTERVAL = 0.1
 local BAGUPDATE_INTERVAL = 0.1
 local ITEMUPDATE_INTERVAL = 0.1
 local timeSinceLastItemUpdate = nil
+
+local latestDataRequestQuestID = nil
 
 local function OnUpdate(self, elapsed)
 	if self.itemUpdateCoroutine then
@@ -1845,8 +1879,6 @@ function CaerdonWardrobeFrame:ADDON_LOADED(name)
 		else
 			CaerdonWardrobeFrame:RegisterEvent("PLAYER_LOGIN")
 		end
-	elseif name == "Blizzard_AuctionUI" then
-		hooksecurefunc("AuctionFrameBrowse_Update", OnAuctionBrowseUpdate)
 	elseif name == "Blizzard_GuildBankUI" then
 		hooksecurefunc("GuildBankFrame_Update", OnGuildBankFrameUpdate)
 	elseif name == "Blizzard_EncounterJournal" then
@@ -1871,37 +1903,61 @@ function UpdatePin(pin)
 	end
 end
 
+local function QuestInfo_GetQuestID()
+	if ( QuestInfoFrame.questLog ) then
+		if (isShadowlands) then
+			return C_QuestLog.GetSelectedQuest();
+		else
+			return select(8, GetQuestLogTitle(GetQuestLogSelection()));
+		end
+	else
+		return GetQuestID();
+	end
+end
+
 local function OnQuestInfoShowRewards(template, parentFrame)
 	local numQuestRewards = 0;
 	local numQuestChoices = 0;
 	local rewardsFrame = QuestInfoFrame.rewardsFrame;
-	local questID
+	local questID = QuestInfo_GetQuestID()
 
-	if ( template.canHaveSealMaterial ) then
-		local questFrame = parentFrame:GetParent():GetParent();
-		if ( template.questLog ) then
-			questID = questFrame.questID;
-		else
-			questID = GetQuestID();
-		end
-	end
+	if questID == 0 then return end -- quest abandoned
+
+	-- if ( template.canHaveSealMaterial ) then
+	-- 	local questFrame = parentFrame:GetParent():GetParent();
+	-- 	if ( template.questLog ) then
+	-- 		questID = questFrame.questID;
+	-- 	else
+	-- 		questID = GetQuestID();
+	-- 	end
+	-- end
 
 	local spellGetter;
+
 	if ( QuestInfoFrame.questLog ) then
-		questID = select(8, GetQuestLogTitle(GetQuestLogSelection()));
 		if C_QuestLog.ShouldShowQuestRewards(questID) then
 			numQuestRewards = GetNumQuestLogRewards();
-			numQuestChoices = GetNumQuestLogChoices();
+			numQuestChoices = GetNumQuestLogChoices(questID, true);
 			-- playerTitle = GetQuestLogRewardTitle();
 			-- numSpellRewards = GetNumQuestLogRewardSpells();
 			-- spellGetter = GetQuestLogRewardSpell;
 		end
 	else
-		numQuestRewards = GetNumQuestRewards();
-		numQuestChoices = GetNumQuestChoices();
-		-- playerTitle = GetRewardTitle();
-		-- numSpellRewards = GetNumRewardSpells();
-		-- spellGetter = GetRewardSpell;
+		if ( QuestFrameRewardPanel:IsShown() or C_QuestLog.ShouldShowQuestRewards(questID) ) then
+			numQuestRewards = GetNumQuestRewards();
+			numQuestChoices = GetNumQuestChoices();
+			-- playerTitle = GetRewardTitle();
+			-- numSpellRewards = GetNumRewardSpells();
+			-- spellGetter = GetRewardSpell;
+		end
+	end
+
+	if not HaveQuestRewardData(questID) then
+		-- HACK: Force load and handle in QUEST_DATA_LOAD_RESULT
+		-- Not needed if Blizzard fixes showing of rewards in follow-up quests
+		latestDataRequestQuestID = questID
+		C_QuestLog.RequestLoadQuestByID(questID)
+		return
 	end
 
 	local options = {
@@ -1977,17 +2033,20 @@ local function OnQuestInfoDisplay(template, parentFrame)
 end
 
 function CaerdonWardrobeFrame:PLAYER_LOGIN(...)
-		-- CaerdonWardrobeFrame:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
-		CaerdonWardrobeFrame:RegisterEvent("BAG_OPEN")
-		CaerdonWardrobeFrame:RegisterEvent("BAG_UPDATE")
-		CaerdonWardrobeFrame:RegisterEvent("BAG_UPDATE_DELAYED")
-		CaerdonWardrobeFrame:RegisterEvent("BANKFRAME_OPENED")
-		CaerdonWardrobeFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
-		CaerdonWardrobeFrame:RegisterEvent("TRANSMOG_COLLECTION_UPDATED")
-		-- CaerdonWardrobeFrame:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
-		CaerdonWardrobeFrame:RegisterEvent("EQUIPMENT_SETS_CHANGED")
-		CaerdonWardrobeFrame:RegisterEvent("MERCHANT_UPDATE")
-		CaerdonWardrobeFrame:RegisterEvent("PLAYER_LOOT_SPEC_UPDATED")
+	-- CaerdonWardrobeFrame:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
+	CaerdonWardrobeFrame:RegisterEvent("AUCTION_HOUSE_BROWSE_RESULTS_UPDATED")
+	CaerdonWardrobeFrame:RegisterEvent("AUCTION_HOUSE_SHOW")
+	CaerdonWardrobeFrame:RegisterEvent("BAG_OPEN")
+	CaerdonWardrobeFrame:RegisterEvent("BAG_UPDATE")
+	CaerdonWardrobeFrame:RegisterEvent("BAG_UPDATE_DELAYED")
+	CaerdonWardrobeFrame:RegisterEvent("BANKFRAME_OPENED")
+	CaerdonWardrobeFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+	CaerdonWardrobeFrame:RegisterEvent("TRANSMOG_COLLECTION_UPDATED")
+	-- CaerdonWardrobeFrame:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
+	CaerdonWardrobeFrame:RegisterEvent("EQUIPMENT_SETS_CHANGED")
+	CaerdonWardrobeFrame:RegisterEvent("MERCHANT_UPDATE")
+	CaerdonWardrobeFrame:RegisterEvent("PLAYER_LOOT_SPEC_UPDATED")
+	CaerdonWardrobeFrame:RegisterEvent("QUEST_DATA_LOAD_RESULT")
 	C_TransmogCollection.SetShowMissingSourceInItemTooltips(true)
 
 	hooksecurefunc (WorldMap_WorldQuestPinMixin, "RefreshVisuals", function (self)
@@ -1997,6 +2056,32 @@ function CaerdonWardrobeFrame:PLAYER_LOGIN(...)
 	end)
 	-- hooksecurefunc("QuestInfo_GetRewardButton", OnQuestInfoGetRewardButton)
 	-- hooksecurefunc("QuestInfo_ShowRewards", OnQuestInfoShowRewards)
+end
+
+function CaerdonWardrobeFrame:AUCTION_HOUSE_BROWSE_RESULTS_UPDATED()
+	OnAuctionBrowseUpdate()
+end
+
+local hookAuction = true
+function CaerdonWardrobeFrame:AUCTION_HOUSE_SHOW()
+	if (hookAuction) then
+		hookAuction = false
+		AuctionHouseFrame.BrowseResultsFrame.ItemList.ScrollFrame.scrollBar:HookScript("OnValueChanged", OnAuctionBrowseUpdate)
+	end
+end
+
+function CaerdonWardrobeFrame:QUEST_DATA_LOAD_RESULT(questID, success)
+	if success then
+		-- Total hack until Blizzard fixes quest rewards not loading
+		if questID == latestDataRequestQuestID then
+			latestDataRequestQuestID = nil
+
+			if QuestFrameDetailPanel:IsShown() then
+				QuestFrameDetailPanel:Hide();
+				QuestFrameDetailPanel:Show();
+			end
+		end
+	end
 end
 
 function RefreshMainBank()
@@ -2160,6 +2245,43 @@ end
 -- 	end
 -- end
 
+local function OnMailFrameUpdateButtonPositions(letterIsTakeable, textCreated, stationeryIcon, money)
+	for i=1, ATTACHMENTS_MAX_RECEIVE do
+		local attachmentButton = OpenMailFrame.OpenMailAttachments[i];
+		if HasInboxItem(InboxFrame.openMailID, i) then
+			local name, itemID, itemTexture, count, quality, canUse = GetInboxItem(InboxFrame.openMailID, i);
+			if name then
+				ProcessOrWaitItem(itemID, "OpenMailFrame", i, attachmentButton, nil)
+			else
+				SetItemButtonMogStatus(attachmentButton, nil)
+				SetItemButtonBindType(attachmentButton, nil)		
+			end
+		else
+			SetItemButtonMogStatus(attachmentButton, nil)
+			SetItemButtonBindType(attachmentButton, nil)		
+		end
+	end
+end
+
+local function OnSendMailFrameUpdate()
+	for i=1, ATTACHMENTS_MAX_SEND do
+		local attachmentButton = SendMailFrame.SendMailAttachments[i];
+
+		if HasSendMailItem(i) then
+			local itemName, itemID, itemTexture, stackCount, quality = GetSendMailItem(i);
+			if itemName then
+				ProcessOrWaitItem(itemID, "SendMailFrame", i, attachmentButton, nil)
+			else
+				SetItemButtonMogStatus(attachmentButton, nil)
+				SetItemButtonBindType(attachmentButton, nil)		
+			end
+		else
+			SetItemButtonMogStatus(attachmentButton, nil)
+			SetItemButtonBindType(attachmentButton, nil)		
+		end
+	end
+end
+
 local function OnLootFrameUpdateButton(index)
 	local numLootItems = LootFrame.numLootItems;
 	local numLootToShow = LOOTFRAME_NUMBUTTONS;
@@ -2215,6 +2337,8 @@ end
 
 hooksecurefunc("LootFrame_UpdateButton", OnLootFrameUpdateButton)
 hooksecurefunc("QuestInfo_Display", OnQuestInfoDisplay)
+hooksecurefunc("OpenMailFrame_UpdateButtonPositions", OnMailFrameUpdateButtonPositions)
+hooksecurefunc("SendMailFrame_Update", OnSendMailFrameUpdate)
 
 GroupLootFrame1:HookScript("OnShow", OnGroupLootFrameShow)
 GroupLootFrame2:HookScript("OnShow", OnGroupLootFrameShow)
