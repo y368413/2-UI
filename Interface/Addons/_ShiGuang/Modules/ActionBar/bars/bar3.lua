@@ -76,6 +76,8 @@ function Bar:CreateBar3()
 			elseif layout == 8 then
 				button:SetSize(cfg.size+7, cfg.size+7)
 				button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", 1.2*margin, 0)
+			else
+			  button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", margin, 0)
 			end
 		elseif i == 3 then
 			if layout == 7 then
@@ -83,6 +85,8 @@ function Bar:CreateBar3()
 			elseif layout == 8 then
 				button:SetSize(cfg.size+7, cfg.size+7)
 				button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", 1.2*margin, 0)
+			else
+			  button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", margin, 0)
 			end
 		elseif i == 4 then
 			if layout == 1 then
@@ -90,6 +94,8 @@ function Bar:CreateBar3()
 			elseif layout == 8 then
 				button:SetSize(cfg.size+7, cfg.size+7)
 				button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", 1.2*margin, 0)
+			else
+			  button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", margin, 0)
 			end
 		elseif i == 5 then
 			if layout == 7 then
@@ -97,6 +103,8 @@ function Bar:CreateBar3()
 			elseif layout == 8 then
 				button:SetSize(cfg.size+7, cfg.size+7)
 				button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", 1.2*margin, 0)
+			else
+			  button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", margin, 0)
 			end
 		elseif i == 7 then
 		  if layout == 1 then
@@ -108,6 +116,8 @@ function Bar:CreateBar3()
 			elseif layout == 8 then
 				button:SetSize(cfg.size+7, cfg.size+7)
 				button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", 1.2*margin, 0)
+			else
+			  button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", margin, 0)
 			end			
 		elseif i == 9 then
 			if layout == 7 then
@@ -115,6 +125,8 @@ function Bar:CreateBar3()
 			elseif layout == 8 then
 				button:SetSize(cfg.size+7, cfg.size+7)
 				button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", 1.2*margin, 0)
+			else
+			  button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", margin, 0)
 			end
 		elseif i == 10 then
 			if layout == 1 then
@@ -122,6 +134,8 @@ function Bar:CreateBar3()
 			elseif layout == 8 then
 				button:SetSize(cfg.size+7, cfg.size+7)
 				button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", 1.2*margin, 0)
+			else
+			  button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", margin, 0)
 			end
 		elseif i == 11 then
 			if layout == 7 then
@@ -130,6 +144,8 @@ function Bar:CreateBar3()
 			elseif layout == 8 then
 				button:SetSize(cfg.size+7, cfg.size+7)
 				button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", 1.2*margin, 0)
+			else
+			  button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", margin, 0)
 			end
 		elseif i == 12 then
 			if layout == 7 then
@@ -137,6 +153,8 @@ function Bar:CreateBar3()
 			elseif layout == 8 then
 				button:SetSize(cfg.size+7, cfg.size+7)
 				button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", 1.2*margin, 0)
+			else
+			  button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", margin, 0)
 			end
 		else
 			if layout == 8 then

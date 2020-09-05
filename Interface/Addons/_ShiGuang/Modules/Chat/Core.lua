@@ -83,7 +83,7 @@ function module:SkinChat()
 	lang:SetPoint("TOPLEFT", eb, "TOPRIGHT", 2, 0)
 	lang:SetPoint("BOTTOMRIGHT", eb, "BOTTOMRIGHT", 21, 0)
 	M.SetBD(lang)
-
+	
 	local tab = _G[name.."Tab"]
 	tab:SetAlpha(0.2)
 	local tabFs = tab:GetFontString()

@@ -15,19 +15,19 @@ function Bar:CreateBar4()
 	if (layout == 2) or (layout == 3) then
 		frame:SetWidth(6*cfg.size + 5*margin + padding)
 		frame:SetHeight(2*cfg.size + margin + padding)
-		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -9*cfg.size - 8*padding - padding, 4}
-	--elseif layout == 8 then
-		--frame:SetWidth(25*cfg.size + 25*margin + 2*padding)
-		--frame:SetHeight(2*cfg.size + 2*margin + 2*padding)
-		--frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 2}
-	elseif layout == 7 then
-	  frame:SetWidth(7*cfg.size + 6*margin)
-		frame:SetHeight(2*cfg.size - margin)
-		frame.Pos = {"CENTER", UIParent, "CENTER", 0, -230}
+		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -9*cfg.size - 8*padding - padding, 4}	
 	elseif layout == 6 then
 		frame:SetWidth(4*cfg.size + margin + padding)
 		frame:SetHeight(3*cfg.size + margin + padding)
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -8*cfg.size - 8*margin , 3*margin}
+	elseif layout == 7 then
+	  frame:SetWidth(7*cfg.size + 6*margin)
+		frame:SetHeight(2*cfg.size - margin)
+		frame.Pos = {"CENTER", UIParent, "CENTER", 0, -230}
+	--elseif layout == 8 then
+		--frame:SetWidth(25*cfg.size + 25*margin + 2*padding)
+		--frame:SetHeight(2*cfg.size + 2*margin + 2*padding)
+		--frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 2}
 	elseif layout == 8 then
 		frame:SetWidth(7*cfg.size + margin + padding)
 		frame:SetHeight(2*cfg.size + margin + padding)

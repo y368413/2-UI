@@ -255,22 +255,26 @@ function module:Chatbar()
 
 	-- Custom ChatMenu
 	VoiceFrame = CreateFrame("Frame", nil, UIParent)
-	VoiceFrame:SetSize(26, 100)
-	VoiceFrame:SetPoint("TOPRIGHT", _G.ChatFrame1, 22, 0)
+	VoiceFrame:SetSize(100, 21)
+	if GetCVar("portal") == "CN" then
+	  VoiceFrame:SetPoint("LEFT", Chatbar, "LEFT", 265, -2)
+	else
+	  VoiceFrame:SetPoint("LEFT", Chatbar, "LEFT", 240, -2)
+	end
 	VoiceFrame:SetShown(MaoRUIPerDB["Chat"]["ChatMenu"])
 	
-	_G.ChatFrameMenuButton:ClearAllPoints()
-	_G.ChatFrameMenuButton:SetPoint("TOP", VoiceFrame)	
-	_G.ChatFrameMenuButton:SetParent(VoiceFrame)
 	_G.ChatFrameChannelButton:ClearAllPoints()
-	_G.ChatFrameChannelButton:SetPoint("TOP", _G.ChatFrameMenuButton, "BOTTOM", 0, -2)
+	_G.ChatFrameChannelButton:SetPoint("TOP", VoiceFrame)
 	_G.ChatFrameChannelButton:SetParent(VoiceFrame)
+	_G.ChatFrameToggleVoiceDeafenButton:ClearAllPoints()
+	_G.ChatFrameToggleVoiceDeafenButton:SetPoint("LEFT", _G.ChatFrameChannelButton, "RIGHT", 0, 0)
 	_G.ChatFrameToggleVoiceDeafenButton:SetParent(VoiceFrame)
+	_G.ChatFrameToggleVoiceMuteButton:ClearAllPoints()
+	_G.ChatFrameToggleVoiceMuteButton:SetPoint("LEFT", _G.ChatFrameToggleVoiceDeafenButton, "RIGHT", 0, 0)
 	_G.ChatFrameToggleVoiceMuteButton:SetParent(VoiceFrame)
 	--_G.QuickJoinToastButton.Show = M.Dummy
 	--_G.QuickJoinToastButton:Hide()
 	_G.QuickJoinToastButton:SetParent(VoiceFrame)
-	--_G.ChatAlertFrame:SetClampedToScreen(true)
 	_G.ChatAlertFrame:ClearAllPoints()
 	_G.ChatAlertFrame:SetPoint("BOTTOMLEFT", _G.ChatFrame1Tab, "TOPLEFT", 6, 21)
 
@@ -282,10 +286,16 @@ function module:Chatbar()
 	Voice.Icon:SetTexture("Interface\\AddOns\\_ShiGuang\\media\\Emotes\\zhuan_push_frame")
 	Voice:RegisterForClicks("AnyUp")
 	Voice:SetScript("OnClick",function(self, btn) if btn == "RightButton" then SenduiCmd("/whisperpop") else M:TogglePanel(VoiceFrame) MaoRUIPerDB["Chat"]["ChatMenu"] = VoiceFrame:IsShown() end end)
-
+	
+	_G.ChatFrameMenuButton:ClearAllPoints()
+	_G.ChatFrameMenuButton:SetSize(21, 21)
+	--_G.ChatFrameMenuButton:SetScale(0.6)
+	_G.ChatFrameMenuButton:SetPoint("LEFT", Voice, "RIGHT", 0, -1)	
+	--_G.ChatFrameMenuButton:SetParent(VoiceFrame)
+	
 	Emote_CallButton=CreateFrame("Button","Emote_CallButton",Chatbar)
  	Emote_CallButton:SetSize(16, 16)
- 	Emote_CallButton:SetPoint("LEFT", Voice, "RIGHT", 3, 0)
+ 	Emote_CallButton:SetPoint("LEFT", Voice, "RIGHT", 21, 0)
  	Emote_CallButton:SetNormalTexture("Interface\\AddOns\\_ShiGuang\\media\\Emotes\\suprise")
 	Emote_CallButton:SetParent(Chatbar)
  	Emote_CallButton:RegisterForClicks("AnyUp")

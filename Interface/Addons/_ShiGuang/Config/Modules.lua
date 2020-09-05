@@ -41,7 +41,7 @@ R.Auras = {
 
 -- 头像相关
 R.UFs = {
-	Playercb		= {"CENTER", UIParent, "CENTER", 0, -250},			-- 玩家施法条默认位置
+	Playercb		= {"CENTER", UIParent, "CENTER", 0, -260},			-- 玩家施法条默认位置
 	Targetcb		= {"CENTER", UIParent, "CENTER", 0, -145},			-- 目标施法条默认位置
 	Focuscb			= {"CENTER", UIParent, "CENTER", 0, -130},			-- 焦点施法条默认位置
 	FocusPos		= {"LEFT", UIParent, "LEFT", 5, -150},				-- 焦点框体默认位置

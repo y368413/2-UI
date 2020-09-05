@@ -612,7 +612,7 @@ SlashCmdList["BATTLEPETBREEDID"] = function(msg)
     local i = 1
     local currAddon = "InterfaceOptionsFrameAddOnsButton" .. i
     while _G[currAddon] do
-        if (_G[currAddon]:GetText() == "Battle Pet BreedID") then _G[currAddon]:Click() break end
+        if (_G[currAddon]:GetText() == "BattlePet BreedID") then _G[currAddon]:Click() break end
         i = i + 1
         currAddon = "InterfaceOptionsFrameAddOnsButton" .. i
     end
@@ -7061,7 +7061,7 @@ BPBID_Options.Breedtip.AllStats25: All breeds' stats at level 25
 -- Create options panel
 local Options = CreateFrame("Frame", nil, InterfaceOptionsFramePanelContainer)
 Options:Hide()
-Options.name = "Battle Pet BreedID"
+Options.name = "BattlePet BreedID"
 
 -- Variable for easy positioning
 local lastcheckbox
@@ -7100,13 +7100,13 @@ local panelWidth = InterfaceOptionsFramePanelContainer:GetWidth() -- ~623
 local wideWidth = panelWidth - 40
 
 -- Create title, version, author, and description fields
-local title = CreateFont("GameFontNormalLarge", "Battle Pet BreedID")
+local title = CreateFont("GameFontNormalLarge", "BattlePet BreedID")
 title:SetPoint("TOPLEFT", 16, -16)
-local ver = CreateFont("GameFontNormalSmall", "version "..GetAddOnMetadata("HPetBattleAny", "Version"))
+local ver = CreateFont("GameFontNormalSmall", "r209")
 ver:SetPoint("BOTTOMLEFT", title, "BOTTOMRIGHT", 4, 0)
-local auth = CreateFont("GameFontNormalSmall", "created by "..GetAddOnMetadata("HPetBattleAny", "Author"))
+local auth = CreateFont("GameFontNormalSmall", "by Simca@Malfurion and Hugh@Burning Blade")
 auth:SetPoint("BOTTOMLEFT", ver, "BOTTOMRIGHT", 3, 0)
-local desc = CreateFont("GameFontHighlight", nil, nil, nil, "TOPLEFT", title, "BOTTOMLEFT", wideWidth, 40, 0, -8, "Battle Pet BreedID displays the BreedID of pets in your journal, in battle, in chat links, and in item tooltips.")
+local desc = CreateFont("GameFontHighlight", nil, nil, nil, "TOPLEFT", title, "BOTTOMLEFT", wideWidth, 40, 0, -8, "BattlePet BreedID displays the BreedID of pets in your journal, in battle, in chat links, and in item tooltips.")
 
 -- Create temp format variable
 local tempformat = 3
@@ -7187,10 +7187,10 @@ local OptNamesPJT = CreateCheckbox("In the Pet Journal description tooltip", 32,
 local OptNamesPJTRarity = CreateCheckbox("Color Pet Journal tooltip headers by rarity", 16, 16, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 32, 0, "GameFontNormalSmall")
 
 -- Above the Tooltips region's title (this checkbox disables the rest of them)
-local OptTooltipsEnabled = CreateCheckbox("Enable Battle Pet BreedID Tooltips", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", -32, -16)
+local OptTooltipsEnabled = CreateCheckbox("Enable BattlePet BreedID Tooltips", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", -32, -16)
 
 -- Text above the Tooltips region
-local tooltipsTitle = CreateFont("GameFontNormal", "Show Battle Pet BreedID Tooltips...")
+local tooltipsTitle = CreateFont("GameFontNormal", "Show BattlePet BreedID Tooltips...")
 tooltipsTitle:SetPoint("TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, -2)
 tooltipsTitle:SetTextColor(1, 1, 1, 1)
 
