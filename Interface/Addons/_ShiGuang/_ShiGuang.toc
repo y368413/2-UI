@@ -1,12 +1,12 @@
-## Interface: 80300
+## Interface: 90001
 ## Title:-|cFFFFFF00 2|r|cFFFF0000 UI |r-
 ## Author: ShiGuang、TuTu、Siweia
 ## Notes: Time Flies...
-## Version: 3.6.0
+## Version: 3.7.0
 ## SavedVariables: MaoRUIDB,ShiGuangDB,CastbarsDB,CurrencyTrackingDB,DialogKeyDB,VLegionToDo,AzeritePowerWeightsDB,WQADB
 ## SavedVariablesPerCharacter: MaoRUIPerDB,ShiGuangPerDB,DEX_SAVE
 
-## X-Support: 8.3.0
+## X-Support: 9.0.1
 ## X-Repple: 2 UI
 ## X-StatsVersion: 20200905
 ## X-LoadOn-Always: Delayed

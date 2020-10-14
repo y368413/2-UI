@@ -55,7 +55,7 @@ local function IsClass(requiredClass)
 end
 
 local function HaveUpgradedZen()
-	return C_QuestLog.IsQuestFlaggedCompleted(40236)   --IsQuestFlaggedCompleted(40236)
+	return C_QuestLog.IsQuestFlaggedCompleted(40236)
 end
 
 local DaySunday = 1
@@ -86,20 +86,29 @@ local function CreateDestination(zone, spells)
 	end
 end
 
+
+local function PrintZoneIndex(name)
+	for i = 1, 10000 do
+		local info = C_Map.GetMapInfo(i)
+		if info and info.name == name then
+			print(name .. " should be zone " .. i)
+			return
+		end
+	end
+	--print("Unknown zone " .. name)
+end
+
 local function LocZone(name, mapID)
 	if mapID == 0 then
-		for i = 1, 10000 do
-			local info = C_Map.GetMapInfo(i)
-			if info and info.name == name then
-				print(name .. " should be zone " .. i)
-			end
-		end
+		PrintZoneIndex(name)		
 		return name
 	else
-		local locName = C_Map.GetMapInfo(mapID).name
-		--if locName ~= name then
-		--	print("Incorrect localization of " .. name)
-		--end
+		local mapInfo =	C_Map.GetMapInfo(mapID)
+		if not mapInfo then
+			PrintZoneIndex(name)	
+			return name
+		end
+		local locName = mapInfo.name
 		return locName
 	end
 end
@@ -290,7 +299,7 @@ CreateDestination(
 	})
 
 CreateDestination(			
-	LocZone("Dalaran", 625) .. " (Legion)",	
+	LocZone("Dalaran", 41) .. " (Legion)",	
 	{
 		CreateSpell(224871),		-- Portal: Dalaran - Broken Isles (UNTESTED)
 		CreateSpell(224869),		-- Teleport: Dalaran - Broken Isles	(UNTESTED)
@@ -301,7 +310,7 @@ CreateDestination(
 	})
 
 CreateDestination(			
-	LocZone("Dalaran", 625) .. " (WotLK)",	
+	LocZone("Dalaran", 41) .. " (WotLK)",	
 	{
 		CreateSpell(53140),			-- Teleport: Dalaran
 		CreateSpell(53142),			-- Portal: Dalaran
@@ -475,6 +484,12 @@ CreateDestination(
 	})
 	
 CreateDestination(
+	LocZone("Maldraxxus", 1536),
+	{
+		CreateItem(181163),		-- Scroll of Teleport: Theater of Pain
+	})
+	
+CreateDestination(
 	LocZone("Mechagon", 1490),
 	{
 		CreateConsumable(167075),	-- Ultrasafe Transporter: Mechagon
@@ -513,6 +528,13 @@ CreateDestination(
 		CreateItem(63207),		-- Wrap of Unity
 		CreateItem(63353),		-- Shroud of Cooperation
 		CreateItem(65274),		-- Cloak of Coordination
+	})
+	
+CreateDestination(
+	LocZone("Oribos", 1670),
+	{
+		CreateSpell(344587),	-- Teleport: Oribos
+		CreateSpell(344597),	-- Portal: Oribos
 	})
 
 CreateDestination(
@@ -633,6 +655,12 @@ CreateDestination(
 	LocArea("Temple of Five Dawns", 5820),
 	{
 		CreateConditionalSpell(126892, function() return HaveUpgradedZen() end ),	-- Zen Pilgrimage
+	})
+	
+CreateDestination(
+	LocZone("The Maw", 1543),
+	{
+		CreateConsumable(180817),		-- Cypher of Relocation
 	})
 
 CreateDestination(

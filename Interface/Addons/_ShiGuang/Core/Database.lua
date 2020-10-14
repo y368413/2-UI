@@ -9,7 +9,17 @@ I.Version = GetAddOnMetadata("_ShiGuang", "Version")
 I.Support = GetAddOnMetadata("_ShiGuang", "X-Support")
 I.Client = GetLocale()
 I.ScreenWidth, I.ScreenHeight = GetPhysicalScreenSize()
-I.isNewPatch = GetBuildInfo() == "8.3.0" -- keep it for future purpose
+I.isNewPatch = select(4, GetBuildInfo()) > 90000 -- keep it for future purpose
+
+-- Deprecated
+LE_ITEM_QUALITY_POOR = Enum.ItemQuality.Poor
+LE_ITEM_QUALITY_COMMON = Enum.ItemQuality.Common
+LE_ITEM_QUALITY_UNCOMMON = Enum.ItemQuality.Uncommon
+LE_ITEM_QUALITY_RARE = Enum.ItemQuality.Rare
+LE_ITEM_QUALITY_EPIC = Enum.ItemQuality.Epic
+LE_ITEM_QUALITY_LEGENDARY = Enum.ItemQuality.Legendary
+LE_ITEM_QUALITY_ARTIFACT = Enum.ItemQuality.Artifact
+LE_ITEM_QUALITY_HEIRLOOM = Enum.ItemQuality.Heirloom
 
 -- Colors
 I.MyName = UnitName("player")
@@ -78,7 +88,7 @@ I.textures = {
 	pushed		= Media.."ActionBar\\pushed",
 }
 I.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
-I.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:411|t "
+I.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:410|t "
 I.ScrollButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:127:204|t "
 I.AFKTex = "|T"..FRIENDS_TEXTURE_AFK..":14:14:0:0:16:16:1:15:1:15|t"
 I.DNDTex = "|T"..FRIENDS_TEXTURE_DND..":14:14:0:0:16:16:1:15:1:15|t"
@@ -121,6 +131,10 @@ I.BuffList = {
 		298837,	-- 智力360
 		298839,	-- 耐力360
 		298841,	-- 力量360
+
+		307166,	-- 大锅
+		307185,	-- 通用合剂
+		307187,	-- 耐力合剂
 	},
 	[2] = {     -- 进食充分
 		104273, -- 250敏捷，BUFF名一致
@@ -178,29 +192,51 @@ I.ReminderBuffs = {
 		},
 	},
 	SHAMAN = {
-		{	spells = {	-- 闪电之盾
-				[192106] = true,
+		{	spells = {
+				[192106] = true,	-- 闪电之盾
+				[974] = true,		-- 大地之盾
+				[52127] = true,		-- 水之护盾
 			},
 			depend = 192106,
 			combat = true,
 			instance = true,
 			pvp = true,
 		},
+		{	spells = {
+				[33757] = true,		-- 风怒武器
+			},
+			depend = 33757,
+			combat = true,
+			instance = true,
+			pvp = true,
+			weaponIndex = 1,
+			spec = 2,
+		},
+		{	spells = {
+				[318038] = true,	-- 火舌武器
+			},
+			depend = 318038,
+			combat = true,
+			instance = true,
+			pvp = true,
+			weaponIndex = 2,
+			spec = 2,
+		},
 	},
 	ROGUE = {
 		{	spells = {	-- 伤害类毒药
 				[2823] = true,		-- 致命药膏
 				[8679] = true,		-- 致伤药膏
+				[315584] = true,	-- 速效药膏
 			},
-			spec = 1,
 			combat = true,
 			instance = true,
 			pvp = true,
 		},
 		{	spells = {	-- 效果类毒药
 				[3408] = true,		-- 减速药膏
+				[5761] = true,		-- 迟钝药膏
 			},
-			spec = 1,
 			pvp = true,
 		},
 	},

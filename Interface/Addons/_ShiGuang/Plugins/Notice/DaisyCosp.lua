@@ -1491,7 +1491,7 @@ end
 local function CreateHuanHuaInfo(tooltip, itemID)
     local iType, subType, setName, setsdata = LibHuanHuaData:FindItem(itemID);
     if (iType) then
-      tooltip:AddLine("["..TRANSMOGRIFY.."]" ..setName.." (" ..#setsdata..")", 0.9, 0.5, 0.9);
+      tooltip:AddLine("["..TRANSMOGRIFY.."] " ..setName.."[" ..#setsdata.."]", 0.9, 0.5, 0.9);
       for i, id in ipairs(setsdata) do
         local name = GetItemInfo(id);
         if (GetItemCount(id) > 0) then

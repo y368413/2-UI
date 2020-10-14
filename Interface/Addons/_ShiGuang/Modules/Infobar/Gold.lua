@@ -7,12 +7,19 @@ local info = module:RegisterInfobar("Gold", R.Infobar.GoldPos)
 
 local format, pairs, wipe, unpack = string.format, pairs, table.wipe, unpack
 local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
-local GetMoney, GetNumWatchedTokens, GetBackpackCurrencyInfo, GetCurrencyInfo = GetMoney, GetNumWatchedTokens, GetBackpackCurrencyInfo, GetCurrencyInfo
+local GetMoney, GetNumWatchedTokens, Ambiguate = GetMoney, GetNumWatchedTokens, Ambiguate
 local GetContainerNumSlots, GetContainerItemLink, GetItemInfo, GetContainerItemInfo, UseContainerItem = GetContainerNumSlots, GetContainerItemLink, GetItemInfo, GetContainerItemInfo, UseContainerItem
 local C_Timer_After, IsControlKeyDown, IsShiftKeyDown = C_Timer.After, IsControlKeyDown, IsShiftKeyDown
+local C_CurrencyInfo_GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
+local C_CurrencyInfo_GetBackpackCurrencyInfo = C_CurrencyInfo.GetBackpackCurrencyInfo
 
 local profit, spent, oldMoney = 0, 0, 0
 local myName, myRealm = I.MyName, I.MyRealm
+
+local crossRealms = GetAutoCompleteRealms()
+if not crossRealms or #crossRealms == 0 then
+	crossRealms = {[1]=myRealm}
+end
 
 local function getClassIcon(class)
 	local c1, c2, c3, c4 = unpack(CLASS_ICON_TCOORDS[class])
@@ -46,7 +53,9 @@ info.onEvent = function(self, event)
 	self.text:SetText(module:GetMoneyString(newMoney))
 
 	if not MaoRUIDB["totalGold"][myRealm] then MaoRUIDB["totalGold"][myRealm] = {} end
-	MaoRUIDB["totalGold"][myRealm][myName] = {GetMoney(), I.MyClass}
+	if not MaoRUIDB["totalGold"][myRealm][myName] then MaoRUIDB["totalGold"][myRealm][myName] = {} end
+	MaoRUIDB["totalGold"][myRealm][myName][1] = GetMoney()
+	MaoRUIDB["totalGold"][myRealm][myName][2] = I.MyClass
 
 	oldMoney = newMoney
 end
@@ -56,7 +65,11 @@ StaticPopupDialogs["RESETGOLD"] = {
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function()
-		wipe(MaoRUIDB["totalGold"][myRealm])
+		for _, realm in pairs(crossRealms) do
+			if MaoRUIDB["totalGold"][realm] then
+				wipe(MaoRUIDB["totalGold"][realm])
+			end
+		end
 		MaoRUIDB["totalGold"][myRealm][myName] = {GetMoney(), I.MyClass}
 	end,
 	whileDead = 1,
@@ -92,24 +105,30 @@ info.onEnter = function(self)
 
 	local totalGold = 0
 	GameTooltip:AddLine(U["RealmCharacter"], .6,.8,1)
-	local thisRealmList = MaoRUIDB["totalGold"][myRealm]
-	for k, v in pairs(thisRealmList) do
-		local gold, class = unpack(v)
-		local r, g, b = M.ClassColor(class)
-		GameTooltip:AddDoubleLine(getClassIcon(class)..k, module:GetMoneyString(gold), r,g,b, 1,1,1)
-		totalGold = totalGold + gold
+	for _, realm in pairs(crossRealms) do
+		local thisRealmList = MaoRUIDB["totalGold"][realm]
+		if thisRealmList then
+			for k, v in pairs(thisRealmList) do
+				local name = Ambiguate(k.."-"..realm, "none")
+				local gold, class = unpack(v)
+				local r, g, b = M.ClassColor(class)
+				GameTooltip:AddDoubleLine(getClassIcon(class)..name, module:GetMoneyString(gold), r,g,b, 1,1,1)
+				totalGold = totalGold + gold
+			end
+		end
 	end
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddDoubleLine(TOTAL..":", module:GetMoneyString(totalGold), .6,.8,1, 1,1,1)
 
 	for i = 1, GetNumWatchedTokens() do
-		local name, count, icon, currencyID = GetBackpackCurrencyInfo(i)
+		local currencyInfo = C_CurrencyInfo_GetBackpackCurrencyInfo(i)
+		local name, count, icon, currencyID = currencyInfo.name, currencyInfo.quantity, currencyInfo.iconFileID, currencyInfo.currencyTypesID
 		if name and i == 1 then
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(CURRENCY..":", .6,.8,1)
 		end
 		if name and count then
-			local _, _, _, _, _, total = GetCurrencyInfo(currencyID)
+			local total = C_CurrencyInfo_GetCurrencyInfo(currencyID).maxQuantity
 			local iconTexture = " |T"..icon..":13:15:0:0:50:50:4:46:4:46|t"
 			if total > 0 then
 				GameTooltip:AddDoubleLine(name, count.."/"..total..iconTexture, 1,1,1, 1,1,1)

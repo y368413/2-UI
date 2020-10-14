@@ -69,9 +69,9 @@ local LE = {
 	ITEM_SPELL_TRIGGER_ONUSE = ITEM_SPELL_TRIGGER_ONUSE,
 	ITEM_BIND_ON_EQUIP = ITEM_BIND_ON_EQUIP,
 	ARTIFACT_POWER = ARTIFACT_POWER,
-	AZERITE = GetCurrencyInfo(1553),
-	ORDER_RESOURCES_NAME_LEGION = GetCurrencyInfo(1220),
-	ORDER_RESOURCES_NAME_BFA = GetCurrencyInfo(1560),
+	--AZERITE = GetCurrencyInfo(1553),
+	--ORDER_RESOURCES_NAME_LEGION = GetCurrencyInfo(1220),
+	--ORDER_RESOURCES_NAME_BFA = GetCurrencyInfo(1560),
 }
 
 local GetCurrentMapID = function() return WorldMapFrame:GetMapID() or 0 end 
@@ -249,7 +249,7 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 
 						--obj.WQL_BountyRing_defSize = obj.BountyRing:GetSize()
 					end
-					local tagID, tagName, worldQuestType, rarity, isElite, tradeskillLineIndex, displayTimeLeft = GetQuestTagInfo(obj.questID)
+					local tagID, tagName, worldQuestType, rarity, isElite, tradeskillLineIndex, displayTimeLeft = C_QuestLog.GetQuestTagInfo(obj.questID)
 					
 					local iconAtlas,iconTexture,iconVirtual,iconGray = nil
 					local ajustSize,ajustMask = 0
@@ -524,7 +524,7 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 					if not RewardIcons_DisableBountyColors then
 						obj.BountyRing:Hide()
 						for _,bountyData in pairs(bounties) do
-							if IsQuestCriteriaForBounty(obj.questID, bountyData.questID) and not bountyData.completed then
+							if C_QuestLog.IsQuestCriteriaForBounty(obj.questID, bountyData.questID) and not bountyData.completed then
 								obj.BountyRing:SetSize(MaoRUIPerDB["Misc"]["WorldQusetRewardIconsSize"]+8,MaoRUIPerDB["Misc"]["WorldQusetRewardIconsSize"]+8)
 								obj.BountyRing:Show()
 								if bountyData.lowTime and obj.BountyRing.WQL_color > 1 then

@@ -1,4 +1,4 @@
--- Author: Simca@Malfurion   ## Version: r18
+-- Author: Simca@Malfurion   ## Version: r24
 
 local SOBC = _G.SetOverrideBindingClick
 

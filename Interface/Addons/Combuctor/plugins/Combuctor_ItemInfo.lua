@@ -110,19 +110,6 @@ local IsItemAccount = function(button)
 	end
 end
 
---local IsItemCorruption = function(button)
-	--for i = 5, 12 do 
-		--local line = _G[ScannerTipName.."TextLeft"..i]
-		--if (not line) then
-			--break
-		--end
-		--local msg = line:GetText()
-		--if msg and strmatch(msg, ITEM_MOD_CORRUPTION) then 
-			--return true
-		--end
-	--end
---end
-
 -- Check if it's a caged battle pet
 local GetBattlePetInfo = function(itemLink)
 	if (string_find(itemLink, "battlepet")) then
@@ -147,106 +134,104 @@ local GetPluginContainter = function(button)
 end
 
 local Cache_GetItemLevel = function(button)
-	local ItemLevel = GetPluginContainter(button):CreateFontString()
-	ItemLevel:SetDrawLayer("ARTWORK", 1)
+	if (not Cache_ItemLevel[button]) then
+		local ItemLevel = GetPluginContainter(button):CreateFontString()
+		ItemLevel:SetDrawLayer("ARTWORK", 1)
 	ItemLevel:SetPoint("TOPRIGHT", 2, 0)
 	--ItemLevel:SetFontObject(_G.NumberFont_Outline_Large or _G.NumberFontNormal) 
 	ItemLevel:SetFont("Interface\\Addons\\_ShiGuang\\Media\\Fonts\\Pixel.ttf", 14, "OUTLINE");
 	ItemLevel:SetTextColor(1, 0.65, 0.16);
-	ItemLevel:SetShadowOffset(1, -1)
-	ItemLevel:SetShadowColor(0, 0, 0, .5)
+		ItemLevel:SetShadowOffset(1, -1)
+		ItemLevel:SetShadowColor(0, 0, 0, .5)
 
-	-- Move Pawn out of the way
-	RefreshPawn(button)
+		-- Move Pawn out of the way
+		RefreshPawn(button)
 
-	-- Store the reference for the next time
-	Cache_ItemLevel[button] = ItemLevel
-
-	return ItemLevel
+		-- Store the reference for the next time
+		Cache_ItemLevel[button] = ItemLevel
+	end
+	return Cache_ItemLevel[button]
 end
 
 local Cache_GetItemBind = function(button)
-	local ItemBind = GetPluginContainter(button):CreateFontString()
-	ItemBind:SetDrawLayer("ARTWORK")
+	if (not Cache_ItemBind[button]) then
+		local ItemBind = GetPluginContainter(button):CreateFontString()
+		ItemBind:SetDrawLayer("ARTWORK")
 	ItemBind:SetPoint("BOTTOM", 2, 2)
-	ItemBind:SetFontObject(_G.NumberFont_Outline_Med or _G.NumberFontNormal) 
-	ItemBind:SetFont(ItemBind:GetFont(), 11, "OUTLINE")
-	ItemBind:SetShadowOffset(1, -1)
-	ItemBind:SetShadowColor(0, 0, 0, .5)
+		ItemBind:SetFontObject(_G.NumberFont_Outline_Med or _G.NumberFontNormal) 
+		ItemBind:SetFont(ItemBind:GetFont(), 11, "OUTLINE")
+		ItemBind:SetShadowOffset(1, -1)
+		ItemBind:SetShadowColor(0, 0, 0, .5)
 
-	-- Move Pawn out of the way
-	RefreshPawn(button)
+		-- Move Pawn out of the way
+		RefreshPawn(button)
 
-	-- Store the reference for the next time
-	Cache_ItemBind[button] = ItemBind
-
-	return ItemBind
+		-- Store the reference for the next time
+		Cache_ItemBind[button] = ItemBind
+	end
+	return Cache_ItemBind[button]
 end
 
 local Cache_GetItemGarbage = function(button)
-	local Icon = button.icon or _G[button:GetName().."IconTexture"]
+	if (not Cache_ItemGarbage[button]) then
+		local Icon = button.icon or _G[button:GetName().."IconTexture"]
+		local ItemGarbage = button:CreateTexture()
+		ItemGarbage:Hide()
+		ItemGarbage:SetDrawLayer("ARTWORK")
+		ItemGarbage:SetAllPoints(Icon)
+		ItemGarbage:SetColorTexture(51/255 * 1/5,  17/255 * 1/5,   6/255 * 1/5, .6)
+		ItemGarbage.owner = button
 
-	local ItemGarbage = button:CreateTexture()
-	ItemGarbage:Hide()
-	ItemGarbage:SetDrawLayer("ARTWORK")
-	ItemGarbage:SetAllPoints(Icon)
-	ItemGarbage:SetColorTexture(51/255 * 1/5,  17/255 * 1/5,   6/255 * 1/5, .6)
-	ItemGarbage.owner = button
-
-	hooksecurefunc(Icon, "SetDesaturated", function() 
-		if ItemGarbage.tempLocked then 
-			return
-		end
-		ItemGarbage.tempLocked = true
-			local itemLink = button:GetItem()
-			if itemLink then 
-				local _, _, itemRarity, iLevel, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink)
-				local texture, itemCount, locked, quality, readable, _, _, isFiltered, noValue, itemID = GetContainerItemInfo(button:GetBag(), button:GetID())
-				local isBattlePet, battlePetLevel, battlePetRarity = GetBattlePetInfo(itemLink)
-				if isBattlePet then 
-					itemRarity = battlePetRarity
-				end
-				if not(((quality and (quality > 0)) or (itemRarity and (itemRarity > 0))) and (not locked)) then
-					Icon:SetDesaturated(true)
-				end 
+		hooksecurefunc(Icon, "SetDesaturated", function() 
+			if ItemGarbage.tempLocked then 
+				return
 			end
-		ItemGarbage.tempLocked = false
-	end)
-	Cache_ItemGarbage[button] = ItemGarbage
-	return ItemGarbage
+
+			ItemGarbage.tempLocked = true
+
+			--if (CombuctorItemInfo_DB.enableGarbage) then  
+				local itemLink = button:GetItem()
+				if itemLink then 
+					local _, _, itemRarity, iLevel, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink)
+					local texture, itemCount, locked, quality, readable, _, _, isFiltered, noValue, itemID = GetContainerItemInfo(button:GetBag(), button:GetID())
+				
+					local isBattlePet, battlePetLevel, battlePetRarity = GetBattlePetInfo(itemLink)
+					if isBattlePet then 
+						itemRarity = battlePetRarity
+					end
+
+					if not(((quality and (quality > 0)) or (itemRarity and (itemRarity > 0))) and (not locked)) then
+						Icon:SetDesaturated(true)
+					end 
+				end
+			--end
+
+			ItemGarbage.tempLocked = false
+		end)
+
+		Cache_ItemGarbage[button] = ItemGarbage
+	end
+	return Cache_ItemGarbage[button]
 end
 
 local Cache_GetUncollected = function(button)
-	local Uncollected = GetPluginContainter(button):CreateTexture()
-	Uncollected:SetDrawLayer("OVERLAY")
-	Uncollected:SetPoint("CENTER", 0, 0)
-	Uncollected:SetSize(24,24)
-	Uncollected:SetTexture([[Interface\Transmogrify\Transmogrify]])
-	Uncollected:SetTexCoord(0.804688, 0.875, 0.171875, 0.230469)
-	Uncollected:Hide()
+	if (not Cache_Uncollected[button]) then
+		local Uncollected = GetPluginContainter(button):CreateTexture()
+		Uncollected:SetDrawLayer("OVERLAY")
+		Uncollected:SetPoint("CENTER", 0, 0)
+		Uncollected:SetSize(24,24)
+		Uncollected:SetTexture([[Interface\Transmogrify\Transmogrify]])
+		Uncollected:SetTexCoord(0.804688, 0.875, 0.171875, 0.230469)
+		Uncollected:Hide()
 
-	-- Move Pawn out of the way
-	RefreshPawn(button)
+		-- Move Pawn out of the way
+		RefreshPawn(button)
 
-	-- Store the reference for the next time
-	Cache_Uncollected[button] = Uncollected
-
-	return Uncollected
+		-- Store the reference for the next time
+		Cache_Uncollected[button] = Uncollected
+	end
+	return Cache_Uncollected[button]
 end
-
---local Cache_CorruptionRank = function(button)
-	--local CorruptionItems = GetPluginContainter(button):CreateTexture()
-	--CorruptionItems:SetDrawLayer("OVERLAY")
-	--CorruptionItems:SetPoint("BOTTOMLEFT", 0, 0)
-	--CorruptionItems:SetSize(16, 16)
-	--CorruptionItems:SetTexture([[Interface\ICONS\INV_DARKMOON_EYE]])  --INV_EyeofNzothPet
-	--CorruptionItems:Hide()
-
-	-- Store the reference for the next time
-	--Cache_CorruptionItems[button] = CorruptionItems
-
-	--return CorruptionItems
---end
 
 -----------------------------------------------------------
 -- Main Update
@@ -266,20 +251,6 @@ local Update = function(self)
 
 		-- Refresh the scanner a single time per update
 		RefreshScanner(self)
-
-		---------------------------------------------------
-		--[[ CorruptionRank
-		---------------------------------------------------
-		if (itemRarity and itemRarity > 1) then 
-		if IsItemCorruption(self) then  --		if IsCorruptedItem(button) then
-				local CorruptionItems = Cache_CorruptionItems[self] or Cache_CorruptionRank(self)
-				CorruptionItems:Show()
-		else
-			if Cache_CorruptionItems[self] then 
-				Cache_CorruptionItems[self]:Hide()
-			end	
-		end
-		end]]
 
 		---------------------------------------------------
 		-- Uncollected Appearance
@@ -442,7 +413,7 @@ local Update = function(self)
 			if ItemGarbage then 
 				ItemGarbage.showJunk = showJunk
 			end 
-			if showJunk then 
+			if MERCHANT_VISIBLE and showJunk then 
 				JunkIcon:Show()
 			else
 				JunkIcon:Hide()
@@ -453,9 +424,6 @@ local Update = function(self)
 		if Cache_Uncollected[self] then 
 			Cache_Uncollected[self]:Hide()
 		end	
-		--if Cache_CorruptionItems[self] then 
-			--Cache_CorruptionItems[self]:Hide()
-		--end	
 		if Cache_ItemLevel[self] then
 			Cache_ItemLevel[self]:SetText("")
 		end
@@ -468,13 +436,15 @@ local Update = function(self)
 		end
 		local JunkIcon = self.JunkIcon
 		if JunkIcon then 
-			if showJunk then 
+			if MERCHANT_VISIBLE and showJunk then 
 				JunkIcon:Show()
 			else
 				JunkIcon:Hide()
 			end
 		end
-	end	
+	end
 end 
-
-hooksecurefunc(Combuctor.Item, "Update", Update)
+local item = Combuctor.ItemSlot or Combuctor.Item
+if (item) and (item.Update) then
+	hooksecurefunc(item, "Update", Update)
+end

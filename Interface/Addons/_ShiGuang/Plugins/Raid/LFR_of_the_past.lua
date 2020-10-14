@@ -9,19 +9,18 @@ function LFRofthepast.npcs_update()
 	-- expansionNumber is for _G["EXPANSION_NAME"..<expansionNumber>]
 	LFRofthepast.npcs = {
 		-- cata
-		{80675,74,63.1,27.3,3,"LFR",imgs={"cata1","cata2","cata3","cata4"}},
+		{80675,74,63.1,27.3,3,"LFR"},
 		-- mop
 		--{78709,390,82.95,30.38,4,"SZN"}, -- szenarios
 		--{78777,390,83.05,30.48,4,"SZHC"}, -- hc szenarios
-		{80633,390,83.16,30.56,4,"LFR",imgs={"mop1","mop2","mop3"}}, -- lfr
+		{80633,390,83.16,30.56,4,"LFR"}, -- lfr
 		-- WoD, lfr (same npc id and different location for alliance and horde)
-		faction=="alliance"
-			and {94870,582,33.2,37.2,5,"LFR",imgs={"wod1_"..faction,"wod2_"..faction,"wod3_"..faction}}
-			or {94870,590,41.5,47.0,5,"LFR",imgs={"wod1_"..faction,"wod2_"..faction,"wod3_"..faction}},
+		faction=="alliance" and {94870,582,33.2,37.2,5,"LFR"} or {94870,590,41.5,47.0,5,"LFR"},
 		-- legion
-		{111246,627,63.6,55.6,6,"LFR",imgs={"legion1","legion2","legion3"}},
-		-- bfa
-		-- {00000,0000,0,0,7,"LFR"}, -- coming soon // 8.1 ?
+		{31439,627,63.6,55.6,6,"LFR"},
+		{111246,627,63.6,55.6,6,"LFR"},
+		-- bfa // coming soon // 9.1 ?
+		--faction=="alliance" and {144383,1161,74.10,14.16,7,"LFR"} or {144384,1165,56.63,88.58,7,"LFR"},
 	};
 
 	wipe(LFRofthepast.npcID);
@@ -31,18 +30,6 @@ function LFRofthepast.npcs_update()
 		LFRofthepast.npcID[LFRofthepast.npcs[i][1]]=1;
 		if strs[1] and strs[1]~="" then
 			LFRofthepast.npcs[i][1] = strs[1];  --L["NPC"..LFRofthepast.npcs[i][1]]
-		end
-
-		local mapInfo = C_Map.GetMapInfo(LFRofthepast.npcs[i][2]);
-		if mapInfo then
-			if mapInfo.name == DUNGEON_FLOOR_DALARANCITY1 then
-				local spell = GetSpellInfo(224869);
-				local _,target = strsplit(HEADER_COLON,spell,2);
-				if target then
-					mapInfo.name = target:trim(); -- replace "Dalaran" by "Dalaran - Broken Isles"
-				end
-			end
-			LFRofthepast.npcs[i].zoneName = mapInfo.name;
 		end
 	end
 end
@@ -88,6 +75,7 @@ LFRofthepast.gossip2instance = {
 	-- wod
 	[94870] = {849,850,851,847,846,848,823,982,983,984,985,986}, -- lfr
 	-- legion
+	[31439] = {1287,1288,1289,1290,1291,1292,1293,1411,1494,1495,1496,1497,1610,1611,1612,1613}, -- Old Dalaran
 	[111246] = {1287,1288,1289,1290,1291,1292,1293,1411,1494,1495,1496,1497,1610,1611,1612,1613}, -- lfr
 	-- bfa
 	--[0] = {1731,1732,1733,1945,1946,1947,1951},
@@ -99,9 +87,7 @@ LFRofthepast.lfrID = {
 	849,850,851,847,846,848,823,982,983,984,985,986, -- wod
 	1287,1288,1289,1411,1290,1291,1292,1293,1494,1495,1496,1497,1610,1611,1612,1613, -- legion
 	-- 1731,1732,1733,1945,1946,1947,1951, -- bfa
-
 }
-
 
 
 -- bosskill tracking das am mittwoch zurückgesetzt wird.
@@ -114,7 +100,6 @@ local iconTexCoords,killedEncounter,BossKillQueryUpdate,UpdateInstanceInfoLock,c
 
 ------------------------------------------------
 -- GameTooltip to get localized names and other informations
-
 LFRofthepast.scanTT = CreateFrame("GameTooltip","LFRofthepast_ScanTT",UIParent,"GameTooltipTemplate");
 LFRofthepast.scanTT:SetScale(0.0001); LFRofthepast.scanTT:SetAlpha(0); LFRofthepast.scanTT:Hide();
 -- unset script functions shipped by GameTooltipTemplate to prevent errors
@@ -236,8 +221,6 @@ local function buttonHook_OnEnter(self)
 		end
 
 		-- instance encounter list
-		--	tinsert(bossIndexes,i);
-		--end
 		local bosses = {};
 		if LFRofthepast.instance2bosses[buttons[buttonID].instanceID] then
 			bosses = LFRofthepast.instance2bosses[buttons[buttonID].instanceID];
@@ -267,48 +250,33 @@ local function buttonHook_OnLeave()
 	GameTooltip:Hide();
 end
 
-local function raidButton(button,icon,data)
-	icon:SetTexture("interface\\minimap\\raid");
-	iconTexCoords[icon] = {icon:GetTexCoord()};
-	icon:SetTexCoord(0.20,0.80,0.20,0.80);
-	local label = data.instance[name].."\n|Tinterface\\lfgframe\\ui-lfg-icon-heroic:12:12:0:0:32:32:0:16:0:16|t ".."|cFF800000".._G.GENERIC_FRACTION_STRING:format(data.numEncounters[1],data.numEncounters[2]).."|r";
-	if data.instance[name]~=data.instance[name2] then
-		label = label .. " || ".. "|cFF404040"..data.instance[name2].."|r";
+local function OnGossipShow()
+	wipe(buttons); wipe(iconTexCoords);
+	local id,_ = UnitGUID("npc");
+	if id then
+		_,_,_,_,_,id = strsplit('-',id);
+		id = tonumber(id);
 	end
-	button:SetText(label);
-end
-
-local function szenarioButton(button,icon,data)
-	icon:SetTexture("interface\\minimap\\dungeon");
-	iconTexCoords[icon] = {icon:GetTexCoord()};
-	icon:SetTexCoord(0.20,0.80,0.20,0.80);
-	local label = {data.instance[name]};
-	if data.instance[difficulty]==1 then
-		tinsert(label,"|cFF000088".." ("..PLAYER_DIFFICULTY2..")".."|r");
-	end
-	button:SetText(table.concat(label,"\n"));
-end
-
-GossipFrame:HookScript("OnHide",function()
-	for icon, texCoord in pairs(iconTexCoords)do
-		icon:SetTexCoord(unpack(texCoord));
-	end
-end);
-
-GossipFrame:HookScript("OnEvent",function(self,event)
-	if event=="GOSSIP_SHOW" then
-		wipe(buttons); wipe(iconTexCoords);
-		local id,_ = UnitGUID("npc");
-		if id then
-			_,_,_,_,_,id = strsplit('-',id);
-			id = tonumber(id);
-		end
-		if id and LFRofthepast.npcID[id] and not IsControlKeyDown() then
-			ScanSavedInstances();
-			NPC_ID = id;
+	if id and LFRofthepast.npcID[id] and not IsControlKeyDown() then
+		ScanSavedInstances();
+		NPC_ID = id;
+		local Buttons = {};
+		if GossipFrame.buttons then -- GossipFrame // since SL prepatch
+			Buttons = GossipFrame.buttons;
+		elseif _G["GossipTitleButton1"] then -- GossipFrame // before SL prepatch
 			local index,button,icon = 1,_G["GossipTitleButton1"],_G["GossipTitleButton1GossipIcon"];
-			while button and button:IsShown() do
-				local buttonID,text = button:GetID(),button:GetText();
+			while button do
+				tinsert(Buttons,button);
+				index = index + 1;
+				button = _G["GossipTitleButton"..index];
+				if button then
+					icon = _G["GossipTitleButton"..index.."GossipIcon"];
+				end
+			end
+		end
+		for i,button in ipairs(Buttons)do
+			if button:IsShown() then
+				local buttonID = button:GetID()
 				local instanceID
 				if LFRofthepast.gossip2instance[NPC_ID] and #LFRofthepast.gossip2instance[NPC_ID]>0 then
 					instanceID = LFRofthepast.gossip2instance[NPC_ID][buttonID];
@@ -345,36 +313,100 @@ GossipFrame:HookScript("OnEvent",function(self,event)
 							tinsert(data.encounters,boss);
 						end
 					end
-					-- get encounter status
-					if data.instance[typeID]==1 and data.instance[subtypeID]==4 then
-						szenarioButton(button,icon,data);
-					else
-						raidButton(button,icon,data);
+					-- GossipFrame
+						local label = data.instance[name].."\n|Tinterface\\lfgframe\\ui-lfg-icon-heroic:12:12:0:0:32:32:0:16:0:16|t ".."|cFF800000".._G.GENERIC_FRACTION_STRING:format(data.numEncounters[1],data.numEncounters[2]).."|r";
+						if data.instance[name]~=data.instance[name2] then
+							label = label .. " || ".. "|cFF404040"..data.instance[name2].."|r"; 
+						end
+						if GossipFrame.buttons then -- GossipFrame // since SL prepatch
+							-- gossip text replacement
+							button:SetText(label);
+							-- gossip icon replacement
+							iconTexCoords[button.Icon] = {button.Icon:GetTexCoord()};
+							button.Icon:SetTexture("interface\\minimap\\raid");
+							button.Icon:SetTexCoord(0.20,0.80,0.20,0.80);
+							button:Resize();
+						elseif _G["GossipTitleButton1"] then -- GossipFrame // before SL prepatch
+							-- gossip text replacement
+							button:SetText(label);
+							-- gossip icon replacement
+							local icon = _G[button:GetName().."GossipIcon"];
+							iconTexCoords[icon] = {icon:GetTexCoord()};
+							icon:SetTexture("interface\\minimap\\raid");
+							icon:SetTexCoord(0.20,0.80,0.20,0.80);
+							GossipResize(button);
+						end
+					if not hookedButton["button"..buttonID] then
+						button:HookScript("OnEnter",buttonHook_OnEnter);
+						button:HookScript("OnLeave",buttonHook_OnLeave);
+						hookedButton["button"..buttonID] = true;
 					end
 					buttons[buttonID] = data;
-					GossipResize(button);
-				end
-
-				if not hookedButton["button"..index] then
-					button:HookScript("OnEnter",buttonHook_OnEnter);
-					button:HookScript("OnLeave",buttonHook_OnLeave);
-					hookedButton["button"..index] = true;
-				end
-				index = index + 1;
-				button = _G["GossipTitleButton"..index];
-				if button then
-					icon = _G["GossipTitleButton"..index.."GossipIcon"];
 				end
 			end
 		end
 	end
+end
+
+hooksecurefunc("GossipFrameUpdate",OnGossipShow)
+
+local function OnGossipHide()
+	for icon, texCoord in pairs(iconTexCoords)do
+		icon:SetTexCoord(unpack(texCoord));
+		iconTexCoords[icon]=nil;
+	end
+end
+
+GossipFrame:HookScript("OnHide",function()
+	OnGossipHide(self)
+end);
+
+----------------------------------------------------
+-- create into tooltip for raids
+
+local function CreateEncounterTooltip(parent)
+	if --[[IsInstance() or]] IsInRaid() then
+		local instanceName, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceMapID, instanceGroupSize = GetInstanceInfo()
+		if not (difficultyID==7 or difficultyID==17) then return end
+		local data = InstanceGroups[instanceName];
+		if data then
+			GameTooltip:SetOwner(parent,"ANCHOR_NONE");
+			GameTooltip:SetPoint("TOP",parent,"BOTTOM");
+			GameTooltip:SetText(instanceName);
+			GameTooltip:AddLine(difficultyName,1,1,1);
+
+			for i=1, #data do
+				GameTooltip:AddLine(" ");
+				GameTooltip:AddLine("|cFF69ccf0"..data[i][2].."|r");
+
+				local encounter = GetEncounterStatus(data[i][1]);
+				local i2b = LFRofthepast.instance2bosses[data[i][1]];
+				if i2b then -- lfr
+					for b=1, #i2b do
+						GameTooltip:AddDoubleLine("|Tinterface/questtypeicons:14:14:0:0:128:64:0:18:36:54|t "..encounter[i2b[b]][1],encounter[i2b[b]][2] and "|cFFff8080"..BOSS_DEAD.."|r" or "|cFF80ff80"..BOSS_ALIVE.."|r");
+					end
+				else -- normal raid
+					for b=1, #encounter do
+						GameTooltip:AddDoubleLine("|Tinterface/questtypeicons:14:14:0:0:128:64:0:18:36:54|t "..encounter[b][1],encounter[b][2] and "|cFFff8080"..BOSS_DEAD.."|r" or "|cFF80ff80"..BOSS_ALIVE.."|r");
+					end
+				end
+			end
+			GameTooltip:Show();
+		end
+	end
+end
+
+QueueStatusFrame:HookScript("OnHide",function(parent)
+	GameTooltip:Hide();
 end);
 
 ------------------------------------------------------ event frame
 local LFRofthepastFrame = CreateFrame("frame");
 LFRofthepastFrame:SetScript("OnEvent",function(self,event,...)
-	if event == "ADDON_LOADED" and addon == "_ShiGuang" then
-		self:UnregisterEvent("ADDON_LOADED");
+	if event=="ADDON_LOADED" then
+		if addon==... then
+			character = (UnitName("player")).."-"..realm;
+		end
 	elseif not LFRofthepast.faction(true) and (event=="PLAYER_LOGIN" or event=="NEUTRAL_FACTION_SELECT_RESULT") then
 		RequestRaidInfo();
 		LFRofthepast.npcs_update();

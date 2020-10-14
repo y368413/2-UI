@@ -25,24 +25,16 @@
         </Scripts>
     </Button>
 
-    <Frame name="MogPartialSetsFilter" hidden="true" frameStrata="DIALOG">
-        <Size x="170" y="164"/>
+    <Frame name="MogPartialSetsFilter" hidden="true" frameStrata="DIALOG" inherits="BackdropTemplate">
+        <Size x="170" y="206"/>
         <Anchors>
             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="MogPartialSetsFilterButton" x="-10" y="-5"/>
         </Anchors>
-        <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-            <EdgeSize>
-                <AbsValue val="16"/>
-            </EdgeSize>
-            <TileSize>
-                <AbsValue val="16"/>
-            </TileSize>
-            <BackgroundInsets>
-                <AbsInset left="5" right="5" top="5" bottom="4"/>
-            </BackgroundInsets>
-        </Backdrop>
+        <KeyValues>
+            <KeyValue key="backdropInfo" value="BACKDROP_TOOLTIP_16_16_5555" type="global"/>
+        </KeyValues>
         <Scripts>
-            <OnLoad>
+            <OnLoad inherit="prepend">
                 self:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b)
                 self:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b)
             </OnLoad>
@@ -72,19 +64,13 @@
                 <FontString name="$parentOnlyFavoriteText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT" text="only favorite sets">
                     <Size x="0" y="10"/>
                     <Anchors>
-                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="37" y="-39"/>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="37" y="-41"/>
                     </Anchors>
                 </FontString>
                 <FontString name="$parentFavoriteVariantsText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT" text="show favorite variants">
                     <Size x="0" y="10"/>
                     <Anchors>
-                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="37" y="-62"/>
-                    </Anchors>
-                </FontString>
-                <FontString name="$parentIgnoreBracersText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT" text="ignore bracers">
-                    <Size x="0" y="10"/>
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="37" y="-85"/>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="37" y="-64"/>
                     </Anchors>
                 </FontString>
                 <FontString name="$parentMaxMissingPiecesText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT" text="max. missing pieces">
@@ -92,7 +78,39 @@
                         <AbsDimension x="0" y="10"/>
                     </Size>
                     <Anchors>
-                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="37" y="-108"/>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="37" y="-85"/>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentIgnoredSlotsText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT" text="Ignore missing slots:">
+                    <Size>
+                        <AbsDimension x="0" y="10"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="18" y="-110"/>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentIgnoreHeadText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT" text="head">
+                    <Size x="0" y="10"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="47" y="-131"/>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentIgnoreCloakText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT" text="cloak">
+                    <Size x="0" y="10"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="47" y="-152"/>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentIgnoreBracersText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT" text="bracers">
+                    <Size x="0" y="10"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="107" y="-131"/>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentIgnoreBootsText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT" text="boots">
+                    <Size x="0" y="10"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="107" y="-152"/>
                     </Anchors>
                 </FontString>
             </Layer>
@@ -137,25 +155,12 @@
                     </OnClick>
                 </Scripts>
             </CheckButton>
-            <CheckButton name="$parentIgnoreBracersButton" inherits="OptionsCheckButtonTemplate" checked="true">
-                <Size x="24" y="24"/>
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="12" y="-81"/>
-                </Anchors>
-                <Scripts>
-                    <OnShow>self:SetChecked(MogPartialSetsAddonConfig.ignoreBracers)</OnShow>
-                    <OnClick>
-                        MogPartialSetsAddonConfig.ignoreBracers = self:GetChecked()
-                        MogPartialSetsAddon:notifyConfigUpdated()
-                    </OnClick>
-                </Scripts>
-            </CheckButton>
             <EditBox name="$parentMaxMissingPiecesEditBox" inherits="InputBoxTemplate" autoFocus="false" letters="1" numeric="true" propagateKeyBoardInput="false">
                 <Size>
                     <AbsDimension x="13" y="20"/>
                 </Size>
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-104"/>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-81"/>
                 </Anchors>
                 <Scripts>
                     <OnShow>self:SetText(tostring(MogPartialSetsAddonConfig.maxMissingPieces))</OnShow>
@@ -171,10 +176,62 @@
                     </OnTextChanged>
                 </Scripts>
             </EditBox>
+            <CheckButton name="$parentIgnoreHeadButton" inherits="OptionsCheckButtonTemplate" checked="true">
+                <Size x="24" y="24"/>
+                <HitRectInsets>
+                    <AbsInset left="0" right="-35" top="0" bottom="0"/>
+                </HitRectInsets>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="22" y="-125"/>
+                </Anchors>
+                <Scripts>
+                    <OnShow>self:SetChecked(MogPartialSetsAddon:isIgnoredSlot(Enum.InventoryType.IndexHeadType))</OnShow>
+                    <OnClick>MogPartialSetsAddon:setIgnoredSlot(Enum.InventoryType.IndexHeadType, self:GetChecked())</OnClick>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="$parentIgnoreCloakButton" inherits="OptionsCheckButtonTemplate" checked="true">
+                <Size x="24" y="24"/>
+                <HitRectInsets>
+                    <AbsInset left="0" right="-35" top="0" bottom="0"/>
+                </HitRectInsets>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="22" y="-146"/>
+                </Anchors>
+                <Scripts>
+                    <OnShow>self:SetChecked(MogPartialSetsAddon:isIgnoredSlot(Enum.InventoryType.IndexCloakType))</OnShow>
+                    <OnClick>MogPartialSetsAddon:setIgnoredSlot(Enum.InventoryType.IndexCloakType, self:GetChecked())</OnClick>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="$parentIgnoreBracersButton" inherits="OptionsCheckButtonTemplate" checked="true">
+                <Size x="24" y="24"/>
+                <HitRectInsets>
+                    <AbsInset left="0" right="-35" top="0" bottom="0"/>
+                </HitRectInsets>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="82" y="-125"/>
+                </Anchors>
+                <Scripts>
+                    <OnShow>self:SetChecked(MogPartialSetsAddon:isIgnoredSlot(Enum.InventoryType.IndexWristType))</OnShow>
+                    <OnClick>MogPartialSetsAddon:setIgnoredSlot(Enum.InventoryType.IndexWristType, self:GetChecked())</OnClick>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="$parentIgnoreBootsButton" inherits="OptionsCheckButtonTemplate" checked="true">
+                <Size x="24" y="24"/>
+                <HitRectInsets>
+                    <AbsInset left="0" right="-35" top="0" bottom="0"/>
+                </HitRectInsets>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="82" y="-146"/>
+                </Anchors>
+                <Scripts>
+                    <OnShow>self:SetChecked(MogPartialSetsAddon:isIgnoredSlot(Enum.InventoryType.IndexFeetType))</OnShow>
+                    <OnClick>MogPartialSetsAddon:setIgnoredSlot(Enum.InventoryType.IndexFeetType, self:GetChecked())</OnClick>
+                </Scripts>
+            </CheckButton>
             <Button name="$parentOkButton" inherits="UIPanelButtonTemplate" text="OK">
                 <Size x="71" y="20"/>
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="12" y="-130"/>
+                    <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="12" y="10"/>
                 </Anchors>
                 <Scripts>
                     <OnClick>MogPartialSetsFilter:Hide()</OnClick>
@@ -183,7 +240,7 @@
             <Button name="$parentRefreshButton" inherits="UIPanelButtonTemplate" text="Refresh">
                 <Size x="71" y="20"/>
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="87" y="-130"/>
+                    <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="87" y="10"/>
                 </Anchors>
                 <Scripts>
                     <OnClick>MogPartialSetsAddon:forceRefresh()</OnClick>

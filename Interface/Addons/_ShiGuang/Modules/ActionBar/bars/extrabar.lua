@@ -1,60 +1,71 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
 local Bar = M:GetModule("Actionbar")
-local cfg = R.bars.extrabar
+
+local _G = _G
+local tinsert = tinsert
+local cfg = R.Bars.extrabar
+local margin, padding = R.Bars.margin, R.Bars.padding
 
 function Bar:CreateExtrabar()
-	local padding, margin = 10, 5
 	local num = 1
 	local buttonList = {}
+	local size = cfg.size
 
-	--create the frame to hold the buttons
+	-- ExtraActionButton
 	local frame = CreateFrame("Frame", "NDui_ActionBarExtra", UIParent, "SecureHandlerStateTemplate")
-	frame:SetWidth(num*cfg.size + (num-1)*margin + 2*padding)
-	frame:SetHeight(cfg.size + 2*padding)
-	frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 130}
+	frame:SetWidth(num*size + (num-1)*margin + 2*padding)
+	frame:SetHeight(size + 2*padding)
+	frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 250, 100}
+	frame.mover = M.Mover(frame, U["Extrabar"], "Extrabar", frame.Pos)
 
-	--move the buttons into position and reparent them
-	ExtraActionBarFrame:SetParent(frame)
 	ExtraActionBarFrame:EnableMouse(false)
-	ExtraActionBarFrame:ClearAllPoints()
-	ExtraActionBarFrame:SetPoint("CENTER", 0, 0)
-	ExtraActionBarFrame.ignoreFramePositionManager = true
+	ExtraAbilityContainer:SetParent(frame)
+	ExtraAbilityContainer:ClearAllPoints()
+	ExtraAbilityContainer:SetPoint("CENTER", frame)
+	ExtraAbilityContainer.ignoreFramePositionManager = true
 
-	--the extra button
 	local button = ExtraActionButton1
-	table.insert(buttonList, button) --add the button object to the list
-	button:SetSize(cfg.size, cfg.size)
+	tinsert(buttonList, button)
+	tinsert(Bar.buttons, button)
+	button:SetSize(size, size)
 
-	--show/hide the frame on a given state driver
 	frame.frameVisibility = "[extrabar] show; hide"
 	RegisterStateDriver(frame, "visibility", frame.frameVisibility)
 
-	--create drag frame and drag functionality
-	if R.bars.userplaced then
-		frame.mover = M.Mover(frame, U["Extrabar"], "Extrabar", frame.Pos)
-	end
-
-	--create the mouseover functionality
 	if cfg.fader then
 		Bar.CreateButtonFrameFader(frame, buttonList, cfg.fader)
 	end
 
-	--zone ability
+	-- ZoneAbility
 	local zoneFrame = CreateFrame("Frame", "NDui_ActionBarZone", UIParent)
-	zoneFrame:SetWidth(cfg.size + 2*padding)
-	zoneFrame:SetHeight(cfg.size + 2*padding)
+	zoneFrame:SetWidth(size + 2*padding)
+	zoneFrame:SetHeight(size + 2*padding)
 	zoneFrame.Pos = {"BOTTOM", UIParent, "BOTTOM", -360, 100}
+	zoneFrame.mover = M.Mover(zoneFrame, U["Zone Ability"], "ZoneAbility", zoneFrame.Pos)
 
 	ZoneAbilityFrame:SetParent(zoneFrame)
 	ZoneAbilityFrame:ClearAllPoints()
-	ZoneAbilityFrame:SetPoint("CENTER", 0, 0)
+	ZoneAbilityFrame:SetPoint("CENTER", zoneFrame)
 	ZoneAbilityFrame.ignoreFramePositionManager = true
-	ZoneAbilityFrameNormalTexture:SetAlpha(0)
-	zoneFrame.mover = M.Mover(ZoneAbilityFrame, U["Zone Ability"], "ZoneAbility", zoneFrame.Pos)
+	ZoneAbilityFrame.Style:SetAlpha(0)
 
-	local spellButton = ZoneAbilityFrame.SpellButton
-	spellButton.Style:SetAlpha(0)
-	spellButton:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
-	M.ReskinIcon(spellButton.Icon, true)
+	hooksecurefunc(ZoneAbilityFrame, "UpdateDisplayedZoneAbilities", function(self)
+		for spellButton in self.SpellButtonContainer:EnumerateActive() do
+			if spellButton and not spellButton.styled then
+				spellButton.NormalTexture:SetAlpha(0)
+				spellButton:SetPushedTexture(I.textures.pushed) --force it to gain a texture
+				spellButton:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
+				M.ReskinIcon(spellButton.Icon, true)
+				spellButton.styled = true
+			end
+		end
+	end)
+
+	-- Fix button visibility
+	hooksecurefunc(ZoneAbilityFrame, "SetParent", function(self, parent)
+		if parent == ExtraAbilityContainer then
+			self:SetParent(zoneFrame)
+		end
+	end)
 end

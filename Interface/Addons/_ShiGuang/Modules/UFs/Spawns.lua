@@ -153,6 +153,7 @@ function UF:OnLogin()
 	local showPartyPetFrame = MaoRUIPerDB["UFs"]["PartyPetFrame"]
 	local petWidth, petHeight = MaoRUIPerDB["UFs"]["PartyPetWidth"], MaoRUIPerDB["UFs"]["PartyPetHeight"]
 	local showTeamIndex = MaoRUIPerDB["UFs"]["ShowTeamIndex"]
+	local showSolo = MaoRUIPerDB["UFs"]["ShowSolo"]
 
 	if MaoRUIPerDB["Nameplate"]["Enable"] then
 		UF:SetupCVars()
@@ -174,7 +175,7 @@ function UF:OnLogin()
 		oUF:RegisterStyle("PlayerPlate", UF.CreatePlayerPlate)
 		oUF:SetActiveStyle("PlayerPlate")
 		local plate = oUF:Spawn("player", "oUF_PlayerPlate", true)
-		plate.mover = M.Mover(plate, U["PlayerNP"], "PlayerPlate", R.UFs.PlayerPlate)
+		plate.mover = M.Mover(plate, U["PlayerPlate"], "PlayerPlate", R.UFs.PlayerPlate)
 	end
 
 	-- Default Clicksets for RaidFrame
@@ -250,7 +251,7 @@ function UF:OnLogin()
 
 			local party = oUF:SpawnHeader("oUF_Party", nil, "solo,party",
 			"showPlayer", true,
-			"showSolo", false,
+			"showSolo", showSolo,
 			"showParty", true,
 			"showRaid", false,
 			"xoffset", xOffset,
@@ -279,7 +280,7 @@ function UF:OnLogin()
 
 				local partyPet = oUF:SpawnHeader("oUF_PartyPet", nil, "solo,party",
 				"showPlayer", true,
-				"showSolo", false,
+				"showSolo", showSolo,
 				"showParty", true,
 				"showRaid", false,
 				"xoffset", xOffset,
@@ -310,7 +311,7 @@ function UF:OnLogin()
 			local function CreateGroup(name, i)
 				local group = oUF:SpawnHeader(name, nil, "solo,party,raid",
 				"showPlayer", true,
-				"showSolo", false,
+				"showSolo", showSolo and not showPartyFrame,
 				"showParty", not showPartyFrame,
 				"showRaid", true,
 				"xoffset", 5,
@@ -364,7 +365,7 @@ function UF:OnLogin()
 			local function CreateGroup(name, i)
 				local group = oUF:SpawnHeader(name, nil, "solo,party,raid",
 				"showPlayer", true,
-				"showSolo", false,
+				"showSolo", showSolo and not showPartyFrame,
 				"showParty", not showPartyFrame,
 				"showRaid", true,
 				"xoffset", 5,

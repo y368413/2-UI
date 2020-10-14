@@ -253,7 +253,7 @@ function TT:StatusBar_OnValueChanged(value)
 	if value > 0 and max == 1 then
 		self.text:SetFormattedText("%d%%", value*100)
 	else
-		self.text:SetText(M.Numb(value).." | "..M.Numb(max))
+		self.text:SetText(M.Numb(value).."/"..M.Numb(max))
 	end
 end
 
@@ -263,7 +263,7 @@ function TT:ReskinStatusBar()
 	self.StatusBar:SetPoint("BOTTOMRIGHT", self.bg, "TOPRIGHT", -R.mult, 3)
 	self.StatusBar:SetStatusBarTexture(I.normTex)
 	self.StatusBar:SetHeight(5)
-	M.CreateBDFrame(self.StatusBar, nil, true)
+	M.SetBD(self.StatusBar)
 end
 
 function TT:GameTooltip_ShowStatusBar()
@@ -299,6 +299,7 @@ local mover
 function TT:GameTooltip_SetDefaultAnchor(parent)
 	if self:IsForbidden() then return end
 	if not parent then return end
+
 	if MaoRUIPerDB["Tooltip"]["Cursor"] then
 		self:SetOwner(parent, "ANCHOR_CURSOR_RIGHT")
 	else
@@ -338,13 +339,6 @@ function TT:GameTooltip_ComparisonFix(anchorFrame, shoppingTooltip1, shoppingToo
 end
 
 -- Tooltip skin
-local fakeBg = CreateFrame("Frame", nil, UIParent)
-fakeBg:SetBackdrop({ bgFile = I.bdTex, edgeFile = I.bdTex, edgeSize = 1 })
-
-local function getBackdrop() return fakeBg:GetBackdrop() end
-local function getBackdropColor() return 0, 0, 0, .7 end
-local function getBackdropBorderColor() return 0, 0, 0 end
-
 function TT:ReskinTooltip()
 	if not self then
 		if I.isDeveloper then print("Unknown tooltip spotted.") end
@@ -354,20 +348,20 @@ function TT:ReskinTooltip()
 	self:SetScale(MaoRUIPerDB["Tooltip"]["Scale"])
 
 	if not self.tipStyled then
-		self:SetBackdrop(nil)
+		if self.SetBackdrop then self:SetBackdrop(nil) end
 		self:DisableDrawLayer("BACKGROUND")
-		self.bg = M.CreateBDFrame(self, .7, true)
+		self.bg = M.SetBD(self, .7)
 		self.bg:SetInside(self)
 		self.bg:SetFrameLevel(self:GetFrameLevel())
-		M.CreateTex(self.bg)
-
-		-- other gametooltip-like support
-		self.GetBackdrop = getBackdrop
-		self.GetBackdropColor = getBackdropColor
-		self.GetBackdropBorderColor = getBackdropBorderColor
 
 		if self.StatusBar then
 			TT.ReskinStatusBar(self)
+		end
+
+		if self.GetBackdrop then
+			self.GetBackdrop = self.bg.GetBackdrop
+			self.GetBackdropColor = self.bg.GetBackdropColor
+			self.GetBackdropBorderColor = self.bg.GetBackdropBorderColor
 		end
 
 		self.tipStyled = true
@@ -386,7 +380,7 @@ function TT:ReskinTooltip()
 	end
 end
 
-function TT:GameTooltip_SetBackdropStyle()
+function TT:SharedTooltip_SetBackdropStyle()
 	if not self.tipStyled then return end
 	self:SetBackdrop(nil)
 end
@@ -426,22 +420,22 @@ end
 
 function TT:OnLogin()
 	GameTooltip.StatusBar = GameTooltipStatusBar
-	GameTooltip:HookScript("OnTooltipCleared", self.OnTooltipCleared)
-	GameTooltip:HookScript("OnTooltipSetUnit", self.OnTooltipSetUnit)
-	GameTooltip.StatusBar:SetScript("OnValueChanged", self.StatusBar_OnValueChanged)
-	hooksecurefunc("GameTooltip_ShowStatusBar", self.GameTooltip_ShowStatusBar)
-	hooksecurefunc("GameTooltip_ShowProgressBar", self.GameTooltip_ShowProgressBar)
-	hooksecurefunc("GameTooltip_SetDefaultAnchor", self.GameTooltip_SetDefaultAnchor)
-	hooksecurefunc("GameTooltip_SetBackdropStyle", self.GameTooltip_SetBackdropStyle)
-	hooksecurefunc("GameTooltip_AnchorComparisonTooltips", self.GameTooltip_ComparisonFix)
+	GameTooltip:HookScript("OnTooltipCleared", TT.OnTooltipCleared)
+	GameTooltip:HookScript("OnTooltipSetUnit", TT.OnTooltipSetUnit)
+	GameTooltip.StatusBar:SetScript("OnValueChanged", TT.StatusBar_OnValueChanged)
+	hooksecurefunc("GameTooltip_ShowStatusBar", TT.GameTooltip_ShowStatusBar)
+	hooksecurefunc("GameTooltip_ShowProgressBar", TT.GameTooltip_ShowProgressBar)
+	hooksecurefunc("GameTooltip_SetDefaultAnchor", TT.GameTooltip_SetDefaultAnchor)
+	hooksecurefunc("SharedTooltip_SetBackdropStyle", TT.SharedTooltip_SetBackdropStyle)
+	hooksecurefunc("GameTooltip_AnchorComparisonTooltips", TT.GameTooltip_ComparisonFix)
 
 	-- Elements
-	self:SetupTooltipFonts()
-	self:ReskinTooltipIcons()
-	self:SetupTooltipID()
-	self:TargetedInfo()
-	self:AzeriteArmor()
-	self:CorruptionRank()
+	TT:SetupTooltipFonts()
+	TT:ReskinTooltipIcons()
+	TT:SetupTooltipID()
+	TT:TargetedInfo()
+	TT:AzeriteArmor()
+	TT:ConduitCollectionData()
 end
 
 -- Tooltip Skin Registration
@@ -473,9 +467,9 @@ TT:RegisterTooltips("_ShiGuang", function()
 		AutoCompleteBox,
 		FriendsTooltip,
 		QuestScrollFrame.StoryTooltip,
+		QuestScrollFrame.CampaignTooltip,
 		GeneralDockManagerOverflowButtonList,
 		ReputationParagonTooltip,
-		QuestScrollFrame.WarCampaignTooltip,
 		NamePlateTooltip,
 		QueueStatusFrame,
 		FloatingGarrisonFollowerTooltip,
@@ -490,7 +484,8 @@ TT:RegisterTooltips("_ShiGuang", function()
 		PetBattlePrimaryUnitTooltip,
 		FloatingBattlePetTooltip,
 		FloatingPetBattleAbilityTooltip,
-		IMECandidatesFrame
+		IMECandidatesFrame,
+		QuickKeybindTooltip
 	}
 	for _, f in pairs(tooltips) do
 		f:HookScript("OnShow", TT.ReskinTooltip)

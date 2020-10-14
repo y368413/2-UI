@@ -1,6 +1,0 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="Main.lua"/>
-	<Script file="Brewmaster.lua"/>
-	<Script file="Mistweaver.lua"/>
-	<Script file="Windwalker.lua"/>
-</Ui>

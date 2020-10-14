@@ -181,7 +181,7 @@ function mod:Create(window, isnew)
         }
     }
 
-    local menu = CreateFrame("Button", "InlineFrameMenuButton", window.frame)
+    local menu = CreateFrame("Button", "InlineFrameMenuButton", window.frame,"BackdropTemplate")
     menu:ClearAllPoints()
     menu:SetWidth(12)
     menu:SetHeight(12)

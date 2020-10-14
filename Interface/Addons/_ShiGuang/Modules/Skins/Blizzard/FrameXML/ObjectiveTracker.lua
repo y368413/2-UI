@@ -1,15 +1,13 @@
-Ôªølocal _, ns = ...
+local _, ns = ...
 local M, R, U, I = unpack(ns)
 
-tinsert(R.defaultThemes, function()
-	local r, g, b = I.r, I.g, I.b
-	local LE_QUEST_FREQUENCY_DAILY = LE_QUEST_FREQUENCY_DAILY or 2
-	local C_QuestLog_IsQuestReplayable = C_QuestLog.IsQuestReplayable
+local r, g, b = I.r, I.g, I.b
+local select, unpack = select, unpack
 
 	-- Reskin Headers
 	local function reskinHeader(header)
 		header.Text:SetTextColor(r, g, b)
-		header.Background:Hide()
+		header.Background:SetTexture(nil)
 		local bg = header:CreateTexture(nil, "ARTWORK")
 		bg:SetTexture("Interface\\LFGFrame\\UI-LFG-SEPARATOR")
 		bg:SetTexCoord(0, .66, 0, .31)
@@ -17,6 +15,10 @@ tinsert(R.defaultThemes, function()
 		bg:SetPoint("BOTTOMLEFT", -30, -4)
 		bg:SetSize(250, 30)
 	end
+	
+tinsert(R.defaultThemes, function()
+	local LE_QUEST_FREQUENCY_DAILY = LE_QUEST_FREQUENCY_DAILY or 2
+	local C_QuestLog_IsQuestReplayable = C_QuestLog.IsQuestReplayable
 
 	local headers = {
 		ObjectiveTrackerBlocksFrame.QuestHeader,
@@ -28,7 +30,7 @@ tinsert(R.defaultThemes, function()
 	}
 	for _, header in pairs(headers) do reskinHeader(header) end
 
-	-- Show quest color and level
+	--[[ Show quest color and level
 	local function Showlevel(_, _, _, title, level, _, isHeader, _, isComplete, frequency, questID)
 		if ENABLE_COLORBLIND_MODE == "1" then return end
 
@@ -73,17 +75,16 @@ tinsert(R.defaultThemes, function()
 			if elementsTable[i] == QuestInfo_ShowTitle then
 				if QuestInfoFrame.questLog then
 					if GetQuestLogSelection() > 0 then QuestInfoTitleHeader:SetText("["..select(2, GetQuestLogTitle(GetQuestLogSelection())).."] "..QuestInfoTitleHeader:GetText()) end
-	end end end end)
+	end end end end)]]
 
 ----------------------------------------------------------------------------------------
---	Ctrl+Click to abandon a quest or Alt+Click to share a quest(by Suicidal Katt)
+--[[	Ctrl+Click to abandon a quest or Alt+Click to share a quest(by Suicidal Katt)
 ----------------------------------------------------------------------------------------
 hooksecurefunc("QuestMapLogTitleButton_OnClick", function(self)
-	local questLogIndex = GetQuestLogIndexByID(self.questID)
 	if IsControlKeyDown() then
 		CloseDropDownMenus()
 		QuestMapQuestOptions_AbandonQuest(self.questID)
-	elseif IsAltKeyDown() and GetQuestLogPushable(questLogIndex) then
+	elseif IsAltKeyDown() and GetQuestLogPushable(self.questID) then
 		CloseDropDownMenus()
 		QuestMapQuestOptions_ShareQuest(self.questID)
 	end
@@ -97,9 +98,9 @@ hooksecurefunc(QUEST_TRACKER_MODULE, "OnBlockHeaderClick", function(_, block)
 		CloseDropDownMenus()
 		QuestLogPushQuest(questLogIndex)
 	end
-end)
+end)]]
 
--- ‰ªªÂä°ÂêçÁß∞ËÅå‰∏öÁùÄËâ≤ -------------------------------------------------------
+--[[ »ŒŒÒ√˚≥∆÷∞“µ◊≈…´ -------------------------------------------------------
  if  MaoRUIPerDB["Skins"]["QuestTrackerSkinTitle"] then
     hooksecurefunc(QUEST_TRACKER_MODULE, "SetBlockHeader", function(_, block)
         --for i = 1, GetNumQuestWatches() do
@@ -125,17 +126,16 @@ end)
     hooksecurefunc(QUEST_TRACKER_MODULE, "OnBlockHeaderLeave", hoverquest)
  end   
   
- end)   
+ end)   ]]
  -- numQuests -------------------------------------------------------
 local numQuests=CreateFrame('frame')
 numQuests:RegisterEvent('PLAYER_LOGIN')
 numQuests:RegisterEvent('QUEST_LOG_UPDATE')
 numQuests:SetScript('OnEvent',function() 
    local numQuests = 0
-   for index=1,GetNumQuestLogEntries() do
-      local questTitle, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden = GetQuestLogTitle(index)
-      if not isHidden then
-         if not isHeader then
+   for index=1,C_QuestLog.GetNumQuestLogEntries() do
+      if not C_QuestLog.GetInfo(index).isHidden then
+         if not C_QuestLog.GetInfo(index).isHeader then
             numQuests = numQuests + 1
          end
       end
@@ -147,7 +147,7 @@ numQuests:SetScript('OnEvent',function()
 	end 
 end)
 
- -- CompletedTip -----------------------------------------------------------Version: 1.0.0.80300    --Author: InvisiBill
+ --[[ CompletedTip -----------------------------------------------------------Version: 1.0.0.80300    --Author: InvisiBill
 local function onSetHyperlink(self, link)
     local type, id = string.match(link,"^(%a+):(%d+)")
     if not type or not id then return end
@@ -161,4 +161,5 @@ local function onSetHyperlink(self, link)
     end
 end
 hooksecurefunc(ItemRefTooltip, "SetHyperlink", onSetHyperlink)
-hooksecurefunc(GameTooltip, "SetHyperlink", onSetHyperlink)
+hooksecurefunc(GameTooltip, "SetHyperlink", onSetHyperlink)]]
+end)

@@ -1,9 +1,9 @@
 ﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
 local module = M:RegisterModule("Chat")
+local cr, cg, cb = I.r, I.g, I.b
 
-local maxLines = 2048
-local maxWidth, maxHeight = UIParent:GetWidth(), UIParent:GetHeight()
+local _G = _G
 local tostring, pairs, ipairs, strsub, strlower = tostring, pairs, ipairs, string.sub, string.lower
 local IsInGroup, IsInRaid, IsPartyLFG, IsInGuild, IsShiftKeyDown, IsControlKeyDown = IsInGroup, IsInRaid, IsPartyLFG, IsInGuild, IsShiftKeyDown, IsControlKeyDown
 local ChatEdit_UpdateHeader, GetChannelList, GetCVar, SetCVar, Ambiguate = ChatEdit_UpdateHeader, GetChannelList, GetCVar, SetCVar, Ambiguate
@@ -11,12 +11,14 @@ local GetNumGuildMembers, GetGuildRosterInfo, IsGuildMember, UnitIsGroupLeader, 
 local CanCooperateWithGameAccount, BNInviteFriend, BNFeaturesEnabledAndConnected = CanCooperateWithGameAccount, BNInviteFriend, BNFeaturesEnabledAndConnected
 local C_BattleNet_GetAccountInfoByID = C_BattleNet.GetAccountInfoByID
 local InviteToGroup = C_PartyInfo.InviteUnit
+local GeneralDockManager = GeneralDockManager
+
+local maxLines = 1024
+local fontOutline
 
 function module:TabSetAlpha(alpha)
-	if alpha ~= 1 and (not self.isDocked or GeneralDockManager.selected:GetID() == self:GetID()) then
+	if self.glow:IsShown() and alpha ~= 1 then
 		self:SetAlpha(1)
-	elseif alpha < .2 then
-		self:SetAlpha(.2)
 	end
 end
 
@@ -40,20 +42,39 @@ function module:UpdateChatSize()
 	ChatFrame1:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 21)
 	ChatFrame1:SetWidth(MaoRUIPerDB["Chat"]["ChatWidth"])
 	ChatFrame1:SetHeight(MaoRUIPerDB["Chat"]["ChatHeight"])
-	local bg = ChatFrame1.gradientBG
-	if bg then
-		bg:SetHeight(MaoRUIPerDB["Chat"]["ChatHeight"] + 30)
-	end
+
 	isScaling = false
 end
 
+local function BlackBackground(self)
+	local frame = M.SetBD(self.Background)
+	frame:SetShown(MaoRUIPerDB["Chat"]["ChatBGType"] == 2)
+
+	return frame
+end
+
+local function GradientBackground(self)
+	local frame = CreateFrame("Frame", nil, self)
+	frame:SetOutside(self.Background)
+	frame:SetFrameLevel(0)
+	frame:SetShown(MaoRUIPerDB["Chat"]["ChatBGType"] == 3)
+
+	local tex = M.SetGradient(frame, "H", 0, 0, 0, .5, 0)
+	tex:SetOutside()
+	local line = M.SetGradient(frame, "H", cr, cg, cb, .5, 0, nil, R.mult)
+	line:SetPoint("BOTTOMLEFT", frame, "TOPLEFT")
+	line:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT")
+
+	return frame
+end
+
 function module:SkinChat()
-	if not self or (self and self.styled) then return end
+	if not self or self.styled then return end
 
 	local name = self:GetName()
 	local fontStyle, fontSize, _= self:GetFont()
 	self:SetClampRectInsets(0, 0, 0, 0)
-	self:SetMaxResize(maxWidth, maxHeight)
+	self:SetMaxResize(I.ScreenWidth, I.ScreenHeight)
 	self:SetMinResize(120, 60)
 	if MaoRUIPerDB["Chat"]["Outline"] then
 	  self:SetFont(I.Font[1], fontSize, "OUTLINE")
@@ -68,15 +89,16 @@ function module:SkinChat()
 		self:SetMaxLines(maxLines)
 	end
 
+	self.__background = BlackBackground(self)
+	self.__gradient = GradientBackground(self)
+
 	local eb = _G[name.."EditBox"]
 	eb:SetAltArrowKeyMode(false)
 	eb:ClearAllPoints()
 	eb:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 2, 21)
 	eb:SetPoint("TOPRIGHT", self, "TOPRIGHT", -12, 43)
+	--M.StripTextures(eb, 2)
 	M.SetBD(eb)
-	for i = 3, 8 do
-		select(i, eb:GetRegions()):SetAlpha(0)
-	end
 
 	local lang = _G[name.."EditBoxLanguage"]
 	lang:GetRegions():SetAlpha(0)
@@ -85,22 +107,31 @@ function module:SkinChat()
 	M.SetBD(lang)
 	
 	local tab = _G[name.."Tab"]
-	tab:SetAlpha(0.2)
-	local tabFs = tab:GetFontString()
-	tabFs:SetFont(I.Font[1], I.Font[2]+2, I.Font[3])
-	tabFs:SetShadowColor(0, 0, 0, 0)
-	tabFs:SetTextColor(1, .8, 0)
+	tab:SetAlpha(1)
+	tab.Text:SetFont(I.Font[1], I.Font[2]+2, fontOutline)
+	tab.Text:SetShadowColor(0, 0, 0, 0)
 	M.StripTextures(tab, 0)
 	hooksecurefunc(tab, "SetAlpha", module.TabSetAlpha)
 
-	--if MaoRUIPerDB["Chat"]["Lock"] then M.StripTextures(self) end
 	M.HideObject(self.buttonFrame)
 	M.HideObject(self.ScrollBar)
 	M.HideObject(self.ScrollToBottomButton)
 
-	self.oldAlpha = self.oldAlpha or 0 -- fix blizz error, need reviewed
+	self.oldAlpha = self.oldAlpha or 0 -- fix blizz error
 
 	self.styled = true
+end
+
+function module:ToggleChatBackground()
+	for _, chatFrameName in ipairs(CHAT_FRAMES) do
+		local frame = _G[chatFrameName]
+		if frame.__background then
+			frame.__background:SetShown(MaoRUIPerDB["Chat"]["ChatBGType"] == 2)
+		end
+		if frame.__gradient then
+			frame.__gradient:SetShown(MaoRUIPerDB["Chat"]["ChatBGType"] == 3)
+		end
+	end
 end
 
 -- Swith channels by Tab
@@ -231,43 +262,46 @@ function module:ChatWhisperSticky()
 	end
 end
 
+-- Tab colors
 function module:UpdateTabColors(selected)
-	if selected then
-		self:GetFontString():SetTextColor(1, .8, 0)
+	if self.glow:IsShown() then
+		if self.whisperIndex == 1 then
+			self.Text:SetTextColor(1, .5, 1)
+		elseif self.whisperIndex == 2 then
+			self.Text:SetTextColor(0, 1, .96)
+		else
+			self.Text:SetTextColor(1, .8, 0)
+		end
+	elseif selected then
+		self.Text:SetTextColor(1, .8, 0)
+		self.whisperIndex = 0
 	else
-		self:GetFontString():SetTextColor(.5, .5, .5)
+		self.Text:SetTextColor(.5, .5, .5)
+		self.whisperIndex = 0
 	end
 end
 
-function module:ChatFrameBackground()
-	if not MaoRUIPerDB["Chat"]["Lock"] then return end
-	if not MaoRUIPerDB["Skins"]["ChatLine"] then return end
-
-	local cr, cg, cb = 0, 0, 0
-	if MaoRUIPerDB["Skins"]["ClassLine"] then cr, cg, cb = I.r, I.g, I.b end
-
-	local Linfobar = CreateFrame("Frame", nil, UIParent)
-	Linfobar:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 3)
-	M.CreateGF(Linfobar, 450, ChatFrame1:GetHeight() + 30, "Horizontal", 0, 0, 0, .5, 0)
-	local Linfobar1 = CreateFrame("Frame", nil, Linfobar)
-	Linfobar1:SetPoint("BOTTOM", Linfobar, "TOP")
-	M.CreateGF(Linfobar1, 450, R.mult, "Horizontal", cr, cg, cb, .7, 0)
-	local Linfobar2 = CreateFrame("Frame", nil, Linfobar)
-	Linfobar2:SetPoint("BOTTOM", Linfobar, "BOTTOM", 0, 18)
-	M.CreateGF(Linfobar2, 450, R.mult, "Horizontal", cr, cg, cb, .7, 0)
-	local Linfobar3 = CreateFrame("Frame", nil, Linfobar)
-	Linfobar3:SetPoint("TOP", Linfobar, "BOTTOM")
-	M.CreateGF(Linfobar3, 450, R.mult, "Horizontal", cr, cg, cb, .7, 0)
-	ChatFrame1.gradientBG = Linfobar
+function module:UpdateTabEventColors(event)
+	local tab = _G[self:GetName().."Tab"]
+	local selected = GeneralDockManager.selected:GetID() == tab:GetID()
+	if event == "CHAT_MSG_WHISPER" then
+		tab.whisperIndex = 1
+		module.UpdateTabColors(tab, selected)
+	elseif event == "CHAT_MSG_BN_WHISPER" then
+		tab.whisperIndex = 2
+		module.UpdateTabColors(tab, selected)
+	end
 end
-	
+
 function module:OnLogin()
+	fontOutline = MaoRUIPerDB["Skins"]["FontOutline"] and "OUTLINE" or ""
+
 	for i = 1, NUM_CHAT_WINDOWS do
 		self.SkinChat(_G["ChatFrame"..i])
 	end
 
 	hooksecurefunc("FCF_OpenTemporaryWindow", function()
-		for _, chatFrameName in next, CHAT_FRAMES do
+		for _, chatFrameName in ipairs(CHAT_FRAMES) do
 			local frame = _G[chatFrameName]
 			if frame.isTemporary then
 				self.SkinChat(frame)
@@ -276,6 +310,7 @@ function module:OnLogin()
 	end)
 
 	hooksecurefunc("FCFTab_UpdateColors", self.UpdateTabColors)
+	hooksecurefunc("FloatingChatFrame_OnEvent", self.UpdateTabEventColors)
 
 	-- Font size
 	for i = 1, 15 do
@@ -294,7 +329,6 @@ function module:OnLogin()
 	self:Chatbar()
 	self:UrlCopy()
 	self:WhisperInvite()
-	self:ChatFrameBackground()
 
 	-- Lock chatframe
 	if MaoRUIPerDB["Chat"]["Lock"] then

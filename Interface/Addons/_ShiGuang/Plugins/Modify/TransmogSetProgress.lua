@@ -1,4 +1,4 @@
-﻿--## Author: LanceDH ## Version: 8.0.01
+﻿--## Author: LanceDH ## Version: 9.0.01
 --local TSP = LibStub("AceAddon-3.0"):NewAddon("TransmogSetProgress");
 --local ADD = LibStub("AddonDropDown-1.0");
 

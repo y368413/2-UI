@@ -43,14 +43,12 @@ function S:OnLogin()
    Bottomline:SetHeight(16)
    Bottomline:SetWidth(UIParent:GetWidth())
    Bottomline:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 0) 
-   Bottomline:SetBackdrop({bgFile = "Interface\\AddOns\\_ShiGuang\\Media\\Modules\\line"}) 
-   Bottomline:SetBackdropColor(I.r, I.g, I.b, 0.8)
+   --Bottomline:SetBackdrop({bgFile = "Interface\\AddOns\\_ShiGuang\\Media\\Modules\\line"}) 
+   --Bottomline:SetBackdropColor(I.r, I.g, I.b, 0.8)
    end
 
 	self:LoadDefaultSkins()
 	-- Add Skins
-	--self:QuestTracker()
-	--self:QuestTrackerSkinTitle()
 	self:DBMSkin()
 	self:BigWigsSkin()
 	self:LootEx()		-- 拾取增强

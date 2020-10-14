@@ -2,6 +2,7 @@
 local M, R, U, I = unpack(ns)
 local cr, cg, cb = I.r, I.g, I.b
 
+local _G = _G
 local type, pairs, tonumber, wipe, next, select, unpack = type, pairs, tonumber, table.wipe, next, select, unpack
 local strmatch, gmatch, strfind, format, gsub = string.match, string.gmatch, string.find, string.format, string.gsub
 local min, max, floor, rad = math.min, math.max, math.floor, math.rad
@@ -337,6 +338,7 @@ do
 		"BG",
 		"border",
 		"Border",
+		"Background",
 		"BorderFrame",
 		"bottomInset",
 		"BottomInset",
@@ -445,14 +447,22 @@ do
 		return frame
 	end
 
-	-- Gradient Frame
-	function M:CreateGF(w, h, o, r, g, b, a1, a2)
-		self:SetSize(w, h)
-		self:SetFrameStrata("BACKGROUND")
-		local gf = self:CreateTexture(nil, "BACKGROUND")
-		gf:SetAllPoints()
-		gf:SetTexture(I.normTex)
-		gf:SetGradientAlpha(o, r, g, b, a1, r, g, b, a2)
+	-- Gradient texture
+	local orientationAbbr = {
+		["V"] = "Vertical",
+		["H"] = "Horizontal",
+	}
+	function M:SetGradient(orientation, r, g, b, a1, a2, width, height)
+		orientation = orientationAbbr[orientation]
+		if not orientation then return end
+
+		local tex = self:CreateTexture(nil, "BACKGROUND")
+		tex:SetTexture(I.bdTex)
+		tex:SetGradientAlpha(orientation, r, g, b, a1, r, g, b, a2)
+		if width then tex:SetWidth(width) end
+		if height then tex:SetHeight(height) end
+
+		return tex
 	end
 
 	-- Background texture
@@ -471,104 +481,37 @@ do
 	end
 
 	-- Backdrop shadow
+	local shadowBackdrop = {edgeFile = I.glowTex}
+
 	function M:CreateSD(size, override)
 		if not override and not MaoRUIPerDB["Skins"]["Shadow"] then return end
-		if self.Shadow then return end
+		if self.__shadow then return end
 
 		local frame = self
 		if self:GetObjectType() == "Texture" then frame = self:GetParent() end
 
-		self.Shadow = CreateFrame("Frame", nil, frame)
-		self.Shadow:SetOutside(self, size or 4, size or 4)
-		self.Shadow:SetBackdrop({edgeFile = I.glowTex, edgeSize = size or 5})
-		self.Shadow:SetBackdropBorderColor(0, 0, 0, size and 1 or .4)
-		self.Shadow:SetFrameLevel(1)
+		shadowBackdrop.edgeSize = size or 5
+		self.__shadow = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+		self.__shadow:SetOutside(self, size or 4, size or 4)
+		self.__shadow:SetBackdrop(shadowBackdrop)
+		self.__shadow:SetBackdropBorderColor(0, 0, 0, size and 1 or .4)
+		self.__shadow:SetFrameLevel(1)
 
-		return self.Shadow
+		return self.__shadow
 	end
 end
 
 -- UI skins
 do
-	-- ls, Azil, and Simpy made this to replace Blizzard's SetBackdrop API while the textures can't snap
-	local PIXEL_BORDERS = {"TOP", "BOTTOM", "LEFT", "RIGHT"}
-
-	function M:SetBackdrop(frame, a)
-		local borders = frame.pixelBorders
-		if not borders then return end
-
-		local size = R.mult
-
-		borders.CENTER:SetPoint("TOPLEFT", frame)
-		borders.CENTER:SetPoint("BOTTOMRIGHT", frame)
-
-		borders.TOP:SetHeight(size)
-		borders.BOTTOM:SetHeight(size)
-		borders.LEFT:SetWidth(size)
-		borders.RIGHT:SetWidth(size)
-
-		M:SetBackdropColor(frame, 0, 0, 0, a)
-		M:SetBackdropBorderColor(frame, 0, 0, 0)
-	end
-
-	function M:SetBackdropColor(frame, r, g, b, a)
-		if frame.pixelBorders then
-			frame.pixelBorders.CENTER:SetVertexColor(r, g, b, a)
-		end
-	end
-
-	function M:SetBackdropBorderColor(frame, r, g, b, a)
-		if frame.pixelBorders then
-			for _, v in pairs(PIXEL_BORDERS) do
-				frame.pixelBorders[v]:SetVertexColor(r or 0, g or 0, b or 0, a)
-			end
-		end
-	end
-
-	function M:SetBackdropColor_Hook(r, g, b, a)
-		M:SetBackdropColor(self, r, g, b, a)
-	end
-
-	function M:SetBackdropBorderColor_Hook(r, g, b, a)
-		M:SetBackdropBorderColor(self, r, g, b, a)
-	end
-
-	function M:PixelBorders(frame)
-		if frame and not frame.pixelBorders then
-			local borders = {}
-			for _, v in pairs(PIXEL_BORDERS) do
-				borders[v] = frame:CreateTexture(nil, "BORDER", nil, 1)
-				borders[v]:SetTexture(I.bdTex)
-			end
-
-			borders.CENTER = frame:CreateTexture(nil, "BACKGROUND", nil, -1)
-			borders.CENTER:SetTexture(I.bdTex)
-
-			borders.TOP:SetPoint("BOTTOMLEFT", borders.CENTER, "TOPLEFT", R.mult, -R.mult)
-			borders.TOP:SetPoint("BOTTOMRIGHT", borders.CENTER, "TOPRIGHT", -R.mult, -R.mult)
-
-			borders.BOTTOM:SetPoint("TOPLEFT", borders.CENTER, "BOTTOMLEFT", R.mult, R.mult)
-			borders.BOTTOM:SetPoint("TOPRIGHT", borders.CENTER, "BOTTOMRIGHT", -R.mult, R.mult)
-
-			borders.LEFT:SetPoint("TOPRIGHT", borders.TOP, "TOPLEFT", 0, 0)
-			borders.LEFT:SetPoint("BOTTOMRIGHT", borders.BOTTOM, "BOTTOMLEFT", 0, 0)
-
-			borders.RIGHT:SetPoint("TOPLEFT", borders.TOP, "TOPRIGHT", 0, 0)
-			borders.RIGHT:SetPoint("BOTTOMLEFT", borders.BOTTOM, "BOTTOMRIGHT", 0, 0)
-
-			hooksecurefunc(frame, "SetBackdropColor", M.SetBackdropColor_Hook)
-			hooksecurefunc(frame, "SetBackdropBorderColor", M.SetBackdropBorderColor_Hook)
-
-			frame.pixelBorders = borders
-		end
-	end
-
 	-- Setup backdrop
 	R.frames = {}
+	local defaultBackdrop = {bgFile = I.bdTex, edgeFile = I.bdTex}
+
 	function M:CreateBD(a)
-		self:SetBackdrop(nil)
-		M:PixelBorders(self)
-		M:SetBackdrop(self, a or MaoRUIPerDB["Skins"]["SkinAlpha"])
+		defaultBackdrop.edgeSize = R.mult
+		self:SetBackdrop(defaultBackdrop)
+		self:SetBackdropColor(0, 0, 0, a or MaoRUIPerDB["Skins"]["SkinAlpha"])
+		self:SetBackdropBorderColor(0, 0, 0)
 		if not a then tinsert(R.frames, self) end
 	end
 
@@ -586,25 +529,29 @@ do
 	end
 
 	-- Handle frame
-	function M:CreateBDFrame(a, shadow)
+	function M:CreateBDFrame(a, gradient)
 		local frame = self
 		if self:GetObjectType() == "Texture" then frame = self:GetParent() end
 		local lvl = frame:GetFrameLevel()
 
-		local bg = CreateFrame("Frame", nil, frame)
+		local bg = CreateFrame("Frame", nil, frame, "BackdropTemplate")
 		bg:SetOutside(self)
 		bg:SetFrameLevel(lvl == 0 and 0 or lvl - 1)
 		M.CreateBD(bg, a)
-		if shadow then M.CreateSD(bg) end
+		if gradient then
+			self.__gradient = M.CreateGradient(bg)
+		end
+
 		return bg
 	end
 
-	function M:SetBD(x, y, x2, y2)
-		local bg = M.CreateBDFrame(self, nil, true)
+	function M:SetBD(a, x, y, x2, y2)
+		local bg = M.CreateBDFrame(self, a)
 		if x then
 			bg:SetPoint("TOPLEFT", self, x, y)
 			bg:SetPoint("BOTTOMRIGHT", self, x2, y2)
 		end
+		M.CreateSD(bg)
 		M.CreateTex(bg)
 
 		return bg
@@ -613,11 +560,14 @@ do
 	-- Handle icons
 	function M:ReskinIcon(shadow)
 		self:SetTexCoord(unpack(I.TexCoord))
-		return M.CreateBDFrame(self, nil, shadow)
+		local bg = M.CreateBDFrame(self)
+		if shadow then M.CreateSD(bg) end
+		return bg
 	end
 
 	function M:PixelIcon(texture, highlight)
-		M.CreateBD(self)
+		self.bg = M.CreateBDFrame(self)
+		self.bg:SetAllPoints()
 		self.Icon = self:CreateTexture(nil, "ARTWORK")
 		self.Icon:SetInside()
 		self.Icon:SetTexCoord(unpack(I.TexCoord))
@@ -659,6 +609,30 @@ do
 		return bu
 	end
 
+	function M:CreateHelpInfo(tooltip)
+		local bu = CreateFrame("Button", nil, self)
+		bu:SetSize(40, 40)
+		bu.Icon = bu:CreateTexture(nil, "ARTWORK")
+		bu.Icon:SetAllPoints()
+		bu.Icon:SetTexture(616343)
+		bu:SetHighlightTexture(616343)
+		if tooltip then
+			bu.title = U["Tips"]
+			M.AddTooltip(bu, "ANCHOR_BOTTOMLEFT", tooltip, "info")
+		end
+
+		return bu
+	end
+
+	function M:CreateWatermark()
+		local logo = self:CreateTexture(nil, "BACKGROUND")
+		logo:SetPoint("BOTTOMRIGHT", 10, 0)
+		logo:SetTexture(I.logoTex)
+		logo:SetTexCoord(0, 1, 0, .75)
+		logo:SetSize(200, 75)
+		logo:SetAlpha(.3)
+	end
+
 	local AtlasToQuality = {
 		["auctionhouse-itemicon-border-gray"] = LE_ITEM_QUALITY_POOR,
 		["auctionhouse-itemicon-border-white"] = LE_ITEM_QUALITY_COMMON,
@@ -681,11 +655,11 @@ do
 	local function resetIconBorderColor(self)
 		self.__owner.bg:SetBackdropBorderColor(0, 0, 0)
 	end
-	function M:HookIconBorderColor()
+	function M:ReskinIconBorder()
 		self:SetAlpha(0)
 		self.__owner = self:GetParent()
 		if not self.__owner.bg then return end
-		if self.__owner.useCircularIconBorder then
+		if self.__owner.useCircularIconBorder then -- for auction item display
 			hooksecurefunc(self, "SetAtlas", updateIconBorderColorByAtlas)
 		else
 			hooksecurefunc(self, "SetVertexColor", updateIconBorderColor)
@@ -703,7 +677,7 @@ do
 		end
 
 		local bg = M.SetBD(self)
-		self.Shadow = bg.Shadow
+		self.__shadow = bg.__shadow
 
 		if spark then
 			self.Spark = self:CreateTexture(nil, "OVERLAY")
@@ -720,19 +694,19 @@ do
 		if not self:IsEnabled() then return end
 
 		if MaoRUIPerDB["Skins"]["FlatMode"] then
-			self.bgTex:SetVertexColor(cr / 4, cg / 4, cb / 4)
+			self.__gradient:SetVertexColor(cr / 4, cg / 4, cb / 4)
 		else
-			self:SetBackdropColor(cr, cg, cb, .25)
+			self.__bg:SetBackdropColor(cr, cg, cb, .25)
 		end
-		self:SetBackdropBorderColor(cr, cg, cb)
+		self.__bg:SetBackdropBorderColor(cr, cg, cb)
 	end
 	local function Button_OnLeave(self)
 		if MaoRUIPerDB["Skins"]["FlatMode"] then
-			self.bgTex:SetVertexColor(.3, .3, .3, .25)
+			self.__gradient:SetVertexColor(.3, .3, .3, .25)
 		else
-			self:SetBackdropColor(0, 0, 0, 0)
+			self.__bg:SetBackdropColor(0, 0, 0, 0)
 		end
-		self:SetBackdropBorderColor(0, 0, 0)
+		self.__bg:SetBackdropBorderColor(0, 0, 0)
 	end
 
 	local blizzRegions = {
@@ -769,9 +743,10 @@ do
 		"BottomRightTex",
 		"RightTex",
 		"MiddleTex",
+		"Center",
 	}
-	function M:Reskin(noHighlight)
-		if self.SetNormalTexture then self:SetNormalTexture("") end
+	function M:Reskin(noHighlight, override)
+		if self.SetNormalTexture and not override then self:SetNormalTexture("") end
 		if self.SetHighlightTexture then self:SetHighlightTexture("") end
 		if self.SetPushedTexture then self:SetPushedTexture("") end
 		if self.SetDisabledTexture then self:SetDisabledTexture("") end
@@ -784,12 +759,12 @@ do
 			end
 		end
 
-		M.CreateBD(self, 0)
-		self.bgTex = M.CreateGradient(self)
+		self.__bg = M.CreateBDFrame(self, 0, true)
+		self.__bg:SetAllPoints()
 
 		if not noHighlight then
 			self:HookScript("OnEnter", Button_OnEnter)
-			 self:HookScript("OnLeave", Button_OnLeave)
+			self:HookScript("OnLeave", Button_OnLeave)
 		end
 	end
 
@@ -807,7 +782,7 @@ do
 			if self.bg then
 				self.bg:SetBackdropColor(cr, cg, cb, .25)
 			else
-				self.bgTex:SetVertexColor(cr, cg, cb)
+				self.__texture:SetVertexColor(cr, cg, cb)
 			end
 		end
 	end
@@ -816,7 +791,7 @@ do
 		if self.bg then
 			self.bg:SetBackdropColor(0, 0, 0, .25)
 		else
-			self.bgTex:SetVertexColor(1, 1, 1)
+			self.__texture:SetVertexColor(1, 1, 1)
 		end
 	end
 	-- Handle arrows
@@ -845,17 +820,16 @@ do
 		tex:SetAllPoints()
 		M.SetupArrow(tex, direction)
 		tex:SetVertexColor(1, 0, 0, 1)
-		self.bgTex = tex
-
-		self:HookScript("OnEnter", function() if self:IsEnabled() then self.bgTex:SetVertexColor(0, 1, 0, 1) end end)
-		self:HookScript("OnLeave", function() self.bgTex:SetVertexColor(1, 0, 0, 1) end)
+		self.__texture = tex
+		self:HookScript("OnEnter", function() if self:IsEnabled() then self.__texture:SetVertexColor(0, 1, 0, 1) end end)
+		self:HookScript("OnLeave", function() self.__texture:SetVertexColor(1, 0, 0, 1) end)
 	end
 end
 
 -- GUI elements
 do
 	function M:CreateButton(width, height, text, fontSize)
-		local bu = CreateFrame("Button", nil, self)
+		local bu = CreateFrame("Button", nil, self, "BackdropTemplate")
 		bu:SetSize(width, height)
 		if type(text) == "boolean" then
 			M.PixelIcon(bu, fontSize, true)
@@ -885,8 +859,7 @@ do
 		eb:SetAutoFocus(false)
 		eb:SetTextInsets(5, 5, 0, 0)
 		eb:SetFont(I.Font[1], I.Font[2]+2, I.Font[3])
-		M.CreateBD(eb, .3)
-		M.CreateGradient(eb)
+		eb.bg = M.CreateBDFrame(eb, .25, true)
 		eb:SetScript("OnEscapePressed", editBoxClearFocus)
 		eb:SetScript("OnEnterPressed", editBoxClearFocus)
 
@@ -930,7 +903,7 @@ do
 	end
 
 	function M:CreateDropDown(width, height, data)
-		local dd = CreateFrame("Frame", nil, self)
+		local dd = CreateFrame("Frame", nil, self, "BackdropTemplate")
 		dd:SetSize(width, height)
 		M.CreateBD(dd)
 		dd:SetBackdropBorderColor(1, 1, 1, .2)
@@ -942,8 +915,7 @@ do
 		bu:SetPoint("RIGHT", 12, 5)
 		M.ReskinArrow(bu, "down")
 		bu:SetSize(26, 26)
-
-		local list = CreateFrame("Frame", nil, dd)
+		local list = CreateFrame("Frame", nil, dd, "BackdropTemplate")
 		list:SetPoint("TOP", dd, "BOTTOM", 0, -2)
 		M.CreateBD(list, 0.85)
 		list:SetBackdropBorderColor(1, 1, 1, .85)
@@ -955,7 +927,7 @@ do
 
 		local opt, index = {}, 0
 		for i, j in pairs(data) do
-			opt[i] = CreateFrame("Button", nil, list)
+			opt[i] = CreateFrame("Button", nil, list, "BackdropTemplate")
 			opt[i]:SetPoint("TOPLEFT", 4, -4 - (i-1)*(height+2))
 			opt[i]:SetSize(width - 8, height)
 			M.CreateBD(opt[i])
@@ -1003,7 +975,7 @@ do
 	function M:CreateColorSwatch(name, color)
 		color = color or {r=1, g=1, b=1}
 
-		local swatch = CreateFrame("Button", nil, self)
+		local swatch = CreateFrame("Button", nil, self, "BackdropTemplate")
 		swatch:SetSize(18, 18)
 		M.CreateBD(swatch, 1)
 		swatch.text = M.CreateFS(swatch, 14, name, false, "LEFT", 26, 0)
@@ -1161,7 +1133,7 @@ end
 
 	-- Function --
 function M:CreatStyleButton(id, parent, w, h, ap, frame, rp, x, y, l, alpha, bgF, r, g, b)
-  local StyleButton = CreateFrame("Button", id, parent, "SecureActionButtonTemplate")
+  local StyleButton = CreateFrame("Button", id, parent, "BackdropTemplate")
 	StyleButton:SetWidth(w)
 	StyleButton:SetHeight(h)
 	StyleButton:SetPoint(ap, frame, rp, x, y)

@@ -203,7 +203,7 @@ local function ColorFrames()
 		GuildFrameBg,
 		GuildFrameTitleBg,
 		ClassicQuestLogBg,
-		ClassicQuestLog.TitleBg,
+		--ClassicQuestLog.TitleBg,
 		TradeSkillFrameBg,
 		TradeSkillFrameTitleBg,
 		CombuctorInventoryFrame1Bg,

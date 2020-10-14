@@ -9,6 +9,7 @@ local Ambiguate, GetContainerNumSlots, GetContainerItemInfo = Ambiguate, GetCont
 local C_ChallengeMode_GetMapUIInfo, C_ChallengeMode_GetGuildLeaders = C_ChallengeMode.GetMapUIInfo, C_ChallengeMode.GetGuildLeaders
 local format, strsplit, strmatch, tonumber, pairs, wipe, select = string.format, string.split, string.match, tonumber, pairs, wipe, select
 
+local hasAngryKeystones
 local frame
 
 function MISC:GuildBest_UpdateTooltip()
@@ -27,10 +28,10 @@ function MISC:GuildBest_UpdateTooltip()
 end
 
 function MISC:GuildBest_Create()
-	frame = CreateFrame("Frame", nil, ChallengesFrame)
-	frame:SetPoint("BOTTOMRIGHT", -6, 80)
+	frame = CreateFrame("Frame", nil, ChallengesFrame, "BackdropTemplate")
+	frame:SetPoint("BOTTOMRIGHT", -8, 75)
 	frame:SetSize(170, 105)
-	M.CreateBD(frame, .3)
+	M.CreateBD(frame, .25)
 	M.CreateFS(frame, 16, GUILD, "system", "TOPLEFT", 16, -6)
 
 	frame.entries = {}
@@ -55,6 +56,10 @@ function MISC:GuildBest_Create()
 		end
 
 		frame.entries[i] = entry
+	end
+
+	if not hasAngryKeystones then
+		ChallengesFrame.WeeklyInfo.Child.Description:SetPoint("CENTER", 0, 20)
 	end
 end
 
@@ -85,13 +90,13 @@ function MISC:GuildBest_Update()
 		end
 	end
 
-	if not resize and IsAddOnLoaded("AngryKeystones") then
+	if not resize and hasAngryKeystones then
 		local schedule = AngryKeystones.Modules.Schedule.AffixFrame
 		frame:SetWidth(246)
 		frame:ClearAllPoints()
 		frame:SetPoint("BOTTOMLEFT", schedule, "TOPLEFT", 0, 10)
 
-		self.WeeklyInfo.Child.Label:SetPoint("TOP", -135, -25)
+		self.WeeklyInfo.Child.ThisWeekLabel:SetPoint("TOP", -135, -25)
 		local affix = self.WeeklyInfo.Child.Affixes[1]
 		if affix then
 			affix:ClearAllPoints()
@@ -118,11 +123,11 @@ local iconColor = I.QualityColors[LE_ITEM_QUALITY_EPIC or 4]
 
 function MISC:KeystoneInfo_Create()
 	local texture = select(10, GetItemInfo(158923)) or 525134
-	local button = CreateFrame("Frame", nil, ChallengesFrame.WeeklyInfo)
+	local button = CreateFrame("Frame", nil, ChallengesFrame.WeeklyInfo, "BackdropTemplate")
 	button:SetPoint("BOTTOMLEFT", 2, 67)
 	button:SetSize(35, 35)
 	M.PixelIcon(button, texture, true)
-	button:SetBackdropBorderColor(iconColor.r, iconColor.g, iconColor.b)
+	button.bg:SetBackdropBorderColor(iconColor.r, iconColor.g, iconColor.b)
 	button:SetScript("OnEnter", function(self)
 		GameTooltip:ClearLines()
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -171,6 +176,7 @@ function MISC:KeystoneInfo_Update()
 end
 
 function MISC:GuildBest()
+	hasAngryKeystones = IsAddOnLoaded("AngryKeystones")
 	M:RegisterEvent("ADDON_LOADED", MISC.GuildBest_OnLoad)
 
 	MISC:KeystoneInfo_Update()

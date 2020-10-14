@@ -1331,7 +1331,7 @@ local function getAlertText(tempKey)
     
     if ( string.find(tempKey, "H") ) then
         if ( returnString ) then
-            returnString = returnString.." | "..IncentiveProgram.TOAST_HEALER
+            returnString = returnString.."/"..IncentiveProgram.TOAST_HEALER
         else
             returnString = IncentiveProgram.TOAST_HEALER
         end

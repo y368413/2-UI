@@ -104,8 +104,8 @@ function Bar:MicroMenu()
 	M.HideObject(MainMenuBarPerformanceBar)
 	MainMenuMicroButton:SetScript("OnUpdate", nil)
 
-	CharacterMicroButtonAlert:EnableMouse(false)
-	M.HideOption(CharacterMicroButtonAlert)
-	TalentMicroButtonAlert:EnableMouse(false)
-	M.HideOption(TalentMicroButtonAlert)
+	--CharacterMicroButtonAlert:EnableMouse(false)
+	--M.HideObject(CharacterMicroButtonAlert)
+	--TalentMicroButtonAlert:EnableMouse(false)
+	--M.HideObject(TalentMicroButtonAlert)
 end

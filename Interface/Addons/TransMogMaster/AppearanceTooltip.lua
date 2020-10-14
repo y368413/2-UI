@@ -1,4 +1,4 @@
-﻿--## Version: v18  ## Author: Kemayo
+﻿--## Version: v20  ## Author: Kemayo
 local AppearanceTooltip = {}
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
@@ -42,9 +42,16 @@ function tooltip:ADDON_LOADED(addon)
         anchor = "vertical", -- vertical / horizontal
         byComparison = true, -- whether to show by the comparison, or fall back to vertical if needed
         tokens = true, -- try to preview tokens?
+        bags = true,
+        bags_unbound = true,
+        merchant = true,
+        loot = true,
+        encounterjournal = true,
+        appearances_known = {},
     })
     db = _G["AppearanceTooltipDB"]
     AppearanceTooltip.db = db
+    db.customModel = false
 
     self:UnregisterEvent("ADDON_LOADED")
 end
@@ -53,6 +60,8 @@ function tooltip:PLAYER_LOGIN()
     tooltip.model:SetUnit("player")
     tooltip.modelZoomed:SetUnit("player")
     C_TransmogCollection.SetShowMissingSourceInItemTooltips(true)
+
+    AppearanceTooltip.UpdateSources()
 end
 
 function tooltip:PLAYER_REGEN_ENABLED()
@@ -144,7 +153,7 @@ positioner:SetScript("OnUpdate", function(self, elapsed)
     end
     self.elapsed = 0
 
-    local owner, our_point, owner_point = AppearanceTooltip:ComputeTooltipAnchors(tooltip.owner, tooltip, db.anchor)
+    local owner, our_point, owner_point = AppearanceTooltip:ComputeTooltipAnchors(tooltip.owner, db.anchor)
     if our_point and owner_point then
         tooltip:ClearAllPoints()
         tooltip:SetPoint(our_point, owner, owner_point)
@@ -172,7 +181,7 @@ do
             bottom = {"TOPLEFT", "TOPRIGHT"},
         },
     }
-    function AppearanceTooltip:ComputeTooltipAnchors(owner, tooltip, anchor)
+    function AppearanceTooltip:ComputeTooltipAnchors(owner, anchor)
         -- Because I always forget: x is left-right, y is bottom-top
         -- Logic here: our tooltip should trend towards the center of the screen, unless something is stopping it.
         -- If comparison tooltips are shown, we shouldn't overlap them
@@ -249,7 +258,7 @@ do
             (primary == "left" and (owner:GetLeft() - tooltip:GetWidth()) < 0)
             or (primary == "right" and (owner:GetRight() + tooltip:GetWidth() > GetScreenWidth()))
         then
-            return self:ComputeTooltipAnchors(originalOwner, tooltip, "vertical")
+            return self:ComputeTooltipAnchors(originalOwner, "vertical")
         end
         return owner, unpack(points[primary][secondary])
     end
@@ -340,7 +349,12 @@ function AppearanceTooltip:ShowItem(link)
             if shouldZoom then
                 if itemCamera then
                     model = tooltip.modelWeapon
-                    model:SetItem(id)
+                    local appearanceID = C_TransmogCollection.GetItemInfo(link)
+                    if appearanceID then
+                        model:SetItemAppearance(appearanceID)
+                    else
+                        model:SetItem(id)
+                    end
                 else
                     model = tooltip.modelZoomed
                     model:SetUseTransmogSkin(db.zoomMasked and slot ~= "INVTYPE_HEAD")
@@ -393,10 +407,10 @@ function AppearanceTooltip:ShowItem(link)
         known:Hide()
 
         if db.notifyKnown then
-            local hasAppearance, appearanceFromOtherItem, notTransmoggable = AppearanceTooltip.PlayerHasAppearance(link)
+            local hasAppearance, appearanceFromOtherItem = AppearanceTooltip.PlayerHasAppearance(link)
 
             local label
-            if notTransmoggable then
+            if not AppearanceTooltip.CanTransmogItem(link) then
                 label = "|c00ffff00" .. TRANSMOGRIFY_INVALID_DESTINATION
             else
                 if hasAppearance then
@@ -425,8 +439,10 @@ function AppearanceTooltip:ResetModel(model)
     -- model:SetAutoDress(db.dressed)
     -- So instead, more complicated:
     if db.customModel then
+        model:SetUnit("none")
         model:SetCustomRace(db.modelRace, db.modelGender)
     else
+        model:SetUnit("player")
         model:Dress()
     end
     model:RefreshCamera()
@@ -495,6 +511,35 @@ AppearanceTooltip.modifiers = {
     None = function() return true end,
 }
 
+---
+
+do
+    local scanned
+    function AppearanceTooltip.UpdateSources()
+        if scanned then return end
+        for categoryID = 1, 28 do
+            local categoryAppearances = C_TransmogCollection.GetCategoryAppearances(categoryID)
+            for _, categoryAppearance in pairs(categoryAppearances) do
+                local appearanceSources = C_TransmogCollection.GetAppearanceSources(categoryAppearance.visualID)
+                local known_any
+                for _, source in pairs(appearanceSources) do
+                    if source.isCollected then
+                        -- it's only worth saving if we know the source
+                        known_any = true
+                    end
+                end
+                if known_any then
+                    AppearanceTooltip.db.appearances_known[categoryAppearance.visualID] = true
+                else
+                    -- cleaning up after unlearned appearances:
+                    AppearanceTooltip.db.appearances_known[categoryAppearance.visualID] = nil
+                end
+            end
+        end
+        scanned = true
+    end
+end
+
 -- Utility fun
 
 --/dump C_Transmog.GetItemInfo(GetItemInfoInstant(""))
@@ -506,50 +551,52 @@ function AppearanceTooltip.CanTransmogItem(itemLink)
     end
 end
 
-function AppearanceTooltip.PlayerHasAppearance(item)
-    if not AppearanceTooltip.CanTransmogItem(item) then
-        return false, false, true
+-- /dump C_TransmogCollection.GetAppearanceSourceInfo(select(2, C_TransmogCollection.GetItemInfo("")))
+function AppearanceTooltip.PlayerHasAppearance(itemLinkOrID)
+    -- hasAppearance, appearanceFromOtherItem
+    local itemID = GetItemInfoInstant(itemLinkOrID)
+    if not itemID then return end
+    local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemLinkOrID)
+    if not appearanceID then
+        -- sometimes the link won't actually give us an appearance, but itemID will
+        -- e.g. mythic Drape of Iron Sutures from Shadowmoon Burial Grounds
+        appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
     end
-    local state = AppearanceTooltip.CheckTooltipFor(item, TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN, TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN)
-    if state == TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN then
-        return
+    if not appearanceID then return end
+    if sourceID and AppearanceTooltip.db.appearances_known[appearanceID] then
+        local _, _, _, _, sourceKnown = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
+        return true, not sourceKnown
     end
-    return true, state == TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN
-end
-
-do
-    local tooltip
-    function AppearanceTooltip.CheckTooltipFor(link, ...)
-        if not tooltip then
-            tooltip = CreateFrame("GameTooltip", "AppearanceTooltipScanningTooltip", nil, "GameTooltipTemplate")
-            tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
-        end
-        tooltip:ClearLines()
-
-        -- just showing tooltip for an itemid
-        -- uses rather innocent checking so that slot can be a link or an itemid
-        local link = tostring(link) -- so that ":match" is guaranteed to be okay
-        if not link:match("item:") then
-            link = "item:"..link
-        end
-        tooltip:SetHyperlink(link)
-
-        for i=2, tooltip:NumLines() do
-            local left = _G["AppearanceTooltipScanningTooltipTextLeft"..i]
-            --local right = _G["AppearanceTooltipScanningTooltipTextRight"..i]
-            if left and left:IsShown() then
-                local text = left:GetText()
-                for ii=1, select('#', ...) do
-                    if string.match(text, (select(ii, ...))) then
-                        return text
-                    end
+    -- Everything after this is a fallback. All know appearances *should* be in that table... but we run
+    -- this in case, we only know about unequippable items after you've logged in as a class which can use
+    -- them. (Also in case the scanning messed up somehow, I guess?)
+    if not LAI:IsAppropriate(itemID) then
+        -- This is a non-class item, so GetAppearanceSources won't work on it
+        -- We can tell whether the specific source is collected, but not the overall appearance
+        -- Fallback if you've not logged in to a class that can use this item in a while
+        local _, _, _, _, sourceKnown = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
+        return sourceKnown, false
+    end
+    local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
+    if sources then
+        local known_any = false
+        for _, source in pairs(sources) do
+            if source.isCollected == true then
+                known_any = true
+                if itemID == source.itemID then
+                    return true, false
                 end
             end
-            --if right and right:IsShown() and string.match(right:GetText(), text) then return true end
         end
-        return false
+        return known_any, false
     end
+    return false
 end
+
+--function AppearanceTooltip.Print(...) print("|cFF33FF99".. myfullname.. "|r:", ...) end
+
+local debugf = tekDebug and tekDebug:GetFrame(myname)
+function AppearanceTooltip.Debug(...) if debugf then debugf:AddMessage(string.join(", ", tostringall(...))) end end
 
 function setDefaults(options, defaults)
     setmetatable(options, { __index = function(t, k)
@@ -662,9 +709,9 @@ local slots_to_cameraids, slot_override
 -- itemid: number/string Anything that GetItemInfoInstant will accept
 -- race: number raceid
 -- gender: number genderid (0: male, 1: female)
-function AppearanceTooltip:GetCameraID(itemid, race, gender)
+function AppearanceTooltip:GetCameraID(itemLinkOrID, race, gender)
     local key, itemcamera
-    local itemid, _, _, slot, _, class, subclass = GetItemInfoInstant(itemid)
+    local itemid, _, _, slot, _, class, subclass = GetItemInfoInstant(itemLinkOrID)
     if item_slots[slot] then
         itemcamera = true
         if item_slots[slot] == true then
@@ -684,9 +731,9 @@ function AppearanceTooltip:GetCameraID(itemid, race, gender)
         if not gender then
             gender = playerSex
         end
-        --if raceMap[race] then
-            --race = raceMap[race]
-        --end
+        if raceMap[race] then
+            race = raceMap[race]
+        end
         key = ("%s-%s-%s"):format(race, gender, slot_override[itemid] or slots[slot] or "Default")
     end
     return slots_to_cameraids[key], itemcamera
@@ -751,7 +798,6 @@ slots_to_cameraids = {
     ["Draenei-Female-Waist"] = 355,
     ["Draenei-Female-Wrist"] = 350,
     ["Draenei-Male-Back"] = 333,
-    ["Draenei-Male-Chest"] = 677,
     ["Draenei-Male-Feet"] = 341,
     ["Draenei-Male-Hands"] = 338,
     ["Draenei-Male-Head"] = 331,
@@ -1012,7 +1058,6 @@ slots_to_cameraids = {
     ["Troll-Female-Waist"] = 539,
     ["Troll-Female-Wrist"] = 537,
     ["Troll-Male-Back"] = 522,
-    ["Troll-Male-Chest"] = 689,
     ["Troll-Male-Feet"] = 530,
     ["Troll-Male-Hands"] = 527,
     ["Troll-Male-Head"] = 520,
@@ -1096,7 +1141,7 @@ slot_override = {
     [106446] = "Shoulder-Alt", -- Anchorite Shoulderpads
     [112531] = "Shoulder-Alt", -- Auchenai Keeper Mantle
     -- Leather
-    -- [] = "Shoulder-Alt", -- 
+    -- [] = "Shoulder-Alt", --
     -- Mail
     [7718] = "Shoulder-Alt", -- Herod's Shoulder
     [122356] = "Shoulder-Alt", -- Champion Herod's Shoulder
@@ -1174,7 +1219,7 @@ local function newBox(parent, title, height)
         insets = {left = 4, right = 4, top = 4, bottom = 4},
     }
 
-    local box = CreateFrame('Frame', nil, parent)
+    local box = CreateFrame('Frame', nil, parent, "BackdropTemplate")
     box:SetBackdrop(boxBackdrop)
     box:SetBackdropBorderColor(.3, .3, .3)
     box:SetBackdropColor(.1, .1, .1, .5)
@@ -1192,6 +1237,7 @@ end
 
 -- and the actual config now
 
+do
 local panel = CreateFrame("Frame", nil, InterfaceOptionsFramePanelContainer)
 panel:Hide()
 panel:SetAllPoints()
@@ -1236,40 +1282,40 @@ local anchor = newDropdown(panel, 'anchor', "Side of the tooltip to attach to, d
     horizontal = "← / →",
 })
 UIDropDownMenu_SetWidth(anchor, 100)
-local modelBox = newBox(panel, "自定义模型种族", 48)
-local customModel = newCheckbox(modelBox, 'customModel', '使用不同的模型', "Instead of your current character, use a specific race/gender")
-local customRaceDropdown = newDropdown(modelBox, 'modelRace', "选择你要的种族模型", {
+--local modelBox = newBox(panel, "自定义模型种族", 48)
+--local customModel = newCheckbox(modelBox, 'customModel', '使用不同的模型', "Instead of your current character, use a specific race/gender")
+--local customRaceDropdown = newDropdown(modelBox, 'modelRace', "选择你要的种族模型", {
 	--[0]	= "Pet",
-	[1] = "人类",
-	[2] = "兽人",
-	[3] = "矮人",
-	[4] = "暗夜精灵",
-	[5] = "亡灵",
-	[6] = "牛头人",
-	[7] = "侏儒",
-	[8] = "巨魔",
-	[9] = "地精",
-	[10] = "血精灵",
-	[11] = "德莱尼",
-	[22] = "狼人",
-	[24] = "熊猫人",
-	[27] = "夜之子",
-	[28] = "至高岭牛头人",
-	[29] = "虚空精灵",
-	[30] = "光铸德莱尼",
-	[31] = "赞达拉巨魔",
-	[32] = "库尔提拉斯人",
-	[34] = "黑铁矮人",
-	[35] = "狐人",
-	[36] = "玛格汉兽人",
-	[37] = "机械侏儒",
-})
-UIDropDownMenu_SetWidth(customRaceDropdown, 100)
-local customGenderDropdown = newDropdown(modelBox, 'modelGender', "选择你要的性别", {
-    [0] = "男",
-    [1] = "女",
-})
-UIDropDownMenu_SetWidth(customGenderDropdown, 100)
+--	[1] = "人类",
+--	[2] = "兽人",
+--	[3] = "矮人",
+--	[4] = "暗夜精灵",
+--	[5] = "亡灵",
+--	[6] = "牛头人",
+--	[7] = "侏儒",
+--	[8] = "巨魔",
+--	[9] = "地精",
+--	[10] = "血精灵",
+--	[11] = "德莱尼",
+--	[22] = "狼人",
+--	[24] = "熊猫人",
+--	[27] = "夜之子",
+--	[28] = "至高岭牛头人",
+--	[29] = "虚空精灵",
+--	[30] = "光铸德莱尼",
+--	[31] = "赞达拉巨魔",
+--	[32] = "库尔提拉斯人",
+--	[34] = "黑铁矮人",
+--	[35] = "狐人",
+--	[36] = "玛格汉兽人",
+--	[37] = "机械侏儒",
+--})
+--UIDropDownMenu_SetWidth(customRaceDropdown, 100)
+--local customGenderDropdown = newDropdown(modelBox, 'modelGender', "选择你要的性别", {
+--    [0] = "男",
+--    [1] = "女",
+--})
+--UIDropDownMenu_SetWidth(customGenderDropdown, 100)
 
 -- And put them together:
 
@@ -1293,12 +1339,56 @@ anchor:SetPoint("LEFT", anchorLabel, "RIGHT", 4, -2)
 
 byComparison:SetPoint("TOPLEFT", anchorLabel, "BOTTOMLEFT", 0, -10)
 
-modelBox:SetPoint("TOP", byComparison, "BOTTOM", 0, -20)
-customModel:SetPoint("LEFT", modelBox, 12, 0)
-customRaceDropdown:SetPoint("LEFT", customModel.Text, "RIGHT", 12, -2)
-customGenderDropdown:SetPoint("TOPLEFT", customRaceDropdown, "TOPRIGHT", 4, 0)
+-- modelBox:SetPoint("TOP", byComparison, "BOTTOM", 0, -20)
+-- customModel:SetPoint("LEFT", modelBox, 12, 0)
+-- customRaceDropdown:SetPoint("LEFT", customModel.Text, "RIGHT", 12, -2)
+-- customGenderDropdown:SetPoint("TOPLEFT", customRaceDropdown, "TOPRIGHT", 4, 0)
 
-InterfaceOptions_AddCategory(panel)
+    InterfaceOptions_AddCategory(panel)
+end
+
+-- Overlay config
+
+do
+    local panel = CreateFrame("Frame", nil, InterfaceOptionsFramePanelContainer)
+    panel:Hide()
+    panel:SetAllPoints()
+    panel.name = "Overlays"
+    panel.parent = myname
+
+    local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+    title:SetPoint("TOPLEFT", 16, -16)
+    title:SetText(panel.name)
+
+    local subText = panel:CreateFontString(nil, 'ARTWORK', 'GameFontHighlightSmall')
+    subText:SetMaxLines(3)
+    subText:SetNonSpaceWrap(true)
+    subText:SetJustifyV('TOP')
+    subText:SetJustifyH('LEFT')
+    subText:SetPoint('TOPLEFT', title, 'BOTTOMLEFT', 0, -8)
+    subText:SetPoint('RIGHT', -32, 0)
+    subText:SetText("These options let you control how transmog availability is shown in various places in the UI")
+
+    local bagicon = CreateAtlasMarkup("transmog-icon-hidden")
+
+    local show = panel:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+    show:SetText(("Show %s icon for unknown items:"):format(bagicon))
+
+    local bags = newCheckbox(panel, 'bags', 'in bags', ("For items whose appearance you don't know, show the %s icon on the item in bags. Works with built-in bags, Baggins, Combuctor, and Inventorian."):format(bagicon))
+    local bags_unbound = newCheckbox(panel, 'bags_unbound', '...for non-soulbound items only', "Soulbound items are either known already, or can't be sent to another character")
+    local merchant = newCheckbox(panel, 'merchant', 'at merchants', ("For items whose appearance you don't know, show the %s icon on the item in the merchant frame."):format(bagicon))
+    local loot = newCheckbox(panel, 'loot', 'in loot', ("For items whose appearance you don't know, show the %s icon on the item in the loot frame."):format(bagicon))
+    local encounterjournal = newCheckbox(panel, 'encounterjournal', 'in Encounter Journal', ("For items whose appearance you don't know, show the %s icon on the item in the loot section of the Encounter Journal."):format(bagicon))
+
+    show:SetPoint("TOPLEFT", subText, "BOTTOMLEFT", 0, -8)
+    bags:SetPoint("TOPLEFT", show, "BOTTOMLEFT", 0, -8)
+    bags_unbound:SetPoint("TOPLEFT", bags, "BOTTOMLEFT", 8, -4)
+    merchant:SetPoint("TOPLEFT", bags_unbound, "BOTTOMLEFT", -8, -4)
+    loot:SetPoint("TOPLEFT", merchant, "BOTTOMLEFT", 0, -4)
+    encounterjournal:SetPoint("TOPLEFT", loot, "BOTTOMLEFT", 0, -4)
+
+    InterfaceOptions_AddCategory(panel)
+end
 
 -- Slash handler
 SlashCmdList.APPEARANCETOOLTIP = function(msg)
@@ -1307,3 +1397,173 @@ SlashCmdList.APPEARANCETOOLTIP = function(msg)
 end
 SLASH_APPEARANCETOOLTIP1 = "/appearancetooltip"
 SLASH_APPEARANCETOOLTIP2 = "/aptip"
+
+
+local LAI = LibStub("LibAppropriateItems-1.0")
+
+local f = CreateFrame("Frame")
+f:SetScript("OnEvent", function(self, event, ...) if f[event] then return f[event](f, ...) end end)
+
+local function PrepareItemButton(button, point, offsetx, offsety)
+    if button.appearancetooltipoverlay then
+        return
+    end
+
+    local overlayFrame = CreateFrame("FRAME", nil, button)
+    overlayFrame:SetFrameLevel(4) -- Azerite overlay must be overlaid itself...
+    overlayFrame:SetAllPoints()
+    button.appearancetooltipoverlay = overlayFrame
+
+    -- need the sublevel to make sure we're above overlays for e.g. azerite gear
+    local background = overlayFrame:CreateTexture(nil, "OVERLAY", nil, 3)
+    background:SetSize(12, 12)
+    background:SetPoint(point or 'BOTTOMLEFT', offsetx or 0, offsety or 0)
+    background:SetColorTexture(0, 0, 0, 0.4)
+
+    button.appearancetooltipoverlay.icon = overlayFrame:CreateTexture(nil, "OVERLAY", nil, 4)
+    button.appearancetooltipoverlay.icon:SetSize(16, 16)
+    button.appearancetooltipoverlay.icon:SetPoint("CENTER", background, "CENTER")
+    button.appearancetooltipoverlay.icon:SetAtlas("transmog-icon-hidden")
+
+    overlayFrame:Hide()
+end
+local function UpdateOverlay(button, link, ...)
+    local hasAppearance, appearanceFromOtherItem = AppearanceTooltip.PlayerHasAppearance(link)
+    local appropriateItem = LAI:IsAppropriate(link)
+    -- AppearanceTooltip.Debug("Considering item", link, hasAppearance, appearanceFromOtherItem)
+    if
+        (not hasAppearance or appearanceFromOtherItem) and
+        (not AppearanceTooltip.db.currentClass or appropriateItem) and
+        IsDressableItem(link) and
+        AppearanceTooltip.CanTransmogItem(link)
+    then
+        PrepareItemButton(button, ...)
+        if appropriateItem then
+            if appearanceFromOtherItem then
+                -- blue eye
+                button.appearancetooltipoverlay.icon:SetVertexColor(0, 1, 1)
+            else
+                -- regular purple trasmog-eye
+                button.appearancetooltipoverlay.icon:SetVertexColor(1, 1, 1)
+            end
+        else
+            -- yellow eye
+            button.appearancetooltipoverlay.icon:SetVertexColor(1, 1, 0)
+        end
+        button.appearancetooltipoverlay:Show()
+    end
+end
+
+local function UpdateContainerButton(button, bag)
+    if button.appearancetooltipoverlay then button.appearancetooltipoverlay:Hide() end
+    if not AppearanceTooltip.db.bags then
+        return
+    end
+    local slot = button:GetID()
+    local item = Item:CreateFromBagAndSlot(bag, slot)
+    if item:IsItemEmpty() then
+        return
+    end
+    item:ContinueOnItemLoad(function()
+        local link = item:GetItemLink()
+        if not AppearanceTooltip.db.bags_unbound or not C_Item.IsBound(item:GetItemLocation()) then
+            UpdateOverlay(button, link)
+        end
+    end)
+end
+
+hooksecurefunc("ContainerFrame_Update", function(container)
+    local bag = container:GetID()
+    local name = container:GetName()
+    for i = 1, container.size, 1 do
+        local button = _G[name .. "Item" .. i]
+        UpdateContainerButton(button, bag)
+    end
+end)
+
+hooksecurefunc("BankFrameItemButton_Update", function(button)
+    if not button.isBag then
+        UpdateContainerButton(button, -1)
+    end
+end)
+
+-- Merchant frame
+
+hooksecurefunc("MerchantFrame_Update", function()
+    for i = 1, MERCHANT_ITEMS_PER_PAGE do
+        local frame = _G["MerchantItem"..i.."ItemButton"]
+        if frame then
+            if frame.appearancetooltipoverlay then frame.appearancetooltipoverlay:Hide() end
+            if not AppearanceTooltip.db.merchant then
+                return
+            end
+            if frame.link then
+                UpdateOverlay(frame, frame.link)
+            end
+        end
+    end
+end)
+
+-- Loot frame
+
+hooksecurefunc("LootFrame_UpdateButton", function(index)
+    local button = _G["LootButton"..index]
+    if not button then return end
+    if button.appearancetooltipoverlay then button.appearancetooltipoverlay:Hide() end
+    if not AppearanceTooltip.db.loot then return end
+    -- AppearanceTooltip.Debug("LootFrame_UpdateButton", button:IsEnabled(), button.slot, button.slot and GetLootSlotLink(button.slot))
+    if button:IsEnabled() and button.slot then
+        local link = GetLootSlotLink(button.slot)
+        if link then
+            UpdateOverlay(button, link)
+        end
+    end
+end)
+
+-- Encounter Journal frame
+
+local function HookEncounterJournal()
+    hooksecurefunc("EncounterJournal_SetLootButton", function(item)
+        if item.appearancetooltipoverlay then item.appearancetooltipoverlay:Hide() end
+        if not AppearanceTooltip.db.encounterjournal then return end
+        if item.link then
+            UpdateOverlay(item, item.link, "TOPLEFT", 4, -4)
+        end
+    end)
+end
+if IsAddOnLoaded("Blizzard_EncounterJournal") then
+    HookEncounterJournal()
+else
+    function f:ADDON_LOADED(addon)
+        if addon == "Blizzard_EncounterJournal" then
+            HookEncounterJournal()
+            self:UnregisterEvent("ADDON_LOADED")
+        end
+    end
+    f:RegisterEvent("ADDON_LOADED")
+end
+
+-- Other addons:
+
+-- Inventorian
+local inv = LibStub("AceAddon-3.0"):GetAddon("Inventorian", true)
+if inv then
+    hooksecurefunc(inv.Item.prototype, "Update", function(self, ...)
+        UpdateContainerButton(self, self.bag)
+    end)
+end
+
+--Baggins:
+if Baggins then
+    hooksecurefunc(Baggins, "UpdateItemButton", function(baggins, bagframe, button, bag, slot)
+        UpdateContainerButton(button, bag)
+    end)
+end
+
+--Combuctor:
+if Combuctor then
+    hooksecurefunc(Combuctor.Item, "Update", function(frame)
+        local bag = frame:GetBag()
+        UpdateContainerButton(frame, bag)
+    end)
+end

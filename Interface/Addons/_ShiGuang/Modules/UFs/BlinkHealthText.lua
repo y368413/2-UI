@@ -170,7 +170,7 @@ end]]
 function BlinkHealth:CreateAnchorFrame()
 	if (self.anchor) then return end
 
-	self.anchor = CreateFrame("Button", "SimpleInfoAnchorFrame", UIParent);
+	self.anchor = CreateFrame("Button", "SimpleInfoAnchorFrame", UIParent, "BackdropTemplate");
 	self.anchor:SetWidth(280);
 	self.anchor:SetHeight(80);
 	self.anchor:EnableMouse(true);

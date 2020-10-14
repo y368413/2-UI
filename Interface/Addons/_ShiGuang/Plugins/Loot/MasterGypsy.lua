@@ -251,7 +251,7 @@ end
 
 function Gypsy.isWearable(item)
 	local itemInfo = {GetItemInfo(item)}
-	if (Gypsy.getItemSlot ~= "MISC") then
+	if (Gypsy.getItemSlot ~= "M") then
 		--wearables
 		if itemInfo[13] == Gypsy.Itemclass or itemInfo[13] == 0 or (itemInfo[13] == 1 and (itemInfo[9] == "INVTYPE_BACK" or itemInfo[9] == "INVTYPE_CLOAK")) then return true end
 		-- weapons
@@ -300,10 +300,10 @@ function Gypsy.getItemSlot(item)
 		if string.len(snipper) > 2 then 
 			return snipper
 		else
-			return "MISC"
+			return "M"
 		end
 	else
-		return "MISC"
+		return "M"
 	end
 end
 

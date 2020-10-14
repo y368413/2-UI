@@ -14,7 +14,7 @@ function CDS:PulseCD()
     PulseCDAnchor:SetSize(43, 43)
     M.Mover(PulseCDAnchor, U["Pulse CD"], "PulseCD", {"CENTER", UIParent, "CENTER", 0, -120})
 
-local frame = CreateFrame("Frame", "PulseCDFrame", PulseCDAnchor)
+local frame = CreateFrame("Frame", "PulseCDFrame", PulseCDAnchor, "BackdropTemplate")
 frame:SetScript("OnEvent", function(self, event, ...) self[event](self, ...) end)
 frame:SetBackdrop({
 	bgFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = framemult,
@@ -149,8 +149,8 @@ local function OnUpdate(_, update)
 			tremove(animating, 1)
 			runtimer = 0
 			icon:SetTexture(nil)
-			frame:SetBackdropBorderColor(0, 0, 0, 0)
-			frame:SetBackdropColor(0, 0, 0, 0)
+			--frame:SetBackdropBorderColor(0, 0, 0, 0)
+			--frame:SetBackdropColor(0, 0, 0, 0)
 		else
 			if not icon:GetTexture() then
 				icon:SetTexture(animating[1][1])
@@ -166,8 +166,8 @@ local function OnUpdate(_, update)
 			local scale = iconSize + (iconSize * ((animScale - 1) * (runtimer / (fadeInTime + holdTime + fadeOutTime))))
 			frame:SetWidth(scale)
 			frame:SetHeight(scale)
-			frame:SetBackdropBorderColor(0.37, 0.3, 0.3, 1)
-			frame:SetBackdropColor(0, 0, 0, 1)
+			--frame:SetBackdropBorderColor(0.37, 0.3, 0.3, 1)
+			--frame:SetBackdropColor(0, 0, 0, 1)
 		end
 	end
 end

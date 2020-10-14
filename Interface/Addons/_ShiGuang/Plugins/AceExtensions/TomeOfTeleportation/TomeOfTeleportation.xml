@@ -1,6 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
   <Script file="TomeOfTeleportation.lua"/>
-  <Frame name="TeleporterFrame">
+  <Frame name="TeleporterFrame" inherits="BackdropTemplate">
     <Scripts>
       <OnLoad>
         self:RegisterEvent("ADDON_LOADED");
@@ -9,13 +9,13 @@
         self:RegisterEvent("PLAYER_REGEN_DISABLED");
         self:RegisterEvent("PLAYER_REGEN_ENABLED");
         self:RegisterEvent("ZONE_CHANGED");
-		self:RegisterEvent("ZONE_CHANGED_NEW_AREA");
-		self:RegisterEvent("ZONE_CHANGED_INDOORS");
-		Teleporter_OnLoad();
+		    self:RegisterEvent("ZONE_CHANGED_NEW_AREA");
+		    self:RegisterEvent("ZONE_CHANGED_INDOORS");
+		    Teleporter_OnLoad();
       </OnLoad>
       <OnEvent function="Teleporter_OnEvent"/>
       <OnUpdate function="Teleporter_OnUpdate"/>
-	  <OnHide function="Teleporter_OnHide"/>
+	    <OnHide function="Teleporter_OnHide"/>
     </Scripts>
   </Frame>
   <Script file="Spells.lua"/>

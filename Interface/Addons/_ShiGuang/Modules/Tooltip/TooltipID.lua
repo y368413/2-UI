@@ -3,8 +3,9 @@ local M, R, U, I = unpack(ns)
 local TT = M:GetModule("Tooltip")
 
 local strmatch, format, tonumber, select = string.match, string.format, tonumber, select
-local UnitAura, GetItemCount, GetItemInfo, GetUnitName, GetCurrencyListLink = UnitAura, GetItemCount, GetItemInfo, GetUnitName, GetCurrencyListLink
+local UnitAura, GetItemCount, GetItemInfo, GetUnitName = UnitAura, GetItemCount, GetItemInfo, GetUnitName
 local C_TradeSkillUI_GetRecipeReagentItemLink = C_TradeSkillUI.GetRecipeReagentItemLink
+local C_CurrencyInfo_GetCurrencyListLink = C_CurrencyInfo.GetCurrencyListLink
 local BAGSLOT, BANK = BAGSLOT, BANK
 
 local types = {
@@ -126,7 +127,7 @@ function TT:SetupTooltipID()
 
 	-- Currencies
 	hooksecurefunc(GameTooltip, "SetCurrencyToken", function(self, index)
-		local id = tonumber(strmatch(GetCurrencyListLink(index), "currency:(%d+)"))
+		local id = tonumber(strmatch(C_CurrencyInfo_GetCurrencyListLink(index), "currency:(%d+)"))
 		if id then TT.AddLineForID(self, id, types.currency) end
 	end)
 	hooksecurefunc(GameTooltip, "SetCurrencyByID", function(self, id)

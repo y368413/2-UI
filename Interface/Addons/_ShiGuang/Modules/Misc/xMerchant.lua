@@ -163,7 +163,7 @@ end
 local function CurrencyUpdate()
 	wipe(currencies);
 	
-	local limit = GetCurrencyListSize();
+	--[[local limit = GetCurrencyListSize();
 	
 	for i=1, limit do
 		-- DONEY note for 6.0   the itemID seemes not avail any more, while the http://wowpedia.org/API_GetCurrencyListInfo is out-dated, 2014-10-25
@@ -179,7 +179,7 @@ local function CurrencyUpdate()
 		elseif ( not isHeader and not itemID ) then
 			currencies[name] = count;
 		end
-	end
+	end]]
 	
 	for i=INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED, 1 do
 		local itemID = GetInventoryItemID("player", i);
@@ -695,8 +695,8 @@ tooltipsearching:SetHeight(21);
 tooltipsearching:SetPoint("LEFT", search, "RIGHT", 5, -2);
 tooltipsearching:SetHitRectInsets(0, 0, 0, 0);
 tooltipsearching:SetScript("OnClick", Search_OnClick);
-tooltipsearching:SetScript("OnEnter", Search_OnEnter);
-tooltipsearching:SetScript("OnLeave", GameTooltip_Hide);
+--tooltipsearching:SetScript("OnEnter", Search_OnEnter);
+--tooltipsearching:SetScript("OnLeave", GameTooltip_Hide);
 tooltipsearching:SetChecked(false);
 
 local scrollframe = CreateFrame("ScrollFrame", "NuuhMerchantScrollFrame", frame, "FauxScrollFrameTemplate");

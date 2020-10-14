@@ -1,18 +1,37 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
 local Bar = M:GetModule("Actionbar")
-local cfg = R.bars.stancebar
+
+local _G = _G
+local tinsert = tinsert
+local cfg = R.Bars.stancebar
+local margin, padding = R.Bars.margin, R.Bars.padding
+
+local function SetFrameSize(frame, size, num)
+	size = size or frame.buttonSize
+	num = num or frame.numButtons
+
+	frame:SetWidth(num*size + (num-1)*margin + 2*padding)
+	frame:SetHeight(size + 2*padding)
+	if not frame.mover then
+		frame.mover = M.Mover(frame, U["StanceBar"], "StanceBar", frame.Pos)
+	else
+		frame.mover:SetSize(frame:GetSize())
+	end
+
+	if not frame.SetFrameSize then
+		frame.buttonSize = size
+		frame.numButtons = num
+		frame.SetFrameSize = SetFrameSize
+	end
+end
 
 function Bar:CreateStancebar()
-	local padding, margin = 2, 5
 	local num = NUM_STANCE_SLOTS
 	local NUM_POSSESS_SLOTS = NUM_POSSESS_SLOTS
 	local buttonList = {}
 
-	--make a frame that fits the size of all microbuttons
 	local frame = CreateFrame("Frame", "NDui_ActionBarStance", UIParent, "SecureHandlerStateTemplate")
-	frame:SetWidth(num*cfg.size + (num-1)*margin + 2*padding)
-	frame:SetHeight(cfg.size + 2*padding)
 	if (MaoRUIPerDB["Actionbar"]["Style"] == 7) or (MaoRUIPerDB["Actionbar"]["Style"] == 8) or (MaoRUIPerDB["Actionbar"]["Style"] == 10) then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -120, 82}
 	elseif (MaoRUIPerDB["Actionbar"]["Style"] == 4) or (MaoRUIPerDB["Actionbar"]["Style"] == 6) then
@@ -23,31 +42,29 @@ function Bar:CreateStancebar()
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -62, 82}
 	end
 
-	--STANCE BAR
+	-- StanceBar
+	if MaoRUIPerDB["Actionbar"]["ShowStance"] then
+		StanceBarFrame:SetParent(frame)
+		StanceBarFrame:EnableMouse(false)
+		StanceBarLeft:SetTexture(nil)
+		StanceBarMiddle:SetTexture(nil)
+		StanceBarRight:SetTexture(nil)
 
-	--move the buttons into position and reparent them
-	StanceBarFrame:SetParent(frame)
-	StanceBarFrame:EnableMouse(false)
-	StanceBarLeft:SetTexture(nil)
-	StanceBarMiddle:SetTexture(nil)
-	StanceBarRight:SetTexture(nil)
-
-	for i = 1, num do
-		local button = _G["StanceButton"..i]
-		table.insert(buttonList, button) --add the button object to the list
-		button:SetSize(cfg.size, cfg.size)
-		button:ClearAllPoints()
-		if i == 1 then
-			button:SetPoint("BOTTOMLEFT", frame, padding, padding)
-		else
-			local previous = _G["StanceButton"..i-1]
-			button:SetPoint("LEFT", previous, "RIGHT", margin, 0)
+		for i = 1, num do
+			local button = _G["StanceButton"..i]
+			tinsert(buttonList, button)
+			tinsert(Bar.buttons, button)
+			button:ClearAllPoints()
+			if i == 1 then
+				button:SetPoint("BOTTOMLEFT", frame, padding, padding)
+			else
+				local previous = _G["StanceButton"..i-1]
+				button:SetPoint("LEFT", previous, "RIGHT", margin, 0)
+			end
 		end
 	end
 
-	--POSSESS BAR
-
-	--move the buttons into position and reparent them
+	-- PossessBar
 	PossessBarFrame:SetParent(frame)
 	PossessBarFrame:EnableMouse(false)
 	PossessBackground1:SetTexture(nil)
@@ -55,8 +72,7 @@ function Bar:CreateStancebar()
 
 	for i = 1, NUM_POSSESS_SLOTS do
 		local button = _G["PossessButton"..i]
-		table.insert(buttonList, button) --add the button object to the list
-		button:SetSize(cfg.size, cfg.size)
+		tinsert(buttonList, button)
 		button:ClearAllPoints()
 		if i == 1 then
 			button:SetPoint("BOTTOMLEFT", frame, padding, padding)
@@ -66,16 +82,12 @@ function Bar:CreateStancebar()
 		end
 	end
 
-	--show/hide the frame on a given state driver
+	frame.buttonList = buttonList
+	SetFrameSize(frame, cfg.size, num)
+
 	frame.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show"
 	RegisterStateDriver(frame, "visibility", frame.frameVisibility)
 
-	--create drag frame and drag functionality
-	if R.bars.userplaced then
-		frame.mover = M.Mover(frame, U["StanceBar"], "StanceBar", frame.Pos)
-	end
-
-	--create the mouseover functionality
 	if cfg.fader then
 		Bar.CreateButtonFrameFader(frame, buttonList, cfg.fader)
 	end

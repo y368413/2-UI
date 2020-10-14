@@ -560,7 +560,7 @@ function Castbars:FrameCustomize(frame)
     end
 
     -- Create backdrop
-    frame.backdrop = CreateFrame("Frame", nil, frame);
+    frame.backdrop = CreateFrame("Frame", nil, frame, "BackdropTemplate");
     frame.backdrop:SetPoint("CENTER", frame.statusBar, "CENTER", 0, 0);
 
     if (frameName == "CastingBarFrame") then

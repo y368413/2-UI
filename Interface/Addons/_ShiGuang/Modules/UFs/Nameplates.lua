@@ -13,6 +13,8 @@ local SetCVar, UIFrameFadeIn, UIFrameFadeOut = SetCVar, UIFrameFadeIn, UIFrameFa
 local IsInRaid, IsInGroup, UnitName = IsInRaid, IsInGroup, UnitName
 local GetNumGroupMembers, GetNumSubgroupMembers, UnitGroupRolesAssigned = GetNumGroupMembers, GetNumSubgroupMembers, UnitGroupRolesAssigned
 local C_NamePlate_GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit
+local GetSpellCooldown, GetTime = GetSpellCooldown, GetTime
+local UnitNameplateShowsWidgetsOnly = UnitNameplateShowsWidgetsOnly
 local INTERRUPTED = INTERRUPTED
 
 -- Init
@@ -654,15 +656,13 @@ function UF:MouseoverIndicator(self)
 	self.HighlightUpdater = f
 end
 
--- NazjatarFollowerXP
-function UF:AddFollowerXP(self)
-	local bar = CreateFrame("StatusBar", nil, self)
-	bar:SetSize(MaoRUIPerDB["Nameplate"]["PlateWidth"]*.75, MaoRUIPerDB["Nameplate"]["PlateHeight"])
-	bar:SetPoint("TOP", self.Castbar, "BOTTOM", 0, -3)
-	M.CreateSB(bar, false, 0, .7, 1)
-	bar.ProgressText = M.CreateFS(bar, 12)
+-- WidgetContainer
+function UF:AddWidgetContainer(self)
+	local widgetContainer = CreateFrame("Frame", nil, self, "UIWidgetContainerTemplate")
+	widgetContainer:SetPoint("BOTTOM", self, "TOP")
+	widgetContainer:Hide()
 
-	self.WidgetXPBar = bar
+	self.WidgetContainer = widgetContainer
 end
 
 -- Interrupt info on castbars
@@ -697,7 +697,7 @@ function UF:CreatePlates()
 	local health = CreateFrame("StatusBar", nil, self)
 	health:SetAllPoints()
 	health:SetStatusBarTexture(I.normTex)
-	--health.backdrop = M.CreateBDFrame(health, nil, true) -- don't mess up with libs
+	--health.backdrop = M.SetBD(health) -- don't mess up with libs
   M.CreateTex(health)
   M.CreateSD(health, 3)
 	M:SmoothBar(health)
@@ -725,7 +725,7 @@ function UF:CreatePlates()
 	self.powerText:SetPoint("TOP", self.Castbar, "BOTTOM", 0, -3)
 	self:Tag(self.powerText, "[nppp]")
 
-	UF:AddFollowerXP(self)
+	UF:AddWidgetContainer(self)
 	UF:MouseoverIndicator(self)
 	UF:AddTargetIndicator(self)
 	UF:AddCreatureIcon(self)
@@ -764,7 +764,6 @@ function UF:UpdateTargetClassPower()
 	else
 		isTargetClassPower = false
 		bar:SetParent(playerPlate.Health)
-		bar:SetScale(1)
 		bar:ClearAllPoints()
 		bar:SetPoint("BOTTOMLEFT", playerPlate.Health, "TOPLEFT", 0, 3)
 		bar:Show()
@@ -818,7 +817,9 @@ function UF:UpdatePlateByType()
 	local title = self.npcTitle
 	local raidtarget = self.RaidTargetIndicator
 	local classify = self.ClassifyIndicator
+	local questIcon = self.questIcon
 
+	name:SetShown(not self.widgetsOnly)
 	name:ClearAllPoints()
 	raidtarget:ClearAllPoints()
 
@@ -839,6 +840,7 @@ function UF:UpdatePlateByType()
 		raidtarget:SetPoint("TOP", title, "BOTTOM", 0, -5)
 		raidtarget:SetParent(self)
 		classify:Hide()
+		if questIcon then questIcon:SetPoint("LEFT", name, "RIGHT", -1, 0) end
 	else
 		for _, element in pairs(DisabledElements) do
 			if not self:IsElementEnabled(element) then
@@ -857,6 +859,7 @@ function UF:UpdatePlateByType()
 		raidtarget:SetPoint("RIGHT", self, "LEFT", -3, 0)
 		raidtarget:SetParent(self.Health)
 		classify:Show()
+		if questIcon then questIcon:SetPoint("LEFT", self, "RIGHT", -1, 0) end
 	end
 
 	UF.UpdateTargetIndicator(self)
@@ -865,7 +868,7 @@ end
 function UF:RefreshPlateType(unit)
 	self.reaction = UnitReaction(unit, "player")
 	self.isFriendly = self.reaction and self.reaction >= 5
-	self.isNameOnly = MaoRUIPerDB["Nameplate"]["NameOnlyMode"] and self.isFriendly or false
+	self.isNameOnly = MaoRUIPerDB["Nameplate"]["NameOnlyMode"] and self.isFriendly or self.widgetsOnly or false
 
 	if self.previousType == nil or self.previousType ~= self.isNameOnly then
 		UF.UpdatePlateByType(self)
@@ -894,17 +897,18 @@ function UF:PostUpdatePlates(event, unit)
 		if self.unitGUID then
 			guidToPlate[self.unitGUID] = self
 		end
-		self.npcID = M.GetNPCID(self.unitGUID)
 		self.isPlayer = UnitIsPlayer(unit)
-
-		local blizzPlate = self:GetParent().UnitFrame
-		self.widget = blizzPlate.WidgetContainer
+		self.npcID = M.GetNPCID(self.unitGUID)
+		self.widgetsOnly = UnitNameplateShowsWidgetsOnly(unit)
+		self.WidgetContainer:RegisterForWidgetSet(UnitWidgetSet(unit), M.Widget_DefaultLayout, nil, unit)
 
 		UF.RefreshPlateType(self, unit)
 	elseif event == "NAME_PLATE_UNIT_REMOVED" then
 		if self.unitGUID then
 			guidToPlate[self.unitGUID] = nil
 		end
+		self.npcID = nil
+		self.WidgetContainer:UnregisterForWidgetSet()
 	end
 
 	if event ~= "NAME_PLATE_UNIT_REMOVED" then
@@ -922,16 +926,17 @@ end
 local auras = M:GetModule("Auras")
 
 function UF:PlateVisibility(event)
+	local alpha = MaoRUIPerDB["Nameplate"]["PPFadeoutAlpha"]
 	if (event == "PLAYER_REGEN_DISABLED" or InCombatLockdown()) and UnitIsUnit("player", self.unit) then
 		UIFrameFadeIn(self.Health, .3, self.Health:GetAlpha(), 1)
 		UIFrameFadeIn(self.Health.bg, .3, self.Health.bg:GetAlpha(), 1)
 		UIFrameFadeIn(self.Power, .3, self.Power:GetAlpha(), 1)
 		UIFrameFadeIn(self.Power.bg, .3, self.Power.bg:GetAlpha(), 1)
 	else
-		UIFrameFadeOut(self.Health, 2, self.Health:GetAlpha(), .1)
-		UIFrameFadeOut(self.Health.bg, 2, self.Health.bg:GetAlpha(), .1)
-		UIFrameFadeOut(self.Power, 2, self.Power:GetAlpha(), .1)
-		UIFrameFadeOut(self.Power.bg, 2, self.Power.bg:GetAlpha(), .1)
+		UIFrameFadeOut(self.Health, 2, self.Health:GetAlpha(), alpha)
+		UIFrameFadeOut(self.Health.bg, 2, self.Health.bg:GetAlpha(), alpha)
+		UIFrameFadeOut(self.Power, 2, self.Power:GetAlpha(), alpha)
+		UIFrameFadeOut(self.Power.bg, 2, self.Power.bg:GetAlpha(), alpha)
 	end
 end
 
@@ -940,7 +945,7 @@ function UF:ResizePlayerPlate()
 	if plate then
 		local barWidth = MaoRUIPerDB["Nameplate"]["PPWidth"]
 		local barHeight = MaoRUIPerDB["Nameplate"]["PPBarHeight"]
-		local healthHeight = MaoRUIPerDB["Nameplate"]["PPHealthHeights"]
+		local healthHeight = MaoRUIPerDB["Nameplate"]["PPHealthHeight"]
 		local powerHeight = MaoRUIPerDB["Nameplate"]["PPPowerHeight"]
 
 		plate:SetSize(barWidth, healthHeight + powerHeight + R.mult)
@@ -961,10 +966,10 @@ function UF:ResizePlayerPlate()
 		if plate.Stagger then
 			plate.Stagger:SetHeight(barHeight)
 		end
-		if plate.bu then
-			local iconSize = (barWidth - R.margin*4)/5
+		if plate.lumos then
+			local iconSize = (barWidth+2*R.mult - R.margin*4)/5
 			for i = 1, 5 do
-				plate.bu[i]:SetSize(iconSize, iconSize)
+				plate.lumos[i]:SetSize(iconSize, iconSize)
 			end
 		end
 		if plate.dices then
@@ -984,7 +989,7 @@ end
 function UF:CreatePlayerPlate()
 	self.mystyle = "PlayerPlate"
 	self:EnableMouse(false)
-	local healthHeight, powerHeight = MaoRUIPerDB["Nameplate"]["PPHealthHeights"], MaoRUIPerDB["Nameplate"]["PPPowerHeight"]
+	local healthHeight, powerHeight = MaoRUIPerDB["Nameplate"]["PPHealthHeight"], MaoRUIPerDB["Nameplate"]["PPPowerHeight"]
 	self:SetSize(MaoRUIPerDB["Nameplate"]["PPWidth"], healthHeight + powerHeight + R.mult)
 
 	UF:CreateHealthBar(self)
@@ -993,20 +998,84 @@ function UF:CreatePlayerPlate()
 	UF:StaggerBar(self)
 	if MaoRUIPerDB["Auras"]["ClassAuras"] then auras:CreateLumos(self) end
 
-	if MaoRUIPerDB["Nameplate"]["PPPowerText"] then
-		local textFrame = CreateFrame("Frame", nil, self.Power)
-		textFrame:SetAllPoints()
-		local power = M.CreateFS(textFrame, 14, "")
-		self:Tag(power, "[pppower]")
-	end
+	local textFrame = CreateFrame("Frame", nil, self.Power)
+	textFrame:SetAllPoints()
+	textFrame:SetFrameLevel(self:GetFrameLevel() + 5)
+	self.powerText = M.CreateFS(textFrame, 14)
+	self:Tag(self.powerText, "[pppower]")
+	UF:TogglePlatePower()
 
+	UF:CreateGCDTicker(self)
 	UF:UpdateTargetClassPower()
+	UF:TogglePlateVisibility()
+end
 
-	if MaoRUIPerDB["Nameplate"]["PPHideOOC"] then
-		self:RegisterEvent("UNIT_EXITED_VEHICLE", UF.PlateVisibility)
-		self:RegisterEvent("UNIT_ENTERED_VEHICLE", UF.PlateVisibility)
-		self:RegisterEvent("PLAYER_REGEN_ENABLED", UF.PlateVisibility, true)
-		self:RegisterEvent("PLAYER_REGEN_DISABLED", UF.PlateVisibility, true)
-		self:RegisterEvent("PLAYER_ENTERING_WORLD", UF.PlateVisibility, true)
+function UF:TogglePlatePower()
+	local plate = _G.oUF_PlayerPlate
+	if not plate then return end
+
+	plate.powerText:SetShown(MaoRUIPerDB["Nameplate"]["PPPowerText"])
+end
+
+function UF:TogglePlateVisibility()
+	local plate = _G.oUF_PlayerPlate
+	if not plate then return end
+
+	if MaoRUIPerDB["Nameplate"]["PPFadeout"] then
+		plate:RegisterEvent("UNIT_EXITED_VEHICLE", UF.PlateVisibility)
+		plate:RegisterEvent("UNIT_ENTERED_VEHICLE", UF.PlateVisibility)
+		plate:RegisterEvent("PLAYER_REGEN_ENABLED", UF.PlateVisibility, true)
+		plate:RegisterEvent("PLAYER_REGEN_DISABLED", UF.PlateVisibility, true)
+		plate:RegisterEvent("PLAYER_ENTERING_WORLD", UF.PlateVisibility, true)
+		UF.PlateVisibility(plate)
+	else
+		plate:UnregisterEvent("UNIT_EXITED_VEHICLE", UF.PlateVisibility)
+		plate:UnregisterEvent("UNIT_ENTERED_VEHICLE", UF.PlateVisibility)
+		plate:UnregisterEvent("PLAYER_REGEN_ENABLED", UF.PlateVisibility)
+		plate:UnregisterEvent("PLAYER_REGEN_DISABLED", UF.PlateVisibility)
+		plate:UnregisterEvent("PLAYER_ENTERING_WORLD", UF.PlateVisibility)
+		UF.PlateVisibility(plate, "PLAYER_REGEN_DISABLED")
 	end
+end
+
+function UF:UpdateGCDTicker()
+	local start, duration = GetSpellCooldown(61304)
+	if start > 0 and duration > 0 then
+		if self.duration ~= duration then
+			self:SetMinMaxValues(0, duration)
+			self.duration = duration
+		end
+		self:SetValue(GetTime() - start)
+		self.spark:Show()
+	else
+		self.spark:Hide()
+	end
+end
+
+function UF:CreateGCDTicker(self)
+	local ticker = CreateFrame("StatusBar", nil, self.Power)
+	ticker:SetFrameLevel(self:GetFrameLevel() + 3)
+	ticker:SetStatusBarTexture(I.normTex)
+	ticker:GetStatusBarTexture():SetAlpha(0)
+	ticker:SetAllPoints()
+
+	local spark = ticker:CreateTexture(nil, "OVERLAY")
+	spark:SetTexture(I.sparkTex)
+	spark:SetBlendMode("ADD")
+	spark:SetPoint("TOPLEFT", ticker:GetStatusBarTexture(), "TOPRIGHT", -10, 10)
+	spark:SetPoint("BOTTOMRIGHT", ticker:GetStatusBarTexture(), "BOTTOMRIGHT", 10, -10)
+	ticker.spark = spark
+
+	ticker:SetScript("OnUpdate", UF.UpdateGCDTicker)
+	self.GCDTicker = ticker
+
+	UF:ToggleGCDTicker()
+end
+
+function UF:ToggleGCDTicker()
+	local plate = _G.oUF_PlayerPlate
+	local ticker = plate and plate.GCDTicker
+	if not ticker then return end
+
+	ticker:SetShown(MaoRUIPerDB["Nameplate"]["PPGCDTicker"])
 end

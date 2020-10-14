@@ -1,4 +1,4 @@
---## Version: 0.5.1 ## Author: romdeau23
+--## Version: 0.6.0 ## Author: romdeau23
 local MogPartialSets = {}
 
 MogPartialSets.frame = CreateFrame('Frame')
@@ -95,7 +95,7 @@ function MogPartialSets:setDefaultConfiguration()
         maxMissingPieces = 2,
         onlyFavorite = false,
         favoriteVariants = false,
-        ignoreBracers = false,
+        ignoredSlotMap = {},
     }
 end
 
@@ -117,6 +117,20 @@ end
 function MogPartialSets:prepareWardrobeApiOverrides()
     self:prepareApiOverride(WardrobeCollectionFrame.SetsTransmogFrame, 'UpdateSets', 'UpdateSets')
     self:prepareApiOverride(WardrobeCollectionFrame.SetsTransmogFrame, 'LoadSet', 'LoadSet')
+end
+
+function MogPartialSets:setIgnoredSlot(invType, isIgnored)
+    if isIgnored then
+        MogPartialSetsAddonConfig.ignoredSlotMap[invType] = true
+    else
+        MogPartialSetsAddonConfig.ignoredSlotMap[invType] = nil
+    end
+
+    self:notifyConfigUpdated()
+end
+
+function MogPartialSets:isIgnoredSlot(invType)
+    return MogPartialSetsAddonConfig.ignoredSlotMap[invType] ~= nil
 end
 
 function MogPartialSets:getAvailableSets()
@@ -165,10 +179,7 @@ function MogPartialSets:getSetProgress(setId)
         for sourceId, collected in pairs(sources) do
             local sourceInfo = self:getSourceInfo(sourceId)
 
-            if
-                not MogPartialSetsAddonConfig.ignoreBracers
-                or sourceInfo.invType ~= Enum.InventoryType.IndexWristType + 1
-            then
+            if not self:isIgnoredSlot(sourceInfo.invType - 1) then
                 totalSlots = totalSlots + 1
 
                 if collected or self:isUsableSource(sourceId) then
@@ -331,10 +342,7 @@ function MogPartialSets:initOverrides()
                     if
                         totalSlots
                         and collectedSlots > 0
-                        and (
-                            MogPartialSetsAddonConfig.maxMissingPieces <= 0
-                            or (totalSlots - collectedSlots) <= MogPartialSetsAddonConfig.maxMissingPieces
-                        )
+                        and (totalSlots - collectedSlots) <= MogPartialSetsAddonConfig.maxMissingPieces
                         and (
                             not MogPartialSetsAddonConfig.onlyFavorite
                             or (
@@ -489,8 +497,15 @@ function MogPartialSets:updateUi()
         MogPartialSetsFilterFavoriteVariantsText,
         MogPartialSetsFilterMaxMissingPiecesEditBox,
         MogPartialSetsFilterMaxMissingPiecesText,
+        MogPartialSetsFilterIgnoredSlotsText,
+        MogPartialSetsFilterIgnoreHeadButton,
+        MogPartialSetsFilterIgnoreHeadText,
+        MogPartialSetsFilterIgnoreCloakButton,
+        MogPartialSetsFilterIgnoreCloakText,
         MogPartialSetsFilterIgnoreBracersButton,
         MogPartialSetsFilterIgnoreBracersText,
+        MogPartialSetsFilterIgnoreBootsButton,
+        MogPartialSetsFilterIgnoreBootsText,
         MogPartialSetsFilterRefreshButton,
     }
 

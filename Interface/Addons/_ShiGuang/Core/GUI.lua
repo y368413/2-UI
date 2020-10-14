@@ -8,7 +8,7 @@ local cr, cg, cb = I.r, I.g, I.b
 local guiTab, guiPage, f, dataFrame = {}, {}
 
 -- Default Settings
-local defaultSettings = {
+G.DefaultSettings = {
 	BFA = false,
 	Mover = {},
 	InternalCD = {},
@@ -33,12 +33,18 @@ local defaultSettings = {
 		BindType = 1,
 		OverrideWA = false,
 		MicroMenu = true,
+		CustomBar = false,
+		CustomBarFader = false,
+		CustomBarButtonSize = 34,
+		CustomBarNumButtons = 12,
+		CustomBarNumPerRow = 12,
+		ShowStance = true,
 	},
 	Auras = {
 		Reminder = true,
 		Totems = true,
-		DestroyTotems = true,
-		Statue = false,
+		VerticleTotems = true,
+		TotemSize = 32,
 		ClassAuras = false,
 		ReverseBuffs = false,
 		BuffSize = 30,
@@ -72,6 +78,7 @@ local defaultSettings = {
 		HorizonRaid = false,
 		HorizonParty = false,
 		ReverseRaid = false,
+		ShowSolo = false,
 		SimpleRaidScale = 12,
 		RaidWidth = 88,
 		RaidHeight = 16,
@@ -154,6 +161,7 @@ local defaultSettings = {
 		BlockStranger = false,
 		AllowFriends = true,
 		Outline = false,
+		ChatBGType = 1,
 	},
 	Map = {
 		Coord = true,
@@ -180,7 +188,7 @@ local defaultSettings = {
 		TankMode = false,
 		TargetIndicator = 3,
 		InsideView = true,
-		Distance = 42,
+		--Distance = 42,
 		PlateWidth = 168,
 		PlateHeight = 9,
 		CustomUnitColor = true,
@@ -191,7 +199,7 @@ local defaultSettings = {
 		ShowPlayerPlate = true,
 		PPWidth = 175,
 		PPBarHeight = 6,
-		PPHealthHeights = 0.1,
+		PPHealthHeight = 0.1,
 		PPPowerHeight = 6,
 		PPPowerText = true,
 		FullHealth = false,
@@ -202,9 +210,9 @@ local defaultSettings = {
 		DPSRevertThreat = false,
 		ExplosivesScale = true,
 		AKSProgress = true,
-		PPHideOOC = true,
+		PPFadeout = true,
+		PPFadeoutAlpha = 0,
 		NameplateClassPower = false,
-		MaxPowerGlow = true,
 		NameTextSize = 14,
 		HealthTextSize = 16,
 		MinScale = 1,
@@ -212,6 +220,7 @@ local defaultSettings = {
 		ColorBorder = true,
 		QuestIndicator = true,
 		NameOnlyMode = false,
+		PPGCDTicker = true,
 	},
 	Skins = {
 		DBM = true,
@@ -254,7 +263,6 @@ local defaultSettings = {
 		HideJunkGuild = true,
 		AzeriteArmor = true,
 		OnlyArmorIcons = true,
-		CorruptionRank = true,
 		QuestCompleteAnnoce = false,
 	},
 	Misc = {
@@ -263,7 +271,6 @@ local defaultSettings = {
 		GemNEnchant = true,
 		AzeriteTraits = true,
 		MissingStats = true,
-		HideErrors = true,
 		SoloInfo = true,
 		RareAlerter = true,
 		AlertinChat = false,
@@ -280,8 +287,9 @@ local defaultSettings = {
 		AutoQuest = true,
 		HideTalking = true,
 		HideBanner = false,
+		HideBossEmote = false,
 		PetFilter = true,
-		QuestNotifier = true,
+		QuestNotification = false,
 		QuestProgress = false,
 		OnlyCompleteRing = false,
 		ExplosiveCount = false,
@@ -294,6 +302,7 @@ local defaultSettings = {
 		RMRune = false,
 		DBMCount = "10",
 		EasyMarking = true,
+		ShowMarkerBar = 4,
 		BlockInvite = false,
 		NzothVision = true,
 		QuickQueue = true,
@@ -321,7 +330,7 @@ local defaultSettings = {
 	},
 }
 
-local accountSettings = {
+G.AccountSettings = {
 	ChatFilterList = "%*",
 	ChatFilterWhiteList = "",
 	TimestampFormat = 1,
@@ -353,10 +362,10 @@ local accountSettings = {
 }
 
 -- Initial settings
-local textureList = {
-	[1] = I.normTex,
-	[2] = I.gradTex,
-	[3] = I.flatTex,
+G.TextureList = {
+	[1] = {texture = I.normTex, name = U["Highlight"]},
+	[2] = {texture = I.gradTex, name = U["Gradient"]},
+	[3] = {texture = I.flatTex, name = U["Flat"]},
 }
 
 local function InitialSettings(source, target, fullClean)
@@ -388,16 +397,20 @@ end
 local loader = CreateFrame("Frame")
 loader:RegisterEvent("ADDON_LOADED")
 loader:SetScript("OnEvent", function(self, _, addon)
+	if not I.isNewPatch then return end
 	if addon ~= "_ShiGuang" then return end
 	if not MaoRUIPerDB["BFA"] then
 		MaoRUIPerDB = {}
 		MaoRUIPerDB["BFA"] = true
 	end
 
-	InitialSettings(defaultSettings, MaoRUIPerDB, true)
-	InitialSettings(accountSettings, MaoRUIDB)
+	InitialSettings(G.DefaultSettings, MaoRUIPerDB, true)
+	InitialSettings(G.AccountSettings, MaoRUIDB)
 	M:SetupUIScale(true)
-	I.normTex = textureList[MaoRUIDB["TexStyle"]]
+	if not G.TextureList[MaoRUIDB["TexStyle"]] then
+		MaoRUIDB["TexStyle"] = 2 -- reset value if not exists
+	end
+	I.normTex = G.TextureList[MaoRUIDB["TexStyle"]].texture
 
 	self:UnregisterAllEvents()
 end)
@@ -441,8 +454,31 @@ local function updateActionbarScale()
 	M:GetModule("Actionbar"):UpdateAllScale()
 end
 
+local function updateCustomBar()
+	M:GetModule("Actionbar"):UpdateCustomBar()
+end
+
+local function updateBuffFrame()
+	local A = M:GetModule("Auras")
+	A:UpdateOptions()
+	A:UpdateHeader(A.BuffFrame)
+	A.BuffFrame.mover:SetSize(A.BuffFrame:GetSize())
+end
+
+local function updateDebuffFrame()
+	local A = M:GetModule("Auras")
+	A:UpdateOptions()
+	A:UpdateHeader(A.DebuffFrame)
+	A.DebuffFrame.mover:SetSize(A.DebuffFrame:GetSize())
+end
+
 local function updateReminder()
 	M:GetModule("Auras"):InitReminder()
+end
+
+local function refreshTotemBar()
+	if not MaoRUIPerDB["Auras"]["Totems"] then return end
+	M:GetModule("Auras"):TotemBar_Init()
 end
 
 local function updateChatSticky()
@@ -463,6 +499,10 @@ end
 
 local function updateChatSize()
 	M:GetModule("Chat"):UpdateChatSize()
+end
+
+local function toggleChatBackground()
+	M:GetModule("Chat"):ToggleChatBackground()
 end
 
 local function updateToggleDirection()
@@ -491,6 +531,18 @@ end
 
 local function refreshNameplates()
 	M:GetModule("UnitFrames"):RefreshAllPlates()
+end
+
+local function togglePlatePower()
+	M:GetModule("UnitFrames"):TogglePlatePower()
+end
+
+local function togglePlateVisibility()
+	M:GetModule("UnitFrames"):TogglePlateVisibility()
+end
+
+local function toggleGCDTicker()
+	M:GetModule("UnitFrames"):ToggleGCDTicker()
 end
 
 local function updatePlateScale()
@@ -560,8 +612,8 @@ local function updateSoloInfo()
 	M:GetModule("Misc"):SoloInfo()
 end
 
-local function updateQuestNotifier()
-	M:GetModule("Misc"):QuestNotifier()
+local function updateQuestNotification()
+	M:GetModule("Misc"):QuestNotification()
 end
 
 local function updateScreenShot()
@@ -572,18 +624,33 @@ local function updateFasterLoot()
 	M:GetModule("Misc"):UpdateFasterLoot()
 end
 
-local function updateErrorBlocker()
-	M:GetModule("Misc"):UpdateErrorBlocker()
+local function toggleBossBanner()
+	M:GetModule("Misc"):ToggleBossBanner()
+end
+
+local function toggleBossEmote()
+	M:GetModule("Misc"):ToggleBossEmote()
+end
+
+local function updateMarkerGrid()
+	M:GetModule("Misc"):RaidTool_UpdateGrid()
 end
 
 local function updateSkinAlpha()
 	for _, frame in pairs(R.frames) do
-		M:SetBackdropColor(frame, 0, 0, 0, MaoRUIPerDB["Skins"]["SkinAlpha"])
+		frame:SetBackdropColor(0, 0, 0, MaoRUIPerDB["Skins"]["SkinAlpha"])
 	end
 end
 
+local function AddTextureToOption(parent, index)
+	local tex = parent[index]:CreateTexture()
+	tex:SetInside(nil, 4, 4)
+	tex:SetTexture(G.TextureList[index].texture)
+	tex:SetVertexColor(cr, cg, cb)
+end
+
 -- Config
-local tabList = {
+G.TabList = {
 	U["Actionbar"],
 	U["Nameplate"],
 	U["RaidFrame"],
@@ -594,20 +661,24 @@ local tabList = {
 	U["UI Settings"],
 }
 
-local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
+G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	[1] = {
 		{1, "Actionbar", "Enable", "|cff00cc4c"..U["Enable Actionbar"]},
-		{3, "Actionbar", "Scale", U["Actionbar Scale"].."*", true, false, {.8, 1.5, .1}, updateActionbarScale},
-		{4, "Actionbar", "Style", U["Actionbar Style"], true, true, {"-- 2*(3+12+3) --", "-- 2*(6+12+6) --", "-- 2*6+3*12+2*6 --", "-- 3*12 --", "-- 2*(12+6) --", "-- 3*(4+12+4) --", "-- What --", "-- MR --", "-- PVP2 --", "-- Cool --"}},
-		{},--blank
+		--{3, "Actionbar", "Scale", U["Actionbar Scale"].."*", true, false, {.8, 1.5, .01}, updateActionbarScale},
+		{1, "Actionbar", "CustomBar", "|cff00cc4c"..U["Enable CustomBar"], true, false, nil, nil, U["CustomBarTip"]},
+		{4, "Actionbar", "Style", U["Actionbar Style"], true, true, {"-- 2*(3+12+3) --", "-- 2*(6+12+6) --", "-- 2*6+3*12+2*6 --", "-- 3*12 --", "-- 2*(12+6) --", "-- 3*(4+12+4) --", "-- What --", "-- MR --", "-- PVP2 --", "-- Cool --", "-- JK --"}},
+		{3, "Actionbar", "CustomBarButtonSize", U["CustomBarButtonSize"].."*", false, false, {24, 60, 1}, updateCustomBar},
+		{3, "Actionbar", "CustomBarNumButtons", U["CustomBarNumButtons"].."*", true, false, {1, 12, 1}, updateCustomBar},
+		{3, "Actionbar", "CustomBarNumPerRow", U["CustomBarNumPerRow"].."*", true, true, {1, 12, 1}, updateCustomBar},
+		{1, "Actionbar", "CustomBarFader", U["CustomBarFader"]},
+		{1, "Actionbar", "MicroMenu", U["Micromenu"], true},
+		{1, "Actionbar", "Classcolor", U["ClassColor BG"], true, true},
 		{1, "Actionbar", "Cooldown", "|cff00cc4c"..U["Show Cooldown"]},
 		{1, "Actionbar", "DecimalCD", U["Decimal Cooldown"].."*", true},
-		{1, "Actionbar", "OverrideWA", U["HideCooldownOnWA"], true, true},
+		{1, "Actionbar", "OverrideWA", U["HideCooldownOnWA"].."*", true, true},
 		{1, "Actionbar", "Hotkeys", U["Actionbar Hotkey"]},
 		{1, "Actionbar", "Macro", U["Actionbar Macro"], true},
 		{1, "Actionbar", "Count", U["Actionbar Item Counts"], true, true},
-		{1, "Actionbar", "MicroMenu", U["Micromenu"]},
-		{1, "Actionbar", "Classcolor", U["ClassColor BG"], true},
 		--{1, "Actionbar", "Bar4Fade", U["Bar4 Fade"]},
 		--{1, "Actionbar", "Bar5Fade", U["Bar5 Fade"], true},
 		--{1, "UFs", "LagString", U["Castbar LagString"]},
@@ -639,7 +710,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Nameplate", "ColorBorder", U["ColorBorder"].."*", false, false, nil, refreshNameplates},
 		{1, "Nameplate", "ExplosivesScale", U["ExplosivesScale"], true},
 		{1, "Nameplate", "AKSProgress", U["AngryKeystones Progress"], true, true},
-		{3, "Nameplate", "Distance", U["Nameplate Distance"].."*", false, false, {20, 100, .1}, updatePlateRange},
+		--{3, "Nameplate", "Distance", U["Nameplate Distance"].."*", false, false, {20, 100, .1}, updatePlateRange},
 		{3, "Nameplate", "MinScale", U["Nameplate MinScale"].."*", true, false, {.5, 1, .1}, updatePlateScale},
 		{3, "Nameplate", "MinAlpha", U["Nameplate MinAlpha"].."*", true, true, {.5, 1, .1}, updatePlateAlpha},
 		{3, "Nameplate", "PlateWidth", U["NP Width"].."*", false, false, {50, 250, 1}, refreshNameplates},
@@ -735,13 +806,14 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{},--blank		
 		{1, "Nameplate", "ShowPlayerPlate", "|cff00cc4c"..U["Enable PlayerPlate"]},
 		{1, "Auras", "ClassAuras", U["Enable ClassAuras"], true},
-		{1, "Nameplate", "MaxPowerGlow", U["MaxPowerGlow"], true, true},
+		--{1, "Nameplate", "MaxPowerGlow", U["MaxPowerGlow"], true, true},
 		{1, "Nameplate", "NameplateClassPower", U["Nameplate ClassPower"]},
-		{1, "Nameplate", "PPPowerText", U["PlayerPlate PowerText"], true},
-		{1, "Nameplate", "PPHideOOC", U["Fadeout OOC"], true, true},
+		{1, "Nameplate", "PPPowerText", U["PlayerPlate PowerText"].."*", true, false, nil, togglePlatePower},
+		{1, "Nameplate", "PPFadeout", U["PlayerPlate Fadeout"].."*", true, true, nil, togglePlateVisibility},
+		--{1, "Nameplate", "PPGCDTicker", U["PlayerPlate GCDTicker"].."*", nil, nil, nil, toggleGCDTicker},
 		{3, "Nameplate", "PPWidth", U["PlayerPlate HPWidth"].."*", false, nil, {120, 310, 1}, refreshNameplates}, -- FIX ME: need to refactor classpower
 		--{3, "Nameplate", "PPBarHeight", U["PlayerPlate CPHeight"].."*", true, false, {0, 16, 1}, refreshNameplates},
-		{3, "Nameplate", "PPHealthHeights", U["PlayerPlate HPHeight"].."*", true, false, {0, 16, .1}, refreshNameplates},
+		{3, "Nameplate", "PPHealthHeight", U["PlayerPlate HPHeight"].."*", true, false, {0, 16, .1}, refreshNameplates},
 		{3, "Nameplate", "PPPowerHeight", U["PlayerPlate MPHeight"].."*", true, true, {1, 16, 1}, refreshNameplates},
 	},
 	[5] = {
@@ -759,8 +831,9 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "ACCOUNT", "AutoBubbles", U["AutoBubbles"], true, true},
 		{},--blank
 		{1, "Misc", "HideTalking", U["No Talking"]},
-		{1, "Misc", "HideBanner", U["Hide Bossbanner"], true},
-		{1, "Misc", "HideErrors", U["Hide Error"].."*", true, true, nil, updateErrorBlocker},
+		{1, "Misc", "HideBanner", U["Hide Bossbanner"].."*", true, false, nil, toggleBossBanner},
+		--{1, "Misc", "HideBossEmote", U["HideBossEmote"].."*", nil, nil, toggleBossEmote},
+		--{1, "Misc", "HideErrors", U["Hide Error"].."*", true, true, nil, updateErrorBlocker},
 		{1, "Chat", "AllowFriends", U["AllowFriendsSpam"].."*", false, false, nil, nil, U["AllowFriendsSpamTip"]},
 		{1, "Chat", "Lock", "|cff00cc4c"..U["Lock Chat"], true, false},
 		{},--blank
@@ -784,7 +857,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Map", "Coord", U["Map Coords"]},
 		{1, "Map", "Clock", U["Minimap Clock"].."*", true, false, nil, showMinimapClock},
 		{1, "Skins", "QuestTrackerSkinTitle", U["QuestTrackerSkinTitle"], true, true},
-		--{1, "Map", "Calendar", U["Minimap Calendar"].."*", true, true, nil, showCalendar},
+		--{1, "Map", "Calendar", U["MinimapCalendar"].."*", true, true, nil, showCalendar, U["MinimapCalendarTip"]},
 		--{1, "Map", "CombatPulse", U["Minimap Pulse"]},
 		--{1, "Map", "ShowRecycleBin", U["Show RecycleBin"], true},
 		{1, "Map", "WhoPings", U["Show WhoPings"]},
@@ -808,7 +881,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		--{1, "Skins", "MenuLine", U["Menu Line"], true},
 		--{1, "Skins", "ClassLine", U["ClassColor Line"], true, true},
 		--{4, "Skins", "ToggleDirection", U["ToggleDirection"].."*", true, true, {U["LEFT"], U["RIGHT"], U["TOP"], U["BOTTOM"]}, updateToggleDirection},
-		{4, "ACCOUNT", "TexStyle", U["Texture Style"], false, false, {U["Highlight"], U["Gradient"], U["Flat"]}},
+		{4, "ACCOUNT", "TexStyle", U["Texture Style"], false, false, {}},
 		{4, "ACCOUNT", "NumberFormat", U["Numberize"], true, false, {U["Number Type1"], U["Number Type2"], U["Number Type3"]}},
 		{2, "Misc", "DBMCount", U["Countdown Sec"].."*", true, true},
 	},
@@ -816,7 +889,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	  --{1, "Misc", "RaidTool", "|cff00cc4c"..U["Raid Manger"]},
 		--{1, "Misc", "RMRune", U["Runes Check"].."*"},
 		--{1, "Misc", "EasyMarking", U["Easy Mark"].."*"},
-		{1, "Misc", "QuestNotifier", "|cff00cc4c"..U["QuestNotifier"].."*", false, false, nil, updateQuestNotifier},
+		{1, "Misc", "QuestNotification", "|cff00cc4c"..U["QuestNotification"].."*", false, false, nil, updateQuestNotifier},
 		{1, "Misc", "QuestProgress", U["QuestProgress"].."*", true},
 		{1, "Misc", "OnlyCompleteRing", U["OnlyCompleteRing"].."*", true, true},
 		{1, "Misc", "Interrupt", "|cff00cc4c"..U["Interrupt Alert"].."*", false, false, nil, updateInterruptAlert}, 
@@ -889,7 +962,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 }
 
 local function SelectTab(i)
-	for num = 1, #tabList do
+	for num = 1, #G.TabList do
 		if num == i then
 			guiTab[num]:SetBackdropColor(cr, cg, cb, .3)
 			guiTab[num].checked = true
@@ -916,7 +989,7 @@ local function tabOnLeave(self)
 end
 
 local function CreateTab(parent, i, name)
-	local tab = CreateFrame("Button", nil, parent)
+	local tab = CreateFrame("Button", nil, parent, "BackdropTemplate")
 	tab:SetPoint("TOP", -310 + 88*(i-1) + R.mult, -121)
 	tab:SetSize(90, 30)
 	M.CreateBD(tab, .3)
@@ -949,7 +1022,7 @@ end
 local function CreateOption(i)
 	local parent, offset = guiPage[i].child, 60
 
-	for _, option in pairs(optionList[i]) do
+	for _, option in pairs(G.OptionList[i]) do
 		local optType, key, value, name, horizon, horizon2, data, callback, tooltip = unpack(option)
 		-- Checkboxes
 		if optType == 1 then
@@ -1016,7 +1089,7 @@ local function CreateOption(i)
 				offset = offset + 58
 			end
 			local s = M.CreateSlider(parent, name, min, max, step, x, y)
-			s.__default = (key == "ACCOUNT" and accountSettings[value]) or defaultSettings[key][value]
+			s.__default = (key == "ACCOUNT" and G.AccountSettings[value]) or G.DefaultSettings[key][value]
 			s:SetValue(NDUI_VARIABLE(key, value))
 			s:SetScript("OnValueChanged", function(_, v)
 				local current = M:Round(tonumber(v), 2)
@@ -1031,6 +1104,12 @@ local function CreateOption(i)
 			end
 		-- Dropdown
 		elseif optType == 4 then
+			if value == "TexStyle" then
+				for _, v in ipairs(G.TextureList) do
+					tinsert(data, v.name)
+				end
+			end
+
 			local dd = M.CreateDropDown(parent, 160, 26, data)
 			if horizon2 then
 				dd:SetPoint("TOPLEFT", 560, -offset + 32)
@@ -1059,6 +1138,9 @@ local function CreateOption(i)
 					NDUI_VARIABLE(key, value, i)
 					if callback then callback() end
 				end)
+				if value == "TexStyle" then
+					AddTextureToOption(opt, i) -- texture preview
+				end
 			end
 			M.CreateFS(dd, 14, name, "system", "CENTER", 0, 25)
 		-- Colorswatch
@@ -1076,9 +1158,8 @@ local function CreateOption(i)
 		-- Blank, no optType
 		else
 			if not key then
-			local l = CreateFrame("Frame", nil, parent)
-			l:SetPoint("TOPLEFT", 26, -offset - 12)
-			M.CreateGF(l, 550, R.mult, "Horizontal", 1, 1, 1, .25, .25)
+				local line = M.SetGradient(parent, "H", 1, 1, 1, .25, .25, 560, R.mult)
+				line:SetPoint("TOPLEFT", 25, -offset - 12)
 			end
 			offset = offset + 32
 		end
@@ -1092,7 +1173,7 @@ local bloodlustFilter = {
 	[264689] = true
 }
 
-local function exportData()
+function G:ExportGUIData()
 	local text = "UISettings:"..I.Version..":"..I.MyName..":"..I.MyClass
 	for KEY, VALUE in pairs(MaoRUIPerDB) do
 		if type(VALUE) == "table" then
@@ -1130,7 +1211,7 @@ local function exportData()
 						end
 					end
 				else
-					if MaoRUIPerDB[KEY][key] ~= defaultSettings[KEY][key] then
+					if MaoRUIPerDB[KEY][key] ~= G.DefaultSettings[KEY][key] then -- don't export default settings
 						text = text..";"..KEY..":"..key..":"..tostring(value)
 					end
 				end
@@ -1193,7 +1274,21 @@ local function toBoolean(value)
 	end
 end
 
-local function importData()
+local function reloadDefaultSettings()
+	for i, j in pairs(G.DefaultSettings) do
+		if type(j) == "table" then
+			if not MaoRUIPerDB[i] then MaoRUIPerDB[i] = {} end
+			for k, v in pairs(j) do
+				MaoRUIPerDB[i][k] = v
+			end
+		else
+			MaoRUIPerDB[i] = j
+		end
+	end
+	MaoRUIPerDB["BFA"] = true -- don't empty data on next loading
+end
+
+function G:ImportGUIData()
 	local profile = dataFrame.editBox:GetText()
 	if M:IsBase64(profile) then profile = M:Decode(profile) end
 	local options = {strsplit(";", profile)}
@@ -1202,6 +1297,9 @@ local function importData()
 		UIErrorsFrame:AddMessage(I.InfoColor..U["Import data error"])
 		return
 	end
+
+	-- we don't export default settings, so need to reload it
+	reloadDefaultSettings()
 
 	for i = 2, #options do
 		local option = options[i]
@@ -1299,8 +1397,6 @@ local function importData()
 			end
 		end
 	end
-
-	ReloadUI()
 end
 
 local function updateTooltip()
@@ -1350,7 +1446,8 @@ local function createDataFrame()
 		button1 = YES,
 		button2 = NO,
 		OnAccept = function()
-			importData()
+			G:ImportGUIData()
+			ReloadUI()
 		end,
 		whileDead = 1,
 	}
@@ -1412,7 +1509,7 @@ local function OpenGUI()
 		StaticPopup_Show("RELOAD_NDUI")
 	end)
 
-	for i, name in pairs(tabList) do
+	for i, name in pairs(G.TabList) do
 		guiTab[i] = CreateTab(f, i, name)
 		guiPage[i] = CreateFrame("ScrollFrame", nil, f)
 		guiPage[i]:SetPoint("TOPLEFT", 310, -120)
@@ -1457,7 +1554,7 @@ local function OpenGUI()
 		createDataFrame()
 		dataFrame.Header:SetText(U["Export Header"])
 		dataFrame.text:SetText(OKAY)
-		exportData()
+		G:ExportGUIData()
 	end)
 
 	--[[local optTip = CreateFrame("Button", nil, f)
@@ -1480,10 +1577,10 @@ local function OpenGUI()
 	local credit = CreateFrame("Button", nil, f)
 	credit:SetPoint("BOTTOM", 0, 66)
 	credit:SetSize(360, 21)
-	M.CreateFS(credit, 18, "This GUI learn form Siweia·s NDui，Sincere Gratitude！", true)
+	M.CreateFS(credit, 18, "This GUI learn form Siweia·s NDui，Sincere Gratitude!", true)
 	
-	local optTip = M.CreateFS(f, 12, U["Option* Tips"], "system", "CENTER", 0, 0)
-	optTip:SetPoint("TOP", credit, "BOTTOM", 0, -2)
+	--local optTip = M.CreateFS(f, 12, U["Option* Tips"], "system", "CENTER", 0, 0)
+	--optTip:SetPoint("TOP", credit, "BOTTOM", 0, -2)
 
 	local function showLater(event)
 		if event == "PLAYER_REGEN_DISABLED" then
@@ -1502,7 +1599,7 @@ local function OpenGUI()
 end
 
 function G:OnLogin()
-	local gui = CreateFrame("Button", "GameMenuFrameNDui", GameMenuFrame, "GameMenuButtonTemplate")
+	local gui = CreateFrame("Button", "GameMenuFrameNDui", GameMenuFrame, "GameMenuButtonTemplate, BackdropTemplate")
 	gui:SetText("2 UI")
 	gui:SetPoint("TOP", GameMenuButtonAddons, "BOTTOM", 0, -2)
 	GameMenuFrame:HookScript("OnShow", function(self)

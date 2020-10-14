@@ -1208,7 +1208,7 @@ resultsFrameTitle:SetJustifyH("CENTER")
 resultsFrameTitle:SetText("Paragon")
 
 --scrollframe
-resultsScrollFrame = CreateFrame("ScrollFrame", nil, resultsFrame)
+resultsScrollFrame = CreateFrame("ScrollFrame", nil, resultsFrame, "BackdropTemplate")
 resultsScrollFrame:SetPoint("TOPLEFT", 6, -64)
 resultsScrollFrame:SetPoint("BOTTOMRIGHT", -28, 6)
 resultsScrollFrame:SetBackdrop({

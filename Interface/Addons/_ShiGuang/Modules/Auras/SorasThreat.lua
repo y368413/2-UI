@@ -79,7 +79,7 @@ local function UpdateThreatFlag()
 		if ThreatList[key].isTanking then
 			FlagT = _G["ThreatFlagTank"]
 			if not FlagT then
-				FlagT = CreateFrame("Frame","ThreatFlagTank",ThreatFrame)
+				FlagT = CreateFrame("Frame","ThreatFlagTank",ThreatFrame, "BackdropTemplate")
 				FlagT:SetWidth(2)
 				FlagT:SetHeight(ThreatFrame:GetHeight())
 				FlagT:SetBackdrop({ bgFile = SorasThreat_Solid })
@@ -110,7 +110,7 @@ local function UpdateThreatFlag()
 		if key > SorasThreat_ThreatLimited then return end
 		Flag = ThreatFlag[key]
 		if not Flag then
-			Flag = CreateFrame("Frame","ThreatFlag"..key,ThreatFrame)
+			Flag = CreateFrame("Frame","ThreatFlag"..key,ThreatFrame, "BackdropTemplate")
 			Flag:SetWidth(2)
 			Flag:SetHeight(ThreatFrame:GetHeight())
 			Flag:SetBackdrop({ bgFile = SorasThreat_Solid })
@@ -154,7 +154,7 @@ local function CreateThreatFrame()
 	ThreatFrame:SetScript("OnLeave", function(self)
 		self.threatUnit:SetAlpha(0)
 	end)
-	ThreatFrame.Overlay = CreateFrame("Frame", nil, ThreatFrame)
+	ThreatFrame.Overlay = CreateFrame("Frame", nil, ThreatFrame, "BackdropTemplate")
 	ThreatFrame.Overlay:SetPoint("TOPLEFT",-1,1)
 	ThreatFrame.Overlay:SetPoint("BOTTOMRIGHT",1,-1)
 	ThreatFrame.Overlay:SetBackdrop({ 

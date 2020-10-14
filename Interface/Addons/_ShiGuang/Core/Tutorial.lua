@@ -103,7 +103,7 @@ local function ForceDefaultSettings()
 	SetCVar("statusText",1) --状态文字
 	SetCVar("statusTextDisplay","NUMERIC")--头像状态文字形式："NUMERIC"数值"PERCENT"百分比"BOTH"同时显示
 	SetCVar("autoLootDefault",1) --自动拾取
-	SetCVar("worldPreloadNonCritical", 1) --0加快蓝条，读完蓝条再载入游戏模组
+	SetCVar("worldPreloadNonCritical", 1) --0是加快蓝条，读完蓝条再载入游戏模组
 end
 
 local function ForceRaidFrame()
@@ -381,16 +381,14 @@ local welcome
 local function HelloWorld()
 	if welcome then welcome:Show() return end
 	local BackDropFile = "Interface\\Addons\\_ShiGuang\\Media\\Modules\\Raid\\Solid"
-	welcome = CreateFrame("Frame", "UI_Tutorial", UIParent)
+	welcome = CreateFrame("Frame", "UI_Tutorial", UIParent, "BackdropTemplate")
 	welcome:SetPoint("TOPLEFT",0,0)
 	welcome:SetPoint("BOTTOMRIGHT",0,0)
 	welcome:SetFrameStrata("HIGH")
 	welcome:SetFrameLevel(0)
 	welcome:SetBackdrop({ 
    bgFile = BackDropFile, 
-   insets = 0, 
    edgeFile = BackDropFile, 
-   edgeSize = 1, 
 	})
 	welcome:SetBackdropColor(0.2, 0.2, 0.2, 1) 
 	welcome:SetBackdropBorderColor(0,0,0,0)
@@ -456,26 +454,22 @@ local function HelloWorld()
 	SmallText3 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 鼠标右键点击小地图便捷插件设置 ]", "LEFT",RightPic,"RIGHT",-26,-20, I.r, I.g, I.b)
 	SmallText4 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 系统自带功能，插件有针对性增强或者删减 ]", "LEFT",RightPic,"RIGHT",-26,-60, I.r, I.g, I.b)
 
-	local LeftBlue = CreateFrame("Frame", nil, welcome) 
+	local LeftBlue = CreateFrame("Frame", nil, welcome, "BackdropTemplate") 
 	LeftBlue:SetPoint("TOPLEFT",welcome,"TOPLEFT",0,0)
 	LeftBlue:SetPoint("BOTTOMRIGHT",LeftPic,"TOPRIGHT",0,0)
 	LeftBlue:SetBackdrop({ 
    bgFile = BackDropFile, 
-   insets = 0, 
    edgeFile = BackDropFile, 
-   edgeSize = 1, 
 	})
 	LeftBlue:SetBackdropColor(0, 0, 1, 0.3) 
 	LeftBlue:SetBackdropBorderColor(0,0,0,0)
 
-	local RightRed = CreateFrame("Frame", nil, welcome) 
+	local RightRed = CreateFrame("Frame", nil, welcome, "BackdropTemplate") 
 	RightRed:SetPoint("TOPRIGHT",welcome,"TOPRIGHT",0,0)
 	RightRed:SetPoint("BOTTOMLEFT",RightPic,"TOPLEFT",0,0)
 	RightRed:SetBackdrop({ 
    bgFile = BackDropFile, 
-   insets = 0, 
    edgeFile = BackDropFile, 
-   edgeSize = 1, 
 	})
 	RightRed:SetBackdropColor(1, 0, 0, 0.3) 
 	RightRed:SetBackdropBorderColor(0,0,0,0)
@@ -516,8 +510,9 @@ SLASH_SHIGUANG1 = "/loadmr"
 -----------------------------------------
 function module:OnLogin()
 	-- Hide options
-	M.HideOption(Advanced_UseUIScale)
-	M.HideOption(Advanced_UIScaleSlider)
+	M.HideOption(Display_UseUIScale)
+	M.HideOption(Display_UIScaleSlider)
+
 	-- Tutorial and settings
 	DefaultSettings()
 	ForceAddonSkins()

@@ -1,4 +1,4 @@
---## Author: Metriss - Stormrage  ## Version: 1.06
+--## Author: Metriss - Stormrage  ## Version: 1.07
 local esm = ESSENCE_SET_MANAGER_ADDON or LibStub("AceAddon-3.0"):NewAddon("ESSENCE_SET_MANAGER_ADDON", "AceConsole-3.0")
 local setButtons = {}
 esm.setNames = {}
@@ -164,7 +164,7 @@ esm.updateSetButtons = function()
 		esm.getUnlockedCount()
 		local i = 0
 		for name, line in esm.pairsByKeys(esm.specProfiles[esm.currentSpec]) do
-			if i < MAX_SETS then
+			if i < 20 then
 				esm.createSetButton(name, i)
 				i = i + 1
 			else

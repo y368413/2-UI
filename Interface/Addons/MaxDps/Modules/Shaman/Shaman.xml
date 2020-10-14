@@ -1,6 +1,0 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="Main.lua"/>
-	<Script file="Elemental.lua"/>
-	<Script file="Enhancement.lua"/>
-	<Script file="Restoration.lua"/>
-</Ui>

@@ -33,8 +33,8 @@ function module:RegisterInfobar(name, point)
 
 	local info = CreateFrame("Frame", nil, UIParent)
 	info:SetHitRectInsets(0, 0, -10, -10)
-	info.text = info:CreateFontString(nil, "OVERLAY")
-	info.text:SetFont(I.Font[1], R.Infobar.FontSize, I.Font[3])
+	info.text = M.CreateFS(info, R.Infobar.FontSize)
+	info.text:ClearAllPoints()
 	if R.Infobar.AutoAnchor then
 		info.point = point
 	else
@@ -74,36 +74,25 @@ function module:BackgroundLines()
 	local cr, cg, cb = 0, 0, 0
 	if MaoRUIPerDB["Skins"]["ClassLine"] then cr, cg, cb = I.r, I.g, I.b end
 
-	-- TOPLEFT
-	local Tinfobar = CreateFrame("Frame", nil, UIParent)
-	Tinfobar:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, -2)
-	M.CreateGF(Tinfobar, 520, 16, "Horizontal", 0, 0, 0, .6, 0)
-	local Tinfobar1 = CreateFrame("Frame", nil, Tinfobar)
-	Tinfobar1:SetPoint("BOTTOM", Tinfobar, "TOP")
-	M.CreateGF(Tinfobar1, 520, R.mult, "Horizontal", cr, cg, cb, .8, 0)
-	local Tinfobar2 = CreateFrame("Frame", nil, Tinfobar)
-	Tinfobar2:SetPoint("TOP", Tinfobar, "BOTTOM")
-	M.CreateGF(Tinfobar2, 520, R.mult, "Horizontal", cr, cg, cb, .8, 0)
-	-- BOTTOMLEFT
-	local Linfobar = CreateFrame("Frame", nil, UIParent)
-	Linfobar:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 1)
-	M.CreateGF(Linfobar, 520, 16, "Horizontal", 0, 0, 0, .6, 0)
-	local Linfobar1 = CreateFrame("Frame", nil, Linfobar)
-	Linfobar1:SetPoint("BOTTOM", Linfobar, "TOP")
-	M.CreateGF(Linfobar1, 520, R.mult, "Horizontal", cr, cg, cb, 0.8, 0)
-	local Linfobar2 = CreateFrame("Frame", nil, Linfobar)
-	Linfobar2:SetPoint("TOP", Linfobar, "BOTTOM")
-	M.CreateGF(Linfobar2, 520, R.mult, "Horizontal", cr, cg, cb, .8, 0)
-	-- BOTTOMRIGHT
-	local Rinfobar = CreateFrame("Frame", nil, UIParent)
-	Rinfobar:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 1)
-	M.CreateGF(Rinfobar, 520, 16, "Horizontal", 0, 0, 0, 0, .6)
-	local Rinfobar1 = CreateFrame("Frame", nil, Rinfobar)
-	Rinfobar1:SetPoint("BOTTOM", Rinfobar, "TOP")
-	M.CreateGF(Rinfobar1, 520, R.mult, "Horizontal", cr, cg, cb, 0, .8)
-	local Rinfobar2 = CreateFrame("Frame", nil, Rinfobar)
-	Rinfobar2:SetPoint("TOP", Rinfobar, "BOTTOM")
-	M.CreateGF(Rinfobar2, 520, R.mult, "Horizontal", cr, cg, cb, 0, .8)
+	local parent = UIParent
+	local width, height = 450, 18
+	local anchors = {
+		[1] = {"TOPLEFT", -3, .5, 0},
+		[2] = {"BOTTOMRIGHT", 3, 0, .5},
+	}
+	for _, v in pairs(anchors) do
+		local frame = CreateFrame("Frame", nil, parent)
+		frame:SetPoint(v[1], parent, v[1], 0, v[2])
+		frame:SetSize(width, height)
+		frame:SetFrameStrata("BACKGROUND")
+
+		local tex = M.SetGradient(frame, "H", 0, 0, 0, v[3], v[4], width, height)
+		tex:SetPoint("CENTER")
+		local bottomLine = M.SetGradient(frame, "H", cr, cg, cb, v[3], v[4], width, R.mult)
+		bottomLine:SetPoint("TOP", frame, "BOTTOM")
+		local topLine = M.SetGradient(frame, "H", cr, cg, cb, v[3], v[4], width, R.mult)
+		topLine:SetPoint("BOTTOM", frame, "TOP")
+	end
 end
 
 function module:OnLogin()

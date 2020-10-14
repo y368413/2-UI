@@ -249,7 +249,7 @@ function module:Chatbar()
 	local editBox = chatFrame.editBox
 	local width, height, padding, buttonList = 16, 18, 6, {}
 	
-	local Chatbar = CreateFrame("Frame", nil, UIParent)
+	local Chatbar = CreateFrame("Frame", "ChatBar", UIParent)
 	Chatbar:SetSize(width, height)
 	Chatbar:SetPoint("TOPLEFT", _G.ChatFrame1, "BOTTOMLEFT", 0, 0)
 
@@ -274,7 +274,8 @@ function module:Chatbar()
 	_G.ChatFrameToggleVoiceMuteButton:SetParent(VoiceFrame)
 	--_G.QuickJoinToastButton.Show = M.Dummy
 	--_G.QuickJoinToastButton:Hide()
-	_G.QuickJoinToastButton:SetParent(VoiceFrame)
+	--_G.QuickJoinToastButton:SetParent(VoiceFrame)
+	_G.QuickJoinToastButton:SetAlpha(0)
 	_G.ChatAlertFrame:ClearAllPoints()
 	_G.ChatAlertFrame:SetPoint("BOTTOMLEFT", _G.ChatFrame1Tab, "TOPLEFT", 6, 21)
 
@@ -303,7 +304,7 @@ function module:Chatbar()
 
     local Emote_width, Emote_height, column, space = 21, 21, 13, 6
     local index = 0
-    Emote_IconPanel = CreateFrame("Frame", "Emote_IconPanel", Emote_CallButton)
+    Emote_IconPanel = CreateFrame("Frame", "Emote_IconPanel", Emote_CallButton, "BackdropTemplate")
     Emote_IconPanel:SetWidth(column*(Emote_width+space) + 8)
     Emote_IconPanel:SetBackdrop(
         {
@@ -318,7 +319,7 @@ function module:Chatbar()
     Emote_IconPanel:SetBackdropColor(0,0,0)
     Emote_IconPanel:SetClampedToScreen(true)
     Emote_IconPanel:SetFrameStrata("DIALOG")
-    Emote_IconPanel:SetPoint("BOTTOMLEFT",Emote_CallButton,"TOPLEFT",-23,0)
+    Emote_IconPanel:SetPoint("BOTTOMLEFT",Emote_CallButton,"TOPLEFT",-43,0)
     for _, v in ipairs(emotes) do
         Emote_button = CreateFrame("Button", nil, Emote_IconPanel)
         Emote_button.emote = "{" .. (v[GetLocale()] or v.key) .. "}"
@@ -345,7 +346,7 @@ function module:Chatbar()
     end)
 
 	local function AddButton(r, g, b, text, func)
-		local bu = CreateFrame("Button", nil, Chatbar, "SecureActionButtonTemplate")
+		local bu = CreateFrame("Button", nil, Chatbar, "SecureActionButtonTemplate, BackdropTemplate")
 		bu:SetSize(width, height)
 		M.CreateFS(bu, 15, text, "Chatbar", "CENTER", 0, 0, r, g, b)
 		bu:SetHitRectInsets(0, 0, -8, -8)

@@ -103,7 +103,22 @@ local function UpdatePixelScale(event)
 	isScaling = false
 end
 
+local function IncorrectExpansion()
+	local f = CreateFrame("Frame", nil, UIParent)
+	f:SetPoint("CENTER")
+	f:SetSize(10, 10)
+	local text = f:CreateFontString()
+	text:SetPoint("CENTER")
+	text:SetFont(STANDARD_TEXT_FONT, 43, "OUTLINE")
+	text:SetText(U["IncorrectExpansion"])
+end
+
 M:RegisterEvent("PLAYER_LOGIN", function()
+	if not I.isNewPatch then
+		IncorrectExpansion()
+		return
+	end
+
 	-- Initial
 	M:SetupUIScale()
 	M:RegisterEvent("UI_SCALE_CHANGED", UpdatePixelScale)

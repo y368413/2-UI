@@ -5,6 +5,28 @@ local _, R = unpack(ns)
 R.mult = 1
 R.margin = 3
 
+-- 动作条
+local barFader = {
+	fadeInAlpha = 1,													-- 显示时的透明度
+	fadeInDuration = .3,												-- 显示耗时
+	fadeOutAlpha = .1,													-- 渐隐后的透明度
+	fadeOutDuration = .8,												-- 渐隐耗时
+	fadeOutDelay = .5,													-- 延迟渐隐
+}
+R.Bars = {
+	margin = 2,															-- 按键间距
+	padding = 2,														-- 边缘间距
+	bar1 = {size = 38, fader = nil},									-- BAR1 主动作条（下）
+	bar2 = {size = 38, fader = nil},									-- BAR2 主动作条（上）
+	bar3 = {size = 36, fader = nil},									-- BAR3 主动作条两侧
+	bar4 = {size = 32, fader = barFader},								-- BAR4 右边动作条1
+	bar5 = {size = 32, fader = barFader},								-- BAR5 右边动作条2
+	petbar = {size = 26, fader = nil},									-- PETBAR 宠物动作条
+	stancebar = {size = 26, fader = nil},								-- STANCE + POSSESSBAR 姿态条
+	extrabar = {size = 52, fader = nil},								-- EXTRABAR 额外动作条
+	leave_vehicle = {size = 32, fader = nil},							-- VEHICLE EXIT 离开载具按钮
+}
+
 -- BUFF/DEBUFF相关
 R.Auras = {
 	IconSize		= 32,											-- BUFF图标大小
@@ -41,7 +63,7 @@ R.Auras = {
 
 -- 头像相关
 R.UFs = {
-	Playercb		= {"CENTER", UIParent, "CENTER", 0, -260},			-- 玩家施法条默认位置
+	Playercb		= {"CENTER", UIParent, "CENTER", 0, -270},			-- 玩家施法条默认位置
 	Targetcb		= {"CENTER", UIParent, "CENTER", 0, -145},			-- 目标施法条默认位置
 	Focuscb			= {"CENTER", UIParent, "CENTER", 0, -130},			-- 焦点施法条默认位置
 	FocusPos		= {"LEFT", UIParent, "LEFT", 5, -150},				-- 焦点框体默认位置

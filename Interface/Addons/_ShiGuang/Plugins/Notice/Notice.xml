@@ -8,6 +8,6 @@
 	<Script file="TransmogHeadsUp.lua"/>
 	<Script file="FeastsAndPortals.lua"/>
 	<Script file="IncentiveProgram.lua"/>
-	<Script file="Defs-Rare-Safari.lua"/>
+	<!--Script file="Defs-Rare-Safari.lua"/-->
 	<Script file="TomeOfIllusionsCheck.lua"/>
 </Ui>

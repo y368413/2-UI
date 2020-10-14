@@ -9,7 +9,7 @@ local cr, cg, cb = I.r, I.g, I.b
 function module:CreatePulse()
 	if not MaoRUIPerDB["Map"]["CombatPulse"] then return end
 
-	local bg = M.CreateBDFrame(Minimap, nil, true)
+	local bg = M.SetBD(Minimap)
 	local anim = bg:CreateAnimationGroup()
 	anim:SetLooping("BOUNCE")
 	anim.fader = anim:CreateAnimation("Alpha")
@@ -116,6 +116,7 @@ function module:ReskinRegions()
 	GameTimeCalendarInvitesTexture:ClearAllPoints()
 	GameTimeCalendarInvitesTexture:SetParent("Minimap")
 	GameTimeCalendarInvitesTexture:SetPoint("TOPRIGHT")
+
 	local Invt = CreateFrame("Button", nil, UIParent)
 	Invt:SetPoint("TOPRIGHT", Minimap, "BOTTOMLEFT", -20, -20)
 	Invt:SetSize(250, 80)
@@ -329,6 +330,34 @@ function module:ShowCalendar()
 	end
 end
 
+function module:SetupHybridMinimap()
+	local mapCanvas = HybridMinimap.MapCanvas
+
+	mapCanvas:SetMaskTexture("Interface\\Buttons\\WHITE8X8")
+	mapCanvas:SetScript("OnMouseWheel", function(_, zoom)
+		if zoom > 0 then
+			Minimap_ZoomIn()
+		else
+			Minimap_ZoomOut()
+		end
+	end)
+	mapCanvas:SetScript("OnMouseUp", function(_, btn)
+		if btn == "MiddleButton" then
+			if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
+			ToggleCalendar()
+		elseif btn == "RightButton" then
+			ToggleDropDownMenu(1, nil, MiniMapTrackingDropDown, Minimap, -(Minimap:GetWidth()*.7), (Minimap:GetWidth()*.3))
+		end
+	end)
+end
+
+function module:HybridMinimapOnLoad(addon)
+	if addon == "Blizzard_HybridMinimap" then
+		module:SetupHybridMinimap()
+		M:UnregisterEvent(self, module.HybridMinimapOnLoad)
+	end
+end
+
 function module:SetupMinimap()
 	-- Shape and Position
 	Minimap:ClearAllPoints()
@@ -394,4 +423,7 @@ function module:SetupMinimap()
 	self:CreatePulse()
 	self:ReskinRegions()
 	self:WhoPingsMyMap()
+
+	-- HybridMinimap
+	M:RegisterEvent("ADDON_LOADED", module.HybridMinimapOnLoad)
 end

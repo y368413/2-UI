@@ -43,7 +43,7 @@ local function ApplyPoints(self, points)
 end
 
 local function ApplyTexCoord(texture, texCoord)
-	if not texCoord then return end
+	if texture.__lockdown or not texCoord then return end
 	texture:SetTexCoord(unpack(texCoord))
 end
 
@@ -117,14 +117,12 @@ local function SetupCooldown(cooldown, cfg)
 	ApplyPoints(cooldown, cfg.points)
 end
 
-local function SetupBackdrop(button)
-	M.CreateBD(button, .25)
-	M.CreateTex(button)
-	M.CreateSD(button)
+local function SetupBackdrop(icon)
+	local bg = M.SetBD(icon, .25)
 	if MaoRUIPerDB["Actionbar"]["Classcolor"] then
-		button:SetBackdropColor(I.r, I.g, I.b, .25)
+		bg:SetBackdropColor(I.r, I.g, I.b, .25)
 	else
-		button:SetBackdropColor(.2, .2, .2, .25)
+		bg:SetBackdropColor(.2, .2, .2, .25)
 	end
 end
 
@@ -181,6 +179,13 @@ function Bar:UpdateHotKey()
 	end
 end
 
+function Bar:HookHotKey(button)
+	Bar.UpdateHotKey(button)
+	if button.UpdateHotkeys then
+		hooksecurefunc(button, "UpdateHotkeys", Bar.UpdateHotKey)
+	end
+end
+
 function Bar:StyleActionButton(button, cfg)
 	if not button then return end
 	if button.__styled then return end
@@ -210,7 +215,7 @@ function Bar:StyleActionButton(button, cfg)
 	if NewActionTexture then NewActionTexture:SetTexture(nil) end
 
 	--backdrop
-	SetupBackdrop(button)
+	SetupBackdrop(icon)
 
 	--textures
 	SetupTexture(icon, cfg.icon, "SetTexture", icon)
@@ -243,7 +248,7 @@ function Bar:StyleActionButton(button, cfg)
 	if hotkey then
 		if MaoRUIPerDB["Actionbar"]["Hotkeys"] then
 			hotkey:SetParent(overlay)
-			Bar.UpdateHotKey(button)
+			Bar:HookHotKey(button)
 			SetupFontString(hotkey, cfg.hotkey)
 		else
 			hotkey:Hide()
@@ -262,6 +267,8 @@ function Bar:StyleActionButton(button, cfg)
 		autoCastable:SetTexCoord(.217, .765, .217, .765)
 		autoCastable:SetInside()
 	end
+
+	Bar:RegisterButtonRange(button)
 
 	button.__styled = true
 end
@@ -285,7 +292,7 @@ function Bar:StyleExtraActionButton(cfg)
 	local checkedTexture = button:GetCheckedTexture()
 
 	--backdrop
-	SetupBackdrop(button)
+	SetupBackdrop(icon)
 
 	--textures
 	SetupTexture(icon, cfg.icon, "SetTexture", icon)
@@ -304,7 +311,7 @@ function Bar:StyleExtraActionButton(cfg)
 	overlay:SetAllPoints()
 	if MaoRUIPerDB["Actionbar"]["Hotkeys"] then
 		hotkey:SetParent(overlay)
-		Bar.UpdateHotKey(button)
+		Bar:HookHotKey(button)
 		cfg.hotkey.font = {I.Font[1], 13, I.Font[3]}
 		SetupFontString(hotkey, cfg.hotkey)
 	else
@@ -318,13 +325,15 @@ function Bar:StyleExtraActionButton(cfg)
 		count:Hide()
 	end
 
+	Bar:RegisterButtonRange(button)
+
 	button.__styled = true
 end
 
 function Bar:UpdateStanceHotKey()
 	for i = 1, NUM_STANCE_SLOTS do
 		_G["StanceButton"..i.."HotKey"]:SetText(GetBindingKey("SHAPESHIFTBUTTON"..i))
-		Bar.UpdateHotKey(_G["StanceButton"..i])
+		Bar:HookHotKey(_G["StanceButton"..i])
 	end
 end
 
@@ -335,6 +344,7 @@ function Bar:StyleAllActionButtons(cfg)
 		Bar:StyleActionButton(_G["MultiBarBottomRightButton"..i], cfg)
 		Bar:StyleActionButton(_G["MultiBarRightButton"..i], cfg)
 		Bar:StyleActionButton(_G["MultiBarLeftButton"..i], cfg)
+		Bar:StyleActionButton(_G["NDui_CustomBarButton"..i], cfg)
 	end
 	for i = 1, 6 do
 		Bar:StyleActionButton(_G["OverrideActionBarButton"..i], cfg)
@@ -351,6 +361,8 @@ function Bar:StyleAllActionButtons(cfg)
 	for i = 1, NUM_POSSESS_SLOTS do
 		Bar:StyleActionButton(_G["PossessButton"..i], cfg)
 	end
+	--leave vehicle
+	Bar:StyleActionButton(_G["NDui_LeaveVehicleButton"], cfg)
 	--extra action button
 	Bar:StyleExtraActionButton(cfg)
 	--spell flyout
@@ -442,7 +454,6 @@ function Bar:ReskinBars()
 	}
 	Bar:StyleAllActionButtons(cfg)
 	-- Update hotkeys
-	hooksecurefunc("ActionButton_UpdateHotkeys", Bar.UpdateHotKey)
 	hooksecurefunc("PetActionButton_SetHotkeys", Bar.UpdateHotKey)
 	if MaoRUIPerDB["Actionbar"]["Hotkeys"] then
 		Bar:UpdateStanceHotKey()

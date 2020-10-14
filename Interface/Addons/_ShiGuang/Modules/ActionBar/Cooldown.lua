@@ -7,7 +7,7 @@ local MIN_DURATION = 2.5                    -- the minimum duration to show cool
 local MIN_SCALE = 0.5                       -- the minimum scale we want to show cooldown counts at, anything below this will be hidden
 local ICON_SIZE = 36
 local hideNumbers, active, hooked = {}, {}, {}
-local pairs, floor, strfind = pairs, math.floor, string.find
+local pairs, strfind = pairs, string.find
 local GetTime, GetActionCooldown = GetTime, GetActionCooldown
 
 function module:StopTimer()
@@ -20,8 +20,8 @@ function module:ForceUpdate()
 	self:Show()
 end
 
-function module:OnSizeChanged(width)
-	local fontScale = floor(width + 0.5) / ICON_SIZE
+function module:OnSizeChanged(width, height)
+	local fontScale = M:Round((width+height)/2) / ICON_SIZE
 	if fontScale == self.fontScale then return end
 	self.fontScale = fontScale
 
@@ -52,6 +52,10 @@ function module:TimerOnUpdate(elapsed)
 	end
 end
 
+function module:ScalerOnSizeChanged(...)
+	module.OnSizeChanged(self.timer, ...)
+end
+
 function module:OnCreate()
 	local scaler = CreateFrame("Frame", nil, self)
 	scaler:SetAllPoints(self)
@@ -60,6 +64,7 @@ function module:OnCreate()
 	timer:Hide()
 	timer:SetAllPoints(scaler)
 	timer:SetScript("OnUpdate", module.TimerOnUpdate)
+	scaler.timer = timer
 
 	local text = timer:CreateFontString(nil, "BACKGROUND")
 	text:SetPoint("CENTER", 2, 0)
@@ -67,9 +72,7 @@ function module:OnCreate()
 	timer.text = text
 
 	module.OnSizeChanged(timer, scaler:GetSize())
-	scaler:SetScript("OnSizeChanged", function(_, ...)
-		module.OnSizeChanged(timer, ...)
-	end)
+	scaler:SetScript("OnSizeChanged", module.ScalerOnSizeChanged)
 
 	self.timer = timer
 	return timer
@@ -77,11 +80,11 @@ end
 
 function module:StartTimer(start, duration)
 	if self:IsForbidden() then return end
-	if self.noOCC or hideNumbers[self] then return end
+	if self.noCooldownCount or hideNumbers[self] then return end
 
-	local frameName = self.GetName and self:GetName() or ""
-	if MaoRUIPerDB["Actionbar"]["OverrideWA"] and strfind(frameName, "WeakAuras") then
-		self.noOCC = true
+	local frameName = self.GetName and self:GetName()
+	if MaoRUIPerDB["Actionbar"]["OverrideWA"] and frameName and strfind(frameName, "WeakAuras") then
+		self.noCooldownCount = true
 		return
 	end
 
@@ -178,7 +181,7 @@ function module:OnLogin()
 			module.RegisterActionButton(frame)
 		end
 	end
-	hooksecurefunc("ActionBarButtonEventsFrame_RegisterFrame", module.RegisterActionButton)
+	hooksecurefunc(ActionBarButtonEventsFrameMixin, "RegisterFrame", module.RegisterActionButton)
 
 	-- Hide Default Cooldown
 	SetCVar("countdownForCooldowns", 0)
@@ -234,7 +237,7 @@ local function comboEventFrame_OnUpdate(self, elapsed)
 	end
 end
 
-hooksecurefunc("ActionButton_OnUpdate", function(self, elapsed)
+hooksecurefunc(ActionBarButtonEventsFrameMixin, "RegisterFrame", function(self, elapsed)
 	if (self.comboEventFrame) then return end
 	self.comboEventFrame = CreateFrame("Frame", nil, self);
 	self.comboEventFrame.countTime = 0;

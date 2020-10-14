@@ -31,9 +31,9 @@ do
 		if C_Garrison.GetLandingPageGarrisonType() ~= LE_GARRISON_TYPE_7_0 then return end
 
 		if event == "GARRISON_FOLLOWER_CATEGORIES_UPDATED" then
-			categoryInfo = C_Garrison.GetClassSpecCategoryInfo(LE_FOLLOWER_TYPE_GARRISON_7_0)
+			categoryInfo = C_Garrison.GetClassSpecCategoryInfo(Enum.GarrisonFollowerType.FollowerType_7_0)
 		else
-			C_Garrison.RequestClassSpecCategoryInfo(LE_FOLLOWER_TYPE_GARRISON_7_0)
+			C_Garrison.RequestClassSpecCategoryInfo(Enum.GarrisonFollowerType.FollowerType_7_0)
 		end
 	end)
 	frame:RegisterEvent("GARRISON_FOLLOWER_CATEGORIES_UPDATED")

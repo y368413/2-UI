@@ -10,11 +10,12 @@ local function ReskinWA()
 				f.icon:SetTexCoord(unpack(I.TexCoord))
 				f.icon.SetTexCoord = M.Dummy
 				f.bg = M.SetBD(f)
+				f.bg:SetFrameLevel(0)
 				f.bg.__icon = f.icon
 				f.bg:HookScript("OnUpdate", function(self)
 					self:SetAlpha(self.__icon:GetAlpha())
-					if self.Shadow then
-						self.Shadow:SetAlpha(self.__icon:GetAlpha())
+					if self.__shadow then
+						self.__shadow:SetAlpha(self.__icon:GetAlpha())
 					end
 				end)
 

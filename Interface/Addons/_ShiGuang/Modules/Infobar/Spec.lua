@@ -7,13 +7,14 @@ local info = module:RegisterInfobar("Spec", R.Infobar.SpecPos)
 info.text:SetFont(unpack(R.Infobar.TTFonts))
 local format, wipe, select, next = string.format, table.wipe, select, next
 local SPECIALIZATION, TALENTS_BUTTON, MAX_TALENT_TIERS = SPECIALIZATION, TALENTS_BUTTON, MAX_TALENT_TIERS
-local SHOW_PVP_TALENT_LEVEL, PVP_TALENTS, LOOT_SPECIALIZATION_DEFAULT = SHOW_PVP_TALENT_LEVEL, PVP_TALENTS, LOOT_SPECIALIZATION_DEFAULT
+local PVP_TALENTS, LOOT_SPECIALIZATION_DEFAULT = PVP_TALENTS, LOOT_SPECIALIZATION_DEFAULT
 local GetSpecialization, GetSpecializationInfo, GetLootSpecialization, GetSpecializationInfoByID = GetSpecialization, GetSpecializationInfo, GetLootSpecialization, GetSpecializationInfoByID
-local GetTalentInfo, UnitLevel, GetCurrencyInfo, GetPvpTalentInfoByID, SetLootSpecialization, SetSpecialization = GetTalentInfo, UnitLevel, GetCurrencyInfo, GetPvpTalentInfoByID, SetLootSpecialization, SetSpecialization
+local GetTalentInfo, GetPvpTalentInfoByID, SetLootSpecialization, SetSpecialization = GetTalentInfo, GetPvpTalentInfoByID, SetLootSpecialization, SetSpecialization
 local C_SpecializationInfo_GetAllSelectedPvpTalentIDs = C_SpecializationInfo.GetAllSelectedPvpTalentIDs
+local C_SpecializationInfo_CanPlayerUsePVPTalentUI = C_SpecializationInfo.CanPlayerUsePVPTalentUI
 
 local function addIcon(texture)
-	texture = texture and "|T"..texture..":13:15:0:0:50:50:4:46:4:46|t" or ""
+	texture = texture and "|T"..texture..":12:16:0:0:50:50:4:46:4:46|t" or ""
 	return texture
 end
 
@@ -47,10 +48,12 @@ info.onEvent = function(self)
 	end
 end
 
---[[local pvpTalents
+local pvpTalents
+local pvpIconTexture = C_CurrencyInfo.GetCurrencyInfo(104).iconFileID
+
 info.onEnter = function(self)
 	local specIndex = GetSpecialization()
-	if not specIndex then return end
+	if not specIndex or specIndex == 5 then return end
 
 	GameTooltip:SetOwner(self, "ANCHOR_TOP", 0, 15)
 	GameTooltip:ClearLines()
@@ -69,13 +72,12 @@ info.onEnter = function(self)
 		end
 	end
 
-	if UnitLevel("player") >= SHOW_PVP_TALENT_LEVEL then
+	if C_SpecializationInfo_CanPlayerUsePVPTalentUI() then
 		pvpTalents = C_SpecializationInfo_GetAllSelectedPvpTalentIDs()
 
 		if #pvpTalents > 0 then
-			local texture = select(3, GetCurrencyInfo(104))
 			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine(addIcon(texture).." "..PVP_TALENTS, .6,.8,1)
+			GameTooltip:AddLine(addIcon(pvpIconTexture).." "..PVP_TALENTS, .6,.8,1)
 			for _, talentID in next, pvpTalents do
 				local _, name, icon, _, _, _, unlocked = GetPvpTalentInfoByID(talentID)
 				if name and unlocked then
@@ -93,7 +95,7 @@ info.onEnter = function(self)
 	GameTooltip:Show()
 end
 
-info.onLeave = M.HideTooltip]]
+info.onLeave = M.HideTooltip
 
 local function clickFunc(i, isLoot)
 	if not i then return end
@@ -106,11 +108,17 @@ local function clickFunc(i, isLoot)
 end
 
 info.onMouseUp = function(self, btn)
-	if not GetSpecialization() then return end
+	local specIndex = GetSpecialization()
+	if not specIndex or specIndex == 5 then return end
+
+	if btn == "LeftButton" then
+		if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
+		ToggleTalentFrame(2)
+	else
 		menuList[2].menuList = {{}, {}, {}, {}}
 		menuList[3].menuList = {{}, {}, {}, {}, {}}
 		local specList, lootList = menuList[2].menuList, menuList[3].menuList
-		local spec, specName = GetSpecializationInfo(GetSpecialization())
+		local spec, specName = GetSpecializationInfo(specIndex)
 		local lootSpec = GetLootSpecialization()
 		lootList[1] = {text = format(LOOT_SPECIALIZATION_DEFAULT, specName), func = function() clickFunc(0, true) end, checked = lootSpec == 0 and true or false}
 
@@ -134,4 +142,5 @@ info.onMouseUp = function(self, btn)
 
 		EasyMenu(menuList, menuFrame, self, -80, 100, "MENU", 1)
 		GameTooltip:Hide()
+	end
 end

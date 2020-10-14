@@ -7147,7 +7147,7 @@ function n:CreateImportGroup(container)
 	container:ReleaseChildren()
 
 	local version = AceGUI:Create("Label")
-	version:SetText(" 8.3.12")
+	version:SetText(" 8.3.13")
 	version:SetJustifyH("RIGHT")
 	version:SetFullWidth(true)
 	container:AddChild(version)
@@ -9257,7 +9257,7 @@ local SlashHandlers = {
 		--ReloadUI()
 	end,
 	["ticket"] = function()
-		local text = ("%s %s/%d/%s (%s)\nSettings: Locale: %s"):format("AzeritePowerWeights", "8.3.12", C_CVar.GetCVar("scriptErrors"), cfg.specScales[playerSpecID].scaleName or U["ScaleName_Unknown"], cfg.specScales[playerSpecID].scaleID)
+		local text = ("%s %s/%d/%s (%s)\nSettings: Locale: %s"):format("AzeritePowerWeights", "8.3.13", C_CVar.GetCVar("scriptErrors"), cfg.specScales[playerSpecID].scaleName or U["ScaleName_Unknown"], cfg.specScales[playerSpecID].scaleID)
 		--local first = true
 		local skip = {
 			["enableTraits"] = false,
@@ -9342,7 +9342,7 @@ local SlashHandlers = {
 
 	end,
 	["tt"] = function(...) -- Get tooltip stuff
-		local text = string.format("> START\n- - - - - - - - - -\nVer. %s\nClass/Spec: %s / %s\nScale: %s (%s)\n- - - - - - - - - -\n", "8.3.12", playerClassID, playerSpecID, cfg.specScales[playerSpecID].scaleName or U["ScaleName_Unknown"], cfg.specScales[playerSpecID].scaleID)
+		local text = string.format("> START\n- - - - - - - - - -\nVer. %s\nClass/Spec: %s / %s\nScale: %s (%s)\n- - - - - - - - - -\n", "8.3.13", playerClassID, playerSpecID, cfg.specScales[playerSpecID].scaleName or U["ScaleName_Unknown"], cfg.specScales[playerSpecID].scaleID)
 
 		text = text .. string.format("Score settings:\naddILvlToScore: %s\nscaleByAzeriteEmpowered: %s\naddPrimaryStatToScore: %s\nrelativeScore: %s\nshowOnlyUpgrades: %s\nshowTooltipLegend: %s\n- - - - - - - - - -\n", tostring(cfg.addILvlToScore), tostring(cfg.scaleByAzeriteEmpowered), tostring(cfg.addPrimaryStatToScore), tostring(cfg.relativeScore), tostring(cfg.showOnlyUpgrades), tostring(cfg.showTooltipLegend))
 
@@ -9417,7 +9417,7 @@ local SlashHandlers = {
 
 	end,
 	["is"] = function()
-		local text = string.join("\n", ("> START\nVer. %s"):format("8.3.12"), unpack(importStack))
+		local text = string.join("\n", ("> START\nVer. %s"):format("8.3.13"), unpack(importStack))
 	end,
 	["bang"] = function(...)
 		local number = tonumber(...)
@@ -9441,6 +9441,15 @@ local SlashHandlers = {
 			[11] =	4	+	1	-	1	-	0, -- Druid (+1 for TMI, -1 for Resto)
 			[12] =	2	+	1	-	0	-	0, -- Demon Hunter (+1 for TMI)
 		}
+		--[[
+			Holy Paladin
+			Disc Priest
+			---Holy Priest---
+			Restoratio Shaman
+			Mistweaver Monk
+			Restoration Druid
+			---
+		]]--
 		local emptySpecs = 5
 		for _, v in ipairs(n.defaultScalesData) do
 			if next(v[4]) or next(v[5]) then -- Check for not empty scales

@@ -1,5 +1,5 @@
 ﻿---------------------------------------------------- MAIN ADDON FRAME
-local MAF=CreateFrame("Frame","MyParent",UIParent)
+local MAF=CreateFrame("Frame","MyParent",UIParent, "BackdropTemplate")
 	MAF:SetSize(21,21)
 	MAF:SetPoint("RIGHT", UIParent, "RIGHT", -66, 88)
 	MAF:SetBackdrop({bgFile = "Interface\\AddOns\\_ShiGuang\\Media\\Hexagon"})
