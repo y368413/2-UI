@@ -397,7 +397,6 @@ end
 local loader = CreateFrame("Frame")
 loader:RegisterEvent("ADDON_LOADED")
 loader:SetScript("OnEvent", function(self, _, addon)
-	if not I.isNewPatch then return end
 	if addon ~= "_ShiGuang" then return end
 	if not MaoRUIPerDB["BFA"] then
 		MaoRUIPerDB = {}

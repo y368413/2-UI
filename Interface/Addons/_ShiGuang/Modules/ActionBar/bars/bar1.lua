@@ -207,8 +207,8 @@ function Bar:CreateBar1()
 	]])
 	RegisterStateDriver(frame, "page", actionPage)
 
-	-- Fix button texture
-	M:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR", function()
+	-- Fix button texture, need reviewed
+	local function FixActionBarTexture()
 		for _, button in next, buttonList do
 			local icon = button.icon
 			local texture = GetActionTexture(button.action)
@@ -218,8 +218,12 @@ function Bar:CreateBar1()
 			else
 				icon:Hide()
 			end
+			Bar.UpdateButtonUsable(button)
 		end
-	end)
+	end
+	M:RegisterEvent("SPELL_UPDATE_ICON", FixActionBarTexture)
+	M:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR", FixActionBarTexture)
+	M:RegisterEvent("UPDATE_OVERRIDE_ACTIONBAR", FixActionBarTexture)
 end
 
 function Bar:OnLogin()

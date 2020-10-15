@@ -1,3 +1,4 @@
+local _, Skada = ...
 Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 	if Skada.db.profile.modulesBlocked.Debuffs then return end
 
@@ -5,16 +6,16 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 	local buffoverview = Skada:NewModule(L["Buffs"])
 	local buffplayers = Skada:NewModule("Buff players")
 	local debuffplayers = Skada:NewModule("Debuff players")
-        
+
 	local mod = Skada:NewModule(L["Debuff uptimes"])
 	local auramod = Skada:NewModule(L["Debuff spell list"])
 
 	local buffs = Skada:NewModule(L["Buff uptimes"])
 	local buffspells = Skada:NewModule(L["Buff spell list"])
-        
-    local pairs, ipairs = pairs, ipairs
-    local time = time
-        
+
+	local pairs, ipairs = pairs, ipairs
+	local time = time
+
 	local function log_auraapply(set, aura)
 		if set then
 
@@ -28,7 +29,7 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 					player.auras[aura.spellname] = {["id"] = aura.spellid, ["name"] = aura.spellname, ["active"] = 1, ["uptime"] = 0, ["auratype"] = aura.auratype, ["started"] = time(), school = aura.spellschool}
 				else
 					player.auras[aura.spellname].active = player.auras[aura.spellname].active + 1
-                    player.auras[aura.spellname].started = player.auras[aura.spellname].started or time()
+										player.auras[aura.spellname].started = player.auras[aura.spellname].started or time()
 				end
 			end
 
@@ -48,14 +49,14 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 					local a = player.auras[aura.spellname]
 					if a.active > 0 then
 						a.active = a.active - 1
-                        
-                        if a.active == 0 and a.started then
-                            -- Calculate aura uptime
-                            a.uptime = a.uptime + math.floor((time() - a.started) + 0.5)
-                            
-                            -- Clear aura start value
-                            a.started = nil
-                        end
+
+						if a.active == 0 and a.started then
+							-- Calculate aura uptime
+							a.uptime = a.uptime + math.floor((time() - a.started) + 0.5)
+
+							-- Clear aura start value
+							a.started = nil
+						end
 					end
 				end
 			end
@@ -72,7 +73,7 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 		aura.spellid = spellId
 		aura.spellname = spellName
 		aura.auratype = auraType
-        aura.spellschool = spellSchool
+		aura.spellschool = spellSchool
 
 		Skada:FixPets(aura)
 		log_auraapply(Skada.current, aura)
@@ -86,7 +87,7 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 		aura.spellid = spellId
 		aura.spellname = spellName
 		aura.auratype = auraType
-        aura.spellschool = spellSchool
+		aura.spellschool = spellSchool
 
 		Skada:FixPets(aura)
 		log_auraremove(Skada.current, aura)
@@ -121,7 +122,7 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 	local function spellupdate(auratype, win, set)
 		local nr = 1
 		local max = 0
-        local spells = {}
+		local spells = {}
 
 		for i, player in ipairs(set.players) do
 			-- Find number of debuffs.
@@ -129,50 +130,50 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 			local aurauptime = 0
 			for spellname, spell in pairs(player.auras) do
 				if spell.auratype == auratype then
-                        
-                    local spellnr = spells[spell.id]
-                    local was_new = false
-                    if not spellnr then
-                        was_new = true
-                        spells[spell.id] = nr
-                        nr = nr + 1
-                        spellnr = spells[spell.id]
-                    end
-                        
-                    local d = win.dataset[spellnr] or {}
-                    win.dataset[spellnr] = d
 
-                    d.id = spell.id
-                    if was_new then
-                        d.value = 1
-                    else
-                        d.value = (d.value or 0) + 1
-                    end
-                    d.valuetext = ("%i"):format(d.value)
-                    d.label = spellname
-                    d.spellid = spell.id
-                        
-                    local _, _, icon = GetSpellInfo(spell.id)
-                    d.icon = icon
-                        
-                    if spell.school then
-                        d.spellschool = spell.school
-                    end
-                        
-                    if d.value > max then
-                        max = d.value
-                    end
+					local spellnr = spells[spell.id]
+					local was_new = false
+					if not spellnr then
+						was_new = true
+						spells[spell.id] = nr
+						nr = nr + 1
+						spellnr = spells[spell.id]
+					end
+
+					local d = win.dataset[spellnr] or {}
+					win.dataset[spellnr] = d
+
+					d.id = spell.id
+					if was_new then
+						d.value = 1
+					else
+						d.value = (d.value or 0) + 1
+					end
+					d.valuetext = ("%i"):format(d.value)
+					d.label = spellname
+					d.spellid = spell.id
+
+					local _, _, icon = GetSpellInfo(spell.id)
+					d.icon = icon
+
+					if spell.school then
+						d.spellschool = spell.school
+					end
+
+					if d.value > max then
+						max = d.value
+					end
 
 				end
-                        
+
 			end
 		end
 
 		win.metadata.maxvalue = max
-	end        
-    
-    local auraspellid = nil
-        
+	end
+
+	local auraspellid = nil
+
 	local function spellplayersupdate(auratype, win, set)
 		local nr = 1
 		local max = 0
@@ -181,38 +182,38 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 			for spellname, spell in pairs(player.auras) do
 				if spell.auratype == auratype and spell.id == auraspellid then
 					local aurauptime = spell.uptime
-                        
-                    -- Account for active auras
-                    if spell.active > 0 and spell.started then
-                        aurauptime = aurauptime + math.floor((time() - spell.started) + 0.5)
-                    end
-                        
-                    -- Calculate player max possible uptime.
-                    local maxtime = Skada:PlayerActiveTime(set, player)
 
-                    local d = win.dataset[nr] or {}
-                    win.dataset[nr] = d
+					-- Account for active auras
+					if spell.active > 0 and spell.started then
+						aurauptime = aurauptime + math.floor((time() - spell.started) + 0.5)
+					end
 
-                    d.id = player.id
-                    d.value = aurauptime
-                    d.valuetext = ("%02.1f%%"):format(aurauptime / maxtime * 100)
-                    d.label = player.name
-                    d.class = player.class
-                    d.role = player.role
+					-- Calculate player max possible uptime.
+					local maxtime = Skada:PlayerActiveTime(set, player)
 
-                    if aurauptime > max then
-                        max = aurauptime
-                    end
+					local d = win.dataset[nr] or {}
+					win.dataset[nr] = d
 
-                    nr = nr + 1
-                end
+					d.id = player.id
+					d.value = aurauptime
+					d.valuetext = ("%02.1f%%"):format(aurauptime / maxtime * 100)
+					d.label = player.name
+					d.class = player.class
+					d.role = player.role
+
+					if aurauptime > max then
+						max = aurauptime
+					end
+
+					nr = nr + 1
+				end
 			end
 		end
 
 		win.metadata.maxvalue = max
-	end        
-        
-        
+	end
+
+
 	local function updatefunc(auratype, win, set)
 		local nr = 1
 		local max = 0
@@ -225,11 +226,11 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 				if spell.auratype == auratype then
 					auracount = auracount + 1
 					aurauptime = aurauptime + spell.uptime
-                        
-                    -- Account for active auras
-                    if spell.active > 0 and spell.started then
-                        aurauptime = aurauptime + math.floor((time() - spell.started) + 0.5)
-                    end
+
+					-- Account for active auras
+					if spell.active > 0 and spell.started then
+						aurauptime = aurauptime + math.floor((time() - spell.started) + 0.5)
+					end
 				end
 			end
 
@@ -242,7 +243,7 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 
 				local d = win.dataset[nr] or {}
 				win.dataset[nr] = d
-                    
+
 				d.id = player.id
 				d.value = uptime
 				d.valuetext = ("%02.1f%% / %u"):format(uptime / maxtime * 100, auracount)
@@ -272,32 +273,32 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 			-- Calculate player max possible uptime.
 			local maxtime = Skada:PlayerActiveTime(set, player)
 
-            if maxtime and maxtime > 0 then
-                win.metadata.maxvalue = maxtime
-                for spellname, spell in pairs(player.auras) do
-                    if spell.auratype == auratype then
-                        local uptime = min(maxtime, spell.uptime)
-                            
-                        -- Account for active auras
-                        if spell.active > 0 and spell.started then
-                            uptime = uptime + math.floor((time() - spell.started) + 0.5)
-                        end
+			if maxtime and maxtime > 0 then
+				win.metadata.maxvalue = maxtime
+				for spellname, spell in pairs(player.auras) do
+					if spell.auratype == auratype then
+						local uptime = min(maxtime, spell.uptime)
 
-                        local d = win.dataset[nr] or {}
-                        win.dataset[nr] = d
+						-- Account for active auras
+						if spell.active > 0 and spell.started then
+							uptime = uptime + math.floor((time() - spell.started) + 0.5)
+						end
 
-                        d.id = spell.name
-                        d.value = uptime
-                        d.label = spell.name
-                        local _, _, icon = GetSpellInfo(spell.id)
-                        d.icon = icon
-                        d.spellid = spell.id
-                        d.valuetext = ("%02.1f%%"):format(uptime / maxtime * 100)
+						local d = win.dataset[nr] or {}
+						win.dataset[nr] = d
 
-                        nr = nr + 1
-                    end
-                end
-            end
+						d.id = spell.name
+						d.value = uptime
+						d.label = spell.name
+						local _, _, icon = GetSpellInfo(spell.id)
+						d.icon = icon
+						d.spellid = spell.id
+						d.valuetext = ("%02.1f%%"):format(uptime / maxtime * 100)
+
+						nr = nr + 1
+					end
+				end
+			end
 		end
 
 	end
@@ -328,7 +329,7 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 	function buffspells:Update(win, set)
 		detailupdatefunc("BUFF", win, set, self.playerid)
 	end
-        
+
 	-- Detail view of a player.
 	function buffspells:Update(win, set)
 		detailupdatefunc("BUFF", win, set, self.playerid)
@@ -337,36 +338,36 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 	function buffoverview:Update(win, set)
 		spellupdate("BUFF", win, set)
 	end
-        
+
 	function debuffoverview:Update(win, set)
 		spellupdate("DEBUFF", win, set)
 	end
-        
+
 	function debuffplayers:Update(win, set)
 		spellplayersupdate("DEBUFF", win, set)
 	end
-        
+
 	function buffplayers:Update(win, set)
 		spellplayersupdate("BUFF", win, set)
 	end
-        
+
 	function debuffplayers:Enter(win, id, label)
 		auraspellid = id
 		debuffplayers.title = label
 	end
-        
+
 	function buffplayers:Enter(win, id, label)
 		auraspellid = id
 		buffplayers.title = label
 	end
-        
+
 	function mod:OnEnable()
-		mod.metadata 		= {showspots = 1, click1 = auramod, click2 = buffspells, icon = "Interface\\Icons\\Ability_creature_disease_02"}
-		auramod.metadata 	= {}
-		buffs.metadata 		= {showspots = 1, click1 = buffspells, click2 = auramod, icon = "Interface\\Icons\\Spell_misc_drink"}
+		mod.metadata = {showspots = 1, click1 = auramod, click2 = buffspells, icon = "Interface\\Icons\\Ability_creature_disease_02"}
+		auramod.metadata = {}
+		buffs.metadata = {showspots = 1, click1 = buffspells, click2 = auramod, icon = "Interface\\Icons\\Spell_misc_drink"}
 		buffspells.metadata = {}
-		buffoverview.metadata 		= {click1 = buffplayers, icon = "Interface\\Icons\\Spell_misc_drink"}
-		debuffoverview.metadata 	= {click1 = debuffplayers, icon = "Interface\\Icons\\Ability_creature_disease_02"}
+		buffoverview.metadata = {click1 = buffplayers, icon = "Interface\\Icons\\Spell_misc_drink"}
+		debuffoverview.metadata = {click1 = debuffplayers, icon = "Interface\\Icons\\Ability_creature_disease_02"}
 		debuffplayers.metadata = {showspots = 1}
 		buffplayers.metadata = {showspots = 1}
 
@@ -388,19 +389,19 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 		Skada:RemoveMode(buffs)
 	end
 
-    function mod:SetComplete(set)
-        -- Finalize any remaining auras
+	function mod:SetComplete(set)
+		-- Finalize any remaining auras
 		for i, player in ipairs(set.players) do
 			for spellname, spell in pairs(player.auras) do
 				if spell.active > 0 and spell.started then
-                    spell.uptime = spell.uptime + math.floor((time() - spell.started) + 0.5)
-                    spell.active = 0
-                    spell.started = nil
+					spell.uptime = spell.uptime + math.floor((time() - spell.started) + 0.5)
+					spell.active = 0
+					spell.started = nil
 				end
 			end
 		end
-    end
-        
+	end
+
 	function mod:AddToTooltip(set, tooltip)
 	end
 
@@ -413,19 +414,18 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 
 	-- Called by Skada when a new set is created.
 	function mod:AddSetAttributes(set)
-        set.auras = {}
-        
-        -- Account for old Total segments
+		set.auras = {}
+
+		-- Account for old Total segments
 		for i, player in ipairs(set.players) do
-            if player.auras ~= nil then
-                for spellname, spell in pairs(player.auras) do
-                    if spell.active > 0 then
-                        spell.active = 0
-                        spell.started = nil
-                    end
-                end
-            end
+			if player.auras ~= nil then
+				for spellname, spell in pairs(player.auras) do
+					if spell.active > 0 then
+						spell.active = 0
+						spell.started = nil
+					end
+				end
+			end
 		end
 	end
 end)
-

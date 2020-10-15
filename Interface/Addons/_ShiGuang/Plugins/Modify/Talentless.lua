@@ -130,7 +130,7 @@ function Talentless:ADDON_LOADED(addon)
 		--PlayerTalentFrameTalents.unspentText:ClearAllPoints()
 		--PlayerTalentFrameTalents.unspentText:SetPoint('TOP', 0, 24)
 		self:CreateItemButtons()
-		--if(UnitLevel('player') < 120 and not (IsTrialAccount() or IsVeteranTrialAccount())) then self:RegisterEvent('PLAYER_LEVEL_UP') end
+		--if(UnitLevel('player') < 110 and not (IsTrialAccount() or IsVeteranTrialAccount())) then self:RegisterEvent('PLAYER_LEVEL_UP') end
 		self:UnregisterEvent('ADDON_LOADED')
 		self:OnShow()
 	end

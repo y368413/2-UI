@@ -2,6 +2,7 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local module = M:GetModule("Maps")
 
+local _G = _G
 local strmatch, strfind, strupper = string.match, string.find, string.upper
 local select, pairs, ipairs, unpack = select, pairs, ipairs, unpack
 local cr, cg, cb = I.r, I.g, I.b
@@ -46,15 +47,20 @@ end
 
 function module:ReskinRegions()
 	-- Garrison
-	GarrisonLandingPageMinimapButton:ClearAllPoints()
-	GarrisonLandingPageMinimapButton:SetPoint("TOPRIGHT", Minimap, "BOTTOMRIGHT", 6, 6)
-	GarrisonLandingPageMinimapButton:SetScale(0.72)
-	--hooksecurefunc("GarrisonLandingPageMinimapButton_UpdateIcon", function(self)
+	hooksecurefunc("GarrisonLandingPageMinimapButton_UpdateIcon", function(self)
+		self:ClearAllPoints()
+		self:SetPoint("TOPRIGHT", Minimap, "BOTTOMRIGHT", 6, 6)
+		self:SetScale(0.72)
 		--self:GetNormalTexture():SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\2UI")
 		--self:GetPushedTexture():SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\2UI")
 		--self:GetHighlightTexture():SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\2UI")
 		--self:SetSize(30, 30)
-	--end)
+
+		if RecycleBinToggleButton and not RecycleBinToggleButton.settled then
+			RecycleBinToggleButton:SetPoint("BOTTOMRIGHT", -15, -6)
+			RecycleBinToggleButton.settled = true
+		end
+	end)
 	if not (IsAddOnLoaded("GarrisonMissionManager") or IsAddOnLoaded("GarrisonMaster")) then
 		GarrisonLandingPageMinimapButton:RegisterForClicks("AnyUp")
 		GarrisonLandingPageMinimapButton:HookScript("OnClick", function(_, btn, down)
@@ -330,25 +336,38 @@ function module:ShowCalendar()
 	end
 end
 
+function module:Minimap_OnMouseWheel(zoom)
+	if zoom > 0 then
+		Minimap_ZoomIn()
+	else
+		Minimap_ZoomOut()
+	end
+end
+
+local NDuiMiniMapTrackingDropDown = CreateFrame("Frame", "NDuiMiniMapTrackingDropDown", _G.UIParent, "UIDropDownMenuTemplate")
+NDuiMiniMapTrackingDropDown:SetID(1)
+NDuiMiniMapTrackingDropDown:SetClampedToScreen(true)
+NDuiMiniMapTrackingDropDown:Hide()
+NDuiMiniMapTrackingDropDown.noResize = true
+_G.UIDropDownMenu_Initialize(NDuiMiniMapTrackingDropDown, _G.MiniMapTrackingDropDown_Initialize, "MENU")
+
+function module:Minimap_OnMouseUp(btn)
+		if btn == "LeftButton" then 
+			if IsAltKeyDown() then ToggleFrame(WorldMapFrame) --Alt+鼠标左键点击显示大地图
+			elseif IsShiftKeyDown() then if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end ToggleCalendar()
+			elseif IsControlKeyDown() then ToggleDropDownMenu(1, nil, NDuiMiniMapTrackingDropDown, "cursor")
+			else Minimap_OnClick(self) --鼠标左键点击小地图显示Ping位置提示
+			end
+		elseif btn == "MiddleButton" then ToggleFrame(ObjectiveTrackerFrame)  --M:DropDown(MapMicromenu, MapMenuFrame, 0, 0) --鼠标中键显示系统菜单
+		elseif btn == "RightButton" then EasyMenu(SetMrbarMicromenu, SetMrbarMenuFrame, "cursor", 0, 0, "MENU", 2) --鼠标右键显示增强菜单
+		end
+end
+
 function module:SetupHybridMinimap()
 	local mapCanvas = HybridMinimap.MapCanvas
-
 	mapCanvas:SetMaskTexture("Interface\\Buttons\\WHITE8X8")
-	mapCanvas:SetScript("OnMouseWheel", function(_, zoom)
-		if zoom > 0 then
-			Minimap_ZoomIn()
-		else
-			Minimap_ZoomOut()
-		end
-	end)
-	mapCanvas:SetScript("OnMouseUp", function(_, btn)
-		if btn == "MiddleButton" then
-			if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
-			ToggleCalendar()
-		elseif btn == "RightButton" then
-			ToggleDropDownMenu(1, nil, MiniMapTrackingDropDown, Minimap, -(Minimap:GetWidth()*.7), (Minimap:GetWidth()*.3))
-		end
-	end)
+	mapCanvas:SetScript("OnMouseWheel", module.Minimap_OnMouseWheel)
+	mapCanvas:SetScript("OnMouseUp", module.Minimap_OnMouseUp)
 end
 
 function module:HybridMinimapOnLoad(addon)
@@ -376,29 +395,11 @@ function module:SetupMinimap()
 	self:ShowMinimapClock()
 	self:ShowCalendar()
 
-	-- Mousewheel Zoom
+	-- Minimap clicks
 	Minimap:EnableMouseWheel(true)
-	Minimap:SetScript("OnMouseWheel", function(_, zoom)
-		if zoom > 0 then
-			Minimap_ZoomIn()
-		else
-			Minimap_ZoomOut()
-		end
-	end)
+	Minimap:SetScript("OnMouseWheel", module.Minimap_OnMouseWheel)
+	Minimap:SetScript("OnMouseUp", module.Minimap_OnMouseUp)
 
-	-- Click Func
-	Minimap:SetScript("OnMouseUp", function(self, btn)
-		if btn == "LeftButton" then 
-			if IsAltKeyDown() then ToggleFrame(WorldMapFrame) --Alt+鼠标左键点击显示大地图
-			elseif IsShiftKeyDown() then ToggleBattlefieldMinimap() --Shift+鼠标左键显示战场小地图
-			elseif IsControlKeyDown() then ToggleFrame(ObjectiveTrackerFrame) --Ctrl+鼠标左键显示任务
-			else Minimap_OnClick(self) --鼠标左键点击小地图显示Ping位置提示
-			end
-		elseif btn == "MiddleButton" then ToggleFrame(ObjectiveTrackerFrame)  --M:DropDown(MapMicromenu, MapMenuFrame, 0, 0) --鼠标中键显示系统菜单
-		elseif btn == "RightButton" then EasyMenu(SetMrbarMicromenu, SetMrbarMenuFrame, "cursor", 0, 0, "MENU", 2) --鼠标右键显示增强菜单
-		end
-	end)
-	
 	-- Hide Blizz
 	local frames = {
 		"MinimapBorderTop",

@@ -776,6 +776,50 @@ do
 	end
 	hooksecurefunc("PanelTemplates_DeselectTab", resetTabAnchor)
 	hooksecurefunc("PanelTemplates_SelectTab", resetTabAnchor)
+
+	-- Handle scrollframe
+	local function Scroll_OnEnter(self)
+		local thumb = self.thumb
+		if not thumb then return end
+		thumb.bg:SetBackdropColor(cr, cg, cb, .25)
+		thumb.bg:SetBackdropBorderColor(cr, cg, cb)
+	end
+
+	local function Scroll_OnLeave(self)
+		local thumb = self.thumb
+		if not thumb then return end
+		thumb.bg:SetBackdropColor(0, 0, 0, 0)
+		thumb.bg:SetBackdropBorderColor(0, 0, 0)
+	end
+
+	local function GrabScrollBarElement(frame, element)
+		local frameName = frame:GetDebugName()
+		return frame[element] or frameName and (_G[frameName..element] or strfind(frameName, element)) or nil
+	end
+
+	function M:ReskinScroll()
+		M.StripTextures(self:GetParent())
+		M.StripTextures(self)
+
+		local thumb = GrabScrollBarElement(self, "ThumbTexture") or GrabScrollBarElement(self, "thumbTexture") or self.GetThumbTexture and self:GetThumbTexture()
+		if thumb then
+			thumb:SetAlpha(0)
+			thumb:SetWidth(16)
+			self.thumb = thumb
+
+			local bg = M.CreateBDFrame(self, 0, true)
+			bg:SetPoint("TOPLEFT", thumb, 0, -2)
+			bg:SetPoint("BOTTOMRIGHT", thumb, 0, 4)
+			thumb.bg = bg
+		end
+
+		local up, down = self:GetChildren()
+		M.ReskinArrow(up, "up")
+		M.ReskinArrow(down, "down")
+
+		self:HookScript("OnEnter", Scroll_OnEnter)
+		self:HookScript("OnLeave", Scroll_OnLeave)
+	end
 	-- Handle close button
 	function M:Texture_OnEnter()
 		if self:IsEnabled() then

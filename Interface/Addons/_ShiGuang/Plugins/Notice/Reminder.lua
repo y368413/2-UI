@@ -23,7 +23,7 @@ Saythanks:SetScript("OnEvent", function()
 	end
 end)
 
-------------------------------- Order Hall Resources Tooltip
+--[[----------------------------- Order Hall Resources Tooltip
 local categoryInfo = {}
 do
 	local frame = CreateFrame("Frame")
@@ -52,7 +52,7 @@ GarrisonLandingPageMinimapButton:HookScript("OnEnter", function(self)
 	--GameTooltip:AddLine(" ")
 	GameTooltip:AddDoubleLine(currency, ("%s |T%s:0:0:0:2:64:64:4:60:4:60|t"):format(BreakUpLargeNumbers(amount), icon), 1,1,1, 1,1,1)
 	GameTooltip:Show()
-end)
+end)]]
 
 ----RepSwitch by Ne0nguy(## Version: 7.3.5.9 ## X-Website: Ne0nguy.com)
 RepSwitch = {};

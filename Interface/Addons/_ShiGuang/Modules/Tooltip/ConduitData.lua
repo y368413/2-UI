@@ -2,8 +2,8 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local TT = M:GetModule("Tooltip")
 
-local pairs, tonumber, strmatch, select = pairs, tonumber, strmatch, select
-local GetItemInfo = GetItemInfo
+local pairs, select = pairs, select
+local GetItemInfo, GetItemInfoFromHyperlink = GetItemInfo, GetItemInfoFromHyperlink
 local C_Soulbinds_GetConduitCollection = C_Soulbinds.GetConduitCollection
 local C_Soulbinds_IsItemConduitByItemInfo = C_Soulbinds.IsItemConduitByItemInfo
 local COLLECTED_STRING = " |cffff0000("..COLLECTED..")|r"
@@ -24,9 +24,9 @@ function TT:Conduit_CheckStatus()
 	if not link then return end
 	if not C_Soulbinds_IsItemConduitByItemInfo(link) then return end
 
-	local itemID = strmatch(link, "item:(%d*)")
+	local itemID = GetItemInfoFromHyperlink(link)
 	local level = select(4, GetItemInfo(link))
-	local knownLevel = itemID and TT.ConduitData[tonumber(itemID)]
+	local knownLevel = itemID and TT.ConduitData[itemID]
 
 	if knownLevel and level and knownLevel >= level then
 		local textLine = _G[self:GetName().."TextLeft1"]
@@ -38,7 +38,7 @@ function TT:Conduit_CheckStatus()
 end
 
 function TT:ConduitCollectionData()
-	C_Timer.After(3, TT.Conduit_UpdateCollection) -- might be empty on fist load
+	C_Timer.After(10, TT.Conduit_UpdateCollection) -- might be empty on fist load
 	M:RegisterEvent("SOULBIND_CONDUIT_COLLECTION_UPDATED", TT.Conduit_UpdateCollection)
 
 	GameTooltip:HookScript("OnTooltipSetItem", TT.Conduit_CheckStatus)

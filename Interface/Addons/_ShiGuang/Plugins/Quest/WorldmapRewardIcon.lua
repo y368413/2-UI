@@ -1,6 +1,7 @@
 ﻿local RewardIcons_DisableBountyColors = false
 
 local CacheQuestItemReward = {}
+local CacheIsAnimaItem = {}
 local list = {
 	[1579] = 2164,
 	[1598] = 2163,
@@ -16,6 +17,29 @@ local list = {
 	[1739] = 2400,
 	[1740] = 2391,
 	[1742] = 2391,
+
+		[1804] = 2407,
+		[1805] = 2410,
+		[1806] = 2465,
+		[1807] = 2413,
+
+		[1837] = 2445,
+		[1838] = 2449,
+		[1839] = 2453,
+		[1840] = 2460,
+		[1841] = 2455,
+		[1842] = 2446,
+		[1843] = 2461,
+		[1844] = 2457,
+		[1845] = 2450,
+		[1846] = 2459,
+		[1847] = 2458,
+		[1848] = 2452,
+		[1849] = 2448,
+		[1850] = 2454,
+		[1851] = 2456,
+		[1852] = 2451,
+		[1853] = 2447,
 	}
 local SlotToIcon = {
 	["INVTYPE_HEAD"]="transmog-nav-slot-head",
@@ -52,32 +76,54 @@ local GENERAL_MAPS = {	--1: continent A, 2: azeroth, 3: argus, 4: continent B
 	[12] = 4,
 	[13] = 4,
 	[101] = 4,
+	[1550] = 1,
 }
+local function GetCurrencyInfo(id)
+	local data = C_CurrencyInfo.GetCurrencyInfo(id)
+	return data.name, nil, data.iconFileID
+end
 local LE = {
-	LE_QUEST_TAG_TYPE_INVASION = LE_QUEST_TAG_TYPE_INVASION,
-	LE_QUEST_TAG_TYPE_DUNGEON = LE_QUEST_TAG_TYPE_DUNGEON,
-	LE_QUEST_TAG_TYPE_RAID = LE_QUEST_TAG_TYPE_RAID,
-	LE_WORLD_QUEST_QUALITY_RARE = LE_WORLD_QUEST_QUALITY_RARE,
-	LE_WORLD_QUEST_QUALITY_EPIC = LE_WORLD_QUEST_QUALITY_EPIC,
-	LE_QUEST_TAG_TYPE_PVP = LE_QUEST_TAG_TYPE_PVP,
-	LE_QUEST_TAG_TYPE_PET_BATTLE = LE_QUEST_TAG_TYPE_PET_BATTLE,
-	LE_QUEST_TAG_TYPE_PROFESSION = LE_QUEST_TAG_TYPE_PROFESSION,
-	LE_ITEM_QUALITY_COMMON = LE_ITEM_QUALITY_COMMON,
-	LE_QUEST_TAG_TYPE_FACTION_ASSAULT = LE_QUEST_TAG_TYPE_FACTION_ASSAULT,
-	LE_QUEST_TAG_TYPE_THREAT = LE_QUEST_TAG_TYPE_THREAT,
+	LE_QUEST_TAG_TYPE_INVASION = Enum.QuestTagType.Invasion,
+	LE_QUEST_TAG_TYPE_DUNGEON = Enum.QuestTagType.Dungeon,
+	LE_QUEST_TAG_TYPE_RAID = Enum.QuestTagType.Raid,
+	LE_WORLD_QUEST_QUALITY_RARE = Enum.WorldQuestQuality.Rare,
+	LE_WORLD_QUEST_QUALITY_EPIC = Enum.WorldQuestQuality.Epic,
+	LE_QUEST_TAG_TYPE_PVP = Enum.QuestTagType.PvP,
+	LE_QUEST_TAG_TYPE_PET_BATTLE = Enum.QuestTagType.PetBattle,
+	LE_QUEST_TAG_TYPE_PROFESSION = Enum.QuestTagType.Profession,
+	LE_ITEM_QUALITY_COMMON = Enum.WorldQuestQuality.Common,
+	LE_QUEST_TAG_TYPE_FACTION_ASSAULT = Enum.QuestTagType.FactionAssault,
+	LE_QUEST_TAG_TYPE_THREAT = Enum.QuestTagType.Threat,
 	BAG_ITEM_QUALITY_COLORS = BAG_ITEM_QUALITY_COLORS,
 	ITEM_SPELL_TRIGGER_ONUSE = ITEM_SPELL_TRIGGER_ONUSE,
 	ITEM_BIND_ON_EQUIP = ITEM_BIND_ON_EQUIP,
 	ARTIFACT_POWER = ARTIFACT_POWER,
-	--AZERITE = GetCurrencyInfo(1553),
-	--ORDER_RESOURCES_NAME_LEGION = GetCurrencyInfo(1220),
-	--ORDER_RESOURCES_NAME_BFA = GetCurrencyInfo(1560),
+	AZERITE = GetCurrencyInfo(1553),
+	ORDER_RESOURCES_NAME_LEGION = GetCurrencyInfo(1220),
+	ORDER_RESOURCES_NAME_BFA = GetCurrencyInfo(1560),
 }
 
 local GetCurrentMapID = function() return WorldMapFrame:GetMapID() or 0 end 
+local IsQuestComplete, IsQuestCriteriaForBounty = C_QuestLog.IsComplete, C_QuestLog.IsQuestCriteriaForBounty
 local inspectScantip = CreateFrame("GameTooltip", "WorldmapRewardIconWorldQuestListInspectScanningTooltip", nil, "GameTooltipTemplate")
       inspectScantip:SetOwner(UIParent, "ANCHOR_NONE")
-  
+
+local function GetQuestLogTitle(id)
+	local data = C_QuestLog.GetInfo(id)
+	return data.title, data.level, data.suggestedGroup, data.isHeader, data.isCollapsed, data.isComplete, data.frequency, data.questID
+end
+local function GetQuestTagInfo(id)
+	local data = C_QuestLog.GetQuestTagInfo(id)
+	return data.tagID, data.tagName, data.worldQuestType, data.quality, data.isElite, data.tradeskillLineID, data.displayExpiration
+end  
+	function WorldQuestList_IsShadowlandsZone(mapID)
+		mapID = mapID or GetCurrentMapID()
+		if mapID >= 1525 then
+			return true
+		else
+			return false
+		end
+	end
 function WorldQuestList_IsFactionCurrency(currencyID)
 	if list[currencyID or 0] then
 		return true
@@ -171,6 +217,9 @@ end
 		end	
 		return num
 	end
+
+
+	
 function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 		frame = frame or WorldMapFrame
 		local pins = frame.pinPools[pinName or "WorldMap_WorldQuestPinTemplate"]
@@ -181,7 +230,7 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 			local bountyMapID = frame:GetMapID() or 0
 			if bountyMapID == 1014 then bountyMapID = 876 
 			elseif bountyMapID == 1011 then bountyMapID = 875 end
-			local bounties = GetQuestBountyInfoForMapID(bountyMapID) or {}
+			local bounties = C_QuestLog.GetBountiesForMapID(bountyMapID) or {}
 			for _,bountyData in pairs(bounties) do
 				local t = C_TaskQuest.GetQuestTimeLeftMinutes(bountyData.questID) or 0
 				if t < 1440 then
@@ -191,6 +240,31 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 				end
 				if IsQuestComplete(bountyData.questID) then
 					bountyData.completed = true
+				end
+			end
+			local mapsToHighlightCallings = {}
+			do
+				local p = 1
+				local questID = WorldQuestList:GetCallingQuests()
+				while questID do
+					local mapID = C_QuestLog.GetQuestAdditionalHighlights(questID)
+					if mapID and mapID ~= 0 then
+						local callingData = {questID = questID}
+
+						local t = C_TaskQuest.GetQuestTimeLeftMinutes(questID) or 0
+						if t < 1440 then
+							callingData.lowTime = true
+						elseif t < 2880 then
+							callingData.middleTime = true
+						end
+						if IsQuestComplete(questID) then
+							callingData.completed = true
+						end
+
+						mapsToHighlightCallings[mapID] = callingData
+					end
+					p = p + 1
+					questID = select(p,WorldQuestList:GetCallingQuests())
 				end
 			end
 			if isWorldMapFrame then
@@ -249,7 +323,7 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 
 						--obj.WQL_BountyRing_defSize = obj.BountyRing:GetSize()
 					end
-					local tagID, tagName, worldQuestType, rarity, isElite, tradeskillLineIndex, displayTimeLeft = C_QuestLog.GetQuestTagInfo(obj.questID)
+					local tagID, tagName, worldQuestType, rarity, isElite, tradeskillLineIndex, displayTimeLeft = GetQuestTagInfo(obj.questID)
 					
 					local iconAtlas,iconTexture,iconVirtual,iconGray = nil
 					local ajustSize,ajustMask = 0
@@ -299,8 +373,8 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 					if GetNumQuestLogRewards(obj.questID) > 0 then
 						local name,icon,numItems,quality,_,itemID = GetQuestLogRewardInfo(1,obj.questID)
 						if itemID then
-							local itemLevel = select(4,GetItemInfo(itemID))
-							if itemLevel > 130 then
+							local itemLevel = select(4,GetItemInfo(itemID)) or 0
+							if itemLevel > 60 or (itemLevel > 40 and not WorldQuestList_IsShadowlandsZone(bountyMapID)) then
 								iconAtlas = "Banker"
 								amount = 0
 								--iconAtlas = "ChallengeMode-icon-chest"
@@ -376,6 +450,36 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 								iconAtlas = SlotToIcon.INVTYPE_HAND
 								ajustSize = 10
 							end
+							
+							if CacheIsAnimaItem[itemID] then
+								iconTexture = 613397
+								ajustMask = true
+								ajustSize = 10
+								amount = numItems * CacheIsAnimaItem[itemID]
+							elseif select(2,GetItemInfoInstant(itemID)) == MISCELLANEOUS then
+								inspectScantip:SetQuestLogItem("reward", 1, obj.questID)
+								local isAnima
+								for j=2, inspectScantip:NumLines() do
+									local tooltipLine = _G[GlobalAddonName.."WorldQuestListInspectScanningTooltipTextLeft"..j]
+									local text = tooltipLine:GetText()
+									if text and text:find(ANIMA.."|r$") then
+										isAnima = 100
+									elseif text and isAnima and text:find("^"..LE.ITEM_SPELL_TRIGGER_ONUSE) then
+										local num = text:gsub("(%d+)[ %.,]+(%d+)","%1%2"):match("%d+")
+										isAnima = tonumber(num or "") or 100
+										break
+									end 
+								end
+								if isAnima then
+									CacheIsAnimaItem[itemID] = isAnima
+									iconTexture = 613397
+									ajustMask = true
+									ajustSize = 10
+									amount = numItems * isAnima
+								end
+								inspectScantip:ClearLines()
+							end
+
 							if worldQuestType == LE.LE_QUEST_TAG_TYPE_PET_BATTLE then
 								iconVirtual = true
 								amountIcon = icon
@@ -524,7 +628,7 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 					if not RewardIcons_DisableBountyColors then
 						obj.BountyRing:Hide()
 						for _,bountyData in pairs(bounties) do
-							if C_QuestLog.IsQuestCriteriaForBounty(obj.questID, bountyData.questID) and not bountyData.completed then
+							if IsQuestCriteriaForBounty(obj.questID, bountyData.questID) and not bountyData.completed then
 								obj.BountyRing:SetSize(MaoRUIPerDB["Misc"]["WorldQusetRewardIconsSize"]+8,MaoRUIPerDB["Misc"]["WorldQusetRewardIconsSize"]+8)
 								obj.BountyRing:Show()
 								if bountyData.lowTime and obj.BountyRing.WQL_color > 1 then
@@ -584,14 +688,14 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 WorldMapFrame:RegisterCallback("WorldQuestsUpdate", function()
   if not MaoRUIPerDB["Misc"]["WorldQusetRewardIcons"] then return end
 	WorldQuestList_WQIcons_AddIcons()
-end)
+end, WorldMapFrame)
 
 local WQIcons_FlightMapLoad = CreateFrame("Frame")
 WQIcons_FlightMapLoad:RegisterEvent("ADDON_LOADED")
 WQIcons_FlightMapLoad:SetScript("OnEvent",function (self, event, arg)
 	if arg == "Blizzard_FlightMap" and MaoRUIPerDB["Misc"]["WorldQusetRewardIcons"] then
 		self:UnregisterAllEvents()
-		FlightMapFrame:RegisterCallback("WorldQuestsUpdate", function() WorldQuestList_WQIcons_AddIcons(FlightMapFrame,"FlightMap_WorldQuestPinTemplate") end)
+		FlightMapFrame:RegisterCallback("WorldQuestsUpdate", function() WorldQuestList_WQIcons_AddIcons(FlightMapFrame,"FlightMap_WorldQuestPinTemplate") end, self)
 	end
 end)
 
@@ -642,7 +746,7 @@ end
 WorldMapFrame:RegisterCallback("WorldQuestsUpdate", function()
   if not MaoRUIPerDB["Misc"]["WorldQusetRewardIcons"] then return end
 	WorldQuestList_WQIcons_UpdateScale()
-end)
+end, WorldMapFrame)
 
 -------------------------------------------------------------------------------------------------------------------	WorldMapQuestBountyCount
 WorldMapQuestBountyCount = {}
@@ -656,7 +760,7 @@ function WorldMapQuestBountyCount:OnLoad()
 	hooksecurefunc(bountyBoard, "OnTabClick", function(self, tab) 
 		if (not MaoRUIPerDB["Misc"]["WorldQusetRewardIcons"] or tab.isEmpty) then return; end
 		WRWorldQuestFrame.autoEmisarryId = bountyBoard.bounties[tab.bountyIndex];
-	end)
+	end, self)
 	
 	hooksecurefunc(bountyBoard, "RefreshSelectedBounty", function() 
 		if (MaoRUIPerDB["Misc"]["WorldQusetRewardIcons"]) then
@@ -675,6 +779,9 @@ end
 function WorldMapQuestBountyCount:UpdateBountyCounters()
 	self.bountyCounterPool:ReleaseAll();
 	if (not MaoRUIPerDB["Misc"]["WorldQusetRewardIcons"]) then return end
+	if (not self.bountyInfo) then
+		self.bountyInfo = {};
+	end
 	for tab, v in pairs(self.bountyBoard.bountyTabPool.activeObjects) do
 		self:AddBountyCountersToTab(tab);
 	end
@@ -688,37 +795,40 @@ end
 
 function WorldMapQuestBountyCount:AddBountyCountersToTab(tab)
 	local bountyData = self.bountyBoard.bounties[tab.bountyIndex];
-	if bountyData then
-		local questIndex = GetQuestLogIndexByID(bountyData.questID);
-		if questIndex > 0 then
-			local desc = GetQuestLogLeaderBoard(1, questIndex);		
-			local progress, goal = desc:match("([%d]+)%s*/%s*([%d]+)");
-			progress = tonumber(progress);
-			goal = tonumber(goal);			
-			if (progress == goal) then return end;
-			local offsetAngle, startAngle = 32, 270;			
-			-- position of first counter
-			startAngle = startAngle - offsetAngle * (goal -1) /2			
-			for i=1, goal do
-				local counter = self.bountyCounterPool:Acquire();
-				local x = cos(startAngle) * 16;
-				local y = sin(startAngle) * 16;
-				counter:SetPoint("CENTER", tab.Icon, "CENTER", x, y);
-				counter:SetParent(tab);
-				counter:Show();			
-				-- Light nr of completed
-				if i <= progress then
-					counter.icon:SetTexCoord(0, 0.5, 0, 0.5);
-					counter.icon:SetVertexColor(1, 0.12, 0.12, 1);
-					counter.icon:SetDesaturated(false);
-				else
-					counter.icon:SetTexCoord(0, 0.5, 0, 0.5);
-					counter.icon:SetVertexColor(0.65, 0.65, 0.65, 1);
-					counter.icon:SetDesaturated(true);
-				end
-				-- Offset next counter
-				startAngle = startAngle + offsetAngle;
+	
+	if (bountyData) then
+		local progress, goal = self.bountyBoard:CalculateBountySubObjectives(bountyData);
+		if (progress == goal) then return end;
+		
+		-- Counters
+		local offsetAngle = 32;
+		local startAngle = 270;
+		
+		-- position of first counter
+		startAngle = startAngle - offsetAngle * (goal -1) /2
+		
+		for i=1, goal do
+			local counter = self.bountyCounterPool:Acquire();
+
+			local x = cos(startAngle) * 16;
+			local y = sin(startAngle) * 16;
+			counter:SetPoint("CENTER", tab.Icon, "CENTER", x, y);
+			counter:SetParent(tab);
+			counter:Show();
+			
+			-- Light nr of completed
+			if i <= progress then
+				counter.icon:SetTexCoord(0, 0.5, 0, 0.5);
+				counter.icon:SetVertexColor(1, 1, 1, 1);
+				counter.icon:SetDesaturated(false);
+			else
+				counter.icon:SetTexCoord(0, 0.5, 0, 0.5);
+				counter.icon:SetVertexColor(0.75, 0.75, 0.75, 1);
+				counter.icon:SetDesaturated(true);
 			end
+
+			-- Offset next counter
+			startAngle = startAngle + offsetAngle;
 		end
 	end
 end

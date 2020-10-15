@@ -1,55 +1,4 @@
 ﻿--## Author: Caerdon ## SavedVariables: CaerdonWardrobeConfig  ## Version: v2.8.2
-local GetDefaultConfig = {
-		Icon = {
-			EnableAnimation = true,
-			Position = "TOPRIGHT",
-
-			ShowLearnable = {
-				BankAndBags = true,
-				GuildBank = true,
-				Merchant = true,
-				Auction = true,
-				SameLookDifferentItem = false,
-			},
-
-			ShowLearnableByOther = {
-				BankAndBags = true,
-				GuildBank = true,
-				Merchant = true,
-				Auction = true,
-				EncounterJournal = true,
-				SameLookDifferentItem = false,
-			},
-
-			ShowSellable = {
-				BankAndBags = true,
-				GuildBank = true
-			},
-
-			ShowOldExpansion = {
-				Unknown = false,
-				Reagents = true,
-				Usable = false,
-				Other = false,
-				Auction = true
-			},
-
-			ShowQuestItems = true
-		},
-		Binding = {
-			ShowStatus = {
-				BankAndBags = true,
-				GuildBank = true,
-				Merchant = true,
-			},
-
-			ShowBoA = true,
-			ShowBoE = true,
-			ShowGearSets = true,
-			ShowGearSetsAsIcon = false,
-			Position = "BOTTOM",
-		}
-	}
 	
 if GetLocale() == "zhCN" then
   CaerdonWardrobeBoA = "|cffe6cc80战网|r";
@@ -88,10 +37,10 @@ end
 
 function CaerdonWardrobeFeatureMixin:GetDisplayInfoInternal(button, item, feature, locationInfo, options, mogStatus, bindingStatus)
 	-- TODO: Temporary for merging - revisit after pushing everything into Mixins
-	local showBindingStatus = not item:HasItemLocationBankOrBags() or GetDefaultConfig.Binding.ShowStatus.BankAndBags
-	local showOwnIcon = not item:HasItemLocationBankOrBags() or GetDefaultConfig.Icon.ShowLearnable.BankAndBags
-	local showOtherIcon = not item:HasItemLocationBankOrBags() or GetDefaultConfig.Icon.ShowLearnableByOther.BankAndBags
-	local showSellableIcon = not item:HasItemLocationBankOrBags() or GetDefaultConfig.Icon.ShowSellable.BankAndBags
+	local showBindingStatus = not item:HasItemLocationBankOrBags() or CaerdonWardrobeConfig.Binding.ShowStatus.BankAndBags
+	local showOwnIcon = not item:HasItemLocationBankOrBags() or CaerdonWardrobeConfig.Icon.ShowLearnable.BankAndBags
+	local showOtherIcon = not item:HasItemLocationBankOrBags() or CaerdonWardrobeConfig.Icon.ShowLearnableByOther.BankAndBags
+	local showSellableIcon = not item:HasItemLocationBankOrBags() or CaerdonWardrobeConfig.Icon.ShowSellable.BankAndBags
 
 	local displayInfo = {
 		bindingStatus = {
@@ -104,7 +53,7 @@ function CaerdonWardrobeFeatureMixin:GetDisplayInfoInternal(button, item, featur
 			shouldShow = showOtherIcon
 		},
 		questIcon = {
-			shouldShow = GetDefaultConfig.Icon.ShowQuestItems
+			shouldShow = CaerdonWardrobeConfig.Icon.ShowQuestItems
 		},
 		oldExpansionIcon = {
 			shouldShow = true
@@ -117,11 +66,11 @@ function CaerdonWardrobeFeatureMixin:GetDisplayInfoInternal(button, item, featur
 	CaerdonAPI:MergeTable(displayInfo, self:GetDisplayInfo(button, item, feature, locationInfo, options, mogStatus, bindingStatus))
 
 	-- TODO: BoA and BoE settings should be per feature
-	if not GetDefaultConfig.Binding.ShowBoA and bindingStatus == CaerdonWardrobeBoA then
+	if not CaerdonWardrobeConfig.Binding.ShowBoA and bindingStatus == CaerdonWardrobeBoA then
 		displayInfo.bindingStatus.shouldShow = false
 	end
 
-	if not GetDefaultConfig.Binding.ShowBoE and bindingStatus == CaerdonWardrobeBoE then
+	if not CaerdonWardrobeConfig.Binding.ShowBoE and bindingStatus == CaerdonWardrobeBoE then
 		displayInfo.bindingStatus.shouldShow = false
 	end
 
@@ -201,10 +150,10 @@ function CaerdonWardrobeMixin:GetBindingStatus(item, feature, locationInfo, butt
 	if bindType == 1 then -- BoP
 		isBindOnPickup = true
 	elseif bindType == 2 then -- BoE
-		bindingStatus = "BoE"
+		bindingStatus = CaerdonWardrobeBoE
 	elseif bindType == 3 then -- BoU
 		isBindOnUse = true
-		bindingStatus = "BoE"
+		bindingStatus = CaerdonWardrobeBoE
 	elseif bindType == 4 then -- Quest
 		bindingStatus = ""
 	end
@@ -259,7 +208,7 @@ function CaerdonWardrobeMixin:GetBindingStatus(item, feature, locationInfo, butt
 	if not bindingStatus and (isCollectionItem or isLocked or isOpenable) then
 		-- TODO: This can be useful on everything but needs to be configurable per type before doing so
 		if not isBindOnPickup then
-			bindingStatus = "BoE"
+			bindingStatus = CaerdonWardrobeBoE
 		end
 	end
 
@@ -309,7 +258,7 @@ function CaerdonWardrobeMixin:SetStatusIconPosition(icon, button, item, feature,
 	local yAdjust = iconHeight / ICON_PROMINENT_SIZE
 
 	local statusScale = options.statusScale or 1
-	local statusPosition = options.overrideStatusPosition or GetDefaultConfig.Icon.Position
+	local statusPosition = options.overrideStatusPosition or CaerdonWardrobeConfig.Icon.Position
 	local xOffset =  4 * xAdjust
 	if statusPosition == "TOP" or statusPosition == "BOTTOM" then
 		xOffset = 0
@@ -622,7 +571,7 @@ function CaerdonWardrobeMixin:SetItemButtonStatus(originalButton, item, feature,
 			alpha = 0.9
 			mogStatus:SetTexCoord(16/64, 48/64, 16/64, 48/64)
 			mogStatus:SetTexture("Interface\\Store\\category-icon-bag")
-		elseif IsGearSetStatus(bindingStatus, item) and GetDefaultConfig.Binding.ShowGearSetsAsIcon then
+		elseif IsGearSetStatus(bindingStatus, item) and CaerdonWardrobeConfig.Binding.ShowGearSetsAsIcon then
 			mogStatus:SetTexCoord(16/64, 48/64, 16/64, 48/64)
 			mogStatus:SetTexture("Interface\\Store\\category-icon-clothes")
 		end
@@ -630,7 +579,7 @@ function CaerdonWardrobeMixin:SetItemButtonStatus(originalButton, item, feature,
 		alpha = 0.5
 		mogStatus:SetTexCoord(16/64, 48/64, 16/64, 48/64)
 		mogStatus:SetTexture("Interface\\Common\\StreamCircle")
-	elseif IsGearSetStatus(bindingStatus, item) and GetDefaultConfig.Binding.ShowGearSetsAsIcon then
+	elseif IsGearSetStatus(bindingStatus, item) and CaerdonWardrobeConfig.Binding.ShowGearSetsAsIcon then
 		mogStatus:SetTexCoord(16/64, 48/64, 16/64, 48/64)
 		mogStatus:SetTexture("Interface\\Store\\category-icon-clothes")
 	end
@@ -658,7 +607,7 @@ function CaerdonWardrobeMixin:SetItemButtonStatus(originalButton, item, feature,
 		end
 	end)
 
-	if showAnim and GetDefaultConfig.Icon.EnableAnimation then
+	if showAnim and CaerdonWardrobeConfig.Icon.EnableAnimation then
 		if mogAnim and not mogAnim:IsPlaying() then
 			mogAnim:Play()
 		end
@@ -692,7 +641,7 @@ function CaerdonWardrobeMixin:SetItemButtonBindType(button, item, feature, locat
 
 	local bindingText = ""
 	if IsGearSetStatus(bindingStatus) then -- is gear set
-		if GetDefaultConfig.Binding.ShowGearSets and not GetDefaultConfig.Binding.ShowGearSetsAsIcon then
+		if CaerdonWardrobeConfig.Binding.ShowGearSets and not CaerdonWardrobeConfig.Binding.ShowGearSetsAsIcon then
 			bindingText = "|cFFFFFFFF" .. bindingStatus .. "|r"
 		end
 	else
@@ -745,7 +694,7 @@ function CaerdonWardrobeMixin:SetItemButtonBindType(button, item, feature, locat
 	bindsOnText:SetSize(newWidth, newHeight)
 
 	local bindingScale = options.bindingScale or 1
-	local bindingPosition = options.overrideBindingPosition or GetDefaultConfig.Binding.Position
+	local bindingPosition = options.overrideBindingPosition or CaerdonWardrobeConfig.Binding.Position
 	local xOffset = 1
 	if options.bindingOffsetX ~= nil then
 		xOffset = options.bindingOffsetX
@@ -827,12 +776,12 @@ function CaerdonWardrobeMixin:ProcessItem(button, item, feature, locationInfo, o
 		if expansionID and expansionID >= 0 and expansionID < GetExpansionLevel() then 
 			local shouldShowExpansion = false
 
-			if expansionID > 0 or GetDefaultConfig.Icon.ShowOldExpansion.Unknown then
-				if isCraftingReagent and GetDefaultConfig.Icon.ShowOldExpansion.Reagents then
+			if expansionID > 0 or CaerdonWardrobeConfig.Icon.ShowOldExpansion.Unknown then
+				if isCraftingReagent and CaerdonWardrobeConfig.Icon.ShowOldExpansion.Reagents then
 					shouldShowExpansion = true
-				elseif item:GetHasUse() and GetDefaultConfig.Icon.ShowOldExpansion.Usable then
+				elseif item:GetHasUse() and CaerdonWardrobeConfig.Icon.ShowOldExpansion.Usable then
 					shouldShowExpansion = true
-				elseif not isCraftingReagent and not item:GetHasUse() and GetDefaultConfig.Icon.ShowOldExpansion.Other then
+				elseif not isCraftingReagent and not item:GetHasUse() and CaerdonWardrobeConfig.Icon.ShowOldExpansion.Other then
 					shouldShowExpansion = true
 				end
 			end
@@ -844,7 +793,7 @@ function CaerdonWardrobeMixin:ProcessItem(button, item, feature, locationInfo, o
 	end
 
 	local isQuestItem = itemClassID == LE_ITEM_CLASS_QUESTITEM
-	if isQuestItem and GetDefaultConfig.Icon.ShowQuestItems then
+	if isQuestItem and CaerdonWardrobeConfig.Icon.ShowQuestItems then
 		mogStatus = "quest"
 	end
 
@@ -860,7 +809,7 @@ function CaerdonWardrobeMixin:ProcessItem(button, item, feature, locationInfo, o
 							mogStatus = "lowSkill"
 						end
 					else
-						if GetDefaultConfig.Icon.ShowLearnable.SameLookDifferentItem then
+						if CaerdonWardrobeConfig.Icon.ShowLearnable.SameLookDifferentItem then
 							if transmogInfo.hasMetRequirements then
 								mogStatus = "ownPlus"
 							else
@@ -873,7 +822,7 @@ function CaerdonWardrobeMixin:ProcessItem(button, item, feature, locationInfo, o
 						if not transmogInfo.isCompletionistItem then
 							mogStatus = "other"
 						else
-							if GetDefaultConfig.Icon.ShowLearnable.SameLookDifferentItem then
+							if CaerdonWardrobeConfig.Icon.ShowLearnable.SameLookDifferentItem then
 								mogStatus = "otherPlus"
 							end
 						end
@@ -896,7 +845,7 @@ function CaerdonWardrobeMixin:ProcessItem(button, item, feature, locationInfo, o
 							if not transmogInfo.isCompletionistItem then
 								mogStatus = "own"
 							else
-								if GetDefaultConfig.Icon.ShowLearnable.SameLookDifferentItem then
+								if CaerdonWardrobeConfig.Icon.ShowLearnable.SameLookDifferentItem then
 									mogStatus = "ownPlus"
 								end
 							end
@@ -904,7 +853,7 @@ function CaerdonWardrobeMixin:ProcessItem(button, item, feature, locationInfo, o
 							if not transmogInfo.isCompletionistItem then
 								mogStatus = "otherSpecPlus"
 							else
-								if GetDefaultConfig.Icon.ShowLearnable.SameLookDifferentItem then
+								if CaerdonWardrobeConfig.Icon.ShowLearnable.SameLookDifferentItem then
 									mogStatus = "otherSpec"
 								end
 							end
@@ -1003,7 +952,7 @@ function CaerdonWardrobeMixin:ProcessItem(button, item, feature, locationInfo, o
 			   itemID == 18333 or
 			   itemID == 18334 or
 			   itemID == 21288 then
-				if GetDefaultConfig.Icon.ShowOldExpansion.Usable then
+				if CaerdonWardrobeConfig.Icon.ShowOldExpansion.Usable then
 					mogStatus = "oldexpansion"
 				else
 					mogStatus = nil
@@ -1334,14 +1283,81 @@ function CaerdonWardrobeMixin:OnUpdate(elapsed)
 	end
 end
 
+function GetDefaultConfig()
+	return {
+		Version = 11,
+		
+		Debug = {
+			Enabled = false
+		},
+
+		Icon = {
+			EnableAnimation = true,
+			Position = "TOPRIGHT",
+
+			ShowLearnable = {
+				BankAndBags = true,
+				GuildBank = true,
+				Merchant = true,
+				Auction = true,
+				SameLookDifferentItem = false
+			},
+
+			ShowLearnableByOther = {
+				BankAndBags = true,
+				GuildBank = true,
+				Merchant = true,
+				Auction = true,
+				EncounterJournal = true,
+				SameLookDifferentItem = false
+			},
+
+			ShowSellable = {
+				BankAndBags = true,
+				GuildBank = false
+			},
+
+			ShowOldExpansion = {
+				Unknown = false,
+				Reagents = true,
+				Usable = false,
+				Other = false,
+				Auction = true
+			},
+
+			ShowQuestItems = true
+		},
+
+		Binding = {
+			ShowStatus = {
+				BankAndBags = true,
+				GuildBank = true,
+				Merchant = true
+			},
+
+			ShowBoA = true,
+			ShowBoE = true,
+			ShowGearSets = true,
+			ShowGearSetsAsIcon = false,
+			Position = "BOTTOM"
+		}
+	}
+end
+
+local function ProcessSettings()
+	if not CaerdonWardrobeConfig or CaerdonWardrobeConfig.Version ~= GetDefaultConfig().Version then
+		CaerdonWardrobeConfig = GetDefaultConfig()
+	end
+end
+
 function CaerdonWardrobeMixin:PLAYER_LOGOUT()
 end
 
 function CaerdonWardrobeMixin:ADDON_LOADED(name)
-	--if name == "Combuctor" then
-		local CaerdonWardrobe, instance
-		for CaerdonWardrobe, instance in pairs(availableFeatures) do
-			registeredFeatures[CaerdonWardrobe] = instance
+	if name == "Combuctor" then
+		local name, instance
+		for name, instance in pairs(availableFeatures) do
+			registeredFeatures[name] = instance
 			local instanceEvents = instance:Init(self)
 			if instanceEvents then
 				for i = 1, #instanceEvents do
@@ -1351,14 +1367,14 @@ function CaerdonWardrobeMixin:ADDON_LOADED(name)
 			end
 		end
 	
-		--ProcessSettings()
-		--CaerdonWardrobeNS:FireConfigLoaded()
+		ProcessSettings()
+		--FireConfigLoaded()
 	-- elseif name == "TradeSkillMaster" then
 	-- 	print("HOOKING TSM")
 	-- 	hooksecurefunc (TSM.UI.AuctionScrollingTable, "_SetRowData", function (self, row, data)
 	-- 		print("Row: " .. row:GetField("auctionId"))
 	-- 	end)
-	--end
+	end
 end
 
 function CaerdonWardrobeMixin:RefreshItems()

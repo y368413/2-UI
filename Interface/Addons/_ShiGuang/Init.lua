@@ -114,11 +114,6 @@ local function IncorrectExpansion()
 end
 
 M:RegisterEvent("PLAYER_LOGIN", function()
-	if not I.isNewPatch then
-		IncorrectExpansion()
-		return
-	end
-
 	-- Initial
 	M:SetupUIScale()
 	M:RegisterEvent("UI_SCALE_CHANGED", UpdatePixelScale)

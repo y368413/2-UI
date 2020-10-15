@@ -1,4 +1,4 @@
-﻿--## Author: wT  ## Version: 1.5.8
+﻿--## Author: wT  ## Version: 1.5.9
 local _, BossesKilled = ...
 if not BossesKilled.RegisterEvent and not BossesKilled.UnregisterEvent and not BossesKilled.UnregisterAllEvents then
 	local f = CreateFrame("frame")

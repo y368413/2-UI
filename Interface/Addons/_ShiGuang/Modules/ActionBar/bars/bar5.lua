@@ -55,7 +55,7 @@ function Bar:CreateBar5()
 	--create the frame to hold the buttons
 	local frame = CreateFrame("Frame", "NDui_ActionBar5", UIParent, "SecureHandlerStateTemplate")
 	if layout == 1 or layout == 4 or layout == 5 then
-		frame.Pos = {"RIGHT", UIParent, "RIGHT", -(frame:GetWidth()-1), -88}
+		frame.Pos = {"RIGHT", UIParent, "RIGHT", -(cfg.size + 3*margin), -88}
 	elseif layout == 3 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 80}
 	elseif layout == 6 then

@@ -6,9 +6,9 @@
 ## Notes: Single window displays for your inventory and bank
 ## Notes-zhCN: 可以按照类型过滤的背包&银行整合插件，标签风格。可按任务物品，装备，消耗品、物品品质等分类查看，让你查询物品更直观方便。
 ## Notes-zhTW: 可以按照类型过滤的背包&银行整合插件，标签风格。可按任务物品，装备，消耗品、物品品质等分类查看，让你查询物品更直观方便。
-## SavedVariables: Combuctor_Sets, BrotherBags, CaerdonWardrobeConfig
+## SavedVariables: Combuctor_Sets, BrotherBags
 ## Dependencies: _ShiGuang
-## Version: 8.3.6
+## Version: 9.0.0
 
 ## X-Repple: 2 UI
 

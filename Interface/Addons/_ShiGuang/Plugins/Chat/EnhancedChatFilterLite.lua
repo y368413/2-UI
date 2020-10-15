@@ -89,8 +89,9 @@ end
 --------------- Filters ---------------
 -- Blocked players: have been filtered many times
 -- Record how many times players are filterd
-local blockedPlayers, blockedMsg = {}, {}
+local blockedPlayers, blockedMsgs = {}, {}
 setmetatable(blockedPlayers, {__index=function() return 0 end})
+setmetatable(blockedMsgs, {__index=function() return 0 end})
 
 -- Languages that player understand
 local availableLanguages = {
@@ -113,10 +114,7 @@ local eventStatus = {
 
 local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- don't filter player/GM/DEV
-	if player == playerName or flags == "GM" or flags == "DEV" then return end
-
-	-- filter blocked players and blocked msg
-	if not good and (blockedPlayers[player] >= 3 or blockedMsg[msg]) then return true end
+	if player == playerName or player == "" or flags == "GM" or flags == "DEV" then return end
 
 	-- remove color/hypelink
 	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
@@ -129,18 +127,21 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if msgLine == "" then msgLine = msg end
 	local annoying = (oriLen - #msgLine) / oriLen
 
+	-- filter blocked players and blocked msg
+	if not good and (blockedPlayers[player] >= 3 or blockedMsgs[msgLine] >= 3) then return msgLine end
+
 	-- filter status for each channel
 	local filtersStatus = eventStatus[Event]
 
 	-- AggressiveFilter: Filter strings that has too much symbols
 	-- AggressiveFilter: Filter journal link and club link
 	if filtersStatus[1] and not IsMyFriend then
-		if annoying >= 0.25 and oriLen >= 30 then return true end
-		if msg:find("|Hjournal") or msg:find("|HclubTicket") then return true end
+		if annoying >= 0.25 and oriLen >= 30 then return msgLine end
+		if msg:find("|Hjournal") or msg:find("|HclubTicket") then return msgLine end
 	end
 
 	-- DND and auto-reply
-	if filtersStatus[2] and (flags == "DND" or Event == 5) and not IsMyFriend then return true end
+	if filtersStatus[2] and (flags == "DND" or Event == 5) and not IsMyFriend then return msgLine end
 
 	-- blackWord Filter
 	if filtersStatus[3] and not IsMyFriend then
@@ -154,23 +155,23 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 						v.count = (v.count or 0) + 1
 						defaults.totalBlackWordsFiltered = defaults.totalBlackWordsFiltered + 1
 					end
-					return true
+					return msgLine
 				end
 			end
 		end
-		if count >= defaults.lesserBlackWordThreshold then return true end
+		if count >= defaults.lesserBlackWordThreshold then return msgLine end
 	end
 
 	-- raidAlert
 	if filtersStatus[4] then
 		for _,tag in ipairs(RaidAlertTagList) do
-			if msg:find(tag) then return true end
+			if msg:find(tag) then return msgLine end
 		end
 	end
 	-- questReport and partyAnnounce
 	if filtersStatus[5] then
 		for _,tag in ipairs(QuestReportTagList) do
-			if msg:find(tag) then return true end
+			if msg:find(tag) then return msgLine end
 		end
 	end
 
@@ -188,7 +189,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 			-- if multiple msgs in 0.6s, filter it (channel & emote only)
 			if line[1] == msgtable[1] and ((Event == 3 and msgtable[3] - line[3] < 0.6) or strDiff(line[2],msgtable[2]) <= 0.1) then
 				tremove(chatLines, i)
-				return true
+				return msgLine
 			end
 		end
 		if chatLinesSize >= 30 then tremove(chatLines, 1) end
@@ -213,11 +214,12 @@ local function PreECFfilter(self,event,msg,player,language,_,_,flags,_,_,_,_,lin
 			IsMyFriend = C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid)
 			good = IsMyFriend or IsGuildMember(guid) or IsGUIDInGroup(guid)
 		end
-		filterResult = ECFfilter(chatEvents[event],msg,player,flags,IsMyFriend,good)
+		local result = ECFfilter(chatEvents[event],msg,player,flags,IsMyFriend,good)
+		filterResult = result
 
-		if filterResult and not good then
+		if result and not good then
 			blockedPlayers[player] = blockedPlayers[player] + 1
-			if blockedPlayers[player] >= 3 then blockedMsg[msg] = true end
+			blockedMsgs[result] = blockedMsgs[result] + 1
 		end
 	end
 	return filterResult

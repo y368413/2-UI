@@ -180,9 +180,9 @@ function MISC:MailBox()
 
 	-------DelMailbutton----------------
 	local DelMailbutton = CreateFrame("Button", nil, InboxFrame, "UIPanelButtonTemplate")
-	DelMailbutton:SetWidth(100)
+	DelMailbutton:SetWidth(80)
 	DelMailbutton:SetHeight(26)
-	DelMailbutton:SetPoint("LEFT", InboxFrame, "RIGHT", 2, 0)
+	DelMailbutton:SetPoint("TOPRIGHT", InboxFrame, "TOPRIGHT", -66, 0)
 	DelMailbutton:SetText(MAIL_DELETEEMPTYMAILS)
 	DelMailbutton:SetScript("OnClick", function() SenduiCmd("/mbclean") end)
 

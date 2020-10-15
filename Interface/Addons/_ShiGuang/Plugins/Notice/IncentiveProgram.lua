@@ -1018,7 +1018,7 @@ local IncentiveProgramToast = {
     end,
     
     CreateFrame = function(self)
-        local toastFrame = CreateFrame("Frame", "IncentiveProgramToastFrame", UIParent)
+        local toastFrame = CreateFrame("Frame", "IncentiveProgramToastFrame", UIParent, "BackdropTemplate")
         toastFrame:Hide()
         
         toastFrame:SetFrameStrata("HIGH")

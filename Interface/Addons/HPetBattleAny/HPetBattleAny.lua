@@ -102,7 +102,7 @@ HPetBattleAny.Default={
 
 	FastForfeit=true,
 	Tooltip=true,				--额外鼠标提示
-	HighGlow=true,				--战斗中用品质颜色对宠物头像着色
+	HighGlow=false,				--战斗中用品质颜色对宠物头像着色
 
 	AutoSaveAbility=true,			--自动保存技能
 	ShowBandageButton=false,
@@ -112,8 +112,8 @@ HPetBattleAny.Default={
 	BreedIDStyle=true,
 
 	PetGreedInfo=true,			--显示品值
-	PetBreedInfo=false,			--breeID
-	ShowBreedID=false,			--显示breedID
+	PetBreedInfo=true,			--breeID
+	ShowBreedID=true,			--显示breedID
 
 	EnemyAbility=true,			--显示敌对技能
 	LockAbilitys=false,
@@ -122,7 +122,7 @@ HPetBattleAny.Default={
 	OtherAbility=false,
 	AllyAbility=false,
 
-	AbScale=0.8,				--敌对技能大小
+	AbScale=0.85,				--敌对技能大小
 	AbPoint={},					--位置(nil)
 	god=false,
 }

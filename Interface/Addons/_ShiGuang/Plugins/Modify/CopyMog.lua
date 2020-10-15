@@ -29,7 +29,7 @@ local SlotIDtoName = {
 local function createGearFrame()
 	if gearFrame then gearFrame:Show() return end
 
-	gearFrame = CreateFrame("Frame", "InspectGearTexts", UIParent)
+	gearFrame = CreateFrame("Frame", "InspectGearTexts", UIParent, "BackdropTemplate")
 	gearFrame:SetPoint("TOP", InspectPaperDollFrame, "BOTTOM", 0, 0)
 	gearFrame:SetSize(330, 250)
 	gearFrame:SetFrameStrata("DIALOG")

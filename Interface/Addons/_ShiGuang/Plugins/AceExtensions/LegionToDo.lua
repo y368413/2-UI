@@ -1,6 +1,6 @@
---## Author: ykiigor  ## SavedVariables: VLegionToDo
-local LegionToDoVersion = "4.2"
-local VERSION_NUMERIC = 42
+Ôªø--## Author: ykiigor  ## SavedVariables: VLegionToDo
+local LegionToDoVersion = "4.3"
+local VERSION_NUMERIC = 43
 
 local GetCurrentRegion
 do
@@ -1046,10 +1046,15 @@ CallingsUpdater:SetScript("OnEvent", function(self, event, ...)
 		end
 	end
 end)
-CallingsUpdater:RegisterEvent("COVENANT_CALLINGS_UPDATED")
+if isLevel60 then
+	CallingsUpdater:RegisterEvent("COVENANT_CALLINGS_UPDATED")
+end
 
 local CallingsPrev = 0
 tinsert(ToDoFunc,function(self,collect)
+	if not isLevel60 then
+		return
+	end
 	local now = GetTime()
 	if not CallingsPrev or now - CallingsPrev > 1 then
 		CallingsPrev = now
@@ -1135,9 +1140,9 @@ tinsert(ToDoFunc,function(self,collect)
 				if inspectScantip:NumLines() > 0 then
 					local name = _G["LegToDoScanningTooltipTextLeft1"]:GetText()
 					name = name:gsub("^[^:]+: ","")
-					if name:find("ß¨ß—ß‚ß—ßÿß—ßﬂ") then
-						name = name:gsub("^[^:]+: ","ß¨ß—ß‚ß—: ")
-					elseif name:find("ßÆß÷ßÁß—ß‘ß‡ßﬂ") then
+					if name:find("–ö–∞—Ä–∞–∂–∞–Ω") then
+						name = name:gsub("^[^:]+: ","–ö–∞—Ä–∞: ")
+					elseif name:find("–ú–µ—Ö–∞–≥–æ–Ω") then
 						name = name:gsub("^[^ ]+ ","")
 					end
 
@@ -1343,7 +1348,7 @@ tinsert(ToDoFunc,function(self,collect)
 		if itemID == "169223" then
 			local ilvl = select(4,GetItemInfo(itemLink))
 			if ilvl then
-				collect.cloak_lvl = min(15, max((ilvl - 470) / 2 + 1, 1))
+				collect.cloak_lvl = min(15, max((ilvl - 125) / 2 + 1, 1))
 			end
 		end
 	end
@@ -2993,7 +2998,7 @@ local menuTable = {
 		wipe(VLegionToDo.black)
 		LegionToDo:Hide()	
 		LegionToDo:Show()
-	end, notCheckable = true, tooltipOnButton = 1, tooltipTitle = GetLocale() == "ruRU" and "ß£ßﬂß‡ß”ßÓ ß·ß‡ß‹ß—ßŸß—ß‰ßÓ ß”ß„ß÷ßÁ ß„ß‹ß‚ßÌß‰ßÌßÁ ß·ß‚ß÷ßÿß’ß÷ ß·ß÷ß‚ß„ß‡ßﬂß—ßÿß÷ß€" or "Show all hidden chars" },
+	end, notCheckable = true, tooltipOnButton = 1, tooltipTitle = GetLocale() == "ruRU" and "–í–Ω–æ–≤—å –ø–æ–∫–∞–∑–∞—Ç—å –≤—Å–µ—Ö —Å–∫—Ä—ã—Ç—ã—Ö –ø—Ä–µ–∂–¥–µ –ø–µ—Ä—Å–æ–Ω–∞–∂–µ–π" or "Show all hidden chars" },
 	{ text = CLOSE, func = function() CloseDropDownMenus() end, notCheckable = true },
 }]]
 

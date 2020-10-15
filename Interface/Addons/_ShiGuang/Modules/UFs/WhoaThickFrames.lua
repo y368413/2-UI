@@ -302,7 +302,7 @@ hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
 			TargetFrameTextureFrameHealthBarText:Show();
 		end
 		for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameTextureFrameManaBarText, TargetFrameManaBar }) do v:SetAlpha(0); end
-		if UnitIsGhost("target") then
+		if UnitIsGhost("target") and not UnitIsDead("target") then
 			TargetFrameTextureFrameHealthBarText:SetText(ghostText);
 		end
 	elseif not UnitIsDead("target") and not UnitIsGhost("target") then
