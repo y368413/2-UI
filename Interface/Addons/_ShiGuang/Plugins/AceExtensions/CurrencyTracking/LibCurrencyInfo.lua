@@ -435,17 +435,15 @@ local GetCurrencyInfo
 local GetLocale = _G.GetLocale
 
 -- Determine WoW TOC Version
-local WoWClassic, WoWRetail, WoWShadowlands
+local WoWClassic, WoWRetail
 local wowtocversion  = select(4, GetBuildInfo())
 if wowtocversion < 19999 then
 	WoWClassic = true
-elseif wowtocversion > 19999 and wowtocversion < 90000 then 
-	WoWRetail = true
 else
-	WoWShadowlands = true
+	WoWRetail = true
 end
 
-if WoWClassic or WoWRetail then
+if WoWClassic then
 	GetCurrencyInfo = _G.GetCurrencyInfo
 else -- Shadowlands
 	GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
@@ -457,7 +455,7 @@ end
 local LibStub = _G.LibStub
 
 local MAJOR_VERSION = "LibCurrencyInfo"
-local MINOR_VERSION = 90000 + tonumber(("$Rev: 39 $"):match("%d+"))
+local MINOR_VERSION = 90000 + tonumber(("$Rev: 40 $"):match("%d+"))
 
 local lib = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
 if not lib then return end
@@ -489,7 +487,7 @@ function lib:GetCurrencyByID(currencyID, lang)
 		lang = GetLocale()
 	end
 	
-	if WoWClassic or WoWRetail then
+	if WoWClassic then
 		name, currentAmount, texture, earnedThisWeek, weeklyMax, totalMax, isDiscovered, rarity = GetCurrencyInfo(currencyID)
 	else
 		local curr = GetCurrencyInfo(currencyID)

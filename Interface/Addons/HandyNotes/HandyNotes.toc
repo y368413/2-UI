@@ -1,0 +1,60 @@
+## Interface: 90001
+## Author: Xinhuan
+## Version: v1.6.0
+## Title: HandyNotes
+## Title-zhCN:|cff0080ff[地图]|r宝藏稀有
+## Title-zhTW:|cff0080ff[地图]|r寶藏稀有
+## Notes: Handynotes with Achievments+Treasures+Toys+Mounts
+## Notes-zhCN: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已击杀过。并替换自带飞行地图，使之更加方便详细。
+## Notes-zhTW: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已擊殺過。并替换自带飞行地图，使之更加方便详细。
+## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, Handynotes_PandariaDB, HandyNotes_LostAndFoundDB, HandyNotes_TimelessIsleChestsDB, HandyNotes_TimelessTreasuresDB, HandyNotes_DraenorDB, HandyNotes_ArathiDB, HandyNotes_WarfrontTreasuresDB, HandyNotes_BFA_HF_TrackerDB, NPC_Name_CacheDB, Item_Name_CacheDB, HNMoleMachineConfig, HandyNotes_MechagonAndNazjatarDB, HandyNotes_ScarabCoffersDB, HandyNotes_VisionsOfNZothDB, HandyNotes_PetDailiesDB,  HandyNotes_ShrinesForJewelcraftersDB, HandyNotes_Universal_ExplorerDB, HandyNotes_TravelGuideDB, HandyNotes_AzerothsTopTunesDB, HandyNotes_BFA_JellyDB, HandyNotes_HigherDimensionalLearningDB, HandyNotes_WitheredChestsDB
+## Dependencies: _ShiGuang
+
+## X-Repple: 2 UI
+
+# Locale files
+Locales\Locales.xml
+
+# Core files
+HandyNotes.lua
+HandyNotes.xml
+HandyNotes_HandyNotes.lua
+HandyNotes_EditFrame.lua
+HandyNotes_WorldMapButton.lua
+
+# MOP
+MOP\HandyNotes_Pandaria.lua
+MOP\HandyNotes_LostAndFound.lua
+MOP\HandyNotes_TimelessTreasures.lua
+MOP\HandyNotes_TimelessIsleChests.lua
+
+# WOD
+WOD\HandyNotes_Draenor.lua
+
+# LEG
+#LEG\HandyNotes_SuramarLeylines.lua
+LEG\HandyNotes_SuramarTelemancy.lua
+LEG\HandyNotes_LegionTreasures.lua
+
+# BFA
+BFA\HandyNotes_WarfrontRares.lua
+BFA\HandyNotes_BFA_HF_Tracker.lua
+BFA\HandyNotes_ShrinesForJewelcrafters.lua
+BFA\HandyNotes_templates.xml
+
+# Mode files
+Mode\HandyNotes_ScarabCoffers.lua
+Mode\HandyNotes_MoleMachine.lua
+Mode\HandyNotes_LightningPaw.lua
+Mode\HandyNotes_Universal_Explorer.lua
+Mode\HandyNotes_TravelGuide.lua
+# Mode\HandyNotes_AzerothsTopTunes.lua
+Mode\HandyNotes_BFA_Jelly.lua
+Mode\HandyNotes_HigherDimensionalLearning.lua
+Mode\HandyNotes_PetDailies.lua
+# Mode\HandyNotes_Syd'sWitheredChests.lua
+
+# Others files
+CandyBuckets.lua
+BiggerBagChecker.lua
+# WorldFlightMap.lua

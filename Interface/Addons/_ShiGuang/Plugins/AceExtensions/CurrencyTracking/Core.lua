@@ -3943,7 +3943,7 @@ else
 end
 
 
--- $Id: Core.lua 198 2020-08-16 14:02:54Z arith $
+-- $Id: Core.lua 199 2020-10-18 06:35:09Z arith $
 -----------------------------------------------------------------------
 -- Upvalued Lua API.
 -----------------------------------------------------------------------
@@ -3967,17 +3967,15 @@ local GetLocale = _G.GetLocale
 local GetBuildInfo = _G.GetBuildInfo
 
 -- Determine WoW TOC Version
-local WoWClassic, WoWRetail, WoWShadowlands
+local WoWClassic, WoWRetail
 local wowtocversion  = select(4, GetBuildInfo())
 if wowtocversion < 19999 then
 	WoWClassic = true
-elseif wowtocversion > 19999 and wowtocversion < 90000 then 
-	WoWRetail = true
 else
-	WoWShadowlands = true
+	WoWRetail = true
 end
 
-if WoWClassic or WoWRetail then
+if WoWClassic then
 	GetCurrencyListSize, GetCurrencyListInfo, GetCurrencyInfo = _G.GetCurrencyListSize, _G.GetCurrencyListInfo, _G.GetCurrencyInfo
 else -- Shadowlands
 	GetCurrencyListSize, GetCurrencyListInfo, GetCurrencyInfo = C_CurrencyInfo.GetCurrencyListSize, C_CurrencyInfo.GetCurrencyListInfo, C_CurrencyInfo.GetCurrencyInfo
@@ -4092,7 +4090,7 @@ local function getTooltipText()
 		-- // GetCurrencyListInfo() syntax:
 		-- // name, isHeader, isExpanded, isUnused, isWatched, count, icon = GetCurrencyListInfo(index)
 		local name, isHeader, isUnused, count, icon, _
-		if WoWClassic or WoWRetail then
+		if WoWClassic then
 			name, isHeader, _, isUnused, _, count, icon = GetCurrencyListInfo(i)
 		else
 			local curr = GetCurrencyListInfo(i)
@@ -4198,7 +4196,7 @@ local function handleTrackedButtons(button, currencyID, itemID)
 	local itemName, itemLink, count, icon, _
 	local width = 15
 	if (currencyID) then 
-		if WoWClassic or WoWRetail then
+		if WoWClassic then
 			_, count, icon = GetCurrencyInfo(currencyID) 
 		else
 			local curr = GetCurrencyInfo(currencyID)
@@ -4313,7 +4311,7 @@ local function currencyButton_Update()
 	for currencyID, v in pairs(profile["currencies"]) do
 		if (currencyID and type(currencyID) == "number" and profile["currencies"][currencyID] == true) then
 			local _, count
-			if WoWClassic or WoWRetail then
+			if WoWClassic then
 				_, count = GetCurrencyInfo(currencyID)
 			else
 				local curr = GetCurrencyInfo(currencyID)
@@ -4393,7 +4391,7 @@ local function currencyString_Update()
 	for currencyID, v in pairs(profile["currencies"]) do
 		if (currencyID and type(currencyID) == "number" and profile["currencies"][currencyID] == true) then
 			local _, count, icon
-			if WoWClassic or WoWRetail then
+			if WoWClassic then
 				_, count, icon = GetCurrencyInfo(currencyID)
 			else
 				local curr = GetCurrencyInfo(currencyID)
