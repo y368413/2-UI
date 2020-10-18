@@ -1,4 +1,4 @@
---## Author: Urtgard  ## Version: v8.3.0-13release
+--## Author: Urtgard  ## Version: v9.0.1-4release
 WQAchievements = LibStub("AceAddon-3.0"):NewAddon("WQAchievements", "AceConsole-3.0", "AceTimer-3.0")
 local WQA = WQAchievements
 WQA.data = {}
@@ -10,6 +10,11 @@ WQA.links = {}
 
 -- Blizzard
 local IsActive = C_TaskQuest.IsActive
+local GetQuestTagInfo = C_QuestLog.GetQuestTagInfo
+local GetBountiesForMapID = C_QuestLog.GetBountiesForMapID
+local GetTitleForQuestID = C_QuestLog.GetTitleForQuestID
+local GetCurrencyLink = C_CurrencyInfo.GetCurrencyLink
+local IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
 local function GetExpansionByMissionID(missionID)
 	return WQA.missionList[missionID].expansion
 end
@@ -181,11 +186,11 @@ end
 
 local function GetTaskLink(task)
 	if task.type == "WORLD_QUEST" then
-	--	if WQA.questPinList[task.id] or WQA.questFlagList[task.id] then
-			return GetQuestLink(task.id) or C_QuestLog.GetQuestInfo(task.id)
-	--	else
-	--		return GetQuestLink(task.id)
-	--	end
+		--	else
+		--		return GetQuestLink(task.id)
+		--	end
+		--	if WQA.questPinList[task.id] or WQA.questFlagList[task.id] then
+		return GetQuestLink(task.id) or GetTitleForQuestID(task.id)
 	else
 		return C_Garrison.GetMissionLink(task.id)
 	end
@@ -670,24 +675,24 @@ function WQA:CreateQuestList()
 	self.missionList = {}
 	self.questFlagList = {}
 
-	if UnitLevel("player") >= 110 then
-		for _,v in pairs(self.data[7].achievements) do
-			self:AddAchievements(v)
-		end
-		self:AddMounts(self.data[7].mounts)
-		self:AddPets(self.data[7].pets)
-		self:AddToys(self.data[7].toys)
+	--if UnitLevel("player") >= 50 then
+	for _, v in pairs(self.data[7].achievements) do
+		self:AddAchievements(v)
 	end
+	self:AddMounts(self.data[7].mounts)
+	self:AddPets(self.data[7].pets)
+	self:AddToys(self.data[7].toys)
+	--end
 
-	if UnitLevel("player") >= 120 then
-		for _,v in pairs(self.data[8].achievements) do
-			self:AddAchievements(v)
-		end
-		self:AddMounts(self.data[8].mounts)
-		self:AddPets(self.data[8].pets)
-		self:AddToys(self.data[8].toys)
+	--if UnitLevel("player") >= 50 then
+	for _, v in pairs(self.data[8].achievements) do
+		self:AddAchievements(v)
 	end
-	
+	self:AddMounts(self.data[8].mounts)
+	self:AddPets(self.data[8].pets)
+	self:AddToys(self.data[8].toys)
+	--end
+
 	self:AddCustom()
 	self:Special()
 	self:Reward()
@@ -768,7 +773,7 @@ function WQA:AddAchievements(achievement, forced, forcedByMe)
 							self:AddRewardToQuest(questID, "ACHIEVEMENT", id)
 						end
 					else
-						questID = achievement.criteria[1]
+						local questID = achievement.criteria[1]
 						if questID then
 							self:AddRewardToQuest(questID, "ACHIEVEMENT", id)
 						end
@@ -1011,8 +1016,9 @@ function WQA:CheckWQ(mode)
 	local activeMissions = self:CheckMissions()
 	local newMissions = {}
 	if type(activeMissions) == "table" then
-		for missionID,_ in pairs(activeMissions) do
-			for k,v in pairs(self.missionList[missionID].reward) do
+		for missionID, _ in pairs(activeMissions) do
+			local link = false
+			for k, v in pairs(self.missionList[missionID].reward) do
 				if k == "custom" or k == "professionSkillup" or k == "gold" then
 					link = true
 				else
@@ -1216,8 +1222,7 @@ end
 local inspectScantip = CreateFrame("GameTooltip", "WorldQuestListInspectScanningTooltip", nil, "GameTooltipTemplate")
 inspectScantip:SetOwner(UIParent, "ANCHOR_NONE")
 
-local EquipLocToSlot1 = 
-{
+local EquipLocToSlot1 = {
 	INVTYPE_HEAD = 1,
 	INVTYPE_NECK = 2,
 	INVTYPE_SHOULDER = 3,
@@ -1242,8 +1247,7 @@ local EquipLocToSlot1 =
 	INVTYPE_HOLDABLE = 17,
 	INVTYPE_TABARD = 19,
 }
-local EquipLocToSlot2 = 
-{
+local EquipLocToSlot2 = {
 	INVTYPE_FINGER = 12,
 	INVTYPE_TRINKET = 14,
 	INVTYPE_WEAPON = 17,
@@ -1356,7 +1360,11 @@ function WQA:Reward()
 				if quests then
 					for i=1,#quests do
 						local questID = quests[i].questId
-						local worldQuestType = select(3,GetQuestTagInfo(questID)) or 0
+						local questTagInfo = GetQuestTagInfo(questID)
+						local worldQuestType = 0
+						if questTagInfo then
+							worldQuestType = questTagInfo.worldQuestType
+						end
 
 						if self.questList[questID] and not self.db.profile.options.reward.general.worldQuestType[worldQuestType] then
 							self.questList[questID] = nil
@@ -1390,23 +1398,28 @@ function WQA:Reward()
 							self:CheckCurrencies(questID)
 
 							-- Profession
-							local _,_,_,_,_, tradeskillLineIndex = GetQuestTagInfo(questID)
-							if tradeskillLineIndex then
-								local professionName,_,_,_,_,_, tradeskillLineID = GetProfessionInfo(tradeskillLineIndex)
-								if tradeskillLineIndex then
-									local zoneID = C_TaskQuest.GetQuestZoneID(questID)
-									local exp = 0
-									for expansion,zones in pairs(WQA.ZoneIDList) do
-										for _, v in pairs(zones) do
-											if zoneID == v then
-												exp = expansion
-											end
+							local tradeskillLineID
+							if questTagInfo then
+								tradeskillLineID = GetQuestTagInfo(questID).tradeskillLineID
+							end
+
+							if tradeskillLineID then
+								local professionName = C_TradeSkillUI.GetTradeSkillDisplayName(tradeskillLineID)
+								local zoneID = C_TaskQuest.GetQuestZoneID(questID)
+								local exp = 0
+								for expansion, zones in pairs(WQA.ZoneIDList) do
+									for _, v in pairs(zones) do
+										if zoneID == v then
+											exp = expansion
 										end
 									end
-									
-									if not self.db.char[exp].profession[tradeskillLineID].isMaxLevel and self.db.profile.options.reward[exp].profession[tradeskillLineID].skillup then
-										self:AddRewardToQuest(questID, "PROFESSION_SKILLUP", professionName)
-									end
+								end
+
+								if
+									not self.db.char[exp].profession[tradeskillLineID].isMaxLevel and
+										self.db.profile.options.reward[exp].profession[tradeskillLineID].skillup
+								 then
+									self:AddRewardToQuest(questID, "PROFESSION_SKILLUP", professionName)
 								end
 							end
 						end
@@ -1467,10 +1480,10 @@ function WQA:IsTransmogable(itemLink)
 
 	-- See if the item is in a valid transmoggable slot
 	local slot = EquipLocToSlot1[slotName]
-    if slot == nil or slot == 11 or slot == 13 then
-        return false
-    end
-    return true
+	if slot == nil or slot == 11 or slot == 13 or slot == 2 then
+		return false
+	end
+	return true
 end
 
 function WQA:CheckItems(questID, isEmissary)
@@ -1480,7 +1493,7 @@ function WQA:CheckItems(questID, isEmissary)
 		local itemName, itemTexture, quantity, quality, isUsable, itemID = GetQuestLogRewardInfo(1, questID)
 		if itemID then
 			inspectScantip:SetQuestLogItem("reward", 1, questID)
-			itemLink = select(2,inspectScantip:GetItem())
+			local itemLink = select(2, inspectScantip:GetItem())
 			if not itemLink then
 				retry = true
 			end
@@ -1520,8 +1533,8 @@ function WQA:CheckItems(questID, isEmissary)
 							else
 								retry = true
 							end
-							
-							slotID2 =  EquipLocToSlot2[itemEquipLoc]
+
+							local slotID2 = EquipLocToSlot2[itemEquipLoc]
 							if slotID2 then
 								equippedLink = GetInventoryItemLink("player", slotID2)
 								if equippedLink then
@@ -1942,10 +1955,8 @@ function WQA:UpdateQTip(tasks)
 									f(widget)
 								end
 							else
-								if IsWorldQuestHardWatched(id) or (IsWorldQuestWatched(id) and GetSuperTrackedQuestID() == id) then
-									BonusObjectiveTracker_UntrackWorldQuest(id)
-								else
-									BonusObjectiveTracker_TrackWorldQuest(id, true)
+									if not C_QuestLog.AddWorldQuestWatch(id, 1) then
+										C_QuestLog.RemoveWorldQuestWatch(id)
 								end
 							end				
 						end
@@ -2199,7 +2210,7 @@ local function SortByExpansion(a,b)
 end
 
 local function GetQuestName(questID)
-	return C_TaskQuest.GetQuestInfoByQuestID(questID) or C_QuestLog.GetQuestInfo(questID) or select(3,string.find(GetQuestLink(questID) or "[unknown]", "%[(.+)%]"))
+	return C_TaskQuest.GetQuestInfoByQuestID(questID) or GetTitleForQuestID(questID) or select(3,string.find(GetQuestLink(questID) or "[unknown]", "%[(.+)%]"))
 end
 
 local function GetMissionName(missionID)
@@ -2249,31 +2260,39 @@ function WQA:SortQuestList(list)
 	return list
 end
 
-local GetQuestBountyInfoForMapIDRequested = false
+local GetBountiesForMapIDRequested = false
 function WQA:EmissaryReward()
 	self.emissaryRewards = false
 	local retry = false
-	
-	for _, mapID in pairs({627,875}) do
-		for _, emissary in ipairs(GetQuestBountyInfoForMapID(mapID)) do
-			local questID = emissary.questID
-			if self.db.profile.options.emissary[questID] == true then
-				self:AddEmissaryReward(questID, "CUSTOM", nil, true)
-			end
-			if HaveQuestData(questID) and HaveQuestRewardData(questID) then
-				retry = (self:CheckItems(questID, true) or retry)
-				self:CheckCurrencies(questID, true)
-			else
-				retry = true
+
+	for _, mapID in pairs({627, 875}) do
+		local bounties = GetBountiesForMapID(mapID)
+		if bounties then
+			for _, emissary in ipairs(GetBountiesForMapID(mapID)) do
+				local questID = emissary.questID
+				if self.db.profile.options.emissary[questID] == true then
+					self:AddEmissaryReward(questID, "CUSTOM", nil, true)
+				end
+				if HaveQuestData(questID) and HaveQuestRewardData(questID) then
+					retry = (self:CheckItems(questID, true) or retry)
+					self:CheckCurrencies(questID, true)
+				else
+					retry = true
+				end
 			end
 		end
 	end
 
-	if retry == true or GetQuestBountyInfoForMapIDRequested == false then
-		GetQuestBountyInfoForMapIDRequested = true
-		self:ScheduleTimer(function() self:EmissaryReward() end, 1.5)
+	if retry == true or GetBountiesForMapIDRequested == false then
+		GetBountiesForMapIDRequested = true
+		self:ScheduleTimer(
+			function()
+				self:EmissaryReward()
+			end,
+			1.5
+		)
 	else
-		GetQuestBountyInfoForMapIDRequested = false
+		GetBountiesForMapIDRequested = false
 		self.emissaryRewards = true
 	end
 end
@@ -2294,8 +2313,8 @@ function WQA:EmissaryIsActive(questID)
 	end
 
 	local i = 1
-	while GetQuestLogTitle(i) do
-		local _,_,_,_,_,_,_, questLogQuestID = GetQuestLogTitle(i)
+	while C_QuestLog.GetInfo(i) do
+		local questLogQuestID = C_QuestLog.GetInfo(i).questID
 		if questLogQuestID == questID then
 			return true
 		end
@@ -2400,9 +2419,9 @@ function WQA:formatTime(t)
 end
 
 local LE_GARRISON_TYPE = {
-	[6] = LE_GARRISON_TYPE_6_0,
-	[7] = LE_GARRISON_TYPE_7_0,
-	[8] = LE_GARRISON_TYPE_8_0,
+	[6] = Enum.GarrisonType.Type_6_0,
+	[7] = Enum.GarrisonType.Type_7_0,
+	[8] = Enum.GarrisonType.Type_8_0
 }
 
 function WQA:CheckMissions()
@@ -2415,14 +2434,14 @@ function WQA:CheckMissions()
 			local missions = C_Garrison.GetAvailableMissions(GetPrimaryGarrisonFollowerType(type))
 			-- Add Shipyard Missions
 			if i == 6 and C_Garrison.HasShipyard() then
-				for missionID,mission in ipairs(C_Garrison.GetAvailableMissions(LE_FOLLOWER_TYPE_SHIPYARD_6_2)) do
-					mission.followerType = LE_FOLLOWER_TYPE_SHIPYARD_6_2
+				for missionID, mission in ipairs(C_Garrison.GetAvailableMissions(Enum.GarrisonFollowerType.FollowerType_6_2)) do
+					mission.followerType = Enum.GarrisonFollowerType.FollowerType_6_2
 					missions[#missions + 1] = mission
 				end
 			end
 
 			if missions then
-				for _,mission in ipairs(missions) do
+				for _, mission in ipairs(missions) do
 					local missionID = mission.missionID
 					local addMission = false
 					if self.missionList[missionID] then
@@ -2526,6 +2545,10 @@ function WQA:UpdateMinimapIcon()
 	end
 end
 
+-- Blizzard
+local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
+local GetTitleForQuestID = C_QuestLog.GetTitleForQuestID
+
 local optionsTimer
 local start
 
@@ -2542,6 +2565,9 @@ local IDToExpansionID = {
 }
 
 local CurrencyIDList = {
+	[6] = {
+		824 -- Garrison Resources
+	},
 	[7] = {
 		1220, -- Order Resources
 		1226, -- Nethershard
@@ -2607,10 +2633,10 @@ local CraftingReagentIDList = {
 }
 
 local worldQuestType = {
-	["LE_QUEST_TAG_TYPE_PVP"] = "PVP",
-	["LE_QUEST_TAG_TYPE_PET_BATTLE"] = "Pet Battle",
-	["LE_QUEST_TAG_TYPE_PROFESSION"] = "Profession",
-	["LE_QUEST_TAG_TYPE_DUNGEON"] = "Dungeon",
+	["LE_QUEST_TAG_TYPE_PVP"] = Enum.QuestTagType.PvP,
+	["LE_QUEST_TAG_TYPE_PET_BATTLE"] = Enum.QuestTagType.PetBattle,
+	["LE_QUEST_TAG_TYPE_PROFESSION"] = Enum.QuestTagType.Profession,
+	["LE_QUEST_TAG_TYPE_DUNGEON"] = Enum.QuestTagType.Dungeon
 }
 
 WQA.ZoneIDList = {
@@ -3437,9 +3463,9 @@ function WQA:UpdateOptions()
 				for k,v in pairs(CurrencyIDList[i]) do
 					if not (type(v) == "table" and v.faction ~= self.faction) then
 						if type(v) == "table" then v = v.id end
-						args.currency.args[GetCurrencyInfo(v)] = {
+						args.currency.args[GetCurrencyInfo(v).name] = {
 							type = "toggle",
-							name = GetCurrencyInfo(v),
+							name = GetCurrencyInfo(v).name,
 							set = function(info, val)
 								WQA.db.profile.options.reward.currency[v] = val
 							end,
@@ -3492,9 +3518,9 @@ function WQA:UpdateOptions()
 				for k,v in pairs(self.EmissaryQuestIDList[i]) do
 					if not (type(v) == "table" and v.faction ~= self.faction) then
 						if type(v) == "table" then v = v.id end
-						args.emissary.args[C_QuestLog.GetQuestInfo(v) or tostring(v)] = {
+						args.emissary.args[GetTitleForQuestID(v) or tostring(v)] = {
 							type = "toggle",
-							name = C_QuestLog.GetQuestInfo(v) or tostring(v),
+							name = GetTitleForQuestID(v) or tostring(v),
 							set = function(info, val)
 								WQA.db.profile.options.emissary[v] = val
 							end,
@@ -3620,8 +3646,7 @@ function WQA:UpdateOptions()
 						name = "minimum Gold",
 						type = "input",
 						order = newOrder(),
-						--width = .6,
-						set = function(info,val)
+						set = function(info, val)
 							WQA.db.profile.options.missionTable.reward.goldMin = tonumber(val)
 						end,
 						get = function() return tostring(WQA.db.profile.options.missionTable.reward.goldMin)  end
@@ -3632,9 +3657,9 @@ function WQA:UpdateOptions()
 			for k,v in pairs(CurrencyIDList[i]) do
 				if not (type(v) == "table" and v.faction ~= self.faction) then
 					if type(v) == "table" then v = v.id end
-					args.currency.args[GetCurrencyInfo(v)] = {
+					args.currency.args[GetCurrencyInfo(v).name] = {
 						type = "toggle",
-						name = GetCurrencyInfo(v),
+						name = GetCurrencyInfo(v).name,
 						set = function(info, val)
 							WQA.db.profile.options.missionTable.reward.currency[v] = val
 						end,
@@ -3787,8 +3812,7 @@ function WQA:UpdateCustomQuests()
  	for id,object in pairs(data) do
 		args[tostring(id)] = {
 			type = "toggle",
-			name = GetQuestLink(id) or C_QuestLog.GetQuestInfo(id) or tostring(id),
-			width = "double",
+			name = GetQuestLink(id) or GetTitleForQuestID(id) or tostring(id),
 			set = function(info, val)
 				WQA.db.profile.custom.worldQuest[id] = val
 			end,
@@ -3890,7 +3914,7 @@ function WQA:UpdateCustomRewards()
 		args[tostring(id)] = {
 			type = "toggle",
 			name = itemLink or tostring(id),
-			width = "double",
+			--width = "double",
 			set = function(info, val)
 				WQA.db.profile.custom.worldQuestReward[id] = val
 			end,
@@ -4015,7 +4039,6 @@ function WQA:UpdateCustomMissionRewards()
 		args[tostring(id)] = {
 			type = "toggle",
 			name = itemLink or tostring(id),
-			width = "double",
 			set = function(info, val)
 				WQA.db.profile.custom.missionReward[id] = val
 			end,
@@ -4057,16 +4080,16 @@ function WQA:UpdateCustom()
 end
 
 function WQA:SortOptions()
-	for k,v in pairs(WQA.options.args.general.args) do
-		for kk,vv in pairs(v.args) do
-			t = {}
-			for kkk,vvv in pairs(vv.args) do
+	for k, v in pairs(WQA.options.args.general.args) do
+		for kk, vv in pairs(v.args) do
+			local t = {}
+			for kkk, vvv in pairs(vv.args) do
 				local completed = false
-				local id = select(3,string.find(kkk, "(%d*)Name"))
+				local id = select(3, string.find(kkk, "(%d*)Name"))
 				if id then
 					id = tonumber(id)
 					if kk == "achievements" then
-						completed = select(4,GetAchievementInfo(id))
+						completed = select(4, GetAchievementInfo(id))
 					elseif kk == "mounts" then
 						for _, mountID in pairs(C_MountJournal.GetMountIDs()) do
 							local _, spellID, _, _, _, _, _, _, _, _, isCollected = C_MountJournal.GetMountInfoByID(mountID)

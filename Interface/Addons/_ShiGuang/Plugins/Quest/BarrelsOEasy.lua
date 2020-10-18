@@ -1,6 +1,7 @@
 ﻿local SkullMarker = 8;
-local UsedMarkers = {};
 local CurrentMarker = SkullMarker;
+local UsedMarkers = {};
+local IsOnWorldQuest = false;
 local BarrelQuests = {[45068]=true,[45069]=true,[45070]=true,[45071]=true,[45072]=true,};
 
 local BarrelsFrame = CreateFrame("Frame");
@@ -12,16 +13,23 @@ BarrelsFrame:SetScript("OnEvent", function(self,event,arg1,arg2)
 		if BarrelsOEasyShowMessageCount == nil then
 			BarrelsOEasyShowMessageCount = 0;
 		end
-		local questLogCount = GetNumQuestLogEntries();
+		local questLogCount = C_QuestLog.GetNumQuestLogEntries();
 		for i = 1, questLogCount do
-			local title, _, _, _, _, _, _, questID  = GetQuestLogTitle(i);
+			local title, _, _, _, _, _, _, questID = C_QuestLog.GetInfo(i);
 			if BarrelQuests[questID] then
 				self:RegisterEvent("UPDATE_MOUSEOVER_UNIT");
-				CurrentMarker = SkullMarker;			
+				CurrentMarker = SkullMarker;
+				IsOnWorldQuest = true;
+				
+				if BarrelsOEasyShowFrame then
+					BOEIconFrame:Show();
+				end
 			end
 		end
 	elseif event == "QUEST_ACCEPTED" then
-		if (arg1 and BarrelQuests[arg1]) or (arg2 and BarrelQuests[arg2]) then	
+		if (arg1 and BarrelQuests[arg1]) or (arg2 and BarrelQuests[arg2]) then
+			IsOnWorldQuest = true;
+			
 			if IsInGroup() then
 				RaidNotice_AddMessage(RaidWarningFrame, "啊噢.你在队伍里会导致欢乐桶插件抽风", ChatTypeInfo["SYSTEM"]);
 				DEFAULT_CHAT_FRAME:AddMessage("Sorry，在队伍你会导致每次点击欢乐桶后，标记都会因为刷新而消失.", 1.0, 0.0, 0.0, ChatTypeInfo["RAID_WARNING"], 6);

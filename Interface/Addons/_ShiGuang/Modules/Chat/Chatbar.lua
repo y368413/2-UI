@@ -443,19 +443,15 @@ function module:Chatbar()
         text = text:gsub("%{.-%}", ReplaceEmote)
         return text
     end
-    
-	local function findChatBubble(msg)
-		local chatbubbles = C_ChatBubbles.GetAllChatBubbles()
-		for index = 1, #chatbubbles do
-			local chatbubble = chatbubbles[index]
-			for i = 1, chatbubble:GetNumRegions() do
-				local region = select(i, chatbubble:GetRegions())
-				if region:GetObjectType() == "FontString" and region:GetText() == msg then
-					local text = region:GetText() or ""
-					local after = TextToEmote(text)
-					if (after ~= text) then
-						region:SetText(after)
-					end
+
+	local function findChatBubble()
+		for _, chatbubble in pairs(C_ChatBubbles.GetAllChatBubbles()) do
+			local frame = chatbubble:GetChildren()
+			if frame and not frame:IsForbidden() then
+				local oldMessage = frame.String:GetText()
+				local afterMessage = TextToEmote(oldMessage)
+				if oldMessage ~= afterMessage then
+					frame.String:SetText(afterMessage)
 				end
 			end
 		end
@@ -475,17 +471,16 @@ function module:Chatbar()
 	for event in next, events do
 		bubbleHook:RegisterEvent(event)
 	end
-	bubbleHook:SetScript("OnEvent", function(self, event, msg)
+	bubbleHook:SetScript("OnEvent", function(self, event)
 		if GetCVarBool(events[event]) then
 			self.elapsed = 0
-			self.msg = msg
 			self:Show()
 		end
 	end)
 	bubbleHook:SetScript("OnUpdate", function(self, elapsed)
 		self.elapsed = self.elapsed + elapsed
 		if self.elapsed > .1 then
-			findChatBubble(self.msg)
+			findChatBubble()
 			self:Hide()
 		end
 	end)

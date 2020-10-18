@@ -312,6 +312,8 @@ function S:ReskinRematch()
 		for i = 1, 4 do
 			S.RematchIcon(RematchOptionPanel.Growth.Corners[i])
 		end
+		M.StripTextures(RematchOptionPanel.Top)
+		S.RematchInput(RematchOptionPanel.Top.SearchBox)
 
 		-- RematchPetCard
 		local petCard = RematchPetCard
@@ -672,4 +674,28 @@ function S:ReskinRematch()
 			end
 		end
 	end)
+
+	-- Window mode
+	M.StripTextures(RematchFrame)
+	M.SetBD(RematchFrame)
+	for _, tab in ipairs(RematchFrame.PanelTabs.Tabs) do
+		M.ReskinTab(tab)
+	end
+	M.StripTextures(RematchMiniPanel)
+
+	local titleBar = RematchFrame.TitleBar
+	M.StripTextures(titleBar)
+	M.ReskinClose(titleBar.CloseButton)
+
+	M.StripTextures(titleBar.MinimizeButton, 2)
+	M.ReskinArrow(titleBar.MinimizeButton, "up")
+	titleBar.MinimizeButton:SetPoint("TOPRIGHT", -25, -6)
+
+	M.StripTextures(titleBar.LockButton, 2)
+	M.ReskinArrow(titleBar.LockButton, "down")
+	titleBar.LockButton:SetPoint("TOPLEFT", 25, -5)
+
+	M.StripTextures(titleBar.SinglePanelButton, 2)
+	M.ReskinArrow(titleBar.SinglePanelButton, "left")
+	titleBar.SinglePanelButton:SetPoint("TOPLEFT", 5, -5)
 end

@@ -149,6 +149,7 @@ valid_classes = {
     DEMONHUNTER = {
         [LE_ITEM_CLASS_WEAPON] = {
             [LE_ITEM_WEAPON_WARGLAIVE] = true,
+            [LE_ITEM_WEAPON_DAGGER] = true,
             [LE_ITEM_WEAPON_UNARMED] = true,
             [LE_ITEM_WEAPON_AXE1H] = true,
             [LE_ITEM_WEAPON_MACE1H] = true,

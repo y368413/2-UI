@@ -100,7 +100,7 @@ local SetFrameScript, ClearFrameScripts
 ------------------------------------------------------------------------------
 -- @debug @
 local usedTables, usedFrames, usedTooltips = 0, 0, 0
---@end-debug@
+--@end-debug@]===]
 
 ------------------------------------------------------------------------------
 -- Internal constants to tweak the layout
@@ -1548,4 +1548,4 @@ end
 
 SLASH_LibQTip1 = "/qtip"
 _G.SlashCmdList["LibQTip"] = PrintStats
---@end-debug@
+--@end-debug@]===]

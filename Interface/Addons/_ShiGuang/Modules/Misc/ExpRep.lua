@@ -104,6 +104,27 @@ function MISC:ExpBar_Update()
 	else
 		self:Hide()
 	end
+    if C_AzeriteItem.HasActiveAzeriteItem() and UnitLevel("player") == MAX_PLAYER_LEVEL then
+		local azeriteItemLocation = C_AzeriteItem.FindActiveAzeriteItem()
+		local azeriteItem = Item:CreateFromItemLocation(azeriteItemLocation)
+		local azeriteItemName = azeriteItem:GetItemName()
+		local xp, totalLevelXP = C_AzeriteItem.GetAzeriteItemXPInfo(C_AzeriteItem.FindActiveAzeriteItem())
+		local currentLevel = C_AzeriteItem.GetPowerLevel(azeriteItemLocation)
+		self.ArtifactText:SetText("|c00FF68CC"..currentLevel.."|r  "..string.format('|c00FF68CC%d%%|r',(xp)/(totalLevelXP)*100)) --.."  "..xp.."/"..totalLevelXP
+	elseif C_AzeriteItem.HasActiveAzeriteItem() and UnitLevel("player") < MAX_PLAYER_LEVEL then
+	    local azeriteItemLocation = C_AzeriteItem.FindActiveAzeriteItem()
+		local azeriteItem = Item:CreateFromItemLocation(azeriteItemLocation)
+		local azeriteItemName = azeriteItem:GetItemName()
+		local xp, totalLevelXP = C_AzeriteItem.GetAzeriteItemXPInfo(C_AzeriteItem.FindActiveAzeriteItem())
+		local currentLevel = C_AzeriteItem.GetPowerLevel(azeriteItemLocation)
+		local function showIfResting() if (IsResting("player") or FALSE) then return "+" end return "" end
+        local function showRestAmount() if (GetXPExhaustion("player") or FALSE) then return math.ceil(100*(GetXPExhaustion("player")/UnitXPMax("player"))) end return "0" end
+		self.ArtifactText:SetText(UnitLevel("player").."  "..math.floor(100*(UnitXP("player")/UnitXPMax("player"))) .. "%".."  |c00FF68CC"..showRestAmount().."%"..showIfResting().."|r".."    ".."|c00FF68CC"..currentLevel.."|r  "..string.format('|c00FF68CC%d%%|r',(xp)/(totalLevelXP)*100))  --.."  "..xp.."/"..totalLevelXP
+	else
+	    local function showIfResting() if (IsResting("player") or FALSE) then return "+" end return "" end
+        local function showRestAmount() if (GetXPExhaustion("player") or FALSE) then return math.ceil(100*(GetXPExhaustion("player")/UnitXPMax("player"))) end return "0" end
+		self.ArtifactText:SetText(UnitLevel("player").."  "..math.floor(100*(UnitXP("player")/UnitXPMax("player"))) .. "%".."  |c00FF68CC"..showRestAmount().."%"..showIfResting().."|r")
+	end
 end
 
 function MISC:ExpBar_UpdateTooltip()
@@ -249,6 +270,10 @@ function MISC:Expbar()
 	bar:SetHitRectInsets(0, 0, 0, -10)
 	bar:SetFrameLevel(bar:GetFrameLevel() + 8)
 	M.CreateSB(bar)
+	
+    bar.ArtifactText=bar:CreateFontString("ShowArtifactText", "OVERLAY")
+    bar.ArtifactText:SetFont("Interface\\AddOns\\_ShiGuang\\Media\\Fonts\\Infinity.ttf", 11, "OUTLINE")  --STANDARD_TEXT_FONT
+    bar.ArtifactText:SetPoint("BOTTOMRIGHT", bar,"BOTTOMRIGHT",2, 2)  
 
 	local rest = CreateFrame("StatusBar", nil, bar)
 	rest:SetAllPoints()

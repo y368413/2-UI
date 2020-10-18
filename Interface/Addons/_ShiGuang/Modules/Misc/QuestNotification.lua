@@ -4,12 +4,13 @@ local MISC = M:GetModule("Misc")
 
 local strmatch, strfind, gsub, format = string.match, string.find, string.gsub, string.format
 local wipe, mod, tonumber, pairs, floor = wipe, mod, tonumber, pairs, math.floor
-local IsPartyLFG, IsInRaid, IsInGroup = IsPartyLFG, IsInRaid, IsInGroup
-local PlaySound, SendChatMessage, GetQuestLink = PlaySound, SendChatMessage, GetQuestLink
+local IsPartyLFG, IsInRaid, IsInGroup, PlaySound, SendChatMessage = IsPartyLFG, IsInRaid, IsInGroup, PlaySound, SendChatMessage
 local C_QuestLog_GetInfo = C_QuestLog.GetInfo
 local C_QuestLog_IsComplete = C_QuestLog.IsComplete
 local C_QuestLog_IsWorldQuest = C_QuestLog.IsWorldQuest
 local C_QuestLog_GetQuestTagInfo = C_QuestLog.GetQuestTagInfo
+local C_QuestLog_GetTitleForQuestID = C_QuestLog.GetTitleForQuestID
+local C_QuestLog_GetQuestIDForLogIndex = C_QuestLog.GetQuestIDForLogIndex
 local C_QuestLog_GetNumQuestLogEntries = C_QuestLog.GetNumQuestLogEntries
 local C_QuestLog_GetLogIndexForQuestID = C_QuestLog.GetLogIndexForQuestID
 local soundKitID = SOUNDKIT.ALARM_CLOCK_WARNING_3
@@ -19,17 +20,17 @@ local LE_QUEST_FREQUENCY_DAILY = Enum.QuestFrequency.Daily
 
 local completedQuest, initComplete = {}
 
-local function acceptText(link, daily)
+local function acceptText(title, daily)
 	if daily then
-		return format("|cFFFFFF00[%s]|r%s-%s", DAILY, GARRISON_START_MISSION, link)
+		return format("|cFFFFFF00[%s]|r%s-%s", DAILY, GARRISON_START_MISSION, title)
 	else
-		return format("%s-%s", ACCEPT..GARRISON_MISSIONS, link)  --"→"
+		return format("%s-%s", ACCEPT..GARRISON_MISSIONS, title)  --"→"
 	end
 end
 
-local function completeText(link)
+local function completeText(title)
 	PlaySound(soundKitID, "Master")  --PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\QuestNotifier.ogg", "Master")
-	return format("%s-%s", QUEST_COMPLETE, link)  --"✓"
+	return format("%s-%s", QUEST_COMPLETE, title)  --"✓"
 end
 
 local function sendQuestMsg(msg)
@@ -82,27 +83,27 @@ function MISC:FindQuestProgress(_, msg)
 end
 
 function MISC:FindQuestAccept(questID)
-	local link = GetQuestLink(questID)
+	local tagInfo = C_QuestLog_GetQuestTagInfo(questID)
+	if tagInfo and tagInfo.worldQuestType == LE_QUEST_TAG_TYPE_PROFESSION then return end
+
 	local questLogIndex = C_QuestLog_GetLogIndexForQuestID(questID)
-	if link and questLogIndex then
+	if questLogIndex then
 		local info = C_QuestLog_GetInfo(questLogIndex)
-		local frequency = info.frequency
-		local tagID, _, worldQuestType = C_QuestLog_GetQuestTagInfo(questID)
-		if tagID == 109 or worldQuestType == LE_QUEST_TAG_TYPE_PROFESSION then return end
-		sendQuestMsg(acceptText(link, frequency == LE_QUEST_FREQUENCY_DAILY))
+		if info then
+			sendQuestMsg(acceptText(info.title, info.frequency == LE_QUEST_FREQUENCY_DAILY))
+		end
 	end
 end
 
 function MISC:FindQuestComplete()
 	for i = 1, C_QuestLog_GetNumQuestLogEntries() do
-		local info = C_QuestLog_GetInfo(i)
-		local questID = info.questID
-		local link = GetQuestLink(questID)
+		local questID = C_QuestLog_GetQuestIDForLogIndex(i)
+		local title = C_QuestLog_GetTitleForQuestID(questID)
 		local isComplete = C_QuestLog_IsComplete(questID)
 		local isWorldQuest = C_QuestLog_IsWorldQuest(questID)
-		if link and isComplete and not completedQuest[questID] and not isWorldQuest then
+		if title and isComplete and not completedQuest[questID] and not isWorldQuest then
 			if initComplete then
-				sendQuestMsg(completeText(link))
+				sendQuestMsg(completeText(title))
 			end
 			completedQuest[questID] = true
 		end
@@ -112,9 +113,9 @@ end
 
 function MISC:FindWorldQuestComplete(questID)
 	if C_QuestLog_IsWorldQuest(questID) then
-		local link = GetQuestLink(questID)
-		if link and not completedQuest[questID] then
-			sendQuestMsg(completeText(link))
+		local title = C_QuestLog_GetTitleForQuestID(questID)
+		if title and not completedQuest[questID] then
+			sendQuestMsg(completeText(title))
 			completedQuest[questID] = true
 		end
 	end

@@ -557,9 +557,11 @@ function HPetAllInfoFrame:Update(speciesID,breedID,rarityvalue,levelvalue)
 		end
 	end
 
+    if tonumber(speciesID) == nil then return end
 	local name, icon, petType, creatureID, sourceText, description, isWild, canBattle, tradable, unique = C_PetJournal.GetPetInfoBySpeciesID(speciesID);
 
-	HPetAllInfoFrame.petName.text:SetText(name)HPetAllInfoFrame.petName.text:SetFont(ChatFontNormal:GetFont(), 14, "")
+	HPetAllInfoFrame.petName.text:SetText(name)
+	HPetAllInfoFrame.petName.text:SetFont(ChatFontNormal:GetFont(), 14, "")
 	HPetAllInfoFrame.petName.icon:SetTexture("Interface\\Icons\\Pet_TYPE_"..PET_TYPE_SUFFIX[petType])
 
 	----------------------------------------------------------------
@@ -1050,6 +1052,38 @@ function HPetAllInfoFrame:initframe(frames)
 end
 function HPetAllInfoFrame:Toggle(...)
 	if not self.ready then self:Init() end
+	if self:GetParent() == RematchPetCard then self:Hide() end
+	self:AnchorToBlizzard()
+    self:SetIgnoreParentAlpha(false)
 	self:Update(...)
-	if not self:IsShown() then self:Show() else self:Hide() end
+	if not self:IsVisible() then self:Show() else self:Hide() end
 end
+--[[
+    hooksecurefunc(Rematch, "ShowPetCard", function(self, parent, petID)
+        if not RematchPetCard.petID then return end
+        local idType = Rematch:GetIDType(RematchPetCard.petID)
+        if idType == "species" then
+            PetJournalPetCard.speciesID = petID
+            PetJournalPetCard.breedID = nil
+        elseif idType == "pet" then
+            if PetJournalPetCard then
+                PetJournalPetCard.speciesID = C_PetJournal.GetPetInfoByPetID(RematchPetCard.petID)
+                PetJournalPetCard.breedID = select(4, HPetBattleAny.ShowMaxValue(RematchPetCard.petID))
+            end
+        else
+            return
+        end
+        local self = HPetAllInfoFrame
+        if not self.ready then self:Init() end
+        self:SetParent(RematchPetCard)
+        self:SetIgnoreParentAlpha(true)
+       	self:SetWidth(350)
+       	self:SetPoint("TOPLEFT",RematchPetCard,"TOPRIGHT", -2, -73)
+       	self:SetFrameStrata("HIGH")
+       	self:SetToplevel(true)
+       	self:SetMovable(true)
+       	self:SetClampedToScreen(false)
+        self:Update()
+        self:Show()
+    end)
+]]

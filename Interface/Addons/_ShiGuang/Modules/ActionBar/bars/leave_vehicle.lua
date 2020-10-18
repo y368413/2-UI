@@ -24,6 +24,9 @@ local function SetFrameSize(frame, size, num)
 		frame.numButtons = num
 		frame.SetFrameSize = SetFrameSize
 	end
+	for _, button in pairs(frame.buttonList) do
+		button:SetSize(size, size)
+	end
 end
 
 function Bar:CreateLeaveVehicle()

@@ -3844,7 +3844,7 @@ NS.Frame( "CollectionShopEventsFrame", UIParent, {
 			end
 		elseif	event == "PLAYER_LOGIN"						then
 			self:UnregisterEvent( "PLAYER_LOGIN" );
-			InterfaceOptions_AddCategory( CollectionShopInterfaceOptionsPanel );
+			--InterfaceOptions_AddCategory( CollectionShopInterfaceOptionsPanel );
 			if #NS.playerLoginMsg > 0 then
 				for _,msg in ipairs( NS.playerLoginMsg ) do
 					NS.Print( msg );

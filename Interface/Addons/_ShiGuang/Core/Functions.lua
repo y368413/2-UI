@@ -350,6 +350,8 @@ do
 		"Portrait",
 		"portrait",
 		"ScrollFrameBorder",
+		"ScrollUpBorder",
+		"ScrollDownBorder",
 	}
 	function M:StripTextures(kill)
 		local frameName = self.GetName and self:GetName()
@@ -467,17 +469,19 @@ do
 
 	-- Background texture
 	function M:CreateTex()
-		if self.Tex then return end
+		if self.__bgTex then return end
 
 		local frame = self
 		if self:GetObjectType() == "Texture" then frame = self:GetParent() end
 
-		self.Tex = frame:CreateTexture(nil, "BACKGROUND", nil, 1)
-		self.Tex:SetAllPoints(self)
-		self.Tex:SetTexture(I.bgTex, true, true)
-		self.Tex:SetHorizTile(true)
-		self.Tex:SetVertTile(true)
-		self.Tex:SetBlendMode("ADD")
+		local tex = frame:CreateTexture(nil, "BACKGROUND", nil, 1)
+		tex:SetAllPoints(self)
+		tex:SetTexture(I.bgTex, true, true)
+		tex:SetHorizTile(true)
+		tex:SetVertTile(true)
+		tex:SetBlendMode("ADD")
+
+		self.__bgTex = tex
 	end
 
 	-- Backdrop shadow
@@ -760,6 +764,7 @@ do
 		end
 
 		self.__bg = M.CreateBDFrame(self, 0, true)
+		self.__bg:SetFrameLevel(self:GetFrameLevel())
 		self.__bg:SetAllPoints()
 
 		if not noHighlight then

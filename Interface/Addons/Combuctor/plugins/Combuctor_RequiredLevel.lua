@@ -225,6 +225,7 @@ moduleData.EP_PANDARIA = "5"
 moduleData.EP_WOD =      "6"
 moduleData.EP_LEGION =   "7"
 moduleData.EP_BFA =      "8"
+moduleData.EP_SL =       "9"
 
 
 
@@ -523,6 +524,7 @@ moduleData.expansionIdentifierToVersionNumber = {
     ["Legion"] =                moduleData.EP_LEGION,
     ["Zandalari"] =             moduleData.EP_BFA,
     ["Kul Tiran"] =             moduleData.EP_BFA,
+    ["Shadowlands"] =           moduleData.EP_SL,
   },
   ["enGB"] = {
     [""] =                      moduleData.EP_VANILLA,
@@ -534,6 +536,7 @@ moduleData.expansionIdentifierToVersionNumber = {
     ["Legion"] =                moduleData.EP_LEGION,
     ["Zandalari"] =             moduleData.EP_BFA,
     ["Kul Tiran"] =             moduleData.EP_BFA,
+    ["Shadowlands"] =           moduleData.EP_SL,
   },
   ["deDE"] = {
     [""] =                      moduleData.EP_VANILLA,
@@ -545,6 +548,7 @@ moduleData.expansionIdentifierToVersionNumber = {
     ["der Verheerten Inseln"] = moduleData.EP_LEGION,
     ["von Zandalar"] =          moduleData.EP_BFA,
     ["von Kul Tiras"] =         moduleData.EP_BFA,
+    ["der Schattenlande"] =     moduleData.EP_SL,
   },
   ["frFR"] = {
     [""] =                      moduleData.EP_VANILLA,
@@ -556,6 +560,7 @@ moduleData.expansionIdentifierToVersionNumber = {
     ["de Legion"] =             moduleData.EP_LEGION,
     ["de Zandalar"] =           moduleData.EP_BFA,
     ["de Kul Tiras"] =          moduleData.EP_BFA,
+    ["d’Ombreterre"] =          moduleData.EP_SL,
   },
   ["itIT"] = {
     [""] =                      moduleData.EP_VANILLA,
@@ -567,6 +572,7 @@ moduleData.expansionIdentifierToVersionNumber = {
     ["di Legion"] =             moduleData.EP_LEGION,
     ["di Zandalar"] =           moduleData.EP_BFA,
     ["di Kul Tiras"] =          moduleData.EP_BFA,
+    ["di Shadowlands"] =        moduleData.EP_SL,
   },
   ["esES"] = {
     [""] =                      moduleData.EP_VANILLA,
@@ -578,6 +584,7 @@ moduleData.expansionIdentifierToVersionNumber = {
     ["de Legion"] =             moduleData.EP_LEGION,
     ["Zandalari"] =             moduleData.EP_BFA,
     ["de Kul Tiras"] =          moduleData.EP_BFA,
+    ["de Shadowlands"] =        moduleData.EP_SL,
   },
   ["esMX"] = {
     [""] =                      moduleData.EP_VANILLA,
@@ -589,18 +596,20 @@ moduleData.expansionIdentifierToVersionNumber = {
     ["de Legion"] =             moduleData.EP_LEGION,
     ["Zandalari"] =             moduleData.EP_BFA,
     ["de Kul Tiras"] =          moduleData.EP_BFA,
+    ["de Shadowlands"] =        moduleData.EP_SL,
   },
   
   
   -- Check these items to create more locales...
-  -- Outland:   https://www.wowhead.com/item=34126/recipe-shoveltusk-soup
-  -- Northrend: https://www.wowhead.com/item=43036/recipe-dragonfin-filet
-  -- Cataclysm: https://www.wowhead.com/item=62800/recipe-seafood-magnifique-feast
-  -- Pandaria:  https://www.wowhead.com/item=74658/recipe-spicy-vegetable-chips
-  -- Draenor:   https://www.wowhead.com/item=116347/recipe-burnished-leather-bag
-  -- Legion:    https://www.wowhead.com/item=133830/recipe-lavish-suramar-feast
-  -- Zandalari: https://www.wowhead.com/spell=265817/zandalari-cooking
-  -- Kul Tiran: https://www.wowhead.com/spell=264646/kul-tiran-cooking
-  
-  
+  -- Outland:     https://www.wowhead.com/item=34126/recipe-shoveltusk-soup
+  -- Northrend:   https://www.wowhead.com/item=43036/recipe-dragonfin-filet
+  -- Cataclysm:   https://www.wowhead.com/item=62800/recipe-seafood-magnifique-feast
+  -- Pandaria:    https://www.wowhead.com/item=74658/recipe-spicy-vegetable-chips
+  -- Draenor:     https://www.wowhead.com/item=116347/recipe-burnished-leather-bag
+  -- Legion:      https://www.wowhead.com/item=133830/recipe-lavish-suramar-feast
+  -- Zandalari:   https://www.wowhead.com/spell=265817/zandalari-cooking
+  -- Kul Tiran:   https://www.wowhead.com/spell=264646/kul-tiran-cooking
+  -- Shadowlands: https://www.wowhead.com/spell=309831/shadowlands-cooking
+
+
 }

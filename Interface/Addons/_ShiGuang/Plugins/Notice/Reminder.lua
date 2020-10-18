@@ -28,7 +28,7 @@ local categoryInfo = {}
 do
 	local frame = CreateFrame("Frame")
 	frame:SetScript("OnEvent", function(self, event)
-		if C_Garrison.GetLandingPageGarrisonType() ~= LE_GARRISON_TYPE_7_0 then return end
+		if C_Garrison.GetLandingPageGarrisonType() ~= Enum.GarrisonType.Type_7_0 then return end
 
 		if event == "GARRISON_FOLLOWER_CATEGORIES_UPDATED" then
 			categoryInfo = C_Garrison.GetClassSpecCategoryInfo(Enum.GarrisonFollowerType.FollowerType_7_0)
@@ -48,7 +48,7 @@ GarrisonLandingPageMinimapButton:HookScript("OnEnter", function(self)
 	local garrisonType = C_Garrison.GetLandingPageGarrisonType()
 	local currencyId = garrisonType and C_Garrison.GetCurrencyTypes(garrisonType)
 	if not currencyId then return end
-	local currency, amount, icon = GetCurrencyInfo(currencyId)
+	local currency, amount, icon = C_CurrencyInfo.GetCurrencyInfo(currencyId)
 	--GameTooltip:AddLine(" ")
 	GameTooltip:AddDoubleLine(currency, ("%s |T%s:0:0:0:2:64:64:4:60:4:60|t"):format(BreakUpLargeNumbers(amount), icon), 1,1,1, 1,1,1)
 	GameTooltip:Show()

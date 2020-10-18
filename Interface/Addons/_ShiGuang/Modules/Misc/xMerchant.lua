@@ -1,4 +1,4 @@
-﻿--## Author: Nils Ruesch  ## Version: 1.8.2
+﻿--## Author: Nils Ruesch  ## Version: 1.9.0
 --[[ xMerchant Copyright (c) 2010-2014, Nils Ruesch All rights reserved. ]]
 local _, ns = ...
 local M, R, U, I = unpack(ns)
@@ -163,23 +163,25 @@ end
 local function CurrencyUpdate()
 	wipe(currencies);
 	
-	--[[local limit = GetCurrencyListSize();
+	local limit = C_CurrencyInfo.GetCurrencyListSize();
 	
 	for i=1, limit do
-		-- DONEY note for 6.0   the itemID seemes not avail any more, while the http://wowpedia.org/API_GetCurrencyListInfo is out-dated, 2014-10-25
-		local name, isHeader, _, _, _, count, icon, maximum, hasWeeklyLimit, currentWeeklyAmount, _, itemID = GetCurrencyListInfo(i);
-		if ( not isHeader ) then
-		end
-		if ( not isHeader and itemID ) then
-			currencies[tonumber(itemID)] = count;
-			-- DONEY fix for 5.0 points
-			if ( not isHeader and itemID and tonumber(itemID) <= 9 ) then
-				currencies[name] = count;
-			end
-		elseif ( not isHeader and not itemID ) then
+		-- DONEY 6.0 http://wowpedia.org/API_GetCurrencyListInfo is out-dated, 2014-10-25
+		-- local name, isHeader, _, _, _, count, icon, maximum, hasWeeklyLimit, currentWeeklyAmount, _, itemID = GetCurrencyListInfo(i);
+		-- DONEY 9.0 thanks to @StevieTV for wow 9.0 update
+		local info = C_CurrencyInfo.GetCurrencyListInfo(i);
+		local name = info.name;
+		local isHeader = info.isHeader;
+		local count = info.quantity;
+		local icon = info.iconFileID;
+		local maximum = info.maxQuantity;
+		local hasWeeklyLimit = info.canEarnPerWeek;
+		local itemID
+		if ( not isHeader and not itemID ) then
 			currencies[name] = count;
 		end
-	end]]
+	end
+	
 	
 	for i=INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED, 1 do
 		local itemID = GetInventoryItemID("player", i);
@@ -874,7 +876,7 @@ xMerchant_InitItemsButtons()
 
 hooksecurefunc("MerchantFrame_Update", function()
 	if ( MerchantFrame.selectedTab == 1 ) then
-		for i=1, 10, 1 do _G["MerchantItem"..i]:Hide(); end  --for i=1, 12
+		for i=1, 12, 1 do _G["MerchantItem"..i]:Hide(); end
 		frame:Show();
 		CurrencyUpdate();
 		-- DONEY
@@ -882,14 +884,14 @@ hooksecurefunc("MerchantFrame_Update", function()
 		MerchantUpdate();
 	else
 		frame:Hide();
-		for i=1, 10, 1 do _G["MerchantItem"..i]:Show(); end  --for i=1, 12
+		for i=1, 12, 1 do _G["MerchantItem"..i]:Show(); end
 		if (StackSplitFrame:IsShown()) then StackSplitFrame:Hide(); end
 	end
 end);
 		
 hooksecurefunc("MerchantFrame_OnHide", function() wipe(errors); wipe(currencies); end);
---MerchantBuyBackItem:ClearAllPoints();
---MerchantBuyBackItem:SetPoint("BOTTOMLEFT", 175, 32);
+MerchantBuyBackItem:ClearAllPoints();
+MerchantBuyBackItem:SetPoint("BOTTOMLEFT", 175, 32);
 
 for _, frame in next, { MerchantNextPageButton, MerchantPrevPageButton, MerchantPageText } do
 	frame:Hide()

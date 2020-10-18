@@ -10,6 +10,18 @@
 	[/hpq ss 月火术 重拳]搜索带月火并且带重拳
 	注意。关键字是包括技能信息内的文字/技能类别"
 ]]--
+local GetQuestsCompleted = _G.GetQuestsCompleted or function(tbl)
+    local list = C_QuestLog.GetAllCompletedQuestIDs();
+    if tbl ~= nil then
+        wipe(tbl);
+    else
+        tbl = {  };
+    end
+    for index = 1, #list do
+        tbl[list[index]] = 1;
+    end
+    return tbl;
+end
 
 --~ Globals
 local _G = getfenv(0)

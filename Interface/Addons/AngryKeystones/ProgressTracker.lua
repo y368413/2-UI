@@ -413,8 +413,8 @@ local function ProgressBar_SetValue(self, percent)
 		
 				reapingFrame.Icon = CreateFrame("Frame", nil, reapingFrame, "ScenarioChallengeModeAffixTemplate")
 				reapingFrame.Icon:SetPoint("LEFT", reapingFrame, "LEFT", 0, 0)
-				reapingFrame.Icon:SetSize(14, 14)
-				reapingFrame.Icon.Portrait:SetSize(12, 12)
+				reapingFrame.Icon:SetSize(16, 16)
+				reapingFrame.Icon.Portrait:SetSize(16, 16)
 				reapingFrame.Icon:SetUp(PRIDEFUL_AFFIX_ID)
 
 				reapingFrame.Text = reapingFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")

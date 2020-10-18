@@ -35,7 +35,7 @@ function HPetOption:Init()
 	self:SetPoint("CENTER")
 	self:SetToplevel(true)
 	self:SetMovable(true)
-	self:SetClampedToScreen(true)
+	-- self:SetClampedToScreen(true)
 
 	--[[ background
 	self:SetBackdrop( {
@@ -503,7 +503,7 @@ function UpdateStoneButton_Click()
 	print("↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓")
 	for _,id in ipairs(Stone) do
 		if (BrotherBags) then
-			GetStringBB(id)
+			GetStringForBB(id)
 		-- elseif () then
 			-- GetStringBS(id)
 		end

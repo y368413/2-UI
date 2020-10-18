@@ -1,0 +1,7 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Main.lua"/>
+	<Script file="Balance.lua"/>
+	<Script file="Feral.lua"/>
+	<Script file="Guardian.lua"/>
+	<Script file="Restoration.lua"/>
+</Ui>

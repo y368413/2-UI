@@ -42,6 +42,7 @@ function Sort:Iterate()
   local todo = false
   local spaces = self:GetSpaces()
   local families = self:GetFamilies(spaces)
+
   local stackable = function(item)
     return (item.count or 1) < (item.stack or 1)
   end

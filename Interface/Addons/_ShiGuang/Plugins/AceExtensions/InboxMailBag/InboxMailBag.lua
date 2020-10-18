@@ -484,6 +484,7 @@ function InboxMailbagItem_OnEnter(self, index)
 			GameTooltip:AddLine( GetCoinTextureString(item.money), 1, 1, 1 );
 		else
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo( links[1].mailID );
+			playerName = playerName or AUCTION_HOUSE_MAIL_MULTIPLE_BUYERS
 
 			if ( invoiceType == "seller" ) then
 				GameTooltip:AddLine( format( "%s  |cffFFFFFF%s|r", ITEM_SOLD_COLON, itemName ) );

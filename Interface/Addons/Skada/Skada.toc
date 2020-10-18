@@ -6,7 +6,7 @@
 ## Notes-zhCN: 模块化伤害统计。
 ## Notes-zhTW: 模組化的傷害統計。
 ## Author: Zarnivoop, OwnlyMe
-## Version: 1.7.7
+## Version: 1.8.2
 ## SavedVariables: SkadaDB, PermanentActivity
 ## SavedVariablesPerCharacter: SkadaPerCharDB, SessionActivity
 ## Dependencies: _ShiGuang
@@ -38,5 +38,3 @@ SkadaStagger.lua
 SkadaAvoidableDamageTaken.lua
 ## SkadaActivity.lua
 ## SkadaPlus.lua
-
-BossesKilled.lua

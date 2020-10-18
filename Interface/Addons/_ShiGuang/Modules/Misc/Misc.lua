@@ -671,7 +671,7 @@ hall:RegisterEvent("ADDON_LOADED")
 hall:SetScript("OnEvent", function(self, event, addon)
 	if event == "ADDON_LOADED" and addon == "Blizzard_OrderHallUI" then
 		M.HideObject(OrderHallCommandBar)
-		GarrisonLandingPageTutorialBox:SetClampedToScreen(true)
+		--GarrisonLandingPageTutorialBox:SetClampedToScreen(true)
 		self:UnregisterEvent("ADDON_LOADED")
 	end
 end)

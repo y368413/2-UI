@@ -1,4 +1,4 @@
-local MAJOR, MINOR = "LibItemUpgradeInfo-1.0", 30
+local MAJOR, MINOR = "LibItemUpgradeInfo-1.0", 31
 local type,tonumber,select,strsplit,GetItemInfoFromHyperlink=type,tonumber,select,strsplit,GetItemInfoFromHyperlink
 local unpack,GetDetailedItemLevelInfo=unpack,GetDetailedItemLevelInfo
 local library,previous = _G.LibStub:NewLibrary(MAJOR, MINOR)
@@ -25,8 +25,8 @@ local i_unk1=14
 local i_unk2=15
 local i_unk3=16
 local i_unk4=17
-
-
+local LE_ITEM_QUALITY_ARTIFACT=Enum.ItemQuality.Artifact
+local LE_ITEM_QUALITY_HEIRLOOM=Enum.ItemQuality.Heirloom
 do
 local oGetItemInfo=GetItemInfo
 lib.itemcache=lib.itemcache or

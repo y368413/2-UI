@@ -794,7 +794,7 @@ function MTG:MERCHANT_SHOW(event,...)
 end
 
 
-function MTG:MERCHANT_CLOSED(event,...)
+--[[function MTG:MERCHANT_CLOSED(event,...)
     if IsAddOnLoaded("WeakAuras") then
         if WeakAuras.loaded["Mrrl's trade game"] then 
             MTG:UnregisterEvent("MERCHANT_SHOW")
@@ -804,7 +804,7 @@ function MTG:MERCHANT_CLOSED(event,...)
         end
     end
     return true
-end
+end]]
 
 local buyitems = ""
 function MTG:CHAT_MSG_LOOT(event,...)
@@ -889,7 +889,7 @@ function MTG:ADDON_LOADED(event,...)
     if ShiGuangDB["MTGsetting"][169202] == nil then ShiGuangDB["MTGsetting"][169202] = true end
     if ShiGuangDB["MTGsetting"][170158] == nil then ShiGuangDB["MTGsetting"][170158] = true end
       MTG:RegisterEvent("MERCHANT_SHOW")
-      MTG:RegisterEvent("MERCHANT_CLOSED")
+      --MTG:RegisterEvent("MERCHANT_CLOSED")
       MTG:RegisterEvent("CHAT_MSG_LOOT")
       MTG:RegisterEvent("GET_ITEM_INFO_RECEIVED")
     initializeValueableList()

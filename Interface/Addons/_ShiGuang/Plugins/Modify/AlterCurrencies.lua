@@ -27,11 +27,11 @@ end
 -----------------------------------------------------------------------------------
 function AlterCurrencies.GetCurrencyAmounts()
     local currencyName, currencyAmount, isDiscovered = nil,nil,nil;
-    for i = 1,GetCurrencyListSize(),1 do
-        local currencyLink = GetCurrencyListLink(i);
+    for i = 1,C_CurrencyInfo.GetCurrencyListSize(),1 do
+        local currencyLink = C_CurrencyInfo.GetCurrencyListLink(i);
         if currencyLink ~= nil then -- Ignore headers
-            local currencyId = tonumber(string.match(GetCurrencyListLink(i),"currency:(%d+)")) -- Get only the ID
-            local currencyName, currencyAmount, isDiscovered = GetCurrencyInfo(currencyLink); 
+            local currencyId = tonumber(string.match(C_CurrencyInfo.GetCurrencyListLink(i),"currency:(%d+)")) -- Get only the ID
+            local currencyName, currencyAmount, isDiscovered = C_CurrencyInfo.GetCurrencyInfo(currencyLink); 
             if currencyId ~= nil and currencyName ~= nil and isDiscovered and currencyAmount > 0 then
                 AlterCurrencies.UpdateTable(currencyId, currencyAmount) -- Store
             end
@@ -78,7 +78,7 @@ end
 -- Append to tooltip text all currency information
 ---------------------------------------------------
 function AlterCurrencies.AddToTooltip(tooltip, index)
-    local id = tonumber(string.match(GetCurrencyListLink(index),"currency:(%d+)"))
+    local id = tonumber(string.match(C_CurrencyInfo.GetCurrencyListLink(index),"currency:(%d+)"))
     if type(ShiGuangDB) == "table" and ShiGuangDB ~= nil then -- If shared variable have data
         for currencyId, value_DB in pairs(ShiGuangDB) do -- For each stored currency
             if id == currencyId then -- If the hover is on this currency 

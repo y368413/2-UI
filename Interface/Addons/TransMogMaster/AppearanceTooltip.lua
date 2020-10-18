@@ -42,8 +42,8 @@ function tooltip:ADDON_LOADED(addon)
         anchor = "vertical", -- vertical / horizontal
         byComparison = true, -- whether to show by the comparison, or fall back to vertical if needed
         tokens = true, -- try to preview tokens?
-        bags = true,
-        bags_unbound = true,
+        bags = false,
+        bags_unbound = false,
         merchant = true,
         loot = true,
         encounterjournal = true,
@@ -1347,7 +1347,7 @@ byComparison:SetPoint("TOPLEFT", anchorLabel, "BOTTOMLEFT", 0, -10)
     InterfaceOptions_AddCategory(panel)
 end
 
--- Overlay config
+--[[ Overlay config
 
 do
     local panel = CreateFrame("Frame", nil, InterfaceOptionsFramePanelContainer)
@@ -1388,7 +1388,7 @@ do
     encounterjournal:SetPoint("TOPLEFT", loot, "BOTTOMLEFT", 0, -4)
 
     InterfaceOptions_AddCategory(panel)
-end
+end]]
 
 -- Slash handler
 SlashCmdList.APPEARANCETOOLTIP = function(msg)

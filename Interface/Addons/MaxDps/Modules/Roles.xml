@@ -1,0 +1,17 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="custom.lua"/>
+	<!--Script file="Window.lua"/>
+	<Script file="profiler.lua"/-->
+	<Include file="DeathKnight\DeathKnight.xml"/>
+	<Include file="DemonHunter\DemonHunter.xml"/>
+	<Include file="Druid\Druid.xml"/>
+	<Include file="Hunter\Hunter.xml"/>
+	<Include file="Mage\Mage.xml"/>
+	<Include file="Monk\Monk.xml"/>
+	<Include file="Paladin\Paladin.xml"/>
+	<Include file="Priest\Priest.xml"/>
+	<Include file="Rogue\Rogue.xml"/>
+	<Include file="Shaman\Shaman.xml"/>
+	<Include file="Warlock\Warlock.xml"/>
+	<Include file="Warrior\Warrior.xml"/>
+</Ui>

@@ -1,4 +1,5 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="BossesKilled.lua"/>
 	<Script file="ElitismHelper.lua"/>
 	<Script file="KeystoneHelper.lua"/>
 	<Script file="LFR_of_the_past.lua"/>

@@ -19,6 +19,8 @@ CanIMogIt.lua
 Overlay\_overlays.xml
 ## Plugins\_plugins.xml
 
+TransmogCleanup.lua
+
 Libs\LibArmorToken-1.0.lua
 Libs\LibAppropriateItems-1.0.lua
 AppearanceTooltip.lua

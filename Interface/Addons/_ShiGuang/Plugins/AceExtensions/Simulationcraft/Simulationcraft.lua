@@ -358,9 +358,7 @@ function Simulationcraft:HandleChatCommand(input)
   local links = getLinks(input)
 
   for _, arg in ipairs(args) do
-    if arg == 'debug' then
-      debugOutput = true
-    elseif arg == 'nobag' or arg == 'nobags' or arg == 'nb' then
+    if arg == 'nobag' or arg == 'nobags' or arg == 'nb' then
       noBags = true
     end
   end
@@ -849,18 +847,11 @@ function Simulationcraft:GetMainFrame(text)
   -- Frame code largely adapted from https://www.wowinterface.com/forums/showpost.php?p=323901&postcount=2
   if not SimcFrame then
     -- Main Frame
-    frameConfig = self.db.profile.frame
     local f = CreateFrame("Frame", "SimcFrame", UIParent, "DialogBoxFrame")
     f:ClearAllPoints()
     -- load position from local DB
-    f:SetPoint(
-      frameConfig.point,
-      frameConfig.relativeFrame,
-      frameConfig.relativePoint,
-      frameConfig.ofsx,
-      frameConfig.ofsy
-    )
-    f:SetSize(frameConfig.width, frameConfig.height)
+    f:SetPoint("CENTER",nil,"CENTER",0,0)
+    f:SetSize(750, 400)
     f:SetBackdrop({
       bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
       edgeFile = "Interface\\PVPFrame\\UI-Character-PVP-Highlight",
@@ -876,13 +867,6 @@ function Simulationcraft:GetMainFrame(text)
     end)
     f:SetScript("OnMouseUp", function(self, button)
       self:StopMovingOrSizing()
-      -- save position between sessions
-      point, relativeFrame, relativeTo, ofsx, ofsy = self:GetPoint()
-      frameConfig.point = point
-      frameConfig.relativeFrame = relativeFrame
-      frameConfig.relativePoint = relativeTo
-      frameConfig.ofsx = ofsx
-      frameConfig.ofsy = ofsy
     end)
 
     -- scroll frame
@@ -938,7 +922,7 @@ end
 -- This is the workhorse function that constructs the profile
 function Simulationcraft:PrintSimcProfile(debugOutput, noBags, links)
   -- addon metadata
-  local versionComment = '# SimC Addon ' .. '9.0.1-alpha-10'
+  local versionComment = '# SimC Addon ' .. '9.0.1-01'
   local simcVersionWarning = '# Requires SimulationCraft 901-01 or newer'
 
   -- Basic player info

@@ -1,4 +1,4 @@
--- ## Author: Gello ## Version 2.0.0
+-- ## Author: Gello ## Version 2.1.0
 local qb = {}
 local qbFont = CreateFont("qb_NumberFont")
 qbFont:CopyFontObject("GameFontHighlightSmall")
@@ -36,6 +36,7 @@ function qb:ReleaseAllButtons()
     if not InCombatLockdown() then
         ClearOverrideBindings(qb.frame)
     end
+    qb.nudgedGossip = false
 end
 
 -- title buttons (the clickable lines of text on gossip and quest frames) take first keys
@@ -106,11 +107,21 @@ function qb:ShowKeyOverlays()
         end
     end
 
+    -- next look for GossipFrame_TitleButtons
+    for i=1,GossipFrame_GetTitleButtonCount() do
+        local titleButton = GossipFrame_GetTitleButton(i)
+        if titleButton:IsVisible() then
+            currentKey = currentKey + 1
+            qb:SetKey(currentKey,titleButton,"GossipTitleButton")
+        end
+    end
+
     -- now look for named buttons
     for _,name in ipairs(qb.noteworthy) do
         if currentKey < 9 then
             local button = _G[name]
-            if button and button:IsVisible() and button:IsEnabled() and button:GetPoint() and not (name:match("QuestInfoRewardsFrameQuestInfoItem") and QuestFrameDetailPanel:IsVisible()) then
+            --if button and button:IsVisible() and button:IsEnabled() and button:GetPoint() and not (name:match("QuestInfoRewardsFrameQuestInfoItem") and QuestFrameDetailPanel:IsVisible()) then
+            if qb:IsNamedButtonInUse(name) then
                 currentKey = currentKey + 1
                 qb:SetKey(currentKey,button)
             end
@@ -119,8 +130,30 @@ function qb:ShowKeyOverlays()
     
 end
 
+-- returns whether the NAMED button is in use (will always return false for anonymous buttons)
+function qb:IsNamedButtonInUse(buttonName)
+    local button = _G[buttonName]
+    if not button then
+        return false
+    elseif not button:IsVisible() then
+        return false
+    elseif not button:IsEnabled() then
+        return false
+    elseif not button:GetPoint() then
+        return false
+    elseif buttonName:match("QuestInfoRewardsFrameQuestInfo") and QuestFrameDetailPanel:IsVisible() then -- if reward is in detail window, then don't put a binding on it
+        return false
+    elseif buttonName=="QuestInfoRewardsFrameQuestInfoItem1" then -- if only one reward, then don't put a binding on it
+        local reward2 = QuestInfoRewardsFrameQuestInfoItem2
+        if not reward2 or not reward2:GetPoint() or not reward2:IsVisible() then
+            return false
+        end
+    end
+    return true
+end
+
 -- puts a new button for key by the parent (this can't happen in combat)
-function qb:SetKey(key,parent)
+function qb:SetKey(key,parent,buttonType)
     if key < 1 or key > 9 then
         return
     end
@@ -130,6 +163,14 @@ function qb:SetKey(key,parent)
     button:SetFrameStrata("FULLSCREEN")
     button.key:SetText(key)
     local name = parent:GetName()
+
+    -- for new GossipTitleButtons in SL, nudging them over like quest title buttons
+    if buttonType=="GossipTitleButton" and not qb.nudgedGossip then
+        qb.nudgedGossip = true
+        local anchorPoint,anchorTo,relativePoint,xoff,yoff = parent:GetPoint()
+        parent:SetPoint(anchorPoint,anchorTo,relativePoint,xoff+14,-20)
+    end
+
     if not name or name:match("QuestTitleButton") then -- anonymous ones are (likely) from titleButtonPool
         button:SetPoint("RIGHT",parent,"LEFT",5,3)
     elseif name:match("GossipTitleButton") then

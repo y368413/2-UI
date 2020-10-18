@@ -74,7 +74,7 @@ function BaudErrorFrameShowError(Error)
 
 	if GetTime() > SoundTime then
 		--PlaySound(48942, "Master")
-		PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Sonar.ogg", "Master")
+		--PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Sonar.ogg", "Master")
 		SoundTime = GetTime() + 1
 	end
 end

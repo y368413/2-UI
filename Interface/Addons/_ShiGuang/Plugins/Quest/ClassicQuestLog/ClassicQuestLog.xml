@@ -1,7 +1,7 @@
 <Ui>
 
 	<!-- parent window is also the parent namespace of the addon; also contains the "chrome" like panel buttons and resize grip -->
-	<Frame name="ClassicQuestLog" parent="UIParent" toplevel="true" clampedToScreen="true" enableMouse="true" movable="true" resizable="true" inherits="ButtonFrameTemplate" hidden="true">
+	<Frame name="ClassicQuestLog" parent="UIParent" toplevel="true" clampedToScreen="true" enableMouse="true" movable="true" resizable="true" inherits="ButtonFrameTemplate,BackdropTemplate" hidden="true">
 		<Size x="667" y="496"/>
 		<Anchors>
 			<Anchor point="TOPLEFT" x="16" y="-116"/>
@@ -143,7 +143,7 @@
 
 		<Frames>
             <!-- count of quests (Quests: 17/25) in a small inset at top of main window -->
-			<Frame parentKey="countFrame" inherits="InsetFrameTemplate3">
+			<Frame parentKey="countFrame" inherits="InsetFrameTemplate3,BackdropTemplate">
 				<Size x="120" y="20"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" x="132" y="-33"/>
@@ -533,7 +533,7 @@
     </Button>
 
     <!-- the lore scrollframe displayed when a campaign header "the story so far..." button is clicked -->
-    <ScrollFrame parentKey="lore" parent="ClassicQuestLog" inherits="UIPanelScrollFrameTemplate" hidden="true">
+    <ScrollFrame parentKey="lore" name="ClassicQuestLogLoreScrollFrame" parent="ClassicQuestLog" inherits="UIPanelScrollFrameTemplate,BackdropTemplate" hidden="true">
         <Anchors>
             <Anchor point="TOPLEFT" relativeKey="$parent.detail" relativePoint="TOPLEFT"/>
             <Anchor point="BOTTOMRIGHT" relativeKey="$parent.detail" relativePoint="BOTTOMRIGHT"/>

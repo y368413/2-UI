@@ -100,14 +100,14 @@ function MISC:RareAlert_Update(id)
 		local atlasWidth = width/(txRight-txLeft)
 		local atlasHeight = height/(txBottom-txTop)
 		local tex = format("|T%s:%d:%d:0:0:%d:%d:%d:%d:%d:%d|t", file, 0, 0, atlasWidth, atlasHeight, atlasWidth*txLeft, atlasWidth*txRight, atlasHeight*txTop, atlasHeight*txBottom)
-
-		UIErrorsFrame:AddMessage(I.InfoColor..U["Rare Found"]..tex..(info.name or ""))
+		--UIErrorsFrame:AddMessage(I.InfoColor..U["Rare Found"]..tex..(info.name or ""))
+		RaidNotice_AddMessage(RaidWarningFrame, "----------   "..tex..(info.name or "").."   ----------", ChatTypeInfo["RAID_WARNING"])
 		if MaoRUIPerDB["Misc"]["AlertinChat"] then
-			local currrentTime = MaoRUIDB["TimestampFormat"] == 1 and "|cff00ff00["..date("%H:%MISC:%S").."]|r" or ""
-			print(currrentTime.." -> "..I.InfoColor..U["Rare Found"]..tex..(info.name or ""))
+			local currrentTime = MaoRUIDB["TimestampFormat"] == 1 and "|cff00ff00["..date("%H:%M:%S").."]|r" or ""
+			print(currrentTime.." -> "..I.InfoColor.." → "..tex..(info.name or ""))
 		end
 		if not MaoRUIPerDB["Misc"]["RareAlertInWild"] or MISC.RareInstType == "none" then
-			PlaySound(23404, "master")
+			PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
 		end
 
 		cache[id] = true

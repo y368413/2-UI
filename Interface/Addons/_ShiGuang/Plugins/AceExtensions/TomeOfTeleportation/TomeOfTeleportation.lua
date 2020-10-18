@@ -84,7 +84,7 @@ local DefaultOptions =
 	["maximumHeight"] = 520,
 	["fontHeight"] = 10,
 	["buttonInset"] = 12,
-	["background"] = "Interface\\ACHIEVEMENTFRAME\\UI-Achievement-Parchment-Horizontal-Desaturated",
+	["background"] = "Interface/DialogFrame/UI-DialogBox-Gold-Background",
 	["backgroundR"] = 0,
 	["backgroundG"] = 0,
 	["backgroundB"] = 0,
@@ -1564,7 +1564,7 @@ function dataobj:OnEnter()
     GameTooltip:AddDoubleLine(TITLEREADME)
     --GameTooltip:AddDoubleLine(ERR_QUEST_HAS_IN_PROGRESS,"|T".."Interface\\Addons\\_ShiGuang\\Media\\Modules\\MaoR-UI"..":32|t")
     GameTooltip:AddLine(" ")
-    --GameTooltip:AddDoubleLine(quest_icon..AddColor("[|cffFFaaaa"..GetCurrencyInfo(1580).."|r] ",GOLD), CheckCurrency())
+    --GameTooltip:AddDoubleLine(quest_icon..AddColor("[|cffFFaaaa"..C_CurrencyInfo.GetCurrencyInfo(1580).."|r] ",GOLD), CheckCurrency())
     --GameTooltip:AddDoubleLine(quest_icon..AddColor(GetItemInfo(138019),LIGHT_BLUE), completedstring(44554))            --史诗钥石
     GameTooltip:AddDoubleLine(quest_icon..AddColor(GARRISON_LANDING_INVASION,LIGHT_BLUE), GarrisonInvade())
     --GameTooltip:AddDoubleLine(quest_icon..AddColor(PLAYER_DIFFICULTY_TIMEWALKER,LIGHT_BLUE), TimeTravelFB())   --TBC--WLK--CTM 
