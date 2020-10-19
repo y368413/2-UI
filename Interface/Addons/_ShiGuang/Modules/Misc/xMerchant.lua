@@ -60,7 +60,6 @@ local function GetError(index, link, isRecipe)
 			local reputation = gettext:match(REQUIRES_REPUTATION);
 			if ( reputation and not skipForRecipe ) then
 				errormsg = errormsg..reputation;
-				-- DONEY
 				local factionName = gettext:match(REQUIRES_REPUTATION_NAME);
 				if ( factionName ) then
 					local standingLabel = factions[factionName];
@@ -615,8 +614,6 @@ local function xMerchant_InitFrame(frame)
 	frame:SetScript("OnEvent", OnEvent);
 	frame:SetWidth(295);
 	frame:SetHeight(294);
-	-- DONEY
-	-- frame:SetPoint("TOPLEFT", 21, -76);
 	frame:SetPoint("TOPLEFT", 10, -65);
 
 	xMerchant.merchantFrame = frame
@@ -703,12 +700,8 @@ tooltipsearching:SetChecked(false);
 
 local scrollframe = CreateFrame("ScrollFrame", "NuuhMerchantScrollFrame", frame, "FauxScrollFrameTemplate");
 frame.scrollframe = scrollframe;
--- DONEY
--- scrollframe:SetWidth(295);
 scrollframe:SetWidth(284);
 scrollframe:SetHeight(298);
--- DONEY
--- scrollframe:SetPoint("TOPLEFT", MerchantFrame, 22, -74);
 scrollframe:SetPoint("TOPLEFT", MerchantFrame, 22, -65);
 scrollframe:SetScript("OnShow", xScrollFrame_OnShow);
 scrollframe:SetScript("OnVerticalScroll", xScrollFrame_OnVerticalScroll);

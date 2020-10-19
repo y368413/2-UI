@@ -66,7 +66,7 @@ Handler:SetScript('OnEvent', function(self, event, ...)
 
 		self:UnregisterEvent(event)
 	elseif(event == 'QUEST_ACCEPTED') then
-		local _, questID = ...
+		local questID = ...
 		if(quests[questID]) then
 			self:Watch(questID)
 		end

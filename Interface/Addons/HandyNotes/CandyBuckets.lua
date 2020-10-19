@@ -1,4 +1,4 @@
-﻿--## Author: Vladinator  ## Version: 9.0.0.200731
+﻿--## Author: Vladinator  ## Version: 9.0.1.201018b
 
 local CandyBuckets = {}
 CandyBuckets.modules = CandyBuckets.modules or {}
@@ -631,9 +631,6 @@ CandyBuckets.modules["midsummer"] = {
 if WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE then
 	return
 end
-
-local C_Calendar_GetDate = C_Calendar.GetDate or C_DateAndTime.GetCurrentCalendarTime -- TODO: 9.0
-
 ---- Session--
 CandyBuckets.FACTION = 0
 CandyBuckets.QUESTS = {}
@@ -1149,7 +1146,7 @@ end
 
 function addon:CheckCalendar()
 	local curHour, curMinute = GetGameTime()
-	local curDate = C_Calendar_GetDate()
+	local curDate = C_DateAndTime.GetCurrentCalendarTime()
 	local calDate = C_Calendar.GetMonthInfo()
 	local month, day, year = calDate.month, curDate.monthDay, calDate.year
 	local curMonth, curYear = curDate.month, curDate.year
@@ -1222,7 +1219,7 @@ end
 function addon:QueryCalendar(check)
 	local function DelayedUpdate()
 		if type(CalendarFrame) ~= "table" or not CalendarFrame:IsShown() then
-			local curDate = C_Calendar_GetDate()
+			local curDate = C_DateAndTime.GetCurrentCalendarTime()
 			C_Calendar.SetAbsMonth(curDate.month, curDate.year)
 			C_Calendar.OpenCalendar()
 		end
@@ -1255,7 +1252,7 @@ function addon:IsDeliveryLocationExpected(questID)
 	end
 
 	if not questCollection[1] then
-		questName = C_QuestLog.GetQuestInfo(questID)
+		questName = C_QuestLog.GetTitleForQuestID(questID)
 
 		if questName then
 			local missingFromModule
@@ -1377,12 +1374,8 @@ function addon:PLAYER_LOGIN(event)
 		CandyBuckets.FACTION = 3
 	end
 
-	if GetQuestsCompleted then
-		GetQuestsCompleted(CandyBuckets.COMPLETED_QUESTS)
-	else
-		for _, id in ipairs(C_QuestLog.GetAllCompletedQuestIDs()) do
-			CandyBuckets.COMPLETED_QUESTS[id] = true
-		end
+	for _, id in ipairs(C_QuestLog.GetAllCompletedQuestIDs()) do
+		CandyBuckets.COMPLETED_QUESTS[id] = true
 	end
 
 	addon:QueryCalendar(true)

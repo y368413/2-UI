@@ -2,10 +2,9 @@
 ## Title:-|cFFFFFF00 2|r|cFFFF0000 UI |r-
 ## Author: ShiGuang、TuTu、Siweia
 ## Notes: Time Flies...
-## Version: 3.7.3
-## SavedVariables: MaoRUIDB,ShiGuangDB,CastbarsDB,CurrencyTrackingDB,DialogKeyDB,VLegionToDo,AzeritePowerWeightsDB,WQADB
+## Version: 3.7.4
+## SavedVariables: MaoRUIDB,ShiGuangDB,CastbarsDB,CurrencyTrackingDB,VLegionToDo,AzeritePowerWeightsDB,WQADB
 ## SavedVariablesPerCharacter: MaoRUIPerDB,ShiGuangPerDB,DEX_SAVE
-
 ## X-Support: 9.0.1
 ## X-Repple: 2 UI
 ## X-StatsVersion: 20201019

@@ -7,7 +7,7 @@
 ## Notes: Handynotes with Achievments+Treasures+Toys+Mounts
 ## Notes-zhCN: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已击杀过。并替换自带飞行地图，使之更加方便详细。
 ## Notes-zhTW: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已擊殺過。并替换自带飞行地图，使之更加方便详细。
-## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, Handynotes_PandariaDB, HandyNotes_LostAndFoundDB, HandyNotes_TimelessIsleChestsDB, HandyNotes_TimelessTreasuresDB, HandyNotes_DraenorDB, HandyNotes_ArathiDB, HandyNotes_WarfrontTreasuresDB, HandyNotes_BFA_HF_TrackerDB, NPC_Name_CacheDB, Item_Name_CacheDB, HNMoleMachineConfig, HandyNotes_MechagonAndNazjatarDB, HandyNotes_ScarabCoffersDB, HandyNotes_VisionsOfNZothDB, HandyNotes_PetDailiesDB,  HandyNotes_ShrinesForJewelcraftersDB, HandyNotes_Universal_ExplorerDB, HandyNotes_TravelGuideDB, HandyNotes_AzerothsTopTunesDB, HandyNotes_BFA_JellyDB, HandyNotes_HigherDimensionalLearningDB, HandyNotes_WitheredChestsDB
+## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, Handynotes_PandariaDB, HandyNotes_LostAndFoundDB, HandyNotes_TimelessIsleChestsDB, HandyNotes_TimelessTreasuresDB, HandyNotes_DraenorDB, HandyNotes_ArathiDB, HandyNotes_WarfrontTreasuresDB, HandyNotes_BFA_HF_TrackerDB, NPC_Name_CacheDB, Item_Name_CacheDB, HNMoleMachineConfig, HandyNotes_MechagonAndNazjatarDB, HandyNotes_ScarabCoffersDB, HandyNotes_VisionsOfNZothDB, HandyNotes_PetDailiesDB,  HandyNotes_ShrinesForJewelcraftersDB, HandyNotes_Universal_ExplorerDB, HandyNotes_TravelGuideDB, HandyNotes_AzerothsTopTunesDB, HandyNotes_BFA_JellyDB, HandyNotes_HigherDimensionalLearningDB, HandyNotes_WitheredChestsDB, HandyNotes_ShadowlandsDB
 ## Dependencies: _ShiGuang
 
 ## X-Repple: 2 UI
@@ -40,7 +40,10 @@ LEG\HandyNotes_LegionTreasures.lua
 BFA\HandyNotes_WarfrontRares.lua
 BFA\HandyNotes_BFA_HF_Tracker.lua
 BFA\HandyNotes_ShrinesForJewelcrafters.lua
-BFA\HandyNotes_templates.xml
+BFA\HandyNotes_BFATemplates.xml
+
+# Shadowlands
+Shadowlands\HandyNotes_ShadowlandsTemplates.xml
 
 # Mode files
 Mode\HandyNotes_ScarabCoffers.lua

@@ -85,6 +85,7 @@ local DefaultOptions =
 	["fontHeight"] = 10,
 	["buttonInset"] = 12,
 	["background"] = "Interface/DialogFrame/UI-DialogBox-Gold-Background",
+	["edge"] = "Interface/DialogFrame/UI-DialogBox-Border",
 	["backgroundR"] = 0,
 	["backgroundG"] = 0,
 	["backgroundB"] = 0,
