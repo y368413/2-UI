@@ -560,7 +560,7 @@ function Castbars:FrameCustomize(frame)
     end
 
     -- Create backdrop
-    frame.backdrop = CreateFrame("Frame", nil, frame, "BackdropTemplate");
+    frame.backdrop = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate");
     frame.backdrop:SetPoint("CENTER", frame.statusBar, "CENTER", 0, 0);
 
     if (frameName == "CastingBarFrame") then
@@ -571,7 +571,7 @@ function Castbars:FrameCustomize(frame)
         frame.gcd.border = frame.gcd:CreateTexture(nil, "BACKGROUND");
         frame.gcd.border:SetAllPoints(frame.gcd);
         local texture = frame.gcd:CreateTexture(nil, "OVERLAY");
-        texture:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark");  --Spells\\AURA_01
+        texture:SetTexture("165623");
         texture:SetVertexColor(1, 1, 1, 1)
         texture:SetBlendMode('ADD');
         texture:SetWidth(35);

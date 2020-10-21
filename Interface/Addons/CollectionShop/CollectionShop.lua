@@ -4,7 +4,7 @@
 local NS = select( 2, ... );
 local L = NS.localization;
 NS.releasePatch = "9.0.1";
-NS.versionString = "4.03";
+NS.versionString = "4.04";
 NS.version = tonumber( NS.versionString );
 --
 NS.options = {};
@@ -694,6 +694,7 @@ NS.AuctionHouseFrame_SetDisplayMode = function( self, displayMode ) -- AuctionHo
 		CollectionShopEventsFrame:RegisterEvent( "PLAYER_SPECIALIZATION_CHANGED" );
 		CollectionShopEventsFrame:RegisterEvent( "INSPECT_READY" );
 		CollectionShopEventsFrame:RegisterEvent( "UI_ERROR_MESSAGE" );
+		CollectionShopEventsFrame:RegisterEvent( "AUCTION_HOUSE_BROWSE_FAILURE" );
 		NotifyInspect( "player" );
 		-- Incompatible with Auctioneer
 		if addonEnabled["Auc-Advanced"] then
@@ -732,6 +733,7 @@ NS.Reset = function( filterOnClick )
 		CollectionShopEventsFrame:UnregisterEvent( "PLAYER_SPECIALIZATION_CHANGED" );
 		CollectionShopEventsFrame:UnregisterEvent( "INSPECT_READY" );
 		CollectionShopEventsFrame:UnregisterEvent( "UI_ERROR_MESSAGE" );
+		CollectionShopEventsFrame:UnregisterEvent( "AUCTION_HOUSE_BROWSE_FAILURE" );
 		NS.SetMode( nil, "noReset" );
 		if NS.numAuctionsWon > 0 and NS.db["auctionsWonReminder"] then
 			NS.Print( RED_FONT_COLOR_CODE .. string.format( L["Remember when leaving %s to equip or use auctions won to update your Collections for future Shop results."], NS.title ) .. FONT_COLOR_CODE_CLOSE );
@@ -1590,6 +1592,7 @@ function NS.scan:Reset()
 	self.status = "ready"; -- ready, scanning, selected, buying
 	self.triggerAuctionWon = nil;
 	self.selectedOwner = nil;
+	self.ignoreInternalAuctionErrorAfterBrowseFailure = false;
 end
 --
 function NS.scan:Start( type )
@@ -1867,6 +1870,11 @@ end
 function NS.scan:OnBrowseResultsUpdated() -- AUCTION_HOUSE_BROWSE_RESULTS_UPDATED
 	CollectionShopEventsFrame:UnregisterEvent( "AUCTION_HOUSE_BROWSE_RESULTS_UPDATED" );
 	-- Not really doing anything here right now.
+end
+--
+function NS.scan:OnBrowseFailure() -- AUCTION_HOUSE_BROWSE_FAILURE
+	-- Beginning some time in early 2020, Blizzard AH is throwing an Internal Auction Error after buyouts along with a browse failure event. So, we're going to ignore one following browse failure
+	self.ignoreInternalAuctionErrorAfterBrowseFailure = true;
 end
 --
 function NS.scan:OnThrottledSystemReady() -- AUCTION_HOUSE_THROTTLED_SYSTEM_READY
@@ -2762,6 +2770,12 @@ end
 function NS.scan:OnUIErrorMessage( ... ) -- UI_ERROR_MESSAGE
 	local arg2 = select( 2, ... );
 	if not arg2 then return end
+	-- Beginning some time in early 2020, Blizzard AH is throwing an Internal Auction Error after buyouts along with a browse failure event. So, we're going to ignore one following browse failure
+	if arg2 == ERR_AUCTION_DATABASE_ERROR and self.ignoreInternalAuctionErrorAfterBrowseFailure then
+		self.ignoreInternalAuctionErrorAfterBrowseFailure = false;
+		return -- Ignore internal auction house error once after AUCTION_HOUSE_BROWSE_FAILURE
+	end
+	--
 	if self.status ~= "buying" then
 		-- Not Buying
 		if arg2 == ERR_AUCTION_DATABASE_ERROR then
@@ -3852,6 +3866,7 @@ NS.Frame( "CollectionShopEventsFrame", UIParent, {
 			end
 		elseif	event == "AUCTION_HOUSE_BROWSE_RESULTS_UPDATED"				then	NS.scan:OnBrowseResultsUpdated();
 		elseif	event == "AUCTION_HOUSE_THROTTLED_SYSTEM_READY"				then	NS.scan:OnThrottledSystemReady();
+		elseif	event == "AUCTION_HOUSE_BROWSE_FAILURE"						then	NS.scan:OnBrowseFailure();
 		elseif	event == "ITEM_SEARCH_RESULTS_UPDATED"						then	NS.scan:OnItemSearchResultsUpdated();
 		elseif	event == "REPLICATE_ITEM_LIST_UPDATE"						then	NS.scan:OnReplicateItemListUpdate();
 		elseif	event == "CHAT_MSG_SYSTEM"									then	NS.scan:OnChatMsgSystem( ... );

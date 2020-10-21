@@ -1,26 +1,9 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="Loh.lua"/>
 	<Script file="MTG.lua"/>
 	<Script file="Mingy.lua"/>
-	<Script file="Barrels.lua"/>
 	<Script file="DarkmoonFaire.lua"/>
 	<Script file="AngryWorldQuest.lua"/>
-	<!--Script file="WorldmapRewardIcon.lua"/>
-	<Frame name="BountyCounterTemplate" virtual="true" hidden="false">
-		<Size x="10" y="10"/>
-		<Layers>		
-			<Layer level="ARTWORK">
-				<Texture parentKey="icon" file="Interface\COMMON\ReputationStar" setAllPoints="true">
-					<TexCoords left="0" right="0.5" top="0.5" bottom="1"/>
-				</Texture>
-			</Layer>
-		</Layers>
-	</Frame>
-	<Frame name="WRWorldQuestFrame" mixin="WorldMapQuestBountyCount" parent="QuestMapFrame" inherits="SecureFrameTemplate" enableMouse="true" hidden="false">
-		<Scripts>
-			<OnLoad method="OnLoad"/>
-		</Scripts>
-	</Frame-->
+	<!--Script file="WorldMapQuestRewardIcon.lua"/-->
     <Button name="QuestBindingsButtonTemplate" virtual="true">
         <Size x="16" y="16"/>
         <Layers>
@@ -39,7 +22,24 @@
         </Scripts>
     </Button>
   <Script file="QuestBindings.lua"/>
-  <!--Frame name='BetterWorldQuestPinTemplate' inherits='WorldMap_WorldQuestPinTemplate' mixin='BetterWorldQuestPinMixin' virtual='true'/>
-  <Script file="BetterWorldQuests.lua"/-->
+  
+	<Frame name="BountyCounterTemplate" virtual="true" hidden="false">
+		<Size x="10" y="10"/>
+		<Layers>		
+			<Layer level="ARTWORK">
+				<Texture parentKey="icon" file="Interface\COMMON\ReputationStar" setAllPoints="true">
+					<TexCoords left="0" right="0.5" top="0.5" bottom="1"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+	<Script file="WorldMapQuestBountyCounter.lua"/>
+	<Frame name="WRWorldQuestFrame" mixin="WorldMapQuestBountyCount" parent="QuestMapFrame" inherits="SecureFrameTemplate" enableMouse="true" hidden="false">
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+		</Scripts>
+	</Frame>
+	<Script file='Barrels.lua'/>
+	<Script file='Loh.lua'/>
   <Include file="ClassicQuestLog\ClassicQuestLog.xml"/>
 </Ui>

@@ -188,7 +188,6 @@ G.DefaultSettings = {
 		TankMode = false,
 		TargetIndicator = 3,
 		InsideView = true,
-		--Distance = 42,
 		PlateWidth = 168,
 		PlateHeight = 9,
 		CustomUnitColor = true,
@@ -457,6 +456,15 @@ local function updateCustomBar()
 	M:GetModule("Actionbar"):UpdateCustomBar()
 end
 
+local function updateHotkeys()
+	local Bar = M:GetModule("Actionbar")
+	for _, button in pairs(Bar.buttons) do
+		if button.UpdateHotkeys then
+			button:UpdateHotkeys(button.buttonType)
+		end
+	end
+end
+
 local function updateBuffFrame()
 	local A = M:GetModule("Auras")
 	A:UpdateOptions()
@@ -514,10 +522,6 @@ end
 
 local function updatePlateSpacing()
 	M:GetModule("UnitFrames"):UpdatePlateSpacing()
-end
-
-local function updatePlateRange()
-	M:GetModule("UnitFrames"):UpdatePlateRange()
 end
 
 local function updateCustomUnitList()
@@ -709,7 +713,6 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Nameplate", "ColorBorder", U["ColorBorder"].."*", false, false, nil, refreshNameplates},
 		{1, "Nameplate", "ExplosivesScale", U["ExplosivesScale"], true},
 		{1, "Nameplate", "AKSProgress", U["AngryKeystones Progress"], true, true},
-		--{3, "Nameplate", "Distance", U["Nameplate Distance"].."*", false, false, {20, 100, .1}, updatePlateRange},
 		{3, "Nameplate", "MinScale", U["Nameplate MinScale"].."*", false, false, {.5, 1, .1}, updatePlateScale},
 		{3, "Nameplate", "MinAlpha", U["Nameplate MinAlpha"].."*", true, false, {.5, 1, .1}, updatePlateAlpha},
 		{3, "Nameplate", "PlateWidth", U["NP Width"].."*", false, false, {50, 250, 1}, refreshNameplates},

@@ -38,10 +38,6 @@ function UF:UpdatePlateAlpha()
 	SetCVar("nameplateMaxAlpha", MaoRUIPerDB["Nameplate"]["MinAlpha"])
 end
 
-function UF:UpdatePlateRange()
-	SetCVar("nameplateMaxDistance", MaoRUIPerDB["Nameplate"]["Distance"])
-end
-
 function UF:UpdatePlateSpacing()
 	SetCVar("nameplateOverlapV", MaoRUIPerDB["Nameplate"]["VerticalSpacing"])
 end
@@ -56,7 +52,6 @@ function UF:SetupCVars()
 	UF:PlateInsideView()
 	SetCVar("nameplateOverlapH", .8)
 	UF:UpdatePlateSpacing()
-	UF:UpdatePlateRange()
 	UF:UpdatePlateAlpha()
 	SetCVar("nameplateSelectedAlpha", 1)
 	SetCVar("showQuestTrackingTooltips", 1)
@@ -659,7 +654,8 @@ end
 -- WidgetContainer
 function UF:AddWidgetContainer(self)
 	local widgetContainer = CreateFrame("Frame", nil, self, "UIWidgetContainerTemplate")
-	widgetContainer:SetPoint("BOTTOM", self, "TOP")
+	widgetContainer:SetPoint("TOP", self.Castbar, "BOTTOM", 0, 0)
+	widgetContainer:SetScale(1/MaoRUIDB["UIScale"]) -- need reviewed
 	widgetContainer:Hide()
 
 	self.WidgetContainer = widgetContainer

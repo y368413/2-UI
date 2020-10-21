@@ -14,14 +14,19 @@ local diceSpells = {
 }
 
 function A:PostCreateLumos(self)
+	local left, right, top, bottom = unpack(I.TexCoord)
+	top = top + 1/4
+	bottom = bottom - 1/4
+
 	local iconSize = (self:GetWidth() - 10)/6
 	local buttons = {}
 	local offset = MaoRUIPerDB["Nameplate"]["NameplateClassPower"] and R.margin or (R.margin*2 + MaoRUIPerDB["Nameplate"]["PPBarHeight"])
 	for i = 1, 6 do
 		local bu = CreateFrame("Frame", nil, self.Health)
-		bu:SetSize(iconSize, iconSize)
+		bu:SetSize(iconSize, iconSize/2)
 		bu.Text = M.CreateFS(bu, 12, diceSpells[i].text, false, "TOP", 1, 12)
 		M.AuraIcon(bu)
+		bu.Icon:SetTexCoord(left, right, top, bottom)
 		if i == 1 then
 			bu:SetPoint("BOTTOMLEFT", self.Health, "TOPLEFT", 0, offset)
 		else
@@ -46,7 +51,8 @@ local function UpdateDebuff(button, spellID, auraID, cooldown, glow)
 end
 
 function A:ChantLumos(self)
-	if GetSpecialization() == 1 then
+	local spec = GetSpecialization()
+	if spec == 1 then
 		for i = 1, 6 do self.dices[i]:Hide() end
 
 		UpdateDebuff(self.lumos[1], 703, 703, true)
@@ -65,7 +71,7 @@ function A:ChantLumos(self)
 		end
 
 		UpdateDebuff(self.lumos[5], 79140, 79140, true, true)
-	elseif GetSpecialization() == 2 then
+	elseif spec == 2 then
 		UpdateBuff(self.lumos[1], 315496, 315496)
 		UpdateCooldown(self.lumos[2], 315341, true)
 		UpdateCooldown(self.lumos[3], 315508, true)
@@ -79,7 +85,7 @@ function A:ChantLumos(self)
 			bu:Show()
 			UpdateBuff(bu, diceSpell, diceSpell)
 		end
-	elseif GetSpecialization() == 3 then
+	elseif spec == 3 then
 		for i = 1, 6 do self.dices[i]:Hide() end
 
 		UpdateBuff(self.lumos[1], 315496, 315496)

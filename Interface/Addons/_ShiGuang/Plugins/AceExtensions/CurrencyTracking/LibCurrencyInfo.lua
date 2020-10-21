@@ -1,6 +1,6 @@
 --[[
 Name: LibCurrencyInfo
-Revision: $Rev: 36 $
+Revision: $Rev: 42 $
 Maintainers: Arith
 Website: https://www.wowace.com/projects/libcurrencyinfo
 Dependencies: None
@@ -203,19 +203,38 @@ data.CurrencyByCategory = {
 		1586, -- Honor Level
 	},
 	[245] = { -- Shadowlands
-		1751, -- Freed Soul
-		1754, -- Soul Ash
+		1754, -- Argent Commendation
 		1767, -- Stygia
-		1791, -- Shadowlands PvP Rated
-		1792, -- Shadowlands PvP Honor
-		1802, -- Shadowlands PvP Weekly Reward Progress
-		1810, -- Sanctum Artisan
-		1811, -- Sanctum Architect
-		1812, -- Sanctum Anima Weaver
+		1828, -- Soul Ash
 		1813, -- Reservoir Anima
 		1816, -- Sinstone Fragments
-		1819, -- Ascension Token
+		1751, -- Freed Soul
 		1820, -- Infused Ruby
+		1830, -- Renown-Venthyr
+		1831, -- Renown-NightFae
+		1832, -- Renown-Necrolord
+		1829, -- Renown-Kyrian
+		1802, -- Shadowlands PvP Weekly Reward Progress
+		1743, -- Fake Anima for Quest Tracking
+		1859, -- Reservoir Anima-Kyrian
+		1868, -- Sanctum Architect-Venthyr
+		1819, -- Medallion of Service
+		1862, -- Reservoir Anima-Necrolord
+		--1812, -- zzoldSanctum Anima Weaver
+		1865, -- Sanctum Artisan-Night Fae
+		1867, -- Sanctum Architect-Kyrian
+		1871, -- Sanctum Anima Weaver-Kyrian
+		1874, -- Sanctum Anima Weaver-Necrolord
+		1863, -- Sanctum Artisan-Kyrian
+		--1811, -- zzoldSanctum Architect
+		1872, -- Sanctum Anima Weaver-Venthyr
+		1860, -- Reservoir Anima-Venthyr
+		1861, -- Reservoir Anima-Night Fae
+		1866, -- Sanctum Artisan-Necrolord
+		1870, -- Sanctum Architect-Necrolord
+		1873, -- Sanctum Anima Weaver-Night Fae
+		1864, -- Sanctum Artisan-Venthyr
+		1869, -- Sanctum Architect-Night Fae
 	},
 }
 
@@ -235,7 +254,7 @@ data.CurrencyCategories = {
 	[142] = { enUS="Hidden",zhCN="隐藏",zhTW="隱藏" },
 	[143] = { enUS="Battle for Azeroth",zhCN="争霸艾泽拉斯",zhTW="決戰艾澤拉斯" },
 	[144] = { enUS="Virtual",zhCN="兑换",zhTW="兑换" },
-	[245] = { enUS="Shadowlands",},
+	[245] = { enUS=EXPANSION_NAME8,zhCN=EXPANSION_NAME8,zhTW=EXPANSION_NAME8},
 }
 
 data.Currencies = {
@@ -404,20 +423,38 @@ data.Currencies = {
 	[1758] = { id=1758, category=142 }, -- Rajani
 	[1755] = { id=1755, category=143 }, -- Coalescing Visions
 	[1803] = { id=1803, category=143 }, -- Echoes of Ny'alotha
-	[1751] = { id=1751, category=245 }, -- Freed Soul
-	[1754] = { id=1754, category=245 }, -- Soul Ash
+	[1754] = { id=1754, category=245 }, -- Argent Commendation
 	[1767] = { id=1767, category=245 }, -- Stygia
-	[1791] = { id=1791, category=245 }, -- Shadowlands PvP Rated
-	[1792] = { id=1792, category=245 }, -- Shadowlands PvP Honor
-	[1802] = { id=1802, category=245 }, -- Shadowlands PvP Weekly Reward Progress
-	[1810] = { id=1810, category=245 }, -- Sanctum Artisan
-	[1811] = { id=1811, category=245 }, -- Sanctum Architect
-	[1812] = { id=1812, category=245 }, -- Sanctum Anima Weaver
+	[1828] = { id=1828, category=245 }, -- Soul Ash
 	[1813] = { id=1813, category=245 }, -- Reservoir Anima
 	[1816] = { id=1816, category=245 }, -- Sinstone Fragments
-	[1819] = { id=1819, category=245 }, -- Ascension Token
+	[1751] = { id=1751, category=245 }, -- Freed Soul
 	[1820] = { id=1820, category=245 }, -- Infused Ruby
-
+	[1830] = { id=1830, category=245 }, -- Renown-Venthyr
+	[1831] = { id=1831, category=245 }, -- Renown-NightFae
+	[1832] = { id=1832, category=245 }, -- Renown-Necrolord
+	[1829] = { id=1829, category=245 }, -- Renown-Kyrian
+	[1802] = { id=1802, category=245 }, -- Shadowlands PvP Weekly Reward Progress
+	[1743] = { id=1743, category=245 }, -- Fake Anima for Quest Tracking
+	[1859] = { id=1859, category=245 }, -- Reservoir Anima-Kyrian
+	[1868] = { id=1868, category=245 }, -- Sanctum Architect-Venthyr
+	[1819] = { id=1819, category=245 }, -- Medallion of Service
+	[1862] = { id=1862, category=245 }, -- Reservoir Anima-Necrolord
+	[1812] = { id=1812, category=245, hide=true }, -- zzoldSanctum Anima Weaver
+	[1865] = { id=1865, category=245 }, -- Sanctum Artisan-Night Fae
+	[1867] = { id=1867, category=245 }, -- Sanctum Architect-Kyrian
+	[1871] = { id=1871, category=245 }, -- Sanctum Anima Weaver-Kyrian
+	[1874] = { id=1874, category=245 }, -- Sanctum Anima Weaver-Necrolord
+	[1863] = { id=1863, category=245 }, -- Sanctum Artisan-Kyrian
+	[1811] = { id=1811, category=245, hide=true }, -- zzoldSanctum Architect
+	[1872] = { id=1872, category=245 }, -- Sanctum Anima Weaver-Venthyr
+	[1860] = { id=1860, category=245 }, -- Reservoir Anima-Venthyr
+	[1861] = { id=1861, category=245 }, -- Reservoir Anima-Night Fae
+	[1866] = { id=1866, category=245 }, -- Sanctum Artisan-Necrolord
+	[1870] = { id=1870, category=245 }, -- Sanctum Architect-Necrolord
+	[1873] = { id=1873, category=245 }, -- Sanctum Anima Weaver-Night Fae
+	[1864] = { id=1864, category=245 }, -- Sanctum Artisan-Venthyr
+	[1869] = { id=1869, category=245 }, -- Sanctum Architect-Night Fae
 }
 
 

@@ -1,4 +1,4 @@
-﻿-- $Id: Config.lua 189 2020-06-28 09:59:57Z arith $
+﻿-- $Id: Config.lua 202 2020-10-20 16:41:04Z arith $
 -----------------------------------------------------------------------
 -- Upvalued Lua API.
 -----------------------------------------------------------------------
@@ -342,6 +342,7 @@ end
 local function getCurrenciesOptions()
 	-- below to force currency category to be displayed in specific order
 	local tCurrencyCategory = {
+		245, -- Shadowlands
 		143, -- Battle for Azeroth
 		141, -- Legion
 		137, -- Warlords of Draenor

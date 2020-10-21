@@ -2,7 +2,7 @@
 ## Title: CollectionShop
 ## Title-zhCN: |cff69ccf0[藏品]|r购买助手
 ## Title-zhTW: |cff69ccf0[藏品]|r购买助手
-## Version: 4.03
+## Version: 4.04
 ## Author: Clinton Caldwell (CurseForge User: cmc3215)
 ## Notes: Find and buy the lowest buyout Mounts, Pets, Toys, Appearances, and Recipes.
 ## SavedVariables: COLLECTIONSHOP_SAVEDVARIABLES
