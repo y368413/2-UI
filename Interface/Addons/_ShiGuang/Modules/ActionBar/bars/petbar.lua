@@ -31,9 +31,9 @@ function Bar:CreatePetbar()
 	local buttonList = {}
 
 	local frame = CreateFrame("Frame", "NDui_ActionBarPet", UIParent, "SecureHandlerStateTemplate")
-	if MaoRUIPerDB["Actionbar"]["Style"] == 3 then
+	if R.db["Actionbar"]["Style"] == 3 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 355, 84}
-	elseif (MaoRUIPerDB["Actionbar"]["Style"] == 4) or (MaoRUIPerDB["Actionbar"]["Style"] == 6) then
+	elseif (R.db["Actionbar"]["Style"] == 4) or (R.db["Actionbar"]["Style"] == 6) then
 	  frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 80, 120}
 	else
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 100, 84}

@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 local P = M:GetModule("Skins")
 
 function P:LootEx()
-	--if not MaoRUIPerDB["Skins"]["Loot"] then return end
+	--if not R.db["Skins"]["Loot"] then return end
 	------------------------------------------------------------ImprovedLootFrame
 local wow_classic = WOW_PROJECT_ID and WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 	--LOOTFRAME_AUTOLOOT_DELAY = 0.5;

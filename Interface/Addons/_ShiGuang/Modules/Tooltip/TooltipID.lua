@@ -155,4 +155,11 @@ end)
 	hooksecurefunc(GameTooltip, "SetAzeritePower", function(self, _, _, id)
 		if id then TT.AddLineForID(self, id, types.azerite, true) end
 	end)
+
+	-- Quests
+	hooksecurefunc("QuestMapLogTitleButton_OnEnter", function(self)
+		if self.questID then
+			TT.AddLineForID(GameTooltip, self.questID, types.quest)
+		end
+	end)
 end

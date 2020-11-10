@@ -8,7 +8,7 @@ local GetAverageItemLevel, C_PaperDollInfo_GetMinItemLevel = GetAverageItemLevel
 local PaperDollFrame_SetLabelAndText = PaperDollFrame_SetLabelAndText
 
 function MISC:MissingStats()
-	if not MaoRUIPerDB["Misc"]["MissingStats"] then return end
+	if not R.db["Misc"]["MissingStats"] then return end
 	if IsAddOnLoaded("DejaCharacterStats") then return end
 
 	local statPanel = CreateFrame("Frame", nil, CharacterFrameInsetRight)

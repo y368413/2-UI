@@ -17,7 +17,7 @@ local esize = 28
 local limit = (27 * 12)/esize
 
 function CDS:EnemyCD()
-  if not MaoRUIPerDB["Misc"]["EnemyCD"] then return end
+  if not R.db["Misc"]["EnemyCD"] then return end
   
 local EnemyCDAnchor = CreateFrame("Frame", "EnemyCDAnchor", UIParent)
 if direction == "UP" or direction == "DOWN" then

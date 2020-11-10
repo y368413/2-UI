@@ -8,7 +8,9 @@ local GetInstanceInfo, PlaySound = GetInstanceInfo, PlaySound
 local IsPartyLFG, IsInRaid, IsInGroup, IsInInstance, IsInGuild = IsPartyLFG, IsInRaid, IsInGroup, IsInInstance, IsInGuild
 local UnitInRaid, UnitInParty, SendChatMessage = UnitInRaid, UnitInParty, SendChatMessage
 local UnitName, Ambiguate, GetTime = UnitName, Ambiguate, GetTime
-local GetSpellLink, GetSpellInfo = GetSpellLink, GetSpellInfo
+local GetSpellLink, GetSpellInfo, GetSpellCooldown = GetSpellLink, GetSpellInfo, GetSpellCooldown
+local GetActionInfo, GetMacroSpell, GetMacroItem = GetActionInfo, GetMacroSpell, GetMacroItem
+local GetItemInfo, GetItemInfoFromHyperlink = GetItemInfo, GetItemInfoFromHyperlink
 local C_VignetteInfo_GetVignetteInfo = C_VignetteInfo.GetVignetteInfo
 local C_Texture_GetAtlasInfo = C_Texture.GetAtlasInfo
 local C_ChatInfo_SendAddonMessage = C_ChatInfo.SendAddonMessage
@@ -55,7 +57,7 @@ function MISC:SoloInfo_Update()
 end
 
 function MISC:SoloInfo()
-	if MaoRUIPerDB["Misc"]["SoloInfo"] then
+	if R.db["Misc"]["SoloInfo"] then
 		self:SoloInfo_Update()
 		M:RegisterEvent("UPDATE_INSTANCE_INFO", self.SoloInfo_Update)
 		M:RegisterEvent("PLAYER_DIFFICULTY_CHANGED", self.SoloInfo_Update)
@@ -102,11 +104,11 @@ function MISC:RareAlert_Update(id)
 		local tex = format("|T%s:%d:%d:0:0:%d:%d:%d:%d:%d:%d|t", file, 0, 0, atlasWidth, atlasHeight, atlasWidth*txLeft, atlasWidth*txRight, atlasHeight*txTop, atlasHeight*txBottom)
 		--UIErrorsFrame:AddMessage(I.InfoColor..U["Rare Found"]..tex..(info.name or ""))
 		RaidNotice_AddMessage(RaidWarningFrame, "----------   "..tex..(info.name or "").."   ----------", ChatTypeInfo["RAID_WARNING"])
-		if MaoRUIPerDB["Misc"]["AlertinChat"] then
+		if R.db["Misc"]["AlertinChat"] then
 			local currrentTime = MaoRUIDB["TimestampFormat"] == 1 and "|cff00ff00["..date("%H:%M:%S").."]|r" or ""
 			print(currrentTime.." -> "..I.InfoColor.." → "..tex..(info.name or ""))
 		end
-		if not MaoRUIPerDB["Misc"]["RareAlertInWild"] or MISC.RareInstType == "none" then
+		if not R.db["Misc"]["RareAlertInWild"] or MISC.RareInstType == "none" then
 			PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
 		end
 
@@ -127,7 +129,7 @@ function MISC:RareAlert_CheckInstance()
 end
 
 function MISC:RareAlert()
-	if MaoRUIPerDB["Misc"]["RareAlerter"] then
+	if R.db["Misc"]["RareAlerter"] then
 		self:RareAlert_CheckInstance()
 		M:RegisterEvent("UPDATE_INSTANCE_INFO", self.RareAlert_CheckInstance)
 	else
@@ -177,13 +179,13 @@ local blackList = {
 }
 
 function MISC:IsAllyPet(sourceFlags)
-	if I:IsMyPet(sourceFlags) or (not MaoRUIPerDB["Misc"]["OwnInterrupt"] and (sourceFlags == I.PartyPetFlags or sourceFlags == I.RaidPetFlags)) then
+	if I:IsMyPet(sourceFlags) or (not R.db["Misc"]["OwnInterrupt"] and (sourceFlags == I.PartyPetFlags or sourceFlags == I.RaidPetFlags)) then
 		return true
 	end
 end
 
 function MISC:InterruptAlert_Update(...)
-	if MaoRUIPerDB["Misc"]["AlertInInstance"] and (not IsInInstance() or IsPartyLFG()) then return end
+	if R.db["Misc"]["AlertInInstance"] and (not IsInInstance() or IsPartyLFG()) then return end
 
 	local _, eventType, _, sourceGUID, sourceName, sourceFlags, _, _, destName, _, _, spellID, _, _, extraskillID, _, _, auraType = ...
 	if not sourceGUID or sourceName == destName then return end
@@ -192,7 +194,7 @@ function MISC:InterruptAlert_Update(...)
 		local infoText = infoType[eventType]
 		if infoText then
 			if infoText == U["BrokenSpell"] then
-				if not MaoRUIPerDB["Misc"]["BrokenSpell"] then return end
+				if not R.db["Misc"]["BrokenSpell"] then return end
 				if auraType and auraType == AURA_TYPE_BUFF or blackList[spellID] then return end
 				if IsInInstance() then
 					SendChatMessage(format(infoText, sourceName..GetSpellLink(extraskillID), destName..GetSpellLink(spellID)), "SAY")  --msgChannel()
@@ -200,8 +202,8 @@ function MISC:InterruptAlert_Update(...)
 					SendChatMessage(format(infoText, sourceName..GetSpellLink(extraskillID), destName..GetSpellLink(spellID)), "PARTY")  --msgChannel()
 				end
 			else
-				if MaoRUIPerDB["Misc"]["OwnInterrupt"] and sourceName ~= I.MyName and not MISC:IsAllyPet(sourceFlags) then return end
-				   if MaoRUIPerDB["Misc"]["InterruptSound"] then
+				if R.db["Misc"]["OwnInterrupt"] and sourceName ~= I.MyName and not MISC:IsAllyPet(sourceFlags) then return end
+				   if R.db["Misc"]["InterruptSound"] then
 				      PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\ShutupFool.ogg", "Master")
 				   end
 				if IsInInstance() then
@@ -223,7 +225,7 @@ function MISC:InterruptAlert_CheckGroup()
 end
 
 function MISC:InterruptAlert()
-	if MaoRUIPerDB["Misc"]["Interrupt"] then
+	if R.db["Misc"]["Interrupt"] then
 		self:InterruptAlert_CheckGroup()
 		M:RegisterEvent("GROUP_LEFT", self.InterruptAlert_CheckGroup)
 		M:RegisterEvent("GROUP_JOINED", self.InterruptAlert_CheckGroup)
@@ -252,7 +254,7 @@ function MISC:Explosive_Update(...)
 		local overkill = select(index, ...)
 		if overkill and overkill > 0 then
 			local name = strsplit("-", sourceName or UNKNOWN)
-			local cache = MaoRUIPerDB["Misc"]["ExplosiveCache"]
+			local cache = R.db["Misc"]["ExplosiveCache"]
 			if not cache[name] then cache[name] = 0 end
 			cache[name] = cache[name] + 1
 		end
@@ -260,13 +262,13 @@ function MISC:Explosive_Update(...)
 end
 
 local function startCount()
-	wipe(MaoRUIPerDB["Misc"]["ExplosiveCache"])
+	wipe(R.db["Misc"]["ExplosiveCache"])
 	M:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.Explosive_Update)
 end
 
 local function endCount()
 	local text
-	for name, count in pairs(MaoRUIPerDB["Misc"]["ExplosiveCache"]) do
+	for name, count in pairs(R.db["Misc"]["ExplosiveCache"]) do
 		text = (text or U["ExplosiveCount"])..name.."("..count..") "
 	end
 	--if text then SendChatMessage(text, "PARTY") end
@@ -296,7 +298,7 @@ function MISC.Explosive_CheckAffixes(event)
 end
 
 function MISC:ExplosiveAlert()
-	if MaoRUIPerDB["Misc"]["ExplosiveCount"] then
+	if R.db["Misc"]["ExplosiveCount"] then
 		self:Explosive_CheckAffixes()
 		M:RegisterEvent("PLAYER_ENTERING_WORLD", self.Explosive_CheckAffixes)
 	else
@@ -324,7 +326,7 @@ local itemList = {
 }
 
 function MISC:ItemAlert_Update(unit, _, spellID)
-	if not MaoRUIPerDB["Misc"]["PlacedItemAlert"] then return end
+	if not R.db["Misc"]["PlacedItemAlert"] then return end
 
 	if (UnitInRaid(unit) or UnitInParty(unit)) and spellID and itemList[spellID] and lastTime ~= GetTime() then
 		local who = UnitName(unit)
@@ -438,7 +440,7 @@ function MISC:NVision_Check()
 		end
 
 		if RaidBossEmoteFrame.__isOff then
-			if not MaoRUIPerDB["Misc"]["HideBossEmote"] then
+			if not R.db["Misc"]["HideBossEmote"] then
 				RaidBossEmoteFrame:RegisterEvent("RAID_BOSS_EMOTE")
 				RaidBossEmoteFrame:RegisterEvent("RAID_BOSS_WHISPER")
 				RaidBossEmoteFrame:RegisterEvent("CLEAR_BOSS_EMOTES")
@@ -449,9 +451,121 @@ function MISC:NVision_Check()
 end
 
 function MISC:NVision_Init()
-	if not MaoRUIPerDB["Misc"]["NzothVision"] then return end
+	if not R.db["Misc"]["NzothVision"] then return end
 	MISC:NVision_Check()
 	M:RegisterEvent("UPDATE_INSTANCE_INFO", MISC.NVision_Check)
+end
+
+-- Incompatible check
+local IncompatibleAddOns = {
+	["Aurora"] = true,
+	["AuroraClassic"] = true,
+	["BigFoot"] = true,
+	["NDui"] = true,
+	["!!!163UI!!!"] = true,
+}
+local AddonDependency = {
+	["BigFoot"] = "!!!Libs",
+}
+function MISC:CheckIncompatible()
+	local IncompatibleList = {}
+	for addon in pairs(IncompatibleAddOns) do
+		if IsAddOnLoaded(addon) then
+			tinsert(IncompatibleList, addon)
+		end
+	end
+
+	if #IncompatibleList > 0 then
+		local frame = CreateFrame("Frame", nil, UIParent)
+		frame:SetPoint("TOP", 0, -200)
+		frame:SetFrameStrata("HIGH")
+		M.CreateMF(frame)
+		M.SetBD(frame)
+		M.CreateFS(frame, 18, U["FoundIncompatibleAddon"], true, "TOPLEFT", 10, -10)
+		M.CreateWatermark(frame)
+
+		local offset = 0
+		for _, addon in pairs(IncompatibleList) do
+			M.CreateFS(frame, 14, addon, false, "TOPLEFT", 10, -(50 + offset))
+			offset = offset + 24
+		end
+		frame:SetSize(300, 100 + offset)
+
+		local close = M.CreateButton(frame, 16, 16, true, I.closeTex)
+		close:SetPoint("TOPRIGHT", -10, -10)
+		close:SetScript("OnClick", function() frame:Hide() end)
+
+		local disable = M.CreateButton(frame, 150, 25, U["DisableIncompatibleAddon"])
+		disable:SetPoint("BOTTOM", 0, 10)
+		disable.text:SetTextColor(1, 0, 0)
+		disable:SetScript("OnClick", function()
+			for _, addon in pairs(IncompatibleList) do
+				DisableAddOn(addon, true)
+				if AddonDependency[addon] then
+					DisableAddOn(AddonDependency[addon], true)
+				end
+			end
+			ReloadUI()
+		end)
+	end
+end
+
+-- Send cooldown status
+local lastCDSend = 0
+function MISC:SendCurrentSpell(thisTime, spellID)
+	local start, duration = GetSpellCooldown(spellID)
+	local spellLink = GetSpellLink(spellID)
+	if start and duration > 0 then
+		local remain = start + duration - thisTime
+		SendChatMessage(format(U["CooldownRemaining"], spellLink, remain), msgChannel())
+	else
+		SendChatMessage(format(U["CooldownCompleted"], spellLink), msgChannel())
+	end
+end
+
+function MISC:SendCurrentItem(thisTime, itemID, itemLink)
+	local start, duration = GetItemCooldown(itemID)
+	if start and duration > 0 then
+		local remain = start + duration - thisTime
+		SendChatMessage(format(U["CooldownRemaining"], itemLink, remain), msgChannel())
+	else
+		SendChatMessage(format(U["CooldownCompleted"], itemLink), msgChannel())
+	end
+end
+
+function MISC:AnalyzeButtonCooldown()
+	if not R.db["Misc"]["SendActionCD"] then return end
+	if not IsInGroup() then return end
+
+	local thisTime = GetTime()
+	if thisTime - lastCDSend < 1.5 then return end
+	lastCDSend = thisTime
+
+	local spellType, id = GetActionInfo(self.action)
+	if spellType == "spell" then
+		MISC:SendCurrentSpell(thisTime, id)
+	elseif spellType == "item" then
+		local itemName, itemLink = GetItemInfo(id)
+		MISC:SendCurrentItem(thisTime, id, itemLink or itemName)
+	elseif spellType == "macro" then
+		local spellID = GetMacroSpell(id)
+		local _, itemLink = GetMacroItem(id)
+		local itemID = itemLink and GetItemInfoFromHyperlink(itemLink)
+		if spellID then
+			MISC:SendCurrentSpell(thisTime, spellID)
+		elseif itemID then
+			MISC:SendCurrentItem(thisTime, itemID, itemLink)
+		end
+	end
+end
+
+function MISC:SendCDStatus()
+	if not R.db["Actionbar"]["Enable"] then return end
+
+	local Bar = M:GetModule("Actionbar")
+	for _, button in pairs(Bar.buttons) do
+		button:HookScript("OnMouseWheel", MISC.AnalyzeButtonCooldown)
+	end
 end
 
 -- Init
@@ -462,6 +576,8 @@ function MISC:AddAlerts()
 	MISC:ExplosiveAlert()
 	MISC:PlacedItemAlert()
 	MISC:NVision_Init()
+	MISC:CheckIncompatible()
+	MISC:SendCDStatus()
 end
 MISC:RegisterMisc("Notifications", MISC.AddAlerts)
 

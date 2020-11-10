@@ -114,7 +114,7 @@ if HPetBattleAny.CreateLinkByInfo then
 			if HPetBattleAny.HasPet[id] then
 				h = 99
 			end
-			print(HPetBattleAny.ICON_LIST[h].."\124cffffff00\124Hbattlepet:"..id..":0:0:0:0:0\124h["..(C_PetJournal.GetPetInfoBySpeciesID(id) or "").."]\124h\124r")
+			print(HPetBattleAny.ICON_LIST[h].."\124cffffff00\124Hbattlepet:"..id..":0:0:0:0:0:BattlePet-0-000000000000:0\124h["..(C_PetJournal.GetPetInfoBySpeciesID(id) or "").."]\124h\124r")
 		end
 	end
 end
@@ -131,7 +131,9 @@ local function TooltipAddOtherInfo(speciesID)
 				local str1,str2 = HPetBattleAny:GetPetCollectedInfo(pets)
 				GameTooltip:AddDoubleLine(string.trim(str2),nil, 1, 1, 1);
 			end
-			GameTooltip:AddLine("|HHPET|h"..string.trim(sourceText), 1, 1, 1, true);
+			if(string.trim(sourceText or "")~="")then
+				GameTooltip:AddLine("|HHPET|h"..string.trim(sourceText or ""), 1, 1, 1, true);
+			end
 			GameTooltip:Show();
 		end
 	end
@@ -216,9 +218,11 @@ hookPetJournal.init = function()
 	---需要修改，某些状态下不能继续事件
 	hooksecurefunc("StaticPopup_Show",function(which, text_arg1, text_arg2, data)
 		if which == "BATTLE_PET_RELEASE" then
-			dialog = StaticPopup_FindVisible(which, data);
-			_G[dialog:GetName().."ItemFrame"]:Show();
+			local info = StaticPopupDialogs[which];
+			local dialog = StaticPopup_FindVisible(which, data);
+			local bottomSpace = info.extraButton ~= nil and (dialog.extraButton:GetHeight() + 60) or 16;
 			if ( data  ) then
+				dialog.ItemFrame:SetPoint("BOTTOM", -60, bottomSpace + 29);
 				local speciesID, customName, level, xp, maxXp, displayID, isFavorite, petName, petIcon, petType, creatureID = C_PetJournal.GetPetInfoByPetID(data);
 				local rarity = select(5,C_PetJournal.GetPetStats(data))
 				_G[dialog:GetName().."ItemFrame"].petID = data
@@ -230,6 +234,8 @@ hookPetJournal.init = function()
 					nameText:SetText(ITEM_QUALITY_COLORS[rarity-1].hex..text_arg1.."\r")
 				end
 				dialog:SetWidth(320);
+			else
+				dialog.ItemFrame:Hide();
 			end
 		end
 	end)
@@ -743,7 +749,11 @@ hookfunction.FloatingBattlePet_Show=function(speciesID,level)
 			CollectionsJournal_LoadUI();
 		end
 		if (not CollectionsJournal:IsShown()) then
-			ShowUIPanel(CollectionsJournal);
+			if ( InCombatLockdown() and not issecure() ) then
+				CollectionsJournal:Show();
+			else
+				ShowUIPanel(CollectionsJournal);
+			end
 		end
 		if not UnitAffectingCombat("player") then CollectionsJournal_SetTab(CollectionsJournal, 2) end
 		if (speciesID and speciesID > 0) then

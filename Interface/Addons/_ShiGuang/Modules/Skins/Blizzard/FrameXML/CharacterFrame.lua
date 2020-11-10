@@ -2,10 +2,12 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 
 tinsert(R.defaultThemes, function()
+	local r, g, b = I.r, I.g, I.b
 	-- [[ Item buttons ]]
-	local function UpdateCorruption(self)
+	local function UpdateCosmetic(self)
+		if not IsCosmeticItem then return end
 		local itemLink = GetInventoryItemLink("player", self:GetID())
-		self.IconOverlay:SetShown(itemLink and IsCorruptedItem(itemLink))
+		self.IconOverlay:SetShown(itemLink and IsCosmeticItem(itemLink))
 	end
 
 	local slots = {"Head", "Neck", "Shoulder", "Shirt", "Chest", "Waist", "Legs", "Feet", "Wrist", "Hands", "Finger0", "Finger1", "Trinket0", "Trinket1", "Back", "MainHand", "SecondaryHand", "Tabard",}
@@ -14,13 +16,14 @@ tinsert(R.defaultThemes, function()
 		local slot = _G["Character"..slots[i].."Slot"]
 		--slot.IconBorder:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\WhiteIconFrame")
 		--slot.ignoreTexture:SetTexture("Interface\\PaperDollInfoFrame\\UI-GearManager-LeaveItem-Transparent")
-		slot.CorruptedHighlightTexture:SetAtlas("Nzoth-charactersheet-item-glow")
-		slot.IconOverlay:SetAtlas("Nzoth-inventory-icon")
+		if IsCosmeticItem then
+			slot.IconOverlay:SetAtlas("CosmeticIconFrame")
+		end
 		slot.IconOverlay:SetInside()
 		--hooksecurefunc(slot.IconBorder, "SetTexture", function() slot:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\WhiteIconFrame") end)
 	end
 
-	hooksecurefunc("PaperDollItemSlotButton_Update", function(button) UpdateCorruption(button) end)
+	hooksecurefunc("PaperDollItemSlotButton_Update", function(button) UpdateCosmetic(button) end)
 end)
 
 hooksecurefunc("SetItemButtonQuality", function(button, quality, itemIDOrLink, suppressOverlays)

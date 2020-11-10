@@ -18,15 +18,15 @@ function M:CreateMF(parent, saved)
 		frame:StopMovingOrSizing()
 		if not saved then return end
 		local orig, _, tar, x, y = frame:GetPoint()
-		MaoRUIPerDB["TempAnchor"][frame:GetName()] = {orig, "UIParent", tar, x, y}
+		R.db["TempAnchor"][frame:GetName()] = {orig, "UIParent", tar, x, y}
 	end)
 end
 
 function M:RestoreMF()
 	local name = self:GetName()
-	if name and MaoRUIPerDB["TempAnchor"][name] then
+	if name and R.db["TempAnchor"][name] then
 		self:ClearAllPoints()
-		self:SetPoint(unpack(MaoRUIPerDB["TempAnchor"][name]))
+		self:SetPoint(unpack(R.db["TempAnchor"][name]))
 	end
 end
 
@@ -46,10 +46,10 @@ function M:Mover(text, value, anchor, width, height, isAuraWatch)
 	mover.text = M.CreateFS(mover, I.Font[2], text)
 	mover.text:SetWordWrap(true)
 
-	if not MaoRUIPerDB[key][value] then
+	if not R.db[key][value] then
 		mover:SetPoint(unpack(anchor))
 	else
-		mover:SetPoint(unpack(MaoRUIPerDB[key][value]))
+		mover:SetPoint(unpack(R.db[key][value]))
 	end
 	mover:EnableMouse(true)
 	mover:SetMovable(true)
@@ -131,7 +131,7 @@ function MISC:DoTrim(trimX, trimY)
 		f.__y.__current = y
 		mover:ClearAllPoints()
 		mover:SetPoint(point, UIParent, point, x, y)
-		MaoRUIPerDB[mover.__key][mover.__value] = {point, "UIParent", point, x, y}
+		R.db[mover.__key][mover.__value] = {point, "UIParent", point, x, y}
 	end
 end
 
@@ -145,7 +145,7 @@ function MISC:Mover_OnClick(btn)
 	elseif IsControlKeyDown() and btn == "RightButton" then
 		self:ClearAllPoints()
 		self:SetPoint(unpack(self.__anchor))
-		MaoRUIPerDB[self.__key][self.__value] = nil
+		R.db[self.__key][self.__value] = nil
 	end
 	updater.__owner = self
 	MISC.UpdateTrimFrame(self)
@@ -176,7 +176,7 @@ function MISC:Mover_OnDragStop()
 
 	self:ClearAllPoints()
 	self:SetPoint(orig, "UIParent", tar, x, y)
-	MaoRUIPerDB[self.__key][self.__value] = {orig, "UIParent", tar, x, y}
+	R.db[self.__key][self.__value] = {orig, "UIParent", tar, x, y}
 	MISC.UpdateTrimFrame(self)
 	updater:Hide()
 end
@@ -206,8 +206,8 @@ StaticPopupDialogs["RESET_MOVER"] = {
 	button1 = OKAY,
 	button2 = CANCEL,
 	OnAccept = function()
-		wipe(MaoRUIPerDB["Mover"])
-		wipe(MaoRUIPerDB["AuraWatchMover"])
+		wipe(R.db["Mover"])
+		wipe(R.db["AuraWatchMover"])
 		ReloadUI()
 	end,
 }

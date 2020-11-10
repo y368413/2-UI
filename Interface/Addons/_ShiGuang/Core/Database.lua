@@ -24,6 +24,7 @@ LE_ITEM_QUALITY_HEIRLOOM = Enum.ItemQuality.Heirloom
 -- Colors
 I.MyName = UnitName("player")
 I.MyRealm = GetRealmName()
+I.MyFullName = I.MyName.."-"..I.MyRealm
 I.MyClass = select(2, UnitClass("player"))
 I.MyFaction = UnitFactionGroup("player")
 I.ClassList = {}
@@ -55,6 +56,7 @@ I.QualityColors[LE_ITEM_QUALITY_COMMON] = {r = 0, g = 0, b = 0}
 -- Fonts
 I.Font = {STANDARD_TEXT_FONT, 12, "OUTLINE"}
 I.LineString = I.GreyColor.."---------------"
+I.NDuiString = "|cff0080ff|r"
 
 -- Textures
 local Media = "Interface\\Addons\\_ShiGuang\\Media\\"
@@ -229,6 +231,8 @@ I.ReminderBuffs = {
 				[8679] = true,		-- 致伤药膏
 				[315584] = true,	-- 速效药膏
 			},
+			texture = 132273,
+			depend = 315584,
 			combat = true,
 			instance = true,
 			pvp = true,
@@ -237,6 +241,7 @@ I.ReminderBuffs = {
 				[3408] = true,		-- 减速药膏
 				[5761] = true,		-- 迟钝药膏
 			},
+			depend = 3408,
 			pvp = true,
 		},
 	},

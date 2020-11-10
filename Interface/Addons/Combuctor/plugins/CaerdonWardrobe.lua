@@ -106,8 +106,8 @@ local bindTextTable = {
 	[ITEM_BIND_TO_BNETACCOUNT] = CaerdonWardrobeBoA,
 	--[ITEM_BIND_ON_EQUIP]       = CaerdonWardrobeBoE,
 	--[ITEM_BIND_ON_USE]         = CaerdonWardrobeBoE,
-	[ITEM_SOULBOUND]           = "|cFF00DDFF    _|r",  -- 拾取后绑定
-	[ITEM_BIND_ON_PICKUP]      = "|cFF00DDFF    _|r",
+	[ITEM_SOULBOUND]           = "      *",  -- 拾取后绑定
+	[ITEM_BIND_ON_PICKUP]      = "      *",
 }
 
 local function IsCollectibleLink(item)

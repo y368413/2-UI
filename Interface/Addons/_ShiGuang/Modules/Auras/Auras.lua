@@ -13,17 +13,17 @@ function A:OnLogin()
 	A.settings = {
 		Buffs = {
 			offset = 12,
-			size = MaoRUIPerDB["Auras"]["BuffSize"],
-			wrapAfter = MaoRUIPerDB["Auras"]["BuffsPerRow"],
+			size = R.db["Auras"]["BuffSize"],
+			wrapAfter = R.db["Auras"]["BuffsPerRow"],
 			maxWraps = 3,
-			reverseGrow = MaoRUIPerDB["Auras"]["ReverseBuffs"],
+			reverseGrow = R.db["Auras"]["ReverseBuffs"],
 		},
 		Debuffs = {
 			offset = 12,
-			size = MaoRUIPerDB["Auras"]["DebuffSize"],
-			wrapAfter = MaoRUIPerDB["Auras"]["DebuffsPerRow"],
+			size = R.db["Auras"]["DebuffSize"],
+			wrapAfter = R.db["Auras"]["DebuffsPerRow"],
 			maxWraps = 1,
-			reverseGrow = MaoRUIPerDB["Auras"]["ReverseDebuffs"],
+			reverseGrow = R.db["Auras"]["ReverseDebuffs"],
 		},
 	}
 
@@ -93,7 +93,7 @@ end
 function A:UpdateAuras(button, index)
 	local filter = button:GetParent():GetAttribute("filter")
 	local unit = button:GetParent():GetAttribute("unit")
-	local name, texture, count, debuffType, duration, expirationTime = UnitAura(unit, index, filter)
+	local name, texture, count, debuffType, duration, expirationTime, _, _, _, spellID = UnitAura(unit, index, filter)
 
 	if name then
 		if duration > 0 and expirationTime then
@@ -105,7 +105,6 @@ function A:UpdateAuras(button, index)
 			else
 				button.timeLeft = timeLeft
 			end
-
 			button.nextUpdate = -1
 			A.UpdateTimer(button, 0)
 		else
@@ -127,6 +126,7 @@ function A:UpdateAuras(button, index)
 			button:SetBackdropBorderColor(0, 0, 0)
 		end
 
+		button.spellID = spellID
 		button.icon:SetTexture(texture)
 		button.offset = nil
 	end
@@ -169,12 +169,12 @@ function A:OnAttributeChanged(attribute, value)
 end
 
 function A:UpdateOptions()
-	A.settings.Buffs.size = MaoRUIPerDB["Auras"]["BuffSize"]
-	A.settings.Buffs.wrapAfter = MaoRUIPerDB["Auras"]["BuffsPerRow"]
-	A.settings.Buffs.reverseGrow = MaoRUIPerDB["Auras"]["ReverseBuffs"]
-	A.settings.Debuffs.size = MaoRUIPerDB["Auras"]["DebuffSize"]
-	A.settings.Debuffs.wrapAfter = MaoRUIPerDB["Auras"]["DebuffsPerRow"]
-	A.settings.Debuffs.reverseGrow = MaoRUIPerDB["Auras"]["ReverseDebuffs"]
+	A.settings.Buffs.size = R.db["Auras"]["BuffSize"]
+	A.settings.Buffs.wrapAfter = R.db["Auras"]["BuffsPerRow"]
+	A.settings.Buffs.reverseGrow = R.db["Auras"]["ReverseBuffs"]
+	A.settings.Debuffs.size = R.db["Auras"]["DebuffSize"]
+	A.settings.Debuffs.wrapAfter = R.db["Auras"]["DebuffsPerRow"]
+	A.settings.Debuffs.reverseGrow = R.db["Auras"]["ReverseDebuffs"]
 end
 
 function A:UpdateHeader(header)
@@ -242,6 +242,13 @@ function A:CreateAuraHeader(filter)
 	return header
 end
 
+function A:RemoveSpellFromIgnoreList()
+	if IsAltKeyDown() and IsControlKeyDown() and self.spellID and R.db["AuraWatchList"]["IgnoreSpells"][self.spellID] then
+		R.db["AuraWatchList"]["IgnoreSpells"][self.spellID] = nil
+		print(format(U["RemoveFromIgnoreList"], I.NDuiString, self.spellID))
+	end
+end
+
 function A:CreateAuraIcon(button)
 	local header = button:GetParent()
 	local cfg = A.settings.Debuffs
@@ -270,4 +277,5 @@ function A:CreateAuraIcon(button)
 	M.CreateSD(button)
 
 	button:SetScript("OnAttributeChanged", A.OnAttributeChanged)
+	button:HookScript("OnMouseDown", A.RemoveSpellFromIgnoreList)
 end

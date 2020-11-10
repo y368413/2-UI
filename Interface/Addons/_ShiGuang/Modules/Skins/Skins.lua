@@ -36,7 +36,7 @@ end
 
 function S:OnLogin()
    ----BOTTOM
-   if MaoRUIPerDB["Skins"]["InfobarLine"] then
+   if R.db["Skins"]["InfobarLine"] then
    local Bottomline = CreateFrame("Frame", nil, UIParent) 
    Bottomline:SetFrameLevel(0) 
    Bottomline:SetFrameStrata("BACKGROUND")
@@ -77,11 +77,11 @@ function S:OnLogin()
 	     frame:UnregisterAllEvents()
 	     frame:Hide()
     end
-	if MaoRUIPerDB["Skins"]["CastBarstyle"] then DisableBlzFrame(TargetFrameSpellBar) DisableBlzFrame(FocusFrameSpellBar) DisableBlzFrame(PetCastingBarFrame) return end --CastingBarFrame
+	if R.db["Skins"]["CastBarstyle"] then DisableBlzFrame(TargetFrameSpellBar) DisableBlzFrame(FocusFrameSpellBar) DisableBlzFrame(PetCastingBarFrame) return end --CastingBarFrame
 end
 
 function S:GetToggleDirection()
-	local direc = MaoRUIPerDB["Skins"]["ToggleDirection"]
+	local direc = R.db["Skins"]["ToggleDirection"]
 	if direc == 1 then
 		return ">", "<", "RIGHT", "LEFT", -2, 0, 20, 80
 	elseif direc == 2 then
@@ -146,7 +146,7 @@ end
 
 function S:LoadWithAddOn(addonName, value, func)
 	local function loadFunc(event, addon)
-		if not MaoRUIPerDB["Skins"][value] then return end
+		if not R.db["Skins"][value] then return end
 
 		if event == "PLAYER_ENTERING_WORLD" then
 			M:UnregisterEvent(event, loadFunc)

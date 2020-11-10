@@ -214,10 +214,14 @@ HPetBattleAny.GetBreedNames = {
 }
 setmetatable(HPetBattleAny.GetBreedNames,{__index=function(self,key)return key and self[key>12 and key-10 or key] or "" end})
 
-if BPBID_Arrays then	--使用BPB会提高内存占用
+if BPBID_Arrays then	
 	addon.PetData = {}
 	addon.PetBaseData = {}
-	BPBID_Arrays.InitializeArrays()
+	if HPetBattleAny.BPBIDInit then
+		HPetBattleAny.BPBIDInit()
+	else
+		BPBID_Arrays.InitializeArrays()
+	end
 	HPetBattleAny.GetBaseState = function(id) return fixBaseData(id) or BPBID_Arrays.BasePetStats[id] end
 	HPetBattleAny.GetPetAState = function(id)
 		if fixData(id) then
@@ -529,7 +533,7 @@ end
 
 
 ---------------------------------------PetAllInfo.lua
-local HPetAllInfoFrame=CreateFrame("Frame","HPetAllInfoFrame",UIParent)
+local HPetAllInfoFrame=CreateFrame("Frame","HPetAllInfoFrame",UIParent,"BackdropTemplate")
 local backdrop={
 	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 	edgeSize = 16,
@@ -557,11 +561,9 @@ function HPetAllInfoFrame:Update(speciesID,breedID,rarityvalue,levelvalue)
 		end
 	end
 
-    if tonumber(speciesID) == nil then return end
 	local name, icon, petType, creatureID, sourceText, description, isWild, canBattle, tradable, unique = C_PetJournal.GetPetInfoBySpeciesID(speciesID);
 
-	HPetAllInfoFrame.petName.text:SetText(name)
-	HPetAllInfoFrame.petName.text:SetFont(ChatFontNormal:GetFont(), 14, "")
+	HPetAllInfoFrame.petName.text:SetText(name)HPetAllInfoFrame.petName.text:SetFont(ChatFontNormal:GetFont(), 14, "")
 	HPetAllInfoFrame.petName.icon:SetTexture("Interface\\Icons\\Pet_TYPE_"..PET_TYPE_SUFFIX[petType])
 
 	----------------------------------------------------------------
@@ -715,9 +717,6 @@ function HPetAllInfoFrame:Init()
 	button.value=true
 	button:SetText("|cff69ccf0"..L["Switch"].."|r")
 	button:SetSize(50,30)
-	-- 	_G[button:GetName().."Left"]:SetAlpha(0.5)
-	-- 	_G[button:GetName().."Right"]:SetAlpha(0.5)
-	-- 	_G[button:GetName().."Middle"]:SetAlpha(0.5)
 	button:SetPoint("TOPLEFT",_G[self:GetName().."breed"],"BOTTOMLEFT")
 	button.Text:SetPoint("CENTER",0,0)
 	button:SetScript("OnClick",function(self)
@@ -860,7 +859,7 @@ function HPetAllInfoFrame:CreateTable(name,useTABLE,width,height,point,relative,
 	end
 	rt.init=function()
 		for i = h and 0 or 1, 20 do
-			local tab=CreateFrame("Frame",name.."table"..i,self)
+			local tab=CreateFrame("Frame",name.."table"..i,self,"BackdropTemplate")
 			local index=rt.index
 			tab:SetSize(width,height)
 			tab:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background"})
@@ -1008,7 +1007,7 @@ end
 
 function HPetAllInfoFrame:initframe(frames)
 	for key,value in pairs(frames) do
-		self[value.name]=CreateFrame("Frame",self:GetName()..value.name,self,value.inherits or nil)
+		self[value.name]=CreateFrame("Frame",self:GetName()..value.name,self,value.inherits or "BackdropTemplate")
 		self[value.name]:SetSize(value.width,value.height)
 		self[value.name]:SetBackdrop(backdrop);
 		if value.point then
@@ -1052,11 +1051,8 @@ function HPetAllInfoFrame:initframe(frames)
 end
 function HPetAllInfoFrame:Toggle(...)
 	if not self.ready then self:Init() end
-	if self:GetParent() == RematchPetCard then self:Hide() end
-	self:AnchorToBlizzard()
-    self:SetIgnoreParentAlpha(false)
 	self:Update(...)
-	if not self:IsVisible() then self:Show() else self:Hide() end
+	if not self:IsShown() then self:Show() else self:Hide() end
 end
 --[[
     hooksecurefunc(Rematch, "ShowPetCard", function(self, parent, petID)

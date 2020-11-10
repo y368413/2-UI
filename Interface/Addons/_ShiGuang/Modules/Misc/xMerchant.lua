@@ -4,7 +4,7 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local MISC = M:GetModule("Misc")
 function MISC:xMerchant()
-if not MaoRUIPerDB["Misc"]["xMerchant"] then return end
+if not R.db["Misc"]["xMerchant"] then return end
 local xMerchant = {};
 local buttons = {};
 local knowns = {};

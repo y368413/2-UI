@@ -23,7 +23,7 @@ I.Devs = {
 	["浩劫复仇-鬼雾峰"] = true,
 }
 local function isDeveloper()
-	return I.Devs[I.MyName.."-"..I.MyRealm]
+	return I.Devs[I.MyFullName]
 end
 I.isDeveloper = isDeveloper()
 

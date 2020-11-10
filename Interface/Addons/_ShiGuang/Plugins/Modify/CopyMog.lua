@@ -42,15 +42,15 @@ local function createGearFrame()
 	if gearFrame then gearFrame:Show() return end
 
 	gearFrame = CreateFrame("Frame", "CopyMogGearTexts", UIParent, "BackdropTemplate")
-	gearFrame:SetPoint("TOP", InspectPaperDollFrame, "BOTTOM", 0, 0)
+	gearFrame:SetPoint("TOP", InspectPaperDollFrame, "BOTTOM", 0, -26)
 	gearFrame:SetSize(330, 250)
 	gearFrame:SetFrameStrata("DIALOG")
-	gearFrame:SetBackdrop({ 
-		bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-		insets = {left = 5,right = 5,top = 5,bottom = 5},
-		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-		edgeSize = 16,
-	})
+	--gearFrame:SetBackdrop({ 
+	--	bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+	--	insets = {left = 5,right = 5,top = 5,bottom = 5},
+	--	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+	--	edgeSize = 16,
+	--})
 	local close = CreateFrame("Button", nil, gearFrame, "UIPanelCloseButton")
 	close:SetPoint("TOPRIGHT", gearFrame)
 	gearFrame.Close = close
@@ -234,17 +234,6 @@ local function createCopyButton(parent)
 	button.Text:SetFont(STANDARD_TEXT_FONT, fontSize, "OUTLINE")
 	parent.CopyButton = button
 
-	if IsAddOnLoaded("NDui") then
-		local B, C, L, DB = unpack(_G.NDui)
-		local cr, cg, cb = DB.r, DB.g, DB.b
-		B.Reskin(button)
-		button.Text:SetTextColor(cr, cg, cb)
-	elseif IsAddOnLoaded("ElvUI") then
-		local E, L, V, P, G = unpack(_G.ElvUI)
-		local S = E:GetModule('Skins')
-		S:HandleButton(button)
-	end
-
 	return button
 end
 
@@ -295,14 +284,4 @@ loader:SetScript("OnEvent", function(self, event, addon)
 		end
 	end
 
-	if event == "PLAYER_LOGIN" then
-		local button = createCopyButton(PaperDollFrame)
-		button:SetPoint("BOTTOMLEFT", 5, 6)
-		button:SetScript("OnClick", function()
-			createGearFrame()
-			getPlayerSources()
-			copyTexts()
-		end)
-		self:UnregisterEvent(event)
-	end
 end)

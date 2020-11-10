@@ -240,7 +240,7 @@ local chatEvents = {
  --------------------------------------- 聊天表情-- Author:M  end -------------------------------------
  
 function module:Chatbar()
-	if not MaoRUIPerDB["Chat"]["Chatbar"] then return end
+	if not R.db["Chat"]["Chatbar"] then return end
 
 	for _, v in pairs(chatEvents) do
 		ChatFrame_AddMessageEventFilter(v, Chatemotefilter)
@@ -261,7 +261,7 @@ function module:Chatbar()
 	else
 	  VoiceFrame:SetPoint("LEFT", Chatbar, "LEFT", 240, -2)
 	end
-	VoiceFrame:SetShown(MaoRUIPerDB["Chat"]["ChatMenu"])
+	VoiceFrame:SetShown(R.db["Chat"]["ChatMenu"])
 	
 	_G.ChatFrameChannelButton:ClearAllPoints()
 	_G.ChatFrameChannelButton:SetPoint("TOP", VoiceFrame)
@@ -286,7 +286,7 @@ function module:Chatbar()
 	Voice.Icon:SetAllPoints()
 	Voice.Icon:SetTexture("Interface\\AddOns\\_ShiGuang\\media\\Emotes\\zhuan_push_frame")
 	Voice:RegisterForClicks("AnyUp")
-	Voice:SetScript("OnClick",function(self, btn) if btn == "RightButton" then SenduiCmd("/whisperpop") else M:TogglePanel(VoiceFrame) MaoRUIPerDB["Chat"]["ChatMenu"] = VoiceFrame:IsShown() end end)
+	Voice:SetScript("OnClick",function(self, btn) if btn == "RightButton" then SenduiCmd("/whisperpop") else M:TogglePanel(VoiceFrame) R.db["Chat"]["ChatMenu"] = VoiceFrame:IsShown() end end)
 	
 	_G.ChatFrameMenuButton:ClearAllPoints()
 	_G.ChatFrameMenuButton:SetSize(21, 21)

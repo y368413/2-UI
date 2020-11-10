@@ -23,7 +23,7 @@ local addonname,addon = ...
 local L = addon.L
 
 
-local HPetOption = CreateFrame("Frame","HPetOption",InterfaceOptionsFramePanelContainer)
+local HPetOption = CreateFrame("Frame","HPetOption",InterfaceOptionsFramePanelContainer,"BackdropTemplate")
 
 HPetOption:Hide()
 --~ tinsert(UISpecialFrames, "HPetOption")
@@ -35,15 +35,15 @@ function HPetOption:Init()
 	self:SetPoint("CENTER")
 	self:SetToplevel(true)
 	self:SetMovable(true)
-	-- self:SetClampedToScreen(true)
+	self:SetClampedToScreen(true)
 
-	--[[ background
+	-- background
 	self:SetBackdrop( {
 	  bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 	  edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile = true, tileSize = 16, edgeSize = 16,
 	  insets = { left = 5, right = 5, top = 5, bottom = 5 }
 	});
-	self:SetBackdropColor(0,0,0)]]
+	self:SetBackdropColor(0,0,0)
 
 	-- drag
 	self:EnableMouse(true)
@@ -503,7 +503,7 @@ function UpdateStoneButton_Click()
 	print("↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓")
 	for _,id in ipairs(Stone) do
 		if (BrotherBags) then
-			GetStringForBB(id)
+			GetStringBB(id)
 		-- elseif () then
 			-- GetStringBS(id)
 		end
@@ -566,7 +566,7 @@ HPetOption:SetScript("OnShow", function(frame)
 
 	frame:EnableMouse(false)
 	frame:SetToplevel(false)
-	--frame:SetBackdrop(nil)
+	frame:SetBackdrop(nil)
 	HPetOptionClose:Hide()
 
 	frame:SetScript("OnShow", function() frame:LoadOptions() end)

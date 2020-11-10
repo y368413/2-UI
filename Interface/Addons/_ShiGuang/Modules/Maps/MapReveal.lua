@@ -209,7 +209,7 @@ local function MapExplorationPin_RefreshOverlays(pin, fullUpdate)
 					texture:SetPoint("TOPLEFT", offsetX + (TILE_SIZE_WIDTH * (k-1)), -(offsetY + (TILE_SIZE_HEIGHT * (j - 1))))
 					texture:SetTexture(tonumber(fileDataIDs[((j - 1) * numTexturesWide) + k]), nil, nil, "TRILINEAR")
 					texture:SetDrawLayer("ARTWORK", -1)
-					if MaoRUIPerDB["Map"]["MapReveal"] then
+					if R.db["Map"]["MapReveal"] then
 						texture:Show()
 						if fullUpdate then
 							pin.textureLoadGroup:AddTexture(texture)
@@ -217,7 +217,11 @@ local function MapExplorationPin_RefreshOverlays(pin, fullUpdate)
 					else
 						texture:Hide()
 					end
-					texture:SetVertexColor(.6, .6, .6)
+					if R.db["Map"]["MapRevealGlow"] then
+						texture:SetVertexColor(.7, .7, .7)
+					else
+						texture:SetVertexColor(1, 1, 1)
+					end
 
 					tinsert(overlayTextures, texture)
 				end
@@ -241,7 +245,7 @@ function module:MapReveal()
 	bu:SetPoint("TOPLEFT", 56, 0)
 	bu:SetSize(26, 26)
 	--M.ReskinCheck(bu)
-	bu:SetChecked(MaoRUIPerDB["Map"]["MapReveal"])
+	bu:SetChecked(R.db["Map"]["MapReveal"])
 	bu.text = M.CreateFS(bu, 14, U["Map Reveal"], false, "LEFT", 25, 0)
 
 	for pin in WorldMapFrame:EnumeratePinsByTemplate("MapExplorationPinTemplate") do
@@ -250,9 +254,9 @@ function module:MapReveal()
 	end
 
 	bu:SetScript("OnClick", function(self)
-		MaoRUIPerDB["Map"]["MapReveal"] = self:GetChecked()
+		R.db["Map"]["MapReveal"] = self:GetChecked()
 		for i = 1, #overlayTextures do
-			overlayTextures[i]:SetShown(MaoRUIPerDB["Map"]["MapReveal"])
+			overlayTextures[i]:SetShown(R.db["Map"]["MapReveal"])
 		end
 	end)
 end

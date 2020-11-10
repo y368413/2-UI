@@ -16,7 +16,7 @@ function module:UpdateChannelNames(text, ...)
 	if strfind(text, INTERFACE_ACTION_BLOCKED) and not I.isDeveloper then return end
 
 	local r, g, b = ...
-	if MaoRUIPerDB["Chat"]["WhisperColor"] and strfind(text, U["Tell"].." |H[BN]*player.+%]") then
+	if R.db["Chat"]["WhisperColor"] and strfind(text, U["Tell"].." |H[BN]*player.+%]") then
 		r, g, b = r*.7, g*.7, b*.7
 	end
 

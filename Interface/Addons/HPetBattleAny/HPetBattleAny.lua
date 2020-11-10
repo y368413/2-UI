@@ -31,6 +31,10 @@ HPetBattleAny = CreateFrame("frame");
 HPetBattleAny:SetScript('OnEvent', function(_, event, ...) return HPetBattleAny[event](HPetBattleAny, event, ...) end)
 HPetBattleAny:Hide()
 HPetBattleAny.addon = addon
+if BPBID_Arrays then
+	--提前检测BBPBID是否已经存在，并备份数据，防止被本插件下的PetData.lua覆盖
+	HPetBattleAny.BPBIDInit = BPBID_Arrays.InitializeArrays
+end
 
 function HPetBattleAny:Init_HPET()
 	if not self.initialized_HPET then
@@ -242,7 +246,8 @@ function HPetBattleAny.CreateLinkByInfo(petID,...)		---...=usecustom,level,healt
 		customname = usecustom or nil
 	end
 	if not speciesID then return end
-	name = customname or C_PetJournal.GetPetInfoBySpeciesID(speciesID)
+	local pn, _, _, _, _, _, _, _, _, _, _, displayID = C_PetJournal.GetPetInfoBySpeciesID(speciesID);
+	name = customname or pn
 	if not name or tonumber(name) == name then return end
 
 	local health,power,speed
@@ -266,9 +271,8 @@ function HPetBattleAny.CreateLinkByInfo(petID,...)		---...=usecustom,level,healt
 		rarity=rarity+HPetSaves.lie
 	end
 	link=ITEM_QUALITY_COLORS[rarity].hex.."\124Hbattlepet:"
-	link=link..speciesID..":"..level..":"..rarity..":"..health..":"..power..":"..speed..":"..(petID or "BattlePet-0-000000000000")
+	link=link..speciesID..":"..level..":"..rarity..":"..health..":"..power..":"..speed..":"..(petID or "BattlePet-0-000000000000")..":"..displayID
 	link=link.."\124h["..(customname or name).."]\124h\124r"
---~ 	print(customname or name,"我勒个去")
 	return link
 end
 -----	成长值
@@ -342,7 +346,6 @@ end
 
 -----	调出宠物收集信息(已有宠物信息)
 function HPetBattleAny:GetPetCollectedInfo(speciesID,enemypet,islink,mini)
-	local isNpc = false 
 	local str1=""
 	local str2=""
 	local pets=type(speciesID)=="table" and  speciesID or HPetBattleAny:GetPetInfo(speciesID)
@@ -391,17 +394,15 @@ function HPetBattleAny:GetPetCollectedInfo(speciesID,enemypet,islink,mini)
 	else
 		if C_PetBattles.IsPlayerNPC(2) and (select(2,C_PetBattles.IsTrapAvailable())==6 or select(2,C_PetBattles.IsTrapAvailable())==7) then
 			str1=str1.."|cffffff00".._G["PET_BATTLE_TRAP_ERR_"..select(2,C_PetBattles.IsTrapAvailable())]
-			isNpc = true
 		else
 			if enemypet and not HPetBattleAny:CanTrapBySpeciesID(speciesID) then
 				str1=str1.."|cffffff00".._G["PET_BATTLE_TRAP_ERR_6"]
-				isNpc = true
 			else
 				str1=str1.."|cffff0000"..NOT_COLLECTED.."!|r"
 			end
 		end
 	end
-	if isNpc then return nil,nil else return str1,str2 end
+	return str1,str2
 end
 
 --[[ 	OnEvent:					PET_BATTLE_OPENING_START	]]--
@@ -463,14 +464,10 @@ function HPetBattleAny:PET_BATTLE_OPENING_START(...)
 
 			if HPetSaves.Contrast or true then
 				local str1,str2 = HPetBattleAny:GetPetCollectedInfo(speciesID,{["level"]=level,["rarity"]=rarity},true,HPetSaves.MiniTip)
-				if str1~=nil then
 				tmprint = tmprint..str1..str2
-				else
-				tmprint = nil
-				end
 			end
 
-			if tmprint~=nil and HPetSaves.ShowMsg then
+			if HPetSaves.ShowMsg then
 				self:PetPrintEX(tmprint)
 			end
 		end

@@ -233,6 +233,26 @@ function cql.log:UpdateQuestTypeIcon(button,info)
     return tagCoords~=nil
 end
 
+-- when an objective tracker quest is clicked, it may open a quest that's in a collapsed header;
+-- this function will find the quest and expand its header
+function cql.log:ExpandHeaderContainingQuestID(questID)
+    local header
+    for i=1,C_QuestLog.GetNumQuestLogEntries() do
+        local info = C_QuestLog.GetInfo(i)
+        if info and not info.isHidden then
+            if info.isHeader then
+                header = info.title
+            else
+                if info.questID==questID and header and collapsedHeaders[header] then
+                    collapsedHeaders[header] = false
+                    cql.log:Update()
+                    return
+                end
+            end
+        end
+    end
+end
+
 --[[ clickable Stuff ]]
 
 -- click of the +/- All button at the top of the log, to expand/collapse all headers
@@ -266,12 +286,19 @@ function cql.log:ListButtonOnClick()
         if IsModifiedClick("QUESTWATCHTOGGLE") then
             cql.chrome:ToggleWatch(info.questID)
         else -- just clicking a quest with nothing special will select and display the quest details
-            C_QuestLog.SetSelectedQuest(info.questID)
-            cql:SetMode("detail")
+            cql.log:SelectQuestID(info.questID)
         end
     end
     PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
     cql.chrome:Update()
+end
+
+-- to make it easier for outside programs to hook quests being selected
+function cql.log:SelectQuestID(questID)
+    C_QuestLog.SetSelectedQuest(questID)
+    cql:SetMode("detail")
+    -- for LightHeaded (or anything else that calls the old 1.x function that was removed)
+    cql:SelectQuestIndex(C_QuestLog.GetLogIndexForQuestID(questID))
 end
 
 --[[ tooltip ]]

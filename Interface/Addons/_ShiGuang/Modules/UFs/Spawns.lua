@@ -7,8 +7,8 @@ local format, tostring = string.format, tostring
 
 -- Units
 local function SetUnitFrameSize(self, unit)
-	local width = MaoRUIPerDB["UFs"][unit.."Width"]
-	local height = MaoRUIPerDB["UFs"][unit.."Height"] + MaoRUIPerDB["UFs"][unit.."PowerHeight"] + R.mult
+	local width = R.db["UFs"][unit.."Width"]
+	local height = R.db["UFs"][unit.."Height"] + R.db["UFs"][unit.."PowerHeight"] + R.mult
 	self:SetSize(width, height)
 end
 
@@ -16,18 +16,18 @@ local function CreatePlayerStyle(self)
 	self.mystyle = "player"
 	--UF:CreateCastBar(self)
 	UF:CreateQuestSync(self)
-	--if MaoRUIPerDB["UFs"]["Castbars"] then
+	--if R.db["UFs"]["Castbars"] then
 		--UF:ReskinMirrorBars()
 		--UF:ReskinTimerTrakcer(self)
 	--end
-	--if MaoRUIPerDB["UFs"]["ClassPower"] and not MaoRUIPerDB["Nameplate"]["ShowPlayerPlate"] then
+	--if R.db["UFs"]["ClassPower"] and not R.db["Nameplate"]["ShowPlayerPlate"] then
 		--UF:CreateClassPower(self)
 		--UF:StaggerBar(self)
 	--end
-	if not MaoRUIPerDB["Misc"]["ExpRep"] then UF:CreateExpRepBar(self) end
-	--if MaoRUIPerDB["UFs"]["PlayerDebuff"] then UF:CreateDebuffs(self) end
-	if MaoRUIPerDB["UFs"]["SwingBar"] then UF:CreateSwing(self) end
-	if MaoRUIPerDB["UFs"]["QuakeTimer"] then UF:CreateQuakeTimer(self) end
+	if not R.db["Misc"]["ExpRep"] then UF:CreateExpRepBar(self) end
+	--if R.db["UFs"]["PlayerDebuff"] then UF:CreateDebuffs(self) end
+	if R.db["UFs"]["SwingBar"] then UF:CreateSwing(self) end
+	if R.db["UFs"]["QuakeTimer"] then UF:CreateQuakeTimer(self) end
 end
 
 local function CreateTargetStyle(self)
@@ -142,20 +142,20 @@ end
 
 -- Spawns
 function UF:OnLogin()
-	local horizonRaid = MaoRUIPerDB["UFs"]["HorizonRaid"]
-	local horizonParty = MaoRUIPerDB["UFs"]["HorizonParty"]
-	local numGroups = MaoRUIPerDB["UFs"]["NumGroups"]
-	local scale = MaoRUIPerDB["UFs"]["SimpleRaidScale"]/10
-	local raidWidth, raidHeight = MaoRUIPerDB["UFs"]["RaidWidth"], MaoRUIPerDB["UFs"]["RaidHeight"]
-	local reverse = MaoRUIPerDB["UFs"]["ReverseRaid"]
-	local showPartyFrame = MaoRUIPerDB["UFs"]["PartyFrame"]
-	local partyWidth, partyHeight = MaoRUIPerDB["UFs"]["PartyWidth"], MaoRUIPerDB["UFs"]["PartyHeight"]
-	local showPartyPetFrame = MaoRUIPerDB["UFs"]["PartyPetFrame"]
-	local petWidth, petHeight = MaoRUIPerDB["UFs"]["PartyPetWidth"], MaoRUIPerDB["UFs"]["PartyPetHeight"]
-	local showTeamIndex = MaoRUIPerDB["UFs"]["ShowTeamIndex"]
-	local showSolo = MaoRUIPerDB["UFs"]["ShowSolo"]
+	local horizonRaid = R.db["UFs"]["HorizonRaid"]
+	local horizonParty = R.db["UFs"]["HorizonParty"]
+	local numGroups = R.db["UFs"]["NumGroups"]
+	local scale = R.db["UFs"]["SimpleRaidScale"]/10
+	local raidWidth, raidHeight = R.db["UFs"]["RaidWidth"], R.db["UFs"]["RaidHeight"]
+	local reverse = R.db["UFs"]["ReverseRaid"]
+	local showPartyFrame = R.db["UFs"]["PartyFrame"]
+	local partyWidth, partyHeight = R.db["UFs"]["PartyWidth"], R.db["UFs"]["PartyHeight"]
+	local showPartyPetFrame = R.db["UFs"]["PartyPetFrame"]
+	local petWidth, petHeight = R.db["UFs"]["PartyPetWidth"], R.db["UFs"]["PartyPetHeight"]
+	local showTeamIndex = R.db["UFs"]["ShowTeamIndex"]
+	local showSolo = R.db["UFs"]["ShowSolo"]
 
-	if MaoRUIPerDB["Nameplate"]["Enable"] then
+	if R.db["Nameplate"]["Enable"] then
 		UF:SetupCVars()
 		UF:BlockAddons()
 		UF:CreateUnitTable()
@@ -171,7 +171,7 @@ function UF:OnLogin()
 		oUF:SpawnNamePlates("oUF_NPs", UF.PostUpdatePlates)
 	end
 
-	if MaoRUIPerDB["Nameplate"]["ShowPlayerPlate"] then
+	if R.db["Nameplate"]["ShowPlayerPlate"] then
 		oUF:RegisterStyle("PlayerPlate", UF.CreatePlayerPlate)
 		oUF:SetActiveStyle("PlayerPlate")
 		local plate = oUF:Spawn("player", "oUF_PlayerPlate", true)
@@ -214,7 +214,7 @@ function UF:OnLogin()
 				boss[i].mover = M.Mover(boss[i], U["BossFrame"]..i, "Boss"..i, {"TOP", boss[i-1], "BOTTOM", 0, -26}, moverWidth, moverHeight)
 			end
 		end
-		if MaoRUIPerDB["UFs"]["Arena"] then
+		if R.db["UFs"]["Arena"] then
 			oUF:RegisterStyle("Arena", CreateArenaStyle)
 			oUF:SetActiveStyle("Arena")
 			local arena = {}
@@ -225,7 +225,7 @@ function UF:OnLogin()
 		end
 
 		UF:UpdateTextScale()
-	if MaoRUIPerDB["UFs"]["RaidFrame"] then
+	if R.db["UFs"]["RaidFrame"] then
 		UF:AddClickSetsListener()
 
 		-- Hide Default RaidFrame
@@ -244,7 +244,7 @@ function UF:OnLogin()
 			oUF:SetActiveStyle("Party")
 
 			local xOffset, yOffset = 5, 5
-			local partyFrameHeight = partyHeight + MaoRUIPerDB["UFs"]["PartyPowerHeight"] + R.mult
+			local partyFrameHeight = partyHeight + R.db["UFs"]["PartyPowerHeight"] + R.mult
 			local moverWidth = horizonParty and (partyWidth*5+xOffset*4) or partyWidth
 			local moverHeight = horizonParty and partyFrameHeight or (partyFrameHeight*5+yOffset*4)
 			local groupingOrder = horizonParty and "TANK,HEALER,DAMAGER,NONE" or "NONE,DAMAGER,HEALER,TANK"
@@ -274,7 +274,7 @@ function UF:OnLogin()
 				oUF:RegisterStyle("PartyPet", CreatePartyPetStyle)
 				oUF:SetActiveStyle("PartyPet")
 
-				local petFrameHeight = petHeight + MaoRUIPerDB["UFs"]["PartyPetPowerHeight"] + R.mult
+				local petFrameHeight = petHeight + R.db["UFs"]["PartyPetPowerHeight"] + R.mult
 				local petMoverWidth = horizonParty and (petWidth*5+xOffset*4) or petWidth
 				local petMoverHeight = horizonParty and petFrameHeight or (petFrameHeight*5+yOffset*4)
 
@@ -304,8 +304,8 @@ function UF:OnLogin()
 		oUF:SetActiveStyle("Raid")
 
 		local raidMover
-		if MaoRUIPerDB["UFs"]["SimpleMode"] then
-			local unitsPerColumn = MaoRUIPerDB["UFs"]["SMUnitsPerColumn"]
+		if R.db["UFs"]["SimpleMode"] then
+			local unitsPerColumn = R.db["UFs"]["SMUnitsPerColumn"]
 			local maxColumns = M:Round(numGroups*5 / unitsPerColumn)
 
 			local function CreateGroup(name, i)
@@ -353,14 +353,14 @@ function UF:OnLogin()
 				[3] = {"TANK,HEALER,DAMAGER,NONE", "ASSIGNEDROLE", "NAME"},
 			}
 			function UF:UpdateSimpleModeHeader()
-				local groupByIndex = MaoRUIPerDB["UFs"]["SMGroupByIndex"]
+				local groupByIndex = R.db["UFs"]["SMGroupByIndex"]
 				group:SetAttribute("groupingOrder", groupByTypes[groupByIndex][1])
 				group:SetAttribute("groupBy", groupByTypes[groupByIndex][2])
 				group:SetAttribute("sortMethod", groupByTypes[groupByIndex][3])
 			end
 			UF:UpdateSimpleModeHeader()
 		else
-			local raidFrameHeight = raidHeight + MaoRUIPerDB["UFs"]["RaidPowerHeight"] + R.mult
+			local raidFrameHeight = raidHeight + R.db["UFs"]["RaidPowerHeight"] + R.mult
 
 			local function CreateGroup(name, i)
 				local group = oUF:SpawnHeader(name, nil, "solo,party,raid",
@@ -432,18 +432,18 @@ function UF:OnLogin()
 		UF:UpdateRaidHealthMethod()
 
 		if raidMover then
-			if not MaoRUIPerDB["UFs"]["SpecRaidPos"] then return end
+			if not R.db["UFs"]["SpecRaidPos"] then return end
 
 			local function UpdateSpecPos(event, ...)
 				local unit, _, spellID = ...
 				if (event == "UNIT_SPELLCAST_SUCCEEDED" and unit == "player" and spellID == 200749) or event == "PLAYER_ENTERING_WORLD" then
 					if not GetSpecialization() then return end
 					local specIndex = GetSpecialization()
-					if not MaoRUIPerDB["Mover"]["RaidPos"..specIndex] then
-						MaoRUIPerDB["Mover"]["RaidPos"..specIndex] = {"TOPLEFT", "UIParent", "TOPLEFT", 35, -50}
+					if not R.db["Mover"]["RaidPos"..specIndex] then
+						R.db["Mover"]["RaidPos"..specIndex] = {"TOPLEFT", "UIParent", "TOPLEFT", 35, -50}
 					end
 					raidMover:ClearAllPoints()
-					raidMover:SetPoint(unpack(MaoRUIPerDB["Mover"]["RaidPos"..specIndex]))
+					raidMover:SetPoint(unpack(R.db["Mover"]["RaidPos"..specIndex]))
 				end
 			end
 			M:RegisterEvent("PLAYER_ENTERING_WORLD", UpdateSpecPos)
@@ -452,7 +452,7 @@ function UF:OnLogin()
 			raidMover:HookScript("OnDragStop", function()
 				if not GetSpecialization() then return end
 				local specIndex = GetSpecialization()
-				MaoRUIPerDB["Mover"]["RaidPos"..specIndex] = MaoRUIPerDB["Mover"]["RaidFrame"]
+				R.db["Mover"]["RaidPos"..specIndex] = R.db["Mover"]["RaidFrame"]
 			end)
 		end
 	end

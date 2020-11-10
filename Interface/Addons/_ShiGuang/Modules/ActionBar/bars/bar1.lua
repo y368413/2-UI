@@ -12,16 +12,15 @@ local function UpdateActionbarScale(bar)
 	local frame = _G["NDui_Action"..bar]
 	if not frame then return end
 
-	local size = frame.buttonSize * MaoRUIPerDB["Actionbar"]["Scale"]
+	local size = frame.buttonSize * R.db["Actionbar"]["Scale"]
 	frame:SetFrameSize(size)
-
 	--for _, button in pairs(frame.buttonList) do
 		--button:SetSize(size, size)
 	--end
 end
 
 function Bar:UpdateAllScale()
-	if not MaoRUIPerDB["Actionbar"]["Enable"] then return end
+	if not R.db["Actionbar"]["Enable"] then return end
 
 	UpdateActionbarScale("Bar1")
 	UpdateActionbarScale("Bar2")
@@ -38,7 +37,7 @@ local function SetFrameSize(frame, size, num)
 	size = cfg.size or frame.buttonSize
 	num = num or frame.numButtons
 	
-	local layout = MaoRUIPerDB["Actionbar"]["Style"]
+	local layout = R.db["Actionbar"]["Style"]
 	if layout == 8 then
 	  frame:SetWidth(6*size + 6*margin + 6*padding)
 	  frame:SetHeight(2*size - padding)
@@ -72,7 +71,7 @@ end
 function Bar:CreateBar1()
 	local num = NUM_ACTIONBAR_BUTTONS
 	local buttonList = {}
-	local layout = MaoRUIPerDB["Actionbar"]["Style"]
+	local layout = R.db["Actionbar"]["Style"]
 
 	local frame = CreateFrame("Frame", "NDui_ActionBar1", UIParent, "SecureHandlerStateTemplate")
 
@@ -229,7 +228,7 @@ end
 function Bar:OnLogin()
 	Bar.buttons = {}
 
-	if not MaoRUIPerDB["Actionbar"]["Enable"] then return end
+	if not R.db["Actionbar"]["Enable"] then return end
 
 	Bar:CreateBar1()
 	Bar:CreateBar2()

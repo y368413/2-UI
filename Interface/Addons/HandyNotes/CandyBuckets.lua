@@ -1,4 +1,4 @@
-﻿--## Author: Vladinator  ## Version: 9.0.1.201018b
+﻿--## Author: Vladinator  ## Version: 9.0.1.201029
 
 local CandyBuckets = {}
 CandyBuckets.modules = CandyBuckets.modules or {}
@@ -214,7 +214,7 @@ CandyBuckets.modules["hallow"] = {
 		{ quest = 32041, side = 3, [379] = {64.20, 61.20} },
 		{ quest = 32042, side = 1, [379] = {54.10, 82.80} },
 		{ quest = 32043, side = 3, [388] = {71.10, 57.80} },
-		{ quest = 32044, side = 3, [390] = {35.10, 77.70} },
+		{ quest = 32044, side = 3, [390] = {35.10, 77.70}, [1530] = {35.10, 75.60} },
 		{ quest = 32046, side = 3, [376] = {19.80, 55.70} },
 		{ quest = 32048, side = 3, [376] = {83.60, 20.30} },
 		{ quest = 32049, side = 1, [371] = {44.80, 84.40} },
@@ -650,7 +650,46 @@ CandyBuckets.COMPLETED_QUESTS = setmetatable({}, {
 
 CandyBuckets.PARENT_MAP = {}
 do
-	local parentMapIDs = {
+
+	local function AddParentChildMapIDs(uiParentMapID, uiChildMapID)
+		if not CandyBuckets.PARENT_MAP[uiParentMapID] then
+			CandyBuckets.PARENT_MAP[uiParentMapID] = { [uiParentMapID] = true }
+		end
+		CandyBuckets.PARENT_MAP[uiParentMapID][uiChildMapID] = true
+	end
+
+	local function CheckMapRecursively(uiMapID, getChildren, depthRemaining, uiParentMapIDs)
+		if not uiMapID or not getChildren then return end
+		if not depthRemaining then depthRemaining = 1 end
+		if depthRemaining < 1 then return end
+		if not uiParentMapIDs then uiParentMapIDs = {} end
+		for uiParentMapID, _ in pairs(uiParentMapIDs) do
+			AddParentChildMapIDs(uiParentMapID, uiMapID)
+		end
+		uiParentMapIDs[uiMapID] = true
+		local children = getChildren(uiMapID)
+		if children and type(children) == "table" then
+			for _, uiChildMapID in pairs(children) do
+				if type(uiChildMapID) == "table" then
+					uiChildMapID = uiChildMapID.mapID
+				end
+				if type(uiChildMapID) == "number" then
+					AddParentChildMapIDs(uiMapID, uiChildMapID)
+					CheckMapRecursively(uiChildMapID, getChildren, depthRemaining - 1, uiParentMapIDs)
+				end
+			end
+		end
+	end
+
+	local function GetChildren(uiMapID)
+		return C_Map.GetMapChildrenInfo(uiMapID, nil, true) -- Enum.UIMapType.Zone
+	end
+
+	local function GetChildrenNS(uiMapID)
+		return CandyBuckets.uimaps and type(CandyBuckets.uimaps) == "table" and CandyBuckets.uimaps[uiMapID]
+	end
+
+	for _, uiMapID in ipairs({
 		12, -- Kalimdor
 		13, -- Eastern Kingdoms
 		101, -- Outland
@@ -669,20 +708,14 @@ do
 		947, -- Azeroth (CPU hog, but it's not too bad?)
 		948, -- The Maelstrom
 		1165, -- Dazar'alor
-	}
-
-	for i = 1, #parentMapIDs do
-		local uiMapID = parentMapIDs[i]
-		local children = C_Map.GetMapChildrenInfo(uiMapID, nil, true) -- Enum.UIMapType.Zone
-
-		for _, child in pairs(children) do
-			if not CandyBuckets.PARENT_MAP[uiMapID] then
-				CandyBuckets.PARENT_MAP[uiMapID] = { [uiMapID] = true }
-			end
-
-			CandyBuckets.PARENT_MAP[uiMapID][child.mapID] = true
-		end
+		1550, -- The Shadowlands
+	}) do
+		CheckMapRecursively(uiMapID, GetChildren, 10)
+		CheckMapRecursively(uiMapID, GetChildrenNS, 10)
 	end
+
+	AddParentChildMapIDs(108, 111) -- Terokkar Forest -> Shattrath City
+
 end
 
 local function GetLowestLevelMapFromMapID(uiMapID, x, y)
@@ -835,6 +868,7 @@ function CandyBucketsDataProviderMixin:RefreshAllData(fromOnShow)
 	local map = self:GetMap()
 	local uiMapID = map:GetMapID()
 	local childUiMapIDs = CandyBuckets.PARENT_MAP[uiMapID]
+	local tempVector = {}
 	local questPOIs
 
 	if IsModifierKeyDown() then
@@ -859,7 +893,8 @@ function CandyBucketsDataProviderMixin:RefreshAllData(fromOnShow)
 						poi = poi[translateKey]
 
 					else
-						local continentID, worldPos = C_Map.GetWorldPosFromMapPos(childUiMapID, CreateVector2D(poi[1]/100, poi[2]/100)) -- TODO: replace with a table and xy properties?
+						tempVector.x, tempVector.y = poi[1]/100, poi[2]/100
+						local continentID, worldPos = C_Map.GetWorldPosFromMapPos(childUiMapID, tempVector)
 						poi, poi2 = nil, poi
 
 						if continentID and worldPos then
@@ -921,7 +956,7 @@ end
 
 function CandyBucketsPinMixin:OnAcquired(quest, poi)
 	self.quest = quest
-	self:UseFrameLevelType("PIN_FRAME_LEVEL_GOSSIP", self:GetMap():GetNumActivePinsByTemplate("CandyBucketsPinTemplate"))
+	self:UseFrameLevelType("PIN_FRAME_LEVEL_AREA_POI", self:GetMap():GetNumActivePinsByTemplate("CandyBucketsPinTemplate"))
 	self:SetSize(12, 12)
 	self.Texture:SetTexture(quest.module.texture[quest.extra or 1])
 	self.Border:SetTexture(PIN_BORDER_COLOR[quest.side or 0])
@@ -985,7 +1020,7 @@ end
 
 function CandyBucketsStatsMixin:OnAcquired(questPOIs)
 	local map = self:GetMap()
-	self:UseFrameLevelType("PIN_FRAME_LEVEL_GOSSIP", map:GetNumActivePinsByTemplate("CandyBucketsStatsTemplate"))
+	self:UseFrameLevelType("PIN_FRAME_LEVEL_AREA_POI", map:GetNumActivePinsByTemplate("CandyBucketsStatsTemplate"))
 	self:SetSize(map:GetSize())
 	self:SetPosition(.5, .5)
 	--self:ClearAllPoints()

@@ -11,7 +11,7 @@
 ## RequiredDeps: Blizzard_GarrisonUI, Blizzard_OrderHallUI
 ## SavedVariables: MasterPlanAG, SV_GarrisonMissionManager, IPMDB
 ## SavedVariablesPerCharacter: MasterPlanPC, SVPC_GarrisonMissionManager
-## Version: 0.117 + V59 + 1.4.0.2 + 8.1.25
+## Version: 0.117 + V60 + 1.4.0.2 + 8.1.25
 ## X-Version-Key: exarch
 
 ## X-Repple: 2 UI

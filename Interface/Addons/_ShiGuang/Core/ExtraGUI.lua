@@ -358,7 +358,7 @@ function G:SetupClickCast(parent)
 		M.AddTooltip(icon, "ANCHOR_RIGHT", value, "system")
 		close:SetScript("OnClick", function()
 			bar:Hide()
-			MaoRUIPerDB["RaidClickSets"][clickSet] = nil
+			R.db["RaidClickSets"][clickSet] = nil
 			barTable[clickSet] = nil
 			sortBars(barTable)
 		end)
@@ -395,7 +395,7 @@ function G:SetupClickCast(parent)
 		button1 = YES,
 		button2 = NO,
 		OnAccept = function()
-			MaoRUIPerDB["RaidClickSets"] = nil
+			R.db["RaidClickSets"] = nil
 			ReloadUI()
 		end,
 		whileDead = 1,
@@ -411,10 +411,10 @@ function G:SetupClickCast(parent)
 		if (not tonumber(value)) and value ~= "target" and value ~= "focus" and value ~= "follow" and not strmatch(value, "/") then UIErrorsFrame:AddMessage(I.InfoColor..U["Invalid Input"]) return end
 		if not modKey or modKey == NONE then modKey = "" end
 		local clickSet = modKey..key
-		if MaoRUIPerDB["RaidClickSets"][clickSet] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ClickSet"]) return end
+		if R.db["RaidClickSets"][clickSet] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ClickSet"]) return end
 
-		MaoRUIPerDB["RaidClickSets"][clickSet] = {key, modKey, value}
-		createBar(scroll.child, MaoRUIPerDB["RaidClickSets"][clickSet])
+		R.db["RaidClickSets"][clickSet] = {key, modKey, value}
+		createBar(scroll.child, R.db["RaidClickSets"][clickSet])
 		clearEdit(options)
 	end
 
@@ -430,7 +430,7 @@ function G:SetupClickCast(parent)
 		clearEdit(options)
 	end)
 
-	for _, v in pairs(MaoRUIPerDB["RaidClickSets"]) do
+	for _, v in pairs(R.db["RaidClickSets"]) do
 		createBar(scroll.child, v)
 	end
 end
@@ -656,7 +656,7 @@ function G:SetupBuffIndicator(parent)
 			if MaoRUIDB["RaidAuraWatch"][spellID] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ID"]) return end
 			MaoRUIDB["RaidAuraWatch"][spellID] = true
 		else
-			anchor, r, g, b = parent.dd.Text:GetText(), parent.swatch.tex:GetVertexColor()
+			anchor, r, g, b = parent.dd.Text:GetText(), parent.swatch.tex:GetColor()
 			showAll = parent.showAll:GetChecked() or nil
 			if MaoRUIDB["CornerBuffs"][I.MyClass][spellID] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ID"]) return end
 			anchor = decodeAnchor[anchor]
@@ -760,14 +760,14 @@ end
 local function sliderValueChanged(self, v)
 	local current = tonumber(format("%.0f", v))
 	self.value:SetText(current)
-	MaoRUIPerDB["UFs"][self.__value] = current
+	R.db["UFs"][self.__value] = current
 	self.__update()
 end
 
 local function createOptionSlider(parent, title, minV, maxV, defaultV, x, y, value, func)
 	local slider = M.CreateSlider(parent, title, minV, maxV, 1, x, y)
-	slider:SetValue(MaoRUIPerDB["UFs"][value])
-	slider.value:SetText(MaoRUIPerDB["UFs"][value])
+	slider:SetValue(R.db["UFs"][value])
+	slider.value:SetText(R.db["UFs"][value])
 	slider.__value = value
 	slider.__update = func
 	slider.__default = defaultV
@@ -775,15 +775,15 @@ local function createOptionSlider(parent, title, minV, maxV, defaultV, x, y, val
 end
 
 local function SetUnitFrameSize(self, unit)
-	local width = MaoRUIPerDB["UFs"][unit.."Width"]
-	local healthHeight = MaoRUIPerDB["UFs"][unit.."Height"]
-	local powerHeight = MaoRUIPerDB["UFs"][unit.."PowerHeight"]
+	local width = R.db["UFs"][unit.."Width"]
+	local healthHeight = R.db["UFs"][unit.."Height"]
+	local powerHeight = R.db["UFs"][unit.."PowerHeight"]
 	local height = healthHeight + powerHeight + R.mult
 	self:SetSize(width, height)
 	self.Health:SetHeight(healthHeight)
 	self.Power:SetHeight(powerHeight)
 	if self.powerText then
-		self.powerText:SetPoint("RIGHT", -3, MaoRUIPerDB["UFs"][unit.."PowerOffset"])
+		self.powerText:SetPoint("RIGHT", -3, R.db["UFs"][unit.."PowerOffset"])
 	end
 end
 
@@ -821,8 +821,8 @@ function G:SetupRaidFrame(parent)
 	local function resizeRaidFrame()
 		for _, frame in pairs(ns.oUF.objects) do
 			if frame.mystyle == "raid" and not frame.isPartyFrame and not frame.isPartyPet then
-				if MaoRUIPerDB["UFs"]["SimpleMode"] then
-					local scale = MaoRUIPerDB["UFs"]["SimpleRaidScale"]/10
+				if R.db["UFs"]["SimpleMode"] then
+					local scale = R.db["UFs"]["SimpleRaidScale"]/10
 					local frameWidth = 100*scale
 					local frameHeight = 20*scale
 					local powerHeight = 2*scale
@@ -890,8 +890,8 @@ function G:SetupCastbar(parent)
 	local scroll = G:CreateScroll(panel, 260, 540)
 
 	createOptionTitle(scroll.child, U["Castbar Colors"], -10)
-	createOptionSwatch(scroll.child, U["Interruptible Color"], MaoRUIPerDB["UFs"]["CastingColor"], 40, -40)
-	createOptionSwatch(scroll.child, U["NotInterruptible Color"], MaoRUIPerDB["UFs"]["NotInterruptColor"], 40, -70)
+	createOptionSwatch(scroll.child, U["Interruptible Color"], R.db["UFs"]["CastingColor"], 40, -40)
+	createOptionSwatch(scroll.child, U["NotInterruptible Color"], R.db["UFs"]["NotInterruptColor"], 40, -70)
 
 	local defaultValue = {
 		["Player"] = {300, 20},
@@ -907,7 +907,7 @@ function G:SetupCastbar(parent)
 
 	local function updatePlayerCastbar()
 		if _G.oUF_Player then
-			local width, height = MaoRUIPerDB["UFs"]["PlayerCBWidth"], MaoRUIPerDB["UFs"]["PlayerCBHeight"]
+			local width, height = R.db["UFs"]["PlayerCBWidth"], R.db["UFs"]["PlayerCBHeight"]
 			_G.oUF_Player.Castbar:SetSize(width, height)
 			_G.oUF_Player.Castbar.Icon:SetSize(height, height)
 			_G.oUF_Player.Castbar.mover:Show()
@@ -927,7 +927,7 @@ function G:SetupCastbar(parent)
 
 	local function updateTargetCastbar()
 		if _G.oUF_Target then
-			local width, height = MaoRUIPerDB["UFs"]["TargetCBWidth"], MaoRUIPerDB["UFs"]["TargetCBHeight"]
+			local width, height = R.db["UFs"]["TargetCBWidth"], R.db["UFs"]["TargetCBHeight"]
 			_G.oUF_Target.Castbar:SetSize(width, height)
 			_G.oUF_Target.Castbar.Icon:SetSize(height, height)
 			_G.oUF_Target.Castbar.mover:Show()
@@ -938,7 +938,7 @@ function G:SetupCastbar(parent)
 
 	local function updateFocusCastbar()
 		if _G.oUF_Focus then
-			local width, height = MaoRUIPerDB["UFs"]["FocusCBWidth"], MaoRUIPerDB["UFs"]["FocusCBHeight"]
+			local width, height = R.db["UFs"]["FocusCBWidth"], R.db["UFs"]["FocusCBHeight"]
 			_G.oUF_Focus.Castbar:SetSize(width, height)
 			_G.oUF_Focus.Castbar.Icon:SetSize(height, height)
 			_G.oUF_Focus.Castbar.mover:Show()

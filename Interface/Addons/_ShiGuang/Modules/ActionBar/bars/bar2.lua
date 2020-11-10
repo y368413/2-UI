@@ -10,7 +10,7 @@ local margin, padding = R.Bars.margin, R.Bars.padding
 local function SetFrameSize(frame, size, num)
 	size = size or frame.buttonSize
 	num = num or frame.numButtons
-	local layout = MaoRUIPerDB["Actionbar"]["Style"]
+	local layout = R.db["Actionbar"]["Style"]
 
 	if layout == 8 then
 		frame:SetWidth(12*(size-7) + (num-1)*margin + 2*padding)
@@ -36,7 +36,7 @@ end
 function Bar:CreateBar2()
 	local num = NUM_ACTIONBAR_BUTTONS
 	local buttonList = {}
-	local layout = MaoRUIPerDB["Actionbar"]["Style"]
+	local layout = R.db["Actionbar"]["Style"]
 
 	local frame = CreateFrame("Frame", "NDui_ActionBar2", UIParent, "SecureHandlerStateTemplate")
 	if layout == 5 then

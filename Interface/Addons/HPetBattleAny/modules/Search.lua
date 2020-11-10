@@ -10,18 +10,6 @@
 	[/hpq ss 月火术 重拳]搜索带月火并且带重拳
 	注意。关键字是包括技能信息内的文字/技能类别"
 ]]--
-local GetQuestsCompleted = _G.GetQuestsCompleted or function(tbl)
-    local list = C_QuestLog.GetAllCompletedQuestIDs();
-    if tbl ~= nil then
-        wipe(tbl);
-    else
-        tbl = {  };
-    end
-    for index = 1, #list do
-        tbl[list[index]] = 1;
-    end
-    return tbl;
-end
 
 --~ Globals
 local _G = getfenv(0)
@@ -236,12 +224,11 @@ local npcs = {
 function PetTamerPinMixin:OnAcquired(poiInfo) -- override
 	if (poiInfo and poiInfo.name) then
 		if npcs[poiInfo.name] and npcs[poiInfo.name].QuestID then
-			local q=GetQuestsCompleted();
+			local com=C_QuestLog.IsComplete(npcs[poiInfo.name].QuestID);
 
-			local com = q[tonumber(npcs[poiInfo.name].QuestID)]
 			poiInfo.description = (com and " |cffffff00完成|r" or " |cffff0000未完成|r")
 			if com then
-				poiInfo.textureIndex=189;
+				poiInfo.textureIndex=188;
 			end
 		end
 	end

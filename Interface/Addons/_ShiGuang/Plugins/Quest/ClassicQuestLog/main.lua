@@ -249,14 +249,20 @@ local function onBlockHeaderClick(self,block,mouseButton)
         if not cql.options.ShowFromObjectiveTracker then
             return -- always let map remain if 'Show For Objective Tracker' is disabled
         end
-        -- see if the questID is in the log and if so hide the world map and show it in the log
+        -- the selected questID should've been selected in the act of clicking an objective.
+        -- if the questID is valid, close the map and open this addon's
+        if C_QuestLog.IsOnQuest(C_QuestLog.GetSelectedQuest() or 0) then
+            ToggleWorldMap()
+            cql:Show()
+        end
+        -- see if the questID is visible in the log; leave if so
         for _,info in pairs(cql.log.quests) do
-            if info.questID == block.id then -- found it, hide map, show log and leave
-                ToggleWorldMap()
-                cql:Show()
+            if info.questID == block.id then -- found it, we're done
                 return
             end
         end
+        -- it's not visible in the log, expand the header that contains the questID if it exists
+        cql.log:ExpandHeaderContainingQuestID(block.id)
     end
 end
 

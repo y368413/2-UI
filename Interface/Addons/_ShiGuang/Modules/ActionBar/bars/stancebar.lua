@@ -32,18 +32,18 @@ function Bar:CreateStancebar()
 	local buttonList = {}
 
 	local frame = CreateFrame("Frame", "NDui_ActionBarStance", UIParent, "SecureHandlerStateTemplate")
-	if (MaoRUIPerDB["Actionbar"]["Style"] == 7) or (MaoRUIPerDB["Actionbar"]["Style"] == 8) or (MaoRUIPerDB["Actionbar"]["Style"] == 10) then
+	if (R.db["Actionbar"]["Style"] == 7) or (R.db["Actionbar"]["Style"] == 8) or (R.db["Actionbar"]["Style"] == 10) then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -120, 82}
-	elseif (MaoRUIPerDB["Actionbar"]["Style"] == 4) or (MaoRUIPerDB["Actionbar"]["Style"] == 6) then
+	elseif (R.db["Actionbar"]["Style"] == 4) or (R.db["Actionbar"]["Style"] == 6) then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -42, 120}
-	elseif MaoRUIPerDB["Actionbar"]["Style"] == 3 then
+	elseif R.db["Actionbar"]["Style"] == 3 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -295, 82}
 	else
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -62, 82}
 	end
 
 	-- StanceBar
-	if MaoRUIPerDB["Actionbar"]["ShowStance"] then
+	if R.db["Actionbar"]["ShowStance"] then
 		StanceBarFrame:SetParent(frame)
 		StanceBarFrame:EnableMouse(false)
 		StanceBarLeft:SetTexture(nil)

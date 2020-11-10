@@ -2,9 +2,10 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local MISC = M:GetModule("Misc")
 
-local strmatch, strfind, gsub, format = string.match, string.find, string.gsub, string.format
-local wipe, mod, tonumber, pairs, floor = wipe, mod, tonumber, pairs, math.floor
+local strmatch, strfind, gsub, format, floor = strmatch, strfind, gsub, format, floor
+local wipe, mod, tonumber, pairs, print = wipe, mod, tonumber, pairs, print
 local IsPartyLFG, IsInRaid, IsInGroup, PlaySound, SendChatMessage = IsPartyLFG, IsInRaid, IsInGroup, PlaySound, SendChatMessage
+local GetQuestLink = GetQuestLink
 local C_QuestLog_GetInfo = C_QuestLog.GetInfo
 local C_QuestLog_IsComplete = C_QuestLog.IsComplete
 local C_QuestLog_IsWorldQuest = C_QuestLog.IsWorldQuest
@@ -14,13 +15,18 @@ local C_QuestLog_GetQuestIDForLogIndex = C_QuestLog.GetQuestIDForLogIndex
 local C_QuestLog_GetNumQuestLogEntries = C_QuestLog.GetNumQuestLogEntries
 local C_QuestLog_GetLogIndexForQuestID = C_QuestLog.GetLogIndexForQuestID
 local soundKitID = SOUNDKIT.ALARM_CLOCK_WARNING_3
-local QUEST_COMPLETE = QUEST_COMPLETE
+local DAILY, QUEST_COMPLETE = DAILY, QUEST_COMPLETE
 local LE_QUEST_TAG_TYPE_PROFESSION = Enum.QuestTagType.Profession
 local LE_QUEST_FREQUENCY_DAILY = Enum.QuestFrequency.Daily
 
 local completedQuest, initComplete = {}
 
-local function acceptText(title, daily)
+local function GetQuestLinkOrName(questID)
+	return GetQuestLink(questID) or C_QuestLog_GetTitleForQuestID(questID) or ""
+end
+
+local function acceptText(questID, daily)
+	local title = GetQuestLinkOrName(questID)
 	if daily then
 		return format("|cFFFFFF00[%s]|r%s-%s", DAILY, GARRISON_START_MISSION, title)
 	else
@@ -28,13 +34,13 @@ local function acceptText(title, daily)
 	end
 end
 
-local function completeText(title)
-	PlaySound(soundKitID, "Master")  --PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\QuestNotifier.ogg", "Master")
-	return format("%s-%s", QUEST_COMPLETE, title)  --"✓"
+local function completeText(questID)
+	PlaySound(soundKitID, "Master")
+	return format("%s-%s", GetQuestLinkOrName(questID), QUEST_COMPLETE)
 end
 
 local function sendQuestMsg(msg)
-	if MaoRUIPerDB["Misc"]["OnlyCompleteRing"] then return end
+	if R.db["Misc"]["OnlyCompleteRing"] then return end
 
 	if IsPartyLFG() then
 		SendChatMessage(msg, "INSTANCE_CHAT")
@@ -63,8 +69,8 @@ local questMatches = {
 }
 
 function MISC:FindQuestProgress(_, msg)
-	if not MaoRUIPerDB["Misc"]["QuestProgress"] then return end
-	if MaoRUIPerDB["Misc"]["OnlyCompleteRing"] then return end
+	if not R.db["Misc"]["QuestProgress"] then return end
+	if R.db["Misc"]["OnlyCompleteRing"] then return end
 
 	for _, pattern in pairs(questMatches) do
 		if strmatch(msg, pattern) then
@@ -90,7 +96,7 @@ function MISC:FindQuestAccept(questID)
 	if questLogIndex then
 		local info = C_QuestLog_GetInfo(questLogIndex)
 		if info then
-			sendQuestMsg(acceptText(info.title, info.frequency == LE_QUEST_FREQUENCY_DAILY))
+			sendQuestMsg(acceptText(questID, info.frequency == LE_QUEST_FREQUENCY_DAILY))
 		end
 	end
 end
@@ -98,12 +104,10 @@ end
 function MISC:FindQuestComplete()
 	for i = 1, C_QuestLog_GetNumQuestLogEntries() do
 		local questID = C_QuestLog_GetQuestIDForLogIndex(i)
-		local title = C_QuestLog_GetTitleForQuestID(questID)
-		local isComplete = C_QuestLog_IsComplete(questID)
-		local isWorldQuest = C_QuestLog_IsWorldQuest(questID)
-		if title and isComplete and not completedQuest[questID] and not isWorldQuest then
+		local isComplete = questID and C_QuestLog_IsComplete(questID)
+		if isComplete and not completedQuest[questID] and not C_QuestLog_IsWorldQuest(questID) then
 			if initComplete then
-				sendQuestMsg(completeText(title))
+				sendQuestMsg(completeText(questID))
 			end
 			completedQuest[questID] = true
 		end
@@ -113,16 +117,15 @@ end
 
 function MISC:FindWorldQuestComplete(questID)
 	if C_QuestLog_IsWorldQuest(questID) then
-		local title = C_QuestLog_GetTitleForQuestID(questID)
-		if title and not completedQuest[questID] then
-			sendQuestMsg(completeText(title))
+		if questID and not completedQuest[questID] then
+			sendQuestMsg(completeText(questID))
 			completedQuest[questID] = true
 		end
 	end
 end
 
 function MISC:QuestNotification()
-	if MaoRUIPerDB["Misc"]["QuestNotification"] then
+	if R.db["Misc"]["QuestNotification"] then
 		M:RegisterEvent("QUEST_ACCEPTED", MISC.FindQuestAccept)
 		M:RegisterEvent("QUEST_LOG_UPDATE", MISC.FindQuestComplete)
 		M:RegisterEvent("QUEST_TURNED_IN", MISC.FindWorldQuestComplete)

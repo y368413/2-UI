@@ -3,6 +3,8 @@ local M, R, U, I = unpack(ns)
 
 local oUF = ns.oUF or oUF
 local UF = M:RegisterModule("UnitFrames")
+local AURA = M:GetModule("Auras")
+
 local format, floor = string.format, math.floor
 local pairs, next = pairs, next
 
@@ -66,20 +68,20 @@ function UF:CreateHealthBar(self)
 	health:SetPoint("TOPRIGHT", self)
 	local healthHeight
 	if mystyle == "PlayerPlate" then
-		healthHeight = MaoRUIPerDB["Nameplate"]["PPHealthHeight"]
+		healthHeight = R.db["Nameplate"]["PPHealthHeight"]
 	elseif mystyle == "raid" then
 		if self.isPartyFrame then
-			healthHeight = MaoRUIPerDB["UFs"]["PartyHeight"]
+			healthHeight = R.db["UFs"]["PartyHeight"]
 		elseif self.isPartyPet then
-			healthHeight = MaoRUIPerDB["UFs"]["PartyPetHeight"]
-		elseif MaoRUIPerDB["UFs"]["SimpleMode"] then
-			local scale = MaoRUIPerDB["UFs"]["SimpleRaidScale"]/10
+			healthHeight = R.db["UFs"]["PartyPetHeight"]
+		elseif R.db["UFs"]["SimpleMode"] then
+			local scale = R.db["UFs"]["SimpleRaidScale"]/10
 			healthHeight = 20*scale - 2*scale - R.mult
 		else
-			healthHeight = MaoRUIPerDB["UFs"]["RaidHeight"]
+			healthHeight = R.db["UFs"]["RaidHeight"]
 		end
 	else
-		healthHeight = retVal(self, MaoRUIPerDB["UFs"]["PlayerHeight"], MaoRUIPerDB["UFs"]["FocusHeight"], MaoRUIPerDB["UFs"]["BossHeight"], MaoRUIPerDB["UFs"]["PetHeight"])
+		healthHeight = retVal(self, R.db["UFs"]["PlayerHeight"], R.db["UFs"]["FocusHeight"], R.db["UFs"]["BossHeight"], R.db["UFs"]["PetHeight"])
 	end
 	health:SetHeight(healthHeight)
 	health:SetStatusBarTexture(I.normTex)
@@ -97,12 +99,12 @@ function UF:CreateHealthBar(self)
 
 	if mystyle == "PlayerPlate" then
 		health.colorHealth = true
-	elseif (mystyle == "raid" and MaoRUIPerDB["UFs"]["RaidHealthColor"] == 2) or (mystyle ~= "raid" and MaoRUIPerDB["UFs"]["HealthColor"] == 2) then
+	elseif (mystyle == "raid" and R.db["UFs"]["RaidHealthColor"] == 2) or (mystyle ~= "raid" and R.db["UFs"]["HealthColor"] == 2) then
 		health.colorClass = true
 		health.colorTapping = true
 		health.colorReaction = true
 		health.colorDisconnected = true
-	elseif (mystyle == "raid" and MaoRUIPerDB["UFs"]["RaidHealthColor"] == 3) or (mystyle ~= "raid" and MaoRUIPerDB["UFs"]["HealthColor"] == 3) then
+	elseif (mystyle == "raid" and R.db["UFs"]["RaidHealthColor"] == 3) or (mystyle ~= "raid" and R.db["UFs"]["HealthColor"] == 3) then
 		health.colorSmooth = true
 	end
 
@@ -113,8 +115,8 @@ end
 function UF:UpdateRaidHealthMethod()
 	for _, frame in pairs(oUF.objects) do
 		if frame.mystyle == "raid" then
-			frame:SetHealthUpdateMethod(MaoRUIPerDB["UFs"]["FrequentHealth"])
-			frame:SetHealthUpdateSpeed(MaoRUIPerDB["UFs"]["HealthFrequency"])
+			frame:SetHealthUpdateMethod(R.db["UFs"]["FrequentHealth"])
+			frame:SetHealthUpdateSpeed(R.db["UFs"]["HealthFrequency"])
 			frame.Health:ForceUpdate()
 		end
 	end
@@ -125,7 +127,7 @@ function UF:CreateHealthText(self)
 	local textFrame = CreateFrame("Frame", nil, self)
 	textFrame:SetAllPoints(self.Health)
 
-	local name = M.CreateFS(textFrame, retVal(self, 13, 12, 12, 12, MaoRUIPerDB["Nameplate"]["NameTextSize"]), "", false, "LEFT", 3, 0)
+	local name = M.CreateFS(textFrame, retVal(self, 13, 12, 12, 12, R.db["Nameplate"]["NameTextSize"]), "", false, "LEFT", 3, 0)
 	name:SetJustifyH("LEFT")
 	if mystyle == "raid" then
 		name:SetWidth(self:GetWidth()*.95)
@@ -133,11 +135,11 @@ function UF:CreateHealthText(self)
 		if self.isPartyPet then
 			name:SetWidth(self:GetWidth()*.55)
 			name:SetPoint("LEFT", 3, -1)
-		elseif MaoRUIPerDB["UFs"]["SimpleMode"] and not self.isPartyFrame then
+		elseif R.db["UFs"]["SimpleMode"] and not self.isPartyFrame then
 			name:SetPoint("LEFT", 4, 0)
-		elseif MaoRUIPerDB["UFs"]["RaidBuffIndicator"] then
+		elseif R.db["UFs"]["RaidBuffIndicator"] then
 			name:SetJustifyH("CENTER")
-			if MaoRUIPerDB["UFs"]["RaidHPMode"] ~= 1 then
+			if R.db["UFs"]["RaidHPMode"] ~= 1 then
 				name:SetPoint("TOP", 0, -3)
 			else
 				name:SetPoint("CENTER")
@@ -145,7 +147,7 @@ function UF:CreateHealthText(self)
 		else
 			name:SetPoint("TOPLEFT", 2, -2)
 		end
-		name:SetScale(MaoRUIPerDB["UFs"]["RaidTextScale"])
+		name:SetScale(R.db["UFs"]["RaidTextScale"])
 	elseif mystyle == "nameplate" then
 		name:SetWidth(self:GetWidth()*.85)
 		name:ClearAllPoints()
@@ -160,28 +162,28 @@ function UF:CreateHealthText(self)
 		self:Tag(name, "[nplevel][name]")
 	elseif mystyle == "arena" then
 		self:Tag(name, "[arenaspec] [color][name]")
-	elseif mystyle == "raid" and MaoRUIPerDB["UFs"]["SimpleMode"] and MaoRUIPerDB["UFs"]["ShowTeamIndex"] and not self.isPartyPet and not self.isPartyFrame then
+	elseif mystyle == "raid" and R.db["UFs"]["SimpleMode"] and R.db["UFs"]["ShowTeamIndex"] and not self.isPartyPet and not self.isPartyFrame then
 		self:Tag(name, "[group].[color][name]")
 	else
 		self:Tag(name, "[color][name]")
 	end
 
-	local hpval = M.CreateFS(textFrame, retVal(self, 14, 13, 13, 13, MaoRUIPerDB["Nameplate"]["HealthTextSize"]), "", false, "RIGHT", -3, 0)
+	local hpval = M.CreateFS(textFrame, retVal(self, 14, 13, 13, 13, R.db["Nameplate"]["HealthTextSize"]), "", false, "RIGHT", -3, 0)
 	if mystyle == "raid" then
 		self:Tag(hpval, "[raidhp]")
 		if self.isPartyPet then
 			hpval:SetPoint("RIGHT", -3, -1)
 			self:Tag(hpval, "[hp]")
-		elseif MaoRUIPerDB["UFs"]["SimpleMode"] and not self.isPartyFrame then
+		elseif R.db["UFs"]["SimpleMode"] and not self.isPartyFrame then
 			hpval:SetPoint("RIGHT", -4, 0)
-		elseif MaoRUIPerDB["UFs"]["RaidBuffIndicator"] then
+		elseif R.db["UFs"]["RaidBuffIndicator"] then
 			hpval:ClearAllPoints()
 			hpval:SetPoint("BOTTOM", 0, 1)
 			hpval:SetJustifyH("CENTER")
 		else
 			hpval:SetPoint("RIGHT", -3, -7)
 		end
-		hpval:SetScale(MaoRUIPerDB["UFs"]["RaidTextScale"])
+		hpval:SetScale(R.db["UFs"]["RaidTextScale"])
 	elseif mystyle == "nameplate" then
 		hpval:SetPoint("RIGHT", self, 0, 8)
 		self:Tag(hpval, "[nphp]")
@@ -198,11 +200,11 @@ function UF:UpdateRaidNameText()
 		if frame.mystyle == "raid" and not frame.isPartyPet then
 			local name = frame.nameText
 			name:ClearAllPoints()
-			if MaoRUIPerDB["UFs"]["SimpleMode"] and not frame.isPartyFrame then
+			if R.db["UFs"]["SimpleMode"] and not frame.isPartyFrame then
 				name:SetPoint("LEFT", 4, 0)
-			elseif MaoRUIPerDB["UFs"]["RaidBuffIndicator"] then
+			elseif R.db["UFs"]["RaidBuffIndicator"] then
 				name:SetJustifyH("CENTER")
-				if MaoRUIPerDB["UFs"]["RaidHPMode"] ~= 1 then
+				if R.db["UFs"]["RaidHPMode"] ~= 1 then
 					name:SetPoint("TOP", 0, -3)
 				else
 					name:SetPoint("CENTER")
@@ -229,19 +231,19 @@ function UF:CreatePowerBar(self)
 	power:SetPoint("BOTTOMRIGHT", self)
 	local powerHeight
 	if mystyle == "PlayerPlate" then
-		powerHeight = MaoRUIPerDB["Nameplate"]["PPPowerHeight"]
+		powerHeight = R.db["Nameplate"]["PPPowerHeight"]
 	elseif mystyle == "raid" then
 		if self.isPartyFrame then
-			powerHeight = MaoRUIPerDB["UFs"]["PartyPowerHeight"]
+			powerHeight = R.db["UFs"]["PartyPowerHeight"]
 		elseif self.isPartyPet then
-			powerHeight = MaoRUIPerDB["UFs"]["PartyPetPowerHeight"]
-		elseif MaoRUIPerDB["UFs"]["SimpleMode"] then
-			powerHeight = 2*MaoRUIPerDB["UFs"]["SimpleRaidScale"]/10
+			powerHeight = R.db["UFs"]["PartyPetPowerHeight"]
+		elseif R.db["UFs"]["SimpleMode"] then
+			powerHeight = 2*R.db["UFs"]["SimpleRaidScale"]/10
 		else
-			powerHeight = MaoRUIPerDB["UFs"]["RaidPowerHeight"]
+			powerHeight = R.db["UFs"]["RaidPowerHeight"]
 		end
 	else
-		powerHeight = retVal(self, MaoRUIPerDB["UFs"]["PlayerPowerHeight"], MaoRUIPerDB["UFs"]["FocusPowerHeight"], MaoRUIPerDB["UFs"]["BossPowerHeight"], MaoRUIPerDB["UFs"]["PetPowerHeight"])
+		powerHeight = retVal(self, R.db["UFs"]["PlayerPowerHeight"], R.db["UFs"]["FocusPowerHeight"], R.db["UFs"]["BossPowerHeight"], R.db["UFs"]["PetPowerHeight"])
 	end
 	power:SetHeight(powerHeight)
 	power:SetFrameLevel(self:GetFrameLevel() - 2)
@@ -257,7 +259,7 @@ function UF:CreatePowerBar(self)
 	bg:SetTexture(I.normTex)
 	bg.multiplier = .25
 
-	if (mystyle == "raid" and MaoRUIPerDB["UFs"]["RaidHealthColor"] == 2) or (mystyle ~= "raid" and MaoRUIPerDB["UFs"]["HealthColor"] == 2) or mystyle == "PlayerPlate" then
+	if (mystyle == "raid" and R.db["UFs"]["RaidHealthColor"] == 2) or (mystyle ~= "raid" and R.db["UFs"]["HealthColor"] == 2) or mystyle == "PlayerPlate" then
 		power.colorPower = true
 	else
 		power.colorClass = true
@@ -278,9 +280,9 @@ function UF:CreatePowerText(self)
 	local ppval = M.CreateFS(textFrame, retVal(self, 13, 12, 12, 12), "", false, "RIGHT", -3, 2)
 	local mystyle = self.mystyle
 	if mystyle == "raid" then
-		ppval:SetScale(MaoRUIPerDB["UFs"]["RaidTextScale"])
+		ppval:SetScale(R.db["UFs"]["RaidTextScale"])
 	elseif mystyle == "focus" then
-		ppval:SetPoint("RIGHT", -3, MaoRUIPerDB["UFs"]["FocusPowerOffset"])
+		ppval:SetPoint("RIGHT", -3, R.db["UFs"]["FocusPowerOffset"])
 	end
 	self:Tag(ppval, "[color][power]")
 	self.powerText = ppval
@@ -296,19 +298,25 @@ local textScaleFrames = {
 	["arena"] = true,
 }
 function UF:UpdateTextScale()
-	local scale = MaoRUIPerDB["UFs"]["UFTextScale"]
+	local scale = R.db["UFs"]["UFTextScale"]
 	for _, frame in pairs(oUF.objects) do
 		local style = frame.mystyle
 		if style and textScaleFrames[style] then
 			--frame.nameText:SetScale(scale)
 			--frame.healthValue:SetScale(scale)
 			if frame.powerText then frame.powerText:SetScale(scale) end
+			local castbar = frame.Castbar
+			if castbar then
+				castbar.Text:SetScale(scale)
+				castbar.Time:SetScale(scale)
+				if castbar.Lag then  castbar.Lag:SetScale(scale) end
+			end
 		end
 	end
 end
 
 function UF:UpdateRaidTextScale()
-	local scale = MaoRUIPerDB["UFs"]["RaidTextScale"]
+	local scale = R.db["UFs"]["RaidTextScale"]
 	for _, frame in pairs(oUF.objects) do
 		if frame.mystyle == "raid" then
 			frame.nameText:SetScale(scale)
@@ -389,7 +397,7 @@ end
 
 function UF:CreateCastBar(self)
 	local mystyle = self.mystyle
-	if mystyle ~= "nameplate" and not MaoRUIPerDB["UFs"]["Castbars"] then return end
+	if mystyle ~= "nameplate" and not R.db["UFs"]["Castbars"] then return end
 
 	local cb = CreateFrame("StatusBar", "oUF_Castbar"..mystyle, self)
 	cb:SetHeight(31)
@@ -398,7 +406,7 @@ function UF:CreateCastBar(self)
 
 	if mystyle == "focus" then
 		cb:SetFrameLevel(10)
-		cb:SetSize(MaoRUIPerDB["UFs"]["FocusCBWidth"], MaoRUIPerDB["UFs"]["FocusCBHeight"])
+		cb:SetSize(R.db["UFs"]["FocusCBWidth"], R.db["UFs"]["FocusCBHeight"])
 		createBarMover(cb, U["Focus Castbar"], "FocusCB", R.UFs.Focuscb)
 	elseif mystyle == "boss" or mystyle == "arena" then
 		cb:SetPoint("TOPRIGHT", self.Power, "BOTTOMRIGHT", 0, -8)
@@ -409,8 +417,8 @@ function UF:CreateCastBar(self)
 		cb:SetHeight(self:GetHeight())
 	end
 
-	local timer = M.CreateFS(cb, retVal(self, 12, 12, 12, 12, MaoRUIPerDB["Nameplate"]["NameTextSize"]-2), "10", false, "RIGHT", -2, 0)
-	local name = M.CreateFS(cb, retVal(self, 12, 12, 12, 12, MaoRUIPerDB["Nameplate"]["NameTextSize"]-1), "10", false, "LEFT", 2, 0)
+	local timer = M.CreateFS(cb, retVal(self, 12, 12, 12, 12, R.db["Nameplate"]["NameTextSize"]-2), "10", false, "RIGHT", -2, 0)
+	local name = M.CreateFS(cb, retVal(self, 12, 12, 12, 12, R.db["Nameplate"]["NameTextSize"]-1), "10", false, "LEFT", 2, 0)
 	name:SetPoint("RIGHT", timer, "LEFT", -6, 0)
 	name:SetJustifyH("LEFT")
 
@@ -505,7 +513,7 @@ function UF.PostCreateIcon(element, button)
 	button.count = M.CreateFS(parentFrame, fontSize, "", false, "BOTTOMRIGHT", 6, -3)
 	button.cd:SetReverse(true)
 	local needShadow = true
-	if element.__owner.mystyle == "raid" and not MaoRUIPerDB["UFs"]["RaidBuffIndicator"] then
+	if element.__owner.mystyle == "raid" and not R.db["UFs"]["RaidBuffIndicator"] then
 		needShadow = false
 	end
 	button.iconbg = M.ReskinIcon(button.icon, needShadow)
@@ -516,6 +524,7 @@ function UF.PostCreateIcon(element, button)
 
 	button.overlay:SetTexture(nil)
 	button.stealable:SetAtlas("bags-newitem")
+	button:HookScript("OnMouseDown", AURA.RemoveSpellFromIgnoreList)
 
 	if element.disableCooldown then button.timer = M.CreateFS(button, 12, "") end
 end
@@ -543,7 +552,7 @@ function UF.PostUpdateIcon(element, _, button, _, _, duration, expiration, debuf
 		button.icon:SetDesaturated(false)
 	end
 
-	if style == "raid" and MaoRUIPerDB["UFs"]["RaidBuffIndicator"] then
+	if style == "raid" and R.db["UFs"]["RaidBuffIndicator"] then
 		button.iconbg:SetBackdropBorderColor(1, 0, 0)
 	elseif element.showDebuffType and button.isDebuff then
 		local color = oUF.colors.debuff[debuffType] or oUF.colors.debuff.none
@@ -594,7 +603,7 @@ function UF.CustomFilter(element, unit, button, name, _, _, _, _, _, caster, isS
 			return true
 		end
 	elseif style == "raid" then
-		if MaoRUIPerDB["UFs"]["RaidBuffIndicator"] then
+		if R.db["UFs"]["RaidBuffIndicator"] then
 			return R.RaidBuffs["ALL"][spellID] or MaoRUIDB["RaidAuraWatch"][spellID]
 		else
 			return (button.isPlayer or caster == "pet") and MaoRUIDB["CornerBuffs"][I.MyClass][spellID] or R.RaidBuffs["ALL"][spellID] or R.RaidBuffs["WARNING"][spellID]
@@ -609,7 +618,7 @@ function UF.CustomFilter(element, unit, button, name, _, _, _, _, _, caster, isS
 		elseif MaoRUIDB["NameplateFilter"][1][spellID] or R.WhiteList[spellID] then
 			return true
 		else
-			local auraFilter = MaoRUIPerDB["Nameplate"]["AuraFilter"]
+			local auraFilter = R.db["Nameplate"]["AuraFilter"]
 			return (auraFilter == 3 and nameplateShowAll) or (auraFilter ~= 1 and (caster == "player" or caster == "pet" or caster == "vehicle"))
 		end
 	elseif (element.onlyShowPlayer and button.isPlayer) or (not element.onlyShowPlayer and name) then
@@ -635,31 +644,31 @@ function UF:CreateAuras(self)
 		bu.numDebuffs = 14
 		bu.iconsPerRow = 7
 	elseif mystyle == "raid" then
-		if MaoRUIPerDB["UFs"]["RaidBuffIndicator"] then
+		if R.db["UFs"]["RaidBuffIndicator"] then
 			bu.initialAnchor = "LEFT"
 			bu:SetPoint("LEFT", self, 15, 0)
-			bu.size = 18*MaoRUIPerDB["UFs"]["SimpleRaidScale"]/10
+			bu.size = 18*R.db["UFs"]["SimpleRaidScale"]/10
 			bu.numTotal = 1
 			bu.disableCooldown = true
 		else
 			bu:SetPoint("BOTTOMLEFT", self.Health)
-			bu.numTotal = MaoRUIPerDB["UFs"]["SimpleMode"] and not self.isPartyFrame and 0 or 6
+			bu.numTotal = R.db["UFs"]["SimpleMode"] and not self.isPartyFrame and 0 or 6
 			bu.iconsPerRow = 6
 			bu.spacing = 2
 		end
 		bu.gap = false
-		bu.disableMouse = MaoRUIPerDB["UFs"]["AurasClickThrough"]
+		bu.disableMouse = R.db["UFs"]["AurasClickThrough"]
 	elseif mystyle == "nameplate" then
 		bu.initialAnchor = "BOTTOMLEFT"
 		bu["growth-y"] = "UP"
-		--if MaoRUIPerDB["Nameplate"]["ShowPlayerPlate"] and MaoRUIPerDB["Nameplate"]["NameplateClassPower"] then
+		--if R.db["Nameplate"]["ShowPlayerPlate"] and R.db["Nameplate"]["NameplateClassPower"] then
 			--bu:SetPoint("BOTTOMLEFT", self.nameText, "TOPLEFT", 0, 10 + _G.oUF_ClassPowerBar:GetHeight())
 		--else
 			bu:SetPoint("BOTTOMLEFT", self.nameText, "TOPLEFT", 0, 5)
 		--end
-		bu.numTotal = MaoRUIPerDB["Nameplate"]["maxAuras"]
-		bu.size = MaoRUIPerDB["Nameplate"]["AuraSize"]
-		bu.showDebuffType = MaoRUIPerDB["Nameplate"]["ColorBorder"]
+		bu.numTotal = R.db["Nameplate"]["maxAuras"]
+		bu.size = R.db["Nameplate"]["AuraSize"]
+		bu.showDebuffType = R.db["Nameplate"]["ColorBorder"]
 		bu.gap = false
 		bu.disableMouse = true
 	end
@@ -813,8 +822,8 @@ end
 
 function UF:CreateClassPower(self)
 	if self.mystyle == "PlayerPlate" then
-		barWidth = MaoRUIPerDB["Nameplate"]["NameplateClassPower"] and MaoRUIPerDB["Nameplate"]["PlateWidth"] or MaoRUIPerDB["Nameplate"]["PPWidth"]
-		barHeight = MaoRUIPerDB["Nameplate"]["PPBarHeight"]
+		barWidth = R.db["Nameplate"]["NameplateClassPower"] and R.db["Nameplate"]["PlateWidth"] or R.db["Nameplate"]["PPWidth"]
+		barHeight = R.db["Nameplate"]["PPBarHeight"]
 		R.UFs.BarPoint = {"BOTTOMLEFT", self, "TOPLEFT", 0, 3}
 	end
 
@@ -841,7 +850,7 @@ function UF:CreateClassPower(self)
 		bars[i].bg:SetTexture(I.normTex)
 		bars[i].bg.multiplier = .25
 
-		if I.MyClass == "DEATHKNIGHT" and MaoRUIPerDB["UFs"]["RuneTimer"] then
+		if I.MyClass == "DEATHKNIGHT" and R.db["UFs"]["RuneTimer"] then
 			bars[i].timer = M.CreateFS(bars[i], 13, "")
 		end
 	end
@@ -1039,10 +1048,10 @@ function UF:CreateAddPower(self)
 end
 
 function UF:CreateSwing(self)
-	--if not MaoRUIPerDB["UFs"]["Castbars"] then return end
+	--if not R.db["UFs"]["Castbars"] then return end
 
 	local bar = CreateFrame("StatusBar", nil, self)
-	local width = MaoRUIPerDB["UFs"]["PlayerCBWidth"] - MaoRUIPerDB["UFs"]["PlayerCBHeight"] - 5
+	local width = R.db["UFs"]["PlayerCBWidth"] - R.db["UFs"]["PlayerCBHeight"] - 5
 	bar:SetSize(width, 3)
 	createBarMover(bar, U["UFs SwingBar"], "Swing", {"CENTER", UIParent, "CENTER", 0, -250})
 	--bar:SetPoint("TOP", self.Castbar.mover, "BOTTOM", 0, -3)
@@ -1063,7 +1072,7 @@ function UF:CreateSwing(self)
 	off:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 0, -6)
 	M.CreateSB(off, true, .8, .8, .8)
 
-	if MaoRUIPerDB["UFs"]["SwingTimer"] then
+	if R.db["UFs"]["SwingTimer"] then
 		bar.Text = M.CreateFS(bar, 11, "")
 		bar.TextMH = M.CreateFS(main, 11, "")
 		bar.TextOH = M.CreateFS(off, 11, "", false, "CENTER", 1, -5)
@@ -1077,10 +1086,10 @@ function UF:CreateSwing(self)
 end
 
 function UF:CreateQuakeTimer(self)
-	--if not MaoRUIPerDB["UFs"]["Castbars"] then return end
+	--if not R.db["UFs"]["Castbars"] then return end
 
 	local bar = CreateFrame("StatusBar", nil, self)
-	bar:SetSize(MaoRUIPerDB["UFs"]["PlayerCBWidth"], MaoRUIPerDB["UFs"]["PlayerCBHeight"])
+	bar:SetSize(R.db["UFs"]["PlayerCBWidth"], R.db["UFs"]["PlayerCBHeight"])
 	M.CreateSB(bar, true, 0, 1, 0)
 	bar:Hide()
 

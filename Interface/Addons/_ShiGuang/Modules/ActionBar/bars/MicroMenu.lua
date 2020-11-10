@@ -8,7 +8,7 @@ local buttonList = {}
 
 function Bar:MicroButton_SetupTexture(icon, texture)
 	local r, g, b = I.r, I.g, I.b
-	if not MaoRUIPerDB["Skins"]["ClassLine"] then r, g, b = 0, 0, 0 end
+	if not R.db["Skins"]["ClassLine"] then r, g, b = 0, 0, 0 end
 	icon:SetOutside(nil, 3, 3)
 	icon:SetTexture("Interface\\BUTTONS\\"..texture)
 	icon:SetVertexColor(1, 1, 1)
@@ -39,11 +39,11 @@ function Bar:MicroButton_Create(parent, data)
 
 		local hl = button:GetHighlightTexture()
 		Bar:MicroButton_SetupTexture(hl, texture)
-		if not MaoRUIPerDB["Skins"]["ClassLine"] then hl:SetVertexColor(1, 1, 1) end
+		if not R.db["Skins"]["ClassLine"] then hl:SetVertexColor(1, 1, 1) end
 
 		local flash = button.Flash
 		Bar:MicroButton_SetupTexture(flash, texture)
-		if not MaoRUIPerDB["Skins"]["ClassLine"] then flash:SetVertexColor(1, 1, 1) end
+		if not R.db["Skins"]["ClassLine"] then flash:SetVertexColor(1, 1, 1) end
 	else
 		bu:SetScript("OnMouseUp", method)
 		--M.AddTooltip(bu, "ANCHOR_RIGHT", tooltip)
@@ -51,12 +51,12 @@ function Bar:MicroButton_Create(parent, data)
 		local hl = bu:CreateTexture(nil, "HIGHLIGHT")
 		hl:SetBlendMode("ADD")
 		Bar:MicroButton_SetupTexture(hl, texture)
-		if not MaoRUIPerDB["Skins"]["ClassLine"] then hl:SetVertexColor(1, 1, 1) end
+		if not R.db["Skins"]["ClassLine"] then hl:SetVertexColor(1, 1, 1) end
 	end
 end
 
 function Bar:MicroMenu()
-	if not MaoRUIPerDB["Actionbar"]["MicroMenu"] then return end
+	if not R.db["Actionbar"]["MicroMenu"] then return end
 
 	local menubar = CreateFrame("Frame", nil, UIParent)
 	menubar:SetSize(21, 186)  --*MaoRUIPerDB["Map"]["MinimapScale"]
@@ -85,12 +85,6 @@ function Bar:MicroMenu()
 	for i = 1, #buttonList do
 		if i == 1 then
 			buttonList[i]:SetPoint("TOPRIGHT", menubar, "TOPRIGHT", 0, 18)
-		--elseif i == 9 and MaoRUIPerDB["Map"]["MinimapScale"] > 1.1 then
-		  		--buttonList[i]:SetPoint("BOTTOM", buttonList[i-1], "TOP", 0, -12)
-		--elseif i == 10 and MaoRUIPerDB["Map"]["MinimapScale"] >= 1.3  then
-		  		--buttonList[i]:SetPoint("BOTTOM", buttonList[i-1], "TOP", 0, -12)
-		--elseif i >= 9 then
-			--buttonList[i]:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMRIGHT", 1, -1)
 		else
 			buttonList[i]:SetPoint("CENTER", buttonList[i-1], "CENTER", 0, -24)
 		end

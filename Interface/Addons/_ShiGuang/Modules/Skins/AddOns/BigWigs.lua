@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 local S = M:GetModule("Skins")
 
 function S:BigWigsSkin()
-	if not MaoRUIPerDB["Skins"]["Bigwigs"] or not IsAddOnLoaded("BigWigs") then return end
+	if not R.db["Skins"]["Bigwigs"] or not IsAddOnLoaded("BigWigs") then return end
 	if not BigWigs3DB then return end
 
 	local function removeStyle(bar)

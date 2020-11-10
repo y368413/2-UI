@@ -11,7 +11,7 @@ local function SetFrameSize(frame, size, num)
 	size = size or frame.buttonSize
 	num = num or frame.numButtons
 
-	local layout = MaoRUIPerDB["Actionbar"]["Style"]
+	local layout = R.db["Actionbar"]["Style"]
 	if (layout == 2) or (layout == 3) or (layout == 6) or (layout == 7)  or (layout == 8) or (layout == 9) or (layout == 10) or (layout == 11) then size = 38 end
 
 	if (layout == 2) or (layout == 3) then
@@ -69,7 +69,7 @@ end
 function Bar:CreateBar4()
 	local num = NUM_ACTIONBAR_BUTTONS
 	local buttonList = {}
-	local layout = MaoRUIPerDB["Actionbar"]["Style"]
+	local layout = R.db["Actionbar"]["Style"]
 
 	if (layout == 2) or (layout == 3) or (layout == 6) or (layout == 7)  or (layout == 8) or (layout == 9) or (layout == 10) or (layout == 11) then size = 38 end
 	local frame = CreateFrame("Frame", "NDui_ActionBar4", UIParent, "SecureHandlerStateTemplate")
@@ -236,15 +236,15 @@ function Bar:CreateBar4()
 				button:SetPoint("TOP", _G["MultiBarRightButton"..i-1], "BOTTOM", 0, -margin)
 			end
 		end
-         end
-	 
+	end
+
 	frame.buttonList = buttonList
 	SetFrameSize(frame, cfg.size, num)
 
 	frame.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show"
 	RegisterStateDriver(frame, "visibility", frame.frameVisibility)
 
-	if MaoRUIPerDB["Actionbar"]["Bar4Fade"] and cfg.fader then
+	if R.db["Actionbar"]["Bar4Fade"] and cfg.fader then
 		Bar.CreateButtonFrameFader(frame, buttonList, cfg.fader)
 	end
 

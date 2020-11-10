@@ -69,10 +69,10 @@ function module:LoadInfobar(info)
 end
 
 function module:BackgroundLines()
-	if not MaoRUIPerDB["Skins"]["InfobarLine"] then return end
+	if not R.db["Skins"]["InfobarLine"] then return end
 
 	local cr, cg, cb = 0, 0, 0
-	if MaoRUIPerDB["Skins"]["ClassLine"] then cr, cg, cb = I.r, I.g, I.b end
+	if R.db["Skins"]["ClassLine"] then cr, cg, cb = I.r, I.g, I.b end
 
 	local parent = UIParent
 	local width, height = 450, 18

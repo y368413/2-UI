@@ -111,6 +111,10 @@ local function UpdateFrame()
 	description:ClearAllPoints()
 	description:SetPoint("TOP", weeklyChest, "TOP", 0, 75)
 
+	local legacyWeeklyChest = ChallengesFrame.WeeklyInfo.Child.LegacyWeeklyChest
+	legacyWeeklyChest:ClearAllPoints()
+	legacyWeeklyChest:SetPoint("TOP", weeklyChest, "TOP", 0, 50)
+
 	local currentKeystoneName = GetNameForKeystone(C_MythicPlus.GetOwnedKeystoneChallengeMapID(), C_MythicPlus.GetOwnedKeystoneLevel())
 	if currentKeystoneName then
 		Mod.KeystoneText:Show()
@@ -284,7 +288,7 @@ function Mod:Blizzard_ChallengesUI()
 	frame2.Entries = entries2
 
 	local keystoneText = ChallengesFrame.WeeklyInfo.Child:CreateFontString(nil, "ARTWORK", "GameFontNormalMed2")
-	keystoneText:SetPoint("BOTTOM", ChallengesFrame.WeeklyInfo.Child.WeeklyChest, "BOTTOM", 0, -25)
+	keystoneText:SetPoint("TOP", ChallengesFrame.WeeklyInfo.Child.WeeklyChest, "BOTTOM", 0, -15)
 	keystoneText:SetWidth(220)
 	Mod.KeystoneText = keystoneText
 

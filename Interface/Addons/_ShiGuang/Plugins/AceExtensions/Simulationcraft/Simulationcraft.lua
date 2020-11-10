@@ -1,4 +1,4 @@
--- Author: Theck, navv_, seriallos  Version: 9.0.1-01
+-- Author: Theck, navv_, seriallos  Version: 9.0.1-02
 
 local Simulationcraft = {}
 
@@ -840,7 +840,7 @@ function Simulationcraft:GetSoulbindString(id)
       end
     end
   end
-  return "soulbind=" .. Tokenize(soulbindData.name) .. ',' .. table.concat(soulbindStrings, '/')
+  return "soulbind=" .. Tokenize(soulbindData.name) .. ':' .. soulbindData.ID .. ',' .. table.concat(soulbindStrings, '/')
 end
 
 function Simulationcraft:GetMainFrame(text)
@@ -922,7 +922,7 @@ end
 -- This is the workhorse function that constructs the profile
 function Simulationcraft:PrintSimcProfile(debugOutput, noBags, links)
   -- addon metadata
-  local versionComment = '# SimC Addon ' .. '9.0.1-01'
+  local versionComment = '# SimC Addon ' .. '9.0.1-02'
   local simcVersionWarning = '# Requires SimulationCraft 901-01 or newer'
 
   -- Basic player info

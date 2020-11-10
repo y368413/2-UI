@@ -188,7 +188,7 @@ function MISC.TradeTabs_OnEvent(event, addon)
 end
 
 function MISC:TradeTabs()
-	if not MaoRUIPerDB["Misc"]["TradeTabs"] then return end
+	if not R.db["Misc"]["TradeTabs"] then return end
 	M:RegisterEvent("ADDON_LOADED", MISC.TradeTabs_OnEvent)
 end
 MISC:RegisterMisc("TradeTabs", MISC.TradeTabs)

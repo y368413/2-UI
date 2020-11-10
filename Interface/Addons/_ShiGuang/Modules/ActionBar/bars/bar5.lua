@@ -10,7 +10,7 @@ local margin, padding = R.Bars.margin, R.Bars.padding
 local function SetFrameSize(frame, size, num)
 	size = size or frame.buttonSize
 	num = num or frame.numButtons
-	local layout = MaoRUIPerDB["Actionbar"]["Style"]
+	local layout = R.db["Actionbar"]["Style"]
 	if (layout == 6) or (layout == 8) or (layout == 9) or (layout == 10) or (layout == 11) then cfg.size = 38 end
 
 	if layout == 3 then
@@ -49,7 +49,7 @@ end
 function Bar:CreateBar5()
 	local num = NUM_ACTIONBAR_BUTTONS
 	local buttonList = {}
-	local layout = MaoRUIPerDB["Actionbar"]["Style"]
+	local layout = R.db["Actionbar"]["Style"]
 	if (layout == 6) or (layout == 8) or (layout == 9) or (layout == 10) or (layout == 11) then cfg.size = 38 end
 
 	--create the frame to hold the buttons
@@ -215,7 +215,7 @@ function Bar:CreateBar5()
 	frame.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show"
 	RegisterStateDriver(frame, "visibility", frame.frameVisibility)
 
-	if MaoRUIPerDB["Actionbar"]["Bar5Fade"] and cfg.fader then
+	if R.db["Actionbar"]["Bar5Fade"] and cfg.fader then
 		Bar.CreateButtonFrameFader(frame, buttonList, cfg.fader)
 	end
 end

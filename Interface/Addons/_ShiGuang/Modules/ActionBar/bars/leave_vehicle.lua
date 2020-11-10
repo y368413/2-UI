@@ -34,7 +34,7 @@ function Bar:CreateLeaveVehicle()
 	local buttonList = {}
 
 	local frame = CreateFrame("Frame", "NDui_ActionBarExit", UIParent, "SecureHandlerStateTemplate")
-	if MaoRUIPerDB["Actionbar"]["Style"] == 3 then
+	if R.db["Actionbar"]["Style"] == 3 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 130}
 	else
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 320, 100}

@@ -27,4 +27,4 @@ AppearanceTooltip.lua
 
 TransmogTokens.lua
 
-MogPartialSets.xml
+## MogPartialSets.xml

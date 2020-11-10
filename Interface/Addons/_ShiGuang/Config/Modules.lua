@@ -2,9 +2,6 @@
 local _, ns = ...
 local _, R = unpack(ns)
 
-R.mult = 1
-R.margin = 3
-
 -- 动作条
 local barFader = {
 	fadeInAlpha = 1,													-- 显示时的透明度
@@ -29,21 +26,8 @@ R.Bars = {
 
 -- BUFF/DEBUFF相关
 R.Auras = {
-	IconSize		= 32,											-- BUFF图标大小
 	BuffPos			= {"TOPRIGHT", Minimap, "TOPLEFT", -21, -3},		-- BUFF默认位置
-	BHPos			= {"CENTER", UIParent, "CENTER", 0, -200},		    -- 血DK助手默认位置
-	StaggerPos		= {"CENTER", UIParent, "CENTER", 0, -290},		-- 坦僧工具默认位置
 	TotemsPos		= {"CENTER", UIParent, "CENTER", 0, -260},		  -- 图腾助手默认位置
-	HunterToolPos		= {"CENTER", UIParent, "CENTER", 0, -310},	-- 射击猎助手默认位置
-	StatuePos		= {"BOTTOMLEFT", UIParent, 520, 260},			      -- 武僧雕像默认位置
-	EnergyPos	= {"CENTER", UIParent, "CENTER", 0, -195},		    -- 职业能量条默认位置
-	ComboPointPos	= {'BOTTOM', UIParent, "CENTER", 16, -210},
-	WarlockPowerPos	= {'BOTTOM', UIParent, "CENTER", 0, -210},
-	PaladinPowerPos	= {'BOTTOM', UIParent, "CENTER", 0, -180},
-	RunePos	= {'BOTTOM', UIParent, "CENTER", 0, -200},
-	MonkHarmonyPos	= {'BOTTOM', UIParent, "CENTER", 90, -190},
-	MonkStaggerPos	= {'BOTTOM', UIParent, "CENTER", 0, -190},
-	MageArcaneChargesPos	= {'BOTTOM', UIParent, "CENTER", 0, -200},
 	
   -- 技能监控各组初始位置
 	ClassBarPos	  = {"CENTER", UIParent, "CENTER", -102.5, -260},	    -- 职业分组
@@ -70,7 +54,6 @@ R.UFs = {
 	PlayerPlate		= {"CENTER", UIParent, "CENTER", 0, -188},			-- 玩家姓名板默认位置
 	BarPoint		= {"CENTER", UIParent, "CENTER", 0, -176},								-- 资源条位置（以自身头像为基准）
 	BarSize			= {150, 5},											-- 资源条的尺寸（宽，长）
-	BarMargin		= 3,												-- 资源条间隔
 }
 
 -- 小地图

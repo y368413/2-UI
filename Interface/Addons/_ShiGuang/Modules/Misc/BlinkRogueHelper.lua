@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 local MISC = M:GetModule("Misc")
 
 function MISC:BlinkRogueHelper()
-if not MaoRUIPerDB["Misc"]["BlinkRogueHelper"] then return end
+if not R.db["Misc"]["BlinkRogueHelper"] then return end
 
 local MyClass = select(2, UnitClass("player"))
 if MyClass ~= "ROGUE" and MyClass ~= "DRUID" and MyClass ~= "PALADIN" and MyClass ~= "MONK" then return end

@@ -6,7 +6,7 @@ hooksecurefunc("TextStatusBar_UpdateTextString", function(bar)   ----	  血量�
 	local _, max = bar:GetMinMaxValues()
 	if bar.pctText then
 		bar.pctText:SetText(value==0 and "" or tostring(math.ceil((value / max) * 100)))  --(value==0 and "" or tostring(math.ceil((value / max) * 100)) .. "%")
-		if not MaoRUIPerDB["UFs"]["UFPctText"] or value == max then bar.pctText:Hide()
+		if not R.db["UFs"]["UFPctText"] or value == max then bar.pctText:Hide()
 		elseif GetCVarBool("statusTextPercentage") and ( bar.unit == PlayerFrame.unit or bar.unit == "target" or bar.unit == "focus" ) then bar.pctText:Hide()
 		else bar.pctText:Show()
 		end

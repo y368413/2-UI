@@ -4,7 +4,7 @@ local M, R, U, I = unpack(ns)
 local MISC = M:GetModule("Misc")
 
 function MISC:FreeMountCD()
-	if (GetLocale() ~= "zhCN") or (not MaoRUIPerDB["Misc"]["FreeMountCD"]) then return end
+	if (GetLocale() ~= "zhCN") or (not R.db["Misc"]["FreeMountCD"]) then return end
 	local Bee = "Interface\\AddOns\\_ShiGuang\\Media\\Hexagon"
 
 -- Whisper Details --

@@ -2,164 +2,254 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 
 local r, g, b = I.r, I.g, I.b
-local select, unpack = select, unpack
+local select, pairs = select, pairs
+
+local function reskinQuestIcon(button)
+	if not button then return end
+
+	if not button.styled then
+		button:SetSize(24, 24)
+		button:SetNormalTexture("")
+		button:SetPushedTexture("")
+		button:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
+		local icon = button.icon or button.Icon
+		if icon then
+			button.bg = M.ReskinIcon(icon, true)
+			icon:SetInside()
+		end
+
+		button.styled = true
+	end
+
+	if button.bg then
+		button.bg:SetFrameLevel(0)
+	end
+end
+
+local function reskinQuestIcons(_, block)
+	reskinQuestIcon(block.itemButton)
+	reskinQuestIcon(block.rightButton)
+end
+
+local function reskinHeader(header)
+	header.Text:SetTextColor(r, g, b)
+	header.Background:SetTexture(nil)
+	local bg = header:CreateTexture(nil, "ARTWORK")
+	bg:SetTexture("Interface\\LFGFrame\\UI-LFG-SEPARATOR")
+	bg:SetTexCoord(0, .66, 0, .31)
+	bg:SetVertexColor(r, g, b, .8)
+	bg:SetPoint("BOTTOMLEFT", 0, -4)
+	bg:SetSize(250, 30)
+	header.bg = bg -- accessable for other addons
+end
+
+local function reskinBarTemplate(bar)
+	if bar.bg then return end
+
+	M.StripTextures(bar)
+	bar:SetStatusBarTexture(I.normTex)
+	bar:SetStatusBarColor(r, g, b)
+	bar.bg = M.SetBD(bar)
+	M:SmoothBar(bar)
+end
+
+local function reskinProgressbar(_, _, line)
+	local progressBar = line.ProgressBar
+	local bar = progressBar.Bar
+
+	if not bar.bg then
+		bar:ClearAllPoints()
+		bar:SetPoint("LEFT")
+		reskinBarTemplate(bar)
+	end
+end
+
+local function reskinProgressbarWithIcon(_, _, line)
+	local progressBar = line.ProgressBar
+	local bar = progressBar.Bar
+	local icon = bar.Icon
+
+	if not bar.bg then
+		bar:SetPoint("LEFT", 22, 0)
+		reskinBarTemplate(bar)
+		BonusObjectiveTrackerProgressBar_PlayFlareAnim = M.Dummy
+
+		icon:SetMask(nil)
+		icon.bg = M.ReskinIcon(icon, true)
+		icon:ClearAllPoints()
+		icon:SetPoint("TOPLEFT", bar, "TOPRIGHT", 5, 0)
+		icon:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 25, 0)
+	end
+
+	if icon.bg then
+		icon.bg:SetShown(icon:IsShown() and icon:GetTexture() ~= nil)
+	end
+end
+
+local function reskinTimerBar(_, _, line)
+	local timerBar = line.TimerBar
+	local bar = timerBar.Bar
+
+	if not bar.bg then
+		reskinBarTemplate(bar)
+	end
+end
+
+local function updateMinimizeButton(button, collapsed)
+	button.__texture:DoCollapse(collapsed)
+end
+
+local function reskinMinimizeButton(button)
+	M.ReskinCollapse(button)
+	button:GetNormalTexture():SetAlpha(0)
+	button:GetPushedTexture():SetAlpha(0)
+	button.__texture:DoCollapse(false)
+	hooksecurefunc(button, "SetCollapsed", updateMinimizeButton)
+end
+
+local atlasToQuality = {
+	["jailerstower-animapowerlist-powerborder-white"] = LE_ITEM_QUALITY_COMMON,
+	["jailerstower-animapowerlist-powerborder-green"] = LE_ITEM_QUALITY_UNCOMMON,
+	["jailerstower-animapowerlist-powerborder-blue"] = LE_ITEM_QUALITY_RARE,
+	["jailerstower-animapowerlist-powerborder-purple"] = LE_ITEM_QUALITY_EPIC,
+}
+
+local function updateMawBuffQuality(button, spellID)
+	if not spellID then return end
+
+	local atlas = C_Spell.GetMawPowerBorderAtlasBySpellID(spellID)
+	local quality = atlasToQuality[atlas]
+	local color = I.QualityColors[quality or 1]
+	if button.bg then
+		button.bg:SetBackdropBorderColor(color.r, color.g, color.b)
+	end
+end
+
+local function updateMawBuffInfo(button, buffInfo)
+	updateMawBuffQuality(button, buffInfo.spellID)
+end
+
+tinsert(R.defaultThemes, function()
+	-- QuestIcons
+	hooksecurefunc(QUEST_TRACKER_MODULE, "SetBlockHeader", reskinQuestIcons)
+	hooksecurefunc(WORLD_QUEST_TRACKER_MODULE, "AddObjective", reskinQuestIcons)
+	hooksecurefunc(CAMPAIGN_QUEST_TRACKER_MODULE, "AddObjective", reskinQuestIcons)
+
+	-- Reskin Progressbars
+	hooksecurefunc(QUEST_TRACKER_MODULE, "AddProgressBar", reskinProgressbar)
+	hooksecurefunc(CAMPAIGN_QUEST_TRACKER_MODULE, "AddProgressBar", reskinProgressbar)
+
+	hooksecurefunc(BONUS_OBJECTIVE_TRACKER_MODULE, "AddProgressBar", reskinProgressbarWithIcon)
+	hooksecurefunc(WORLD_QUEST_TRACKER_MODULE, "AddProgressBar", reskinProgressbarWithIcon)
+	hooksecurefunc(SCENARIO_TRACKER_MODULE, "AddProgressBar", reskinProgressbarWithIcon)
+
+	hooksecurefunc(QUEST_TRACKER_MODULE, "AddTimerBar", reskinTimerBar)
+	hooksecurefunc(SCENARIO_TRACKER_MODULE, "AddTimerBar", reskinTimerBar)
+	hooksecurefunc(ACHIEVEMENT_TRACKER_MODULE, "AddTimerBar", reskinTimerBar)
+
+	-- Reskin Blocks
+	hooksecurefunc("ScenarioStage_CustomizeBlock", function(block)
+		block.NormalBG:SetTexture("")
+		if not block.bg then
+			block.bg = M.SetBD(block.GlowTexture, nil, 4, -2, -4, 2)
+		end
+	end)
+
+	hooksecurefunc(SCENARIO_CONTENT_TRACKER_MODULE, "Update", function()
+		local widgetContainer = ScenarioStageBlock.WidgetContainer
+		if not widgetContainer then return end
+
+		local widgetFrame = widgetContainer:GetChildren()
+		if widgetFrame and widgetFrame.Frame then
+			widgetFrame.Frame:SetAlpha(0)
+
+			for i = 1, widgetFrame.CurrencyContainer:GetNumChildren() do
+				local bu = select(i, widgetFrame.CurrencyContainer:GetChildren())
+				if bu and bu.Icon and not bu.styled then
+					M.ReskinIcon(bu.Icon)
+					bu.styled = true
+				end
+			end
+		end
+	end)
+
+	hooksecurefunc("Scenario_ChallengeMode_ShowBlock", function()
+		local block = ScenarioChallengeModeBlock
+		if not block.bg then
+			block.TimerBG:Hide()
+			block.TimerBGBack:Hide()
+			block.timerbg = M.CreateBDFrame(block.TimerBGBack, .3)
+			block.timerbg:SetPoint("TOPLEFT", block.TimerBGBack, 6, -2)
+			block.timerbg:SetPoint("BOTTOMRIGHT", block.TimerBGBack, -6, -5)
+
+			block.StatusBar:SetStatusBarTexture(I.normTex)
+			block.StatusBar:SetStatusBarColor(r, g, b)
+			block.StatusBar:SetHeight(10)
+
+			select(3, block:GetRegions()):Hide()
+			block.bg = M.SetBD(block, nil, 4, -2, -4, 0)
+		end
+	end)
+
+	hooksecurefunc("Scenario_ChallengeMode_SetUpAffixes", M.AffixesSetup)
+
+	-- Block in jail tower
+	local mawBuffsBlock = ScenarioBlocksFrame.MawBuffsBlock
+	local bg = M.SetBD(mawBuffsBlock, nil, 20, -10, -20, 10)
+	bg:SetBackdropColor(0, .5, .5, .25)
+
+	local blockContainer = mawBuffsBlock.Container
+	M.StripTextures(blockContainer)
+	blockContainer:GetPushedTexture():SetAlpha(0)
+	blockContainer:GetHighlightTexture():SetAlpha(0)
+
+	local blockList = blockContainer.List
+	blockList.__bg = bg
+	blockList:HookScript("OnShow", function(self)
+		self.__bg:SetBackdropBorderColor(1, .8, 0, .5)
+
+		for mawBuff in self.buffPool:EnumerateActive() do
+			if mawBuff:IsShown() and not mawBuff.bg then
+				mawBuff.Border:SetAlpha(0)
+				mawBuff.CircleMask:Hide()
+				mawBuff.CountRing:SetAlpha(0)
+				mawBuff.HighlightBorder:SetColorTexture(1, 1, 1, .25)
+				mawBuff.bg = M.ReskinIcon(mawBuff.Icon)
+
+				updateMawBuffQuality(mawBuff, mawBuff.spellID)
+				hooksecurefunc(mawBuff, "SetBuffInfo", updateMawBuffInfo)
+			end
+		end
+	end)
+	blockList:HookScript("OnHide", function(self)
+		self.__bg:SetBackdropBorderColor(0, 0, 0, 1)
+	end)
+	M.StripTextures(blockList)
+	M.SetBD(blockList)
 
 	-- Reskin Headers
-	local function reskinHeader(header)
-		header.Text:SetTextColor(r, g, b)
-		header.Background:SetTexture(nil)
-		local bg = header:CreateTexture(nil, "ARTWORK")
-		bg:SetTexture("Interface\\LFGFrame\\UI-LFG-SEPARATOR")
-		bg:SetTexCoord(0, .66, 0, .31)
-		bg:SetVertexColor(r, g, b, .8)
-		bg:SetPoint("BOTTOMLEFT", -30, -4)
-		bg:SetSize(250, 30)
-	end
-	
-tinsert(R.defaultThemes, function()
-	local LE_QUEST_FREQUENCY_DAILY = LE_QUEST_FREQUENCY_DAILY or 2
-	local C_QuestLog_IsQuestReplayable = C_QuestLog.IsQuestReplayable
-
 	local headers = {
 		ObjectiveTrackerBlocksFrame.QuestHeader,
 		ObjectiveTrackerBlocksFrame.AchievementHeader,
 		ObjectiveTrackerBlocksFrame.ScenarioHeader,
+		ObjectiveTrackerBlocksFrame.CampaignQuestHeader,
 		BONUS_OBJECTIVE_TRACKER_MODULE.Header,
 		WORLD_QUEST_TRACKER_MODULE.Header,
 		ObjectiveTrackerFrame.BlocksFrame.UIWidgetsHeader
 	}
-	for _, header in pairs(headers) do reskinHeader(header) end
+	for _, header in pairs(headers) do
+		reskinHeader(header)
+	end
 
-	--[[ Show quest color and level
-	local function Showlevel(_, _, _, title, level, _, isHeader, _, isComplete, frequency, questID)
-		if ENABLE_COLORBLIND_MODE == "1" then return end
+	--[[ Minimize Button
+	local mainMinimize = ObjectiveTrackerFrame.HeaderMenu.MinimizeButton
+	reskinMinimizeButton(mainMinimize)
+	mainMinimize.bg:SetBackdropBorderColor(1, .8, 0, .5)
 
-		for button in pairs(QuestScrollFrame.titleFramePool.activeObjects) do
-			if title and not isHeader and button.questID == questID then
-				local title = "["..level.."] "..title
-				if isComplete then
-					title = "|cffff78ff"..title
-				elseif C_QuestLog_IsQuestReplayable(questID) then
-					title = "|cff00ff00"..title
-				elseif frequency == LE_QUEST_FREQUENCY_DAILY then
-					title = "|cff3399ff"..title
-				end
-				button.Text:SetText(title)
-				button.Text:SetPoint("TOPLEFT", 24, -5)
-				button.Text:SetWidth(205)
-				button.Text:SetWordWrap(false)
-				button.Check:SetPoint("LEFT", button.Text, button.Text:GetWrappedWidth(), 0)
-			end
+	for _, header in pairs(headers) do
+		local minimize = header.MinimizeButton
+		if minimize then
+			reskinMinimizeButton(minimize)
 		end
-	end
-	hooksecurefunc("QuestLogQuests_AddQuestButton", Showlevel)
-
-	-- Hook objective tracker
-	hooksecurefunc(QUEST_TRACKER_MODULE, "Update", function()
-		for i = 1, GetNumQuestWatches() do
-			local questID, title, questLogIndex, numObjectives, requiredMoney, isComplete, startEvent, isAutoComplete, failureTime, timeElapsed, questType, isTask, isStory, isOnMap, hasLocalPOI = GetQuestWatchInfo(i)
-			if ( not questID ) then break end
-			local oldBlock = QUEST_TRACKER_MODULE:GetExistingBlock(questID)
-			if oldBlock then
-				local oldBlockHeight = oldBlock.height
-			  local oldHeight = QUEST_TRACKER_MODULE:SetStringText(oldBlock.HeaderText, title, nil, OBJECTIVE_TRACKER_COLOR["Header"])
-			  local newTitle = "["..select(2, GetQuestLogTitle(questLogIndex)).."] "..title
-			  local newHeight = QUEST_TRACKER_MODULE:SetStringText(oldBlock.HeaderText, newTitle, nil, OBJECTIVE_TRACKER_COLOR["Header"])
-			  oldBlock:SetHeight(oldBlockHeight + newHeight - oldHeight);
-			end end end)
-
--- Hook quest info
-	hooksecurefunc("QuestInfo_Display", function(template, parentFrame, acceptButton, material, mapView)
-		local elementsTable = template.elements
-		for i = 1, #elementsTable, 3 do
-			if elementsTable[i] == QuestInfo_ShowTitle then
-				if QuestInfoFrame.questLog then
-					if GetQuestLogSelection() > 0 then QuestInfoTitleHeader:SetText("["..select(2, GetQuestLogTitle(GetQuestLogSelection())).."] "..QuestInfoTitleHeader:GetText()) end
-	end end end end)]]
-
-----------------------------------------------------------------------------------------
---[[	Ctrl+Click to abandon a quest or Alt+Click to share a quest(by Suicidal Katt)
-----------------------------------------------------------------------------------------
-hooksecurefunc("QuestMapLogTitleButton_OnClick", function(self)
-	if IsControlKeyDown() then
-		CloseDropDownMenus()
-		QuestMapQuestOptions_AbandonQuest(self.questID)
-	elseif IsAltKeyDown() and GetQuestLogPushable(self.questID) then
-		CloseDropDownMenus()
-		QuestMapQuestOptions_ShareQuest(self.questID)
-	end
-end)
-hooksecurefunc(QUEST_TRACKER_MODULE, "OnBlockHeaderClick", function(_, block)
-	local questLogIndex = block.id
-	if IsControlKeyDown() then
-		CloseDropDownMenus()
-		QuestMapQuestOptions_AbandonQuest(questLogIndex)
-	elseif IsAltKeyDown() and GetQuestLogPushable(questLogIndex) then
-		CloseDropDownMenus()
-		QuestLogPushQuest(questLogIndex)
-	end
-end)]]
-
---[[ 任务名称职业着色 -------------------------------------------------------
- if  MaoRUIPerDB["Skins"]["QuestTrackerSkinTitle"] then
-    hooksecurefunc(QUEST_TRACKER_MODULE, "SetBlockHeader", function(_, block)
-        --for i = 1, GetNumQuestWatches() do
-		    --local questID = GetQuestWatchInfo(i)
-	        --if not questID then break end
-            --local block = QUEST_TRACKER_MODULE:GetBlock(questID)
-	          block.HeaderText:SetFont(STANDARD_TEXT_FONT, 12, 'nil')
-	          block.HeaderText:SetShadowOffset(.7, -.7)
-	          block.HeaderText:SetShadowColor(0, 0, 0, 1)
-              block.HeaderText:SetTextColor(I.r, I.g, I.b)
-              block.HeaderText:SetJustifyH("LEFT")
-          --end
-     end)
-     local function hoverquest(_, block)
-     --for i = 1, GetNumQuestWatches() do
-		    --local id = GetQuestWatchInfo(i)
-	        --if not id then break end
-	        --QUEST_TRACKER_MODULE:GetBlock(id).HeaderText:SetTextColor(r, g, b)
-	        block.HeaderText:SetTextColor(I.r, I.g, I.b)
-        --end
-     end
-    hooksecurefunc(QUEST_TRACKER_MODULE, "OnBlockHeaderEnter", hoverquest)  
-    hooksecurefunc(QUEST_TRACKER_MODULE, "OnBlockHeaderLeave", hoverquest)
- end   
-  
- end)   ]]
- -- numQuests -------------------------------------------------------
-local numQuests=CreateFrame('frame')
-numQuests:RegisterEvent('PLAYER_LOGIN')
-numQuests:RegisterEvent('QUEST_LOG_UPDATE')
-numQuests:SetScript('OnEvent',function() 
-   local numQuests = 0
-   for index=1,C_QuestLog.GetNumQuestLogEntries() do
-      if not C_QuestLog.GetInfo(index).isHidden then
-         if not C_QuestLog.GetInfo(index).isHeader then
-            numQuests = numQuests + 1
-         end
-      end
-   end
-   if not InCombatLockdown() then  --not InCombat and 
-		ObjectiveTrackerBlocksFrame.QuestHeader.Text:SetText(numQuests.."/"..C_QuestLog.GetMaxNumQuestsCanAccept().." "..TRACKER_HEADER_QUESTS)  --MAX_QUESTS
-		ObjectiveTrackerFrame.HeaderMenu.Title:SetText(numQuests.."/"..C_QuestLog.GetMaxNumQuestsCanAccept().." "..OBJECTIVES_TRACKER_LABEL)
-		--WorldMapFrame.BorderFrame.TitleText:SetText(MAP_AND_QUEST_LOG.." ("..numQuests.."/"..C_QuestLog.GetMaxNumQuestsCanAccept()..")")
-	end 
-end)
-
- --[[ CompletedTip -----------------------------------------------------------Version: 1.0.0.80300    --Author: InvisiBill
-local function onSetHyperlink(self, link)
-    local type, id = string.match(link,"^(%a+):(%d+)")
-    if not type or not id then return end
-    if type == "quest" then
-        if IsQuestFlaggedCompleted(id) then
-            self:AddDoubleLine(AUCTION_CATEGORY_QUEST_ITEMS, GARRISON_MISSION_COMPLETE, 1, 0.82, 0, 0, 1, 0)
-        else
-            self:AddDoubleLine(AUCTION_CATEGORY_QUEST_ITEMS, INCOMPLETE , 1, 0.82, 0, 1, 0, 0)
-        end
-        self:Show()
-    end
-end
-hooksecurefunc(ItemRefTooltip, "SetHyperlink", onSetHyperlink)
-hooksecurefunc(GameTooltip, "SetHyperlink", onSetHyperlink)]]
+	end]]
 end)

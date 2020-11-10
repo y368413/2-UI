@@ -260,7 +260,7 @@ local Backdrop={
 	}
 
 function CreateAbilityList(targetname,rpoints)
-	local frame = CreateFrame("frame","HAbiFrame"..targetname,PetBattleFrame)
+	local frame = CreateFrame("frame","HAbiFrame"..targetname,PetBattleFrame,"BackdropTemplate")
 
 	function frame:Init(unit)
 		self:SetSize("175","30")

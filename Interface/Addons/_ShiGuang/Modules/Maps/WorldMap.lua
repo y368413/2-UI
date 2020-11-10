@@ -11,7 +11,7 @@ local C_Map_GetBestMapForUnit = C_Map.GetBestMapForUnit
 
 local mapRects = {}
 local tempVec2D = CreateVector2D(0, 0)
-local currentMapID, playerCoords, cursorCoords, mapScale
+local currentMapID, playerCoords, cursorCoords
 
 function module:GetPlayerMapPos(mapID)
 	tempVec2D.x, tempVec2D.y = UnitPosition("player")
@@ -79,8 +79,6 @@ function module:UpdateMapID()
 end
 
 function module:SetupCoords()
-	if not MaoRUIPerDB["Map"]["Coord"] then return end
-
 	playerCoords = M.CreateFS(WorldMapFrame.BorderFrame, 12, "", false, "BOTTOMLEFT", 110, 3)
 	cursorCoords = M.CreateFS(WorldMapFrame.BorderFrame, 12, "", false, "BOTTOMLEFT", 220, 3)
 	WorldMapFrame.BorderFrame.Tutorial:SetPoint("TOPLEFT", WorldMapFrame, "TOPLEFT", -12, -12)
@@ -93,35 +91,35 @@ function module:SetupCoords()
 end
 
 function module:UpdateMapScale()
-	if self.isMaximized and self:GetScale() ~= 1 then
-		self:SetScale(1)
-	elseif not self.isMaximized and self:GetScale() ~= mapScale then
-		self:SetScale(mapScale)
+	if self.isMaximized and self:GetScale() ~= R.db["Map"]["MaxMapScale"] then
+		self:SetScale(R.db["Map"]["MaxMapScale"])
+	elseif not self.isMaximized and self:GetScale() ~= R.db["Map"]["MapScale"] then
+		self:SetScale(R.db["Map"]["MapScale"])
 	end
 end
 
 function module:UpdateMapAnchor()
 	module.UpdateMapScale(self)
-	if not self.isMaximized then M.RestoreMF(self) end
+	M.RestoreMF(self)
 end
 
 function module:WorldMapScale()
-	mapScale = MaoRUIPerDB["Map"]["MapScale"]
-
 	-- Fix worldmap cursor when scaling
-	if mapScale > 1 then
-		WorldMapFrame.ScrollContainer.GetCursorPosition = function(f)
-			local x, y = MapCanvasScrollControllerMixin.GetCursorPosition(f)
-			local scale = WorldMapFrame:GetScale()
-			return x / scale, y / scale
-		end
+	WorldMapFrame.ScrollContainer.GetCursorPosition = function(f)
+		local x, y = MapCanvasScrollControllerMixin.GetCursorPosition(f)
+		local scale = WorldMapFrame:GetScale()
+		return x / scale, y / scale
 	end
 
 	M.CreateMF(WorldMapFrame, nil, true)
 	hooksecurefunc(WorldMapFrame, "SynchronizeDisplayState", self.UpdateMapAnchor)
 end
 
-function module:OnLogin()
+function module:SetupWorldMap()
+	if R.db["Map"]["DisableMap"] then return end
+	if IsAddOnLoaded("Mapster") then return end
+	if IsAddOnLoaded("Leatrix_Maps") then return end
+
 	-- Remove from frame manager
 	WorldMapFrame:ClearAllPoints()
 	WorldMapFrame:SetPoint("CENTER") -- init anchor
@@ -130,10 +128,18 @@ function module:OnLogin()
 	WorldMapFrame:SetAttribute("UIPanelLayout-allowOtherPanels", true)
 	tinsert(UISpecialFrames, "WorldMapFrame")
 
+	-- Hide stuff
+	WorldMapFrame.BlackoutFrame:SetAlpha(0)
+	WorldMapFrame.BlackoutFrame:EnableMouse(false)
+
 	self:WorldMapScale()
 	self:SetupCoords()
-	self:SetupMinimap()
 	self:MapReveal()
+end
+
+function module:OnLogin()
+	self:SetupWorldMap()
+	self:SetupMinimap()
 end
 
 --## Author: Coop ## Version: 01.00

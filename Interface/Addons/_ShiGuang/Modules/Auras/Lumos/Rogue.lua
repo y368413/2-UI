@@ -20,7 +20,7 @@ function A:PostCreateLumos(self)
 
 	local iconSize = (self:GetWidth() - 10)/6
 	local buttons = {}
-	local offset = MaoRUIPerDB["Nameplate"]["NameplateClassPower"] and R.margin or (R.margin*2 + MaoRUIPerDB["Nameplate"]["PPBarHeight"])
+	local offset = R.db["Nameplate"]["NameplateClassPower"] and R.margin or (R.margin*2 + R.db["Nameplate"]["PPBarHeight"])
 	for i = 1, 6 do
 		local bu = CreateFrame("Frame", nil, self.Health)
 		bu:SetSize(iconSize, iconSize/2)

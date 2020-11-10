@@ -107,7 +107,7 @@ local function MoveTalkingHead()
 end
 
 local function NoTalkingHeads()
-	if not MaoRUIPerDB["Misc"]["HideTalking"] then return end
+	if not R.db["Misc"]["HideTalking"] then return end
 
 	hooksecurefunc(TalkingHeadFrame, "Show", function(self)
 		self:Hide()

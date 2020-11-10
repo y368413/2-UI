@@ -22,7 +22,7 @@ local function completeText(link)
 end
 
 local function sendQuestMsg(msg)
-	if MaoRUIPerDB["Misc"]["OnlyCompleteRing"] then return end
+	if R.db["Misc"]["OnlyCompleteRing"] then return end
 
 	if IsPartyLFG() then
 		SendChatMessage(msg, "INSTANCE_CHAT")
@@ -51,8 +51,8 @@ local questMatches = {
 }
 
 function MISC:FindQuestProgress(_, msg)
-	if not MaoRUIPerDB["Misc"]["QuestProgress"] then return end
-	if MaoRUIPerDB["Misc"]["OnlyCompleteRing"] then return end
+	if not R.db["Misc"]["QuestProgress"] then return end
+	if R.db["Misc"]["OnlyCompleteRing"] then return end
 
 	for _, pattern in pairs(questMatches) do
 		if strmatch(msg, pattern) then
@@ -106,7 +106,7 @@ function MISC:FindWorldQuestComplete(questID)
 end
 
 function MISC:QuestNotifier()
-	if MaoRUIPerDB["Misc"]["QuestNotifier"] then
+	if R.db["Misc"]["QuestNotifier"] then
 		MISC:FindQuestComplete()
 		M:RegisterEvent("QUEST_ACCEPTED", MISC.FindQuestAccept)
 		M:RegisterEvent("QUEST_LOG_UPDATE", MISC.FindQuestComplete)

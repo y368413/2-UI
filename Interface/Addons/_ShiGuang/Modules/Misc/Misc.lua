@@ -67,7 +67,7 @@ function MISC:OnLogin()
 	MISC:BlinkRogueHelper()
 	
 	----------------QuickQueue.lua----------------------
-	if MaoRUIPerDB["Misc"]["QuickQueue"] then
+	if R.db["Misc"]["QuickQueue"] then
 	  local QuickQueue = CreateFrame("Frame")
 	    QuickQueue:RegisterEvent("LFG_ROLE_CHECK_SHOW")
 	    QuickQueue:SetScript("OnEvent", function(self, event, ...) CompleteLFGRoleCheck(true) end)
@@ -102,7 +102,7 @@ function MISC:OnLogin()
 
 	-- Instant delete
 	hooksecurefunc(StaticPopupDialogs["DELETE_GOOD_ITEM"], "OnShow", function(self)
-		if MaoRUIPerDB["Misc"]["InstantDelete"] then
+		if R.db["Misc"]["InstantDelete"] then
 			self.editBox:SetText(DELETE_ITEM_CONFIRM_STRING)
 		end
 	end)
@@ -118,7 +118,7 @@ end
 
 -- Hide boss banner
 function MISC:ToggleBossBanner()
-	if MaoRUIPerDB["Misc"]["HideBanner"] then
+	if R.db["Misc"]["HideBanner"] then
 		BossBanner:UnregisterAllEvents()
 	else
 		BossBanner:RegisterEvent("BOSS_KILL")
@@ -128,7 +128,7 @@ end
 
 -- Hide boss emote
 function MISC:ToggleBossEmote()
-	if MaoRUIPerDB["Misc"]["HideBossEmote"] then
+	if R.db["Misc"]["HideBossEmote"] then
 		RaidBossEmoteFrame:UnregisterAllEvents()
 	else
 		RaidBossEmoteFrame:RegisterEvent("RAID_BOSS_EMOTE")
@@ -272,7 +272,7 @@ function MISC:UpdateScreenShot()
 		end)
 	end
 
-	if MaoRUIPerDB["Misc"]["Screenshot"] then
+	if R.db["Misc"]["Screenshot"] then
 		M:RegisterEvent("ACHIEVEMENT_EARNED", MISC.ScreenShotOnEvent)
 	else
 		MISC.ScreenShotFrame:Hide()
@@ -295,7 +295,7 @@ function MISC:DoFasterLoot()
 end
 
 function MISC:UpdateFasterLoot()
-	if MaoRUIPerDB["Misc"]["FasterLoot"] then
+	if R.db["Misc"]["FasterLoot"] then
 		M:RegisterEvent("LOOT_READY", MISC.DoFasterLoot)
 	else
 		M:UnregisterEvent("LOOT_READY", MISC.DoFasterLoot)
@@ -328,7 +328,7 @@ end
 -- Block invite from strangers
 function MISC:BlockStrangerInvite()
 	M:RegisterEvent("PARTY_INVITE_REQUEST", function(_, _, _, _, _, _, _, guid)
-		if MaoRUIPerDB["Misc"]["BlockInvite"] and not (C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGuildMember(guid)) then
+		if R.db["Misc"]["BlockInvite"] and not (C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGuildMember(guid)) then
 			DeclineGroup()
 			StaticPopup_Hide("PARTY_INVITE")
 		end

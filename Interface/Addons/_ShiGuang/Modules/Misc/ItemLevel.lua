@@ -86,7 +86,7 @@ local function GetSlotItemLocation(id)
 end
 
 function MISC:ItemLevel_UpdateTraits(button, id, link)
-	if not MaoRUIPerDB["Misc"]["AzeriteTraits"] then return end
+	if not R.db["Misc"]["AzeriteTraits"] then return end
 
 	local empoweredItemLocation = GetSlotItemLocation(id)
 	if not empoweredItemLocation then return end
@@ -173,7 +173,7 @@ end
 function MISC:ItemLevel_RefreshInfo(link, unit, index, slotFrame)
 	C_Timer.After(.1, function()
 		local quality = select(3, GetItemInfo(link))
-		local info = M.GetItemLevel(link, unit, index, MaoRUIPerDB["Misc"]["GemNEnchant"])
+		local info = M.GetItemLevel(link, unit, index, R.db["Misc"]["GemNEnchant"])
 		if info == "tooSoon" then return end
 		MISC:ItemLevel_UpdateInfo(index, slotFrame, info, quality)
 	end)
@@ -198,7 +198,7 @@ function MISC:ItemLevel_SetupLevel(frame, strType, unit)
 			local link = GetInventoryItemLink(unit, index)
 			if link then
 				local quality = select(3, GetItemInfo(link))
-				local info = M.GetItemLevel(link, unit, index, MaoRUIPerDB["Misc"]["GemNEnchant"])
+				local info = M.GetItemLevel(link, unit, index, R.db["Misc"]["GemNEnchant"])
 				if info == "tooSoon" then
 					MISC:ItemLevel_RefreshInfo(link, unit, index, slotFrame)
 				else
@@ -290,7 +290,7 @@ function MISC.ItemLevel_ScrappingShow(event, addon)
 end
 
 function MISC:ShowItemLevel()
-	if not MaoRUIPerDB["Misc"]["ItemLevel"] then return end
+	if not R.db["Misc"]["ItemLevel"] then return end
 
 	-- iLvl on CharacterFrame
 	CharacterFrame:HookScript("OnShow", MISC.ItemLevel_UpdatePlayer)

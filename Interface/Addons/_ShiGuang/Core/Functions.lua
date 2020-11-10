@@ -59,7 +59,7 @@ do
 		elseif s > 3 then
 			return format("|cffffff00%d|r", s), s - floor(s)
 		else
-			if MaoRUIPerDB["Actionbar"]["DecimalCD"] then
+			if R.db["Actionbar"]["DecimalCD"] then
 				return format("|cffff0000%.1f|r", s), s - format("%.1f", s)
 			else
 				return format("|cffff0000%d|r", s + .5), s - floor(s)
@@ -171,6 +171,7 @@ do
 	local essenceDescription = GetSpellDescription(277253)
 	local ITEM_SPELL_TRIGGER_ONEQUIP = ITEM_SPELL_TRIGGER_ONEQUIP
 	local RETRIEVING_ITEM_INFO = RETRIEVING_ITEM_INFO
+
 	local tip = CreateFrame("GameTooltip", "NDui_ScanTooltip", nil, "GameTooltipTemplate")
 	M.ScanTip = tip
 
@@ -385,6 +386,9 @@ end
 
 -- UI widgets
 do
+	-- Dropdown menu
+	M.EasyMenu = CreateFrame("Frame", "NDui_EasyMenu", UIParent, "UIDropDownMenuTemplate")
+
 	-- Fontstring
 	function M:CreateFS(size, text, color, anchor, x, y, r, g, b)
 		local fs = self:CreateFontString(nil, "OVERLAY")
@@ -488,7 +492,7 @@ do
 	local shadowBackdrop = {edgeFile = I.glowTex}
 
 	function M:CreateSD(size, override)
-		if not override and not MaoRUIPerDB["Skins"]["Shadow"] then return end
+		if not override and not R.db["Skins"]["Shadow"] then return end
 		if self.__shadow then return end
 
 		local frame = self
@@ -514,7 +518,7 @@ do
 	function M:CreateBD(a)
 		defaultBackdrop.edgeSize = R.mult
 		self:SetBackdrop(defaultBackdrop)
-		self:SetBackdropColor(0, 0, 0, a or MaoRUIPerDB["Skins"]["SkinAlpha"])
+		self:SetBackdropColor(0, 0, 0, a or R.db["Skins"]["SkinAlpha"])
 		self:SetBackdropBorderColor(0, 0, 0)
 		if not a then tinsert(R.frames, self) end
 	end
@@ -523,7 +527,7 @@ do
 		local tex = self:CreateTexture(nil, "BORDER")
 		tex:SetInside()
 		tex:SetTexture(I.bdTex)
-		if MaoRUIPerDB["Skins"]["FlatMode"] then
+		if R.db["Skins"]["FlatMode"] then
 			tex:SetVertexColor(.3, .3, .3, .25)
 		else
 			tex:SetGradientAlpha("Vertical", 0, 0, 0, .5, .3, .3, .3, .3)
@@ -653,13 +657,15 @@ do
 		self.__owner.bg:SetBackdropBorderColor(color.r, color.g, color.b)
 	end
 	local function updateIconBorderColor(self, r, g, b)
-		if r == .65882 then r, g, b = 0, 0, 0 end
+		if (r==.65882 and g==.65882 and b==.65882) or (r>.99 and g>.99 and b>.99) then
+			r, g, b = 0, 0, 0
+		end
 		self.__owner.bg:SetBackdropBorderColor(r, g, b)
 	end
 	local function resetIconBorderColor(self)
 		self.__owner.bg:SetBackdropBorderColor(0, 0, 0)
 	end
-	function M:ReskinIconBorder()
+	function M:ReskinIconBorder(needInit)
 		self:SetAlpha(0)
 		self.__owner = self:GetParent()
 		if not self.__owner.bg then return end
@@ -667,6 +673,9 @@ do
 			hooksecurefunc(self, "SetAtlas", updateIconBorderColorByAtlas)
 		else
 			hooksecurefunc(self, "SetVertexColor", updateIconBorderColor)
+			if needInit then
+				self:SetVertexColor(self:GetVertexColor()) -- for border with color before hook
+			end
 		end
 		hooksecurefunc(self, "Hide", resetIconBorderColor)
 	end
@@ -697,7 +706,7 @@ do
 	local function Button_OnEnter(self)
 		if not self:IsEnabled() then return end
 
-		if MaoRUIPerDB["Skins"]["FlatMode"] then
+		if R.db["Skins"]["FlatMode"] then
 			self.__gradient:SetVertexColor(cr / 4, cg / 4, cb / 4)
 		else
 			self.__bg:SetBackdropColor(cr, cg, cb, .25)
@@ -705,7 +714,7 @@ do
 		self.__bg:SetBackdropBorderColor(cr, cg, cb)
 	end
 	local function Button_OnLeave(self)
-		if MaoRUIPerDB["Skins"]["FlatMode"] then
+		if R.db["Skins"]["FlatMode"] then
 			self.__gradient:SetVertexColor(.3, .3, .3, .25)
 		else
 			self.__bg:SetBackdropColor(0, 0, 0, 0)
@@ -875,6 +884,23 @@ do
 	end
 end
 
+	function M:AffixesSetup()
+		for _, frame in ipairs(self.Affixes) do
+			frame.Border:SetTexture(nil)
+			frame.Portrait:SetTexture(nil)
+			if not frame.bg then
+				frame.bg = M.ReskinIcon(frame.Portrait)
+			end
+
+			if frame.info then
+				frame.Portrait:SetTexture(CHALLENGE_MODE_EXTRA_AFFIX_INFO[frame.info.key].texture)
+			elseif frame.affixID then
+				local _, _, filedataid = C_ChallengeMode.GetAffixInfo(frame.affixID)
+				frame.Portrait:SetTexture(filedataid)
+			end
+		end
+	end
+
 -- GUI elements
 do
 	function M:CreateButton(width, height, text, fontSize)
@@ -909,6 +935,7 @@ do
 		eb:SetTextInsets(5, 5, 0, 0)
 		eb:SetFont(I.Font[1], I.Font[2]+2, I.Font[3])
 		eb.bg = M.CreateBDFrame(eb, .25, true)
+		eb.bg:SetAllPoints()
 		eb:SetScript("OnEscapePressed", editBoxClearFocus)
 		eb:SetScript("OnEnterPressed", editBoxClearFocus)
 
@@ -1021,6 +1048,15 @@ do
 		ColorPickerFrame:Show()
 	end
 
+	local function GetSwatchTexColor(tex)
+		local r, g, b = tex:GetVertexColor()
+		r = M:Round(r, 2)
+		g = M:Round(g, 2)
+		b = M:Round(b, 2)
+		print(r,g,b)
+		return r, g, b
+	end
+
 	function M:CreateColorSwatch(name, color)
 		color = color or {r=1, g=1, b=1}
 
@@ -1032,6 +1068,7 @@ do
 		tex:SetInside()
 		tex:SetTexture(I.bdTex)
 		tex:SetVertexColor(color.r, color.g, color.b)
+		tex.GetColor = GetSwatchTexColor
 
 		swatch.tex = tex
 		swatch.color = color

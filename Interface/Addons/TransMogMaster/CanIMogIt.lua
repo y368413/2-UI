@@ -1,4 +1,4 @@
-﻿ -- 9.0.1v1.26
+﻿ --  9.0.1v1.29
  -- Constants for CanIMogIt
 local L = CanIMogIt.L
 --------------------------------------------

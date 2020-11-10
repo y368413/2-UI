@@ -1,9 +1,11 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="MTG.lua"/>
 	<Script file="Mingy.lua"/>
+	<Script file="bfaPetQuest.lua"/>
 	<Script file="DarkmoonFaire.lua"/>
 	<Script file="AngryWorldQuest.lua"/>
-	<!--Script file="WorldMapQuestRewardIcon.lua"/-->
+	<Script file="WorldMapQuestRewardIcon.lua"/>
+
     <Button name="QuestBindingsButtonTemplate" virtual="true">
         <Size x="16" y="16"/>
         <Layers>
@@ -33,12 +35,13 @@
 			</Layer>
 		</Layers>
 	</Frame>
-	<Script file="WorldMapQuestBountyCounter.lua"/>
+	
 	<Frame name="WRWorldQuestFrame" mixin="WorldMapQuestBountyCount" parent="QuestMapFrame" inherits="SecureFrameTemplate" enableMouse="true" hidden="false">
 		<Scripts>
 			<OnLoad method="OnLoad"/>
 		</Scripts>
 	</Frame>
+	
 	<Script file='Barrels.lua'/>
 	<Script file='Loh.lua'/>
   <Include file="ClassicQuestLog\ClassicQuestLog.xml"/>

@@ -1,7 +1,6 @@
 ﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
 local A = M:GetModule("Auras")
-local margin = R.margin
 
 local _G = _G
 local GetTotemInfo = GetTotemInfo
@@ -10,8 +9,9 @@ local GetTotemInfo = GetTotemInfo
 local totems = {}
 
 function A:TotemBar_Init()
-	local vertical = MaoRUIPerDB["Auras"]["VerticalTotems"]
-	local iconSize = MaoRUIPerDB["Auras"]["TotemSize"]
+	local margin = R.margin
+	local vertical = R.db["Auras"]["VerticalTotems"]
+	local iconSize = R.db["Auras"]["TotemSize"]
 	local width = vertical and (iconSize + margin*2) or (iconSize*4 + margin*5)
 	local height = vertical and (iconSize*4 + margin*5) or (iconSize + margin*2)
 
@@ -74,7 +74,7 @@ function A:TotemBar_Update()
 end
 
 function A:Totems()
-	if not MaoRUIPerDB["Auras"]["Totems"] then return end
+	if not R.db["Auras"]["Totems"] then return end
 
 	A:TotemBar_Init()
 	M:RegisterEvent("PLAYER_ENTERING_WORLD", A.TotemBar_Update)

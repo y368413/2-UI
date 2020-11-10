@@ -4,7 +4,7 @@ ns[2] = {}			-- R, Config
 ns[3] = {}			-- U, Locales
 ns[4] = {}			-- I, Database
 
-MaoRUIPerDB, MaoRUIDB = {}, {}
+MaoRUIPerDB, MaoRUIDB, MaoRUIPlusDB = {}, {}, {}
 ShiGuangDB = ShiGuangDB or {}
 ShiGuangPerDB = ShiGuangPerDB or {}
 
@@ -117,7 +117,8 @@ M:RegisterEvent("PLAYER_LOGIN", function()
 	-- Initial
 	M:SetupUIScale()
 	M:RegisterEvent("UI_SCALE_CHANGED", UpdatePixelScale)
-	M:SetSmoothingAmount(MaoRUIPerDB["UFs"]["SmoothAmount"])
+	M:SetSmoothingAmount(R.db["UFs"]["SmoothAmount"])
+	R.margin = 3
 
 	for _, module in next, initQueue do
 		if module.OnLogin then

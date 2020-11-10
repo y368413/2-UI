@@ -1,5 +1,5 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
-  <Script file="Misc.lua"/>
+	<Script file="Misc.lua"/>
 	<Script file="AlertFrames.lua"/>
 	<Script file="ExpRep.lua"/>
 	<Script file="Focuser.lua"/>

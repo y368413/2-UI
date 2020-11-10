@@ -121,8 +121,8 @@ local list = {
 		--{AuraID = 345439, UnitID = "player"},	-- 赤红华尔兹
 		--{AuraID = 345019, UnitID = "player"},	-- 潜伏的掠食者
 		--{AuraID = 345530, UnitID = "player"},	-- 过载的心能电池
-		{AuraID = 336588, UnitID = "player"},	-- 唤醒者的复叶
 		--{AuraID = 345541, UnitID = "player"},	-- 天域涌动
+		{AuraID = 336588, UnitID = "player"},	-- 唤醒者的复叶
 		{AuraID = 311444, UnitID = "player", Value = true},	-- 不屈套牌
 		{AuraID = 336465, UnitID = "player", Value = true},	-- 脉冲光辉护盾
 
@@ -364,6 +364,7 @@ local list = {
 		{AuraID = 311390, UnitID = "player"},	-- 疯狂：昆虫恐惧症，幻象
 		{AuraID = 306583, UnitID = "player"},	-- 灌铅脚步
 		{AuraID = 313698, UnitID = "player", Flash = true},	-- 泰坦之赐
+
 		{AuraID = 314478, UnitID = "player"},	-- 倾泻恐惧
 		{AuraID = 314483, UnitID = "player"},	-- 倾泻恐惧
 		{AuraID = 314411, UnitID = "player"},	-- 疑云密布

@@ -2,7 +2,7 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 
 tinsert(R.defaultThemes, function()
-	if not MaoRUIPerDB["Skins"]["PetBattle"] then return end
+	if not R.db["Skins"]["PetBattle"] then return end
 
 	local r, g, b, pairs = I.r, I.g, I.b, pairs
 
@@ -298,6 +298,7 @@ tinsert(R.defaultThemes, function()
 		local frame = CreateFrame("Frame", nil, UIParent)
 		frame:SetSize(width, height)
 		frame:SetPoint(anchor, UIParent, "BOTTOM", 0, 3)
+		frame:SetFrameLevel(0)
 		local tex = M.SetGradient(frame, "H", 0, 0, 0, v[1], v[2], width, height)
 		tex:SetPoint("CENTER")
 		local line = M.SetGradient(frame, "H", r, g, b, v[1], v[2], width, R.mult)

@@ -2,12 +2,15 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local MISC = M:GetModule("Misc")
 
+local format, strsplit, tonumber, pairs, wipe = format, strsplit, tonumber, pairs, wipe
+local Ambiguate = Ambiguate
+local C_ChallengeMode_GetMapUIInfo = C_ChallengeMode.GetMapUIInfo
+local C_ChallengeMode_GetGuildLeaders = C_ChallengeMode.GetGuildLeaders
+local C_MythicPlus_GetOwnedKeystoneLevel = C_MythicPlus.GetOwnedKeystoneLevel
+local C_MythicPlus_GetOwnedKeystoneChallengeMapID = C_MythicPlus.GetOwnedKeystoneChallengeMapID
 local CHALLENGE_MODE_POWER_LEVEL = CHALLENGE_MODE_POWER_LEVEL
 local CHALLENGE_MODE_GUILD_BEST_LINE = CHALLENGE_MODE_GUILD_BEST_LINE
 local CHALLENGE_MODE_GUILD_BEST_LINE_YOU = CHALLENGE_MODE_GUILD_BEST_LINE_YOU
-local Ambiguate, GetContainerNumSlots, GetContainerItemInfo = Ambiguate, GetContainerNumSlots, GetContainerItemInfo
-local C_ChallengeMode_GetMapUIInfo, C_ChallengeMode_GetGuildLeaders = C_ChallengeMode.GetMapUIInfo, C_ChallengeMode.GetGuildLeaders
-local format, strsplit, strmatch, tonumber, pairs, wipe, select = string.format, string.split, string.match, tonumber, pairs, wipe, select
 
 local hasAngryKeystones
 local frame
@@ -117,8 +120,7 @@ function MISC.GuildBest_OnLoad(event, addon)
 end
 
 -- Keystone Info
-local myFaction = I.MyFaction
-local myFullName = I.MyName.."-"..I.MyRealm
+local myFullName = I.MyFullName
 local iconColor = I.QualityColors[LE_ITEM_QUALITY_EPIC or 4]
 
 function MISC:KeystoneInfo_Create()
@@ -153,23 +155,16 @@ function MISC:KeystoneInfo_Create()
 end
 
 function MISC:KeystoneInfo_UpdateBag()
-	for bag = 0, 4 do
-		local numSlots = GetContainerNumSlots(bag)
-		for slot = 1, numSlots do
-			local slotLink = select(7, GetContainerItemInfo(bag, slot))
-			local itemString = slotLink and strmatch(slotLink, "|Hkeystone:([0-9:]+)|h(%b[])|h")
-			if itemString then
-				return slotLink, itemString
-			end
-		end
+	local keystoneMapID = C_MythicPlus_GetOwnedKeystoneChallengeMapID()
+	if keystoneMapID then
+		return keystoneMapID, C_MythicPlus_GetOwnedKeystoneLevel()
 	end
 end
 
 function MISC:KeystoneInfo_Update()
-	local link, itemString = MISC:KeystoneInfo_UpdateBag()
-	if link then
-		local _, mapID, level = strsplit(":", itemString)
-		MaoRUIDB["KeystoneInfo"][myFullName] = mapID..":"..level..":"..I.MyClass..":"..myFaction
+	local mapID, keystoneLevel = MISC:KeystoneInfo_UpdateBag()
+	if mapID then
+		MaoRUIDB["KeystoneInfo"][myFullName] = mapID..":"..keystoneLevel..":"..I.MyClass..":"..I.MyFaction
 	else
 		MaoRUIDB["KeystoneInfo"][myFullName] = nil
 	end

@@ -21,8 +21,8 @@ local function DefaultSettings()
 	--SetCVar("fstack_preferParentKeys", 0)
 	SetCVar("missingTransmogSourceInItemTooltips", 1)
 	--setglobal("MAX_EQUIPMENT_SETS_PER_PLAYER",100)
-	PlayerFrame:SetScale(MaoRUIPerDB["UFs"]["PlayerFrameScale"]) 
-	TargetFrame:SetScale(MaoRUIPerDB["UFs"]["PlayerFrameScale"])
+	PlayerFrame:SetScale(R.db["UFs"]["PlayerFrameScale"]) 
+	TargetFrame:SetScale(R.db["UFs"]["PlayerFrameScale"])
 end
 
 local function ForceDefaultSettings()
@@ -143,7 +143,7 @@ local function ForceChatSettings()
 	end
 	FCF_SavePositionAndDimensions(ChatFrame1)
 
-	MaoRUIPerDB["Chat"]["Lock"] = true
+	R.db["Chat"]["Lock"] = true
 end
 
 StaticPopupDialogs["RELOAD_NDUI"] = {
@@ -213,6 +213,7 @@ local function ForceDBMOptions()
 	DBM_AllSavedOptions["Default"]["SpecialWarningFontSize2"] = 36
 	MaoRUIDB["DBMRequest"] = false
 end
+
 -- Skada
 local function ForceSkadaOptions()
 	if not IsAddOnLoaded("Skada") then return end
@@ -424,7 +425,7 @@ local function HelloWorld()
 		welcome:Hide()
 		if MaoRUIDB["YesTutor"] then YesTutor() end
 		ShiGuangPerDB["BHT"] = true
-		MaoRUIPerDB["Tutorial"]["Complete"] = true
+		R.db["Tutorial"]["Complete"] = true
 		ForceDefaultSettings()
 		ReloadUI()
 	end)
@@ -445,7 +446,7 @@ local function HelloWorld()
 		welcome:Hide()
 		if MaoRUIDB["YesTutor"] then YesTutor() end
 		ShiGuangPerDB["BHT"] = false
-		MaoRUIPerDB["Tutorial"]["Complete"] = true
+		R.db["Tutorial"]["Complete"] = true
 		ForceDefaultSettings()
 		ReloadUI()
   end)
@@ -516,6 +517,6 @@ function module:OnLogin()
 	-- Tutorial and settings
 	DefaultSettings()
 	ForceAddonSkins()
-	if not MaoRUIPerDB["Tutorial"]["Complete"] then HelloWorld() end
+	if not R.db["Tutorial"]["Complete"] then HelloWorld() end
 	if (ShiGuangPerDB["BHT"] == true) then SenduiCmd("/bht on") else SenduiCmd("/bht off") end
 end

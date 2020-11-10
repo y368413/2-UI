@@ -21,8 +21,9 @@ local _G = getfenv(0)
 local point_format = "(%d+)\.([0-9]+):(.+):(.+):(.+):(.*)";
 
 local GameTooltip = _G.GameTooltip
-local GetQuestLogIndexByID = _G.GetQuestLogIndexByID
+local GetQuestLogIndexByID = _G.C_QuestLog.GetLogIndexForQuestID
 local GetQuestLogLeaderBoard = _G.GetQuestLogLeaderBoard
+local IsQuestFlaggedCompleted = _G.C_QuestLog.IsQuestFlaggedCompleted
 local GetAchievementCriteriaInfo = _G.GetAchievementCriteriaInfo
 local GetAchievementInfo = _G.GetAchievementInfo
 --local GetGameTime = _G.GetGameTime
@@ -56,35 +57,6 @@ end
 local function showally()
     return playerfaction == "Alliance"
 end
-
-
-
----- check
---local setEnabled = false
---local function CheckEventActive()
---	local _, month, day, year = CalendarGetDate()
---	local curMonth, curYear = CalendarGetMonth()
---	local monthOffset = -12 * (curYear - year) + month - curMonth
---	local numEvents = CalendarGetNumDayEvents(monthOffset, day)
---
---	for i=1, numEvents do
---		local _, eventHour, _, eventType, state, _, texture = CalendarGetDayEvent(monthOffset, day, i)
---
---		if texture == 235548 or texture == 235447 or texture == 235446 then
---			if state == "ONGOING" then
---				setEnabled = true
---			else
---				local hour = GetGameTime()
---
---				if state == "END" and hour <= eventHour or state == "START" and hour >= eventHour then
---					setEnabled = true
---				else
---					setEnabled = false
---				end
---			end
---		end
---	end
---end
 
 
 local function IsAdventure( questID )
@@ -174,7 +146,7 @@ local function IsLogged(questID, questIndex)
     end
 end
 
-local function IsComplete(questID, questIndex)
+function HandyNotes_PetDailies:IsComplete(questID, questIndex)
 
 	if (questIndex > 0 and not IsAdventure(questID) and not IsFamily(questID) and not IsBattler(questID)
 			and not IsArgus(questID) and not IsNuisances(questID) and not IsMinions(questID)) then
@@ -185,7 +157,7 @@ local function IsComplete(questID, questIndex)
         end
 	elseif (IsAdventure(questID) or IsFamily(questID) or IsArgus(questID) or IsBattler(questID) or IsNuisances(questID)
 			or IsMinions(questID)) then return false
-	else return C_QuestLog.IsQuestFlaggedCompleted(questID)
+	else return IsQuestFlaggedCompleted(questID)
 	end
 
 end
@@ -255,12 +227,13 @@ local function MatchesFaction( faction )
     return ( (faction == "both") or (faction == "horde" and showhorde() or (faction == "alliance" and showally())) )
 end
 
-local function ShouldBeShown( questStr )
+function HandyNotes_PetDailies:ShouldBeShown( questStr )
+--local function ShouldBeShown( questStr )
     local questID, questIndex, _, _, coinReward, faction = questStr:match(point_format)
 	questID = tonumber(questID)
 	questIndex = tonumber(questIndex)
     return IsLogged(questID, questIndex) -- true if it doesn't need to be logged or it is still in log
-        and (db.completed or not IsComplete(questID, questIndex) -- true if you want to show complete or it's not complete
+        and (db.completed or not HandyNotes_PetDailies:IsComplete(questID, questIndex) -- true if you want to show complete or it's not complete
 		and (not IsAdventure(questID) or not IsAdventureComplete(questID, questIndex)) -- true if it isn't the Adventure achievement or it isn't completed for Adventure
 		and (not IsArgus(questID) or not IsArgusComplete(questID, questIndex)) -- true if it isn't the Argus achievement or it isn't completed for Argus
 		and (not IsMinions(questID) or not IsMinionsComplete(questID, questIndex)) -- true if it isn't the Minions achievement or it isn't completed for Minions
@@ -290,7 +263,7 @@ end
 local function createAllWaypoints()
 	for mapFile, coords in next, points do
 		for coord, questStr in next, coords do
-			if ( coord and ShouldBeShown(questStr) ) then
+			if ( coord and HandyNotes_PetDailies:ShouldBeShown(questStr) ) then
 				createWaypoint(mapFile, coord)
 			end
 		end
@@ -319,7 +292,7 @@ do
 		while state do -- have we reached the end of this zone?
 			local _, _, _, iconstr, _ = value:match(point_format)
 			local icon = "interface\\icons\\"..iconstr
-			if ShouldBeShown(value) then
+			if HandyNotes_PetDailies:ShouldBeShown(value) then
 				return state, mapFile, icon, db.icon_scale, db.icon_alpha
 			end
 
@@ -348,7 +321,7 @@ do
 				while state do -- have we reached the end of this zone?
 					local _, _,_, iconstr, _ = value:match(point_format)
 					local icon = "interface\\icons\\"..iconstr
-					if (ShouldBeShown(value)) then
+					if (HandyNotes_PetDailies:ShouldBeShown(value)) then
 						return state, uiMapID, icon, db.icon_scale, db.icon_alpha
 					end
 
@@ -491,16 +464,6 @@ local options = {
 -- initialise
 function HandyNotes_PetDailies:OnEnable()
 	self.isEnabled = true
-
---	local HereBeDragons = LibStub("HereBeDragons-1.0", true)
---	if not HereBeDragons then
---		HandyNotes:Print("Your installed copy of HandyNotes is out of date and the Pet Dailies plug-in will not work correctly.  Please update HandyNotes to version 1.4.0 or newer.")
---		return
---	end
-
---	local _, month, _, year = CalendarGetDate()
---	CalendarSetAbsMonth(month, year)
-
 	HandyNotes:RegisterPluginDB("HandyNotes_PetDailies", self, options)
 
 	db = LibStub("AceDB-3.0"):New("HandyNotes_PetDailiesDB", defaults, "Default").profile
@@ -559,16 +522,16 @@ points[422] = {
 	[26185027] = "32869.1:Gorespine:inv_misc_bag_cenarionherbbag:false:both",
 	[26185028] = "32603.2:Gorespine:inv_misc_bag_cenarionherbbag:false:both",
 	[61208760] = "32439.0:Flowing Pandaren Spirit:inv_pet_pandarenelemental:false:both",
-	[61208761] = "9069.15:Flowing Pandaren Spirit:inv_tailoring_elekkplushie:false:both",
+	[61208761] = ADVENTURE..".15:Flowing Pandaren Spirit:inv_tailoring_elekkplushie:false:both",
 	[55003740] = "31957.0:Grand Master Shu:inv_misc_bag_cenarionherbbag:false:both",
-	[55003741] = "9069.41:Wastewalker Shu:inv_tailoring_elekkplushie:false:both",
+	[55003741] = ADVENTURE..".41:Wastewalker Shu:inv_tailoring_elekkplushie:false:both",
 }
 --Krasarang
 points[418] = {
 	[37133351] = "32868.3:Skitterer Xia:inv_misc_bag_cenarionherbbag:false:both",
 	[37133352] = "32603.10:Skitterer Xia:inv_misc_bag_cenarionherbbag:false:both",
 	[65094274] = "31954.0:Grand Master Mo'ruk:inv_misc_bag_cenarionherbbag:false:both",
-	[65094275] = "9069.24:Mo'ruk:inv_tailoring_elekkplushie:false:both",
+	[65094275] = ADVENTURE..".24:Mo'ruk:inv_tailoring_elekkplushie:false:both",
 }
 --KunLaiSummit
 points[379] = {
@@ -577,9 +540,9 @@ points[379] = {
 	[35185618] = "32603.7:Kafi:inv_misc_bag_cenarionherbbag:false:both",
 	[67878470] = "32603.8:Dos'Ryga:inv_misc_bag_cenarionherbbag:false:both",
 	[64809360] = "32441.0:Thundering Pandaren Spirit:inv_pet_pandarenelemental_earth:false:both",
-	[64809361] = "9069.39:Thundering Pandaren Spirit:inv_tailoring_elekkplushie:false:both",
+	[64809361] = ADVENTURE..".39:Thundering Pandaren Spirit:inv_tailoring_elekkplushie:false:both",
 	[35807361] = "31956.0:Grand Master Yon:inv_misc_bag_cenarionherbbag:false:both",
-	[35807360] = "9069.11:Courageous Yon:inv_tailoring_elekkplushie:false:both",
+	[35807360] = ADVENTURE..".11:Courageous Yon:inv_tailoring_elekkplushie:false:both",
 }
 --TheJadeForest
 points[371] = {
@@ -588,25 +551,25 @@ points[371] = {
 	[48427097] = "32603.1:Ka'wi the Gorger:inv_misc_bag_cenarionherbbag:false:both",
 	[57042913] = "32603.9:Nitun:inv_misc_bag_cenarionherbbag:false:both",
 	[28803600] = "32440.0:Whispering Pandaren Spirit:inv_pet_pandarenelemental_air:false:both",
-	[28803601] = "9069.42:Whispering Pandaren Spirit:inv_tailoring_elekkplushie:false:both",
+	[28803601] = ADVENTURE..".42:Whispering Pandaren Spirit:inv_tailoring_elekkplushie:false:both",
 	[48005400] = "31953.0:Grand Master Hyuna:inv_misc_bag_cenarionherbbag:false:both",
-	[48005401] = "9069.19:Hyuna of the Shrines:inv_tailoring_elekkplushie:false:both",
+	[48005401] = ADVENTURE..".19:Hyuna of the Shrines:inv_tailoring_elekkplushie:false:both",
 }
 --TownlongSteppes
 points[388] = {
 	[72267978] = "32869.3:Ti'un the Wanderer:inv_misc_bag_cenarionherbbag:false:both",
 	[72267979] = "32603.9:Ti'un the Wanderer:inv_misc_bag_cenarionherbbag:false:both",
 	[57004220] = "32434.0:Burning Pandaren Spirit:inv_pet_pandarenelemental_fire:false:both",
-	[57004221] = "9069.8:Burning Pandaren Spirit:inv_tailoring_elekkplushie:false:both",
+	[57004221] = ADVENTURE..".8:Burning Pandaren Spirit:inv_tailoring_elekkplushie:false:both",
 	[36205220] = "31991.0:Grand Master Zusshi:inv_misc_bag_cenarionherbbag:false:both",
-	[36205221] = "9069.32:Seeker Zusshi:inv_tailoring_elekkplushie:false:both",
+	[36205221] = ADVENTURE..".32:Seeker Zusshi:inv_tailoring_elekkplushie:false:both",
 }
 --Vale of Eternal Blossoms
 points[390] = {
 	[11007100] = "32869.2:No-No:inv_misc_bag_cenarionherbbag:false:both",
 	[11007101] = "32603.3:No-No:inv_misc_bag_cenarionherbbag:false:both",
 	[31207420] = "31958.0:Grand Master Aki:inv_misc_bag_cenarionherbbag:false:both",
-	[31207421] = "9069.1:Aki the Chosen:inv_tailoring_elekkplushie:false:both",
+	[31207421] = ADVENTURE..".1:Aki the Chosen:inv_tailoring_elekkplushie:false:both",
 }
 --ValleyoftheFourWinds88
 points[376] = {
@@ -615,59 +578,59 @@ points[376] = {
 	[25297855] = "32603.4:Greyhoof:inv_misc_bag_cenarionherbbag:false:both",
 	[40544368] = "32603.5:Lucky Yi:inv_misc_bag_cenarionherbbag:false:both",
 	[46004360] = "31955.0:Grand Master Nishi:inv_misc_bag_cenarionherbbag:false:both",
-	[46004361] = "9069.14:Farmer Nishi:inv_tailoring_elekkplushie:false:both",
+	[46004361] = ADVENTURE..".14:Farmer Nishi:inv_tailoring_elekkplushie:false:both",
 }
 
 --Other Bags
 --Winterspring
 points[83] = {
 	[65606440] =	"31909.0:Stone Cold Trixxy:inv_misc_bag_cenarionherbbag:false:both",
-	[65606441] =	"9069.34:Stone Cold Trixxy:inv_tailoring_elekkplushie:false:both",
+	[65606441] =	ADVENTURE..".34:Stone Cold Trixxy:inv_tailoring_elekkplushie:false:both",
 }
 --Uldum
 points[249] = {
 	[56604180] =	"31971.0:Obalis:inv_misc_bag_cenarionherbbag:false:both",
-	[56604181] =	"9069.29:Obalis:inv_tailoring_elekkplushie:false:both",
+	[56604181] =	ADVENTURE..".29:Obalis:inv_tailoring_elekkplushie:false:both",
 }
 --IcecrownGlacier
 points[118] = {
 	[77401960] =	"31935.0:Major Payne:inv_misc_bag_cenarionherbbag:false:both",
-	[77401961] =	"9069.23:Major Payne:inv_tailoring_elekkplushie:false:both",
+	[77401961] =	ADVENTURE..".23:Major Payne:inv_tailoring_elekkplushie:false:both",
 }
 --ShadowmoonValley
 points[539] = {
 	[30404180] =	"31926.0:Blood Master Antari:inv_misc_bag_cenarionherbbag:false:both",
-	[30404181] =	"9069.5:Bloodknight Antari:inv_tailoring_elekkplushie:false:both",
+	[30404181] =	ADVENTURE..".5:Bloodknight Antari:inv_tailoring_elekkplushie:false:both",
 }
 --DeadwindPass
 points[42] = {
 	[40207640] =	"31916.0:Lydia Accoste:inv_misc_bag_cenarionherbbag:false:both",
-	[40207641] =	"9069.22:Lydia Accoste:inv_tailoring_elekkplushie:false:both",
+	[40207641] =	ADVENTURE..".22:Lydia Accoste:inv_tailoring_elekkplushie:false:both",
 }
 --TimelessIsle
 points[554] = {
 	[34805960] =	"33137.0:Celestial Tournament:inv_misc_trinketpanda_07:false:both",
-	[34805964] =	"9069.4:Blingtron 4000:inv_tailoring_elekkplushie:false:both",
-	[34805969] =	"9069.9:Chen Stormstout:inv_tailoring_elekkplushie:false:both",
-	[34805963] =	"9069.13:Dr. Ion Goldbloom:inv_tailoring_elekkplushie:false:both",
-	[34805961] =	"9069.21:Lorewalker Cho:inv_tailoring_elekkplushie:false:both",
-	[34805962] =	"9069.33:Shademaster Kiryn:inv_tailoring_elekkplushie:false:both",
-	[34805965] =	"9069.35:Sully \"The Pickle\" McLeary:inv_tailoring_elekkplushie:false:both",
-	[34805967] =	"9069.37:Taran Zhu:inv_tailoring_elekkplushie:false:both",
-	[34805966] =	"9069.43:Wise Mari:inv_tailoring_elekkplushie:false:both",
-	[34805968] =	"9069.44:Wrathion:inv_tailoring_elekkplushie:false:both",
+	[34805964] =	ADVENTURE..".4:Blingtron 4000:inv_tailoring_elekkplushie:false:both",
+	[34805969] =	ADVENTURE..".9:Chen Stormstout:inv_tailoring_elekkplushie:false:both",
+	[34805963] =	ADVENTURE..".13:Dr. Ion Goldbloom:inv_tailoring_elekkplushie:false:both",
+	[34805961] =	ADVENTURE..".21:Lorewalker Cho:inv_tailoring_elekkplushie:false:both",
+	[34805962] =	ADVENTURE..".33:Shademaster Kiryn:inv_tailoring_elekkplushie:false:both",
+	[34805965] =	ADVENTURE..".35:Sully \"The Pickle\" McLeary:inv_tailoring_elekkplushie:false:both",
+	[34805967] =	ADVENTURE..".37:Taran Zhu:inv_tailoring_elekkplushie:false:both",
+	[34805966] =	ADVENTURE..".43:Wise Mari:inv_tailoring_elekkplushie:false:both",
+	[34805968] =	ADVENTURE..".44:Wrathion:inv_tailoring_elekkplushie:false:both",
 }
 --CelestialChallenge
 points[571] = {
-	[40005640] =	"9069.4:Blingtron 4000:inv_tailoring_elekkplushie:false:both",
-	[40405660] =	"9069.9:Chen Stormstout:inv_tailoring_elekkplushie:false:both",
-	[40205620] =	"9069.13:Dr. Ion Goldbloom:inv_tailoring_elekkplushie:false:both",
-	[40005260] =	"9069.21:Lorewalker Cho:inv_tailoring_elekkplushie:false:both",
-	[37805720] =	"9069.33:Shademaster Kiryn:inv_tailoring_elekkplushie:false:both",
-	[37805721] =	"9069.35:Sully \"The Pickle\" McLeary:inv_tailoring_elekkplushie:false:both",
-	[40005261] =	"9069.37:Taran Zhu:inv_tailoring_elekkplushie:false:both",
-	[40005262] =	"9069.43:Wise Mari:inv_tailoring_elekkplushie:false:both",
-	[37805722] =	"9069.44:Wrathion:inv_tailoring_elekkplushie:false:both"
+	[40005640] =	ADVENTURE..".4:Blingtron 4000:inv_tailoring_elekkplushie:false:both",
+	[40405660] =	ADVENTURE..".9:Chen Stormstout:inv_tailoring_elekkplushie:false:both",
+	[40205620] =	ADVENTURE..".13:Dr. Ion Goldbloom:inv_tailoring_elekkplushie:false:both",
+	[40005260] =	ADVENTURE..".21:Lorewalker Cho:inv_tailoring_elekkplushie:false:both",
+	[37805720] =	ADVENTURE..".33:Shademaster Kiryn:inv_tailoring_elekkplushie:false:both",
+	[37805721] =	ADVENTURE..".35:Sully \"The Pickle\" McLeary:inv_tailoring_elekkplushie:false:both",
+	[40005261] =	ADVENTURE..".37:Taran Zhu:inv_tailoring_elekkplushie:false:both",
+	[40005262] =	ADVENTURE..".43:Wise Mari:inv_tailoring_elekkplushie:false:both",
+	[37805722] =	ADVENTURE..".44:Wrathion:inv_tailoring_elekkplushie:false:both"
 }
 --Northern Barrens
 points[10] = {
@@ -774,88 +737,88 @@ points[80] = {
 --Hellfire
 points[100] = {
 	[64404920] = 	"31922.0:Nicki Tinytech:inv_misc_coin_01:true:both",
-	[64404921] =	"9069.28:Nicki Tinytech:inv_tailoring_elekkplushie:false:both",
+	[64404921] =	ADVENTURE..".28:Nicki Tinytech:inv_tailoring_elekkplushie:false:both",
 }
 --Zangarmarsh
 points[102] = {
 	[17205040] = 	"31923.0:Ras'an:inv_misc_coin_01:true:both",
-	[17205041] =	"9069.31:Ras'an:inv_tailoring_elekkplushie:false:both",
+	[17205041] =	ADVENTURE..".31:Ras'an:inv_tailoring_elekkplushie:false:both",
 }
 --Nagrand
 points[107] = {
 	[61004940] = 	"31924.0:Narrok:inv_misc_coin_01:true:both",
-	[61004941] =	"9069.26:Narrok:inv_tailoring_elekkplushie:false:both",
+	[61004941] =	ADVENTURE..".26:Narrok:inv_tailoring_elekkplushie:false:both",
 }
 --ShattrathCity
 points[111] = {
 	[59007000] = 	"31925.0:Morulu The Elder:inv_misc_coin_01:true:both",
-	[59007001] =	"9069.25:Morulu the Elder:inv_tailoring_elekkplushie:false:both",
+	[59007001] =	ADVENTURE..".25:Morulu the Elder:inv_tailoring_elekkplushie:false:both",
 }
 --Deepholm
 points[207] = {
 	[49805700] = 	"31973.0:Bordin Steadyfist:inv_misc_coin_01:true:both",
-	[49805701] =	"9069.6:Bordin Steadyfist:inv_tailoring_elekkplushie:false:both",
+	[49805701] =	ADVENTURE..".6:Bordin Steadyfist:inv_tailoring_elekkplushie:false:both",
 }
 --Hyjal
 points[198] = {
 	[61403280] = 	"31972.0:Brok:inv_misc_coin_01:true:both",
-	[61403281] =	"9069.7:Brok:inv_tailoring_elekkplushie:false:both",
+	[61403281] =	ADVENTURE..".7:Brok:inv_tailoring_elekkplushie:false:both",
 }
 --TwilightHighlands
 points[241] = {
 	[56605680] = 	"31974.0:Goz Banefury:inv_misc_coin_01:true:both",
-	[56605681] =	"9069.17:Goz Banefury:inv_tailoring_elekkplushie:false:both",
+	[56605681] =	ADVENTURE..".17:Goz Banefury:inv_tailoring_elekkplushie:false:both",
 }
 --HowlingFjord
 points[117] = {
 	[28603380] = 	"31931.0:Beegle Blastfuse:inv_misc_coin_01:true:both",
-	[28603381] =	"9069.3:Beegle Blastfuse:inv_tailoring_elekkplushie:false:both",
+	[28603381] =	ADVENTURE..".3:Beegle Blastfuse:inv_tailoring_elekkplushie:false:both",
 }
 --ZulDrak
 points[121] = {
 	[13206680] = 	"31934.0:Gutretch:inv_misc_coin_01:true:both",
-	[13206681] =	"9069.18:Gutretch:inv_tailoring_elekkplushie:false:both",
+	[13206681] =	ADVENTURE..".18:Gutretch:inv_tailoring_elekkplushie:false:both",
 }
 --CrystalsongForest
 points[127] = {
 	[50205900] = 	"31932.0:Nearly Headless Jacob:inv_misc_coin_01:true:both",
-	[50205901] =	"9069.27:Nearly Headless Jacob:inv_tailoring_elekkplushie:false:both",
+	[50205901] =	ADVENTURE..".27:Nearly Headless Jacob:inv_tailoring_elekkplushie:false:both",
 }
 --Dragonblight
 points[115] = {
 	[59007700] = 	"31933.0:Okrut Dragonwaste:inv_misc_coin_01:true:both",
-	[59007701] =	"9069.30:Okrut Dragonwaste:inv_tailoring_elekkplushie:false:both",
+	[59007701] =	ADVENTURE..".30:Okrut Dragonwaste:inv_tailoring_elekkplushie:false:both",
 }
 --Tokens
 points[539] = {
 	[50003120] =	"37203.0:Ashlei:achievement_guildperk_honorablemention:false:both",
-	[50003121] =	"9069.2:Ashlei:inv_tailoring_elekkplushie:false:both",
+	[50003121] =	ADVENTURE..".2:Ashlei:inv_tailoring_elekkplushie:false:both",
 
 }
 --SpiresOfArak
 points[542] = {
 	[46204540] =	"37207.0:Vesharr:achievement_guildperk_honorablemention:false:both",
-	[46204541] =	"9069.40:Vesharr:inv_tailoring_elekkplushie:false:both",
+	[46204541] =	ADVENTURE..".40:Vesharr:inv_tailoring_elekkplushie:false:both",
 }
 --Talador
 points[535] = {
 	[49008040] =	"37208.0:Taralune:achievement_guildperk_honorablemention:false:both",
-	[49008041] =	"9069.36:Taralune:inv_tailoring_elekkplushie:false:both",
+	[49008041] =	ADVENTURE..".36:Taralune:inv_tailoring_elekkplushie:false:both",
 }
 --NagrandDraenor
 points[550] = {
 	[56200980] =	"37206.0:Tarr the Terrible:achievement_guildperk_honorablemention:false:both",
-	[56200981] =	"9069.38:Tarr the Terrible:inv_tailoring_elekkplushie:false:both",
+	[56200981] =	ADVENTURE..".38:Tarr the Terrible:inv_tailoring_elekkplushie:false:both",
 }
 --FrostfireRidge88
 points[525] = {
 	[68606460] =	"37205.0:Gargra:achievement_guildperk_honorablemention:false:both",
-	[68606461] =	"9069.16:Gargra:inv_tailoring_elekkplushie:false:both",
+	[68606461] =	ADVENTURE..".16:Gargra:inv_tailoring_elekkplushie:false:both",
 }
 --Gorgrond
 points[543] = {
 	[51007060] =	"37201.0:Cymre Brightblade:achievement_guildperk_honorablemention:false:both",
-	[51007061] =	"9069.12:Cymre Brightblade:inv_tailoring_elekkplushie:false:both",
+	[51007061] =	ADVENTURE..".12:Cymre Brightblade:inv_tailoring_elekkplushie:false:both",
 }
 --Garrison Alliance
 points[579] = {
@@ -874,9 +837,9 @@ points[630] = {
 --DarkmoonFaireIsland
 points[407] = {
 	[47206260] ="32175.0:Jeremy Feasel:Inv_misc_bag_felclothbag:false:both",
-	[47206261] ="9069.20:Jeremy Feasel:inv_tailoring_elekkplushie:false:both",
+	[47206261] =ADVENTURE..".20:Jeremy Feasel:inv_tailoring_elekkplushie:false:both",
 	[47406220] = "36471.0:Christoph VonFeasel:inv_misc_bag_31:false:both",
-	[47406221] = "9069.10:Christoph VonFeasel:inv_tailoring_elekkplushie:false:both",
+	[47406221] = ADVENTURE..".10:Christoph VonFeasel:inv_tailoring_elekkplushie:false:both",
 }
 --Krokuun
 points[830] = {

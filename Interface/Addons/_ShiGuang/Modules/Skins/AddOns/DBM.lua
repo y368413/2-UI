@@ -24,7 +24,7 @@ function S:DBMSkin()
 	end
 
 	if not IsAddOnLoaded("DBM-Core") then return end
-	if not MaoRUIPerDB["Skins"]["DBM"] then return end
+	if not R.db["Skins"]["DBM"] then return end
 
 	local buttonsize = 24
 

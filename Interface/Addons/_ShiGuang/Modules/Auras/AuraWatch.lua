@@ -7,7 +7,7 @@ local updater = CreateFrame("Frame")
 local AuraList, FrameList, UnitIDTable, IntTable, IntCD, myTable, cooldownTable = {}, {}, {}, {}, {}, {}, {}
 local pairs, select, tinsert, tremove, wipe = pairs, select, table.insert, table.remove, table.wipe
 local InCombatLockdown, UnitBuff, UnitDebuff, GetPlayerInfoByGUID, UnitInRaid, UnitInParty = InCombatLockdown, UnitBuff, UnitDebuff, GetPlayerInfoByGUID, UnitInRaid, UnitInParty
-local GetTime, GetSpellInfo, GetSpellCooldown, GetSpellCharges, GetTotemInfo = GetTime, GetSpellInfo, GetSpellCooldown, GetSpellCharges, GetTotemInfo
+local GetTime, GetSpellInfo, GetSpellCooldown, GetSpellCharges, GetTotemInfo, IsPlayerSpell = GetTime, GetSpellInfo, GetSpellCooldown, GetSpellCharges, GetTotemInfo, IsPlayerSpell
 local GetItemCooldown, GetItemInfo, GetInventoryItemLink, GetInventoryItemCooldown = GetItemCooldown, GetItemInfo, GetInventoryItemLink, GetInventoryItemCooldown
 
 -- DataConvert
@@ -35,7 +35,7 @@ local function DataAnalyze(v)
 end
 
 local function InsertData(index, target)
-	if MaoRUIPerDB["AuraWatchList"]["Switcher"][index] then
+	if R.db["AuraWatchList"]["Switcher"][index] then
 		wipe(target)
 	end
 
@@ -52,15 +52,15 @@ local function ConvertTable()
 	for i = 1, 10 do
 		myTable[i] = {}
 		if i < 10 then
-			local value = MaoRUIPerDB["AuraWatchList"][i]
+			local value = R.db["AuraWatchList"][i]
 			if value and next(value) then
 				for spellID, v in pairs(value) do
 					myTable[i][spellID] = DataAnalyze(v)
 				end
 			end
 		else
-			if next(MaoRUIPerDB["InternalCD"]) then
-				for spellID, v in pairs(MaoRUIPerDB["InternalCD"]) do
+			if next(R.db["InternalCD"]) then
+				for spellID, v in pairs(R.db["InternalCD"]) do
 					myTable[i][spellID] = DataAnalyze(v)
 				end
 			end
@@ -123,9 +123,11 @@ local function BuildUnitIDTable()
 end
 
 local function BuildCooldownTable()
+	wipe(cooldownTable)
+
 	for KEY, VALUE in pairs(AuraList) do
 		for spellID, value in pairs(VALUE.List) do
-			if value.SpellID or value.ItemID or value.SlotID or value.TotemID then
+			if value.SpellID and IsPlayerSpell(value.SpellID) or value.ItemID or value.SlotID or value.TotemID then
 				if not cooldownTable[KEY] then cooldownTable[KEY] = {} end
 				cooldownTable[KEY][spellID] = true
 			end
@@ -166,6 +168,13 @@ local function tooltipOnEnter(self)
 	GameTooltip:Show()
 end
 
+function A:RemoveSpellFromAuraList()
+	if IsAltKeyDown() and IsControlKeyDown() and self.type == 4 and self.spellID then
+		R.db["AuraWatchList"]["IgnoreSpells"][self.spellID] = true
+		print(format(U["AddToIgnoreList"], I.NDuiString, self.spellID))
+	end
+end
+
 local function enableTooltip(self)
 	self:EnableMouse(true)
 	self.HL = self:CreateTexture(nil, "HIGHLIGHT")
@@ -173,11 +182,12 @@ local function enableTooltip(self)
 	self.HL:SetAllPoints(self.Icon)
 	self:SetScript("OnEnter", tooltipOnEnter)
 	self:SetScript("OnLeave", M.HideTooltip)
+	self:SetScript("OnMouseDown", A.RemoveSpellFromAuraList)
 end
 
 -- Icon mode
 local function BuildICON(iconSize)
-	iconSize = iconSize * MaoRUIPerDB["AuraWatch"]["IconScale"]
+	iconSize = iconSize * R.db["AuraWatch"]["IconScale"]
 
 	local frame = CreateFrame("Frame", nil, PetBattleFrameHider)
 	frame:SetSize(iconSize, iconSize)
@@ -200,7 +210,7 @@ local function BuildICON(iconSize)
 
 	frame.glowFrame = M.CreateGlowFrame(frame, iconSize)
 
-	if not MaoRUIPerDB["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
+	if not R.db["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
 
 	frame:Hide()
 	return frame
@@ -218,7 +228,7 @@ local function BuildTEXT(iconSize)
 	frame.Count = M.CreateFS(frame, iconSize*.55, "", false, "BOTTOMRIGHT", 6, -3)
 	frame.Spellname = M.CreateFS(frame, 12, "", false, "LEFT", iconSize, -3)
 
-	if not MaoRUIPerDB["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
+	if not R.db["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
 
 	frame:Hide()
 	return frame
@@ -247,7 +257,7 @@ local function BuildBAR(barWidth, iconSize)
 	frame.Spellname:SetWidth(frame.Statusbar:GetWidth()*.65)
 	frame.Spellname:SetJustifyH("LEFT")
 
-	if not MaoRUIPerDB["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
+	if not R.db["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
 
 	frame:Hide()
 	return frame
@@ -276,7 +286,7 @@ local function BuildBAR2(barWidth, iconSize)
 	frame.Spellname:SetWidth(frame.Statusbar:GetWidth()*.65)
 	frame.Spellname:SetJustifyH("LEFT")
 
-	if not MaoRUIPerDB["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
+	if not R.db["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
 
 	frame:Hide()
 	return frame
@@ -342,6 +352,7 @@ local function InitSetup()
 	BuildAuraList()
 	BuildUnitIDTable()
 	BuildCooldownTable()
+	M:RegisterEvent("PLAYER_TALENT_UPDATE", BuildCooldownTable)
 	BuildAura()
 	SetupAnchor()
 end
@@ -444,7 +455,7 @@ function A:AuraWatch_UpdateCD()
 end
 
 -- UpdateAura
-function A:AuraWatch_SetupAura(index, UnitID, name, icon, count, duration, expires, id, filter, flash)
+function A:AuraWatch_SetupAura(index, UnitID, name, icon, count, duration, expires, id, filter, flash, spellID)
 	if not index then return end
 
 	local frames = FrameList[index]
@@ -474,11 +485,14 @@ function A:AuraWatch_SetupAura(index, UnitID, name, icon, count, duration, expir
 	frame.unitID = UnitID
 	frame.id = id
 	frame.filter = filter
+	frame.spellID = spellID
 
 	frames.Index = (frames.Index + 1 > maxFrames) and maxFrames or frames.Index + 1
 end
 
 function A:AuraWatch_UpdateAura(spellID, UnitID, index, bool)
+	if R.db["AuraWatchList"]["IgnoreSpells"][spellID] then return end -- ignore spells
+
 	for KEY, VALUE in pairs(AuraList) do
 		local value = VALUE.List[spellID]
 		if value and value.AuraID and value.UnitID == UnitID then
@@ -505,7 +519,7 @@ function A:AuraWatch_UpdateAura(spellID, UnitID, index, bool)
 				end
 			end
 			if value.Timeless then duration, expires = 0, 0 end
-			return KEY, value.UnitID, name, icon, count, duration, expires, index, filter, value.Flash
+			return KEY, value.UnitID, name, icon, count, duration, expires, index, filter, value.Flash, spellID
 		end
 	end
 	return false
@@ -656,7 +670,7 @@ function A:AuraWatch_UpdateInt(_, ...)
 		if value.OnSuccess then guid, name = sourceGUID, sourceName end
 
 		A:AuraWatch_SetupInt(value.IntID, value.ItemID, value.Duration, value.UnitID, guid, name)
-		if MaoRUIPerDB["AuraWatch"]["QuakeRing"] and spellID == 240447 then PlaySound(soundKitID, "Master") end -- 'Ding' on quake
+		if R.db["AuraWatch"]["QuakeRing"] and spellID == 240447 then PlaySound(soundKitID, "Master") end -- 'Ding' on quake
 
 		cache[timestamp] = spellID
 	end
@@ -684,7 +698,7 @@ end
 
 -- Event
 function A.AuraWatch_OnEvent(event, ...)
-	if not MaoRUIPerDB["AuraWatch"]["Enable"] then
+	if not R.db["AuraWatch"]["Enable"] then
 		M:UnregisterEvent("PLAYER_ENTERING_WORLD", A.AuraWatch_OnEvent)
 		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", A.AuraWatch_OnEvent)
 		return

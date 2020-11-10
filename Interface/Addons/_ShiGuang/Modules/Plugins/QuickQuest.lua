@@ -31,8 +31,8 @@ QuickQuestCheckButton:SetPoint("TOPLEFT", ObjectiveTrackerBlocksFrame.QuestHeade
 QuickQuestCheckButton:SetSize(21, 21)
 QuickQuestCheckButton:SetHitRectInsets(0, -10, 0, 0)
 QuickQuestCheckButton:RegisterEvent("PLAYER_LOGIN")
-QuickQuestCheckButton:SetScript("OnEvent", function(self) self:SetChecked(MaoRUIPerDB["Misc"].AutoQuest) end)
-QuickQuestCheckButton:SetScript("OnClick", function(self) MaoRUIPerDB["Misc"].AutoQuest = self:GetChecked() end)
+QuickQuestCheckButton:SetScript("OnEvent", function(self) self:SetChecked(R.db["Misc"].AutoQuest) end)
+QuickQuestCheckButton:SetScript("OnClick", function(self) R.db["Misc"].AutoQuest = self:GetChecked() end)
 
 -- Main
 local QuickQuest = CreateFrame("Frame")
@@ -41,7 +41,7 @@ QuickQuest:SetScript("OnEvent", function(self, event, ...) self[event](...) end)
 function QuickQuest:Register(event, func)
 	self:RegisterEvent(event)
 	self[event] = function(...)
-		if MaoRUIPerDB["Misc"]["AutoQuest"] and not IsShiftKeyDown() then
+		if R.db["Misc"]["AutoQuest"] and not IsShiftKeyDown() then
 			func(...)
 		end
 	end

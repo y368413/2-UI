@@ -24,7 +24,7 @@ end
 
 local isScaling = false
 function module:UpdateChatSize()
-	if not MaoRUIPerDB["Chat"]["Lock"] then return end
+	if not R.db["Chat"]["Lock"] then return end
 	if isScaling then return end
 	isScaling = true
 
@@ -40,15 +40,15 @@ function module:UpdateChatSize()
 	end
 	ChatFrame1:ClearAllPoints()
 	ChatFrame1:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 21)
-	ChatFrame1:SetWidth(MaoRUIPerDB["Chat"]["ChatWidth"])
-	ChatFrame1:SetHeight(MaoRUIPerDB["Chat"]["ChatHeight"])
+	ChatFrame1:SetWidth(R.db["Chat"]["ChatWidth"])
+	ChatFrame1:SetHeight(R.db["Chat"]["ChatHeight"])
 
 	isScaling = false
 end
 
 local function BlackBackground(self)
 	local frame = M.SetBD(self.Background)
-	frame:SetShown(MaoRUIPerDB["Chat"]["ChatBGType"] == 2)
+	frame:SetShown(R.db["Chat"]["ChatBGType"] == 2)
 
 	return frame
 end
@@ -57,7 +57,7 @@ local function GradientBackground(self)
 	local frame = CreateFrame("Frame", nil, self)
 	frame:SetOutside(self.Background)
 	frame:SetFrameLevel(0)
-	frame:SetShown(MaoRUIPerDB["Chat"]["ChatBGType"] == 3)
+	frame:SetShown(R.db["Chat"]["ChatBGType"] == 3)
 
 	local tex = M.SetGradient(frame, "H", 0, 0, 0, .5, 0)
 	tex:SetOutside()
@@ -76,7 +76,7 @@ function module:SkinChat()
 	self:SetClampRectInsets(0, 0, 0, 0)
 	self:SetMaxResize(I.ScreenWidth, I.ScreenHeight)
 	self:SetMinResize(120, 60)
-	if MaoRUIPerDB["Chat"]["Outline"] then
+	if R.db["Chat"]["Outline"] then
 	  self:SetFont(I.Font[1], fontSize, "OUTLINE")
 	else
 	  self:SetFont(fontStyle, fontSize)
@@ -126,10 +126,10 @@ function module:ToggleChatBackground()
 	for _, chatFrameName in ipairs(CHAT_FRAMES) do
 		local frame = _G[chatFrameName]
 		if frame.__background then
-			frame.__background:SetShown(MaoRUIPerDB["Chat"]["ChatBGType"] == 2)
+			frame.__background:SetShown(R.db["Chat"]["ChatBGType"] == 2)
 		end
 		if frame.__gradient then
-			frame.__gradient:SetShown(MaoRUIPerDB["Chat"]["ChatBGType"] == 3)
+			frame.__gradient:SetShown(R.db["Chat"]["ChatBGType"] == 3)
 		end
 	end
 end
@@ -203,7 +203,7 @@ hooksecurefunc("FloatingChatFrame_OnMouseScroll", module.QuickMouseScroll)
 -- Autoinvite by whisper
 local whisperList = {}
 function module:UpdateWhisperList()
-	M.SplitList(whisperList, MaoRUIPerDB["Chat"]["Keyword"], true)
+	M.SplitList(whisperList, R.db["Chat"]["Keyword"], true)
 end
 
 function module:IsUnitInGuild(unitName)
@@ -230,13 +230,13 @@ function module.OnChatWhisper(event, ...)
 					if gameID then
 						local charName = gameAccountInfo.characterName
 						local realmName = gameAccountInfo.realmName
-						if CanCooperateWithGameAccount(accountInfo) and (not MaoRUIPerDB["Chat"]["GuildInvite"] or module:IsUnitInGuild(charName.."-"..realmName)) then
+						if CanCooperateWithGameAccount(accountInfo) and (not R.db["Chat"]["GuildInvite"] or module:IsUnitInGuild(charName.."-"..realmName)) then
 							BNInviteFriend(gameID)
 						end
 					end
 				end
 			else
-				if not MaoRUIPerDB["Chat"]["GuildInvite"] or IsGuildMember(guid) then
+				if not R.db["Chat"]["GuildInvite"] or IsGuildMember(guid) then
 					InviteToGroup(author)
 				end
 			end
@@ -245,7 +245,7 @@ function module.OnChatWhisper(event, ...)
 end
 
 function module:WhisperInvite()
-	if not MaoRUIPerDB["Chat"]["Invite"] then return end
+	if not R.db["Chat"]["Invite"] then return end
 	self:UpdateWhisperList()
 	M:RegisterEvent("CHAT_MSG_WHISPER", module.OnChatWhisper)
 	M:RegisterEvent("CHAT_MSG_BN_WHISPER", module.OnChatWhisper)
@@ -253,7 +253,7 @@ end
 
 -- Sticky whisper
 function module:ChatWhisperSticky()
-	if MaoRUIPerDB["Chat"]["Sticky"] then
+	if R.db["Chat"]["Sticky"] then
 		ChatTypeInfo["WHISPER"].sticky = 1
 		ChatTypeInfo["BN_WHISPER"].sticky = 1
 	else
@@ -264,20 +264,19 @@ end
 
 -- Tab colors
 function module:UpdateTabColors(selected)
-	if self.glow:IsShown() then
-		if self.whisperIndex == 1 then
-			self.Text:SetTextColor(1, .5, 1)
-		elseif self.whisperIndex == 2 then
-			self.Text:SetTextColor(0, 1, .96)
-		else
-			self.Text:SetTextColor(1, .8, 0)
-		end
-	elseif selected then
+	if selected then
 		self.Text:SetTextColor(1, .8, 0)
 		self.whisperIndex = 0
 	else
 		self.Text:SetTextColor(.5, .5, .5)
-		self.whisperIndex = 0
+	end
+
+	if self.whisperIndex == 1 then
+		self.glow:SetVertexColor(1, .5, 1)
+	elseif self.whisperIndex == 2 then
+		self.glow:SetVertexColor(0, 1, .96)
+	else
+		self.glow:SetVertexColor(1, .8, 0)
 	end
 end
 
@@ -294,7 +293,7 @@ function module:UpdateTabEventColors(event)
 end
 
 function module:OnLogin()
-	fontOutline = MaoRUIPerDB["Skins"]["FontOutline"] and "OUTLINE" or ""
+	fontOutline = R.db["Skins"]["FontOutline"] and "OUTLINE" or ""
 
 	for i = 1, NUM_CHAT_WINDOWS do
 		self.SkinChat(_G["ChatFrame"..i])
@@ -319,6 +318,7 @@ function module:OnLogin()
 
 	-- Default
 	SetCVar("chatStyle", "classic")
+	SetCVar("whisperMode", "inline") -- blizz reset this on NPE
 	M.HideOption(InterfaceOptionsSocialPanelChatStyle)
 	CombatLogQuickButtonFrame_CustomTexture:SetTexture(nil)
 
@@ -331,15 +331,15 @@ function module:OnLogin()
 	self:WhisperInvite()
 
 	-- Lock chatframe
-	if MaoRUIPerDB["Chat"]["Lock"] then
-		self:UpdateChatSize()
+	if R.db["Chat"]["Lock"] then
 		hooksecurefunc("FCF_SavePositionAndDimensions", self.UpdateChatSize)
 		M:RegisterEvent("UI_SCALE_CHANGED", self.UpdateChatSize)
+		self:UpdateChatSize()
 	end
 
 	-- ProfanityFilter
 	if not BNFeaturesEnabledAndConnected() then return end
-	if MaoRUIPerDB["Chat"]["Freedom"] then
+	if R.db["Chat"]["Freedom"] then
 		if GetCVar("portal") == "CN" then
 			ConsoleExec("portal TW")
 		end

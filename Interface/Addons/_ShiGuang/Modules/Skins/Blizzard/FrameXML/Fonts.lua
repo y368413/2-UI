@@ -2,7 +2,7 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 
 tinsert(R.defaultThemes, function()
-	--if not MaoRUIPerDB["Skins"]["FontOutline"] then return end
+	--if not R.db["Skins"]["FontOutline"] then return end
 	-- Refont RaidFrame Health
 	hooksecurefunc("CompactUnitFrame_UpdateStatusText", function(frame)
 		if frame:IsForbidden() then return end

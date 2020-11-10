@@ -10,7 +10,7 @@ local GetInstanceInfo, UnitClassification, UnitExists, InCombatLockdown = GetIns
 local C_Scenario_GetInfo, C_Scenario_GetStepInfo, C_MythicPlus_GetCurrentAffixes = C_Scenario.GetInfo, C_Scenario.GetStepInfo, C_MythicPlus.GetCurrentAffixes
 local UnitGUID, GetPlayerInfoByGUID, Ambiguate = UnitGUID, GetPlayerInfoByGUID, Ambiguate
 local SetCVar, UIFrameFadeIn, UIFrameFadeOut = SetCVar, UIFrameFadeIn, UIFrameFadeOut
-local IsInRaid, IsInGroup, UnitName = IsInRaid, IsInGroup, UnitName
+local IsInRaid, IsInGroup, UnitName, UnitHealth, UnitHealthMax = IsInRaid, IsInGroup, UnitName, UnitHealth, UnitHealthMax
 local GetNumGroupMembers, GetNumSubgroupMembers, UnitGroupRolesAssigned = GetNumGroupMembers, GetNumSubgroupMembers, UnitGroupRolesAssigned
 local C_NamePlate_GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit
 local GetSpellCooldown, GetTime = GetSpellCooldown, GetTime
@@ -19,7 +19,7 @@ local INTERRUPTED = INTERRUPTED
 
 -- Init
 function UF:PlateInsideView()
-	if MaoRUIPerDB["Nameplate"]["InsideView"] then
+	if R.db["Nameplate"]["InsideView"] then
 		SetCVar("nameplateOtherTopInset", .05)
 		SetCVar("nameplateOtherBottomInset", .08)
 	else
@@ -29,23 +29,23 @@ function UF:PlateInsideView()
 end
 
 function UF:UpdatePlateScale()
-	SetCVar("namePlateMinScale", MaoRUIPerDB["Nameplate"]["MinScale"])
-	SetCVar("namePlateMaxScale", MaoRUIPerDB["Nameplate"]["MinScale"])
+	SetCVar("namePlateMinScale", R.db["Nameplate"]["MinScale"])
+	SetCVar("namePlateMaxScale", R.db["Nameplate"]["MinScale"])
 end
 
 function UF:UpdatePlateAlpha()
-	SetCVar("nameplateMinAlpha", MaoRUIPerDB["Nameplate"]["MinAlpha"])
-	SetCVar("nameplateMaxAlpha", MaoRUIPerDB["Nameplate"]["MinAlpha"])
+	SetCVar("nameplateMinAlpha", R.db["Nameplate"]["MinAlpha"])
+	SetCVar("nameplateMaxAlpha", R.db["Nameplate"]["MinAlpha"])
 end
 
 function UF:UpdatePlateSpacing()
-	SetCVar("nameplateOverlapV", MaoRUIPerDB["Nameplate"]["VerticalSpacing"])
+	SetCVar("nameplateOverlapV", R.db["Nameplate"]["VerticalSpacing"])
 end
 
 function UF:UpdateClickableSize()
 	if InCombatLockdown() then return end
-	C_NamePlate.SetNamePlateEnemySize(MaoRUIPerDB["Nameplate"]["PlateWidth"]*MaoRUIDB["UIScale"], MaoRUIPerDB["Nameplate"]["PlateHeight"]*MaoRUIDB["UIScale"]+40)
-	C_NamePlate.SetNamePlateFriendlySize(MaoRUIPerDB["Nameplate"]["PlateWidth"]*MaoRUIDB["UIScale"], MaoRUIPerDB["Nameplate"]["PlateHeight"]*MaoRUIDB["UIScale"]+40)
+	C_NamePlate.SetNamePlateEnemySize(R.db["Nameplate"]["PlateWidth"]*MaoRUIDB["UIScale"], R.db["Nameplate"]["PlateHeight"]*MaoRUIDB["UIScale"]+40)
+	C_NamePlate.SetNamePlateFriendlySize(R.db["Nameplate"]["PlateWidth"]*MaoRUIDB["UIScale"], R.db["Nameplate"]["PlateHeight"]*MaoRUIDB["UIScale"]+40)
 end
 
 function UF:SetupCVars()
@@ -89,16 +89,16 @@ end
 local customUnits = {}
 function UF:CreateUnitTable()
 	wipe(customUnits)
-	if not MaoRUIPerDB["Nameplate"]["CustomUnitColor"] then return end
+	if not R.db["Nameplate"]["CustomUnitColor"] then return end
 	M.CopyTable(R.CustomUnits, customUnits)
-	M.SplitList(customUnits, MaoRUIPerDB["Nameplate"]["UnitList"])
+	M.SplitList(customUnits, R.db["Nameplate"]["UnitList"])
 end
 
 local showPowerList = {}
 function UF:CreatePowerUnitTable()
 	wipe(showPowerList)
 	M.CopyTable(R.ShowPowerList, showPowerList)
-	M.SplitList(showPowerList, MaoRUIPerDB["Nameplate"]["ShowPowerList"])
+	M.SplitList(showPowerList, R.db["Nameplate"]["ShowPowerList"])
 end
 
 function UF:UpdateUnitPower()
@@ -165,12 +165,14 @@ function UF:UpdateColor(_, unit)
 	local isPlayer = self.isPlayer
 	local isFriendly = self.isFriendly
 	local status = self.feedbackUnit and UnitThreatSituation(self.feedbackUnit, unit) or false -- just in case
-	local customColor = MaoRUIPerDB["Nameplate"]["CustomColor"]
-	local secureColor = MaoRUIPerDB["Nameplate"]["SecureColor"]
-	local transColor = MaoRUIPerDB["Nameplate"]["TransColor"]
-	local insecureColor = MaoRUIPerDB["Nameplate"]["InsecureColor"]
-	local revertThreat = MaoRUIPerDB["Nameplate"]["DPSRevertThreat"]
-	local offTankColor = MaoRUIPerDB["Nameplate"]["OffTankColor"]
+	local customColor = R.db["Nameplate"]["CustomColor"]
+	local secureColor = R.db["Nameplate"]["SecureColor"]
+	local transColor = R.db["Nameplate"]["TransColor"]
+	local insecureColor = R.db["Nameplate"]["InsecureColor"]
+	local revertThreat = R.db["Nameplate"]["DPSRevertThreat"]
+	local offTankColor = R.db["Nameplate"]["OffTankColor"]
+	local executeRatio = R.db["Nameplate"]["ExecuteRatio"]
+	local healthPerc = UnitHealth(unit) / (UnitHealthMax(unit) + .0001) * 100
 	local r, g, b
 
 	if not UnitIsConnected(unit) then
@@ -179,18 +181,18 @@ function UF:UpdateColor(_, unit)
 		if isCustomUnit then
 			r, g, b = customColor.r, customColor.g, customColor.b
 		elseif isPlayer and isFriendly then
-			if MaoRUIPerDB["Nameplate"]["FriendlyCC"] then
+			if R.db["Nameplate"]["FriendlyCC"] then
 				r, g, b = M.UnitColor(unit)
 			else
 				r, g, b = .3, .3, 1
 			end
-		elseif isPlayer and (not isFriendly) and MaoRUIPerDB["Nameplate"]["HostileCC"] then
+		elseif isPlayer and (not isFriendly) and R.db["Nameplate"]["HostileCC"] then
 			r, g, b = M.UnitColor(unit)
 		elseif UnitIsTapDenied(unit) and not UnitPlayerControlled(unit) then
 			r, g, b = .6, .6, .6
 		else
 			r, g, b = UnitSelectionColor(unit, true)
-			if status and (MaoRUIPerDB["Nameplate"]["TankMode"] or I.Role == "Tank") then
+			if status and (R.db["Nameplate"]["TankMode"] or I.Role == "Tank") then
 				if status == 3 then
 					if I.Role ~= "Tank" and revertThreat then
 						r, g, b = insecureColor.r, insecureColor.g, insecureColor.b
@@ -218,7 +220,7 @@ function UF:UpdateColor(_, unit)
 		element:SetStatusBarColor(r, g, b)
 	end
 
-	if isCustomUnit or (not MaoRUIPerDB["Nameplate"]["TankMode"] and I.Role ~= "Tank") then
+	if isCustomUnit or (not R.db["Nameplate"]["TankMode"] and I.Role ~= "Tank") then
 		if status and status == 3 then
 			self.ThreatIndicator:SetBackdropBorderColor(1, 0, 0)
 			self.ThreatIndicator:Show()
@@ -230,6 +232,12 @@ function UF:UpdateColor(_, unit)
 		end
 	else
 		self.ThreatIndicator:Hide()
+	end
+
+	if executeRatio > 0 and healthPerc <= executeRatio then
+		self.nameText:SetTextColor(1, 0, 0)
+	else
+		self.nameText:SetTextColor(1, 1, 1)
 	end
 end
 
@@ -252,7 +260,7 @@ end
 -- Target indicator
 function UF:UpdateTargetChange()
 	local element = self.TargetIndicator
-	if MaoRUIPerDB["Nameplate"]["TargetIndicator"] == 1 then return end
+	if R.db["Nameplate"]["TargetIndicator"] == 1 then return end
 
 	if UnitIsUnit(self.unit, "target") and not UnitIsUnit(self.unit, "player") then
 		element:Show()
@@ -262,7 +270,7 @@ function UF:UpdateTargetChange()
 end
 
 function UF:UpdateTargetIndicator()
-	local style = MaoRUIPerDB["Nameplate"]["TargetIndicator"]
+	local style = R.db["Nameplate"]["TargetIndicator"]
 	local element = self.TargetIndicator
 	local isNameOnly = self.isNameOnly
 	if style == 1 then
@@ -368,14 +376,14 @@ local function CheckInstanceStatus()
 end
 
 function UF:QuestIconCheck()
-	if not MaoRUIPerDB["Nameplate"]["QuestIndicator"] then return end
+	if not R.db["Nameplate"]["QuestIndicator"] then return end
 
 	CheckInstanceStatus()
 	M:RegisterEvent("PLAYER_ENTERING_WORLD", CheckInstanceStatus)
 end
 
 function UF:UpdateQuestUnit(_, unit)
-	if not MaoRUIPerDB["Nameplate"]["QuestIndicator"] then return end
+	if not R.db["Nameplate"]["QuestIndicator"] then return end
 	if isInInstance then
 		self.questIcon:Hide()
 		self.questCount:SetText("")
@@ -443,7 +451,7 @@ function UF:UpdateQuestUnit(_, unit)
 end
 
 function UF:AddQuestIcon(self)
-	if not MaoRUIPerDB["Nameplate"]["QuestIndicator"] then return end
+	if not R.db["Nameplate"]["QuestIndicator"] then return end
 
 	local qicon = self:CreateTexture(nil, "OVERLAY", nil, 2)
 	qicon:SetPoint("RIGHT", self, "LEFT", 0, 0)
@@ -466,7 +474,7 @@ end
 
 -- Dungeon progress, AngryKeystones required
 function UF:AddDungeonProgress(self)
-	if not MaoRUIPerDB["Nameplate"]["AKSProgress"] then return end
+	if not R.db["Nameplate"]["AKSProgress"] then return end
 	--self.progressText = M.CreateFS(self, 16, "", false, "LEFT", 0, 0)
 	self.progressText = self:CreateFontString(nil, 'OVERLAY')
 	self.progressText:SetPoint("LEFT", self, "RIGHT", 5, 0)
@@ -528,8 +536,8 @@ function UF:AddCreatureIcon(self)
 
 	local icon = iconFrame:CreateTexture(nil, "ARTWORK")
 	--icon:SetAtlas("VignetteKill")
-	icon:SetPoint("BOTTOM", self, "LEFT", -3, -1)
-	icon:SetSize(26, 26)
+	icon:SetPoint("RIGHT", self, "LEFT", 0, 0)
+	icon:SetSize(21, 21)
 	icon:Hide()
 
 	self.ClassifyIndicator = icon
@@ -594,7 +602,7 @@ local function checkAffixes(event)
 end
 
 function UF:CheckExplosives()
-	if not MaoRUIPerDB["Nameplate"]["ExplosivesScale"] then return end
+	if not R.db["Nameplate"]["ExplosivesScale"] then return end
 
 	M:RegisterEvent("PLAYER_ENTERING_WORLD", checkAffixes)
 end
@@ -626,7 +634,7 @@ function UF:MouseoverIndicator(self)
 	highlight:Hide()
 	local texture = highlight:CreateTexture(nil, "ARTWORK")
 	texture:SetPoint("BOTTOM", self, "BOTTOM", 0, 0)
-	texture:SetSize(MaoRUIPerDB["Nameplate"]["PlateWidth"]+8, MaoRUIPerDB["Nameplate"]["PlateHeight"]+8)
+	texture:SetSize(R.db["Nameplate"]["PlateWidth"]+8, R.db["Nameplate"]["PlateHeight"]+8)
 	texture:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\Modules\\UFs\\hlglow")
 	texture:SetTexCoord(0, 1, 1, 0)
 	texture:SetVertexColor(1, 1, 0)
@@ -686,7 +694,7 @@ end
 local platesList = {}
 function UF:CreatePlates()
 	self.mystyle = "nameplate"
-	self:SetSize(MaoRUIPerDB["Nameplate"]["PlateWidth"], MaoRUIPerDB["Nameplate"]["PlateHeight"])
+	self:SetSize(R.db["Nameplate"]["PlateWidth"], R.db["Nameplate"]["PlateHeight"])
 	self:SetPoint("CENTER")
 	self:SetScale(MaoRUIDB["UIScale"])
 
@@ -701,7 +709,7 @@ function UF:CreatePlates()
 	self.Health = health
 	self.Health.UpdateColor = UF.UpdateColor
 
-	local title = M.CreateFS(self, MaoRUIPerDB["Nameplate"]["NameTextSize"]-1)
+	local title = M.CreateFS(self, R.db["Nameplate"]["NameTextSize"]-1)
 	title:ClearAllPoints()
 	title:SetPoint("TOP", self, "BOTTOM", 0, -10)
 	title:Hide()
@@ -754,7 +762,7 @@ function UF:UpdateTargetClassPower()
 	local playerPlate = _G.oUF_PlayerPlate
 	if not bar or not playerPlate then return end
 
-	if MaoRUIPerDB["Nameplate"]["NameplateClassPower"] then
+	if R.db["Nameplate"]["NameplateClassPower"] then
 		isTargetClassPower = true
 		UF:UpdateClassPowerAnchor()
 	else
@@ -768,14 +776,14 @@ end
 
 function UF:UpdateNameplateAuras()
 	local element = self.Auras
-	if MaoRUIPerDB["Nameplate"]["ShowPlayerPlate"] and MaoRUIPerDB["Nameplate"]["NameplateClassPower"] then
+	if R.db["Nameplate"]["ShowPlayerPlate"] and R.db["Nameplate"]["NameplateClassPower"] then
 		element:SetPoint("BOTTOMLEFT", self.nameText, "TOPLEFT", 0, 10 + _G.oUF_ClassPowerBar:GetHeight())
 	else
 		element:SetPoint("BOTTOMLEFT", self.nameText, "TOPLEFT", 0, 5)
 	end
-	element.numTotal = MaoRUIPerDB["Nameplate"]["maxAuras"]
-	element.size = MaoRUIPerDB["Nameplate"]["AuraSize"]
-	element.showDebuffType = MaoRUIPerDB["Nameplate"]["ColorBorder"]
+	element.numTotal = R.db["Nameplate"]["maxAuras"]
+	element.size = R.db["Nameplate"]["AuraSize"]
+	element.showDebuffType = R.db["Nameplate"]["ColorBorder"]
 	element:SetWidth(self:GetWidth())
 	element:SetHeight((element.size + element.spacing) * 2)
 	element:ForceUpdate()
@@ -783,12 +791,12 @@ end
 
 function UF:RefreshNameplats()
 	for nameplate in pairs(platesList) do
-		nameplate:SetSize(MaoRUIPerDB["Nameplate"]["PlateWidth"], MaoRUIPerDB["Nameplate"]["PlateHeight"])
-		nameplate.nameText:SetFont(I.Font[1], MaoRUIPerDB["Nameplate"]["NameTextSize"], I.Font[3])
-		nameplate.npcTitle:SetFont(I.Font[1], MaoRUIPerDB["Nameplate"]["NameTextSize"]-1, I.Font[3])
-		nameplate.Castbar.Time:SetFont(I.Font[1], MaoRUIPerDB["Nameplate"]["NameTextSize"], I.Font[3])
-		nameplate.Castbar.Text:SetFont(I.Font[1], MaoRUIPerDB["Nameplate"]["NameTextSize"], I.Font[3])
-		nameplate.healthValue:SetFont(I.Font[1], MaoRUIPerDB["Nameplate"]["HealthTextSize"], I.Font[3])
+		nameplate:SetSize(R.db["Nameplate"]["PlateWidth"], R.db["Nameplate"]["PlateHeight"])
+		nameplate.nameText:SetFont(I.Font[1], R.db["Nameplate"]["NameTextSize"], I.Font[3])
+		nameplate.npcTitle:SetFont(I.Font[1], R.db["Nameplate"]["NameTextSize"]-1, I.Font[3])
+		nameplate.Castbar.Time:SetFont(I.Font[1], R.db["Nameplate"]["NameTextSize"], I.Font[3])
+		nameplate.Castbar.Text:SetFont(I.Font[1], R.db["Nameplate"]["NameTextSize"], I.Font[3])
+		nameplate.healthValue:SetFont(I.Font[1], R.db["Nameplate"]["HealthTextSize"], I.Font[3])
 		nameplate.healthValue:UpdateTag()
 		UF.UpdateNameplateAuras(nameplate)
 		UF.UpdateTargetIndicator(nameplate)
@@ -798,7 +806,7 @@ function UF:RefreshNameplats()
 end
 
 function UF:RefreshAllPlates()
-	if MaoRUIPerDB["Nameplate"]["ShowPlayerPlate"] then
+	if R.db["Nameplate"]["ShowPlayerPlate"] then
 		UF:ResizePlayerPlate()
 	end
 	UF:RefreshNameplats()
@@ -864,7 +872,7 @@ end
 function UF:RefreshPlateType(unit)
 	self.reaction = UnitReaction(unit, "player")
 	self.isFriendly = self.reaction and self.reaction >= 5
-	self.isNameOnly = MaoRUIPerDB["Nameplate"]["NameOnlyMode"] and self.isFriendly or self.widgetsOnly or false
+	self.isNameOnly = R.db["Nameplate"]["NameOnlyMode"] and self.isFriendly or self.widgetsOnly or false
 
 	if self.previousType == nil or self.previousType ~= self.isNameOnly then
 		UF.UpdatePlateByType(self)
@@ -922,7 +930,7 @@ end
 local auras = M:GetModule("Auras")
 
 function UF:PlateVisibility(event)
-	local alpha = MaoRUIPerDB["Nameplate"]["PPFadeoutAlpha"]
+	local alpha = R.db["Nameplate"]["PPFadeoutAlpha"]
 	if (event == "PLAYER_REGEN_DISABLED" or InCombatLockdown()) and UnitIsUnit("player", self.unit) then
 		UIFrameFadeIn(self.Health, .3, self.Health:GetAlpha(), 1)
 		UIFrameFadeIn(self.Health.bg, .3, self.Health.bg:GetAlpha(), 1)
@@ -939,10 +947,10 @@ end
 function UF:ResizePlayerPlate()
 	local plate = _G.oUF_PlayerPlate
 	if plate then
-		local barWidth = MaoRUIPerDB["Nameplate"]["PPWidth"]
-		local barHeight = MaoRUIPerDB["Nameplate"]["PPBarHeight"]
-		local healthHeight = MaoRUIPerDB["Nameplate"]["PPHealthHeight"]
-		local powerHeight = MaoRUIPerDB["Nameplate"]["PPPowerHeight"]
+		local barWidth = R.db["Nameplate"]["PPWidth"]
+		local barHeight = R.db["Nameplate"]["PPBarHeight"]
+		local healthHeight = R.db["Nameplate"]["PPHealthHeight"]
+		local powerHeight = R.db["Nameplate"]["PPPowerHeight"]
 
 		plate:SetSize(barWidth, healthHeight + powerHeight + R.mult)
 		plate.mover:SetSize(barWidth, healthHeight + powerHeight + R.mult)
@@ -951,7 +959,7 @@ function UF:ResizePlayerPlate()
 
 		local bars = plate.ClassPower or plate.Runes
 		if bars then
-			local classpowerWidth = MaoRUIPerDB["Nameplate"]["NameplateClassPower"] and MaoRUIPerDB["Nameplate"]["PlateWidth"] or barWidth
+			local classpowerWidth = R.db["Nameplate"]["NameplateClassPower"] and R.db["Nameplate"]["PlateWidth"] or barWidth
 			_G.oUF_ClassPowerBar:SetSize(classpowerWidth, barHeight)
 			local max = bars.__max
 			for i = 1, max do
@@ -969,7 +977,7 @@ function UF:ResizePlayerPlate()
 			end
 		end
 		if plate.dices then
-			local offset = MaoRUIPerDB["Nameplate"]["NameplateClassPower"] and R.margin or (R.margin*2 + barHeight)
+			local offset = R.db["Nameplate"]["NameplateClassPower"] and R.margin or (R.margin*2 + barHeight)
 			local size = (barWidth - 10)/6
 			for i = 1, 6 do
 				local dice = plate.dices[i]
@@ -985,14 +993,14 @@ end
 function UF:CreatePlayerPlate()
 	self.mystyle = "PlayerPlate"
 	self:EnableMouse(false)
-	local healthHeight, powerHeight = MaoRUIPerDB["Nameplate"]["PPHealthHeight"], MaoRUIPerDB["Nameplate"]["PPPowerHeight"]
-	self:SetSize(MaoRUIPerDB["Nameplate"]["PPWidth"], healthHeight + powerHeight + R.mult)
+	local healthHeight, powerHeight = R.db["Nameplate"]["PPHealthHeight"], R.db["Nameplate"]["PPPowerHeight"]
+	self:SetSize(R.db["Nameplate"]["PPWidth"], healthHeight + powerHeight + R.mult)
 
 	UF:CreateHealthBar(self)
 	UF:CreatePowerBar(self)
 	UF:CreateClassPower(self)
 	UF:StaggerBar(self)
-	if MaoRUIPerDB["Auras"]["ClassAuras"] then auras:CreateLumos(self) end
+	if R.db["Auras"]["ClassAuras"] then auras:CreateLumos(self) end
 
 	local textFrame = CreateFrame("Frame", nil, self.Power)
 	textFrame:SetAllPoints()
@@ -1010,14 +1018,14 @@ function UF:TogglePlatePower()
 	local plate = _G.oUF_PlayerPlate
 	if not plate then return end
 
-	plate.powerText:SetShown(MaoRUIPerDB["Nameplate"]["PPPowerText"])
+	plate.powerText:SetShown(R.db["Nameplate"]["PPPowerText"])
 end
 
 function UF:TogglePlateVisibility()
 	local plate = _G.oUF_PlayerPlate
 	if not plate then return end
 
-	if MaoRUIPerDB["Nameplate"]["PPFadeout"] then
+	if R.db["Nameplate"]["PPFadeout"] then
 		plate:RegisterEvent("UNIT_EXITED_VEHICLE", UF.PlateVisibility)
 		plate:RegisterEvent("UNIT_ENTERED_VEHICLE", UF.PlateVisibility)
 		plate:RegisterEvent("PLAYER_REGEN_ENABLED", UF.PlateVisibility, true)
@@ -1073,5 +1081,5 @@ function UF:ToggleGCDTicker()
 	local ticker = plate and plate.GCDTicker
 	if not ticker then return end
 
-	ticker:SetShown(MaoRUIPerDB["Nameplate"]["PPGCDTicker"])
+	ticker:SetShown(R.db["Nameplate"]["PPGCDTicker"])
 end

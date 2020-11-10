@@ -17,6 +17,7 @@ G.DefaultSettings = {
 	TempAnchor = {},
 	AuraWatchList = {
 		Switcher = {},
+		IgnoreSpells = {},
 	},
 	Actionbar = {
 		Enable = true,
@@ -43,7 +44,7 @@ G.DefaultSettings = {
 	Auras = {
 		Reminder = true,
 		Totems = true,
-		VerticleTotems = true,
+		VerticalTotems = true,
 		TotemSize = 32,
 		ClassAuras = false,
 		ReverseBuffs = false,
@@ -164,14 +165,16 @@ G.DefaultSettings = {
 		ChatBGType = 1,
 	},
 	Map = {
-		Coord = true,
+		DisableMap = false,
 		Clock = false,
 		CombatPulse = false,
 		MapScale = 1,
+		MaxMapScale = 1,
 		MinimapScale = 1,
 		ShowRecycleBin = false,
 		WhoPings = true,
 		MapReveal = false,
+		MapRevealGlow = true,
 		Calendar = false,
 		zrMMbordersize = 2,
 		zrMMbuttonsize = 18,
@@ -220,6 +223,7 @@ G.DefaultSettings = {
 		QuestIndicator = true,
 		NameOnlyMode = false,
 		PPGCDTicker = true,
+		ExecuteRatio = 0,
 	},
 	Skins = {
 		DBM = true,
@@ -262,6 +266,7 @@ G.DefaultSettings = {
 		HideJunkGuild = true,
 		AzeriteArmor = true,
 		OnlyArmorIcons = true,
+		ConduitInfo = true,
 		QuestCompleteAnnoce = false,
 	},
 	Misc = {
@@ -358,6 +363,8 @@ G.AccountSettings = {
 	PartyWatcherSpells = {},
 	ContactList = {},
 	CustomJunkList = {},
+	ProfileIndex = {},
+	ProfileNames = {}
 }
 
 -- Initial settings
@@ -397,13 +404,27 @@ local loader = CreateFrame("Frame")
 loader:RegisterEvent("ADDON_LOADED")
 loader:SetScript("OnEvent", function(self, _, addon)
 	if addon ~= "_ShiGuang" then return end
-	if not MaoRUIPerDB["BFA"] then
-		MaoRUIPerDB = {}
-		MaoRUIPerDB["BFA"] = true
+
+	InitialSettings(G.AccountSettings, MaoRUIDB)
+	if not next(MaoRUIPlusDB) then
+		for i = 1, 5 do MaoRUIPlusDB[i] = {} end
 	end
 
-	InitialSettings(G.DefaultSettings, MaoRUIPerDB, true)
-	InitialSettings(G.AccountSettings, MaoRUIDB)
+	if not MaoRUIDB["ProfileIndex"][I.MyFullName] then
+		MaoRUIDB["ProfileIndex"][I.MyFullName] = 1
+	end
+
+	if MaoRUIDB["ProfileIndex"][I.MyFullName] == 1 then
+		R.db = MaoRUIPerDB
+		if not R.db["BFA"] then
+			wipe(R.db)
+			R.db["BFA"] = true
+		end
+	else
+		R.db = MaoRUIPlusDB[MaoRUIDB["ProfileIndex"][I.MyFullName] - 1]
+	end
+	InitialSettings(G.DefaultSettings, R.db, true)
+
 	M:SetupUIScale(true)
 	if not G.TextureList[MaoRUIDB["TexStyle"]] then
 		MaoRUIDB["TexStyle"] = 2 -- reset value if not exists
@@ -484,7 +505,7 @@ local function updateReminder()
 end
 
 local function refreshTotemBar()
-	if not MaoRUIPerDB["Auras"]["Totems"] then return end
+	if not R.db["Auras"]["Totems"] then return end
 	M:GetModule("Auras"):TotemBar_Init()
 end
 
@@ -584,7 +605,7 @@ local function updateRaidHealthMethod()
 end
 
 local function updateSmoothingAmount()
-	M:SetSmoothingAmount(MaoRUIPerDB["UFs"]["SmoothAmount"])
+	M:SetSmoothingAmount(R.db["UFs"]["SmoothAmount"])
 end
 
 local function updateMinimapScale()
@@ -641,7 +662,7 @@ end
 
 local function updateSkinAlpha()
 	for _, frame in pairs(R.frames) do
-		frame:SetBackdropColor(0, 0, 0, MaoRUIPerDB["Skins"]["SkinAlpha"])
+		frame:SetBackdropColor(0, 0, 0, R.db["Skins"]["SkinAlpha"])
 	end
 end
 
@@ -658,6 +679,7 @@ G.TabList = {
 	U["Nameplate"],
 	U["RaidFrame"],
 	U["Auras"],
+	U["Profile"],
 	U["ChatFrame"],
 	U["Skins"],
 	U["Misc"],
@@ -819,6 +841,8 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{3, "Nameplate", "PPPowerHeight", U["PlayerPlate MPHeight"].."*", true, true, {1, 16, 1}, refreshNameplates},
 	},
 	[5] = {
+	},
+	[6] = {
 		{1, "Chat", "Outline", U["Font Outline"]},
 		{1, "Chat", "Sticky", U["Chat Sticky"].."*", true, false, nil, updateChatSticky},
 	{4, "ACCOUNT", "TimestampFormat", U["TimestampFormat"].."*", true, true, {DISABLE, "03:27 PM", "03:27:32 PM", "15:27", "15:27:32"}},
@@ -848,7 +872,7 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{2, "Chat", "Keyword", U["Whisper Keyword"].."*", true, false, nil, updateWhisperList},
 		{2, "ACCOUNT", "ChatFilterWhiteList", "|cff00cc4c"..U["ChatFilterWhiteList"].."*", true, true, nil, updateFilterWhiteList, U["ChatFilterWhiteListTip"]},
 	},
-	[6] = {
+	[7] = {
 		{1, "UFs", "UFFade", U["UFFade"]},
 		{1, "UFs", "UFClassIcon", U["UFClassIcon"], true},
 	  {1, "UFs", "UFPctText", U["UFPctText"], true, true},
@@ -887,7 +911,7 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{4, "ACCOUNT", "NumberFormat", U["Numberize"], true, false, {U["Number Type1"], U["Number Type2"], U["Number Type3"]}},
 		{2, "Misc", "DBMCount", U["Countdown Sec"].."*", true, true},
 	},
-	[7] = {
+	[8] = {
 	  --{1, "Misc", "RaidTool", "|cff00cc4c"..U["Raid Manger"]},
 		--{1, "Misc", "RMRune", U["Runes Check"].."*"},
 		--{1, "Misc", "EasyMarking", U["Easy Mark"].."*"},
@@ -931,7 +955,7 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "CtrlIndicator", U["Shiftfreeze"]},
 		{1, "Misc", "BlinkRogueHelper", U["BlinkRogueHelper"], true},
 	},
-	[8] = {
+	[9] = {
 		{1, "Misc", "ParagonRep", U["ParagonRep"]},
 		{1, "Misc", "TradeTabs", U["TradeTabs"], true},
 		{1, "Misc", "PetFilter", U["Show PetFilter"], true, true},
@@ -992,8 +1016,8 @@ end
 
 local function CreateTab(parent, i, name)
 	local tab = CreateFrame("Button", nil, parent, "BackdropTemplate")
-	tab:SetPoint("TOP", -310 + 88*(i-1) + R.mult, -121)
-	tab:SetSize(90, 30)
+	tab:SetPoint("TOP", -320 + 80*(i-1) + R.mult, -121)
+	tab:SetSize(80, 30)
 	M.CreateBD(tab, .3)
 	M.CreateFS(tab, 15, name, "system", "CENTER", 0, 0)
 	tab.index = i
@@ -1014,9 +1038,9 @@ local function NDUI_VARIABLE(key, value, newValue)
 		end
 	else
 		if newValue ~= nil then
-			MaoRUIPerDB[key][value] = newValue
+			R.db[key][value] = newValue
 		else
-			return MaoRUIPerDB[key][value]
+			return R.db[key][value]
 		end
 	end
 end
@@ -1177,7 +1201,7 @@ local bloodlustFilter = {
 
 function G:ExportGUIData()
 	local text = "UISettings:"..I.Version..":"..I.MyName..":"..I.MyClass
-	for KEY, VALUE in pairs(MaoRUIPerDB) do
+	for KEY, VALUE in pairs(R.db) do
 		if type(VALUE) == "table" then
 			for key, value in pairs(VALUE) do
 				if type(value) == "table" then
@@ -1191,6 +1215,11 @@ function G:ExportGUIData()
 						if key == "Switcher" then
 							for k, v in pairs(value) do
 								text = text..";"..KEY..":"..key..":"..k..":"..tostring(v)
+							end
+						elseif key == "IgnoreSpells" then
+							text = text..";"..KEY..":"..key
+							for spellID in pairs(value) do
+								text = text..":"..tostring(spellID)
 							end
 						else
 							for spellID, k in pairs(value) do
@@ -1213,7 +1242,7 @@ function G:ExportGUIData()
 						end
 					end
 				else
-					if MaoRUIPerDB[KEY][key] ~= G.DefaultSettings[KEY][key] then -- don't export default settings
+					if R.db[KEY][key] ~= G.DefaultSettings[KEY][key] then -- don't export default settings
 						text = text..";"..KEY..":"..key..":"..tostring(value)
 					end
 				end
@@ -1261,6 +1290,10 @@ function G:ExportGUIData()
 			for name, color in pairs(VALUE) do
 				text = text..";ACCOUNT:"..KEY..":"..name..":"..color
 			end
+		elseif KEY == "ProfileIndex" or KEY == "ProfileNames" then
+			for k, v in pairs(VALUE) do
+				text = text..";ACCOUNT:"..KEY..":"..k..":"..v
+			end
 		end
 	end
 
@@ -1279,15 +1312,15 @@ end
 local function reloadDefaultSettings()
 	for i, j in pairs(G.DefaultSettings) do
 		if type(j) == "table" then
-			if not MaoRUIPerDB[i] then MaoRUIPerDB[i] = {} end
+			if not R.db[i] then R.db[i] = {} end
 			for k, v in pairs(j) do
-				MaoRUIPerDB[i][k] = v
+				R.db[i][k] = v
 			end
 		else
-			MaoRUIPerDB[i] = j
+			R.db[i] = j
 		end
 	end
-	MaoRUIPerDB["BFA"] = true -- don't empty data on next loading
+	R.db["BFA"] = true -- don't empty data on next loading
 end
 
 function G:ImportGUIData()
@@ -1307,18 +1340,23 @@ function G:ImportGUIData()
 		local option = options[i]
 		local key, value, arg1 = strsplit(":", option)
 		if arg1 == "true" or arg1 == "false" then
-			MaoRUIPerDB[key][value] = toBoolean(arg1)
+			R.db[key][value] = toBoolean(arg1)
 		elseif arg1 == "EMPTYTABLE" then
-			MaoRUIPerDB[key][value] = {}
+			R.db[key][value] = {}
 		elseif strfind(value, "Color") and (arg1 == "r" or arg1 == "g" or arg1 == "b") then
 			local color = select(4, strsplit(":", option))
-			if MaoRUIPerDB[key][value] then
-				MaoRUIPerDB[key][value][arg1] = tonumber(color)
+			if R.db[key][value] then
+				R.db[key][value][arg1] = tonumber(color)
 			end
 		elseif key == "AuraWatchList" then
 			if value == "Switcher" then
 				local index, state = select(3, strsplit(":", option))
-				MaoRUIPerDB[key][value][tonumber(index)] = toBoolean(state)
+				R.db[key][value][tonumber(index)] = toBoolean(state)
+			elseif value == "IgnoreSpells" then
+				local spells = {select(3, strsplit(":", option))}
+				for _, spellID in next, spells do
+					R.db[key][value][tonumber(spellID)] = true
+				end
 			else
 				local idType, spellID, unit, caster, stack, amount, timeless, combat, text, flash = select(4, strsplit(":", option))
 				value = tonumber(value)
@@ -1329,30 +1367,30 @@ function G:ImportGUIData()
 				timeless = toBoolean(timeless)
 				combat = toBoolean(combat)
 				flash = toBoolean(flash)
-				if not MaoRUIPerDB[key][value] then MaoRUIPerDB[key][value] = {} end
-				MaoRUIPerDB[key][value][arg1] = {idType, spellID, unit, caster, stack, amount, timeless, combat, text, flash}
+				if not R.db[key][value] then R.db[key][value] = {} end
+				R.db[key][value][arg1] = {idType, spellID, unit, caster, stack, amount, timeless, combat, text, flash}
 			end
 		elseif value == "FavouriteItems" then
 			local items = {select(3, strsplit(":", option))}
 			for _, itemID in next, items do
-				MaoRUIPerDB[key][value][tonumber(itemID)] = true
+				R.db[key][value][tonumber(itemID)] = true
 			end
 		elseif key == "Mover" or key == "AuraWatchMover" then
 			local relFrom, parent, relTo, x, y = select(3, strsplit(":", option))
 			value = tonumber(value) or value
 			x = tonumber(x)
 			y = tonumber(y)
-			MaoRUIPerDB[key][value] = {relFrom, parent, relTo, x, y}
+			R.db[key][value] = {relFrom, parent, relTo, x, y}
 		elseif key == "RaidClickSets" then
 			if I.MyClass == class then
-				MaoRUIPerDB[key][value] = {select(3, strsplit(":", option))}
+				R.db[key][value] = {select(3, strsplit(":", option))}
 			end
 		elseif key == "InternalCD" then
 			local spellID, duration, indicator, unit, itemID = select(3, strsplit(":", option))
 			spellID = tonumber(spellID)
 			duration = tonumber(duration)
 			itemID = tonumber(itemID)
-			MaoRUIPerDB[key][spellID] = {spellID, duration, indicator, unit, itemID}
+			R.db[key][spellID] = {spellID, duration, indicator, unit, itemID}
 		elseif key == "ACCOUNT" then
 			if value == "RaidAuraWatch" or value == "CustomJunkList" then
 				local spells = {select(3, strsplit(":", option))}
@@ -1389,13 +1427,19 @@ function G:ImportGUIData()
 				end
 			elseif value == "ContactList" then
 				local name, r, g, b = select(3, strsplit(":", option))
-				MaoRUIDB["ContactList"][name] = r..":"..g..":"..b
+				MaoRUIDB[value][name] = r..":"..g..":"..b
+			elseif value == "ProfileIndex" then
+				local name, index = select(3, strsplit(":", option))
+				MaoRUIDB[value][name] = tonumber(index)
+			elseif value == "ProfileNames" then
+				local index, name = select(3, strsplit(":", option))
+				MaoRUIDB[value][tonumber(index)] = name
 			end
 		elseif tonumber(arg1) then
 			if value == "DBMCount" then
-				MaoRUIPerDB[key][value] = arg1
+				R.db[key][value] = arg1
 			else
-				MaoRUIPerDB[key][value] = tonumber(arg1)
+				R.db[key][value] = tonumber(arg1)
 			end
 		end
 	end
@@ -1415,7 +1459,7 @@ local function updateTooltip()
 	end
 end
 
-local function createDataFrame()
+function G:CreateDataFrame()
 	if dataFrame then dataFrame:Show() return end
 
 	dataFrame = CreateFrame("Frame", nil, UIParent)
@@ -1478,6 +1522,8 @@ local function createDataFrame()
 	end)
 	accept:HookScript("OnLeave", M.HideTooltip)
 	dataFrame.text = accept.text
+
+	G.ProfileDataFrame = dataFrame
 end
 
 local function OpenGUI()
@@ -1522,7 +1568,8 @@ local function OpenGUI()
 		guiPage[i]:SetScrollChild(guiPage[i].child)
 		CreateOption(i)
 	end
-	local reset = M.CreateButton(f, 72, 21, "Reset")
+	G:CreateProfileGUI(guiPage[5]) -- profile GUI
+	--[[local reset = M.CreateButton(f, 72, 21, "Reset")
 	reset:SetPoint("BOTTOM", -330, 66)
 	StaticPopupDialogs["RESET_NDUI"] = {
 		text = CONFIRM_RESET_SETTINGS,
@@ -1559,7 +1606,7 @@ local function OpenGUI()
 		G:ExportGUIData()
 	end)
 
-	--[[local optTip = CreateFrame("Button", nil, f)
+	local optTip = CreateFrame("Button", nil, f)
 	optTip:SetPoint("TOPLEFT", 20, -5)
 	optTip:SetSize(45, 45)
 	optTip.Icon = optTip:CreateTexture(nil, "ARTWORK")

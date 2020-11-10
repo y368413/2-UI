@@ -1,6 +1,6 @@
 ## Interface: 90001
 ## Author: Xinhuan
-## Version: v1.6.0
+## Version: v1.6.0 
 ## Title: HandyNotes
 ## Title-zhCN:|cff0080ff[地图]|r宝藏稀有
 ## Title-zhTW:|cff0080ff[地图]|r寶藏稀有
@@ -8,9 +8,11 @@
 ## Notes-zhCN: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已击杀过。并替换自带飞行地图，使之更加方便详细。
 ## Notes-zhTW: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已擊殺過。并替换自带飞行地图，使之更加方便详细。
 ## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, Handynotes_PandariaDB, HandyNotes_LostAndFoundDB, HandyNotes_TimelessIsleChestsDB, HandyNotes_TimelessTreasuresDB, HandyNotes_DraenorDB, HandyNotes_ArathiDB, HandyNotes_WarfrontTreasuresDB, HandyNotes_BFA_HF_TrackerDB, NPC_Name_CacheDB, Item_Name_CacheDB, HNMoleMachineConfig, HandyNotes_MechagonAndNazjatarDB, HandyNotes_ScarabCoffersDB, HandyNotes_VisionsOfNZothDB, HandyNotes_PetDailiesDB,  HandyNotes_ShrinesForJewelcraftersDB, HandyNotes_Universal_ExplorerDB, HandyNotes_TravelGuideDB, HandyNotes_AzerothsTopTunesDB, HandyNotes_BFA_JellyDB, HandyNotes_HigherDimensionalLearningDB, HandyNotes_WitheredChestsDB, HandyNotes_ShadowlandsDB
-## Dependencies: _ShiGuang
+## Dependencies: _ShiGuang, Blizzard_FlightMap
 
 ## X-Repple: 2 UI
+
+WorldFlightMap.lua
 
 # Locale files
 Locales\Locales.xml
@@ -34,7 +36,8 @@ WOD\HandyNotes_Draenor.lua
 # LEG
 #LEG\HandyNotes_SuramarLeylines.lua
 LEG\HandyNotes_SuramarTelemancy.lua
-LEG\HandyNotes_LegionTreasures.lua
+LEG\HandyNotes_Argus.lua
+##LEG\HandyNotes_LegionTreasures.lua
 
 # BFA
 BFA\HandyNotes_WarfrontRares.lua

@@ -12,7 +12,7 @@ local LE_GARRISON_TYPE_8_0 = Enum.GarrisonType.Type_8_0
 local LE_GARRISON_TYPE_9_0 = Enum.GarrisonType.Type_9_0
 
 function module:CreatePulse()
-	if not MaoRUIPerDB["Map"]["CombatPulse"] then return end
+	if not R.db["Map"]["CombatPulse"] then return end
 
 	local bg = M.SetBD(Minimap)
 	local anim = bg:CreateAnimationGroup()
@@ -51,7 +51,10 @@ end
 
 local function ToggleLandingPage(_, ...)
 	if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
-	if not C_Garrison.HasGarrison(...) then return end
+	if not C_Garrison.HasGarrison(...) then
+		UIErrorsFrame:AddMessage(I.InfoColor..CONTRIBUTION_TOOLTIP_UNLOCKED_WHEN_ACTIVE)
+		return
+	end
 	ShowGarrisonLandingPage(...)
 end
 
@@ -72,17 +75,16 @@ function module:ReskinRegions()
 		end
 	end)
 
-	local menuFrame = CreateFrame("Frame", "NDuiGarrisonTypeMenu", GarrisonLandingPageMinimapButton, "UIDropDownMenuTemplate")
 	local menuList = {
-		{text =	GARRISON_LANDING_PAGE_TITLE, func = ToggleLandingPage, arg1 = LE_GARRISON_TYPE_6_0, notCheckable = true},
-		{text =	ORDER_HALL_LANDING_PAGE_TITLE, func = ToggleLandingPage, arg1 = LE_GARRISON_TYPE_7_0, notCheckable = true},
-		{text =	WAR_CAMPAIGN, func = ToggleLandingPage, arg1 = LE_GARRISON_TYPE_8_0, notCheckable = true},
 		{text =	GARRISON_TYPE_9_0_LANDING_PAGE_TITLE, func = ToggleLandingPage, arg1 = LE_GARRISON_TYPE_9_0, notCheckable = true},
+		{text =	WAR_CAMPAIGN, func = ToggleLandingPage, arg1 = LE_GARRISON_TYPE_8_0, notCheckable = true},
+		{text =	ORDER_HALL_LANDING_PAGE_TITLE, func = ToggleLandingPage, arg1 = LE_GARRISON_TYPE_7_0, notCheckable = true},
+		{text =	GARRISON_LANDING_PAGE_TITLE, func = ToggleLandingPage, arg1 = LE_GARRISON_TYPE_6_0, notCheckable = true},
 	}
-	GarrisonLandingPageMinimapButton:HookScript("OnMouseUp", function(self, btn)
+	GarrisonLandingPageMinimapButton:HookScript("OnMouseDown", function(self, btn)
 		if btn == "RightButton" then
 			HideUIPanel(GarrisonLandingPage)
-			EasyMenu(menuList, menuFrame, self, -80, 0, "MENU", 1)
+			EasyMenu(menuList, M.EasyMenu, self, -80, 0, "MENU", 1)
 		end
 	end)
 	GarrisonLandingPageMinimapButton:SetScript("OnEnter", function(self)
@@ -280,7 +282,7 @@ local SetMrbarMicromenu = {
 
 
 function module:WhoPingsMyMap()
-	if not MaoRUIPerDB["Map"]["WhoPings"] then return end
+	if not R.db["Map"]["WhoPings"] then return end
 	local f = CreateFrame("Frame", nil, Minimap)
 	f:SetAllPoints()
 	f.text = M.CreateFS(f, 14, "", false, "TOP", 0, -3)
@@ -304,13 +306,13 @@ end
 
 function module:UpdateMinimapScale()
 	local size = Minimap:GetWidth()
-	local scale = MaoRUIPerDB["Map"]["MinimapScale"]
+	local scale = R.db["Map"]["MinimapScale"]
 	Minimap:SetScale(scale)
 	Minimap.mover:SetSize(size*scale, size*scale)
 end
 
 function module:ShowMinimapClock()
-	if MaoRUIPerDB["Map"]["Clock"] then
+	if R.db["Map"]["Clock"] then
 		if not TimeManagerClockButton then LoadAddOn("Blizzard_TimeManager") end
 		if not TimeManagerClockButton.styled then
 			TimeManagerClockButton:DisableDrawLayer("BORDER")
@@ -327,7 +329,7 @@ function module:ShowMinimapClock()
 end
 
 function module:ShowCalendar()
-	if MaoRUIPerDB["Map"]["Calendar"] then
+	if R.db["Map"]["Calendar"] then
 		if not GameTimeFrame.styled then
 			GameTimeFrame:SetNormalTexture(nil)
 			GameTimeFrame:SetPushedTexture(nil)

@@ -1,4 +1,4 @@
-﻿--## Version: v20  ## Author: Kemayo
+﻿--## Version: v23  ## Author: Kemayo
 local AppearanceTooltip = {}
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
@@ -47,7 +47,9 @@ function tooltip:ADDON_LOADED(addon)
         merchant = true,
         loot = true,
         encounterjournal = true,
+        setjournal = true,
         appearances_known = {},
+        scan_delay = 0.2,
     })
     db = _G["AppearanceTooltipDB"]
     AppearanceTooltip.db = db
@@ -132,6 +134,10 @@ classwarning:Show()
 
 -- Ye showing:
 GameTooltip:HookScript("OnTooltipSetItem", function(self)
+    AppearanceTooltip:ShowItem(select(2, self:GetItem()))
+end)
+-- This is mostly world quest rewards:
+GameTooltip.ItemTooltip.Tooltip:HookScript("OnTooltipSetItem", function(self)
     AppearanceTooltip:ShowItem(select(2, self:GetItem()))
 end)
 GameTooltip:HookScript("OnHide", function()
@@ -514,29 +520,32 @@ AppearanceTooltip.modifiers = {
 ---
 
 do
-    local scanned
+    local categoryID = 1
     function AppearanceTooltip.UpdateSources()
-        if scanned then return end
-        for categoryID = 1, 28 do
-            local categoryAppearances = C_TransmogCollection.GetCategoryAppearances(categoryID)
-            for _, categoryAppearance in pairs(categoryAppearances) do
-                local appearanceSources = C_TransmogCollection.GetAppearanceSources(categoryAppearance.visualID)
-                local known_any
-                for _, source in pairs(appearanceSources) do
-                    if source.isCollected then
-                        -- it's only worth saving if we know the source
-                        known_any = true
-                    end
-                end
-                if known_any then
-                    AppearanceTooltip.db.appearances_known[categoryAppearance.visualID] = true
-                else
-                    -- cleaning up after unlearned appearances:
-                    AppearanceTooltip.db.appearances_known[categoryAppearance.visualID] = nil
+        if categoryID > 28 then return end
+        local categoryAppearances = C_TransmogCollection.GetCategoryAppearances(categoryID)
+        local acount, scount = 0, 0
+        for _, categoryAppearance in pairs(categoryAppearances) do
+            acount = acount + 1
+            local appearanceSources = C_TransmogCollection.GetAppearanceSources(categoryAppearance.visualID)
+            local known_any
+            for _, source in pairs(appearanceSources) do
+                if source.isCollected then
+                    scount = scount + 1
+                    -- it's only worth saving if we know the source
+                    known_any = true
                 end
             end
+            if known_any then
+                AppearanceTooltip.db.appearances_known[categoryAppearance.visualID] = true
+            else
+                -- cleaning up after unlearned appearances:
+                AppearanceTooltip.db.appearances_known[categoryAppearance.visualID] = nil
+            end
         end
-        scanned = true
+        --AppearanceTooltip.Debug("Updating sources in category", categoryID, "appearances", acount, "sources known", scount)
+        categoryID = categoryID + 1
+        C_Timer.After(db.scan_delay, AppearanceTooltip.UpdateSources)
     end
 end
 
@@ -593,10 +602,37 @@ function AppearanceTooltip.PlayerHasAppearance(itemLinkOrID)
     return false
 end
 
---function AppearanceTooltip.Print(...) print("|cFF33FF99".. myfullname.. "|r:", ...) end
+do
+    local function ColorGradient(perc, ...)
+        if perc >= 1 then
+            local r, g, b = select(select("#", ...) - 2, ...)
+            return r, g, b
+        elseif perc <= 0 then
+            local r, g, b = ...
+            return r, g, b
+        end
 
-local debugf = tekDebug and tekDebug:GetFrame(myname)
-function AppearanceTooltip.Debug(...) if debugf then debugf:AddMessage(string.join(", ", tostringall(...))) end end
+        local num = select("#", ...) / 3
+
+        local segment, relperc = math.modf(perc*(num-1))
+        local r1, g1, b1, r2, g2, b2 = select((segment*3)+1, ...)
+
+        return r1 + (r2-r1)*relperc, g1 + (g2-g1)*relperc, b1 + (b2-b1)*relperc
+    end
+    local function rgb2hex(r, g, b)
+        if type(r) == "table" then
+            g = r.g
+            b = r.b
+            r = r.r
+        end
+        return ("%02x%02x%02x"):format(r*255, g*255, b*255)
+    end
+    function AppearanceTooltip.ColorTextByCompletion(text, perc)
+        return ("|cff%s%s|r"):format(rgb2hex(ColorGradient(perc, 1,0,0, 1,1,0, 0,1,0)), text)
+    end
+end
+
+function AppearanceTooltip.Print(...) print("|cFF33FF99".. myfullname.. "|r:", ...) end
 
 function setDefaults(options, defaults)
     setmetatable(options, { __index = function(t, k)
@@ -1370,15 +1406,17 @@ do
     subText:SetText("These options let you control how transmog availability is shown in various places in the UI")
 
     local bagicon = CreateAtlasMarkup("transmog-icon-hidden")
+    local reverticon = CreateAtlasMarkup("transmog-icon-revert")
 
     local show = panel:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
-    show:SetText(("Show %s icon for unknown items:"):format(bagicon))
+    show:SetText(("Show %s icon for unknown items, and %s icon for unknown items you can't learn on this character:"):format(bagicon, reverticon))
 
     local bags = newCheckbox(panel, 'bags', 'in bags', ("For items whose appearance you don't know, show the %s icon on the item in bags. Works with built-in bags, Baggins, Combuctor, and Inventorian."):format(bagicon))
     local bags_unbound = newCheckbox(panel, 'bags_unbound', '...for non-soulbound items only', "Soulbound items are either known already, or can't be sent to another character")
     local merchant = newCheckbox(panel, 'merchant', 'at merchants', ("For items whose appearance you don't know, show the %s icon on the item in the merchant frame."):format(bagicon))
     local loot = newCheckbox(panel, 'loot', 'in loot', ("For items whose appearance you don't know, show the %s icon on the item in the loot frame."):format(bagicon))
     local encounterjournal = newCheckbox(panel, 'encounterjournal', 'in Encounter Journal', ("For items whose appearance you don't know, show the %s icon on the item in the loot section of the Encounter Journal."):format(bagicon))
+    local setjournal = newCheckbox(panel, 'setjournal', 'in Appearance Sets', ("Show a count of set items known / needed in the sets list"))
 
     show:SetPoint("TOPLEFT", subText, "BOTTOMLEFT", 0, -8)
     bags:SetPoint("TOPLEFT", show, "BOTTOMLEFT", 0, -8)
@@ -1386,6 +1424,7 @@ do
     merchant:SetPoint("TOPLEFT", bags_unbound, "BOTTOMLEFT", -8, -4)
     loot:SetPoint("TOPLEFT", merchant, "BOTTOMLEFT", 0, -4)
     encounterjournal:SetPoint("TOPLEFT", loot, "BOTTOMLEFT", 0, -4)
+    setjournal:SetPoint("TOPLEFT", encounterjournal, "BOTTOMLEFT", 0, -4)
 
     InterfaceOptions_AddCategory(panel)
 end]]
@@ -1403,6 +1442,21 @@ local LAI = LibStub("LibAppropriateItems-1.0")
 
 local f = CreateFrame("Frame")
 f:SetScript("OnEvent", function(self, event, ...) if f[event] then return f[event](f, ...) end end)
+local hooks = {}
+function f:RegisterAddonHook(addon, callback)
+    if IsAddOnLoaded(addon) then
+        callback()
+    else
+        hooks[addon] = callback
+    end
+end
+function f:ADDON_LOADED(addon)
+    if hooks[addon] then
+        hooks[addon]()
+        hooks[addon] = nil
+    end
+end
+f:RegisterEvent("ADDON_LOADED")
 
 local function PrepareItemButton(button, point, offsetx, offsety)
     if button.appearancetooltipoverlay then
@@ -1439,6 +1493,7 @@ local function UpdateOverlay(button, link, ...)
     then
         PrepareItemButton(button, ...)
         if appropriateItem then
+            button.appearancetooltipoverlay.icon:SetAtlas("transmog-icon-hidden")
             if appearanceFromOtherItem then
                 -- blue eye
                 button.appearancetooltipoverlay.icon:SetVertexColor(0, 1, 1)
@@ -1448,6 +1503,7 @@ local function UpdateOverlay(button, link, ...)
             end
         else
             -- yellow eye
+            button.appearancetooltipoverlay.icon:SetAtlas("transmog-icon-revert")
             button.appearancetooltipoverlay.icon:SetVertexColor(1, 1, 0)
         end
         button.appearancetooltipoverlay:Show()
@@ -1522,7 +1578,7 @@ end)
 
 -- Encounter Journal frame
 
-local function HookEncounterJournal()
+f:RegisterAddonHook("Blizzard_EncounterJournal", function()
     hooksecurefunc("EncounterJournal_SetLootButton", function(item)
         if item.appearancetooltipoverlay then item.appearancetooltipoverlay:Hide() end
         if not AppearanceTooltip.db.encounterjournal then return end
@@ -1530,40 +1586,64 @@ local function HookEncounterJournal()
             UpdateOverlay(item, item.link, "TOPLEFT", 4, -4)
         end
     end)
-end
-if IsAddOnLoaded("Blizzard_EncounterJournal") then
-    HookEncounterJournal()
-else
-    function f:ADDON_LOADED(addon)
-        if addon == "Blizzard_EncounterJournal" then
-            HookEncounterJournal()
-            self:UnregisterEvent("ADDON_LOADED")
+end)
+
+-- Sets list
+
+f:RegisterAddonHook("Blizzard_Collections", function()
+    local function setCompletion(setID)
+        local have, need = 0, 0
+        for _, known in pairs(C_TransmogSets.GetSetSources(setID)) do
+            need = need + 1
+            if known then
+                have = have + 1
+            end
+        end
+        return have, need
+    end
+    local function setSort(a, b)
+        return a.uiOrder < b.uiOrder
+    end
+    local function buildSetText(setID)
+        local variants = C_TransmogSets.GetVariantSets(setID)
+        if type(variants) ~= "table" then return "" end
+        table.insert(variants, C_TransmogSets.GetSetInfo(setID))
+        table.sort(variants, setSort)
+        -- local text = setID -- debug
+        local text = ""
+        for _,set in ipairs(variants) do
+            local have, need = setCompletion(set.setID)
+            text = text .. AppearanceTooltip.ColorTextByCompletion((GENERIC_FRACTION_STRING):format(have, need), have / need) .. " \n"
+        end
+        return string.sub(text, 1, -2)
+    end
+    local function update(self)
+        local offset = HybridScrollFrame_GetOffset(self)
+        local buttons = self.buttons
+        for i = 1, #buttons do
+            local button = buttons[i]
+            if button.appearancetooltipoverlay then button.appearancetooltipoverlay.text:SetText("") end
+            if AppearanceTooltip.db.setjournal and button:IsShown() then
+                local setID = button.setID
+                if not button.appearancetooltipoverlay then
+                    button.appearancetooltipoverlay = CreateFrame("Frame", nil, button)
+                    button.appearancetooltipoverlay.text = button.appearancetooltipoverlay:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+                    button.appearancetooltipoverlay:SetAllPoints()
+                    button.appearancetooltipoverlay.text:SetPoint("BOTTOMRIGHT", -2, 2)
+                    button.appearancetooltipoverlay:Show()
+                end
+                button.appearancetooltipoverlay.text:SetText(buildSetText(setID))
+            end
         end
     end
-    f:RegisterEvent("ADDON_LOADED")
-end
+    hooksecurefunc(WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame, "Update", update)
+    hooksecurefunc(WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame, "update", update)
+end)
 
--- Other addons:
-
--- Inventorian
-local inv = LibStub("AceAddon-3.0"):GetAddon("Inventorian", true)
-if inv then
-    hooksecurefunc(inv.Item.prototype, "Update", function(self, ...)
-        UpdateContainerButton(self, self.bag)
-    end)
-end
-
---Baggins:
-if Baggins then
-    hooksecurefunc(Baggins, "UpdateItemButton", function(baggins, bagframe, button, bag, slot)
-        UpdateContainerButton(button, bag)
-    end)
-end
-
---Combuctor:
-if Combuctor then
+-- Combuctor:
+f:RegisterAddonHook("Combuctor", function()
     hooksecurefunc(Combuctor.Item, "Update", function(frame)
         local bag = frame:GetBag()
         UpdateContainerButton(frame, bag)
     end)
-end
+end)

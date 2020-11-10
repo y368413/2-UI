@@ -8,7 +8,7 @@ local fadeInTime, fadeOutTime, maxAlpha, elapsed, runtimer, animScale, iconSize,
 local GetTime, cooldowns, animating, watching = GetTime, {}, {}, {}
 
 function CDS:PulseCD()
-  if not MaoRUIPerDB["Misc"]["PulseCD"] then return end
+  if not R.db["Misc"]["PulseCD"] then return end
 
     local PulseCDAnchor = CreateFrame("Frame", "PulseCDAnchor", UIParent, "BackdropTemplate")
     PulseCDAnchor:SetSize(43, 43)
@@ -16,12 +16,12 @@ function CDS:PulseCD()
 
 local frame = CreateFrame("Frame", "PulseCDFrame", PulseCDAnchor, "BackdropTemplate")
 frame:SetScript("OnEvent", function(self, event, ...) self[event](self, ...) end)
-frame:SetBackdrop({
-	bgFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = framemult,
-	insets = {left = -framemult, right = -framemult, top = -framemult, bottom = -framemult}
-})
-frame:SetBackdropBorderColor(0.37, 0.3, 0.3, 1)
-frame:SetBackdropColor(0, 0, 0, 1)
+--frame:SetBackdrop({
+	--bgFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = framemult,
+	--insets = {left = -framemult, right = -framemult, top = -framemult, bottom = -framemult}
+--})
+--frame:SetBackdropBorderColor(0.37, 0.3, 0.3, 1)
+--frame:SetBackdropColor(0, 0, 0, 1)
 frame:SetPoint("CENTER", PulseCDAnchor, "CENTER")
 
 local icon = frame:CreateTexture(nil, "ARTWORK")

@@ -21,7 +21,7 @@ local currentNumResses, raidcd_width, raidcd_height = 0, 172, 8
 local raidcd_upwards, raidcd_expiration = false,  true
 
 function CDS:RaidCD()
-  if not MaoRUIPerDB["Misc"]["RaidCD"] then return end
+  if not R.db["Misc"]["RaidCD"] then return end
   
 local RaidCDAnchor = CreateFrame("Frame", "RaidCDAnchor", UIParent)
 RaidCDAnchor:SetSize(210, 21)

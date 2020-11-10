@@ -1,4 +1,4 @@
-﻿--## Author: Semlar ## Version: 8.3.0.1
+﻿--## Author: Semlar ## Version: 9.0.0.0
 NomiCakesGossipButtonName = 'GossipTitleButton' -- Allow other addons to override the buttons we hook, if needed
 local HookedButtons = {} -- [button] = true
 local Undiscoverable = { -- List of rank 1 recipes that can't be obtained from nomi
@@ -22,7 +22,9 @@ local Undiscoverable = { -- List of rank 1 recipes that can't be obtained from n
 }
 
 local Requisites = { -- List of recipes you must (probably) already know in order to discover a recipe from nomi
-	-- if we don't know the base rank, add the higher ranks as well
+	-- While technically you need to know the previous rank of a spell to receive the next one,
+	-- we'll use the base rank as the requirement for all ranks because it's more intuitive
+	-- I only want to grey-out recipes that we can't learn because we don't know the base rank
 	--[[
 	-- 7.1 patch notes imply that recipes no longer require knowing other recipes to learn
 	[201506] = {201501}, -- Azshari Salad: Suramar Surf and Turf
@@ -199,10 +201,9 @@ local function DecorateNomi()
 		local _, _, _, _, ingredientIcon = GetItemInfoInstant(ingredientItemID)
 		if count >= 5 then -- we have enough of an ingredient for nomi to display it
 			i = i + 1
-			local buttonName = NomiCakesGossipButtonName .. i
-			local button = _G[buttonName]
-			local buttonIcon = _G[buttonName .. 'GossipIcon'] -- check that the icon is for a work order, otherwise we might overwrite a quest button or something
-			if button and button:IsShown() and buttonIcon and buttonIcon:GetTexture():lower() == 'interface\\gossipframe\\workordergossipicon' then
+			local button = GossipFrame_GetTitleButton(i)
+			local buttonIcon = button.Icon
+			if button and button:IsShown() and buttonIcon and button.type == "Gossip" then
 				if not HookedButtons[button] then
 					button:HookScript('OnEnter', function(self)
 						if not IsNomi then return end
@@ -282,7 +283,7 @@ local function DecorateNomi()
 						end
 						button:SetText(text)
 					end
-					GossipResize(button)
+					button:Resize()
 				end
 			else
 				break
@@ -291,17 +292,19 @@ local function DecorateNomi()
 	end
 end
 
-NomiCakes:SetScript('OnEvent', function(self, event, ...)
-	if event == 'GOSSIP_SHOW' then
-		local guid = UnitGUID('npc')
-		if guid then
-			local _, _, _, _, _, npcID = strsplit('-', guid)
-			if npcID == '101846' then -- Nomi
-				IsNomi = true
-				RequestCookingStuff(DecorateNomi)
-			end
+hooksecurefunc("GossipFrameUpdate", function()
+	local guid = UnitGUID("npc")
+	if guid then
+		local _, _, _, _, _, npcID = strsplit("-", guid)
+		if npcID == "101846" then -- Nomi
+			IsNomi = true
+			RequestCookingStuff(DecorateNomi)
 		end
-	elseif event == 'GOSSIP_CLOSED' then
+	end
+end)
+
+NomiCakes:SetScript('OnEvent', function(self, event, ...)
+	if event == 'GOSSIP_CLOSED' then
 		IsNomi = false
 	elseif event == 'TRADE_SKILL_SHOW' then
 		self:UnregisterEvent('TRADE_SKILL_SHOW')
@@ -332,7 +335,6 @@ NomiCakes:SetScript('OnEvent', function(self, event, ...)
 		end
 	end
 end)
-NomiCakes:RegisterEvent('GOSSIP_SHOW')
 NomiCakes:RegisterEvent('GOSSIP_CLOSED')
 NomiCakes:RegisterEvent('GET_ITEM_INFO_RECEIVED')
 NomiCakes:RegisterEvent('PLAYER_LOGIN')

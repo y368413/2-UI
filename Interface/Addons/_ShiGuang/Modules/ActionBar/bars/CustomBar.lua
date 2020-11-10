@@ -6,7 +6,7 @@ local cfg = R.Bars.bar4
 local margin, padding = R.Bars.margin, R.Bars.padding
 
 function Bar:CreateCustomBar(anchor)
-	local size = MaoRUIPerDB["Actionbar"]["CustomBarButtonSize"]
+	local size = R.db["Actionbar"]["CustomBarButtonSize"]
 	local num = 12
 	local name = "NDui_CustomBar"
 	local page = 8
@@ -34,7 +34,7 @@ function Bar:CreateCustomBar(anchor)
 		tinsert(Bar.buttons, button)
 	end
 
-	if MaoRUIPerDB["Actionbar"]["CustomBarFader"] and cfg.fader then
+	if R.db["Actionbar"]["CustomBarFader"] and cfg.fader then
 		Bar.CreateButtonFrameFader(frame, buttonList, cfg.fader)
 	end
 
@@ -45,9 +45,9 @@ function Bar:UpdateCustomBar()
 	local frame = _G.NDui_CustomBar
 	if not frame then return end
 
-	local size = MaoRUIPerDB["Actionbar"]["CustomBarButtonSize"]
-	local num = MaoRUIPerDB["Actionbar"]["CustomBarNumButtons"]
-	local perRow = MaoRUIPerDB["Actionbar"]["CustomBarNumPerRow"]
+	local size = R.db["Actionbar"]["CustomBarButtonSize"]
+	local num = R.db["Actionbar"]["CustomBarNumButtons"]
+	local perRow = R.db["Actionbar"]["CustomBarNumPerRow"]
 	for i = 1, num do
 		local button = frame.buttons[i]
 		button:SetSize(size, size)
@@ -77,7 +77,7 @@ function Bar:UpdateCustomBar()
 end
 
 function Bar:CustomBar()
-	if MaoRUIPerDB["Actionbar"]["CustomBar"] then
+	if R.db["Actionbar"]["CustomBar"] then
 		Bar:CreateCustomBar({"BOTTOM", UIParent, "BOTTOM", 0, 140})
 	end
 end
