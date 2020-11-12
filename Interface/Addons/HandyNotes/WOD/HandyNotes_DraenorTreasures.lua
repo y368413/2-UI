@@ -1,3 +1,15 @@
+local GetCurrencyInfo = GetCurrencyInfo;
+if GetCurrencyInfo == nil and C_CurrencyInfo.GetCurrencyInfo ~= nil then
+    local __GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
+    GetCurrencyInfo = function(index)
+        if index ~= nil then
+            local info = __GetCurrencyInfo(index);
+            return info.name, info.quantity, info.iconFileID, info.quantityEarnedThisWeek, info.maxWeeklyQuantity, info.maxQuantity, info.discovered, info.quality;
+        end
+	end
+end
+local WorldMapTooltip = WorldMapTooltip or _G.GameTooltip
+
 DraenorTreasures = LibStub("AceAddon-3.0"):NewAddon("DraenorTreasures", "AceBucket-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes", true)
 

@@ -32,9 +32,8 @@
         </Texture>
       </Layer>
       <Layer level="ARTWORK">
-        <Texture parentKey="Icon" file="Interface\Addons\HandyNotes\Icons\Trashpile.blp">
+        <Texture parentKey="Icon" file="Interface\Addons\HandyNotes\Icons\artwork\icons\chest_gray.blp">
           <Size x="25" y="25"/>
-          <!--TexCoords left="0.38" right="0.5" top="0" bottom="0.06" /-->
           <Anchors>
             <Anchor point="TOPLEFT" x="4" y="-4"/>
           </Anchors>
@@ -70,6 +69,22 @@
       <OnLeave function="GameTooltip_Hide"/>
     </Scripts>
   </DropDownToggleButton>
+
+  <Frame name="HandyNotes_ShadowlandsTextMenuOptionTemplate" inherits="UIDropDownCustomMenuEntryTemplate" virtual="true">
+    <Size x="240" y="20"/>
+    <Layers>
+      <Layer>
+        <FontString parentKey="Text" inherits="GameFontHighlightSmallLeft" wordwrap="true" maxLines="2">
+          <Anchors>
+            <Anchor point="TOP"/>
+            <Anchor point="BOTTOM"/>
+            <Anchor point="LEFT"/>
+            <Anchor point="RIGHT"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+  </Frame>
 
   <Frame name="HandyNotes_ShadowlandsSliderMenuOptionTemplate" inherits="UIDropDownCustomMenuEntryTemplate" virtual="true">
     <Size x="240" y="20"/>

@@ -1,6 +1,6 @@
 ## Interface: 90001
 ## Author: Xinhuan
-## Version: v1.6.0 
+## Version: v1.6.0
 ## Title: HandyNotes
 ## Title-zhCN:|cff0080ff[地图]|r宝藏稀有
 ## Title-zhTW:|cff0080ff[地图]|r寶藏稀有
