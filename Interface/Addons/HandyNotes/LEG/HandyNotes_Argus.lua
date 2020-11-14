@@ -17,66 +17,20 @@ local WorldMapTooltip = WorldMapTooltip
 local Argus = LibStub("AceAddon-3.0"):NewAddon("ArgusRaresTreasures", "AceBucket-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes", true)
 local L = LibStub("AceLocale-3.0"):GetLocale("HandyNotes");
-local objAtlas = "Interface\\Addons\\HandyNotes\\Icons\\ObjectIconsAtlas.blp";
+
 local iconDefaults = {
-    skull_grey = "Interface\\Addons\\HandyNotes\\Icons\\RareWhite.blp",
-    skull_purple = "Interface\\Addons\\HandyNotes\\Icons\\RarePurple.blp",
-    skull_blue = "Interface\\Addons\\HandyNotes\\Icons\\RareBlue.blp",
-    skull_yellow = "Interface\\Addons\\HandyNotes\\Icons\\RareYellow.blp",
-    battle_pet = "Interface\\Addons\\HandyNotes\\Icons\\BattlePet.blp",
-	treasure = "Interface\\Addons\\HandyNotes\\Icons\\Treasure.blp",
-	portal = "Interface\\Addons\\HandyNotes\\Icons\\Portal.blp",
-	default = "Interface\\Icons\\TRADE_ARCHAEOLOGY_CHESTOFTINYGLASSANIMALS",
+  skull_grey = "Interface\\Worldmap\\Skull_64Grey.tga",
+  battle_pet = "Interface\\Addons\\HandyNotes\\Icons\\Artwork\\Icons\\paw_yellow.blp",
+	treasure = "Interface\\Addons\\HandyNotes\\Icons\\Artwork\\Icons\\chest_gray.blp",
 	eye = "Interface\\Icons\\INV_Misc_Eye_02.blp",
 	shadowmend = "Interface\\Icons\\Spell_Priest_Shadow Mend.blp",
-	portalGreen = {
-		icon = objAtlas,
-		tCoordLeft = 219/512, tCoordRight = 243/512, tCoordTop = 108/512, tCoordBottom = 129/512,
-	},
-	starChest = {
-		icon = objAtlas,
-		tCoordLeft = 351/512, tCoordRight = 383/512, tCoordTop = 408/512, tCoordBottom = 440/512,
-	},
-	starChestBlue = {
-		icon = "Interface\\Addons\\HandyNotes\\Icons\\shootboxes.blp",
-		tCoordLeft = 6/256, tCoordRight = 58/256, tCoordTop = 6/64, tCoordBottom = 58/64,
-	},
-	starChestPurple = {
-		icon = "Interface\\Addons\\HandyNotes\\Icons\\shootboxes.blp",
-		tCoordLeft = (64+6)/256, tCoordRight = (64+58)/256, tCoordTop = 6/64, tCoordBottom = 58/64,
-	},
-	starChestYellow = {
-		icon = "Interface\\Addons\\HandyNotes\\Icons\\shootboxes.blp",
-		tCoordLeft = (128+6)/256, tCoordRight = (128+58)/256, tCoordTop = 6/64, tCoordBottom = 58/64,
-	},
-	starChestBlank = {
-		icon = "Interface\\Addons\\HandyNotes\\Icons\\shootboxes.blp",
-		tCoordLeft = (192+6)/256, tCoordRight = (192+58)/256, tCoordTop = 6/64, tCoordBottom = 58/64,
-	},
-	skullWhite = {
-		icon = "Interface\\Addons\\HandyNotes\\Icons\\skulls.blp",
-		tCoordLeft = 0/256, tCoordRight = 40/256, tCoordTop = 0/256, tCoordBottom = 40/256,
-	},
-	skullWhiteRedGlow = {
-		icon = "Interface\\Addons\\HandyNotes\\Icons\\skulls.blp",
-		tCoordLeft = 40/256, tCoordRight = 80/256, tCoordTop = 0/256, tCoordBottom = 40/256,
-	},
-	skullWhiteGreenGlow = {
-		icon = "Interface\\Addons\\HandyNotes\\Icons\\skulls.blp",
-		tCoordLeft = 80/256, tCoordRight = 120/256, tCoordTop = 0/256, tCoordBottom = 40/256,
-	},
-	skullBlue = {
-		icon = "Interface\\Addons\\HandyNotes\\Icons\\skulls.blp",
-		tCoordLeft = 0/256, tCoordRight = 40/256, tCoordTop = 40/256, tCoordBottom = 80/256,
-	},
-	skullBlueRedGlow = {
-		icon = "Interface\\Addons\\HandyNotes\\Icons\\skulls.blp",
-		tCoordLeft = 40/256, tCoordRight = 80/256, tCoordTop = 40/256, tCoordBottom = 80/256,
-	},
-	skullBlueGreenGlow = {
-		icon = "Interface\\Addons\\HandyNotes\\Icons\\skulls.blp",
-		tCoordLeft = 80/256, tCoordRight = 120/256, tCoordTop = 40/256, tCoordBottom = 80/256,
-	},
+	portalGreen = "Interface\\Addons\\HandyNotes\\Icons\\Artwork\\Icons\\portal_green.blp",
+	starChestBlue = "Interface\\Addons\\HandyNotes\\Icons\\Artwork\\Icons\\star_chest_blue.blp",
+	starChestPurple = "Interface\\Addons\\HandyNotes\\Icons\\Artwork\\Icons\\star_chest_pink.blp",
+	starChestYellow = "Interface\\Addons\\HandyNotes\\Icons\\Artwork\\Icons\\star_chest_yellow.blp",
+	starChestBlank = "Interface\\Addons\\HandyNotes\\Icons\\Artwork\\Icons\\star_chest_gray.blp",
+	skullWhite = "Interface\\Addons\\HandyNotes\\Icons\\Artwork\\Icons\\skull_white.blp",
+	skullBlue = "Interface\\Addons\\HandyNotes\\Icons\\Artwork\\Icons\\skull_blue.blp",
 }
 local itemTypeMisc = 0;
 local itemTypePet = 1;
@@ -2132,10 +2086,10 @@ end
 function Argus:OnInitialize()
     local defaults = {
         profile = {
-            icon_scale_treasures = 2.0,
-            icon_scale_rares = 1.875,
-            icon_scale_pets = 1.5,
-			icon_scale_sfll = 3.25,
+            icon_scale_treasures = 1.0,
+            icon_scale_rares = 1.25,
+            icon_scale_pets = 1,
+			icon_scale_sfll = 1,
             icon_alpha_treasures = 0.5,
 			icon_alpha_rares = 0.75,
 			icon_alpha_pets = 1.0,

@@ -383,8 +383,9 @@ function module:Chatbar()
 	--combat:SetAttribute("macrotext", "/combatlog")
 	
 	-- WORLD CHANNEL
-	if GetCVar("portal") == "CN" then
-		local channelName, channelID, channels = "大脚世界频道"
+	local locale = GetLocale()
+	if GetCVar("portal") == "CN" and (locale == "zhCN" or locale == "zhTW") then
+		local channelName, channelID, channels = WORLD_CHANNEL_NAME
 		local wc = AddButton(255/255, 200/255, 150/255, "世")  --U["World Channel"]
 
 		local function isInChannel(event)

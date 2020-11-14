@@ -37,7 +37,7 @@ WOD\HandyNotes_Draenor.lua
 #LEG\HandyNotes_SuramarLeylines.lua
 LEG\HandyNotes_SuramarTelemancy.lua
 LEG\HandyNotes_Argus.lua
-##LEG\HandyNotes_LegionTreasures.lua
+LEG\HandyNotes_LegionTreasures.lua
 
 # BFA
 BFA\HandyNotes_WarfrontRares.lua
@@ -63,4 +63,4 @@ Mode\HandyNotes_PetDailies.lua
 # Others files
 CandyBuckets.lua
 BiggerBagChecker.lua
-# WorldFlightMap.lua
+WorldFlightMap.lua

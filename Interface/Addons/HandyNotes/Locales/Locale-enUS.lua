@@ -1351,8 +1351,8 @@ L["anima_shard_61297"] = "Behind a stone pillar."
 L["anima_shard_61298"] = "Sitting behind a lounge chair."
 L["anima_shard_61299"] = "Hidden behind a large torch."
 L["anima_shard_61300"] = "On a ledge hanging over the central font."
-L["options_icons_anima_shard"] = "Lost Anima Shards"
-L["options_icons_anima_shard_desc"] = "Display the locations of all 50 lost anima shards for the Shard Labor achievement."
+L["options_icons_anima_shard"] = "{achievement:14339}"
+L["options_icons_anima_shard_desc"] = "Display the locations of all 50 lost anima shards for the {achievement:14339} achievement."
 
 L["aspirants_rest"] = "Aspirant's Rest"
 L["eternal_gateway"] = "Eternal Gateway"
@@ -1388,6 +1388,8 @@ Gather ingredients from the surrounding mobs and toss them into the pool. Once 3
 
 • Collect {spell:306722} from {npc:165027} and {npc:166438} to the south.
 ]]
+L["Violet"] = nil
+L["Oily"] = nil
 
 L["blackhound_cache"] = "Blackhound Cache"
 L["bladesworn_supply_cache"] = "Bladesworn Supply Cache"
@@ -1440,8 +1442,8 @@ L["lime"] = "Sitting on top of the large bone arch."
 L["moldstopheles"] = "Run around the back of the stalk and jump up the mushroom platforms. For the final platform, use a mount and jump at the corner where it meets the stalk."
 L["pus_in_boots"] = "Located under the bridge."
 
-L["options_icons_slime_cat"] = "Kittens"
-L["options_icons_slime_cat_desc"] = "Display locations of kittens for the Nine Afterlives achievement."
+L["options_icons_slime_cat"] = "{achievement:14634}"
+L["options_icons_slime_cat_desc"] = "Display locations of kittens for the {achievement:14634} achievement."
 
 L["exoramas"] = "Exoramas, House of Rituals"
 L["nurakkir"] = "Nurakkir, House of Eyes"
@@ -1523,7 +1525,9 @@ L["return_to_the_maw"] = "Return to the Maw"
 L["maw_intro_note"] = "Begin the introductory quest chain from {npc:162804} to unlock rares and events in the maw."
 
 L["apholeias_note"] = "With 3 other players, stand on the corners of the platform and cast {spell:331783} to summon the rare."
+L["dekaris_note"] = "On top of a large jutting rock."
 L["ekphoras_note"] = "With 3 other players, stand on the corners of the platform and cast {spell:330650} to summon the rare."
+L["ikras_note"] = "Flies around Perdition Hold. This is a good place to pull him."
 L["orophea_note"] = "Pick up {spell:337143} to the southeast and offer it to {npc:172577} to activate."
 L["sanngror_note"] = "If he is not attackable, wait until he is not experimenting on souls."
 L["talaporas_note"] = "With 3 other players, stand on the corners of the platform and cast {spell:331800} to summon the rare."
@@ -1541,9 +1545,14 @@ Combine all three etchings to create the {item:182329}, which can be used to sum
 ]]
 
 L["soul_well_note"] = "Catch the Stygia erupting from the Soul Well."
-L["obliterated_soul_shards_note"] = "Collect Obliterated Soul Shards on the bridges."
+L["obliterated_soul_shards_note"] = "Collect {item:177834s} on the bridges."
 
-L["chaotic_riftstone_note"] = "Activate to {spell:344157} quickly across the Maw."
+L["chaotic_riftstone_note"] = [[
+Activate to {spell:344157} quickly across the Maw.
+
+Requires the {item:184613} upgrade from {npc:162804}.
+]]
+L["venari_upgrade"] = "{npc:162804} Upgrade"
 
 L["options_icons_bonus_boss"] = "Bonus Elites"
 L["options_icons_bonus_boss_desc"] = "Display locations of bonus elites."
@@ -1556,10 +1565,25 @@ L["options_icons_riftstone_desc"] = "Display the locations of chaotic riftstone 
 ----------------------------------- ICECROWN ----------------------------------
 -------------------------------------------------------------------------------
 
-L["prepatch_intro"] = "Complete the intro quests for the Shadowlands prepatch event to unlock rares in this zone."
-L["icecrown_rares"] = "All rares spawn in a fixed order on a 20 minute interval."
+L["prepatch_intro"] = "Complete the intro quests for the Shadowlands prepatch event to unlock bosses in this zone."
+L["icecrown_rares"] = "All bosses spawn in a fixed order on a 20 minute interval. Each can be looted multiple times a day!"
+L["next_spawn"] = "Next spawn at %s local time."
 L["shared_loot"] = "Shared Loot"
 L["unique_loot"] = "Unique Loot"
+
+local ORIG = "Originally in %s."
+
+L["orig_atk"] = ORIG:format(EJ_GetInstanceInfo(271))
+L["orig_azn"] = ORIG:format(EJ_GetInstanceInfo(272))
+L["orig_dtk"] = ORIG:format(EJ_GetInstanceInfo(273))
+L["orig_fos"] = ORIG:format(EJ_GetInstanceInfo(280))
+L["orig_hor"] = ORIG:format(EJ_GetInstanceInfo(276))
+L["orig_icc"] = ORIG:format(EJ_GetInstanceInfo(758))
+L["orig_nax"] = ORIG:format(EJ_GetInstanceInfo(754))
+L["orig_pos"] = ORIG:format(EJ_GetInstanceInfo(278))
+L["orig_tot"] = ORIG:format(EJ_GetInstanceInfo(284))
+L["orig_utk"] = ORIG:format(EJ_GetInstanceInfo(285))
+L["orig_utp"] = ORIG:format(EJ_GetInstanceInfo(286))
 
 ---------------------------------- VISIBILITY ---------------------------------
 L["options_toggle_chests_desc"] = "Display locations of chests (lootable daily)."

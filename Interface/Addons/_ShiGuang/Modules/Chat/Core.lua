@@ -145,7 +145,7 @@ local cycles = {
 		if GetCVar("portal") ~= "CN" then return false end
 		local channels, inWorldChannel, number = {GetChannelList()}
 		for i = 1, #channels do
-			if channels[i] == "大脚世界频道" then
+			if channels[i] == WORLD_CHANNEL_NAME then
 				inWorldChannel = true
 				number = channels[i-1]
 				break

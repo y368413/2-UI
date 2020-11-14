@@ -99,8 +99,10 @@ function module:UpdateMapScale()
 end
 
 function module:UpdateMapAnchor()
-	module.UpdateMapScale(self)
-	M.RestoreMF(self)
+	if not InCombatLockdown() then
+		module.UpdateMapScale(self)
+		M.RestoreMF(self)
+	end
 end
 
 function module:WorldMapScale()

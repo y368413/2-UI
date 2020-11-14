@@ -301,6 +301,23 @@ function cql.log:SelectQuestID(questID)
     cql:SelectQuestIndex(C_QuestLog.GetLogIndexForQuestID(questID))
 end
 
+-- fix for lightheaded which hooks this deprecated function and calls deprecated GetQuestLogTitle and GetQuestLogSelection
+function cql:SelectQuestIndex(index)
+    if IsAddOnLoaded("LightHeaded") then
+        -- this defines GetQuestLogTitle which is replaced by C_QuestLog.GetInfo in the 9.0 client
+        if not GetQuestLogTitle then
+            GetQuestLogTitle = function(index)
+                local info = C_QuestLog.GetInfo(index)
+                return info.title, info.level, info.suggestedGroup, info.isHeader, info.isCollapsed, info.isComplete, info.frequency, info.questID
+            end
+        end
+        -- this defines GetQuestLogTitle which is replaced by C_QuestLog.GetSelectedQuest in the 9.0 client
+        if not GetQuestLogSelection then
+            GetQuestLogSelection = C_QuestLog.GetSelectedQuest
+        end
+    end
+end
+
 --[[ tooltip ]]
 
 -- onenter of quest log list button, displays a tooltip

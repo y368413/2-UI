@@ -26,7 +26,7 @@ TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN = "|cffFF4040你尚未收藏過此外觀
 TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN = "|cff6060ff你擁有此外觀，但不是來自此物品|r";
 
 WORLD_CHANNEL = "世界頻道";
-WORLD_CHANNEL_NAME = "世界頻道";
+WORLD_CHANNEL_NAME = "大脚世界频道";
 
 STAT_STRENGTH = "力量"; STAT_AGILITY = "敏捷"; STAT_INTELLECT = "智力"; STAT_VERSATILITY = "臨機應變"; STAT_ARMOR = "護甲"; STAT_HASTE = "加速"; STAT_MASTERY = "精通"; STAT_CRITICALSTRIKE = "致命一擊"; STAT_STAMINA = "耐力";
 
@@ -278,49 +278,55 @@ InboxMailBag_RETURNED_7 = "%s 從 %s |cffFFA020 將返回於 %d |4日:日; 後|r
 InboxMailBag_TOTAL = "總計訊息: %d";
 InboxMailBag_TOTAL_MORE = "總計訊息: %d (%d)";
 ----------------CurrencyTracking----------------------
-	CurrencyTracking_Notes = "|cff00CC33追蹤所有獲取的通貨，並顯示在遊戲畫面上|r";
-	CurrencyTracking_Elemental = "元素";
-	CurrencyTracking_Meat = "肉";
-	CurrencyTracking_ADDON_NOTES = "追蹤所有獲取的通貨，並顯示在遊戲畫面上";
-	CurrencyTracking_OPTIONS = "選項";
-	CurrencyTracking_DISPLAYSETTINGS = "顯示設定";
-	CurrencyTracking_OPT_SHOWONSCREEN = "在遊戲畫面上顯示通貨資訊";
-	CurrencyTracking_SHOWTOOLTIP = "顯示提示";
-	CurrencyTracking_SHOWTOOLTIPINFO = "顯示所有貨幣資訊提示";
-	CurrencyTracking_SHOW_MONEY = "顯示現金資訊";
-	CurrencyTracking_ENABLE_SHOW_MONEY_WITH_CURRENCIES = "啟用後顯示貨幣資訊提示和貨幣總金額。";
-	CurrencyTracking_SHOW_ICON = "僅顯示圖示";
-	CurrencyTracking_SHOW_ICON = "僅顯示貨幣或道具的圖示，不顯示金額";
-	CurrencyTracking_RESET_POSITION = "重設位置";
-	CurrencyTracking_RESET_SCREEN_POSITION = "重設遊戲畫面窗格的位置.";
-	CurrencyTracking_BREAKUP_NUMBERS = "千分號";
-	CurrencyTracking_OPT_BREAKUP_NUMBERS = "將數字加上當地語系化千分號";
-	CurrencyTracking_HIDEZERO = "隱藏未獲取的貨幣";
-  CurrencyTracking_AUTOHIDEITEMS = "自動隱藏數值為0的貨幣和道具";
-	CurrencyTracking_ICON_FIRST = "圖示優先";
-	CurrencyTracking_OPT_ICON_PRIORTO_NUMBER = "先顯示通貨圖示再顯示其數量";
-	CurrencyTracking_OPT_ALWAYS_LOCK = "永遠鎖定通貨資訊視窗";
-	CurrencyTracking_OPT_ALWAYS_LOCK_TIP = "啟用則將不僅限於戰鬥中才鎖定。停用則僅會於戰鬥中才鎖定。";
-	CurrencyTracking_OPT_HIDE_IN_PETBATTLE = "寵物對戰時隱藏";
-  CurrencyTracking_OPT_AUTO_HIDE_IN_PETBATTLE = "在寵物對戰開始後自動隱藏框體";
-	-- Scale and Transparency
-  CurrencyTracking_SCALE_TRANSPARENCY = "大小與透明度";
-  CurrencyTracking_ON_SCREEN_FRAME = "遊戲畫面窗格";
-  CurrencyTracking_TOOLTIP = "提示訊息";
-  CurrencyTracking_SCALE = "大小";
-  CurrencyTracking_TRANSPARENCY = "透明度";
-  CurrencyTracking_BACKGROUND = "背景";
-  CurrencyTracking_OPT_BGTRANSPARENCY = "通貨資訊的背景透明度";
-  -- Others
-  CurrencyTracking_MAXITEMS = "Max items per row";
-  CurrencyTracking_MAXITEMSINFO = "Set the maximum number of items to be displayed per row. Set to 0 to allow unlimited items on one single row.";
-  CurrencyTracking_CURRENCY_TO_TRACK = "在遊戲畫面上要追蹤的通貨:";
-  CurrencyTracking_TRACKED_CURRENCY = "追蹤的通貨";
-  CurrencyTracking_TRACKED_ITEMS = "追蹤的物品";
-  CurrencyTracking_PROFILE_OPTIONS = "設定檔選項";
+CurrencyTracking_Notes = "|cff00CC33追蹤所有獲取的通貨，並顯示在遊戲畫面上|r";
+CurrencyTracking_Elemental = "元素";
+CurrencyTracking_Meat = "肉";
+CurrencyTracking_ADDON_NOTES = "追蹤所有獲取的通貨，並顯示在遊戲畫面上";
+CurrencyTracking_OPTIONS = "選項";
+CurrencyTracking_DISPLAYSETTINGS = "顯示設定";
+CurrencyTracking_OPT_SHOWONSCREEN = "在遊戲畫面上顯示通貨資訊";
+CurrencyTracking_SHOWTOOLTIP = "顯示提示";
+CurrencyTracking_SHOWTOOLTIPINFO = "顯示所有貨幣資訊提示";
+CurrencyTracking_SHOW_MONEY = "顯示現金資訊";
+CurrencyTracking_ENABLE_SHOW_MONEY_WITH_CURRENCIES = "啟用後顯示貨幣資訊提示和貨幣總金額。";
+CurrencyTracking_SHOW_ICON = "僅顯示圖示";
+CurrencyTracking_SHOW_ICON = "僅顯示貨幣或道具的圖示，不顯示金額";
+CurrencyTracking_RESET_POSITION = "重設位置";
+CurrencyTracking_RESET_SCREEN_POSITION = "重設遊戲畫面窗格的位置.";
+CurrencyTracking_BREAKUP_NUMBERS = "千分號";
+CurrencyTracking_OPT_BREAKUP_NUMBERS = "將數字加上當地語系化千分號";
+CurrencyTracking_HIDEZERO = "隱藏未獲取的貨幣";
+CurrencyTracking_AUTOHIDEITEMS = "自動隱藏數值為0的貨幣和道具";
+CurrencyTracking_ICON_FIRST = "圖示優先";
+CurrencyTracking_OPT_ICON_PRIORTO_NUMBER = "先顯示通貨圖示再顯示其數量";
+CurrencyTracking_OPT_ALWAYS_LOCK = "永遠鎖定通貨資訊視窗";
+CurrencyTracking_OPT_ALWAYS_LOCK_TIP = "啟用則將不僅限於戰鬥中才鎖定。停用則僅會於戰鬥中才鎖定。";
+CurrencyTracking_OPT_HIDE_IN_PETBATTLE = "寵物對戰時隱藏";
+CurrencyTracking_OPT_AUTO_HIDE_IN_PETBATTLE = "在寵物對戰開始後自動隱藏框體";
+CURRENCYTRACKING_OPT_HIDE_IN_COMBAT = "在戰鬥中隱藏"
+CURRENCYTRACKING_OPT_HIDE_IN_COMBAT_DEC = "在戰鬥中自動隱藏框體。"
+CurrencyTracking_OPT_HIDE_IN_BATTLEGROUND = "在戰場中隱藏"
+CurrencyTracking_OPT_HIDE_IN_BATTLEGROUND_DEC = "在戰場中自動隱藏框體。"
+CurrencyTracking_OPT_HIDE_IN_PETBATTLE = "寵物對戰時隱藏";
+CurrencyTracking_OPT_AUTO_HIDE_IN_PETBATTLE = "在寵物對戰開始後自動隱藏框體";
+-- Scale and Transparency
+CurrencyTracking_SCALE_TRANSPARENCY = "大小與透明度";
+CurrencyTracking_ON_SCREEN_FRAME = "遊戲畫面窗格";
+CurrencyTracking_TOOLTIP = "提示訊息";
+CurrencyTracking_SCALE = "大小";
+CurrencyTracking_TRANSPARENCY = "透明度";
+CurrencyTracking_BACKGROUND = "背景";
+CurrencyTracking_OPT_BGTRANSPARENCY = "通貨資訊的背景透明度";
+-- Others
+CurrencyTracking_MAXITEMS = "Max items per row";
+CurrencyTracking_MAXITEMSINFO = "Set the maximum number of items to be displayed per row. Set to 0 to allow unlimited items on one single row.";
+CurrencyTracking_CURRENCY_TO_TRACK = "在遊戲畫面上要追蹤的通貨:";
+CurrencyTracking_TRACKED_CURRENCY = "追蹤的通貨";
+CurrencyTracking_TRACKED_ITEMS = "追蹤的物品";
+CurrencyTracking_PROFILE_OPTIONS = "設定檔選項";
 ----------------WorldQuest----------------------
 WQACHIEVEMENTS_TITLE = "|cff8080ff[成就]|r世界任务"
-ANGRYWORLDQUEST_TITLE = "||cff0080ff[地圖]|r世界任务"
+ANGRYWORLDQUEST_TITLE = "|cff0080ff[地圖]|r世界任务"
 
 U["Damage"] = "傷害"  
 U["PlayerFrame Scale"] = "頭像縮放"

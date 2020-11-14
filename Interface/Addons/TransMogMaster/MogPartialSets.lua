@@ -86,7 +86,13 @@ function MogPartialSets:initConfiguration()
         self:setDefaultConfiguration()
         return
     end
-        --self:setDefaultConfiguration()
+                MogPartialSetsAddonConfig.ignoredSlotMap = {}
+
+                if MogPartialSetsAddonConfig.ignoreBracers then
+                    MogPartialSetsAddonConfig.ignoredSlotMap[Enum.InventoryType.IndexWristType] = true
+                end
+
+                MogPartialSetsAddonConfig.ignoreBracers = nil
 end
 
 function MogPartialSets:setDefaultConfiguration()

@@ -1287,13 +1287,13 @@ L["anima_shard_61292"] = "在石牌坊的顶部。"
 L["anima_shard_61293"] = "在较低水平的细石柱上。"
 L["anima_shard_61294"] = "隐藏在一堆桶后面。"
 L["anima_shard_61295"] = "在书架上 {npc:156889} 后面。"
-L["anima_shard_61296"] = "在倒下的大钟后面。"
-L["anima_shard_61297"] = "在石柱后面。"
+L["anima_shard_61296"] = "在倒下的大钟后面。\n\n'通灵战潮地下城内。'"
+L["anima_shard_61297"] = "在石柱后面。\n\n'通灵战潮地下城内。'"
 L["anima_shard_61298"] = "坐在躺椅后面。"
 L["anima_shard_61299"] = "隐藏在大火炬的后面。"
 L["anima_shard_61300"] = "挂在中央字体的壁架上。"
-L["options_icons_anima_shard"] = "失落的心能碎片"
-L["options_icons_anima_shard_desc"] = "显示“碎片苦工”成就所需的全部50个失落的心能碎片。"
+L["options_icons_anima_shard"] = "{achievement:14339}"
+L["options_icons_anima_shard_desc"] = "显示 {achievement:14339} 成就中全部50个失落的心能碎片的位置。"
 
 L["aspirants_rest"] = "候选者之憩"
 L["eternal_gateway"] = "永恒之门"
@@ -1329,6 +1329,8 @@ L["mixed_pool_note"] = [[
 
 • 从南侧的 {npc:165027} 和 {npc:166438} 收集 {spell:306722}。
 ]]
+L["Violet"] = "绛紫之误"
+L["Oily"] = "油腻的无脊者"
 
 L["blackhound_cache"] = "黑犬宝箱"
 L["bladesworn_supply_cache"] = "刃誓补给箱"
@@ -1381,8 +1383,8 @@ L["lime"] = "坐在大骨头拱顶上。"
 L["moldstopheles"] = "绕到茎秆后面并跳上蘑菇平台。到达最后的平台，使用坐骑并在茎秆上跳来跳去到达。"
 L["pus_in_boots"] = "在桥的下面。"
 
-L["options_icons_slime_cat"] = "猫咪"
-L["options_icons_slime_cat_desc"] = "显示成就亡命九条的猫咪位置。"
+L["options_icons_slime_cat"] = "{achievement:14634}"
+L["options_icons_slime_cat_desc"] = "显示 {achievement:14634} 成就中猫咪的位置。"
 
 L["exoramas"] = "埃索拉玛斯，祭仪密院"
 L["nurakkir"] = "努拉基尔，锐眼密院"
@@ -1432,7 +1434,6 @@ L["remlates_cache_note"] = "在暗湾镇墓穴后面的外墙上。"
 L["taskmaster_trove_note"] = "阅读Ingress and Egress Rites然后小心地走到宝箱。"
 L["the_count_note"] = "获得99个 {currency:1820} 末日迷沼然后把它带给 {npc:173488}。"
 
-L["abandoned_curios"] = "被遗弃的奇珍"
 L["bleakwood_chest"] = "冷木宝箱"
 L["forgotten_anglers_rod"] = "被遗忘的渔翁之竿"
 
@@ -1464,7 +1465,9 @@ L["return_to_the_maw"] = "重返噬渊"
 L["maw_intro_note"] = "从 {npc:162804} 开始指引任务线以解锁噬渊的稀有和事件。"
 
 L["apholeias_note"] = "和3名其他玩家，站在平台的角落并施放 {spell:331783} 召唤稀有。"
+L["dekaris_note"] = "在一块凸起的大岩石上。"
 L["ekphoras_note"] = "和3名其他玩家，站在平台的角落并施放 {spell:330650} 召唤稀有。"
+L["ikras_note"] = "在破灭堡飞来飞去。这里是攻击他的好位置。"
 L["orophea_note"] = "从东南方的拾取 {spell:337143} 并提供给 {npc:172577} 激活。"
 L["sanngror_note"] = "如果他是不可攻击，等待直到他不再灵魂实验。"
 L["talaporas_note"] = "和3名其他玩家，站在平台的角落并施放 {spell:331800} 召唤稀有。"
@@ -1482,9 +1485,14 @@ L["exos_note"] = [[
 ]]
 
 L["soul_well_note"] = "从灵魂之井抓住冥殇爆发。"
-L["obliterated_soul_shards_note"] = "在桥上收集灭绝之魂碎片。"
+L["obliterated_soul_shards_note"] = "在桥上收集 {item:177834}。"
 
-L["chaotic_riftstone_note"] = "激活 {spell:344157} 快速穿过噬渊。"
+L["chaotic_riftstone_note"] = [[
+激活 {spell:344157} 快速穿过噬渊。"
+
+需要从 {npc:162804} 升级 {item:184613}。
+]]
+L["venari_upgrade"] = "{npc:162804} 升级"
 
 L["options_icons_bonus_boss"] = "奖励精英"
 L["options_icons_bonus_boss_desc"] = "显示奖励精英位置。"
@@ -1497,10 +1505,26 @@ L["options_icons_riftstone_desc"] = "显示混乱裂隙石传送者位置。"
 ----------------------------------- ICECROWN ----------------------------------
 -------------------------------------------------------------------------------
 
-L["prepatch_intro"] = "完成暗影国度前夕事件指引任务解锁此区域的稀有。"
-L["icecrown_rares"] = "所有稀有以固定的顺序每20分钟刷新一个。"
+L["prepatch_intro"] = "完成暗影国度前夕事件指引任务解锁此区域的首领。"
+L["icecrown_rares"] = "所有首领以固定的顺序每20分钟刷新一个。每个可以在一天拾取多次。"
+L["next_spawn"] = "下次刷新在 %s 本地时间。"
 L["shared_loot"] = "共享拾取"
 L["unique_loot"] = "独立拾取"
+local ORIG = "原本位于%s。"
+
+L["orig_atk"] = ORIG:format(EJ_GetInstanceInfo(271))
+L["orig_azn"] = ORIG:format(EJ_GetInstanceInfo(272))
+L["orig_dtk"] = ORIG:format(EJ_GetInstanceInfo(273))
+L["orig_fos"] = ORIG:format(EJ_GetInstanceInfo(280))
+L["orig_hor"] = ORIG:format(EJ_GetInstanceInfo(276))
+L["orig_icc"] = ORIG:format(EJ_GetInstanceInfo(758))
+L["orig_nax"] = ORIG:format(EJ_GetInstanceInfo(754))
+L["orig_pos"] = ORIG:format(EJ_GetInstanceInfo(278))
+L["orig_tot"] = ORIG:format(EJ_GetInstanceInfo(284))
+L["orig_utk"] = ORIG:format(EJ_GetInstanceInfo(285))
+L["orig_utp"] = ORIG:format(EJ_GetInstanceInfo(286))
+
+
 ----------------------------------- VOLDUN ------------------------------------
 
 L["voldun"] = "沃顿"
