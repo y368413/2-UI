@@ -27,13 +27,12 @@ local function poi_texture(poi)
 end
 local function atlas_texture(atlas, scale)
     if not icon_cache[atlas] then
-        local texture, _, _, left, right, top, bottom = GetAtlasInfo(atlas)
         icon_cache[atlas] = {
-            icon = texture,
-            tCoordLeft = left,
-            tCoordRight = right,
-            tCoordTop = top,
-            tCoordBottom = bottom,
+            icon = C_Texture.GetAtlasInfo(atlas).file,
+            tCoordLeft = C_Texture.GetAtlasInfo(atlas).leftTexCoord,
+            tCoordRight = C_Texture.GetAtlasInfo(atlas).rightTexCoord,
+            tCoordTop = C_Texture.GetAtlasInfo(atlas).topTexCoord,
+            tCoordBottom = C_Texture.GetAtlasInfo(atlas).bottomTexCoord,
             scale = scale or 1,
             r = 1, g = 1, b = 1,
         }

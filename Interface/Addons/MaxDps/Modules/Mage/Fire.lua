@@ -513,7 +513,7 @@ function Mage:FireStandardRotation()
 	end
 
 	-- phoenix_flames,if=(buff.heating_up.react|(!buff.hot_streak.react&(action.fire_blast.charges>0|talent.searing_touch.enabled&target.health.pct<=30)))&!variable.phoenix_pooling;
-	if talents[FR.PhoenixFlames] and (
+	if talents[FR.PhoenixFlames] and cooldown[FR.PhoenixFlames].ready and (
 		buff[FR.HeatingUp].up or
 			(
 				not buff[FR.HotStreak].up and (

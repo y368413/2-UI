@@ -139,9 +139,8 @@ end
 local function IsLogged(questID, questIndex)
     if (questIndex > 0 and not IsAdventure(questID) and not IsFamily(questID) and not IsBattler(questID)
 			and not IsArgus(questID) and not IsNuisances(questID) and not IsMinions(questID)) then
-        if (GetQuestLogIndexByID(questID) > 0) then return true
-        else return false
-        end
+        local q = GetQuestLogIndexByID(questID)
+        return (q ~= nil and q > 0)
     else return true --shouldn't be logged so just say it is
     end
 end

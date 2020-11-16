@@ -1,4 +1,4 @@
-﻿-- $Id: Constants.lua 197 2020-08-09 12:23:46Z arith $
+﻿-- $Id: Constants.lua 204 2020-11-15 14:08:53Z arith $
 local _G = getfenv(0)
 local constants = {}
 
@@ -1846,6 +1846,8 @@ constants.items = {
 		},
 	},
 	others = {
+		180720, -- Pitch Black Scourgestone
+		183200, -- Darkened Scourgestone
 		173363, -- Vessel of Horrific Visions
 		163036, -- Polished Pet Charm, added in patch 8.0.1.26624
 		157796, -- Purified Titan Essence, added in 7.3.5.25807

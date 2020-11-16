@@ -41,67 +41,48 @@ function DeathKnight:Blood()
 	local fd = MaxDps.FrameData;
 	local cooldown, buff, debuff, timeShift, talents, azerite, currentSpell =
 	fd.cooldown, fd.buff, fd.debuff, fd.timeShift, fd.talents, fd.azerite, fd.currentSpell;
-
-	local runic = UnitPower('player', RunicPower);
-	local runicMax = UnitPowerMax('player', RunicPower);
+	local runic = UnitPower('player', 6);
+	local runicMax = UnitPowerMax('player', 6);
 	local runes, runeCd = DeathKnight:Runes(timeShift);
+	local playerHp = MaxDps:TargetPercentHealth('player');
+	local targets = MaxDps:TargetsInRange(49998);
 
 	MaxDps:GlowEssences();
 	MaxDps:GlowCooldown(BL.DancingRuneWeapon, cooldown[BL.DancingRuneWeapon].ready);
 
-	if talents[BL.Bonestorm] then
-		MaxDps:GlowCooldown(BL.Bonestorm, cooldown[BL.Bonestorm].ready and runic >= 60);
-	end
-
-	local shouldUseMarrowrend = buff[BL.BoneShield].count <= 6 or buff[BL.BoneShield].remains < 6;
+	--MARROWREND FOR GETTING 7+ BONE SHIELDS OR IF TIMER IS RUNNING LOW
+	local shouldUseMarrowrend = buff[BL.BoneShield].count <= 7 or buff[BL.BoneShield].remains < 3;
 	if shouldUseMarrowrend and runes >= 2 then
 		return BL.Marrowrend;
 	end
+	--IF TARGETS > 4 and BONESTORM READY USE BORNSTORM
+	--ELSE USE DEATHSTRIKE IF ON CD
 
-	local playerHp = MaxDps:TargetPercentHealth('player');
-	if runic >= 45 and (buff[BL.BoneShield].remains < 3 or playerHp < 0.5) then
+	if runic >= 45 and  playerHp < 0.30 then
 		return BL.DeathStrike;
 	end
-
-	if talents[BL.BloodDrinker] and cooldown[BL.BloodDrinker].ready then
-		return BL.BloodDrinker;
-	end
-
+	--BLOODBOIL IF CAPPED OR IF NO DEBUFF
 	if not debuff[BL.BloodPlague].up or cooldown[BL.BloodBoil].charges >= 2 then
 		return BL.BloodBoil;
 	end
-
-	if shouldUseMarrowrend and runes >= 2 then
-		return BL.Marrowrend;
+	--DEATH AND DECAY IF 3+ RUNES AND MULTIPLE TARGETS
+	if runes >= 3 and cooldown[BL.DeathAndDecay].ready and targets >= 3 then
+		return BL.DeathAndDecay;
 	end
 
-	if talents[BL.RuneStrike] and cooldown[BL.RuneStrike].charges >= 1.7 and runes <= 3 then
-		return BL.RuneStrike;
-	end
-
-	local targets = MaxDps:TargetsInRange(49998);
-	if runes >= 3 then
-		if cooldown[BL.DeathAndDecay].ready and targets >= 3 then
-			return BL.DeathAndDecay;
-		end
-
+	if runes >=3 and targets >= 3 then
 		return BL.HeartStrike;
 	end
 
 	if buff[BL.CrimsonScourge].up or (cooldown[BL.DeathAndDecay].ready and targets > 5 and runes >= 1) then
 		return BL.DeathAndDecay;
 	end
-
-	if runicMax - runic <= 20 then
+	if runic >= 95 then
 		return BL.DeathStrike;
 	end
 
-	if runes > 2 then
+	if runes > 4 then
 		return BL.HeartStrike;
-	end
-
-	if runic >= 60 then
-		return BL.DeathStrike;
 	end
 
 	if cooldown[BL.BloodBoil].charges >= 1 then

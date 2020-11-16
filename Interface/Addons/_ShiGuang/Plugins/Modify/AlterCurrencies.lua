@@ -31,8 +31,13 @@ function AlterCurrencies.GetCurrencyAmounts()
         local currencyLink = C_CurrencyInfo.GetCurrencyListLink(i);
         if currencyLink ~= nil then -- Ignore headers
             local currencyId = tonumber(string.match(C_CurrencyInfo.GetCurrencyListLink(i),"currency:(%d+)")) -- Get only the ID
-            local currencyName, currencyAmount, isDiscovered = C_CurrencyInfo.GetCurrencyInfo(currencyLink); 
-            if currencyId ~= nil and currencyName ~= nil and isDiscovered and currencyAmount > 0 then
+            local currencyStruct = C_CurrencyInfo.GetCurrencyInfoFromLink(currencyLink); 
+
+            currencyName = currencyStruct.name;
+            currencyAmount = currencyStruct.quantity;
+            isDiscovered = currencyStruct.discovered;
+
+            if currencyId ~= nil and currencyName ~= nil and isDiscovered and currencyAmount >= 0 then
                 AlterCurrencies.UpdateTable(currencyId, currencyAmount) -- Store
             end
         end

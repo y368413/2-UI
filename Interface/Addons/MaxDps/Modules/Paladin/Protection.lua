@@ -18,6 +18,8 @@ local PR = {
 	BlessedHammer            = 204019,
 	BastionOfLight           = 204035,
 	HammerOfTheRighteous     = 53595,
+	HammerOfWrath            = 24275,
+	WordOfGlory              = 85673,
 };
 
 setmetatable(PR, Paladin.spellMeta);
@@ -28,45 +30,35 @@ function Paladin:Protection()
 	local buff = fd.buff;
 	local talents = fd.talents;
 	local gcd = fd.gcd;
-
+	local targetHp = MaxDps:TargetPercentHealth() * 100;
 	local consecrationUp = GetTotemInfo(1);
-	-- call_action_list,name=cooldowns;
 
 	Paladin:ProtectionCooldowns();
 
-	-- consecration,if=!consecration.up;
 	if cooldown[PR.Consecration].ready and (not consecrationUp) then
 		return PR.Consecration;
 	end
 
-	-- judgment,if=(cooldown.judgment.remains<gcd&cooldown.judgment.charges_fractional>1&cooldown_react)|!talent.crusaders_judgment.enabled;
-	if (cooldown[PR.Judgment].remains < gcd and cooldown[PR.Judgment].charges > 1) or
-		not talents[PR.CrusadersJudgment] and cooldown[PR.Judgment].ready
-	then
+	if cooldown[PR.Judgment].ready then
 		return PR.Judgment;
 	end
 
-	-- avengers_shield,if=cooldown_react;
+	if cooldown[PR.HammerOfWrath].ready and targetHp <= 20 then
+		return PR.HammerOfWrath;
+	end
+
 	if cooldown[PR.AvengersShield].ready then
 		return PR.AvengersShield;
 	end
 
-	-- judgment,if=cooldown_react|!talent.crusaders_judgment.enabled;
-	if not talents[PR.CrusadersJudgment] and cooldown[PR.Judgment].ready then
-		return PR.Judgment;
-	end
-
-	-- blessed_hammer,strikes=2;
 	if talents[PR.BlessedHammer] and cooldown[PR.BlessedHammer].ready then
 		return PR.BlessedHammer;
 	end
 
-	-- hammer_of_the_righteous;
 	if cooldown[PR.HammerOfTheRighteous].ready then
 		return PR.HammerOfTheRighteous;
 	end
 
-	-- consecration;
 	if cooldown[PR.Consecration].ready then
 		return PR.Consecration;
 	end
@@ -77,14 +69,22 @@ function Paladin:ProtectionCooldowns()
 	local cooldown = fd.cooldown;
 	local buff = fd.buff;
 	local talents = fd.talents;
-
+	local health = UnitHealth('player');
+	local healthMax = UnitHealthMax('player');
+	local healthPercent = (health / healthMax) * 100;
+	local holyPower = UnitPower('player', 9);
 	MaxDps:GlowEssences();
 
-	-- avenging_wrath;
-	MaxDps:GlowCooldown(PR.AvengingWrath, cooldown[PR.AvengingWrath].ready);
-	MaxDps:GlowCooldown(PR.ShieldOfTheRighteous, cooldown[PR.ShieldOfTheRighteous].ready and not buff[PR.ShieldOfTheRighteousAura].up);
+	if not buff[PR.ShieldOfTheRighteousAura].up and holyPower == 5 then
+		MaxDps:GlowCooldown(PR.ShieldOfTheRighteous);
+	end
 
-	-- seraphim;
+	if healthPercent <= 70 and holyPower > 2 then
+		MaxDps:GlowCooldown(PR.WordOfGlory);
+	end
+
+	MaxDps:GlowCooldown(PR.AvengingWrath, cooldown[PR.AvengingWrath].ready);
+
 	if talents[PR.Seraphim] then
 		MaxDps:GlowCooldown(PR.Seraphim, cooldown[PR.Seraphim].ready);
 	end

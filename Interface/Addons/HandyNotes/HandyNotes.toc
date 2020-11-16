@@ -12,8 +12,6 @@
 
 ## X-Repple: 2 UI
 
-WorldFlightMap.lua
-
 # Locale files
 Locales\Locales.xml
 
@@ -63,4 +61,3 @@ Mode\HandyNotes_PetDailies.lua
 # Others files
 CandyBuckets.lua
 BiggerBagChecker.lua
-WorldFlightMap.lua

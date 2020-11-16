@@ -32,7 +32,22 @@
             <OnUpdate method="OnUpdate"/>
 		</Scripts>
     </Frame>
-  <Script file="CaerdonWardrobeCombuctor.lua"/>
+	<Script file="CaerdonWardrobeCombuctor.lua" />
+	
+	<Script file="features\Auction.lua" />
+	<Script file="features\Bags.lua" />
+	<Script file="features\Bank.lua" />
+	<Script file="features\BlackMarket.lua" />
+	<Script file="features\EncounterJournal.lua" />
+	<Script file="features\GroupLoot.lua" />
+	<Script file="features\GuildBank.lua" />
+	<Script file="features\Loot.lua" />
+	<Script file="features\Mail.lua" />
+	<Script file="features\Merchant.lua" />
+	<Script file="features\QuestLog.lua" />
+	<Script file="features\ReagentBank.lua" />
+	<Script file="features\WorldMap.lua" />
+	<Script file="features\Tooltip.lua" />
 
 	<Script file="types\BattlePetMixin.lua" />
 	<Script file="types\CompanionPetMixin.lua" />
@@ -43,4 +58,12 @@
 	<Script file="types\QuestMixin.lua" />
 	<Script file="types\RecipeMixin.lua" />
 	<Script file="types\ToyMixin.lua" />	
+
+	<Script file="tests\CaerdonItemTests.lua" />
+	<Script file="tests\ClothTests.lua" />
+	<Script file="tests\LeatherTests.lua" />
+	<Script file="tests\MailTests.lua" />
+	<Script file="tests\PlateTests.lua" />
+	<Script file="tests\WeaponTests.lua" />
+	<Script file="tests\SharedTests.lua" />
 </Ui>

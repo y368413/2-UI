@@ -3323,6 +3323,7 @@ map.nodes[54067601] = Rare({
 map.nodes[27885248] = Rare({
     id=164107,
     quest=59145,
+    note=L["gormtamer_tizo_note"],
     rewards={
         Achievement({id=14309, criteria=48781}),
         Mount({item=180725, id=1362}) -- Spinemaw Gladechewer
@@ -3364,7 +3365,8 @@ map.nodes[67465147] = Rare({
 
 map.nodes[62102470] = Rare({
     id=165053,
-    quest=nil,
+    quest=59431,
+    note=L["mymaen_note"],
     rewards={
         Achievement({id=14309, criteria=48788})
     }
@@ -3560,6 +3562,7 @@ map.nodes[36236527] = Treasure({
     note=L["cache_of_the_night"],
     rewards={
         Achievement({id=14313, criteria=50044}),
+        Transmog({item=179549, slot=L["1h_mace"]}), -- Nightwillow Cudgel
         Pet({item=180637, id=2914}) -- Starry Dreamfoal
     }, pois={
         POI({
@@ -3591,11 +3594,11 @@ map.nodes[41953253] = Treasure({
     },
     pois={
         POI({41413161}), -- Bounding Shroom
-        POI({31763247}) -- Aromatic Flowers
+        POI({31763247, 36445960}) -- Aromatic Flowers
     }
 }) -- Desiccated Moth
 
-map.nodes[37683688] = Treasure({
+map.nodes[37643706] = Treasure({
     quest=61070,
     note=L["dreamsong_heart"],
     rewards={
@@ -3612,9 +3615,11 @@ map.nodes[44827587] = Treasure({
     note=L["elusive_faerie_cache"],
     rewards={
         Achievement({id=14313, criteria=50043}),
-        Transmog({item=179512, slot=L["1h_sword"]}) -- Dreamsong Saber
+        Transmog({item=179512, slot=L["1h_sword"]}), -- Dreamsong Saber
+        Toy({item=184490}) -- Fae Pipes
     },
     pois={
+        POI({46497011}), -- Faerie Lamp
         Path({
             44827587, 44477530, 44417436, 44647334, 44877246, 45057161,
             45417087, 45837033, 46497011
@@ -3644,7 +3649,9 @@ map.nodes[67803462] = Treasure({
     quest=61165,
     note=L["harmonic_chest"],
     rewards={
-        Achievement({id=14313, criteria=50036})
+        Achievement({id=14313, criteria=50036}),
+        Transmog({item=179565, slot=L["offhand"]}), -- Songwood Stem
+        Toy({item=184489}) -- Fae Harp
     }
 }) -- Harmonic Chest
 
@@ -3721,6 +3728,28 @@ map.nodes[52943729] = Treasure({
 -------------------------------------------------------------------------------
 --------------------------------- BATTLE PETS ---------------------------------
 -------------------------------------------------------------------------------
+map.nodes[34224452] = PetBattle({
+    id=175778,
+    rewards={
+        Achievement({id=14881, criteria=51048})
+    }
+}) -- Briarpaw
+
+map.nodes[26546222] = PetBattle({
+    id=175779,
+    note=L["in_small_cave"],
+    rewards={
+        Achievement({id=14881, criteria=51049})
+    }
+}) -- Chittermaw
+
+map.nodes[49884175] = PetBattle({
+    id=175780,
+    note=L["in_small_cave"],
+    rewards={
+        Achievement({id=14881, criteria=51050})
+    }
+}) -- Mistwing
 
 map.nodes[39956449] = PetBattle({
     id=173376,
@@ -3738,15 +3767,39 @@ map.nodes[40192880] = PetBattle({
 
 map.nodes[51274406] = PetBattle({
     id=173377,
+    note=L["faryl_note"],
     rewards={
-        Achievement({id=14625, criteria=49403})
+        Achievement({id=14625, criteria=49403}),
+        Shadowlands.reward.Spacer(),
+        Achievement({id=14868, criteria=11, oneline=true}), -- Aquatic
+        Achievement({id=14869, criteria=11, oneline=true}), -- Beast
+        Achievement({id=14870, criteria=11, oneline=true}), -- Critter
+        Achievement({id=14871, criteria=11, oneline=true}), -- Dragon
+        Achievement({id=14872, criteria=11, oneline=true}), -- Elemental
+        Achievement({id=14873, criteria=11, oneline=true}), -- Flying
+        Achievement({id=14874, criteria=11, oneline=true}), -- Humanoid
+        Achievement({id=14875, criteria=11, oneline=true}), -- Magic
+        Achievement({id=14876, criteria=11, oneline=true}), -- Mechanical
+        Achievement({id=14877, criteria=11, oneline=true}), -- Undead
     }
 }) -- Faryl
 
 map.nodes[58205690] = PetBattle({
     id=173372,
+    note=L["glitterdust_note"],
     rewards={
-        Achievement({id=14625, criteria=49405})
+        Achievement({id=14625, criteria=49405}),
+        Shadowlands.reward.Spacer(),
+        Achievement({id=14868, criteria=10, oneline=true}), -- Aquatic
+        Achievement({id=14869, criteria=10, oneline=true}), -- Beast
+        Achievement({id=14870, criteria=10, oneline=true}), -- Critter
+        Achievement({id=14871, criteria=10, oneline=true}), -- Dragon
+        Achievement({id=14872, criteria=10, oneline=true}), -- Elemental
+        Achievement({id=14873, criteria=10, oneline=true}), -- Flying
+        Achievement({id=14874, criteria=10, oneline=true}), -- Humanoid
+        Achievement({id=14875, criteria=10, oneline=true}), -- Magic
+        Achievement({id=14876, criteria=10, oneline=true}), -- Mechanical
+        Achievement({id=14877, criteria=10, oneline=true}), -- Undead
     }
 }) -- Glitterdust
 
@@ -3843,7 +3896,7 @@ map.nodes[55358024] = Rare({
 
 map.nodes[55826249] = Rare({
     id=171189,
-    quest={59022,62167},
+    quest={59022},
     note=L["bookkeeper_mnemis_note"],
     rewards={
         Achievement({id=14307, criteria=50612}),
@@ -3876,7 +3929,8 @@ map.nodes[66004367] = Rare({
             -- 65734345, Mercia's Legacy: Chapter Four
             -- 65934316, Mercia's Legacy: Chapter Five
             -- 66204327, Mercia's Legacy: Chapter Six
-            64174218 -- Mercia's Legacy: Chapter Seven
+            64174218, -- Mercia's Legacy: Chapter Seven
+            67604342, -- Mercia's Legacy: Chapter Seven
         })
     }
 }) -- Collector Astorestes
@@ -3924,7 +3978,8 @@ map.nodes[41354887] = Rare({
     quest=62650,
     note=L["in_small_cave"]..' '..L["dionae_note"],
     rewards={
-        Achievement({id=14307, criteria=50595})
+        Achievement({id=14307, criteria=50595}),
+        Pet({item=180856, id=2932}) -- Silvershell Snapper
     }
 }) -- Dionae
 
@@ -3974,6 +4029,7 @@ map.nodes[42908265] = Rare({
     requires=Shadowlands.requirement.Item(172451, 10),
     rewards={
         Achievement({id=14307, criteria=50582})
+        --Item({item=182759, quest=62200}) -- Functioning Anima Core
     }
 }) -- Herculon
 
@@ -4006,14 +4062,9 @@ map.nodes[61295090] = Rare({
     }
 }) -- Selena the Reborn
 
-local Sotirstus = Class('Sotirstus', Rare)
-
-function Sotirstus.getters:label ()
-    return GetAchievementCriteriaInfoByID(14307, 50618) or UNKNOWN
-end
-
-map.nodes[22432285] = Sotirstus({
+map.nodes[22432285] = Rare({
    id=156339,
+   label=GetAchievementCriteriaInfoByID(14307, 50618) or UNKNOWN,
    quest=61634,
    covenant=KYRIAN,
    requires=Shadowlands.requirement.GarrisonTalent(1241, L["anima_channeled"]),
@@ -4058,12 +4109,35 @@ map.nodes[63503590] = Rare({
     }
 }) -- Swelling Tear
 
+map.nodes[53498868] = Rare({
+    id=170899,
+    quest=60977, -- 60933 makes Cache of the Ascended visible
+    label=GetAchievementCriteriaInfoByID(14307, 50619),
+    note=L["ascended_council_note"],
+    rewards={
+        Achievement({id=14307, criteria=50619}),
+        Shadowlands.reward.Spacer(),
+        Achievement({id=14734, criteria={49818, 49815, 49816, 49819, 49817} }),
+        Mount({item=183741, id=1426}) -- Ascended Skymane
+    },
+    pois={
+        POI({
+            64326980, -- Vesper of Purity
+            33325980, -- Vesper of Courage
+            71933896, -- Vesper of Humility
+            39132038, -- Vesper of Wisdom
+            32171776, -- Vesper of Loyalty
+        })
+    }
+}) -- The Ascended Council
+
 map.nodes[43482524] = Rare({
     id=171008,
     quest=60997,
     note=L["unstable_memory_note"],
     rewards={
-        Achievement({id=14307, criteria=50606})
+        Achievement({id=14307, criteria=50606}),
+        Toy({item=184413}) -- Mnemonic Attunement Pane
     }
 }) -- Unstable Memory
 
@@ -4109,26 +4183,14 @@ map.nodes[35834811] = Treasure({
     }
 }) -- Broken Flute
 
-map.nodes[53498880] = Treasure({
-    quest=60977, -- 60933 makes the chest visible
-    label=L["cache_of_the_ascended"],
-    note=L["cache_of_the_ascended_note"],
-    rewards={
-        Achievement({id=14307, criteria=50619}),
-        Shadowlands.reward.Spacer(),
-        Achievement({id=14734, criteria={49818, 49815, 49816, 49819, 49817} }),
-        Mount({item=183741, id=1426}) -- Ascended Skymane
-    },
+map.nodes[61061510] = Treasure({
+    quest=61698,
+    label=L["cloudwalkers_coffer"],
+    note=L["cloudwalkers_coffer_note"],
     pois={
-        POI({
-            64326980, -- Vesper of Purity
-            33325980, -- Vesper of Courage
-            71933896, -- Vesper of Humility
-            39132038, -- Vesper of Wisdom
-            32171776, -- Vesper of Loyalty
-        })
+        POI({59011639}) -- First Flower
     }
-}) -- Cache of the Ascended
+}) -- Cloudwalker's Coffer
 
 map.nodes[51471795] = Treasure({
     quest=61052,
@@ -4139,7 +4201,7 @@ map.nodes[51471795] = Treasure({
         Transmog({item=183609, slot=L["fist"]}) -- Re-Powered Golliath Fists
     },
     pois={
-        POI({53541715, 53141903}) -- Unstable Anima Core
+        POI({52471448, 53541715, 53141903}) -- Unstable Anima Core
     }
 }) -- Experimental Construct Part
 
@@ -4161,7 +4223,8 @@ map.nodes[70473645] = Treasure({
     requires=Shadowlands.requirement.Spell(333045),
     note=L["gift_of_chyrus"],
     rewards={
-        Achievement({id=14311, criteria=50060})
+        Achievement({id=14311, criteria=50060}),
+        Toy({item=183988}) -- Bondable Val'kyr Diadem
     },
     pois={
         POI({69374031})
@@ -4236,10 +4299,15 @@ map.nodes[56481714] = Treasure({
     pois={
         POI({
             56851899, -- Drink Tray
+            33996651, -- Kobri (Cliffs of Respite)
+            43573224, -- Kobri (Sagehaven)
+            47967389, -- Kobri (Aspirant's Rest)
+            51804641, -- Kobri (Hero's Rest)
+            52164709, -- Kobri (Hero's Rest)
+            53498033, -- Kobri (Aspirant's Crucible)
         })
     }
 }) -- Memorial Offering
---Kobri coordinate 47967389
 
 map.nodes[52038607] = Treasure({
     quest=58329,
@@ -4271,15 +4339,15 @@ map.nodes[40504980] = Treasure({
 }) -- Stolen Equipment
 
 map.nodes[36012652] = Treasure({
-    quest=61183,
+    quest=61183, -- 61229 (mallet forged) 61191 (vesper rung)
     requires=Shadowlands.requirement.Item(180858),
-    note=L["vesper_of_silver_wind"],
+    label=L["vesper_of_silver_wind"],
+    note=L["vesper_of_silver_wind_note"],
     rewards={
         Mount({item=180772, id=1404}) -- Silverwind Larion
     }
 }) -- Vesper of the Silver Wind
--- 61229 (mallet forged)
--- 61191 (vesper rung)
+
 
 map.nodes[58667135] = Treasure({
     quest=60478,
@@ -4293,10 +4361,43 @@ map.nodes[58667135] = Treasure({
 --------------------------------- BATTLE PETS ---------------------------------
 -------------------------------------------------------------------------------
 
+map.nodes[52727429] = PetBattle({
+    id=175777,
+    rewards={
+        Achievement({id=14881, criteria=51047})
+    }
+}) -- Crystalsnap
+
+map.nodes[25903078] = PetBattle({
+    id=175783,
+    rewards={
+        Achievement({id=14881, criteria=51053})
+    }
+}) -- Digallo
+
+map.nodes[46524930] = PetBattle({
+    id=175785,
+    rewards={
+        Achievement({id=14881, criteria=51055})
+    }
+}) -- Kostos
+
 map.nodes[34806280] = PetBattle({
     id=173131,
+    note=L["stratios_note"],
     rewards={
-        Achievement({id=14625, criteria=49416})
+        Achievement({id=14625, criteria=49416}),
+        Shadowlands.reward.Spacer(),
+        Achievement({id=14868, criteria=9, oneline=true}), -- Aquatic
+        Achievement({id=14869, criteria=9, oneline=true}), -- Beast
+        Achievement({id=14870, criteria=9, oneline=true}), -- Critter
+        Achievement({id=14871, criteria=9, oneline=true}), -- Dragon
+        Achievement({id=14872, criteria=9, oneline=true}), -- Elemental
+        Achievement({id=14873, criteria=9, oneline=true}), -- Flying
+        Achievement({id=14874, criteria=9, oneline=true}), -- Humanoid
+        Achievement({id=14875, criteria=9, oneline=true}), -- Magic
+        Achievement({id=14876, criteria=9, oneline=true}), -- Mechanical
+        Achievement({id=14877, criteria=9, oneline=true}), -- Undead
     }
 }) -- Stratios
 
@@ -4309,15 +4410,39 @@ map.nodes[36603180] = PetBattle({
 
 map.nodes[51393833] = PetBattle({
     id=173130,
+    note=L["zolla_note"],
     rewards={
-        Achievement({id=14625, criteria=49415})
+        Achievement({id=14625, criteria=49415}),
+        Shadowlands.reward.Spacer(),
+        Achievement({id=14868, criteria=7, oneline=true}), -- Aquatic
+        Achievement({id=14869, criteria=7, oneline=true}), -- Beast
+        Achievement({id=14870, criteria=7, oneline=true}), -- Critter
+        Achievement({id=14871, criteria=7, oneline=true}), -- Dragon
+        Achievement({id=14872, criteria=7, oneline=true}), -- Elemental
+        Achievement({id=14873, criteria=7, oneline=true}), -- Flying
+        Achievement({id=14874, criteria=7, oneline=true}), -- Humanoid
+        Achievement({id=14875, criteria=7, oneline=true}), -- Magic
+        Achievement({id=14876, criteria=7, oneline=true}), -- Mechanical
+        Achievement({id=14877, criteria=7, oneline=true}), -- Undead
     }
 }) -- Zolla
 
 map.nodes[54555609] = PetBattle({
     id=173129,
+    note=L["thenia_note"],
     rewards={
-        Achievement({id=14625, criteria=49414})
+        Achievement({id=14625, criteria=49414}),
+        Shadowlands.reward.Spacer(),
+        Achievement({id=14868, criteria=8, oneline=true}), -- Aquatic
+        Achievement({id=14869, criteria=8, oneline=true}), -- Beast
+        Achievement({id=14870, criteria=8, oneline=true}), -- Critter
+        Achievement({id=14871, criteria=8, oneline=true}), -- Dragon
+        Achievement({id=14872, criteria=8, oneline=true}), -- Elemental
+        Achievement({id=14873, criteria=8, oneline=true}), -- Flying
+        Achievement({id=14874, criteria=8, oneline=true}), -- Humanoid
+        Achievement({id=14875, criteria=8, oneline=true}), -- Magic
+        Achievement({id=14876, criteria=8, oneline=true}), -- Mechanical
+        Achievement({id=14877, criteria=8, oneline=true}), -- Undead
     }
 }) -- Thenia
 
@@ -4445,7 +4570,8 @@ map.nodes[52663542] = Rare({
     id=162727,
     quest=58870,
     rewards={
-        Achievement({id=14308, criteria=48876})
+        Achievement({id=14308, criteria=48876}),
+        Transmog({item=184154, slot=L["cloak"]}) -- Grungy Containment Pack
     }
 }) -- Bubbleblood
 
@@ -4641,10 +4767,9 @@ map.nodes[24184297] = Rare({
     }
 }) -- Thread Mistress Leeda
 
-map.nodes[33538086] = Rare({
+map.nodes[33718016] = Rare({
     id=162819,
-    quest=nil,
-    note=L["malkorak_note"],
+    quest=58889,
     rewards={
         Achievement({id=14308, criteria=48875}),
         Mount({item=182085, id=1372}) -- Umbral Bloodtusk
@@ -4732,7 +4857,7 @@ map.nodes[54011234] = Treasure({
     }
 }) -- Cache of Eyes
 
-map.nodes[49441509] = Treasure({
+map.nodes[48301630] = Treasure({
     quest=59244,
     rewards={
         Achievement({id=14312, criteria=50070}),
@@ -4786,7 +4911,7 @@ map.nodes[32742127] = Treasure({
     }
 }) -- Kyrian Keepsake
 
-map.nodes[62505990] = Treasure({
+map.nodes[62405997] = Treasure({
     quest=59245,
     note=L["misplaced_supplies"],
     rewards={
@@ -4837,10 +4962,6 @@ map.nodes[64672475] = Treasure({
         Achievement({id=14312, criteria=50075}),
         Item({item=183517, quest=62372}) -- Page 76 of the Necronom-i-nom
     },
-    pois={
-        POI({69873103, 69073250, 71473663}), -- Bone Pile
-        POI({71733540}) -- Book of Binding Ritials
-    }
 }) -- Ritualist's Cache
 
 map.nodes[31737004] = Treasure({
@@ -4856,12 +4977,15 @@ map.nodes[31737004] = Treasure({
     }
 }) -- Runespeaker's Trove
 
-map.nodes[73564986] = Treasure({
+map.nodes[66145045] = Treasure({
     quest=61451,
     note=L["stolen_jar_note"],
     rewards={
         Achievement({id=14312, criteria=50067}),
         Item({item=182618, quest=62085}) -- ... Why Me?
+    },
+    pois={
+        POI({66135027, 66145045, 73564986})
     }
 }) -- Stolen Jar
 
@@ -4902,17 +5026,55 @@ map.nodes[51444848] = Treasure({
 --------------------------------- BATTLE PETS ---------------------------------
 -------------------------------------------------------------------------------
 
+map.nodes[61907879] = PetBattle({
+    id=175784,
+    rewards={
+        Achievement({id=14881, criteria=51054})
+    }
+}) -- Gelatinous
+
+map.nodes[26482675] = PetBattle({
+    id=175786,
+    rewards={
+        Achievement({id=14881, criteria=51056})
+    }
+}) -- Glurp
+
 map.nodes[34005526] = PetBattle({
     id=173263,
+    note=L["rotgut_note"],
     rewards={
-        Achievement({id=14625, criteria=49412})
+        Achievement({id=14625, criteria=49412}),
+        Shadowlands.reward.Spacer(),
+        Achievement({id=14868, criteria=4, oneline=true}), -- Aquatic
+        Achievement({id=14869, criteria=4, oneline=true}), -- Beast
+        Achievement({id=14870, criteria=4, oneline=true}), -- Critter
+        Achievement({id=14871, criteria=4, oneline=true}), -- Dragon
+        Achievement({id=14872, criteria=4, oneline=true}), -- Elemental
+        Achievement({id=14873, criteria=4, oneline=true}), -- Flying
+        Achievement({id=14874, criteria=4, oneline=true}), -- Humanoid
+        Achievement({id=14875, criteria=4, oneline=true}), -- Magic
+        Achievement({id=14876, criteria=4, oneline=true}), -- Mechanical
+        Achievement({id=14877, criteria=4, oneline=true}), -- Undead
     }
 }) -- Rotgut
 
 map.nodes[46865000] = PetBattle({
     id=173257,
+    note=L["maximillian_note"],
     rewards={
-        Achievement({id=14625, criteria=49413})
+        Achievement({id=14625, criteria=49413}),
+        Shadowlands.reward.Spacer(),
+        Achievement({id=14868, criteria=6, oneline=true}), -- Aquatic
+        Achievement({id=14869, criteria=6, oneline=true}), -- Beast
+        Achievement({id=14870, criteria=6, oneline=true}), -- Critter
+        Achievement({id=14871, criteria=6, oneline=true}), -- Dragon
+        Achievement({id=14872, criteria=6, oneline=true}), -- Elemental
+        Achievement({id=14873, criteria=6, oneline=true}), -- Flying
+        Achievement({id=14874, criteria=6, oneline=true}), -- Humanoid
+        Achievement({id=14875, criteria=6, oneline=true}), -- Magic
+        Achievement({id=14876, criteria=6, oneline=true}), -- Mechanical
+        Achievement({id=14877, criteria=6, oneline=true}), -- Undead
     }
 }) -- Caregiver Maximillian
 
@@ -4925,8 +5087,20 @@ map.nodes[54062806] = PetBattle({
 
 map.nodes[63234687] = PetBattle({
     id=173267,
+    note=L["dundley_note"],
     rewards={
-        Achievement({id=14625, criteria=49411})
+        Achievement({id=14625, criteria=49411}),
+        Shadowlands.reward.Spacer(),
+        Achievement({id=14868, criteria=5, oneline=true}), -- Aquatic
+        Achievement({id=14869, criteria=5, oneline=true}), -- Beast
+        Achievement({id=14870, criteria=5, oneline=true}), -- Critter
+        Achievement({id=14871, criteria=5, oneline=true}), -- Dragon
+        Achievement({id=14872, criteria=5, oneline=true}), -- Elemental
+        Achievement({id=14873, criteria=5, oneline=true}), -- Flying
+        Achievement({id=14874, criteria=5, oneline=true}), -- Humanoid
+        Achievement({id=14875, criteria=5, oneline=true}), -- Magic
+        Achievement({id=14876, criteria=5, oneline=true}), -- Mechanical
+        Achievement({id=14877, criteria=5, oneline=true}), -- Undead
     }
 }) -- Dundley Stickyfingers
 
@@ -5326,7 +5500,8 @@ map.nodes[47335536] = Treasure({
     quest=62243,
     note=L["forbidden_chamber_note"],
     rewards={
-        Achievement({id=14314, criteria=50084})
+        Achievement({id=14314, criteria=50084}),
+        Toy({item=184075}) -- Stonewrought Sentry
     }
 }) -- Forbidden Chamber
 
@@ -5459,24 +5634,74 @@ map.nodes[25263799] = PetBattle({
     }
 }) -- Scorch
 
+map.nodes[25662361] = PetBattle({
+    id=175781,
+    rewards={
+        Achievement({id=14881, criteria=51051})
+    }
+}) -- Sewer Creeper
+
+map.nodes[53004149] = PetBattle({
+    id=175782,
+    rewards={
+        Achievement({id=14881, criteria=51052})
+    }
+}) -- The Countess
+
 map.nodes[39945249] = PetBattle({
     id=173315,
+    note=L["sylla_note"],
     rewards={
-        Achievement({id=14625, criteria=49408})
+        Achievement({id=14625, criteria=49408}),
+        Shadowlands.reward.Spacer(),
+        Achievement({id=14868, criteria=1, oneline=true}), -- Aquatic
+        Achievement({id=14869, criteria=1, oneline=true}), -- Beast
+        Achievement({id=14870, criteria=1, oneline=true}), -- Critter
+        Achievement({id=14871, criteria=1, oneline=true}), -- Dragon
+        Achievement({id=14872, criteria=1, oneline=true}), -- Elemental
+        Achievement({id=14873, criteria=1, oneline=true}), -- Flying
+        Achievement({id=14874, criteria=1, oneline=true}), -- Humanoid
+        Achievement({id=14875, criteria=1, oneline=true}), -- Magic
+        Achievement({id=14876, criteria=1, oneline=true}), -- Mechanical
+        Achievement({id=14877, criteria=1, oneline=true}), -- Undead
     }
 }) -- Sylla
 
 map.nodes[61354121] = PetBattle({
     id=173331,
+    note=L["addius_note"],
     rewards={
-        Achievement({id=14625, criteria=49406})
+        Achievement({id=14625, criteria=49406}),
+        Shadowlands.reward.Spacer(),
+        Achievement({id=14868, criteria=3, oneline=true}), -- Aquatic
+        Achievement({id=14869, criteria=3, oneline=true}), -- Beast
+        Achievement({id=14870, criteria=3, oneline=true}), -- Critter
+        Achievement({id=14871, criteria=3, oneline=true}), -- Dragon
+        Achievement({id=14872, criteria=3, oneline=true}), -- Elemental
+        Achievement({id=14873, criteria=3, oneline=true}), -- Flying
+        Achievement({id=14874, criteria=3, oneline=true}), -- Humanoid
+        Achievement({id=14875, criteria=3, oneline=true}), -- Magic
+        Achievement({id=14876, criteria=3, oneline=true}), -- Mechanical
+        Achievement({id=14877, criteria=3, oneline=true}), -- Undead
     }
 }) -- Addius the Tormentor
 
 map.nodes[67626608] = PetBattle({
     id=173324,
+    note=L["eyegor_note"],
     rewards={
-        Achievement({id=14625, criteria=49407})
+        Achievement({id=14625, criteria=49407}),
+        Shadowlands.reward.Spacer(),
+        Achievement({id=14868, criteria=2, oneline=true}), -- Aquatic
+        Achievement({id=14869, criteria=2, oneline=true}), -- Beast
+        Achievement({id=14870, criteria=2, oneline=true}), -- Critter
+        Achievement({id=14871, criteria=2, oneline=true}), -- Dragon
+        Achievement({id=14872, criteria=2, oneline=true}), -- Elemental
+        Achievement({id=14873, criteria=2, oneline=true}), -- Flying
+        Achievement({id=14874, criteria=2, oneline=true}), -- Humanoid
+        Achievement({id=14875, criteria=2, oneline=true}), -- Magic
+        Achievement({id=14876, criteria=2, oneline=true}), -- Mechanical
+        Achievement({id=14877, criteria=2, oneline=true}), -- Undead
     }
 }) -- Eyegor
 
@@ -5564,7 +5789,7 @@ map.nodes[66727652] = Carriage({
     }
 }) -- Pridefall Carriage
 
-map.nodes[52634155] = Carriage({
+map.nodes[47694787] = Carriage({
     id=174754,
     rewards={ Achievement({id=14771, criteria=50173}) },
     pois={
@@ -6124,6 +6349,44 @@ map.nodes[34804362] = Riftstone({
             27193061, 26212974, 25282901, 24352838, 23382834, 22742938,
             22693066, 23433121
         })
+    }
+})
+-------------------------------------------------------------------------------
+----------------------------------- VE'NARI -----------------------------------
+-------------------------------------------------------------------------------
+
+map.nodes[46914169] = NPC({
+    id=162804,
+    icon=3527519,
+    note=L["venari_note"],
+    rewards={
+        Achievement({id=14895, criteria={
+            51251, -- Vessel of Unforunate Spirits
+            51253, -- Extradimensional Pockets
+            51255, -- Encased Riftwalker Essence
+            51254, -- Animated Levitating Chain
+            51258, -- Animaflow Stabilizer
+            51256, -- Soul-Stabilizing Salve
+            51252, -- Ritual Prism of Fortune
+            51248, -- Bangle of Seniority
+            51257, -- Talisman of Destined Defiance
+            51249, -- Rank Insignia: Acquisitionist
+            51464, -- Possibility Matrix
+            51250, -- Loupe of Unusual Charm
+        }}), -- 'Ghast Five
+
+        -- Item({item=184620, quest=63202, note=L["Apprehensive"]}), -- Vessel of Unforunate Spirits
+        -- Item({item=184615, quest=63183, note=L["Apprehensive"]}), -- Extradimensional Pockets
+        -- Item({item=184613, quest=63177, note=L["Apprehensive"]}), -- Encased Riftwalker Essence
+        -- Item({item=184653, quest=nil, note=L["Tentative"]}), -- Animated Levitating Chain
+        -- Item({item=180949, quest=nil, note=L["Tentative"]}), -- Animaflow Stabilizer
+        -- Item({item=184617, quest=nil, note=L["Tentative"]}), -- Bangle of Seniority
+        -- Item({item=184605, quest=nil, note=L["Tentative"]}), -- Sigil of the Unseen
+        -- Item({item=184588, quest=nil, note=L["Ambivalent"]}), -- Soul-Stabilizing Salve
+        -- Item({item=184621, quest=nil, note=L["Ambivalent"]}), -- Ritual Prism of Fortune
+        -- Item({item=184618, quest=nil, note=L["Cordial"]}), -- Rank Insignia: Acquisitionist
+        -- Item({item=184619, quest=nil, note=L["Cordial"]}), -- Loupe of Unusual Charm
+        -- Item({item=180952, quest=nil, note=L["Appreciative"]}), -- Possibility Matrix
     }
 })
 

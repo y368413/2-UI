@@ -78,13 +78,12 @@ end
 local function work_out_texture(point)
     if point.atlas then
         if not icon_cache[point.atlas] then
-            local texture, _, _, left, right, top, bottom = GetAtlasInfo(point.atlas)
             icon_cache[point.atlas] = {
-                icon = texture,
-                tCoordLeft = left,
-                tCoordRight = right,
-                tCoordTop = top,
-                tCoordBottom = bottom,
+                icon = C_Texture.GetAtlasInfo(point.atlas).file,
+            tCoordLeft = C_Texture.GetAtlasInfo(point.atlas).leftTexCoord,
+            tCoordRight = C_Texture.GetAtlasInfo(point.atlas).rightTexCoord,
+            tCoordTop = C_Texture.GetAtlasInfo(point.atlas).topTexCoord,
+            tCoordBottom = C_Texture.GetAtlasInfo(point.atlas).bottomTexCoord,
             }
         end
         return icon_cache[point.atlas]
@@ -116,38 +115,35 @@ local function work_out_texture(point)
     end
     if point.follower then
         if not follower_texture then
-            local texture, _, _, left, right, top, bottom = GetAtlasInfo("GreenCross")
             follower_texture = {
-                icon = texture,
-                tCoordLeft = left,
-                tCoordRight = right,
-                tCoordTop = top,
-                tCoordBottom = bottom,
+                icon = C_Texture.GetAtlasInfo("GreenCross").file,
+            tCoordLeft = C_Texture.GetAtlasInfo("GreenCross").leftTexCoord,
+            tCoordRight = C_Texture.GetAtlasInfo("GreenCross").rightTexCoord,
+            tCoordTop = C_Texture.GetAtlasInfo("GreenCross").topTexCoord,
+            tCoordBottom = C_Texture.GetAtlasInfo("GreenCross").bottomTexCoord,
             }
         end
         return follower_texture
     end
     if point.npc then
         if not npc_texture then
-            local texture, _, _, left, right, top, bottom = GetAtlasInfo("DungeonSkull")
             npc_texture = {
-                icon = texture,
-                tCoordLeft = left,
-                tCoordRight = right,
-                tCoordTop = top,
-                tCoordBottom = bottom,
+                icon = C_Texture.GetAtlasInfo("DungeonSkull").file,
+            tCoordLeft = C_Texture.GetAtlasInfo("DungeonSkull").leftTexCoord,
+            tCoordRight = C_Texture.GetAtlasInfo("DungeonSkull").rightTexCoord,
+            tCoordTop = C_Texture.GetAtlasInfo("DungeonSkull").topTexCoord,
+            tCoordBottom = C_Texture.GetAtlasInfo("DungeonSkull").bottomTexCoord,
             }
         end
         return npc_texture
     end
     if not default_texture then
-        local texture, _, _, left, right, top, bottom = GetAtlasInfo("minortalents-icon-book")
         default_texture = {
-            icon = texture,
-            tCoordLeft = left,
-            tCoordRight = right,
-            tCoordTop = top,
-            tCoordBottom = bottom,
+            icon = C_Texture.GetAtlasInfo("minortalents-icon-book").file,
+            tCoordLeft = C_Texture.GetAtlasInfo("minortalents-icon-book").leftTexCoord,
+            tCoordRight = C_Texture.GetAtlasInfo("minortalents-icon-book").rightTexCoord,
+            tCoordTop = C_Texture.GetAtlasInfo("minortalents-icon-book").topTexCoord,
+            tCoordBottom = C_Texture.GetAtlasInfo("minortalents-icon-book").bottomTexCoord,
         }
     end
     return default_texture

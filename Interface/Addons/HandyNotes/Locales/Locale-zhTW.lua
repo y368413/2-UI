@@ -1064,14 +1064,16 @@ L["anima_channeled"] = "靈魄連接到 %s"
 
 L["deifir_note"] = "騎上圈內的稀有並使用 {spell:319566} 和 {spell:319575} 使其減速和昏迷"
 L["faeflayer_note"] = "瀑布後面隱藏的小洞穴內"
+L["gormtamer_tizo_note"] = nil
 L["humongozz_note"] = "種植一個 {item:175247} 在潮濕的沃土後將刷新 {npc:164122}。在一分鐘後 {spell:319367}，稀有將刷新。區域內的許多怪物都會掉落蘑菇"
 L["lehgo_note"] = "摧毀顫動的果姆蛋並擊殺 {npc:171827} 直到他出現。在洞穴內(入口在東南黃塵地穴內)"
+L["mymaen_note"] = nil
 L["rainbowhorn_note"] = "\n|cffff5400品|r|cffffaa00嘗|r|cffffff00絕|r|cffaaff00妙|r|cff54ff00的|r |cff00ff55美|r|cff00ffa9麗|r|cff00ffff的|r |cff0055ff七|r|cff0000ff彩|r|cff5400ff之|r|cffaa00ff虹|r|cffff00ff好|r|cffff00aa味|r|cffff0054道|r|cffff0000！|r"
 L["rootwrithe_note"] = "觸碰 {npc:167928} 直到稀有出現"
 L["rotbriar_note"] = "和 {npc:171684} 交談對話後在附近召喚稀有"
 L["slumbering_note"] = "跑到迷霧中將會昏迷並被帶出。使用信號彈或有範圍法術的寵物將他擊出迷霧"
 L["skuld_vit_note"] = "在被障礙物阻擋的山洞中。暗夜妖精必須使用 {spell:310143} 進入洞穴。他進入戰鬥後，障礙物將消失"
-L["valfir_note"] = "在閃光的靈魄之種下降過程中點選並使用 {spell:338045} 移除他的 {spell:338038} 增益"
+L["valfir_note"] = "在閃亮的靈魄種子下降過程中點選並使用 {spell:338045} 移除他的 {spell:338038} 增益"
 L["wrigglemortis_note"] = "與 {npc:164179} 戰鬥刷新稀有"
 
 L["night_mare_note"] = [[
@@ -1115,10 +1117,14 @@ L["tame_gladerunner_note"] = [[
 如果你走錯路而且當你到終點時 {npc:171699} 已經消失了，返回開始的位置並再次閱讀“Tale of the Tangle”來再次嘗試。如果 {npc:171767} 不在，你需要等待他刷新
 ]]
 
+L["faryl_note"] = nil
+L["glitterdust_note"] = nil
+
 -------------------------------------------------------------------------------
 ----------------------------------- BASTION -----------------------------------
 -------------------------------------------------------------------------------
 
+L["ascended_council_note"] = "與其他四名玩家，同時點選五個純淨的容器，勇氣，謙卑，智慧和忠誠。然後前往志士試煉場擊敗晉升者議會獲得寶箱獎勵。"
 L["aspirant_eolis_note"] = "拾取附近的 {item:180613} 並將該 NPC 設為目標後閱讀來啟動他。"
 L["baedos_note"] = "從周圍地區帶一盤發酵的普恩果給 {npc:161536} 直到她啟動。"
 L["basilofos_note"] = "在岩石上移動，直到紫色的追蹤標記出現在你的頭頂。 站著不動，等待四種表情出現，然後他會刷新"
@@ -1150,11 +1156,14 @@ L["unstable_memory_note"] = "當 {npc:171018} 存在時可以刷新。拉一個 
 L["wingflayer_note"] = "點選附近桌上的勇氣號角召喚(東南方，樓梯上)。"
 
 L["broken_flute"] = "擊殺附近的 {npc:170009} 直到掉落 {item:180536}，使用此工具修理它。"
+L["cloudwalkers_coffer"] = "雲行者寶箱"
+L["cloudwalkers_coffer_note"] = "使用大型紫色花來彈跳到平台上。"
 L["experimental_construct_part"] = "拾取附近 {item:180534} 並使用修理部件。靈魄有多個刷新地點。."
 L["larion_harness"] = "位於野獸大廳內。"
 L["memorial_offering"] = "從志士之墓的 {npc:171526} 購買 {item:180788}。將其放在靠近寶箱的飲料托盤中以獲取 {item:180797}。"
 L["scroll_of_aeons"] = "在中心地區拾取2個 {item:173973} 並將它們放在附近的貢品盤上顯出寶藏。"
-L["vesper_of_silver_wind"] = "完成 {achievement:14339} 成就並和晉升之巔入口的 {npc:171732} 交談鑄造 {item:180858}。"
+L["vesper_of_silver_wind"] = "銀風禱鐘"
+L["vesper_of_silver_wind_note"] = "完成 {achievement:14339} 成就並和晉升之巔入口的 {npc:171732} 交談鑄造 {item:180858}。"
 
 L["gift_of_agthia"] = "點選通往西北方斷橋的火炬並攜帶 {spell:333320} 從火炬到火炬直到到達寶箱。點亮最後的火炬你會受益 {spell:333063}。"
 L["gift_of_chyrus"] = "在寶箱前面跪下將被授予 {spell:333045}。"
@@ -1176,9 +1185,6 @@ L["gift_of_thenios"] = [[
 這個寶珠將把你進入真正的審判熏香。與它溝通後最後的飛行平臺會讓你獲得 {spell:333068} 來打開寶箱。
 ]]
 L["gift_of_vesiphone"] = "敲鐘刷新一個 {npc:170849} 擊殺後獲得 {spell:333239} 負面效果。寶箱正對面的流水將清潔此負面效果，並獲得 {spell:332785}。"
-
-L["cache_of_the_ascended"] = "晉升寶箱"
-L["cache_of_the_ascended_note"] = "與其他四名玩家，同時點選五個純淨的容器，勇氣，謙卑，智慧和忠誠。然後前往志士試煉場擊敗晉升者議會獲得寶箱獎勵。"
 
 L["anima_shard"] = "失落的靈魄碎片"
 L["anima_shard_61225"] = "在橋下的較低平臺上。"
@@ -1244,6 +1250,10 @@ L["temple_of_humility"] = "謙遜神殿"
 L["temple_of_purity"] = "純潔神殿"
 L["xandrias_vigil"] = "珊卓亞的守望"
 
+L["stratios_note"] = nil
+L["thenia_note"] = nil
+L["zolla_note"] = nil
+
 -------------------------------------------------------------------------------
 --------------------------------- MALDRAXXUS ----------------------------------
 -------------------------------------------------------------------------------
@@ -1254,7 +1264,6 @@ L["forgotten_mementos"] = "在寶藏西側的房間拖拽寶庫閘門之鏈打�
 L["gieger_note"] = "攻擊 {npc:162815} 後啟動稀有。"
 L["gristlebeak_note"] = "破壞附近的 {npc:162761} 後啟動稀有。"
 L["leeda_note"] = "擊殺兩個 {npc:162220} 單位後稀有刷新。"
-L["malkorak_note"] = "在塔頂(很多樓梯)。"
 L["sabriel_note"] = "可以作為苦痛劇場的冠軍之一出現。"
 L["schmitd_note"] = "使用附近的 {spell:313451} 破壞他的護盾。"
 L["taskmaster_xox_note"] = "與 {npc:160204}，{npc:160230} 和 {npc:160226} 共用刷新。"
@@ -1331,6 +1340,10 @@ L["overlook_primus"] = "瞭望台，統御者之座"
 L["zerekriss"] = "澤瑞奎斯，瑪卓薩斯"
 L["zerekriss_note"] = "啟動後，浮空城將在該區域飛行。抓住 {npc:165822} 來滑行到地面。"
 
+L["dundley_note"] = nil
+L["maximillian_note"] = nil
+L["rotgut_note"] = nil
+
 -------------------------------------------------------------------------------
 --------------------------------- REVENDRETH ----------------------------------
 -------------------------------------------------------------------------------
@@ -1396,6 +1409,10 @@ L["halls_of_atonement"] = "贖罪之殿"
 L["pridefall_hamlet"] = "尊殞村"
 L["the_banewood"] = "禍孽森林"
 
+L["addius_note"] = nil
+L["eyegor_note"] = nil
+L["sylla_note"] = nil
+
 -------------------------------------------------------------------------------
 ----------------------------------- THE MAW -----------------------------------
 -------------------------------------------------------------------------------
@@ -1404,9 +1421,9 @@ L["return_to_the_maw"] = "重返淵喉"
 L["maw_intro_note"] = "從 {npc:162804} 開始指引任務線以解鎖淵喉的稀有和事件。"
 
 L["apholeias_note"] = "和3名其他玩家，站在平臺的角落並施放 {spell:331783} 召喚稀有。"
-L["dekaris_note"] = nil
+L["dekaris_note"] = "在一個大型的突出岩石上。"
 L["ekphoras_note"] = "和3名其他玩家，站在平臺的角落並施放 {spell:330650} 召喚稀有。"
-L["ikras_note"] = nil
+L["ikras_note"] = "環繞墮滅堡飛行。這是個攻擊他的好位置。"
 L["orophea_note"] = "從東南方的拾取 {spell:337143} 並提供給 {npc:172577} 啟動。"
 L["sanngror_note"] = "如果他是不可攻擊，等待直到他不再對靈魂實驗。"
 L["talaporas_note"] = "和3名其他玩家，站在平臺的角落並施放 {spell:331800} 召喚稀有。"
@@ -1431,6 +1448,7 @@ L["chaotic_riftstone_note"] = [[
 
 需要從 {npc:162804} 升級 {item:184613}。
 ]]
+L["venari_note"] = nil
 L["venari_upgrade"] = "{npc:162804} 升級"
 
 L["options_icons_bonus_boss"] = "獎勵精英"
@@ -1439,7 +1457,6 @@ L["options_icons_bonus_event"] = "獎勵事件"
 L["options_icons_bonus_event_desc"] = "顯示獎勵事件位置。"
 L["options_icons_riftstone"] = "混亂裂隙石"
 L["options_icons_riftstone_desc"] = "顯示混亂裂隙石傳送者位置。"
-
 
 -------------------------------------------------------------------------------
 ----------------------------------- ICECROWN ----------------------------------

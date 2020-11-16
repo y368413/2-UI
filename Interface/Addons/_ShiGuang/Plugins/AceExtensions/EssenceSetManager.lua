@@ -372,15 +372,15 @@ esm.showInfoTooltip = function(button)
 		local x, y = esm.LDBButton:GetCenter()
 		if y > GetScreenWidth()/2 then
 			if x < GetScreenWidth()/2 then
-				GameTooltip:SetOwner(esm.LDBButton.bg, "ANCHOR_RIGHT")
+				GameTooltip:SetOwner(esm.LDBButton.background, "ANCHOR_RIGHT")
 			else
-				GameTooltip:SetOwner(esm.LDBButton.bg, "ANCHOR_LEFT")
+				GameTooltip:SetOwner(esm.LDBButton.background, "ANCHOR_LEFT")
 			end
 		else
 			if x < GetScreenWidth()/2 then
-				GameTooltip:SetOwner(esm.LDBButton.bg, "ANCHOR_TOPRIGHT")
+				GameTooltip:SetOwner(esm.LDBButton.background, "ANCHOR_TOPRIGHT")
 			else
-				GameTooltip:SetOwner(esm.LDBButton.bg, "ANCHOR_TOPLEFT")
+				GameTooltip:SetOwner(esm.LDBButton.background, "ANCHOR_TOPLEFT")
 			end
 		
 		end

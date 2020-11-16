@@ -60,11 +60,11 @@ function MISC:RaidTool_Header()
 		if btn == "RightButton" and (IsPartyLFG() and IsLFGComplete() or not IsInInstance()) then
 			LeaveParty()
 		end
-	end)]]
+	end)
 	frame:SetScript("OnHide", function(self)
 		self.bg:SetBackdropColor(0, 0, 0, .5)
 		self.bg:SetBackdropBorderColor(0, 0, 0, 1)
-	end)
+	end)]]
 
 	return frame
 end
