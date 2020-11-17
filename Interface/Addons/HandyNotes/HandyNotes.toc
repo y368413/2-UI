@@ -8,7 +8,7 @@
 ## Notes-zhCN: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已击杀过。并替换自带飞行地图，使之更加方便详细。
 ## Notes-zhTW: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已擊殺過。并替换自带飞行地图，使之更加方便详细。
 ## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, Handynotes_PandariaDB, HandyNotes_LostAndFoundDB, HandyNotes_TimelessIsleChestsDB, HandyNotes_TimelessTreasuresDB, HandyNotes_DraenorDB, HandyNotes_ArathiDB, HandyNotes_WarfrontTreasuresDB, HandyNotes_BFA_HF_TrackerDB, NPC_Name_CacheDB, Item_Name_CacheDB, HNMoleMachineConfig, HandyNotes_MechagonAndNazjatarDB, HandyNotes_ScarabCoffersDB, HandyNotes_VisionsOfNZothDB, HandyNotes_PetDailiesDB,  HandyNotes_ShrinesForJewelcraftersDB, HandyNotes_Universal_ExplorerDB, HandyNotes_TravelGuideDB, HandyNotes_AzerothsTopTunesDB, HandyNotes_BFA_JellyDB, HandyNotes_HigherDimensionalLearningDB, HandyNotes_WitheredChestsDB, HandyNotes_ShadowlandsDB
-## Dependencies: _ShiGuang, Blizzard_FlightMap
+## Dependencies: _ShiGuang
 
 ## X-Repple: 2 UI
 
