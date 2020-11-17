@@ -11,6 +11,7 @@
 	<Script file="Talentless.lua"/>
 	<Script file="ColorFrames.lua"/>
 	<Script file="nReputation.lua"/>
+	<Script file="GotoCroods.lua"/>
 	<Script file="WallpaperKit.lua"/>
 	<Script file="AlterCurrencies.lua"/>
 	<Script file="TransmogSetProgress.lua"/>

@@ -877,7 +877,7 @@ end
 local function FilterButton_OnEnter(self)
 	local text = Mod.Filters[ self.filter ].name
 	if self.filter == "EMISSARY" and Config.AngryWorldQuestsFilterEmissary and not C_QuestLog.IsComplete(Config.AngryWorldQuestsFilterEmissary) then
-		local title = C_QuestLog.GetTitleForQuestID(Config.filterEmissary)
+		local title = C_QuestLog.GetTitleForQuestID(Config.AngryWorldQuestsFilterEmissary)
 		if title then text = text..": "..title end
 	end
 	if self.filter == "LOOT" then
@@ -1379,7 +1379,8 @@ local function TaskPOI_IsFiltered(info, displayMapID)
 
 	local title, factionID, capped = C_TaskQuest.GetQuestInfoByQuestID(info.questId)
 	local questTagInfo = C_QuestLog.GetQuestTagInfo(info.questId)
-	if not questTagInfo then return end
+	if not questTagInfo then return end -- fix for nil tag
+	local tradeskillLineID = questTagInfo.tradeskillLineID
 	local timeLeftMinutes = C_TaskQuest.GetQuestTimeLeftMinutes(info.questId)
 	C_TaskQuest.RequestPreloadRewardData(info.questId)
 
@@ -1426,7 +1427,7 @@ local function TaskPOI_IsFiltered(info, displayMapID)
 		end
 
 		if AngryWorldQuestsSelectedFilters.PROFESSION then
-			if questTagInfo.tradeskillLineIndex then
+			if tradeskillLineID and WORLD_QUEST_ICONS_BY_PROFESSION[tradeskillLineID] then
 				isFiltered = false
 			end
 		end
@@ -1479,6 +1480,15 @@ local function TaskPOI_IsFiltered(info, displayMapID)
 			end
 		end
 
+	end
+
+	if Config.onlyCurrentZone and info.mapID ~= displayMapID then
+		-- Needed since C_TaskQuest.GetQuestsForPlayerByMapID returns quests not on the passed map.....
+		-- But, if we are on a continent (the quest continent map id matches the currently shown map)
+		-- we should not be changing anything, since quests should be shown here.
+		if (GetMapContinentMapID(info.mapID) ~= displayMapID) then
+			isFiltered = true
+		end
 	end
 
 	return isFiltered

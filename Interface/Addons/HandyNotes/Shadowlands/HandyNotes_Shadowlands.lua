@@ -645,6 +645,12 @@ Shadowlands.icons = { -- name => path
     crystal_b = {Icon('crystal_blue'), Glow('crystal')},
     crystal_o = {Icon('crystal_orange'), Glow('crystal')},
 
+    flight_point_g = {Icon('flight_point_gray'), Glow('flight_point')},
+    flight_point_y = {Icon('flight_point_yellow'), Glow('flight_point')},
+
+    horseshoe_b = {Icon('horseshoe_black'), Glow('horseshoe')},
+    horseshoe_g = {Icon('horseshoe_gray'), Glow('horseshoe')},
+    horseshoe_o = {Icon('horseshoe_orange'), Glow('horseshoe')},
     paw_g = {Icon('paw_green'), Glow('paw')},
     paw_y = {Icon('paw_yellow'), Glow('paw')},
 
@@ -682,8 +688,6 @@ Shadowlands.icons = { -- name => path
     achievement = {Icon('achievement'), nil},
     door_down = {Icon('door_down'), Glow('door_down')},
     envelope = {Icon('envelope'), Glow('envelope')},
-    flight_point = {Icon('flight_point'), Glow('flight_point')},
-    horseshoe = {Icon('horseshoe'), Glow('horseshoe')},
     left_mouse = {Icon('left_mouse'), nil},
     scroll = {Icon('scroll'), Glow('scroll')},
     world_quest = {Icon('world_quest'), Glow('world_quest')},
@@ -1466,12 +1470,16 @@ MinimapDataProvider.facing = GetPlayerFacing()
 MinimapDataProvider.pins = {}
 MinimapDataProvider.pool = {}
 MinimapDataProvider.minimap = true
+MinimapDataProvider.updateTimer = 0
 
 function MinimapDataProvider:ReleaseAllPins()
     for i, pin in ipairs(self.pins) do
-        self.pool[pin] = true
-        pin:OnReleased()
-        pin:Hide()
+        if pin.acquired then
+            self.pool[pin] = true
+            pin.acquired = false
+            pin:OnReleased()
+            pin:Hide()
+        end
     end
 end
 
@@ -1486,6 +1494,7 @@ function MinimapDataProvider:AcquirePin(template, ...)
         pin:Hide()
         self.pins[#self.pins + 1] = pin
     end
+    pin.acquired = true
     pin:OnAcquired(...)
 end
 
@@ -1518,13 +1527,19 @@ function MinimapDataProvider:RefreshAllData()
     end
 end
 
+
+function MinimapDataProvider:RefreshAllRotations()
+    for i, pin in ipairs(self.pins) do
+        if pin.acquired then pin:UpdateRotation() end
+    end
+end
+
 function MinimapDataProvider:OnUpdate()
     local facing = GetPlayerFacing()
     if facing ~= self.facing then
-        if GetCVar('rotateMinimap') == '1' then
-            self:RefreshAllData()
-        end
         self.facing = facing
+        self:RefreshAllRotations()
+        self.updateTimer = 0
     end
 end
 
@@ -1537,9 +1552,7 @@ end
 function MinimapPinMixin:OnAcquired(poi, ...)
     local mapID = HBD:GetPlayerZone()
     local x, y = poi:Draw(self, ...)
-    if GetCVar('rotateMinimap') == '1' then
-        self.texture:SetRotation(self.texture:GetRotation() + math.pi*2 - self.provider.facing)
-    end
+    if GetCVar('rotateMinimap') == '1' then self:UpdateRotation() end
     HBDPins:AddMinimapIconMap(MinimapPinsKey, self, mapID, x, y, true)
 end
 
@@ -1550,8 +1563,17 @@ function MinimapPinMixin:OnReleased()
     end
 end
 
+function MinimapPinMixin:UpdateRotation()
+    -- If the pin has a rotation, its original value will be stored in the
+    -- `rotation` attribute. Update to accommodate player facing.
+    if self.rotation == nil then return end
+    self.texture:SetRotation(self.rotation + math.pi*2 - self.provider.facing)
+end
+
 MinimapDataProvider:SetScript('OnUpdate', function ()
-    MinimapDataProvider:OnUpdate()
+    if GetCVar('rotateMinimap') == '1' then
+        MinimapDataProvider:OnUpdate()
+    end
 end)
 
 HandyNotes_Shadowlands:RegisterEvent('MINIMAP_UPDATE_ZOOM', function (...)
@@ -2895,6 +2917,7 @@ end
 
 local HBD = LibStub('HereBeDragons-2.0')
 
+local ARROW = "Interface\\AddOns\\HandyNotes\\Icons\\artwork\\arrow"
 local CIRCLE = "Interface\\AddOns\\HandyNotes\\Icons\\artwork\\circle"
 local LINE = "Interface\\AddOns\\HandyNotes\\Icons\\artwork\\line"
 
@@ -2905,6 +2928,7 @@ local function ResetPin(pin)
     pin.texture:SetTexCoord(0, 1, 0, 1)
     pin.texture:SetVertexColor(1, 1, 1, 1)
     pin.frameOffset = 0
+    pin.rotation = nil
     pin:SetAlpha(1)
     if pin.SetScalingLimits then -- World map only!
         pin:SetScalingLimits(nil, nil, nil)
@@ -2996,7 +3020,7 @@ function Path:Draw(pin, type, xy1, xy2)
     t:SetTexture(type)
 
     -- constant size for minimaps, variable size for world maps
-    local size = pin.minimap and 5 or (pin.parentHeight * 0.005)
+    local size = pin.minimap and 4 or (pin.parentHeight * 0.003)
     local line_width = pin.minimap and 60 or (pin.parentHeight * 0.05)
 
     -- apply user scaling
@@ -3006,7 +3030,7 @@ function Path:Draw(pin, type, xy1, xy2)
     if type == CIRCLE then
         pin:SetSize(size, size)
         return HandyNotes:getXY(xy1)
-    else
+    elseif type == LINE then
         local x1, y1 = HandyNotes:getXY(xy1)
         local x2, y2 = HandyNotes:getXY(xy2)
         local line_length
@@ -3018,21 +3042,21 @@ function Path:Draw(pin, type, xy1, xy2)
             local wmapDistance = sqrt((wx2-wx1)^2 + (wy2-wy1)^2)
             local mmapDiameter = C_Minimap:GetViewRadius() * 2
             line_length = Minimap:GetWidth() * (wmapDistance / mmapDiameter)
-            t:SetRotation(-math.atan2(wy2-wy1, wx2-wx1))
+            pin.rotation = -math.atan2(wy2-wy1, wx2-wx1)
         else
             local x1p = x1 * pin.parentWidth
             local x2p = x2 * pin.parentWidth
             local y1p = y1 * pin.parentHeight
             local y2p = y2 * pin.parentHeight
             line_length = sqrt((x2p-x1p)^2 + (y2p-y1p)^2)
-            t:SetRotation(-math.atan2(y2p-y1p, x2p-x1p))
+            pin.rotation = -math.atan2(y2p-y1p, x2p-x1p)
         end
         pin:SetSize(line_length, line_width)
+        pin.texture:SetRotation(pin.rotation)
 
         return (x1+x2)/2, (y1+y2)/2
     end
 end
-
 -------------------------------------------------------------------------------
 ------------------------------------ LINE -------------------------------------
 -------------------------------------------------------------------------------
@@ -3080,30 +3104,40 @@ end
 
 local Arrow = Class('Arrow', Line)
 
-function Arrow:Initialize(attrs)
-    Line.Initialize(self, attrs)
-
-    local x1, y1 = HandyNotes:getXY(self[1])
-    local x2, y2 = HandyNotes:getXY(self[2])
-    local angle = math.atan2(y2 - y1, (x2 - x1) * 1.85) + (math.pi * 0.5)
-    local xdiff = math.cos(angle) * (self.distance / self.segments / 4)
-    local ydiff = math.sin(angle) * (self.distance / self.segments / 4)
-
-    local xl, yl = HandyNotes:getXY(self.path[#self.path - 1])
-    self.corner1 = HandyNotes:getCoord(xl + xdiff, yl + ydiff)
-    self.corner2 = HandyNotes:getCoord(xl - xdiff, yl - ydiff)
+function Arrow:Render(map, template)
+    -- draw a segmented line and the head of the arrow
+    Line.Render(self, map, template)
+    map:AcquirePin(template, self, ARROW, self[1], self[2])
 end
 
-function Arrow:Render(map, template)
-    -- draw a segmented line
-    Line.Render(self, map, template)
+function Arrow:Draw(pin, type, xy1, xy2)
+    local x, y = Line.Draw(self, pin, type, xy1, xy2)
+    if x and y then return x, y end -- circle or line
 
-    -- draw the head of the arrow
-    map:AcquirePin(template, self, CIRCLE, self.corner1)
-    map:AcquirePin(template, self, CIRCLE, self.corner2)
-    map:AcquirePin(template, self, LINE, self.corner1, self.path[#self.path])
-    map:AcquirePin(template, self, LINE, self.corner2, self.path[#self.path])
-    map:AcquirePin(template, self, LINE, self.corner1, self.corner2)
+    -- constant size for minimaps, variable size for world maps
+    local head_length = pin.minimap and 40 or (pin.parentHeight * 0.04)
+    local head_width = pin.minimap and 15 or (pin.parentHeight * 0.015)
+    head_length = head_length * Shadowlands:GetOpt('poi_scale')
+    head_width = head_width * Shadowlands:GetOpt('poi_scale')
+    pin:SetSize(head_width, head_length)
+
+    local x1, y1 = HandyNotes:getXY(xy1)
+    local x2, y2 = HandyNotes:getXY(xy2)
+    if pin.minimap then
+        local mapID = HBD:GetPlayerZone()
+        local wx1, wy1 = HBD:GetWorldCoordinatesFromZone(x1, y1, mapID)
+        local wx2, wy2 = HBD:GetWorldCoordinatesFromZone(x2, y2, mapID)
+        pin.rotation = -math.atan2(wy2-wy1, wx2-wx1) + (math.pi / 2)
+    else
+        local x1p = x1 * pin.parentWidth
+        local x2p = x2 * pin.parentWidth
+        local y1p = y1 * pin.parentHeight
+        local y2p = y2 * pin.parentHeight
+        pin.rotation = -math.atan2(y2p-y1p, x2p-x1p) - (math.pi / 2)
+    end
+    pin.texture:SetRotation(pin.rotation)
+
+    return x2, y2
 end
 
 -------------------------------------------------------------------------------
@@ -3188,11 +3222,16 @@ end
 -------------------------------------------------------------------------------
 
 Shadowlands.groups.ANIMA_SHARD = Group('anima_shard', 'crystal_b', {defaults=Shadowlands.GROUP_HIDDEN})
+Shadowlands.groups.BLESSINGS = Group('blessings', 1022951, {defaults=Shadowlands.GROUP_HIDDEN})
 Shadowlands.groups.BONUS_BOSS = Group('bonus_boss', 'peg_wr')
 Shadowlands.groups.BONUS_EVENT = Group('bonus_event', 'peg_wy')
-Shadowlands.groups.CARRIAGE = Group('carriages', 'horseshoe')
-Shadowlands.groups.RIFTSTONE = Group('riftstone', 'portal_b')
+Shadowlands.groups.CARRIAGE = Group('carriages', 'horseshoe_g', {defaults=Shadowlands.GROUP_HIDDEN})
+Shadowlands.groups.DREDBATS = Group('dredbats', 'flight_point_g', {defaults=Shadowlands.GROUP_HIDDEN})
+Shadowlands.groups.INQUISITORS = Group('inquisitors', 3528307, {defaults=Shadowlands.GROUP_HIDDEN})
+Shadowlands.groups.RIFTSTONE = Group('riftstone', 'portal_b', {defaults=Shadowlands.GROUP_HIDDEN})
+Shadowlands.groups.SINRUNNER = Group('sinrunners', 'horseshoe_o', {defaults=Shadowlands.GROUP_HIDDEN})
 Shadowlands.groups.SLIME_CAT = Group('slime_cat', 3732497, {defaults=Shadowlands.GROUP_HIDDEN})
+Shadowlands.groups.VESPERS = Group('vespers', 3536181, {defaults=Shadowlands.GROUP_HIDDEN})
 
 -------------------------------------------------------------------------------
 ------------------------------------ MAPS -------------------------------------
@@ -3811,7 +3850,7 @@ map.nodes[58205690] = PetBattle({
 
 
 
-
+local Collectible = Shadowlands.node.Collectible
 local Node = Shadowlands.node.Node
 
 
@@ -4446,7 +4485,97 @@ map.nodes[54555609] = PetBattle({
     }
 }) -- Thenia
 
+
 -------------------------------------------------------------------------------
+----------------------------- COUNT YOUR BLESSINGS ----------------------------
+-------------------------------------------------------------------------------
+
+map.nodes[34753001] = Collectible({
+    icon=1022951,
+    group=Shadowlands.groups.BLESSINGS,
+    label='{spell:327976}',
+    note=L["count_your_blessings_note"],
+    rewards={
+        Achievement({id=14767, criteria=49946})
+    }
+}) -- Purified Blessing of Fortitude
+
+map.nodes[53832886] = Collectible({
+    icon=1022951,
+    group=Shadowlands.groups.BLESSINGS,
+    label='{spell:327974}',
+    note=L["count_your_blessings_note"],
+    rewards={
+        Achievement({id=14767, criteria=49944})
+    }
+}) -- Purified Blessing of Grace
+
+map.nodes[45285979] = Collectible({
+    icon=1022951,
+    group=Shadowlands.groups.BLESSINGS,
+    label='{spell:327975}',
+    note=L["count_your_blessings_note"],
+    rewards={
+        Achievement({id=14767, criteria=49945})
+    }
+}) -- Purified Blessing of Power
+
+-------------------------------------------------------------------------------
+------------------------- RALLYING CRY OF THE ASCENDED ------------------------
+-------------------------------------------------------------------------------
+
+map.nodes[32171776] = Collectible({
+    icon=3536181,
+    group=Shadowlands.groups.VESPERS,
+    label=L["vesper_of_loyalty"],
+    note=L["vespers_ascended_note"],
+    rewards={
+        Achievement({id=14734, criteria=49817})
+    }
+}) -- Vesper of Loyalty
+
+map.nodes[33325980] = Collectible({
+    icon=3536181,
+    group=Shadowlands.groups.VESPERS,
+    label=L["vesper_of_courage"],
+    note=L["vespers_ascended_note"],
+    rewards={
+        Achievement({id=14734, criteria=49815})
+    }
+}) -- Vesper of Courage
+
+map.nodes[39132038] = Collectible({
+    icon=3536181,
+    group=Shadowlands.groups.VESPERS,
+    label=L["vesper_of_wisdom"],
+    note=L["vespers_ascended_note"],
+    rewards={
+        Achievement({id=14734, criteria=49819})
+    }
+}) -- Vesper of Wisdom
+
+map.nodes[64326980] = Collectible({
+    icon=3536181,
+    group=Shadowlands.groups.VESPERS,
+    label=L["vesper_of_purity"],
+    note=L["vespers_ascended_note"],
+    rewards={
+        Achievement({id=14734, criteria=49818})
+    }
+}) -- Vesper of Purity
+
+map.nodes[71933896] = Collectible({
+    icon=3536181,
+    group=Shadowlands.groups.VESPERS,
+    label=L["vesper_of_humility"],
+    note=L["vespers_ascended_note"],
+    rewards={
+        Achievement({id=14734, criteria=49816})
+    }
+}) -- Vesper of Humility
+
+-------------------------------------------------------------------------------
+--------------------------------- SHARD LABOR ---------------------------------
 ----------------------------- ANIMA CRYSTAL SHARDS ----------------------------
 -------------------------------------------------------------------------------
 
@@ -5159,9 +5288,9 @@ Map({id=1697}).nodes[45203680] = Kitten({id=174195, parent=map.id, rewards={
 
 
 
-
+local Collectible = Shadowlands.node.Collectible
 local NPC = Shadowlands.node.NPC
-
+local Arrow = Shadowlands.poi.Arrow
 
 
 
@@ -5553,6 +5682,7 @@ map.nodes[61525864] = Treasure({
 
 map.nodes[31055506] = Treasure({
     quest=59889,
+    note=L["smuggled_cache_note"],
     rewards={
         Achievement({id=14314, criteria=50895}),
         Item({item=182738, quest=62189}) -- Bundle of Smuggled Parasol Components
@@ -5706,11 +5836,11 @@ map.nodes[67626608] = PetBattle({
 }) -- Eyegor
 
 -------------------------------------------------------------------------------
----------------------------- THE AFTERLIFE EXPRESS ----------------------------
+---------------------------- CARRIAGES ----------------------------
 -------------------------------------------------------------------------------
 
 local Carriage = Class('Carriage', NPC, {
-    icon = 'horseshoe',
+    icon = 'horseshoe_g',
     scale = 1.2,
     group = Shadowlands.groups.CARRIAGE
 })
@@ -5805,6 +5935,349 @@ map.nodes[47694787] = Carriage({
 }) -- The Castle Carriage
 
 -------------------------------------------------------------------------------
+------------------------------ CASTLE SINRUNNERS ------------------------------
+-------------------------------------------------------------------------------
+
+local Sinrunner = Class('Sinrunner', NPC, {
+    icon = 'horseshoe_o',
+    scale = 1.2,
+    group = Shadowlands.groups.SINRUNNER
+})
+
+map.nodes[41304731] = Sinrunner({
+    id=174032,
+    requires=Shadowlands.requirement.Currency(1820, 5),
+    rewards={ Achievement({id=14770, criteria={50175,50176}}) },
+    pois={
+        Path({
+            41304731, 41464669, 42054607, 41874510, 41124495, 40244475,
+            39414432, 39064339, 39064170, 39054014, 39093895, 39633808,
+            39973739, 39483657, 39063587, 39043502, 39513412, 40053319,
+            40363272, 40853196, 41433106, 41833043, 42202985, 42732902,
+            43232849, 43872849, 44512868, 45022906, 45063013, 45063112,
+            45063208, 45053252, 45383261, 45343344, 45043348, 45053397,
+            44853458, 44343536, 44153626, 43983713, 43883809, 43743902,
+            44153988, 44034071, 43304079, 42684134, 42354225, 42034311,
+            42044416, 42084502, 42054607
+        })
+    }
+}) -- Hole in the Wall => Ramparts => Hole in the Wall
+
+map.nodes[39464455] = Sinrunner({
+    id=174032,
+    requires=Shadowlands.requirement.Currency(1820, 5),
+    rewards={ Achievement({id=14770, criteria={50175,50176}}) },
+    pois={
+        Path({
+            39464455, 39064339, 39064170, 39054014, 39093895, 39633808,
+            39973739, 39483657, 39063587, 39043502, 39513412, 40053319,
+            40363272, 40853196, 41433106, 41833043, 42202985, 42732902,
+            43232849, 43872849, 44512868, 45022906, 45063013, 45063112,
+            45063208, 45053252, 45383261, 45343344, 45043348, 45053397,
+            44853458, 44343536, 44153626, 43983713, 43883809, 43743902,
+            44153988, 44034071, 43304079, 42684134, 42354225, 42034311,
+            42044416, 42084502, 42054607, 41464669, 41304731
+        })
+    }
+}) -- The Abandoned Purlieu => Hole in the Wall
+
+map.nodes[40153776] = Sinrunner({
+    id=174032,
+    requires=Shadowlands.requirement.Currency(1820, 5),
+    rewards={ Achievement({id=14770, criteria={50175,50176}}) },
+    pois={
+        Path({
+            40153776, 39973739, 39483657, 39063587, 39043502, 39513412,
+            40053319, 40363272, 40853196, 41433106, 41833043, 42202985,
+            42732902, 43232849, 43872849, 44512868, 45022906, 45063013,
+            45063112, 45063208, 45053252, 45383261, 45343344, 45043348,
+            45053397, 44853458, 44343536, 44153626, 43983713, 43883809,
+            43743902, 44153988, 44034071, 43304079, 42684134, 42354225,
+            42034311, 42044416, 42084502, 42054607, 41464669, 41304731
+        })
+    }
+}) -- Dominance Gate => Hole in the Wall
+
+map.nodes[60346271] = Sinrunner({
+    id=174032,
+    requires=Shadowlands.requirement.Currency(1820, 5),
+    rewards={ Achievement({id=14770, criteria=50174}) },
+    pois={
+        Path({
+            60346271, 59926265, 59296277, 58786286, 58176293, 57536310,
+            56776328, 56156337, 55596351, 55246340, 55096242, 54966141,
+            54826032, 54665928, 54485856, 54365781, 54255677, 54525588,
+            54895519, 55475485, 56195445, 56775395, 57395347, 57945307,
+            58375248, 58805183, 59025103, 58945013, 59014930, 59194847,
+            59194760, 59194686, 59124605, 58964517, 58884437, 58824343,
+            58794245, 58754166, 58804094, 59234033, 59433974, 59763915,
+            60183876, 60633892, 60763966
+        })
+    }
+}) -- Darkhaven => Old Gate
+
+map.nodes[55246221] = Sinrunner({
+    id=174032,
+    requires=Shadowlands.requirement.Currency(1820, 5),
+    rewards={ Achievement({id=14770, criteria=50174}) },
+    pois={
+        Path({
+            55246221, 54966141, 54826032, 54665928, 54485856, 54365781,
+            54255677, 54525588, 54895519, 55475485, 56195445, 56775395,
+            57395347, 57945307, 58375248, 58805183, 59025103, 58945013,
+            59014930, 59194847, 59194760, 59194686, 59124605, 58964517,
+            58884437, 58824343, 58794245, 58754166, 58804094, 59234033,
+            59433974, 59763915, 60183876, 60633892, 60763966
+        })
+    }
+}) -- Wildwall => Old Gate
+
+map.nodes[71624105] = Sinrunner({
+    id=174032,
+    requires=Shadowlands.requirement.Currency(1820, 5),
+    rewards={ Achievement({id=14770, criteria=50177}) },
+    pois={
+        Path({
+            71624105, 72164110, 72834061, 73464009, 73894112, 74404207,
+            74984302, 75614371, 76374405, 76824489, 77044604, 77064722,
+            77454830, 77504953, 77635068, 77265175, 76855266, 76435372,
+            76045451, 75505532, 75165648, 74705738, 74095803, 73315796,
+            72455795, 71685792, 70935796, 70305858, 69645824, 68525724,
+            67825686, 67025699, 66165737, 65455787, 64735861, 64005885,
+            63235874, 62585910, 62446025, 62436123, 62936212, 63396186
+        })
+    }
+}) -- Absolution Crypt => Darkhaven
+
+map.nodes[77394882] = Sinrunner({
+    id=174032,
+    requires=Shadowlands.requirement.Currency(1820, 5),
+    rewards={ Achievement({id=14770, criteria=50177}) },
+    pois={
+        Path({
+            77394882, 77504953, 77635068, 77265175, 76855266, 76435372,
+            76045451, 75505532, 75165648, 74705738, 74095803, 73315796,
+            72455795, 71685792, 70935796, 70305858, 69645824, 68525724,
+            67825686, 67025699, 66165737, 65455787, 64735861, 64005885,
+            63235874, 62585910, 62446025, 62436123, 62936212, 63396186
+        })
+    }
+}) -- Edge of Sin => Darkhaven
+
+map.nodes[76365372] = Sinrunner({
+    id=174032,
+    requires=Shadowlands.requirement.Currency(1820, 5),
+    rewards={ Achievement({id=14770, criteria=50177}) },
+    pois={
+        Path({
+            76365372, 76045451, 75505532, 75165648, 74705738, 74095803,
+            73315796, 72455795, 71685792, 70935796, 70305858, 69645824,
+            68525724, 67825686, 67025699, 66165737, 65455787, 64735861,
+            64005885, 63235874, 62585910, 62446025, 62436123, 62936212,
+            63396186
+        })
+    }
+}) -- Edge of Sin => Darkhaven
+
+map.nodes[69635800] = Sinrunner({
+    id=174032,
+    requires=Shadowlands.requirement.Currency(1820, 5),
+    rewards={ Achievement({id=14770, criteria=50177}) },
+    pois={
+        Path({
+            69635800, 69115793, 68525724, 67825686, 67025699, 66165737,
+            65455787, 64735861, 64005885, 63235874, 62585910, 62446025,
+            62436123, 62936212, 63396186
+        })
+    }
+}) -- Edge of Sin => Darkhaven
+
+map.nodes[48836885] = Sinrunner({
+    id=174032,
+    requires=Shadowlands.requirement.Currency(1820, 5),
+    rewards={ Achievement({id=14770, criteria=50175}) },
+    pois={
+        Path({
+            48836885, 48776937, 49306972, 49847016, 50256959, 50726915,
+            51176855, 51566801, 52106783, 52626798, 53026849, 53466892,
+            53926909, 54236859, 54266781, 54156698, 54036627, 53986562,
+            53936490, 53986407, 54476370, 55086352, 55066266, 54916179,
+            54846142, 54676026, 54505916, 54355828, 54195723, 53835626,
+            53355546, 52575540, 51845510, 51225437, 50725358, 50225280,
+            49595233, 48905194, 48365134, 47715199, 47205278, 46625368,
+            46115446, 45655519, 45155587, 44515616, 43715627, 42995614,
+            42295630, 41675639, 41035649, 40575560, 40125460, 39955357,
+            39485259, 39245155, 39335039, 39724939, 40174839, 40564749,
+            40844697
+        })
+    }
+}) -- Wanecrypt Hill => Hole in the Wall
+
+map.nodes[54926234] = Sinrunner({
+    id=174032,
+    requires=Shadowlands.requirement.Currency(1820, 5),
+    rewards={ Achievement({id=14770, criteria=50175}) },
+    pois={
+        Path({
+            54926234, 54846142, 54676026, 54505916, 54355828, 54195723,
+            53835626, 53355546, 52575540, 51845510, 51225437, 50725358,
+            50225280, 49595233, 48905194, 48365134, 47715199, 47205278,
+            46625368, 46115446, 45655519, 45155587, 44515616, 43715627,
+            42995614, 42295630, 41675639, 41035649, 40575560, 40125460,
+            39955357, 39485259, 39245155, 39335039, 39724939, 40174839,
+            40564749, 40844697
+        })
+    }
+}) -- Wildwall => Hole in the Wall
+
+map.nodes[53535504] = Sinrunner({
+    id=174032,
+    requires=Shadowlands.requirement.Currency(1820, 5),
+    rewards={ Achievement({id=14770, criteria=50175}) },
+    pois={
+        Path({
+            53535504, 52575540, 51845510, 51225437, 50725358, 50225280,
+            49595233, 48905194, 48365134, 47715199, 47205278, 46625368,
+            46115446, 45655519, 45155587, 44515616, 43715627, 42995614,
+            42295630, 41675639, 41035649, 40575560, 40125460, 39955357,
+            39485259, 39245155, 39335039, 39724939, 40174839, 40564749,
+            40844697
+        })
+    }
+}) -- Briar Gate => Hole in the Wall
+
+map.nodes[44035641] = Sinrunner({
+    id=174032,
+    requires=Shadowlands.requirement.Currency(1820, 5),
+    rewards={ Achievement({id=14770, criteria=50175}) },
+    pois={
+        Path({
+            44035641, 43715627, 42995614, 42295630, 41675639, 41035649,
+            40575560, 40125460, 39955357, 39485259, 39245155, 39335039,
+            39724939, 40174839, 40564749, 40844697
+        })
+    }
+}) -- Charred Ramparts => Hole in the Wall
+
+-------------------------------------------------------------------------------
+------------------------------- DREDBAT STATUES -------------------------------
+-------------------------------------------------------------------------------
+
+local Dredbat = Class('Dredbat', NPC, {
+    id=161015,
+    icon='flight_point_g',
+    group=Shadowlands.groups.DREDBATS,
+    requires=Shadowlands.requirement.Currency(1820, 5),
+    rewards={ Achievement({id=14769, criteria={id=1, qty=true}}) }
+})
+map.nodes[25103757] = Dredbat({ pois={ Arrow({25103757, 30024700}) } })
+map.nodes[64076201] = Dredbat({ pois={ Arrow({64076201, 70125719}) } })
+map.nodes[56236226] = Dredbat({ pois={ Arrow({56236226, 57485549}) } })
+map.nodes[57246125] = Dredbat({ pois={ Arrow({57246125, 60286116}) } })
+map.nodes[60396117] = Dredbat({ pois={ Arrow({60396117, 57495549}) } })
+map.nodes[64076201] = Dredbat({ pois={ Arrow({64076201, 70125719}) } })
+
+-------------------------------------------------------------------------------
+------------------------ ITS ALWAYS SINNY IN REVENDRETH -----------------------
+-------------------------------------------------------------------------------
+
+local Inquisitor = Class('Inquisitor', Collectible, {
+    icon=3528307,
+    group=Shadowlands.groups.INQUISITORS,
+    pois={ POI({72995199}) } -- Archivist Fane
+})
+
+map.nodes[76205210] = Inquisitor({
+    id=159151,
+    note=L["inquisitor_note"],
+    requires=Shadowlands.requirement.Item(172999),
+    rewards={
+        Achievement({id=14276, criteria=48136})
+    }
+}) -- Inquisitor Traian
+
+map.nodes[64704640] = Inquisitor({
+    id=156918,
+    note=L["inquisitor_note"],
+    requires=Shadowlands.requirement.Item(172998),
+    rewards={
+        Achievement({id=14276, criteria=48135})
+    }
+}) -- Inquisitor Otilia
+
+map.nodes[67304340] = Inquisitor({
+    id=156919,
+    note=L["inquisitor_note"],
+    requires=Shadowlands.requirement.Item(172997),
+    rewards={
+        Achievement({id=14276, criteria=48134})
+    }
+}) -- Inquisitor Petre
+
+map.nodes[69804720] = Inquisitor({
+    id=156916,
+    note=L["inquisitor_note"],
+    requires=Shadowlands.requirement.Item(172996),
+    rewards={
+        Achievement({id=14276, criteria=48133})
+    }
+}) -- Inquisitor Sorin
+
+map.nodes[75304420] = Inquisitor({
+    id=159152,
+    note=L["high_inquisitor_note"],
+    requires=Shadowlands.requirement.Item(173000),
+    rewards={
+        Achievement({id=14276, criteria=48137})
+    }
+}) -- High Inquisitor Gabi
+
+map.nodes[71204240] = Inquisitor({
+    id=159153,
+    note=L["high_inquisitor_note"],
+    requires=Shadowlands.requirement.Item(173001),
+    rewards={
+        Achievement({id=14276, criteria=48138})
+    }
+}) -- High Inquisitor Radu
+
+map.nodes[72105320] = Inquisitor({
+    id=159155,
+    note=L["high_inquisitor_note"],
+    requires=Shadowlands.requirement.Item(173006),
+    rewards={
+        Achievement({id=14276, criteria=48140})
+    }
+}) -- High Inquisitor Dacian
+
+map.nodes[69805230] = Inquisitor({
+    id=159154,
+    note=L["high_inquisitor_note"],
+    requires=Shadowlands.requirement.Item(173005),
+    rewards={
+        Achievement({id=14276, criteria=48139})
+    }
+}) -- High Inquisitor Magda
+
+map.nodes[69704540] = Inquisitor({
+    id=159157,
+    note=L["grand_inquisitor_note"],
+    requires=Shadowlands.requirement.Item(173008),
+    rewards={
+        Achievement({id=14276, criteria=48142})
+    }
+}) -- Grand Inquisitor Aurica
+
+map.nodes[64505270] = Inquisitor({
+    id=159156,
+    note=L["grand_inquisitor_note"],
+    requires=Shadowlands.requirement.Item(173007),
+    rewards={
+        Achievement({id=14276, criteria=48141})
+    }
+}) -- Grand Inquisitor Nicu
+
+-------------------------------------------------------------------------------
 -------------------------------- LOYAL GORGER ---------------------------------
 -------------------------------------------------------------------------------
 
@@ -5847,21 +6320,25 @@ local Blanchy = Class('Blanchy', NPC, {
 })
 
 function Blanchy.getters:note ()
-    local note = L["sinrunner_note"]
-    local status
-    for i, quest in ipairs(self.quest) do
-        if C_QuestLog.IsQuestFlaggedCompleted(quest) then
-            status = Shadowlands.status.Green(i)
+    local function status(i)
+        if C_QuestLog.IsQuestFlaggedCompleted(self.quest[i]) then
+            return Shadowlands.status.Green(i)
         else
-            status = Shadowlands.status.Red(i)
+            return Shadowlands.status.Red(i)
         end
-        note = note..'\n\n'..status..' '..L["sinrunner_note_day"..i]
     end
+
+    local note = L["sinrunner_note"]
+    note = note..'\n\n'..status(1)..' '..L["sinrunner_note_day1"]
+    note = note..'\n\n'..status(2)..' '..L["sinrunner_note_day2"]
+    note = note..'\n\n'..status(3)..' '..L["sinrunner_note_day3"]
+    note = note..'\n\n'..status(4)..' '..L["sinrunner_note_day4"]
+    note = note..'\n\n'..status(5)..' '..L["sinrunner_note_day5"]
+    note = note..'\n\n'..status(6)..' '..L["sinrunner_note_day6"]
     return note
 end
 
 map.nodes[62874341] = Blanchy()
-
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -6468,11 +6945,11 @@ hooksecurefunc(HandyNotes_Shadowlands, 'OnInitialize', function ()
     end
 
     local function UpdateSpawnTimes(startNPC, time)
-        EXPECTED[startNPC] = time + 24000 -- 6h40m
+        EXPECTED[startNPC] = time + 12000 -- 3h20m
         local next = function (id) return (id == 174048) and 174067 or (id - 1) end
         local npc = next(startNPC)
         while npc ~= startNPC do
-            time = time + 1200 -- 20 minutes
+            time = time + 600 -- 10 minutes
             EXPECTED[npc] = time
             npc = next(npc)
         end
@@ -6510,7 +6987,7 @@ end
 
 function ICCRare:GetGlow(minimap)
     local expected = EXPECTED[self.id] or 0
-    if expected > time() and expected - time() < 1080 then
+    if expected > time() and expected - time() < 540 then
         local _, scale, alpha = self:GetDisplayInfo(minimap)
         self.glow.alpha = alpha
         self.glow.scale = scale * 1.1

@@ -736,10 +736,12 @@ L["shassera_cave"] = "夏瑟菈洞穴的入口。"
 L["Nazjatar"] = "納沙塔爾"
 L["Mechagon"] = "機械岡"
 ------------------------------------ GEAR -------------------------------------
+L["bag"] = "背包"
 L["cloth"] = "布甲"
 L["leather"] = "皮甲"
 L["mail"] = "鎖甲"
 L["plate"] = "鎧甲"
+L["cosmetic"] = "裝飾品"
 
 L["1h_mace"] = "單手錘"
 L["1h_sword"] = "單手劍"
@@ -760,27 +762,40 @@ L["offhand"] = "副手"
 L["warglaive"] = "戰刃"
 
 L["ring"] = "戒指"
-L["amulet"] = "項鍊"
+L["neck"] = "項鍊"
 L["cloak"] = "披風"
 L["trinket"] = "飾品"
 ---------------------------------- TOOLTIPS -----------------------------------
-L["retrieving"] = "檢索項目連結 ..."
+-------------------------------------------------------------------------------
+
+L["activation_unknown"] = "啟動條件未知"
+L["requirement_not_found"] = "所需位置未知"
+
+L["Requires"] = "需要"
+L["focus"] = "專注"
+L["retrieving"] = "接收物品連結 ..."
 L["in_cave"] = "在洞穴。"
 L["in_small_cave"] = "在小洞穴。"
 L["in_water_cave"] = "在水下洞穴。"
+L["in_waterfall_cave"] = "在瀑布後面洞穴內。"
 L["in_water"] = "在水下。"
+L["hourly"] = "每小時"
+L["daily"] = "每日"
 L["weekly"] = "每週"
 L["normal"] = "普通"
 L["hard"] = "困難"
 L["mount"] = "坐騎"
 L["pet"] = "寵物"
+L["spell"] = "法術"
 L["toy"] = "玩具"
 L["completed"] = "已完成"
 L["incomplete"] = "未完成"
-L["known"] = "已收藏"
-L["missing"] = "缺少"
+L["known"] = "已獲得"
+L["missing"] = "未獲得"
 L["unobtainable"] = "無法獲得"
-L["unlearnable"] = "無法學習"
+L["unlearnable"] = "無法解鎖"
+L["defeated"] = "已擊敗"
+L["undefeated"] = "未擊敗"
 
 ----------------------------------- OPTIONS -----------------------------------
 L["context_menu_title_Visions"] = "恩若司的幻象"
@@ -789,10 +804,16 @@ L["options_title_Visions"] = "恩佐斯的幻象"
 
 L["options_visibility_settings"] = "可視性"
 L["options_general_settings"] = "一般"
+L["options_show_completed_nodes"] = "顯示已完成"
+L["options_show_completed_nodes_desc"] = "顯示所有的節點，即使它今天已被拾取或完成。"
 L["options_toggle_hide_done_rare"] = "如果戰利品已收藏，隱藏稀有"
 L["options_toggle_hide_done_rare_desc"] = "隱藏所有戰利品已收藏的稀有。"
 L["options_toggle_hide_minimap"] = "隱藏小地圖上的所有圖示"
 L["options_toggle_hide_minimap_desc"] = "在小地圖上隱藏此插件的所有圖示，並只在主地圖上顯示它們。"
+L["options_toggle_maximized_enlarged"] = "當世界地圖時最大化時放大圖示"
+L["options_toggle_maximized_enlarged_desc"] = "當世界地圖放到最大時，放大所有的圖示。"
+L["options_toggle_use_char_achieves"] = "使用角色成就"
+L["options_toggle_use_char_achieves_desc"] = "用此角色的成就進度來替代顯示整個帳號的進度。"
 L["options_restore_hidden_nodes"] = "恢復隱藏的節點"
 L["options_restore_hidden_nodes_desc"] = "恢復所有使用右鍵選單隱藏的節點。"
 
@@ -1186,6 +1207,19 @@ L["gift_of_thenios"] = [[
 ]]
 L["gift_of_vesiphone"] = "敲鐘刷新一個 {npc:170849} 擊殺後獲得 {spell:333239} 負面效果。寶箱正對面的流水將清潔此負面效果，並獲得 {spell:332785}。"
 
+L["count_your_blessings_note"] = nil
+L["options_icons_blessings"] = "{achievement:14767}"
+L["options_icons_blessings_desc"] = nil
+
+L["vesper_of_courage"] = nil
+L["vesper_of_humility"] = nil
+L["vesper_of_loyalty"] = nil
+L["vesper_of_purity"] = nil
+L["vesper_of_wisdom"] = nil
+L["vespers_ascended_note"] = nil
+L["options_icons_vespers"] = "{achievement:14734}"
+L["options_icons_vespers_desc"] = nil
+
 L["anima_shard"] = "失落的靈魄碎片"
 L["anima_shard_61225"] = "在橋下的較低平臺上。"
 L["anima_shard_61235"] = "在瀑布上方的壁架上。"
@@ -1239,16 +1273,6 @@ L["anima_shard_61299"] = "隱藏在大火炬的後面。"
 L["anima_shard_61300"] = "掛在中央字體的壁架上。"
 L["options_icons_anima_shard"] = "{achievement:14339}"
 L["options_icons_anima_shard_desc"] = "顯示 {achievement:14339} 成就中全部50個失落的靈魄碎片的位置。"
-
-L["aspirants_rest"] = "志士之墓"
-L["eternal_gateway"] = "永恆之門"
-L["exaltations_rise"] = "晉升高地"
-L["heros_rest"] = "英雄之眠"
-L["sagehaven"] = "賢者集所"
-L["seat_of_eternal_hymns"] = "永恆頌歌之座"
-L["temple_of_humility"] = "謙遜神殿"
-L["temple_of_purity"] = "純潔神殿"
-L["xandrias_vigil"] = "珊卓亞的守望"
 
 L["stratios_note"] = nil
 L["thenia_note"] = nil
@@ -1334,12 +1358,6 @@ L["pus_in_boots"] = "在橋的下面。"
 L["options_icons_slime_cat"] = "{achievement:14634}"
 L["options_icons_slime_cat_desc"] = "顯示 {achievement:14634} 成就中貓咪的位置。"
 
-L["exoramas"] = "艾克索拉馬斯，祭儀家族"
-L["nurakkir"] = "努拉齊爾，蛛眼家族"
-L["overlook_primus"] = "瞭望台，統御者之座"
-L["zerekriss"] = "澤瑞奎斯，瑪卓薩斯"
-L["zerekriss_note"] = "啟動後，浮空城將在該區域飛行。抓住 {npc:165822} 來滑行到地面。"
-
 L["dundley_note"] = nil
 L["maximillian_note"] = nil
 L["rotgut_note"] = nil
@@ -1383,6 +1401,7 @@ L["gilded_plum_chest_note"] = "擊殺在路上徘徊的 {npc:166680}。"
 L["lost_quill_note"] = "從禁忌圖書館的桌上瓶子拾取 {item:182475}。"
 L["rapier_fearless_note"] = "點選地上的劍杆，然後擊敗 {npc:173603}。"
 L["remlates_cache_note"] = "在暗隱村墓穴後面的外牆上。"
+L["smuggled_cache_note"] = nil
 L["taskmaster_trove_note"] = "閱讀Ingress and Egress Rites然後小心地走到寶箱。"
 L["the_count_note"] = "在歿路沼澤農99個 {currency:1820} 然後把它帶給 {npc:173488}。"
 
@@ -1401,17 +1420,20 @@ L["sinrunner_note_day6"] = "從城牆破洞的 {npc:167815} 購買3個 {item:179
 
 L["options_icons_carriages"] = "馬車"
 L["options_icons_carriages_desc"] = "顯示可騎乘馬車的位置和路徑。"
-
-L["dominance_keep"] = "威權要塞"
-L["eternal_terrace"] = "永恆露臺"
-L["feeders_thicket"] = "進食者的灌木林"
-L["halls_of_atonement"] = "贖罪之殿"
-L["pridefall_hamlet"] = "尊殞村"
-L["the_banewood"] = "禍孽森林"
+L["options_icons_dredbats"] = nil
+L["options_icons_dredbats_desc"] = nil
+L["options_icons_sinrunners"] = nil
+L["options_icons_sinrunners_desc"] = nil
 
 L["addius_note"] = nil
 L["eyegor_note"] = nil
 L["sylla_note"] = nil
+
+L["grand_inquisitor_note"] = nil
+L["high_inquisitor_note"] = nil
+L["inquisitor_note"] = nil
+L["options_icons_inquisitors"] = nil
+L["options_icons_inquisitors_desc"] = nil
 
 -------------------------------------------------------------------------------
 ----------------------------------- THE MAW -----------------------------------
@@ -1463,10 +1485,8 @@ L["options_icons_riftstone_desc"] = "顯示混亂裂隙石傳送者位置。"
 -------------------------------------------------------------------------------
 
 L["prepatch_intro"] = "完成暗影之境前夕事件前置任務來解鎖此區域的首領"
-L["icecrown_rares"] = "所有首領以固定順序每20分鐘刷新一個.每個首領一天可以拾取多次"
+L["icecrown_rares"] = "所有首領以固定順序每10分鐘刷新一個.每個首領一天可以拾取多次"
 L["next_spawn"] = "下次刷新時間為本地時間 %s "
-L["shared_loot"] = "共享掉寶"
-L["unique_loot"] = "獨立掉寶"
 
 local ORIG = "原本位於 %s"
 

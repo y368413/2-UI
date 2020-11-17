@@ -747,6 +747,7 @@ L["caverndark_cave"] = "Cave entrance to Caverndark Terror."
 L["chasmhaunt_cave"] = "Cave entrance to Chasm-Haunter."
 L["shassera_cave"] = "Cave entrance to Shassera."
 ------------------------------------ GEAR -------------------------------------
+L["bag"] = "Bag"
 L["cloth"] = "Cloth"
 L["leather"] = "Leather"
 L["mail"] = "Mail"
@@ -770,7 +771,7 @@ L["wand"] = "Wand"
 L["crossbow"] = "Crossbow"
 L["offhand"] = "Off Hand"
 L["warglaive"] = "Warglaive"
-L["warglaives"] = "Warglaives"
+
 L["ring"] = "Ring"
 L["neck"] = "Neck"
 L["cloak"] = "Cloak"
@@ -785,13 +786,16 @@ L["retrieving"] = "Retrieving item link ..."
 L["in_cave"] = "In a cave."
 L["in_small_cave"] = "In a small cave."
 L["in_water_cave"] = "In an underwater cave."
+L["in_waterfall_cave"] = "In a cave behind a waterfall."
 L["in_water"] = "In the water."
+L["hourly"] = "Hourly"
 L["daily"] = "Daily"
 L["weekly"] = "Weekly"
 L["normal"] = "Normal"
 L["hard"] = "Hard"
 L["mount"] = "Mount"
 L["pet"] = "Pet"
+L["spell"] = "Spell"
 L["toy"] = "Toy"
 L["completed"] = "Completed"
 L["incomplete"] = "Incomplete"
@@ -799,8 +803,6 @@ L["known"] = "Known"
 L["missing"] = "Missing"
 L["unobtainable"] = "Unobtainable"
 L["unlearnable"] = "Unlearnable"
-L["A"] = "A" -- available/alive
-L["D"] = "D" -- dead/defeated
 L["defeated"] = "Defeated"
 L["undefeated"] = "Undefeated"
 
@@ -827,6 +829,10 @@ L["options_general_description"] = "Settings that control the behavior of nodes 
 L["options_global_description"] = "Settings that control the display of all nodes in all zones."
 L["options_zones_description"] = "Settings that control the display of nodes in each individual zone."
 
+L["options_open_settings_panel"] = "Open Settings Panel ..."
+L["options_open_world_map"] = "Open World Map"
+L["options_open_world_map_desc"] = "Open this zone in the world map."
+
 ------------------------------------ ICONS ------------------------------------
 
 L["options_icon_settings"] = "Icon Settings"
@@ -845,9 +851,15 @@ L["options_toggle_hide_done_rare"] = "Hide rare, if all loot known"
 L["options_toggle_hide_done_rare_desc"] = "Hide all rares for which all loot is known."
 L["options_toggle_hide_minimap"] = "Hide all icons on the minimap"
 L["options_toggle_hide_minimap_desc"] = "Hides all icons from this addon on the minimap and displays them only on the main map."
+L["options_toggle_maximized_enlarged"] = "Enlarge icons on maximized world map"
+L["options_toggle_maximized_enlarged_desc"] = "When the world map is maximized, enlarge all icons."
+L["options_toggle_use_char_achieves"] = "Use character achievements"
+L["options_toggle_use_char_achieves_desc"] = "Display achievement progress for this character instead of the overall account."
 L["options_restore_hidden_nodes"] = "Restore hidden nodes"
 L["options_restore_hidden_nodes_desc"] = "Restore all nodes hidden using the right-click context menu."
 
+L["options_icons_misc_desc"] = "Display locations of other miscellaneous nodes."
+L["options_icons_misc"] = "Miscellaneous"
 L["options_icons_pet_battles_desc"] = "Display locations of battle pet trainers and NPCs."
 L["options_icons_pet_battles"] = "Pet Battles"
 L["options_icons_caves_desc"] = "Display cave entrances for other nodes."
@@ -1244,7 +1256,7 @@ L["glitterdust_note"] = "The creatures of Ardenweald may look docile, but they w
 ----------------------------------- BASTION -----------------------------------
 -------------------------------------------------------------------------------
 
-L["ascended_council_note"] = "With four other players, click the five Vespers of Purity, Courage, Humility, Wisdom and Loyalty at the same time to summon the council."
+L["ascended_council_note"] = "With four other players, click the five temple vespers at the same time to summon the {npc:170899} at Aspirant's Crucible."
 L["aspirant_eolis_note"] = "Loot a nearby {item:180613} and read it with the NPC targeted to activate him."
 L["baedos_note"] = "Carry casks of Fermenting Purian Fruit from the surrounding area to {npc:161536} until he activates."
 L["basilofos_note"] = "Move around the rock until a purple fixate marker appears over your head. Stand still and wait for four emotes to appear, then he will spawn."
@@ -1302,6 +1314,19 @@ The orb will take you to the true Incense of Judgment. Commune with it and the f
 ]]
 L["gift_of_vesiphone"] = "Ring one of the bells to spawn a {npc:170849} and kill it to receive the {spell:333239} debuff. The falling water opposite the chest will cleanse this debuff and grant you {spell:332785}."
 
+L["count_your_blessings_note"] = "Place a {item:178915} in the tribute bowl to receive the blessing."
+L["options_icons_blessings"] = "{achievement:14767}"
+L["options_icons_blessings_desc"] = "Display tribute locations for the {achievement:14767} achievement."
+
+L["vesper_of_courage"] = "Vesper of Courage"
+L["vesper_of_humility"] = "Vesper of Humility"
+L["vesper_of_loyalty"] = "Vesper of Loyalty"
+L["vesper_of_purity"] = "Vesper of Purity"
+L["vesper_of_wisdom"] = "Vesper of Wisdom"
+L["vespers_ascended_note"] = "Click this vesper at the same time as the other four vespers to summon the {npc:170899} at Aspirant's Crucible."
+L["options_icons_vespers"] = "{achievement:14734}"
+L["options_icons_vespers_desc"] = "Display vesper locations for the {achievement:14734} achievement."
+
 L["anima_shard"] = "Lost Anima Shard"
 L["anima_shard_61225"] = "On a lower platform below the bridge."
 L["anima_shard_61235"] = "On a ledge above the waterfall."
@@ -1355,16 +1380,6 @@ L["anima_shard_61299"] = "Hidden behind a large torch."
 L["anima_shard_61300"] = "On a ledge hanging over the central font."
 L["options_icons_anima_shard"] = "{achievement:14339}"
 L["options_icons_anima_shard_desc"] = "Display the locations of all 50 lost anima shards for the {achievement:14339} achievement."
-
-L["aspirants_rest"] = "Aspirant's Rest"
-L["eternal_gateway"] = "Eternal Gateway"
-L["exaltations_rise"] = "Exaltation Rise"
-L["heros_rest"] = "Hero's Rest"
-L["sagehaven"] = "Sagehaven"
-L["seat_of_eternal_hymns"] = "Seat of Eternal Hymns"
-L["temple_of_humility"] = "Temple of Humility"
-L["temple_of_purity"] = "Temple of Purity"
-L["xandrias_vigil"] = "Xandria's Vigil"
 
 L["stratios_note"] = "Even the smallest battles should be fought with honor and care. Present your team when you are ready."
 L["thenia_note"] = "Such magnificent open plains here. A glorious place to battle. Are you prepared?"
@@ -1450,12 +1465,6 @@ L["pus_in_boots"] = "Located under the bridge."
 L["options_icons_slime_cat"] = "{achievement:14634}"
 L["options_icons_slime_cat_desc"] = "Display locations of kittens for the {achievement:14634} achievement."
 
-L["exoramas"] = "Exoramas, House of Rituals"
-L["nurakkir"] = "Nurakkir, House of Eyes"
-L["overlook_primus"] = "Overlook, Seat of the Primus"
-L["zerekriss"] = "Zerekriss, Maldraxxus"
-L["zerekriss_note"] = "Once activated, the necropolis will fly around the zone. Grab hold of {npc:165822} to glide down to the surface."
-
 L["dundley_note"] = "I'll battle my way to victory and gain the respect I finally deserve. The only downside is everything I own is now sticky. Everything."
 L["maximillian_note"] = "I have waited dozens of years for a worthy opponent. To the victor go the spoils!"
 L["rotgut_note"] = "Rotgut. Leftovers. Extra pieces. You fight."
@@ -1499,6 +1508,7 @@ L["gilded_plum_chest_note"] = "Kill the {npc:166680} wandering up and down the r
 L["lost_quill_note"] = "Loot the {item:182475} from the bottle on the table in the Forbidden Library, then give it to the {npc:173449} on top of the archway outside."
 L["rapier_fearless_note"] = "Click the rapier on the ground, then defeat {npc:173603}."
 L["remlates_cache_note"] = "On the outer wall of Darkhaven behind the crypt."
+L["smuggled_cache_note"] = "BEFORE YOU LOOT: Make sure you have completed {quest:60480} side quest or you will miss out on 40 {currency:1820} from the treasure and quest."
 L["taskmaster_trove_note"] = "Read the Ingress and Egress Rites then carefully make your way to the chest."
 L["the_count_note"] = "Farm 99 {currency:1820} in the Endmire and then bring them to {npc:173488}."
 
@@ -1517,17 +1527,20 @@ L["sinrunner_note_day6"] = "Feed Blanchy 3 {item:179271}, sold by {npc:167815} b
 
 L["options_icons_carriages"] = "Carriages"
 L["options_icons_carriages_desc"] = "Display locations and paths of rideable carriages."
-
-L["dominance_keep"] = "Dominance Keep"
-L["eternal_terrace"] = "The Eternal Terrace"
-L["feeders_thicket"] = "Feeders' Thicket"
-L["halls_of_atonement"] = "Halls of Atonement"
-L["pridefall_hamlet"] = "Pridefall Hamlet"
-L["the_banewood"] = "The Banewood"
+L["options_icons_dredbats"] = "{npc:161015s}"
+L["options_icons_dredbats_desc"] = "Display locations and paths of {npc:161015s}."
+L["options_icons_sinrunners"] = "{npc:174032s}"
+L["options_icons_sinrunners_desc"] = "Display locations and paths of {npc:174032s}."
 
 L["addius_note"] = "Weak minded beings should not waste my time, but if you insist, I will show you real pain."
 L["eyegor_note"] = "Eyegor ready for battle!"
 L["sylla_note"] = "One can never expect to have a distinguished battle out here in this awful area, but alas here we are. Do not waste my time."
+
+L["grand_inquisitor_note"] = "Turn in 10 {item:180451} to {npc:160248} for a chance at this sinstone."
+L["high_inquisitor_note"] = "Turn in 250 {currency:1816} to {npc:160248} for a chance at this sinstone."
+L["inquisitor_note"] = "Turn in 100 {currency:1816} to {npc:160248} for a chance at this sinstone."
+L["options_icons_inquisitors"] = "{achievement:14276}"
+L["options_icons_inquisitors_desc"] = "Display inquisitor locations for the {achievement:14276} achievement."
 
 -------------------------------------------------------------------------------
 ----------------------------------- THE MAW -----------------------------------
@@ -1579,10 +1592,8 @@ L["options_icons_riftstone_desc"] = "Display the locations of chaotic riftstone 
 -------------------------------------------------------------------------------
 
 L["prepatch_intro"] = "Complete the intro quests for the Shadowlands prepatch event to unlock bosses in this zone."
-L["icecrown_rares"] = "All bosses spawn in a fixed order on a 20 minute interval. Each can be looted multiple times a day!"
+L["icecrown_rares"] = "All bosses spawn in a fixed order on a 10 minute interval. Each can be looted multiple times a day!"
 L["next_spawn"] = "Next spawn at %s local time."
-L["shared_loot"] = "Shared Loot"
-L["unique_loot"] = "Unique Loot"
 
 local ORIG = "Originally in %s."
 
