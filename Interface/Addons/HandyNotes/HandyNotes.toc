@@ -1,4 +1,4 @@
-## Interface: 90001
+## Interface: 90002
 ## Author: Xinhuan
 ## Version: v1.6.0
 ## Title: HandyNotes
@@ -61,3 +61,4 @@ Mode\HandyNotes_PetDailies.lua
 # Others files
 CandyBuckets.lua
 BiggerBagChecker.lua
+#WorldFlightMap.lua

@@ -508,7 +508,7 @@ function CombuctorMixin:OnUpdateSlot(button)
 	if button.info.cached then
 		if button.info.link then
 			local item = CaerdonItem:CreateFromItemLink(button.info.link)
-			CaerdonWardrobe:UpdateButton(button, item, self, { 
+			CaerdonWardrobe:UpdateButton(button, item, self, {
 				locationKey = format("bag%d-slot%d", bag, slot),
 				isOffline = true
 			}, { showMogIcon = true, showBindStatus = true, showSellables = true } )
@@ -537,7 +537,6 @@ function CombuctorMixin:OnUpdateSlot(button)
 		end
 	end
 end
-
 
 local Version = nil
 if select(4, GetAddOnInfo('Combuctor')) then

@@ -1,6 +1,6 @@
 ﻿--## Author: ykiigor  ## SavedVariables: VLegionToDo
-local LegionToDoVersion = "4.3"
-local VERSION_NUMERIC = 43
+local LegionToDoVersion = "4.4"
+local VERSION_NUMERIC = 44
 
 local GetCurrentRegion
 do
@@ -111,7 +111,9 @@ end
 
 local function GetCurrencyInfo(id)
 	local data = C_CurrencyInfo.GetCurrencyInfo(id)
-	return data.name, data.quantity, data.iconFileID, data.quantityEarnedThisWeek, data.maxWeeklyQuantity, data.maxQuantity, data.discovered, data.quality
+	if data then
+		return data.name, data.quantity, data.iconFileID, data.quantityEarnedThisWeek, data.maxWeeklyQuantity, data.maxQuantity, data.discovered, data.quality
+	end
 end
 
 local ToDoFunc = {}
@@ -266,13 +268,6 @@ tinsert(ToDoFunc,function(self,collect)
 		self:AddTexture(texturePath)
 	end
 	collect.anima = amount
-
-	local name, amount, texturePath, earnedThisWeek, weeklyMax, totalMax, isDiscovered, quality = GetCurrencyInfo(1751)
-	if isLevel60 then
-		self:AddDoubleLine(name, amount, 1,1,1)
-		self:AddTexture(texturePath)
-	end
-	collect.freedsoul = amount
 
 	local name, amount, texturePath, earnedThisWeek, weeklyMax, totalMax, isDiscovered, quality = GetCurrencyInfo(1792)
 	collect.honor = amount
@@ -462,9 +457,9 @@ tinsert(ToDoFunc,function(self,collect)
 		else
 			local objectiveText, objectiveType, finished, numFulfilled, numRequired = GetQuestObjectiveInfo(questID, 1, false)
 			if isLevel50 then
-				self:AddDoubleLine("Islands", numFulfilled.."/"..numRequired, 1,1,1)
+				self:AddDoubleLine("Islands", (numFulfilled or 0).."/"..(numRequired or 0), 1,1,1)
 			end
-			collect.island = numFulfilled.."/"..numRequired
+			collect.island = (numFulfilled or 0).."/"..(numRequired or 0)
 		end
 	end
 
@@ -983,8 +978,8 @@ tinsert(ToDoFunc,function(self,collect)
 		for objectiveIndex = 1, d.numObjectives do
 			local objectiveText, objectiveType, finished, numFulfilled, numRequired = GetQuestObjectiveInfo(d.questID, objectiveIndex, false)
 			
-			currQ = numFulfilled
-			maxQ = numRequired
+			currQ = numFulfilled or 0
+			maxQ = numRequired or 0
 		end
 		local fNameStr1 = "|T"..d.icon..":0|t "
 		local fNameStr = fNameStr1..(factionName or "")
@@ -1024,8 +1019,8 @@ CallingsUpdater:SetScript("OnEvent", function(self, event, ...)
 				for objectiveIndex = 1, d.numObjectives do
 					local objectiveText, objectiveType, finished, numFulfilled, numRequired = GetQuestObjectiveInfo(d.questID, objectiveIndex, false)
 					
-					currQ = numFulfilled
-					maxQ = numRequired
+					currQ = numFulfilled or 0
+					maxQ = numRequired or 0
 
 					if not numRequired then
 						currQ, maxQ = 0, 1
@@ -1187,7 +1182,7 @@ end)
 tinsert(ToDoFunc,function(self,collect)
 	local avgItemLevel, avgItemLevelEquipped = GetAverageItemLevel()
 	
-	local ilvlStr = format("|cff%s%.1f|r",avgItemLevelEquipped >= 460 and "00ff00" or avgItemLevelEquipped >= 430 and "ffff00" or "ff0000",avgItemLevelEquipped)
+	local ilvlStr = format("|cff%s%.1f|r",avgItemLevelEquipped >= 213 and "00ff00" or avgItemLevelEquipped >= 200 and "ffff00" or "ff0000",avgItemLevelEquipped)
 
 	collect.ilvl = ilvlStr
 	self:AddDoubleLine("iLvl", ilvlStr,nil,nil,nil,1,1,1)
@@ -1353,6 +1348,59 @@ tinsert(ToDoFunc,function(self,collect)
 		end
 	end
 end)
+
+tinsert(ToDoFunc,function(self,collect)
+	local torghast1 = nil
+	local torghast2 = nil
+
+	collect.torghast1 = torghast1
+	collect.torghast2 = torghast2
+
+	local pois = C_AreaPoiInfo.GetAreaPOIForMap(1543) or {}
+	for i=1,#pois do
+		local poiID = pois[i]
+		local poiData = C_AreaPoiInfo.GetAreaPOIInfo(1543,poiID)
+		if poiData and poiData.atlasName == "poi-torghast" then
+			local widgetSetID = poiData.widgetSetID
+			if widgetSetID then
+				local lines = {}
+
+				local setWidgets = C_UIWidgetManager.GetAllWidgetsBySetID(widgetSetID)
+				for _, widgetInfo in ipairs(setWidgets) do
+					local widgetTypeInfo = UIWidgetManager:GetWidgetTypeInfo(widgetInfo.widgetType)
+					if widgetTypeInfo then
+						local subWidgetInfo = widgetTypeInfo.visInfoDataFunction(widgetInfo.widgetID)
+						if subWidgetInfo then
+							lines[#lines+1] = {subWidgetInfo.text:trim():gsub("|[nr]",""):gsub("|c........",""), subWidgetInfo.orderIndex}
+						end
+					end
+				end
+
+				sort(lines,function(a,b)return a[2]<b[2] end)
+				for i=1,#lines,2 do
+					local floorName = lines[i][1]
+					local def = lines[i+1][1]:match("%d+")
+					if not def then 
+						def = 0 
+					else
+						def = tonumber(def)
+					end
+					if torghast1 then
+						torghast2 = (def==8 and "|cff00ff00" or def==0 and "|cffff0000" or "|cffffff00")..tostring(def).."/8" .. " " .. floorName
+						break
+					else
+						torghast1 = (def==8 and "|cff00ff00" or def==0 and "|cffff0000" or "|cffffff00")..tostring(def).."/8" .. " " .. floorName
+					end
+				end
+			end
+			break
+		end
+	end
+
+	collect.torghast1 = torghast1
+	collect.torghast2 = torghast2
+end)
+
 
 
 
@@ -2007,11 +2055,44 @@ LegionToDo.CharsList:SetScript("OnClick",function(self)
 				checked = function() 
 					return not VLegionToDo.black[guid] 
 				end,
-				func = function()
+				func = function(self)
 					VLegionToDo.black[guid] = not VLegionToDo.black[guid] 
-					UIDropDownMenu_RefreshAll(CharsListDropdown)
+
+					if VLegionToDo.black[guid] then
+						_G[self:GetName().."Check"]:Hide()
+						_G[self:GetName().."UnCheck"]:Show()
+					else
+						_G[self:GetName().."Check"]:Show()
+						_G[self:GetName().."UnCheck"]:Hide()
+					end
+
+					LegionToDo:GetScript("OnShow")(LegionToDo)
 				end,
 				--isNotRadio = true,
+				hasArrow = true,
+				menuList = {
+					{
+						notCheckable = true, 
+						text = DELETE, 
+						func = function()
+							StaticPopupDialogs["LEGIONTODO_REMOVECHAR"] = {
+								text = GetLocale() == "ruRU" and ("Удалить всю информацию о персонаже "..name.."?") or
+									("Remove data for "..name.."?"),
+								button1 = YES,
+								button2 = NO,
+								OnAccept = function()
+									VLegionToDo.chars[ guid ] = nil
+									VLegionToDo.black[ guid ] = nil
+								end,
+								timeout = 0,
+								whileDead = true,
+								hideOnEscape = true,
+								preferredIndex = 3,
+							}
+							StaticPopup_Show("LEGIONTODO_REMOVECHAR")	
+						end,
+					},
+				},
 			}
 		end
 	
@@ -2221,9 +2302,6 @@ LegionToDo:SetScript("OnShow",function(self)
 	local name, _, texturePath = GetCurrencyInfo(1813)
 	count = LineUpdate(count,"anima",name,texturePath)
 
-	local name, _, texturePath = GetCurrencyInfo(1751)
-	count = LineUpdate(count,"freedsoul",name,texturePath)
-
 
 	count = LineUpdate(count,"miniVision","Mini Vision")
 	count = LineUpdate(count,"visionReward","Vision Reward")
@@ -2268,6 +2346,9 @@ LegionToDo:SetScript("OnShow",function(self)
 	
 	count = LineUpdate(count,"mplusmax","Weekly max mythic+")
 	count = LineUpdate(count,"mpluskey","M+ Key",nil,'small')
+
+	count = LineUpdate(count,"torghast","Torghast",nil,'small-left2')
+	count = LineUpdate(count,"torghast","Torghast",nil,'small-left2')
 
 	count = LineUpdate(count,"conq_points","Conquest points")
 	count = LineUpdate(count,"pvp_cache","PvP cache")
@@ -2381,6 +2462,11 @@ LegionToDo:SetScript("OnShow",function(self)
 						t:SetFont(t:GetFont(),10)
 						t:SetSize(90,18)
 						t:SetJustifyH("LEFT")
+					elseif lineApp == 'small-left2' then
+						t:SetFont(t:GetFont(),10)
+						t:SetSize(90,20)
+						t:SetJustifyH("LEFT")
+						t:SetJustifyV("MIDDLE")
 					elseif lineApp == 'center' then
 						t:SetFont(GameFontWhite:GetFont())
 						t:SetSize(90,18)
@@ -2542,11 +2628,6 @@ LegionToDo:SetScript("OnShow",function(self)
 			if not optData["anima"] or OPTIONS_TOGGLED then
 				lineCount = lineCount + 1
 				lines[lineCount].cols[col]:SetText(db.anima or "0")
-			end
-
-			if not optData["freedsoul"] or OPTIONS_TOGGLED then
-				lineCount = lineCount + 1
-				lines[lineCount].cols[col]:SetText(db.freedsoul or "0")
 			end
 
 			if not optData["miniVision"] or OPTIONS_TOGGLED  then
@@ -2722,6 +2803,22 @@ LegionToDo:SetScript("OnShow",function(self)
 					lines[lineCount].cols[col]:SetText("")
 				else
 					lines[lineCount].cols[col]:SetText(db.mkey or "")
+				end
+			end
+
+			if not optData["torghast"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				if needReset then
+					lines[lineCount].cols[col]:SetText("|cffff0000-")
+				else
+					lines[lineCount].cols[col]:SetText(db.torghast1 or "|cffff0000-")
+				end
+
+				lineCount = lineCount + 1
+				if needReset then
+					lines[lineCount].cols[col]:SetText("|cffff0000-")
+				else
+					lines[lineCount].cols[col]:SetText(db.torghast2 or "|cffff0000-")
 				end
 			end
 

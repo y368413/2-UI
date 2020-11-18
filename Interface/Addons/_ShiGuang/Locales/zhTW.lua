@@ -35,7 +35,7 @@ DANWEI_YI = "億";
 
 TOASTY_TRANSMOG_ADDED = "外觀已加入";
 TOASTY_TRANSMOG_REMOVED = "外觀已移除";
-  
+----------------Binding----------------------
 TOMEOFTELEPORTATIONTITLE = "傳送大師";
 TITLEREADME = "點擊圖標打開傳送大師";
 ----------------Title----------------------
@@ -293,6 +293,8 @@ CurrencyTracking_SHOW_ICON = "僅顯示圖示";
 CurrencyTracking_SHOW_ICON = "僅顯示貨幣或道具的圖示，不顯示金額";
 CurrencyTracking_RESET_POSITION = "重設位置";
 CurrencyTracking_RESET_SCREEN_POSITION = "重設遊戲畫面窗格的位置.";
+CurrencyTracking_SHOW_LOWER_DENOMINATIONS = "显示低面额货币";
+CurrencyTracking_SHOW_LOWER_DENOMINATIONS_DEC = "允许显示低面额货币，禁用仅显示金币。";
 CurrencyTracking_BREAKUP_NUMBERS = "千分號";
 CurrencyTracking_OPT_BREAKUP_NUMBERS = "將數字加上當地語系化千分號";
 CurrencyTracking_HIDEZERO = "隱藏未獲取的貨幣";
@@ -307,8 +309,6 @@ CURRENCYTRACKING_OPT_HIDE_IN_COMBAT = "在戰鬥中隱藏"
 CURRENCYTRACKING_OPT_HIDE_IN_COMBAT_DEC = "在戰鬥中自動隱藏框體。"
 CurrencyTracking_OPT_HIDE_IN_BATTLEGROUND = "在戰場中隱藏"
 CurrencyTracking_OPT_HIDE_IN_BATTLEGROUND_DEC = "在戰場中自動隱藏框體。"
-CurrencyTracking_OPT_HIDE_IN_PETBATTLE = "寵物對戰時隱藏";
-CurrencyTracking_OPT_AUTO_HIDE_IN_PETBATTLE = "在寵物對戰開始後自動隱藏框體";
 -- Scale and Transparency
 CurrencyTracking_SCALE_TRANSPARENCY = "大小與透明度";
 CurrencyTracking_ON_SCREEN_FRAME = "遊戲畫面窗格";

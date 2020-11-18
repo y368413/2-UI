@@ -1,4 +1,4 @@
-## Interface: 90001
+## Interface: 90002
 ## Title: Angry Keystones
 ## Title-zhCN:|cff8000ff[战斗]|r秘境助手
 ## Title-zhTW:|cff8000ff[戰鬥]|r秘境助手

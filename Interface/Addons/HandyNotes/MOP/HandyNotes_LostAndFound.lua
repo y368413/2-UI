@@ -1,4 +1,4 @@
----------------------------------------------------------## Author: Kemayo  ## Version: 1 ## SavedVariables: HandyNotes_LostAndFoundDB
+---------------------------------------------------------## Author: Kemayo  ## Version: v14 ## SavedVariables: HandyNotes_LostAndFoundDB
 -- Addon declaration
 HandyNotes_LostAndFound = LibStub("AceAddon-3.0"):NewAddon("HandyNotes_LostAndFound", "AceEvent-3.0")
 local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes")

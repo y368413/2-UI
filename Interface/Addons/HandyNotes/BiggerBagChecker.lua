@@ -1,4 +1,4 @@
-﻿--## Version: v1.3-release ## Author: KyrosKrane Sylvanblade
+﻿--## Version: v1.4.3-release ## Author: KyrosKrane Sylvanblade
 local L = {}
 
 local criteria =
@@ -139,11 +139,13 @@ local color =
 	["green"] = "|cff1eff00",
 	["blue"] = "|cff0070dd",
 	["violet"] = "|cffa335ee",
-	["orange"] = "|cffff8000",
 	["beige"] = "|cffe6cc80",
 	["gold"] = "|cffffd200",
 	["yellow"] = "|cfffbfb1f",
-	["red"] = "|cffff0000"
+	["red"] = "|cffff0000",
+
+	-- Not used here
+	["orange"] = "|cffff8000",
 }
 
 local BiggerBagAchievementNum = 8728 -- the internal achievement ID for Bigger Bag
@@ -173,8 +175,7 @@ local function addItem(item, itemcolor, criteriaNum, percent)
 	-- So just in case, do some sanity checks on the passed in parameters, and just exit if they're invalid. This prevents a nasty in game error.
 	if not item or not itemcolor or not criteriaNum or not percent then return end
 
-	local Completed
-	_ , _ , Completed = GetAchievementCriteriaInfo(BiggerBagAchievementNum, criteriaNum);
+	local _ , _ , Completed = GetAchievementCriteriaInfo(BiggerBagAchievementNum, criteriaNum);
 
 	if not TimelessTooltipHeadlinePrinted then
 		headline()
@@ -210,7 +211,7 @@ local function checkObjects(...)
 			if text ~= nil then
 
 				-- determine what object was found.
-				if text == L["Crane Nest"] or text == L["Eerie Crystal"] or text == L["Sunken Treasure"] or text == L["Timeless Chest"] then
+				if text == L["Crane Nest"] or text == L["Eerie Crystal"] or text == L["Sunken Treasure"] or text == L["Timeless Chest"] or text == L["Conspicuously Empty Shell"] then
 					ObjectFound = text
 				end
 
@@ -219,6 +220,7 @@ local function checkObjects(...)
 					or	string.find(text, L["Crystal of Insanity"]) ~= nil
 					or	string.find(text, L["Cursed Swabby Helmet"]) ~= nil
 					or	string.find(text, L["Bonkers"]) ~= nil
+					or	string.find(text, L["Hardened Shell"]) ~= nil
 					then
 						LineFound = true
 						break -- we have an item and its line; no point continuing to loop.
@@ -241,6 +243,8 @@ local function checkObjects(...)
 			addItem(L["Cursed Swabby Helmet"],color["blue"],criteria["Cursed Swabby Helmet"],67)
 		elseif ObjectFound == L["Timeless Chest"] then
 			addItem(L["Bonkers"],color["blue"],criteria["Bonkers"],1.5)
+		elseif ObjectFound == L["Conspicuously Empty Shell"] then
+			addItem(L["Hardened Shell"], color["blue"], criteria["Hardened Shell"], 1.7 )  	-- 1.7%
 		end -- check each item
 
 	end -- if need to add line
@@ -283,11 +287,11 @@ f:SetScript("OnEvent", function()
 		--elseif npcID == mob["Gulp Frog"] then
 		--	addItem(L["Wilted Lilypad"],color["gray"],criteria["Overgrown Lilypad"],1.2)  -- 1.2%
 		elseif npcID == mob["Nessos the Oracle"] then
-			addItem(L["Hardened Shell"], color["blue"], criteria["Hardened Shell"], 18 )  	-- 18%
+			addItem(L["Hardened Shell"], color["blue"], criteria["Hardened Shell"], 26 )  	-- 26%
 		elseif npcID == mob["Great Turtle Furyshell"] then
 			addItem(L["Hardened Shell"], color["blue"], criteria["Hardened Shell"], 1.7 )  	-- 1.7%
 		elseif npcID == mob["Chelon"] then
-			addItem(L["Hardened Shell"], color["blue"], criteria["Hardened Shell"], 1.6 )  	-- 1.6%
+			addItem(L["Hardened Shell"], color["blue"], criteria["Hardened Shell"], 1.3 )  	-- 1.3%
 		elseif npcID == mob["Korda Torros"] then
 			addItem(L["Forager's Gloves"], color["blue"], criteria["Forager's Gloves"], 10 )		-- 10%
 		elseif npcID == mob["Burning Berserker"] then
@@ -477,6 +481,7 @@ if GetLocale() == "zhCN" then
 	["Eerie Crystal"] = "神秘的水晶",
 	["Sunken Treasure"] = "沉没的宝箱",
 	["Timeless Chest"] = "永恒宝箱",
+	["Conspicuously Empty Shell"] = true, -- @TODO: Get translation
 	---
 	["missing"] = "缺少",
 	["completed"] = "已完成",
@@ -552,6 +557,7 @@ elseif GetLocale() == "zhTW" then
 	["Eerie Crystal"] = "神秘的水晶",
 	["Sunken Treasure"] = "水下寶藏",
 	["Timeless Chest"] = "永恆寶箱",
+	["Conspicuously Empty Shell"] = true, -- @TODO: Get translation
 	----
 	["missing"] = "缺少",
 	["completed"] = "已完成",
@@ -626,6 +632,7 @@ updateLocale(
 	["Eerie Crystal"] = true,
 	["Sunken Treasure"] = true,
 	["Timeless Chest"] = true,
+	["Conspicuously Empty Shell"] = true,
 	---
 	["completed"] = "Done",
 	["missing"] = "Need",

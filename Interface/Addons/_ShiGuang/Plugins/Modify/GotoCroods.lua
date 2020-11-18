@@ -1,15 +1,15 @@
--- ÊäÈë×ø±ê±ê¼ÇÎ»ÖÃ
+ï»¿-- è¾“å…¥åæ ‡æ ‡è®°ä½ç½®
 local WayPointPositionButton = CreateFrame("Button", "WayPointPositionButton", WorldMapFrame.BorderFrame, "UIPanelButtonTemplate")
 WayPointPositionButton:SetWidth(50)
 WayPointPositionButton:SetHeight(18)
 -- WayPointPositionButton.Font = WayPointPositionButton:CreateFontString(nil,nil)
 -- WayPointPositionButton.Font:SetFont("Fonts\\ZYKai_T.ttf",12)
 -- WayPointPositionButton:SetFontString(WayPointPositionButton.Font)
-WayPointPositionButton:SetText("¶¨Î»")
+WayPointPositionButton:SetText("å®šä½")
 WayPointPositionButton:SetPoint("TOPRIGHT", WorldMapFrame.BorderFrame, "TOPRIGHT", -90, -2)
 WayPointPositionButton:SetScript("OnShow", function() WayPointContainer:Close() end)
 
--- ÉèÖÃÄ¿±êÎ»ÖÃ
+-- è®¾ç½®ç›®æ ‡ä½ç½®
 function WayPointPositionButton:SetWayPoint(desX, desY)
     local currentViewMapID = WorldMapFrame:GetMapID()
     if C_Map.CanSetUserWaypointOnMap(currentViewMapID) then
@@ -17,15 +17,15 @@ function WayPointPositionButton:SetWayPoint(desX, desY)
         C_Map.SetUserWaypoint(point)
         C_SuperTrack.SetSuperTrackedUserWaypoint(true);
     else
-        print("|cFFFF0000µ±Ç°µØÍ¼ÎŞ·¨±ê¼Ç£¡|r")
+        print("|cFFFF0000å½“å‰åœ°å›¾æ— æ³•æ ‡è®°ï¼|r")
     end
 end
 
--- µã»÷¶¨Î»°´Å¥
+-- ç‚¹å‡»å®šä½æŒ‰é’®
 function WayPointPositionButton.OnClick(button, down)
     local currentViewMapID = WorldMapFrame:GetMapID()
     if not C_Map.CanSetUserWaypointOnMap(currentViewMapID) then
-        print("|cFFFF0000µ±Ç°µØÍ¼ÎŞ·¨±ê¼Ç£¡|r")
+        print("|cFFFF0000å½“å‰åœ°å›¾æ— æ³•æ ‡è®°ï¼|r")
         return
     end
     C_Map.ClearUserWaypoint()
@@ -62,7 +62,7 @@ function WayPointContainer:Close()
     WayPointContainer:Hide()
 end
 
--- ÊäÈëtab
+-- è¾“å…¥tab
 local function OnCoordTabPressed(editBox)
     if editBox == WayPointContainer.CoordX then
         WayPointContainer.CoordX:ClearFocus()
@@ -73,7 +73,7 @@ local function OnCoordTabPressed(editBox)
     end
 end
 
--- ÊäÈë»Ø³µ
+-- è¾“å…¥å›è½¦
 local function OnCoordEnterPressed(editBox)
     if editBox == WayPointContainer.CoordX then
         if editBox:GetText():len() ~= 0 then
