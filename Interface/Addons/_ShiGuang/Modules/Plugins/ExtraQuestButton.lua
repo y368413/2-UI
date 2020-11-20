@@ -56,6 +56,7 @@ local inaccurateQuestAreas = {
 	[25798] = 64, -- Thousand Needles (TODO: test if we need to associate the item with the zone instead)
 	[25799] = 64, -- Thousand Needles (TODO: test if we need to associate the item with the zone instead)
 	[34461] = 590, -- Horde Garrison
+	[60004] = 118, -- 前夕任务：英勇之举
 }
 
 -- items that should be used for a quest but aren't (questID = itemID)
@@ -164,12 +165,28 @@ function ExtraQuestButton:BAG_UPDATE_DELAYED()
 	end
 end
 
-function ExtraQuestButton:PLAYER_REGEN_ENABLED(event)
-	if self.itemID then
-		self:SetAttribute("item", "item:" .. self.itemID)
-		self:UnregisterEvent(event)
-		self:BAG_UPDATE_COOLDOWN()
+function ExtraQuestButton:UpdateAttributes()
+	if InCombatLockdown() then
+		if not self.itemID and self:IsShown() then
+			self:SetAlpha(0)
+		end
+		self:RegisterEvent("PLAYER_REGEN_ENABLED")
+		return
+	else
+		self:SetAlpha(1)
 	end
+
+	if self.itemID then
+		self:SetAttribute("item", "item:"..self.itemID)
+		self:BAG_UPDATE_COOLDOWN()
+	else
+		self:SetAttribute("item", nil)
+	end
+end
+
+function ExtraQuestButton:PLAYER_REGEN_ENABLED(event)
+	self:UpdateAttributes()
+	self:UnregisterEvent(event)
 end
 
 function ExtraQuestButton:UPDATE_BINDINGS()
@@ -247,10 +264,7 @@ function ExtraQuestButton:PLAYER_LOGIN()
 end
 
 ExtraQuestButton:SetScript("OnEnter", function(self)
-	if not self.itemLink then
-		if I.isDeveloper then print("ExtraQuestButton: invalid item link.") end
-		return
-	end
+	if not self.itemLink then return end
 	GameTooltip:SetOwner(self, "ANCHOR_LEFT")
 	GameTooltip:SetHyperlink(self.itemLink)
 end)
@@ -344,23 +358,18 @@ function ExtraQuestButton:SetItem(itemLink)
 		end
 		M:GetModule("Actionbar").UpdateHotKey(self)
 
-		if InCombatLockdown() then
-			self:RegisterEvent("PLAYER_REGEN_ENABLED")
-		else
-			self:SetAttribute("item", "item:" .. self.itemID)
-			self:BAG_UPDATE_COOLDOWN()
-		end
+		self:UpdateAttributes()
 		self.updateRange = hasRange
 	end
 end
 
 function ExtraQuestButton:RemoveItem()
-	if InCombatLockdown() then
-		self.itemID = nil
-		self:RegisterEvent("PLAYER_REGEN_ENABLED")
-	else
-		self:SetAttribute("item", nil)
-	end
+	self.itemID = nil
+	self:UpdateAttributes()
+end
+
+local function IsQuestOnMap(questID)
+	return not onlyCurrentZone or C_QuestLog_IsOnMap(questID)
 end
 
 local function GetQuestDistanceWithItem(questID)
@@ -377,10 +386,11 @@ local function GetQuestDistanceWithItem(questID)
 	if not itemLink then return end
 	if GetItemCount(itemLink) == 0 then return end
 
-	local shouldShowItem = not C_QuestLog_IsComplete(questID) or showWhenComplete
+	if C_QuestLog_IsComplete(questID) and not showWhenComplete then return end
+
 	local distanceSq = C_QuestLog_GetDistanceSqToQuest(questID)
 	local distanceYd = distanceSq and sqrt(distanceSq)
-	if shouldShowItem and distanceYd and distanceYd <= MAX_DISTANCE_YARDS then
+	if IsQuestOnMap(questID) and distanceYd and distanceYd <= MAX_DISTANCE_YARDS then
 		return distanceYd, itemLink
 	end
 
@@ -403,10 +413,6 @@ local function GetQuestDistanceWithItem(questID)
 	end
 end
 
-local function IsQuestOnMap(questID)
-	return not onlyCurrentZone or C_QuestLog_IsOnMap(questID)
-end
-
 local function GetClosestQuestItem()
 	local closestQuestItemLink
 	local closestDistance = MAX_DISTANCE_YARDS
@@ -415,7 +421,7 @@ local function GetClosestQuestItem()
 		-- this only tracks supertracked worldquests,
 		-- e.g. stuff the player has shift-clicked on the map
 		local questID = C_QuestLog_GetQuestIDForWorldQuestWatchIndex(index)
-		if questID and IsQuestOnMap(questID) then
+		if questID then
 			local distance, itemLink = GetQuestDistanceWithItem(questID)
 			if distance and distance <= closestDistance then
 				closestDistance = distance
@@ -427,7 +433,7 @@ local function GetClosestQuestItem()
 	if not closestQuestItemLink then
 		for index = 1, C_QuestLog_GetNumQuestWatches() do
 			local questID = C_QuestLog_GetQuestIDForQuestWatchIndex(index)
-			if questID and QuestHasPOIInfo(questID) and IsQuestOnMap(questID) then
+			if questID and QuestHasPOIInfo(questID) then
 				local distance, itemLink = GetQuestDistanceWithItem(questID)
 				if distance and distance <= closestDistance then
 					closestDistance = distance
@@ -441,7 +447,7 @@ local function GetClosestQuestItem()
 		for index = 1, C_QuestLog_GetNumQuestLogEntries() do
 			local info = C_QuestLog_GetInfo(index)
 			local questID = info.questID
-			if info and not info.isHeader and (not info.isHidden or C_QuestLog_IsWorldQuest(questID)) and QuestHasPOIInfo(questID) and IsQuestOnMap(questID) then
+			if info and not info.isHeader and (not info.isHidden or C_QuestLog_IsWorldQuest(questID)) and QuestHasPOIInfo(questID) then
 				local distance, itemLink = GetQuestDistanceWithItem(questID)
 				if distance and distance <= closestDistance then
 					closestDistance = distance

@@ -1,4 +1,4 @@
---## Version: 1.1.7 ## Author: AcidWeb
+--## Version: 1.2.1 ## Author: AcidWeb
 local HN = {}
 local L = LibStub("AceLocale-3.0"):GetLocale("HandyNotes")
 local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes")
@@ -63,13 +63,6 @@ HN.Drills = {
   [72421764] = {["mapID"] = 105, ["name"] = L["Skald"], ["questID"] = 53597},
   [76971866] = {["mapID"] = 118, ["name"] = L["Argent Tournament Grounds"], ["questID"] = 53586}
 }
-
-local function ElvUISwag(sender)
-  if sender == "Livarax-BurningLegion" then
-    return [[|TInterface\PvPRankBadges\PvPRank09:0|t ]]
-  end
-  return nil
-end
 
 function HN:CheckMap(mapID)
   for _, p in pairs(HN.ContinentData[HN.CurrentMap]) do

@@ -1,4 +1,4 @@
---## Version: 0.6.0 ## Author: romdeau23
+--## Version: 0.7.0 ## Author: romdeau23
 local MogPartialSets = {}
 
 MogPartialSets.frame = CreateFrame('Frame')
@@ -6,6 +6,7 @@ MogPartialSets.loaded = false
 MogPartialSets.initialized = false
 MogPartialSets.updateTimer = nil
 MogPartialSets.pendingModelUpdate = false
+MogPartialSets.pendingInvalidSetCacheClear = false
 MogPartialSets.eventHandlers = {
     ADDON_LOADED = 'onAddonLoaded',
     TRANSMOGRIFY_UPDATE = 'onTransmogrifyAction',
@@ -77,7 +78,7 @@ end
 
 function MogPartialSets:onTransmogCollectionItemUpdate()
     if self.loaded and self.initialized then
-        self:refreshAfter(0.5)
+        self:refreshAfter(0.5, false, true)
     end
 end
 
@@ -154,12 +155,20 @@ end
 function MogPartialSets:isValidSet(setId)
     if self.validSetCache[setId] == nil then
         for sourceId in pairs(self:getCollectedSetSources(setId)) do
+            local valid = false
             local sourceInfo = self:callOriginalApi('GetSourceInfo', sourceId)
-            local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
-            local slotSources = C_TransmogSets.GetSourcesForSlot(setId, slot)
-            local index = WardrobeCollectionFrame_GetDefaultSourceIndex(slotSources, sourceId)
 
-            if slotSources[index] == nil then
+            if sourceInfo then
+                local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
+                local slotSources = C_TransmogSets.GetSourcesForSlot(setId, slot)
+                local index = WardrobeCollectionFrame_GetDefaultSourceIndex(slotSources, sourceId)
+
+                if slotSources[index] then
+                    valid = true
+                end
+            end
+
+            if not valid then
                 self.validSetCache[setId] = false
                 break
             end
@@ -185,7 +194,7 @@ function MogPartialSets:getSetProgress(setId)
         for sourceId, collected in pairs(sources) do
             local sourceInfo = self:getSourceInfo(sourceId)
 
-            if not self:isIgnoredSlot(sourceInfo.invType - 1) then
+            if sourceInfo and not self:isIgnoredSlot(sourceInfo.invType - 1) then
                 totalSlots = totalSlots + 1
 
                 if collected or self:isUsableSource(sourceId) then
@@ -444,7 +453,7 @@ function MogPartialSets:initOverrides()
         for sourceId in pairs(self:getCollectedSetSources(setId)) do
             local sourceInfo = self:getSourceInfo(sourceId)
 
-            if C_Transmog.GetSlotForInventoryType(sourceInfo.invType) == slot then
+            if sourceInfo and C_Transmog.GetSlotForInventoryType(sourceInfo.invType) == slot then
                 table.insert(slotSources, sourceInfo)
                 break
             end
@@ -542,7 +551,7 @@ function MogPartialSets:forceRefresh()
     self:refreshSetsFrame(true)
 end
 
-function MogPartialSets:refreshAfter(delay, updateModels)
+function MogPartialSets:refreshAfter(delay, updateModels, clearInvalidSetCache)
     if self.updateTimer then
         self.updateTimer:Cancel()
     end
@@ -551,10 +560,19 @@ function MogPartialSets:refreshAfter(delay, updateModels)
         self.pendingModelUpdate = true
     end
 
+    if clearInvalidSetCache then
+        self.pendingInvalidSetCacheClear = true
+    end
+
     self.updateTimer = C_Timer.NewTimer(delay, function ()
+        if self.pendingInvalidSetCacheClear then
+            self:clearInvalidSetCache()
+        end
+
         self:refreshSetsFrame(self.pendingModelUpdate)
         self.updateTimer = nil
         self.pendingModelUpdate = false
+        self.pendingInvalidSetCacheClear = false
     end)
 end
 
@@ -575,6 +593,14 @@ function MogPartialSets:clearCaches()
     self.setSourceCache = {}
     self.sourceInfoCache = {}
     self.usableSourceCache = {}
+end
+
+function MogPartialSets:clearInvalidSetCache()
+    for id, valid in pairs(self.validSetCache) do
+        if not valid then
+            self.validSetCache[id] = nil
+        end
+    end
 end
 
 function MogPartialSets:tryFinally(try, finally, ...)

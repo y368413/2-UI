@@ -721,7 +721,7 @@ function G:SetupBuffIndicator(parent)
 				createBar(scroll.child, index, spellID)
 			end
 		else
-			scroll.dd = M.CreateDropDown(frame, 45, 25, anchors)
+			scroll.dd = M.CreateDropDown(frame, 60, 25, anchors)
 			scroll.dd:SetPoint("TOPLEFT", 10, -10)
 			scroll.dd.options[1]:Click()
 
@@ -729,7 +729,7 @@ function G:SetupBuffIndicator(parent)
 				scroll.dd.options[i]:HookScript("OnEnter", optionOnEnter)
 				scroll.dd.options[i]:HookScript("OnLeave", M.HideTooltip)
 			end
-			scroll.box:SetPoint("TOPLEFT", scroll.dd, "TOPRIGHT", 20, 0)
+			scroll.box:SetPoint("TOPLEFT", scroll.dd, "TOPRIGHT", 5, 0)
 
 			local swatch = M.CreateColorSwatch(frame, "")
 			swatch:SetPoint("LEFT", scroll.box, "RIGHT", 5, 0)

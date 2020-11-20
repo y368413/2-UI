@@ -1,4 +1,4 @@
--- Author: Theck, navv_, seriallos  Version: 9.0.1-02
+-- Author: Theck, navv_, seriallos  Version: 9.0.2-03
 
 local Simulationcraft = {}
 
@@ -288,6 +288,7 @@ Simulationcraft.azeriteEssenceSlotsMinor = {
 local Simulationcraft = LibStub("AceAddon-3.0"):NewAddon(Simulationcraft, "Simulationcraft", "AceConsole-3.0", "AceEvent-3.0")
 local ItemUpgradeInfo = LibStub("LibItemUpgradeInfo-1.0")
 local LibRealmInfo = LibStub("LibRealmInfo")
+local SimcFrame = nil
 
 local OFFSET_ITEM_ID = 1
 local OFFSET_ENCHANT_ID = 2
@@ -922,7 +923,7 @@ end
 -- This is the workhorse function that constructs the profile
 function Simulationcraft:PrintSimcProfile(debugOutput, noBags, links)
   -- addon metadata
-  local versionComment = '# SimC Addon ' .. '9.0.1-02'
+  local versionComment = '# SimC Addon ' .. '9.0.2-02'
   local simcVersionWarning = '# Requires SimulationCraft 901-01 or newer'
 
   -- Basic player info
@@ -1038,7 +1039,13 @@ function Simulationcraft:PrintSimcProfile(debugOutput, noBags, links)
     local unlockedEssences = Simulationcraft:GetUnlockedAzeriteEssencesString()
 
     if essences then
-      simulationcraftProfile = simulationcraftProfile .. essences .. '\n'
+      if UnitLevel('player') > 50 then
+        -- Essences generally have no effect in Shadowlands content so export as a comment.
+        -- Otherwise, SimC will sim the essences for level 60 characters
+        simulationcraftProfile = simulationcraftProfile .. '# ' .. essences .. '\n'
+      else
+        simulationcraftProfile = simulationcraftProfile .. essences .. '\n'
+      end
     end
     if unlockedEssences then
       -- output as a comment, SimC doesn't care about unlocked powers but users might

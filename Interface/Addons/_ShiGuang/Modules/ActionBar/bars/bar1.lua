@@ -39,8 +39,8 @@ local function SetFrameSize(frame, size, num)
 	
 	local layout = R.db["Actionbar"]["Style"]
 	if layout == 8 then
-	  frame:SetWidth(6*size + 6*margin + 6*padding)
-	  frame:SetHeight(2*size - padding)
+	  frame:SetWidth(7*size*1.05 + margin + padding)
+	  frame:SetHeight(2*size - 6*padding)
 	elseif layout == 9 then
 	  frame:SetWidth(7*size + 3*padding)
 	  frame:SetHeight(2*size - 3*padding)
@@ -97,26 +97,26 @@ function Bar:CreateBar1()
 		button:ClearAllPoints()
 		if layout == 8 then
 		  if i == 1 then
-			  button:SetSize(cfg.size *1.1, cfg.size *1.1)
-			  button:SetPoint("TOPLEFT", frame, 5*padding, -padding)
-			elseif i == 2 then
-			  button:SetSize(cfg.size *1.1, cfg.size *1.1)
-			  button:SetPoint("LEFT", _G["ActionButton"..i-1], "RIGHT", 3*padding, 0)
-		  elseif i == 3 then
-			  button:SetSize(cfg.size *1.1, cfg.size *1.1)
-			  button:SetPoint("LEFT", _G["ActionButton"..i-1], "RIGHT", 3*padding, 0)
-			elseif i == 4 then
-			  button:SetSize(cfg.size *1.1, cfg.size *1.1)
-			  button:SetPoint("LEFT", _G["ActionButton"..i-1], "RIGHT", 3*padding, 0)
-		  elseif i == 5 then
-			  button:SetSize(cfg.size *1.1, cfg.size *1.1)
-			  button:SetPoint("LEFT", _G["ActionButton"..i-1], "RIGHT", 3*padding, 0)
-			elseif i == 6 then
-			  button:SetSize(cfg.size *0.8, cfg.size*0.8)
-			  button:SetPoint("TOPLEFT", _G["ActionButton1"], "BOTTOMLEFT", -4*padding, 0)
+			  button:SetSize(cfg.size *1.05, cfg.size *1.05)
+			  button:SetPoint("TOPLEFT", frame, margin, -padding)
+			elseif i == 8 then
+			  button:SetSize(cfg.size *0.75, cfg.size*0.75)
+			  button:SetPoint("TOPLEFT", _G["ActionButton3"], "BOTTOMLEFT", -6*margin, 0)
+			elseif i == 9 then
+			  button:SetSize(cfg.size *0.75, cfg.size*0.75)
+			  button:SetPoint("LEFT", _G["ActionButton"..i-1], "RIGHT", 0, 0)
+			elseif i == 10 then
+			  button:SetSize(cfg.size *0.75, cfg.size*0.75)
+			  button:SetPoint("LEFT", _G["ActionButton"..i-1], "RIGHT", 0, 0)
+			elseif i == 11 then
+			  button:SetSize(cfg.size *0.75, cfg.size*0.75)
+			  button:SetPoint("LEFT", _G["ActionButton"..i-1], "RIGHT", 0, 0)
+			elseif i == 12 then
+			  button:SetSize(cfg.size *0.75, cfg.size*0.75)
+			  button:SetPoint("LEFT", _G["ActionButton"..i-1], "RIGHT", 0, 0)
 			else
-			  button:SetSize(cfg.size *0.8, cfg.size*0.8)
-			  button:SetPoint("LEFT", _G["ActionButton"..i-1], "RIGHT", 3*padding, 0)
+			  button:SetSize(cfg.size *1.05, cfg.size *1.05)
+			  button:SetPoint("LEFT", _G["ActionButton"..i-1], "RIGHT", 0, 0)
 			end
 		elseif layout == 9 then
 		  if i == 1 then
@@ -217,7 +217,7 @@ function Bar:CreateBar1()
 			else
 				icon:Hide()
 			end
-			Bar.UpdateButtonUsable(button)
+			button:UpdateUsable()
 		end
 	end
 	M:RegisterEvent("SPELL_UPDATE_ICON", FixActionBarTexture)

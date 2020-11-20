@@ -21,6 +21,7 @@ local Spells = {
 	-- Affixes
 	[209862] = 20,		-- Volcanic Plume (Environment)
 	[226512] = 20,		-- Sanguine Ichor (Environment)
+	[240448] = 20,      -- Quaking (Environment)
 
 	-- Freehold
 	[272046] = 20,		--- Dive Bomb (Sharkbait)
@@ -69,7 +70,6 @@ local Spells = {
 	[268443] = 20,		--- Dread Volley (Dread Captain Lockwood)
 	[272713] = 20,		--- Crushing Slam (Bilge Rat Demolisher)
 	[274941] = 20,		--- Banana Rampage swirlies(Bilge Rat Buccaneer)
-	[257883] = 20,		--- Break Water (Hadal Darkfathom)
 	[276068] = 20,		--- Tidal Surge (Hadal Darkfathom)
 	[257886] = 20,		--- Brine Pool (Hadal Darkfathom)
 	[261565] = 20,		--- Crashing Tide (Hadal Darkfathom)
@@ -162,7 +162,6 @@ local Spells = {
 	[264206] = 20,		--- Burrow (Merektha)
 	[272657] = 20,		--- Noxious Breath (Merektha)
 	[272821] = 20,		--- Call Lightning (Imbued Stormcaller)
-	[264763] = 20,		--- Spark (Static-charged Dervish)
 	[279014] = 20,		--- Cardiac Shock (Avatar, Environment)
 	
 	-- Underrot

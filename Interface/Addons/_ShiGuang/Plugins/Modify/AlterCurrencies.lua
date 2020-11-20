@@ -82,8 +82,7 @@ end
 ---------------------------------------------------
 -- Append to tooltip text all currency information
 ---------------------------------------------------
-function AlterCurrencies.AddToTooltip(tooltip, index)
-    local id = tonumber(string.match(C_CurrencyInfo.GetCurrencyListLink(index),"currency:(%d+)"))
+function AlterCurrencies.AddToTooltip(tooltip, id)
     if type(ShiGuangDB) == "table" and ShiGuangDB ~= nil then -- If shared variable have data
         for currencyId, value_DB in pairs(ShiGuangDB) do -- For each stored currency
             if id == currencyId then -- If the hover is on this currency 
@@ -109,5 +108,14 @@ function AlterCurrencies.AddToTooltip(tooltip, index)
 end
 
 -- Add amounts below Blizzard tooltip
-hooksecurefunc(GameTooltip, "SetCurrencyToken", AlterCurrencies.AddToTooltip)
+hooksecurefunc(GameTooltip, "SetCurrencyToken", function(tooltip, index)
+			local id = tonumber(string.match(C_CurrencyInfo.GetCurrencyListLink(index),"currency:(%d+)"))
+			AlterCurrencies.AddToTooltip(tooltip, id)
+		end)
+hooksecurefunc(GameTooltip, "SetMerchantCostItem", function(tooltip, item, currency)
+			local itemTexture, itemValue, itemLink, currencyName = GetMerchantItemCostItem(item, currency)
+			local id = tonumber(string.match(itemLink,"currency:(%d+)"))
+			AlterCurrencies.AddToTooltip(tooltip, id)
+		end)
+
 AlterCurrencies_Frame:SetScript("OnEvent", AlterCurrencies.OnEvent)

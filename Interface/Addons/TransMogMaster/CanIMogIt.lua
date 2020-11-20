@@ -704,8 +704,6 @@ function CanIMogIt:SlashCommands(input)
         CanIMogIt.frame.showUnknownOnly:Click()
     elseif input == 'count' then
         self:Print(CanIMogIt.Utils.tablelength(CanIMogIt.db.global.appearances))
-    elseif input == 'test' then
-        CanIMogIt.Tests:RunTests()
     elseif input == 'PleaseDeleteMyDB' then
         self:DBReset()
     elseif input == 'refresh' then

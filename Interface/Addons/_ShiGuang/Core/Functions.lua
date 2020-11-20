@@ -657,7 +657,7 @@ do
 		self.__owner.bg:SetBackdropBorderColor(color.r, color.g, color.b)
 	end
 	local function updateIconBorderColor(self, r, g, b)
-		if (r==.65882 and g==.65882 and b==.65882) or (r>.99 and g>.99 and b>.99) then
+		if not r or (r==.65882 and g==.65882 and b==.65882) or (r>.99 and g>.99 and b>.99) then
 			r, g, b = 0, 0, 0
 		end
 		self.__owner.bg:SetBackdropBorderColor(r, g, b)
@@ -1053,7 +1053,6 @@ do
 		r = M:Round(r, 2)
 		g = M:Round(g, 2)
 		b = M:Round(b, 2)
-		print(r,g,b)
 		return r, g, b
 	end
 

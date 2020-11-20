@@ -528,6 +528,7 @@ function lib:GetCurrencyByID(currencyID, lang)
 		name, currentAmount, texture, earnedThisWeek, weeklyMax, totalMax, isDiscovered, rarity = GetCurrencyInfo(currencyID)
 	else
 		local curr = GetCurrencyInfo(currencyID)
+		if not curr then return end
 		name = curr.name
 		currentAmount = curr.quantity
 		texture = curr.iconFileID
