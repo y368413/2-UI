@@ -852,5 +852,4 @@ function WorldMapQuestBountyCount:AddBountyCountersToTab(tab)
 		end
 	end
 end
-
-QuestMapFrame:HookScript("OnLoad", function()  WorldMapQuestBountyCount:OnLoad() end)
+--QuestMapFrame:HookScript("OnLoad", function() WorldMapQuestBountyCount:OnLoad() end)

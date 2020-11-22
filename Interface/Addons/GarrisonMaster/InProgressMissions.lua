@@ -1,5 +1,4 @@
 ﻿--## Version: 8.1.25 ## Author: lteke
-
 local InProgressMissions = {}
 
 InProgressMissions.frame = InProgressMissions.frame or CreateFrame("Frame", nil, _G.WorldFrame)

@@ -35,7 +35,13 @@
 			</Layer>
 		</Layers>
 	</Frame>
-	
+	<Frame name="WRWorldQuestFrame" mixin="WorldMapQuestBountyCount" parent="QuestMapFrame">
+		<Scripts>
+			<OnLoad>
+				self:OnLoad();
+			</OnLoad>
+		</Scripts>
+	</Frame>	
 	<Script file='Barrels.lua'/>
 	<Script file='Loh.lua'/>
   <Include file="ClassicQuestLog\ClassicQuestLog.xml"/>
