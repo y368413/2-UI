@@ -16,7 +16,7 @@ local function SetFrameSize(frame, size, num)
 		frame:SetWidth(12*(size-7) + (num-1)*margin + 2*padding)
 		frame:SetHeight(size + padding)
 	else
-	frame:SetWidth(num*size + (num-1)*margin + 2*padding)
+	frame:SetWidth(num*size + padding)
 	frame:SetHeight(size + 2*padding)
 	end
 	

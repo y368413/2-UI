@@ -133,6 +133,7 @@ local function RenderLinks(str, nameOnly)
                 end
             end
         elseif type == 'item' then
+            name = name..(suffix or '')
             local name, link, _, _, _, _, _, _, _, icon = GetItemInfo(id)
             if link and icon then
                 if nameOnly then return name end
@@ -644,6 +645,7 @@ Shadowlands.icons = { -- name => path
 
     crystal_b = {Icon('crystal_blue'), Glow('crystal')},
     crystal_o = {Icon('crystal_orange'), Glow('crystal')},
+    crystal_p = {Icon('crystal_purple'), Glow('crystal')},
 
     flight_point_g = {Icon('flight_point_gray'), Glow('flight_point')},
     flight_point_y = {Icon('flight_point_yellow'), Glow('flight_point')},

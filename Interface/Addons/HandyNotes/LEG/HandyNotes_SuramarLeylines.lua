@@ -10,12 +10,10 @@ local GameTooltip = GameTooltip
 local HandyNotes = HandyNotes
 
 local function work_out_texture(atlas)
+    atlas = C_Texture.GetAtlasInfo(atlas)
     return {
-        icon = C_Texture.GetAtlasInfo(atlas).file,
-            tCoordLeft = C_Texture.GetAtlasInfo(atlas).leftTexCoord,
-            tCoordRight = C_Texture.GetAtlasInfo(atlas).rightTexCoord,
-            tCoordTop = C_Texture.GetAtlasInfo(atlas).topTexCoord,
-            tCoordBottom = C_Texture.GetAtlasInfo(atlas).bottomTexCoord,
+        icon = atlas.file,
+        tCoordLeft = atlas.leftTexCoord, tCoordRight = atlas.rightTexCoord, tCoordTop = atlas.topTexCoord, tCoordBottom = atlas.bottomTexCoord,
     }
 end
 local default_texture = work_out_texture("worldquest-questmarker-abilityhighlight")

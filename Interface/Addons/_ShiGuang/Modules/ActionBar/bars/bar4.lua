@@ -15,11 +15,11 @@ local function SetFrameSize(frame, size, num)
 	if (layout == 2) or (layout == 3) or (layout == 6) or (layout == 7)  or (layout == 8) or (layout == 9) or (layout == 10) or (layout == 11) then size = 38 end
 
 	if (layout == 2) or (layout == 3) then
-		frame:SetWidth(6*size + 5*margin + padding)
-		frame:SetHeight(2*size + margin + padding)
+		frame:SetWidth(6*size + margin)
+		frame:SetHeight(2*size + padding)
 	elseif layout == 6 then
-		frame:SetWidth(4*size + margin + padding)
-		frame:SetHeight(3*size + margin + padding)
+		frame:SetWidth(4*size + margin)
+		frame:SetHeight(3*size + margin)
 	elseif layout == 7 then
 	  frame:SetWidth(7*size + 6*margin)
 		frame:SetHeight(2*size - margin)
@@ -27,14 +27,14 @@ local function SetFrameSize(frame, size, num)
 		frame:SetWidth(7*size + margin + padding)
 		frame:SetHeight(2*size + margin + padding)
 	elseif (layout == 9) or (layout == 10) then
-		frame:SetWidth(6*size)
-		frame:SetHeight(2*size)
+		frame:SetWidth(6*size + 2*margin + 2*padding)
+		frame:SetHeight(2*size + 2*margin + padding)
 	elseif layout == 11 then
-		frame:SetWidth(22*size + 4*margin + 2*padding)
-	  frame:SetHeight(2*size + 2*padding)
+		frame:SetWidth((num+8)*size + (num+3)*margin + (num+3)*padding)
+	  frame:SetHeight(2*size)
 	else
-		frame:SetWidth(size + 2*padding)
-		frame:SetHeight(num*size + (num-1)*margin + 2*padding)
+		frame:SetWidth(size + padding)
+		frame:SetHeight((num+1)*size + (num-1)*margin + 8*padding)
 	end
 
 	if not frame.mover then
@@ -74,19 +74,19 @@ function Bar:CreateBar4()
 	if (layout == 2) or (layout == 3) or (layout == 6) or (layout == 7)  or (layout == 8) or (layout == 9) or (layout == 10) or (layout == 11) then size = 38 end
 	local frame = CreateFrame("Frame", "NDui_ActionBar4", UIParent, "SecureHandlerStateTemplate")
 	if (layout == 2) or (layout == 3) then
-		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -9*size - 8*padding - padding, 4}	
+		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -9*size - 2*padding, 2}	
 	elseif layout == 6 then
-		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -8*size - 8*margin , 3*margin}
+		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -8*size - margin , margin}
 	elseif layout == 7 then
 		frame.Pos = {"CENTER", UIParent, "CENTER", 0, -230}
 	elseif layout == 8 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -9*size + 2*margin, 6}
 	elseif (layout == 9) or (layout == 10) then
-		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -9*size - 8*padding, 10}
+		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -9*size - 2*padding, 2}
 	elseif layout == 11 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 2}
 	else
-		frame.Pos = {"RIGHT", UIParent, "RIGHT", -1, -88}
+		frame.Pos = {"RIGHT", UIParent, "RIGHT", 0, -88}
 	end
 	MultiBarRight:SetParent(frame)
 	MultiBarRight:EnableMouse(false)
@@ -157,7 +157,7 @@ function Bar:CreateBar4()
 		elseif layout == 9 then
 			if i == 1 then
 				button:SetSize(size + 7, size + 7)
-				button:SetPoint("TOPRIGHT", frame, padding, -padding)
+				button:SetPoint("TOPRIGHT", frame, -padding, -padding)
 			elseif i == 2 then
 				button:SetSize(size + 7, size + 7)
 				button:SetPoint("RIGHT", _G["MultiBarRightButton"..i-1], "LEFT", -margin, 0)
@@ -180,7 +180,7 @@ function Bar:CreateBar4()
 		elseif layout == 10 then
 		  if i == 1 then
 				button:SetSize(size, size)
-				button:SetPoint("TOPRIGHT", frame, padding, -padding)
+				button:SetPoint("TOPRIGHT", frame, -padding, -padding)
 			elseif i == 2 then
 				button:SetSize(size, size)
 				button:SetPoint("RIGHT", _G["MultiBarRightButton1"], "LEFT", -margin, 0)
@@ -217,7 +217,7 @@ function Bar:CreateBar4()
 			elseif i == 5 then
 				button:SetPoint("TOP", _G["MultiBarRightButton3"], "BOTTOM", 0, -margin)
 			elseif i == 7 then
-				button:SetPoint("LEFT", _G["MultiBarRightButton4"], "RIGHT", 12*size + 14*margin + 4*padding, 0)
+				button:SetPoint("LEFT", _G["MultiBarRightButton4"], "RIGHT", 12*size + 2*margin, 0)
 			elseif i == 9 then
 				button:SetPoint("TOP", _G["MultiBarRightButton7"], "BOTTOM", 0, -margin)
 			elseif i == 11 then
@@ -231,7 +231,7 @@ function Bar:CreateBar4()
 			end
 		else
 			if i == 1 then
-				button:SetPoint("TOPRIGHT", frame, -padding, -padding)
+				button:SetPoint("TOPRIGHT", frame, 0, 0)
 			else
 				button:SetPoint("TOP", _G["MultiBarRightButton"..i-1], "BOTTOM", 0, -margin)
 			end

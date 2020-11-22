@@ -15,13 +15,13 @@ local function SetFrameSize(frame, size, num)
 	if layout ~= 1 then cfg = R.Bars.bar2 end
 
 	if layout == 1 then
-	  frame:SetWidth(19*size + 17*margin + 2*padding)
+	  frame:SetWidth((num+7)*size + (num-6)*padding)
 		frame:SetHeight(2*size + margin + 2*padding)
 	elseif (layout == 2) or (layout == 3) then
-		frame:SetWidth(6*size + 5*margin + padding)
-		frame:SetHeight(2*size + margin + padding)
-	elseif (layout == 4) or (layout == 6) then
-		frame:SetWidth(num*size + (num-1)*margin + 2*padding)
+		frame:SetWidth(6*size + margin)
+		frame:SetHeight(2*size + padding)
+	elseif (layout == 4) or (layout == 6) or(layout == 9) or (layout == 10) or (layout == 11) then
+		frame:SetWidth(num*size + padding)
 		frame:SetHeight(size + 2*padding)
 	elseif layout == 5 then
 		frame:SetWidth(6*size + 5*margin + 2*padding)
@@ -29,12 +29,9 @@ local function SetFrameSize(frame, size, num)
 	elseif layout == 8 then
 	  frame:SetWidth(num*(size+7) + (num-1)*margin + 4*padding)
 	  frame:SetHeight(size + 5*padding)
-	elseif (layout == 9) or (layout == 10) or (layout == 11) then
-	  frame:SetWidth(num*size + (num-1)*margin + 2*padding)
-	  frame:SetHeight(size + 2*padding)
 	elseif layout == 7 then
-	  frame:SetWidth(22*size + 4*margin + 2*padding)
-	  frame:SetHeight(2*size + 2*padding)
+	  frame:SetWidth(22*size - 8*margin)
+	  frame:SetHeight(2*size - padding)
 	else
 		frame:SetWidth(19*size + 2*margin + 2*padding)
 		frame:SetHeight(2*size + margin + 2*padding)
@@ -69,17 +66,17 @@ function Bar:CreateBar3()
 	if layout == 1 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 2}
 	elseif (layout == 2) or (layout == 3) then
-		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 9*cfg.size + 8*margin + padding, 4}
+		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 9*cfg.size + 2*margin, 2}
 	elseif (layout == 4) or (layout == 6) then
-		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 82}
+		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 80}
 	elseif layout == 5 then
-		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 256, 4}
+		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 240, 2}
 	elseif layout == 8 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, cfg.size}
 	elseif (layout == 9) or (layout == 10) or (layout == 11) then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 44}
 	elseif layout == 7 then
-		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 0}
+		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 2}
 	else
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 2}
 	end
@@ -146,11 +143,11 @@ function Bar:CreateBar3()
 			end
 		elseif i == 7 then
 		  if layout == 1 then
-			  button:SetPoint("LEFT", _G["MultiBarBottomRightButton3"], "RIGHT", 12*cfg.size + 14*margin + 16*padding, 0)
+			  button:SetPoint("LEFT", _G["MultiBarBottomRightButton3"], "RIGHT", 12*cfg.size + 9*margin + 9*padding, 0)
 			elseif layout == 2 or layout == 3 or layout == 5 then
 			  button:SetPoint("TOP", _G["MultiBarBottomRightButton1"], "BOTTOM", 0, -margin)
 			elseif layout == 7 then
-			  button:SetPoint("LEFT", _G["MultiBarBottomRightButton4"], "RIGHT", 12*cfg.size + 11*margin + 2*padding, 0)
+			  button:SetPoint("LEFT", _G["MultiBarBottomRightButton4"], "RIGHT", 12*cfg.size + 3*margin, 0)
 			elseif layout == 8 then
 				button:SetSize(cfg.size+7, cfg.size+7)
 				button:SetPoint("LEFT", _G["MultiBarBottomRightButton"..i-1], "RIGHT", 1.2*margin, 0)

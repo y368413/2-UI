@@ -492,7 +492,7 @@ end
 local LibStub = _G.LibStub
 
 local MAJOR_VERSION = "LibCurrencyInfo"
-local MINOR_VERSION = 90000 + tonumber(("$Rev: 40 $"):match("%d+"))
+local MINOR_VERSION = 90000 + tonumber(("$Rev: 44 $"):match("%d+"))
 
 local lib = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
 if not lib then return end
@@ -528,15 +528,16 @@ function lib:GetCurrencyByID(currencyID, lang)
 		name, currentAmount, texture, earnedThisWeek, weeklyMax, totalMax, isDiscovered, rarity = GetCurrencyInfo(currencyID)
 	else
 		local curr = GetCurrencyInfo(currencyID)
-		if not curr then return end
-		name = curr.name
-		currentAmount = curr.quantity
-		texture = curr.iconFileID
-		earnedThisWeek = curr.quantityEarnedThisWeek
-		weeklyMax = curr.maxWeeklyQuantity
-		totalMax = curr.maxQuantity
-		isDiscovered = curr.discovered
-		rarity = curr.quality
+		if curr then
+			name = curr.name
+			currentAmount = curr.quantity
+			texture = curr.iconFileID
+			earnedThisWeek = curr.quantityEarnedThisWeek
+			weeklyMax = curr.maxWeeklyQuantity
+			totalMax = curr.maxQuantity
+			isDiscovered = curr.discovered
+			rarity = curr.quality
+		end
 	end
 	if not name then return end
 	local CurrencyDisplayInfo = C_CurrencyInfo.GetBasicCurrencyInfo(currencyID)

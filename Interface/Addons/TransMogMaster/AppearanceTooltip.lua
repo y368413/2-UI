@@ -1,4 +1,4 @@
-﻿--## Version: v23  ## Author: Kemayo
+﻿--## Version: v24  ## Author: Kemayo
 local AppearanceTooltip = {}
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
@@ -546,7 +546,6 @@ do
                 AppearanceTooltip.db.appearances_known[categoryAppearance.visualID] = nil
             end
         end
-        --AppearanceTooltip.Debug("Updating sources in category", categoryID, "appearances", acount, "sources known", scount)
         categoryID = categoryID + 1
         C_Timer.After(db.scan_delay, AppearanceTooltip.UpdateSources)
     end
@@ -1409,10 +1408,10 @@ do
     subText:SetText("These options let you control how transmog availability is shown in various places in the UI")
 
     local bagicon = CreateAtlasMarkup("transmog-icon-hidden")
-    local reverticon = CreateAtlasMarkup("transmog-icon-revert")
+    local othercharicon = CreateAtlasMarkup("mailbox")
 
     local show = panel:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
-    show:SetText(("Show %s icon for unknown items, and %s icon for unknown items you can't learn on this character:"):format(bagicon, reverticon))
+    show:SetText(("Show %s icon for unknown items, and %s icon for unknown items you can't learn on this character:"):format(bagicon, othercharicon))
 
     local bags = newCheckbox(panel, 'bags', 'in bags', ("For items whose appearance you don't know, show the %s icon on the item in bags. Works with built-in bags, Baggins, Combuctor, and Inventorian."):format(bagicon))
     local bags_unbound = newCheckbox(panel, 'bags_unbound', '...for non-soulbound items only', "Soulbound items are either known already, or can't be sent to another character")

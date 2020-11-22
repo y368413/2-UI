@@ -14,23 +14,23 @@ local function SetFrameSize(frame, size, num)
 	if (layout == 6) or (layout == 8) or (layout == 9) or (layout == 10) or (layout == 11) then cfg.size = 38 end
 
 	if layout == 3 then
-	  frame:SetWidth(num*cfg.size + (num-1)*margin + 2*padding)
-		frame:SetHeight(cfg.size + 2*padding)
+	  frame:SetWidth((num+1)*cfg.size + (num-2)*margin + (num-1)*padding)
+		frame:SetHeight(cfg.size + 4*padding)
 	elseif layout == 6 then
-		frame:SetWidth(4*cfg.size + margin + padding)
-		frame:SetHeight(3*cfg.size + margin + padding)
+		frame:SetWidth(4*cfg.size + margin)
+		frame:SetHeight(3*cfg.size + margin)
 	elseif layout == 8 then
 		frame:SetWidth(7*cfg.size + margin + padding)
 		frame:SetHeight(2*cfg.size + margin + padding)
 	elseif (layout == 9) or (layout == 10) then
-		frame:SetWidth(6*cfg.size)
-		frame:SetHeight(2*cfg.size)
+		frame:SetWidth(6*size + 2*margin + 2*padding)
+		frame:SetHeight(2*cfg.size + 2*margin + padding)
 	elseif layout == 11 then
 		frame:SetWidth(4*cfg.size + 2*margin + 2*padding)
 		frame:SetHeight(3*cfg.size + 4*margin + 2*padding)
 	else
-			frame:SetWidth(size + 2*padding)
-	    frame:SetHeight(num*size + (num-1)*margin + 2*padding)
+			frame:SetWidth(size + padding)
+	    frame:SetHeight((num+1)*size + (num-1)*margin + 8*padding)
 	end
 
 	if not frame.mover then
@@ -59,15 +59,15 @@ function Bar:CreateBar5()
 	elseif layout == 3 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 80}
 	elseif layout == 6 then
-		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 8*cfg.size + 8*margin , 3*margin}
+		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 8*cfg.size + margin , margin}
 	elseif layout == 8 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 9*cfg.size - 2*margin, 6}
 	elseif (layout == 9) or (layout == 10) then
-		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 9*cfg.size+ 6*padding, 9}
+		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 9*cfg.size + 2*padding, 2}
 	elseif layout == 11 then
 		frame.Pos = {"CENTER", UIParent, "CENTER", 8*cfg.size + 6*padding, 4*cfg.size + 6*padding}
 	else
-		frame.Pos = {"RIGHT", UIParent, "RIGHT", -1, -88}
+		frame.Pos = {"RIGHT", UIParent, "RIGHT", 0, -88}
 	end
 
 	MultiBarLeft:SetParent(frame)
@@ -81,10 +81,9 @@ function Bar:CreateBar5()
 		button:ClearAllPoints()
 		if layout == 3 then
 		  if i == 1 then
-			  button:SetPoint("BOTTOMLEFT", frame, padding, padding)
+			  button:SetPoint("TOPLEFT", frame, padding, -padding)
 		  else
-			  local previous = _G["MultiBarLeftButton"..i-1]
-			  button:SetPoint("LEFT", previous, "RIGHT", margin, 0)
+			  button:SetPoint("LEFT", _G["MultiBarLeftButton"..i-1], "RIGHT", margin, 0)
 			 end
 		elseif layout == 6 then
 			if i == 1 then
@@ -202,10 +201,9 @@ function Bar:CreateBar5()
 			end
 		else
 		if i == 1 then
-			button:SetPoint("TOPRIGHT", frame, -padding, -padding)
+			button:SetPoint("TOPRIGHT", frame, 0, 0)
 		else
-			local previous = _G["MultiBarLeftButton"..i-1]
-			button:SetPoint("TOP", previous, "BOTTOM", 0, -margin)
+			button:SetPoint("TOP", _G["MultiBarLeftButton"..i-1], "BOTTOM", 0, -margin)
 		end
 	end
 	end

@@ -11,7 +11,7 @@
 ## RequiredDeps: Blizzard_GarrisonUI, Blizzard_OrderHallUI
 ## SavedVariables: MasterPlanAG, SV_GarrisonMissionManager, IPMDB
 ## SavedVariablesPerCharacter: MasterPlanPC, SVPC_GarrisonMissionManager
-## Version: 0.117 + V60 + 1.4.0.2 + 8.1.25
+## Version: 0.117 + V61 + 1.4.0.2 + 8.1.25
 ## X-Version-Key: exarch
 
 ## X-Repple: 2 UI
@@ -39,10 +39,12 @@ FindBestFollowersForMission.lua
 GarrisonMissionManager.lua
 MissionUI_Shared.lua
 MissionUI_Shared_UpgradeItems.lua
+MissionUI_Shared_Init.lua
 MissionUI_Garrison.lua
 MissionUI_Shipyard.lua
 MissionUI_OrderHall.lua
 MissionUI_BFA.lua
+MissionUI_Covenant.lua
 GarrisonBuilding.lua
 Broker.lua
 
