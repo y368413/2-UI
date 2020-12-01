@@ -176,88 +176,6 @@ local function UpdateButtons()
 		button.Label:SetPoint("BOTTOMLEFT", button, "BOTTOMLEFT", 6, 7);
 	end
 end
-		
-local function InitDropDown(ddFrame)
-	local info = ddFrame:CreateButtonInfo("checkbox");
-
-	-- Hide Completed
-	info.text = "Hide Completed";
-	info.tooltipTitle = "Hide Completed";
-	info.tooltipText = "Hides progress bar for completed set variants.";
-	info.func = function(_, _, _, value)
-		TSP.settings.HideCompleted = value;
-		ddFrame:Refresh();
-		UpdateButtons();
-	end
-	info.checked = function() return TSP.settings.HideCompleted end;
-	ddFrame:AddButton(info);
-	
-	info = ddFrame:CreateButtonInfo("radio");
-	-- Spread it like butter
-	info.disabled = function() return not TSP.settings.HideCompleted end;
-	info.text = "Unchanged";
-	info.tooltipTitle = "Unchanged";
-	info.tooltipText = "Keep remaining bars in their original position.";
-	info.func = function(_, _, _, value)
-		if (value) then
-			TSP.settings.handleEmpty = ENUM_EMPTY_OPTION.keep;
-			ddFrame:Refresh();
-			UpdateButtons();
-		end
-	end
-	
-	info.checked = function() return TSP.settings.handleEmpty == ENUM_EMPTY_OPTION.keep; end;
-	ddFrame:AddButton(info)
-	
-	-- Align Left
-	info.disabled = function() return not TSP.settings.HideCompleted end;
-	info.text = "Align Left";
-	info.tooltipTitle = "Align Left";
-	info.tooltipText = "Aligns progress bars to the left if any bars before it are hidden.";
-	info.func = function(_, _, _, value)
-		if (value) then
-			TSP.settings.handleEmpty = ENUM_EMPTY_OPTION.left;
-			ddFrame:Refresh();
-			UpdateButtons();
-		end
-	end
-	info.checked = function() return TSP.settings.handleEmpty == ENUM_EMPTY_OPTION.left; end;
-	ddFrame:AddButton(info);
-	
-	-- Spread it like butter
-	info.disabled = function() return not TSP.settings.HideCompleted end;
-	info.text = "Spread";
-	info.tooltipTitle = "Spread";
-	info.tooltipText = "Fills up the empty space with the remaining bars.";
-	info.func = function(_, _, _, value)
-		if (value) then
-			TSP.settings.handleEmpty = ENUM_EMPTY_OPTION.spread;
-			ddFrame:Refresh();
-			UpdateButtons();
-		end
-	end
-	
-	info.checked = function() return TSP.settings.handleEmpty == ENUM_EMPTY_OPTION.spread; end;
-	ddFrame:AddButton(info);
-end
-		
-function TSP:OnEnable()
-	self.db = LibStub("AceDB-3.0"):New("TSPDB", TSP_DEFAULTS, true);
-	self.settings = self.db.global;
-	
-	local currentVersion = GetAddOnMetadata(_addonName, "version");
-	
-	if (not self.settings.handleEmpty) then
-		self.settings.handleEmpty = ENUM_EMPTY_OPTION.keep;
-	end
-	
-	if (self.settings.AlignLeft) then
-		self.settings.AlignLeft = false;
-		self.settings.handleEmpty = ENUM_EMPTY_OPTION.left;
-	end
-	
-	self.settings.version = currentVersion;
-end
 
 local TSP_EventFrame = CreateFrame("FRAME", "TSP_EventFrame"); 
 TSP_EventFrame:RegisterEvent("ADDON_LOADED");
@@ -270,7 +188,7 @@ function TSP_EventFrame:ADDON_LOADED(loaded)
 		
 		TSP_SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin);
 		TSP_EventFrame:RegisterEvent("TRANSMOG_COLLECTION_UPDATED");
-		TSP_EventFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
+		--TSP_EventFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
 		--TSP_EventFrame:RegisterEvent("PLAYER_REGEN_ENABLED");
 		--TSP_SettingsButton:SetParent(WardrobeCollectionFrame.SetsCollectionFrame);
 		--TSP_SettingsButton:SetPoint("TOPRIGHT", WardrobeCollectionFrame, "TOPRIGHT", -11, -35);
