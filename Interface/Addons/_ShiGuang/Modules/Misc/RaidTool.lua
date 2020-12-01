@@ -372,14 +372,14 @@ function MISC:RaidTool_BuffChecker(parent)
 				end
 			end
 		end
-		if not MaoRUIPerDB["Misc"]["RMRune"] then NoBuff[numGroups] = {} end
+		if not R.db["Misc"]["RMRune"] then NoBuff[numGroups] = {} end
 
 		if #NoBuff[1] == 0 and #NoBuff[2] == 0 and #NoBuff[3] == 0 and #NoBuff[4] == 0 and #NoBuff[5] == 0 and #NoBuff[6] == 0 then
 			sendMsg(U["Buffs Ready"])
 		else
 			sendMsg(U["Raid Buff Check"])
 			for i = 1, 5 do sendResult(i) end
-			if MaoRUIPerDB["Misc"]["RMRune"] then sendResult(numGroups) end
+			if R.db["Misc"]["RMRune"] then sendResult(numGroups) end
 		end
 	end
 
@@ -421,7 +421,7 @@ function MISC:RaidTool_BuffChecker(parent)
 			if IsInGroup() and (UnitIsGroupLeader("player") or (UnitIsGroupAssistant("player") and IsInRaid())) then
 				if IsAddOnLoaded("DBM-Core") then
 					if reset then
-						SlashCmdList["DEADLYBOSSMODS"]("pull "..MaoRUIPerDB["Misc"]["DBMCount"])
+						SlashCmdList["DEADLYBOSSMODS"]("pull "..R.db["Misc"]["DBMCount"])
 					else
 						SlashCmdList["DEADLYBOSSMODS"]("pull 0")
 					end
@@ -429,7 +429,7 @@ function MISC:RaidTool_BuffChecker(parent)
 				elseif IsAddOnLoaded("BigWigs") then
 					if not SlashCmdList["BIGWIGSPULL"] then LoadAddOn("BigWigs_Plugins") end
 					if reset then
-						SlashCmdList["BIGWIGSPULL"](MaoRUIPerDB["Misc"]["DBMCount"])
+						SlashCmdList["BIGWIGSPULL"](R.db["Misc"]["DBMCount"])
 					else
 						SlashCmdList["BIGWIGSPULL"]("0")
 					end
@@ -533,7 +533,6 @@ function MISC:RaidTool_CreateMenu(parent)
 end
 
 function MISC:RaidTool_EasyMarker()
-	local menuFrame = CreateFrame("Frame", "NDui_EastMarking", UIParent, "UIDropDownMenuTemplate")
 	local menuList = {
 		{text = RAID_TARGET_NONE, func = function() SetRaidTarget("target", 0) end},
 		{text = M.HexRGB(1, .92, 0)..RAID_TARGET_1.." "..ICON_LIST[1].."12|t", func = function() SetRaidTarget("target", 1) end},
@@ -547,7 +546,7 @@ function MISC:RaidTool_EasyMarker()
 	}
 
 	WorldFrame:HookScript("OnMouseDown", function(_, btn)
-		if not MaoRUIPerDB["Misc"]["EasyMarking"] then return end
+		if not R.db["Misc"]["EasyMarking"] then return end
 
 		if btn == "LeftButton" and IsControlKeyDown() and UnitExists("mouseover") then
 			if not IsInGroup() or (IsInGroup() and not IsInRaid()) or UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") then
@@ -559,7 +558,7 @@ function MISC:RaidTool_EasyMarker()
 						menuList[i+1].checked = false
 					end
 				end
-				EasyMenu(menuList, menuFrame, "cursor", 0, 0, "MENU", 1)
+				EasyMenu(menuList, M.EasyMenu, "cursor", 0, 0, "MENU", 1)
 			end
 		end
 	end)
@@ -617,7 +616,7 @@ function MISC:RaidTool_UpdateGrid()
 	if not frame then return end
 
 	local size, margin = 24, 5
-	local showType = MaoRUIPerDB["Misc"]["ShowMarkerBar"]
+	local showType = R.db["Misc"]["ShowMarkerBar"]
 	local perRow = markerTypeToRow[showType]
 
 	for i = 1, 9 do
@@ -648,7 +647,7 @@ function MISC:RaidTool_Misc()
 end
 
 function MISC:RaidTool_Init()
-	if not MaoRUIPerDB["Misc"]["RaidTool"] then return end
+	if not R.db["Misc"]["RaidTool"] then return end
 
 	local frame = MISC:RaidTool_Header()
 	--MISC:RaidTool_RoleCount(frame)

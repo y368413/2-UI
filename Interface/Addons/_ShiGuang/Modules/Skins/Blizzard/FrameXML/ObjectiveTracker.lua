@@ -6,6 +6,7 @@ local select, pairs = select, pairs
 
 local function reskinQuestIcon(button)
 	if not button then return end
+	if not button.SetNormalTexture then return end
 
 	if not button.styled then
 		button:SetSize(24, 24)
@@ -28,7 +29,7 @@ end
 
 local function reskinQuestIcons(_, block)
 	reskinQuestIcon(block.itemButton)
-	reskinQuestIcon(block.rightButton)
+	reskinQuestIcon(block.groupFinderButton)
 end
 
 local function reskinHeader(header)
@@ -72,7 +73,6 @@ local function reskinProgressbarWithIcon(_, _, line)
 	if not bar.bg then
 		bar:SetPoint("LEFT", 22, 0)
 		reskinBarTemplate(bar)
-		BonusObjectiveTrackerProgressBar_PlayFlareAnim = M.Dummy
 
 		icon:SetMask(nil)
 		icon.bg = M.ReskinIcon(icon, true)
@@ -107,29 +107,9 @@ local function reskinMinimizeButton(button)
 	hooksecurefunc(button, "SetCollapsed", updateMinimizeButton)
 end
 
-local atlasToQuality = {
-	["jailerstower-animapowerlist-powerborder-white"] = LE_ITEM_QUALITY_COMMON,
-	["jailerstower-animapowerlist-powerborder-green"] = LE_ITEM_QUALITY_UNCOMMON,
-	["jailerstower-animapowerlist-powerborder-blue"] = LE_ITEM_QUALITY_RARE,
-	["jailerstower-animapowerlist-powerborder-purple"] = LE_ITEM_QUALITY_EPIC,
-}
-
-local function updateMawBuffQuality(button, spellID)
-	if not spellID then return end
-
-	local atlas = C_Spell.GetMawPowerBorderAtlasBySpellID(spellID)
-	local quality = atlasToQuality[atlas]
-	local color = I.QualityColors[quality or 1]
-	if button.bg then
-		button.bg:SetBackdropBorderColor(color.r, color.g, color.b)
-	end
-end
-
-local function updateMawBuffInfo(button, buffInfo)
-	updateMawBuffQuality(button, buffInfo.spellID)
-end
-
 tinsert(R.defaultThemes, function()
+	if IsAddOnLoaded("!KalielsTracker") then return end
+
 	-- QuestIcons
 	hooksecurefunc(QUEST_TRACKER_MODULE, "SetBlockHeader", reskinQuestIcons)
 	hooksecurefunc(WORLD_QUEST_TRACKER_MODULE, "AddObjective", reskinQuestIcons)
@@ -192,40 +172,6 @@ tinsert(R.defaultThemes, function()
 	end)
 
 	hooksecurefunc("Scenario_ChallengeMode_SetUpAffixes", M.AffixesSetup)
-
-	-- Block in jail tower
-	local mawBuffsBlock = ScenarioBlocksFrame.MawBuffsBlock
-	local bg = M.SetBD(mawBuffsBlock, nil, 20, -10, -20, 10)
-	bg:SetBackdropColor(0, .5, .5, .25)
-
-	local blockContainer = mawBuffsBlock.Container
-	M.StripTextures(blockContainer)
-	blockContainer:GetPushedTexture():SetAlpha(0)
-	blockContainer:GetHighlightTexture():SetAlpha(0)
-
-	local blockList = blockContainer.List
-	blockList.__bg = bg
-	blockList:HookScript("OnShow", function(self)
-		self.__bg:SetBackdropBorderColor(1, .8, 0, .5)
-
-		for mawBuff in self.buffPool:EnumerateActive() do
-			if mawBuff:IsShown() and not mawBuff.bg then
-				mawBuff.Border:SetAlpha(0)
-				mawBuff.CircleMask:Hide()
-				mawBuff.CountRing:SetAlpha(0)
-				mawBuff.HighlightBorder:SetColorTexture(1, 1, 1, .25)
-				mawBuff.bg = M.ReskinIcon(mawBuff.Icon)
-
-				updateMawBuffQuality(mawBuff, mawBuff.spellID)
-				hooksecurefunc(mawBuff, "SetBuffInfo", updateMawBuffInfo)
-			end
-		end
-	end)
-	blockList:HookScript("OnHide", function(self)
-		self.__bg:SetBackdropBorderColor(0, 0, 0, 1)
-	end)
-	M.StripTextures(blockList)
-	M.SetBD(blockList)
 
 	-- Reskin Headers
 	local headers = {

@@ -3,12 +3,14 @@ local M, R, U, I = unpack(ns)
 local oUF = ns.oUF or oUF
 local UF = M:GetModule("UnitFrames")
 
-local strmatch, format, wipe, tinsert = string.match, string.format, table.wipe, table.insert
+local strmatch, format, wipe = strmatch, format, wipe
 local pairs, ipairs, next, tonumber, unpack, gsub = pairs, ipairs, next, tonumber, unpack, gsub
 local UnitAura, GetSpellInfo = UnitAura, GetSpellInfo
 local InCombatLockdown = InCombatLockdown
-local GetTime, GetSpellCooldown, IsInRaid, IsInGroup, IsPartyLFG = GetTime, GetSpellCooldown, IsInRaid, IsInGroup, IsPartyLFG
+local GetTime, GetSpellCooldown, IsInRaid, IsInGroup = GetTime, GetSpellCooldown, IsInRaid, IsInGroup
 local C_ChatInfo_SendAddonMessage = C_ChatInfo.SendAddonMessage
+local LE_PARTY_CATEGORY_HOME = LE_PARTY_CATEGORY_HOME
+local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 
 -- RaidFrame Elements
 function UF:CreateRaidIcons(self)
@@ -370,34 +372,33 @@ function UF:UpdateBuffIndicator(event, unit)
 			if not name then break end
 			local value = spellList[spellID]
 			if value and (value[3] or caster == "player" or caster == "pet") then
-				for _, bu in pairs(buttons) do
-					if bu.anchor == value[1] then
-						if R.db["UFs"]["BuffIndicatorType"] == 3 then
-							if duration and duration > 0 then
-								bu.expiration = expiration
-								bu:SetScript("OnUpdate", UF.BuffIndicatorOnUpdate)
-							else
-								bu:SetScript("OnUpdate", nil)
-							end
-							bu.timer:SetTextColor(unpack(value[2]))
+				local bu = buttons[value[1]]
+				if bu then
+					if R.db["UFs"]["BuffIndicatorType"] == 3 then
+						if duration and duration > 0 then
+							bu.expiration = expiration
+							bu:SetScript("OnUpdate", UF.BuffIndicatorOnUpdate)
 						else
-							if duration and duration > 0 then
-								bu.cd:SetCooldown(expiration - duration, duration)
-								bu.cd:Show()
-							else
-								bu.cd:Hide()
-							end
-							if R.db["UFs"]["BuffIndicatorType"] == 1 then
-								bu.icon:SetVertexColor(unpack(value[2]))
-							else
-								bu.icon:SetTexture(texture)
-							end
+							bu:SetScript("OnUpdate", nil)
 						end
-						if count > 1 then bu.count:SetText(count) end
-						bu:Show()
-						found[bu.anchor] = true
-						break
+						bu.timer:SetTextColor(unpack(value[2]))
+					else
+						if duration and duration > 0 then
+							bu.cd:SetCooldown(expiration - duration, duration)
+							bu.cd:Show()
+						else
+							bu.cd:Hide()
+						end
+						if R.db["UFs"]["BuffIndicatorType"] == 1 then
+							bu.icon:SetVertexColor(unpack(value[2]))
+						else
+							bu.icon:SetTexture(texture)
+						end
 					end
+
+					if count > 1 then bu.count:SetText(count) end
+					bu:Show()
+					found[bu.anchor] = true
 				end
 			end
 		end
@@ -461,7 +462,7 @@ function UF:CreateBuffIndicator(self)
 		bu.count = M.CreateFS(bu, 12, "")
 
 		bu.anchor = anchor
-		tinsert(buttons, bu)
+		buttons[anchor] = bu
 
 		UF:RefreshBuffIndicator(bu)
 	end
@@ -513,6 +514,15 @@ function UF:HandleCDMessage(...)
 	end
 end
 
+local function SendPartySyncMsg(text)
+	if IsInRaid() or not IsInGroup() then return end
+	if not IsInGroup(LE_PARTY_CATEGORY_HOME) and IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+		C_ChatInfo_SendAddonMessage("ZenTracker", text, "INSTANCE_CHAT")
+	else
+		C_ChatInfo_SendAddonMessage("ZenTracker", text, "PARTY")
+	end
+end
+
 local lastUpdate = 0
 function UF:SendCDMessage()
 	local thisTime = GetTime()
@@ -524,7 +534,7 @@ function UF:SendCDMessage()
 				if enabled ~= 0 and start ~= 0 then
 					local remaining = start + duration - thisTime
 					if remaining < 0 then remaining = 0 end
-					C_ChatInfo_SendAddonMessage("ZenTracker", format("3:U:%s:%d:%.2f:%.2f:%s", UF.myGUID, spellID, duration, remaining, "-"), IsPartyLFG() and "INSTANCE_CHAT" or "PARTY") -- sync to others
+					SendPartySyncMsg(format("3:U:%s:%d:%.2f:%.2f:%s", UF.myGUID, spellID, duration, remaining, "-")) -- sync to others
 				end
 			end
 		end
@@ -537,7 +547,7 @@ function UF:UpdateSyncStatus()
 	if IsInGroup() and not IsInRaid() and R.db["UFs"]["PartyFrame"] then
 		local thisTime = GetTime()
 		if thisTime - lastSyncTime > 5 then
-			C_ChatInfo_SendAddonMessage("ZenTracker", format("3:H:%s:0::0:1", UF.myGUID), IsPartyLFG() and "INSTANCE_CHAT" or "PARTY") -- handshake to ZenTracker
+			SendPartySyncMsg(format("3:H:%s:0::0:1", UF.myGUID)) -- handshake to ZenTracker
 			lastSyncTime = thisTime
 		end
 		M:RegisterEvent("SPELL_UPDATE_COOLDOWN", UF.SendCDMessage)

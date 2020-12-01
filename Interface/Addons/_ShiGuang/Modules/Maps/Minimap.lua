@@ -3,8 +3,10 @@ local M, R, U, I = unpack(ns)
 local module = M:GetModule("Maps")
 
 local _G = _G
-local strmatch, strfind, strupper = string.match, string.find, string.upper
-local select, pairs, ipairs, unpack = select, pairs, ipairs, unpack
+local select, pairs, unpack, next, tinsert = select, pairs, unpack, next, tinsert
+local strmatch, strfind, strupper = strmatch, strfind, strupper
+local UIFrameFadeOut, UIFrameFadeIn = UIFrameFadeOut, UIFrameFadeIn
+local C_Timer_After = C_Timer.After
 local cr, cg, cb = I.r, I.g, I.b
 local LE_GARRISON_TYPE_6_0 = Enum.GarrisonType.Type_6_0
 local LE_GARRISON_TYPE_7_0 = Enum.GarrisonType.Type_7_0
@@ -62,7 +64,7 @@ function module:ReskinRegions()
 	-- Garrison
 	hooksecurefunc("GarrisonLandingPageMinimapButton_UpdateIcon", function(self)
 		self:ClearAllPoints()
-		self:SetPoint("TOPRIGHT", Minimap, "BOTTOMRIGHT", 6, 6)
+		self:SetPoint("TOPRIGHT", Minimap, "BOTTOMRIGHT", 12, 12)
 		self:SetScale(0.72)
 		--self:GetNormalTexture():SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\2UI")
 		--self:GetPushedTexture():SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\2UI")
@@ -297,6 +299,7 @@ function module:WhoPingsMyMap()
 	anim.fader:SetStartDelay(3)
 
 	M:RegisterEvent("MINIMAP_PING", function(_, unit)
+		if unit == "player" then return end -- ignore player ping
 		anim:Stop()
 		f.text:SetText(GetUnitName(unit))
 		f.text:SetTextColor(M.ClassColor(select(2, UnitClass(unit))))

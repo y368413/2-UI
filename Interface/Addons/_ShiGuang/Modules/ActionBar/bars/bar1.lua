@@ -206,18 +206,21 @@ function Bar:CreateBar1()
 	]])
 	RegisterStateDriver(frame, "page", actionPage)
 
-	-- Fix button texture, need reviewed
+	-- Fix button texture
 	local function FixActionBarTexture()
 		for _, button in next, buttonList do
+			local action = button.action
+			if action < 120 then break end
+
 			local icon = button.icon
-			local texture = GetActionTexture(button.action)
+			local texture = GetActionTexture(action)
 			if texture then
 				icon:SetTexture(texture)
 				icon:Show()
 			else
 				icon:Hide()
 			end
-			button:UpdateUsable()
+			Bar.UpdateButtonStatus(button)
 		end
 	end
 	M:RegisterEvent("SPELL_UPDATE_ICON", FixActionBarTexture)

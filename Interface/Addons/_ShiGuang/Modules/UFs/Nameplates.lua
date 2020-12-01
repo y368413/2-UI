@@ -662,9 +662,9 @@ end
 
 -- WidgetContainer
 function UF:AddWidgetContainer(self)
-	local widgetContainer = CreateFrame("Frame", nil, self, "UIWidgetContainerTemplate")
+	local widgetContainer = CreateFrame("Frame", nil, self, "UIWidgetContainerNoResizeTemplate")
 	widgetContainer:SetPoint("TOP", self.Castbar, "BOTTOM", 0, 0)
-	widgetContainer:SetScale(1/MaoRUIDB["UIScale"]) -- need reviewed
+	widgetContainer:SetScale(M:Round(1/MaoRUIDB["UIScale"], 2))
 	widgetContainer:Hide()
 
 	self.WidgetContainer = widgetContainer
@@ -749,7 +749,7 @@ function UF:UpdateClassPowerAnchor()
 	local nameplate = C_NamePlate_GetNamePlateForUnit("target")
 	if nameplate then
 		bar:SetParent(nameplate.unitFrame)
-		bar:SetScale(.85)
+		--bar:SetScale(.85)
 		bar:ClearAllPoints()
 		bar:SetPoint("TOP", nameplate.unitFrame, "BOTTOM", 0, 1)  --.nameText
 		bar:Show()

@@ -346,7 +346,7 @@ function module:Chatbar()
     end)
 
 	local function AddButton(r, g, b, text, func)
-		local bu = CreateFrame("Button", nil, Chatbar, "SecureActionButtonTemplate, BackdropTemplate")
+		local bu = CreateFrame("Button", nil, Chatbar, "InsecureActionButtonTemplate, BackdropTemplate")
 		bu:SetSize(width, height)
 		M.CreateFS(bu, 15, text, "Chatbar", "CENTER", 0, 0, r, g, b)
 		bu:SetHitRectInsets(0, 0, -8, -8)

@@ -1625,7 +1625,8 @@ do -- tabs
 		SetTabState(followerTab, GarrisonMissionFrame.selectedTab == 2)
 		api.roamingParty:Update()
 		api:SetMissionsUI(GarrisonMissionFrame.selectedTab)
-		if GarrisonMissionFrame.selectedTab == 3 or #C_Garrison.GetCompleteMissions(1) == 0 then
+		local cm = C_Garrison.GetCompleteMissions(1)
+		if GarrisonMissionFrame.selectedTab == 3 or (not cm or #cm == 0) then
 			activeTab.Pulse:Stop()
 		else
 			activeTab.Pulse:Play()
@@ -1699,7 +1700,7 @@ local GetActiveMissions, StartCompleteAll, CompleteMission, ClearCompletionState
 		end
 		for j=1,2 do
 			local t = C_Garrison[j == 1 and "GetCompleteMissions" or "GetInProgressMissions"](1)
-			for i=1,#t do
+			for i=1,t and #t or 0 do
 				local v = t[i]
 				if not mark[v.missionID] then
 					if j == 1 then
@@ -1774,7 +1775,7 @@ activeUI.CompleteAll:SetScript("OnClick", function(_, button)
 	if button ~= "RightButton" then
 		StartCompleteAll()
 	else
-		GarrisonMissionFrame.MissionComplete.completeMissions = C_Garrison.GetCompleteMissions(1)
+		GarrisonMissionFrame.MissionComplete.completeMissions = C_Garrison.GetCompleteMissions(1) or {}
 		GarrisonMissionFrameMissions.CompleteDialog.BorderFrame.ViewButton:Click()
 	end
 end)
@@ -2721,10 +2722,10 @@ do -- availMissionsHandle
 		local _, _, expTimeShort = G.GetMissionSeen(d.missionID, d)
 		self.expire:SetText(expTimeShort or "")
 
-		if d.locPrefix then
-			self.loc:SetAtlas(d.locPrefix.."-List")
+		if d.locTextureKit then
+			self.loc:SetAtlas(d.locTextureKit.."-List")
 		end
-		self.loc:SetShown(not not d.locPrefix)
+		self.loc:SetShown(not not d.locTextureKit)
 		local fol = "" do
 			local nf = G.HasTentativeParty(d.missionID)
 			for i=1, d.numFollowers do
@@ -3657,12 +3658,13 @@ function GarrisonMissionFrame:CheckCompleteMissions(onShow, ...)
 		return oldComplete(self, onShow, ...)
 	end
 	if not GarrisonMissionFrame.MissionComplete:IsShown() then
-		GarrisonMissionFrame.MissionComplete.completeMissions = C_Garrison.GetCompleteMissions(1)
+		GarrisonMissionFrame.MissionComplete.completeMissions = C_Garrison.GetCompleteMissions(1) or {}
 		if #GarrisonMissionFrame.MissionComplete.completeMissions > 0 then
 			T.UpdateMissionTabs()
 		end
 	end
-	if onShow and not activeUI:IsVisible() and #C_Garrison.GetCompleteMissions(1) > 0 then
+	local cm = C_Garrison.GetCompleteMissions(1)
+	if onShow and not activeUI:IsVisible() and (cm and #cm or 0) > 0 then
 		missionList.activeTab:Click()
 	end
 end
@@ -3721,12 +3723,4 @@ function EV:ADDON_LOADED(a)
 		GarrisonMissionFrame:CheckCompleteMissions(true)
 	end
 	return "remove"
-end
-local o1, o2 = C_Garrison.GetCompleteMissions, C_Garrison.GetInProgressMissions
-local function rest()
-	if not activeUI:IsVisible() then
-		C_Garrison.GetCompleteMissions, C_Garrison.GetInProgressMissions = o1, o2
-	else
-		C_Timer.After(0.1, rest)
-	end
 end

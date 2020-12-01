@@ -112,22 +112,8 @@ function G:SetupRaidDebuffs(parent)
 		end
 	end
 
-	-- Deprecated, left them for SL prepatch
-	local bfaDungeons = {1023, 1022, 1030, 1002, 1012, 1021, 1001, 1041, 968, 1036, 1178}
-	for _, dungeonID in pairs(bfaDungeons) do
-		local name = EJ_GetInstanceInfo(dungeonID)
-		if name then
-			tinsert(dungeons, name)
-		end
-	end
-
 	local raids = {
-		[1] = EJ_GetInstanceInfo(1031),
-		[2] = EJ_GetInstanceInfo(1176),
-		[3] = EJ_GetInstanceInfo(1177),
-		[4] = EJ_GetInstanceInfo(1179),
-		[5] = EJ_GetInstanceInfo(1180),
-		[6] = EJ_GetInstanceInfo(1190),
+		[1] = EJ_GetInstanceInfo(1190),
 	}
 
 	options[1] = G:CreateDropdown(frame, DUNGEONS.."*", 10, -30, dungeons, U["Dungeons Intro"], 110, 30)

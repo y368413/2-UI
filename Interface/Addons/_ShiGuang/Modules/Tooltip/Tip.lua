@@ -546,15 +546,18 @@ TT:RegisterTooltips("_ShiGuang", function()
 		end
 	end)
 
-	-- Others
+	--[[ Others
 	C_Timer.After(5, function()
 		-- BagSync
 		if BSYC_EventAlertTooltip then
 			TT.ReskinTooltip(BSYC_EventAlertTooltip)
 		end
-		-- Lib minimap icon
+		-- Libs
 		if LibDBIconTooltip then
 			TT.ReskinTooltip(LibDBIconTooltip)
+		end
+		if AceConfigDialogTooltip then
+			TT.ReskinTooltip(AceConfigDialogTooltip)
 		end
 		-- TomTom
 		if TomTomTooltip then
@@ -567,7 +570,11 @@ TT:RegisterTooltips("_ShiGuang", function()
 		if LootBarToolTip then
 			TT.ReskinTooltip(LootBarToolTip)
 		end
-	end)
+		-- Narcissus
+		if NarciGameTooltip then
+			TT.ReskinTooltip(NarciGameTooltip)
+		end
+	end)]]
 
 	if IsAddOnLoaded("BattlePetBreedID") then
 		hooksecurefunc("BPBID_SetBreedTooltip", function(parent)

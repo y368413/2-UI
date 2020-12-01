@@ -5,7 +5,6 @@ tinsert(R.defaultThemes, function()
 	local r, g, b = I.r, I.g, I.b
 	-- [[ Item buttons ]]
 	local function UpdateCosmetic(self)
-		if not IsCosmeticItem then return end
 		local itemLink = GetInventoryItemLink("player", self:GetID())
 		self.IconOverlay:SetShown(itemLink and IsCosmeticItem(itemLink))
 	end

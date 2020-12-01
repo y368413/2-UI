@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
   <Script file="Castbars.lua"/>
   <Script file="LegionToDo.lua"/>
-  <!--Script file="WQAchievements.lua"/-->
+  <Script file="WQAchievements.lua"/>
   <Script file="EssenceSetManager.lua"/>
   <Script file="AzeritePowerWeights.lua"/>
 	<Include file="InboxMailBag\InboxMailBag.xml"/>

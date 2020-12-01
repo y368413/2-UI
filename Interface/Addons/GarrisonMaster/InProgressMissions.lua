@@ -1,4 +1,4 @@
-﻿--## Version: 8.1.25 ## Author: lteke
+﻿--## Version: 9.0.27 ## Author: lteke
 local InProgressMissions = {}
 
 InProgressMissions.frame = InProgressMissions.frame or CreateFrame("Frame", nil, _G.WorldFrame)
@@ -32,8 +32,10 @@ local ORDERHALL_ADDONS = {
 	["RENovate"] = false,
 }
 
+local GFT = Enum.GarrisonFollowerType
 
 local TEXT_LEGION_MISSIONS = _G.EXPANSION_NAME6.." ".._G.GARRISON_MISSIONS
+local TEXT_BFA_MISSIONS = _G.EXPANSION_NAME7.." ".._G.GARRISON_MISSIONS
 
 local itemDifficulty do
 	local tooltip
@@ -81,8 +83,15 @@ function InProgressMissions:InitDB()
 	if type(IPMDB) ~= "table" then
 		IPMDB = {}
 	end
-	if IPMDB.enableGarrisonMissions == nil then IPMDB.enableGarrisonMissions = false end
-	if IPMDB.enableLegionMissions == nil then IPMDB.enableLegionMissions = IPMDB.enableGarrisonMissions end
+	if IPMDB.enableGarrisonMissions == nil then
+		IPMDB.enableGarrisonMissions = true
+	end
+	if IPMDB.enableLegionMissions == nil then
+		IPMDB.enableLegionMissions = IPMDB.enableGarrisonMissions
+	end
+	if IPMDB.enableBfaMissions == nil then
+		IPMDB.enableBfaMissions = IPMDB.enableLegionMissions
+	end
 	if type(IPMDB.profiles) ~= "table" then
 		IPMDB.profiles = {}
 	end
@@ -109,10 +118,11 @@ function InProgressMissions:SaveInProgressMissions()
 		return
 	end
 	local profile = wipe(IPMDB.profiles[self.profileName])
-	self:GetMissions(Enum.GarrisonFollowerType.FollowerType_8_0, profile)
-	self:GetMissions(Enum.GarrisonFollowerType.FollowerType_7_0, profile)
-	self:GetMissions(Enum.GarrisonFollowerType.FollowerType_6_2, profile)
-	self:GetMissions(Enum.GarrisonFollowerType.FollowerType_6_0, profile)
+	self:GetMissions(GFT.FollowerType_9_0, profile)
+	self:GetMissions(GFT.FollowerType_8_0, profile)
+	self:GetMissions(GFT.FollowerType_7_0, profile)
+	self:GetMissions(GFT.FollowerType_6_2, profile)
+	self:GetMissions(GFT.FollowerType_6_0, profile)
 	if not next(profile) then
 		IPMDB.profiles[self.profileName] = nil
 	end
@@ -143,13 +153,13 @@ do
 	end
 
 	local function CompareMissionTime(m1, m2)
-		if (m1.followerTypeID == Enum.GarrisonFollowerType.FollowerType_8_0) == (m2.followerTypeID == Enum.GarrisonFollowerType.FollowerType_8_0) then
+		if (m1.followerTypeID == GFT.FollowerType_8_0) == (m2.followerTypeID == GFT.FollowerType_8_0) then
 			if (m1.missionEndTime or 0) == (m2.missionEndTime or 0) then
 				return CompareMissionName(m1, m2)
 			else
 				return (m1.missionEndTime or 0) < (m2.missionEndTime or 0)
 			end
-		elseif (m1.followerTypeID == Enum.GarrisonFollowerType.FollowerType_7_0) == (m2.followerTypeID == Enum.GarrisonFollowerType.FollowerType_7_0) then
+		elseif (m1.followerTypeID == GFT.FollowerType_7_0) == (m2.followerTypeID == GFT.FollowerType_7_0) then
 			if (m1.missionEndTime or 0) == (m2.missionEndTime or 0) then
 				return CompareMissionName(m1, m2)
 			else
@@ -163,15 +173,18 @@ do
 	function InProgressMissions:UpdateMissions()
 		local garrisonType = C_Garrison.GetLandingPageGarrisonType()
 		wipe(self.missions)
-		if garrisonType == Enum.GarrisonType.Type_8_0 then
-			self:GetMissions(Enum.GarrisonFollowerType.FollowerType_8_0, self.missions, true)
+		if garrisonType == Enum.GarrisonType.Type_9_0 then
+			self:GetMissions(GFT.FollowerType_9_0, self.missions, true)
+		end
+		if garrisonType == Enum.GarrisonType.Type_8_0 or IPMDB.enableBfaMissions or C_Garrison.IsPlayerInGarrison(Enum.GarrisonType.Type_8_0) then
+			self:GetMissions(GFT.FollowerType_8_0, self.missions, true)
 		end
 		if garrisonType == Enum.GarrisonType.Type_7_0 or IPMDB.enableLegionMissions or C_Garrison.IsPlayerInGarrison(Enum.GarrisonType.Type_7_0) then
-			self:GetMissions(Enum.GarrisonFollowerType.FollowerType_7_0, self.missions, true)
+			self:GetMissions(GFT.FollowerType_7_0, self.missions, true)
 		end
 		if garrisonType == Enum.GarrisonType.Type_6_0 or IPMDB.enableGarrisonMissions or C_Garrison.IsPlayerInGarrison(Enum.GarrisonType.Type_6_0) then
-			self:GetMissions(Enum.GarrisonFollowerType.FollowerType_6_2, self.missions, true)
-			self:GetMissions(Enum.GarrisonFollowerType.FollowerType_6_0, self.missions, true)
+			self:GetMissions(GFT.FollowerType_6_2, self.missions, true)
+			self:GetMissions(GFT.FollowerType_6_0, self.missions, true)
 		end
 		self:UpdateInProgressTabText()
 	end
@@ -182,7 +195,7 @@ do
 			if name ~= self.profileName and not IPMDB.ignores[name] then
 				for i, mission in ipairs(missions) do
 					mission.followerTypeID = mission.followerTypeID or 0
-					if mission.followerTypeID >= Enum.GarrisonFollowerType.FollowerType_8_0 or (mission.followerTypeID == Enum.GarrisonFollowerType.FollowerType_7_0 and IPMDB.enableLegionMissions) or (mission.followerTypeID < Enum.GarrisonFollowerType.FollowerType_7_0 and IPMDB.enableGarrisonMissions) then
+					if mission.followerTypeID >= GFT.FollowerType_9_0 or (mission.followerTypeID == GFT.FollowerType_8_0 and IPMDB.enableBfaMissions) or (mission.followerTypeID == GFT.FollowerType_7_0 and IPMDB.enableLegionMissions) or (mission.followerTypeID < GFT.FollowerType_7_0 and IPMDB.enableGarrisonMissions) then
 						if type(mission) == "table" and type(mission.charText) == "string" then
 							tinsert(self.altMissions, mission)
 						end
@@ -403,7 +416,7 @@ local function GarrisonLandingPageReportList_Update(...)
 			if (item.isBuilding) then
 				bgName = "GarrLanding-Building-"
 				button.Status:SetText(GARRISON_LANDING_STATUS_BUILDING)
-			elseif (item.followerTypeID == Enum.GarrisonFollowerType.FollowerType_6_2) then
+			elseif (item.followerTypeID == GFT.FollowerType_6_2) then
 				bgName = "GarrLanding-ShipMission-"
 			else
 				bgName = "GarrLanding-Mission-"
@@ -445,10 +458,12 @@ local function GarrisonLandingPageReportList_Update(...)
 				button.Title:SetWidth(322 - button.TimeLeft:GetWidth())
 				stopUpdate = false
 			end
-			if item.followerTypeID == Enum.GarrisonFollowerType.FollowerType_8_0 then
+			if item.followerTypeID == GFT.FollowerType_8_0 then
 				button.Level:SetText(item.level)
+			elseif item.followerTypeID == GFT.FollowerType_9_0 then
+				button.Level:SetText(nil)
 			else
-				button.Level:SetText(item.iLevel and item.iLevel > 0 and item.iLevel or item.followerTypeID ~= Enum.GarrisonFollowerType.FollowerType_6_2 and item.level or nil)
+				button.Level:SetText(item.iLevel and item.iLevel > 0 and item.iLevel or item.followerTypeID ~= GFT.FollowerType_6_2 and item.level or nil)
 			end
 			if item.typeAtlas then
 				button.MissionTypeIcon:SetAtlas(item.typeAtlas)
@@ -457,9 +472,18 @@ local function GarrisonLandingPageReportList_Update(...)
 			else
 				button.MissionTypeIcon:SetTexture(nil)
 			end
-			button.MissionTypeIcon:SetShown(not item.isBuilding)
+			button.MissionTypeIcon:SetShown(not item.isBuilding and item.followerTypeID < GFT.FollowerType_9_0)
 			--button.NumFollowers:SetText(item.numFollowers and string.rep(RANGE_INDICATOR, item.numFollowers) or nil)
-			button.NumFollowers:SetText(GetFollowerIndicator(item))
+			if item.followerTypeID == GFT.FollowerType_9_0 then
+				button.NumFollowers:Hide()
+			else
+				button.NumFollowers:SetText(GetFollowerIndicator(item))
+				button.NumFollowers:Show()
+			end
+			button.EncounterIcon:SetShown(item.followerTypeID == GFT.FollowerType_9_0)
+			if item.followerTypeID == GFT.FollowerType_9_0 then
+				button.EncounterIcon:SetEncounterInfo(C_Garrison.GetMissionEncounterIconInfo(item.missionID))
+			end
 			button.Status:SetShown(item.isBuilding and not item.isComplete)
 			button.TimeLeft:SetShown(not item.isComplete)
 
@@ -471,7 +495,7 @@ local function GarrisonLandingPageReportList_Update(...)
 				button.Title:SetTextColor(unpack(TITLE_COLOR_NORMAL))
 				button.Level:SetTextColor(unpack(TITLE_COLOR_NORMAL))
 			end
-			if item.followerTypeID == Enum.GarrisonFollowerType.FollowerType_6_2 then
+			if item.followerTypeID == GFT.FollowerType_6_2 then
 				button.BG:SetVertexColor(0.9, 0.9, 1)
 			else
 				button.BG:SetVertexColor(1, 1, 1)
@@ -504,12 +528,18 @@ local function ScrollFrame_UpdateAvailable(...)
 			button.MissionTypeIcon:SetPoint("LEFT", button, 2, 0)
 			button.MissionTypeIcon:SetSize(MISSION_ICON_SIZE, MISSION_ICON_SIZE)
 			button.BG:SetVertexColor(1, 1, 1)
-			if item.followerTypeID == Enum.GarrisonFollowerType.FollowerType_8_0 then
+			if item.followerTypeID == GFT.FollowerType_8_0 then
 				button.Level:SetText(item.level)
+			elseif item.followerTypeID == GFT.FollowerType_9_0 then
+				button.Level:SetText(nil)
 			else
-				button.Level:SetText(item.iLevel and item.iLevel > 0 and item.iLevel or item.followerTypeID ~= Enum.GarrisonFollowerType.FollowerType_6_2 and item.level or nil)
+				button.Level:SetText(item.followerTypeID ~= GFT.FollowerType_9_0 and item.iLevel and item.iLevel > 0 and item.iLevel or item.followerTypeID ~= GFT.FollowerType_6_2 and item.level or nil)
 			end
-			button.NumFollowers:SetText(item.numFollowers and string.rep(RANGE_INDICATOR, item.numFollowers) or nil)
+			if item.followerTypeID == GFT.FollowerType_9_0 then
+				button.NumFollowers:SetText(nil)
+			else
+				button.NumFollowers:SetText(item.numFollowers and string.rep(RANGE_INDICATOR, item.numFollowers) or nil)
+			end
 			rewardIndex = Rewards_Update(button, item) or 1
 			if rewardIndex < 0 then
 				rewardIndex = 1
@@ -625,13 +655,16 @@ local function SetupMissionInfoTooltip(item, isAltMission, anchorFrame)
 		return
 	end
 
+	local isAutoCombatant = item.followerTypeID == GFT.FollowerType_9_0 -- Shadowlands
+
 	GameTooltip:SetText(item.isComplete and ERR_QUEST_OBJECTIVE_COMPLETE_S:format(item.name) or item.name)
 	-- level
 	local color = item.isRare and ITEM_QUALITY_COLORS[3] or ITEM_QUALITY_COLORS[1]
-	if item.followerTypeID == Enum.GarrisonFollowerType.FollowerType_6_2 then
+	if isAutoCombatant then
+		GameTooltip:AddLine(format(FORMAT_TOOLTIP_LEVEL, item.missionScalar), color.r, color.g, color.b)
+	elseif item.followerTypeID == GFT.FollowerType_6_2 then
 
 	else
-		-- if (item.followerTypeID == Enum.GarrisonFollowerType.FollowerType_6_0 and item.level == 100) or (item.followerTypeID == Enum.GarrisonFollowerType.FollowerType_7_0 and item.level == 110) and item.iLevel > 0 then
 		if item.iLevel and item.iLevel > 0 then
 			GameTooltip:AddLine(format(FORMAT_TOOLTIP_ITEMLEVEL, item.level, item.iLevel), color.r, color.g, color.b)
 		elseif item.level then
@@ -653,7 +686,7 @@ local function SetupMissionInfoTooltip(item, isAltMission, anchorFrame)
 
 	GameTooltip:AddLine(" ")
 	local caption = REWARDS
-	if successChance then
+	if not isAutoCombatant and successChance then
 		caption = caption..(" (%d%%)"):format(math.min(successChance, 100))
 	end
 	GameTooltip:AddLine(caption)
@@ -670,7 +703,7 @@ local function SetupMissionInfoTooltip(item, isAltMission, anchorFrame)
 
 	if (item.followers ~= nil) then
 		GameTooltip:AddLine(" ");
-		GameTooltip:AddLine(item.followerTypeID == Enum.GarrisonFollowerType.FollowerType_6_2 and _G.GARRISON_SHIPYARD_FOLLOWERS or _G.GARRISON_FOLLOWERS)
+		GameTooltip:AddLine(isAutoCombatant and _G.COVENANT_MISSIONS_FOLLOWERS or item.followerTypeID == GFT.FollowerType_6_2 and _G.GARRISON_SHIPYARD_FOLLOWERS or _G.GARRISON_FOLLOWERS)
 		local id, info
 		local leftText, rightText
 		local icon
@@ -682,15 +715,26 @@ local function SetupMissionInfoTooltip(item, isAltMission, anchorFrame)
 				info = C_Garrison.GetFollowerInfo(id)
 				if info then
 					info.abilities = {}
-					for k, ability in ipairs(C_Garrison.GetFollowerAbilities(info.followerID)) do
-						tinsert(info.abilities, ability.id)
+					if isAutoCombatant then
+						info.abilities = C_Garrison.GetFollowerAutoCombatSpells(info.followerID, info.level or 1)
+					else
+						for k, ability in ipairs(C_Garrison.GetFollowerAbilities(info.followerID)) do
+							tinsert(info.abilities, ability.id)
+						end
 					end
 				end
 			end
 			if type(info) == "table" then
 				leftText = nil
 				rightText = nil
-				if (info.followerTypeID == Enum.GarrisonFollowerType.FollowerType_7_0 or info.followerTypeID == Enum.GarrisonFollowerType.FollowerType_8_0) and info.abilities then
+				if isAutoCombatant then
+					leftText = MakeIcon(info.portraitIconID)..QualityColorText(FORMAT_LEVEL:format(info.level), info.quality or 2).." "..info.name
+					for i, autoSpell in ipairs(info.abilities) do
+						if autoSpell.icon then
+							rightText = AddIcon(rightText, autoSpell.icon)
+						end
+					end
+				elseif (info.followerTypeID >= GFT.FollowerType_7_0) and info.abilities then
 					leftText = MakeIcon(info.portraitIconID)
 					if info.isTroop then
 						leftText = leftText.." "..QualityColorText(info.name, info.quality)
@@ -698,7 +742,7 @@ local function SetupMissionInfoTooltip(item, isAltMission, anchorFrame)
 						if info.iLevel then
 							leftText = leftText..QualityColorText(FORMAT_LEVEL:format(info.iLevel), info.quality or 2)
 						end
-						leftText = AddIcon(leftText, C_Garrison.GetFollowerAbilityIcon(info.abilities[1]), info.isTroop and QualityColorText(info.name, info.quality) or info.name)
+						leftText = AddIcon(leftText, C_Garrison.GetFollowerAbilityIcon(info.abilities[1]), info.name)
 					end
 					for i = 2, 6 do
 						if info.abilities[i] then
@@ -708,7 +752,7 @@ local function SetupMissionInfoTooltip(item, isAltMission, anchorFrame)
 							end
 						end
 					end
-				elseif info.followerTypeID == Enum.GarrisonFollowerType.FollowerType_6_2 then
+				elseif info.followerTypeID == GFT.FollowerType_6_2 then
 					leftText = ""
 					if type(info.abilities) == "table" then
 						for k, abilityID in ipairs(info.abilities) do
@@ -878,6 +922,9 @@ function InProgressMissions:MissionButton_SetStyle()
 			button.MissionTypeBG:SetBlendMode("BLEND")
 			button.MissionTypeBG:SetVertexColor(0, 0, 0, 0.6)
 			FlipTexture(button.MissionTypeBG)
+			button.EncounterIcon:ClearAllPoints()
+			button.EncounterIcon:SetPoint("LEFT", button, 5, 0)
+			button.EncounterIcon:SetScale(0.9)
 			button.TimeLeft:SetFontObject("GameFontNormalMed2")
 			button.TimeLeft:SetPoint("TOPRIGHT", -3, -4)
 			button.BG:ClearAllPoints()
@@ -989,6 +1036,12 @@ do
 		InProgressMissions:Refresh()
 	end
 
+	local function ToggleBfaMissions(self)
+		IPMDB.enableBfaMissions = not IPMDB.enableBfaMissions
+		InProgressMissions:UpdateAltMissions()
+		InProgressMissions:Refresh()
+	end
+
 	function InProgressMissions:CreateMenu()
 		if self.menu then return end
 		self.menu = CreateFrame("Frame", "InProgressMissionsDropDownList")
@@ -1034,6 +1087,13 @@ do
 				info.isTitle = nil
 				info.disabled = nil
 				info.notClickable = nil
+
+				info.notCheckable = nil
+				info.isNotRadio = true
+				info.text = TEXT_BFA_MISSIONS
+				info.func = ToggleBfaMissions
+				info.checked = IPMDB.enableBfaMissions and true or nil
+				UIDropDownMenu_AddButton(info, level)
 
 				info.notCheckable = nil
 				info.isNotRadio = true
@@ -1139,6 +1199,7 @@ function InProgressMissions:Init()
 
 	self:HookOrderHallMissionFrame()
 	self:HookBFAMissionFrame()
+	self:HookCovenantMissionFrame()
 
 	self:MissionButton_SetStyle()
 	self.Init = function() end
@@ -1154,23 +1215,27 @@ local function CreateButtonText(button)
 	return text
 end
 
+local function MissionsScrollFrame_SetExpiresText(ScrollFrame)
+	if ScrollFrame:IsVisible() and not InProgressMissions:OrderHallAddonExists() then
+		local info, text
+		for i, button in ipairs(ScrollFrame.buttons) do
+			info = button.info
+			text = buttonText[button] or CreateButtonText(button)
+			if info and not info.inProgress then
+				text:SetText(info.offerEndTime and RAID_INSTANCE_EXPIRES:format(info.offerTimeRemaining) or nil)
+				text:Show()
+			else
+				text:Hide()
+			end
+		end
+	end
+end
+
 function InProgressMissions:HookOrderHallMissionFrame()
 	if _G.OrderHallMissionFrameMissionsListScrollFrame and not self.OrderHallMissionsScrollFrame then
 		self.OrderHallMissionsScrollFrame = _G.OrderHallMissionFrameMissionsListScrollFrame
 		hooksecurefunc(_G.OrderHallMissionFrame.MissionTab.MissionList, "Update", function()
-			if InProgressMissions.OrderHallMissionsScrollFrame:IsVisible() and not InProgressMissions:OrderHallAddonExists() then
-				local info, text
-				for i, button in ipairs(InProgressMissions.OrderHallMissionsScrollFrame.buttons) do
-					info = button.info
-					text = buttonText[button] or CreateButtonText(button)
-					if info and not info.inProgress then
-						text:SetText(info.offerEndTime and RAID_INSTANCE_EXPIRES:format(info.offerTimeRemaining) or nil)
-						text:Show()
-					else
-						text:Hide()
-					end
-				end
-			end
+			MissionsScrollFrame_SetExpiresText(self.OrderHallMissionsScrollFrame)
 		end)
 	end
 end
@@ -1179,19 +1244,16 @@ function InProgressMissions:HookBFAMissionFrame()
 	if _G.BFAMissionFrameMissionsListScrollFrame and not self.BFAMissionsScrollFrame then
 		self.BFAMissionsScrollFrame = _G.BFAMissionFrameMissionsListScrollFrame
 		hooksecurefunc(_G.BFAMissionFrame.MissionTab.MissionList, "Update", function()
-			if InProgressMissions.BFAMissionsScrollFrame:IsVisible() and not InProgressMissions:OrderHallAddonExists() then
-				local info, text
-				for i, button in ipairs(InProgressMissions.BFAMissionsScrollFrame.buttons) do
-					info = button.info
-					text = buttonText[button] or CreateButtonText(button)
-					if info and not info.inProgress then
-						text:SetText(info.offerEndTime and RAID_INSTANCE_EXPIRES:format(info.offerTimeRemaining) or nil)
-						text:Show()
-					else
-						text:Hide()
-					end
-				end
-			end
+			MissionsScrollFrame_SetExpiresText(self.BFAMissionsScrollFrame)
+		end)
+	end
+end
+
+function InProgressMissions:HookCovenantMissionFrame()
+	if _G.CovenantMissionFrameMissionsListScrollFrame and not self.CovenantMissionsScrollFrame then
+		self.CovenantMissionsScrollFrame = _G.CovenantMissionFrameMissionsListScrollFrame
+		hooksecurefunc(_G.CovenantMissionFrame.MissionTab.MissionList, "Update", function()
+			MissionsScrollFrame_SetExpiresText(self.CovenantMissionsScrollFrame)
 		end)
 	end
 end
@@ -1500,6 +1562,9 @@ do
 		AlertFrame_OnHide(frame)
 		if not ex then return end
 		if info then
+			if info.followerTypeID == GFT.FollowerType_9_0 then
+				return
+			end
 			info.successChance = info.missionID and C_Garrison.GetMissionSuccessChance(info.missionID) or 100
 			frame.Title:SetText(GARRISON_MISSION_COMPLETE)
 			if info.isArtifact then

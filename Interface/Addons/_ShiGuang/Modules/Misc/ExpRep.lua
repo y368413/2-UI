@@ -7,7 +7,6 @@ local MISC = M:GetModule("Misc")
 ]]
 local format, pairs, select = string.format, pairs, select
 local min, mod, floor = math.min, mod, math.floor
-local MAX_PLAYER_LEVEL = MAX_PLAYER_LEVEL
 local MAX_REPUTATION_REACTION = MAX_REPUTATION_REACTION
 local FACTION_BAR_COLORS = FACTION_BAR_COLORS
 local NUM_FACTIONS_DISPLAYED = NUM_FACTIONS_DISPLAYED
@@ -20,9 +19,9 @@ local GetText, UnitSex, BreakUpLargeNumbers, GetNumFactions, GetFactionInfo = Ge
 local GetWatchedFactionInfo, GetFriendshipReputation, GetFriendshipReputationRanks = GetWatchedFactionInfo, GetFriendshipReputation, GetFriendshipReputationRanks
 local HasArtifactEquipped, ArtifactBarGetNumArtifactTraitsPurchasableFromXP = HasArtifactEquipped, ArtifactBarGetNumArtifactTraitsPurchasableFromXP
 local IsWatchingHonorAsXP, UnitHonor, UnitHonorMax, UnitHonorLevel = IsWatchingHonorAsXP, UnitHonor, UnitHonorMax, UnitHonorLevel
+local IsPlayerAtEffectiveMaxLevel = IsPlayerAtEffectiveMaxLevel
 local C_Reputation_IsFactionParagon = C_Reputation.IsFactionParagon
 local C_Reputation_GetFactionParagonInfo = C_Reputation.GetFactionParagonInfo
-local C_AzeriteItem_HasActiveAzeriteItem = C_AzeriteItem.HasActiveAzeriteItem
 local C_AzeriteItem_IsAzeriteItemAtMaxLevel = C_AzeriteItem.IsAzeriteItemAtMaxLevel
 local C_AzeriteItem_FindActiveAzeriteItem = C_AzeriteItem.FindActiveAzeriteItem
 local C_AzeriteItem_GetAzeriteItemXPInfo = C_AzeriteItem.GetAzeriteItemXPInfo
@@ -30,11 +29,16 @@ local C_AzeriteItem_GetPowerLevel = C_AzeriteItem.GetPowerLevel
 local C_ArtifactUI_IsEquippedArtifactDisabled = C_ArtifactUI.IsEquippedArtifactDisabled
 local C_ArtifactUI_GetEquippedArtifactInfo = C_ArtifactUI.GetEquippedArtifactInfo
 
+local function IsAzeriteAvailable()
+	local itemLocation = C_AzeriteItem_FindActiveAzeriteItem()
+	return itemLocation and itemLocation:IsEquipmentSlot() and not C_AzeriteItem_IsAzeriteItemAtMaxLevel()
+end
+
 function MISC:ExpBar_Update()
 	local rest = self.restBar
 	if rest then rest:Hide() end
 
-	if UnitLevel("player") < MAX_PLAYER_LEVEL then
+	if not IsPlayerAtEffectiveMaxLevel() then
 		local xp, mxp, rxp = UnitXP("player"), UnitXPMax("player"), GetXPExhaustion()
 		self:SetStatusBarColor(0, .7, 1)
 		self:SetMinMaxValues(0, mxp)
@@ -46,6 +50,9 @@ function MISC:ExpBar_Update()
 			rest:Show()
 		end
 		if IsXPUserDisabled() then self:SetStatusBarColor(.7, 0, 0) end
+		local function showIfResting() if (IsResting("player") or FALSE) then return "+" end return "" end
+    local function showRestAmount() if (GetXPExhaustion("player") or FALSE) then return math.ceil(100*(GetXPExhaustion("player")/UnitXPMax("player"))) end return "0" end		
+		self.ArtifactText:SetText(UnitLevel("player").."  "..math.floor(100*(UnitXP("player")/UnitXPMax("player"))) .. "%".."  |c00FF68CC"..showRestAmount().."%"..showIfResting().."|r")
 	elseif GetWatchedFactionInfo() then
 		local _, standing, barMin, barMax, value, factionID = GetWatchedFactionInfo()
 		local friendID, friendRep, _, _, _, _, _, friendThreshold, nextFriendThreshold = GetFriendshipReputation(factionID)
@@ -73,20 +80,13 @@ function MISC:ExpBar_Update()
 		self:SetMinMaxValues(0, barMax)
 		self:SetValue(current)
 		self:Show()
-	elseif C_AzeriteItem_HasActiveAzeriteItem() then
-		local isMaxLevel = C_AzeriteItem_IsAzeriteItemAtMaxLevel()
-		if isMaxLevel then
-			self:Hide()
-		else
-			local azeriteItemLocation = C_AzeriteItem_FindActiveAzeriteItem()
-			if azeriteItemLocation then
-				local xp, totalLevelXP = C_AzeriteItem_GetAzeriteItemXPInfo(azeriteItemLocation)
-				self:SetStatusBarColor(.9, .8, .6)
-				self:SetMinMaxValues(0, totalLevelXP)
-				self:SetValue(xp)
-				self:Show()
-			end
-		end
+	elseif IsAzeriteAvailable() then
+		local azeriteItemLocation = C_AzeriteItem_FindActiveAzeriteItem()
+		local xp, totalLevelXP = C_AzeriteItem_GetAzeriteItemXPInfo(azeriteItemLocation)
+		self:SetStatusBarColor(.9, .8, .6)
+		self:SetMinMaxValues(0, totalLevelXP)
+		self:SetValue(xp)
+		self:Show()
 	elseif HasArtifactEquipped() then
 		if C_ArtifactUI_IsEquippedArtifactDisabled() then
 			self:SetStatusBarColor(.6, .6, .6)
@@ -104,27 +104,6 @@ function MISC:ExpBar_Update()
 	else
 		self:Hide()
 	end
-    if C_AzeriteItem.HasActiveAzeriteItem() and UnitLevel("player") == MAX_PLAYER_LEVEL then
-		local azeriteItemLocation = C_AzeriteItem.FindActiveAzeriteItem()
-		local azeriteItem = Item:CreateFromItemLocation(azeriteItemLocation)
-		local azeriteItemName = azeriteItem:GetItemName()
-		local xp, totalLevelXP = C_AzeriteItem.GetAzeriteItemXPInfo(C_AzeriteItem.FindActiveAzeriteItem())
-		local currentLevel = C_AzeriteItem.GetPowerLevel(azeriteItemLocation)
-		self.ArtifactText:SetText("|c00FF68CC"..currentLevel.."|r  "..string.format('|c00FF68CC%d%%|r',(xp)/(totalLevelXP)*100)) --.."  "..xp.."/"..totalLevelXP
-	elseif C_AzeriteItem.HasActiveAzeriteItem() and UnitLevel("player") < MAX_PLAYER_LEVEL then
-	    local azeriteItemLocation = C_AzeriteItem.FindActiveAzeriteItem()
-		local azeriteItem = Item:CreateFromItemLocation(azeriteItemLocation)
-		local azeriteItemName = azeriteItem:GetItemName()
-		local xp, totalLevelXP = C_AzeriteItem.GetAzeriteItemXPInfo(C_AzeriteItem.FindActiveAzeriteItem())
-		local currentLevel = C_AzeriteItem.GetPowerLevel(azeriteItemLocation)
-		local function showIfResting() if (IsResting("player") or FALSE) then return "+" end return "" end
-        local function showRestAmount() if (GetXPExhaustion("player") or FALSE) then return math.ceil(100*(GetXPExhaustion("player")/UnitXPMax("player"))) end return "0" end
-		self.ArtifactText:SetText(UnitLevel("player").."  "..math.floor(100*(UnitXP("player")/UnitXPMax("player"))) .. "%".."  |c00FF68CC"..showRestAmount().."%"..showIfResting().."|r".."    ".."|c00FF68CC"..currentLevel.."|r  "..string.format('|c00FF68CC%d%%|r',(xp)/(totalLevelXP)*100))  --.."  "..xp.."/"..totalLevelXP
-	else
-	    local function showIfResting() if (IsResting("player") or FALSE) then return "+" end return "" end
-        local function showRestAmount() if (GetXPExhaustion("player") or FALSE) then return math.ceil(100*(GetXPExhaustion("player")/UnitXPMax("player"))) end return "0" end
-		self.ArtifactText:SetText(UnitLevel("player").."  "..math.floor(100*(UnitXP("player")/UnitXPMax("player"))) .. "%".."  |c00FF68CC"..showRestAmount().."%"..showIfResting().."|r")
-	end
 end
 
 function MISC:ExpBar_UpdateTooltip()
@@ -132,7 +111,7 @@ function MISC:ExpBar_UpdateTooltip()
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(LEVEL.." "..UnitLevel("player"), 0,.6,1)
 
-	if UnitLevel("player") < MAX_PLAYER_LEVEL then
+	if not IsPlayerAtEffectiveMaxLevel() then
 		local xp, mxp, rxp = UnitXP("player"), UnitXPMax("player"), GetXPExhaustion()
 		GameTooltip:AddDoubleLine(XP..":", BreakUpLargeNumbers(xp).." / "..BreakUpLargeNumbers(mxp).." ("..format("%.1f%%)", xp/mxp*100), .6,.8,1, 1,1,1)
 		if rxp then
@@ -180,20 +159,16 @@ function MISC:ExpBar_UpdateTooltip()
 		GameTooltip:AddDoubleLine(LEVEL.." "..level, current.." / "..barMax, .6,.8,1, 1,1,1)
 	end
 
-	if C_AzeriteItem_HasActiveAzeriteItem() then
+	if IsAzeriteAvailable() then
 		local azeriteItemLocation = C_AzeriteItem_FindActiveAzeriteItem()
 		local azeriteItem = Item:CreateFromItemLocation(azeriteItemLocation)
 		local xp, totalLevelXP = C_AzeriteItem_GetAzeriteItemXPInfo(azeriteItemLocation)
 		local currentLevel = C_AzeriteItem_GetPowerLevel(azeriteItemLocation)
-		local isMaxLevel = C_AzeriteItem_IsAzeriteItemAtMaxLevel()
-		if not isMaxLevel then
-			azeriteItem:ContinueWithCancelOnItemLoad(function()
-				local azeriteItemName = azeriteItem:GetItemName()
-				--GameTooltip:AddLine(" ")
-				GameTooltip:AddLine(azeriteItemName.." ("..format(SPELLBOOK_AVAILABLE_AT, currentLevel)..")", 0,.6,1)
-				GameTooltip:AddDoubleLine(ARTIFACT_POWER, BreakUpLargeNumbers(xp).." / "..BreakUpLargeNumbers(totalLevelXP).." ("..floor(xp/totalLevelXP*100).."%)", .6,.8,1, 1,1,1)
-			end)
-		end
+		azeriteItem:ContinueWithCancelOnItemLoad(function()
+			--GameTooltip:AddLine(" ")
+			GameTooltip:AddLine(azeriteItem:GetItemName().." ("..format(SPELLBOOK_AVAILABLE_AT, currentLevel)..")", 0,.6,1)
+			GameTooltip:AddDoubleLine(ARTIFACT_POWER, BreakUpLargeNumbers(xp).." / "..BreakUpLargeNumbers(totalLevelXP).." ("..floor(xp/totalLevelXP*100).."%)", .6,.8,1, 1,1,1)
+		end)
 	end
 
 	if HasArtifactEquipped() then
@@ -235,7 +210,7 @@ function MISC:SetupScript(bar)
 		"PLAYER_ENTERING_WORLD",
 		"UPDATE_FACTION",
 		"ARTIFACT_XP_UPDATE",
-		"UNIT_INVENTORY_CHANGED",
+		"PLAYER_EQUIPMENT_CHANGED",
 		"ENABLE_XP_GAIN",
 		"DISABLE_XP_GAIN",
 		"AZERITE_ITEM_EXPERIENCE_CHANGED",

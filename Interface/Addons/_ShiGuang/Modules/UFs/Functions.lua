@@ -7,6 +7,7 @@ local AURA = M:GetModule("Auras")
 
 local format, floor = string.format, math.floor
 local pairs, next = pairs, next
+local UnitFrame_OnEnter, UnitFrame_OnLeave = UnitFrame_OnEnter, UnitFrame_OnLeave
 
 -- Custom colors
 oUF.colors.smooth = {1, 0, 0, .85, .8, .45, .1, .1, .1}
@@ -40,6 +41,16 @@ local function retVal(self, val1, val2, val3, val4, val5)
 end
 
 -- Elements
+local function UF_OnEnter(self)
+	UnitFrame_OnEnter(self)
+	self.Highlight:Show()
+end
+
+local function UF_OnLeave(self)
+	UnitFrame_OnLeave(self)
+	self.Highlight:Hide()
+end
+
 function UF:CreateHeader(self)
 	local hl = self:CreateTexture(nil, "OVERLAY")
 	hl:SetAllPoints()
@@ -51,14 +62,44 @@ function UF:CreateHeader(self)
 	self.Highlight = hl
 
 	self:RegisterForClicks("AnyUp")
-	self:HookScript("OnEnter", function()
-		UnitFrame_OnEnter(self)
-		self.Highlight:Show()
-	end)
-	self:HookScript("OnLeave", function()
-		UnitFrame_OnLeave(self)
-		self.Highlight:Hide()
-	end)
+	self:HookScript("OnEnter", UF_OnEnter)
+	self:HookScript("OnLeave", UF_OnLeave)
+end
+
+local function UpdateHealthColorByIndex(health, index)
+	health.colorClass = (index == 2)
+	health.colorReaction = (index == 2)
+	if health.SetColorTapping then
+		health:SetColorTapping(index == 2)
+	else
+		health.colorTapping = (index == 2)
+	end
+	if health.SetColorDisconnected then
+		health:SetColorDisconnected(index == 2)
+	else
+		health.colorDisconnected = (index == 2)
+	end
+	health.colorSmooth = (index == 3)
+	if index == 1 then
+		health:SetStatusBarColor(.1, .1, .1)
+		health.bg:SetVertexColor(.6, .6, .6)
+	end
+end
+
+function UF:UpdateHealthBarColor(self, force)
+	local health = self.Health
+	local mystyle = self.mystyle
+	if mystyle == "PlayerPlate" then
+		health.colorHealth = true
+	elseif mystyle == "raid" then
+		UpdateHealthColorByIndex(health, R.db["UFs"]["RaidHealthColor"])
+	else
+		UpdateHealthColorByIndex(health, R.db["UFs"]["HealthColor"])
+	end
+
+	if force then
+		health:ForceUpdate()
+	end
 end
 
 function UF:CreateHealthBar(self)
@@ -97,19 +138,10 @@ function UF:CreateHealthBar(self)
 	bg:SetVertexColor(.6, .6, .6)
 	bg.multiplier = .25
 
-	if mystyle == "PlayerPlate" then
-		health.colorHealth = true
-	elseif (mystyle == "raid" and R.db["UFs"]["RaidHealthColor"] == 2) or (mystyle ~= "raid" and R.db["UFs"]["HealthColor"] == 2) then
-		health.colorClass = true
-		health.colorTapping = true
-		health.colorReaction = true
-		health.colorDisconnected = true
-	elseif (mystyle == "raid" and R.db["UFs"]["RaidHealthColor"] == 3) or (mystyle ~= "raid" and R.db["UFs"]["HealthColor"] == 3) then
-		health.colorSmooth = true
-	end
-
 	self.Health = health
 	self.Health.bg = bg
+
+	UF:UpdateHealthBarColor(self)
 end
 
 function UF:UpdateRaidHealthMethod()
@@ -217,6 +249,38 @@ function UF:UpdateRaidNameText()
 	end
 end
 
+local function UpdatePowerColorByIndex(power, index)
+	power.colorPower = (index == 2)
+	power.colorClass = (index ~= 2)
+	power.colorReaction = (index ~= 2)
+	if power.SetColorTapping then
+		power:SetColorTapping(index ~= 2)
+	else
+		power.colorTapping = (index ~= 2)
+	end
+	if power.SetColorDisconnected then
+		power:SetColorDisconnected(index ~= 2)
+	else
+		power.colorDisconnected = (index ~= 2)
+	end
+end
+
+function UF:UpdatePowerBarColor(self, force)
+	local power = self.Power
+	local mystyle = self.mystyle
+	if mystyle == "PlayerPlate" then
+		power.colorPower = true
+	elseif mystyle == "raid" then
+		UpdatePowerColorByIndex(power, R.db["UFs"]["RaidHealthColor"])
+	else
+		UpdatePowerColorByIndex(power, R.db["UFs"]["HealthColor"])
+	end
+
+	if force then
+		power:ForceUpdate()
+	end
+end
+
 local frequentUpdateCheck = {
 	["player"] = true,
 	["target"] = true,
@@ -259,18 +323,11 @@ function UF:CreatePowerBar(self)
 	bg:SetTexture(I.normTex)
 	bg.multiplier = .25
 
-	if (mystyle == "raid" and R.db["UFs"]["RaidHealthColor"] == 2) or (mystyle ~= "raid" and R.db["UFs"]["HealthColor"] == 2) or mystyle == "PlayerPlate" then
-		power.colorPower = true
-	else
-		power.colorClass = true
-		power.colorTapping = true
-		power.colorDisconnected = true
-		power.colorReaction = true
-	end
-	power.frequentUpdates = frequentUpdateCheck[mystyle]
-
 	self.Power = power
 	self.Power.bg = bg
+
+	power.frequentUpdates = frequentUpdateCheck[mystyle]
+	UF:UpdatePowerBarColor(self)
 end
 
 function UF:CreatePowerText(self)

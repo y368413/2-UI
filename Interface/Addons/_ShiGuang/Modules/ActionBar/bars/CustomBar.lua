@@ -18,7 +18,7 @@ function Bar:CreateCustomBar(anchor)
 	frame.mover = M.Mover(frame, U[name], "CustomBar", anchor)
 	frame.buttons = {}
 
-	RegisterStateDriver(frame, "visibility", "[petbattle] hide; show")
+	RegisterStateDriver(frame, "visibility", "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show")
 	RegisterStateDriver(frame, "page", page)
 
 	local buttonList = {}

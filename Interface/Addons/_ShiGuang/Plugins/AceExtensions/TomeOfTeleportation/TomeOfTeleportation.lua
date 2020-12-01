@@ -173,6 +173,33 @@ function TeleporterCreateConsumable(id, dest)
 end
 
 ---------------------------------------------------------------
+
+local NameToIdCache = nil
+
+local function BuildNameToIdCache()
+	NameToIdCache = {}
+	for id, t in pairs(TomeOfTele_Cache) do
+		NameToIdCache[t[1]] = id
+	end
+end
+
+local function GetCachedItemInfo(itemId)
+	if NameToIdCache == nil then
+		BuildNameToIdCache()
+	end
+	
+	if NameToIdCache[itemId] ~= nil then
+		itemId = NameToIdCache[itemId]
+	end
+
+	if TomeOfTele_Cache[itemId] then
+		local t = TomeOfTele_Cache[itemId]
+		return t[1], t[2], t[3], t[4], t[5], t[6], t[7], t[8], t[9], t[10], t[11], t[12], t[13], t[14], t[15], t[16], t[17]
+	else
+		print("Tome of Teleportation: item " .. itemId .. " is missing from the cache. Report a bug.")
+		return GetItemInfo(itemId)
+	end
+end
 	
 -- [Orignal spell ID] = { Alt spell ID, Buff }
 -- Currently unused
@@ -360,7 +387,7 @@ end
 local function SetupSpells()
 	for index, spell in ipairs(TeleporterSpells) do		
 		if spell.spellType == ST_Item then
-			spell.spellName = GetItemInfo( spell.spellId )
+			spell.spellName = GetCachedItemInfo( spell.spellId )
 		else
 			spell.spellName = GetSpellInfo( spell.spellId)
 		end
@@ -470,7 +497,7 @@ function TeleporterUpdateButton(button)
 		cooldownString:SetPoint("BOTTOMRIGHT",button,"BOTTOMRIGHT",-buttonInset - 2,6)
 		
 		if countString and isItem then
-			countString:SetText(GetItemCount(itemId))
+			countString:SetText(GetItemCount(itemId, false, true))
 		end
 
 		if CustomizeSpells then
@@ -529,7 +556,7 @@ function TeleporterUpdateAllButtons()
 end
 
 function TeleporterShowItemTooltip( item, button )
-	local _,link = GetItemInfo(item)
+	local _,link = GetCachedItemInfo(item)
 	if link then
 		GameTooltip:SetOwner(button, "ANCHOR_BOTTOMRIGHT")
 		GameTooltip:SetHyperlink(link)
@@ -592,25 +619,7 @@ local function CanUseSpell(spell)
 		haveToy = PlayerHasToy(spellId) and toyUsable
 		haveSpell = GetItemCount( spellId ) > 0 or haveToy
 	else
-		haveSpell = IsSpellKnown( spellId )					
-		
-		-- This isn't currently used - delete it if it's not needed in BfA, move it to the right place if it is.
-		--if haveSpell and SpellBuffs[spellId] then
-		--	local targetSpell = SpellBuffs[spellId][1]
-		--	local targetBuff = SpellBuffs[spellId][2]
-		--	local buffIndex = 1
-		--	local buffName, _, _, _, _, _, _, _, _, _, buffID = UnitBuff("player", buffIndex)
-		--	while buffName do
-		--		if  buffID == targetBuff  then
-		--			spellId = targetSpell
-		--			displaySpellName = GetSpellInfo(spellId)
-		--			buffName = nil
-		--		else
-		--			buffIndex = buffIndex + 1
-		--			buffName, _, _, _, _, _, _, _, _, _, buffID = UnitBuff("player", buffIndex)							
-		--		end
-		--	end
-		--end
+		haveSpell = IsSpellKnown( spellId )
 	end
 	
 	if condition and not CustomizeSpells then
@@ -779,7 +788,7 @@ local function ShowSelectDestinationUI(dialog, isItem)
 	local id = dialog.editBox:GetText()
 	local name
 	if isItem then
-		name = GetItemInfo(id)
+		name = GetCachedItemInfo(id)
 	else
 		name = GetSpellInfo(id)
 	end
@@ -945,7 +954,7 @@ local function FindValidSpells()
 
 
 		if isItem then
-			_, _, _, _, _, _, _, _, _, spell.itemTexture = GetItemInfo( spellId )
+			_, _, _, _, _, _, _, _, _, spell.itemTexture = GetCachedItemInfo( spellId )
 			if not spellName then
 				isValidSpell = false
 			end
@@ -1175,11 +1184,11 @@ function TeleporterOpenFrame()
 				-- Count label
 				local countString = nil
 				if consumable then
-					countString = TeleporterCreateReusableFontString("TeleporterCT", buttonFrame, "SystemFont_Outline_Small")
+					countString = TeleporterCreateReusableFontString("TeleporterCT", cooldownbar, "SystemFont_Outline_Small")
 					countString:SetJustifyH("RIGHT")
 					countString:SetJustifyV("CENTER")
-					countString:SetPoint("TOPLEFT",buttonFrame,"TOPLEFT",iconOffsetX,iconOffsetY)
-					countString:SetPoint("BOTTOMRIGHT", buttonFrame, "TOPLEFT", iconOffsetX + iconW, iconOffsetY - iconH - 2)
+					countString:SetPoint("TOPLEFT",cooldownbar,"TOPLEFT",iconOffsetX,iconOffsetY)
+					countString:SetPoint("BOTTOMRIGHT", cooldownbar, "TOPLEFT", iconOffsetX + iconW, iconOffsetY - iconH - 2)
 					countString:SetText("")
 				end
 			
@@ -1309,7 +1318,7 @@ local function PrepareUnequippedSlot(item, itemSlot)
 		for slotIdx = 1, GetContainerNumSlots(bagIdx), 1 do
 			local itemInBag = GetContainerItemID(bagIdx, slotIdx)
 			if itemInBag then
-				local bagItemName = GetItemInfo(itemInBag)
+				local bagItemName = GetCachedItemInfo(itemInBag)
 				if bagItemName == item or itemInBag == item then
 					inBag = bagIdx
 				end
@@ -1335,7 +1344,7 @@ function TeleporterEquipSlashCmdFunction( item )
 
 	if not IsEquippedItem ( item ) then
 		if IsEquippableItem( item ) then 
-			local _, _, _, _, _, _, _, _,itemEquipLoc = GetItemInfo(item)
+			local _, _, _, _, _, _, _, _,itemEquipLoc = GetCachedItemInfo(item)
 			local itemSlot = InvTypeToSlot[ itemEquipLoc ]
 			if itemSlot == nil then
 				print( "Unrecognised equipable item type: " .. itemEquipLoc )
@@ -1369,7 +1378,7 @@ function TeleporterCreateMacroSlashCmdFunction( spell )
 		local macro
 		local printEquipInfo = false
 
-		if GetItemInfo( spell ) then
+		if GetCachedItemInfo( spell ) then
 			if IsEquippableItem( spell ) then
 				macro =
 					"#showtooltip " .. spell .. "\n" ..

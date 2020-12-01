@@ -298,6 +298,12 @@ function G:CreateProfileGUI(parent)
 		StaticPopup_Show("RESET_NDUI")
 	end)
 
+	--[[local restore = M.CreateButton(parent, 120, 24, U["Reset Help"])
+	restore:SetPoint("BOTTOM", reset, "TOP", 0, 2)
+	restore:SetScript("OnClick", function()
+		StaticPopup_Show("RESET_NDUI_HELPINFO")
+	end)]]
+
 	local import = M.CreateButton(parent, 120, 24, U["Import"])
 	import:SetPoint("LEFT", reset, "RIGHT", 6, 0)
 	import:SetScript("OnClick", function()

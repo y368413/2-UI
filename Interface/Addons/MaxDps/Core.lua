@@ -89,6 +89,10 @@ local GetAddOnInfo = GetAddOnInfo;
 local IsAddOnLoaded = IsAddOnLoaded;
 local LoadAddOn = LoadAddOn;
 
+local spellHistoryBlacklist = {
+	[75] = true; -- Auto shot
+};
+
 function MaxDps:OnInitialize()
 	self.db = LibStub('AceDB-3.0'):New('MaxDpsOptions', self.defaultOptions);
 
@@ -166,6 +170,7 @@ function MaxDps:EnableRotation()
 	self:CheckTalents();
 	self:GetAzeriteTraits();
 	self:GetAzeriteEssences();
+	self:GetCovenantInfo();
 	self:CheckIsPlayerMelee();
 	if self.ModuleOnEnable then
 		self.ModuleOnEnable();
@@ -230,8 +235,9 @@ function MaxDps:OnEnable()
 
 		self.playerUnitFrame = CreateFrame('Frame');
 		self.playerUnitFrame:RegisterUnitEvent('UNIT_SPELLCAST_SUCCEEDED', 'player');
-		self.playerUnitFrame:SetScript('OnEvent', function(_, _, _, _, spellId)		-- event, unit, lineId
-			if IsPlayerSpell(spellId) then
+		self.playerUnitFrame:SetScript('OnEvent', function(_, _, _, _, spellId)
+			-- event, unit, lineId
+			if IsPlayerSpell(spellId) and not spellHistoryBlacklist[spellId] then
 				TableInsert(self.spellHistory, 1, spellId);
 
 				if #self.spellHistory > 5 then
@@ -320,6 +326,7 @@ function MaxDps:PrepareFrameData()
 	self.FrameData.talents = self.PlayerTalents;
 	self.FrameData.azerite = self.AzeriteTraits;
 	self.FrameData.essences = self.AzeriteEssences;
+	self.FrameData.covenant = self.CovenantInfo;
 	self.FrameData.spellHistory = self.spellHistory;
 	self.FrameData.timeToDie = self:GetTimeToDie();
 end

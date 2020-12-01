@@ -4,10 +4,12 @@ local RewardIcons_Size = 36
 local GetCurrentMapID, tonumber, C_TaskQuest, tinsert, abs, time, HaveQuestData, QuestUtils_IsQuestWorldQuest, bit, format, floor, pairs = 
       function() return WorldMapFrame:GetMapID() or 0 end, tonumber, C_TaskQuest, tinsert, abs, time, HaveQuestData, QuestUtils_IsQuestWorldQuest, bit, format, floor, pairs
 local IsQuestComplete, IsQuestCriteriaForBounty = C_QuestLog.IsComplete, C_QuestLog.IsQuestCriteriaForBounty
+
 local function GetCurrencyInfo(id)
 	local data = C_CurrencyInfo.GetCurrencyInfo(id)
 	return data.name, nil, data.iconFileID
 end
+
 local function GetQuestTagInfo(id)
 	local data = C_QuestLog.GetQuestTagInfo(id)
 	return data.tagID, data.tagName, data.worldQuestType, data.quality, data.isElite, data.tradeskillLineID, data.displayExpiration
@@ -485,15 +487,17 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 									local tooltipLine = _G["WorldmapRewardIconWorldQuestListInspectScanningTooltipTextLeft"..j]								                       	
 									local text = tooltipLine:GetText()
 									if text and text:find(ANIMA.."|r$") then
-										isAnima = 100
+										isAnima = 1
 									elseif text and isAnima and text:find("^"..LE.ITEM_SPELL_TRIGGER_ONUSE) then
 										local num = text:gsub("(%d+)[ %.,]+(%d+)","%1%2"):match("%d+")
-										isAnima = tonumber(num or "") or 100
+										isAnima = tonumber(num or "") or 1
 										break
 									end 
 								end
 								if isAnima then
-									CacheIsAnimaItem[itemID] = isAnima
+									if isAnima ~= 1 then
+										CacheIsAnimaItem[itemID] = isAnima
+									end
 									iconTexture = 613397
 									ajustMask = true
 									ajustSize = 10

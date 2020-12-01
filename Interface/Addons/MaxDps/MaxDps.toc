@@ -1,5 +1,5 @@
 ## Interface: 90002
-## Version: 9.0.0
+## Version: 9.0.2
 ## Author: Kaminaris
 ## Title: MaxDps
 ## Title-zhCN:|CFFD74DE1[输出]|rMaxDps

@@ -1199,6 +1199,13 @@ L["faeflayer_note"] = "In a small cave hidden behind a waterfall."
 L["gormtamer_tizo_note"] = "Kill {npc:166735s} and the {npc:166736s} that are riding them until {npc:164110} spawns."
 L["humongozz_note"] = "Plant an {item:175247} in the Damp Loam to spawn a {npc:164122}. After a minute of {spell:319367}, the rare will spawn. The mushroom drops from numerous mobs in the zone."
 L["lehgo_note"] = "Destroy Quivering Gorm Eggs and kill {npc:171827} until he spawns. In a cave (entrance to the south-east in the Dusty Burrows)."
+L["macabre_note"] = [[
+Spawns in multiple locations. To summon, stand in the Mysterious Mushroom Ring with 2 other players and dance with each other.
+
+• Player 1 dances with Player 2
+• Player 2 dances with Player 3
+• Player 3 dances with Player 1
+]]
 L["mymaen_note"] = "Kill Rotbriar sprites in the area until he emotes and spawns."
 L["rainbowhorn_note"] = "\n|cffff5400T|r|cffffaa00A|r|cffffff00S|r|cffaaff00T|r|cff54ff00E|r |cff00ff55T|r|cff00ffa9H|r|cff00ffffE|r |cff0055ffR|r|cff0000ffA|r|cff5400ffI|r|cffaa00ffN|r|cffff00ffB|r|cffff00aaO|r|cffff0054W|r|cffff0000!|r"
 L["rootwrithe_note"] = "Poke the {npc:167928s} until the rare appears."
@@ -1213,11 +1220,16 @@ Travel to Tirna Scithe and follow the root path on the northwest cliff to a brok
 
 Take this item to {npc:165704} at Glitterfall Basin. She will give you a {item:181242} in exchange for 10 {item:173204}. |cFFFF8C00If she is not there, you must complete the |cFFFFFD00Trouble at the Gormling Corral|r and |cFFFFFD00Tricky Spriggans|r quest lines.|r
 
-Next, talk to {npc:160262} in the Heart of the Forest to exchange the {item:181242} for a {item:178675}. Use this item to get {spell:327083} buff, allowing you to see the {npc:168135}.
+Next, talk to {npc:160262} in the Heart of the Forest to exchange the {item:181242} for a {item:178675}. Talk to the guards to have her come outside if you are not a Night Fae. Use this item to get {spell:327083} buff, allowing you to see the {npc:168135}.
 ]]
 
 L["star_lake"] = "Star Lake Amphitheater"
-L["star_lake_note"] = "Talk to {npc:171743}, the Stage Director, to start one of the special encounters."
+L["star_lake_note"] = [[
+Talk to {npc:171743}, the Stage Director, to start one of the special encounters. The encounter changes each day.
+
+Participate in all seven encounters to unlock {item:180748} from {npc:163714}.
+]]
+L["guldan"] = "Gul'dan"
 
 L["cache_of_the_moon"] = "Collect {npc:171360}'s five missing tools in the Garden of Night and combine them to create {item:180753}. Return her toolkit and she will cast {spell:334353} on you, allowing you to see the cache."
 L["cache_of_the_night"] = "Collect {item:180656}, {item:180654} and {item:180655} from across the zone and combine them to create {item:180652}."
@@ -1252,6 +1264,10 @@ If you take a wrong path and {npc:171699} disappears when you reach the end, go 
 L["faryl_note"] = "Let Ardenweald's defense be lead by the creatures in the sky."
 L["glitterdust_note"] = "The creatures of Ardenweald may look docile, but they will defend their territory with the strength and courage of the mightiest champions ever known. Do you have what it takes?"
 
+L["lost_book_note"] = "Return this lost book to {npc:165867} in the Grove of Memory."
+L["options_icons_faerie_tales"] = "{achievement:14788}"
+L["options_icons_faerie_tales_desc"] = "Display lost book locations for the {achievement:14788} achievement."
+
 -------------------------------------------------------------------------------
 ----------------------------------- BASTION -----------------------------------
 -------------------------------------------------------------------------------
@@ -1265,7 +1281,7 @@ L["beasts_of_bastion_note"] = "Talk to {npc:161441} to summon one of the four be
 L["bookkeeper_mnemis_note"] = "Has a chance to spawn in place of the {npc:166867} units in the area."
 L["cloudfeather_patriarch_note"] = "Kill {npc:158110s} in the area until the guardian engages you."
 L["collector_astor_note"] = "Read all six chapters of Mercia's Legacy scattered around the room, after which you will receive a whisper from {npc:157979}. Talk to her to receive {spell:333779}, allowing you to find the hidden {item:180569} to the northwest. Returning the chapter will spawn the rare."
-L["corrupted_clawguard_note"] = "Loot a {item:180651} in Forgefire Outpost up the hill and use it to repair the {npc:171300}."
+L["corrupted_clawguard_note"] = "Loot a {item:180651} in the room or in Forgefire Outpost up the hill and use it to repair the {npc:171300}."
 L["dark_watcher_note"] = "Can only be seen while dead. Talk to her and she will cast {spell:332830} on you before attacking."
 L["demi_hoarder_note"] = "Starts with 99 stacks of {spell:333874}, reducing damage taken. Stacks are slowly removed with damage. The rare will follow a path and despawn if it reaches the end."
 L["dionae_note"] = "When she becomes immune, click the four {npc:163747} to break her shield."
@@ -1395,10 +1411,16 @@ L["forgotten_mementos"] = "Pull the Vault Portcullis Chain in the chamber west o
 L["gieger_note"] = "Pull the {npc:162815} to activate the rare."
 L["gristlebeak_note"] = "Break all nearby {npc:162761} to engage the rare."
 L["leeda_note"] = "Kill the two {npc:162220s} until the rare spawns."
+L["nirvaska_note"] = "Only appears when the {wq:Deadly Reminder} world quest is active."
 L["sabriel_note"] = "Can appear as one of the champions in the Theater of Pain."
 L["schmitd_note"] = "Use nearby {spell:313451} to break his shield."
 L["taskmaster_xox_note"] = "Shares a spawn with {npc:160204}, {npc:160230} and {npc:160226}."
-L["zargox_the_reborn_note"] = "Use {item:175841} on top of the {npc:157124}. To obtain the orb, you must complete the quest {quest:57245} from {npc:157076} and talk to him again."
+L["theater_of_pain_note"] = "Your first boss kill each day has a chance to drop the mount."
+L["zargox_the_reborn_note"] = [[
+Use {item:175841} on top of the {npc:157124}. To obtain the orb, you must complete the quest {quest:57245} from {npc:157076} and talk to him again.
+
+If the {npc:157124} is not up, reanimate {npc:157132} in the area until it appears.
+]]
 L["mixed_pool_note"] = [[
 Gather ingredients from the surrounding mobs and toss them into the pool. Once 30 ingredients have been added, one of seven rares will spawn depending on the combination used.
 
@@ -1407,11 +1429,17 @@ Gather ingredients from the surrounding mobs and toss them into the pool. Once 3
 • Collect {spell:306719} from {npc:165015} and {npc:171142} to the south.
 
 • Collect {spell:306722} from {npc:165027} and {npc:166438} to the south.
+
+Kill each rare once to earn the {item:183903} toy.
 ]]
-L["Violet"] = nil
+L["Boneslurp"] = nil
+L["Corrupted"] = nil
 L["Oily"] = nil
+L["Pulsing"] = nil
+L["Violet"] = nil
 
 L["blackhound_cache"] = "Blackhound Cache"
+L["blackhound_cache_note"] = "Summon {npc:157843} at the Abomination Factory, then escort him to the Blackhound Outpost."
 L["bladesworn_supply_cache"] = "Bladesworn Supply Cache"
 L["cache_of_eyes"] = "Cache of Eyes"
 L["cache_of_eyes_note"] = "Spawns at multiple locations within the Sightless Hold."
@@ -1512,7 +1540,6 @@ L["smuggled_cache_note"] = "BEFORE YOU LOOT: Make sure you have completed {quest
 L["taskmaster_trove_note"] = "Read the Ingress and Egress Rites then carefully make your way to the chest."
 L["the_count_note"] = "Farm 99 {currency:1820} in the Endmire and then bring them to {npc:173488}."
 
-L["bleakwood_chest"] = "Bleakwood Chest"
 L["forgotten_anglers_rod"] = "Forgotten Angler's Rod"
 
 L["loyal_gorger_note"] = "Visit the Endmire and complete a daily offered by your {npc:173498} 7 times to obtain him as a mount."
@@ -1536,6 +1563,12 @@ L["addius_note"] = "Weak minded beings should not waste my time, but if you insi
 L["eyegor_note"] = "Eyegor ready for battle!"
 L["sylla_note"] = "One can never expect to have a distinguished battle out here in this awful area, but alas here we are. Do not waste my time."
 
+L["avowed_ritualist_note"] = "Bring nearby {npc:160149s} here to absolve them."
+L["fugitive_soul_note"] = "Bring this {npc:160149} to a nearby {npc:166150} to begin a ritual of absolution."
+L["souls_absolved"] = "souls absolved"
+L["options_icons_fugitives"] = "{achievement:14274}"
+L["options_icons_fugitives_desc"] = "Display fugitive soul locations for the {achievement:14274} achievement."
+
 L["grand_inquisitor_note"] = "Turn in 10 {item:180451} to {npc:160248} for a chance at this sinstone."
 L["high_inquisitor_note"] = "Turn in 250 {currency:1816} to {npc:160248} for a chance at this sinstone."
 L["inquisitor_note"] = "Turn in 100 {currency:1816} to {npc:160248} for a chance at this sinstone."
@@ -1551,6 +1584,7 @@ L["maw_intro_note"] = "Begin the introductory quest chain from {npc:162804} to u
 
 L["apholeias_note"] = "With 3 other players, stand on the corners of the platform and cast {spell:331783} to summon the rare."
 L["dekaris_note"] = "On top of a large jutting rock."
+L["drifting_sorrow_note"] = "Kill {npc:175246s} near the hovering orb to activate the boss."
 L["ekphoras_note"] = "With 3 other players, stand on the corners of the platform and cast {spell:330650} to summon the rare."
 L["ikras_note"] = "Flies around Perdition Hold. This is a good place to pull him."
 L["orophea_note"] = "Pick up {spell:337143} to the southeast and offer it to {npc:172577} to activate."

@@ -8,21 +8,20 @@ local cfg = R.Bars.extrabar
 local margin, padding = R.Bars.margin, R.Bars.padding
 
 function Bar:CreateExtrabar()
-	local num = 1
 	local buttonList = {}
 	local size = cfg.size
 
 	-- ExtraActionButton
 	local frame = CreateFrame("Frame", "NDui_ActionBarExtra", UIParent, "SecureHandlerStateTemplate")
-	frame:SetWidth(num*size + (num-1)*margin + 2*padding)
+	frame:SetWidth(size + 2*padding)
 	frame:SetHeight(size + 2*padding)
-	frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 250, 100}
+	frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 210}
 	frame.mover = M.Mover(frame, U["Extrabar"], "Extrabar", frame.Pos)
 
 	ExtraActionBarFrame:EnableMouse(false)
 	ExtraAbilityContainer:SetParent(frame)
 	ExtraAbilityContainer:ClearAllPoints()
-	ExtraAbilityContainer:SetPoint("CENTER", frame)
+	ExtraAbilityContainer:SetPoint("CENTER", frame, 0, 2*padding)
 	ExtraAbilityContainer.ignoreFramePositionManager = true
 
 	local button = ExtraActionButton1
@@ -56,6 +55,8 @@ function Bar:CreateExtrabar()
 				spellButton.NormalTexture:SetAlpha(0)
 				spellButton:SetPushedTexture(I.textures.pushed) --force it to gain a texture
 				spellButton:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
+				spellButton:GetHighlightTexture():SetInside()
+				spellButton.Icon:SetInside()
 				M.ReskinIcon(spellButton.Icon, true)
 				spellButton.styled = true
 			end

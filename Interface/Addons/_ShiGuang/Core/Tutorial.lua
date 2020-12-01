@@ -208,6 +208,7 @@ local function ForceDBMOptions()
 	DBM_AllSavedOptions["Default"]["SpecialWarningX"] = 0
 	DBM_AllSavedOptions["Default"]["SpecialWarningY"] = -195
 	DBM_AllSavedOptions["Default"]["SpecialWarningFontStyle"] = "OUTLINE"
+	DBM_AllSavedOptions["Default"]["HideQuestTooltips"] = false
 	DBM_AllSavedOptions["Default"]["HideObjectivesFrame"] = false
 	DBM_AllSavedOptions["Default"]["WarningFontSize"] = 20
 	DBM_AllSavedOptions["Default"]["SpecialWarningFontSize2"] = 36
@@ -367,9 +368,6 @@ end
 -- Tutorial
 local function YesTutor()
 	ForceRaidFrame()
-	ForceChatSettings()
-	MaoRUIDB["LockUIScale"] = true
-	M:SetupUIScale()
 	MaoRUIDB["DBMRequest"] = true
 	MaoRUIDB["SkadaRequest"] = true
 	MaoRUIDB["BWRequest"] = true

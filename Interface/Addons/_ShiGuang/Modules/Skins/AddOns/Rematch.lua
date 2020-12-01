@@ -199,6 +199,14 @@ function S:RematchFlyoutButton(flyout)
 	end
 end
 
+local function hookRematchPetButton(texture, _, _, _, y)
+	if y == .5 then
+		texture:SetTexCoord(.5625, 1, 0, .4375)
+	elseif y == 1 then
+		texture:SetTexCoord(0, .4375, 0, .4375)
+	end
+end
+
 local styled
 function S:ReskinRematchElements()
 	if styled then return end
@@ -297,6 +305,31 @@ function S:ReskinRematchElements()
 		S.RematchIcon(target["Pet"..i])
 	end
 	S:RematchFlyoutButton(RematchLoadoutPanel.Flyout)
+
+	local targetPanel = RematchLoadoutPanel.TargetPanel
+	if targetPanel then -- compatible
+		M.StripTextures(targetPanel.Top)
+		S.RematchInput(targetPanel.Top.SearchBox)
+		S.RematchFilter(targetPanel.Top.BackButton)
+		S.RematchScroll(targetPanel.List)
+
+		hooksecurefunc(targetPanel, "FillHeader", function(_, button, targetIndex)
+			if not button.styled then
+				button.Border:SetTexture(nil)
+				button.Back:SetTexture(nil)
+				button.bg = M.CreateBDFrame(button.Back, .25)
+				button.bg:SetInside()
+				button:HookScript("OnEnter", buttonOnEnter)
+				button:HookScript("OnLeave", buttonOnLeave)
+				button.Expand:SetSize(8, 8)
+				button.Expand:SetPoint("LEFT", 5, 0)
+				button.Expand:SetTexture("Interface\\Buttons\\UI-PlusMinus-Buttons")
+				hooksecurefunc(button.Expand, "SetTexCoord", hookRematchPetButton)
+
+				button.styled = true
+			end
+		end)
+	end
 
 	-- RematchTeamPanel
 	M.StripTextures(RematchTeamPanel.Top)
@@ -458,7 +491,7 @@ function S:ReskinRematch()
 		M.ReskinClose(self.CloseButton)
 		S:RematchLockButton(self.LockButton)
 		self.LockButton:SetPoint("TOPLEFT")
-	
+
 		local content = self.Content
 		M.ReskinScroll(content.ScrollFrame.ScrollBar)
 		local bg = M.CreateBDFrame(content.ScrollFrame, .25)
@@ -480,7 +513,7 @@ function S:ReskinRematch()
 		for bu, tex in pairs(icons) do
 			bu:SetTexture(tex)
 		end
-	
+
 		M.Reskin(self.Controls.DeleteButton)
 		M.Reskin(self.Controls.UndoButton)
 		M.Reskin(self.Controls.SaveButton)

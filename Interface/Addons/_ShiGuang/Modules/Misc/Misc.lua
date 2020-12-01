@@ -57,12 +57,11 @@ function MISC:OnLogin()
 	MISC:TradeTargetInfo()
 	MISC:MoveQuestTracker()
 	MISC:BlockStrangerInvite()
-	MISC:OverrideAWQ()
 	MISC:ToggleBossBanner()
 	MISC:ToggleBossEmote()
 	
 	--MISC:CreateRM()
-	MISC:FreeMountCD()
+	--MISC:FreeMountCD()
 	MISC:xMerchant()
 	MISC:BlinkRogueHelper()
 	
@@ -333,28 +332,6 @@ function MISC:BlockStrangerInvite()
 			StaticPopup_Hide("PARTY_INVITE")
 		end
 	end)
-end
-
--- Override default settings for AngryWorldQuests
-function MISC:OverrideAWQ()
-	if not IsAddOnLoaded("AngryWorldQuests") then return end
-
-	AngryWorldQuests_Config = AngryWorldQuests_Config or {}
-	AngryWorldQuests_CharacterConfig = AngryWorldQuests_CharacterConfig or {}
-
-	local settings = {
-		hideFilteredPOI = true,
-		showContinentPOI = true,
-		sortMethod = 2,
-	}
-	local function overrideOptions(_, key)
-		local value = settings[key]
-		if value then
-			AngryWorldQuests_Config[key] = value
-			AngryWorldQuests_CharacterConfig[key] = value
-		end
-	end
-	hooksecurefunc(AngryWorldQuests.Modules.Config, "Set", overrideOptions)
 end
 
 -- Archaeology counts

@@ -122,6 +122,7 @@ info.onEnter = function(self)
 
 	for i = 1, GetNumWatchedTokens() do
 		local currencyInfo = C_CurrencyInfo_GetBackpackCurrencyInfo(i)
+		if not currencyInfo then break end
 		local name, count, icon, currencyID = currencyInfo.name, currencyInfo.quantity, currencyInfo.iconFileID, currencyInfo.currencyTypesID
 		if name and i == 1 then
 			GameTooltip:AddLine(" ")
@@ -169,7 +170,7 @@ local function startSelling()
 					sellCount = sellCount + price*count
 					cache["b"..bag.."s"..slot] = true
 					UseContainerItem(bag, slot)
-					C_Timer_After(.1, startSelling)
+					C_Timer_After(.05, startSelling)
 					--startSelling
 					return
 				end

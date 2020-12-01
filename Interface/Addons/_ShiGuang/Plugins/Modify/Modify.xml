@@ -16,6 +16,40 @@
 	<Script file="AlterCurrencies.lua"/>
 	<Script file="TransmogCostCutter.lua"/>
 	<Script file="TransmogSetProgress.lua"/>
+	<Frame name="TSP_MainBar" virtual="true">
+		<Size y="4"/>
+		
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="BGLeft" file="Interface\QuestFrame\ObjectiveTracker">
+					<Size x="16"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="-1"/>
+						<Anchor point="BOTTOMLEFT" x="-1"/>
+					</Anchors>
+					<Color r="0" b="0" g="0" a="1"/>
+					<TexCoords left="0.587890625" right="0.73815" top="0.421875" bottom="0.453125"/>
+				</Texture>
+				<Texture parentKey="BGRight" file="Interface\QuestFrame\ObjectiveTracker">
+					<Size x="16"/>
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="1"/>
+						<Anchor point="BOTTOMRIGHT" x="1"/>
+					</Anchors>
+					<Color r="0" b="0" g="0" a="1"/>
+					<TexCoords left="0.73815" right="0.888671875" top="0.421875" bottom="0.453125"/>
+				</Texture>
+				<Texture parentKey="BGMid" file="Interface\QuestFrame\ObjectiveTracker">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.BGLeft" relativePoint="TOPRIGHT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.BGRight" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+					<Color r="0" b="0" g="0" a="1"/>
+					<TexCoords left="0.735" right="0.735" top="0.421875" bottom="0.453125"/>
+				</Texture>
+			</Layer>
+		</Layers>		
+	</Frame>
 	<Script file="ItemTooltipProfession.lua"/>
 	<CheckButton name="nReputation" parent="ReputationFrame" mixin="nReputationMixin">
 		<Size x="24" y="24"/>

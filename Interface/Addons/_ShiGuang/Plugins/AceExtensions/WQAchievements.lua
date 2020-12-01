@@ -1,4 +1,4 @@
---## Author: Urtgard  ## Version: v9.0.1-4release
+--## Author: Urtgard  ## Version: v9.0.1-12
 WQAchievements = LibStub("AceAddon-3.0"):NewAddon("WQAchievements", "AceConsole-3.0", "AceTimer-3.0")
 local WQA = WQAchievements
 WQA.data = {}
@@ -664,6 +664,52 @@ do
 	}
 	WQA.data[8] = bfa
 end
+-- Shadowlands
+do
+	local shadowlands = {}
+	shadowlands = {
+		name = "Shadowlands",
+		achievements = {
+			{name = "Tea Tales", id = 14233, criteriaType = "QUESTS", criteria = {59848, 59850, 59852, 59853}},
+			{name = "Something's Not Quite Right....", id = 14671, criteriaType = "QUEST_SINGLE", criteria = 60739},
+			{name = "A Bit of This, A Bit of That", id = 14672, criteriaType = "QUEST_SINGLE", criteria = 60475},
+			{name = "Flight School Graduate", id = 14735, criteriaType = "QUESTS", criteria = {60844, 60858, 60911}},
+			{name = "What Bastion Remembered", id = 14737, criteriaType = "QUEST_SINGLE", criteria = 59717},
+			{name = "Aerial Ace", id = 14741, criteriaType = "QUEST_SINGLE", criteria = 60911},
+			{name = "Breaking the Stratus Fear", id = 14762, criteriaType = "QUEST_SINGLE", criteria = 60858},
+			{name = "Ramparts Racer", id = 14765, criteriaType = "QUEST_SINGLE", criteria = 59643},
+			{name = "Parasoling", id = 14766, criteriaType = "QUEST_SINGLE", criteria = 59718},
+			{name = "Caught in a Bat Romance", id = 14772, criteriaType = "QUEST_SINGLE", criteria = 60602},
+			{
+				name = "Battle in the Shadowlands",
+				id = 14625,
+				criteriaType = "QUESTS",
+				criteria = {
+					61949,
+					61948,
+					61947,
+					61946,
+					61886,
+					61885,
+					61883, -- Sylla
+					61879,
+					61870,
+					61868,
+					61867, -- Rotgut
+					61866,
+					61791,
+					61787, -- Zolla
+					61784,
+					61783
+				}
+			}
+		},
+		toys = {
+			{name = "Tithe Collector's Vessel", itemID = 180947, quest = {{trackingID = 0, wqID = 59789}}}
+		}
+	}
+	WQA.data[9] = shadowlands
+end
 
 -- Terrors of the Shore
 -- Commander of Argus
@@ -675,23 +721,27 @@ function WQA:CreateQuestList()
 	self.missionList = {}
 	self.questFlagList = {}
 
-	--if UnitLevel("player") >= 50 then
+	-- Legion
 	for _, v in pairs(self.data[7].achievements) do
 		self:AddAchievements(v)
 	end
 	self:AddMounts(self.data[7].mounts)
 	self:AddPets(self.data[7].pets)
 	self:AddToys(self.data[7].toys)
-	--end
 
-	--if UnitLevel("player") >= 50 then
+	-- Battle for Azeroth
 	for _, v in pairs(self.data[8].achievements) do
 		self:AddAchievements(v)
 	end
 	self:AddMounts(self.data[8].mounts)
 	self:AddPets(self.data[8].pets)
 	self:AddToys(self.data[8].toys)
-	--end
+
+	-- Shadowlands
+	for _, v in pairs(self.data[9].achievements) do
+		self:AddAchievements(v)
+	end
+	self:AddToys(self.data[9].toys)
 
 	self:AddCustom()
 	self:Special()
@@ -759,8 +809,8 @@ function WQA:AddAchievements(achievement, forced, forcedByMe)
 								self:AddRewardToQuest(questID, "ACHIEVEMENT", id)
 							end
 						elseif achievement.criteriaType == "MISSION_TABLE" then
-							self:AddRewardToMission(questID, "ACHIEVEMENT", id)
 							--self.missionList[questID] = {name = C_Garrison.GetMissionName(questID), reward = {{rewardType = "ACHIEVEMENT", achievement[1] = {id = id}}}}
+							self:AddRewardToMission(questID, "ACHIEVEMENT", id)
 						else
 							self:AddRewardToQuest(questID, "ACHIEVEMENT", id)
 						end
@@ -1495,7 +1545,9 @@ function WQA:CheckItems(questID, isEmissary)
 			inspectScantip:SetQuestLogItem("reward", 1, questID)
 			local itemLink = select(2, inspectScantip:GetItem())
 			if not itemLink then
-				retry = true
+				return true
+			elseif string.find(itemLink, "%[]") then
+				return true
 			end
 			
 			local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice, itemClassID, itemSubClassID = GetItemInfo(itemLink)
@@ -1777,7 +1829,6 @@ function WQA:CheckItems(questID, isEmissary)
 				if not l.reward.item then l.reward.item = {} end
 				l.reward.item.itemLink = itemLink
 			end--]]
-
 			-- Custom itemID
 			if self.db.global.custom.worldQuestReward[itemID] == true then
 				if self.db.profile.custom.worldQuestReward[itemID] == true then
@@ -1797,7 +1848,6 @@ function WQA:CheckItems(questID, isEmissary)
 					end
 				end
 			end
-
 		else
 			retry = true
 		end
@@ -2085,8 +2135,10 @@ function WQA:AnnouncePopUp(quests, silent)
 	self.tooltip:ClearAllPoints()
 	self.tooltip:SetPoint("TOP", PopUp, "TOP", 2, -27)
 	self:UpdateQTip(quests)
-	PopUp:SetWidth(self.tooltip:GetWidth()+8.5)
-	PopUp:SetHeight(self.tooltip:GetHeight()+32)
+	PopUp:SetWidth(self.tooltip:GetWidth() + 8.5)
+	PopUp:SetHeight(self.tooltip:GetHeight() + 32)
+	PopUp:SetScale(self.tooltip:GetScale())
+	PopUp:SetFrameLevel(self.tooltip:GetFrameLevel())
 
 	if self.db.profile.options.popupRememberPosition then
 		PopUp:ClearAllPoints()
@@ -2324,7 +2376,11 @@ function WQA:EmissaryIsActive(questID)
 end
 
 function WQA:Special()
-	if (self.db.profile.achievements["Variety is the Spice of Life"] == true and not select(4,GetAchievementInfo(11189)) == true) or (self.db.profile.achievements["Wide World of Quests"] == true and not select(4,GetAchievementInfo(13144)) == true) then 
+	if
+		(self.db.profile.achievements["Variety is the Spice of Life"] == true and
+			not select(4, GetAchievementInfo(11189)) == true) or
+			(self.db.profile.achievements["Wide World of Quests"] == true and not select(4, GetAchievementInfo(13144)) == true)
+	 then
 		self.event:RegisterEvent("QUEST_TURNED_IN")
 	end
 end
@@ -2421,7 +2477,8 @@ end
 local LE_GARRISON_TYPE = {
 	[6] = Enum.GarrisonType.Type_6_0,
 	[7] = Enum.GarrisonType.Type_7_0,
-	[8] = Enum.GarrisonType.Type_8_0
+	[8] = Enum.GarrisonType.Type_8_0,
+	[9] = Enum.GarrisonType.Type_9_0
 }
 
 function WQA:CheckMissions()
@@ -2431,7 +2488,7 @@ function WQA:CheckMissions()
 		local type = LE_GARRISON_TYPE[i]
 		local followerType = GetPrimaryGarrisonFollowerType(type)
 		if C_Garrison.HasGarrison(type) then
-			local missions = C_Garrison.GetAvailableMissions(GetPrimaryGarrisonFollowerType(type))
+			local missions = C_Garrison.GetAvailableMissions(followerType)
 			-- Add Shipyard Missions
 			if i == 6 and C_Garrison.HasShipyard() then
 				for missionID, mission in ipairs(C_Garrison.GetAvailableMissions(Enum.GarrisonFollowerType.FollowerType_6_2)) do
@@ -2447,11 +2504,11 @@ function WQA:CheckMissions()
 					if self.missionList[missionID] then
 						addMission = true
 					end
-					if mission.rewards[1] then
-						if mission.rewards[1].currencyID then
-							if mission.rewards[1].currencyID ~= 0 then
-								local currencyID = mission.rewards[1].currencyID
-								local amount = mission.rewards[1].quantity
+					for _, reward in ipairs(mission.rewards) do
+						if reward.currencyID then
+							if reward.currencyID ~= 0 then
+								local currencyID = reward.currencyID
+								local amount = reward.quantity
 								if self.db.profile.options.missionTable.reward.currency[currencyID] then
 									local currency = {currencyID = currencyID, amount = amount}
 									self:AddRewardToMission(missionID, "CURRENCY", currency)
@@ -2466,17 +2523,32 @@ function WQA:CheckMissions()
 									end
 								end
 							else
-								local gold = math.floor(mission.rewards[1].quantity/10000)
-								if self.db.profile.options.missionTable.reward.gold and gold >= self.db.profile.options.missionTable.reward.goldMin then
+								local gold = math.floor(reward.quantity / 10000)
+								if
+									self.db.profile.options.missionTable.reward.gold and
+										gold >= self.db.profile.options.missionTable.reward.goldMin
+								 then
 									self:AddRewardToMission(missionID, "GOLD", gold)
 									addMission = true
 								end
 							end
 						end
-						
-						if mission.rewards[1].itemID then
-							local itemID = mission.rewards[1].itemID
-							local itemLink = select(2,GetItemInfo(itemID))
+
+						if reward.itemID then
+							local itemID = reward.itemID
+							local itemName,
+								itemLink,
+								itemRarity,
+								itemLevel,
+								itemMinLevel,
+								itemType,
+								itemSubType,
+								itemStackCount,
+								itemEquipLoc,
+								itemTexture,
+								itemSellPrice,
+								itemClassID,
+								itemSubClassID = GetItemInfo(itemID)
 
 							if not itemLink then
 								retry = true
@@ -2495,6 +2567,36 @@ function WQA:CheckMissions()
 										local reputation = {itemLink = itemLink, factionID = factionID}
 										self:AddRewardToMission(missionID, "REPUTATION", reputation)
 										addMission = true
+									end
+								end
+
+								-- Transmog
+								if self.db.profile.options.reward.gear.unknownAppearance and self:IsTransmogable(itemLink) then
+									if itemClassID == 2 or itemClassID == 4 then
+										local transmog
+										if AllTheThings then
+											local state = AllTheThings.SearchForLink(itemLink)[1].collected
+											if not state then
+												transmog = "|TInterface\\Addons\\AllTheThings\\assets\\unknown:0|t"
+											elseif state == 2 and self.db.profile.options.reward.gear.unknownSource then
+												transmog = "|TInterface\\Addons\\AllTheThings\\assets\\known_circle:0|t"
+											end
+										elseif CanIMogIt then
+											if CanIMogIt:IsEquippable(itemLink) and CanIMogIt:CharacterCanLearnTransmog(itemLink) then
+												if not CanIMogIt:PlayerKnowsTransmog(itemLink) then
+													transmog = "|TInterface\\AddOns\\TransMogMaster\\Icons\\UNKNOWN:0|t"
+												elseif
+													not CanIMogIt:PlayerKnowsTransmogFromItem(itemLink) and self.db.profile.options.reward.gear.unknownSource
+												 then
+													transmog = "|TInterface\\AddOns\\TransMogMaster\\Icons\\KNOWN_circle:0|t"
+												end
+											end
+										end
+										if transmog then
+											local item = {itemLink = itemLink, transmog = transmog}
+											self:AddRewardToMission(missionID, "ITEM", item)
+											addMission = true
+										end
 									end
 								end
 							end
@@ -2556,12 +2658,14 @@ WQA.ExpansionList = {
 	[6] = "|cFFFF0000 WOD >>>|r",  --Warlords of Draenor
 	[7] = "|cFFFF0000 LEG >>>|r",  --Legion
 	[8] = "|cFFFF0000 BFA >>>|r",  --Battle For Azeroth
+	[9] = "|cFFFF0000 SLS >>>|r",  --"Shadowlands"
 }
 
 local IDToExpansionID = {
 	[1] = 6,
 	[2] = 7,
-	[3] = 8
+	[3] = 8,
+	[4] = 9
 }
 
 local CurrencyIDList = {
@@ -2581,7 +2685,10 @@ local CurrencyIDList = {
 		{id = 1717, faction = "Alliance"}, -- 7th Legion Service Medal
 		1721, -- Prismatic Manapearl
 		1602, -- Conquest
-		1166, -- Timewarped Badge
+		1166 -- Timewarped Badge
+	},
+	[9] = {
+		1889 -- Adventure Campaign Progress
 	}
 }
 
@@ -2589,18 +2696,15 @@ local CraftingReagentIDList = {
 	[7] = {
 		124124, -- Blood of Sargeras
 		133680, -- Slice of Bacon
-
 		124444, -- Infernal Brimstone
 		151564, -- Empyrium
 		123919, -- Felslate
 		123918, -- Leystone Ore
-
 		124116, -- Felhide
 		136533, -- Dreadhide Leather
 		151566, -- Fiendish Leather
 		124113, -- Stonehide Leather
 		124115, -- Stormscale
-
 		124106, -- Felwort
 		124101, -- Aethril
 		124102, -- Dreamleaf
@@ -2613,7 +2717,6 @@ local CraftingReagentIDList = {
 		152513, -- Platinum Ore
 		152512, -- Monelite Ore
 		152579, -- Storm Silver Ore
-
 		152542, -- Hardened Tempest Hide
 		153051, -- Mistscale
 		154165, -- Calcified Bone
@@ -2621,7 +2724,6 @@ local CraftingReagentIDList = {
 		152541, -- Coarse Leather
 		153050, -- Shimmerscale
 		154164, -- Blood-Stained Bone
-
 		152510, -- Anchor Weed
 		152505, -- Riverbud
 		152506, -- Star Moss
@@ -2671,7 +2773,13 @@ WQA.ZoneIDList = {
 		1355, -- Nazjatar
 		1462, -- Mechagon
 		1527, -- Uldum
-		1530, -- Vale of Eternal Blossoms
+		1530 -- Vale of Eternal Blossoms
+	},
+	[9] = {
+		1525, -- Revendreth
+		1533, -- Bastion
+		1536, -- Maldraxxus
+		1565 -- Ardenweald
 	}
 }
 
@@ -2794,8 +2902,7 @@ function WQA:UpdateOptions()
 								name = "minimum Gold",
 								type = "input",
 								order = newOrder(),
-								--width = .6,
-								set = function(info,val)
+								set = function(info, val)
 									WQA.db.profile.options.reward.general.goldMin = tonumber(val)
 								end,
 						 	get = function() return tostring(WQA.db.profile.options.reward.general.goldMin)  end
@@ -2811,7 +2918,6 @@ function WQA:UpdateOptions()
 							itemLevelUpgrade = {
 								type = "toggle",
 								name = "ItemLevel Upgrade",
-								--width = "double",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.itemLevelUpgrade = val
 								end,
@@ -2824,7 +2930,6 @@ function WQA:UpdateOptions()
 							AzeriteArmorCache = {
 								type = "toggle",
 								name = "Azerite Armor Cache",
-								--width = "double",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.AzeriteArmorCache = val
 								end,
@@ -2838,8 +2943,7 @@ function WQA:UpdateOptions()
 								name = "minimum ItemLevel Upgrade",
 								type = "input",
 								order = newOrder(),
-								--width = .6,
-								set = function(info,val)
+								set = function(info, val)
 									WQA.db.profile.options.reward.gear.itemLevelUpgradeMin = tonumber(val)
 								end,
 						 	get = function() return tostring(WQA.db.profile.options.reward.gear.itemLevelUpgradeMin)  end
@@ -2847,7 +2951,6 @@ function WQA:UpdateOptions()
 							armorCache = {
 								type = "toggle",
 								name = "Armor Cache",
-								--width = "double",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.armorCache = val
 								end,
@@ -2860,7 +2963,6 @@ function WQA:UpdateOptions()
 							weaponCache = {
 								type = "toggle",
 								name = "Weapon Cache",
-								--width = "double",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.weaponCache = val
 								end,
@@ -2873,7 +2975,6 @@ function WQA:UpdateOptions()
 							jewelryCache = {
 								type = "toggle",
 								name = "Jewelry Cache",
-								--width = "double",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.jewelryCache = val
 								end,
@@ -2887,7 +2988,6 @@ function WQA:UpdateOptions()
 							PawnUpgrade = {
 								type = "toggle",
 								name = "% Upgrade (Pawn)",
-								--width = "double",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.PawnUpgrade = val
 								end,
@@ -2900,7 +3000,6 @@ function WQA:UpdateOptions()
 							StatWeightScore = {
 								type = "toggle",
 								name = "% Upgrade (Stat Weight Score)",
-								--width = "double",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.StatWeightScore = val
 								end,
@@ -2914,8 +3013,7 @@ function WQA:UpdateOptions()
 								name = "minimum % Upgrade",
 								type = "input",
 								order = newOrder(),
-								--width = .6,
-								set = function(info,val)
+								set = function(info, val)
 									WQA.db.profile.options.reward.gear.PercentUpgradeMin = tonumber(val)
 								end,
 						 	get = function() return tostring(WQA.db.profile.options.reward.gear.PercentUpgradeMin)  end
@@ -2924,7 +3022,6 @@ function WQA:UpdateOptions()
 							unknownAppearance = {
 								type = "toggle",
 								name = "Unknown appearance",
-								--width = "double",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.unknownAppearance = val
 								end,
@@ -2937,7 +3034,6 @@ function WQA:UpdateOptions()
 							unknownSource = {
 								type = "toggle",
 								name = "Unknown source",
-								--width = "double",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.unknownSource = val
 								end,
@@ -2952,8 +3048,7 @@ function WQA:UpdateOptions()
 								desc = "Comma separated spellIDs",
 								type = "input",
 								order = newOrder(),
-								--width = .6,
-								set = function(info,val)
+								set = function(info, val)
 									WQA.db.profile.options.reward.gear.azeriteTraits = val
 								end,
 						 	get = function() return WQA.db.profile.options.reward.gear.azeriteTraits end
@@ -2993,7 +3088,6 @@ function WQA:UpdateOptions()
 								desc = "IsActive:\nUse this as a last resort. Works for some daily quests.\n\nIsQuestFlaggedCompleted:\nUse this for quests, that are always active.\n\nQuest Pin:\nUse this, if the daily is marked with a quest pin on the world map.\n\nWorld Quest:\nUse this, if you want to track a world quest.",
 								type = "select",
 								values = {WORLD_QUEST = "World Quest", QUEST_PIN = "Quest Pin", QUEST_FLAG = "IsQuestFlaggedCompleted", IsActive = "IsActive"},
-								--width = .6,
 								set = function(info,val)
 									WQA.data.custom.questType = val
 								end,
@@ -3398,8 +3492,7 @@ function WQA:UpdateOptions()
 				name = v.name,
 				type = "group",
 				inline = true,
-				args = {
-				}
+				args = {}
 			}
 			self:CreateGroup(self.options.args.general.args[v.name].args, v, "achievements")
 			self:CreateGroup(self.options.args.general.args[v.name].args, v, "mounts")
@@ -3741,8 +3834,7 @@ function WQA:CreateGroup(options, data, groupName)
 			order = 1,
 			name = groupName,
 			type = "group",
-			args = {
-			}
+			args = {}
 		}
 		local args = options[groupName].args
 
@@ -3963,7 +4055,6 @@ function WQA:UpdateCustomMissions()
 	args[tostring(id)] = {
 		type = "toggle",
 		name = C_Garrison.GetMissionLink(id) or tostring(id),
-		width = "double",
 		set = function(info, val)
 			WQA.db.profile.custom.mission[id] = val
 		end,

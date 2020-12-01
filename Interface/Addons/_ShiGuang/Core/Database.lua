@@ -125,10 +125,6 @@ M:RegisterEvent("PLAYER_TALENT_UPDATE", CheckRole)
 -- Raidbuff Checklist
 I.BuffList = {
 	[1] = {		-- 合剂
-		--251836,	-- 敏捷238
-		--251837,	-- 智力238
-		--251838,	-- 耐力238
-		--251839,	-- 力量238
 		298836,	-- 敏捷360
 		298837,	-- 智力360
 		298839,	-- 耐力360
@@ -160,6 +156,24 @@ I.BuffList = {
 
 -- Reminder Buffs Checklist
 I.ReminderBuffs = {
+	ITEMS = {
+		{	itemID = 178742, -- 瓶装毒素饰品
+			spells = {
+				[345545] = true,
+			},
+			equip = true,
+			instance = true,
+			combat = true,
+		},
+		{	itemID = 174906, -- 属性符文
+			spells = {
+				[317065] = true,
+				[270058] = true,
+			},
+			instance = true,
+			disable = true,
+		},
+	},
 	MAGE = {
 		{	spells = {	-- 奥术魔宠
 				[210126] = true,

@@ -1,4 +1,4 @@
-﻿--## Author: Semlar ## Version: 9.0.0.0
+﻿--## Author: Semlar ## Version: 9.0.2.0
 NomiCakesGossipButtonName = 'GossipTitleButton' -- Allow other addons to override the buttons we hook, if needed
 local HookedButtons = {} -- [button] = true
 local Undiscoverable = { -- List of rank 1 recipes that can't be obtained from nomi

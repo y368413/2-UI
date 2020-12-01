@@ -106,7 +106,7 @@ do -- Completion stats
 	end
 end
 
---[[function EV:GARRISON_RECRUITMENT_NPC_OPENED()
+function EV:GARRISON_RECRUITMENT_NPC_OPENED()
 	if C_Garrison.CanGenerateRecruits() then
 		aconf.recruitTime = GetServerTime()-604801
 	else
@@ -118,7 +118,7 @@ end
 end
 function EV:GARRISON_RECRUITMENT_FOLLOWERS_GENERATED()
 	aconf.recruitTime = GetServerTime()
-end]]
+end
 
 function api:GetSortFollowers()
 	return conf.sortFollowers

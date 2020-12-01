@@ -2,10 +2,9 @@
 local M, R, U, I = unpack(ns)
 local G = M:RegisterModule("GUI")
 
-local tonumber, tostring, pairs, ipairs, next, select, type = tonumber, tostring, pairs, ipairs, next, select, type
-local tinsert, strsplit, strfind = table.insert, string.split, string.find
+local tonumber, pairs, ipairs, next, type, tinsert = tonumber, pairs, ipairs, next, type, tinsert
 local cr, cg, cb = I.r, I.g, I.b
-local guiTab, guiPage, f, dataFrame = {}, {}
+local guiTab, guiPage, f = {}, {}
 
 -- Default Settings
 G.DefaultSettings = {
@@ -267,6 +266,7 @@ G.DefaultSettings = {
 		AzeriteArmor = true,
 		OnlyArmorIcons = true,
 		ConduitInfo = true,
+		HideAllID = false,
 		QuestCompleteAnnoce = false,
 	},
 	Misc = {
@@ -309,6 +309,7 @@ G.DefaultSettings = {
 		ShowMarkerBar = 4,
 		BlockInvite = false,
 		NzothVision = true,
+		SendActionCD = false,
 		QuickQueue = true,
 		--AltTabLfgNotification = false,
 		--CrazyCatLady = true,
@@ -364,7 +365,8 @@ G.AccountSettings = {
 	ContactList = {},
 	CustomJunkList = {},
 	ProfileIndex = {},
-	ProfileNames = {}
+	ProfileNames = {},
+	Help = {},
 }
 
 -- Initial settings
@@ -674,6 +676,9 @@ local function AddTextureToOption(parent, index)
 end
 
 -- Config
+local HeaderTag = "|cff00cc4c"
+local NewFeatureTag = "|TInterface\\OptionsFrame\\UI-OptionsFrame-NewFeatureIcon:0|t"
+
 G.TabList = {
 	U["Actionbar"],
 	U["Nameplate"],

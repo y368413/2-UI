@@ -512,13 +512,21 @@ function MISC:CheckIncompatible()
 end
 
 -- Send cooldown status
+local function GetRemainTime(second)
+	if second > 60 then
+		return format("%d:%.2d", second/60, second%60)
+	else
+		return format("%ds", second)
+	end
+end
+
 local lastCDSend = 0
 function MISC:SendCurrentSpell(thisTime, spellID)
 	local start, duration = GetSpellCooldown(spellID)
 	local spellLink = GetSpellLink(spellID)
 	if start and duration > 0 then
 		local remain = start + duration - thisTime
-		SendChatMessage(format(U["CooldownRemaining"], spellLink, remain), msgChannel())
+		SendChatMessage(format(U["CooldownRemaining"], spellLink, GetRemainTime(remain)), msgChannel())
 	else
 		SendChatMessage(format(U["CooldownCompleted"], spellLink), msgChannel())
 	end
@@ -528,7 +536,7 @@ function MISC:SendCurrentItem(thisTime, itemID, itemLink)
 	local start, duration = GetItemCooldown(itemID)
 	if start and duration > 0 then
 		local remain = start + duration - thisTime
-		SendChatMessage(format(U["CooldownRemaining"], itemLink, remain), msgChannel())
+		SendChatMessage(format(U["CooldownRemaining"], itemLink, GetRemainTime(remain)), msgChannel())
 	else
 		SendChatMessage(format(U["CooldownCompleted"], itemLink), msgChannel())
 	end

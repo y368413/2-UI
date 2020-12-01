@@ -95,11 +95,11 @@ local function PrepareLinks(str)
         if type == 'npc' then
             NameResolver:Prepare(("unit:Creature-0-0-0-0-%d"):format(id))
         elseif type == 'item' then
-            GetItemInfo(id) -- prime item info
+            C_Item.RequestLoadItemDataByID(id) -- prime item info
         elseif type == 'daily' or type == 'quest' then
-            C_QuestLog.GetTitleForQuestID(id) -- prime quest title
+            C_QuestLog.RequestLoadQuestByID(id) -- prime quest title
         elseif type == 'spell' then
-            GetSpellInfo(id) -- prime spell info
+            C_Spell.RequestLoadSpellData(id) -- prime spell info
         end
     end
 end
@@ -133,10 +133,9 @@ local function RenderLinks(str, nameOnly)
                 end
             end
         elseif type == 'item' then
-            name = name..(suffix or '')
             local name, link, _, _, _, _, _, _, _, icon = GetItemInfo(id)
             if link and icon then
-                if nameOnly then return name end
+                if nameOnly then return name..(suffix or '') end
                 return '|T'..icon..':0:0:1:-1|t '..link
             end
         elseif type == 'daily' or type == 'quest' then
@@ -619,8 +618,8 @@ end
 -------------------------------- ICONS & GLOWS --------------------------------
 -------------------------------------------------------------------------------
 
-local ICONS = "Interface\\Addons\\HandyNotes\\Icons\\artwork\\icons"
-local GLOWS = "Interface\\Addons\\HandyNotes\\Icons\\artwork\\glows"
+local ICONS = "Interface\\Addons\\HandyNotes\\Icons\\Artwork\\icons"
+local GLOWS = "Interface\\Addons\\HandyNotes\\Icons\\Artwork\\glows"
 
 local function Icon(name) return ICONS..'\\'..name..'.blp' end
 local function Glow(name) return GLOWS..'\\'..name..'.blp' end
@@ -1529,7 +1528,6 @@ function MinimapDataProvider:RefreshAllData()
     end
 end
 
-
 function MinimapDataProvider:RefreshAllRotations()
     for i, pin in ipairs(self.pins) do
         if pin.acquired then pin:UpdateRotation() end
@@ -1976,7 +1974,7 @@ associated rewards have been obtained (achievements, toys, pets, mounts).
 
 function Node:IsCollected()
     for reward in self:IterateRewards() do
-        if not reward:IsObtained() then return false end
+        if reward:IsEnabled() and reward:IsObtainable() and not reward:IsObtained() then return false end
     end
     return true
 end
@@ -2362,6 +2360,10 @@ local Orange = Shadowlands.status.Orange
 local Red = Shadowlands.status.Red
 
 -------------------------------------------------------------------------------
+
+local function Icon(icon) return '|T'..icon..':0:0:1:-1|t ' end
+
+-------------------------------------------------------------------------------
 ----------------------------------- REWARD ------------------------------------
 -------------------------------------------------------------------------------
 
@@ -2379,12 +2381,40 @@ function Reward:IsEnabled()
     return true
 end
 
-function Reward:IsObtained()
-    return true
-end
+function Reward:IsObtainable() return true end
+function Reward:IsObtained() return true end
+
+-- These functions drive the appearance of the tooltip
+function Reward:GetLines() return function () end end
+function Reward:GetCategoryIcon() end
+function Reward:GetStatus() end
+function Reward:GetText() return UNKNOWN end
 
 function Reward:Render(tooltip)
-    tooltip:AddLine('Render not implemented: '..tostring(self))
+    local text = self:GetText()
+    local status = self:GetStatus()
+
+    -- Add category icon (if registered)
+    local icon = self:GetCategoryIcon()
+    if text and icon then
+        text = Icon(icon)..text
+    end
+
+    -- Render main line and optional status
+    if text and status then
+        tooltip:AddDoubleLine(text, status)
+    elseif text then
+        tooltip:AddLine(text)
+    end
+
+    -- Render follow-up lines (example: achievement criteria)
+    for text, status, r, g, b in self:GetLines() do
+        if text and status then
+            tooltip:AddDoubleLine(text, status, r, g, b)
+        elseif text then
+            tooltip:AddLine(text, r, g, b)
+        end
+    end
 end
 
 -------------------------------------------------------------------------------
@@ -2451,45 +2481,51 @@ function Achievement:IsObtained()
     return false
 end
 
-function Achievement:Render(tooltip)
+function Achievement:GetText()
     local _,name,_,_,_,_,_,_,_,icon = GetAchievementInfo(self.id)
+    return Icon(icon)..ACHIEVEMENT_COLOR_CODE..'['..name..']|r'
+end
+
+function Achievement:GetStatus()
+    if not self.oneline then return end
+    return self:IsObtained() and Green(L['completed']) or Red(L['incomplete'])
+end
+
+function Achievement:GetLines()
     local completed = self:IsObtained()
-    if self.criteria and not self.oneline then
-        tooltip:AddLine(ACHIEVEMENT_COLOR_CODE..'['..name..']|r')
-        tooltip:AddTexture(icon, {margin={right=2}})
-        for i, c in ipairs(self.criteria) do
-            local cname,_,ccomp,qty,req = GetCriteriaInfo(self.id, c.id)
-            if (cname == '' or c.qty) then
-                cname = c.suffix or cname
-                cname = (completed and req..'/'..req or qty..'/'..req)..' '..cname
-            end
+    local index = 0
+    return function ()
+        -- ignore sub-lines if oneline is enabled or no criteria were given
+        if self.oneline or not self.criteria then return end
 
-            local r, g, b = .6, .6, .6
-            local ctext = "   ? "..cname
-            if (completed or ccomp) then
-                r, g, b = 0, 1, 0
-            end
+        -- increment our criteria counter
+        index = index + 1
+        if index > #self.criteria then return end
 
-            local note, status = c.note
-            if c.quest then
-                if C_QuestLog.IsQuestFlaggedCompleted(c.quest) then
-                    status = Shadowlands.status.Green(L['defeated'])
-                else
-                    status = Shadowlands.status.Red(L['undefeated'])
-                end
-                note = note and (note..'  '..status) or status
-            end
-
-            if note then
-                tooltip:AddDoubleLine(ctext, note, r, g, b)
-            else
-                tooltip:AddLine(ctext, r, g, b)
-            end
+        local c = self.criteria[index]
+        local cname, _, ccomp, qty, req = GetCriteriaInfo(self.id, c.id)
+        if (cname == '' or c.qty) then
+            cname = c.suffix or cname
+            cname = (completed and req..'/'..req or qty..'/'..req)..' '..cname
         end
-    else
-        local status = completed and Green(L['completed']) or Red(L['incomplete'])
-        tooltip:AddDoubleLine(ACHIEVEMENT_COLOR_CODE..'['..name..']|r', status)
-        tooltip:AddTexture(icon, {margin={right=2}})
+
+        local r, g, b = .6, .6, .6
+        local ctext = "   ? "..cname
+        if (completed or ccomp) then
+            r, g, b = 0, 1, 0
+        end
+
+        local note, status = c.note
+        if c.quest then
+            if C_QuestLog.IsQuestFlaggedCompleted(c.quest) then
+                status = Shadowlands.status.Green(L['defeated'])
+            else
+                status = Shadowlands.status.Red(L['undefeated'])
+            end
+            note = note and (note..'  '..status) or status
+        end
+
+        return ctext, note, r, g, b
     end
 end
 
@@ -2521,22 +2557,25 @@ function Item:IsObtained()
     return true
 end
 
-function Item:Render(tooltip)
+function Item:GetText()
     local text = self.itemLink
-    local status = ''
-    if self.quest then
-        local completed = C_QuestLog.IsQuestFlaggedCompleted(self.quest)
-        status = completed and Green(L['completed']) or Red(L['incomplete'])
-    elseif self.weekly then
-        local completed = C_QuestLog.IsQuestFlaggedCompleted(self.weekly)
-        status = completed and Green(L['weekly']) or Red(L['weekly'])
+    if self.type then -- mount, pet, toy, etc
+        text = text..' ('..self.type..')'
     end
-
-    if self.note then
+    if self.note then -- additional info
         text = text..' ('..self.note..')'
     end
-    tooltip:AddDoubleLine(text, status)
-    tooltip:AddTexture(self.itemIcon, {margin={right=2}})
+    return Icon(self.itemIcon)..text
+end
+
+function Item:GetStatus()
+    if self.quest then
+        local completed = C_QuestLog.IsQuestFlaggedCompleted(self.quest)
+        return completed and Green(L['completed']) or Red(L['incomplete'])
+    elseif self.weekly then
+        local completed = C_QuestLog.IsQuestFlaggedCompleted(self.weekly)
+        return completed and Green(L['weekly']) or Red(L['weekly'])
+    end
 end
 
 -------------------------------------------------------------------------------
@@ -2545,23 +2584,15 @@ end
 
 -- /run for i,m in ipairs(C_MountJournal.GetMountIDs()) do if (C_MountJournal.GetMountInfoByID(m) == "NAME") then print(m) end end
 
-local Mount = Class('Mount', Item)
+local Mount = Class('Mount', Item, { type = L["mount"] })
 
 function Mount:IsObtained()
     return select(11, C_MountJournal.GetMountInfoByID(self.id))
 end
 
-function Mount:Render(tooltip)
+function Mount:GetStatus()
     local collected = select(11, C_MountJournal.GetMountInfoByID(self.id))
-    local status = collected and Green(L["known"]) or Red(L["missing"])
-    local text = self.itemLink..' ('..L["mount"]..')'
-
-    if self.note then
-        text = text..' ('..self.note..')'
-    end
-
-    tooltip:AddDoubleLine(text, status)
-    tooltip:AddTexture(self.itemIcon, {margin={right=2}})
+    return collected and Green(L["known"]) or Red(L["missing"])
 end
 
 -------------------------------------------------------------------------------
@@ -2570,7 +2601,7 @@ end
 
 -- /run print(C_PetJournal.FindPetIDByName("NAME"))
 
-local Pet = Class('Pet', Item)
+local Pet = Class('Pet', Item, { type = L["pet"] })
 
 function Pet:Initialize(attrs)
     if attrs.item then
@@ -2587,17 +2618,9 @@ function Pet:IsObtained()
     return C_PetJournal.GetNumCollectedInfo(self.id) > 0
 end
 
-function Pet:Render(tooltip)
+function Pet:GetStatus()
     local n, m = C_PetJournal.GetNumCollectedInfo(self.id)
-    local text = self.itemLink..' ('..L["pet"]..')'
-    local status = (n > 0) and Green(n..'/'..m) or Red(n..'/'..m)
-
-    if self.note then
-        text = text..' ('..self.note..')'
-    end
-
-    tooltip:AddDoubleLine(text, status)
-    tooltip:AddTexture(self.itemIcon, {margin={right=2}})
+    return (n > 0) and Green(n..'/'..m) or Red(n..'/'..m)
 end
 
 -------------------------------------------------------------------------------
@@ -2621,58 +2644,53 @@ function Quest:IsObtained()
     return true
 end
 
-function Quest:Render(tooltip)
+function Quest:GetText()
     local name = C_QuestLog.GetTitleForQuestID(self.id[1])
+    return Shadowlands.GetIconLink('quest_ay', 13)..' '..(name or UNKNOWN)
+end
 
-    local status
+function Quest:GetStatus()
     if #self.id == 1 then
         local completed = C_QuestLog.IsQuestFlaggedCompleted(self.id[1])
-        status = completed and Green(L['completed']) or Red(L['incomplete'])
+        return completed and Green(L['completed']) or Red(L['incomplete'])
     else
         local count = 0
         for i, id in ipairs(self.id) do
             if C_QuestLog.IsQuestFlaggedCompleted(id) then count = count + 1 end
         end
-        status = count..'/'..#self.id
-        status = (count == #self.id) and Green(status) or Red(status)
+        local status = count..'/'..#self.id
+        return (count == #self.id) and Green(status) or Red(status)
     end
-
-    local line = Shadowlands.GetIconLink('quest_ay', 13)..' '..(name or UNKNOWN)
-    tooltip:AddDoubleLine(line, status)
 end
 
 -------------------------------------------------------------------------------
 ------------------------------------ SPELL ------------------------------------
 -------------------------------------------------------------------------------
 
-local Spell = Class('Spell', Item)
+local Spell = Class('Spell', Item, { type = L["spell"] })
 
 function Spell:IsObtained()
     return IsSpellKnown(self.spell)
 end
 
-function Spell:Render(tooltip)
+function Spell:GetStatus()
     local collected = IsSpellKnown(self.spell)
-    local status = collected and Green(L["known"]) or Red(L["missing"])
-    tooltip:AddDoubleLine(self.itemLink..' ('..L["spell"]..')', status)
-    tooltip:AddTexture(self.itemIcon, {margin={right=2}})
+    return collected and Green(L["known"]) or Red(L["missing"])
 end
 
 -------------------------------------------------------------------------------
 ------------------------------------- TOY -------------------------------------
 -------------------------------------------------------------------------------
 
-local Toy = Class('Toy', Item)
+local Toy = Class('Toy', Item, { type = L["toy"] })
 
 function Toy:IsObtained()
     return PlayerHasToy(self.item)
 end
 
-function Toy:Render(tooltip)
+function Toy:GetStatus()
     local collected = PlayerHasToy(self.item)
-    local status = collected and Green(L["known"]) or Red(L["missing"])
-    tooltip:AddDoubleLine(self.itemLink..' ('..L["toy"]..')', status)
-    tooltip:AddTexture(self.itemIcon, {margin={right=2}})
+    return collected and Green(L["known"]) or Red(L["missing"])
 end
 
 -------------------------------------------------------------------------------
@@ -2681,6 +2699,13 @@ end
 
 local Transmog = Class('Transmog', Item)
 local CTC = C_TransmogCollection
+
+function Transmog:Initialize(attrs)
+    Item.Initialize(self, attrs)
+    if self.slot then
+        self.type = self.slot -- backwards compat
+    end
+end
 
 function Transmog:IsObtained()
     -- Check if the player knows the appearance
@@ -2700,7 +2725,7 @@ function Transmog:IsObtained()
     return false
 end
 
-function Transmog:Render(tooltip)
+function Transmog:GetStatus()
     local collected = CTC.PlayerHasTransmog(self.item)
     local status = collected and Green(L["known"]) or Red(L["missing"])
 
@@ -2718,13 +2743,7 @@ function Transmog:Render(tooltip)
         end
     end
 
-    local suffix = ' ('..L[self.slot]..')'
-    if self.note then
-        suffix = suffix..' ('..self.note..')'
-    end
-
-    tooltip:AddDoubleLine(self.itemLink..suffix, status)
-    tooltip:AddTexture(self.itemIcon, {margin={right=2}})
+    return status
 end
 
 -------------------------------------------------------------------------------
@@ -3180,17 +3199,65 @@ Shadowlands.icons.cov_sigil_nf = {Icon('covenant_nightfae'), nil}
 Shadowlands.icons.cov_sigil_vn = {Icon('covenant_venthyr'), nil}
 
 -------------------------------------------------------------------------------
----------------------------------- CALLBACKS ----------------------------------
+------------------------------ CALLING TREASURES ------------------------------
 -------------------------------------------------------------------------------
 
-HandyNotes_Shadowlands:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', function (...)
-    -- Watch for a spellcast event that signals the kitten was pet.
-    -- https://www.wowhead.com/spell=321337/petting
-    -- Watch for a spellcast event for collecting a shard
-    -- https://shadowlands.wowhead.com/spell=335400/collecting
-    local _, source, _, spellID = ...
-    if source == 'player' and (spellID == 321337 or spellID == 335400) then
-        C_Timer.After(1, function() HandyNotes_Shadowlands:Refresh() end)
+-- Add reward information to Blizzard's vignette treasures for callings
+
+local VIGNETTES = {
+    [4212] = {
+        Pet({item=180592, id=2901}) -- Trapped Stonefiend
+    }, -- Bleakwood Chest
+    [4214] = {
+        Toy({item=184418}) -- Acrobatic Steward
+    }, -- Gilded Chest
+    [4366] = {
+        Toy({item=184447}) -- Kevin's Party Supplies
+    }, -- Slime-Coated Crate
+
+    -- [4174] = {}, -- Secret Treasure
+    -- [4176] = {}, -- Secret Treasure
+    -- [4202] = {}, -- Spouting Growth
+    -- [4213] = {}, -- Enchanted Chest
+    -- [4222] = {}, -- Faerie Stash
+    -- [4224] = {}, -- Faerie Stash
+    -- [4225] = {}, -- Faerie Stash
+    -- [4238] = {}, -- Lunarlight Pod
+    -- [4243] = {}, -- Skyward Bell
+    -- [4244] = {}, -- Wish Cricket
+    -- [4263] = {}, -- Silver Strongbox
+    -- [4266] = {}, -- Silver Strongbox
+    -- [4270] = {}, -- Silver Strongbox
+    -- [4271] = {}, -- Silver Strongbox
+    -- [4274] = {}, -- Steward's Golden Chest
+    -- [4275] = {}, -- Skyward Bell
+    -- [4278] = {}, -- Hidden Hoard
+    -- [4308] = {}, -- Stoneborn Satchel
+    -- [4314] = {}, -- Pugilist's Prize
+    -- [4317] = {}, -- Pugilist's Prize
+    -- [4323] = {}, -- Stoneborn Satchel
+    -- [4324] = {}, -- Stoneborn Satchel
+    -- [4325] = {}, -- Stoneborn Satchel
+    -- [4327] = {}, -- Stoneborn Satchel
+    -- [4347] = {}, -- Greedstone
+    -- [4362] = {}, -- Spouting Growth
+    -- [4363] = {}, -- Spouting Growth
+    -- [4374] = {}, -- Runebound Coffer
+    -- [4375] = {}, -- Runebound Coffer
+}
+
+hooksecurefunc(GameTooltip, 'SetText', function(self)
+    local owner = self:GetOwner()
+    if owner and owner.vignetteID then
+        local rewards = VIGNETTES[owner.vignetteID]
+        if rewards and #rewards > 0 then
+            self:AddLine(' ') -- add blank line before rewards
+            for i, reward in ipairs(rewards) do
+                if reward:IsEnabled() then
+                    reward:Render(self)
+                end
+            end
+        end
     end
 end)
 
@@ -3219,6 +3286,19 @@ local function ProcessCovenant (node)
     end
 end
 
+function Reward:GetCategoryIcon()
+    return self.covenant and Shadowlands.GetIconPath(self.covenant.icon)
+end
+
+function Reward:IsObtainable()
+    if self.covenant then
+        if self.covenant.id ~= C_Covenants.GetActiveCovenantID() then
+            return false
+        end
+    end
+    return true
+end
+
 -------------------------------------------------------------------------------
 ----------------------------------- GROUPS ------------------------------------
 -------------------------------------------------------------------------------
@@ -3229,6 +3309,8 @@ Shadowlands.groups.BONUS_BOSS = Group('bonus_boss', 'peg_wr')
 Shadowlands.groups.BONUS_EVENT = Group('bonus_event', 'peg_wy')
 Shadowlands.groups.CARRIAGE = Group('carriages', 'horseshoe_g', {defaults=Shadowlands.GROUP_HIDDEN})
 Shadowlands.groups.DREDBATS = Group('dredbats', 'flight_point_g', {defaults=Shadowlands.GROUP_HIDDEN})
+Shadowlands.groups.FAERIE_TALES = Group('faerie_tales', 355498, {defaults=Shadowlands.GROUP_HIDDEN})
+Shadowlands.groups.FUGITIVES = Group('fugitives', 236247, {defaults=Shadowlands.GROUP_HIDDEN})
 Shadowlands.groups.INQUISITORS = Group('inquisitors', 3528307, {defaults=Shadowlands.GROUP_HIDDEN})
 Shadowlands.groups.RIFTSTONE = Group('riftstone', 'portal_b', {defaults=Shadowlands.GROUP_HIDDEN})
 Shadowlands.groups.SINRUNNER = Group('sinrunners', 'horseshoe_o', {defaults=Shadowlands.GROUP_HIDDEN})
@@ -3276,7 +3358,7 @@ Shadowlands.requirement.Venari = Venari
 
 
 
-
+local Collectible = Shadowlands.node.Collectible
 local PetBattle = Shadowlands.node.PetBattle
 local Rare = Shadowlands.node.Rare
 local Treasure = Shadowlands.node.Treasure
@@ -3285,7 +3367,6 @@ local Achievement = Shadowlands.reward.Achievement
 local Item = Shadowlands.reward.Item
 local Mount = Shadowlands.reward.Mount
 local Pet = Shadowlands.reward.Pet
-local Quest = Shadowlands.reward.Quest
 local Transmog = Shadowlands.reward.Transmog
 local Toy = Shadowlands.reward.Toy
 
@@ -3339,7 +3420,8 @@ map.nodes[57862955] = Rare({
     quest=60266,
     note=L["lehgo_note"],
     rewards={
-        Achievement({id=14309, criteria=48790})
+        Achievement({id=14309, criteria=48790}),
+        Transmog({item=179539, slot=L["2h_mace"]}) -- Kelox's Eggbeater
     }
 }) -- Egg-Tender Leh'go
 
@@ -3348,7 +3430,8 @@ map.nodes[68612765] = Rare({
     quest=61184,
     note=L["faeflayer_note"],
     rewards={
-        Achievement({id=14309, criteria=48798})
+        Achievement({id=14309, criteria=48798}),
+        Transmog({item=180144, slot=L["1h_mace"]}) -- Faeflayer's Hatchet
     }
 }) -- Faeflayer
 
@@ -3388,28 +3471,31 @@ map.nodes[67465147] = Rare({
     rewards={
         Achievement({id=14309, criteria=48787}),
         Transmog({item=179596, slot=L["cosmetic"]}), -- Drust Mask of Dominance
-        Quest({id=62246}) -- A Fallen Friend
+        Item({item=183091, quest=62246}) -- Lifewoven Bracelet
     }
 }) -- Hunter Vivian
 
--- Mysterious Mushroom Ring (36474814)
--- Mysterious Mushroom Ring (47924018)
+local MACABRE = Rare({
+    id=164093,
+    quest=59140,
+    note=L["macabre_note"],
+    rewards={
+        Achievement({id=14309, criteria=48780}),
+        Pet({item=180644, id=2907}) -- Rocky
+    }
+}) -- Macabre
 
--- map.nodes[] = Rare({
---     id=164093,
---     quest=nil,
---     rewards={
---         Achievement({id=14309, criteria=48780}),
---         Pet({item=180644, id=2907}) -- Rocky
---     }
--- }) -- Macabre
+map.nodes[36474814] = MACABRE
+map.nodes[47924018] = MACABRE
+map.nodes[59952940] = MACABRE
 
 map.nodes[62102470] = Rare({
     id=165053,
     quest=59431,
     note=L["mymaen_note"],
     rewards={
-        Achievement({id=14309, criteria=48788})
+        Achievement({id=14309, criteria=48788}),
+        Transmog({item=179502, slot=L["dagger"]}) -- Ripvine Barb
     }
 }) -- Mymaen
 
@@ -3438,7 +3524,7 @@ map.nodes[50092091] = Rare({
     glow=RainbowGlow({ icon=Shadowlands.GetGlowPath('skull_w') }),
     rewards={
         Achievement({id=14309, criteria=48715}),
-        Item({item=182179, quest=62434}) -- Runestag Soul
+        Item({item=182179, quest=62434, covenant=NIGHTFAE}) -- Runestag Soul
     }
 }) -- Mystic Rainbowhorn
 
@@ -3477,7 +3563,8 @@ map.nodes[65104430] = Rare({
     quest=60273,
     note=L["rootwrithe_note"],
     rewards={
-        Achievement({id=14309, criteria=48791})
+        Achievement({id=14309, criteria=48791}),
+        Transmog({item=179603, slot=L["shield"]}) -- Nettlehusk Barrier
     }
 }) -- Rootwrithe
 
@@ -3507,7 +3594,8 @@ map.nodes[37675917] = Rare({
     note=L["skuld_vit_note"],
     rewards={
         Achievement({id=14309, criteria=48786}),
-        Item({item=182183, quest=62439}) -- Wolfhawk Soul
+        Transmog({item=180146, slot=L["1h_axe"]}), -- Axe of Broken Wills
+        Item({item=182183, quest=62439, covenant=NIGHTFAE}) -- Wolfhawk Soul
     }
 }) -- Skuld Vit
 
@@ -3516,7 +3604,8 @@ map.nodes[59304660] = Rare({
     quest=60290,
     note=L["slumbering_note"],
     rewards={
-        Achievement({id=14309, criteria=48792})
+        Achievement({id=14309, criteria=48792}),
+        Item({item=175711, note=L["ring"]}) -- Slumberwood Band
     }
 }) -- The Slumbering Emperor
 
@@ -3528,8 +3617,9 @@ map.nodes[30115536] = Rare({
     note=L["valfir_note"],
     rewards={
         Achievement({id=14309, criteria=48796}),
+        Transmog({item=180154, slot=L["2h_axe"]}), -- Greataxe of Unrelenting Pursuit
         Mount({item=180730, id=1393}), -- Glimmerfur Prowler
-        Item({item=182176, quest=62431}) -- Shadowstalker Soul
+        Item({item=182176, quest=62431, covenant=NIGHTFAE}) -- Shadowstalker Soul
     },
     pois={
         Path({29265611, 30115536, 30875464})
@@ -3541,7 +3631,8 @@ map.nodes[58306180] = Rare({
     quest=59170,
     note=L["wrigglemortis_note"],
     rewards={
-        Achievement({id=14309, criteria=48783})
+        Achievement({id=14309, criteria=48783}),
+        Transmog({item=181396, slot=L["polearm"]}) -- Thornsweeper Scythe
     }
 }) -- Wrigglemortis
 
@@ -3563,7 +3654,9 @@ map.nodes[41254443] = Rare({
             48707, -- Kil'jaeden
             48710, -- N'Zoth
             48705  -- Xavius
-        }})
+        }}),
+        Item({item=182454, type=L["trinket"], note=L["guldan"]}), -- Murmurs in the Dark
+        Mount({item=180748, id=1332}) -- Silky Shimmermoth
     }
 })
 
@@ -3619,6 +3712,7 @@ map.nodes[37646159] = Treasure({
     note=L["darkreach_supplies"],
     rewards={
         Achievement({id=14313, criteria=50045}),
+        Transmog({item=179593, slot=L["cloth"]}), -- Darkreach Mask
         Transmog({item=179594, slot=L["leather"]}) -- Witherscorn Guise
     },
     pois={
@@ -3843,6 +3937,90 @@ map.nodes[58205690] = PetBattle({
         Achievement({id=14877, criteria=10, oneline=true}), -- Undead
     }
 }) -- Glitterdust
+-------------------------------------------------------------------------------
+---------------------------- FRACTURED FAIRY TALES ----------------------------
+-------------------------------------------------------------------------------
+
+local Tale = Class('Tale', Collectible, {
+    icon=355498,
+    note=L["lost_book_note"],
+    group=Shadowlands.groups.FAERIE_TALES,
+    pois={
+        POI({63622274}) -- Archivist Dreyden
+    },
+    IsCollected = function (self)
+        if Shadowlands.PlayerHasItem(self.rewards[2].item) then return true end
+        return Collectible.IsCollected(self)
+    end
+})
+
+local MEANDERING = Tale({
+    id=174721,
+    rewards={
+        Achievement({id=14788, criteria=50012}),
+        Item({item=183877, quest=62619})
+    },
+    pois={
+        Path({
+            53054452, 53544400, 54204350, 54674267, 54974164, 55444087,
+            56044040, 56684009, 57253957, 57573871, 58013798, 58603759,
+            58913716
+        })
+    }
+}) -- A Meandering Story
+
+local WANDERING = Tale({
+    id=174723,
+    rewards={
+        Achievement({id=14788, criteria=50013}),
+        Item({item=183878, quest=62620})
+    }
+}) -- A Wandering Tale
+
+local ESCAPIST = Tale({
+    id=174724,
+    rewards={
+        Achievement({id=14788, criteria=50014}),
+        Item({item=183879, quest=62621})
+    }
+}) -- An Escapist Novel
+
+local JOURNAL = Tale({
+    id=174725,
+    rewards={
+        Achievement({id=14788, criteria=50015}),
+        Item({item=183880, quest=62622})
+    }
+}) -- A Travel Journal
+
+local NAUGHTY = Tale({
+    id=174726,
+    rewards={
+        Achievement({id=14788, criteria=50016}),
+        Item({item=183881, quest=62623})
+    }
+}) -- A Naughty Story
+
+map.nodes[56044040] = MEANDERING
+
+map.nodes[30004480] = WANDERING
+map.nodes[35602680] = WANDERING
+map.nodes[36404800] = WANDERING
+map.nodes[37894005] = WANDERING
+
+map.nodes[32603160] = ESCAPIST
+map.nodes[40004460] = ESCAPIST
+map.nodes[40602760] = ESCAPIST
+map.nodes[40944230] = ESCAPIST
+
+map.nodes[40094168] = JOURNAL
+map.nodes[49664016] = JOURNAL
+map.nodes[50202500] = JOURNAL
+map.nodes[50174187] = JOURNAL
+
+map.nodes[33605740] = NAUGHTY
+map.nodes[39806560] = NAUGHTY
+map.nodes[51005480] = NAUGHTY
 
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
@@ -3909,8 +4087,8 @@ map.nodes[48985031] = Rare({
     quest={60897,62158},
     note=L["basilofos_note"],
     rewards={
-        Achievement({id=14307, criteria=50602}),
-        Toy({item=182655}) -- Hill King's Roarbox
+        Achievement({id=14307, criteria=50602})
+        -- Toy({item=182655}) -- Hill King's Roarbox (gone?)
     }
 }) -- Basilofos, King of the Hill
 
@@ -3937,7 +4115,7 @@ map.nodes[55358024] = Rare({
 
 map.nodes[55826249] = Rare({
     id=171189,
-    quest={59022},
+    quest=59022,
     note=L["bookkeeper_mnemis_note"],
     rewards={
         Achievement({id=14307, criteria=50612}),
@@ -3951,7 +4129,7 @@ map.nodes[50435804] = Rare({
     note=L["cloudfeather_patriarch_note"],
     rewards={
         Achievement({id=14307, criteria=50604}),
-        Pet({item=180812, id=2925}) -- Golden Teroclaw
+        Pet({item=180812, id=2925}) -- Golden Cloudfeather
     }
 }) -- Cloudfeather Guardian
 
@@ -3994,8 +4172,8 @@ map.nodes[27823014] = Rare({
     quest=60883,
     note=L["dark_watcher_note"],
     rewards={
-        Achievement({id=14307, criteria=50603})
-        -- also dropped class-specific finesse conduits
+        Achievement({id=14307, criteria=50603}),
+        Transmog({item=184297, slot=L["2h_sword"]}) -- Death Warden's Greatblade
     }
 }) -- Dark Watcher
 
@@ -4132,7 +4310,7 @@ map.nodes[61409050] = Rare({
     }
 }) -- Sundancer
 
-map.nodes[63503590] = Rare({
+local SWELLING_TEAR = Rare({
     id=171012,
     quest={61001,61046,61047},
     questCount=true,
@@ -4144,11 +4322,15 @@ map.nodes[63503590] = Rare({
             {id=50608, quest=61046}, -- Xixin the Ravening
         }}),
         Transmog({item=183605, slot=L["warglaive"]}) -- Devourer Wrought Warglaive
-    },
-    pois={
-        POI({47434282, 52203280, 56031463, 59825165, 63503590})
     }
 }) -- Swelling Tear
+
+map.nodes[39604499] = SWELLING_TEAR
+map.nodes[47434282] = SWELLING_TEAR
+map.nodes[52203280] = SWELLING_TEAR
+map.nodes[56031463] = SWELLING_TEAR
+map.nodes[59825165] = SWELLING_TEAR
+map.nodes[63503590] = SWELLING_TEAR
 
 map.nodes[53498868] = Rare({
     id=170899,
@@ -4228,6 +4410,9 @@ map.nodes[61061510] = Treasure({
     quest=61698,
     label=L["cloudwalkers_coffer"],
     note=L["cloudwalkers_coffer_note"],
+    rewards={
+        Item({item=180783}) -- Design: Crown of the Righteous
+    },
     pois={
         POI({59011639}) -- First Flower
     }
@@ -4242,7 +4427,7 @@ map.nodes[51471795] = Treasure({
         Transmog({item=183609, slot=L["fist"]}) -- Re-Powered Golliath Fists
     },
     pois={
-        POI({52471448, 53541715, 53141903}) -- Unstable Anima Core
+        POI({52041999, 52471448, 52861966, 53541715, 53141903}) -- Unstable Anima Core
     }
 }) -- Experimental Construct Part
 
@@ -4294,7 +4479,8 @@ map.nodes[40601890] = Treasure({
     requires=Shadowlands.requirement.Spell(333068),
     note=L["gift_of_thenios"],
     rewards={
-        Achievement({id=14311, criteria=50061})
+        Achievement({id=14311, criteria=50061}),
+        Transmog({item=181290, slot=L["cosmetic"], covenant=KYRIAN}) -- Harmonious Sigil of the Archon
     },
     pois={
         POI({41662331, 39551900}) -- Transport platform
@@ -4306,7 +4492,7 @@ map.nodes[64877114] = Treasure({
     note=L["gift_of_vesiphone"],
     rewards={
         Achievement({id=14311, criteria=50059}),
-        Pet({item=180859, id=2935}) -- White Vulpin
+        Pet({item=180859, id=2935}) -- Purity
     }
 }) -- Gift of Vesiphone
 
@@ -4578,7 +4764,6 @@ map.nodes[71933896] = Collectible({
 
 -------------------------------------------------------------------------------
 --------------------------------- SHARD LABOR ---------------------------------
------------------------------ ANIMA CRYSTAL SHARDS ----------------------------
 -------------------------------------------------------------------------------
 
 local AnimaShard = Class('AnimaShard', Node, {
@@ -4702,7 +4887,9 @@ map.nodes[52663542] = Rare({
     quest=58870,
     rewards={
         Achievement({id=14308, criteria=48876}),
-        Transmog({item=184154, slot=L["cloak"]}) -- Grungy Containment Pack
+        Transmog({item=184290, slot=L["dagger"]}), -- Blood-Dyed Bonesaw
+        Transmog({item=184154, slot=L["cosmetic"]}), -- Grungy Containment Pack
+        Toy({item=184476}) -- Regenerating Slime Vial
     }
 }) -- Bubbleblood
 
@@ -4710,7 +4897,9 @@ map.nodes[49012351] = Rare({
     id=159105,
     quest=58005,
     rewards={
-        Achievement({id=14308, criteria=48866})
+        Achievement({id=14308, criteria=48866}),
+        Transmog({item=184181, slot=L["1h_axe"]}), -- Kash's Favored Hook
+        Transmog({item=184182, slot=L["1h_axe"]}) -- Strengthened Abomination Hook
     }
 }) -- Collector Kash
 
@@ -4720,13 +4909,14 @@ map.nodes[26392633] = Rare({
     rewards={
         Achievement({id=14308, criteria=48872})
     }
-}) -- Corpsecutter (Bonebreaker) Moroc
+}) -- Corpsecutter Moroc
 
 map.nodes[76835707] = Rare({
     id=162711,
     quest=58868,
     rewards={
         Achievement({id=14308, criteria=48851}),
+        Transmog({item=184280, slot=L["cloth"]}), -- Dapper Threads
         Pet({id=2953, item=181263}) -- Shy Melvin
     }
 }) -- Deadly Dapperling
@@ -4759,7 +4949,7 @@ map.nodes[31603540] = Rare({
     requires=Shadowlands.requirement.GarrisonTalent(1250, L["anima_channeled"]),
     note=L["gieger_note"],
     rewards={
-        Mount({item=182080, id=1411}) -- Predatory Bonejowl
+        Mount({item=182080, id=1411}) -- Predatory Plagueroc
     }
 }) -- Gieger
 
@@ -4787,7 +4977,8 @@ map.nodes[72872891] = Rare({
     id=174108,
     quest=62369,
     rewards={
-        Achievement({id=14308, criteria=49724})
+        Achievement({id=14308, criteria=49724}),
+        Transmog({item=181810, slot=L["cosmetic"]}) -- Phylactery of the Dead Conniver
     }
 }) -- Necromantic Anomaly
 
@@ -4800,20 +4991,21 @@ map.nodes[66023532] = Rare({
     }
 }) -- Nerissa Heartless
 
+map.nodes[50346328] = Rare({
+    id=161857,
+    quest=58629,
+    note=L["nirvaska_note"],
+    rewards={
+        Achievement({id=14308, criteria=48868})
+    }
+}) -- Nirvaska the Summoner
+
 map.nodes[53726132] = Rare({
     id=162767,
     quest=58875,
     rewards={
         Achievement({id=14308, criteria=48849}),
         Transmog({item=182205, slot=L["mail"]}) -- Scarab-Shell Faceguard
-    }
-}) -- Nirvaska the Summoner
-
-map.nodes[50346328] = Rare({
-    id=161857,
-    quest=58629,
-    rewards={
-        Achievement({id=14308, criteria=48868})
     }
 }) -- Pesticide
 
@@ -4835,8 +5027,8 @@ map.nodes[51744439] = Rare({
     rewards={
         Achievement({id=14308, criteria=48874}),
         Achievement({id=14802, criteria=48874}),
-        Mount({item=182083, id=1374}), -- Bonecleaver's Skullboar
-        Mount({item=182075, id=1374}) -- Bonehoof Tauralus
+        -- Mount({item=182083, id=1374}), -- Bonecleaver's Skullboar
+        Mount({item=182075, id=1374, covenant=NECROLORD}) -- Bonehoof Tauralus
     }
 }) -- Sabriel the Bonecleaver
 
@@ -4855,6 +5047,7 @@ map.nodes[55502361] = Rare({
     note=L["chelicerae_note"],
     rewards={
         Achievement({id=14308, criteria=48873}),
+        Transmog({item=184289, slot=L["1h_sword"]}), -- Spindlefang Spellblade
         Pet({item=181172, id=2948}) -- Boneweave Hatchling
     }
 }) -- Sister Chelicerae
@@ -4875,7 +5068,7 @@ map.nodes[44215132] = Rare({
     rewards={
         Achievement({id=14308, criteria=48850}),
         Transmog({item=182190, slot=L["leather"]}), -- Tauralus Hide Collar
-        Mount({item=181815, id=1370,}) -- Armored Bonehoof Tauralus
+        Mount({item=181815, id=1370, covenant=NECROLORD}) -- Bonehoof Tauralus
     }
 }) -- Tahonta
 
@@ -4894,7 +5087,7 @@ map.nodes[24184297] = Rare({
     note=L["leeda_note"],
     rewards={
         Achievement({id=14308, criteria=48870}),
-        Transmog({item=184180, slot=L["cloth"]})
+        Transmog({item=184180, slot=L["cloth"]}) -- Leeda's Unrefined Mask
     }
 }) -- Thread Mistress Leeda
 
@@ -4903,17 +5096,19 @@ map.nodes[33718016] = Rare({
     quest=58889,
     rewards={
         Achievement({id=14308, criteria=48875}),
-        Mount({item=182085, id=1372}) -- Umbral Bloodtusk
+        Mount({item=182085, id=1372}) -- Blisterback Bloodtusk
     }
 }) -- Warbringer Mal'Korak
 
 map.nodes[28965138] = Rare({
     id=157125,
-    quest=62079,
+    quest=59290,
     requires=Shadowlands.requirement.Item(175841),
     note=L["zargox_the_reborn_note"],
     rewards={
-        Achievement({id=14308, criteria=48864})
+        Achievement({id=14308, criteria=48864}),
+        Transmog({item=184285, slot=L["plate"]}), -- Boneclutched Shackles
+        Transmog({item=181804, slot=L["cosmetic"]}) -- Trophy of the Reborn Bonelord
     },
     pois={
         POI({26314280})
@@ -4941,7 +5136,14 @@ map.nodes[58197421] = Rare({
             {id=48861, quest=61720, note='('..GOO..' = '..OIL..') > '..OOZE}, -- Violet Mistake
             {id=48859, quest=61724, note=OOZE..' = '..GOO..' = '..OIL}, -- Oily Invertebrate
         }}),
+        Transmog({item=184302, slot=L["mail"], note=L["Corrupted"]}), -- Residue-Coated Muck Waders
+        Transmog({item=184300, slot=L["cloak"], note=L["Oily"]}), -- Fused Spineguard
+        Transmog({item=184301, slot=L["leather"], note=L["Violet"]}), -- Twenty-Loop Violet Girdle
+        -- Item({item=184185, type=L["neck"], note=L["Boneslurp"]}), -- Grunge-Caked Collarbone
+        -- Item({item=184279, type=L["trinket"], note=L["Pulsing"]}), -- Siphoning Blood-Drinker
+        Shadowlands.reward.Spacer(),
         Mount({item=182079, id=1410, note=L["Violet"]}), -- Slime-Covered Reins of the Hulking Deathroc
+        Toy({item=183903}), -- Smelly Jelly
         Pet({item=181270, id=2960, note=L["Oily"]}) -- Decaying Oozewalker
     }
 })
@@ -4952,6 +5154,7 @@ map.nodes[50354728] = Rare({
     id=162853,
     quest=62786,
     label=C_Map.GetMapInfo(1683).name,
+    note=L["theater_of_pain_note"],
     rewards = {
         Achievement({id=14802, criteria={
             50397, -- Azmogal
@@ -4961,7 +5164,8 @@ map.nodes[50354728] = Rare({
             50402, -- Devmorta
             50403, -- Ti'or
             48874  -- Sabriel the Bonecleaver
-        }})
+        }}),
+        Mount({item=184062, id=1437})
     }
 })
 
@@ -4971,21 +5175,26 @@ map.nodes[50354728] = Rare({
 
 map.nodes[44083989] = Treasure({
     quest=60368,
-    label=L["blackhound_cache"]
+    label=L["blackhound_cache"],
+    note=L["blackhound_cache_note"],
+    covenant=NECROLORD,
+    rewards={
+        Toy({item=184318}) -- Battlecry of Krexus
+    }
 }) -- Blackhound Cache
 
-map.nodes[36797862] = Treasure({
-    label=L["bladesworn_supply_cache"]
-}) -- Bladesworn Supply Cache
+-- map.nodes[36797862] = Treasure({
+--     label=L["bladesworn_supply_cache"]
+-- }) -- Bladesworn Supply Cache
 
 map.nodes[54011234] = Treasure({
-    quest=nil,
     label=L["cache_of_eyes"],
     note=L["cache_of_eyes_note"],
     rewards={
-        -- Achievement({id=14312, criteria=50070}),
         Pet({item=181171, id=2947}) -- Luminous Webspinner
-    }
+    },
+    -- Still no quest id for this chest, so we'll just complete when collected
+    IsCompleted = function (self) return self:IsCollected() end
 }) -- Cache of Eyes
 
 map.nodes[48301630] = Treasure({
@@ -5078,7 +5287,7 @@ map.nodes[57667581] = Treasure({
     note=L["plaguefallen_chest_note"],
     rewards={
         Achievement({id=14312, criteria=50074}),
-        Pet({item=183515, id=3045}) -- Reanimated Plague
+        Pet({item=183515, id=3045}) -- Iridescent Ooze
     },
     pois={
         POI({62487656})
@@ -5092,7 +5301,7 @@ map.nodes[64672475] = Treasure({
     rewards={
         Achievement({id=14312, criteria=50075}),
         Item({item=183517, quest=62372}) -- Page 76 of the Necronom-i-nom
-    },
+    }
 }) -- Ritualist's Cache
 
 map.nodes[31737004] = Treasure({
@@ -5108,17 +5317,18 @@ map.nodes[31737004] = Treasure({
     }
 }) -- Runespeaker's Trove
 
-map.nodes[66145045] = Treasure({
+local STOLEN_JAR = Treasure({
     quest=61451,
     note=L["stolen_jar_note"],
     rewards={
         Achievement({id=14312, criteria=50067}),
         Item({item=182618, quest=62085}) -- ... Why Me?
-    },
-    pois={
-        POI({66135027, 66145045, 73564986})
     }
 }) -- Stolen Jar
+
+map.nodes[66135027] = STOLEN_JAR
+map.nodes[66145045] = STOLEN_JAR
+map.nodes[73564986] = STOLEN_JAR
 
 map.nodes[55893897] = Treasure({
     quest={59428,59429},
@@ -5334,7 +5544,10 @@ map.nodes[25304850] = Rare({
     note=L["amalgamation_of_light_note"],
     rewards={
         Achievement({id=14310, criteria=48811}),
+        Transmog({item=179926, slot=L["cloth"]}), -- Light-Infused Tunic
         Transmog({item=179924, slot=L["leather"]}), -- Light-Infused Jacket
+        Transmog({item=179653, slot=L["mail"]}), -- Light-Infused Hauberk
+        Transmog({item=179925, slot=L["plate"]}), -- Light-Infused Breastplate
         Item({item=180688}) -- Infused Remnant of Light
     }
 }) -- Amalgamation of Light
@@ -5360,7 +5573,7 @@ map.nodes[35817052] = Rare({
 
 map.nodes[35003230] = Rare({
     id=166292,
-    quest=nil,
+    quest=59823,
     note=L["bog_beast_note"],
     rewards={
         Achievement({id=14310, criteria=48818}),
@@ -5384,7 +5597,6 @@ map.nodes[37084742] = Rare({
     note=L["executioner_aatron_note"],
     rewards={
         Achievement({id=14310, criteria=48819}),
-        Item({item=180696}), -- Legion Wing Insignia
         Transmog({item=183737, slot=L["plate"]}) -- Aatron's Stone Girdle
     }
 }) -- Executioner Aatron
@@ -5417,6 +5629,9 @@ map.nodes[32641545] = Rare({
     covenant=VENTHYR,
     requires=Shadowlands.requirement.GarrisonTalent(1259, L["anima_channeled"]),
     note=L["madalav_note"],
+    rewards={
+        Transmog({item=180939, slot=L["cosmetic"]}) -- Mantle of the Forgemaster's Dark Blades
+    },
     pois={
         POI({32661483}) -- Madalav's Hammer
     }
@@ -5452,7 +5667,7 @@ map.nodes[51985179] = Rare({
     quest=59900,
     rewards={
         Achievement({id=14310, criteria=48817}),
-        Mount({item=180581, id=1298}) -- Harnessed Hopecrusher
+        Mount({item=180581, id=1298, covenant=VENTHYR}) -- Hopecrusher Gargon
     }
 }) -- Hopecrusher
 
@@ -5461,8 +5676,7 @@ map.nodes[61717949] = Rare({
     quest=60022,
     rewards={
         Achievement({id=14310, criteria=48820}),
-        Item({item=180705}), -- Gargon Training Manual
-        Item({item=180704}) -- Infused Pet Biscuit
+        Item({item=180705, class='HUNTER'}) -- Gargon Training Manual
     }
 }) -- Huntmaster Petrus
 
@@ -5483,7 +5697,7 @@ map.nodes[67978179] = Rare({
     note=L["leeched_soul_note"],
     rewards={
         Achievement({id=14310, criteria=48809}),
-        Transmog({item=183736, slot=L["cloth"]}),
+        Transmog({item=183736, slot=L["cloth"]}), -- Pride Resistant Handwraps
         Pet({item=180585, id=2897}) -- Bottled Up Emotions
     }
 }) -- Leeched Soul
@@ -5524,7 +5738,6 @@ map.nodes[67443048] = Rare({
     note=L["sinstone_hoarder_note"],
     rewards={
         Achievement({id=14310, criteria=50030}),
-        Item({item=180677}), -- Discarded Medal of Valor
         Transmog({item=183732, slot=L["mail"]}) -- Sinstone-Linked Greaves
     }
 }) -- Sinstone Hoarder
@@ -5544,8 +5757,7 @@ map.nodes[78934975] = Rare({
     quest=58130,
     note=L["soulstalker_doina_note"],
     rewards={
-        Achievement({id=14310, criteria=48799}),
-        Item({item=180692}) -- Box of Stalker Traps
+        Achievement({id=14310, criteria=48799})
     }
 }) -- Soulstalker Doina
 
@@ -5573,7 +5785,7 @@ map.nodes[43007910] = Rare({
     note=L["tomb_burster_note"],
     rewards={
         Achievement({id=14310, criteria=48802}),
-        Pet({item=180584, id=2891}) -- Rose Spiderling
+        Pet({item=180584, id=2891}) -- Blushing Spiderling
     }
 }) -- Tomb Burster
 
@@ -5591,11 +5803,6 @@ map.nodes[38607200] = Rare({
 -------------------------------------------------------------------------------
 ---------------------------------- TREASURES ----------------------------------
 -------------------------------------------------------------------------------
-
--- Stoneguard Satchel (76226410) (60896,60939)
--- Reliquary of Remembrance (79763376) (item=180403)
--- Unimplemented treasure? (50244910)
-
 map.nodes[51855954] = Treasure({
     quest=59888,
     rewards={
@@ -5615,8 +5822,7 @@ map.nodes[69327795] = Treasure({
 map.nodes[64187265] = Treasure({
     quest=59883,
     rewards={
-        Achievement({id=14314, criteria=50897}),
-        Item({item=179392}) -- Orb of Burgeoning Ambition
+        Achievement({id=14314, criteria=50897})
     }
 }) -- Filcher's Prize
 
@@ -5709,7 +5915,7 @@ map.nodes[63367398] = Treasure({
 }) -- Taskmaster's Trove
 
 map.nodes[57374337] = Treasure({
-    quest=nil,
+    quest=62063,
     requires=Shadowlands.requirement.Currency(1820, 99),
     note=L["the_count_note"],
     rewards={
@@ -5736,16 +5942,6 @@ map.nodes[68446445] = Treasure({
 
 -------------------------------------------------------------------------------
 
--- Not at this location for me -Zar
--- map.nodes[30342472] = Treasure({
---     quest=60665,
---     label=L["bleakwood_chest"],
---     rewards={
---         Pet({item=180592, id=2901}), -- Trapped Stonefiend
---         Transmog({item=182720, slot=L["mail"]}), -- Mail Courier's Tunic
---         Transmog({item=180398, slot=L["polearm"]}) -- Stonewrought Legion Halberd
---     }
--- }) -- Bleakwood Chest
 
 map.nodes[73597539] = Treasure({
     quest=62196,
@@ -5838,7 +6034,7 @@ map.nodes[67626608] = PetBattle({
 }) -- Eyegor
 
 -------------------------------------------------------------------------------
----------------------------- CARRIAGES ----------------------------
+---------------------------------- CARRIAGES ----------------------------------
 -------------------------------------------------------------------------------
 
 local Carriage = Class('Carriage', NPC, {
@@ -6173,11 +6369,59 @@ local Dredbat = Class('Dredbat', NPC, {
     rewards={ Achievement({id=14769, criteria={id=1, qty=true}}) }
 })
 map.nodes[25103757] = Dredbat({ pois={ Arrow({25103757, 30024700}) } })
-map.nodes[64076201] = Dredbat({ pois={ Arrow({64076201, 70125719}) } })
-map.nodes[56236226] = Dredbat({ pois={ Arrow({56236226, 57485549}) } })
+map.nodes[31905920] = Dredbat({ pois={ Arrow({31905920, 38954941}) } })
 map.nodes[57246125] = Dredbat({ pois={ Arrow({57246125, 60286116}) } })
 map.nodes[60396117] = Dredbat({ pois={ Arrow({60396117, 57495549}) } })
 map.nodes[64076201] = Dredbat({ pois={ Arrow({64076201, 70125719}) } })
+map.nodes[64076201] = Dredbat({ pois={ Arrow({64076201, 70125719}) } })
+
+-------------------------------------------------------------------------------
+------------------------------ ABSOLUTION FOR ALL -----------------------------
+-------------------------------------------------------------------------------
+
+local Fugitive = Class('Fugitive', NPC, {
+    id=160149,
+    icon=236247,
+    note=L["fugitive_soul_note"],
+    group=Shadowlands.groups.FUGITIVES,
+    rewards={
+        Achievement({id=14274, criteria={id=1, qty=true, suffix=L["souls_absolved"]}})
+    }
+})
+
+map.nodes[65404450] = Fugitive()
+map.nodes[65704610] = Fugitive()
+map.nodes[65904250] = Fugitive()
+map.nodes[68604460] = Fugitive()
+map.nodes[70105630] = Fugitive()
+map.nodes[70205500] = Fugitive()
+map.nodes[70604340] = Fugitive()
+map.nodes[70605200] = Fugitive()
+map.nodes[70605200] = Fugitive()
+map.nodes[70804400] = Fugitive()
+map.nodes[71004180] = Fugitive()
+map.nodes[71305350] = Fugitive()
+map.nodes[71504690] = Fugitive()
+map.nodes[71705440] = Fugitive()
+map.nodes[72304440] = Fugitive()
+map.nodes[72605510] = Fugitive()
+
+local Ritualist = Class('Ritualist', NPC, {
+    id=166150,
+    icon=458226,
+    note=L["avowed_ritualist_note"],
+    group=Shadowlands.groups.FUGITIVES,
+    rewards={
+        Achievement({id=14274, criteria={id=1, qty=true, suffix=L["souls_absolved"]}})
+    }
+})
+
+map.nodes[72505390] = Ritualist()
+map.nodes[71704790] = Ritualist()
+map.nodes[72004600] = Ritualist()
+map.nodes[69304210] = Ritualist()
+map.nodes[67204610] = Ritualist()
+map.nodes[69204650] = Ritualist()
 
 -------------------------------------------------------------------------------
 ------------------------ ITS ALWAYS SINNY IN REVENDRETH -----------------------
@@ -6393,7 +6637,8 @@ map.nodes[19324172] = Rare({
     note=L["apholeias_note"],
     rewards={
         Achievement({id=14744, criteria=49842}),
-        Item({item=182327}) -- Dominion Etching Loss 182327
+        Item({item=184106, note=L["ring"]}), -- Gimble
+        Item({item=182327}) -- Dominion Etching: Loss
     }
 }) -- Apholeias, Herald of Loss
 
@@ -6402,6 +6647,7 @@ map.nodes[39014119] = Rare({
     quest=57469,
     rewards={
         Achievement({id=14744, criteria=49843}),
+        Toy({item=184312}) -- Borr-Geth's Fiery Brimstone
     }
 }) -- Borr-Geth
 
@@ -6410,6 +6656,7 @@ map.nodes[27731305] = Rare({
     quest=61106,
     rewards={
         Achievement({id=14744, criteria=49844}),
+        Transmog({item=183887, slot=L["1h_sword"]}) -- Suirhtaned, Blade of the Heir
     }
 }) -- Conjured Death
 
@@ -6452,6 +6699,7 @@ map.nodes[42342108] = Rare({
     note=L["ekphoras_note"],
     rewards={
         Achievement({id=14744, criteria=49849}),
+        Item({item=184105, note=L["ring"]}), -- Gyre
         Item({item=182328}) -- Dominion Etching: Grief
     }
 }) -- Ekphoras, Herald of Grief
@@ -6470,12 +6718,13 @@ map.nodes[20586935] = Rare({
     note=L["exos_note"],
     rewards={
         Achievement({id=14744, criteria=49851}),
+        Item({item=184108, note=L["neck"]}) -- Vorpal Amulet
     }
 }) -- Exos, Herald of Domination
 
 map.nodes[30775000] = Rare({
     id=175012,
-    quest=nil,
+    quest=62788,
     note=L["ikras_note"],
     rewards={
         Achievement({id=14744, criteria=50621}),
@@ -6487,6 +6736,7 @@ map.nodes[16945102] = Rare({
     quest=60987,
     rewards={
         Achievement({id=14744, criteria=49852}),
+        Toy({item=184292}) -- Ancient Elethium Coin
     }
 }) -- Morguliax <Lord of Decapitation>
 
@@ -6542,6 +6792,7 @@ map.nodes[28701204] = Rare({
     note=L["talaporas_note"],
     rewards={
         Achievement({id=14744, criteria=49858}),
+        Transmog({item=184107, slot=L["cloak"]}), -- Borogove Cloak
         Item({item=182326}) -- Dominion Etching: Pain
     }
 }) -- Talaporas, Herald of Pain
@@ -6582,12 +6833,8 @@ local BonusBoss = Class('BonusBoss', NPC, {
 map.nodes[28204450] = BonusBoss({
     id=169102,
     quest=61136, -- 63380
-    note=L["in_cave"],
     rewards={
         Achievement({id=14660, criteria=49485}),
-    },
-    pois={
-        POI({20813927}) -- Cave entrance
     }
 }) -- Agonix
 
@@ -6604,6 +6851,7 @@ map.nodes[28712513] = BonusBoss({
     quest=61346,
     rewards={
         Achievement({id=14660, criteria=49484}),
+        Item({item=183070, quest=63164}) -- Mawsworn Orders
     }
 }) -- Cyrixia <The Willbreaker>
 
@@ -6620,12 +6868,16 @@ map.nodes[19205740] = BonusBoss({
     quest=61140,
     rewards={
         Achievement({id=14660, criteria=50410}),
+        Item({item=183066, quest=63160}), -- Korrath's Grimoire: Aleketh
+        Item({item=183067, quest=63161}), -- Korrath's Grimoire: Belidir
+        Item({item=183068, quest=63162}) -- Korrath's Grimoire: Gyadrek
     }
 }) -- Dath Rezara <Lord of Blades>
 
 map.nodes[31982122] = BonusBoss({
     id=158314,
     quest=59183,
+    note=L["drifting_sorrow_note"],
     rewards={
         Achievement({id=14660, criteria=49475}),
     }
@@ -6685,7 +6937,7 @@ map.nodes[22674223] = BonusBoss({
 
 map.nodes[26173744] = BonusBoss({
     id=162829,
-    quest=62228,
+    quest=60992,
     rewards={
         Achievement({id=14660, criteria=49479}),
     }
@@ -6868,403 +7120,3 @@ map.nodes[46914169] = NPC({
         -- Item({item=180952, quest=nil, note=L["Appreciative"]}), -- Possibility Matrix
     }
 })
-
--------------------------------------------------------------------------------
----------------------------------- NAMESPACE ----------------------------------
--------------------------------------------------------------------------------
-
- 
-
-
-
-
-local Intro = Shadowlands.node.Intro
-
-
-
-
-
-
-
-local Arrow = Shadowlands.poi.Arrow
-
-
--------------------------------------------------------------------------------
-------------------------------------- MAP -------------------------------------
--------------------------------------------------------------------------------
-
-local map = Map({ id=118 })
-local nodes = map.nodes
-
-function map:Prepare ()
-    Map.Prepare(self)
-
-    -- Hide nodes until the "Return of the Scourge" is completed
-    if Shadowlands.faction == 'Alliance' then
-        self.phased = C_QuestLog.IsQuestFlaggedCompleted(60767)
-    else
-        self.phased = C_QuestLog.IsQuestFlaggedCompleted(60761)
-    end
-end
-
--------------------------------------------------------------------------------
------------------------------------- INTRO ------------------------------------
--------------------------------------------------------------------------------
-
-if UnitFactionGroup('player') == 'Alliance' then
-    map.intro = Intro({
-        quest=60767,
-        note=L["prepatch_intro"],
-        rewards={
-            Quest({id={60113, 60116, 60117, 59876, 60766, 60767}})
-        }
-    })
-else
-    map.intro = Intro({
-        quest=60761,
-        note=L["prepatch_intro"],
-        rewards={
-            Quest({id={60115, 60669, 60670, 60725, 60759, 60761}})
-        }
-    })
-end
-
-map.nodes[43905720] = map.intro
-
--------------------------------------------------------------------------------
---------------------------------- SPAWN TIMES ---------------------------------
--------------------------------------------------------------------------------
-
-local SPAWNS = {}
-local EXPECTED = {}
-
-hooksecurefunc(HandyNotes_Shadowlands, 'OnInitialize', function ()
-    SPAWNS = Shadowlands.GetDatabaseTable('prepatch', 'spawns')
-    EXPECTED = Shadowlands.GetDatabaseTable('prepatch', 'expected')
-
-    for npc = 174048, 174067 do
-        if SPAWNS[npc] == nil then SPAWNS[npc] = 1 end
-    end
-
-    local function UpdateSpawnTimes(startNPC, time)
-        EXPECTED[startNPC] = time + 12000 -- 3h20m
-        local next = function (id) return (id == 174048) and 174067 or (id - 1) end
-        local npc = next(startNPC)
-        while npc ~= startNPC do
-            time = time + 600 -- 10 minutes
-            EXPECTED[npc] = time
-            npc = next(npc)
-        end
-    end
-
-    HandyNotes_Shadowlands:RegisterEvent('VIGNETTES_UPDATED', function (...)
-        for _, guid in ipairs(C_VignetteInfo.GetVignettes()) do
-            local info = C_VignetteInfo.GetVignetteInfo(guid)
-            if (info and info.objectGUID and info.onWorldMap) then
-                local id = select(6, strsplit("-", info.objectGUID))
-                local npc = tonumber(id)
-                if SPAWNS[npc] and time() - SPAWNS[npc] > 3600 then
-                    SPAWNS[npc] = time()
-                    Shadowlands.Debug('Detected '..info.name..' spawn at '..date('%H:%M:%S', SPAWNS[npc]))
-                    UpdateSpawnTimes(npc, SPAWNS[npc])
-                end
-            end
-        end
-    end)
-end)
-
--------------------------------------------------------------------------------
------------------------------------- RARES ------------------------------------
--------------------------------------------------------------------------------
-
-local ICCRare = Class('ICCRare', Rare, { fgroup='iccrares' })
-
-function ICCRare.getters:note()
-    if EXPECTED[self.id] and time() < EXPECTED[self.id] then
-        local spawn = Shadowlands.color.Blue(date('%H:%M', EXPECTED[self.id]))
-        return L["icecrown_rares"]..'\n\n'..L["next_spawn"]:format(spawn)
-    end
-    return L["icecrown_rares"]
-end
-
-function ICCRare:GetGlow(minimap)
-    local expected = EXPECTED[self.id] or 0
-    if expected > time() and expected - time() < 540 then
-        local _, scale, alpha = self:GetDisplayInfo(minimap)
-        self.glow.alpha = alpha
-        self.glow.scale = scale * 1.1
-        self.glow.r, self.glow.g, self.glow.b = 1, 0, 1
-        return self.glow
-    end
-    return Shadowlands.node.NPC.GetGlow(self, minimap)
-end
-
-local function SharedLoot(rewards)
-    -- Only shared item on live appears to be the keepsake
-    rewards[#rewards + 1] = Item({item=183616}) -- Accursed Keepsake
-    return rewards
-end
-
--------------------------------------------------------------------------------
-
-nodes[31607050] = ICCRare({
-    id=174067,
-    --quest=62345,
-    sublabel=L["orig_nax"],
-    rlabel='(1)',
-    rewards=SharedLoot({
-        Transmog({item=183642, slot=L["cloth"]}), -- Robes of Rasped Breaths
-        Transmog({item=183654, slot=L["plate"]}), -- Etched Dragonbone Stompers
-        Item({item=183676, note=L["ring"]}) -- Hailstone Loop
-    }),
-    pois={ POI({44204910}), Arrow({44204910, 31607050}) }
-}) -- Noth the Plaguebringer
-
-nodes[36506740] = ICCRare({
-    id=174066,
-    --quest=62344,
-    sublabel=L["orig_nax"],
-    rlabel='(2)',
-    rewards=SharedLoot({
-        Transmog({item=183643, slot=L["2h_axe"]}), -- Severance of Mortality
-        Transmog({item=183645, slot=L["leather"]}), -- Cinch of the Tortured
-        Transmog({item=183644, slot=L["mail"]}) -- Regurgitator's Shoulderpads
-    }),
-    pois={ POI({31607050}), Arrow({31607050, 36506740}) }
-}) -- Patchwerk
-
-nodes[49703270] = ICCRare({
-    id=174065,
-    --quest=62343,
-    sublabel=L["orig_icc"],
-    rlabel='(3)',
-    rewards=SharedLoot({
-        Transmog({item=183647, slot=L["polearm"]}), -- Bloodspatter
-        Transmog({item=183646, slot=L["mail"]}), -- Chestguard of Siphoned Vitality
-        Transmog({item=183648, slot=L["plate"]}) -- Veincrusher Gauntlets
-    }),
-    pois={ POI({36506740}), Arrow({36506740, 49703270}) }
-}) -- Blood Queen Lana'thel
-
-nodes[57103030] = ICCRare({
-    id=174064,
-    --quest=62342,
-    sublabel=L["orig_icc"],
-    rlabel='(4)',
-    rewards=SharedLoot({
-        Transmog({item=183649, slot=L["leather"]}), -- Bag of Discarded Entrails
-        Transmog({item=183651, slot=L["plate"]}), -- Chestplate of Septic Sutures
-        Item({item=183650, note=L["trinket"]}) -- Miniscule Abomination in a Jar
-    }),
-    pois={ POI({49703270}), Arrow({49703270, 57103030}) }
-}) -- Professor Putricide
-
-nodes[51107850] = ICCRare({
-    id=174063,
-    --quest=62341,
-    sublabel=L["orig_icc"],
-    rlabel='(5)',
-    rewards=SharedLoot({
-        Transmog({item=183652, slot=L["bow"]}), -- Zod's Echoing Longbow
-        Transmog({item=183653, slot=L["leather"]}), -- Deathwhisper Vestment
-        Transmog({item=183655, slot=L["mail"]}) -- Handgrips of Rime and Sleet
-    }),
-    pois={ POI({57103030}), Arrow({57103030, 51107850}) }
-}) -- Lady Deathwhisper
-
-nodes[57805610] = ICCRare({
-    id=174062,
-    --quest=62340,
-    sublabel=L["orig_utp"],
-    rlabel='(6)',
-    rewards=SharedLoot({
-        Transmog({item=183656, slot=L["leather"]}), -- Drake Rider's Jerkin
-        Transmog({item=183657, slot=L["mail"]}), -- Skadi's Scaled Sollerets
-        Transmog({item=183670, slot=L["plate"]}), -- Skadi's Saronite Belt
-        Mount({item=44151, id=264}) -- Reins of the Blue Proto-Drake
-    }),
-    pois={ POI({51107850}), Arrow({51107850, 57805610}) }
-}) -- Skadi the Ruthless
-
-nodes[52305260] = ICCRare({
-    id=174061,
-    --quest=62339,
-    sublabel=L["orig_utk"],
-    rlabel='(7)',
-    rewards=SharedLoot({
-        Transmog({item=183658, slot=L["2h_axe"]}), -- Ingvar's Monolithic Skullcleaver
-        Transmog({item=183668, slot=L["leather"]}), -- Razor-Barbed Leather Belt
-        Item({item=183659, note=L["ring"]}) -- Annhylde's Band
-    }),
-    pois={ POI({57805610}), Arrow({57805610, 52305260}) }
-}) -- Ingvar the Plunderer
-
-nodes[54004470] = ICCRare({
-    id=174060,
-    --quest=62338,
-    sublabel=L["orig_utk"],
-    rlabel='(8)',
-    rewards=SharedLoot({
-        Transmog({item=183678, slot=L["fist"]}), -- Keleseth's Influencer
-        Transmog({item=183661, slot=L["mail"]}), -- Drake Stabler's Gauntlets
-        Transmog({item=183680, slot=L["cloak"]}) -- Royal Sanguine Cloak
-    }),
-    pois={ POI({52305260}), Arrow({52305260, 54004470}) }
-}) -- Prince Keleseth
-
-nodes[64802210] = ICCRare({
-    id=174059,
-    --quest=62337,
-    sublabel=L["orig_tot"],
-    rlabel='(9)',
-    rewards=SharedLoot({
-        Transmog({item=183638, slot=L["dagger"]}), -- Phantasmic Kris
-        Transmog({item=183637, slot=L["leather"]}), -- Shoulderpads of the Notorious Knave
-        Transmog({item=183636, slot=L["plate"]}) -- Helm of the Violent Fracas
-    }),
-    pois={ POI({54004470}), Arrow({54004470, 64802210}) }
-}) -- The Black Knight
-
-nodes[70603850] = ICCRare({
-    id=174058,
-    --quest=62336,
-    sublabel=L["orig_fos"],
-    rlabel='(10)',
-    rewards=SharedLoot({
-        Transmog({item=183675, slot=L["cloth"]}), -- Cold Sweat Mitts
-        Transmog({item=183639, slot=L["mail"]}), -- Gaze of Bewilderment
-        Transmog({item=183635, slot=L["plate"]}), -- Grieving Gauntlets
-        Item({item=183634}) -- Papa's Mint Condition Bag
-    }),
-    pois={ POI({64802210}), Arrow({64802210, 70603850}) }
-}) -- Bronjahm
-
-nodes[47136590] = ICCRare({
-    id=174057,
-    --quest=62335,
-    sublabel=L["orig_pos"],
-    rlabel='(11)',
-    rewards=SharedLoot({
-        Transmog({item=183674, slot=L["cloth"]}), -- Rimewoven Pantaloons
-        Transmog({item=183633, slot=L["leather"]}), -- Fringed Wyrmleather Leggings
-        Transmog({item=183632, slot=L["shield"]}) -- Protector of Stolen Souls
-    }),
-    pois={ POI({70603850}), Arrow({70603850, 47136590}) }
-}) -- Scourgelord Tyrannus
-
-nodes[59107240] = ICCRare({
-    id=174056,
-    --quest=62334,
-    sublabel=L["orig_pos"],
-    rlabel='(12)',
-    rewards=SharedLoot({
-        Transmog({item=183630, slot=L["2h_mace"]}), -- Garfrost's Two-Ton Bludgeon
-        Transmog({item=183666, slot=L["plate"]}), -- Legguards of the Frosty Fathoms
-        Item({item=183631, note=L["ring"]}) -- Ring of Carnelian and Sinew
-    }),
-    pois={ POI({47136590}), Arrow({47136590, 59107240}) }
-}) -- Forgemaster Garfrost
-
-nodes[58208350] = ICCRare({
-    id=174055,
-    --quest=62333,
-    sublabel=L["orig_hor"],
-    rlabel='(13)',
-    rewards=SharedLoot({
-        Transmog({item=183687, slot=L["cloth"]}), -- Frayed Flesh-Stitched Shoulderguards
-        Transmog({item=183663, slot=L["cloth"]}), -- Sightless Capuchin of Ulmaas
-        Transmog({item=183662, slot=L["mail"]}) -- Frostsworn Rattleshirt
-    }),
-    pois={ POI({59107240}), Arrow({59107240, 58208350}) }
-}) -- Marwyn
-
-nodes[50208810] = ICCRare({
-    id=174054,
-    --quest=62332,
-    sublabel=L["orig_hor"],
-    rlabel='(14)',
-    rewards=SharedLoot({
-        Transmog({item=183667, slot=L["1h_sword"]}), -- Geistslicer
-        Transmog({item=183664, slot=L["cloth"]}), -- Bracer of Ground Molars
-        Transmog({item=183665, slot=L["plate"]}) -- Valonforth's Marred Pauldrons
-    }),
-    pois={ POI({58208350}), Arrow({58208350, 50208810}) }
-}) -- Falric
-
-nodes[80326135] = ICCRare({
-    id=174053,
-    --quest=62331,
-    sublabel=L["orig_dtk"],
-    rlabel='(15)',
-    rewards=SharedLoot({
-        Transmog({item=183686, slot=L["leather"]}), -- Breeches of the Skeletal Serpent
-        Transmog({item=183684, slot=L["shield"]}), -- Tharon'ja's Protectorate
-        Item({item=183685, note=L["ring"]}) -- Phantasmic Seal of the Prophet
-    }),
-    pois={ POI({50208810}), Arrow({50208810, 80326135}) }
-}) -- The Prophet Tharon'ja
-
-nodes[77806610] = ICCRare({
-    id=174052,
-    --quest=62330,
-    sublabel=L["orig_dtk"],
-    rlabel='(16)',
-    rewards=SharedLoot({
-        Transmog({item=183627, slot=L["1h_mace"]}), -- Summoner's Granite Gavel
-        Transmog({item=183671, slot=L["mail"]}), -- Necromantic Wristwraps
-        Transmog({item=183672, slot=L["plate"]}) -- Cuirass of Undeath
-    }),
-    pois={ POI({80326135}), Arrow({80326135, 77806610}) }
-}) -- Novos the Summoner
-
-nodes[58303940] = ICCRare({
-    id=174051,
-    --quest=62329,
-    sublabel=L["orig_dtk"],
-    rlabel='(17)',
-    rewards=SharedLoot({
-        Transmog({item=183626, slot=L["2h_sword"]}), -- Troll Gorer
-        Transmog({item=183669, slot=L["cloth"]}), -- Cowl of the Rampaging Troll
-        Transmog({item=183640, slot=L["mail"]}) -- Leggings of Disreputable Charms
-    }),
-    pois={ POI({77806610}), Arrow({77806610, 58303940}) }
-}) -- Trollgore
-
-nodes[67505800] = ICCRare({
-    id=174050,
-    --quest=62328,
-    sublabel=L["orig_azn"],
-    rlabel='(18)',
-    rewards=SharedLoot({
-        Transmog({item=183681, slot=L["dagger"]}), -- Webrending Machete
-        Transmog({item=183682, slot=L["cloth"]}), -- Cinch of the Servant
-        Transmog({item=183683, slot=L["leather"]}) -- Skittering Vestments
-    }),
-    pois={ POI({58303940}), Arrow({58303940, 67505800}) }
-}) -- Krik'thir the Gatewatcher
-
-nodes[29606220] = ICCRare({
-    id=174049,
-    --quest=62327,
-    sublabel=L["orig_atk"],
-    rlabel='(19)',
-    rewards=SharedLoot({
-        Transmog({item=183679, slot=L["leather"]}), -- Taldaram's Supple Slippers
-        Transmog({item=183677, slot=L["mail"]}), -- Blood-Drinker's Belt
-        Item({item=183625, note=L["neck"]}) -- Reforged Necklace of Taldaram
-    }),
-    pois={ POI({67505800}), Arrow({67505800, 29606220}) }
-}) -- Prince Taldaram
-
-nodes[44204910] = ICCRare({
-    id=174048,
-    --quest=62326,
-    sublabel=L["orig_atk"],
-    rlabel='(20)',
-    rewards=SharedLoot({
-        Transmog({item=183624, slot=L["dagger"]}), -- Serrated Blade of Nadox
-        Transmog({item=183641, slot=L["cloth"]}), -- Shoulderpads of Corpal Rigidity
-        Item({item=183673, note=L["ring"]}) -- Nerubian Aegis Ring
-    }),
-    pois={ POI({29606220}), Arrow({29606220, 44204910}) }
-}) -- Elder Nadox

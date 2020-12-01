@@ -1,4 +1,4 @@
-﻿--## Version: v24  ## Author: Kemayo
+﻿--## Version: v25  ## Author: Kemayo
 local AppearanceTooltip = {}
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
@@ -134,14 +134,14 @@ classwarning:Show()
 
 -- Ye showing:
 GameTooltip:HookScript("OnTooltipSetItem", function(self)
-    AppearanceTooltip:ShowItem(select(2, self:GetItem()))
+    AppearanceTooltip:ShowItem(select(2, self:GetItem()), self)
 end)
 GameTooltip:HookScript("OnHide", function()
     AppearanceTooltip:HideItem()
 end)
 -- This is mostly world quest rewards:
 GameTooltip.ItemTooltip.Tooltip:HookScript("OnTooltipSetItem", function(self)
-    AppearanceTooltip:ShowItem(select(2, self:GetItem()))
+    AppearanceTooltip:ShowItem(select(2, self:GetItem()), self)
 end)
 GameTooltip.ItemTooltip.Tooltip:HookScript("OnHide", function()
     AppearanceTooltip:HideItem()
@@ -225,12 +225,14 @@ do
                 else
                     outermostComparisonShown = comparisonTooltip1:IsShown() and comparisonTooltip1 or comparisonTooltip2
                 end
+                local outerx = outermostComparisonShown:GetCenter() * outermostComparisonShown:GetEffectiveScale()
+                local ownerx = owner:GetCenter() * owner:GetEffectiveScale()
                 if
                     -- outermost is right of owner while we're biasing left
-                    (biasLeft and outermostComparisonShown:GetCenter() > owner:GetCenter())
+                    (biasLeft and outerx > ownerx)
                     or
                     -- outermost is left of owner while we're biasing right
-                    ((not biasLeft) and outermostComparisonShown:GetCenter() < owner:GetCenter())
+                    ((not biasLeft) and outerx < ownerx)
                 then
                     -- the comparison won't be in the way, so ignore it
                     outermostComparisonShown = nil
@@ -297,8 +299,10 @@ end)
 ----
 
 local _, class = UnitClass("player")
-function AppearanceTooltip:ShowItem(link)
+
+function AppearanceTooltip:ShowItem(link, for_tooltip)
     if not link then return end
+    for_tooltip = for_tooltip or GameTooltip
     local id = tonumber(link:match("item:(%d+)"))
     if not id or id == 0 then return end
     local token = db.tokens and LAT:ItemIsToken(id)
@@ -331,8 +335,8 @@ function AppearanceTooltip:ShowItem(link)
             end
         end
         if found then
-            GameTooltip:AddDoubleLine(ITEM_PURCHASED_COLON, link)
-            GameTooltip:Show()
+            for_tooltip:AddDoubleLine(ITEM_PURCHASED_COLON, link)
+            for_tooltip:Show()
         end
     end
 
@@ -386,7 +390,7 @@ function AppearanceTooltip:ShowItem(link)
             end
 
             tooltip:Show()
-            tooltip.owner = GameTooltip
+            tooltip.owner = for_tooltip
 
             positioner:Show()
             spinner:SetShown(db.spin)
@@ -562,6 +566,10 @@ function AppearanceTooltip.CanTransmogItem(itemLink)
     end
 end
 
+local brokenItems = {
+    -- itemid : {appearanceid, sourceid}
+    [153268] = {25124, 90807}, -- Enclave Aspirant's Axe
+}
 -- /dump C_TransmogCollection.GetAppearanceSourceInfo(select(2, C_TransmogCollection.GetItemInfo("")))
 function AppearanceTooltip.PlayerHasAppearance(itemLinkOrID)
     -- hasAppearance, appearanceFromOtherItem
@@ -572,6 +580,10 @@ function AppearanceTooltip.PlayerHasAppearance(itemLinkOrID)
         -- sometimes the link won't actually give us an appearance, but itemID will
         -- e.g. mythic Drape of Iron Sutures from Shadowmoon Burial Grounds
         appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
+    end
+    if not appearanceID and brokenItems[itemID] then
+        -- ...and there's a few that just need to be hardcoded
+        appearanceID, sourceID = unpack(brokenItems[itemID])
     end
     if not appearanceID then return end
     if sourceID and AppearanceTooltip.db.appearances_known[appearanceID] then
@@ -1466,22 +1478,26 @@ local function PrepareItemButton(button, point, offsetx, offsety)
     end
 
     local overlayFrame = CreateFrame("FRAME", nil, button)
-    overlayFrame:SetFrameLevel(4) -- Azerite overlay must be overlaid itself...
     overlayFrame:SetAllPoints()
     button.appearancetooltipoverlay = overlayFrame
 
     -- need the sublevel to make sure we're above overlays for e.g. azerite gear
-    local background = overlayFrame:CreateTexture(nil, "OVERLAY", nil, 3)
+    local sublevel = 4
+    if button.IconOverlay then
+        sublevel = select(2, button.IconOverlay:GetDrawLayer())
+    end
+
+    local background = overlayFrame:CreateTexture(nil, "OVERLAY", nil, sublevel)
     background:SetSize(12, 12)
     background:SetPoint(point or 'BOTTOMLEFT', offsetx or 0, offsety or 0)
     background:SetColorTexture(0, 0, 0, 0.4)
 
-    button.appearancetooltipoverlay.icon = overlayFrame:CreateTexture(nil, "OVERLAY", nil, 4)
+    button.appearancetooltipoverlay.icon = overlayFrame:CreateTexture(nil, "OVERLAY", nil, sublevel + 1)
     button.appearancetooltipoverlay.icon:SetSize(16, 16)
     button.appearancetooltipoverlay.icon:SetPoint("CENTER", background, "CENTER")
     button.appearancetooltipoverlay.icon:SetAtlas("transmog-icon-hidden")
 
-    button.appearancetooltipoverlay.iconInappropriate = overlayFrame:CreateTexture(nil, "OVERLAY", nil, 4)
+    button.appearancetooltipoverlay.iconInappropriate = overlayFrame:CreateTexture(nil, "OVERLAY", nil, sublevel + 1)
     button.appearancetooltipoverlay.iconInappropriate:SetSize(14, 14)
     button.appearancetooltipoverlay.iconInappropriate:SetPoint("CENTER", background, "CENTER")
     button.appearancetooltipoverlay.iconInappropriate:SetAtlas("mailbox")
@@ -1490,6 +1506,12 @@ local function PrepareItemButton(button, point, offsetx, offsety)
     overlayFrame:Hide()
 end
 local function UpdateOverlay(button, link, ...)
+    if not link then
+        if button.appearancetooltipoverlay then
+            button.appearancetooltipoverlay:Hide()
+        end
+        return
+    end
     local hasAppearance, appearanceFromOtherItem = AppearanceTooltip.PlayerHasAppearance(link)
     local appropriateItem = LAI:IsAppropriate(link)
     -- AppearanceTooltip.Debug("Considering item", link, hasAppearance, appearanceFromOtherItem)
@@ -1516,6 +1538,8 @@ local function UpdateOverlay(button, link, ...)
             button.appearancetooltipoverlay.iconInappropriate:Show()
         end
         button.appearancetooltipoverlay:Show()
+    elseif button.appearancetooltipoverlay then
+        button.appearancetooltipoverlay:Hide()
     end
 end
 

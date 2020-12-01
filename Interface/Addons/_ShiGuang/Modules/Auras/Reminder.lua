@@ -6,7 +6,7 @@ local pairs, tinsert, next = pairs, table.insert, next
 local GetSpecialization, GetZonePVPInfo, GetItemCooldown = GetSpecialization, GetZonePVPInfo, GetItemCooldown
 local UnitIsDeadOrGhost, UnitInVehicle, InCombatLockdown = UnitIsDeadOrGhost, UnitInVehicle, InCombatLockdown
 local IsInInstance, IsPlayerSpell, UnitBuff, GetSpellTexture = IsInInstance, IsPlayerSpell, UnitBuff, GetSpellTexture
-local GetWeaponEnchantInfo = GetWeaponEnchantInfo
+local GetWeaponEnchantInfo, IsEquippedItem = GetWeaponEnchantInfo, IsEquippedItem
 
 local groups = I.ReminderBuffs[I.MyClass]
 local iconSize = 36
@@ -19,14 +19,18 @@ function A:Reminder_Update(cfg)
 	local combat = cfg.combat
 	local instance = cfg.instance
 	local pvp = cfg.pvp
-	local cooldown = cfg.cooldown
-	local isPlayerSpell, isRightSpec, isInCombat, isInInst, isInPVP = true, true
+	local itemID = cfg.itemID
+	local equip = cfg.equip
+	local isPlayerSpell, isRightSpec, isEquipped, isInCombat, isInInst, isInPVP = true, true, true
 	local inInst, instType = IsInInstance()
 	local weaponIndex = cfg.weaponIndex
 
-	if cooldown and GetItemCooldown(cooldown) > 0 then -- check rune cooldown
-		frame:Hide()
-		return
+	if itemID then
+		if equip and not IsEquippedItem(itemID) then isEquipped = false end
+		if GetItemCount(itemID) == 0 or (not isEquipped) or GetItemCooldown(itemID) > 0 then -- check item cooldown
+			frame:Hide()
+			return
+		end
 	end
 
 	if depend and not IsPlayerSpell(depend) then isPlayerSpell = false end
@@ -98,23 +102,22 @@ function A:Reminder_OnEvent()
 	A:Reminder_UpdateAnchor()
 end
 
-function A:Reminder_AddRune()
-	if GetItemCount(174906) == 0 then return end
-	if not groups then groups = {} end
-	tinsert(groups, {
-		spells = {
-			[317065] = true,
-			[270058] = true,
-		},
-		texture = 839983,
-		cooldown = 174906,
-		instance = true,
-	})
+function A:Reminder_AddItemGroup()
+	for _, value in pairs(I.ReminderBuffs["ITEMS"]) do
+		if not value.disable and GetItemCount(value.itemID) > 0 then
+			if not value.texture then
+				value.texture = GetItemIcon(value.itemID)
+			end
+			if not groups then groups = {} end
+			tinsert(groups, value)
+		end
+	end
 end
 
 function A:InitReminder()
-	--A:Reminder_AddRune()
-	if not groups then return end
+	A:Reminder_AddItemGroup()
+
+	if not groups or not next(groups) then return end
 
 	if R.db["Auras"]["Reminder"] then
 		if not parentFrame then
