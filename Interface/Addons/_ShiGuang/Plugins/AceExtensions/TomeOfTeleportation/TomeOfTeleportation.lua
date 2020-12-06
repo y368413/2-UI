@@ -1,4 +1,4 @@
-﻿--## Author: Remeen  4.0
+﻿--## Author: Remeen  4.2.1
 
 -- Tome of Teleportation by Remeen.
 
@@ -174,29 +174,19 @@ end
 
 ---------------------------------------------------------------
 
-local NameToIdCache = nil
+local ItemsFound = {}
+local EmulateSlowServer = false
 
-local function BuildNameToIdCache()
-	NameToIdCache = {}
-	for id, t in pairs(TomeOfTele_Cache) do
-		NameToIdCache[t[1]] = id
-	end
-end
-
+-- Emulating slow server.
 local function GetCachedItemInfo(itemId)
-	if NameToIdCache == nil then
-		BuildNameToIdCache()
-	end
-	
-	if NameToIdCache[itemId] ~= nil then
-		itemId = NameToIdCache[itemId]
-	end
-
-	if TomeOfTele_Cache[itemId] then
-		local t = TomeOfTele_Cache[itemId]
-		return t[1], t[2], t[3], t[4], t[5], t[6], t[7], t[8], t[9], t[10], t[11], t[12], t[13], t[14], t[15], t[16], t[17]
+	if EmulateSlowServer then	
+		if ItemsFound[itemId] == nil then
+			ItemsFound[itemId] = true
+			return nil
+		else
+			return GetItemInfo(itemId)
+		end
 	else
-		print("Tome of Teleportation: item " .. itemId .. " is missing from the cache. Report a bug.")
 		return GetItemInfo(itemId)
 	end
 end
@@ -385,6 +375,7 @@ local function SortSpells(spell1, spell2, sortType)
 end
 
 local function SetupSpells()
+	local loaded = true
 	for index, spell in ipairs(TeleporterSpells) do		
 		if spell.spellType == ST_Item then
 			spell.spellName = GetCachedItemInfo( spell.spellId )
@@ -394,10 +385,13 @@ local function SetupSpells()
 		
 		if not spell.spellName then
 			spell.spellName = "<Loading>"
+			loaded = false
 		end
 		
 		spell.isItem = spell.spellType == ST_Item
 	end
+	
+	return loaded
 end
 
 local function GetSortedFavourites(favourites)
@@ -725,13 +719,13 @@ local function OnClickRemove(spell)
 	StaticPopup_Show("TELEPORTER_CONFIRM_REMOVE")
 end
 
-local function AddCustomizationIcon(existingIcon, buttonFrame, xOffset, yOffset, width, height, optionName, onClick, forceHidden)
+local function AddCustomizationIcon(existingIcon, buttonFrame, showAboveFrame, xOffset, yOffset, width, height, optionName, onClick, forceHidden)
 	local iconObject = existingIcon
 	if not iconObject then		
 		iconObject = {}
-		iconObject.icon = buttonFrame:CreateTexture(frameName)
+		iconObject.icon = showAboveFrame:CreateTexture(frameName)
 		-- Invisible frame use for button notifications
-		iconObject.frame = TeleporterCreateReusableFrame("Frame","TeleporterIconFrame",buttonFrame)	
+		iconObject.frame = TeleporterCreateReusableFrame("Frame","TeleporterIconFrame",showAboveFrame)	
 	end
 	
 	if iconObject.icon then
@@ -918,7 +912,7 @@ local function GetRandomHearth(validSpells)
 	local hearthSpells = {}
 	for index, spell in ipairs(validSpells) do
 		if spell.zone == TeleporterHearthString then
-			tinsert(hearthSpells, spell.spellName)
+			tinsert(hearthSpells, spell.spellId)
 		end
 	end
 	if  #hearthSpells > 0 then
@@ -1004,9 +998,7 @@ function TeleporterOpenFrame()
 		local fontFlags = nil 
 		local buttonInset = GetOption("buttonInset")		
 		
-		IsVisible = true
-		NeedUpdate = true
-		OpenTime = GetTime()
+		IsVisible = true		
 
 		if TeleporterParentFrame == nil then
 			CreateMainFrame()			
@@ -1031,7 +1023,11 @@ function TeleporterOpenFrame()
 
 		ButtonSettings = {}
 		
-		SetupSpells()
+		if not SetupSpells() then
+			NeedUpdate = true
+			OpenTime = GetTime()
+		end
+		
 		local SortType = GetOption("sort")
 		if CustomizeSpells then
 			SortType = SortCustom
@@ -1055,7 +1051,7 @@ function TeleporterOpenFrame()
 			
 			local haveSpell = true
 			if spell.zone == TeleporterHearthString and GetOption("randomHearth") then
-				if spellName ~= onlyHearth and not CustomizeSpells then
+				if spellId ~= onlyHearth and not CustomizeSpells then
 					haveSpell = false
 				end
 			end
@@ -1110,7 +1106,7 @@ function TeleporterOpenFrame()
 					buttonFrame:SetScript(
 						"OnEnter",
 						function()
-							TeleporterShowItemTooltip( spellName, buttonFrame )
+							TeleporterShowItemTooltip( spellId, buttonFrame )
 						end )
 				else
 					buttonFrame:SetScript(
@@ -1201,10 +1197,10 @@ function TeleporterOpenFrame()
 				SortUpIconOffset = -iconOffsetX - iconW
 				SortDownIconOffset = -iconOffsetX
 				
-				buttonFrame.RemoveIcon = AddCustomizationIcon(buttonFrame.RemoveIcon, buttonFrame, RemoveIconOffset, iconOffsetY, iconW, iconH, "removeButtonIcon", function() OnClickRemove(spell) end, not spell.isCustom)
-				buttonFrame.ShowIcon = AddCustomizationIcon(buttonFrame.ShowIcon, buttonFrame, ShowIconOffset, iconOffsetY, iconW, iconH, "showButtonIcon", function() OnClickShow(spell) end)				
-				buttonFrame.SortUpIcon = AddCustomizationIcon(buttonFrame.SortUpIcon, buttonFrame, SortUpIconOffset, iconOffsetY, iconW, iconH, "sortUpIcon", function() OnClickSortUp(spell) end)
-				buttonFrame.SortDownIcon = AddCustomizationIcon(buttonFrame.SortDownIcon, buttonFrame, SortDownIconOffset, iconOffsetY, iconW, iconH, "sortDownIcon", function() OnClickSortDown(spell) end)
+				buttonFrame.RemoveIcon = AddCustomizationIcon(buttonFrame.RemoveIcon, buttonFrame, cooldownbar, RemoveIconOffset, iconOffsetY, iconW, iconH, "removeButtonIcon", function() OnClickRemove(spell) end, not spell.isCustom)
+				buttonFrame.ShowIcon = AddCustomizationIcon(buttonFrame.ShowIcon, buttonFrame, cooldownbar, ShowIconOffset, iconOffsetY, iconW, iconH, "showButtonIcon", function() OnClickShow(spell) end)				
+				buttonFrame.SortUpIcon = AddCustomizationIcon(buttonFrame.SortUpIcon, buttonFrame, cooldownbar, SortUpIconOffset, iconOffsetY, iconW, iconH, "sortUpIcon", function() OnClickSortUp(spell) end)
+				buttonFrame.SortDownIcon = AddCustomizationIcon(buttonFrame.SortDownIcon, buttonFrame, cooldownbar, SortDownIconOffset, iconOffsetY, iconW, iconH, "sortDownIcon", function() OnClickSortDown(spell) end)
 				
 				local buttonSetting = { }	
 				buttonSetting.isItem = isItem
@@ -1298,6 +1294,18 @@ function TeleporterClose()
 		end
 		if TeleporterQuickMenuFrame then
 			TeleporterQuickMenuFrame:Hide()
+		end
+	end
+end
+
+local function CacheItems()
+	TomeOfTele_DevCache = {}
+	for index, spell in ipairs(TeleporterSpells) do		
+		if spell.spellType == ST_Item then
+			local item = Item:CreateFromItemID(spell.spellId)
+			item:ContinueOnItemLoad(function()
+				TomeOfTele_DevCache[spell.spellId] = {GetItemInfo(spell.spellId)}
+			end)
 		end
 	end
 end
@@ -1428,15 +1436,14 @@ function Teleporter_OnAddonLoaded()
 	end
 end
 
-function Teleporter_OnUpdate()
-	if IsVisible then	
+function Teleporter_OnUpdate()	
+	if IsVisible then		
 		-- The first time the UI is opened toy ownership may be incorrect. Reopen once it's correct.
-		if NeedUpdate then			
-			-- Assume it's ready after 1 second.
-			if GetTime() > OpenTime + 1 then
-				--TeleporterClose()
-				TeleporterOpenFrame()
+		if NeedUpdate then		
+			-- If it's still wrong then will try again later.
+			if GetTime() > OpenTime + 0.5 then
 				NeedUpdate = false
+				Refresh()			
 			end
 		end
 		TeleporterUpdateAllButtons()		
@@ -1609,7 +1616,6 @@ end
 
 function dataobj:OnClick(button)
 	TeleporterFunction()
-	NeedUpdate = false
 end
 
 function TeleporterAddSpell(id, dest)

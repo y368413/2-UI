@@ -1,4 +1,4 @@
---## Version: 1.0.0 ## Author: Bytespire
+--## Version: 1.1.0 ## Author: Bytespire
 local ItemProfConstants = {}
 
 local COOK = 0x001
@@ -27,10 +27,10 @@ local LEGION =  0x40000
 local BFA =     0x80000
 --]]
 
-ItemProfConstants_VENDOR_ITEM_FLAG = VENDOR
-ItemProfConstants_NUM_PROF_FLAGS = 10	-- Num professions tracked
+ItemProfConstants.VENDOR_ITEM_FLAG = VENDOR
+ItemProfConstants.NUM_PROF_FLAGS = 10	-- Num professions tracked
 
-ItemProfConstants_PROF_TEXTURES = {
+ItemProfConstants.PROF_TEXTURES = {
 [ COOK ] = GetSpellTexture( 2550 ),
 [ FAID ] = GetSpellTexture( 3273 ),
 [ ALC ] = GetSpellTexture( 2259 ),
@@ -44,7 +44,7 @@ ItemProfConstants_PROF_TEXTURES = {
 }
 
 -- Mapping the item IDs to texture indices
-ItemProfConstants_ITEM_PROF_FLAGS = {
+ItemProfConstants.ITEM_PROF_FLAGS = {
 
 [ 118 ] = ALC,
 [ 159 ] = COOK + ENG + VENDOR,
@@ -1493,7 +1493,120 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 
 [ 174327 ] = COOK,
 [ 174328 ] = COOK,
-[ 174353 ] = COOK
+[ 174353 ] = COOK,
+
+-- Shadowlands:
+[ 168583 ] = ALC + INS + LW,
+[ 168586 ] = ALC + INS + LW,
+[ 168589 ] = ALC + INS + LW,
+
+[ 169701 ] = ALC + INS,
+
+[ 170554 ] = ALC + INS + LW,
+
+[ 171276 ] = ALC,
+[ 171285 ] = ALC,
+[ 171286 ] = ALC,
+[ 171287 ] = ALC,
+[ 171288 ] = ALC,
+[ 171289 ] = ALC,
+[ 171290 ] = ALC,
+[ 171291 ] = ALC,
+[ 171292 ] = ALC,
+[ 171315 ] = ALC + INS,
+[ 171428 ] = BS + JC,
+[ 171828 ] = BS + ENG + JC,
+[ 171829 ] = BS + ENG + JC,
+[ 171830 ] = BS + ENG + JC,
+[ 171831 ] = BS + ENG + JC,
+[ 171832 ] = BS + ENG + JC,
+[ 171833 ] = BS + ENC + ENG + JC,
+[ 171840 ] = BS + ENG,
+[ 171841 ] = BS + ENG,
+
+[ 172052 ] = COOK,
+[ 172053 ] = COOK,
+[ 172054 ] = COOK,
+[ 172055 ] = COOK,
+[ 172056 ] = COOK + VENDOR,
+[ 172057 ] = COOK + VENDOR,
+[ 172058 ] = COOK + VENDOR,
+[ 172059 ] = COOK + VENDOR,
+[ 172089 ] = ENG + LW,
+[ 172092 ] = ENG + LW,
+[ 172093 ] = LW,
+[ 172094 ] = LW,
+[ 172095 ] = LW,
+[ 172096 ] = LW,
+[ 172097 ] = ENC + LW,
+[ 172230 ] = ENC + ENG,
+[ 172231 ] = ENC + ENG,
+[ 172232 ] = ENC, 
+[ 172437 ] = BS,
+[ 172438 ] = LW,
+[ 172439 ] = TAIL,
+[ 172930 ] = ENG,
+[ 172934 ] = ENG,
+[ 172935 ] = ENG,
+[ 172936 ] = ENG,
+[ 172937 ] = ENG,
+
+[ 173032 ] = COOK,
+[ 173033 ] = COOK,
+[ 173034 ] = COOK,
+[ 173035 ] = COOK,
+[ 173036 ] = COOK,
+[ 173037 ] = COOK,
+[ 173056 ] = INS,
+[ 173057 ] = INS,
+[ 173058 ] = INS,
+[ 173059 ] = INS,
+[ 173060 ] = INS + VENDOR,
+[ 173108 ] = ENG + JC,
+[ 173109 ] = ENG + JC,
+[ 173110 ] = ENG + JC,
+[ 173121 ] = JC,
+[ 173122 ] = JC,
+[ 173123 ] = JC,
+[ 173124 ] = JC,
+[ 173127 ] = JC,
+[ 173128 ] = JC,
+[ 173129 ] = JC,
+[ 173130 ] = JC,
+[ 173168 ] = JC + VENDOR,
+[ 173170 ] = JC,
+[ 173171 ] = JC,
+[ 173172 ] = JC,
+[ 173173 ] = JC,
+[ 173202 ] = ALC + BS + ENG + TAIL,
+[ 173204 ] = BS + ENC + LW + TAIL,
+
+[ 175788 ] = INS,
+[ 175970 ] = INS,
+
+[ 177061 ] = ENC + ENG + INS + LW,
+[ 177062 ] = ENG + LW + TAIL + VENDOR,
+[ 177840 ] = INS,
+[ 177841 ] = INS,
+[ 177842 ] = INS,
+[ 177843 ] = INS,
+
+[ 178786 ] = COOK + VENDOR,
+[ 178787 ] = BS + JC + LW + TAIL + VENDOR,
+
+[ 179314 ] = COOK,
+[ 179315 ] = COOK,
+
+[ 180457 ] = ALC,
+[ 180732 ] = ALC + INS + VENDOR,
+[ 180733 ] = BS + ENG + VENDOR,
+
+[ 183950 ] = ALC + VENDOR,
+[ 183951 ] = ENC + ENG + VENDOR,
+[ 183952 ] = ENG + VENDOR,
+[ 183953 ] = INS + VENDOR,
+[ 183954 ] = JC + VENDOR,
+[ 183955 ] = LW + VENDOR
 }
 
 local frame = CreateFrame( "Frame" )
@@ -1502,17 +1615,17 @@ local previousItemID = -1
 local itemIcons = ""
 local iconSize
 
-local ITEM_VENDOR_FLAG = ItemProfConstants_VENDOR_ITEM_FLAG
-local ITEM_PROF_FLAGS = ItemProfConstants_ITEM_PROF_FLAGS
-local NUM_PROFS_TRACKED = ItemProfConstants_NUM_PROF_FLAGS
-local PROF_TEXTURES = ItemProfConstants_PROF_TEXTURES
+local ITEM_VENDOR_FLAG = ItemProfConstants.VENDOR_ITEM_FLAG
+local ITEM_PROF_FLAGS = ItemProfConstants.ITEM_PROF_FLAGS
+local NUM_PROFS_TRACKED = ItemProfConstants.NUM_PROF_FLAGS
+local PROF_TEXTURES = ItemProfConstants.PROF_TEXTURES
 
 local showProfs
 local profFilter
 local includeVendor
 
-ItemProfConstants_configTooltipIconsRealm = GetRealmName()
-ItemProfConstants_configTooltipIconsChar = UnitName( "player" )
+ItemProfConstants.configTooltipIconsRealm = GetRealmName()
+ItemProfConstants.configTooltipIconsChar = UnitName( "player" )
 
 
 
@@ -1588,10 +1701,10 @@ end
 
 function ItemProfConstants:ConfigChanged()
 
-	showProfs = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].showProfs
-	profFilter = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].profFlags
-	includeVendor = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].includeVendor
-	iconSize = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].iconSize
+	showProfs = ShiGuangDB[ ItemProfConstants.configTooltipIconsRealm ][ ItemProfConstants.configTooltipIconsChar ].showProfs
+	profFilter = ShiGuangDB[ ItemProfConstants.configTooltipIconsRealm ][ ItemProfConstants.configTooltipIconsChar ].profFlags
+	includeVendor = ShiGuangDB[ ItemProfConstants.configTooltipIconsRealm ][ ItemProfConstants.configTooltipIconsChar ].includeVendor
+	iconSize = ShiGuangDB[ ItemProfConstants.configTooltipIconsRealm ][ ItemProfConstants.configTooltipIconsChar ].iconSize
 	
 	previousItemID = -1		-- Reset line
 end
@@ -1624,7 +1737,7 @@ local configDefaultIconSize = 14
 
 local userVariables
 
-local NUM_PROFS_TRACKED = ItemProfConstants_NUM_PROF_FLAGS
+local NUM_PROFS_TRACKED = ItemProfConstants.NUM_PROF_FLAGS
 
 
 
@@ -1696,8 +1809,8 @@ end
 
 local function InitVariables()
 	
-	local configRealm = ItemProfConstants_configTooltipIconsRealm
-	local configChar = ItemProfConstants_configTooltipIconsChar
+	local configRealm = ItemProfConstants.configTooltipIconsRealm
+	local configChar = ItemProfConstants.configTooltipIconsChar
 
 	if not ShiGuangDB[ configRealm ] then
 		ShiGuangDB[ configRealm ] = {}

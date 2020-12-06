@@ -44,11 +44,31 @@ end
 
 local function handle_tooltip(tooltip, point)
     if point then
-        tooltip:AddLine(point.label)
-        if C_QuestLog.IsQuestFlaggedCompleted(point.quest) then
-            tooltip:AddLine(ACTIVE_PETS, 0, 1, 0) -- Active
-        else
-            tooltip:AddLine(FACTION_INACTIVE, 1, 0, 0) -- Inactive
+        if point.label then
+            tooltip:AddLine(point.label)
+        end
+        if point.achievement then
+            if point.criteria then
+                local criteria, _, complete = GetAchievementCriteriaInfoByID(point.achievement, point.criteria)
+                tooltip:AddLine(criteria,
+                    complete and 0 or 1, complete and 1 or 0, 0
+                )
+                local _, name, _, complete = GetAchievementInfo(point.achievement)
+                tooltip:AddLine(name)
+            else
+                local _, name, _, complete = GetAchievementInfo(point.achievement)
+                tooltip:AddDoubleLine(BATTLE_PET_SOURCE_6, name or point.achievement,
+                    nil, nil, nil,
+                    complete and 0 or 1, complete and 1 or 0, 0
+                )
+            end
+        end
+        if point.quest then
+            if C_QuestLog.IsQuestFlaggedCompleted(point.quest) then
+                tooltip:AddLine(ACTIVE_PETS, 0, 1, 0) -- Active
+            else
+                tooltip:AddLine(FACTION_INACTIVE, 1, 0, 0) -- Inactive
+            end
         end
     else
         tooltip:SetText(UNKNOWN)
@@ -171,6 +191,16 @@ do
         if point.level and point.level ~= currentLevel then
             return false
         end
+        if SuramarTelemancy.db.complete then
+            return true
+        end
+        if point.achievement then
+            if point.criteria then
+                return not select(3, GetAchievementCriteriaInfoByID(point.achievement, point.criteria))
+            else
+                return not select(4, GetAchievementInfo(point.achievement))
+            end
+        end
         if point.hide_after and C_QuestLog.IsQuestFlaggedCompleted(point.hide_after) then
             return false
         end
@@ -211,6 +241,7 @@ SuramarTelemancy.defaults = {
         icon_alpha = 1.0,
         entrances = true,
         upcoming = false,
+	complete = false,
     },
 }
 
@@ -302,11 +333,36 @@ SuramarTelemancy.points = {
         -- entrances
         [27802230] = { quest=43808, entrance=true, label=L["Moon Guard (entrance)"], hide_before=40956, }, -- Moon Guard (entrance)
         [42606170] = { quest=43813, entrance=true, label=L["Sanctum of Order (entrance)"], hide_before=40956, }, -- Sanctum of Order (entrance)
+        --
+        [41703890] = { achievement=10756, criteria=31056, }, -- Anora Hollow (the prerequisite!)
+        [29008480] = { achievement=10756, criteria=31918, }, -- Soul Vaults
+        [59304280] = { achievement=10756, criteria=31914, }, -- Kel'balor
+        [65804190] = { achievement=10756, criteria=31913, }, -- Elor'shan
+        [20405040] = { achievement=10756, criteria=31917, }, -- Falanaar South
+        [21404330] = { achievement=10756, criteria=31916, }, -- Falanaar North
+        [24301940] = { achievement=10756, criteria=31919, }, -- Moon Guard
+        [35702410] = { achievement=10756, criteria=31915, }, -- Moonwhisper Gulch
     },
     [684] = { -- Fal'adore
         [40901350] = { quest=42230, label=L["Falanaar"], hide_before=42228 }, -- Falanaar
     },
     [682] = { -- The Fel Breach
         [53403680] = { quest=41575, label=L["Felsoul Hold"], hide_before=40956 }, -- Felsoul Hold
+    },
+        [685] = { -- Falanaar Tunnels
+        [65105210] = { achievement=10756, criteria=31916, }, -- Falanaar North
+        [58107520] = { achievement=10756, criteria=31917, }, -- Falanaar South
+    },
+    [686] = { -- Elor'shan
+        [46704720] = { achievement=10756, criteria=31913, },
+    },
+    [687] = { -- Kel'balor
+        [52304490] = { achievement=10756, criteria=31914, },
+    },
+    [689] = { -- Ley Station Moonfall, Moonwhisper Gulch
+        [54004470] = { achievement=10756, criteria=31915, },
+    },
+    [690] = { -- Ley Station Aethenar, Moon Guard
+        [48704870] = { achievement=10756, criteria=31919, },
     },
 }

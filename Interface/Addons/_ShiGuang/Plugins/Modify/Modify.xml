@@ -14,11 +14,11 @@
 	<Script file="GotoCroods.lua"/>
 	<Script file="WallpaperKit.lua"/>
 	<Script file="AlterCurrencies.lua"/>
+	<Script file="MogAllArtifacts.lua"/>
 	<Script file="TransmogCostCutter.lua"/>
 	<Script file="TransmogSetProgress.lua"/>
 	<Frame name="TSP_MainBar" virtual="true">
 		<Size y="4"/>
-		
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture parentKey="BGLeft" file="Interface\QuestFrame\ObjectiveTracker">

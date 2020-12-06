@@ -77,8 +77,8 @@ function module:BackgroundLines()
 	local parent = UIParent
 	local width, height = 450, 18
 	local anchors = {
-		[1] = {"TOPLEFT", -3, .5, 0},
-		[2] = {"BOTTOMRIGHT", 3, 0, .5},
+		[1] = {"TOPLEFT", 0, .5, 0},
+		[2] = {"BOTTOMRIGHT", 0, 0, .5},
 	}
 	for _, v in pairs(anchors) do
 		local frame = CreateFrame("Frame", nil, parent)

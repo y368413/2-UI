@@ -1,19 +1,19 @@
 
 ------------------------------------------
---  This addon was heavily inspired by  --
+--  This HandyNotes_PetDailies was heavily inspired by  --
 --    HandyNotes_SummerFestival         --
 --  by Ethan Centaurai                  --
 ------------------------------------------
 
 
 -- declaration
-local HandyNotes_PetDailies = {}
-HandyNotes_PetDailies.points = {}
+local PetDailies = {}
+PetDailies.points = {}
 
 
 -- our db and defaults
 local db
-local defaults = { profile = { completed = false, icon_scale = 1.4, icon_alpha = 0.8 } }
+local defaults = { profile = { completed = false, icon_scale = 1, icon_alpha = 0.8 } }
 
 -- upvalues
 local _G = getfenv(0)
@@ -39,7 +39,7 @@ local WorldMapTooltip = _G.WorldMapTooltip
 local HandyNotes = _G.HandyNotes
 local TomTom = _G.TomTom
 
-local points = HandyNotes_PetDailies.points
+local points = PetDailies.points
 local ADVENTURE = 9069
 local ARGUS = 12088
 local FAMILY = 12100
@@ -48,6 +48,9 @@ local BATTLER = 13279
 local BATTLERALL = {13270, 13271, 13272, 13273, 13274, 13275, 13277, 13278, 13280, 13281 }
 local NUISANCES = 13626
 local MINIONS = 13625
+local ABHORRENT = 14881
+local EXORCIST = 14879
+local EXORCISTALL = {14868, 14869, 14870, 14871, 14872, 14873, 14874, 14875, 14876, 14877 }
 
 local playerfaction = UnitFactionGroup("PLAYER")
 local function showhorde()
@@ -81,7 +84,12 @@ end
 local function IsBattler( questID )
 	return (questID == BATTLER)
 end
-
+local function IsExorcist( questID )
+	return (questID == EXORCIST)
+end
+local function IsAbhorrent( questID )
+	return (questID == ABHORRENT)
+end
 
 local function GetAchieveString(questID, questIndex, achieve)
 	local extra = {}
@@ -113,7 +121,7 @@ local function infoFromCoord(uiMapID, coord)
 	return nametag, extra
 end
 
-function HandyNotes_PetDailies:OnEnter(mapFile, coord)
+function PetDailies:OnEnter(mapFile, coord)
 	local tooltip = self:GetParent() == WorldMapButton and WorldMapTooltip or GameTooltip
 
 	if self:GetCenter() > UIParent:GetCenter() then -- compare X coordinate
@@ -138,24 +146,26 @@ end
 
 local function IsLogged(questID, questIndex)
     if (questIndex > 0 and not IsAdventure(questID) and not IsFamily(questID) and not IsBattler(questID)
-			and not IsArgus(questID) and not IsNuisances(questID) and not IsMinions(questID)) then
+			and not IsArgus(questID) and not IsNuisances(questID) and not IsMinions(questID)
+			and not IsExorcist(questID) and not IsAbhorrent(questID)) then
         local q = GetQuestLogIndexByID(questID)
         return (q ~= nil and q > 0)
     else return true --shouldn't be logged so just say it is
     end
 end
 
-function HandyNotes_PetDailies:IsComplete(questID, questIndex)
-
+function PetDailies:IsComplete(questID, questIndex)
 	if (questIndex > 0 and not IsAdventure(questID) and not IsFamily(questID) and not IsBattler(questID)
-			and not IsArgus(questID) and not IsNuisances(questID) and not IsMinions(questID)) then
+			and not IsArgus(questID) and not IsNuisances(questID) and not IsMinions(questID)
+			and not IsExorcist(questID) and not IsAbhorrent(questID)) then
 		if (IsLogged(questID, questIndex)) then
             local _,_,done = GetQuestLogLeaderBoard(questIndex,GetQuestLogIndexByID(questID))
             return done
         else return true
         end
-	elseif (IsAdventure(questID) or IsFamily(questID) or IsArgus(questID) or IsBattler(questID) or IsNuisances(questID)
-			or IsMinions(questID)) then return false
+	elseif (IsAdventure(questID) or IsFamily(questID) or IsBattler(questID) 
+			or IsArgus(questID) or IsNuisances(questID) or IsMinions(questID)
+			or IsExorcist(questID) or IsAbhorrent(questID)) then return false
 	else return IsQuestFlaggedCompleted(questID)
 	end
 
@@ -217,32 +227,52 @@ local function IsBattlerComplete(questID, questIndex)
 	end
 end
 
+local function IsAbhorrentComplete(questID, questIndex)
+	if (IsAbhorrent( questID ) and db.abhorrent) then
+		local _,_,done = GetAchievementCriteriaInfo(ABHORRENT,questIndex)
+		return done
+	else return true
+	end
+end
+local function IsExorcistComplete(questID, questIndex)
+	if (IsExorcist( questID ) and db.exorcist) then
+		for _,j in ipairs(EXORCISTALL) do
+			local _,_,done = GetAchievementCriteriaInfo(j,questIndex)
+			if (not done) then return false end
+		end
+		return true
+	else return true
+	end
+end
 local function IsCoin( coinReward )
     return (coinReward=="true")
 end
 
 
 local function MatchesFaction( faction )
-    return ( (faction == "both") or (faction == "horde" and showhorde() or (faction == "alliance" and showally())) )
+    return ( (faction == "both") or (faction == "horde" and showhorde() or 
+    	(faction == "alliance" and showally())) )
 end
 
-function HandyNotes_PetDailies:ShouldBeShown( questStr )
+function PetDailies:ShouldBeShown( questStr )
 --local function ShouldBeShown( questStr )
     local questID, questIndex, _, _, coinReward, faction = questStr:match(point_format)
 	questID = tonumber(questID)
 	questIndex = tonumber(questIndex)
     return IsLogged(questID, questIndex) -- true if it doesn't need to be logged or it is still in log
-        and (db.completed or not HandyNotes_PetDailies:IsComplete(questID, questIndex) -- true if you want to show complete or it's not complete
+        and (db.completed or not PetDailies:IsComplete(questID, questIndex) -- true if you want to show complete or it's not complete
 		and (not IsAdventure(questID) or not IsAdventureComplete(questID, questIndex)) -- true if it isn't the Adventure achievement or it isn't completed for Adventure
 		and (not IsArgus(questID) or not IsArgusComplete(questID, questIndex)) -- true if it isn't the Argus achievement or it isn't completed for Argus
 		and (not IsMinions(questID) or not IsMinionsComplete(questID, questIndex)) -- true if it isn't the Minions achievement or it isn't completed for Minions
 		and (not IsNuisances(questID) or not IsNuisancesComplete(questID, questIndex)) -- true if it isn't the Nuisances achievement or it isn't completed for Nuisances
 		and (not IsBattler(questID) or not IsBattlerComplete(questID, questIndex)) -- true if it isn't the Family Battler achievement or it isn't completed for Battler
+		and (not IsAbhorrent(questID) or not IsAbhorrentComplete(questID, questIndex)) -- true if it isn't the Abhorrent achievement or it isn't completed for Abhorrent
+		and (not IsExorcist(questID) or not IsExorcistComplete(questID, questIndex)) -- true if it isn't the Exorcist achievement or it isn't completed for Exorcist
 		and (db.coins or not IsCoin(coinReward)) -- true if you want to show coins or it isn't a coin
         and (MatchesFaction(faction))) -- true if it is your faction or if it doesn't matter
     end
 
-function HandyNotes_PetDailies:OnLeave()
+function PetDailies:OnLeave()
 	if self:GetParent() == WorldMapButton then
 		WorldMapTooltip:Hide()
 	else
@@ -262,14 +292,14 @@ end
 local function createAllWaypoints()
 	for mapFile, coords in next, points do
 		for coord, questStr in next, coords do
-			if ( coord and HandyNotes_PetDailies:ShouldBeShown(questStr) ) then
+			if ( coord and PetDailies:ShouldBeShown(questStr) ) then
 				createWaypoint(mapFile, coord)
 			end
 		end
 	end
 end
 
-function HandyNotes_PetDailies:OnClick(button, down, uMapID, coord)
+function PetDailies:OnClick(button, down, uMapID, coord)
 	if TomTom and button == "RightButton" and not down then
 		if IsControlKeyDown() then
 			createAllWaypoints()
@@ -282,7 +312,7 @@ end
 do
 	local function iter(t, prestate)
 
-		if not HandyNotes_PetDailies.isEnabled then return nil end
+		if not PetDailies.isEnabled then return nil end
 
 		if not t then return nil end
 
@@ -291,7 +321,7 @@ do
 		while state do -- have we reached the end of this zone?
 			local _, _, _, iconstr, _ = value:match(point_format)
 			local icon = "interface\\icons\\"..iconstr
-			if HandyNotes_PetDailies:ShouldBeShown(value) then
+			if PetDailies:ShouldBeShown(value) then
 				return state, mapFile, icon, db.icon_scale, db.icon_alpha
 			end
 
@@ -302,7 +332,7 @@ do
 	end
 
 	local function iterCont(t, prestate)
-		if not HandyNotes_PetDailies.isEnabled then return nil end
+		if not PetDailies.isEnabled then return nil end
 		if not t then return nil end
 
 		local zone = t.Z
@@ -320,7 +350,7 @@ do
 				while state do -- have we reached the end of this zone?
 					local _, _,_, iconstr, _ = value:match(point_format)
 					local icon = "interface\\icons\\"..iconstr
-					if (HandyNotes_PetDailies:ShouldBeShown(value)) then
+					if (PetDailies:ShouldBeShown(value)) then
 						return state, uiMapID, icon, db.icon_scale, db.icon_alpha
 					end
 
@@ -336,7 +366,7 @@ do
 		end
 	end
 
-	function HandyNotes_PetDailies:GetNodes2(uiMapID, miniMap)
+	function PetDailies:GetNodes2(uiMapID, miniMap)
 		local C = HandyNotes:GetContinentZoneList(uiMapID) -- Is this a continent?
 		if C then
 			local tbl = { C = C, Z = next(C) }
@@ -346,7 +376,7 @@ do
 			return iter, points[uiMapID], nil
 		end
 	end
---	function HandyNotes_PetDailies:GetNodes(mapFile)
+--	function PetDailies:GetNodes(mapFile)
 --		print(mapFile)
 --		local C = HandyNotes:GetContinentZoneList(mapFile) -- Is this a continent?
 --
@@ -369,7 +399,7 @@ local options = {
 	get = function(info) return db[info[#info]] end,
 	set = function(info, v)
 		db[info[#info]] = v
-		HandyNotes_PetDailies:Refresh()
+		PetDailies:Refresh()
 	end,
 	args = {
 
@@ -423,7 +453,7 @@ local options = {
 		},
 		nuisances = {
 			name = "Show Nautical Nuisances of Nazjatar",
-			desc = "Show icons for pet tamers you haven't defeated for this achievement.",
+			desc = "Show icons for pets you haven't defeated for this achievement.",
 			type = "toggle",
 			width = "full",
 			arg = "nuisances",
@@ -431,23 +461,39 @@ local options = {
 		},
 		minions = {
 			name = "Show Mighty Minions of Mechagon",
-			desc = "Show icons for pet tamers you haven't defeated for this achievement.",
+			desc = "Show icons for pets you haven't defeated for this achievement.",
 			type = "toggle",
 			width = "full",
 			arg = "minions",
 			order = 6,
 		},
+		exorcist = {
+			name = "Show Family Exorcist",
+			desc = "Show icons for pet tamers you haven't defeated fully for this achievement.",
+			type = "toggle",
+			width = "full",
+			arg = "exorcist",
+			order = 7,
+		},
+		abhorrent = {
+			name = "Show Abhorrent Adversaries",
+			desc = "Show icons for pets you haven't defeated for this achievement.",
+			type = "toggle",
+			width = "full",
+			arg = "abhorrent",
+			order = 8,
+		},
         desc = {
             name = "These settings control the look and feel of the icon.",
             type = "description",
-            order = 7,
+            order = 9,
         },		icon_scale = {
 			type = "range",
 			name = "Icon Scale",
 			desc = "Change the size of the icons.",
 			min = 0.25, max = 2, step = 0.01,
 			arg = "icon_scale",
-			order = 8,
+			order = 10,
 		},
 		icon_alpha = {
 			type = "range",
@@ -455,26 +501,424 @@ local options = {
 			desc = "Change the transparency of the icons.",
 			min = 0, max = 1, step = 0.01,
 			arg = "icon_alpha",
-			order = 9,
+			order = 11,
 		},
 	},
 }
 
 -- initialise
-function HandyNotes_PetDailies:OnEnable()
+function PetDailies:OnEnable()
 	self.isEnabled = true
-	HandyNotes:RegisterPluginDB("HandyNotes_PetDailies", self, options)
+	HandyNotes:RegisterPluginDB("PetDailies", self, options)
 
 	db = LibStub("AceDB-3.0"):New("HandyNotes_PetDailiesDB", defaults, "Default").profile
 end
 
-function HandyNotes_PetDailies:Refresh(_, _)
-	self:SendMessage("HandyNotes_NotifyUpdate", "HandyNotes_PetDailies")
+function PetDailies:Refresh(_, _)
+	self:SendMessage("HandyNotes_NotifyUpdate", "PetDailies")
 end
 
 
 -- activate
-LibStub("AceAddon-3.0"):NewAddon(HandyNotes_PetDailies, "HandyNotes_PetDailies", "AceEvent-3.0")
+LibStub("AceAddon-3.0"):NewAddon(PetDailies, "HandyNotes_PetDailies", "AceEvent-3.0")
+
+
+local HandyNotes_PetDailies = LibStub("AceAddon-3.0"):NewAddon("PetDailies", "AceConsole-3.0", "AceEvent-3.0")
+
+function HandyNotes_PetDailies:handleSlashCommand(msg)
+	if (msg) then
+		if (msg == "list") then
+			HandyNotes_PetDailies.ToggleList()
+		end
+	end
+end
+
+HandyNotes_PetDailies.defaults = { profile = { completed = false } }
+
+function HandyNotes_PetDailies:OnInitialize()
+	HandyNotes_PetDailies:RegisterChatCommand("pd","handleSlashCommand")
+end
+
+
+function HandyNotes_PetDailies:ToggleList()
+	HandyNotes_PetDailies.UI:Show()
+end
+
+local function ParsePoint(id)
+	local point_format = "(%d+)\.([0-9]+):(.+):(.+):(.+):(.*)";
+	return id:match(point_format)
+end
+
+function HandyNotes_PetDailies:BuildData(group)
+	local achieves = {
+		[9069] = true,
+		[12088] = true,
+		[12100] = true,
+		[13279] = true,
+		[13626] = true,
+		[13625] = true
+	}
+	local ADVENTURE = "9069"
+	local ARGUS = "12088"
+	local FAMILY = "12100"
+	local BATTLER = "13279"
+	local NUISANCES = "13626"
+	local MINIONS = "13625"
+	local points_db = HandyNotes_PetDailies.points
+	local map = C_Map.GetBestMapForUnit("player")
+
+	if (group == 1) then
+		self.UI:AddToScroll(self.UI:CreateHeading(C_Map.GetMapInfo(534).name))
+
+		for i, id in pairs(points_db[534]) do
+			if PetDailies:ShouldBeShown(id) then
+				self.UI:AddToScroll(self.UI:CreateScrollGroup(false, ParsePoint(id)))
+			end
+
+		end
+	elseif (group == 2) then
+		self.UI:AddToScroll(self.UI:CreateHeading(C_Map.GetMapInfo(map).name))
+
+		for i, id in pairs(points_db[map]) do
+			if PetDailies:ShouldBeShown(id) then
+				self.UI:AddToScroll(self.UI:CreateScrollGroup(false,ParsePoint(id)))
+			end
+
+		end
+	elseif (group == 3) then
+		self.UI:AddToScroll(self.UI:CreateHeading(C_Map.GetMapInfo(map).name))
+		local achieve = 0
+		local newachieve = 1
+		local idx = 1
+		for i, id in pairs(points_db[map]) do
+			if PetDailies:ShouldBeShown(id) then
+				newachieve, idx = ParsePoint(id)
+				newachieve = newachieve + 0
+				if (achieves[newachieve] == true) then
+					if (achieve ~= newachieve) then
+						local _, txt = GetAchievementInfo(13279)
+						self.UI:AddToScroll(self.UI:CreateHeading(txt))
+					end
+					self.UI:AddToScroll(self.UI:CreateScrollGroup(PetDailies:IsComplete(newachieve, idx+0), ParsePoint(id)))
+				end
+				achieve = newachieve
+			end
+
+		end
+
+	end
+end
+
+HandyNotes_PetDailies.UI = HandyNotes_PetDailies:NewModule("UI", "AceEvent-3.0")
+--HandyNotes_PetDailies.UI.PDUI = HandyNotes_PetDailies:GetModule("PDUI")
+
+local AceGUI = LibStub("AceGUI-3.0")
+--if not AceGUI then
+--    print("no acegui")
+--    return
+--end
+
+function HandyNotes_PetDailies.UI:OnInitialize()
+    self.active_group = false
+    self:Build(false)
+end
+
+function HandyNotes_PetDailies.UI:Build(withDB)
+    local f = AceGUI:Create("Frame")
+    f:SetTitle("Pet Dailies")
+    f:SetWidth(400)
+    f:SetHeight(500)
+    f:SetLayout("Fill")
+    tinsert(UISpecialFrames, f.frame:GetName())
+
+    local container = AceGUI:Create("SimpleGroup")
+    container:SetLayout("Flow")
+    container:SetFullWidth(true)
+    container:SetFullHeight(true)
+    f:AddChild(container)
+
+    local tabs = AceGUI:Create("TabGroup")
+    tabs:SetTabs({
+        {text = "All", value = 1},
+        {text = "Zone", value = 2 },
+        {text = "Achieves", value = 3}
+    })
+    tabs:SetFullWidth(true)
+    tabs:SetCallback("OnGroupSelected", function (container, event, group) self:SelectGroup(container, group) end)
+    container:AddChild(tabs)
+
+    self.frame = f
+    self.tabs = tabs
+    if (withDB) then self:Show()
+    else self.frame:Hide()
+    end
+end
+
+function HandyNotes_PetDailies.UI:ReloadScroll(group)
+    if self.scroll then
+        self.scroll:ReleaseChildren()
+        HandyNotes_PetDailies:BuildData(group)
+    end
+end
+
+function HandyNotes_PetDailies.UI:Show(group)
+    if group ~= nil then
+        print("not nil")
+    elseif self.active_group == false then
+        print("no active")
+        group = 1
+    else
+        print(self.active_group)
+        group = self.active_group
+    end
+
+    self:SelectTab(group)
+    self:ReloadScroll(group)
+    self.frame:Show()
+end
+
+function HandyNotes_PetDailies.UI:SelectTab(group)
+    self.tabs:SelectTab(group)
+end
+
+function HandyNotes_PetDailies.UI:SelectGroup(container, group)
+    local ht = 500
+ 
+    container:ReleaseChildren()
+    self.active_group = group
+
+    --self.frame.statusbar:Hide()
+    --self:HideCheckButtons()
+--    container:SetLayout("Flow")
+    local optionscontainer = AceGUI:Create("SimpleGroup")
+    optionscontainer:SetFullWidth(true)
+    optionscontainer:SetHeight(ht*.3)
+    optionscontainer:SetLayout("Flow")
+    container:AddChild(optionscontainer)
+    self.options = options
+    
+    local scrollcontainer = AceGUI:Create("SimpleGroup")
+    scrollcontainer:SetFullWidth(true)
+    scroll:SetFullHeight(true)
+    scrollcontainer:SetLayout("Fill")
+    container:AddChild(scrollcontainer)
+    
+    local scroll = AceGUI:Create("ScrollFrame")
+--    scroll:SetFullHeight(true)
+    scroll:SetLayout("Flow")
+    scrollcontainer:AddChild(scroll)
+    self.scroll = scroll
+  
+    HandyNotes_PetDailies:BuildData(group)
+end
+
+function HandyNotes_PetDailies.UI:AddToScroll(f)
+    self.scroll:AddChild(f)
+end
+
+function HandyNotes_PetDailies.UI:AddToFilter(f)
+    self.filter:AddChild(f)
+end
+
+function HandyNotes_PetDailies.UI:CreateHeading(text)
+    local heading = AceGUI:Create("Heading")
+    heading:SetText(text)
+    heading:SetFullWidth(true)
+
+    return heading
+end
+
+function HandyNotes_PetDailies.UI:CreateScrollLabel(...)
+    self:AddToScroll(self:CreateLabel(...))
+end
+function HandyNotes_PetDailies.UI:CreateDefScrollLabel(...)
+    self:AddToScroll(self:CreateDefLabel(...))
+end
+
+function HandyNotes_PetDailies.UI:CreateFilterCheckbox(...)
+    self:AddToFilter(self:CreateCheckbox(...))
+end
+
+function HandyNotes_PetDailies.UI:CreateScrollCheckbox(...)
+    self:AddToScroll(self:CreateCheckbox(...))
+end
+
+function HandyNotes_PetDailies.UI:CreateFilterDropdown(...)
+    self:AddToFilter(self:CreateDropdown(...))
+end
+
+function HandyNotes_PetDailies.UI:CreateLabel(text, icon, callbacks)
+    local f = AceGUI:Create("WoWMeLabel")
+    f:SetHighlight("Interface\\QuestFrame\\UI-QuestTitleHighlight")
+    f:SetFontObject(SystemFont_Shadow_Med1)
+    f:SetPoint("Top", 10, 10)
+    f:SetFullWidth(true)
+
+    if text ~= nil then
+        f:SetText(text)
+    end
+    if icon ~= nil then
+        f:SetImage(icon)
+        f:SetImageSize(20, 20)
+    end
+
+    self:AddCallbacks(f, callbacks)
+    return f
+end
+
+function HandyNotes_PetDailies.UI:CreateDefLabel(text, icon, callbacks)
+    local f = AceGUI:Create("WoWMeLabel")
+    f:SetHighlight("Interface\\QuestFrame\\UI-QuestTitleHighlight")
+    f:SetFontObject(SystemFont_Shadow_Med1)
+    f:SetPoint("Top", 10, 10)
+    f:SetFullWidth(true)
+
+    if text ~= nil then
+        f:SetText(text)
+    end
+    if icon ~= nil then
+        f:SetImage(icon)
+        f:SetImageSize(20, 20)
+    end
+
+    self:AddCallbacks(f, callbacks)
+    return f
+end
+
+function HandyNotes_PetDailies.UI:AddCallbacks(f, callbacks)
+    if callbacks ~= nil then
+        for i,v in pairs(callbacks) do
+            f:SetCallback(i, v)
+        end
+    end
+end
+
+function HandyNotes_PetDailies.UI:CreateCheckbox(label, value, callbacks, max_lines, height, enabled)
+    local f = AceGUI:Create("CheckBox")
+
+    if label ~= nil then
+        f:SetLabel(label)
+    end
+    if value ~= nil then
+        f:SetValue(value)
+    end
+    if max_lines ~= nil then
+        f.text:SetMaxLines(max_lines)
+    end
+    if height ~= nil then
+        f:SetHeight(height)
+    end
+    if enabled ~= nil then
+        f:SetDisabled(not enabled)
+    end
+
+    f:SetFullWidth(true)
+    f:SetPoint("Top", 15, 15)
+    self:AddCallbacks(f, callbacks)
+    return f
+end
+    
+function HandyNotes_PetDailies.UI:CreateButton(text)
+    local f = AceGUI:Create("Button")
+    f.frame:SetHeight(20)
+    f:SetHeight(20)
+    f:SetWidth(130)
+    f:SetText(text)
+--    f:ClearAllPoints()
+--    f.buton("BOTTOMRIGHT", f.frame, "BOTTOMRIGHT", -30)
+    f:SetCallback("OnClick", function () WayList:Map(id) end)
+    return f
+end
+
+function HandyNotes_PetDailies.UI:CreateScrollButton( ... )
+self:AddToScroll(self:CreateButton(...))
+--    local xbutton = self:CreateButton("Set Waypoints", self.scroll)
+--    xbutton:SetScript("OnClick", function () WayList:Map(id) end)
+--    xbutton:SetWidth(25)
+--    xbutton:ClearAllPoints()
+--    xbutton:SetPoint("RIGHT")
+end
+
+function HandyNotes_PetDailies.UI:CreateDropdown(label, list, value, callbacks, multiselect, order)
+    local f = AceGUI:Create("Dropdown")
+    f:SetLabel(label)
+    f:SetList(list, order)
+    if multiselect ~= nil then
+        f:SetMultiselect(multiselect)
+    end
+    f.label:ClearAllPoints()
+    f.label:SetPoint("LEFT", 10, 15)
+    f.dropdown:ClearAllPoints()
+    f.dropdown:SetPoint("TOPLEFT",f.frame,"TOPLEFT",-10,-15)
+    f.dropdown:SetPoint("BOTTOMRIGHT",f.frame,"BOTTOMRIGHT",17,0)
+    if type(value) == "table" then
+        for i = 1,#value do
+            f:SetValue(value[i])
+            f:SetItemValue(value[i], true)
+        end
+    else
+        f:SetValue(value)
+    end
+
+    self:AddCallbacks(f, callbacks)
+    return f
+end
+
+function HandyNotes_PetDailies.UI:CreateScrollGroup(iscomplete, _,_,tag,i_path,_)
+
+    local l = AceGUI:Create("InteractiveLabel")
+    l:SetText(tag)
+    if (iscomplete) then l:SetColor(0,153,0) else l:SetColor(255,255,0) end
+    l:SetFullWidth(true)
+    --l:SetFont(12)
+    l:SetImage("interface\\icons\\"..i_path)
+    l:SetImageSize(25,25)
+    return l
+
+--    opts:SetLayout("Flow")
+--    opts:SetWidth(350)
+--    opts:ClearAllPoints()
+--    opts:SetPoint("LEFT")
+--
+--    --local _, desc = GetAchievementInfo( id )
+--
+--    local icon = AceGUI:Create("Icon")
+--    icon:SetImage("interface\\icons\\"..i_path)
+--    icon:SetImageSize(25,25)--leftContainer.frame:GetWidth()-20, 249)
+--    icon:SetDisabled(true)
+--    opts:AddChild(icon)
+--
+--    local f = AceGUI:Create("Label")
+--    --    f:SetHighlight("Interface\\QuestFrame\\UI-QuestTitleHighlight")
+--    f:SetFontObject(SystemFont_Shadow_Med1)
+--    f:SetPoint("LEFT")
+--    --    f:SetHeight(15)
+--    f:SetRelativeWidth(.9)
+--    f:SetText(tag)
+--    opts:AddChild( f )
+
+--    local modelContainer = AceGUI:Create("InlineGroup")
+--    modelContainer.frame:SetBackdropColor(1,1,1,0)
+--    modelContainer:SetWidth(leftContainer.frame:GetWidth()-20)
+--    modelContainer:SetHeight(249)
+--    modelContainer:SetLayout("Flow")
+
+--    local WayList = WoWMe:GetModule("WayList")
+--    local btn = AceGUI:Create("Button")
+--    btn:SetHeight(20)
+--    btn:SetWidth(130)
+--    btn:SetText("Set Waypoints")
+--    btn:SetCallback("OnClick", function () WayList:SetWays(id) end)
+--    btn:SetPoint("RIGHT")
+--    opts:AddChild(btn)
+
+--    return opts
+end
+
+
+
+
+local points = PetDailies.points
 
 
 local ADVENTURE = "9069"
@@ -483,6 +927,9 @@ local FAMILY = "12100"
 local BATTLER = "13279"
 local NUISANCES = "13626"
 local MINIONS = "13625"
+local EXORCIST = "14879"
+local ABHORRENT = "14881"
+--local SHBATTLE = "14625"
 
 --To find map id for points[mmm] = /run print(C_Map.GetBestMapForUnit("player"))
 
@@ -490,6 +937,60 @@ local MINIONS = "13625"
 --xxxx is the x waypoint coordinate as in 33.50
 --yyyy is the y waypoint coordinate as in 33.50
 --qqqqq.q is the quest id where the decimal portion is the series number if the quest must be in the quest log
+
+-----------------
+-- Shadowlands World Quests & Achievements--
+-----------------
+--Bastion
+points[1533] = {
+	[34806280] = EXORCIST..".9:Stratios:inv_misc_bag_33:false:both",
+--	[34816281] = SHBATTLE..".15:Stratios:inv_misc_bag_33:false:both",
+	[51405820] = EXORCIST..".7:Zolla:inv_misc_bag_33:false:both",
+--	[51415821] = SHBATTLE..".14:Zolla:inv_misc_bag_33:false:both",
+	--[36603180] = SHBATTLE..".16:Jawbone:inv_misc_bag_33:false:both",
+	[54605620] = EXORCIST..".8:Thenia:inv_misc_bag_33:false:both",
+--	[54615621] = SHBATTLE..".13:Thenia:inv_misc_bag_33:false:both",
+	[52607420] = ABHORRENT..".1:Crystalsnap:inv_pet_batpetrevendreth_red:false:both",
+	[25803080] = ABHORRENT..".7:Digallo:inv_pet_batpetrevendreth_red:false:both",
+	[46604920] = ABHORRENT..".9:Kostos:inv_pet_batpetrevendreth_red:false:both",
+}
+--Maldraxxus
+points[1536] = {
+	[46805000] = EXORCIST..".6:Caregiver Maxamillian:inv_misc_bag_33:false:both",
+--	[46815001] = SHBATTLE..".12:Caregiver Maxamillian:inv_misc_bag_33:false:both",
+	[34005520] = EXORCIST..".4:Rotgut:inv_misc_bag_33:false:both",
+--	[34015521] = SHBATTLE..".11:Rotgut:inv_misc_bag_33:false:both",
+	[63204680] = EXORCIST..".5:Dundley Stickyfingers:inv_misc_bag_33:false:both",
+--	[63214681] = SHBATTLE..".10:Dundley Stickyfingers:inv_misc_bag_33:false:both",
+--	[54002800] = SHBATTLE..".9:Gorgemouth:inv_pet_achievement_pandaria:false:both",
+	[61807180] = ABHORRENT..".8:Gelatinous:inv_pet_batpetrevendreth_red:false:both",
+	[26602680] = ABHORRENT..".10:Glurp:inv_pet_batpetrevendreth_red:false:both",
+}
+--Revendreth
+points[1525] = {
+--	[25203800] = SHBATTLE..".8:Scorch:inv_misc_bag_33:false:both",
+	[40005260] = EXORCIST..".1:Sylla:inv_misc_bag_33:false:both",
+--	[40015261] = SHBATTLE..".7:Sylla:inv_pet_achievement_pandaria:false:both",
+	[67606600] = EXORCIST..".2:Eyegor:inv_misc_bag_33:false:both",
+--	[67616601] = SHBATTLE..".6:Eyegor:inv_misc_bag_33:false:both",
+	[61204100] = EXORCIST..".3:Addius the Tormentor:inv_misc_bag_33:false:both",
+--	[61214101] = SHBATTLE..".5:Addius the Tormentor:inv_pet_achievement_pandaria:false:both",
+	[25602360] = ABHORRENT..".5:Sewer Creeper:inv_pet_batpetrevendreth_red:false:both",
+	[52804160] = ABHORRENT..".6:The Countess:inv_pet_batpetrevendreth_red:false:both",
+}
+--Ardenweald
+points[1565] = {
+	[58205680] = EXORCIST..".10:Glitterdust:inv_misc_bag_33:false:both",
+--	[58215681] = SHBATTLE..".4:Glitterdust:inv_misc_bag_33:false:both",
+--	[40006440] = SHBATTLE..".3:Nightfang:inv_pet_achievement_pandaria:false:both",
+	[51204400] = EXORCIST..".11:Faryl:inv_misc_bag_33:false:both",
+--	[51214401] = SHBATTLE..".2:Faryl:inv_misc_bag_33:false:both",
+--	[40202880] = SHBATTLE..".1:Rascal:inv_misc_bag_33:false:both",
+	[26606200] = ABHORRENT..".3:Chittermaw:inv_pet_batpetrevendreth_red:false:both",
+	[34204460] = ABHORRENT..".2:Briarpaw:inv_pet_batpetrevendreth_red:false:both",
+	[49804160] = ABHORRENT..".4:Mistwing:inv_pet_batpetrevendreth_red:false:both",
+}	
+
 -- -- (Beasts of Fable Books)
 --------------
 -- Tanaan --
@@ -597,7 +1098,7 @@ points[118] = {
 	[77401961] =	ADVENTURE..".23:Major Payne:inv_tailoring_elekkplushie:false:both",
 }
 --ShadowmoonValley
-points[539] = {
+points[104] = {
 	[30404180] =	"31926.0:Blood Master Antari:inv_misc_bag_cenarionherbbag:false:both",
 	[30404181] =	ADVENTURE..".5:Bloodknight Antari:inv_tailoring_elekkplushie:false:both",
 }
@@ -950,3 +1451,6 @@ points[1462] = {
 	[39504010] = MINIONS..".7:Unit 6:inv_mechanicalprairiedog_black:false:both",
 	[72107290] = MINIONS..".8:Unit 17:inv_mechanicalprairiedog_black:false:both"
 }
+
+
+HandyNotes_PetDailies.points = points

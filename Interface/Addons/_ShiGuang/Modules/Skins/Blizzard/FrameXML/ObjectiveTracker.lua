@@ -199,3 +199,9 @@ tinsert(R.defaultThemes, function()
 		end
 	end]]
 end)
+local mawBuffsBlock = _G.ScenarioBlocksFrame.MawBuffsBlock
+local list = mawBuffsBlock and mawBuffsBlock.Container.List
+if list then
+list:ClearAllPoints()
+list:SetPoint("TOPLEFT", mawBuffsBlock.Container, "TOPRIGHT", 10, 0)
+end
