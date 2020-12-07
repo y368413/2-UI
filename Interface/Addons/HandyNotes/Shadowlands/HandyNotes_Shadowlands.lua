@@ -7171,7 +7171,7 @@ map.nodes[40705959] = BonusBoss({
 -------------------------------------------------------------------------------
 
 local BonusEvent = Class('BonusEvent', Shadowlands.node.Quest, {
-    icon = 'peg_wy',
+    icon = 'peg_yw',
     scale = 1.8,
     group = Shadowlands.groups.BONUS_EVENT,
     note = ''

@@ -10,7 +10,10 @@ local DeathKnight = MaxDps_DeathKnightTable.DeathKnight;
 local defaultOptions = {
 	unholyApocalypseAsCooldown = false,
 	unholyDarkTransformationAsCooldown = false,
-	unholyUnholyFrenzyAsCooldown = false,
+	unholyUnholyAssaultAsCooldown = false,
+	shackleTheUnworthyAsCooldown = false,
+	abominationLimbAsCooldown = true,
+	swarmingMistAsCooldown = false,
 };
 
 function DeathKnight:GetConfig()
@@ -19,7 +22,7 @@ function DeathKnight:GetConfig()
 		database     = self.db,
 		rows         = {
 			[1] = {
-				outlaw = {
+				unholy = {
 					type = 'header',
 					label = 'Unholy options'
 				}
@@ -39,9 +42,36 @@ function DeathKnight:GetConfig()
 				},
 			},
 			[4] = {
-				unholyUnholyFrenzyAsCooldown = {
+				unholyUnholyAssaultAsCooldown = {
 					type   = 'checkbox',
-					label  = 'Unholy Frenzy as cooldown',
+					label  = 'Unholy Assault as cooldown',
+					column = 12
+				},
+			},
+			[5] = {
+				covenant = {
+					type = 'header',
+					label = 'Covenant ability options'
+				}
+			},
+			[6] = {
+				shackleTheUnworthyAsCooldown = {
+					type   = 'checkbox',
+					label  = 'Shackle The Unworthy as cooldown',
+					column = 12
+				},
+			},
+			[7] = {
+				abominationLimbAsCooldown = {
+					type   = 'checkbox',
+					label  = 'Abomination Limb as cooldown',
+					column = 12
+				},
+			},
+			[8] = {
+				swarmingMistAsCooldown = {
+					type   = 'checkbox',
+					label  = 'Swarming Mist as cooldown',
 					column = 12
 				},
 			},

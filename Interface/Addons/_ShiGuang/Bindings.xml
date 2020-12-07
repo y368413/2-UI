@@ -15,4 +15,9 @@
 	</Binding>
 	<Binding name="TARGETCLASSBUTTON_FOLLOW" category="BINDING_HEADER_ACE3"> FollowUnit("target") </Binding>
 	<Binding name="TARGETCLASSBUTTON_COMPARE_ACHIEVEMENTS" category="BINDING_HEADER_ACE3"> InspectAchievements("target") </Binding>
+	<Binding name= "COVENANTFORGE_BINDING_TOGGLE_SOULBINDS" hidden="false" header="COVENANTFORGE" category="BINDING_HEADER_ACE3">
+		if UIParentLoadAddOn("Blizzard_Soulbinds") then
+		SoulbindViewer:Open();
+	end	
+	</Binding>
 </Bindings>
