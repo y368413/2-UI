@@ -9,6 +9,7 @@ local Warlock = MaxDps_WarlockTable.Warlock;
 local MaxDps = MaxDps;
 local UnitPower = UnitPower;
 local GetTime = GetTime;
+local GetTotemInfo = GetTotemInfo;
 local Necrolord = Enum.CovenantType.Necrolord;
 local Venthyr = Enum.CovenantType.Venthyr;
 local NightFae = Enum.CovenantType.NightFae;
@@ -41,6 +42,12 @@ local DE = {
 	DemonicPower         = 265273,
 
 	Felstorm = 89751
+};
+
+local TotemIcons = {
+	[1616211] = 'Vilefiend',
+	[136216]  = 'Felguard',
+	[1378282] = 'Dreadstalker'
 };
 
 setmetatable(DE, Warlock.spellMeta);
@@ -82,9 +89,6 @@ function Warlock:Demonology()
 		soulShards = soulShards + 2;
 	elseif currentSpell == DE.SummonDemonicTyrant then
 		soulShards = 5;
-		if talents[DE.DemonicConsumption] then
-			wildImps = 0;
-		end
 	end
 
 	if soulShards < 0 then
@@ -160,14 +164,14 @@ function Warlock:Demonology()
 	if targets > 1 and
 		not talents[DE.SacrificedSouls] and
 		wildImps >= 8 and
-		not buff[DE.Tyrant].up and
+		not tyrantUp and
 		cooldown[DE.SummonDemonicTyrant].remains > 5
 	then
 		return DE.Implosion;
 	end
 
 	-- implosion,if=active_enemies>2&buff.wild_imps.stack>=8&buff.tyrant.down;
-	if targets > 2 and wildImps >= 8 and not buff[DE.Tyrant].up then
+	if targets > 2 and wildImps >= 8 and not tyrantUp then
 		return DE.Implosion;
 	end
 
@@ -288,6 +292,7 @@ function Warlock:DemonologySummonTyrant()
 	local talents = fd.talents;
 	local soulShards = fd.soulShards;
 	local wildImps = fd.wildImps;
+	local pets = Warlock:Pets();
 
 	-- hand_of_guldan,if=soul_shard=5,line_cd=20;
 	if soulShards == 5 then -- currentSpell ~= DE.HandOfGuldan and
@@ -295,9 +300,9 @@ function Warlock:DemonologySummonTyrant()
 	end
 
 	-- demonbolt,if=buff.demonic_core.up&(talent.demonic_consumption.enabled|buff.nether_portal.down),line_cd=20;
-	if buff[DE.DemonicCoreAura].up and (talents[DE.DemonicConsumption] or not buff[DE.NetherPortal].up) then
-		return DE.Demonbolt;
-	end
+	--if buff[DE.DemonicCoreAura].up and (talents[DE.DemonicConsumption] or not buff[DE.NetherPortal].up) then
+	--	return DE.Demonbolt;
+	--end
 
 	-- shadow_bolt,if=buff.wild_imps.stack+incoming_imps<4&(talent.demonic_consumption.enabled|buff.nether_portal.down),line_cd=20;
 	--if --currentSpell ~= DE.ShadowBolt and
@@ -318,12 +323,14 @@ function Warlock:DemonologySummonTyrant()
 		return DE.HandOfGuldan;
 	end
 
+	local vilefiendRemains = pets.Vilefiend;
+	local felguardRemains = pets.Felguard;
 	-- demonbolt,if=buff.demonic_core.up&buff.nether_portal.up&((buff.vilefiend.remains>5|!talent.summon_vilefiend.enabled)&(buff.grimoire_felguard.remains>5|buff.grimoire_felguard.down));
 	if buff[DE.DemonicCoreAura].up and
 		buff[DE.NetherPortal].up and
 		(
-			(buff[DE.Vilefiend].remains > 5 or not talents[DE.SummonVilefiend]) and
-			(buff[DE.GrimoireFelguard].remains > 5 or not buff[DE.GrimoireFelguard].up)
+			(vilefiendRemains > 5 or not talents[DE.SummonVilefiend]) and
+			(felguardRemains > 5 or felguardRemains <= 0)
 		)
 	then
 		return DE.Demonbolt;
@@ -333,8 +340,8 @@ function Warlock:DemonologySummonTyrant()
 	if --currentSpell ~= DE.ShadowBolt and
 		buff[DE.NetherPortal].up and
 		(
-			(buff[DE.Vilefiend].remains > 5 or not talents[DE.SummonVilefiend]) and
-			(buff[DE.GrimoireFelguard].remains > 5 or not buff[DE.GrimoireFelguard].up)
+			(vilefiendRemains > 5 or not talents[DE.SummonVilefiend]) and
+			(felguardRemains > 5 or felguardRemains <= 0)
 		)
 	then
 		return DE.ShadowBolt;
@@ -425,4 +432,25 @@ function Warlock:DemonologyTyrantPrep()
 	--if soulShards >= 1 and currentSpell ~= DE.HandOfGuldan then
 		return DE.HandOfGuldan;
 	--end
+end
+
+function Warlock:Pets()
+	local pets = {
+		Vilefiend = 0,
+		Felguard = 0,
+		Dreadstalker = 0
+	};
+
+	for index = 1, MAX_TOTEMS do
+		local hasTotem, totemName, startTime, duration, icon = GetTotemInfo(index);
+		if hasTotem then
+			local totemUnifiedName = TotemIcons[icon];
+			if totemUnifiedName then
+				local remains = startTime + duration - GetTime();
+				pets[totemUnifiedName] = remains;
+			end
+		end
+	end
+
+	return pets;
 end

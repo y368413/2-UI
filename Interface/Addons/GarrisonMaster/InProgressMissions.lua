@@ -1,4 +1,4 @@
-﻿--## Version: 9.0.27 ## Author: lteke
+﻿--## Version: 9.0.28 ## Author: lteke
 local InProgressMissions = {}
 
 InProgressMissions.frame = InProgressMissions.frame or CreateFrame("Frame", nil, _G.WorldFrame)
@@ -6,6 +6,7 @@ InProgressMissions.events = InProgressMissions.events or {}
 
 local MISSION_BUTTON_HEIGHT = 37
 local MISSION_ICON_SIZE = MISSION_BUTTON_HEIGHT - 4
+local MISSION_REWARD_SIZE = MISSION_BUTTON_HEIGHT * 0.78
 
 local FORMAT_DURATION_DAYS = _G.GARRISON_DURATION_DAYS:gsub("([^|]*)|4[^:]+:([^;]+);(.*)", "%1%2%3"):gsub("%%d", "%%.1f")
 local FORMAT_DURATION_HOURS = _G.GARRISON_DURATION_HOURS:gsub("([^|]*)|4[^:]+:([^;]+);(.*)", "%1%2%3"):gsub("%%d", "%%.1f")
@@ -562,10 +563,14 @@ local function ScrollFrame_UpdateItems()
 		button.MissionTypeIcon:ClearAllPoints()
 		button.MissionTypeIcon:SetPoint("LEFT", button, 2, 0)
 		button.MissionTypeIcon:SetSize(MISSION_ICON_SIZE, MISSION_ICON_SIZE)
-		--button.Level:SetShown(isTabProgress)
-		--button.NumFollowers:SetShown(isTabProgress)
-		button.Rewards[1]:SetPoint("RIGHT", isTabProgress and -68 or -5, -0)
-		--button.BG:SetVertexColor(0.9, 0.9, 0.9)
+		for i = 1, #button.Rewards do
+			button.Rewards[i]:ClearAllPoints()
+			if i == 1 then
+				button.Rewards[i]:SetPoint("RIGHT", isTabProgress and -68 or -5, -0)
+			else
+				button.Rewards[i]:SetPoint("RIGHT", button.Rewards[i - 1], "LEFT", - MISSION_REWARD_SIZE / 11, 0)
+			end
+		end
 		if isTabProgress then
 			button.Status:SetPoint("BOTTOMRIGHT", -8, 3)
 		end
@@ -901,7 +906,6 @@ function InProgressMissions:MissionButton_SetStyle()
 		end
 	end
 	HybridScrollFrame_CreateButtons(self.listScroll, "GarrisonLandingPageReportMissionTemplate", 0, 0)
-	local rewardSize = MISSION_BUTTON_HEIGHT * 0.78
 	for k, button in pairs(self.listScroll.buttons) do
 		if type(button) == "table" and button:GetObjectType() == "Button" then
 			button:SetHeight(MISSION_BUTTON_HEIGHT)
@@ -931,16 +935,11 @@ function InProgressMissions:MissionButton_SetStyle()
 			button.BG:SetPoint("TOPLEFT", button, 0, 0)
 			button.BG:SetPoint("BOTTOMRIGHT", button, 0, 0.725)
 			for i = 1, #button.Rewards do
-				if i == 1 then
-					-- button.Rewards[i]:SetPoint("RIGHT", -82, -1)
-				else
-					button.Rewards[i]:SetPoint("RIGHT", button.Rewards[i - 1], "LEFT", - rewardSize / 11, 0)
-				end
-				button.Rewards[i]:SetSize(rewardSize, rewardSize)
-				button.Rewards[i].Icon:SetSize(rewardSize * 0.92, rewardSize * 0.92)
+				button.Rewards[i]:SetSize(MISSION_REWARD_SIZE, MISSION_REWARD_SIZE)
+				button.Rewards[i].Icon:SetSize(MISSION_REWARD_SIZE * 0.92, MISSION_REWARD_SIZE * 0.92)
 				for j, r in pairs({button.Rewards[i]:GetRegions()}) do
 					if r:GetObjectType() == "Texture" and r:GetAtlas() then
-						r:SetSize(rewardSize * 1.1, rewardSize * 1.1)
+						r:SetSize(MISSION_REWARD_SIZE * 1.1, MISSION_REWARD_SIZE * 1.1)
 					end
 				end
 				button.Rewards[i].Quantity:SetFontObject("GarrisonReportFontRewardQuantity")
@@ -950,8 +949,6 @@ function InProgressMissions:MissionButton_SetStyle()
 				button.Rewards[i].IconBorder:ClearAllPoints()
 				button.Rewards[i].IconBorder:SetPoint("TOPLEFT", 1, -1)
 				button.Rewards[i].IconBorder:SetPoint("BOTTOMRIGHT", -1, 1)
-				-- button.Rewards[i].IconBorder:SetAlpha(1)
-				-- button.Rewards[i].IconBorder:Hide()
 				button.Rewards[i].Success = button.Rewards[i]:CreateFontString(nil, "ARTWORK", "GarrisonReportFontRewardQuantity")
 				button.Rewards[i].Success:SetPoint("TOPLEFT", -2, 2)
 				button.Rewards[i].Success:SetTextColor(0.9, 0.9, 0.9)

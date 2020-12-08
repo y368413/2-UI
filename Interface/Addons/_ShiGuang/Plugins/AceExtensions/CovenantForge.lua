@@ -648,7 +648,7 @@ CovenantForge.Soulbinds ={
 }
 
 CovenantForge.Weights ={
-	["Pre Raid"]={
+	["PreRaid"]={
 		[255] ={{{"Power",1,145,158,171,184,200,213,226,},{"Flame Infusion",0,-5,-5,-5,-3,-5,-7,-11,},{"Strength of the Pack",0,43,39,53,58,66,76,78,},{"Enfeebled Mark",0,58,63,71,82,83,93,98,},{"Pointed Courage (Kleia)",135,0,0,0,0,0,0,0,},{"Stinging Strike",0,38,37,38,51,45,51,62,},{"Deadly Tandem",0,21,21,21,28,35,34,35,},{"Hammer of Genesis (Mikanikos)",2,0,0,0,0,0,0,0,},{"Bron's Call to Action (Mikanikos)",60,0,0,0,0,0,0,0,},{"Combat Meditation (Pelagos)",72,0,0,0,0,0,0,0,},},{{"Power",1,145,158,171,184,200,213,226,},{"Flame Infusion",0,2,1,-2,-2,4,2,-3,},{"Strength of the Pack",0,43,52,58,59,67,77,82,},{"Stinging Strike",0,37,39,42,41,50,51,52,},{"Deadly Tandem",0,22,27,27,35,40,40,44,},{"Empowered Release",0,44,45,47,41,49,43,45,},{"Built for War (Draven)",110,0,0,0,0,0,0,0,},{"Dauntless Duelist (Nadjia)",107,0,0,0,0,0,0,0,},{"Thrill Seeker (Nadjia)",79,0,0,0,0,0,0,0,},{"Refined Palate (Theotar)",69,0,0,0,0,0,0,0,},{"Soothing Shade (Theotar)",51,0,0,0,0,0,0,0,},{"Superior Tactics (Draven)",-4,0,0,0,0,0,0,0,},{"Exacting Preparation (Nadjia)",10,0,0,0,0,0,0,0,},{"Wasteland Propriety (Theotar)",37,0,0,0,0,0,0,0,},},{{"Power",1,145,158,171,184,200,213,226,},{"Flame Infusion",0,-3,5,2,0,3,-5,4,},{"Spirit Attunement",0,65,72,66,70,77,77,71,},{"Deadly Tandem",0,23,30,33,33,36,40,35,},{"Stinging Strike",0,37,41,43,50,57,55,67,},{"Strength of the Pack",0,50,54,61,75,73,84,92,},{"Wild Hunt Tactics (Korayn)",87,0,0,0,0,0,0,0,},{"Niya's Tools: Poison (Niya)",4,0,0,0,0,0,0,0,},{"Field of Blossoms (Dreamweaver)",125,0,0,0,0,0,0,0,},{"Niya's Tools: Burrs (Niya)",182,0,0,0,0,0,0,0,},{"First Strike (Korayn)",27,0,0,0,0,0,0,0,},{"Niya's Tools: Herbs (Niya)",3,0,0,0,0,0,0,0,},{"Social Butterfly (Dreamweaver)",55,0,0,0,0,0,0,0,},{"Grove Invigoration (Niya)",90,0,0,0,0,0,0,0,},},{{"Power",1,145,158,171,184,200,213,226,},{"Flame Infusion",0,3,2,0,-3,3,4,2,},{"Strength of the Pack",0,46,50,56,67,69,76,82,},{"Stinging Strike",0,37,42,49,56,59,60,58,},{"Deadly Tandem",0,29,27,35,39,44,45,50,},{"Necrotic Barrage",0,9,13,15,17,22,21,23,},{"Forgeborne Reveries (Heirmir)",90,0,0,0,0,0,0,0,},{"Gnashing Chompers (Emeni)",13,0,0,0,0,0,0,0,},{"Plaguey's Preemptive Strike (Marileth)",27,0,0,0,0,0,0,0,},{"Heirmir's Arsenal: Marrowed Gemstone (Heirmir)",75,0,0,0,0,0,0,0,},{"Lead by Example (Emeni)",66,0,0,0,0,0,0,0,},},},
 		[262] ={{{"Power",1,145,158,171,184,200,213,226,},{"Pyroclastic Shock",0,31,38,41,43,47,52,61,},{"High Voltage",0,13,15,14,22,23,24,23,},{"Shake the Foundations",0,4,2,9,10,1,4,4,},{"Elysian Dirge",0,40,35,40,40,42,47,42,},{"Combat Meditation (Pelagos)",89,0,0,0,0,0,0,0,},{"Hammer of Genesis (Mikanikos)",10,0,0,0,0,0,0,0,},{"Bron's Call to Action (Mikanikos)",45,0,0,0,0,0,0,0,},{"Call of Flame",0,68,65,72,78,73,76,79,},{"Pointed Courage (Kleia)",148,0,0,0,0,0,0,0,},},{{"Power",1,145,158,171,184,200,213,226,},{"Lavish Harvest",0,8,11,5,10,10,3,8,},{"High Voltage",0,12,13,24,15,11,10,17,},{"Shake the Foundations",0,1,9,-4,9,6,2,1,},{"Pyroclastic Shock",0,34,40,40,44,46,45,48,},{"Call of Flame",0,64,73,73,76,77,80,76,},{"Built for War (Draven)",150,0,0,0,0,0,0,0,},{"Dauntless Duelist (Nadjia)",113,0,0,0,0,0,0,0,},{"Thrill Seeker (Nadjia)",71,0,0,0,0,0,0,0,},{"Soothing Shade (Theotar)",75,0,0,0,0,0,0,0,},{"Wasteland Propriety (Theotar)",34,0,0,0,0,0,0,0,},{"Superior Tactics (Draven)",5,0,0,0,0,0,0,0,},{"Exacting Preparation (Nadjia)",29,0,0,0,0,0,0,0,},{"Refined Palate (Theotar)",82,0,0,0,0,0,0,0,},},{{"Power",1,145,158,171,184,200,213,226,},{"Essential Extraction",0,27,28,29,36,43,28,36,},{"Pyroclastic Shock",0,33,32,40,41,39,48,53,},{"High Voltage",0,13,15,13,12,16,9,8,},{"Social Butterfly (Dreamweaver)",54,0,0,0,0,0,0,0,},{"Shake the Foundations",0,0,-2,0,0,-8,4,0,},{"Field of Blossoms (Dreamweaver)",90,0,0,0,0,0,0,0,},{"Niya's Tools: Burrs (Niya)",164,0,0,0,0,0,0,0,},{"First Strike (Korayn)",8,0,0,0,0,0,0,0,},{"Call of Flame",0,65,65,69,71,64,67,78,},{"Grove Invigoration (Niya)",107,0,0,0,0,0,0,0,},{"Niya's Tools: Herbs (Niya)",6,0,0,0,0,0,0,0,},{"Niya's Tools: Poison (Niya)",1,0,0,0,0,0,0,0,},{"Wild Hunt Tactics (Korayn)",112,0,0,0,0,0,0,0,},},{{"Power",1,145,158,171,184,200,213,226,},{"Tumbling Waves",0,27,24,27,30,32,46,38,},{"High Voltage",0,17,23,22,27,25,19,29,},{"Pyroclastic Shock",0,32,34,37,42,43,43,48,},{"Shake the Foundations",0,4,5,3,10,9,8,9,},{"Gnashing Chompers (Emeni)",4,0,0,0,0,0,0,0,},{"Lead by Example (Emeni)",87,0,0,0,0,0,0,0,},{"Plaguey's Preemptive Strike (Marileth)",28,0,0,0,0,0,0,0,},{"Heirmir's Arsenal: Marrowed Gemstone (Heirmir)",85,0,0,0,0,0,0,0,},{"Call of Flame",0,83,84,80,85,86,85,86,},{"Forgeborne Reveries (Heirmir)",128,0,0,0,0,0,0,0,},},},
 		[62] ={{{"Power",1,145,158,171,184,200,213,226,},{"Artifice of the Archmage",0,10,2,10,15,9,9,4,},{"Ire of the Ascended",0,58,70,76,88,86,99,100,},{"Pointed Courage (Kleia)",172,0,0,0,0,0,0,0,},{"Nether Precision",0,23,23,22,28,29,36,32,},{"Arcane Prodigy",0,26,32,28,21,66,63,65,},{"Combat Meditation (Pelagos)",97,0,0,0,0,0,0,0,},{"Hammer of Genesis (Mikanikos)",14,0,0,0,0,0,0,0,},{"Bron's Call to Action (Mikanikos)",39,0,0,0,0,0,0,0,},{"Magi's Brand",0,63,75,88,93,96,104,109,},},{{"Power",1,145,158,171,184,200,213,226,},{"Artifice of the Archmage",0,4,3,12,3,4,10,3,},{"Magi's Brand",0,74,77,86,93,102,108,111,},{"Nether Precision",0,22,30,29,36,40,39,43,},{"Superior Tactics (Draven)",4,0,0,0,0,0,0,0,},{"Exacting Preparation (Nadjia)",11,0,0,0,0,0,0,0,},{"Arcane Prodigy",0,50,38,46,50,83,84,82,},{"Siphoned Malice",0,71,59,67,75,80,87,98,},{"Thrill Seeker (Nadjia)",50,0,0,0,0,0,0,0,},{"Refined Palate (Theotar)",51,0,0,0,0,0,0,0,},{"Soothing Shade (Theotar)",71,0,0,0,0,0,0,0,},{"Wasteland Propriety (Theotar)",93,0,0,0,0,0,0,0,},{"Built for War (Draven)",155,0,0,0,0,0,0,0,},{"Dauntless Duelist (Nadjia)",118,0,0,0,0,0,0,0,},},{{"Power",1,145,158,171,184,200,213,226,},{"Artifice of the Archmage",0,1,7,2,-2,7,-10,-1,},{"Magi's Brand",0,78,84,80,89,102,101,122,},{"Nether Precision",0,12,20,25,25,28,35,37,},{"Discipline of the Grove",0,37,51,50,79,87,89,101,},{"Niya's Tools: Herbs (Niya)",-8,0,0,0,0,0,0,0,},{"Arcane Prodigy",0,36,31,35,31,31,34,26,},{"Niya's Tools: Poison (Niya)",-3,0,0,0,0,0,0,0,},{"Wild Hunt Tactics (Korayn)",158,0,0,0,0,0,0,0,},{"Niya's Tools: Burrs (Niya)",138,0,0,0,0,0,0,0,},{"Grove Invigoration (Niya)",61,0,0,0,0,0,0,0,},{"Field of Blossoms (Dreamweaver)",28,0,0,0,0,0,0,0,},{"Social Butterfly (Dreamweaver)",62,0,0,0,0,0,0,0,},{"First Strike (Korayn)",0,0,0,0,0,0,0,0,},},{{"Power",1,145,158,171,184,200,213,226,},{"Artifice of the Archmage",0,4,8,1,8,6,10,11,},{"Gift of the Lich",0,45,42,51,49,60,58,61,},{"Nether Precision",0,26,24,33,34,39,41,38,},{"Arcane Prodigy",0,36,45,45,36,76,85,78,},{"Plaguey's Preemptive Strike (Marileth)",17,0,0,0,0,0,0,0,},{"Heirmir's Arsenal: Marrowed Gemstone (Heirmir)",118,0,0,0,0,0,0,0,},{"Gnashing Chompers (Emeni)",-2,0,0,0,0,0,0,0,},{"Forgeborne Reveries (Heirmir)",116,0,0,0,0,0,0,0,},{"Lead by Example (Emeni)",133,0,0,0,0,0,0,0,},{"Magi's Brand",0,75,76,84,88,90,103,111,},},},
@@ -878,10 +878,6 @@ function CovenantForge.Init:CreateSoulbindFrames()
 		CovenantForge:Hook(button, "OnSelected", function() CovenantForge:Update() end , true)
 
 		local f = CreateFrame("Frame", "CovForge_Souldbind"..buttonIndex, button, "CovenantForge_SoulbindInfoTemplate")
-		--local soulbindID = button:GetSoulbindID()
-		--f.soulbindName:SetText(C_Soulbinds.GetSoulbindData(soulbindID).name)
-		--local nodeTotal, conduitTotal = CovenantForge:GetSoulbindWeight(soulbindID)
-		--f.soulbindWeight:SetText(nodeTotal + conduitTotal .. "["..nodeTotal.."]" )
 		button.ForgeInfo = f
 	end
 
@@ -900,6 +896,7 @@ function CovenantForge.Init:CreateSoulbindFrames()
 
 	--Spec Selection Dropdown
 	local frame = AceGUI:Create("SimpleGroup")
+	frame.frame:SetParent(SoulbindViewer)
 	frame:SetHeight(20)
 	frame:SetWidth(125)
 	frame:SetPoint("TOP",SoulbindViewer,"TOP", 105, -33)
@@ -932,7 +929,12 @@ function CovenantForge:Update()
 
 
 	for buttonIndex, button in ipairs(SoulbindViewer.SelectGroup.buttonGroup:GetButtons()) do
-		local f = button.ForgeInfo
+		local f = button.ForgeInfo 
+		if not f then 
+			f = CreateFrame("Frame", "CovForge_Souldbind"..buttonIndex, button, "CovenantForge_SoulbindInfoTemplate")
+			button.ForgeInfo = f
+		end
+
 		local soulbindID = button:GetSoulbindID()
 		f.soulbindName:SetText(C_Soulbinds.GetSoulbindData(soulbindID).name)
 		local selectedTotal, unlockedTotal, nodeMax, conduitMax = CovenantForge:GetSoulbindWeight(soulbindID)
@@ -943,7 +945,7 @@ function CovenantForge:Update()
 		if curentsoulbindID == soulbindID then 
 			--CovenantForge.CovForge_WeightTotalFrame.Weight:SetText("Base: %s/%s\nCurrent: %s/%s":format(unlockedMax, nodeMax, selectedNodeTotal + selectedConduitTotal, conduitMax + unlockedMax))
 		
-			CovenantForge.CovForge_WeightTotalFrame.Weight:SetText("Current: "..selectedTotal.."/"..unlockedTotal.."\nMax Possible:"..nodeMax+conduitMax)
+			CovenantForge.CovForge_WeightTotalFrame.Weight:SetText(selectedTotal.."/"..unlockedTotal.."\nMax:"..nodeMax+conduitMax)
 		end
 
 	end
@@ -1048,9 +1050,9 @@ function CovenantForge:BuildWeightData()
 	local _, _, classID = UnitClass("player")
 	local covenantID = C_Covenants.GetActiveCovenantID();
 	local classSpecs = CLASS_SPECS[classID]
-	if CovenantForge.Weights["Pre Raid"][specID] then 
 		for i,spec in ipairs(classSpecs) do
-			local data = CovenantForge.Weights["Pre Raid"][spec][covenantID]
+		if (CovenantForge.Weights["PreRaid"][spec]) and (UnitLevel("player") == MAX_PLAYER_LEVEL) then 
+			local data = CovenantForge.Weights["PreRaid"][spec][covenantID]
 			Weights[spec] =  {}
 			for i=2, #data do
 				local conduitData = data[i]
@@ -1062,7 +1064,6 @@ function CovenantForge:BuildWeightData()
 				end
 				Weights[spec][name] = ilevel
 			end
-
 		end
 	end
 end
@@ -1220,7 +1221,7 @@ end
 	local classSpecs = specID[classID]
 	for i,spec in ipairs(classSpecs) do
 
-	--CovenantForge.Weights["Pre Raid"][specID][covenantID]
+	--CovenantForge.Weights["PreRaid"][specID][covenantID]
 end
 
 end 

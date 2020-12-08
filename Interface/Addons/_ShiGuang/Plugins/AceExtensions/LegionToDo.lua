@@ -1,6 +1,6 @@
 ﻿--## Author: ykiigor  ## SavedVariables: VLegionToDo
-local LegionToDoVersion = "4.4"
-local VERSION_NUMERIC = 44
+local LegionToDoVersion = "4.6"
+local VERSION_NUMERIC = 46
 
 local GetCurrentRegion
 do
@@ -268,6 +268,13 @@ tinsert(ToDoFunc,function(self,collect)
 		self:AddTexture(texturePath)
 	end
 	collect.anima = amount
+
+	local name, amount, texturePath, earnedThisWeek, weeklyMax, totalMax, isDiscovered, quality = GetCurrencyInfo(1810)
+	if isLevel60 then
+		self:AddDoubleLine(name, amount, 1,1,1)
+		self:AddTexture(texturePath)
+	end
+	collect.rsouls = amount
 
 	local name, amount, texturePath, earnedThisWeek, weeklyMax, totalMax, isDiscovered, quality = GetCurrencyInfo(1792)
 	collect.honor = amount
@@ -706,6 +713,34 @@ tinsert(ToDoFunc,function(self,collect)
 	]]
 end)
 
+
+tinsert(ToDoFunc,function(self,collect)
+	local curr = time()
+	
+	local currentMissions = C_Garrison.GetAvailableMissions(Enum.GarrisonFollowerType.FollowerType_9_0)
+	
+	if currentMissions then
+		for i=1,#currentMissions do
+			if currentMissions[i].missionID == 2250 then
+				if currentMissions[i].offerEndTime then
+					collect.s.ashmission = currentMissions[i].offerEndTime - GetTime() + curr - 2 * 24 * 60 * 60
+
+				end
+			end
+		end
+	end
+
+	local ashmission = collect.s.ashmission
+	if ashmission then
+		while ashmission < curr do
+			ashmission = ashmission + (3 * 24 * 60 * 60)
+		end
+
+		self:AddDoubleLine("Next Ash mission", date("%d.%m.%Y %H:%M",ashmission), 1,1,1,1,1,1)
+	end
+end)
+
+
 --ELib:Frame(UIParent):SetScript('OnUpdate',function()local q=GetMouseFocus()if not q or not q.link then DInfo'nil' return end DInfo(q.link:gsub("\124","I"))end)
 local instances = {
 	707,740,767,716,727,762,721,777,726,800,860,900,945,
@@ -1000,17 +1035,26 @@ tinsert(ToDoFunc,function(self,collect)
 				self:AddDoubleLine("         Reset in",strDiff,1,1,1)
 			end
 		
-			collect["bounty"..i] = fNameStr1.." "..bountyStr
-			collect["bounty"..i.."end"] = time() + diff * 60
+			collect.s["bounty"..i] = fNameStr1.." "..bountyStr
+			collect.s["bounty"..i.."end"] = time() + diff * 60
 		end
 	end
 end)
+
+local function calling_sort(a,b)
+	return (C_TaskQuest.GetQuestTimeLeftMinutes(a.questID or 0) or 0) < (C_TaskQuest.GetQuestTimeLeftMinutes(b.questID or 0) or 0)
+end
 
 local CallingsUpdater = CreateFrame("Frame")
 CallingsUpdater:SetScript("OnEvent", function(self, event, ...)
 	if event == "COVENANT_CALLINGS_UPDATED" and self.collect then
 		local calling = ...
 		if calling then
+			self.collect.s.bounty1 = nil
+			self.collect.s.bounty2 = nil
+			self.collect.s.bounty3 = nil
+
+			sort(calling,calling_sort)
 			for i=1,#calling do
 				local d = calling[i]
 				
@@ -1034,8 +1078,8 @@ CallingsUpdater:SetScript("OnEvent", function(self, event, ...)
 				local diff = C_TaskQuest.GetQuestTimeLeftMinutes(d.questID)
 			
 				if diff then
-					self.collect["bounty"..i] = fNameStr1.." "..bountyStr
-					self.collect["bounty"..i.."end"] = time() + diff * 60
+					self.collect.s["bounty"..i] = fNameStr1.." "..bountyStr
+					self.collect.s["bounty"..i.."end"] = time() + diff * 60
 				end
 			end
 		end
@@ -1054,9 +1098,9 @@ tinsert(ToDoFunc,function(self,collect)
 	if not CallingsPrev or now - CallingsPrev > 1 then
 		CallingsPrev = now
 		CallingsUpdater.collect = collect
-		collect.bounty1 = nil
-		collect.bounty2 = nil
-		collect.bounty3 = nil
+		--collect.bounty1 = nil
+		--collect.bounty2 = nil
+		--collect.bounty3 = nil
 		C_CovenantCallings.RequestCallings()
 	end
 end)
@@ -1247,6 +1291,8 @@ local factionsToWatch = {
 	2410,
 	2413,
 	2407,
+
+	2432,
 }
 
 tinsert(ToDoFunc,function(self,collect)
@@ -1260,6 +1306,7 @@ tinsert(ToDoFunc,function(self,collect)
 				collect["reputation"..factionID.."c"] = mod(currentValue,threshold) + (hasRewardPending and threshold or 0)
 				collect["reputation"..factionID.."m"] = threshold
 				collect["reputation"..factionID.."p"] = true
+				collect["reputation"..factionID.."e"] = nil
 				
 				isAdded = true
 			end
@@ -1279,6 +1326,12 @@ tinsert(ToDoFunc,function(self,collect)
 					collect["reputation"..factionID.."c"] = 999
 					collect["reputation"..factionID.."m"] = 999
 				end
+
+				if factionID == 2432 and (standingID <= 4) then
+					collect["reputation"..factionID.."e"] = standingID
+				else
+					collect["reputation"..factionID.."e"] = nil
+				end
 				
 				isAdded = true
 			end
@@ -1286,7 +1339,8 @@ tinsert(ToDoFunc,function(self,collect)
 		if not isAdded then
 			collect["reputation"..factionID.."c"] = nil
 			collect["reputation"..factionID.."m"] = nil
-			collect["reputation"..factionID.."p"] = nil	
+			collect["reputation"..factionID.."p"] = nil
+			collect["reputation"..factionID.."c"] = nil
 		end
 	end
 end)
@@ -1401,6 +1455,20 @@ tinsert(ToDoFunc,function(self,collect)
 	collect.torghast2 = torghast2
 end)
 
+
+tinsert(ToDoFunc,function(self,collect)
+	if C_QuestLog.IsQuestFlaggedCompleted(63414) then
+		collect.wrathofthejailer = true
+	else
+		collect.wrathofthejailer = nil
+	end
+
+	if C_QuestLog.IsQuestFlaggedCompleted(63180) or C_QuestLog.IsQuestFlaggedCompleted(63194) then
+		collect.mawhunt = true
+	else
+		collect.mawhunt = nil
+	end
+end)
 
 
 
@@ -2302,6 +2370,9 @@ LegionToDo:SetScript("OnShow",function(self)
 	local name, _, texturePath = GetCurrencyInfo(1813)
 	count = LineUpdate(count,"anima",name,texturePath)
 
+	local name, _, texturePath = GetCurrencyInfo(1810)
+	count = LineUpdate(count,"rsouls",name,texturePath)
+
 
 	count = LineUpdate(count,"miniVision","Mini Vision")
 	count = LineUpdate(count,"visionReward","Vision Reward")
@@ -2332,6 +2403,9 @@ LegionToDo:SetScript("OnShow",function(self)
 	count = LineUpdate(count,"warfront","Warfront: Stromgarde")
 
 	count = LineUpdate(count,"warfrontHC","Warfront HC: Stromgarde")
+
+	count = LineUpdate(count,"wrathofthejailer","Maw: Wrath of the Jailer")
+	count = LineUpdate(count,"mawhunt","Maw: The Hunt")
 
 	local name, _, texturePath = GetCurrencyInfo(1166)
 	count = LineUpdate(count,"timewarped",name,texturePath)
@@ -2539,6 +2613,19 @@ LegionToDo:SetScript("OnShow",function(self)
 				needDailiyReset = true
 			end
 
+
+			local thursdayReset = GetCurrentRegion() == 2 and thursdayResetDay0EU or thursdayResetDay0US
+			while thursdayReset < currTime do
+				thursdayReset = thursdayReset + 302400
+			end
+			local prevReset = thursdayReset - 302400
+
+			local needHalfWeekReset = false
+
+			if db.t < prevReset then
+				needHalfWeekReset = true
+			end
+
 			
 			for i=1,#lines do
 				if lines[i].cols[col] then
@@ -2628,6 +2715,11 @@ LegionToDo:SetScript("OnShow",function(self)
 			if not optData["anima"] or OPTIONS_TOGGLED then
 				lineCount = lineCount + 1
 				lines[lineCount].cols[col]:SetText(db.anima or "0")
+			end
+
+			if not optData["rsouls"] or OPTIONS_TOGGLED then
+				lineCount = lineCount + 1
+				lines[lineCount].cols[col]:SetText(db.rsouls or "0")
 			end
 
 			if not optData["miniVision"] or OPTIONS_TOGGLED  then
@@ -2746,6 +2838,25 @@ LegionToDo:SetScript("OnShow",function(self)
 				lineCount = lineCount + 1
 				lines[lineCount].cols[col]:SetText(db.warfrontHC and "|cff00ff00Done" or "|cffff0000Not done")				
 			end
+
+			if not optData["wrathofthejailer"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				if needReset then
+					lines[lineCount].cols[col]:SetText("|cffff0000Not done")
+				else
+					lines[lineCount].cols[col]:SetText(db.wrathofthejailer and "|cff00ff00Done" or "|cffff0000Not done")	
+				end			
+			end
+
+			if not optData["mawhunt"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				if needHalfWeekReset then
+					lines[lineCount].cols[col]:SetText("|cffff0000Not done")
+				else
+					lines[lineCount].cols[col]:SetText(db.mawhunt and "|cff00ff00Done" or "|cffff0000Not done")	
+				end			
+			end
+
 
 			if not optData["timewarped"] or OPTIONS_TOGGLED  then
 				lineCount = lineCount + 1				
@@ -2955,9 +3066,9 @@ LegionToDo:SetScript("OnShow",function(self)
 			for i=1,3 do
 				if not optData["bounty"..i] or OPTIONS_TOGGLED  then
 					lineCount = lineCount + 1
-					local t = (db["bounty"..i] or ""):gsub(":0|t",":18|t")
+					local t = (db.s and db.s["bounty"..i] or ""):gsub(":0|t",":18|t")
 					lines[lineCount].cols[col]:SetText(t)
-					if db["bounty"..i.."end"] and db["bounty"..i.."end"] < currTime then
+					if db.s and db.s["bounty"..i.."end"] and db.s["bounty"..i.."end"] < currTime then
 						local icon = t:gsub("|t.*$","|t")
 						lines[lineCount].cols[col]:SetText(icon.." |cffffff00expired")
 					end
@@ -2970,7 +3081,7 @@ LegionToDo:SetScript("OnShow",function(self)
 					lineCount = lineCount + 1
 					local r = ""
 					if db["reputation"..factionID.."c"] then
-						r = (db["reputation"..factionID.."p"] and (db["reputation"..factionID.."c"] > db["reputation"..factionID.."m"] and "|cff00ff00" or "") or db["reputation"..factionID.."c"] == -36000 and "|cff666666" or "|cffffff00")..db["reputation"..factionID.."c"].."/"..db["reputation"..factionID.."m"]
+						r = (db["reputation"..factionID.."p"] and (db["reputation"..factionID.."c"] > db["reputation"..factionID.."m"] and "|cff00ff00" or "") or db["reputation"..factionID.."c"] == -36000 and "|cff666666" or "|cffffff00")..db["reputation"..factionID.."c"].."/"..db["reputation"..factionID.."m"]..(db["reputation"..factionID.."e"] and " ["..db["reputation"..factionID.."e"].."]" or "")
 					
 					end
 					lines[lineCount].cols[col]:SetText(r)					

@@ -24,7 +24,7 @@ function Warlock:Enable()
 		MaxDps.NextSpell = Warlock.Affliction;
 	elseif MaxDps.Spec == 2 then
 		MaxDps.NextSpell = Warlock.Demonology;
-		self:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED', 'CLEU');
+		--self:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED', 'CLEU');
 	elseif MaxDps.Spec == 3 then
 		MaxDps.NextSpell = Warlock.Destruction;
 	end

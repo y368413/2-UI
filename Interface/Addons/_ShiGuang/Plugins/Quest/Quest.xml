@@ -4,6 +4,7 @@
 	<Script file="bfaPetQuest.lua"/>
 	<Script file="DarkmoonFaire.lua"/>
 	<Script file="AngryWorldQuest.lua"/>
+	<Script file="KayrCovenantMissions.lua"/>
 	<Script file="WorldMapQuestRewardIcon.lua"/>
 
     <Button name="QuestBindingsButtonTemplate" virtual="true">

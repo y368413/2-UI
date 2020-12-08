@@ -1,4 +1,4 @@
---## Author: Urtgard  ## Version: v9.0.1-12
+--## Author: Urtgard  ## Version: v9.0.2-1
 WQAchievements = LibStub("AceAddon-3.0"):NewAddon("WQAchievements", "AceConsole-3.0", "AceTimer-3.0")
 local WQA = WQAchievements
 WQA.data = {}
@@ -401,7 +401,6 @@ function WQA:slash(input)
 	local arg1 = string.lower(input)
 	if arg1 == "" then
 		self:Show()
-		--self:CheckWQ()
 	elseif arg1 == "new" then
 		self:Show("new")
 	elseif arg1 == "popup" then
@@ -2811,7 +2810,6 @@ WQA.EmissaryQuestIDList = {
 		--2391, -- Rustbolt Resistance
 		{id = 56119, faction = "Alliance"}, -- Waveblade Ankoan
 		{id = 56120, faction = "Horde"}, -- The Unshackled
-
 	},
 }
 
