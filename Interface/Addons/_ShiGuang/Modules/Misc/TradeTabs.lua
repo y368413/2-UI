@@ -4,7 +4,7 @@ local MISC = M:GetModule("Misc")
 
 local pairs, unpack, tinsert, select = pairs, unpack, tinsert, select
 local GetSpellCooldown, GetSpellInfo, GetItemCooldown, GetItemCount, GetItemInfo = GetSpellCooldown, GetSpellInfo, GetItemCooldown, GetItemCount, GetItemInfo
-local IsPassiveSpell, IsCurrentSpell, CastSpell, IsPlayerSpell = IsPassiveSpell, IsCurrentSpell, CastSpell, IsPlayerSpell
+local IsPassiveSpell, IsCurrentSpell, IsPlayerSpell = IsPassiveSpell, IsCurrentSpell, IsPlayerSpell
 local GetProfessions, GetProfessionInfo, GetSpellBookItemInfo = GetProfessions, GetProfessionInfo, GetSpellBookItemInfo
 local PlayerHasToy, C_ToyBox_IsToyUsable, C_ToyBox_GetToyInfo = PlayerHasToy, C_ToyBox.IsToyUsable, C_ToyBox.GetToyInfo
 local C_TradeSkillUI_GetOnlyShowSkillUpRecipes, C_TradeSkillUI_SetOnlyShowSkillUpRecipes = C_TradeSkillUI.GetOnlyShowSkillUpRecipes, C_TradeSkillUI.SetOnlyShowSkillUpRecipes
@@ -28,15 +28,18 @@ local onlyPrimary = {
 function MISC:UpdateProfessions()
 	local prof1, prof2, _, fish, cook = GetProfessions()
 	local profs = {prof1, prof2, fish, cook}
+
 	if I.MyClass == "DEATHKNIGHT" then
-		MISC:TradeTabs_Create(nil, RUNEFORGING_ID)
+		MISC:TradeTabs_Create(RUNEFORGING_ID)
 	elseif I.MyClass == "ROGUE" and IsPlayerSpell(PICK_LOCK) then
-		MISC:TradeTabs_Create(nil, PICK_LOCK)
+		MISC:TradeTabs_Create(PICK_LOCK)
 	end
+
 	local isCook
 	for _, prof in pairs(profs) do
 		local _, _, _, _, numSpells, spelloffset, skillLine = GetProfessionInfo(prof)
 		if skillLine == 185 then isCook = true end
+
 		numSpells = onlyPrimary[skillLine] and 1 or numSpells
 		if numSpells > 0 then
 			for i = 1, numSpells do
@@ -44,19 +47,20 @@ function MISC:UpdateProfessions()
 				if not IsPassiveSpell(slotID, BOOKTYPE_PROFESSION) then
 					local spellID = select(2, GetSpellBookItemInfo(slotID, BOOKTYPE_PROFESSION))
 					if i == 1 then
-						MISC:TradeTabs_Create(slotID, spellID)
+						MISC:TradeTabs_Create(spellID)
 					else
-						MISC:TradeTabs_Create(nil, spellID)
+						MISC:TradeTabs_Create(spellID)
 					end
 				end
 			end
 		end
 	end
+
 	if isCook and PlayerHasToy(CHEF_HAT) and C_ToyBox_IsToyUsable(CHEF_HAT) then
-		MISC:TradeTabs_Create(nil, nil, CHEF_HAT)
+		MISC:TradeTabs_Create(nil, CHEF_HAT)
 	end
 	if GetItemCount(THERMAL_ANVIL) > 0 then
-		MISC:TradeTabs_Create(nil, nil, nil, THERMAL_ANVIL)
+		MISC:TradeTabs_Create(nil, nil, THERMAL_ANVIL)
 	end
 end
 
@@ -64,6 +68,7 @@ function MISC:TradeTabs_Update()
 	for _, tab in pairs(tabList) do
 		local spellID = tab.spellID
 		local itemID = tab.itemID
+
 		if IsCurrentSpell(spellID) then
 			tab:SetChecked(true)
 			tab.cover:Show()
@@ -71,6 +76,7 @@ function MISC:TradeTabs_Update()
 			tab:SetChecked(false)
 			tab.cover:Hide()
 		end
+
 		local start, duration
 		if itemID then
 			start, duration = GetItemCooldown(itemID)
@@ -83,12 +89,8 @@ function MISC:TradeTabs_Update()
 	end
 end
 
-function MISC:TradeTabs_OnClick()
-	CastSpell(self.slotID, BOOKTYPE_PROFESSION)
-end
-
 local index = 1
-function MISC:TradeTabs_Create(slotID, spellID, toyID, itemID)
+function MISC:TradeTabs_Create(spellID, toyID, itemID)
 	local name, _, texture
 	if toyID then
 		_, name, texture = C_ToyBox_GetToyInfo(toyID)
@@ -97,26 +99,25 @@ function MISC:TradeTabs_Create(slotID, spellID, toyID, itemID)
 	else
 		name, _, texture = GetSpellInfo(spellID)
 	end
+
 	local tab = CreateFrame("CheckButton", nil, TradeSkillFrame, "SpellBookSkillLineTabTemplate, SecureActionButtonTemplate")
 	tab.tooltip = name
-	tab.slotID = slotID
 	tab.spellID = spellID
 	tab.itemID = toyID or itemID
 	tab.type = (toyID and "toy") or (itemID and "item") or "spell"
-	if slotID then
-		tab:SetScript("OnClick", MISC.TradeTabs_OnClick)
-	else
-		tab:SetAttribute("type", tab.type)
-		tab:SetAttribute(tab.type, name)
-	end
+	tab:SetAttribute("type", tab.type)
+	tab:SetAttribute(tab.type, spellID or name)
 	tab:SetNormalTexture(texture)
 	tab:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
 	tab:Show()
+
 	tab.CD = CreateFrame("Cooldown", nil, tab, "CooldownFrameTemplate")
 	tab.CD:SetAllPoints()
+
 	tab.cover = CreateFrame("Frame", nil, tab)
 	tab.cover:SetAllPoints()
 	tab.cover:EnableMouse(true)
+
 	tab:SetPoint("TOPLEFT", TradeSkillFrame, "TOPRIGHT", 3, -index*42)
 	tinsert(tabList, tab)
 	index = index + 1

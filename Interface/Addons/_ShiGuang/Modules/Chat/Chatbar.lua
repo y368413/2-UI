@@ -388,22 +388,21 @@ function module:Chatbar()
 		local channelName, channelID, channels = WORLD_CHANNEL_NAME
 		local wc = AddButton(255/255, 200/255, 150/255, "世")  --U["World Channel"]
 
+		local function updateChannelInfo()
+			local id = GetChannelName(channelName)
+			if not id or id == 0 then
+				wc.inChannel = false
+				channelID = nil
+				--wc.Icon:SetVertexColor(1, .1, .1)
+			else
+				wc.inChannel = true
+				channelID = id
+				--wc.Icon:SetVertexColor(0, .8, 1)
+			end
+		end
+
 		local function isInChannel(event)
-			C_Timer.After(.1, function()
-				channels = {GetChannelList()}
-				for i = 1, #channels do
-					if channels[i] == channelName then
-						wc.inChannel = true
-						channelID = channels[i-1]
-						break
-					end
-				end
-				--if wc.inChannel then
-					--wc.Icon:SetVertexColor(0, .8, 1)
-				--else
-					--wc.Icon:SetVertexColor(1, .1, .1)
-				--end
-			end)
+			C_Timer.After(.2, updateChannelInfo)
 
 			if event == "PLAYER_ENTERING_WORLD" then
 				M:UnregisterEvent(event, isInChannel)
@@ -411,6 +410,7 @@ function module:Chatbar()
 		end
 		M:RegisterEvent("PLAYER_ENTERING_WORLD", isInChannel)
 		M:RegisterEvent("CHANNEL_UI_UPDATE", isInChannel)
+		hooksecurefunc("ChatConfigChannelSettings_UpdateCheckboxes", isInChannel) -- toggle in chatconfig
 
 		wc:SetScript("OnClick", function(_, btn)
 			if wc.inChannel then

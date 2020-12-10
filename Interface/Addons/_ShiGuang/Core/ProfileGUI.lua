@@ -16,7 +16,7 @@ StaticPopupDialogs["RESET_NDUI"] = {
 	OnAccept = function()
 		MaoRUIPerDB = {}
 		MaoRUIDB = {}
-		MaoRUIPlusDB = {}
+		MaoRUISetDB = {}
 		ReloadUI()
 	end,
 	whileDead = 1,
@@ -51,11 +51,11 @@ StaticPopupDialogs["NDUI_DOWNLOAD_PROFILE"] = {
 	OnAccept = function()
 		local profileIndex = MaoRUIDB["ProfileIndex"][myFullName]
 		if G.currentProfile == 1 then
-			MaoRUIPlusDB[profileIndex-1] = MaoRUIPerDB
+			MaoRUISetDB[profileIndex-1] = MaoRUIPerDB
 		elseif profileIndex == 1 then
-			MaoRUIPerDB = MaoRUIPlusDB[G.currentProfile-1]
+			MaoRUIPerDB = MaoRUISetDB[G.currentProfile-1]
 		else
-			MaoRUIPlusDB[profileIndex-1] = MaoRUIPlusDB[G.currentProfile-1]
+			MaoRUISetDB[profileIndex-1] = MaoRUISetDB[G.currentProfile-1]
 		end
 		ReloadUI()
 	end,
@@ -70,7 +70,7 @@ StaticPopupDialogs["NDUI_UPLOAD_PROFILE"] = {
 		if G.currentProfile == 1 then
 			MaoRUIPerDB = R.db
 		else
-			MaoRUIPlusDB[G.currentProfile-1] = R.db
+			MaoRUISetDB[G.currentProfile-1] = R.db
 		end
 	end,
 	whileDead = 1,
@@ -190,7 +190,7 @@ function G:CreateProfileBar(parent, index)
 	bar:SetPoint("TOPLEFT", 10, -10 - 45*(index-1))
 	bar:SetSize(600, 40)
 	bar.index = index
-	
+
 	local icon = CreateFrame("Frame", nil, bar)
 	icon:SetSize(32, 32)
 	icon:SetPoint("LEFT", 5, 0)

@@ -52,6 +52,7 @@ module:RegisterDebuff(TIER, INSTANCE, 0, 322487) -- 过度生长
 module:RegisterDebuff(TIER, INSTANCE, 0, 323137) -- 迷乱花粉
 module:RegisterDebuff(TIER, INSTANCE, 0, 328756) -- 憎恨之容
 module:RegisterDebuff(TIER, INSTANCE, 0, 321828) -- 肉饼蛋糕
+module:RegisterDebuff(TIER, INSTANCE, 0, 340191) -- 再生辐光
 
 INSTANCE = 1188 -- 彼界
 RegisterSeasonSpells(INSTANCE)
@@ -77,6 +78,7 @@ module:RegisterDebuff(TIER, INSTANCE, 0, 317661) -- 险恶毒液
 module:RegisterDebuff(TIER, INSTANCE, 0, 328331) -- 严刑逼供
 module:RegisterDebuff(TIER, INSTANCE, 0, 323195) -- 净化冲击波
 module:RegisterDebuff(TIER, INSTANCE, 0, 328453) -- 压迫
+module:RegisterDebuff(TIER, INSTANCE, 0, 331997) -- 心能澎湃
 
 INSTANCE = 1185 -- 赎罪大厅
 RegisterSeasonSpells(INSTANCE)
@@ -100,6 +102,7 @@ module:RegisterDebuff(TIER, INSTANCE, 0, 328593) -- 苦痛刑罚
 module:RegisterDebuff(TIER, INSTANCE, 0, 325254) -- 钢铁尖刺
 module:RegisterDebuff(TIER, INSTANCE, 0, 335306) -- 尖刺镣铐
 module:RegisterDebuff(TIER, INSTANCE, 0, 327814) -- 邪恶创口
+module:RegisterDebuff(TIER, INSTANCE, 0, 331415) -- 邪恶创口
 module:RegisterDebuff(TIER, INSTANCE, 0, 328737) -- 光辉残片
 module:RegisterDebuff(TIER, INSTANCE, 0, 324092) -- 闪耀光辉
 

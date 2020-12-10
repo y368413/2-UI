@@ -107,6 +107,15 @@ local function reskinMinimizeButton(button)
 	hooksecurefunc(button, "SetCollapsed", updateMinimizeButton)
 end
 
+local function GetMawBuffsAnchor(frame)
+	local center = frame:GetCenter()
+	if center and center < I.ScreenWidth/2 then
+		return "LEFT"
+	else
+		return "RIGHT"
+	end
+end
+
 tinsert(R.defaultThemes, function()
 	if IsAddOnLoaded("!KalielsTracker") then return end
 
@@ -143,11 +152,13 @@ tinsert(R.defaultThemes, function()
 		if widgetFrame and widgetFrame.Frame then
 			widgetFrame.Frame:SetAlpha(0)
 
-			for i = 1, widgetFrame.CurrencyContainer:GetNumChildren() do
-				local bu = select(i, widgetFrame.CurrencyContainer:GetChildren())
-				if bu and bu.Icon and not bu.styled then
-					M.ReskinIcon(bu.Icon)
-					bu.styled = true
+			if widgetFrame.CurrencyContainer then -- this may be removed, needs review
+				for i = 1, widgetFrame.CurrencyContainer:GetNumChildren() do
+					local bu = select(i, widgetFrame.CurrencyContainer:GetChildren())
+					if bu and bu.Icon and not bu.styled then
+						M.ReskinIcon(bu.Icon)
+						bu.styled = true
+					end
 				end
 			end
 		end
@@ -198,10 +209,18 @@ tinsert(R.defaultThemes, function()
 			reskinMinimizeButton(minimize)
 		end
 	end]]
+
+	-- Maw buffs block
+	ScenarioBlocksFrame.MawBuffsBlock.Container:HookScript("OnClick", function(container)
+		local direc = GetMawBuffsAnchor(container)
+		if not container.lastDirec or container.lastDirec ~= direc then
+			container.List:ClearAllPoints()
+			if direc == "LEFT" then
+				container.List:SetPoint("TOPLEFT", container, "TOPRIGHT", 12, 0)
+			else
+				container.List:SetPoint("TOPRIGHT", container, "TOPLEFT", 12, 0)
+			end
+			container.lastDirec = direc
+		end
+	end)
 end)
-local mawBuffsBlock = _G.ScenarioBlocksFrame.MawBuffsBlock
-local list = mawBuffsBlock and mawBuffsBlock.Container.List
-if list then
-list:ClearAllPoints()
-list:SetPoint("TOPLEFT", mawBuffsBlock.Container, "TOPRIGHT", 10, 0)
-end

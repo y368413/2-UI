@@ -4,7 +4,7 @@ ns[2] = {}			-- R, Config
 ns[3] = {}			-- U, Locales
 ns[4] = {}			-- I, Database
 
-MaoRUIPerDB, MaoRUIDB, MaoRUIPlusDB = {}, {}, {}
+MaoRUIPerDB, MaoRUIDB, MaoRUISetDB = {}, {}, {}
 ShiGuangDB = ShiGuangDB or {}
 ShiGuangPerDB = ShiGuangPerDB or {}
 

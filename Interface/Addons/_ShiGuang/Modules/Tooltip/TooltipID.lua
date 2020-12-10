@@ -12,7 +12,6 @@ local BAGSLOT, BANK = BAGSLOT, BANK
 local types = {
 	spell = SPELLS.."ID:",
 	item = ITEMS.."ID:",
-	NPCs = "NpcID:",
 	quest = QUESTS_LABEL.."ID:",
 	talent = TALENT.."ID:",
 	achievement = ACHIEVEMENTS.."ID:",
@@ -140,16 +139,6 @@ function TT:SetupTooltipID()
 		if id then TT.AddLineForID(self, id, types.currency) end
 	end)
 	
--- NPCs
-GameTooltip:HookScript("OnTooltipSetUnit", function(self)
-  local unit = select(2, self:GetUnit())
-  if unit then
-    local guid = UnitGUID(unit) or ""
-    local id = tonumber(guid:match("-(%d+)-%x+$"), 10)
-    if id and guid:match("%a+") ~= "Player" then TT.AddLineForID(self, id, types.NPCs) end
-  end
-end)
-
 	-- Spell caster
 	hooksecurefunc(GameTooltip, "SetUnitAura", TT.UpdateSpellCaster)
 

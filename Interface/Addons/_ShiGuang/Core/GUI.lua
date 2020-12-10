@@ -408,8 +408,8 @@ loader:SetScript("OnEvent", function(self, _, addon)
 	if addon ~= "_ShiGuang" then return end
 
 	InitialSettings(G.AccountSettings, MaoRUIDB)
-	if not next(MaoRUIPlusDB) then
-		for i = 1, 5 do MaoRUIPlusDB[i] = {} end
+	if not next(MaoRUISetDB) then
+		for i = 1, 5 do MaoRUISetDB[i] = {} end
 	end
 
 	if not MaoRUIDB["ProfileIndex"][I.MyFullName] then
@@ -423,7 +423,7 @@ loader:SetScript("OnEvent", function(self, _, addon)
 			R.db["BFA"] = true
 		end
 	else
-		R.db = MaoRUIPlusDB[MaoRUIDB["ProfileIndex"][I.MyFullName] - 1]
+		R.db = MaoRUISetDB[MaoRUIDB["ProfileIndex"][I.MyFullName] - 1]
 	end
 	InitialSettings(G.DefaultSettings, R.db, true)
 
@@ -1174,6 +1174,10 @@ local function CreateOption(i)
 				end
 			end
 			M.CreateFS(dd, 14, name, "system", "CENTER", 0, 25)
+			if tooltip then
+				dd.title = U["Tips"]
+				M.AddTooltip(dd, "ANCHOR_RIGHT", tooltip, "info")
+			end
 		-- Colorswatch
 		elseif optType == 5 then
 			local f = M.CreateColorSwatch(parent, name, NDUI_VARIABLE(key, value))

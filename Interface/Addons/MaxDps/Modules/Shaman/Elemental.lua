@@ -53,7 +53,8 @@ local EL = {
 	EchoesOfGreatSunderingBonusId = 6991,
 	EchoesOfGreatSundering        = 336217,
 
-	ElementalEquilibriumBonusId   = 6990
+	ElementalEquilibriumBonusId   = 6990,
+	ElementalEquilibriumDebuff    = 347349
 
 };
 
@@ -602,9 +603,15 @@ function Shaman:ElementalSingleTarget()
 		return EL.FrostShock;
 	end
 
+	local elementalEquilibriumDebuff = MaxDps:IntUnitAura(
+		'player',
+		EL.ElementalEquilibriumDebuff,
+		'HARMFUL',
+		fd.timeShift
+	);
 	-- frost_shock,if=runeforge.elemental_equilibrium.equipped&!buff.elemental_equilibrium_debuff.up&!talent.elemental_blast.enabled&!talent.echoing_shock.enabled;
 	if runeforge[EL.ElementalEquilibriumBonusId] and
-		not buff[EL.ElementalEquilibriumDebuff].up and --TODO wtf is this
+		not elementalEquilibriumDebuff.up and
 		not talents[EL.ElementalBlast] and
 		not talents[EL.EchoingShock]
 	then

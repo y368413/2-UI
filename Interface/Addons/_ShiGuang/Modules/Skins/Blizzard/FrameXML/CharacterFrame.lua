@@ -4,6 +4,12 @@ local M, R, U, I = unpack(ns)
 tinsert(R.defaultThemes, function()
 	local r, g, b = I.r, I.g, I.b
 	-- [[ Item buttons ]]
+	local function UpdateHighlight(self)
+		local highlight = self:GetHighlightTexture()
+		highlight:SetColorTexture(1, 1, 1, .25)
+		highlight:SetInside()
+	end
+
 	local function UpdateCosmetic(self)
 		local itemLink = GetInventoryItemLink("player", self:GetID())
 		self.IconOverlay:SetShown(itemLink and IsCosmeticItem(itemLink))
@@ -15,15 +21,14 @@ tinsert(R.defaultThemes, function()
 		local slot = _G["Character"..slots[i].."Slot"]
 		--slot.IconBorder:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\WhiteIconFrame")
 		--slot.ignoreTexture:SetTexture("Interface\\PaperDollInfoFrame\\UI-GearManager-LeaveItem-Transparent")
-		if IsCosmeticItem then
-			slot.IconOverlay:SetAtlas("CosmeticIconFrame")
-		end
+		slot.IconOverlay:SetAtlas("CosmeticIconFrame")
 		slot.IconOverlay:SetInside()
-		--hooksecurefunc(slot.IconBorder, "SetTexture", function() slot:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\WhiteIconFrame") end)
 	end
 
-	hooksecurefunc("PaperDollItemSlotButton_Update", function(button) UpdateCosmetic(button) end)
-end)
+	hooksecurefunc("PaperDollItemSlotButton_Update", function(button)
+		UpdateCosmetic(button)
+		UpdateHighlight(button)
+	end)
 
 hooksecurefunc("SetItemButtonQuality", function(button, quality, itemIDOrLink, suppressOverlays)
 	if itemIDOrLink then

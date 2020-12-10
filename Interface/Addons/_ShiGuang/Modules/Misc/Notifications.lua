@@ -11,6 +11,7 @@ local UnitName, Ambiguate, GetTime = UnitName, Ambiguate, GetTime
 local GetSpellLink, GetSpellInfo, GetSpellCooldown = GetSpellLink, GetSpellInfo, GetSpellCooldown
 local GetActionInfo, GetMacroSpell, GetMacroItem = GetActionInfo, GetMacroSpell, GetMacroItem
 local GetItemInfo, GetItemInfoFromHyperlink = GetItemInfo, GetItemInfoFromHyperlink
+local C_Timer_After = C_Timer.After
 local C_VignetteInfo_GetVignetteInfo = C_VignetteInfo.GetVignetteInfo
 local C_Texture_GetAtlasInfo = C_Texture.GetAtlasInfo
 local C_ChatInfo_SendAddonMessage = C_ChatInfo.SendAddonMessage
@@ -48,7 +49,7 @@ end
 function MISC:SoloInfo_Update()
 	local name, instType, diffID, diffName, _, _, _, instID = GetInstanceInfo()
 
-	if instType ~= "none" and diffID ~= 24 and instList[instID] and instList[instID] ~= diffID then
+	if (diffName and diffName ~= "") and instType ~= "none" and diffID ~= 24 and instList[instID] and instList[instID] ~= diffID then
 		MISC:SoloInfo_Create()
 		soloInfo.Text:SetText(I.InfoColor..name..I.MyColor.."\n( "..diffName.." )\n\n"..I.InfoColor.."^-^")
 	else
@@ -56,15 +57,19 @@ function MISC:SoloInfo_Update()
 	end
 end
 
+function MISC:SoloInfo_DelayCheck()
+	C_Timer_After(3, MISC.SoloInfo_Update)
+end
+
 function MISC:SoloInfo()
 	if R.db["Misc"]["SoloInfo"] then
 		self:SoloInfo_Update()
-		M:RegisterEvent("UPDATE_INSTANCE_INFO", self.SoloInfo_Update)
-		M:RegisterEvent("PLAYER_DIFFICULTY_CHANGED", self.SoloInfo_Update)
+		M:RegisterEvent("PLAYER_ENTERING_WORLD", self.SoloInfo_DelayCheck)
+		M:RegisterEvent("PLAYER_DIFFICULTY_CHANGED", self.SoloInfo_DelayCheck)
 	else
 		if soloInfo then soloInfo:Hide() end
-		M:UnregisterEvent("UPDATE_INSTANCE_INFO", self.SoloInfo_Update)
-		M:UnregisterEvent("PLAYER_DIFFICULTY_CHANGED", self.SoloInfo_Update)
+		M:UnregisterEvent("PLAYER_ENTERING_WORLD", self.SoloInfo_DelayCheck)
+		M:UnregisterEvent("PLAYER_DIFFICULTY_CHANGED", self.SoloInfo_DelayCheck)
 	end
 end
 

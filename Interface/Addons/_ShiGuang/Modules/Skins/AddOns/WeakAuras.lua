@@ -41,6 +41,7 @@ local function Skin_WeakAuras(f, fType)
 			hooksecurefunc(f.icon, "SetTexCoord", UpdateIconTexCoord)
 			f.bg = M.SetBD(f)
 			f.bg:SetFrameLevel(0)
+			f.bg:SetFrameStrata("BACKGROUND")
 			f.bg.__icon = f.icon
 			f.bg:HookScript("OnUpdate", IconBgOnUpdate)
 
@@ -48,8 +49,9 @@ local function Skin_WeakAuras(f, fType)
 		end
 	elseif fType == "aurabar" then
 		if not f.styled then
-			f.bg = M.SetBD(f.bar)
+			f.bg = M.SetBD(f.bar, 0)
 			f.bg:SetFrameLevel(0)
+			f.bg:SetFrameStrata("BACKGROUND")
 			UpdateIconTexCoord(f.icon)
 			hooksecurefunc(f.icon, "SetTexCoord", UpdateIconTexCoord)
 			f.iconFrame:SetAllPoints(f.icon)

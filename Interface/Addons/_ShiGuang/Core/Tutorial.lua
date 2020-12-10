@@ -52,17 +52,13 @@ local function ForceDefaultSettings()
 	SetCVar("alwaysCompareItems", 1)
 	SetCVar("lootUnderMouse", 1)
 	SetCVar("autoSelfCast", 1)
-	SetCVar("nameplateShowEnemies", 1)
 	SetCVar("nameplateShowSelf", 0)
-	SetCVar("nameplateShowAll", 1)
-	SetCVar("nameplateMotion", 1)
 	--SetCVar("guildMemberNotify", 0)--公会成员提示
   --SetCVar("showToastBroadcast", 0)--通告更新
   --SetCVar("showToastWindow", 0)--显示浮窗
 	SetCVar("nameplateShowFriendlyNPCs", 0)
 	SetCVar("showTimestamps", "none")--聊天时间戳
 	SetCVar("ActionButtonUseKeyDown", 1)
-	SetCVar("alwaysShowActionBars", 0)
 	SetCVar("lockActionBars", 1)
 	SetActionBarToggles(1, 1, 0, 0)
 	SHOW_MULTI_ACTIONBAR_1="1" --左下方动作条 
@@ -97,9 +93,15 @@ local function ForceDefaultSettings()
   SetCVar("floatingCombatTextHonorGains", 0)    --榮譽擊殺 
   SetCVar("floatingCombatTextAuras", 0)   --光環 
 	SetCVar("doNotFlashLowHealthWarning", 1)
+	if not InCombatLockdown() then
+		SetCVar("nameplateMotion", 1)
+		SetCVar("nameplateShowAll", 1)
+		SetCVar("nameplateShowEnemies", 1)
+		SetCVar("alwaysShowActionBars", 1)
+	end
 	SetCVar("ffxGlow", 0)
 	SetCVar("Sound_EnableErrorSpeech", 0)								--错误提示音
-	--SetCVar("cameraYawMoveSpeed", 360); -- Maximum in-game: 270
+	--SetCVar("SpellQueueWindow", 100);
 	SetCVar("statusText",1) --状态文字
 	SetCVar("statusTextDisplay","NUMERIC")--头像状态文字形式："NUMERIC"数值"PERCENT"百分比"BOTH"同时显示
 	SetCVar("autoLootDefault",1) --自动拾取

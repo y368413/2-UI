@@ -29,8 +29,10 @@ constants.defaults = {
         show_transmogrifier = true,
         show_vendor = true,
         show_void = true,
---        show_others = true,
+        show_others = true,
 
+        fmaster_waypoint = true,
+        fmaster_waypoint_dropdown = 1,
         easy_waypoint = true,
 
         force_nodes = false,
@@ -81,11 +83,17 @@ constants.icon = {
     reforge         = "Interface\\AddOns\\HandyNotes\\icons\\reforge",
     stablemaster    = "Interface\\MINIMAP\\TRACKING\\StableMaster",
     trainer      = "Interface\\MINIMAP\\TRACKING\\Profession",
+    portaltrainer   = "Interface\\MINIMAP\\TRACKING\\Profession",
 --    reagents        = "Interface\\MINIMAP\\TRACKING\\Reagents",
     transmogrifier  = "Interface\\MINIMAP\\TRACKING\\Transmogrifier",
     tpplatform      = "Interface\\MINIMAP\\TempleofKotmogu_ball_cyan",
     vendor          = "Interface\\AddOns\\HandyNotes\\icons\\vendor",
     void            = "Interface\\AddOns\\HandyNotes\\icons\\void",
+
+    kyrian          = "Interface\\AddOns\\HandyNotes\\icons\\kyrian",
+    necrolord       = "Interface\\AddOns\\HandyNotes\\icons\\necrolord",
+    nightfae        = "Interface\\AddOns\\HandyNotes\\icons\\nightfae",
+    venthyr         = "Interface\\AddOns\\HandyNotes\\icons\\venthyr",
 
 }
 
@@ -155,8 +163,8 @@ local function SetIcon(point)
     local icon_key
 
     for i, k in ipairs({
-        "auctioneer", "anvil", "banker", "barber", "innkeeper", "mail", "portal",
-        "reforge", "stablemaster", "trainer", "transmogrifier", "tpplatform", "vendor", "void"
+        "auctioneer", "anvil", "banker", "barber", "innkeeper", "mail", "portal", "reforge", "stablemaster", "trainer",
+        "portaltrainer", "transmogrifier", "tpplatform", "vendor", "void", "kyrian", "necrolord", "nightfae", "venthyr"
     }) do
         if point[k] then icon_key = k end
     end
@@ -395,19 +403,21 @@ local currentMapID = nil
         if (point.profession and (not Oribos:CharacterHasProfession(point.profession) and HasTwoProfessions()) and HandyNotes_Oribos.db.show_onlymytrainers and not point.auctioneer) then
             return false
         end
-        if (point.auctioneer and (not Oribos:CharacterHasProfession(point.profession) or not HandyNotes_Oribos.db.show_auctioneer)) then return false; end
-        if (point.banker and not HandyNotes_Oribos.db.show_banker) then return false; end
-        if (point.barber and not HandyNotes_Oribos.db.show_barber) then return false; end
-        if (point.innkeeper and not HandyNotes_Oribos.db.show_innkeeper) then return false; end
-        if (point.mail and not HandyNotes_Oribos.db.show_mail) then return false; end
-        if (point.portal and (not HandyNotes_Oribos.db.show_portal or IsAddOnLoaded("HandyNotes_TravelGuide"))) then return false; end
-        if (point.tpplatform and (not HandyNotes_Oribos.db.show_tpplatform or IsAddOnLoaded("HandyNotes_TravelGuide"))) then return false; end
-        if (point.reforge and not HandyNotes_Oribos.db.show_reforge) then return false; end
-        if (point.stablemaster and not HandyNotes_Oribos.db.show_stablemaster) then return false; end
-        if (point.trainer and not HandyNotes_Oribos.db.show_trainer) then return false; end
-        if (point.transmogrifier and not HandyNotes_Oribos.db.show_transmogrifier) then return false; end
-        if ((point.vendor or point.anvil) and not HandyNotes_Oribos.db.show_vendor) then return false; end
-        if (point.void and not HandyNotes_Oribos.db.show_void) then return false; end
+        if (point.auctioneer and (not Oribos:CharacterHasProfession(point.profession) or not HandyNotes_Oribos.db.show_auctioneer)) then return false end
+        if (point.banker and not HandyNotes_Oribos.db.show_banker) then return false end
+        if (point.barber and not HandyNotes_Oribos.db.show_barber) then return false end
+        if (point.innkeeper and not HandyNotes_Oribos.db.show_innkeeper) then return false end
+        if (point.mail and not HandyNotes_Oribos.db.show_mail) then return false end
+        if (point.portal and (not HandyNotes_Oribos.db.show_portal or IsAddOnLoaded("HandyNotes_TravelGuide"))) then return false end
+        if (point.tpplatform and (not HandyNotes_Oribos.db.show_tpplatform or IsAddOnLoaded("HandyNotes_TravelGuide"))) then return false end
+        if (point.reforge and not HandyNotes_Oribos.db.show_reforge) then return false end
+        if (point.stablemaster and not HandyNotes_Oribos.db.show_stablemaster) then return false end
+        if (point.trainer and not HandyNotes_Oribos.db.show_trainer) then return false end
+        if (point.portaltrainer and not HandyNotes_Oribos.db.show_others) then return false end
+        if (point.transmogrifier and not HandyNotes_Oribos.db.show_transmogrifier) then return false end
+        if ((point.vendor or point.anvil) and not HandyNotes_Oribos.db.show_vendor) then return false end
+        if (point.void and not HandyNotes_Oribos.db.show_void) then return false end
+        if ((point.kyrian or point.necrolord or point.nightfae or point.venthyr) and not HandyNotes_Oribos.db.show_others) then return false end
     end
         return true
     end
@@ -451,6 +461,12 @@ function events:ZONE_CHANGED(...)
 
     if HandyNotes_Oribos.global.dev and HandyNotes_Oribos.db.show_prints then
         print("Oribos: refreshed after ZONE_CHANGED")
+        print("MapID: "..C_Map.GetBestMapForUnit("player"))
+    end
+
+    if C_Map.GetBestMapForUnit("player") == (1671 or 1543) then
+        C_Map.ClearUserWaypoint()
+        --TomTom:RemoveWaypoint(TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNamebyID(162666)}))
     end
 end
 
@@ -459,6 +475,23 @@ function events:ZONE_CHANGED_INDOORS(...)
 
     if HandyNotes_Oribos.global.dev and HandyNotes_Oribos.db.show_prints then
         print("Oribos: refreshed after ZONE_CHANGED_INDOORS")
+    end
+
+    -- Set automatically a waypoint (Blizzard, TomTom or both) to the flightmaster.
+    if HandyNotes_Oribos.db.fmaster_waypoint and C_Map.GetBestMapForUnit("player") == 1671 then
+        if IsAddOnLoaded("TomTom") and HandyNotes_Oribos.db.fmaster_waypoint_dropdown == 2 then
+            TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNamebyID(162666)})
+        elseif IsAddOnLoaded("TomTom") and HandyNotes_Oribos.db.fmaster_waypoint_dropdown == 3 then
+            C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(1550, 47.02/100, 51.16/100))
+            C_SuperTrack.SetSuperTrackedUserWaypoint(true)
+            TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNamebyID(162666)})
+        else
+            C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(1550, 47.02/100, 51.16/100))
+            C_SuperTrack.SetSuperTrackedUserWaypoint(true)
+        end
+    elseif C_Map.GetBestMapForUnit("player") == 1670 then
+        C_Map.ClearUserWaypoint()
+        --TomTom:RemoveWaypoint(TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNamebyID(162666)}))
     end
 end
 
@@ -596,6 +629,23 @@ config.options = {
                     desc = L["config_onlymytrainers_desc"],
                     order = 32,
                 },
+                fmaster_waypoint = {
+                    type = "toggle",
+                    width = 1.3,
+                    name = L["config_fmaster_waypoint"],
+                    desc = L["config_fmaster_waypoint_desc"],
+                    order = 33,
+                },
+                fmaster_waypoint_dropdown = {
+                    type = "select",
+                    values = { L["Blizzard"], L["TomTom"], L["Both"] },
+                    disabled = function() return not HandyNotes_Oribos.db.fmaster_waypoint end,
+                    hidden = function() return not IsAddOnLoaded("TomTom") end,
+                    name = L["config_fmaster_waypoint_dropdown"],
+                    desc = L["config_fmaster_waypoint_dropdown_desc"],
+                    width = 0.7,
+                    order = 34,
+                },
                 easy_waypoint = {
                     type = "toggle",
                     width = "full",
@@ -608,7 +658,7 @@ config.options = {
                     end,
                     disabled = function() return not IsAddOnLoaded("TomTom") end,
                     desc = L["config_easy_waypoints_desc"],
-                    order = 33,
+                    order = 35,
                 },
                 unhide = {
                     type = "execute",
@@ -622,7 +672,7 @@ config.options = {
                         Oribos:Refresh()
                         print("Covenant Sanctum: "..L["config_restore_nodes_print"])
                     end,
-                    order = 34,
+                    order = 36,
                 },
             },
             },
@@ -641,8 +691,8 @@ config.options = {
 }
 
 local icongroup = {
-    "banker", "barber", "innkeeper", "mail", "reforge",
-    "stablemaster", "trainer", "transmogrifier", "vendor", "void"
+    "banker", "barber", "innkeeper", "mail", "reforge", "stablemaster",
+    "trainer", "transmogrifier", "vendor", "void", "others"
 }
 
 for i, icongroup in ipairs(icongroup) do
@@ -831,10 +881,14 @@ DB.points = {
     [47867789] = { vendor=true, npc=176067 }, -- Quartermaster
     [47577721] = { vendor=true, npc=176064 }, -- Quartermaster
     [47087695] = { vendor=true, npc=176065 }, -- Quartermaster
+    [46677736] = { vendor=true, npc=176066 }, -- Quartermaster
+    [46227780] = { vendor=true, npc=176368 }, -- Quartermaster
 
     [35055815] = { vendor=true, npc=164095 },
     [34445752] = { vendor=true, npc=168011 },
     [34645648] = { reforge=true, npc=164096 },
+
+    [23324895] = { portaltrainer=true, npc=176186, class="MAGE" },
 
     [20835477] = { portal=true, label=PtoOG, note=Durotar, faction="Horde", quest=60151 },
     [20894567] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance", quest=60151 },
@@ -851,6 +905,11 @@ DB.points = {
     [55735162] = { tpplatform=true, label=RingFates },
     [49506073] = { tpplatform=true, label=RingFates },
     [43375150] = { tpplatform=true, label=RingFates },
+
+    [62183266] = { kyrian=true, label=C_Map.GetMapInfo(1533).name, scale=1.5 },
+    [67345157] = { necrolord=true, label=C_Map.GetMapInfo(1536).name, scale=1.5 },
+    [49587788] = { nightfae=true, label=C_Map.GetMapInfo(1565).name, scale=1.5 },
+    [32015156] = { venthyr=true, label=C_Map.GetMapInfo(1525).name, scale=1.5 },
 },
 
 [1672] = {

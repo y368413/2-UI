@@ -58,6 +58,7 @@ local EH = {
 
 	-- leggos
 	DoomWindsBonusId           = 6993,
+	DoomWindsDebuff            = 335904,
 	PrimalLavaActuatorsBonusId = 6996,
 };
 
@@ -76,6 +77,7 @@ function Shaman:Enhancement()
 	local runeforge = fd.runeforge;
 	fd.totems = Shaman:Totems();
 	fd.activeFlameShock = MaxDps:DebuffCounter(EH.FlameShock, fd.timeShift);
+	local doomWindsDebuff = MaxDps:IntUnitAura('player', EH.DoomWindsDebuff, 'HARMFUL', fd.timeShift);
 
 	-- feral_spirit;
 	MaxDps:GlowCooldown(EH.FeralSpirit, cooldown[EH.FeralSpirit].ready);
@@ -87,7 +89,7 @@ function Shaman:Enhancement()
 	end
 
 	-- windfury_totem,if=runeforge.doom_winds.equipped&buff.doom_winds_debuff.down;
-	if runeforge[EH.DoomWindsBonusId] and not buff[EH.DoomWindsDebuff].up then
+	if runeforge[EH.DoomWindsBonusId] and not doomWindsDebuff.up then
 		return EH.WindfuryTotem;
 	end
 

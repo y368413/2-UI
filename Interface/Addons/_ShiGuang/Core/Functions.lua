@@ -120,6 +120,7 @@ do
 	function M.SplitList(list, variable, cleanup)
 		if cleanup then wipe(list) end
 		for word in gmatch(variable, "%S+") do
+			word = tonumber(word) or word -- use number if exists, needs review
 			list[word] = true
 		end
 	end
@@ -787,6 +788,19 @@ do
 		end
 	end
 
+	local function Menu_OnEnter(self)
+		self.bg:SetBackdropBorderColor(cr, cg, cb)
+	end
+	local function Menu_OnLeave(self)
+		self.bg:SetBackdropBorderColor(0, 0, 0)
+	end
+	local function Menu_OnMouseUp(self)
+		self.bg:SetBackdropColor(0, 0, 0, R.db["Skins"]["SkinAlpha"])
+	end
+	local function Menu_OnMouseDown(self)
+		self.bg:SetBackdropColor(cr, cg, cb, .25)
+	end
+
 	local function resetTabAnchor(tab)
 		local text = tab.Text or _G[tab:GetName().."Text"]
 		if text then
@@ -884,8 +898,33 @@ do
 		M.SetupArrow(tex, direction)
 		tex:SetVertexColor(1, 0, 0, 1)
 		self.__texture = tex
-		self:HookScript("OnEnter", function() if self:IsEnabled() then self.__texture:SetVertexColor(0, 1, 0, 1) end end)
-		self:HookScript("OnLeave", function() self.__texture:SetVertexColor(1, 0, 0, 1) end)
+
+		self:HookScript("OnEnter", M.Texture_OnEnter)
+		self:HookScript("OnLeave", M.Texture_OnLeave)
+	end
+	function M:ReskinNavBar()
+		if self.navBarStyled then return end
+
+		local homeButton = self.homeButton
+		local overflowButton = self.overflowButton
+
+		self:GetRegions():Hide()
+		self:DisableDrawLayer("BORDER")
+		self.overlay:Hide()
+		homeButton:GetRegions():Hide()
+		M.Reskin(homeButton)
+		M.Reskin(overflowButton, true)
+
+		local tex = overflowButton:CreateTexture(nil, "ARTWORK")
+		M.SetupArrow(tex, "left")
+		tex:SetSize(14, 14)
+		tex:SetPoint("CENTER")
+		overflowButton.__texture = tex
+
+		overflowButton:HookScript("OnEnter", M.Texture_OnEnter)
+		overflowButton:HookScript("OnLeave", M.Texture_OnLeave)
+
+		self.navBarStyled = true
 	end
 end
 

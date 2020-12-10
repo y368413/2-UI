@@ -184,7 +184,7 @@ function Hunter:MarksmanshipSt()
 	local TrickShotsUp = buff[MM.TrickShots].up and not (currentSpell == MM.RapidFire or currentSpell == MM.AimedShot);
 
 	-- steady_shot,if=talent.steady_focus&(prev_gcd.1.steady_shot&buff.steady_focus.remains<5|buff.steady_focus.down);
-	if talents[MM.SteadyFocus] and buff[MM.SteadyFocusAura].remains < 5 then
+	if talents[MM.SteadyFocus] and buff[MM.SteadyFocusAura].remains < 6 then
 		-- first cast
 		if spellHistory[1] ~= MM.SteadyShot and currentSpell ~= MM.SteadyShot then
 			return MM.SteadyShot;
@@ -201,7 +201,7 @@ function Hunter:MarksmanshipSt()
 	end
 
 	-- kill_shot;
-	if cooldown[MM.KillShot].ready and targetHp < 0.2 and focus >= 10 then
+	if cooldown[MM.KillShot].ready and targetHp < 20 and focus >= 10 then
 		return MM.KillShot;
 	end
 
@@ -376,7 +376,7 @@ function Hunter:MarksmanshipTrickshots()
 	end
 
 	-- kill_shot,if=buff.dead_eye.down;
-	if cooldown[MM.KillShot].ready and targetHp < 0.2 and focus >= 10 and not buff[MM.DeadEye].up then
+	if cooldown[MM.KillShot].ready and targetHp < 20 and focus >= 10 and not buff[MM.DeadEye].up then
 		return MM.KillShot;
 	end
 

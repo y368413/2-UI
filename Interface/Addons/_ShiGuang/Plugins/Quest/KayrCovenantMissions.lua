@@ -1,4 +1,5 @@
-﻿local max = _G["max"]
+﻿-- 0.3.4
+local max = _G["max"]
 local gsub = _G["gsub"]
 local hooksecurefunc = _G["hooksecurefunc"]
 local CreateFrame = _G["CreateFrame"]
@@ -59,14 +60,14 @@ local function warnText(text) return ColorText(text, warningTextColor) end
 -- GetNumMissionPlayerUnitsTotal
 -- --------------------------------------------------------
 function KayrCovenantMissions:GetNumMissionPlayerUnitsTotal()
-	local numFollowers = 0
+    local numFollowers = 0
     local missionPage = _G["CovenantMissionFrame"]:GetMissionPage()
     for followerFrame in missionPage.Board:EnumerateFollowers() do
-		if followerFrame:GetFollowerGUID() then
-			numFollowers = numFollowers + 1
-		end
-	end
-	return numFollowers
+        if followerFrame:GetFollowerGUID() then
+            numFollowers = numFollowers + 1
+        end
+    end
+    return numFollowers
 end
 
 
@@ -125,6 +126,13 @@ function KayrCovenantMissions.CMFrame_ShowMission_Hook(...)
 end
 
 
+local function roundOrRounds(numRounds)
+    if numRounds == 1 then
+        return KayrCovenantMissions.i18n("round")
+    end
+    return KayrCovenantMissions.i18n("rounds")
+end
+
 -- --------------------------------------------------------------------------------------------------------------------
 -- ConstructAdviceText
 -- --------------------------------------------------------
@@ -138,14 +146,21 @@ function KayrCovenantMissions:ConstructAdviceText(roundsToBeatEnemy, roundsBefor
             numTextColor = middlingTextColor
         end
     end
-    local roundsToBeatText = _i("rounds")
-    if roundsToBeatEnemy == 1 then roundsToBeatText = _i("round") end
-    local roundsBeforeBeatenText = _i("rounds")
-    if roundsBeforeBeaten == 1 then roundsBeforeBeatenText = _i("round") end
+    local roundsToBeatEnemyStr = ColorText(roundsToBeatEnemy, numTextColor)
+    local roundsBeforeBeatenStr = ColorText(roundsBeforeBeaten, numTextColor)
 
-    local str = _i("It would take ") .. ColorText(roundsToBeatEnemy, numTextColor) .. _i(" combat ") .. roundsToBeatText .. _i(" for your current team to beat the enemy team.\n")
-    str = str .. _i("It would take ") .. ColorText(roundsBeforeBeaten, numTextColor) .. _i(" combat ") .. roundsBeforeBeatenText .. _i(" for the enemy team to beat your current team.\n")
+    local beatEnemytext = _i("It would take ") .. roundsToBeatEnemyStr .. _i(" combat ") .. roundOrRounds(roundsToBeatEnemy) .. _i(" for your current team to beat the enemy team.")
+    local beatenByEnemytext = _i("It would take ") .. roundsBeforeBeatenStr .. _i(" combat ") .. roundOrRounds(roundsBeforeBeaten) .. _i(" for the enemy team to beat your current team.")
 
+    if _i.currentLocale == "koKR" then
+        -- TODO: This is hacky. Implement better strings with string.format, more suited to i18n.
+        -- Korean is surely not the only language with different sentence structure.
+        -- Korean structure: "for [y] team to beat [z] team [x] round(s) It would take."
+        beatEnemytext = _i(" for your current team to beat the enemy team.") .. " " .. roundsToBeatEnemyStr .. " " .. roundOrRounds(roundsToBeatEnemy) .. " " .. _i("It would take ")
+        beatenByEnemytext = _i(" for the enemy team to beat your current team.") .. " " .. roundsBeforeBeatenStr .. " " .. roundOrRounds(roundsBeforeBeaten) .. " " .. _i("It would take ")
+    end
+
+    local str = beatEnemytext .. "\n" .. beatenByEnemytext .. "\n"
     if successPossible then
         if closeResult then
             str = str .. midText(_i("\nSuccess is possible with your current units, but it will be close.\n"))
@@ -180,6 +195,21 @@ function KayrCovenantMissions.CMFrame_CloseMission_Hook(...)
     return ...
 end
 
+-- --------------------------------------------------------------------------------------------------------------------
+-- UpdateAdviceFrameSize
+-- --------------------------------------------------------
+function KayrCovenantMissions:UpdateAdviceFrameSize(width, height)
+    local _i = KayrCovenantMissions.i18n
+    local frameWidth = width or 600
+    local frameHeight = height or 90
+    if _i.currentLocale ~= "enUS" then
+        -- Extra size for the frame to prevent string truncation risk when i18n applied
+        local localeTable = _i.stringTable[_i.currentLocale] or {}
+        frameWidth = localeTable["_adviceFrameWidth"] or 700
+        frameHeight = localeTable["_adviceFrameHeight"] or 100
+    end
+    self.adviceFrame:SetSize(frameWidth, frameHeight)
+end
 
 -- --------------------------------------------------------------------------------------------------------------------
 -- Init Hook - Fired when the covenant mission table is first accessed
@@ -196,20 +226,12 @@ function KayrCovenantMissions.CMFrame_SetupTabs_Hook(...)
     hooksecurefunc(_G["CovenantMissionFrame"], "CloseMission", KayrCovenantMissions.CMFrame_CloseMission_Hook)
 
     local adviceFrame = CreateFrame("Frame", "KayrCovenantMissionsAdvice", _G["CovenantMissionFrame"], "TranslucentFrameTemplate")
-    local frameWidth = 600
-    local frameHeight = 90
-    if _i.currentLocale ~= "enUS" then
-        -- Extra size for the frame to prevent string truncation risk when i18n applied
-        local localeTable = _i.stringTable[_i.currentLocale] or {}
-        frameWidth = localeTable["_adviceFrameWidth"] or 700
-        frameHeight = localeTable["_adviceFrameHeight"] or 100
-    end
-    adviceFrame:SetSize(frameWidth, frameHeight)
     adviceFrame:SetPoint("TOPRIGHT", CovenantMissionFrame, "BOTTOMRIGHT")
     adviceFrame:SetClampedToScreen(true)  -- To keep it on-screen when user has a tiny display resolution
     adviceFrame:SetFrameStrata("TOOLTIP")
     adviceFrame:Hide()
     KayrCovenantMissions.adviceFrame = adviceFrame
+    KayrCovenantMissions:UpdateAdviceFrameSize()
 
     local adviceFrameText = adviceFrame:CreateFontString(adviceFrame, "OVERLAY", "GameTooltipText")
     adviceFrame.text = adviceFrameText
@@ -226,7 +248,7 @@ end
 -- Listen for Blizz Garrison UI being loaded
 -- --------------------------------------------------------
 function KayrCovenantMissions:ADDON_LOADED(event, addon)
-	if addon == "Blizzard_GarrisonUI" then
+    if addon == "Blizzard_GarrisonUI" then
         KayrCovenantMissions:Init()
     end
 end
@@ -253,15 +275,9 @@ local stringTable = {}
 i18n.stringTable = stringTable
 KayrCovenantMissions.i18n = i18n
 KayrCovenantMissions.i18n.currentLocale = _G["GetLocale"]()
+KayrCovenantMissions.i18n.useCaching = true
 -- --------------------------------------------------------------------------------------------------------------------
-
 -- --------------------------------------------------------------------------------------------------------------------
--- Debugging
-local KLib = _G["KLib"]
-if not KLib then
-    KLib = {Con = function() end} -- No-Op if KLib not available
-end
--- KayrCovenantMissions.i18n.currentLocale = "frFR" -- DEBUG
 -- --------------------------------------------------------------------------------------------------------------------
 
 -- TODO: Use ALIASES instead of passing the enUS str through as stringTable key
@@ -280,7 +296,7 @@ function i18n.GetLocalization(str, locale)
     if locale == "enUS" then return str end
 
     local cachedResults = memoizeResults[locale]
-    if cachedResults and cachedResults[str] then return cachedResults[str] end
+    if i18n.useCaching and cachedResults and cachedResults[str] then return cachedResults[str] end
 
     local whitespaceStart, cleanedStr, whitespaceEnd = string.match(str, "^(%s*)(.-)(%s*)$")
 
@@ -313,55 +329,15 @@ setmetatable(i18n, mt)
 -- --------------------------------------------------------------------------------------------------------------------
 -- --------------------------------------------------------------------------------------------------------------------
 
--- French
-stringTable["frFR"] = {}
-stringTable["frFR"]["_adviceFrameWidth"] = 700
-stringTable["frFR"]["_adviceFrameHeight"] = 90
-stringTable["frFR"]["Add some units to your team to begin success estimation."] = "Ajoutez des troupes à votre équipe pour commencer l'estimation."
-stringTable["frFR"]["round"] = " tour"
-stringTable["frFR"]["rounds"] = " tours"
-stringTable["frFR"]["It would take"] = "Il faudrait"
-stringTable["frFR"]["combat"] = ""
-stringTable["frFR"]["for your current team to beat the enemy team."] = "à votre équipe actuelle pour battre l'équipe adverse."
-stringTable["frFR"]["for the enemy team to beat your current team."] = "à l'équipe adverse pour battre votre équipe actuelle."
-stringTable["frFR"]["Success is possible with your current units, but it will be close."] = "Votre équipe actuelle peut gagner, mais de peu."
-stringTable["frFR"]["There is a reasonable chance of success with your current units."] = "Il existe une chance raisonnable de victoire pour votre équipe actuelle."
-stringTable["frFR"]["Mission success is impossible with your current units."] = "Vous ne gagnerez pas avec la composition actuelle."
-stringTable["frFR"]["Warning: This guidance is a rough estimate. Unit abilities strongly influence the actual result."] = "Attention: Ceci est donné à titre indicatif. Les capacités adverses peuvent fortement influencer le résultat final."
-stringTable["frFR"]["[No Mission Selected]"] = "[Pas d'aventure sélectionnée]"
-
--- German
-stringTable["deDE"] = {}
-stringTable["deDE"]["_adviceFrameWidth"] = 600
-stringTable["deDE"]["_adviceFrameHeight"] = 100
-stringTable["deDE"]["Add some units to your team to begin success estimation."] = "Fügt Einheiten der Mission hinzu um die Erfolgschancenberechnung zu beginnen."
-stringTable["deDE"]["round"] = " Runde"
-stringTable["deDE"]["rounds"] = " Runden"
-stringTable["deDE"]["It would take"] = "Es benötigt"
-stringTable["deDE"]["combat"] = ""--Gefecht
-stringTable["deDE"]["for your current team to beat the enemy team."] = "bis Euer aktuelles Team den Gegner besiegt."
-stringTable["deDE"]["for the enemy team to beat your current team."] = "bis der Gegner Euer aktuelles Team besiegt."
-stringTable["deDE"]["Success is possible with your current units, but it will be close."] = "Eure aktuellen Einheiten können das Gefecht gewinnen, aber es wird sehr knapp."
-stringTable["deDE"]["There is a reasonable chance of success with your current units."] = "Eure aktuellen Einheiten haben eine gute Chance das Gefecht zu gewinnen."
-stringTable["deDE"]["Mission success is impossible with your current units."] = "Eure aktuellen Einheiten haben keine Chance das Gefecht zu gewinnen."
-stringTable["deDE"]["Warning: This guidance is a rough estimate. Unit abilities strongly influence the actual result."] = "Achtung: Diese Richtlinien sind nur eine ungefähre Einschätzung.\nFähigkeiten individueller Einheiten können das Ergebnis stark beeinflussen."
-stringTable["deDE"]["[No Mission Selected]"] = "[Keine Mission ausgewählt]"
-
 -- English
 stringTable["enUS"] = {}
 stringTable["enGB"] = stringTable["enUS"]
 -- stringTable["enUS"]["combat"] = "wombat" -- DEBUG
 
--- Italian
--- stringTable["itIT"] = {}
-
--- Korean (RTL)
--- stringTable["koKR"] = {}
-
 -- Simplified Chinese
 -- Translation by Azpilicuet@CN主宰之剑
 stringTable["zhCN"] = {}
-stringTable["zhCN"]["_adviceFrameWidth"] = 500
+stringTable["zhCN"]["_adviceFrameWidth"] = 550
 stringTable["zhCN"]["_adviceFrameHeight"] = 100
 stringTable["zhCN"]["Add some units to your team to begin success estimation."] = "将一些随从加入到你的队伍中以开始成功估算。"
 stringTable["zhCN"]["round"] = "回合"
@@ -381,7 +357,7 @@ stringTable["zhCN"]["[No Mission Selected]"] = "[没有选择任务]"
 -- Translation by BNS (三皈依 - 暗影之月)@miliui
 -- Arranged by Azpilicuet@CN主宰之剑
 stringTable["zhTW"] = {}
-stringTable["zhTW"]["_adviceFrameWidth"] = 500
+stringTable["zhTW"]["_adviceFrameWidth"] = 550
 stringTable["zhTW"]["_adviceFrameHeight"] = 100
 stringTable["zhTW"]["Add some units to your team to begin success estimation."] = "將一些單位加入到您的隊伍以開始成功估算。"
 stringTable["zhTW"]["round"] = "回合"
@@ -395,15 +371,3 @@ stringTable["zhTW"]["There is a reasonable chance of success with your current u
 stringTable["zhTW"]["Mission success is impossible with your current units."] = "您當前的單位不可能成功完成任務。"
 stringTable["zhTW"]["Warning: This guidance is a rough estimate. Unit abilities strongly influence the actual result."] = "警告: 該指導是一個粗略的估計。 單位技能強烈影響實際結果。"
 stringTable["zhTW"]["[No Mission Selected]"] = "[沒有選擇的任務]"
-
--- Russian
--- stringTable["ruRU"] = {}
-
--- Spanish
--- stringTable["esES"] = {}
-
--- Spanish (Mexico)
--- stringTable["esMX"] = {}
-
--- Portuguese (Brazil)
--- stringTable["ptBR"] = {}

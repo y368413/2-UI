@@ -27,7 +27,7 @@ local UTF8Symbols = {
 	['·']='',['＠']='',['＃']='',['％']='',['／']='',['＆']='',['＊']='',['－']='',['＋']='',['｜']='',['～']='',['　']='',['，']='',['。']='',['、']='',['｛']='',['｝']='',['﹏']='',['？']='',['！']='',['：']='',['；']='',['￥']='',['＝']='',['—']='',['…']='',['‖']='',['【']='',['】']='',['『']='',['』']='',['《']='',['》']='',['（']='',['）']='',['〔']='',['〕']='',['〈']='',['〉']='',['＇']='',['＂']='',['’']='',['‘']='',['“']='',['”']='',['≈']='',['︾']='',['．']='',['∴']='',['灬']='',['━']='',['↑']='',['↓']='',['→']='',['←']='',['▲']='',['丨'] = '',['〡']='',['▇']='',['√']='',['↘']='',['↙']='',['★']='',['‐']='',
 	['|']='',['@']='',['!']='',['/']='',['<']='',['>']='',['"']='',['`']='',['_']='',["'"]='',['#']='',['&']='',[';']='',[':']='',['~']='',['\\']='',['=']='',['\t']='',['\n']='',['\r']='',[' ']='',
 }
-local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡:", "|Hspell.+[=>%- ]+> ", "受伤源自 |Hspell", "已打断.*|Hspell", "→.?|Hspell", "打断：.+|Hspell", "打断.+>.+<", "<iLvl>", "^%-+$", "EH: ", "<友情提示>"}
+local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡:", "|Hspell.+[=>%- ]+> ", "受伤源自 |Hspell", "已打断.*|Hspell", "→.?|Hspell", "打断了.+|Hspell", "打断：.+|Hspell", "打断.+>.+<", "<iLvl>", "^%-+$", "EH: ", "<友情提示>", "挂了。%("}
 local QuestReportTagList = {"任务进度提示", "任务完成[%)%-]", "<大脚", "接受任务[%]:%-]", "进度:.+: %d+/%d+", "【爱不易】", "【有爱插件】","任务.*%[%d+%].+ 已完成!"}
 local RegexCharList = "[().%%%+%-%*?%[%]$^{}]" -- won't work on regex blackWord, but works on others
 
@@ -232,30 +232,38 @@ local MSFOffQuestT = {[42880] = true, [54090]=true,} -- 42880: Meeting their Quo
 local MSFOffQuestFlag = false
 
 --TODO: If player uses hearthstone to leave questzone, QUEST_REMOVED is not fired.
-local Questf = CreateFrame("Frame")
-Questf:RegisterEvent("QUEST_ACCEPTED")
-Questf:RegisterEvent("QUEST_REMOVED")
-Questf:SetScript("OnEvent", function(self,event,arg1,arg2)
-	if event == "QUEST_ACCEPTED" and MSFOffQuestT[arg2] then MSFOffQuestFlag = true end
-	if event == "QUEST_REMOVED" and MSFOffQuestT[arg1] then MSFOffQuestFlag = false end
+local QuestChanged = CreateFrame("Frame")
+QuestChanged:RegisterEvent("QUEST_ACCEPTED")
+QuestChanged:RegisterEvent("QUEST_REMOVED")
+QuestChanged:SetScript("OnEvent", function(self,event,questId)
+	if MSFOffQuestT[questId] then MSFOffQuestFlag = event == "QUEST_ACCEPTED" end
 end)
 
-local MSL, MSLPos = {}, 1
-local function MonsterFilter(self,_,msg)
+local MSL, MSLPos, lastMSID, lastMSIDResult = {}, 1, nil, false
+local function MonsterFilter(self,_,msg,_,_,_,_,_,_,_,_,_,lineID)
 	if not defaults.enableMSF or MSFOffQuestFlag then return end
+	if lineID ~= lastMSID then -- for multi chat tabs, check only once
+		lastMSID = lineID
 
-	for _, v in ipairs(MSL) do if v == msg then return true end end
-	MSL[MSLPos] = msg
-	MSLPos = MSLPos + 1
-	if MSLPos > 7 then MSLPos = MSLPos - 7 end
+		for _, v in ipairs(MSL) do
+			if v == msg then
+				lastMSIDResult = true
+				return true
+			end
+		end
+		MSL[MSLPos] = msg
+		MSLPos = MSLPos + 1
+		if MSLPos > 7 then MSLPos = MSLPos - 7 end
+		lastMSIDResult = false
+	end
+	return lastMSIDResult
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", MonsterFilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", MonsterFilter)
 
 -- System Message
 local SystemFilterTag = {
-	-- !!! Always add parentheses since gsub() has two return values !!!
-	(AZERITE_ISLANDS_XP_GAIN:gsub("%%.-s",".+"):gsub("%%.-d","%%d+")), -- Azerite gain in islands
+	-- !!! Always add parentheses since gsub() has two return values !!! (xxx:gsub())
 }
 if UnitLevel("player") == GetMaxPlayerLevel() then -- spell learn, only when max level
 	local SSFilterStrings = {
