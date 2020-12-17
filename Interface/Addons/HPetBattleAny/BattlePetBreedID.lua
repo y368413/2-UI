@@ -1,4 +1,4 @@
---[[
+﻿--[[
 Written by: Hugh@Burning Blade-US and Simca@Malfurion-US
 
 Special thanks to Nullberri, Ro, and Warla for helping at various points throughout the addon's development.
@@ -612,7 +612,7 @@ SlashCmdList["BATTLEPETBREEDID"] = function(msg)
     local i = 1
     local currAddon = "InterfaceOptionsFrameAddOnsButton" .. i
     while _G[currAddon] do
-        if (_G[currAddon]:GetText() == "Battle Pet BreedID") then _G[currAddon]:Click() break end
+        if (_G[currAddon]:GetText() == BattlePetBreedIDOptionsName) then _G[currAddon]:Click() break end
         i = i + 1
         currAddon = "InterfaceOptionsFrameAddOnsButton" .. i
     end
@@ -7460,11 +7460,18 @@ BPBID_Options.Breedtip.AllStats25: All breeds' stats at level 25
     BPBID_Options.Breedtip.AllStats25Rare: Always assume pet will be Rare at level 25
 --]]
 
+if GetLocale() == "zhCN" then
+  BattlePetBreedIDOptionsName = "|cFFBF00FF[宠物]|r三围数据";
+elseif GetLocale() == "zhTW" then
+  BattlePetBreedIDOptionsName = "|cFFBF00FF[宠物]|r三围数据r";
+else
+  BattlePetBreedIDOptionsName = "|cFFBF00FF[BB]|rBattlePet BreedID";
+end
 
 -- Create options panel
 local Options = CreateFrame("Frame", nil, InterfaceOptionsFramePanelContainer)
 Options:Hide()
-Options.name = "BattlePet BreedID"
+Options.name = BattlePetBreedIDOptionsName
 
 -- Variable for easy positioning
 local lastcheckbox

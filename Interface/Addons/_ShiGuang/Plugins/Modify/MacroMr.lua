@@ -368,27 +368,29 @@ else
 	CreateMrMacroButton()
 end
 
---------------------------------------------------PolarBearRandomHearthstone----------------------------------------## Author:霜刃北极熊  ## Version:2.0
-local random = math.random 
-local insert = table.insert
-
---所有炉石ID 
+--------------------------------------------------PolarBearRandomHearthstone----------------------------------------## Author:霜刃北极熊  ## Version:2.0 
 local hearthstones={ 
 	--> 节日炉石
-	162973, --冬天爷爷的炉石 278244
-	163045, --无头骑士的炉石 278559
-	165669, --春节长者的炉石 285362
-	165670, --小匹德菲特的可爱炉石 
-	165802, --复活节的炉石
-	166746, --吞火者的炉石
-	166747, --美酒节狂欢者的炉石
-	168907, --全息数字化炉石
-	172179, --永恒旅者的炉石
-	--> 其它
-	64488, --旅店老板的女儿
-	93672, --黑暗之门
-	54452, --虚灵之门
-	142542, --城镇传送门 231504   
+  93672,				-- Dark Portal  黑暗之门
+	54452,				-- Ethereal Portal  虚灵之门
+	6948 ,				-- Hearthstone  炉石
+	28585,				-- Ruby Slippers
+	64488,				-- The Innkeeper's Daughter	  旅店老板的女儿
+	142298,				-- Astonishingly Scarlet Slippers
+	142542,				-- Tome of Town Portal  城镇传送门
+	162973,				-- Greatfather Winter's Hearthstone  冬天爷爷的炉石 278244
+	163045,				-- Headless Horseman's Hearthstone  无头骑士的炉石 278559
+	166747,				-- Brewfest Reveler's Hearthstone  美酒节狂欢者的炉石
+	166746,				-- Fire Eater's Hearthstone  吞火者的炉石
+	165802,				-- Noble Gardener's Hearthstone  复活节的炉石
+	168907,				-- Holographic Digitalization Hearthstone 全息数字化炉石
+	165669,				-- Lunar Elder's Hearthstone  春节长者的炉石 285362
+	165670,				-- Peddlefeet's Lovely Hearthstone  小匹德菲特的可爱炉石
+	172179,				-- Eternal Traveler's Hearthstone  永恒旅者的炉石
+	180290,				-- Night Fae Hearthstone
+	182773,				-- Necrolord Hearthstone
+	184353,				-- Kyrian Hearthstone
+	183716, --Venthyr
 } 
 
 --玩家拥有的炉石
@@ -400,7 +402,7 @@ local PolarBearRandomHearthstone = CreateFrame("Button", "PBRH", nil, "SecureAct
 --随机选择一个炉石 
 local function randomhearthstone() 
     if not UnitAffectingCombat("player") then 
-        choosen=playerhas[random(#playerhas)] 
+        choosen=playerhas[math.random (#playerhas)] 
         PolarBearRandomHearthstone:SetAttribute("toy", choosen) 
     end 
 end 
@@ -410,7 +412,7 @@ PolarBearRandomHearthstone:RegisterEvent("PLAYER_LOGIN")
 PolarBearRandomHearthstone:SetScript("OnEvent",function()
     for i,v in ipairs(hearthstones) do
         if PlayerHasToy(v) then
-            insert(playerhas,v)
+            table.insert(playerhas,v)
         end
     end
     if #playerhas == 0 then

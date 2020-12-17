@@ -1,4 +1,4 @@
-﻿--## Version: 9.0.28 ## Author: lteke
+﻿--## Version: 9.0.30 ## Author: lteke
 local InProgressMissions = {}
 
 InProgressMissions.frame = InProgressMissions.frame or CreateFrame("Frame", nil, _G.WorldFrame)
@@ -7,6 +7,7 @@ InProgressMissions.events = InProgressMissions.events or {}
 local MISSION_BUTTON_HEIGHT = 37
 local MISSION_ICON_SIZE = MISSION_BUTTON_HEIGHT - 4
 local MISSION_REWARD_SIZE = MISSION_BUTTON_HEIGHT * 0.78
+local COVENANTMISSION_BUTTONHEIGHT = 64
 
 local FORMAT_DURATION_DAYS = _G.GARRISON_DURATION_DAYS:gsub("([^|]*)|4[^:]+:([^;]+);(.*)", "%1%2%3"):gsub("%%d", "%%.1f")
 local FORMAT_DURATION_HOURS = _G.GARRISON_DURATION_HOURS:gsub("([^|]*)|4[^:]+:([^;]+);(.*)", "%1%2%3"):gsub("%%d", "%%.1f")
@@ -93,6 +94,9 @@ function InProgressMissions:InitDB()
 	if IPMDB.enableBfaMissions == nil then
 		IPMDB.enableBfaMissions = IPMDB.enableLegionMissions
 	end
+	if IPMDB.improveMissionUI == nil then
+		IPMDB.improveMissionUI = true
+	end
 	if type(IPMDB.profiles) ~= "table" then
 		IPMDB.profiles = {}
 	end
@@ -102,13 +106,6 @@ function InProgressMissions:InitDB()
 	if type(IPMDB.profiles[self.profileName]) ~= "table" then
 		IPMDB.profiles[self.profileName] = {}
 	end
-	-- for name, missions in pairs(IPMDB.profiles) do -- back compatibility
-	-- 	for i, mission in ipairs(missions) do
-	-- 		if type(mission) == "table" and not mission.missionEndTime then
-	-- 			mission.missionEndTime = mission.timeComplete
-	-- 		end
-	-- 	end
-	-- end
 end
 
 function InProgressMissions:SaveInProgressMissions()
@@ -154,18 +151,14 @@ do
 	end
 
 	local function CompareMissionTime(m1, m2)
-		if (m1.followerTypeID == GFT.FollowerType_8_0) == (m2.followerTypeID == GFT.FollowerType_8_0) then
+		if (m1.followerTypeID == m2.followerTypeID) and (m1.followerTypeID > GFT.FollowerType_6_2) then
 			if (m1.missionEndTime or 0) == (m2.missionEndTime or 0) then
 				return CompareMissionName(m1, m2)
 			else
 				return (m1.missionEndTime or 0) < (m2.missionEndTime or 0)
 			end
-		elseif (m1.followerTypeID == GFT.FollowerType_7_0) == (m2.followerTypeID == GFT.FollowerType_7_0) then
-			if (m1.missionEndTime or 0) == (m2.missionEndTime or 0) then
-				return CompareMissionName(m1, m2)
-			else
-				return (m1.missionEndTime or 0) < (m2.missionEndTime or 0)
-			end
+		elseif (m1.followerTypeID < GFT.FollowerType_7_0) and (m2.followerTypeID < GFT.FollowerType_7_0) then
+			return (m1.missionEndTime or 0) < (m2.missionEndTime or 0)
 		else
 			return m1.followerTypeID > m2.followerTypeID
 		end
@@ -210,6 +203,7 @@ do
 
 	local temp = {}
 	function InProgressMissions:GetMissions(followerType, dest, sort)
+		local isAutoCombatant = followerType == GFT.FollowerType_9_0 -- Shadowlands
 		C_Garrison.GetInProgressMissions(temp, followerType)
 		for k, mission in pairs(temp) do
 			if type(mission) == "table" then
@@ -220,13 +214,23 @@ do
 					local info = C_Garrison.GetFollowerInfo(id)
 					if info then
 						info.abilities = {}
-						for k, ability in ipairs(C_Garrison.GetFollowerAbilities(info.followerID)) do
-							tinsert(info.abilities, ability.id)
+						if isAutoCombatant then
+							local spells = C_Garrison.GetFollowerAutoCombatSpells(info.followerID, info.level or 1)
+							for k, spell in ipairs(spells or {}) do
+								tinsert(info.abilities, 1, spell.icon)
+							end
+						else
+							for k, ability in ipairs(C_Garrison.GetFollowerAbilities(info.followerID)) do
+								tinsert(info.abilities, ability.id)
+							end
 						end
 						mission.followerInfo[id] = info
 					end
 				end
 				mission.successChance = C_Garrison.GetMissionSuccessChance(mission.missionID)
+				if isAutoCombatant then
+					mission.encounterIconInfo = C_Garrison.GetMissionEncounterIconInfo(mission.missionID)
+				end
 			end
 		end
 		if sort then
@@ -482,8 +486,8 @@ local function GarrisonLandingPageReportList_Update(...)
 				button.NumFollowers:Show()
 			end
 			button.EncounterIcon:SetShown(item.followerTypeID == GFT.FollowerType_9_0)
-			if item.followerTypeID == GFT.FollowerType_9_0 then
-				button.EncounterIcon:SetEncounterInfo(C_Garrison.GetMissionEncounterIconInfo(item.missionID))
+			if item.followerTypeID == GFT.FollowerType_9_0 and item.encounterIconInfo then
+				button.EncounterIcon:SetEncounterInfo(item.encounterIconInfo)
 			end
 			button.Status:SetShown(item.isBuilding and not item.isComplete)
 			button.TimeLeft:SetShown(not item.isComplete)
@@ -714,30 +718,14 @@ local function SetupMissionInfoTooltip(item, isAltMission, anchorFrame)
 		local icon
 		for i = 1, #(item.followers) do
 			id = item.followers[i]
-			if isAltMission then
-				info = type(item.followerInfo) == "table" and item.followerInfo[id]
-			else
-				info = C_Garrison.GetFollowerInfo(id)
-				if info then
-					info.abilities = {}
-					if isAutoCombatant then
-						info.abilities = C_Garrison.GetFollowerAutoCombatSpells(info.followerID, info.level or 1)
-					else
-						for k, ability in ipairs(C_Garrison.GetFollowerAbilities(info.followerID)) do
-							tinsert(info.abilities, ability.id)
-						end
-					end
-				end
-			end
+			info = type(item.followerInfo) == "table" and item.followerInfo[id] or nil
 			if type(info) == "table" then
 				leftText = nil
 				rightText = nil
 				if isAutoCombatant then
 					leftText = MakeIcon(info.portraitIconID)..QualityColorText(FORMAT_LEVEL:format(info.level), info.quality or 2).." "..info.name
-					for i, autoSpell in ipairs(info.abilities) do
-						if autoSpell.icon then
-							rightText = AddIcon(rightText, autoSpell.icon)
-						end
+					for i, icon in ipairs(info.abilities) do
+						rightText = AddIcon(rightText, icon)
 					end
 				elseif (info.followerTypeID >= GFT.FollowerType_7_0) and info.abilities then
 					leftText = MakeIcon(info.portraitIconID)
@@ -1246,12 +1234,109 @@ function InProgressMissions:HookBFAMissionFrame()
 	end
 end
 
+function InProgressMissions:CovenantMissionFrame_SetStyle()
+	if not self.CovenantMissionsScrollFrame then return end
+	self.CovenantMissionsScrollFrame.buttons[1]:SetHeight(COVENANTMISSION_BUTTONHEIGHT)
+	HybridScrollFrame_CreateButtons(self.CovenantMissionsScrollFrame, "CovenantMissionListButtonTemplate", 13, -8, nil, nil, nil, -4)
+	for i, button in ipairs(self.CovenantMissionsScrollFrame.buttons) do
+		button:SetHeight(COVENANTMISSION_BUTTONHEIGHT)
+		button.ButtonBG:ClearAllPoints()
+		button.ButtonBG:SetPoint("TOPLEFT", 0, 0)
+		button.ButtonBG:SetPoint("BOTTOMRIGHT", 0, 0)
+		button.Highlight:ClearAllPoints()
+		button.Highlight:SetPoint("TOPLEFT", 0, 0)
+		button.Highlight:SetPoint("BOTTOMRIGHT", 0, 0)
+		button.Level:ClearAllPoints()
+		button.Level:SetPoint("CENTER", button, "LEFT", 40, 0)
+		button.Level:SetScale(0.9)
+		button.EncounterIcon:ClearAllPoints()
+		button.EncounterIcon:SetPoint("CENTER", button, "LEFT", 110, 0)
+		button.EncounterIcon:SetScale(0.8)
+		button.Title:SetScale(0.9)
+		button.Summary:SetScale(0.85)
+	end
+end
+
+function InProgressMissions:CovenantMissionFrame_SetRewardStyle()
+	local scrollFrame = self.CovenantMissionsScrollFrame
+	local expireText, rAnchor
+	for i, button in ipairs(scrollFrame.buttons) do
+		rAnchor = nil
+		for j, reward in ipairs(button.Rewards) do
+			if reward:IsVisible() then
+				reward:SetScale(0.75)
+				reward:ClearAllPoints()
+				if j == 1 then
+					reward:SetPoint("RIGHT", button, "RIGHT", -30, 0)
+				elseif rAnchor then -- j > 1
+					reward:SetPoint("RIGHT", rAnchor, "LEFT", 10, 0)
+				end
+				rAnchor = reward
+			end
+		end
+		expireText = buttonText[button]
+		if expireText then
+			expireText:ClearAllPoints()
+			expireText:SetPoint("BOTTOM", 0, 7)
+			if rAnchor then
+				expireText:SetPoint("RIGHT", rAnchor, "LEFT", -2, 0)
+			else
+				expireText:SetPoint("RIGHT", button, "RIGHT", -35, 0)
+			end
+		end
+	end
+end
+
+do -- CovenantMissionFrame Smooth Scroll
+	local CovenantMissionFrame_DoMouseWheel
+	local SCROLL_MULTIPLIER = 4
+	local SCROLL_MAX = 9
+	local function CovenantMissionFrame_OnMouseWheel(self, delta, ...)
+		if delta == 1 or delta == -1 then
+			delta = SCROLL_MULTIPLIER * delta
+		end
+		delta = (self.scrollBar.doScroll or 0) + delta
+		if delta > SCROLL_MAX then delta = SCROLL_MAX end
+		if delta < -SCROLL_MAX then delta = -SCROLL_MAX end
+		self.scrollBar.doScroll = delta
+	end
+
+	local function CovenantMissionFrameScrollBar_OnUpdate(self, _, doubleScroll)
+		if not self.doScroll or self.doScroll == 0 then return end
+		if self.doScroll > 0 then
+			HybridScrollFrame_OnMouseWheel(InProgressMissions.CovenantMissionsScrollFrame, 1)
+			self.doScroll = self.doScroll - 1
+		else
+			HybridScrollFrame_OnMouseWheel(InProgressMissions.CovenantMissionsScrollFrame, -1)
+			self.doScroll = self.doScroll + 1
+		end
+		if not doubleScroll and abs(self.doScroll) > SCROLL_MULTIPLIER then
+			return CovenantMissionFrameScrollBar_OnUpdate(self, nil, true)
+		end
+	end
+
+	function InProgressMissions:CovenantMissionFrame_EnableSmoothScroll()
+		self.CovenantMissionsScrollFrame.scrollBar:SetValueStep(7)
+		self.CovenantMissionsScrollFrame.stepSize = 7
+		self.CovenantMissionsScrollFrame:SetScript("OnMouseWheel", CovenantMissionFrame_OnMouseWheel)
+		self.CovenantMissionsScrollFrame.scrollBar:SetScript("OnUpdate", CovenantMissionFrameScrollBar_OnUpdate)
+		self.CovenantMissionsScrollFrame:HookScript("OnHide", function(self) self.scrollBar.doScroll = 0 end)
+	end
+end
+
 function InProgressMissions:HookCovenantMissionFrame()
 	if _G.CovenantMissionFrameMissionsListScrollFrame and not self.CovenantMissionsScrollFrame then
 		self.CovenantMissionsScrollFrame = _G.CovenantMissionFrameMissionsListScrollFrame
 		hooksecurefunc(_G.CovenantMissionFrame.MissionTab.MissionList, "Update", function()
 			MissionsScrollFrame_SetExpiresText(self.CovenantMissionsScrollFrame)
+			if IPMDB.improveMissionUIforceEnabled then
+				self:CovenantMissionFrame_SetRewardStyle()
+			end
 		end)
+	end
+	if IPMDB.improveMissionUIforceEnabled then
+		self:CovenantMissionFrame_SetStyle()
+		self:CovenantMissionFrame_EnableSmoothScroll()
 	end
 end
 
@@ -1380,17 +1465,33 @@ end
 
 local function SlashCommandHandler(msg)
 	if not msg or msg:len() == 0 then
-		if C_Garrison.GetLandingPageGarrisonType() >= Enum.GarrisonType.Type_6_0 then
-			return _G.GarrisonLandingPageMinimapButton:Click()
-		end
-	end
-
-	for char, missions in pairs(IPMDB.profiles) do
-		print("=====", (missions[1] and missions[1].charText) or char, "=====")
-		for k, m in pairs(missions) do
-			if type(m) == "table" then
-				print(("[%03d] %s"):format(m.level, m.name), "-", date("%a,%H:%M", m.missionEndTime), (time() - m.missionEndTime) > 0 and "(".._G.COMPLETE..")" or "")
+		local GarrisonID = C_Garrison.GetLandingPageGarrisonType()
+		if GarrisonID >= Enum.GarrisonType.Type_6_0 then
+			if C_Covenants.GetActiveCovenantID() > 0 then
+				_G.GarrisonLandingPageMinimapButton:Click()
+			else
+				if GarrisonID >= _G.Enum.GarrisonType.Type_9_0 then
+					GarrisonID = _G.Enum.GarrisonType.Type_8_0
+				end
+				ShowGarrisonLandingPage(GarrisonID)
 			end
+		else -- no Garrison
+			for char, missions in pairs(IPMDB.profiles) do
+				print("=====", (missions[1] and missions[1].charText) or char, "=====")
+				for k, m in pairs(missions) do
+					if type(m) == "table" then
+						print(("[%03d] %s"):format(m.level, m.name), "-", date("%a,%H:%M", m.missionEndTime), (time() - m.missionEndTime) > 0 and "(".._G.COMPLETE..")" or "")
+					end
+				end
+			end
+		end
+	else
+		msg = msg:lower()
+		if msg == "missionui" then
+			IPMDB.improveMissionUI = not IPMDB.improveMissionUI
+			print(YELLOW_FONT_COLOR:WrapTextInColorCode("[InProgressMissions]"), RED_FONT_COLOR:WrapTextInColorCode(_G.REQUIRES_RELOAD))
+		else
+			print(YELLOW_FONT_COLOR:WrapTextInColorCode("[InProgressMissions]"), ORANGE_FONT_COLOR:WrapTextInColorCode("Unknown command:"), msg)
 		end
 	end
 end

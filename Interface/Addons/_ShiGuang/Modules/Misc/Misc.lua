@@ -212,7 +212,7 @@ function MISC:UIWidgetFrameMover()
 	hooksecurefunc(UIWidgetBelowMinimapContainerFrame, "SetPoint", function(self, _, parent)
 		if parent == "MinimapCluster" or parent == MinimapCluster then
 			self:ClearAllPoints()
-			self:SetPoint("TOP", frame)
+			self:SetPoint("TOPRIGHT", frame)
 		end
 	end)
 end

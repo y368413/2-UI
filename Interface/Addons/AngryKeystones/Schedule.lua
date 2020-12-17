@@ -2,25 +2,26 @@ local ADDON, Addon = ...
 local Mod = Addon:NewModule('Schedule')
 
 local rowCount = 3
-
 local requestPartyKeystones
 
+local seasonAffix = 121
 local affixSchedule = {
-    [1] = {[1]=5,[2]=3,[3]=9,[4]=120},
-    [2] = {[1]=7,[2]=2,[3]=10,[4]=120},
-    [3] = {[1]=11,[2]=4,[3]=9,[4]=120},
-    [4] = {[1]=8,[2]=14,[3]=10,[4]=120},
-    [5] = {[1]=7,[2]=13,[3]=9,[4]=120},
-    [6] = {[1]=11,[2]=3,[3]=10,[4]=120},
-    [7] = {[1]=6,[2]=4,[3]=9,[4]=120},
-    [8] = {[1]=5,[2]=14,[3]=10,[4]=120},
-    [9] = {[1]=11,[2]=2,[3]=9,[4]=120},
-    [10] = {[1]=7,[2]=12,[3]=10,[4]=120},
-    [11] = {[1]=6,[2]=13,[3]=9,[4]=120},
-    [12] = {[1]=8,[2]=12,[3]=10,[4]=120},
+	[1]  = {[1]=10, [2]=11,  [3]=3,   [4]=seasonAffix},
+	[2]  = {[1]=9,  [2]=7,   [3]=124, [4]=seasonAffix},
+	-- not sure about below
+	[3]  = {[1]=10, [2]=123, [3]=12,  [4]=seasonAffix},
+	[4]  = {[1]=9,  [2]=122, [3]=4,   [4]=seasonAffix},
+	[5]  = {[1]=10, [2]=8,   [3]=14,  [4]=seasonAffix},
+	[6]  = {[1]=9,  [2]=6,   [3]=13,  [4]=seasonAffix},
+	[7]  = {[1]=10, [2]=7,   [3]=4,   [4]=seasonAffix},
+	[8]  = {[1]=9,  [2]=123, [3]=3,   [4]=seasonAffix},
+	[9]  = {[1]=10, [2]=122, [3]=124, [4]=seasonAffix},
+	[10] = {[1]=9,  [2]=11,  [3]=13,  [4]=seasonAffix},
+	[11] = {[1]=10, [2]=8,   [3]=12,  [4]=seasonAffix},
+	[12] = {[1]=9,  [2]=6,   [3]=14,  [4]=seasonAffix},
 }
 
-local affixScheduleUnknown = false
+local affixScheduleUnknown = true or not next(affixSchedule)
 local currentWeek
 local currentKeystoneMapID
 local currentKeystoneLevel
@@ -41,7 +42,7 @@ local function UpdatePartyKeystones()
 
 	if not IsAddOnLoaded("Blizzard_ChallengesUI") then return end
 
-	local playerRealm = select(2, UnitFullName("player"))
+	local playerRealm = GetRealmName()
 
 	local e = 1
 	for i = 1, 4 do
@@ -87,7 +88,7 @@ local function UpdatePartyKeystones()
 		Mod.PartyFrame:Hide()
 	else
 		Mod.AffixFrame:ClearAllPoints()
-		Mod.AffixFrame:SetPoint("TOPLEFT", ChallengesFrame.WeeklyInfo.Child.WeeklyChest, "TOPRIGHT", 130, 55)
+		Mod.AffixFrame:SetPoint("TOPLEFT", ChallengesFrame.WeeklyInfo.Child.WeeklyChest, "TOPRIGHT", 130, 65)
 		Mod.PartyFrame:Show()
 	end
 	while e <= 4 do
@@ -230,11 +231,7 @@ function Mod:Blizzard_ChallengesUI()
 	label:SetJustifyV("MIDDLE")
 	label:SetHeight(72)
 	label:SetWordWrap(true)
-	if affixScheduleUnknown then
-		label:SetText(Addon.Locale.scheduleUnknown)
-	else
-		label:SetText(Addon.Locale.scheduleMissingKeystone)
-	end
+	label:SetText(Addon.Locale.scheduleUnknown)
 	frame.Label = label
 
 	local frame2 = CreateFrame("Frame", nil, ChallengesFrame)

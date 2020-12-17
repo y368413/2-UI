@@ -806,6 +806,7 @@ L["mount"] = "坐骑"
 L["pet"] = "宠物"
 L["spell"] = "法术"
 L["toy"] = "玩具"
+L["rep"] = "声望"
 L["completed"] = "已完成"
 L["incomplete"] = "未完成"
 L["known"] = "已获得"
@@ -1172,7 +1173,7 @@ L["wrigglemortis_note"] = "拉动 {npc:164179} 刷新稀有。"
 L["night_mare_note"] = [[
 前往塞兹仙林，并沿着西北悬崖的树根路前往破损的车。在那可以在地面上拾取 {item:181243}。
 
-把此物品带给位于闪瀑盆地的 {npc:165704}。她将给你一个 {item:181242} 换成10个 {item:173204}。|cFFFF8C00如果她不在这里，你必须完成|cFFFFFD00戈姆蛴围栏的麻烦|r和|cFFFFFD00捣蛋的林鬼|r任务线。|r
+把此物品带给位于闪瀑盆地的 {npc:165704}。用10个 {item:173204} 和她交换一个 {item:181242}。|cFFFF8C00如果她不在这里，你必须完成|cFFFFFD00戈姆蛴围栏的麻烦|r和|cFFFFFD00捣蛋的林鬼|r任务线。|r
 
 接下来，和森林之心的 {npc:160262} 交谈兑换 {item:181242} 为 {item:178675}。如果你不是法夜的话，与守卫交谈让她出来。使用此物品得到 {spell:327083} 增益，可以让你看见 {npc:168135}。
 ]]
@@ -1181,14 +1182,14 @@ L["star_lake"] = "泊星剧场"
 L["star_lake_note"] = [[
 与舞台导演 {npc:171743} 交谈，会开启一场特殊的战斗。战斗每天会更换。
 
-参加全部七场战斗会从  {npc:163714} 解锁 {item:180748}。
+参加全部七场战斗会从 {npc:163714} 解锁 {item:180748}。
 ]]
 L["guldan"] = "古尔丹"
 
 L["cache_of_the_moon"] = "在魅夜花园收集 {npc:171360} 的五个遗失工具并组合它们制造 {item:180753}。交给她工具包后会施放 {spell:334353} 给你，可以让你看到宝箱。"
 L["cache_of_the_night"] = "在整个区域收集 {item:180656}，{item:180654} 和 {item:180655} 组合它们制造 {item:180652}。"
 L["darkreach_supplies"] = "跳上 {npc:169995} 并滑翔到西南方进入空心山峰到达魅夜宝箱宝藏上面。"
-L["desiccated_moth"] = "跳上 {npc:169997} 滑翔到西北方的树的树枝上。燃烧 {item:180784} 于焚香炉收集宝藏。"
+L["desiccated_moth"] = "跳上 {npc:169997} 滑翔到西北方的树的树枝上。在焚香炉燃烧 {item:180784} 后收集宝藏。"
 L["dreamsong_heart"] = "使用 {npc:169997} 滑翔到东北方的树上。"
 L["elusive_faerie_cache"] = "拾取 {spell:333923} 在暮辉林地的东北角并使用拾取宝箱。"
 L["enchanted_dreamcatcher"] = "悬挂在树根顶上。从西侧往上跳最容易。"
@@ -1349,6 +1350,7 @@ L["anima_shard_61297"] = "在石柱后面。\n\n('通灵战潮地下城内。')"
 L["anima_shard_61298"] = "位于在躺椅后面。"
 L["anima_shard_61299"] = "隐藏在大火炬的后面。"
 L["anima_shard_61300"] = "挂在中央字体的壁架上。"
+L["anima_shard_spires"] = "三个碎片位于晋升高塔地下城。"
 L["options_icons_anima_shard"] = "{achievement:14339}"
 L["options_icons_anima_shard_desc"] = "显示 {achievement:14339} 成就中全部50个失落的心能碎片的位置。"
 
@@ -1505,9 +1507,9 @@ L["options_icons_dredbats_desc"] = "显示{npc:161015}的位置和路径。"
 L["options_icons_sinrunners"] = "{npc:174032}"
 L["options_icons_sinrunners_desc"] = "显示{npc:174032}的位置和路径。"
 
-L["addius_note"] = "头脑虚弱的人不应浪费我的时间，但是如果您坚持，我会向您展示真正的痛苦。（暂）"
+L["addius_note"] = "意志薄弱的生灵不该来浪费我的时间，不过如果你坚持的话，我会让你见识下真正的痛苦。"
 L["eyegor_note"] = "艾戈尔准备战斗！"
-L["sylla_note"] = "在这片令人毛骨悚然的地区，人们永远无法期望在这里展开一场出色的战斗，可惜我们在这里。不要浪费我的时间。（暂）"
+L["sylla_note"] = "在这可怕的地方，谁也别指望能打出一场出色的战斗。但是，唉，我们就是在这么个地方。别再浪费我的时间了。"
 
 L["avowed_ritualist_note"] = "把 {npc:160149} 带到这里赦免它们。"
 L["fugitive_soul_note"] = "把此 {npc:160149} 带到 {npc:166150} 附近开始赦罪仪式。"
@@ -1532,6 +1534,7 @@ L["apholeias_note"] = "和3名其他玩家，站在平台的角落并施放 {spe
 L["dekaris_note"] = "在一块凸起的大岩石上。"
 L["drifting_sorrow_note"] = "在悬浮宝珠附近击杀 {npc:175246} 激活首领。"
 L["ekphoras_note"] = "和3名其他玩家，站在平台的角落并施放 {spell:330650} 召唤稀有。"
+L["gorged_shadehound_note"] = "只在 {wq:狩猎：影犬} 事件期间可用。"
 L["ikras_note"] = "在破灭堡飞来飞去。这里是攻击他的好位置。"
 L["orophea_note"] = "从东南方的拾取 {spell:337143} 并提供给 {npc:172577} 激活。"
 L["sanngror_note"] = "如果他是不可攻击，等待直到他不再灵魂实验。"
@@ -1552,7 +1555,7 @@ L["exos_note"] = [[
 L["soul_well_note"] = "接住从灵魂之井喷发而出的冥殇。"
 L["obliterated_soul_shards_note"] = "在桥上收集 {item:177834}。"
 
-L["animaflow_teleporter_note"] = "激活即可直接前往特玛库伦。"
+L["animaflow_teleporter_note"] = "激活即可直接前往噬渊其他位置。"
 L["chaotic_riftstone_note"] = "激活 {spell:344157} 快速穿过噬渊。"
 L["venari_note"] = [[
 使用 {currency:1767} 购买噬渊和托加斯特升级。"
@@ -1571,12 +1574,22 @@ L["Tentative"] = "犹豫"
 L["stygian_cache"] = "冥殇宝箱"
 L["stygian_cache_note"] = "每次刷新只有一人可以拾取宝箱！"
 
+L["box_of_torments_note"] = "在特玛库伦下面打开 {npc:173837}。"
+L["tormentors_notes_note"] = "拾取 {npc:173811} 的尸体。"
+L["words_of_warden_note"] = "检查一些罐子后面岩石上的 {npc:173841}。"
+
 L["options_icons_bonus_boss"] = "奖励精英"
 L["options_icons_bonus_boss_desc"] = "显示奖励精英位置。"
 L["options_icons_bonus_event"] = "奖励事件"
 L["options_icons_bonus_event_desc"] = "显示奖励事件位置。"
 L["options_icons_riftstone"] = "{npc:174962}"
 L["options_icons_riftstone_desc"] = "显示混乱裂隙石传送者位置。"
+L["options_icons_grapples"] = "{npc:176308}"
+L["options_icons_grapples_desc"] = "显示 {item:184653} 升级 {npc:176308} 的位置。"
+L["options_icons_maw_lore"] = "噬渊学识"
+L["options_icons_maw_lore_desc"] = "显示 {achievement:14761} 成就中噬渊学识的位置。"
+L["options_icons_stygian_caches"] = "冥殇宝箱"
+L["options_icons_stygian_caches_desc"] = "显示获取额外冥殇的宝箱位置。"
 
 -------------------------------------------------------------------------------
 ----------------------------------- ICECROWN ----------------------------------

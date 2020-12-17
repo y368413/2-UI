@@ -535,7 +535,7 @@ function HandyNotes_TravelGuide:OnInitialize()
     end
 
     -- Initialize database with HandyNotes
-    HandyNotes:RegisterPluginDB(HandyNotes_TravelGuide.pluginName, PluginHandler, TravelGuide.config.options)
+    HandyNotes:RegisterPluginDB("TravelGuide", PluginHandler, TravelGuide.config.options) --HandyNotes_TravelGuide.pluginName
     self:RegisterEvent("PLAYER_ENTERING_WORLD", "WorldEnter");
 end
 

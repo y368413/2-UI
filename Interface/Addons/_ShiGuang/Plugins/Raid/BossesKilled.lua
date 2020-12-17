@@ -1,4 +1,4 @@
-﻿--## Author: wT  ## Version: 1.5.9.1
+﻿--## Author: wT  ## Version: 9.0.2.1
 local _, BossesKilled = ...
 if not BossesKilled.RegisterEvent and not BossesKilled.UnregisterEvent and not BossesKilled.UnregisterAllEvents then
 	local f = CreateFrame("frame")
@@ -361,4 +361,10 @@ BossesKilled.raidData = {
 	[2037] = { numEncounters = 4, startFrom =  1 }, -- Halls of Devotion
 	[2038] = { numEncounters = 3, startFrom =  1 }, -- Gift of Flesh
 	[2039] = { numEncounters = 2, startFrom =  1 }, -- The Waking Dream
+	
+	-- Castle Nathria
+	[2090] = { numEncounters = 3, startFrom =  1 }, -- The Leeching Vautls
+	[2091] = { numEncounters = 3, startFrom =  1 }, -- Reliquary of Opulence
+	[2092] = { numEncounters = 3, startFrom =  1 }, -- Blood from Stone
+	[2096] = { numEncounters = 1, startFrom =  1 }, -- An Audience with Arrogance
 }

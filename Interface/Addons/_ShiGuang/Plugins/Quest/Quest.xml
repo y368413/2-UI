@@ -3,7 +3,7 @@
 	<Script file="Mingy.lua"/>
 	<Script file="bfaPetQuest.lua"/>
 	<Script file="DarkmoonFaire.lua"/>
-	<Script file="AngryWorldQuest.lua"/>
+	<Script file="AngrierWorldQuests.lua"/>
 	<Script file="KayrCovenantMissions.lua"/>
 	<Script file="WorldMapQuestRewardIcon.lua"/>
 

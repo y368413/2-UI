@@ -797,6 +797,7 @@ L["mount"] = "Mount"
 L["pet"] = "Pet"
 L["spell"] = "Spell"
 L["toy"] = "Toy"
+L["rep"] = "Rep"
 L["completed"] = "Completed"
 L["incomplete"] = "Incomplete"
 L["known"] = "Known"
@@ -1403,6 +1404,7 @@ L["anima_shard_61297"] = "Behind a stone pillar.\n\n('Inside the Necrotic Wake d
 L["anima_shard_61298"] = "Sitting behind a lounge chair."
 L["anima_shard_61299"] = "Hidden behind a large torch."
 L["anima_shard_61300"] = "On a ledge hanging over the central font."
+L["anima_shard_spires"] = "Three shards are located in the Spires of Ascension dungeon."
 L["options_icons_anima_shard"] = "{achievement:14339}"
 L["options_icons_anima_shard_desc"] = "Display the locations of all 50 lost anima shards for the {achievement:14339} achievement."
 
@@ -1586,6 +1588,7 @@ L["apholeias_note"] = "With 3 other players, stand on the corners of the platfor
 L["dekaris_note"] = "On top of a large jutting rock."
 L["drifting_sorrow_note"] = "Kill {npc:175246s} near the hovering orb to activate the boss."
 L["ekphoras_note"] = "With 3 other players, stand on the corners of the platform and cast {spell:330650} to summon the rare."
+L["gorged_shadehound_note"] = "Only available during the {wq:Hunt: Shadehounds} event."
 L["ikras_note"] = "Flies around Perdition Hold. This is a good place to pull him."
 L["orophea_note"] = "Pick up {spell:337143} to the southeast and offer it to {npc:172577} to activate."
 L["sanngror_note"] = "If he is not attackable, wait until he is not experimenting on souls."
@@ -1606,7 +1609,7 @@ Combine all three etchings to create the {item:182329}, which can be used to sum
 L["soul_well_note"] = "Catch the Stygia erupting from the Soul Well."
 L["obliterated_soul_shards_note"] = "Collect {item:177834s} on the bridges."
 
-L["animaflow_teleporter_note"] = "Activate to travel directly to the Tremaculum."
+L["animaflow_teleporter_note"] = "Activate to travel directly to other locations in the Maw."
 L["chaotic_riftstone_note"] = "Activate to {spell:344157} quickly across the Maw."
 L["venari_note"] = [[
 Use {currency:1767} to purchase Maw and Torghast upgrades.
@@ -1625,13 +1628,22 @@ L["Tentative"] = nil
 L["stygian_cache"] = "Stygian Cache"
 L["stygian_cache_note"] = "Only one person can loot the cache each time it spawns!"
 
+L["box_of_torments_note"] = "Open the {npc:173837} under the Tremaculum."
+L["tormentors_notes_note"] = "Loot the corpse of {npc:173811}."
+L["words_of_warden_note"] = "Examine the |cffffff00Paper Scrap|r on a rock behind some pots."
+
 L["options_icons_bonus_boss"] = "Bonus Elites"
 L["options_icons_bonus_boss_desc"] = "Display locations of bonus elites."
 L["options_icons_bonus_event"] = "Bonus Events"
 L["options_icons_bonus_event_desc"] = "Display locations of bonus events."
 L["options_icons_riftstone"] = "{npc:174962s}"
 L["options_icons_riftstone_desc"] = "Display the locations of chaotic riftstone teleporters."
-
+L["options_icons_grapples"] = "{npc:176308s}"
+L["options_icons_grapples_desc"] = "Display grapple locations for the {item:184653} upgrade."
+L["options_icons_maw_lore"] = "Maw Lore"
+L["options_icons_maw_lore_desc"] = "Display maw lore locations for the {achievement:14761} achievement."
+L["options_icons_stygian_caches"] = "Stygian Caches"
+L["options_icons_stygian_caches_desc"] = "Display cache locations containing extra Stygia."
 -------------------------------------------------------------------------------
 ----------------------------------- ICECROWN ----------------------------------
 -------------------------------------------------------------------------------

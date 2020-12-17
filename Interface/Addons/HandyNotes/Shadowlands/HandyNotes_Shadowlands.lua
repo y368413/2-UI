@@ -10,12 +10,13 @@
 
 Shadowlands.COLORS = {
     Blue = 'FF0066FF',
-    Green = 'FF00FF00',
     Gray = 'FF999999',
-    Red = 'FFFF0000',
+    Green = 'FF00FF00',
+    LightBlue = 'FF8080FF',
     Orange = 'FFFF8C00',
-    Yellow = 'FFFFFF00',
+    Red = 'FFFF0000',
     White = 'FFFFFFFF',
+    Yellow = 'FFFFFF00',
     --------------------
     NPC = 'FFFFFD00',
     Spell = 'FF71D5FF'
@@ -2533,7 +2534,7 @@ function Achievement:GetText()
 end
 
 function Achievement:GetStatus()
-    if not self.oneline then return end
+    if not self.oneline and self.criteria then return end
     return self:IsObtained() and Green(L['completed']) or Red(L['incomplete'])
 end
 
@@ -3295,6 +3296,7 @@ local VIGNETTES = {
     -- [4174] = {}, -- Secret Treasure
     -- [4176] = {}, -- Secret Treasure
     -- [4202] = {}, -- Spouting Growth
+    -- [4211] = {}, -- Bonebound Chest
     -- [4213] = {}, -- Enchanted Chest
     -- [4222] = {}, -- Faerie Stash
     -- [4224] = {}, -- Faerie Stash
@@ -3394,6 +3396,7 @@ Shadowlands.groups.FAERIE_TALES = Group('faerie_tales', 355498, {defaults=Shadow
 Shadowlands.groups.FUGITIVES = Group('fugitives', 236247, {defaults=Shadowlands.GROUP_HIDDEN})
 Shadowlands.groups.GRAPPLES = Group('grapples', 'peg_bk', {defaults=Shadowlands.GROUP_HIDDEN})
 Shadowlands.groups.INQUISITORS = Group('inquisitors', 3528307, {defaults=Shadowlands.GROUP_HIDDEN})
+Shadowlands.groups.MAW_LORE = Group('maw_lore', 'chest_gy')
 Shadowlands.groups.RIFTSTONE = Group('riftstone', 'portal_b')
 Shadowlands.groups.SINRUNNER = Group('sinrunners', 'horseshoe_o', {defaults=Shadowlands.GROUP_HIDDEN})
 Shadowlands.groups.SLIME_CAT = Group('slime_cat', 3732497, {defaults=Shadowlands.GROUP_HIDDEN})
@@ -3732,7 +3735,7 @@ map.nodes[30115536] = Rare({
     rewards={
         Achievement({id=14309, criteria=48796}),
         Transmog({item=180154, slot=L["2h_axe"]}), -- Greataxe of Unrelenting Pursuit
-        Mount({item=180730, id=1393}), -- Wild Glimmerfur Prowler
+        Mount({item=180730, id=1393, covenant=NIGHTFAE}), -- Wild Glimmerfur Prowler
         Item({item=182176, quest=62431, covenant=NIGHTFAE}) -- Shadowstalker Soul
     },
     pois={
@@ -4991,6 +4994,11 @@ gardens.nodes[46605310] = AnimaShard({quest=61298, note=L["anima_shard_61298"]})
 gardens.nodes[69403870] = AnimaShard({quest=61299, note=L["anima_shard_61299"]})
 font.nodes[49804690] = AnimaShard({quest=61300, note=L["anima_shard_61300"]})
 
+map.nodes[60552554] = AnimaShard({
+    quest={61298, 61299, 61300},
+    questCount=true,
+    note=L["anima_shard_spires"]
+})
 
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
@@ -5098,7 +5106,7 @@ map.nodes[31603540] = Rare({
     note=L["gieger_note"],
     rewards={
         Transmog({item=184298, slot=L["offhand"]}), -- Amalgamated Forsworn's Journal
-        Mount({item=182080, id=1411}) -- Predatory Plagueroc
+        Mount({item=182080, id=1411, covenant=NECROLORD}) -- Predatory Plagueroc
     }
 }) -- Gieger
 
@@ -5307,7 +5315,7 @@ map.nodes[58197421] = Rare({
         Shadowlands.reward.Spacer(),
         Shadowlands.reward.Section('{npc:157312}'), -- Oily Invertebrate
         Transmog({item=184300, slot=L["cloak"], indent=true}), -- Fused Spineguard
-        Item({item=184155, quest=62804, indent=true}), -- Recovered Containment Pack
+        Item({item=184155, note=L["cosmetic"], quest=62804, indent=true}), -- Recovered Containment Pack
         Pet({item=181270, id=2960, indent=true}) -- Decaying Oozewalker
     }
 })
@@ -5820,7 +5828,7 @@ map.nodes[45847919] = Rare({
     note=L["harika_note"],
     rewards={
         Transmog({item=183720, slot=L["leather"]}), -- Dredbatskin Jerkin
-        Mount({item=180461, id=1310}) -- Horrid Brood Dredwing
+        Mount({item=180461, id=1310, covenant=VENTHYR}) -- Horrid Brood Dredwing
     },
     pois={
         POI({43257769}) -- Ballista Bolt
@@ -5946,7 +5954,7 @@ map.nodes[66507080] = Rare({
 
 map.nodes[43007910] = Rare({
     id=155779,
-    quest=56877,
+    quest=61231,
     note=L["tomb_burster_note"],
     rewards={
         Achievement({id=14310, criteria=48802}),
@@ -5961,7 +5969,17 @@ map.nodes[38607200] = Rare({
     note=L["worldedge_gorger_note"],
     rewards={
         Achievement({id=14310, criteria=48805}),
-        Item({item=180583, quest=61188}) -- Impressionable Gorger Spawn
+        Item({
+            item=180583,
+            quest=61188,
+            IsObtained = function (self)
+                if select(11, C_MountJournal.GetMountInfoByID(1391)) then
+                    return true
+                end
+                return Item.IsObtained(self)
+            end
+        }), -- Impressionable Gorger Spawn
+        Mount({item=182589, id=1391}) -- Loyal Gorger
     }
 }) -- Worldedge Gorger
 
@@ -6788,6 +6806,7 @@ map.nodes[25923116] = Rare({
     id=157964,
     quest=57482,
     note=L["dekaris_note"],
+    rlabel=Shadowlands.status.LightBlue('+80 '..L["rep"]),
     rewards={
         Achievement({id=14744, criteria=49841})
     }
@@ -6797,6 +6816,7 @@ map.nodes[19324172] = Rare({
     id=170301,
     quest=60788,
     note=L["apholeias_note"],
+    rlabel=Shadowlands.status.LightBlue('+100 '..L["rep"]),
     rewards={
         Achievement({id=14744, criteria=49842}),
         Item({item=184106, note=L["ring"]}), -- Gimble
@@ -6807,6 +6827,7 @@ map.nodes[19324172] = Rare({
 map.nodes[39014119] = Rare({
     id=157833,
     quest=57469,
+    rlabel=Shadowlands.status.LightBlue('+100 '..L["rep"]),
     rewards={
         Achievement({id=14744, criteria=49843}),
         Toy({item=184312}) -- Borr-Geth's Fiery Brimstone
@@ -6816,6 +6837,7 @@ map.nodes[39014119] = Rare({
 map.nodes[27731305] = Rare({
     id=171317,
     quest=61106,
+    rlabel=Shadowlands.status.LightBlue('+80 '..L["rep"]),
     rewards={
         Achievement({id=14744, criteria=49844}),
         Transmog({item=183887, slot=L["1h_sword"]}) -- Suirhtaned, Blade of the Heir
@@ -6826,32 +6848,36 @@ map.nodes[60964805] = Rare({
     id=160770,
     quest=62281,
     note=L["in_cave"],
+    rlabel=Shadowlands.status.LightBlue('+100 '..L["rep"]),
     rewards={
-        Achievement({id=14744, criteria=49845}),
+        Achievement({id=14744, criteria=49845})
     }
 }) -- Darithis the Bleak
 
 map.nodes[49128175] = Rare({
     id=158025,
     quest=62282,
+    rlabel=Shadowlands.status.LightBlue('+80 '..L["rep"]),
     rewards={
-        Achievement({id=14744, criteria=49846}),
+        Achievement({id=14744, criteria=49846})
     }
 }) -- Darklord Taraxis
 
 map.nodes[28086058] = Rare({
     id=170711,
     quest=60909,
+    rlabel=Shadowlands.status.LightBlue('+100 '..L["rep"]),
     rewards={
-        Achievement({id=14744, criteria=49847}),
+        Achievement({id=14744, criteria=49847})
     }
 }) -- Dolos <Death's Knife>
 
 map.nodes[23765341] = Rare({
     id=170774,
     quest=60915,
+    rlabel=Shadowlands.status.LightBlue('+100 '..L["rep"]),
     rewards={
-        Achievement({id=14744, criteria=49848}),
+        Achievement({id=14744, criteria=49848})
     }
 }) -- Eketra <The Impaler>
 
@@ -6859,6 +6885,7 @@ map.nodes[42342108] = Rare({
     id=169827,
     quest=60666,
     note=L["ekphoras_note"],
+    rlabel=Shadowlands.status.LightBlue('+100 '..L["rep"]),
     rewards={
         Achievement({id=14744, criteria=49849}),
         Item({item=184105, note=L["ring"]}), -- Gyre
@@ -6869,6 +6896,7 @@ map.nodes[42342108] = Rare({
 map.nodes[19194608] = Rare({ -- was 27584966
     id=154330,
     quest=57509,
+    rlabel=Shadowlands.status.LightBlue('+80 '..L["rep"]),
     rewards={
         Achievement({id=14744, criteria=49850}),
         Pet({item=183407, id=3037}) -- Contained Essence of Dread
@@ -6879,24 +6907,39 @@ map.nodes[20586935] = Rare({
     id=170303,
     quest=62260,
     note=L["exos_note"],
+    rlabel=Shadowlands.status.LightBlue('+100 '..L["rep"]),
     rewards={
         Achievement({id=14744, criteria=49851}),
-        Item({item=184108, note=L["neck"]}) -- Vorpal Amulet
+        Item({item=184108, note=L["neck"]}), -- Vorpal Amulet
+        Item({item=183066, quest=63160}), -- Korrath's Grimoire: Aleketh
+        Item({item=183067, quest=63161}), -- Korrath's Grimoire: Belidir
+        Item({item=183068, quest=63162})  -- Korrath's Grimoire: Gyadrek
     }
 }) -- Exos, Herald of Domination
+
+map.nodes[53507950] = Rare({
+    id=174827,
+    note=L["gorged_shadehound_note"],
+    -- quest=61124,
+    rewards={
+        Mount({item=184167, id=1304}) -- Mawsworn Soulhunter
+    }
+}) -- Gorged Shadehound
 
 map.nodes[30775000] = Rare({
     id=175012,
     quest=62788,
     note=L["ikras_note"],
+    rlabel=Shadowlands.status.LightBlue('+100 '..L["rep"]),
     rewards={
-        Achievement({id=14744, criteria=50621}),
+        Achievement({id=14744, criteria=50621})
     }
 }) -- Ikras the Devourer
 
 map.nodes[16945102] = Rare({
     id=162849,
     quest=60987,
+    rlabel=Shadowlands.status.LightBlue('+100 '..L["rep"]),
     rewards={
         Achievement({id=14744, criteria=49852}),
         Toy({item=184292}) -- Ancient Elethium Coin
@@ -6907,16 +6950,18 @@ map.nodes[45507376] = Rare({
     id=158278,
     quest=57573,
     note=L["in_small_cave"],
+    rlabel=Shadowlands.status.LightBlue('+80 '..L["rep"]),
     rewards={
-        Achievement({id=14744, criteria=49853}),
+        Achievement({id=14744, criteria=49853})
     }
 }) -- Nascent Devourer
 
 map.nodes[48801830] = Rare({
     id=164064,
     quest=60667,
+    rlabel=Shadowlands.status.LightBlue('+80 '..L["rep"]),
     rewards={
-        Achievement({id=14744, criteria=49854}),
+        Achievement({id=14744, criteria=49854})
     }
 }) -- Obolos <Prime Adjutant>
 
@@ -6924,6 +6969,7 @@ map.nodes[23692139] = Rare({
     id=172577,
     quest=61519,
     note=L["orophea_note"],
+    rlabel=Shadowlands.status.LightBlue('+80 '..L["rep"]),
     rewards={
         Achievement({id=14744, criteria=49855}),
         Toy({item=181794}) -- Orophea's Lyre
@@ -6936,19 +6982,21 @@ map.nodes[23692139] = Rare({
 map.nodes[32946646] = Rare({
     id=170634,
     quest=60884,
+    rlabel=Shadowlands.status.LightBlue('+100 '..L["rep"]),
     rewards={
         Achievement({id=14744, criteria=49856}),
-        -- Item({item=183066, quest=63160}), -- Korrath's Grimoire: Aleketh
-        -- Item({item=183067, quest=63161}), -- Korrath's Grimoire: Belidir
-        -- Item({item=183068, quest=63162}) -- Korrath's Grimoire: Gyadrek
+        Item({item=183066, quest=63160}), -- Korrath's Grimoire: Aleketh
+        Item({item=183067, quest=63161}), -- Korrath's Grimoire: Belidir
+        Item({item=183068, quest=63162}) -- Korrath's Grimoire: Gyadrek
     }
 }) -- Shadeweaver Zeris
 
 map.nodes[35974156] = Rare({
     id=166398,
     quest=60834,
+    rlabel=Shadowlands.status.LightBlue('+80 '..L["rep"]),
     rewards={
-        Achievement({id=14744, criteria=49857}),
+        Achievement({id=14744, criteria=49857})
     }
 }) -- Soulforger Rhovus
 
@@ -6956,6 +7004,7 @@ map.nodes[28701204] = Rare({
     id=170302,
     quest=60789, -- 62722?
     note=L["talaporas_note"],
+    rlabel=Shadowlands.status.LightBlue('+100 '..L["rep"]),
     rewards={
         Achievement({id=14744, criteria=49858}),
         Transmog({item=184107, slot=L["cloak"]}), -- Borogove Cloak
@@ -6966,22 +7015,24 @@ map.nodes[28701204] = Rare({
 map.nodes[27397152] = Rare({
     id=170731,
     quest=60914,
+    rlabel=Shadowlands.status.LightBlue('+100 '..L["rep"]),
     rewards={
         Achievement({id=14744, criteria=49859}),
     }
 }) -- Thanassos <Death's Voice>
 
-map.nodes[37676591] = Rare({
+map.nodes[37446212] = Rare({
     id=172862,
     quest=61568,
     note=L["yero_note"],
+    rlabel=Shadowlands.status.LightBlue('+80 '..L["rep"]),
     rewards={
-        Achievement({id=14744, criteria=49860}),
+        Achievement({id=14744, criteria=49860})
     },
     pois={
         Path({
-            37446212, 37356052, 37585887, 38465859, 39185892, 39026021,
-            38456142, 38146265, 37936400, 37676591
+            37976153, 38786073, 39155953, 38795855, 37925852, 37375934,
+            37346068, 37446212
         })
     }
 }) -- Yero the Skittish
@@ -6993,14 +7044,15 @@ map.nodes[37676591] = Rare({
 local BonusBoss = Class('BonusBoss', NPC, {
     icon = 'peg_rd',
     scale = 1.8,
-    group = Shadowlands.groups.BONUS_BOSS
+    group = Shadowlands.groups.BONUS_BOSS,
+    rlabel = Shadowlands.status.LightBlue('+40 '..L["rep"])
 })
 
 map.nodes[28204450] = BonusBoss({
     id=169102,
     quest=61136, -- 63380
     rewards={
-        Achievement({id=14660, criteria=49485}),
+        Achievement({id=14660, criteria=49485})
     }
 }) -- Agonix
 
@@ -7008,7 +7060,7 @@ map.nodes[34087453] = BonusBoss({
     id=170787,
     quest=60920,
     rewards={
-        Achievement({id=14660, criteria=49487}),
+        Achievement({id=14660, criteria=49487})
     }
 }) -- Akros <Death's Hammer>
 
@@ -7025,7 +7077,7 @@ map.nodes[25831479] = BonusBoss({
     id=162452,
     quest=59230,
     rewards={
-        Achievement({id=14660, criteria=49476}),
+        Achievement({id=14660, criteria=49476})
     }
 }) -- Dartanos <Flayer of Souls>
 
@@ -7045,7 +7097,7 @@ map.nodes[31982122] = BonusBoss({
     quest=59183,
     note=L["drifting_sorrow_note"],
     rewards={
-        Achievement({id=14660, criteria=49475}),
+        Achievement({id=14660, criteria=49475})
     }
 }) -- Drifting Sorrow
 
@@ -7053,7 +7105,7 @@ map.nodes[60456478] = BonusBoss({
     id=172523,
     quest=62209,
     rewards={
-        Achievement({id=14660, criteria=49490}),
+        Achievement({id=14660, criteria=49490})
     }
 }) -- Houndmaster Vasanok
 
@@ -7061,15 +7113,15 @@ map.nodes[20782968] = BonusBoss({
     id=162965,
     quest=58918,
     rewards={
-        Achievement({id=14660, criteria=49481}),
+        Achievement({id=14660, criteria=49481})
     }
 }) -- Huwerath
 
 map.nodes[30846866] = BonusBoss({
     id=170692,
-    quest=60903,
+    quest=63381,
     rewards={
-        Achievement({id=14660, criteria=49486}),
+        Achievement({id=14660, criteria=49486})
     }
 }) -- Krala <Death's Wings>
 
@@ -7077,7 +7129,7 @@ map.nodes[27311754] = BonusBoss({
     id=171316,
     quest=61125,
     rewards={
-        Achievement({id=14660, criteria=49488}),
+        Achievement({id=14660, criteria=49488})
     }
 }) -- Malevolent Stygia
 
@@ -7086,6 +7138,8 @@ map.nodes[38642880] = BonusBoss({
     quest=62618,
     rewards={
         Achievement({id=14660, criteria=50408}),
+        Achievement({id=14761, criteria=49909}),
+        Item({item=183061, quest=63158}) -- Wailing Coin
     }
 }) -- Odalrik
 
@@ -7093,7 +7147,7 @@ map.nodes[25364875] = BonusBoss({
     id=162845,
     quest=60991,
     rewards={
-        Achievement({id=14660, criteria=49480}),
+        Achievement({id=14660, criteria=49480})
     }
 }) -- Orrholyn <Lord of Bloodletting>
 
@@ -7102,7 +7156,7 @@ map.nodes[22674223] = BonusBoss({
     quest=63044, -- 63388 ??
     note=L["in_cave"],
     rewards={
-        Achievement({id=14660, criteria=51058}),
+        Achievement({id=14660, criteria=51058})
     },
     pois={
         POI({20813927}) -- Cave entrance
@@ -7113,7 +7167,7 @@ map.nodes[26173744] = BonusBoss({
     id=162829,
     quest=60992,
     rewards={
-        Achievement({id=14660, criteria=49479}),
+        Achievement({id=14660, criteria=49479})
     }
 }) -- Razkazzar <Lord of Axes>
 
@@ -7122,7 +7176,7 @@ map.nodes[55626318] = BonusBoss({
     quest=62210,
     note=L["in_cave"]..' '..L["sanngror_note"],
     rewards={
-        Achievement({id=14660, criteria=49489}),
+        Achievement({id=14660, criteria=49489})
     },
     pois={
         POI({55806753}) -- Cave entrance
@@ -7134,7 +7188,7 @@ map.nodes[61737795] = BonusBoss({
     quest=62211,
     note=L["in_cave"],
     rewards={
-        Achievement({id=14660, criteria=49491}),
+        Achievement({id=14660, criteria=49491})
     },
     pois={
         POI({59268001}) -- Cave entrance
@@ -7145,7 +7199,7 @@ map.nodes[36253744] = BonusBoss({
     id=165047,
     quest=59441,
     rewards={
-        Achievement({id=14660, criteria=49482}),
+        Achievement({id=14660, criteria=49482})
     }
 }) -- Soulsmith Yol-Mattar
 
@@ -7153,7 +7207,7 @@ map.nodes[36844480] = BonusBoss({
     id=156203,
     quest=62539,
     rewards={
-        Achievement({id=14660, criteria=50409}),
+        Achievement({id=14660, criteria=50409})
     }
 }) -- Stygian Incinerator
 
@@ -7162,7 +7216,7 @@ map.nodes[40705959] = BonusBoss({
     quest=61728,
     note=L["valis_note"],
     rewards={
-        Achievement({id=14660, criteria=49492}),
+        Achievement({id=14660, criteria=49492})
     }
 }) -- Valis the Cruel
 
@@ -7232,7 +7286,10 @@ map.nodes[48284145] = NPC({
     note=L["animaflow_teleporter_note"],
     requires=Shadowlands.requirement.Venari(61600),
     scale=1.3,
-    pois={Arrow({48284145, 34181473})}
+    pois={
+        Arrow({48284145, 34181473}), -- The Tremaculum
+        Arrow({48284145, 53426364}) -- The Beastwarrens
+    }
 })
 
 -------------------------------------------------------------------------------
@@ -7261,6 +7318,49 @@ for _, coord in ipairs(GRAPPLES) do
         scale=1.25,
     })
 end
+
+-------------------------------------------------------------------------------
+---------------------------------- MAW LORE -----------------------------------
+-------------------------------------------------------------------------------
+
+local Lore = Class('MawLore', Treasure, {
+    group=Shadowlands.groups.MAW_LORE,
+    rlabel=Shadowlands.status.LightBlue('+150 '..L["rep"]),
+    IsCompleted=function(self)
+        if C_QuestLog.IsOnQuest(self.quest[1]) then return true end
+        return Treasure.IsCompleted(self)
+    end
+})
+
+Map({id=1822}).nodes[73121659] = Lore({
+    quest=63157,
+    note=L["box_of_torments_note"],
+    parent={ id=map.id, pois={POI({27702020})} },
+    rewards={
+        Achievement({id=14761, criteria=49908}),
+        Item({item=183060, quest=63157})
+    }
+}) -- Box of Torments
+
+-- Shadehound Armor Plating ??
+
+map.nodes[35764553] = Lore({
+    quest=63163,
+    note=L["tormentors_notes_note"],
+    rewards={
+        Achievement({id=14761, criteria=49914}),
+        Item({item=183069, quest=63163})
+    }
+}) -- Tormentor's Notes
+
+map.nodes[19363340] = Lore({
+    quest=63159,
+    note=L["words_of_warden_note"],
+    rewards={
+        Achievement({id=14761, criteria=49910}),
+        Item({item=183063, quest=63159})
+    }
+}) -- Words of the Warden
 
 -------------------------------------------------------------------------------
 ------------------------------- STYGIAN CACHES --------------------------------
@@ -7305,16 +7405,16 @@ map.nodes[46914169] = NPC({
         Item({item=184653, quest=63217, note=L["Tentative"]}), -- Animated Levitating Chain
         Item({item=180949, quest=61600, note=L["Tentative"]}), -- Animaflow Stabilizer
         Item({item=184605, quest=63092, note=L["Tentative"]}), -- Sigil of the Unseen
-        Item({item=184588, quest=nil, note=L["Ambivalent"]}), -- Soul-Stabilizing Salve
+        Item({item=184588, quest=63091, note=L["Ambivalent"]}), -- Soul-Stabilizing Talisman
         Shadowlands.reward.Spacer(),
         Section(L["torghast"]),
         Shadowlands.reward.Spacer(),
         Item({item=184620, quest=63202, note=L["Apprehensive"]}), -- Vessel of Unforunate Spirits
         Item({item=184615, quest=63183, note=L["Apprehensive"]}), -- Extradimensional Pockets
         Item({item=184617, quest=63193, note=L["Tentative"]}), -- Bangle of Seniority
-        Item({item=184621, quest=nil, note=L["Ambivalent"]}), -- Ritual Prism of Fortune
-        Item({item=184618, quest=nil, note=L["Cordial"]}), -- Rank Insignia: Acquisitionist
-        Item({item=184619, quest=nil, note=L["Cordial"]}), -- Loupe of Unusual Charm
+        Item({item=184621, quest=63204, note=L["Ambivalent"]}), -- Ritual Prism of Fortune
+        Item({item=184618, quest=63200, note=L["Cordial"]}), -- Rank Insignia: Acquisitionist
+        Item({item=184619, quest=63201, note=L["Cordial"]}), -- Loupe of Unusual Charm
         Item({item=180952, quest=nil, note=L["Appreciative"]}), -- Possibility Matrix
     }
 })

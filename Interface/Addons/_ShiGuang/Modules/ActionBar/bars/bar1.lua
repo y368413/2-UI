@@ -14,9 +14,11 @@ local function UpdateActionbarScale(bar)
 
 	local size = frame.buttonSize * R.db["Actionbar"]["Scale"]
 	frame:SetFrameSize(size)
-	--for _, button in pairs(frame.buttonList) do
+	for _, button in pairs(frame.buttonList) do
 		--button:SetSize(size, size)
-	--end
+		button.Name:SetScale(R.db["Actionbar"]["Scale"])
+		button.HotKey:SetScale(R.db["Actionbar"]["Scale"])
+	end
 end
 
 function Bar:UpdateAllScale()

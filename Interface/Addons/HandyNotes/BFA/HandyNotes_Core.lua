@@ -2,13 +2,13 @@
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
 
-local MistsOfPandaria = {}
+local _, BattleForAzeroth = ...
 
 -------------------------------------------------------------------------------
 ----------------------------------- COLORS ------------------------------------
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.COLORS = {
+BattleForAzeroth.COLORS = {
     Blue = 'FF0066FF',
     Gray = 'FF999999',
     Green = 'FF00FF00',
@@ -22,12 +22,12 @@ MistsOfPandaria.COLORS = {
     Spell = 'FF71D5FF'
 }
 
-MistsOfPandaria.color = {}
-MistsOfPandaria.status = {}
+BattleForAzeroth.color = {}
+BattleForAzeroth.status = {}
 
-for name, color in pairs(MistsOfPandaria.COLORS) do
-    MistsOfPandaria.color[name] = function (t) return string.format('|c%s%s|r', color, t) end
-    MistsOfPandaria.status[name] = function (t) return string.format('(|c%s%s|r)', color, t) end
+for name, color in pairs(BattleForAzeroth.COLORS) do
+    BattleForAzeroth.color[name] = function (t) return string.format('|c%s%s|r', color, t) end
+    BattleForAzeroth.status[name] = function (t) return string.format('(|c%s%s|r)', color, t) end
 end
 
 -------------------------------------------------------------------------------
@@ -43,8 +43,8 @@ end
 local NameResolver = {
     cache = {},
     prepared = {},
-    preparer = CreateDatamineTooltip("HandyNotes_MistsOfPandaria_NamePreparer"),
-    resolver = CreateDatamineTooltip("HandyNotes_MistsOfPandaria_NameResolver")
+    preparer = CreateDatamineTooltip("HandyNotes_BattleForAzeroth_NamePreparer"),
+    resolver = CreateDatamineTooltip("HandyNotes_BattleForAzeroth_NameResolver")
 }
 
 function NameResolver:IsLink (link)
@@ -68,7 +68,7 @@ function NameResolver:Resolve (link)
 
     -- all npcs must be prepared ahead of time to avoid breaking the resolver
     if not self.prepared[link] then
-        MistsOfPandaria.Debug('ERROR: npc link not prepared:', link)
+        BattleForAzeroth.Debug('ERROR: npc link not prepared:', link)
     end
 
     local name = self.cache[link]
@@ -76,8 +76,8 @@ function NameResolver:Resolve (link)
         self.resolver:SetHyperlink(link)
         name = _G[self.resolver:GetName().."TextLeft1"]:GetText() or UNKNOWN
         if name == UNKNOWN then
-            MistsOfPandaria.Debug('NameResolver returned UNKNOWN, recreating tooltip ...')
-            self.resolver = CreateDatamineTooltip("HandyNotes_MistsOfPandaria_NameResolver")
+            BattleForAzeroth.Debug('NameResolver returned UNKNOWN, recreating tooltip ...')
+            self.resolver = CreateDatamineTooltip("HandyNotes_BattleForAzeroth_NameResolver")
         else
             self.cache[link] = name
         end
@@ -113,7 +113,7 @@ local function RenderLinks(str, nameOnly)
             local name = NameResolver:Resolve(("unit:Creature-0-0-0-0-%d"):format(id))
             name = name..(suffix or '')
             if nameOnly then return name end
-            return MistsOfPandaria.color.NPC(name)
+            return BattleForAzeroth.color.NPC(name)
         elseif type == 'achievement' then
             if nameOnly then
                 local _, name = GetAchievementInfo(id)
@@ -121,7 +121,7 @@ local function RenderLinks(str, nameOnly)
             else
                 local link = GetAchievementLink(id)
                 if link then
-                    return MistsOfPandaria.GetIconLink('achievement', 15)..link
+                    return BattleForAzeroth.GetIconLink('achievement', 15)..link
                 end
             end
         elseif type == 'currency' then
@@ -144,13 +144,13 @@ local function RenderLinks(str, nameOnly)
             if name then
                 if nameOnly then return name end
                 local icon = (type == 'daily') and 'quest_ab' or 'quest_ay'
-                return MistsOfPandaria.GetIconLink(icon, 12)..MistsOfPandaria.color.Yellow('['..name..']')
+                return BattleForAzeroth.GetIconLink(icon, 12)..BattleForAzeroth.color.Yellow('['..name..']')
             end
         elseif type == 'spell' then
             local name, _, icon = GetSpellInfo(id)
             if name and icon then
                 if nameOnly then return name end
-                local spell = MistsOfPandaria.color.Spell('|Hspell:'..id..'|h['..name..']|h')
+                local spell = BattleForAzeroth.color.Spell('|Hspell:'..id..'|h['..name..']|h')
                 return '|T'..icon..':0:0:1:-1|t '..spell
             end
         end
@@ -159,8 +159,8 @@ local function RenderLinks(str, nameOnly)
     -- render non-numeric ids
     links, _ = links:gsub('{(%l+):([^}]+)}', function (type, id)
         if type == 'wq' then
-            local icon = MistsOfPandaria.GetIconLink('world_quest', 16, 0, -1)
-            return icon..MistsOfPandaria.color.Yellow('['..id..']')
+            local icon = BattleForAzeroth.GetIconLink('world_quest', 16, 0, -1)
+            return icon..BattleForAzeroth.color.Yellow('['..id..']')
         end
         return type..'+'..id
     end)
@@ -204,7 +204,7 @@ end
 -------------------------------------------------------------------------------
 
 local function GetDatabaseTable(...)
-    local db = _G["HandyNotes_MistsOfPandariaDB"]
+    local db = _G["HandyNotes_BattleForAzerothDB"]
     for _, key in ipairs({...}) do
         if db[key] == nil then db[key] = {} end
         db = db[key]
@@ -226,12 +226,12 @@ same keys in the exact same order even before actual translations are done.
 
 --]]
 
-local AceLocale = LibStub("AceLocale-3.0")
+--[[local AceLocale = LibStub("AceLocale-3.0")
 local LOCALES = {}
 
 local function NewLocale (locale)
     if LOCALES[locale] then return LOCALES[locale] end
-    local L = AceLocale:NewLocale("HandyNotes_MistsOfPandaria", locale, (locale == 'enUS'), true)
+    local L = AceLocale:NewLocale("HandyNotes_BattleForAzeroth", locale, (locale == 'enUS'), true)
     if not L then return end
     local wrapper = {}
     setmetatable(wrapper, {
@@ -242,7 +242,7 @@ local function NewLocale (locale)
         end
     })
     return wrapper
-end
+end]]
 
 -------------------------------------------------------------------------------
 ------------------------------ TABLE CONVERTERS -------------------------------
@@ -252,7 +252,7 @@ local function AsTable (value, class)
     -- normalize to table of scalars
     if type(value) == 'nil' then return end
     if type(value) ~= 'table' then return {value} end
-    if class and MistsOfPandaria.IsInstance(value, class) then return {value} end
+    if class and BattleForAzeroth.IsInstance(value, class) then return {value} end
     return value
 end
 
@@ -269,14 +269,15 @@ end
 
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.AsIDTable = AsIDTable
-MistsOfPandaria.AsTable = AsTable
-MistsOfPandaria.GetDatabaseTable = GetDatabaseTable
-MistsOfPandaria.NameResolver = NameResolver
-MistsOfPandaria.NewLocale = NewLocale
-MistsOfPandaria.PlayerHasItem = PlayerHasItem
-MistsOfPandaria.PrepareLinks = PrepareLinks
-MistsOfPandaria.RenderLinks = RenderLinks
+BattleForAzeroth.AsIDTable = AsIDTable
+BattleForAzeroth.AsTable = AsTable
+BattleForAzeroth.GetDatabaseTable = GetDatabaseTable
+BattleForAzeroth.NameResolver = NameResolver
+--BattleForAzeroth.NewLocale = NewLocale
+BattleForAzeroth.PlayerHasItem = PlayerHasItem
+BattleForAzeroth.PrepareLinks = PrepareLinks
+BattleForAzeroth.RenderLinks = RenderLinks
+
 
 
 
@@ -284,9 +285,9 @@ MistsOfPandaria.RenderLinks = RenderLinks
 ------------------------------------ CLASS ------------------------------------
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.Class = function (name, parent, attrs)
+BattleForAzeroth.Class = function (name, parent, attrs)
     if type(name) ~= 'string' then error('name param must be a string') end
-    if parent and not MistsOfPandaria.IsClass(parent) then error('parent param must be a class') end
+    if parent and not BattleForAzeroth.IsClass(parent) then error('parent param must be a class') end
 
     local Class = attrs or {}
     Class.getters = Class.getters or {}
@@ -357,11 +358,11 @@ end
 ----------------------------------- HELPERS -----------------------------------
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.IsClass = function (class)
+BattleForAzeroth.IsClass = function (class)
     return type(class) == 'table' and class.getters and class.setters
 end
 
-MistsOfPandaria.IsInstance = function (instance, class)
+BattleForAzeroth.IsInstance = function (instance, class)
     if type(instance) ~= 'table' then return false end
     local function compare (c1, c2)
         if c2 == nil then return false end
@@ -371,7 +372,7 @@ MistsOfPandaria.IsInstance = function (instance, class)
     return compare(class, instance.__class)
 end
 
-MistsOfPandaria.Clone = function (instance, newattrs)
+BattleForAzeroth.Clone = function (instance, newattrs)
     local clone = {}
     for k, v in pairs(instance) do clone[k] = v end
     if newattrs then
@@ -381,35 +382,36 @@ MistsOfPandaria.Clone = function (instance, newattrs)
 end
 
 
-
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
 
-local HandyNotes_MistsOfPandaria = LibStub("AceAddon-3.0"):NewAddon("HandyNotes_MistsOfPandaria", "AceBucket-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
+
+local Addon = LibStub("AceAddon-3.0"):NewAddon("HandyNotes_BattleForAzeroth","AceBucket-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes", true)
 local L = LibStub("AceLocale-3.0"):GetLocale("HandyNotes")
 if not HandyNotes then return end
 
-MistsOfPandaria.locale = L
-MistsOfPandaria.maps = {}
+BattleForAzeroth.addon = Addon
+BattleForAzeroth.locale = L
+BattleForAzeroth.maps = {}
 
-_G[HandyNotes_MistsOfPandaria] = HandyNotes_MistsOfPandaria
+_G["HandyNotes_BattleForAzeroth"] = Addon
 
 -------------------------------------------------------------------------------
 ----------------------------------- HELPERS -----------------------------------
 -------------------------------------------------------------------------------
 
-local DropdownMenu = CreateFrame("Frame", "HandyNotes_MistsOfPandariaDropdownMenu")
+local DropdownMenu = CreateFrame("Frame", "HandyNotes_BattleForAzerothDropdownMenu")
 DropdownMenu.displayMode = "MENU"
 local function InitializeDropdownMenu(level, mapID, coord)
     if not level then return end
-    local node = MistsOfPandaria.maps[mapID].nodes[coord]
+    local node = BattleForAzeroth.maps[mapID].nodes[coord]
     local spacer = {text='', disabled=1, notClickable=1, notCheckable=1}
 
     if (level == 1) then
         UIDropDownMenu_AddButton({
-            text=MistsOfPandaria.plugin_name, isTitle=1, notCheckable=1
+            text=BattleForAzeroth.plugin_name, isTitle=1, notCheckable=1
         }, level)
 
         UIDropDownMenu_AddButton(spacer, level)
@@ -430,7 +432,7 @@ local function InitializeDropdownMenu(level, mapID, coord)
                 func=function (button)
                     local x, y = HandyNotes:getXY(coord)
                     TomTom:AddWaypoint(mapID, x, y, {
-                        title = MistsOfPandaria.RenderLinks(node.label, true),
+                        title = BattleForAzeroth.RenderLinks(node.label, true),
                         persistent = nil,
                         minimap = true,
                         world = true
@@ -442,16 +444,16 @@ local function InitializeDropdownMenu(level, mapID, coord)
         UIDropDownMenu_AddButton({
             text=L["context_menu_hide_node"], notCheckable=1,
             func=function (button)
-                HandyNotes_MistsOfPandaria.db.char[mapID..'_coord_'..coord] = true
-                HandyNotes_MistsOfPandaria:Refresh()
+                Addon.db.char[mapID..'_coord_'..coord] = true
+                Addon:Refresh()
             end
         }, level)
 
         UIDropDownMenu_AddButton({
             text=L["context_menu_restore_hidden_nodes"], notCheckable=1,
             func=function ()
-                wipe(HandyNotes_MistsOfPandaria.db.char)
-                HandyNotes_MistsOfPandaria:Refresh()
+                wipe(Addon.db.char)
+                Addon:Refresh()
             end
         }, level)
 
@@ -468,8 +470,8 @@ end
 ---------------------------------- CALLBACKS ----------------------------------
 -------------------------------------------------------------------------------
 
-function HandyNotes_MistsOfPandaria:OnEnter(mapID, coord)
-    local map = MistsOfPandaria.maps[mapID]
+function Addon:OnEnter(mapID, coord)
+    local map = BattleForAzeroth.maps[mapID]
     local node = map.nodes[coord]
 
     if self:GetCenter() > UIParent:GetCenter() then
@@ -480,22 +482,22 @@ function HandyNotes_MistsOfPandaria:OnEnter(mapID, coord)
 
     node:Render(GameTooltip, map:HasPOIs(node))
     map:SetFocus(node, true, true)
-    MistsOfPandaria.MinimapDataProvider:RefreshAllData()
-    MistsOfPandaria.WorldMapDataProvider:RefreshAllData()
+    BattleForAzeroth.MinimapDataProvider:RefreshAllData()
+    BattleForAzeroth.WorldMapDataProvider:RefreshAllData()
     GameTooltip:Show()
 end
 
-function HandyNotes_MistsOfPandaria:OnLeave(mapID, coord)
-    local map = MistsOfPandaria.maps[mapID]
+function Addon:OnLeave(mapID, coord)
+    local map = BattleForAzeroth.maps[mapID]
     local node = map.nodes[coord]
     map:SetFocus(node, false, true)
-    MistsOfPandaria.MinimapDataProvider:RefreshAllData()
-    MistsOfPandaria.WorldMapDataProvider:RefreshAllData()
+    BattleForAzeroth.MinimapDataProvider:RefreshAllData()
+    BattleForAzeroth.WorldMapDataProvider:RefreshAllData()
     GameTooltip:Hide()
 end
 
-function HandyNotes_MistsOfPandaria:OnClick(button, down, mapID, coord)
-    local map = MistsOfPandaria.maps[mapID]
+function Addon:OnClick(button, down, mapID, coord)
+    local map = BattleForAzeroth.maps[mapID]
     local node = map.nodes[coord]
     if button == "RightButton" and down then
         DropdownMenu.initialize = function (_, level)
@@ -505,47 +507,47 @@ function HandyNotes_MistsOfPandaria:OnClick(button, down, mapID, coord)
     elseif button == "LeftButton" and down then
         if map:HasPOIs(node) then
             map:SetFocus(node, not node._focus)
-            HandyNotes_MistsOfPandaria:Refresh()
+            Addon:Refresh()
         end
     end
 end
 
-function HandyNotes_MistsOfPandaria:OnInitialize()
-    MistsOfPandaria.class = select(2, UnitClass('player'))
-    MistsOfPandaria.faction = UnitFactionGroup('player')
-    self.db = LibStub("AceDB-3.0"):New('HandyNotes_MistsOfPandariaDB', MistsOfPandaria.optionDefaults, "Default")
+function Addon:OnInitialize()
+    BattleForAzeroth.class = select(2, UnitClass('player'))
+    BattleForAzeroth.faction = UnitFactionGroup('player')
+    self.db = LibStub("AceDB-3.0"):New('HandyNotes_BattleForAzerothDB', BattleForAzeroth.optionDefaults, "Default")
     self:RegisterEvent("PLAYER_ENTERING_WORLD", function ()
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")
         self:ScheduleTimer("RegisterWithHandyNotes", 1)
     end)
 
     -- Add global groups to settings panel
-    MistsOfPandaria.CreateGlobalGroupOptions()
+    BattleForAzeroth.CreateGlobalGroupOptions()
 
     -- Add quick-toggle menu button to top-right corner of world map
     WorldMapFrame:AddOverlayFrame(
-        "HandyNotes_MistsOfPandariaWorldMapOptionsButtonTemplate",
+        "HandyNotes_BattleForAzerothWorldMapOptionsButtonTemplate",
         "DROPDOWNTOGGLEBUTTON", "TOPRIGHT",
         WorldMapFrame:GetCanvasContainer(), "TOPRIGHT", -68, -2
     )
 
     -- Query localized expansion title
-    if not MistsOfPandaria.expansion then error('Expansion not set: HandyNotes_MistsOfPandaria') end
-    local expansion_name = EJ_GetTierInfo(MistsOfPandaria.expansion)
-    MistsOfPandaria.plugin_name = 'HandyNotes: '..expansion_name
-    MistsOfPandaria.options.name = ('%02d - '):format(MistsOfPandaria.expansion)..expansion_name
+    if not BattleForAzeroth.expansion then error('Expansion not set: HandyNotes_BattleForAzeroth') end
+    local expansion_name = EJ_GetTierInfo(BattleForAzeroth.expansion)
+    BattleForAzeroth.plugin_name = 'HandyNotes: '..expansion_name
+    BattleForAzeroth.options.name = ('%02d - '):format(BattleForAzeroth.expansion)..expansion_name
 end
 
 -------------------------------------------------------------------------------
 ------------------------------------ MAIN -------------------------------------
 -------------------------------------------------------------------------------
 
-function HandyNotes_MistsOfPandaria:RegisterWithHandyNotes()
+function Addon:RegisterWithHandyNotes()
     do
         local map, minimap, force
         local function iter(nodes, precoord)
             if not nodes then return nil end
-            if minimap and MistsOfPandaria:GetOpt('hide_minimap') then return nil end
+            if minimap and BattleForAzeroth:GetOpt('hide_minimap') then return nil end
             local coord, node = next(nodes, precoord)
             while coord do -- Have we reached the end of this zone?
                 if node and (force or map:IsNodeEnabled(node, coord, minimap)) then
@@ -556,14 +558,14 @@ function HandyNotes_MistsOfPandaria:RegisterWithHandyNotes()
             end
             return nil, nil, nil, nil
         end
-        function HandyNotes_MistsOfPandaria:GetNodes2(mapID, _minimap)
-            if MistsOfPandaria:GetOpt('show_debug_map') then
-                MistsOfPandaria.Debug('Loading nodes for map: '..mapID..' (minimap='..tostring(_minimap)..')')
+        function Addon:GetNodes2(mapID, _minimap)
+            if BattleForAzeroth:GetOpt('show_debug_map') then
+                BattleForAzeroth.Debug('Loading nodes for map: '..mapID..' (minimap='..tostring(_minimap)..')')
             end
 
-            map = MistsOfPandaria.maps[mapID]
+            map = BattleForAzeroth.maps[mapID]
             minimap = _minimap
-            force = MistsOfPandaria:GetOpt('force_nodes') or MistsOfPandaria.dev_force
+            force = BattleForAzeroth:GetOpt('force_nodes') or BattleForAzeroth.dev_force
 
             if map then
                 map:Prepare()
@@ -575,11 +577,11 @@ function HandyNotes_MistsOfPandaria:RegisterWithHandyNotes()
         end
     end
 
-    if MistsOfPandaria:GetOpt('development') then
-        MistsOfPandaria.BootstrapDevelopmentEnvironment()
+    if BattleForAzeroth:GetOpt('development') then
+        BattleForAzeroth.BootstrapDevelopmentEnvironment()
     end
 
-    HandyNotes:RegisterPluginDB("HandyNotes_MistsOfPandaria", self, MistsOfPandaria.options)
+    HandyNotes:RegisterPluginDB("HandyNotes_BattleForAzeroth", self, BattleForAzeroth.options)
 
     -- Refresh in any cases where node status may have changed
     self:RegisterBucketEvent({
@@ -602,17 +604,15 @@ function HandyNotes_MistsOfPandaria:RegisterWithHandyNotes()
     self:Refresh()
 end
 
-function HandyNotes_MistsOfPandaria:Refresh()
+function Addon:Refresh()
     if self._refreshTimer then return end
     self._refreshTimer = C_Timer.NewTimer(0.1, function ()
         self._refreshTimer = nil
-        self:SendMessage("HandyNotes_NotifyUpdate", "HandyNotes_MistsOfPandaria")
-        MistsOfPandaria.MinimapDataProvider:RefreshAllData()
-        MistsOfPandaria.WorldMapDataProvider:RefreshAllData()
+        self:SendMessage("HandyNotes_NotifyUpdate", "HandyNotes_BattleForAzeroth")
+        BattleForAzeroth.MinimapDataProvider:RefreshAllData()
+        BattleForAzeroth.WorldMapDataProvider:RefreshAllData()
     end)
 end
-
-
 
 -------------------------------------------------------------------------------
 -------------------------------- ICONS & GLOWS --------------------------------
@@ -627,7 +627,7 @@ local function Glow(name) return GLOWS..'\\'..name..'.blp' end
 local DEFAULT_ICON = 454046
 local DEFAULT_GLOW = Glow('square_icon')
 
-MistsOfPandaria.icons = { -- name => path
+BattleForAzeroth.icons = { -- name => path
 
     chest_bk = {Icon('chest_black'), Glow('chest')},
     chest_bl = {Icon('chest_blue'), Glow('chest')},
@@ -703,7 +703,7 @@ MistsOfPandaria.icons = { -- name => path
 
 local function GetIconPath(name)
     if type(name) == 'number' then return name end
-    local info = MistsOfPandaria.icons[name]
+    local info = BattleForAzeroth.icons[name]
     return info and info[1] or DEFAULT_ICON
 end
 
@@ -717,21 +717,19 @@ end
 
 local function GetGlowPath(name)
     if type(name) == 'number' then return DEFAULT_GLOW end
-    local info = MistsOfPandaria.icons[name]
+    local info = BattleForAzeroth.icons[name]
     return info and info[2] or nil
 end
 
-MistsOfPandaria.GetIconLink = GetIconLink
-MistsOfPandaria.GetIconPath = GetIconPath
-MistsOfPandaria.GetGlowPath = GetGlowPath
-
-
+BattleForAzeroth.GetIconLink = GetIconLink
+BattleForAzeroth.GetIconPath = GetIconPath
+BattleForAzeroth.GetGlowPath = GetGlowPath
 
 -------------------------------------------------------------------------------
 ---------------------------------- DEFAULTS -----------------------------------
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.optionDefaults = {
+BattleForAzeroth.optionDefaults = {
     profile = {
         -- visibility
         hide_done_rares = false,
@@ -772,30 +770,30 @@ MistsOfPandaria.optionDefaults = {
 ----------------------------------- HELPERS -----------------------------------
 -------------------------------------------------------------------------------
 
-function MistsOfPandaria:GetOpt(n) return HandyNotes_MistsOfPandaria.db.profile[n] end
-function MistsOfPandaria:SetOpt(n, v) HandyNotes_MistsOfPandaria.db.profile[n] = v; HandyNotes_MistsOfPandaria:Refresh() end
+function BattleForAzeroth:GetOpt(n) return BattleForAzeroth.addon.db.profile[n] end
+function BattleForAzeroth:SetOpt(n, v) BattleForAzeroth.addon.db.profile[n] = v; BattleForAzeroth.addon:Refresh() end
 
-function MistsOfPandaria:GetColorOpt(n)
-    local db = HandyNotes_MistsOfPandaria.db.profile
+function BattleForAzeroth:GetColorOpt(n)
+    local db = BattleForAzeroth.addon.db.profile
     return db[n..'_R'], db[n..'_G'], db[n..'_B'], db[n..'_A']
 end
 
-function MistsOfPandaria:SetColorOpt(n, r, g, b, a)
-    local db = HandyNotes_MistsOfPandaria.db.profile
+function BattleForAzeroth:SetColorOpt(n, r, g, b, a)
+    local db = BattleForAzeroth.addon.db.profile
     db[n..'_R'], db[n..'_G'], db[n..'_B'], db[n..'_A'] = r, g, b, a
-    HandyNotes_MistsOfPandaria:Refresh()
+    BattleForAzeroth.addon:Refresh()
 end
 
 -------------------------------------------------------------------------------
 --------------------------------- OPTIONS UI ----------------------------------
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.options = {
+BattleForAzeroth.options = {
     type = "group",
     name = nil, -- populated in core.lua
     childGroups = "tab",
-    get = function(info) return MistsOfPandaria:GetOpt(info.arg) end,
-    set = function(info, v) MistsOfPandaria:SetOpt(info.arg, v) end,
+    get = function(info) return BattleForAzeroth:GetOpt(info.arg) end,
+    set = function(info, v) BattleForAzeroth:SetOpt(info.arg, v) end,
     args = {
         GeneralTab = {
             type = "group",
@@ -863,8 +861,8 @@ MistsOfPandaria.options = {
                     order = 17,
                     width = "full",
                     func = function ()
-                        wipe(HandyNotes_MistsOfPandaria.db.char)
-                        HandyNotes_MistsOfPandaria:Refresh()
+                        wipe(BattleForAzeroth.addon.db.char)
+                        BattleForAzeroth.addon:Refresh()
                     end
                 },
                 FocusHeader = {
@@ -886,8 +884,8 @@ MistsOfPandaria.options = {
                     name = L["options_poi_color"],
                     desc = L["options_poi_color_desc"],
                     hasAlpha = true,
-                    set = function(_, ...) MistsOfPandaria:SetColorOpt('poi_color', ...) end,
-                    get = function() return MistsOfPandaria:GetColorOpt('poi_color') end,
+                    set = function(_, ...) BattleForAzeroth:SetColorOpt('poi_color', ...) end,
+                    get = function() return BattleForAzeroth:GetColorOpt('poi_color') end,
                     order = 22,
                 },
                 PATH_color = {
@@ -895,8 +893,8 @@ MistsOfPandaria.options = {
                     name = L["options_path_color"],
                     desc = L["options_path_color_desc"],
                     hasAlpha = true,
-                    set = function(_, ...) MistsOfPandaria:SetColorOpt('path_color', ...) end,
-                    get = function() return MistsOfPandaria:GetColorOpt('path_color') end,
+                    set = function(_, ...) BattleForAzeroth:SetColorOpt('path_color', ...) end,
+                    get = function() return BattleForAzeroth:GetColorOpt('path_color') end,
                     order = 23,
                 },
                 restore_poi_colors = {
@@ -906,9 +904,9 @@ MistsOfPandaria.options = {
                     order = 24,
                     width = "full",
                     func = function ()
-                        local df = MistsOfPandaria.optionDefaults.profile
-                        MistsOfPandaria:SetColorOpt('poi_color', df.poi_color_R, df.poi_color_G, df.poi_color_B, df.poi_color_A)
-                        MistsOfPandaria:SetColorOpt('path_color', df.path_color_R, df.path_color_G, df.path_color_B, df.path_color_A)
+                        local df = BattleForAzeroth.optionDefaults.profile
+                        BattleForAzeroth:SetColorOpt('poi_color', df.poi_color_R, df.poi_color_G, df.poi_color_B, df.poi_color_A)
+                        BattleForAzeroth:SetColorOpt('path_color', df.path_color_R, df.path_color_G, df.path_color_B, df.path_color_A)
                     end
                 },
                 TooltipsHeader = {
@@ -936,7 +934,7 @@ MistsOfPandaria.options = {
             type = "group",
             name = L["options_global"],
             desc = L["options_global_description"],
-            disabled = function () return MistsOfPandaria:GetOpt('per_map_settings') end,
+            disabled = function () return BattleForAzeroth:GetOpt('per_map_settings') end,
             order = 1,
             args = {}
         },
@@ -954,20 +952,20 @@ MistsOfPandaria.options = {
 -- Display these groups in the global settings tab. They are the most common
 -- group options that players might want to customize.
 
-function MistsOfPandaria.CreateGlobalGroupOptions()
+function BattleForAzeroth.CreateGlobalGroupOptions()
     for i, group in ipairs({
-        MistsOfPandaria.groups.RARE,
-        MistsOfPandaria.groups.TREASURE,
-        MistsOfPandaria.groups.PETBATTLE,
-        MistsOfPandaria.groups.MISC
+        BattleForAzeroth.groups.RARE,
+        BattleForAzeroth.groups.TREASURE,
+        BattleForAzeroth.groups.PETBATTLE,
+        BattleForAzeroth.groups.MISC
     }) do
-        MistsOfPandaria.options.args.GlobalTab.args['group_icon_'..group.name] = {
+        BattleForAzeroth.options.args.GlobalTab.args['group_icon_'..group.name] = {
             type = "header",
-            name = function () return MistsOfPandaria.RenderLinks(group.label, true) end,
+            name = function () return BattleForAzeroth.RenderLinks(group.label, true) end,
             order = i * 10,
         }
 
-        MistsOfPandaria.options.args.GlobalTab.args['icon_scale_'..group.name] = {
+        BattleForAzeroth.options.args.GlobalTab.args['icon_scale_'..group.name] = {
             type = "range",
             name = L["options_scale"],
             desc = L["options_scale_desc"],
@@ -977,7 +975,7 @@ function MistsOfPandaria.CreateGlobalGroupOptions()
             order = i * 10 + 1,
         }
 
-        MistsOfPandaria.options.args.GlobalTab.args['icon_alpha_'..group.name] = {
+        BattleForAzeroth.options.args.GlobalTab.args['icon_alpha_'..group.name] = {
             type = "range",
             name = L["options_opacity"],
             desc = L["options_opacity_desc"],
@@ -995,13 +993,13 @@ end
 
 local _INITIALIZED = {}
 
-function MistsOfPandaria.CreateGroupOptions (map, group)
+function BattleForAzeroth.CreateGroupOptions (map, group)
     -- Check if we've already initialized this group
     if _INITIALIZED[group.name..map.id] then return end
     _INITIALIZED[group.name..map.id] = true
 
     -- Create map options group under zones tab
-    local options = MistsOfPandaria.options.args.ZonesTab.args['Zone_'..map.id]
+    local options = BattleForAzeroth.options.args.ZonesTab.args['Zone_'..map.id]
     if not options then
         options = {
             type = "group",
@@ -1037,7 +1035,7 @@ function MistsOfPandaria.CreateGroupOptions (map, group)
                 }
             }
         }
-        MistsOfPandaria.options.args.ZonesTab.args['Zone_'..map.id] = options
+        BattleForAzeroth.options.args.ZonesTab.args['Zone_'..map.id] = options
     end
 
     map._icons_order = map._icons_order or 0
@@ -1047,8 +1045,8 @@ function MistsOfPandaria.CreateGroupOptions (map, group)
         type = "toggle",
         get = function () return group:GetDisplay(map.id) end,
         set = function (info, v) group:SetDisplay(v, map.id) end,
-        name = function () return MistsOfPandaria.RenderLinks(group.label, true) end,
-        desc = function () return MistsOfPandaria.RenderLinks(group.desc) end,
+        name = function () return BattleForAzeroth.RenderLinks(group.label, true) end,
+        desc = function () return BattleForAzeroth.RenderLinks(group.desc) end,
         disabled = function () return not group:IsEnabled() end,
         width = 0.9,
         order = map._icons_order
@@ -1056,7 +1054,7 @@ function MistsOfPandaria.CreateGroupOptions (map, group)
 
     options.args.VisibilityGroup.args["header_"..group.name] = {
         type = "header",
-        name = function () return MistsOfPandaria.RenderLinks(group.label, true) end,
+        name = function () return BattleForAzeroth.RenderLinks(group.label, true) end,
         order = map._visibility_order
     }
 
@@ -1088,6 +1086,7 @@ function MistsOfPandaria.CreateGroupOptions (map, group)
     map._visibility_order = map._visibility_order + 3
 end
 
+
 -------------------------------------------------------------------------------
 --------------------------------- DEVELOPMENT ---------------------------------
 -------------------------------------------------------------------------------
@@ -1109,32 +1108,32 @@ To enable all development settings and functionality:
 -- Register all addons objects for the CTRL+ALT handler
 local plugins = "HandyNotes_ZarPlugins"
 if _G[plugins] == nil then _G[plugins] = {} end
-_G[plugins][#_G[plugins] + 1] = MistsOfPandaria
+_G[plugins][#_G[plugins] + 1] = BattleForAzeroth
 
 local function BootstrapDevelopmentEnvironment()
     _G['HandyNotes_ZarPluginsDevelopment'] = true
 
     -- Add development settings to the UI
-    MistsOfPandaria.options.args.GeneralTab.args.DevelopmentHeader = {
+    BattleForAzeroth.options.args.GeneralTab.args.DevelopmentHeader = {
         type = "header",
         name = L["options_dev_settings"],
         order = 100,
     }
-    MistsOfPandaria.options.args.GeneralTab.args.show_debug_map = {
+    BattleForAzeroth.options.args.GeneralTab.args.show_debug_map = {
         type = "toggle",
         arg = "show_debug_map",
         name = L["options_toggle_show_debug_map"],
         desc = L["options_toggle_show_debug_map_desc"],
         order = 101,
     }
-    MistsOfPandaria.options.args.GeneralTab.args.show_debug_quest = {
+    BattleForAzeroth.options.args.GeneralTab.args.show_debug_quest = {
         type = "toggle",
         arg = "show_debug_quest",
         name = L["options_toggle_show_debug_quest"],
         desc = L["options_toggle_show_debug_quest_desc"],
         order = 102,
     }
-    MistsOfPandaria.options.args.GeneralTab.args.force_nodes = {
+    BattleForAzeroth.options.args.GeneralTab.args.force_nodes = {
         type = "toggle",
         arg = "force_nodes",
         name = L["options_toggle_force_nodes"],
@@ -1143,22 +1142,22 @@ local function BootstrapDevelopmentEnvironment()
     }
 
     -- Print debug messages for each quest ID that is flipped
-    local QTFrame = CreateFrame('Frame', "HandyNotes_MistsOfPandariaQT")
-    local history = MistsOfPandaria.GetDatabaseTable('quest_id_history')
+    local QTFrame = CreateFrame('Frame', "HandyNotes_BattleForAzerothQT")
+    local history = BattleForAzeroth.GetDatabaseTable('quest_id_history')
     local lastCheck = GetTime()
     local quests = {}
     local changed = {}
     local max_quest_id = 100000
 
     local function DebugQuest(...)
-        if MistsOfPandaria:GetOpt('show_debug_quest') then MistsOfPandaria.Debug(...) end
+        if BattleForAzeroth:GetOpt('show_debug_quest') then BattleForAzeroth.Debug(...) end
     end
 
     C_Timer.After(2, function ()
         -- Give some time for quest info to load in before we start
         for id = 0, max_quest_id do quests[id] = C_QuestLog.IsQuestFlaggedCompleted(id) end
         QTFrame:SetScript('OnUpdate', function ()
-            if GetTime() - lastCheck > 1 and MistsOfPandaria:GetOpt('show_debug_quest') then
+            if GetTime() - lastCheck > 1 and BattleForAzeroth:GetOpt('show_debug_quest') then
                 for id = 0, max_quest_id do
                     local s = C_QuestLog.IsQuestFlaggedCompleted(id)
                     if s ~= quests[id] then
@@ -1187,7 +1186,7 @@ local function BootstrapDevelopmentEnvironment()
     end)
 
     -- Listen for LCTRL + LALT when the map is open to force display nodes
-    local IQFrame = CreateFrame('Frame', "HandyNotes_MistsOfPandariaIQ", WorldMapFrame)
+    local IQFrame = CreateFrame('Frame', "HandyNotes_BattleForAzerothIQ", WorldMapFrame)
     local groupPins = WorldMapFrame.pinPools.GroupMembersPinTemplate
     IQFrame:SetPropagateKeyboardInput(true)
     IQFrame:SetScript('OnKeyDown', function (_, key)
@@ -1246,8 +1245,8 @@ end
 
 -- Debug function that prints entries from the quest id history
 
-_G['HandyNotes_MistsOfPandariaQuestHistory'] = function (count)
-    local history = MistsOfPandaria.GetDatabaseTable('quest_id_history')
+_G['HandyNotes_BattleForAzerothQuestHistory'] = function (count)
+    local history = BattleForAzeroth.GetDatabaseTable('quest_id_history')
     if #history == 0 then return print('Quest ID history is empty') end
     for i = 1, (count or 10) do
         if i > #history then break end
@@ -1269,7 +1268,7 @@ end
 -- map. This is helpful for determining which template a pin is coming from.
 
 local hidden = {}
-_G['HandyNotes_MistsOfPandariaRemovePins'] = function ()
+_G['HandyNotes_BattleForAzerothRemovePins'] = function ()
     for k, v in pairs(WorldMapFrame.pinPools) do
         if not hidden[k] then
             hidden[k] = true
@@ -1282,32 +1281,31 @@ end
 
 -------------------------------------------------------------------------------
 
-function MistsOfPandaria.Debug(...)
-    if not HandyNotes_MistsOfPandaria.db then return end
-    if MistsOfPandaria:GetOpt('development') then print(MistsOfPandaria.color.Blue('DEBUG:'), ...) end
+function BattleForAzeroth.Debug(...)
+    if not BattleForAzeroth.addon.db then return end
+    if BattleForAzeroth:GetOpt('development') then print(BattleForAzeroth.color.Blue('DEBUG:'), ...) end
 end
 
-function MistsOfPandaria.Warn(...)
-    if not HandyNotes_MistsOfPandaria.db then return end
-    if MistsOfPandaria:GetOpt('development') then print(MistsOfPandaria.color.Orange('WARN:'), ...) end
+function BattleForAzeroth.Warn(...)
+    if not BattleForAzeroth.addon.db then return end
+    if BattleForAzeroth:GetOpt('development') then print(BattleForAzeroth.color.Orange('WARN:'), ...) end
 end
 
-function MistsOfPandaria.Error(...)
-    if not HandyNotes_MistsOfPandaria.db then return end
-    if MistsOfPandaria:GetOpt('development') then print(MistsOfPandaria.color.Red('ERROR:'), ...) end
+function BattleForAzeroth.Error(...)
+    if not BattleForAzeroth.addon.db then return end
+    if BattleForAzeroth:GetOpt('development') then print(BattleForAzeroth.color.Red('ERROR:'), ...) end
 end
 
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.BootstrapDevelopmentEnvironment = BootstrapDevelopmentEnvironment
-
+BattleForAzeroth.BootstrapDevelopmentEnvironment = BootstrapDevelopmentEnvironment
 
 
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
 
-local Class = MistsOfPandaria.Class
+local Class = BattleForAzeroth.Class
 
 local HBD = LibStub("HereBeDragons-2.0")
 local HBDPins = LibStub("HereBeDragons-Pins-2.0")
@@ -1349,12 +1347,12 @@ function Map:Initialize(attrs)
     })
 
     -- auto-register this map
-    if MistsOfPandaria.maps[self.id] then error('Map already registered: '..self.id) end
-    MistsOfPandaria.maps[self.id] = self
+    if BattleForAzeroth.maps[self.id] then error('Map already registered: '..self.id) end
+    BattleForAzeroth.maps[self.id] = self
 end
 
 function Map:AddNode(coord, node)
-    if not MistsOfPandaria.IsInstance(node, MistsOfPandaria.node.Node) then
+    if not BattleForAzeroth.IsInstance(node, BattleForAzeroth.node.Node) then
         error(format('All nodes must be instances of the Node() class: %d %s', coord, tostring(node)))
     end
 
@@ -1364,10 +1362,10 @@ function Map:AddNode(coord, node)
         fgroup[#fgroup + 1] = coord
     end
 
-    if node.group ~= MistsOfPandaria.groups.QUEST then
+    if node.group ~= BattleForAzeroth.groups.QUEST then
         -- Initialize group defaults and UI controls for this map if the group does
         -- not inherit its settings and defaults from a parent map
-        if self.settings then MistsOfPandaria.CreateGroupOptions(self, node.group) end
+        if self.settings then BattleForAzeroth.CreateGroupOptions(self, node.group) end
 
         -- Keep track of all groups associated with this map
         if not self.groups[node.group.name] then
@@ -1389,8 +1387,8 @@ function Map:AddNode(coord, node)
             if not (px and py) then
                 error(format('No parent coords for node: %d %s %d', coord, tostring(node), parent.id))
             end
-            local map = MistsOfPandaria.maps[parent.id] or Map({id=parent.id})
-            map.nodes[HandyNotes:getCoord(px, py)] = MistsOfPandaria.Clone(node, {pois=(parent.pois or false)})
+            local map = BattleForAzeroth.maps[parent.id] or Map({id=parent.id})
+            map.nodes[HandyNotes:getCoord(px, py)] = BattleForAzeroth.Clone(node, {pois=(parent.pois or false)})
         end
     end
 end
@@ -1413,10 +1411,10 @@ function Map:HasPOIs(node)
 end
 
 function Map:IsNodeEnabled(node, coord, minimap)
-    local db = HandyNotes_MistsOfPandaria.db
+    local db = BattleForAzeroth.addon.db
 
     -- Check for dev force enable
-    if MistsOfPandaria:GetOpt('force_nodes') or MistsOfPandaria.dev_force then return true end
+    if BattleForAzeroth:GetOpt('force_nodes') or BattleForAzeroth.dev_force then return true end
 
     -- Check if the zone is still phased
     if node ~= self.intro and not self.phased then return false end
@@ -1428,7 +1426,7 @@ function Map:IsNodeEnabled(node, coord, minimap)
     if not node.minimap and minimap then return false end
 
     -- Node may be faction restricted
-    if node.faction and node.faction ~= MistsOfPandaria.faction then return false end
+    if node.faction and node.faction ~= BattleForAzeroth.faction then return false end
 
     -- Check if node's group is disabled
     if not node.group:IsEnabled() then return false end
@@ -1465,12 +1463,12 @@ end
 ---------------------------- MINIMAP DATA PROVIDER ----------------------------
 -------------------------------------------------------------------------------
 
-local MinimapPinsKey = "HandyNotes_MistsOfPandariaMinimapPins"
-local MinimapDataProvider = CreateFrame("Frame", "HandyNotes_MistsOfPandariaMinimapDP")
-local MinimapPinTemplate = 'HandyNotes_MistsOfPandariaMinimapPinTemplate'
+local MinimapPinsKey = "HandyNotes_BattleForAzerothMinimapPins"
+local MinimapDataProvider = CreateFrame("Frame", "HandyNotes_BattleForAzerothMinimapDP")
+local MinimapPinTemplate = 'HandyNotes_BattleForAzerothMinimapPinTemplate'
 local MinimapPinMixin = {}
 
-_G['HandyNotes_MistsOfPandariaMinimapPinMixin'] = MinimapPinMixin
+_G['HandyNotes_BattleForAzerothMinimapPinMixin'] = MinimapPinMixin
 
 MinimapDataProvider.facing = GetPlayerFacing()
 MinimapDataProvider.pins = {}
@@ -1494,7 +1492,7 @@ function MinimapDataProvider:AcquirePin(template, ...)
     if pin then
         self.pool[pin] = nil -- remove it from the pool
     else
-        pin = CreateFrame("Button", "HandyNotes_MistsOfPandariaPin"..(#self.pins + 1), Minimap, template)
+        pin = CreateFrame("Button", "HandyNotes_BattleForAzerothPin"..(#self.pins + 1), Minimap, template)
         pin.provider = self
         pin:OnLoad()
         pin:Hide()
@@ -1511,7 +1509,7 @@ function MinimapDataProvider:RefreshAllData()
     HBDPins:RemoveAllMinimapIcons(MinimapPinsKey)
     self:ReleaseAllPins()
 
-    local map = MistsOfPandaria.maps[HBD:GetPlayerZone()]
+    local map = BattleForAzeroth.maps[HBD:GetPlayerZone()]
     if not map then return end
 
     for coord, node in pairs(map.nodes) do
@@ -1581,11 +1579,11 @@ MinimapDataProvider:SetScript('OnUpdate', function ()
     end
 end)
 
-HandyNotes_MistsOfPandaria:RegisterEvent('MINIMAP_UPDATE_ZOOM', function (...)
+BattleForAzeroth.addon:RegisterEvent('MINIMAP_UPDATE_ZOOM', function (...)
     MinimapDataProvider:RefreshAllData()
 end)
 
-HandyNotes_MistsOfPandaria:RegisterEvent('CVAR_UPDATE', function (_, varname)
+BattleForAzeroth.addon:RegisterEvent('CVAR_UPDATE', function (_, varname)
     if varname == 'ROTATE_MINIMAP' then
         MinimapDataProvider:RefreshAllData()
     end
@@ -1596,10 +1594,10 @@ end)
 -------------------------------------------------------------------------------
 
 local WorldMapDataProvider = CreateFromMixins(MapCanvasDataProviderMixin)
-local WorldMapPinTemplate = 'HandyNotes_MistsOfPandariaWorldMapPinTemplate'
+local WorldMapPinTemplate = 'HandyNotes_BattleForAzerothWorldMapPinTemplate'
 local WorldMapPinMixin = CreateFromMixins(MapCanvasPinMixin)
 
-_G['HandyNotes_MistsOfPandariaWorldMapPinMixin'] = WorldMapPinMixin
+_G['HandyNotes_BattleForAzerothWorldMapPinMixin'] = WorldMapPinMixin
 
 function WorldMapDataProvider:RemoveAllData()
     if self:GetMap() then
@@ -1611,7 +1609,7 @@ function WorldMapDataProvider:RefreshAllData(fromOnShow)
     self:RemoveAllData()
 
     if not self:GetMap() then return end
-    local map = MistsOfPandaria.maps[self:GetMap():GetMapID()]
+    local map = BattleForAzeroth.maps[self:GetMap():GetMapID()]
     if not map then return end
 
     for coord, node in pairs(map.nodes) do
@@ -1690,12 +1688,17 @@ end
 
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.Map = Map
-MistsOfPandaria.MinimapDataProvider = MinimapDataProvider
-MistsOfPandaria.WorldMapDataProvider = WorldMapDataProvider
+BattleForAzeroth.Map = Map
+BattleForAzeroth.MinimapDataProvider = MinimapDataProvider
+BattleForAzeroth.WorldMapDataProvider = WorldMapDataProvider
 
 
+-------------------------------------------------------------------------------
+---------------------------------- NAMESPACE ----------------------------------
+-------------------------------------------------------------------------------
 
+local L = BattleForAzeroth.locale
+local Class = BattleForAzeroth.Class
 
 -------------------------------------------------------------------------------
 ------------------------------------ GROUP ------------------------------------
@@ -1714,8 +1717,8 @@ function Group:Initialize(name, icon, attrs)
     self.desc = L["options_icons_"..name.."_desc"]
 
     -- Prepare any links in this group label/description
-    MistsOfPandaria.PrepareLinks(self.label)
-    MistsOfPandaria.PrepareLinks(self.desc)
+    BattleForAzeroth.PrepareLinks(self.label)
+    BattleForAzeroth.PrepareLinks(self.desc)
 
     if attrs then
         for k, v in pairs(attrs) do self[k] = v end
@@ -1733,26 +1736,26 @@ end
 
 -- Override to hide this group in the UI under certain circumstances
 function Group:IsEnabled()
-    if self.class and self.class ~= MistsOfPandaria.class then return false end
-    if self.faction and self.faction ~= MistsOfPandaria.faction then return false end
+    if self.class and self.class ~= BattleForAzeroth.class then return false end
+    if self.faction and self.faction ~= BattleForAzeroth.faction then return false end
     return true
 end
 
 function Group:_GetOpt (option, default, mapID)
     local value
-    if MistsOfPandaria:GetOpt('per_map_settings') then
-        value = MistsOfPandaria:GetOpt(option..'_'..mapID)
+    if BattleForAzeroth:GetOpt('per_map_settings') then
+        value = BattleForAzeroth:GetOpt(option..'_'..mapID)
     else
-        value = MistsOfPandaria:GetOpt(option)
+        value = BattleForAzeroth:GetOpt(option)
     end
     return (value == nil) and default or value
 end
 
 function Group:_SetOpt (option, value, mapID)
-    if MistsOfPandaria:GetOpt('per_map_settings') then
-        return MistsOfPandaria:SetOpt(option..'_'..mapID, value)
+    if BattleForAzeroth:GetOpt('per_map_settings') then
+        return BattleForAzeroth:SetOpt(option..'_'..mapID, value)
     end
-    return MistsOfPandaria:SetOpt(option, value)
+    return BattleForAzeroth:SetOpt(option, value)
 end
 
 -- Get group settings
@@ -1767,20 +1770,25 @@ function Group:SetDisplay(v, mapID) self:_SetOpt(self.displayArg, v, mapID) end
 
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.Group = Group
+BattleForAzeroth.Group = Group
 
-MistsOfPandaria.GROUP_HIDDEN = {display=false}
-MistsOfPandaria.GROUP_HIDDEN75 = {alpha=0.75, display=false}
-MistsOfPandaria.GROUP_ALPHA75 = {alpha=0.75}
+BattleForAzeroth.GROUP_HIDDEN = {display=false}
+BattleForAzeroth.GROUP_HIDDEN75 = {alpha=0.75, display=false}
+BattleForAzeroth.GROUP_ALPHA75 = {alpha=0.75}
 
-MistsOfPandaria.groups = {
+BattleForAzeroth.groups = {
     PETBATTLE = Group('pet_battles', 'paw_y'),
     QUEST = Group('quests', 'quest_ay'),
-    RARE = Group('rares', 'skull_w', {defaults=MistsOfPandaria.GROUP_ALPHA75}),
-    TREASURE = Group('treasures', 'chest_gy', {defaults=MistsOfPandaria.GROUP_ALPHA75}),
+    RARE = Group('rares', 'skull_w', {defaults=BattleForAzeroth.GROUP_ALPHA75}),
+    TREASURE = Group('treasures', 'chest_gy', {defaults=BattleForAzeroth.GROUP_ALPHA75}),
     MISC = Group('misc', 454046),
 }
 
+-------------------------------------------------------------------------------
+---------------------------------- NAMESPACE ----------------------------------
+-------------------------------------------------------------------------------
+
+local Class = BattleForAzeroth.Class
 
 -------------------------------------------------------------------------------
 --------------------------------- REQUIREMENT ---------------------------------
@@ -1849,7 +1857,7 @@ function Item:Initialize(id, count)
 end
 
 function Item:IsMet()
-    return MistsOfPandaria.PlayerHasItem(self.id, self.count)
+    return BattleForAzeroth.PlayerHasItem(self.id, self.count)
 end
 
 -------------------------------------------------------------------------------
@@ -1883,7 +1891,7 @@ local WarMode = Class('WarMode', Requirement, {
 
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.requirement = {
+BattleForAzeroth.requirement = {
     Currency=Currency,
     GarrisonTalent=GarrisonTalent,
     Item=Item,
@@ -1897,9 +1905,11 @@ MistsOfPandaria.requirement = {
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
 
-local Group = MistsOfPandaria.Group
-local IsInstance = MistsOfPandaria.IsInstance
-local Requirement = MistsOfPandaria.requirement.Requirement
+local L = BattleForAzeroth.locale
+local Class = BattleForAzeroth.Class
+local Group = BattleForAzeroth.Group
+local IsInstance = BattleForAzeroth.IsInstance
+local Requirement = BattleForAzeroth.requirement.Requirement
 
 -------------------------------------------------------------------------------
 ------------------------------------ NODE -------------------------------------
@@ -1932,7 +1942,7 @@ local Node = Class('Node', nil, {
     alpha = 1,
     scale = 1,
     icon = "default",
-    group = MistsOfPandaria.groups.MISC
+    group = BattleForAzeroth.groups.MISC
 })
 
 function Node:Initialize(attrs)
@@ -1942,10 +1952,10 @@ function Node:Initialize(attrs)
     end
 
     -- normalize table values
-    self.quest = MistsOfPandaria.AsTable(self.quest)
-    self.questDeps = MistsOfPandaria.AsTable(self.questDeps)
-    self.parent = MistsOfPandaria.AsIDTable(self.parent)
-    self.requires = MistsOfPandaria.AsTable(self.requires, Requirement)
+    self.quest = BattleForAzeroth.AsTable(self.quest)
+    self.questDeps = BattleForAzeroth.AsTable(self.questDeps)
+    self.parent = BattleForAzeroth.AsIDTable(self.parent)
+    self.requires = BattleForAzeroth.AsTable(self.requires, Requirement)
 
     -- ensure proper group is assigned
     if not IsInstance(self.group, Group) then
@@ -1959,11 +1969,11 @@ for this node.
 --]]
 
 function Node:GetDisplayInfo(mapID, minimap)
-    local icon = MistsOfPandaria.GetIconPath(self.icon)
+    local icon = BattleForAzeroth.GetIconPath(self.icon)
     local scale = self.scale * self.group:GetScale(mapID)
     local alpha = self.alpha * self.group:GetAlpha(mapID)
 
-    if not minimap and WorldMapFrame.isMaximized and MistsOfPandaria:GetOpt('maximized_enlarged') then
+    if not minimap and WorldMapFrame.isMaximized and BattleForAzeroth:GetOpt('maximized_enlarged') then
         scale = scale * 1.3 -- enlarge on maximized world map
     end
 
@@ -2037,7 +2047,7 @@ function Node:IsEnabled()
     if not self:PrerequisiteCompleted() then return false end
 
     -- Check completed state
-    if self.group == MistsOfPandaria.groups.QUEST or not MistsOfPandaria:GetOpt('show_completed_nodes') then
+    if self.group == BattleForAzeroth.groups.QUEST or not BattleForAzeroth:GetOpt('show_completed_nodes') then
         if self:IsCompleted() then return false end
     end
 
@@ -2084,29 +2094,29 @@ world map containing this node is opened.
 
 function Node:Prepare()
     -- verify chosen icon exists
-    if type(self.icon) == 'string' and MistsOfPandaria.icons[self.icon] == nil then
+    if type(self.icon) == 'string' and BattleForAzeroth.icons[self.icon] == nil then
         error('unknown icon: '..self.icon)
     end
 
     -- initialize glow POI (if glow icon available)
 
     if not self.glow then
-        local icon = MistsOfPandaria.GetGlowPath(self.icon)
+        local icon = BattleForAzeroth.GetGlowPath(self.icon)
         if icon then
-            self.glow = MistsOfPandaria.poi.Glow({ icon=icon })
+            self.glow = BattleForAzeroth.poi.Glow({ icon=icon })
         end
     end
 
-    MistsOfPandaria.PrepareLinks(self.label)
-    MistsOfPandaria.PrepareLinks(self.sublabel)
-    MistsOfPandaria.PrepareLinks(self.note)
+    BattleForAzeroth.PrepareLinks(self.label)
+    BattleForAzeroth.PrepareLinks(self.sublabel)
+    BattleForAzeroth.PrepareLinks(self.note)
 
     if self.requires then
         for i, req in ipairs(self.requires) do
             if IsInstance(req, Requirement) then
-                MistsOfPandaria.PrepareLinks(req:GetText())
+                BattleForAzeroth.PrepareLinks(req:GetText())
             else
-                MistsOfPandaria.PrepareLinks(req)
+                BattleForAzeroth.PrepareLinks(req)
             end
         end
     end
@@ -2124,7 +2134,7 @@ on the attributes set on this specific node, such as setting an `rlabel` or
 
 function Node:Render(tooltip, hasPOIs)
     -- render the label text with NPC names resolved
-    tooltip:SetText(MistsOfPandaria.RenderLinks(self.label, true))
+    tooltip:SetText(BattleForAzeroth.RenderLinks(self.label, true))
 
     local color, text
     local rlabel = self.rlabel or ''
@@ -2137,17 +2147,17 @@ function Node:Render(tooltip, hasPOIs)
                 count = count + 1
             end
         end
-        color = (count == #self.quest) and MistsOfPandaria.status.Green or MistsOfPandaria.status.Gray
+        color = (count == #self.quest) and BattleForAzeroth.status.Green or BattleForAzeroth.status.Gray
         rlabel = rlabel..' '..color(tostring(count)..'/'..#self.quest)
     end
 
     if self.faction then
-        rlabel = rlabel..' '..MistsOfPandaria.GetIconLink(self.faction:lower(), 16, 1, -1)
+        rlabel = rlabel..' '..BattleForAzeroth.GetIconLink(self.faction:lower(), 16, 1, -1)
     end
 
     if hasPOIs then
         -- add an rlabel hint to use left-mouse to focus the node
-        local focus = MistsOfPandaria.GetIconLink('left_mouse', 12)..MistsOfPandaria.status.Gray(L["focus"])
+        local focus = BattleForAzeroth.GetIconLink('left_mouse', 12)..BattleForAzeroth.status.Gray(L["focus"])
         rlabel = (#rlabel > 0) and focus..' '..rlabel or focus
     end
 
@@ -2161,38 +2171,38 @@ function Node:Render(tooltip, hasPOIs)
 
     -- optional text directly under label
     if self.sublabel then
-        tooltip:AddLine(MistsOfPandaria.RenderLinks(self.sublabel, true), 1, 1, 1)
+        tooltip:AddLine(BattleForAzeroth.RenderLinks(self.sublabel, true), 1, 1, 1)
     end
 
     -- display item, spell or other requirements
     if self.requires then
         for i, req in ipairs(self.requires) do
             if IsInstance(req, Requirement) then
-                color = req:IsMet() and MistsOfPandaria.color.White or MistsOfPandaria.color.Red
+                color = req:IsMet() and BattleForAzeroth.color.White or BattleForAzeroth.color.Red
                 text = color(L["Requires"]..' '..req:GetText())
             else
-                text = MistsOfPandaria.color.Red(L["Requires"]..' '..req)
+                text = BattleForAzeroth.color.Red(L["Requires"]..' '..req)
             end
-            tooltip:AddLine(MistsOfPandaria.RenderLinks(text, true))
+            tooltip:AddLine(BattleForAzeroth.RenderLinks(text, true))
         end
     end
 
     -- additional text for the node to describe how to interact with the
     -- object or summon the rare
-    if self.note and MistsOfPandaria:GetOpt('show_notes') then
+    if self.note and BattleForAzeroth:GetOpt('show_notes') then
         if self.requires or self.sublabel then tooltip:AddLine(" ") end
-        tooltip:AddLine(MistsOfPandaria.RenderLinks(self.note), 1, 1, 1, true)
+        tooltip:AddLine(BattleForAzeroth.RenderLinks(self.note), 1, 1, 1, true)
     end
 
     -- all rewards (achievements, pets, mounts, toys, quests) that can be
     -- collected or completed from this node
-    if self.rewards and MistsOfPandaria:GetOpt('show_loot') then
+    if self.rewards and BattleForAzeroth:GetOpt('show_loot') then
         local firstAchieve, firstOther = true, true
         for reward in self:IterateRewards() do
 
             -- Add a blank line between achievements and other rewards
-            local isAchieve = IsInstance(reward, MistsOfPandaria.reward.Achievement)
-            local isSpacer = IsInstance(reward, MistsOfPandaria.reward.Spacer)
+            local isAchieve = IsInstance(reward, BattleForAzeroth.reward.Achievement)
+            local isSpacer = IsInstance(reward, BattleForAzeroth.reward.Spacer)
             if isAchieve and firstAchieve then
                 tooltip:AddLine(" ")
                 firstAchieve = false
@@ -2216,7 +2226,7 @@ function Collectible.getters:label()
     if self.id then return ("{npc:%d}"):format(self.id) end
     if self.item then return ("{item:%d}"):format(self.item) end
     for reward in self:IterateRewards() do
-        if IsInstance(reward, MistsOfPandaria.reward.Achievement) then
+        if IsInstance(reward, BattleForAzeroth.reward.Achievement) then
             return GetAchievementCriteriaInfoByID(reward.id, reward.criteria[1].id) or UNKNOWN
         end
     end
@@ -2235,7 +2245,7 @@ end
 local Intro = Class('Intro', Node, {
     icon = 'quest_ay',
     scale = 3,
-    group = MistsOfPandaria.groups.QUEST,
+    group = BattleForAzeroth.groups.QUEST,
     minimap = false
 })
 
@@ -2275,7 +2285,7 @@ end
 local PetBattle = Class('PetBattle', NPC, {
     icon = 'paw_y',
     scale = 1.2,
-    group = MistsOfPandaria.groups.PETBATTLE
+    group = BattleForAzeroth.groups.PETBATTLE
 })
 
 -------------------------------------------------------------------------------
@@ -2284,7 +2294,7 @@ local PetBattle = Class('PetBattle', NPC, {
 
 local Quest = Class('Quest', Node, {
     note = AVAILABLE_QUEST,
-    group = MistsOfPandaria.groups.QUEST
+    group = BattleForAzeroth.groups.QUEST
 })
 
 function Quest:Initialize(attrs)
@@ -2306,7 +2316,7 @@ end
 
 local Rare = Class('Rare', NPC, {
     scale = 1.2,
-    group = MistsOfPandaria.groups.RARE
+    group = BattleForAzeroth.groups.RARE
 })
 
 function Rare.getters:icon()
@@ -2314,7 +2324,7 @@ function Rare.getters:icon()
 end
 
 function Rare:IsEnabled()
-    if MistsOfPandaria:GetOpt('hide_done_rares') and self:IsCollected() then return false end
+    if BattleForAzeroth:GetOpt('hide_done_rares') and self:IsCollected() then return false end
     return NPC.IsEnabled(self)
 end
 
@@ -2338,12 +2348,12 @@ end
 local Treasure = Class('Treasure', Node, {
     icon = 'chest_gy',
     scale = 1.3,
-    group = MistsOfPandaria.groups.TREASURE
+    group = BattleForAzeroth.groups.TREASURE
 })
 
 function Treasure.getters:label()
     for reward in self:IterateRewards() do
-        if IsInstance(reward, MistsOfPandaria.reward.Achievement) then
+        if IsInstance(reward, BattleForAzeroth.reward.Achievement) then
             return GetAchievementCriteriaInfoByID(reward.id, reward.criteria[1].id) or UNKNOWN
         end
     end
@@ -2365,7 +2375,7 @@ end
 
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.node = {
+BattleForAzeroth.node = {
     Node=Node,
     Collectible=Collectible,
     Intro=Intro,
@@ -2382,9 +2392,12 @@ MistsOfPandaria.node = {
 -------------------------------------------------------------------------------
 
 
-local Green = MistsOfPandaria.status.Green
-local Orange = MistsOfPandaria.status.Orange
-local Red = MistsOfPandaria.status.Red
+local Class = BattleForAzeroth.Class
+local L = BattleForAzeroth.locale
+
+local Green = BattleForAzeroth.status.Green
+local Orange = BattleForAzeroth.status.Orange
+local Red = BattleForAzeroth.status.Red
 
 -------------------------------------------------------------------------------
 
@@ -2393,6 +2406,7 @@ local function Icon(icon) return '|T'..icon..':0:0:1:-1|t ' end
 -- in zhCN¡¯s built-in font, ARHei.ttf, the glyph of U+2022 <bullet> is missing.
 -- use U+00B7 <middle dot> instead.
 local bullet = (GetLocale() == "zhCN" and "¡¤" or "?")
+
 -------------------------------------------------------------------------------
 ----------------------------------- REWARD ------------------------------------
 -------------------------------------------------------------------------------
@@ -2406,8 +2420,8 @@ function Reward:Initialize(attrs)
 end
 
 function Reward:IsEnabled()
-    if self.class and self.class ~= MistsOfPandaria.class then return false end
-    if self.faction and self.faction ~= MistsOfPandaria.faction then return false end
+    if self.class and self.class ~= BattleForAzeroth.class then return false end
+    if self.faction and self.faction ~= BattleForAzeroth.faction then return false end
     return true
 end
 
@@ -2436,7 +2450,7 @@ function Reward:Render(tooltip)
     if self.indent then
         text = '   '..text
     end
-    
+
     -- Render main line and optional status
     if text and status then
         tooltip:AddDoubleLine(text, status)
@@ -2463,12 +2477,13 @@ local Section = Class('Section', Reward)
 function Section:Initialize(title)
     self.title = title
 end
+
 function Section:Prepare()
-    MistsOfPandaria.PrepareLinks(self.title)
+    BattleForAzeroth.PrepareLinks(self.title)
 end
 
 function Section:Render(tooltip)
-    tooltip:AddLine(MistsOfPandaria.RenderLinks(self.title, true)..':')
+    tooltip:AddLine(BattleForAzeroth.RenderLinks(self.title, true)..':')
 end
 
 -------------------------------------------------------------------------------
@@ -2494,7 +2509,7 @@ local GetCriteriaInfo = function (id, criteria)
         if criteria <= GetAchievementNumCriteria(id) then
             results = {GetAchievementCriteriaInfo(id, criteria)}
         else
-            MistsOfPandaria.Error('unknown achievement criteria ('..id..', '..criteria..')')
+            BattleForAzeroth.Error('unknown achievement criteria ('..id..', '..criteria..')')
             return UNKNOWN
         end
     end
@@ -2503,12 +2518,12 @@ end
 
 function Achievement:Initialize(attrs)
     Reward.Initialize(self, attrs)
-    self.criteria = MistsOfPandaria.AsIDTable(self.criteria)
+    self.criteria = BattleForAzeroth.AsIDTable(self.criteria)
 end
 
 function Achievement:IsObtained()
     local _,_,_,completed,_,_,_,_,_,_,_,_,earnedByMe = GetAchievementInfo(self.id)
-    completed = completed and (not MistsOfPandaria:GetOpt('use_char_achieves') or earnedByMe)
+    completed = completed and (not BattleForAzeroth:GetOpt('use_char_achieves') or earnedByMe)
     if completed then return true end
     if self.criteria then
         for i, c in ipairs(self.criteria) do
@@ -2557,9 +2572,9 @@ function Achievement:GetLines()
         local note, status = c.note
         if c.quest then
             if C_QuestLog.IsQuestFlaggedCompleted(c.quest) then
-                status = MistsOfPandaria.status.Green(L['defeated'])
+                status = BattleForAzeroth.status.Green(L['defeated'])
             else
-                status = MistsOfPandaria.status.Red(L['undefeated'])
+                status = BattleForAzeroth.status.Red(L['undefeated'])
             end
             note = note and (note..'  '..status) or status
         end
@@ -2700,7 +2715,7 @@ end
 
 function Quest:GetText()
     local name = C_QuestLog.GetTitleForQuestID(self.id[1])
-    return MistsOfPandaria.GetIconLink('quest_ay', 13)..' '..(name or UNKNOWN)
+    return BattleForAzeroth.GetIconLink('quest_ay', 13)..' '..(name or UNKNOWN)
 end
 
 function Quest:GetStatus()
@@ -2802,7 +2817,7 @@ end
 
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.reward = {
+BattleForAzeroth.reward = {
     Reward=Reward,
     Section=Section,
     Spacer=Spacer,
@@ -2816,7 +2831,6 @@ MistsOfPandaria.reward = {
     Toy=Toy,
     Transmog=Transmog
 }
-
 
 
 
@@ -2850,7 +2864,7 @@ end
 -------------------------------------------------------------------------------
 
 local WorldMapOptionsButtonMixin = {}
-_G["HandyNotes_MistsOfPandariaWorldMapOptionsButtonMixin"] = WorldMapOptionsButtonMixin
+_G["HandyNotes_BattleForAzerothWorldMapOptionsButtonMixin"] = WorldMapOptionsButtonMixin
 
 function WorldMapOptionsButtonMixin:OnLoad()
     UIDropDownMenu_SetInitializeFunction(self.DropDown, function (dropdown, level)
@@ -2858,12 +2872,12 @@ function WorldMapOptionsButtonMixin:OnLoad()
     end)
     UIDropDownMenu_SetDisplayMode(self.DropDown, "MENU")
 
-    self.GroupDesc = CreateFrame('Frame', 'HandyNotes_MistsOfPandariaGroupMenuSliderOption',
-        nil, 'HandyNotes_MistsOfPandariaTextMenuOptionTemplate')
-    self.AlphaOption = CreateFrame('Frame', 'HandyNotes_MistsOfPandariaAlphaMenuSliderOption',
-        nil, 'HandyNotes_MistsOfPandariaSliderMenuOptionTemplate')
-    self.ScaleOption = CreateFrame('Frame', 'HandyNotes_MistsOfPandariaScaleMenuSliderOption',
-        nil, 'HandyNotes_MistsOfPandariaSliderMenuOptionTemplate')
+    self.GroupDesc = CreateFrame('Frame', 'HandyNotes_BattleForAzerothGroupMenuSliderOption',
+        nil, 'HandyNotes_BattleForAzerothTextMenuOptionTemplate')
+    self.AlphaOption = CreateFrame('Frame', 'HandyNotes_BattleForAzerothAlphaMenuSliderOption',
+        nil, 'HandyNotes_BattleForAzerothSliderMenuOptionTemplate')
+    self.ScaleOption = CreateFrame('Frame', 'HandyNotes_BattleForAzerothScaleMenuSliderOption',
+        nil, 'HandyNotes_BattleForAzerothSliderMenuOptionTemplate')
 end
 
 function WorldMapOptionsButtonMixin:OnMouseDown(button)
@@ -2880,18 +2894,18 @@ end
 
 function WorldMapOptionsButtonMixin:OnEnter()
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-    GameTooltip_SetTitle(GameTooltip, MistsOfPandaria.plugin_name)
+    GameTooltip_SetTitle(GameTooltip, BattleForAzeroth.plugin_name)
     GameTooltip_AddNormalLine(GameTooltip, L["map_button_text"])
     GameTooltip:Show()
 end
 
 function WorldMapOptionsButtonMixin:Refresh()
-    local map = MistsOfPandaria.maps[self:GetParent():GetMapID() or 0]
+    local map = BattleForAzeroth.maps[self:GetParent():GetMapID() or 0]
     if map and map:HasEnabledGroups() then self:Show() else self:Hide() end
 end
 
 function WorldMapOptionsButtonMixin:InitializeDropDown(level)
-    local map, icon = MistsOfPandaria.maps[self:GetParent():GetMapID()]
+    local map, icon = BattleForAzeroth.maps[self:GetParent():GetMapID()]
 
     if level == 1 then
         UIDropDownMenu_AddButton({
@@ -2903,12 +2917,12 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
         for i, group in ipairs(map.groups) do
             if group:IsEnabled() then
                 if type(group.icon) == 'number' then
-                    icon = MistsOfPandaria.GetIconLink(group.icon, 12, 1, 0)..' '
+                    icon = BattleForAzeroth.GetIconLink(group.icon, 12, 1, 0)..' '
                 else
-                    icon = MistsOfPandaria.GetIconLink(group.icon, 16)
+                    icon = BattleForAzeroth.GetIconLink(group.icon, 16)
                 end
                 UIDropDownMenu_AddButton({
-                    text = icon..' '..MistsOfPandaria.RenderLinks(group.label, true),
+                    text = icon..' '..BattleForAzeroth.RenderLinks(group.label, true),
                     isNotRadio = true,
                     keepShownOnClick = true,
                     hasArrow = true,
@@ -2927,18 +2941,18 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
             text = L["options_show_completed_nodes"],
             isNotRadio = true,
             keepShownOnClick = true,
-            checked = MistsOfPandaria:GetOpt('show_completed_nodes'),
+            checked = BattleForAzeroth:GetOpt('show_completed_nodes'),
             func = function (button, option)
-                MistsOfPandaria:SetOpt('show_completed_nodes', button.checked)
+                BattleForAzeroth:SetOpt('show_completed_nodes', button.checked)
             end
         })
         UIDropDownMenu_AddButton({
             text = L["options_toggle_use_char_achieves"],
             isNotRadio = true,
             keepShownOnClick = true,
-            checked = MistsOfPandaria:GetOpt('use_char_achieves'),
+            checked = BattleForAzeroth:GetOpt('use_char_achieves'),
             func = function (button, option)
-                MistsOfPandaria:SetOpt('use_char_achieves', button.checked)
+                BattleForAzeroth:SetOpt('use_char_achieves', button.checked)
             end
         })
 
@@ -2952,7 +2966,7 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
                 InterfaceOptionsFrame_Show()
                 InterfaceOptionsFrame_OpenToCategory('HandyNotes')
                 LibStub('AceConfigDialog-3.0'):SelectGroup(
-                    'HandyNotes', 'plugins', "HandyNotes_MistsOfPandaria", 'ZonesTab', 'Zone_'..map.id
+                    'HandyNotes', 'plugins', "HandyNotes_BattleForAzeroth", 'ZonesTab', 'Zone_'..map.id
                 )
             end
         })
@@ -2960,7 +2974,7 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
         -- Get correct map ID to query/set options for
         local group = UIDROPDOWNMENU_MENU_VALUE
 
-        self.GroupDesc.Text:SetText(MistsOfPandaria.RenderLinks(group.desc))
+        self.GroupDesc.Text:SetText(BattleForAzeroth.RenderLinks(group.desc))
         UIDropDownMenu_AddButton({ customFrame = self.GroupDesc }, 2)
         UIDropDownMenu_AddButton({
             notClickable = true,
@@ -2990,11 +3004,12 @@ end
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
 
+local Class = BattleForAzeroth.Class
 local HBD = LibStub('HereBeDragons-2.0')
 
-local ARROW = "Interface\\AddOns\\HandyNotes\\Icons\\artwork\\arrow"
-local CIRCLE = "Interface\\AddOns\\HandyNotes\\Icons\\artwork\\circle"
-local LINE = "Interface\\AddOns\\HandyNotes\\Icons\\artwork\\line"
+local ARROW = "Interface\\AddOns\\HandyNotes\\Icons\\Artwork\\arrow"
+local CIRCLE = "Interface\\AddOns\\HandyNotes\\Icons\\Artwork\\circle"
+local LINE = "Interface\\AddOns\\HandyNotes\\Icons\\Artwork\\line"
 
 -------------------------------------------------------------------------------
 
@@ -3031,8 +3046,8 @@ end
 function POI:Draw(pin, xy)
     local t = ResetPin(pin)
     local size = (pin.minimap and 10 or (pin.parentHeight * 0.012))
-    size = size * MistsOfPandaria:GetOpt('poi_scale')
-    t:SetVertexColor(unpack({MistsOfPandaria:GetColorOpt('poi_color')}))
+    size = size * BattleForAzeroth:GetOpt('poi_scale')
+    t:SetVertexColor(unpack({BattleForAzeroth:GetColorOpt('poi_color')}))
     t:SetTexture(CIRCLE)
     pin:SetSize(size, size)
     return HandyNotes:getXY(xy)
@@ -3091,7 +3106,7 @@ end
 
 function Path:Draw(pin, type, xy1, xy2)
     local t = ResetPin(pin)
-    t:SetVertexColor(unpack({MistsOfPandaria:GetColorOpt('path_color')}))
+    t:SetVertexColor(unpack({BattleForAzeroth:GetColorOpt('path_color')}))
     t:SetTexture(type)
 
     -- constant size for minimaps, variable size for world maps
@@ -3099,8 +3114,8 @@ function Path:Draw(pin, type, xy1, xy2)
     local line_width = pin.minimap and 60 or (pin.parentHeight * 0.05)
 
     -- apply user scaling
-    size = size * MistsOfPandaria:GetOpt('poi_scale')
-    line_width = line_width * MistsOfPandaria:GetOpt('poi_scale')
+    size = size * BattleForAzeroth:GetOpt('poi_scale')
+    line_width = line_width * BattleForAzeroth:GetOpt('poi_scale')
 
     if type == CIRCLE then
         pin:SetSize(size, size)
@@ -3193,8 +3208,8 @@ function Arrow:Draw(pin, type, xy1, xy2)
     -- constant size for minimaps, variable size for world maps
     local head_length = pin.minimap and 40 or (pin.parentHeight * 0.04)
     local head_width = pin.minimap and 15 or (pin.parentHeight * 0.015)
-    head_length = head_length * MistsOfPandaria:GetOpt('poi_scale')
-    head_width = head_width * MistsOfPandaria:GetOpt('poi_scale')
+    head_length = head_length * BattleForAzeroth:GetOpt('poi_scale')
+    head_width = head_width * BattleForAzeroth:GetOpt('poi_scale')
     pin:SetSize(head_width, head_length)
 
     local x1, y1 = HandyNotes:getXY(xy1)
@@ -3218,7 +3233,7 @@ end
 
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.poi = {
+BattleForAzeroth.poi = {
     POI=POI,
     Glow=Glow,
     Path=Path,
@@ -3226,868 +3241,190 @@ MistsOfPandaria.poi = {
     Arrow=Arrow
 }
 
-
--------------------------------------------------------------------------------
-
-MistsOfPandaria.expansion = 5
-
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
 
-local Map = MistsOfPandaria.Map
-local Rare = MistsOfPandaria.node.Rare
 
-local Achievement = MistsOfPandaria.reward.Achievement
-local Mount = MistsOfPandaria.reward.Mount
+local Class = BattleForAzeroth.Class
+local Group = BattleForAzeroth.Group
+local Map = BattleForAzeroth.Map
 
--------------------------------------------------------------------------------
-
-local map = Map({ id=422, settings=true })
-
--------------------------------------------------------------------------------
------------------------------------- RARES ------------------------------------
--------------------------------------------------------------------------------
-
-map.nodes[47606160] = Rare({
-    id=69842,
-    note=L["zandalari_warbringer_note"],
-    rewards={
-        Achievement({id=8078, criteria={
-            {id=2, qty=true, suffix=L["zandalari_warbringer_killed"]}
-        }}),
-        Mount({item=94229, id=535}), -- Reins of the Slate Primordial Direhorn
-        Mount({item=94230, id=534}), -- Reins of the Amber Primordial Direhorn
-        Mount({item=94231, id=536}) -- Reins of the Jade Primordial Direhorn
-    }
-}) -- Zandalari Warbringer
-
+local Node = BattleForAzeroth.node.Node
+local Quest = BattleForAzeroth.node.Quest
+local Achievement = BattleForAzeroth.reward.Achievement
 
 -------------------------------------------------------------------------------
 
-local map = Map({ id=371, settings=true })
-
--------------------------------------------------------------------------------
------------------------------------- RARES ------------------------------------
--------------------------------------------------------------------------------
-
-map.nodes[52601900] = Rare({
-    id=69842,
-    note=L["zandalari_warbringer_note"],
-    rewards={
-        Achievement({id=8078, criteria={
-            {id=2, qty=true, suffix=L["zandalari_warbringer_killed"]}
-        }}),
-        Mount({item=94229, id=535}), -- Reins of the Slate Primordial Direhorn
-        Mount({item=94230, id=534}), -- Reins of the Amber Primordial Direhorn
-        Mount({item=94231, id=536}) -- Reins of the Jade Primordial Direhorn
-    }
-}) -- Zandalari Warbringer
-
-
--------------------------------------------------------------------------------
----------------------------------- NAMESPACE ----------------------------------
--------------------------------------------------------------------------------
-
--- local ADDON_NAME, MistsOfPandaria = ...
--- local Map = MistsOfPandaria.Map
-
--------------------------------------------------------------------------------
-------------------------------------- MAP -------------------------------------
--------------------------------------------------------------------------------
-
--- local map = Map({ id=418, settings=true })
--- local nodes = map.nodes
-
-
-
+BattleForAzeroth.expansion = 8
 
 -------------------------------------------------------------------------------
 
-local map = Map({ id=379, settings=true })
+BattleForAzeroth.groups.ASSAULT_EVENT = Group('assault_events', 'peg_yw')
+BattleForAzeroth.groups.BOW_TO_YOUR_MASTERS = Group('bow_to_your_masters', 1850548, {defaults=BattleForAzeroth.GROUP_HIDDEN, faction='Horde'})
+BattleForAzeroth.groups.BRUTOSAURS = Group('brutosaurs', 1881827, {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.CARVED_IN_STONE = Group('carved_in_stone', 134424, {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.CATS_NAZJ = Group('cats_nazj', 454045)
+BattleForAzeroth.groups.COFFERS = Group('coffers', 'star_chest_g')
+BattleForAzeroth.groups.DAILY_CHESTS = Group('daily_chests', 'chest_bl', {defaults=BattleForAzeroth.GROUP_ALPHA75})
+BattleForAzeroth.groups.DRUST_FACTS = Group('drust_facts', 2101971, {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.DUNE_RIDER = Group('dune_rider', 134962, {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.EMBER_RELICS = Group('ember_relics', 514016, {defaults=BattleForAzeroth.GROUP_HIDDEN, faction='Alliance'})
+BattleForAzeroth.groups.GET_HEKD = Group('get_hekd', 1604165, {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.HONEYBACKS = Group('honeybacks', 2066005, {defaults=BattleForAzeroth.GROUP_HIDDEN, faction='Alliance'})
+BattleForAzeroth.groups.HOPPIN_SAD = Group('hoppin_sad', 804969, {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.LIFE_FINDS_A_WAY = Group('life_finds_a_way', 236192, {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.LOCKED_CHEST = Group('locked_chest', 'chest_gy', {defaults=BattleForAzeroth.GROUP_ALPHA75})
+BattleForAzeroth.groups.MECH_CHEST = Group('mech_chest', 'chest_rd', {defaults=BattleForAzeroth.GROUP_ALPHA75})
+BattleForAzeroth.groups.MISC_NAZJ = Group('misc_nazj', 528288)
+BattleForAzeroth.groups.MUSHROOM_HARVEST = Group('mushroom_harvest', 1869654, {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.PAKU_TOTEMS = Group('paku_totems', 'flight_point_y', {defaults=BattleForAzeroth.GROUP_HIDDEN, faction='Horde'})
+BattleForAzeroth.groups.PRISMATICS = Group('prismatics', 'crystal_p', {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.RECRIG = Group('recrig', 'peg_bl')
+BattleForAzeroth.groups.SAUSAGE_SAMPLER = Group('sausage_sampler', 133200, {defaults=BattleForAzeroth.GROUP_HIDDEN, faction='Alliance'})
+BattleForAzeroth.groups.SCAVENGER_OF_THE_SANDS = Group('scavenger_of_the_sands', 135725, {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.SECRET_SUPPLY = Group('secret_supplies', 'star_chest_b', {defaults=BattleForAzeroth.GROUP_HIDDEN75})
+BattleForAzeroth.groups.SHANTY_RAID = Group('shanty_raid', 1500866, {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.SLIMES_NAZJ = Group('slimes_nazj', 132107)
+BattleForAzeroth.groups.SQUIRRELS = Group('squirrels', 237182, {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.SUPPLY = Group('supplies', 'star_chest_g', {defaults=BattleForAzeroth.GROUP_HIDDEN75})
+BattleForAzeroth.groups.TALES_OF_DE_LOA = Group('tales_of_de_loa', 1875083, {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.THREE_SHEETS = Group('three_sheets', 135999, {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.TIDESAGE_LEGENDS = Group('tidesage_legends', 1500881, {defaults=BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.UPRIGHT_CITIZENS = Group('upright_citizens', 516667, {defaults=BattleForAzeroth.GROUP_HIDDEN, faction='Alliance'})
+BattleForAzeroth.groups.VISIONS_BUFFS = Group('visions_buffs', 132183)
+BattleForAzeroth.groups.VISIONS_CHEST = Group('visions_chest', 'chest_gy')
+BattleForAzeroth.groups.VISIONS_CRYSTALS = Group('visions_crystals', 'crystal_o')
+BattleForAzeroth.groups.VISIONS_MAIL = Group('visions_mail', 'envelope')
+BattleForAzeroth.groups.VISIONS_MISC = Group('visions_misc', 2823166)
 
 -------------------------------------------------------------------------------
------------------------------------- RARES ------------------------------------
+---------------------------------- CALLBACKS ----------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[75006760] = Rare({
-    id=69842,
-    note=L["zandalari_warbringer_note"],
-    rewards={
-        Achievement({id=8078, criteria={
-            {id=2, qty=true, suffix=L["zandalari_warbringer_killed"]}
-        }}),
-        Mount({item=94229, id=535}), -- Reins of the Slate Primordial Direhorn
-        Mount({item=94230, id=534}), -- Reins of the Amber Primordial Direhorn
-        Mount({item=94231, id=536}) -- Reins of the Jade Primordial Direhorn
-    }
-}) -- Zandalari Warbringer
-
-
-
-
--------------------------------------------------------------------------------
-
-local map = Map({ id=388, settings=true })
-
--------------------------------------------------------------------------------
------------------------------------- RARES ------------------------------------
--------------------------------------------------------------------------------
-
-map.nodes[36608560] = Rare({
-    id=69842,
-    note=L["zandalari_warbringer_note"],
-    rewards={
-        Achievement({id=8078, criteria={
-            {id=2, qty=true, suffix=L["zandalari_warbringer_killed"]}
-        }}),
-        Mount({item=94229, id=535}), -- Reins of the Slate Primordial Direhorn
-        Mount({item=94230, id=534}), -- Reins of the Amber Primordial Direhorn
-        Mount({item=94231, id=536}) -- Reins of the Jade Primordial Direhorn
-    }
-}) -- Zandalari Warbringer
-
-
--------------------------------------------------------------------------------
----------------------------------- NAMESPACE ----------------------------------
--------------------------------------------------------------------------------
-
--- local ADDON_NAME, MistsOfPandaria = ...
--- local Map = MistsOfPandaria.Map
-
--------------------------------------------------------------------------------
-------------------------------------- MAP -------------------------------------
--------------------------------------------------------------------------------
-
--- local map = Map({ id=390, settings=true })
--- local nodes = map.nodes
-
-
--------------------------------------------------------------------------------
----------------------------------- NAMESPACE ----------------------------------
--------------------------------------------------------------------------------
-
--- local ADDON_NAME, MistsOfPandaria = ...
--- local Map = MistsOfPandaria.Map
-
--------------------------------------------------------------------------------
-------------------------------------- MAP -------------------------------------
--------------------------------------------------------------------------------
-
--- local map = Map({ id=376, settings=true })
--- local nodes = map.nodes
-
-
--------------------------------------------------------------------------------
----------------------------------- NAMESPACE ----------------------------------
--------------------------------------------------------------------------------
-
--- local ADDON_NAME, MistsOfPandaria = ...
--- local Map = MistsOfPandaria.Map
-
--------------------------------------------------------------------------------
-------------------------------------- MAP -------------------------------------
--------------------------------------------------------------------------------
-
--- local map = Map({ id=504, settings=true })
--- local nodes = map.nodes
-
-
--------------------------------------------------------------------------------
----------------------------------- NAMESPACE ----------------------------------
--------------------------------------------------------------------------------
-
-local Node = MistsOfPandaria.node.Node
-local NPC = MistsOfPandaria.node.NPC
-local Treasure = MistsOfPandaria.node.Treasure
-
-local Item = MistsOfPandaria.reward.Item
-local Pet = MistsOfPandaria.reward.Pet
-local Toy = MistsOfPandaria.reward.Toy
-
-local Path = MistsOfPandaria.poi.Path
-local POI = MistsOfPandaria.poi.POI
-
--------------------------------------------------------------------------------
-
-local Rare = Class('TimelessRare', MistsOfPandaria.node.Rare)
-
-function Rare:Render(tooltip)
-    MistsOfPandaria.node.Rare.Render(self, tooltip)
-
-    -- If two quests are given, the first is flipped the first time you ever
-    -- loot the rare and the second is the daily tracker. On the first day, you
-    -- can loot each rare twice.
-    if self.quest and #self.quest == 2 then
-        if not C_QuestLog.IsQuestFlaggedCompleted(self.quest[1]) then
-            tooltip:AddLine(' ')
-            tooltip:AddLine(MistsOfPandaria.color.Orange(L["looted_twice"]), 1, 1, 1, true)
-        end
+-- Listen for aura applied/removed events so we can refresh when the player
+-- enters and exits the alternate future
+BattleForAzeroth.addon:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED', function ()
+    local _,e,_,_,_,_,_,_,t,_,_,s  = CombatLogGetCurrentEventInfo()
+    if (e == 'SPELL_AURA_APPLIED' or e == 'SPELL_AURA_REMOVED') and
+        t == UnitName('player') and s == 296644 then
+        C_Timer.After(1, function() BattleForAzeroth.addon:Refresh() end)
     end
-end
+end)
+
+BattleForAzeroth.addon:RegisterEvent('QUEST_ACCEPTED', function (_, _, id)
+    if id == 56540 then
+        BattleForAzeroth.Debug('Vale assaults unlock detected')
+        C_Timer.After(1, function() BattleForAzeroth.addon:Refresh() end)
+    end
+end)
+
+BattleForAzeroth.addon:RegisterEvent('QUEST_WATCH_UPDATE', function (_, index)
+    local info = C_QuestLog.GetInfo(index)
+    if info and info.questID == 56376 then
+        BattleForAzeroth.Debug('Uldum assaults unlock detected')
+        C_Timer.After(1, function() BattleForAzeroth.addon:Refresh() end)
+    end
+end)
+
+BattleForAzeroth.addon:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', function (...)
+    -- Watch for a spellcast event that signals a ravenous slime was fed
+    -- https://www.wowhead.com/spell=293775/schleimphage-feeding-tracker
+    local _, source, _, spellID = ...
+    if source == 'player' and spellID == 293775 then
+        C_Timer.After(1, function() BattleForAzeroth.addon:Refresh() end)
+    end
+end)
 
 -------------------------------------------------------------------------------
-
-local map = Map({ id=554, settings=true })
-local lostspirits = Map({ id=555 }) -- Cavern of Lost Spirits
-
--------------------------------------------------------------------------------
------------------------------------- RARES ------------------------------------
+-------------------------------- TIMED EVENTS ---------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[34403250] = Rare({
-    id=73666,
-    quest={33288, 33312},
-    note=L["archiereus_note"],
-    rewards={
-        Achievement({id=8714, criteria=31})
-    },
-    pois={
-        POI({42805480}) -- Mistweaver Ku
-    }
-}) -- Archiereus of Flame
-
-map.nodes[62097715] = Rare({
-    id=72775,
-    quest={33276, 33301},
-    rewards={
-        Achievement({id=8714, criteria=23986}),
-        Achievement({id=8728, criteria=24034}), -- Gulp Froglet
-        Pet({id=1338, item=104169}) -- Gulp Froglet
-    },
-    pois={
-        POI({62097715, 63607260, 64807460, 65606980, 66806660}) -- Spawns
-    }
-}) -- Bufo
-
-map.nodes[25063598] = Rare({
-    id=72045,
-    quest={33318, 32966},
-    note=L["chelon_note"],
-    rewards={
-        Achievement({id=8714, criteria=23974}),
-        Achievement({id=8728, criteria=24072}), -- Hardened Shell
-        Toy({item=86584}) -- Hardened Shell
-    }
-}) -- Chelon
-
-map.nodes[62384384] = Rare({
-    id=73171,
-    quest={33274, 33299},
-    rewards={
-        Achievement({id=8714, criteria=23996}),
-        Achievement({id=8728, criteria={24055, 24074}}), -- Blackflame Daggers, Big Bag of Herbs
-        Toy({item=104302}), -- Blackflame Daggers
-        Item({item=106130}) -- Big Bag of Herbs
-    },
-    pois={
-        Path({
-            65426021, 67235734, 68225690, 69635427, 70635181, 71014722,
-            69814461, 69044288, 66614262, 64434227, 62384384, 60624841
-        })
-    }
-}) -- Champion of the Black Flame
-
-map.nodes[52954988] = Rare({
-    id=73175,
-    quest={33286, 33310},
-    rewards={
-        Achievement({id=8714, criteria=23981}),
-        Achievement({id=8728, criteria={24054, 24038}}), -- Falling Flame, Glowing Blue Ash
-        Item({item=104299}), -- Falling Flame
-        Item({item=104261}) -- Glowing Blue Ash
-    }
-}) -- Cinderfall
-
-map.nodes[43896989] = Rare({
-    id=72049,
-    quest={33319, 32967},
-    note=L["cranegnasher_note"],
-    rewards={
-        Achievement({id=8714, criteria=23976}),
-        Achievement({id=8728, criteria=24041}), -- Pristine Stalker Hide
-        Item({item=104268}) -- Pristine Stalker Hide
-    },
-    pois={
-        POI({45238400}) -- Fishgorged Cranes
-    }
-}) -- Cranegnasher
-
-map.nodes[26082283] = Rare({
-    id=73281,
-    quest={33290, 33314},
-    requires=MistsOfPandaria.requirement.Item(104115),
-    note=L["dread_ship_note"],
-    rewards={
-        Achievement({id=8714, criteria=23987}),
-        Achievement({id=8728, criteria=24050}), -- Rime of the Time-Lost Mariner
-        Toy({item=104294}) -- Rime of the Time-Lost Mariner
-    },
-    pois={
-        POI({26322792}) -- Cursed Gravestone
-    }
-}) -- Dread Ship Vazuvius
-
-map.nodes[30535067] = Rare({
-    id=73158,
-    quest={33261, 33295},
-    note=L["emerald_gander_note"],
-    rewards={
-        Achievement({id=8714, criteria=23967})
-    },
-    pois={
-        POI({
-            29465012, 30076178, 30185857, 30535067, 30584364, 31286682,
-            31386563, 31493965, 31517989, 31766262, 31958040, 32055222,
-            32424870, 36224036, 36638408, 38334073, 39476853, 40594355,
-            41074082, 42176766, 42706996, 44306167, 44755486, 45095358
-        })
-    }
-}) -- Emerald Gander
-
-map.nodes[14215240] = Rare({
-    id=73279,
-    quest={33289, 33313},
-    note=L["evermaw_note"],
-    rewards={
-        Achievement({id=8714, criteria=23990}),
-        Item({item=104115}) -- Mist-Filled Spirit Lantern
-    },
-    pois={
-        Path({
-            33019113, 30568918, 28068714, 25608463, 23658160, 22107833,
-            20617473, 19057094, 17566721, 16116356, 14855997, 14375586,
-            14255183, 14174775, 14094376, 14003959, 13923549, 14083139,
-            15012764, 16212413, 17582050, 18941689, 20321337, 21931006,
-            24860678, 27530425, 30750261, 34290222, 37810248, 42060284,
-            45270305, 48090364, 51040433, 53980511, 56580581, 58950612,
-            61680640, 64120704, 64140707, 66320848, 68531052, 70571266,
-            72521474, 74181725, 75552016, 76852319, 78152623, 79212939,
-            80083238, 80963554, 81603881, 81664251, 81514619, 81384975,
-            81255324, 81035661, 80826003, 80626356, 80406708, 79597027,
-            78627337, 77667631, 76607942, 75448221, 73748450, 72078649,
-            70138864, 68099073, 66159267, 64269456, 62259625, 59859709,
-            57379739, 55019758, 52569771, 49929782, 47529798, 45119807,
-            42599776, 40289655, 38019499, 35819325, 33019113
-        })
-    }
-}) -- Evermaw
-
-map.nodes[44003400] = Rare({
-    id=73172,
-    quest={33285, 33309},
-    rewards={
-        Achievement({id=8714, criteria=23995}),
-        Achievement({id=8728, criteria=24053}), -- Ordon Death Chime
-        Item({item=104298, note=L["trinket"]}) -- Ordon Death Chime
-    }
-}) -- Flintlord Gairan
-
-map.nodes[64002700] = Rare({
-    id=73282,
-    quest={33275, 33300},
-    rewards={
-        Achievement({id=8714, criteria=23982}),
-        Achievement({id=8728, criteria=24027}), -- Ruby Droplet
-        Pet({id=1328, item=104159}) -- Ruby Droplet
-    }
-}) -- Garnia
-
-map.nodes[62086372] = Rare({
-    id=72970,
-    quest={33291, 33315},
-    rewards={
-        Achievement({id=8714, criteria=23988}),
-        Achievement({id=8728, criteria={24039, 24040}}), -- Odd Polished Stone, Glinting Pile of Stone
-        Toy({item=104262}), -- Odd Polished Stone
-        Item({item=104263}) -- Glinting Pile of Stone
-    }
-}) -- Golganarr
-
-map.nodes[24805500] = Rare({
-    id=73161,
-    quest={33272, 33297},
-    note=L["great_turtle_furyshell_note"],
-    rewards={
-        Achievement({id=8714, criteria=23969}),
-        Achievement({id=8728, criteria=24072}), -- Hardened Shell
-        Toy({item=86584}) -- Hardened Shell
-    },
-    pois={
-        Path({24134948, 23174726, 22024583, 21494263}),
-        Path({24807031, 23146803, 22816508, 22856185}),
-        POI({
-            20724295, 21966163, 22096756, 22286598, 22354287, 22355353,
-            22456783, 23155999, 23455775, 23584919, 23606338, 23665353,
-            24565808, 24785905, 25165270, 25605832, 25645600, 25765788,
-            25867230, 26045024
-        }) -- Stationary spawns
-    }
-}) -- Great Turtle Furyshell
-
-map.nodes[42387523] = Rare({
-    id=72909,
-    quest={33260, 33294},
-    rewards={
-        Achievement({id=8714, criteria=23970}),
-        Achievement({id=8728, criteria={24047, 24046}}), -- Swarmling of Gu'chi, Sticky Silkworm Goo
-        Pet({id=1345, item=104291}), -- Swarmling of Gu'chi
-        Item({item=104290}) -- Sticky Silkworm Goo
-    },
-    pois={
-        Path({
-            41467211, 40916989, 38847014, 36256953, 34197060, 31987059,
-            29937174, 31417454, 32287785, 33918004, 35928119, 38018272,
-            40198236, 40647913, 42387523, 41467211
-        })
-    }
-}) -- Gu'chi the Swarmbringer
-
-map.nodes[65875660] = Rare({
-    id=73167,
-    quest={33287, 33311},
-    rewards={
-        Achievement({id=8714, criteria=23984}),
-        Achievement({id=8728, criteria=24081}), -- Reins of the Thundering Onyx Cloud Serpent
-        Mount({item=104269, id=561}) -- Thundering Onyx Cloud Serpent
-    }
-}) -- Huolon
-
-map.nodes[28764361] = Rare({
-    id=73163,
-    quest={33278, 33303},
-    note=L["imperial_python_note"],
-    rewards={
-        Achievement({id=8714, criteria=23989}),
-        Achievement({id=8728, criteria=24029}), -- Death Adder Hatchling
-        Pet({item=104161, id=1330}) -- Death Adder Hatchling
-    },
-    pois={
-        POI({
-            25914618, 27056896, 27656178, 28764361, 28916409, 29337383,
-            30563630, 30907608, 33674610, 34057420, 36397405, 44316581,
-            50684582, 53325823
-        })
-    }
-}) -- Imperial Python
-
-map.nodes[34046916] = Rare({
-    id=73160,
-    quest={33270, 33296},
-    note=L["ironfur_steelhorn_note"],
-    rewards={
-        Achievement({id=8714, criteria=23968})
-    },
-    pois={
-        POI({
-            27024610, 27564009, 29937026, 32044588, 32564426, 33236147,
-            33976228, 34046774, 34046916, 35026757, 35736952, 39976625,
-            41046615, 41203741, 43905468, 44785287, 46046378
-        })
-    }
-}) -- Ironfur Steelhorn
-
-map.nodes[53298314] = Rare({
-    id=73169,
-    quest={33281, 33306},
-    rewards={
-        Achievement({id=8714, criteria=23994}),
-        Achievement({id=8728, criteria=24068}), -- Warning Sign
-        Toy({item=104331}) -- Warning Sign
-    }
-}) -- Jakur of Ordon
-
-map.nodes[34088384] = Rare({
-    id=72193,
-    quest={33258, 33292},
-    note=L["karkanos_note"],
-    rewards={
-        Achievement({id=8714, criteria=23973}),
-        Achievement({id=8728, criteria=24079}), -- Giant Purse of Timeless Coins
-        Item({item=104035}) -- Giant Purse of Timeless Coins
-    }
-}) -- Karkanos
-
-map.nodes[67614423] = Rare({
-    id=73277,
-    quest={33273, 33298},
-    rewards={
-        Achievement({id=8714, criteria=23979}),
-        Achievement({id=8728, criteria=24025}), -- Ashleaf Spriteling
-        Pet({id=1323, item=104156}) -- Ashleaf Spriteling
-    }
-}) -- Leafmender
-
-map.nodes[18036202] = Rare({
-    id=73166,
-    quest={33277, 33302},
-    note=L["monstrous_spineclaw_note"],
-    rewards={
-        Achievement({id=8714, criteria=23985}),
-        Achievement({id=8728, criteria=24033}), -- Spineclaw Crab
-        Pet({item=104168, id=1337}) -- Spineclaw Crab
-    },
-    pois={
-        POI({
-            16103654, 16306071, 17377226, 17735384, 18036202, 18255509,
-            18355853, 18767563, 20394765, 20717747, 20797142, 21053567,
-            21153248, 21156353, 21913600, 22383043, 22793512, 23502794,
-            23713527, 24727504, 25357482, 27517472, 27768033, 29368443,
-            30743114, 33188564, 36068786, 40749101, 44778961, 52368699,
-            62138293, 62508013, 65707822, 67937803, 68907404, 69947106,
-            70466704, 71396302
-        })
-    }
-}) -- Monstrous Spineclaw
-
-map.nodes[60768795] = Rare({
-    id=72048,
-    quest=nil,
-    note=L["rattleskew_note"],
-    rewards={
-        Achievement({id=8714, criteria=23977}),
-        Achievement({id=8728, criteria=24065}), -- Captain Zvezdan's Lost Leg
-        Item({item=104321, note=L["trinket"]}) -- Captain Zvezdan's Lost Leg
-    }
-}) -- Rattleskew
-
-lostspirits.nodes[42153233] = Rare({
-    id=73157,
-    quest={33283, 33307},
-    note=L["cavern_of_lost_spirits"],
-    parent={ id=map.id, pois={POI({43624055})} },
-    rewards={
-        Achievement({id=8714, criteria=23980}),
-        Achievement({id=8728, criteria=24063}), -- Golden Moss
-        Item({item=104313, note=L["trinket"]}) -- Golden Moss
-    }
-}) -- Rock Moss
-
-map.nodes[59004880] = Rare({
-    id=71864,
-    quest=32960, -- 33164
-    note=L["spelurk_note"],
-    rewards={
-        Achievement({id=8714, criteria=23975}),
-        Achievement({id=8728, criteria=24064}), -- Cursed Talisman
-        Item({item=104320}) -- Cursed Talisman
-    },
-    pois={
-        POI({
-            22403870, 25007190, 32006150, 32603280, 33805450, 37704110,
-            39607780, 42805540, 47308080, 48005120, 50407170, 52206260,
-            55107290, 55305030, 55605930, 63104530, 64507230, 65405170,
-            68406040
-        }) -- Lost Artifact locations
-    }
-}) -- Spelurk
-
-lostspirits.nodes[48116069] = Rare({
-    id=72769,
-    quest={33259, 33293},
-    note=L["cavern_of_lost_spirits"],
-    parent={ id=map.id, pois={POI({43624055})} },
-    rewards={
-        Achievement({id=8714, criteria=23978}),
-        Achievement({id=8728, criteria={24060, 24037}}), -- Jadefire Spirit, Glowing Green Ash
-        Pet({id=1348, item=104307}), -- Jadefire Spirit
-        Item({item=104258}) -- Glowing Green Ash
-    },
-    pois={
-        POI({
-            48006094, 54797178, 55633192, 62283465, 65236484, 70776311,
-            74443334
-        }) -- Caverns spawns
-    }
-}) -- Spirit of Jadefire
-
-map.nodes[71348293] = Rare({
-    id=73704,
-    quest={33280, 33305},
-    rewards={
-        Achievement({id=8714, criteria=24144})
-    }
-}) -- Stinkbraid
-
-map.nodes[54094240] = Rare({
-    id=72808,
-    quest={33279, 33304},
-    note=L["in_small_cave"],
-    rewards={
-        Achievement({id=8714, criteria=23983}),
-        Achievement({id=8728, criteria=24041}), -- Pristine Stalker Hide
-        Item({item=104268}) -- Pristine Stalker Hide
-    }
-}) -- Tsavo'ka
-
-map.nodes[43002500] = Rare({
-    id=73173,
-    quest={33284, 33308},
-    rewards={
-        Achievement({id=8714, criteria=23993}),
-        Achievement({id=8728, criteria=24059}), -- Sunset Stone
-        Item({item=104306}) -- Sunset Stone
-    }
-}) -- Urdur the Cauterizer
-
-map.nodes[57617660] = Rare({
-    id=73170,
-    quest={33321, 33322}, -- 44696
-    rewards={
-        Achievement({id=8714, criteria=23992}),
-        Achievement({id=8728, criteria=24058}), -- Ashen Stone
-        Item({item=104305}) -- Ashen Stone
-    }
-}) -- Watcher Osu
-
-map.nodes[47008700] = Rare({
-    id=72245,
-    quest={32997, 33316},
-    rewards={
-        Achievement({id=8714, criteria=23971}),
-        Achievement({id=8728, criteria=24056}), -- Rain Stone
-        Item({item=104303}) -- Rain Stone
-    }
-}) -- Zesqua
-
-map.nodes[37797773] = Rare({
-    id=71919,
-    quest={33317, 32959},
-    note=L["zhugon_note"],
-    rewards={
-        Achievement({id=8714, criteria=23972}),
-        Achievement({id=8728, criteria=24032}), -- Skunky Alemental
-        Pet({item=104167, id=1336}) -- Skunky Alemental
-    }
-}) -- Zhu-Gon Sour
-
--------------------------------------------------------------------------------
----------------------------------- TREASURES ----------------------------------
--------------------------------------------------------------------------------
-
-local MossCoveredChest = Class('MossCoveredChest', Treasure)
-
-MossCoveredChest.label = L["moss_covered_chest"]
-MossCoveredChest.icon = "chest_gn"
-MossCoveredChest.rewards = {
-    Achievement({id=8729, criteria=1})
-}
-
-map.nodes[36703410] = MossCoveredChest({ quest=33170 })
-map.nodes[25502720] = MossCoveredChest({ quest=33171 })
-map.nodes[27403910] = MossCoveredChest({ quest=33172 })
-map.nodes[30703650] = MossCoveredChest({ quest=33173 })
-map.nodes[22403540] = MossCoveredChest({ quest=33174 })
-map.nodes[22104930] = MossCoveredChest({ quest=33175 })
-map.nodes[24805300] = MossCoveredChest({ quest=33176 })
-map.nodes[25704580] = MossCoveredChest({ quest=33177 })
-map.nodes[22306810] = MossCoveredChest({ quest=33178 })
-map.nodes[26806870] = MossCoveredChest({ quest=33179 })
-map.nodes[31007630] = MossCoveredChest({ quest=33180 })
-map.nodes[35307640] = MossCoveredChest({ quest=33181 })
-map.nodes[38707160] = MossCoveredChest({ quest=33182 })
-map.nodes[39807950] = MossCoveredChest({ quest=33183 })
-map.nodes[34808420] = MossCoveredChest({ quest=33184 })
-map.nodes[43608410] = MossCoveredChest({ quest=33185 })
-map.nodes[47005370] = MossCoveredChest({ quest=33186 })
-map.nodes[46704670] = MossCoveredChest({ quest=33187 })
-map.nodes[51204570] = MossCoveredChest({ quest=33188 })
-map.nodes[55504430] = MossCoveredChest({ quest=33189 })
-map.nodes[58005070] = MossCoveredChest({ quest=33190 })
-map.nodes[65704780] = MossCoveredChest({ quest=33191 })
-map.nodes[63805920] = MossCoveredChest({ quest=33192 })
-map.nodes[64907560] = MossCoveredChest({ quest=33193 })
-map.nodes[60206600] = MossCoveredChest({ quest=33194 })
-map.nodes[49706570] = MossCoveredChest({ quest=33195 })
-map.nodes[53107080] = MossCoveredChest({ quest=33196 })
-map.nodes[52706270] = MossCoveredChest({ quest=33197 })
-map.nodes[61708850] = MossCoveredChest({ quest=33227 })
-map.nodes[44206530] = MossCoveredChest({ quest=33198 })
-map.nodes[26006140] = MossCoveredChest({ quest=33199 })
-map.nodes[24603850] = MossCoveredChest({ quest=33200 })
-map.nodes[59903130] = MossCoveredChest({ quest=33201 })
-map.nodes[29703180] = MossCoveredChest({ quest=33202 })
-
-lostspirits.nodes[62853535] = Treasure({
-    quest=33203,
-    label=L["skull_covered_chest"],
-    note=L["cavern_of_lost_spirits"],
-    parent={ id=map.id, pois={POI({43624055})} },
-    rewards={
-        Achievement({id=8729, criteria=2})
-    }
-}) -- Skull-Covered Chest
-
-map.nodes[47602760] = Treasure({
-    quest=33210,
-    label=L["blazing_chest"],
-    icon='chest_rd',
-    rewards={
-        Achievement({id=8729, criteria=24118})
-    }
-}) -- Blazing Chest
-
-map.nodes[28203520] = Treasure({
-    quest=33204,
-    label=L["sturdy_chest"],
-    note=L["sturdy_chest_note"],
-    icon="chest_bn",
-    rewards={
-        Achievement({id=8729, criteria=4})
-    }
-}) -- Sturdy Chest
-
-map.nodes[26806490] = Treasure({
-    quest=33205,
-    label=L["sturdy_chest"],
-    note=L["sturdy_chest_note"],
-    icon="chest_bn",
-    rewards={
-        Achievement({id=8729, criteria=4})
-    }
-}) -- Sturdy Chest
-
-map.nodes[64607040] = Treasure({
-    quest=33206,
-    label=L["sturdy_chest"],
-    icon="chest_bn",
-    rewards={
-        Achievement({id=8729, criteria=4})
-    }
-}) -- Sturdy Chest
-
-map.nodes[59204950] = Treasure({
-    quest=33207,
-    label=L["sturdy_chest"],
-    note=L["spelurk_cave"],
-    icon="chest_bn",
-    rewards={
-        Achievement({id=8729, criteria=4})
-    },
-}) -- Sturdy Chest
-
-map.nodes[69503290] = Treasure({
-    quest=33208,
-    label=L["smoldering_chest"],
-    icon='chest_yw',
-    rewards={
-        Achievement({id=8729, criteria=5})
-    }
-}) -- Smoldering Chest
-
-map.nodes[54007820] = Treasure({
-    quest=33209,
-    label=L["smoldering_chest"],
-    icon='chest_yw',
-    rewards={
-        Achievement({id=8729, criteria=5})
-    }
-}) -- Smoldering Chest
-
--------------------------------------------------------------------------------
---------------------------- EXTREME TREASURE HUNTER ---------------------------
--------------------------------------------------------------------------------
-
-map.nodes[49676941] = Treasure({
-    quest=32969,
-    note=L["gleaming_treasure_chest_note"],
-    icon="star_chest_g",
-    scale=1.5,
-    rewards={
-        Achievement({id=8726, criteria=24018})
-    },
-    pois={
-        POI({51607460}),
-        Path({51607460, 51157221, 51067103, 50596978, 49676941})
-    }
-}) -- Gleaming Treasure Chest
-
-map.nodes[53934723] = Treasure({
-    quest=32968,
-    note=L["ropebound_treasure_chest_note"],
-    icon="star_chest_g",
-    scale=1.5,
-    rewards={
-        Achievement({id=8726, criteria=24019})
-    },
-    pois={
-        POI({60204590}),
-        Path({60204590, 57804728, 55144409, 53934723})
-    }
-}) -- Rope-Bound Treasure Chest
-
-map.nodes[58506010] = Treasure({
-    quest=32971,
-    note=L["mist_covered_treasure_chest_note"],
-    icon="star_chest_g",
-    scale=1.5,
-    rewards={
-        Achievement({id=8726, criteria=24020})
-    }
-}) -- Mist-Covered Treasure Chest
-
--------------------------------------------------------------------------------
--------------------- WHERE THERE'S PIRATES, THERE'S BOOTY ---------------------
--------------------------------------------------------------------------------
-
-map.nodes[22705890] = Treasure({
-    quest=32956,
-    note=L["in_water_cave"],
-    icon="star_chest_g",
-    scale=1.5,
-    rewards={
-        Achievement({id=8727, criteria=24022})
-    },
-    pois={
-        POI({16905710}) -- Cave Entrance
-    }
-}) -- Blackguard's Jetsam
-
-map.nodes[70608090] = Treasure({
-    quest=32970,
-    icon="star_chest_g",
-    scale=1.5,
-    note=L["gleaming_treasure_satchel_note"],
-    rewards={
-        Achievement({id=8727, criteria=24023})
-    }
-}) -- Gleaming Treasure Satchel
-
-map.nodes[40409300] = Treasure({
-    quest=32957,
-    requires=MistsOfPandaria.requirement.Item(104015),
-    icon="star_chest_g",
-    scale=1.5,
-    note=L["sunken_treasure_note"],
-    rewards={
-        Achievement({id=8727, criteria=24021}),
-        Achievement({id=8728, criteria=24024}), -- Cursed Swabby Helmet
-        Toy({item=134024}) -- Cursed Swabby Helmet
-    }
-}) -- Sunken Treasure
-
--------------------------------------------------------------------------------
--------------------------------- MISCELLANEOUS --------------------------------
--------------------------------------------------------------------------------
-
-map.nodes[46177088] = Node({
-    quest=32961,
-    icon=132781,
-    label=L["neverending_spritewood"],
-    note=L["neverending_spritewood_note"],
-    rewards={
-        Achievement({id=8728, criteria=24028}), -- Dandelion Frolicker
-        Pet({item=104160, id=1329}) -- Dandelion Frolicker
-    }
+local TimedEvent = Class('TimedEvent', Quest, {
+    icon = "peg_yw",
+    scale = 2,
+    group = BattleForAzeroth.groups.ASSAULT_EVENT,
+    note = ''
 })
 
-lostspirits.nodes[53395699] = NPC({
-    id=71876,
-    icon=133730,
-    quest=32962,
-    note=L["cavern_of_lost_spirits"]..' '..L["zarhym_note"],
-    parent={ id=map.id, pois={POI({43624055})} },
-    rewards={
-        Achievement({id=8743}) -- Zarhym Altogether
-    }
-}) -- Zarhym
+function TimedEvent:PrerequisiteCompleted()
+    -- Timed events that are not active today return nil here
+    return C_TaskQuest.GetQuestTimeLeftMinutes(self.quest[1])
+end
+
+BattleForAzeroth.node.TimedEvent = TimedEvent
+
+-------------------------------------------------------------------------------
+------------------------------ WAR SUPPLY CRATES ------------------------------
+-------------------------------------------------------------------------------
+
+-- quest = 53640 (50 conquest looted for today)
+
+BattleForAzeroth.node.Supply = Class('Supply', Node, {
+    icon = 'star_chest_g',
+    scale = 1.5,
+    label = L["supply_chest"],
+    rlabel = BattleForAzeroth.GetIconLink('war_mode_swords', 16),
+    note=L["supply_chest_note"],
+    requires = BattleForAzeroth.requirement.WarMode,
+    rewards={ Achievement({id=12572}) },
+    group = BattleForAzeroth.groups.SUPPLY
+})
+
+BattleForAzeroth.node.SecretSupply = Class('SecretSupply', BattleForAzeroth.node.Supply, {
+    icon = 'star_chest_b',
+    group = BattleForAzeroth.groups.SECRET_SUPPLY,
+    label = L["secret_supply_chest"],
+    note = L["secret_supply_chest_note"]
+})
+
+BattleForAzeroth.node.Coffer = Class('Coffer', Node, {
+    icon = 'star_chest_g',
+    scale = 1.5,
+    group = BattleForAzeroth.groups.COFFERS
+})
+
+-------------------------------------------------------------------------------
+----------------------------- VISIONS ASSAULT MAP -----------------------------
+-------------------------------------------------------------------------------
+
+local VisionsMap = Class('VisionsMap', Map)
+
+function VisionsMap:Prepare()
+    Map.Prepare(self)
+    self.assault = self.GetAssault()
+    self.phased = self.assault ~= nil
+end
+
+function VisionsMap:IsNodeEnabled(node, coord, minimap)
+    local assault = node.assault
+    if assault then
+        assault = type(assault) == 'number' and {assault} or assault
+        for i=1, #assault + 1, 1 do
+            if i > #assault then return false end
+            if assault[i] == self.assault then break end
+        end
+    end
+
+    return Map.IsNodeEnabled(self, node, coord, minimap)
+end
+
+BattleForAzeroth.VisionsMap = VisionsMap
+
+-------------------------------------------------------------------------------
+-------------------------------- WARFRONT MAP ---------------------------------
+-------------------------------------------------------------------------------
+
+local WarfrontMap = Class('WarfrontMap', Map)
+
+function WarfrontMap:IsNodeEnabled(node, coord, minimap)
+    -- Disable nodes that are not available when the other faction controls
+    if node.controllingFaction then
+        local state = C_ContributionCollector.GetState(self.collector)
+        local faction = (state == 1 or state == 2) and 'Alliance' or 'Horde'
+        if faction ~= node.controllingFaction then return false end
+    end
+    return Map.IsNodeEnabled(self, node, coord, minimap)
+end
+
+BattleForAzeroth.WarfrontMap = WarfrontMap

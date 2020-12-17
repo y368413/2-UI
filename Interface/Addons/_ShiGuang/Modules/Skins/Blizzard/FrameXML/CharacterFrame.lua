@@ -29,7 +29,7 @@ tinsert(R.defaultThemes, function()
 		UpdateCosmetic(button)
 		UpdateHighlight(button)
 	end)
-
+end)
 hooksecurefunc("SetItemButtonQuality", function(button, quality, itemIDOrLink, suppressOverlays)
 	if itemIDOrLink then
 		if IsArtifactRelicItem(itemIDOrLink) then

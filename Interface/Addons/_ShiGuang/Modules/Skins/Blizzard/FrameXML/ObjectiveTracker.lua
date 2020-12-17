@@ -9,7 +9,7 @@ local function reskinQuestIcon(button)
 	if not button.SetNormalTexture then return end
 
 	if not button.styled then
-		button:SetSize(24, 24)
+		button:SetSize(26, 26)
 		button:SetNormalTexture("")
 		button:SetPushedTexture("")
 		button:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
@@ -44,7 +44,7 @@ local function reskinHeader(header)
 	header.bg = bg -- accessable for other addons
 end
 
-local function reskinBarTemplate(bar)
+--[[local function reskinBarTemplate(bar)
 	if bar.bg then return end
 
 	M.StripTextures(bar)
@@ -93,7 +93,7 @@ local function reskinTimerBar(_, _, line)
 	if not bar.bg then
 		reskinBarTemplate(bar)
 	end
-end
+end]]
 
 local function updateMinimizeButton(button, collapsed)
 	button.__texture:DoCollapse(collapsed)
@@ -109,7 +109,7 @@ end
 
 local function GetMawBuffsAnchor(frame)
 	local center = frame:GetCenter()
-	if center and center < I.ScreenWidth/2 then
+	if center and center < GetScreenWidth()/2 then
 		return "LEFT"
 	else
 		return "RIGHT"
@@ -125,16 +125,16 @@ tinsert(R.defaultThemes, function()
 	hooksecurefunc(CAMPAIGN_QUEST_TRACKER_MODULE, "AddObjective", reskinQuestIcons)
 
 	-- Reskin Progressbars
-	hooksecurefunc(QUEST_TRACKER_MODULE, "AddProgressBar", reskinProgressbar)
-	hooksecurefunc(CAMPAIGN_QUEST_TRACKER_MODULE, "AddProgressBar", reskinProgressbar)
+	--hooksecurefunc(QUEST_TRACKER_MODULE, "AddProgressBar", reskinProgressbar)
+	--hooksecurefunc(CAMPAIGN_QUEST_TRACKER_MODULE, "AddProgressBar", reskinProgressbar)
 
-	hooksecurefunc(BONUS_OBJECTIVE_TRACKER_MODULE, "AddProgressBar", reskinProgressbarWithIcon)
-	hooksecurefunc(WORLD_QUEST_TRACKER_MODULE, "AddProgressBar", reskinProgressbarWithIcon)
-	hooksecurefunc(SCENARIO_TRACKER_MODULE, "AddProgressBar", reskinProgressbarWithIcon)
+	--hooksecurefunc(BONUS_OBJECTIVE_TRACKER_MODULE, "AddProgressBar", reskinProgressbarWithIcon)
+	--hooksecurefunc(WORLD_QUEST_TRACKER_MODULE, "AddProgressBar", reskinProgressbarWithIcon)
+	--hooksecurefunc(SCENARIO_TRACKER_MODULE, "AddProgressBar", reskinProgressbarWithIcon)
 
-	hooksecurefunc(QUEST_TRACKER_MODULE, "AddTimerBar", reskinTimerBar)
-	hooksecurefunc(SCENARIO_TRACKER_MODULE, "AddTimerBar", reskinTimerBar)
-	hooksecurefunc(ACHIEVEMENT_TRACKER_MODULE, "AddTimerBar", reskinTimerBar)
+	--hooksecurefunc(QUEST_TRACKER_MODULE, "AddTimerBar", reskinTimerBar)
+	--hooksecurefunc(SCENARIO_TRACKER_MODULE, "AddTimerBar", reskinTimerBar)
+	--hooksecurefunc(ACHIEVEMENT_TRACKER_MODULE, "AddTimerBar", reskinTimerBar)
 
 	-- Reskin Blocks
 	hooksecurefunc("ScenarioStage_CustomizeBlock", function(block)
@@ -210,7 +210,7 @@ tinsert(R.defaultThemes, function()
 		end
 	end]]
 
-	-- Maw buffs block
+	-- MawBuffsBlock
 	ScenarioBlocksFrame.MawBuffsBlock.Container:HookScript("OnClick", function(container)
 		local direc = GetMawBuffsAnchor(container)
 		if not container.lastDirec or container.lastDirec ~= direc then

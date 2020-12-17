@@ -109,7 +109,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("HandyNotes")
 _G.HandyNotes_Oribos = Oribos
 
 local IsQuestCompleted = C_QuestLog.IsQuestFlaggedCompleted
-local constantsicon = constants.icon
+local constantsicon = HandyNotes_Oribos.constants.icon
 
 ----------------------------------------------------------------------------------------------------
 -----------------------------------------------LOCALS-----------------------------------------------
@@ -241,7 +241,7 @@ local SetTooltipByCoord = function(tooltip, uMapID, coord)
 end
 
 ----------------------------------------------------------------------------------------------------
---[[-----------------------------------------PluginHandler--------------------------------------------
+-------------------------------------------PluginHandler--------------------------------------------
 ----------------------------------------------------------------------------------------------------
 
 local PluginHandler = {}
@@ -284,11 +284,11 @@ local function addTomTomWaypoint(button, uMapID, coord)
             world = true
         })
     end
-end]]
+end
 
 --------------------------------------------CONTEXT MENU--------------------------------------------
 
---[[do
+do
     local currentMapID = nil
     local currentCoord = nil
     local function generateMenu(button, level)
@@ -359,9 +359,9 @@ end]]
         end
         end
     end
-end]]
+end
 
---[[do
+do
 
 local currentMapID = nil
     local function iter(t, prestate)
@@ -421,7 +421,7 @@ local currentMapID = nil
     end
         return true
     end
-end]]
+end
 
 ---------------------------------------------------------------------------------------------------
 ----------------------------------------------REGISTER---------------------------------------------
@@ -464,9 +464,13 @@ function events:ZONE_CHANGED(...)
         print("MapID: "..C_Map.GetBestMapForUnit("player"))
     end
 
-    if C_Map.GetBestMapForUnit("player") == (1671 or 1543) then
-        C_Map.ClearUserWaypoint()
-        --TomTom:RemoveWaypoint(TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNamebyID(162666)}))
+    if C_Map.GetBestMapForUnit("player") == 1671 then
+        if HandyNotes_Oribos.db.fmaster_waypoint_dropdown == 1 or HandyNotes_Oribos.db.fmaster_waypoint_dropdown == 3 then
+            C_Map.ClearUserWaypoint()
+        end
+        if IsAddOnLoaded("TomTom") and (HandyNotes_Oribos.db.fmaster_waypoint_dropdown == 2 or HandyNotes_Oribos.db.fmaster_waypoint_dropdown == 3) then
+            TomTom:RemoveWaypoint(TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNamebyID(162666)}))
+        end
     end
 end
 
@@ -490,8 +494,12 @@ function events:ZONE_CHANGED_INDOORS(...)
             C_SuperTrack.SetSuperTrackedUserWaypoint(true)
         end
     elseif C_Map.GetBestMapForUnit("player") == 1670 then
-        C_Map.ClearUserWaypoint()
-        --TomTom:RemoveWaypoint(TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNamebyID(162666)}))
+        if HandyNotes_Oribos.db.fmaster_waypoint_dropdown == 1 or HandyNotes_Oribos.db.fmaster_waypoint_dropdown == 3 then
+            C_Map.ClearUserWaypoint()
+        end
+        if IsAddOnLoaded("TomTom") and (HandyNotes_Oribos.db.fmaster_waypoint_dropdown == 2 or HandyNotes_Oribos.db.fmaster_waypoint_dropdown == 3) then
+            TomTom:RemoveWaypoint(TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNamebyID(162666)}))
+        end
     end
 end
 
@@ -845,11 +853,11 @@ DB.points = {
     -- Tailor
     [45493182] = { trainer=true, npc=156681, profession=197 },
     -- Cooking
-    [46232637] = { vendor=true, npc=168353 },
-    [46202560] = { trainer=true, npc=156672 }, -- , profession=185
+    [47492372] = { vendor=true, npc=168353 },
+    [46822268] = { trainer=true, npc=156672 }, -- , profession=185
     -- Fishing
-    [46832259] = { vendor=true, npc=156690 },
-    [47542360] = { trainer=true, npc=156671 }, -- , profession=356
+    [46282576] = { vendor=true, npc=156690 },
+    [46172640] = { trainer=true, npc=156671 }, -- , profession=356
     -- Enchanting
     [48412939] = { trainer=true, npc=156683, profession=333 },
     [47572905] = { vendor=true, npc=156694, profession=333 },
@@ -906,8 +914,8 @@ DB.points = {
     [49506073] = { tpplatform=true, label=RingFates },
     [43375150] = { tpplatform=true, label=RingFates },
 
-    [62183266] = { kyrian=true, label=C_Map.GetMapInfo(1533).name, scale=1.5 },
-    [67345157] = { necrolord=true, label=C_Map.GetMapInfo(1536).name, scale=1.5 },
+    [67345157] = { kyrian=true, label=C_Map.GetMapInfo(1533).name, scale=1.5 },
+    [62183266] = { necrolord=true, label=C_Map.GetMapInfo(1536).name, scale=1.5 },
     [49587788] = { nightfae=true, label=C_Map.GetMapInfo(1565).name, scale=1.5 },
     [32015156] = { venthyr=true, label=C_Map.GetMapInfo(1525).name, scale=1.5 },
 },

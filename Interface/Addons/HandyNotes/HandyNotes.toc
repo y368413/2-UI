@@ -35,11 +35,7 @@ LEG\HandyNotes_Argus.lua
 LEG\HandyNotes_LegionRaresTreasures.lua
 
 # BFA
-BFA\HandyNotes_WarfrontRares.lua
-BFA\HandyNotes_BFA_HF_Tracker.lua
-BFA\HandyNotes_ShrinesForJewelcrafters.lua
-BFA\HandyNotes_BFATemplates.xml
-#BFA\HandyNotes_BattleForAzeroth.xml
+BFA\HandyNotes_BattleForAzeroth.xml
 
 # Shadowlands
 Shadowlands\HandyNotes_ShadowlandsTemplates.xml
@@ -52,7 +48,6 @@ Mode\HandyNotes_LightningPaw.lua
 Mode\HandyNotes_Universal_Explorer.lua
 Mode\HandyNotes_TravelGuide.lua
 # Mode\HandyNotes_AzerothsTopTunes.lua
-Mode\HandyNotes_BFA_Jelly.lua
 Mode\HandyNotes_HigherDimensionalLearning.lua
 Mode\HandyNotes_PetDailies.lua
 # Mode\HandyNotes_Syd'sWitheredChests.lua

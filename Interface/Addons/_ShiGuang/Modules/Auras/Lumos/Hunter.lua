@@ -175,6 +175,10 @@ for i = 1, maxSlots do
 	end
 	frame:SetFrameLevel(PetStableFrame:GetFrameLevel() + 1)
 	frame:SetScale(7/NUM_PER_ROW)
+	frame.dimOverlay = frame:CreateTexture(nil, "OVERLAY");
+	frame.dimOverlay:SetColorTexture(0, 0, 0, 0.8);
+	frame.dimOverlay:SetAllPoints();
+	frame.dimOverlay:Hide();
 end
 
 for i = NUM_PER_ROW+1, maxSlots, NUM_PER_ROW do
@@ -185,9 +189,45 @@ end
 PetStableNextPageButton:Hide()
 PetStablePrevPageButton:Hide()
 
+
+function ImprovedStableFrame_Update()
+	local input = ISF_SearchInput:GetText()
+	if not input or input:trim() == "" then
+		for i = 1, maxSlots do
+			local button = _G["PetStableStabledPet"..i];
+			button.dimOverlay:Hide();
+		end
+		return
+	end
+
+	for i = 1, maxSlots do
+		local icon, name, level, family, talent = GetStablePetInfo(NUM_PET_ACTIVE_SLOTS + i);
+		local button = _G["PetStableStabledPet"..i];
+
+		button.dimOverlay:Show();
+		if icon then
+			local matched, expected = 0, 0
+			for str in input:gmatch("([^%s]+)") do
+				expected = expected + 1
+				str = str:trim():lower()
+
+				if name:lower():find(str)
+				or family:lower():find(str)
+				or talent:lower():find(str)
+				then
+					matched = matched + 1
+				end
+			end
+			if matched == expected then
+				button.dimOverlay:Hide();
+			end
+		end
+	end
+end
+
 if wow_900 then
 	local widthDelta = 315
-	local heightDelta = 184
+	local heightDelta = 204
 	local f = CreateFrame("Frame", "ImprovedStableFrameSlots", PetStableFrame, "InsetFrameTemplate")
 	f:ClearAllPoints()
 	f:SetSize(widthDelta, PetStableFrame:GetHeight() + heightDelta - 28)
@@ -204,7 +244,17 @@ if wow_900 then
 	PetStableModel:SetPoint(p, r, rp, x, y - 32)
 
 	PetStableStabledPet1:ClearAllPoints()
-	PetStableStabledPet1:SetPoint("TOPLEFT", f, 8, -8)
+	PetStableStabledPet1:SetPoint("TOPLEFT", f, 8, -36)
+
+
+	local searchInput = CreateFrame("EditBox", "ISF_SearchInput", f, "SearchBoxTemplate")
+	searchInput:SetPoint("TOPLEFT", 9, 0)
+	searchInput:SetPoint("RIGHT", -3, 0)
+	searchInput:SetHeight(20)
+	searchInput:HookScript("OnTextChanged", ImprovedStableFrame_Update)
+	searchInput.Instructions:SetText(SEARCH .. " (" .. NAME .. ", " .. PET_FAMILIES .. ", " .. PET_TALENTS  .. ")")
+
+	hooksecurefunc("PetStable_Update", ImprovedStableFrame_Update)
 else
 
 	PetStableStabledPet1:ClearAllPoints()
@@ -217,7 +267,6 @@ else
 
 	PetStableFrameStableBg:SetHeight(116 + heightChange)
 end
-
 
 NUM_PET_STABLE_SLOTS = maxSlots
 NUM_PET_STABLE_PAGES = 1

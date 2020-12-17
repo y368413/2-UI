@@ -505,16 +505,20 @@ function A:AuraWatch_UpdateAura(spellID, UnitID, index, bool)
 				if VALUE.Mode:lower() == "icon" then
 					name = M.Numb(number)
 				elseif VALUE.Mode:lower() == "text" then
-							name = M.Numb(number)
+					name = M.Numb(number)
 				elseif VALUE.Mode:lower() == "bar" then
+					name = name..":"..M.Numb(number)
+				elseif VALUE.Mode:lower() == "bar2" then
 					name = name..":"..M.Numb(number)
 				end
 			else
 				if VALUE.Mode:lower() == "icon" then
-							name = value.Text or nil
+					name = value.Text or nil
 				elseif VALUE.Mode:lower() == "text" then
 					name = value.Text or nil
 				elseif VALUE.Mode:lower() == "bar" then
+					name = name
+				elseif VALUE.Mode:lower() == "bar2" then
 					name = name
 				end
 			end
@@ -735,7 +739,7 @@ SlashCmdList.AuraWatch = function(msg)
 	if msg:lower() == "move" then
 		updater:SetScript("OnUpdate", nil)
 		for _, value in pairs(FrameList) do
-			for i = 1, 6 do
+			for i = 1, 3 do
 				if value[i] then
 					value[i]:SetScript("OnUpdate", nil)
 					value[i]:Show()

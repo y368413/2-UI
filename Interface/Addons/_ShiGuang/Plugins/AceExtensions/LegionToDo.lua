@@ -1,6 +1,6 @@
 ﻿--## Author: ykiigor  ## SavedVariables: VLegionToDo
-local LegionToDoVersion = "4.6"
-local VERSION_NUMERIC = 46
+local LegionToDoVersion = "4.7"
+local VERSION_NUMERIC = 47
 
 local GetCurrentRegion
 do
@@ -1066,6 +1066,11 @@ CallingsUpdater:SetScript("OnEvent", function(self, event, ...)
 					currQ = numFulfilled or 0
 					maxQ = numRequired or 0
 
+					if objectiveType == "progressbar" then
+						currQ = finished and 100 or GetQuestProgressBarPercent(d.questID) or 0
+						maxQ = 100
+					end
+
 					if not numRequired then
 						currQ, maxQ = 0, 1
 					end
@@ -1077,9 +1082,23 @@ CallingsUpdater:SetScript("OnEvent", function(self, event, ...)
 				
 				local diff = C_TaskQuest.GetQuestTimeLeftMinutes(d.questID)
 			
+				self.collect.s["bounty"..i] = fNameStr1.." "..bountyStr
 				if diff then
-					self.collect.s["bounty"..i] = fNameStr1.." "..bountyStr
 					self.collect.s["bounty"..i.."end"] = time() + diff * 60
+					self.collect.s["bounty"..i.."notime"] = false
+				else
+					self.collect.s["bounty"..i.."end"] = time() + (3 * 24 * 60 * 60) * 60
+					self.collect.s["bounty"..i.."notime"] = true
+				end
+
+				self.collect.s["bounty"..i.."name"] = nil
+
+				local questIndex = C_QuestLog.GetLogIndexForQuestID(d.questID)
+				if questIndex and questIndex ~= 0 then
+					local questLogData = C_QuestLog.GetInfo(questIndex)
+					if questLogData then
+						self.collect.s["bounty"..i.."name"] = questLogData.title
+					end
 				end
 			end
 		end
@@ -1146,15 +1165,23 @@ tinsert(ToDoFunc,function(self,collect)
 	for i=1,#data do
 		local activityInfo = data[i]
 		if (activityInfo.progress >= activityInfo.threshold) then
+			local ilvl = nil
+			if activityInfo.id then
+				local itemLink = C_WeeklyRewards.GetExampleRewardItemHyperlinks(activityInfo.id)
+				if itemLink and itemLink ~= "" then
+					ilvl = select(4,GetItemInfo(itemLink))
+				end
+			end
+
 			if activityInfo.type == Enum.WeeklyRewardChestThresholdType.Raid then
 				local name = DifficultyUtil.GetDifficultyName(activityInfo.level)
-				collect["sl_reward"..rewardsDone] = "Raid "..(name or "")
+				collect["sl_reward"..rewardsDone] = "Raid "..(name or "")..(ilvl and " ilvl:"..ilvl or "")
 				rewardsDone = rewardsDone + 1
 			elseif activityInfo.type == Enum.WeeklyRewardChestThresholdType.MythicPlus then
-				collect["sl_reward"..rewardsDone] = "M+ "..format(WEEKLY_REWARDS_MYTHIC, activityInfo.level)
+				collect["sl_reward"..rewardsDone] = "M+ "..format(WEEKLY_REWARDS_MYTHIC, activityInfo.level)..(ilvl and " ilvl:"..ilvl or "")
 				rewardsDone = rewardsDone + 1
 			elseif activityInfo.type == Enum.WeeklyRewardChestThresholdType.RankedPvP then
-				collect["sl_reward"..rewardsDone] = "PvP "..(PVPUtil.GetTierName(activityInfo.level) or "")
+				collect["sl_reward"..rewardsDone] = "PvP "..(PVPUtil.GetTierName(activityInfo.level) or "")..(ilvl and " ilvl:"..ilvl or "")
 				rewardsDone = rewardsDone + 1
 			end
 		end
@@ -1463,7 +1490,12 @@ tinsert(ToDoFunc,function(self,collect)
 		collect.wrathofthejailer = nil
 	end
 
-	if C_QuestLog.IsQuestFlaggedCompleted(63180) or C_QuestLog.IsQuestFlaggedCompleted(63194) then
+	if 
+		C_QuestLog.IsQuestFlaggedCompleted(63180) or 
+		C_QuestLog.IsQuestFlaggedCompleted(63194) or 
+		C_QuestLog.IsQuestFlaggedCompleted(63198) or C_QuestLog.IsQuestFlaggedCompleted(63196) or
+		C_QuestLog.IsQuestFlaggedCompleted(63199)
+	then
 		collect.mawhunt = true
 	else
 		collect.mawhunt = nil
@@ -2418,7 +2450,7 @@ LegionToDo:SetScript("OnShow",function(self)
 
 	count = LineUpdate(count,"slreward","Great Vault")
 	
-	count = LineUpdate(count,"mplusmax","Weekly max mythic+")
+	--count = LineUpdate(count,"mplusmax","Weekly max mythic+")
 	count = LineUpdate(count,"mpluskey","M+ Key",nil,'small')
 
 	count = LineUpdate(count,"torghast","Torghast",nil,'small-left2')
@@ -2899,6 +2931,7 @@ LegionToDo:SetScript("OnShow",function(self)
 				end
 			end
 			
+			--[[
 			if not optData["mplusmax"] or OPTIONS_TOGGLED  then
 				lineCount = lineCount + 1
 				if needReset then
@@ -2907,6 +2940,7 @@ LegionToDo:SetScript("OnShow",function(self)
 					lines[lineCount].cols[col]:SetText(db.weeklymax or "0")
 				end
 			end
+			]]
 			
 			if not optData["mpluskey"] or OPTIONS_TOGGLED  then
 				lineCount = lineCount + 1
@@ -3072,6 +3106,15 @@ LegionToDo:SetScript("OnShow",function(self)
 						local icon = t:gsub("|t.*$","|t")
 						lines[lineCount].cols[col]:SetText(icon.." |cffffff00expired")
 					end
+
+					local tooltip = {
+						[-1]=(db.s and db.s["bounty"..i.."name"] or ""),
+					}
+					if db.s and not db.s["bounty"..i.."notime"] then
+						tooltip[#tooltip+1] = "Expire on"
+						tooltip[#tooltip+1] = (db.s and db.s["bounty"..i.."end"] and date("%d/%m/%Y %H:%M:%S",db.s["bounty"..i.."end"]) or "")
+					end
+					AddColTooltip(lines[lineCount].cols[col],tooltip)
 				end
 			end
 			

@@ -56,6 +56,10 @@ local EH = {
 	HotHand             = 201900,
 	PrimalLavaActuators = 335896,
 
+	-- soulbind abilities
+	GroveInvigoration   = 322721,
+	FieldOfBlossoms     = 319191,
+
 	-- leggos
 	DoomWindsBonusId           = 6993,
 	DoomWindsDebuff            = 335904,

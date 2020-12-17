@@ -169,6 +169,7 @@ CreateDestination(
 		CreateItem(180290),				-- Night Fae Hearthstone
 		CreateItem(182773),				-- Necrolord Hearthstone
 		CreateItem(184353),				-- Kyrian Hearthstone
+		CreateItem(183716), --Venthyr
 	})
 	
 CreateDestination(

@@ -1,4 +1,4 @@
-﻿--## Author: Caerdon ## SavedVariables: CaerdonWardrobeConfig  ## Version: v2.8.6
+﻿--## Author: Caerdon ## SavedVariables: CaerdonWardrobeConfig  ## Version: v2.9.0
 	
 if GetLocale() == "zhCN" then
   CaerdonWardrobeBoA = "|cffe6cc80战网|r";
@@ -80,6 +80,9 @@ end
 function CaerdonWardrobeFeatureMixin:OnUpdate()
 	-- Called from the main frame's OnUpdate
 end
+--BINDING_HEADER_CAERDON = L["Caerdon Addons"]
+--BINDING_NAME_COPYMOUSEOVERLINK = L["Copy Mouseover Link"]
+--BINDING_NAME_PRINTMOUSEOVERLINKDETAILS = L["Print Mouseover Link Details"]
 
 local availableFeatures = {}
 local registeredFeatures = {}

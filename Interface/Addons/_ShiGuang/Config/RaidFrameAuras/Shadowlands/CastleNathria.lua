@@ -26,12 +26,14 @@ BOSS = 2422 -- 太阳之王的救赎
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 333002) -- 劣民印记
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 326078) -- 灌注者的恩赐
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 325251) -- 骄傲之罪
+module:RegisterDebuff(TIER, INSTANCE, BOSS, 339251) -- 干涸之魂
 
 BOSS = 2418 -- 技师赛·墨克斯
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 327902) -- 锁定
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 326302) -- 静滞陷阱
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 325236) -- 毁灭符文
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 327414) -- 附身
+module:RegisterDebuff(TIER, INSTANCE, BOSS, 340860) -- 枯萎之触
 
 BOSS = 2420 -- 伊涅瓦·暗脉女勋爵
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 325936) -- 共享认知
@@ -71,7 +73,10 @@ module:RegisterDebuff(TIER, INSTANCE, BOSS, 342698) -- 不稳定的心能感染
 
 BOSS = 2424 -- 德纳修斯大帝
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 326851) -- 血债
-module:RegisterDebuff(TIER, INSTANCE, BOSS, 327798) -- 罐装心能
+module:RegisterDebuff(TIER, INSTANCE, BOSS, 327796) -- 罐装心能
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 327992) -- 荒芜
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 328276) -- 悔悟之行
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 326699) -- 罪孽烦扰
+module:RegisterDebuff(TIER, INSTANCE, BOSS, 329181) -- 毁灭痛苦
+module:RegisterDebuff(TIER, INSTANCE, BOSS, 335873) -- 积恨
+module:RegisterDebuff(TIER, INSTANCE, BOSS, 329951) -- 穿刺
