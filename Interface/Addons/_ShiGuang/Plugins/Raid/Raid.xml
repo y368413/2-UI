@@ -1,4 +1,5 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="PremadeSort.lua"/>
 	<Script file="BossesKilled.lua"/>
 	<Script file="ElitismHelper.lua"/>
 	<!--Script file="KeystoneHelper.lua"/-->

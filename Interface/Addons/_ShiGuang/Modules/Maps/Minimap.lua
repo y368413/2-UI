@@ -65,7 +65,7 @@ function module:ReskinRegions()
 	-- Garrison
 	hooksecurefunc("GarrisonLandingPageMinimapButton_UpdateIcon", function(self)
 		self:ClearAllPoints()
-		self:SetPoint("TOPRIGHT", Minimap, "BOTTOMRIGHT", 12, 12)
+		self:SetPoint("TOPRIGHT", Minimap, "BOTTOMRIGHT", 16, 12)
 		self:SetScale(0.72)
 		--self:GetNormalTexture():SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\2UI")
 		--self:GetPushedTexture():SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\2UI")

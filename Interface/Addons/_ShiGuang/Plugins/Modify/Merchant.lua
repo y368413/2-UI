@@ -111,7 +111,7 @@ end)
 ----------------------------------------------------------------------------------------
 --	One-click Milling, Prospecting and Disenchanting(Molinari by p3lim)
 ----------------------------------------------------------------------------------------
-local button = CreateFrame("Button", "OneClickMPD", UIParent, "SecureActionButtonTemplate, AutoCastShineTemplate")
+local button = CreateFrame("Button", "OneClickMPD", UIParent, "InsecureActionButtonTemplate, AutoCastShineTemplate")
 button:SetScript("OnEvent", function(self, event, ...) self[event](self, ...) end)
 button:RegisterEvent("PLAYER_LOGIN")
 

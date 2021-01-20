@@ -8,11 +8,13 @@
 	<Script file="kAutoOpen.lua"/>
 	<Script file="HardYards.lua"/>
 	<Script file="NomiCakes.lua"/>
+	<Script file="GotoCroods.lua"/>
 	<Script file="Talentless.lua"/>
+	<Script file="TalentNotes.lua"/>
 	<Script file="ColorFrames.lua"/>
 	<Script file="nReputation.lua"/>
-	<Script file="GotoCroods.lua"/>
 	<Script file="WallpaperKit.lua"/>
+	<Script file="StatPriorities.lua"/>
 	<Script file="AlterCurrencies.lua"/>
 	<Script file="MogAllArtifacts.lua"/>
 	<Script file="TransmogCostCutter.lua"/>

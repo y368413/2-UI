@@ -118,6 +118,8 @@ function Shaman:EnhancementAoe()
 	local covenantId = covenant.covenantId;
 	local totems = fd.totems;
 	local activeFlameShock = fd.activeFlameShock;
+	-- 2021-01-06 Laag - Added targets variable
+	local targets = MaxDps:SmartAoe();
 
 	-- windstrike,if=buff.crash_lightning.up;
 	local Windstrike = MaxDps:FindSpell(EH.Windstrike) and EH.Windstrike or EH.Stormstrike;
@@ -132,9 +134,21 @@ function Shaman:EnhancementAoe()
 		return EH.FaeTransfusion;
 	end
 
+	-- 2021-01-06 Laag - Added Crash Lightning when DoomWinds buff is up
+	-- Crash Lightning,if=runeforge.doom_winds.equipped&buff.doom_winds.up);
+	if cooldown[EH.CrashLightning].ready and runeforge[EH.DoomWindsBonusId] and buff[EH.DoomWinds].up then
+		return EH.CrashLightning;
+	end
+
 	-- frost_shock,if=buff.hailstorm.up;
 	if cooldown[EH.FrostShock].ready and buff[EH.Hailstorm].up then
 		return EH.FrostShock;
+	end
+
+	-- 2021-01-06 Laag - Moved Sundering to earlier in rotation
+	-- sundering;
+	if talents[EH.Sundering] and cooldown[EH.Sundering].ready then
+		return EH.Sundering;
 	end
 
 	-- flame_shock,target_if=refreshable,cycle_targets=1,if=talent.fire_nova.enabled|talent.lashing_flames.enabled|covenant.necrolord;
@@ -227,17 +241,18 @@ function Shaman:EnhancementAoe()
 		return EH.FlameShock;
 	end
 
-	-- sundering;
-	if talents[EH.Sundering] and cooldown[EH.Sundering].ready then
-		return EH.Sundering;
-	end
-
 	-- lava_lash,target_if=min:debuff.lashing_flames.remains,cycle_targets=1,if=runeforge.primal_lava_actuators.equipped&buff.primal_lava_actuators.stack>6;
 	if cooldown[EH.LavaLash].ready and
 		runeforge[EH.PrimalLavaActuatorsBonusId] and
 		buff[EH.PrimalLavaActuators].count > 6
 	then
 		return EH.LavaLash;
+	end
+
+	-- 2021-01-06 Laag - Chain Lightning if targets >= 3
+	-- chain_lightning,if=buff.maelstrom_weapon.stack>=5&active_enemies>=3;
+	if currentSpell ~= EH.ChainLightning and buff[EH.MaelstromWeapon].count >= 5 and targets >= 3 then
+		return EH.ChainLightning;
 	end
 
 	-- windstrike;
@@ -336,6 +351,12 @@ function Shaman:EnhancementSingle()
 		buff[EH.DoomWinds].up
 	then
 		return EH.IceStrike;
+	end
+
+	-- 2021-01-06 Laag - Added Sundering when DoomWinds buff is up
+	-- Sundering,if=runeforge.doom_winds.equipped&buff.doom_winds.up);
+	if talents[EH.Sundering] and cooldown[EH.Sundering].ready and runeforge[EH.DoomWindsBonusId] and buff[EH.DoomWinds].up then
+		return EH.Sundering;
 	end
 
 	-- flame_shock,if=!ticking;

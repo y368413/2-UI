@@ -842,6 +842,9 @@ L["options_opacity"] = "透明度"
 L["options_opacity_desc"] = "0 = 透明, 1 = 不透明"
 ---------------------------------- VISIBILITY ---------------------------------
 
+L["options_show_worldmap_button"] = "显示世界地图按钮"
+L["options_show_worldmap_button_desc"] = "在世界地图右上角添加一个快速切换下拉菜单。"
+
 L["options_visibility_settings"] = "可见性"
 L["options_general_settings"] = "通用"
 L["options_show_completed_nodes"] = "显示已完成"
@@ -858,6 +861,17 @@ L["options_toggle_per_map_settings"] = "使用区域特定设置"
 L["options_toggle_per_map_settings_desc"] = "应用切换，缩放和透明度设置到每个区域。"
 L["options_restore_hidden_nodes"] = "恢复隐藏项"
 L["options_restore_hidden_nodes_desc"] = "使用右击菜单恢复全部隐藏项。"
+
+L["options_rewards_settings"] = "奖励"
+L["options_reward_types"] = "显示奖励类型"
+L["options_mount_rewards"] = "显示坐骑奖励"
+L["options_mount_rewards_desc"] = "在提示和追踪其收集状态显示坐骑奖励。"
+L["options_pet_rewards"] = "显示宠物奖励"
+L["options_pet_rewards_desc"] = "在提示和追踪其收集状态显示宠物奖励。"
+L["options_toy_rewards"] = "显示玩具奖励"
+L["options_toy_rewards_desc"] = "在提示和追踪其收集状态显示玩具奖励。"
+L["options_transmog_rewards"] = "显示幻化奖励"
+L["options_transmog_rewards_desc"] = "在提示和追踪其收集状态显示幻化奖励。"
 
 L["options_icons_misc_desc"] = "显示其它未分类项的位置。"
 L["options_icons_misc"] = "杂项"
@@ -1167,7 +1181,7 @@ L["rootwrithe_note"] = "触碰 {npc:167928} 直到稀有出现。"
 L["rotbriar_note"] = "和 {npc:171684} 交谈对话后在附近召唤稀有。"
 L["slumbering_note"] = "跑到迷雾中将昏迷并被带出。使用信号弹或带 AOE 的宠物把他击出迷雾。"
 L["skuld_vit_note"] = "在被障碍物阻挡的山洞中。法夜必须使用 {spell:310143} 进入洞穴。他进入战斗后，障碍物将消失。"
-L["valfir_note"] = "在闪光的心能之种下降过程中点击并使用 {spell:338045} 移除他的 {spell:338038} 增益。"
+L["valfir_note"] = "在路径中途下坡点击闪光的心能之种并使用 {spell:338045} 移除他的 {spell:338038} 增益。"
 L["wrigglemortis_note"] = "拉动 {npc:164179} 刷新稀有。"
 
 L["night_mare_note"] = [[
@@ -1184,7 +1198,6 @@ L["star_lake_note"] = [[
 
 参加全部七场战斗会从 {npc:163714} 解锁 {item:180748}。
 ]]
-L["guldan"] = "古尔丹"
 
 L["cache_of_the_moon"] = "在魅夜花园收集 {npc:171360} 的五个遗失工具并组合它们制造 {item:180753}。交给她工具包后会施放 {spell:334353} 给你，可以让你看到宝箱。"
 L["cache_of_the_night"] = "在整个区域收集 {item:180656}，{item:180654} 和 {item:180655} 组合它们制造 {item:180652}。"
@@ -1248,10 +1261,11 @@ L["herculon_note"] = [[
 
 |cFFFF8C00不能在世界任务 {wq:突袭前庭} 期间击败。|r
 ]]
-L["nikara_note"] = "和两名其他玩家，点击上古熏香来召唤。"
+L["reekmonger_note"] = "在勇气神庙击杀敌人直到 {npc:171327} 做出表情并降落。"
+L["repair_note"] = "和两名其他玩家，点击上古熏香来召唤。"
 L["sotiros_orstus_note"] = "点击黑色的钟召唤稀有。"
 L["sundancer_note"] = "点击雕像获得 {spell:332309} 增益，然后使用 {item:180445} 滑翔到稀有并骑上它。"
-L["swelling_tear_note"] = "点击 {npc:171012} 召唤三个稀有中的一个。眼泪可以在区域内的多个位置出现。"
+L["swelling_tear_note"] = "点击 {npc:171012} 召唤三个稀有中的一个。裂隙可以在区域内的多个位置出现。"
 L["unstable_memory_note"] = "当 {npc:171018} 存在时可以刷新。拉一个 {npc:171018} 到其它会给它10层堆叠 {spell:333558}，把它变成稀有。"
 L["wingflayer_note"] = "点击附近桌上的勇气号角召唤（东南方，楼梯上）。"
 
@@ -1354,6 +1368,10 @@ L["anima_shard_spires"] = "三个碎片位于晋升高塔地下城。"
 L["options_icons_anima_shard"] = "{achievement:14339}"
 L["options_icons_anima_shard_desc"] = "显示 {achievement:14339} 成就中全部50个失落的心能碎片的位置。"
 
+L["hymn_note"] = "在每个神庙中找到赞美诗并获得它的增益来获得成就。"
+L["options_icons_hymns"] = "{achievement:14768}"
+L["options_icons_hymns_desc"] = "显示 {achievement:14768} 成就中赞美诗的位置。"
+
 L["stratios_note"] = "即便是最小规模的战斗也应该带着荣誉和谨慎而战。准备好以后就展示出你的队伍。"
 L["thenia_note"] = "如此壮丽而开阔的平原。多么光荣的战场。你准备好了吗？"
 L["zolla_note"] = "我们非常重视自身的防御。无论规模大小，我们都将全力维护和训练让晋升堡垒得以稳固的资源。"
@@ -1376,7 +1394,7 @@ L["theater_of_pain_note"] = "每天第一次击杀首领有几率掉落坐骑。
 L["zargox_the_reborn_note"] = [[
 使用 {item:175841} 位于 {npc:157124} 顶上。获得宝珠，你必须完成 {npc:157076} 的任务 {quest:57245} 之后再与他交谈。
 
-假如 {npc:157124} 不起来，复活区域内的 {npc:157132} 直到它出现。
+假如 {npc:157124} 不在，复活区域内的 {npc:157132} 直到它出现。
 ]]
 L["mixed_pool_note"] = [[
 从周围怪物收集材料并扔进池中。每30个材料，根据所使用的组合，将刷新七个稀有中的一个。
@@ -1419,21 +1437,16 @@ L["spinebug_note"] = [[
 ]]
 
 L["oonar_sorrowbane_note"] = [[
-在伤逝剧场，可以找到哀伤克星插在地上和乌纳尔的手臂附在一起。|cFFFF8C00在尝试拉出之前，设置 {item:6948} 到 {npc:161702} 飞行点。|r
+在伤逝剧场，可以找到和 {item:181164} 附在一起的 {item:180273} 插在地上。拔出它们：
 
-拉出 {item:181164}：
-
-· 到格拉萨恩之腐东侧。
-· 吃4层 {spell:327367} （2分钟负面效果）。
-· 迅速炉石并拉动手臂。
-
-拉出 {item:180273}：
-
-· 从雷文德斯的 {npc:171808} 买个 {item:182163}。
-· 从玛卓克萨斯的 {npc:166640} 买个 {item:180771}。
-· 从 |cFFFFFD00{wq:一路磕磕绊绊}|r 世界任务西侧得到2层 {spell:306272}。
+· 从雷文德斯的 {npc:171808} 购买一个 {item:182163}。
+· 从玛卓克萨斯的 {npc:166640} 购买一个 {item:180771}。
+· 从玛卓克萨斯的 {npc:169964} 购买一个 {item:181163}。
+· 从西侧的世界任务 {wq:一路磕磕绊绊} 得到2层 {spell:306272}。
 · 在格拉萨恩之腐吃4层 {spell:327367}。
-· 迅速炉石，喝下2种药水并拉出大宝剑。
+· 迅速使用 {item:181163}，喝下两种药水并拉出大宝剑。
+
+只拉出 {item:181164}，只需要4层 {spell:327367}。
 ]]
 
 L["pet_cat"] = "宠爱该死的猫！"
@@ -1479,21 +1492,21 @@ L["worldedge_gorger_note"] = [[
 ]]
 
 L["dredglaive_note"] = "在 {npc:173671} 尸体的桥下。"
-L["forbidden_chamber_note"] = "拾取一个废弃的心能之罐在锁着的门前学习 {spell:340701}。使用它吸取五个附近的 {npc:173838}s，然后在 {npc:173786} 前使用 {spell:340866}。"
+L["forbidden_chamber_note"] = "在锁着的门前拾取一个被抛弃的心能之罐学习 {spell:340701}。使用它吸取五个附近的 {npc:173838}，然后在 {npc:173786} 前使用 {spell:340866}。"
 L["gilded_plum_chest_note"] = "击杀在路上徘徊的 {npc:166680}。"
 L["lost_quill_note"] = "从禁忌图书馆的桌上瓶子拾取 {item:182475}，然后把它交给外面拱门顶上的 {npc:173449}。"
 L["rapier_fearless_note"] = "点击地上的剑杆，然后击败 {npc:173603}。"
 L["remlates_cache_note"] = "在暗湾镇墓穴后面的外墙上。"
 L["smuggled_cache_note"] = "*在拾取之前*：确认已完成 {quest:60480} 分支任务否则宝藏和任务将缺少40个 {currency:1820}。"
 L["taskmaster_trove_note"] = "阅读出入口仪式然后小心地走到宝箱。"
-L["the_count_note"] = "获得99个 {currency:1820} 末日迷沼然后把它带给 {npc:173488}。"
+L["the_count_note"] = "在末日迷沼获得99个 {currency:1820} 然后把它带给 {npc:173488}。"
 
 L["forgotten_anglers_rod"] = "被遗忘的渔翁之竿"
 
-L["loyal_gorger_note"] = "到末日迷沼完成{npc:173498} 的每日任务七次将获得他的坐骑。"
+L["loyal_gorger_note"] = "到末日迷沼完成 {npc:173498} 的每日任务七次将获得他的坐骑。"
 
 L["sinrunner_note"] = "将食物和补给品给 {npc:173468} 共六天获得她的缰绳。她一次只出现几分钟。"
-L["sinrunner_note_day1"] = "在西部荒野农场的8个 {item:182581} 给布兰契。"
+L["sinrunner_note_day1"] = "带西部荒野农场的8个 {item:182581} 给布兰契。"
 L["sinrunner_note_day2"] = "从暗湾镇的 {npc:173570} 获得 {item:182585} 并梳理布兰契。"
 L["sinrunner_note_day3"] = "在暗湾镇道路周围找到4个 {item:182595} 给布兰契装配上。"
 L["sinrunner_note_day4"] = "在 {npc:173570} 处拾取 {item:182620} 并填满晋升堡垒或炽蓝仙野的水。把 {item:182599} 给布兰契。"
@@ -1520,7 +1533,7 @@ L["options_icons_fugitives_desc"] = "显示 {achievement:14274} 成就中逃亡�
 L["grand_inquisitor_note"] = "把10个 {item:180451} 交给 {npc:160248} 有机会获得此罪碑。"
 L["high_inquisitor_note"] = "把250个 {currency:1816} 交给 {npc:160248} 有机会获得此罪碑。"
 L["inquisitor_note"] = "把100个 {currency:1816} 交给 {npc:160248} 有机会获得此罪碑。"
-L["options_icons_inquisitors"] = "{achievement:14276}"
+L["options_icons_inquisitors"] = "审判官"
 L["options_icons_inquisitors_desc"] = "显示 {achievement:14276} 成就中审判官的位置。"
 
 -------------------------------------------------------------------------------
@@ -1534,7 +1547,6 @@ L["apholeias_note"] = "和3名其他玩家，站在平台的角落并施放 {spe
 L["dekaris_note"] = "在一块凸起的大岩石上。"
 L["drifting_sorrow_note"] = "在悬浮宝珠附近击杀 {npc:175246} 激活首领。"
 L["ekphoras_note"] = "和3名其他玩家，站在平台的角落并施放 {spell:330650} 召唤稀有。"
-L["gorged_shadehound_note"] = "只在 {wq:狩猎：影犬} 事件期间可用。"
 L["ikras_note"] = "在破灭堡飞来飞去。这里是攻击他的好位置。"
 L["orophea_note"] = "从东南方的拾取 {spell:337143} 并提供给 {npc:172577} 激活。"
 L["sanngror_note"] = "如果他是不可攻击，等待直到他不再灵魂实验。"
@@ -1558,10 +1570,9 @@ L["obliterated_soul_shards_note"] = "在桥上收集 {item:177834}。"
 L["animaflow_teleporter_note"] = "激活即可直接前往噬渊其他位置。"
 L["chaotic_riftstone_note"] = "激活 {spell:344157} 快速穿过噬渊。"
 L["venari_note"] = [[
-使用 {currency:1767} 购买噬渊和托加斯特升级。"
+使用 {currency:1767} 购买噬渊和托加斯特升级。
 
 |cFFFF8C00帐号通用托加斯特升级在小号上显示不完整！|r
-|cFFFF8C00解锁后，下面的完成状态将更新！|r
 ]]
 L["venari_upgrade"] = "{npc:162804} 升级"
 L["torghast"] = "托加斯特"
@@ -1621,7 +1632,8 @@ L["elusive_alpaca"] = "将海滩叶蔬沙拉喂给轻盈的迅蹄驼以获得坐
 L["options_icons_alpaca_voldun_desc"] = "显示轻盈的迅蹄驼的刷新位置。"
 L["options_icons_alpaca_voldun"] = "轻盈的迅蹄驼"
 
-
+L["TravelGuide_plugin_name"] = "传送向导"
+L["TravelGuide_plugin_desc"] = "Displays the portal, zeppelin and boat locations on the world map and minimap."
 ---------------------------------- VISIBILITY ---------------------------------
 L["options_toggle_chests_desc"] = "显示宝箱位置 (每日刷新)。"
 L["options_toggle_chests"] = "宝箱"
@@ -1756,7 +1768,7 @@ L["Portal to Vashj'ir"] = "传送到 瓦斯琪尔"
 L["Portal to Hyjal"] = "传送到 海加尔山"
 --巫妖王之怒
 L["Northrend, Crystalsong Forest"] = "诺森德, 晶歌森林"
-L["Portal to the Purple Parlor"] = "传送到 the Purple Parlor"
+L["Portal to the Purple Parlor"] = "传送到 紫色天台"
 L["Northrend, Howling Fjord"] = "诺森德, 嚎风峡湾"
 L["Northrend, Vengeance Landing"] = "诺森德, 复仇港"
 L["Northrend, Valgarde"] = "诺森德, Valgarde"

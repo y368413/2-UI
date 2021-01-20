@@ -19,7 +19,7 @@ local MAF=CreateFrame("Frame","MyParent",UIParent, "BackdropTemplate")
 	
 ---------------------------------------------------- MARKS & FLARES
 local function CreatMarkerButton(id, parent, Texture, w, h, ap, frame, rp, x, y, alpha)
-		local Markerbutton = CreateFrame("Button", id, parent, "SecureActionButtonTemplate")
+		local Markerbutton = CreateFrame("Button", id, parent, "secureActionButtonTemplate")
 		Markerbutton:SetWidth(w)
 		Markerbutton:SetHeight(h)
 		Markerbutton:SetPoint(ap, frame, rp, x, y)

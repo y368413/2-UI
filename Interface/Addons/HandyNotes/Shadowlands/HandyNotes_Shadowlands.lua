@@ -478,7 +478,7 @@ function HandyNotes_Shadowlands:OnEnter(mapID, coord)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
     end
 
-    node:Render(GameTooltip, map:HasPOIs(node))
+    node:Render(GameTooltip, map:CanFocus(node))
     map:SetFocus(node, true, true)
     Shadowlands.MinimapDataProvider:RefreshAllData()
     Shadowlands.WorldMapDataProvider:RefreshAllData()
@@ -503,7 +503,7 @@ function HandyNotes_Shadowlands:OnClick(button, down, mapID, coord)
         end
         ToggleDropDownMenu(1, nil, DropdownMenu, self, 0, 0)
     elseif button == "LeftButton" and down then
-        if map:HasPOIs(node) then
+        if map:CanFocus(node) then
             map:SetFocus(node, not node._focus)
             HandyNotes_Shadowlands:Refresh()
         end
@@ -523,7 +523,7 @@ function HandyNotes_Shadowlands:OnInitialize()
     Shadowlands.CreateGlobalGroupOptions()
 
     -- Add quick-toggle menu button to top-right corner of world map
-    WorldMapFrame:AddOverlayFrame(
+    Shadowlands.world_map_button = WorldMapFrame:AddOverlayFrame(
         "HandyNotes_ShadowlandsWorldMapOptionsButtonTemplate",
         "DROPDOWNTOGGLEBUTTON", "TOPRIGHT",
         WorldMapFrame:GetCanvasContainer(), "TOPRIGHT", -68, -2
@@ -739,6 +739,8 @@ local L = Shadowlands.locale
 
 Shadowlands.optionDefaults = {
     profile = {
+        show_worldmap_button = true,
+
         -- visibility
         hide_done_rares = false,
         hide_minimap = false,
@@ -750,6 +752,12 @@ Shadowlands.optionDefaults = {
         -- tooltip
         show_loot = true,
         show_notes = true,
+
+        -- rewards
+        show_mount_rewards = true,
+        show_pet_rewards = true,
+        show_toy_rewards = true,
+        show_transmog_rewards = true,
 
         -- development
         development = false,
@@ -773,6 +781,7 @@ Shadowlands.optionDefaults = {
         path_color_A = 1
     },
 }
+
 
 -------------------------------------------------------------------------------
 ----------------------------------- HELPERS -----------------------------------
@@ -809,33 +818,21 @@ Shadowlands.options = {
             desc = L["options_general_description"],
             order = 0,
             args = {
-                VisibilityHeader = {
+                GeneralHeader = {
                     type = "header",
-                    name = L["options_visibility_settings"],
-                    order = 10,
+                    name = L["options_general_settings"],
+                    order = 1,
                 },
-                show_completed_nodes = {
+                show_worldmap_button = {
                     type = "toggle",
-                    arg = "show_completed_nodes",
-                    name = L["options_show_completed_nodes"],
-                    desc = L["options_show_completed_nodes_desc"],
-                    order = 11,
-                    width = "full",
-                },
-                hide_done_rare = {
-                    type = "toggle",
-                    arg = "hide_done_rares",
-                    name = L["options_toggle_hide_done_rare"],
-                    desc = L["options_toggle_hide_done_rare_desc"],
-                    order = 12,
-                    width = "full",
-                },
-                hide_minimap = {
-                    type = "toggle",
-                    arg = "hide_minimap",
-                    name = L["options_toggle_hide_minimap"],
-                    desc = L["options_toggle_hide_minimap_desc"],
-                    order = 13,
+                    arg = "show_worldmap_button",
+                    name = L["options_show_worldmap_button"],
+                    desc = L["options_show_worldmap_button_desc"],
+                    set = function(info, v)
+                        Shadowlands:SetOpt(info.arg, v)
+                        Shadowlands.world_map_button:Refresh()
+                    end,
+                    order = 2,
                     width = "full",
                 },
                 maximized_enlarged = {
@@ -843,15 +840,7 @@ Shadowlands.options = {
                     arg = "maximized_enlarged",
                     name = L["options_toggle_maximized_enlarged"],
                     desc = L["options_toggle_maximized_enlarged_desc"],
-                    order = 14,
-                    width = "full",
-                },
-                use_char_achieves = {
-                    type = "toggle",
-                    arg = "use_char_achieves",
-                    name = L["options_toggle_use_char_achieves"],
-                    desc = L["options_toggle_use_char_achieves_desc"],
-                    order = 15,
+                    order = 3,
                     width = "full",
                 },
                 per_map_settings = {
@@ -859,24 +848,98 @@ Shadowlands.options = {
                     arg = "per_map_settings",
                     name = L["options_toggle_per_map_settings"],
                     desc = L["options_toggle_per_map_settings_desc"],
-                    order = 16,
+                    order = 4,
+                    width = "full",
+                },
+                RewardsHeader = {
+                    type = "header",
+                    name = L["options_rewards_settings"],
+                    order = 10,
+                },
+                show_mount_rewards = {
+                    type = "toggle",
+                    arg = "show_mount_rewards",
+                    name = L["options_mount_rewards"],
+                    desc = L["options_mount_rewards_desc"],
+                    order = 11,
+                    width = "full",
+                },
+                show_pet_rewards = {
+                    type = "toggle",
+                    arg = "show_pet_rewards",
+                    name = L["options_pet_rewards"],
+                    desc = L["options_pet_rewards_desc"],
+                    order = 11,
+                    width = "full",
+                },
+                show_toy_rewards = {
+                    type = "toggle",
+                    arg = "show_toy_rewards",
+                    name = L["options_toy_rewards"],
+                    desc = L["options_toy_rewards_desc"],
+                    order = 11,
+                    width = "full",
+                },
+                show_transmog_rewards = {
+                    type = "toggle",
+                    arg = "show_transmog_rewards",
+                    name = L["options_transmog_rewards"],
+                    desc = L["options_transmog_rewards_desc"],
+                    order = 11,
+                    width = "full",
+                },
+                VisibilityHeader = {
+                    type = "header",
+                    name = L["options_visibility_settings"],
+                    order = 20,
+                },
+                show_completed_nodes = {
+                    type = "toggle",
+                    arg = "show_completed_nodes",
+                    name = L["options_show_completed_nodes"],
+                    desc = L["options_show_completed_nodes_desc"],
+                    order = 21,
+                    width = "full",
+                },
+                hide_done_rare = {
+                    type = "toggle",
+                    arg = "hide_done_rares",
+                    name = L["options_toggle_hide_done_rare"],
+                    desc = L["options_toggle_hide_done_rare_desc"],
+                    order = 22,
+                    width = "full",
+                },
+                hide_minimap = {
+                    type = "toggle",
+                    arg = "hide_minimap",
+                    name = L["options_toggle_hide_minimap"],
+                    desc = L["options_toggle_hide_minimap_desc"],
+                    order = 23,
+                    width = "full",
+                },
+                use_char_achieves = {
+                    type = "toggle",
+                    arg = "use_char_achieves",
+                    name = L["options_toggle_use_char_achieves"],
+                    desc = L["options_toggle_use_char_achieves_desc"],
+                    order = 24,
                     width = "full",
                 },
                 restore_all_nodes = {
                     type = "execute",
                     name = L["options_restore_hidden_nodes"],
                     desc = L["options_restore_hidden_nodes_desc"],
-                    order = 17,
+                    order = 25,
                     width = "full",
                     func = function ()
-                        wipe(HandyNotes_Shadowlands.db.char)
-                        HandyNotes_Shadowlands:Refresh()
+                        wipe(Shadowlands.addon.db.char)
+                        Shadowlands.addon:Refresh()
                     end
                 },
                 FocusHeader = {
                     type = "header",
                     name = L["options_focus_settings"],
-                    order = 20,
+                    order = 30,
                 },
                 POI_scale = {
                     type = "range",
@@ -885,7 +948,7 @@ Shadowlands.options = {
                     min = 1, max = 3, step = 0.01,
                     arg = "poi_scale",
                     width = "full",
-                    order = 21,
+                    order = 31,
                 },
                 POI_color = {
                     type = "color",
@@ -894,7 +957,7 @@ Shadowlands.options = {
                     hasAlpha = true,
                     set = function(_, ...) Shadowlands:SetColorOpt('poi_color', ...) end,
                     get = function() return Shadowlands:GetColorOpt('poi_color') end,
-                    order = 22,
+                    order = 32,
                 },
                 PATH_color = {
                     type = "color",
@@ -903,13 +966,13 @@ Shadowlands.options = {
                     hasAlpha = true,
                     set = function(_, ...) Shadowlands:SetColorOpt('path_color', ...) end,
                     get = function() return Shadowlands:GetColorOpt('path_color') end,
-                    order = 23,
+                    order = 33,
                 },
                 restore_poi_colors = {
                     type = "execute",
                     name = L["options_reset_poi_colors"],
                     desc = L["options_reset_poi_colors_desc"],
-                    order = 24,
+                    order = 34,
                     width = "full",
                     func = function ()
                         local df = Shadowlands.optionDefaults.profile
@@ -920,21 +983,21 @@ Shadowlands.options = {
                 TooltipsHeader = {
                     type = "header",
                     name = L["options_tooltip_settings"],
-                    order = 30,
+                    order = 40,
                 },
                 show_loot = {
                     type = "toggle",
                     arg = "show_loot",
                     name = L["options_toggle_show_loot"],
                     desc = L["options_toggle_show_loot_desc"],
-                    order = 31,
+                    order = 41,
                 },
                 show_notes = {
                     type = "toggle",
                     arg = "show_notes",
                     name = L["options_toggle_show_notes"],
                     desc = L["options_toggle_show_notes_desc"],
-                    order = 32,
+                    order = 42,
                 }
             }
         },
@@ -1410,7 +1473,8 @@ function Map:HasEnabledGroups()
     return false
 end
 
-function Map:HasPOIs(node)
+function Map:CanFocus(node)
+    if node.focusable then return true end
     if type(node.pois) == 'table' then return true end
     if node.fgroup then
         for i, coord in ipairs(self.fgroups[node.fgroup]) do
@@ -1743,6 +1807,7 @@ end
 function Group:IsEnabled()
     if self.class and self.class ~= Shadowlands.class then return false end
     if self.faction and self.faction ~= Shadowlands.faction then return false end
+    if self.display_option and not Shadowlands:GetOpt(self.display_option) then return false end
     return true
 end
 
@@ -2118,8 +2183,10 @@ function Node:Prepare()
         end
     end
 
-    for reward in self:IterateRewards() do
-        reward:Prepare()
+    if self.rewards then
+        for i, reward in ipairs(self.rewards) do
+            reward:Prepare()
+        end
     end
 end
 
@@ -2129,7 +2196,7 @@ on the attributes set on this specific node, such as setting an `rlabel` or
 `sublabel` value.
 --]]
 
-function Node:Render(tooltip, hasPOIs)
+function Node:Render(tooltip, focusable)
     -- render the label text with NPC names resolved
     tooltip:SetText(Shadowlands.RenderLinks(self.label, true))
 
@@ -2152,7 +2219,7 @@ function Node:Render(tooltip, hasPOIs)
         rlabel = rlabel..' '..Shadowlands.GetIconLink(self.faction:lower(), 16, 1, -1)
     end
 
-    if hasPOIs then
+    if focusable then
         -- add an rlabel hint to use left-mouse to focus the node
         local focus = Shadowlands.GetIconLink('left_mouse', 12)..Shadowlands.status.Gray(L["focus"])
         rlabel = (#rlabel > 0) and focus..' '..rlabel or focus
@@ -2471,6 +2538,8 @@ function Section:Initialize(title)
     self.title = title
 end
 
+function Section:IsEnabled() return true end
+
 function Section:Prepare()
     Shadowlands.PrepareLinks(self.title)
 end
@@ -2484,7 +2553,7 @@ end
 -------------------------------------------------------------------------------
 
 local Spacer = Class('Spacer', Reward)
-
+function Spacer:IsEnabled() return true end
 function Spacer:Render(tooltip)
     tooltip:AddLine(' ')
 end
@@ -2492,8 +2561,6 @@ end
 -------------------------------------------------------------------------------
 --------------------------------- ACHIEVEMENT ---------------------------------
 -------------------------------------------------------------------------------
-
--- /run print(GetAchievementCriteriaInfo(ID, NUM))
 
 local Achievement = Class('Achievement', Reward)
 local GetCriteriaInfo = function (id, criteria)
@@ -2614,6 +2681,10 @@ function Item:Initialize(attrs)
     end
 end
 
+function Item:Prepare()
+    Shadowlands.PrepareLinks(self.note)
+end
+
 function Item:IsObtained()
     if self.quest then return C_QuestLog.IsQuestFlaggedCompleted(self.quest) end
     return true
@@ -2625,7 +2696,7 @@ function Item:GetText()
         text = text..' ('..self.type..')'
     end
     if self.note then -- additional info
-        text = text..' ('..self.note..')'
+        text = text..' ('..Shadowlands.RenderLinks(self.note, true)..')'
     end
     return Icon(self.itemIcon)..text
 end
@@ -2643,10 +2714,10 @@ end
 -------------------------------------------------------------------------------
 ------------------------------------ MOUNT ------------------------------------
 -------------------------------------------------------------------------------
-
--- /run for i,m in ipairs(C_MountJournal.GetMountIDs()) do if (C_MountJournal.GetMountInfoByID(m) == "NAME") then print(m) end end
-
-local Mount = Class('Mount', Item, { type = L["mount"] })
+local Mount = Class('Mount', Item, {
+    display_option='show_mount_rewards',
+    type=L["mount"]
+})
 
 function Mount:IsObtained()
     return select(11, C_MountJournal.GetMountInfoByID(self.id))
@@ -2661,9 +2732,10 @@ end
 ------------------------------------- PET -------------------------------------
 -------------------------------------------------------------------------------
 
--- /run print(C_PetJournal.FindPetIDByName("NAME"))
-
-local Pet = Class('Pet', Item, { type = L["pet"] })
+local Pet = Class('Pet', Item, {
+    display_option='show_pet_rewards',
+    type=L["pet"]
+})
 
 function Pet:Initialize(attrs)
     if attrs.item then
@@ -2743,9 +2815,10 @@ end
 -------------------------------------------------------------------------------
 ------------------------------------- TOY -------------------------------------
 -------------------------------------------------------------------------------
-
-local Toy = Class('Toy', Item, { type = L["toy"] })
-
+local Toy = Class('Toy', Item, {
+    display_option='show_toy_rewards',
+    type=L["toy"]
+})
 function Toy:IsObtained()
     return PlayerHasToy(self.item)
 end
@@ -2758,8 +2831,9 @@ end
 -------------------------------------------------------------------------------
 ---------------------------------- TRANSMOG -----------------------------------
 -------------------------------------------------------------------------------
-
-local Transmog = Class('Transmog', Item)
+local Transmog = Class('Transmog', Item, {
+    display_option='show_transmog_rewards'
+})
 local CTC = C_TransmogCollection
 
 function Transmog:Initialize(attrs)
@@ -2893,12 +2967,13 @@ function WorldMapOptionsButtonMixin:OnEnter()
 end
 
 function WorldMapOptionsButtonMixin:Refresh()
+    local enabled = Shadowlands:GetOpt('show_worldmap_button')
     local map = Shadowlands.maps[self:GetParent():GetMapID() or 0]
-    if map and map:HasEnabledGroups() then self:Show() else self:Hide() end
+    if enabled and map and map:HasEnabledGroups() then self:Show() else self:Hide() end
 end
 
 function WorldMapOptionsButtonMixin:InitializeDropDown(level)
-    local map, icon = Shadowlands.maps[self:GetParent():GetMapID()]
+    local map, icon, iconLink = Shadowlands.maps[self:GetParent():GetMapID()]
 
     if level == 1 then
         UIDropDownMenu_AddButton({
@@ -2909,13 +2984,25 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
 
         for i, group in ipairs(map.groups) do
             if group:IsEnabled() then
-                if type(group.icon) == 'number' then
-                    icon = Shadowlands.GetIconLink(group.icon, 12, 1, 0)..' '
-                else
-                    icon = Shadowlands.GetIconLink(group.icon, 16)
+                icon = group.icon
+                if group.name == 'misc' then
+                    -- find an icon from the misc nodes in the map
+                    for coord, node in pairs(map.nodes) do
+                        if node.group == group then
+                            icon = node.icon
+                            break
+                        end
+                    end
                 end
+
+                if type(icon) == 'number' then
+                    iconLink = Shadowlands.GetIconLink(icon, 12, 1, 0)..' '
+                else
+                    iconLink = Shadowlands.GetIconLink(icon, 16)
+                end
+
                 UIDropDownMenu_AddButton({
-                    text = icon..' '..Shadowlands.RenderLinks(group.label, true),
+                    text = iconLink..' '..Shadowlands.RenderLinks(group.label, true),
                     isNotRadio = true,
                     keepShownOnClick = true,
                     hasArrow = true,
@@ -2931,12 +3018,29 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
 
         UIDropDownMenu_AddSeparator()
         UIDropDownMenu_AddButton({
+            text = L["options_reward_types"],
+            isNotRadio = true,
+            notCheckable = true,
+            keepShownOnClick = true,
+            hasArrow = true,
+            value = 'rewards'
+        })
+        UIDropDownMenu_AddButton({
             text = L["options_show_completed_nodes"],
             isNotRadio = true,
             keepShownOnClick = true,
             checked = Shadowlands:GetOpt('show_completed_nodes'),
             func = function (button, option)
                 Shadowlands:SetOpt('show_completed_nodes', button.checked)
+            end
+        })
+        UIDropDownMenu_AddButton({
+            text = L["options_toggle_hide_done_rare"],
+            isNotRadio = true,
+            keepShownOnClick = true,
+            checked = Shadowlands:GetOpt('hide_done_rares'),
+            func = function (button, option)
+                Shadowlands:SetOpt('hide_done_rares', button.checked)
             end
         })
         UIDropDownMenu_AddButton({
@@ -2959,37 +3063,51 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
                 InterfaceOptionsFrame_Show()
                 InterfaceOptionsFrame_OpenToCategory('HandyNotes')
                 LibStub('AceConfigDialog-3.0'):SelectGroup(
-                    'HandyNotes', 'plugins', 'HandyNotes_Shadowlands', 'ZonesTab', 'Zone_'..map.id
+                    'HandyNotes', 'plugins', ADDON_NAME, 'ZonesTab', 'Zone_'..map.id
                 )
             end
         })
     elseif level == 2 then
-        -- Get correct map ID to query/set options for
-        local group = UIDROPDOWNMENU_MENU_VALUE
+        if UIDROPDOWNMENU_MENU_VALUE == 'rewards' then
+            for i, type in ipairs({'mount', 'pet', 'toy', 'transmog'}) do
+                UIDropDownMenu_AddButton({
+                    text = L["options_"..type.."_rewards"],
+                    isNotRadio = true,
+                    keepShownOnClick = true,
+                    checked = Shadowlands:GetOpt('show_'..type..'_rewards'),
+                    func = function (button, option)
+                        Shadowlands:SetOpt('show_'..type..'_rewards', button.checked)
+                    end
+                }, 2)
+            end
+        else
+            -- Get correct map ID to query/set options for
+            local group = UIDROPDOWNMENU_MENU_VALUE
 
-        self.GroupDesc.Text:SetText(Shadowlands.RenderLinks(group.desc))
-        UIDropDownMenu_AddButton({ customFrame = self.GroupDesc }, 2)
-        UIDropDownMenu_AddButton({
-            notClickable = true,
-            notCheckable = true
-        }, 2)
+            self.GroupDesc.Text:SetText(Shadowlands.RenderLinks(group.desc))
+            UIDropDownMenu_AddButton({ customFrame = self.GroupDesc }, 2)
+            UIDropDownMenu_AddButton({
+                notClickable = true,
+                notCheckable = true
+            }, 2)
 
-        UIDropDownMenu_AddSlider({
-            text = L["options_opacity"],
-            min = 0, max = 1, step=0.01,
-            value = group:GetAlpha(map.id),
-            frame = self.AlphaOption,
-            percentage = true,
-            func = function (v) group:SetAlpha(v, map.id) end
-        }, 2)
+            UIDropDownMenu_AddSlider({
+                text = L["options_opacity"],
+                min = 0, max = 1, step=0.01,
+                value = group:GetAlpha(map.id),
+                frame = self.AlphaOption,
+                percentage = true,
+                func = function (v) group:SetAlpha(v, map.id) end
+            }, 2)
 
-        UIDropDownMenu_AddSlider({
-            text = L["options_scale"],
-            min = 0.3, max = 3, step=0.05,
-            value = group:GetScale(map.id),
-            frame = self.ScaleOption,
-            func = function (v) group:SetScale(v, map.id) end
-        }, 2)
+            UIDropDownMenu_AddSlider({
+                text = L["options_scale"],
+                min = 0.3, max = 3, step=0.05,
+                value = group:GetScale(map.id),
+                frame = self.ScaleOption,
+                func = function (v) group:SetScale(v, map.id) end
+            }, 2)
+        end
     end
 end
 
@@ -3242,7 +3360,7 @@ Shadowlands.poi = {
  
 
 
-
+local Mount = Shadowlands.reward.Mount
 local Map = Shadowlands.Map
 
 -------------------------------------------------------------------------------
@@ -3292,6 +3410,9 @@ local VIGNETTES = {
     [4366] = {
         Toy({item=184447}) -- Kevin's Party Supplies
     }, -- Slime-Coated Crate
+    [4460] = {
+        Mount({item=184167, id=1304}) -- Mawsworn Soulhunter
+    }, -- Hunt: Shadehounds
 
     -- [4174] = {}, -- Secret Treasure
     -- [4176] = {}, -- Secret Treasure
@@ -3395,6 +3516,7 @@ Shadowlands.groups.DREDBATS = Group('dredbats', 'flight_point_g', {defaults=Shad
 Shadowlands.groups.FAERIE_TALES = Group('faerie_tales', 355498, {defaults=Shadowlands.GROUP_HIDDEN})
 Shadowlands.groups.FUGITIVES = Group('fugitives', 236247, {defaults=Shadowlands.GROUP_HIDDEN})
 Shadowlands.groups.GRAPPLES = Group('grapples', 'peg_bk', {defaults=Shadowlands.GROUP_HIDDEN})
+Shadowlands.groups.HYMNS = Group('hymns', 'scroll', {defaults=Shadowlands.GROUP_HIDDEN})
 Shadowlands.groups.INQUISITORS = Group('inquisitors', 3528307, {defaults=Shadowlands.GROUP_HIDDEN})
 Shadowlands.groups.MAW_LORE = Group('maw_lore', 'chest_gy')
 Shadowlands.groups.RIFTSTONE = Group('riftstone', 'portal_b')
@@ -3451,7 +3573,6 @@ local Treasure = Shadowlands.node.Treasure
 
 local Achievement = Shadowlands.reward.Achievement
 local Item = Shadowlands.reward.Item
-local Mount = Shadowlands.reward.Mount
 local Pet = Shadowlands.reward.Pet
 local Transmog = Shadowlands.reward.Transmog
 local Toy = Shadowlands.reward.Toy
@@ -3566,6 +3687,7 @@ local MACABRE = Rare({
     id=164093,
     quest=59140,
     note=L["macabre_note"],
+    focusable=true,
     rewards={
         Achievement({id=14309, criteria=48780}),
         Pet({item=180644, id=2907}) -- Rocky
@@ -3772,8 +3894,12 @@ map.nodes[41254443] = Rare({
             48710, -- N'Zoth
             48705  -- Xavius
         }}),
-        Item({item=182454, type=L["trinket"], note=L["guldan"]}), -- Murmurs in the Dark
-        Mount({item=180748, id=1332}) -- Silky Shimmermoth
+        Transmog({item=179518, type=L["staff"], note='{npc:166135}'}), -- Glimmerlight Staff
+        Transmog({item=179534, type=L["polearm"], note='{npc:166138}'}), -- Mi'kai's Deathscythe
+        -- Item({item=182455, type=L["trinket"], note='{npc:166146}'}), -- Dreamer's Mending
+        -- Item({item=182452, type=L["trinket"], note='{npc:166142}'}), -- Everchill Brambles
+        -- Item({item=182451, type=L["trinket"], note='{npc:166139}'}), -- Glimmerdust's Grand Design
+        -- Item({item=182454, type=L["trinket"], note='{npc:166140}'}), -- Murmurs in the Dark
     }
 })
 
@@ -4134,7 +4260,9 @@ map.nodes[40094168] = JOURNAL
 map.nodes[49664016] = JOURNAL
 map.nodes[50202500] = JOURNAL
 map.nodes[50174187] = JOURNAL
+map.nodes[56002100] = JOURNAL
 
+map.nodes[24755197] = NAUGHTY
 map.nodes[33605740] = NAUGHTY
 map.nodes[39806560] = NAUGHTY
 map.nodes[51005480] = NAUGHTY
@@ -4255,7 +4383,8 @@ map.nodes[66004367] = Rare({
     quest=61002,
     note=L["collector_astor_note"],
     rewards={
-        Achievement({id=14307, criteria=50610})
+        Achievement({id=14307, criteria=50610}),
+        Transmog({item=183608, slot=L["offhand"]}) -- Evernote Vesper
     },
     pois={
         POI({
@@ -4397,7 +4526,7 @@ map.nodes[42908265] = Rare({
 map.nodes[51456859] = Rare({
     id=160882,
     quest=58319,
-    note=L["nikara_note"],
+    note=L["repair_note"],
     rewards={
         Achievement({id=14307, criteria=50594}),
         Transmog({item=183608, slot=L["offhand"]}) -- Evernote Vesper
@@ -4406,8 +4535,8 @@ map.nodes[51456859] = Rare({
 
 map.nodes[30365517] = Rare({
     id=171327,
-    quest=nil,
-    note=L["activation_unknown"],
+    quest=61101,
+    note=L["reekmonger_note"],
     rewards={
         Achievement({id=14307, criteria=50616}),
     }
@@ -4415,8 +4544,8 @@ map.nodes[30365517] = Rare({
 
 map.nodes[61295090] = Rare({
     id=160985,
-    quest=58320,
-    note=L["nikara_note"],
+    quest=53820,
+    note=L["repair_note"],
     rewards={
         Achievement({id=14307, criteria=50593}),
         Transmog({item=183608, slot=L["offhand"]}) -- Evernote Vesper
@@ -4437,7 +4566,7 @@ map.nodes[22432285] = Rare({
 
 map.nodes[61409050] = Rare({
     id=170548,
-    quest=nil,
+    quest=60860,
     note=L["sundancer_note"],
     rewards={
         Achievement({id=14307, criteria=50601}),
@@ -4457,6 +4586,7 @@ local SWELLING_TEAR = Rare({
     quest={61001,61046,61047},
     questCount=true,
     note=L["swelling_tear_note"],
+    focusable=true,
     rewards={
         Achievement({id=14307, criteria={
             {id=50607, quest=61001}, -- Embodied Hunger
@@ -5001,6 +5131,70 @@ map.nodes[60552554] = AnimaShard({
 })
 
 -------------------------------------------------------------------------------
+---------------------------- WHAT IS THAT MELODY? -----------------------------
+-------------------------------------------------------------------------------
+
+local Hymn = Class('Hymn', Collectible, {
+    icon='scroll',
+    note=L["hymn_note"],
+    group=Shadowlands.groups.HYMNS
+})
+
+local COURAGE = Hymn({
+    label='{spell:338912}',
+    rewards={
+        Achievement({id=14768, criteria=49948})
+    }
+})
+
+local HUMILITY = Hymn({
+    label='{spell:338910}',
+    rewards={
+        Achievement({id=14768, criteria=49949})
+    }
+})
+
+local PURITY = Hymn({
+    label='{spell:338911}',
+    rewards={
+        Achievement({id=14768, criteria=49947})
+    }
+})
+
+local WISDOM = Hymn({
+    label='{spell:338909}',
+    rewards={
+        Achievement({id=14768, criteria=49950})
+    }
+})
+
+map.nodes[31905460] = COURAGE
+map.nodes[32505770] = COURAGE
+map.nodes[34105850] = COURAGE
+map.nodes[35405560] = COURAGE
+map.nodes[39216038] = COURAGE -- available after phase
+map.nodes[40365882] = COURAGE -- available after phase
+
+map.nodes[63004290] = HUMILITY
+map.nodes[64504640] = HUMILITY
+map.nodes[66104080] = HUMILITY
+map.nodes[68704340] = HUMILITY
+map.nodes[69304110] = HUMILITY
+
+map.nodes[57927896] = PURITY
+map.nodes[61107610] = PURITY
+map.nodes[63607370] = PURITY
+map.nodes[63717413] = PURITY
+map.nodes[63907350] = PURITY
+
+map.nodes[41702420] = WISDOM
+map.nodes[41832781] = WISDOM
+map.nodes[42202370] = WISDOM
+map.nodes[42502560] = WISDOM
+map.nodes[42902730] = WISDOM
+map.nodes[43182813] = WISDOM
+
+-------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
 
@@ -5531,7 +5725,11 @@ map.nodes[51444848] = Treasure({
         Transmog({item=180273, slot=L["2h_sword"]}), --Sorrowbane
     },
     pois={
-        POI({50945317, 37114699, 53634792, 76445672})
+        POI({37114699, -- A Few Bumps Along the Way
+            53134131, -- One-Eyed Joby
+            53634792, -- Au'larrynar
+            76445672, -- Edible Redcaps
+        })
     }
 }) -- Oonar's Arm and Sorrowbane
 
@@ -5720,7 +5918,8 @@ map.nodes[25304850] = Rare({
         Transmog({item=179924, slot=L["leather"]}), -- Light-Infused Jacket
         Transmog({item=179653, slot=L["mail"]}), -- Light-Infused Hauberk
         Transmog({item=179925, slot=L["plate"]}), -- Light-Infused Breastplate
-        Item({item=180688}) -- Infused Remnant of Light
+        Item({item=180688}), -- Infused Remnant of Light
+        Pet({item=180586, id=2892}) -- Lightbinders
     }
 }) -- Amalgamation of Light
 
@@ -5948,13 +6147,14 @@ map.nodes[66507080] = Rare({
     quest=59595,
     rewards={
         Achievement({id=14310, criteria=48812}),
-        Item({item=179363, quest=60517}) -- The Toll of the Road
+        -- Item({item=179363, quest=60517}) -- The Toll of the Road
+        -- quest id for this never actually flips true?
     }
 }) -- Tollkeeper Varaboss
 
 map.nodes[43007910] = Rare({
     id=155779,
-    quest=61231,
+    quest=56877,
     note=L["tomb_burster_note"],
     rewards={
         Achievement({id=14310, criteria=48802}),
@@ -6557,6 +6757,7 @@ map.nodes[57246125] = Dredbat({ pois={ Arrow({57246125, 60286116}) } })
 map.nodes[60396117] = Dredbat({ pois={ Arrow({60396117, 57495549}) } })
 map.nodes[64076201] = Dredbat({ pois={ Arrow({64076201, 70125719}) } })
 map.nodes[64076201] = Dredbat({ pois={ Arrow({64076201, 70125719}) } })
+map.nodes[35103510] = Dredbat({ pois={ Arrow({35103510, 38103680}) } })
 
 -------------------------------------------------------------------------------
 ------------------------------ ABSOLUTION FOR ALL -----------------------------
@@ -6606,7 +6807,7 @@ end
 ------------------------ ITS ALWAYS SINNY IN REVENDRETH -----------------------
 -------------------------------------------------------------------------------
 
-local Inquisitor = Class('Inquisitor', Collectible, {
+local Inquisitor = Class('Inquisitor', NPC, {
     icon='peg_rd',
     scale=1.3,
     group=Shadowlands.groups.INQUISITORS,
@@ -6916,15 +7117,6 @@ map.nodes[20586935] = Rare({
         Item({item=183068, quest=63162})  -- Korrath's Grimoire: Gyadrek
     }
 }) -- Exos, Herald of Domination
-
-map.nodes[53507950] = Rare({
-    id=174827,
-    note=L["gorged_shadehound_note"],
-    -- quest=61124,
-    rewards={
-        Mount({item=184167, id=1304}) -- Mawsworn Soulhunter
-    }
-}) -- Gorged Shadehound
 
 map.nodes[30775000] = Rare({
     id=175012,
@@ -7306,7 +7498,11 @@ local GRAPPLES = {
     31655664, 32056840, 32194490, 32426772, 32674369, 32904238, 33102066,
     33286365, 33295928, 33374532, 33584024, 33767056, 34074701, 34237005,
     34463889, 34624440, 35006680, 36244139, 36264642, 37844512, 40334904,
-    41184945, 41304785, 42264174
+    41184945, 41304785, 42264174,
+    -- Beast Warrens
+    44996655, 47608194, 48397060, 49377318, 49997460, 50027306, 51427820,
+    52177614, 52247887, 52957021, 53157840, 53266871, 53726760, 53917700,
+    54486713, 54987622, 55247788
 }
 
 for _, coord in ipairs(GRAPPLES) do
@@ -7377,18 +7573,34 @@ local Cache = Class('Cache', Shadowlands.node.Node, {
     }
 })
 
-map.nodes[15705040] = Cache()
-map.nodes[19604460] = Cache()
-map.nodes[19805500] = Cache()
+map.nodes[15705050] = Cache()
+map.nodes[19203310] = Cache()
+map.nodes[19704460] = Cache()
+map.nodes[19705500] = Cache()
 map.nodes[24301660] = Cache()
-map.nodes[28402560] = Cache()
+map.nodes[25603660] = Cache()
+map.nodes[26602920] = Cache()
+map.nodes[27604570] = Cache()
+map.nodes[27607180] = Cache()
+map.nodes[28402550] = Cache()
 map.nodes[29621283] = Cache()
+map.nodes[34306190] = Cache()
 map.nodes[35201630] = Cache()
 map.nodes[35902360] = Cache()
 map.nodes[39802510] = Cache()
-map.nodes[44201870] = Cache()
+map.nodes[40306160] = Cache()
+map.nodes[44301870] = Cache()
+map.nodes[44804830] = Cache()
 map.nodes[45204740] = Cache()
-
+map.nodes[47407630] = Cache()
+map.nodes[50808390] = Cache()
+map.nodes[56196307] = Cache({
+    note=L["in_cave"],
+    pois={
+        POI({55806753}) -- Cave entrance
+    }
+})
+map.nodes[61505080] = Cache()
 -------------------------------------------------------------------------------
 ----------------------------------- VE'NARI -----------------------------------
 -------------------------------------------------------------------------------
@@ -7415,6 +7627,6 @@ map.nodes[46914169] = NPC({
         Item({item=184621, quest=63204, note=L["Ambivalent"]}), -- Ritual Prism of Fortune
         Item({item=184618, quest=63200, note=L["Cordial"]}), -- Rank Insignia: Acquisitionist
         Item({item=184619, quest=63201, note=L["Cordial"]}), -- Loupe of Unusual Charm
-        Item({item=180952, quest=nil, note=L["Appreciative"]}), -- Possibility Matrix
+        Item({item=180952, quest=61144, note=L["Appreciative"]}), -- Possibility Matrix
     }
 })

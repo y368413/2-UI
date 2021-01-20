@@ -16,30 +16,31 @@ local Kyrian = Enum.CovenantType.Kyrian;
 local darkglareAsCooldown = true;
 
 local AF = {
-	GrimoireOfSacrifice  = 108503,
-	SeedOfCorruption     = 27243,
-	Haunt                = 48181,
-	ShadowBolt           = 686,
-	PhantomSingularity   = 205179,
-	SummonDarkglare      = 205180,
-	SoulRot              = 325640,
-	Agony                = 980,
-	ImpendingCatastrophe = 321792,
-	SowTheSeeds          = 196226,
-	SiphonLife           = 63106,
-	Corruption           = 172,
-	CorruptionAura       = 146739,
-	VileTaint            = 278350,
-	UnstableAffliction   = 316099,
-	MaleficRapture       = 324536,
-	ShadowEmbrace        = 32388,
-	DarkSoulMisery       = 113860,
-	DrainLife            = 234153,
-	InevitableDemise     = 334319,
-	DrainSoul            = 198590,
-	DecimatingBolt       = 325289,
-	ScouringTithe        = 312321,
-	CorruptingLeer       = 339455
+	GrimoireOfSacrifice     = 108503,
+	SeedOfCorruption        = 27243,
+	Haunt                   = 48181,
+	ShadowBolt              = 686,
+	PhantomSingularity      = 205179,
+	SummonDarkglare         = 205180,
+	SoulRot                 = 325640,
+	Agony                   = 980,
+	ImpendingCatastrophe    = 321792,
+	ImpendingCatastropheDot = 322170,
+	SowTheSeeds             = 196226,
+	SiphonLife              = 63106,
+	Corruption              = 172,
+	CorruptionAura          = 146739,
+	VileTaint               = 278350,
+	UnstableAffliction      = 316099,
+	MaleficRapture          = 324536,
+	ShadowEmbrace           = 32390,
+	DarkSoulMisery          = 113860,
+	DrainLife               = 234153,
+	InevitableDemise        = 334319,
+	DrainSoul               = 198590,
+	DecimatingBolt          = 325289,
+	ScouringTithe           = 312321,
+	CorruptingLeer          = 339455
 };
 setmetatable(AF, Warlock.spellMeta);
 
@@ -54,6 +55,7 @@ function Warlock:Affliction()
 	local timeToDie = fd.timeToDie;
 	local covenantId = fd.covenant.covenantId;
 	local soulShards = UnitPower('player', Enum.PowerType.SoulShards);
+	local canMalefic = soulShards >= 2 or currentSpell ~= AF.MaleficRapture and soulShards >= 1;
 
 	if currentSpell == AF.SeedOfCorruption or
 		currentSpell == AF.MaleficRapture or
@@ -65,6 +67,7 @@ function Warlock:Affliction()
 
 	fd.targets = targets;
 	fd.soulShards = soulShards;
+	fd.canMalefic = canMalefic;
 
 	MaxDps:GlowCooldown(
 		AF.SummonDarkglare,
@@ -257,7 +260,7 @@ function Warlock:Affliction()
 	end
 
 	-- malefic_rapture,if=soul_shard>4;
-	if soulShards > 4 then -- TODO: currentSpell ~= AF.MaleficRapture and (
+	if soulShards > 4 then
 		return AF.MaleficRapture;
 	end
 
@@ -305,7 +308,12 @@ function Warlock:Affliction()
 	end
 
 	-- call_action_list,name=se,if=debuff.shadow_embrace.stack<(2-action.shadow_bolt.in_flight)|debuff.shadow_embrace.remains<3;
-	if debuff[AF.ShadowEmbrace].count < 2 or debuff[AF.ShadowEmbrace].remains < 3 then
+	if Warlock.playerLevel >= 58 and
+		(
+			debuff[AF.ShadowEmbrace].count < (2 - (currentSpell == AF.ShadowBolt and 1 or 0)) or
+			debuff[AF.ShadowEmbrace].remains < 3
+		)
+	then
 		local result = Warlock:AfflictionSe();
 		if result then
 			return result;
@@ -313,30 +321,30 @@ function Warlock:Affliction()
 	end
 
 	-- malefic_rapture,if=dot.vile_taint.ticking;
-	if soulShards >= 1 and currentSpell ~= AF.MaleficRapture and debuff[AF.VileTaint].up then
+	if canMalefic and debuff[AF.VileTaint].up then
 		return AF.MaleficRapture;
 	end
 
 	-- malefic_rapture,if=dot.impending_catastrophe_dot.ticking;
-	if soulShards >= 1 and currentSpell ~= AF.MaleficRapture and debuff[AF.ImpendingCatastropheDot].up then
+	if canMalefic and debuff[AF.ImpendingCatastropheDot].up then
 		return AF.MaleficRapture;
 	end
 
 	-- malefic_rapture,if=dot.soul_rot.ticking;
-	if soulShards >= 1 and currentSpell ~= AF.MaleficRapture and debuff[AF.SoulRot].up then
+	if canMalefic and debuff[AF.SoulRot].up then
 		return AF.MaleficRapture;
 	end
 
 	-- malefic_rapture,if=talent.phantom_singularity.enabled&(dot.phantom_singularity.ticking|soul_shard>3|time_to_die<cooldown.phantom_singularity.remains);
-	if soulShards >= 1 and currentSpell ~= AF.MaleficRapture and
+	if canMalefic and
 		talents[AF.PhantomSingularity] and
-		(debuff[AF.PhantomSingularity].up or soulShards > 3 or timeToDie < cooldown[AF.PhantomSingularity].remains)
+		(debuff[AF.PhantomSingularity].up or soulShards >= 3 or timeToDie < cooldown[AF.PhantomSingularity].remains)
 	then
 		return AF.MaleficRapture;
 	end
 
 	-- malefic_rapture,if=talent.sow_the_seeds.enabled;
-	if soulShards >= 1 and currentSpell ~= AF.MaleficRapture and talents[AF.SowTheSeeds] then
+	if canMalefic and talents[AF.SowTheSeeds] then
 		return AF.MaleficRapture;
 	end
 
@@ -407,6 +415,7 @@ function Warlock:AfflictionAoe()
 	local talents = fd.talents;
 	local timeToDie = fd.timeToDie;
 	local soulShards = fd.soulShards;
+	local canMalefic = fd.canMalefic;
 	local covenantId = fd.covenant.covenantId;
 
 	-- phantom_singularity;
@@ -552,22 +561,22 @@ function Warlock:AfflictionAoe()
 	end
 
 	-- malefic_rapture,if=dot.vile_taint.ticking;
-	if soulShards >= 1 and currentSpell ~= AF.MaleficRapture and debuff[AF.VileTaint].up then
+	if canMalefic and debuff[AF.VileTaint].up then
 		return AF.MaleficRapture;
 	end
 
 	-- malefic_rapture,if=dot.soul_rot.ticking&!talent.sow_the_seeds.enabled;
-	if soulShards >= 1 and currentSpell ~= AF.MaleficRapture and debuff[AF.SoulRot].up and not talents[AF.SowTheSeeds] then
+	if canMalefic and debuff[AF.SoulRot].up and not talents[AF.SowTheSeeds] then
 		return AF.MaleficRapture;
 	end
 
 	-- malefic_rapture,if=!talent.vile_taint.enabled;
-	if soulShards >= 1 and currentSpell ~= AF.MaleficRapture and not talents[AF.VileTaint] then
+	if canMalefic and not talents[AF.VileTaint] then
 		return AF.MaleficRapture;
 	end
 
 	-- malefic_rapture,if=soul_shard>4;
-	if currentSpell ~= AF.MaleficRapture and soulShards > 4 then
+	if soulShards > 4 then
 		return AF.MaleficRapture;
 	end
 
@@ -691,6 +700,7 @@ function Warlock:AfflictionSe()
 	local cooldown = fd.cooldown;
 	local currentSpell = fd.currentSpell;
 	local talents = fd.talents;
+	local debuff = fd.debuff;
 
 	-- haunt;
 	if talents[AF.Haunt] and cooldown[AF.Haunt].ready and currentSpell ~= AF.Haunt then
@@ -698,6 +708,10 @@ function Warlock:AfflictionSe()
 	end
 
 	-- drain_soul,interrupt_global=1,interrupt_if=debuff.shadow_embrace.stack>=3;
+	if debuff[AF.ShadowEmbrace].count >= 3 then
+		return nil;
+	end
+
 	if talents[AF.DrainSoul] then
 		return AF.DrainSoul;
 	end

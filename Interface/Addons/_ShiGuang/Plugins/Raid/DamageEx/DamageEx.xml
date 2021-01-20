@@ -34,7 +34,7 @@
 				<FontString name="DEXaniText17" inherits="GameFontNormal"/>
 				<FontString name="DEXaniText18" inherits="GameFontNormal"/>
 				<FontString name="DEXaniText19" inherits="GameFontNormal"/>
-				<FontString name="DEXaniText20" inherits="GameFontNormal"/>
+				<FontString name="DEXaniText20" inherits="GameFontNormal"/>	
 				<FontString name="DEXaniText21" inherits="GameFontNormal"/>
 				<FontString name="DEXaniText22" inherits="GameFontNormal"/>
 				<FontString name="DEXaniText23" inherits="GameFontNormal"/>

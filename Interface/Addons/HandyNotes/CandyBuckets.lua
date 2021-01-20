@@ -1040,12 +1040,14 @@ function CandyBucketsStatsMixin:OnAcquired(questPOIs)
 				x, y = poi[1]/100, poi[2]/100
 			end
 			local childUiMapID, childX, childY = GetLowestLevelMapFromMapID(uiMapID, x, y)
-			local mapInfo = C_Map.GetMapInfo(childUiMapID)
-			i = i + 1
-			if mapInfo and mapInfo.name then
-				text[i] = string.format("%s (%.2f, %.2f)", mapInfo.name, childX * 100, childY * 100)
-			else
-				text[i] = string.format("#%d", quest.quest)
+			if childX > 0 and childX < 1 and childY > 0 and childY < 1 then
+				local mapInfo = C_Map.GetMapInfo(childUiMapID)
+				i = i + 1
+				if mapInfo and mapInfo.name then
+					text[i] = string.format("%s (%.2f, %.2f)", mapInfo.name, childX * 100, childY * 100)
+				else
+					text[i] = string.format("#%d", quest.quest)
+				end
 			end
 		end
 		table.sort(text)
@@ -1180,18 +1182,19 @@ function addon:UnloadModule(name)
 end
 
 function addon:CheckCalendar()
-	local curHour, curMinute = GetGameTime()
 	local curDate = C_DateAndTime.GetCurrentCalendarTime()
+	local month, day, year = curDate.month, curDate.monthDay, curDate.year
+	local curHour, curMinute = curDate.hour, curDate.minute
+
 	local calDate = C_Calendar.GetMonthInfo()
-	local month, day, year = calDate.month, curDate.monthDay, calDate.year
-	local curMonth, curYear = curDate.month, curDate.year
-	local monthOffset = -12 * (curYear - year) + month - curMonth
-	local numEvents = C_Calendar.GetNumDayEvents(monthOffset, day)
-	local loadedEvents, numLoaded, numLoadedRightNow = {}, 0, 0
+	local monthOffset = -12 * (curDate.year - calDate.year) + calDate.month - curDate.month -- convert difference between calendar and the realm time
 
 	if monthOffset ~= 0 then
 		return -- we only care about the current events, so we need the view to be on the current month (otherwise we unload the ongoing events if we change the month manually...)
 	end
+
+	local numEvents = C_Calendar.GetNumDayEvents(monthOffset, day)
+	local loadedEvents, numLoaded, numLoadedRightNow = {}, 0, 0
 
 	for i = 1, numEvents do
 		local event = C_Calendar.GetDayEvent(monthOffset, day, i)

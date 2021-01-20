@@ -820,6 +820,19 @@ L["options_toggle_per_map_settings_desc"] = "只使用各個地圖各自獨立�
 L["options_restore_hidden_nodes"] = "恢復隱藏的節點"
 L["options_restore_hidden_nodes_desc"] = "恢復所有使用右鍵選單隱藏的節點。"
 
+L["options_rewards_settings"] = nil
+L["options_reward_types"] = nil
+L["options_mount_rewards"] = nil
+L["options_mount_rewards_desc"] = nil
+L["options_pet_rewards"] = nil
+L["options_pet_rewards_desc"] = nil
+L["options_toy_rewards"] = nil
+L["options_toy_rewards_desc"] = nil
+L["options_transmog_rewards"] = nil
+L["options_transmog_rewards_desc"] = nil
+
+L["options_icons_misc_desc"] = "顯示其他節點的位置。"
+L["options_icons_misc"] = "其他"
 L["options_icons_pet_battles_desc"] = "顯示戰寵訓練師與NPC的位置。"
 L["options_icons_pet_battles"] = "戰寵"
 L["options_icons_caves_desc"] = "顯示其他節點的洞穴入口。"
@@ -1116,7 +1129,7 @@ L["wrigglemortis_note"] = "拉動 {npc:164179} 刷新稀有。"
 L["night_mare_note"] = [[
 前往特那希，並沿著西北懸崖的樹根路前往破損的車。在那的地面上可以拾取 {item:181243}。
 
-把此物品帶給位於爍瀑高地的 {npc:165704}。她將給你一個 {item:181242} 換成10個 {item:173204}。|cFFFF8C00如果她不在這裡，你必須完成|cFFFFFD00小果姆飼育區的麻煩|r和|cFFFFFD00狡詐的木魈|r任務線。|r
+把此物品帶給位於爍瀑高地的 {npc:165704}。用10個 {item:173204} 和他交換一個 {item:181242}。|cFFFF8C00如果她不在這裡，你必須完成|cFFFFFD00小果姆飼育區的麻煩|r和|cFFFFFD00狡詐的木魈|r任務線。|r
 
 接下來，和森林之心的 {npc:160262} 交談兌換 {item:181242} 為 {item:178675}。使用此物品得到 {spell:327083} 增益，可以讓你看見 {npc:168135}。
 ]]
@@ -1127,7 +1140,6 @@ L["star_lake_note"] = [[
 
 參加所有7個戰鬥會從 {npc:163714} 解鎖 {item:180748}。
 ]]
-L["guldan"] = "古爾丹"
 
 L["cache_of_the_moon"] = "在黑夜花園收集 {npc:171360} 的五個遺失工具並組合它們以製造 {item:180753}。交給她工具包後會施放 {spell:334353} 給你，讓你可以看到寶箱"
 L["cache_of_the_night"] = "在整個區域收集 {item:180656}、{item:180654} 和 {item:180655} 組合它們製造 {item:180652}。"
@@ -1145,11 +1157,11 @@ L["swollen_anima_seed"] = "在樹幹裡面的一顆大種子"
 L["playful_vulpin_note"] = [[
 在 {npc:171206} 找到並使用正確的表情五次後獲得寵物。
 
-• 開始好奇的挖掘 = |cFFFF8C00/curious（/好奇）|r
-• 仍然徘徊在無法坐下的地方 = |cFFFF8C00/sit（/坐下）|r
-• 獨自一人唱歌 = |cFFFF8C00/sing（/唱歌）|r
-• 歡樂地跳舞 = |cFFFF8C00/dance（/跳舞）|r
-• 孤獨悲傷的坐著 = |cFFFF8C00/pet（/拍）|r
+• 開始好奇地挖地 = |cFFFF8C00/curious（/好奇）|r
+• 四處亂走，就是靜不下來 = |cFFFF8C00/sit（/坐下）|r
+• 獨自歌唱 = |cFFFF8C00/sing（/唱歌）|r
+• 帶著歡笑舞動 = |cFFFF8C00/dance（/跳舞）|r
+• 孤單坐著一臉悲傷 = |cFFFF8C00/pet（/拍）|r
 ]]
 
 L["tame_gladerunner"] = "馴服的巡林者"
@@ -1191,10 +1203,11 @@ L["herculon_note"] = [[
 
 |cFFFF8C00不能在世界任務 {wq:進攻門廊} 期間擊敗。|r
 ]]
-L["nikara_note"] = "和兩名其他玩家，點選遠古焚香來召喚。"
+L["reekmonger_note"] = nil
+L["repair_note"] = "和兩名其他玩家，點選遠古焚香來召喚。"
 L["sotiros_orstus_note"] = "點選黑色的鐘召喚稀有。"
 L["sundancer_note"] = "點選雕像獲得 {spell:332309} 增益，然後使用 {item:180445} 滑翔到稀有並騎上它。"
-L["swelling_tear_note"] = "點選 {npc:171012} 召喚三個稀有中的一個。眼淚可以在區域內的多個位置出現。"
+L["swelling_tear_note"] = "點選 {npc:171012} 召喚三個稀有中的一個。裂隙可以在區域內的多個位置出現。"
 L["unstable_memory_note"] = "當 {npc:171018} 存在時可以刷新。拉一個 {npc:171018} 到其它會給它10層堆疊 {spell:333558}，把它變成稀有。"
 L["wingflayer_note"] = "點擊附近桌上的勇氣號角召喚（東南方，樓梯上）。"
 
@@ -1293,9 +1306,13 @@ L["anima_shard_61297"] = "在石柱後面。\n\n死靈戰地副本內。"
 L["anima_shard_61298"] = "位在躺椅後面。"
 L["anima_shard_61299"] = "隱藏在大火炬的後面。"
 L["anima_shard_61300"] = "掛在中央字體的壁架上。"
-L["anima_shard_spires"] = nil
+L["anima_shard_spires"] = "三個碎片位於晉升之巔副本內"
 L["options_icons_anima_shard"] = "{achievement:14339}"
 L["options_icons_anima_shard_desc"] = "顯示 {achievement:14339} 成就中全部50個失落的靈魄碎片的位置。"
+
+L["hymn_note"] = "在每個神廟中找到頌歌並獲得它們的增益來取得成就"
+L["options_icons_hymns"] = "{achievement:14768}"
+L["options_icons_hymns_desc"] = "顯示 {achievement:14768} 成就中頌歌的位置"
 
 L["stratios_note"] = "就算是規模再小的戰爭，也要慎重以對。等你準備好了，就展示你的隊伍。"
 L["thenia_note"] = "這裡有如此廣大的開放平原。正好適合拿來戰鬥。你準備好了嗎？"
@@ -1348,7 +1365,7 @@ L["plaguefallen_chest_note"] = [[
 
 轉化後，到 {npc:158406} 平台（入口在東側）下面洞穴並點擊管線來傳送到寶箱。
 ]]
-L["ritualists_cache_note"] = "從骨頭堆（多個刷新點）拾取 {item:181558}。在 {npc:174386} 後面使用它完成裝訂儀式書並獲得 {spell:337041} 增益。"
+L["ritualists_cache_note"] = "在地上拾取 {item:181558} 然後使用它來完成裝訂儀式書"
 L["runespeakers_trove_note"] = "東側找到 {npc:170563} 並擊殺他獲得 {item:181777}。"
 L["stolen_jar_note"] = "在巨大的蘑菇下面的山洞裡。"
 L["strange_growth_note"] = "攻擊 {npc:165037} 獲得寶藏。"
@@ -1362,27 +1379,22 @@ L["spinebug_note"] = [[
 ]]
 
 L["oonar_sorrowbane_note"] = [[
-在苦痛劇場，可以找到哀禍插在地上和烏納的手臂附在一起。|cFFFF8C00在嘗試拉出之前，設置 {item:6948} 到 {npc:161702} 飛行點。|r
+在苦痛劇場，可以找到和 {item:181164} 附在一起的 {item:180273} 插在地上。要拔出它們：
 
-拉出 {item:181164}：
-
-• 到格魯薩恩凋亡地東側。
-• 吃4層 {spell:327367} （2分鐘負面效果）。
-• 迅速爐石並拉動手臂。
-
-拉出 {item:180273}：
-
-• 從瑞文崔斯的 {npc:171808} 買個 {item:182163}。
-• 從瑪卓薩斯的 {npc:166640} 買個 {item:180771}。
-• 從 |cFFFFFD00{wq:顛跛之路}|r 世界任務西側得到2層 {spell:306272}。
+• 從瑞文崔斯的 {npc:171808} 買一個 {item:182163}。
+• 從瑪卓薩斯的 {npc:166640} 買一個 {item:180771}。
+• 從瑪卓薩斯的 {npc:169964} 買一個 {item:181163}。
+• 從西側的世界任務 {wq:顛跛之路} 取得2層 {spell:306272}。
 • 在格魯薩恩凋亡地吃4層 {spell:327367}。
-• 迅速爐石，喝下2種藥水並拉出大寶劍。
+• 迅速使用 {item:181163}，喝下2種藥水並拉出大寶劍。
+
+只要拉出 {item:181164} 的話，只需要4層 {spell:327367}
 ]]
 
 L["pet_cat"] = "寵愛該死的貓！"
 L["hairball"] = "只在瘟疫之臨副本內的膿瘡聖所出現！"
 L["lime"] = "位在大骨頭拱頂上。"
-L["moldstopheles"] = "繞到莖稈後面並跳上蘑菇平臺。到達最後的平臺，使用坐騎並在莖稈上跳來跳去到達。"
+L["moldstopheles"] = "繞到莖的後面並跳上莖上的平臺。使用坐騎對準莖和最後平台的夾角跳躍來到達目標。"
 L["pus_in_boots"] = "在橋的下面。"
 
 L["options_icons_slime_cat"] = "{achievement:14634}"
@@ -1422,7 +1434,7 @@ L["worldedge_gorger_note"] = [[
 ]]
 
 L["dredglaive_note"] = "在 {npc:173671} 屍體的橋下。"
-L["forbidden_chamber_note"] = "在鎖著的門前拾取一個廢棄的靈魄之罐並學習 {spell:340701}。使用它吸取五個附近的 {npc:173838s}，然後在 {npc:173786} 前使用 {spell:340866}。"
+L["forbidden_chamber_note"] = "在鎖著的門前拾取一個廢棄的靈魄之罐並學習 {spell:340701}。使用它吸取五個附近的 {npc:173838}，然後在 {npc:173786} 前使用 {spell:340866}。"
 L["gilded_plum_chest_note"] = "擊殺在路上徘徊的 {npc:166680}。"
 L["lost_quill_note"] = "從禁忌圖書館的桌上瓶子拾取 {item:182475}，然後把它交給外面拱門頂上的 {npc:173449}。"
 L["rapier_fearless_note"] = "點擊地上的劍杆，然後擊敗 {npc:173603}。"
@@ -1433,7 +1445,7 @@ L["the_count_note"] = "在歿路沼澤農99個 {currency:1820} 然後把它帶�
 
 L["forgotten_anglers_rod"] = "被遺忘的漁翁之竿"
 
-L["loyal_gorger_note"] = "到歿路沼澤完成 {npc:173498} 的每日任務七次將以坐騎獲得他。"
+L["loyal_gorger_note"] = "到歿路沼澤完成 {npc:173498} 的每日任務七次將獲得他的坐騎。"
 
 L["sinrunner_note"] = "將食物和補給品帶給 {npc:173468} 持續六天後可獲得她的韁繩。她一次只會出現幾分鐘。"
 L["sinrunner_note_day1"] = "在西部荒野農場撿8個 {item:182581} 給布蘭契。"
@@ -1477,7 +1489,6 @@ L["apholeias_note"] = "和3名其他玩家，站在平臺的角落並施放 {spe
 L["dekaris_note"] = "在一個大型的突出岩石上。"
 L["drifting_sorrow_note"] = "在懸浮寶珠附近殺死 {npc:175246} 來啟動首領。"
 L["ekphoras_note"] = "和3名其他玩家，站在平臺的角落並施放 {spell:330650} 召喚稀有。"
-L["gorged_shadehound_note"] = "只在 {wq:狩獵：暗影獵犬} 事件期間可用"
 L["ikras_note"] = "環繞墮滅堡飛行。這是個攻擊他的好位置。"
 L["orophea_note"] = "從東南方的拾取 {spell:337143} 並提供給 {npc:172577} 啟動。"
 L["sanngror_note"] = "如果他是無法攻擊的，等到她停止對靈魂做實驗即可。"
@@ -1514,7 +1525,7 @@ L["Apprehensive"] = "不安"
 L["Cordial"] = "友善"
 L["Tentative"] = "猶豫"
 
-L["stygian_cache"] = "冥魄聖匣"
+L["stygian_cache"] = "冥魄儲藏箱"
 L["stygian_cache_note"] = "每次重生只有一個人能夠拾取"
 
 L["box_of_torments_note"] = "在悲慘之牢下方開啟 {npc:173837}"
@@ -1565,6 +1576,9 @@ L["warglaive"] = "战刃"
 ---------------------------------- TOOLTIPS -----------------------------------
 L["in_small_cave"] = "在小洞穴。"
 L["in_water_cave"] = "在水下洞穴。"
+
+L["TravelGuide_plugin_name"] = "TravelGuide"
+L["TravelGuide_plugin_desc"] = "Displays the portal, zeppelin and boat locations on the world map and minimap."
 ---------------------------------- VISIBILITY ---------------------------------
 L["options_toggle_chests_desc"] = "顯示寶箱位置 (每日可拾取的)。"
 L["options_toggle_chests"] = "寶箱"

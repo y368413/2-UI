@@ -29,6 +29,7 @@ function Warlock:Enable()
 		MaxDps.NextSpell = Warlock.Destruction;
 	end
 
+	Warlock.playerLevel = UnitLevel('player');
 	return true;
 end
 

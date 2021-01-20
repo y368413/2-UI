@@ -6,26 +6,6 @@
 	<Script file="AngrierWorldQuests.lua"/>
 	<Script file="KayrCovenantMissions.lua"/>
 	<Script file="WorldMapQuestRewardIcon.lua"/>
-
-    <Button name="QuestBindingsButtonTemplate" virtual="true">
-        <Size x="16" y="16"/>
-        <Layers>
-            <Layer level="ARTWORK">
-                <FontString parentKey="key" inherits="qb_NumberFont">
-                    <Anchors>
-                        <Anchor point="CENTER" x="0.5" y="-0.5"/>
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
-        <Scripts>
-            <OnClick>
-                self:GetParent():Click()
-            </OnClick>
-        </Scripts>
-    </Button>
-  <Script file="QuestBindings.lua"/>
-  
 	<Frame name="BountyCounterTemplate" virtual="true" hidden="false">
 		<Size x="10" y="10"/>
 		<Layers>		
@@ -43,7 +23,28 @@
 			</OnLoad>
 		</Scripts>
 	</Frame>	
-	<Script file='Barrels.lua'/>
-	<Script file='Loh.lua'/>
+	<Script file='Helpers\Barrels.lua'/>
+	<Script file='Helpers\Loh.lua'/>
+	<Script file='Helpers\Training.lua'/>
+	<Script file='Helpers\Chores.lua'/>
+	<Script file='Helpers\Boggarts.lua'/>
+	   <Button name="QuestBindingsButtonTemplate" virtual="true">
+        <Size x="16" y="16"/>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="key" inherits="qb_NumberFont">
+                    <Anchors>
+                        <Anchor point="CENTER" x="0.5" y="-0.5"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnClick>
+                self:GetParent():Click()
+            </OnClick>
+        </Scripts>
+    </Button>
+  <Script file="QuestBindings.lua"/>
   <Include file="ClassicQuestLog\ClassicQuestLog.xml"/>
 </Ui>

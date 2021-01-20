@@ -10,6 +10,7 @@ function A:PostCreateLumos(self)
 	boom:SetSize(iconSize, iconSize)
 	boom:SetPoint("BOTTOM", self.Health, "TOP", 0, 5)
 	M.AuraIcon(boom)
+	boom:Hide()
 
 	self.boom = boom
 end
@@ -271,3 +272,41 @@ end
 NUM_PET_STABLE_SLOTS = maxSlots
 NUM_PET_STABLE_PAGES = 1
 PetStableFrame.page = 1
+
+
+--PetHealthWarning------------------
+PetHealthWarningFrame.Threshold=35
+PetHealthWarningFrame.Warned=false
+local PetHealthWarningFrame=CreateFrame("ScrollingMessageFrame","PHA",UIParent)	
+PetHealthWarningFrame:RegisterEvent("PLAYER_LOGIN")
+PetHealthWarningFrame:RegisterEvent("UNIT_HEALTH")
+PetHealthWarningFrame:SetScript("OnEvent",function(Event,Arg1,...)
+	if(Event=="PLAYER_LOGIN")then
+			PetHealthWarningFrame:SetWidth(450)
+			PetHealthWarningFrame:SetHeight(200)
+			PetHealthWarningFrame:SetPoint("CENTER",UIParent,"CENTER",0,360)	
+			PetHealthWarningFrame:SetFont("Interface\\addons\\Ace3\\ShiGuang\\Media\\Fonts\\RedCircl.TTF",36,"THICKOUTLINE")
+			PetHealthWarningFrame:SetShadowColor(0.00,0.00,0.00,0.75)
+			PetHealthWarningFrame:SetShadowOffset(3.00,-3.00)
+			PetHealthWarningFrame:SetJustifyH("CENTER")		
+			PetHealthWarningFrame:SetMaxLines(2)
+			--PetHealthWarningFrame:SetInsertMode("BOTTOM")
+			PetHealthWarningFrame:SetTimeVisible(2)
+			PetHealthWarningFrame:SetFadeDuration(1)		
+			--HealthWatch:Update()
+		return
+	end	
+	if(Event=="UNIT_HEALTH" and Arg1=="pet")then
+			if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)<=PetHealthWarningFrame.Threshold and PetHealthWarningFrame.Warned==false)then
+				PlaySoundFile("Interface\\AddOns\\Ace3\\ShiGuang\\Media\\Sounds\\Beep.ogg")	
+				PetHealthWarningFrame:AddMessage("- CRITICAL PET HEALTH -", 1, 0, 0, nil, 3)
+				PetHealthWarningFrame.Warned=true
+				return
+			end
+			if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)>PetHealthWarningFrame.Threshold) then
+				PetHealthWarningFrame.Warned=false
+				return
+			end	
+		return
+	end	
+end)

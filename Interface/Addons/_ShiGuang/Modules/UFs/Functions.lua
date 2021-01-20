@@ -366,7 +366,7 @@ function UF:UpdateTextScale()
 			if castbar then
 				castbar.Text:SetScale(scale)
 				castbar.Time:SetScale(scale)
-				if castbar.Lag then  castbar.Lag:SetScale(scale) end
+				if castbar.Lag then castbar.Lag:SetScale(scale) end
 			end
 		end
 	end
@@ -663,7 +663,7 @@ function UF.CustomFilter(element, unit, button, name, _, _, _, _, _, caster, isS
 		if R.db["UFs"]["RaidBuffIndicator"] then
 			return R.RaidBuffs["ALL"][spellID] or MaoRUIDB["RaidAuraWatch"][spellID]
 		else
-			return (button.isPlayer or caster == "pet") and MaoRUIDB["CornerBuffs"][I.MyClass][spellID] or R.RaidBuffs["ALL"][spellID] or R.RaidBuffs["WARNING"][spellID]
+			return (button.isPlayer or caster == "pet") and UF.CornerSpells[spellID] or R.RaidBuffs["ALL"][spellID] or R.RaidBuffs["WARNING"][spellID]
 		end
 	elseif style == "nameplate" or style == "boss" or style == "arena" then
 		if element.__owner.isNameOnly then

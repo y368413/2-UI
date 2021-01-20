@@ -433,6 +433,7 @@ local CreateClassSpecButton, ClassSpecButton_Set do
 	end
 end
 function EV:FXUI_GARRISON_FOLLOWER_LIST_SHOW_FOLLOWER(tab, followerID)
+    if not Enum.GarrisonType.Type_9_0 then --9.0不介入
 	local et, ab, at, ct = T.EquivTrait, tab.AbilitiesFrame.Abilities
 	if not T.config.ignore[followerID] and followerID and followerID ~= 0 then
 		at, ct = G.GetFollowerRerollConstraints(followerID)
@@ -465,6 +466,7 @@ function EV:FXUI_GARRISON_FOLLOWER_LIST_SHOW_FOLLOWER(tab, followerID)
 				button.IconButton.ValidSpellHighlight:SetVertexColor(1,1,0)
 			end
 		end
+	end
 	end
 end
 hooksecurefunc(GarrisonShipyardFrameFollowers, "UpdateValidSpellHighlight", function(self, followerID, followerInfo, _hideCounters)
@@ -812,11 +814,13 @@ local function FollowerPageAbility_OnEnter(self)
 	return RecruitAbility_OnEnter(self)
 end
 function EV:FXUI_GARRISON_FOLLOWER_LIST_SHOW_FOLLOWER(followerTab)
+if not Enum.GarrisonType.Type_9_0 then --9.0不介入
 	local af = followerTab.AbilitiesFrame.Abilities
 	for i=1,#af do
 		af[i].IconButton:SetScript("OnEnter", FollowerPageAbility_OnEnter)
 		af[i].IconButton:SetScript("OnLeave", RecruitAbility_OnLeave)
 	end
+end
 end
 
 GarrisonThreatCountersFrame:SetScript("OnShow", GarrisonThreatCountersFrame.Hide)

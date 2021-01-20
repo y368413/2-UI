@@ -320,6 +320,8 @@ end
 ]]
 local lastTime = 0
 local itemList = {
+	[54710] = true,		-- 随身邮箱
+	[67826] = true,		-- 基维斯
 	[226241] = true,	-- 宁神圣典
 	[256230] = true,	-- 静心圣典
 	[185709] = true,	-- 焦糖鱼宴
@@ -509,7 +511,7 @@ function MISC:CheckIncompatible()
 
 		local disable = M.CreateButton(frame, 150, 25, U["DisableIncompatibleAddon"])
 		disable:SetPoint("BOTTOM", 0, 10)
-		disable.text:SetTextColor(1, 0, 0)
+		disable.text:SetTextColor(1, .8, 0)
 		disable:SetScript("OnClick", function()
 			for _, addon in pairs(IncompatibleList) do
 				DisableAddOn(addon, true)

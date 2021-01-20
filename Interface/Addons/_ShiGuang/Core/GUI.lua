@@ -8,11 +8,10 @@ local guiTab, guiPage, f = {}, {}
 
 -- Default Settings
 G.DefaultSettings = {
-	BFA = false,
+	SL = false,
 	Mover = {},
 	InternalCD = {},
 	AuraWatchMover = {},
-	RaidClickSets = {},
 	TempAnchor = {},
 	AuraWatchList = {
 		Switcher = {},
@@ -213,6 +212,7 @@ G.DefaultSettings = {
 		AKSProgress = true,
 		PPFadeout = true,
 		PPFadeoutAlpha = 0,
+		PPOnFire = false,
 		NameplateClassPower = false,
 		NameTextSize = 14,
 		HealthTextSize = 16,
@@ -223,6 +223,8 @@ G.DefaultSettings = {
 		NameOnlyMode = false,
 		PPGCDTicker = true,
 		ExecuteRatio = 0,
+		ColoredTarget = false,
+		TargetColor = {r=0, g=.6, b=1},
 	},
 	Skins = {
 		DBM = true,
@@ -290,7 +292,7 @@ G.DefaultSettings = {
 		FasterLoot = true,
 		AutoQuest = true,
 		HideTalking = true,
-		HideBanner = false,
+		HideBossBanner = false,
 		HideBossEmote = false,
 		PetFilter = true,
 		QuestNotification = false,
@@ -310,6 +312,7 @@ G.DefaultSettings = {
 		BlockInvite = false,
 		NzothVision = true,
 		SendActionCD = false,
+		MawThreatBar = true,
 		QuickQueue = true,
 		--AltTabLfgNotification = false,
 		--CrazyCatLady = true,
@@ -356,17 +359,18 @@ G.AccountSettings = {
 	SkadaRequest = false,
 	BWRequest = false,
 	RaidAuraWatch = {},
-	CornerBuffs = {},
+	RaidClickSets = {},
 	TexStyle = 3,
 	KeystoneInfo = {},
 	AutoBubbles = false,
 	DisableInfobars = false,
-	PartyWatcherSpells = {},
 	ContactList = {},
 	CustomJunkList = {},
 	ProfileIndex = {},
 	ProfileNames = {},
 	Help = {},
+	PartySpells = {},
+	CornerSpells = {},
 }
 
 -- Initial settings
@@ -418,9 +422,9 @@ loader:SetScript("OnEvent", function(self, _, addon)
 
 	if MaoRUIDB["ProfileIndex"][I.MyFullName] == 1 then
 		R.db = MaoRUIPerDB
-		if not R.db["BFA"] then
+		if not R.db["SL"] then
 			wipe(R.db)
-			R.db["BFA"] = true
+			R.db["SL"] = true
 		end
 	else
 		R.db = MaoRUISetDB[MaoRUIDB["ProfileIndex"][I.MyFullName] - 1]
@@ -693,9 +697,9 @@ G.TabList = {
 
 G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	[1] = {
-		{1, "Actionbar", "Enable", "|cff00cc4c"..U["Enable Actionbar"]},
-		--{3, "Actionbar", "Scale", U["Actionbar Scale"].."*", true, false, {.8, 1.5, .01}, updateActionbarScale},
-		{1, "Actionbar", "CustomBar", "|cff00cc4c"..U["Enable CustomBar"], true, false, nil, nil, U["CustomBarTip"]},
+		{1, "Actionbar", "Enable", HeaderTag..U["Enable Actionbar"]},
+		--{3, "Actionbar", "Scale", U["Actionbar Scale"].."*", true, false, {.5, 1.5, .01}, updateActionbarScale},
+		{1, "Actionbar", "CustomBar", HeaderTag..U["Enable CustomBar"], true, false, nil, nil, U["CustomBarTip"]},
 		{4, "Actionbar", "Style", U["Actionbar Style"], true, true, {"-- 2*(3+12+3) --", "-- 2*(6+12+6) --", "-- 2*6+3*12+2*6 --", "-- 3*12 --", "-- 2*(12+6) --", "-- 3*(4+12+4) --", "-- What --", "-- MR --", "-- PVP2 --", "-- Cool --", "-- JK --"}},
 		{3, "Actionbar", "CustomBarButtonSize", U["CustomBarButtonSize"].."*", false, false, {24, 60, 1}, updateCustomBar},
 		{3, "Actionbar", "CustomBarNumButtons", U["CustomBarNumButtons"].."*", true, false, {1, 12, 1}, updateCustomBar},
@@ -1180,16 +1184,17 @@ local function CreateOption(i)
 			end
 		-- Colorswatch
 		elseif optType == 5 then
-			local f = M.CreateColorSwatch(parent, name, NDUI_VARIABLE(key, value))
+			local swatch = M.CreateColorSwatch(parent, name, NDUI_VARIABLE(key, value))
 			local width = 80 + (horizon or 0)*120
 			if horizon2 then
-				dd:SetPoint("TOPLEFT", width, -offset + 33)
+				swatch:SetPoint("TOPLEFT", width, -offset + 33)
 			elseif horizon then
-				f:SetPoint("TOPLEFT", width, -offset + 33)
+				swatch:SetPoint("TOPLEFT", width, -offset + 33)
 			else
-				f:SetPoint("TOPLEFT", width, -offset - 3)
+				swatch:SetPoint("TOPLEFT", width, -offset - 3)
 				offset = offset + 36
 			end
+			swatch.__default = (key == "ACCOUNT" and G.AccountSettings[value]) or G.DefaultSettings[key][value]
 		-- Blank, no optType
 		else
 			if not key then

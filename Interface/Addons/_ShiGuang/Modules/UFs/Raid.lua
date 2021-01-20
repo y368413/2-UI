@@ -234,10 +234,12 @@ local defaultSpellList = {
 }
 
 function UF:DefaultClickSets()
-	if not next(R.db["RaidClickSets"]) then
+	if not MaoRUIDB["RaidClickSets"][I.MyClass] then MaoRUIDB["RaidClickSets"][I.MyClass] = {} end
+
+	if not next(MaoRUIDB["RaidClickSets"][I.MyClass]) then
 		for k, v in pairs(defaultSpellList[I.MyClass]) do
 			local clickSet = keyList[k][2]..keyList[k][1]
-			R.db["RaidClickSets"][clickSet] = {keyList[k][1], keyList[k][2], v}
+			MaoRUIDB["RaidClickSets"][I.MyClass][clickSet] = {keyList[k][1], keyList[k][2], v}
 		end
 	end
 end
@@ -262,7 +264,7 @@ local onMouseString = "if not self:IsUnderMouse(false) then self:ClearBindings()
 
 local function setupMouseWheelCast(self)
 	local found
-	for _, data in pairs(R.db["RaidClickSets"]) do
+	for _, data in pairs(MaoRUIDB["RaidClickSets"][I.MyClass]) do
 		if strmatch(data[1], U["Wheel"]) then
 			found = true
 			break
@@ -281,7 +283,7 @@ end
 local function setupClickSets(self)
 	if self.clickCastRegistered then return end
 
-	for _, data in pairs(R.db["RaidClickSets"]) do
+	for _, data in pairs(MaoRUIDB["RaidClickSets"][I.MyClass]) do
 		local key, modKey, value = unpack(data)
 		if key == KEY_BUTTON1 and modKey == "SHIFT" then self.focuser = true end
 
@@ -355,13 +357,38 @@ function UF:BuffIndicatorOnUpdate(elapsed)
 	M.CooldownOnUpdate(self, elapsed, true)
 end
 
+UF.CornerSpells = {}
+function UF:UpdateCornerSpells()
+	wipe(UF.CornerSpells)
+
+	for spellID, value in pairs(R.CornerBuffs[I.MyClass]) do
+		local modData = MaoRUIDB["CornerSpells"][I.MyClass]
+		if not (modData and modData[spellID]) then
+			local r, g, b = unpack(value[2])
+			UF.CornerSpells[spellID] = {value[1], {r, g, b}, value[3]}
+		end
+	end
+
+	for spellID, value in pairs(MaoRUIDB["CornerSpells"][I.MyClass]) do
+		if next(value) then
+			local r, g, b = unpack(value[2])
+			UF.CornerSpells[spellID] = {value[1], {r, g, b}, value[3]}
+		end
+	end
+end
+
+local bloodlustList = {}
+for _, spellID in pairs(R.bloodlustID) do
+	bloodlustList[spellID] = {"BOTTOMLEFT", {1, .8, 0}, true}
+end
+
 local found = {}
 local auraFilter = {"HELPFUL", "HARMFUL"}
 
 function UF:UpdateBuffIndicator(event, unit)
 	if event == "UNIT_AURA" and self.unit ~= unit then return end
 
-	local spellList = MaoRUIDB["CornerBuffs"][I.MyClass]
+	local spellList = UF.CornerSpells
 	local buttons = self.BuffIndicator
 	unit = self.unit
 
@@ -370,7 +397,7 @@ function UF:UpdateBuffIndicator(event, unit)
 		for i = 1, 32 do
 			local name, texture, count, _, duration, expiration, caster, _, _, spellID = UnitAura(unit, i, filter)
 			if not name then break end
-			local value = spellList[spellID]
+			local value = spellList[spellID] or (I.Role ~= "HEALER" and bloodlustList[spellID])
 			if value and (value[3] or caster == "player" or caster == "pet") then
 				local bu = buttons[value[1]]
 				if bu then
@@ -484,6 +511,28 @@ function UF:RefreshRaidFrameIcons()
 					UF:RefreshBuffIndicator(bu)
 				end
 			end
+		end
+	end
+end
+
+-- Partywatcher
+UF.PartyWatcherSpells = {}
+function UF:UpdatePartyWatcherSpells()
+	wipe(UF.PartyWatcherSpells)
+
+	for spellID, duration in pairs(R.PartySpells) do
+		local name = GetSpellInfo(spellID)
+		if name then
+			local modDuration = MaoRUIDB["PartySpells"][spellID]
+			if not modDuration or modDuration > 0 then
+				UF.PartyWatcherSpells[spellID] = duration
+			end
+		end
+	end
+
+	for spellID, duration in pairs(MaoRUIDB["PartySpells"]) do
+		if duration > 0 then
+			UF.PartyWatcherSpells[spellID] = duration
 		end
 	end
 end
@@ -609,7 +658,7 @@ function UF:InterruptIndicator(self)
 	end
 
 	buttons.__max = maxIcons
-	buttons.PartySpells = MaoRUIDB["PartyWatcherSpells"]
+	buttons.PartySpells = UF.PartyWatcherSpells
 	buttons.TalentCDFix = R.TalentCDFix
 	self.PartyWatcher = buttons
 	if R.db["UFs"]["PartyWatcherSync"] then

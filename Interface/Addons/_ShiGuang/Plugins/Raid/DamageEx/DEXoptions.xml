@@ -90,10 +90,11 @@
 			</Layer>
 		</Layers>
 	</Frame>
-	<!-- Drag-able frame template -->
-	<Frame name="DEXDragableFrameTemplate" movable="true" enableMouse="true" virtual="true">
+	
+	<!-- Drag-able frame template  -->
+	<Frame name="DEXDragableFrameTemplate" movable="true" enableMouse="true" virtual="true" inherits="BackdropTemplate">
 		<Scripts>
-			<OnLoad>
+			<OnLoad inherit="prepend">
 				self:SetUserPlaced(true)
 				self:RegisterForDrag("LeftButton")
 			</OnLoad>
@@ -107,24 +108,15 @@
 	</Frame>
 	<!-- MAIN OPTION FRAME -->
 	<Frame name="DEXOptions" toplevel="true" frameStrata="LOW" hidden="true" parent="UIParent" inherits="DEXDragableFrameTemplate">
+		<KeyValues>
+			<KeyValue key="backdropInfo" value="BACKDROP_DIALOG_32_32" type="global" />
+		</KeyValues>
 		<Size>
 			<AbsDimension x="560" y="450"/>
 		</Size>
 		<Anchors>
 			<Anchor point="CENTER" />
 		</Anchors>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background"
-				  edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
-			<BackgroundInsets>
-				<AbsInset left="11" right="12" top="12" bottom="11"/>
-			</BackgroundInsets>
-			<TileSize>
-				<AbsValue val="32" />
-			</TileSize>
-			<EdgeSize>
-				<AbsValue val="32" />
-			</EdgeSize>
-		</Backdrop>
 		<Layers>
 			<Layer level="ARTWORK">
 				<Texture name="DEXFrameTitle" file="Interface\DialogFrame\UI-DialogBox-Header">
@@ -524,7 +516,7 @@
 
 			<Button name="DEXOptionsSave" inherits="UIPanelCloseButton">
 				<Anchors>
-					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relitiveTo="DEXOptions">
 						<Offset>
 							<AbsDimension x="-5" y="-5" />
 						</Offset>
@@ -579,29 +571,21 @@
 				</Scripts>
 			</Button>
 			<Button name="DEX_PreBox" parent="UIParent" movable="true" hidden="true" inherits="DEXDragableFrameTemplate">
+				<KeyValues>
+					<KeyValue key="backdropInfo" value="BACKDROP_TOOLTIP_16_16_5555" type="global" />
+				</KeyValues>
 				<Size>
 					<AbsDimension x="200" y="20"/>
 				</Size>
 				<Anchors>
 					<Anchor point="CENTER" />
 				</Anchors>
-				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-					<EdgeSize>
-						<AbsValue val="8"/>
-					</EdgeSize>
-					<TileSize>
-						<AbsValue val="8"/>
-					</TileSize>
-					<BackgroundInsets>
-						<AbsInset left="2" right="2" top="2" bottom="2"/>
-					</BackgroundInsets>
-				</Backdrop>
 				<Layers>
 					<Layer level="OVERLAY">
 						<FontString name="DEX_PreBox_Title" inherits="GameFontNormal" text="DEX_PREVIEW_LABEL">
 							<Anchors>
-								<Anchor point="CENTER"/>
-							</Anchors>
+								<Anchor point="CENTER" relitiveTo="$parent"/>							
+							</Anchors>							
 							<FontHeight>
 								<AbsValue val="14"/>
 							</FontHeight>

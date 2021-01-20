@@ -844,11 +844,14 @@ L["options_opacity_desc"] = "0 = transparent, 1 = opaque"
 
 ---------------------------------- VISIBILITY ---------------------------------
 
+L["options_show_worldmap_button"] = "Show world map button"
+L["options_show_worldmap_button_desc"] = "Add a quick-toggle dropdown menu to the top-right corner of the world map."
+
 L["options_visibility_settings"] = "Visibility"
 L["options_general_settings"] = "General"
 L["options_show_completed_nodes"] = "Show completed"
 L["options_show_completed_nodes_desc"] = "Show all nodes even if they have already been looted or completed today."
-L["options_toggle_hide_done_rare"] = "Hide rare, if all loot known"
+L["options_toggle_hide_done_rare"] = "Hide rare if all rewards known"
 L["options_toggle_hide_done_rare_desc"] = "Hide all rares for which all loot is known."
 L["options_toggle_hide_minimap"] = "Hide all icons on the minimap"
 L["options_toggle_hide_minimap_desc"] = "Hides all icons from this addon on the minimap and displays them only on the main map."
@@ -860,6 +863,17 @@ L["options_toggle_per_map_settings"] = "Use zone-specific settings"
 L["options_toggle_per_map_settings_desc"] = "Apply toggle, scale and opacity settings to each zone individually."
 L["options_restore_hidden_nodes"] = "Restore hidden nodes"
 L["options_restore_hidden_nodes_desc"] = "Restore all nodes hidden using the right-click context menu."
+
+L["options_rewards_settings"] = "Rewards"
+L["options_reward_types"] = "Show reward types"
+L["options_mount_rewards"] = "Show mount rewards"
+L["options_mount_rewards_desc"] = "Display mount rewards in tooltips and track their collected status."
+L["options_pet_rewards"] = "Show pet rewards"
+L["options_pet_rewards_desc"] = "Display pet rewards in tooltips and track their collected status."
+L["options_toy_rewards"] = "Show toy rewards"
+L["options_toy_rewards_desc"] = "Display toy rewards in tooltips and track their collected status."
+L["options_transmog_rewards"] = "Show transmog rewards"
+L["options_transmog_rewards_desc"] = "Display transmog rewards in tooltips and track their collected status."
 
 L["options_icons_misc_desc"] = "Display locations of other miscellaneous nodes."
 L["options_icons_misc"] = "Miscellaneous"
@@ -1238,7 +1252,6 @@ Talk to {npc:171743}, the Stage Director, to start one of the special encounters
 
 Participate in all seven encounters to unlock {item:180748} from {npc:163714}.
 ]]
-L["guldan"] = "Gul'dan"
 
 L["cache_of_the_moon"] = "Collect {npc:171360}'s five missing tools in the Garden of Night and combine them to create {item:180753}. Return her toolkit and she will cast {spell:334353} on you, allowing you to see the cache."
 L["cache_of_the_night"] = "Collect {item:180656}, {item:180654} and {item:180655} from across the zone and combine them to create {item:180652}."
@@ -1302,7 +1315,8 @@ Motes can be collected from nearby Depleted Anima Canisters located in the room 
 
 |cFFFF8C00Cannot be defeated during the {wq:Assault on the Vestibule} world quest.|r
 ]]
-L["nikara_note"] = "With two other players, click the Ancient Incense to summon."
+L["reekmonger_note"] = "Kill enemies in the Temple of Courage until {npc:171327} emotes and lands."
+L["repair_note"] = "With two other players, click the Ancient Incense to summon."
 L["sotiros_orstus_note"] = "Click the Black Bell to summon the rares."
 L["sundancer_note"] = "Click the statue to obtain the {spell:332309} buff, then use a {item:180445} to glide to the rare and mount it."
 L["swelling_tear_note"] = "Click the {npc:171012} to summon one of three rares. Tears can appear in multiple locations in the zone."
@@ -1408,6 +1422,10 @@ L["anima_shard_spires"] = "Three shards are located in the Spires of Ascension d
 L["options_icons_anima_shard"] = "{achievement:14339}"
 L["options_icons_anima_shard_desc"] = "Display the locations of all 50 lost anima shards for the {achievement:14339} achievement."
 
+L["hymn_note"] = "Locate hymns at each of the temples and acquire their buffs to earn the achievement."
+L["options_icons_hymns"] = "{achievement:14768}"
+L["options_icons_hymns_desc"] = "Display hymn locations for the {achievement:14768} achievement."
+
 L["stratios_note"] = "Even the smallest battles should be fought with honor and care. Present your team when you are ready."
 L["thenia_note"] = "Such magnificent open plains here. A glorious place to battle. Are you prepared?"
 L["zolla_note"] = "We take our defenses very seriously. Whether small or large, we are fully committed to maintain and train the resources that keep Bastion strong."
@@ -1473,21 +1491,16 @@ Oh look! A {spell:343124}! Approach it brave adventurer, this is surely not a ru
 ]]
 
 L["oonar_sorrowbane_note"] = [[
-In the Theater of Pain, you will find Sorrowbane stuck in the ground and Oonar's Arm attached to it. |cFFFF8C00Before attempting to pull either, set your {item:6948} to {npc:161702} by the flight point.|r
+In the Theater of Pain, you will find {item:180273} stuck in the ground and {item:181164} attached to it. To pull them free:
 
-To pull {item:181164} free:
-
-• Travel to Glutharn's Decay to the east.
-• Eat 4x {spell:327367} (2min debuff).
-• Quickly hearth and pull on the arm.
-
-To pull {item:180273} free:
-
-• Purchase 1 {item:182163} from {npc:171808} in Revendreth.
-• Purchase 1 {item:180771} from {npc:166640} in Maldraxxus.
+• Purchase a {item:182163} from {npc:171808} in Revendreth.
+• Purchase a {item:180771} from {npc:166640} in Maldraxxus.
+• Purchase a {item:181163} from {npc:169964} in Maldraxxus.
 • Get 2 stacks of {spell:306272} from the {wq:A Few Bumps Along the Way} world quest to the west.
 • Eat 4x {spell:327367} in Glutharn's Decay.
-• Quickly hearth, drink both potions and pull on the sword.
+• Quickly use {item:181163}, drink both potions and pull on the arm and sword.
+
+To pull just the arm, only the 4x {spell:327367} are needed.
 ]]
 
 L["pet_cat"] = "Pet the damn cat!"
@@ -1574,7 +1587,7 @@ L["options_icons_fugitives_desc"] = "Display fugitive soul locations for the {ac
 L["grand_inquisitor_note"] = "Turn in 10 {item:180451} to {npc:160248} for a chance at this sinstone."
 L["high_inquisitor_note"] = "Turn in 250 {currency:1816} to {npc:160248} for a chance at this sinstone."
 L["inquisitor_note"] = "Turn in 100 {currency:1816} to {npc:160248} for a chance at this sinstone."
-L["options_icons_inquisitors"] = "{achievement:14276}"
+L["options_icons_inquisitors"] = "Inquisitors"
 L["options_icons_inquisitors_desc"] = "Display inquisitor locations for the {achievement:14276} achievement."
 
 -------------------------------------------------------------------------------
@@ -1588,7 +1601,6 @@ L["apholeias_note"] = "With 3 other players, stand on the corners of the platfor
 L["dekaris_note"] = "On top of a large jutting rock."
 L["drifting_sorrow_note"] = "Kill {npc:175246s} near the hovering orb to activate the boss."
 L["ekphoras_note"] = "With 3 other players, stand on the corners of the platform and cast {spell:330650} to summon the rare."
-L["gorged_shadehound_note"] = "Only available during the {wq:Hunt: Shadehounds} event."
 L["ikras_note"] = "Flies around Perdition Hold. This is a good place to pull him."
 L["orophea_note"] = "Pick up {spell:337143} to the southeast and offer it to {npc:172577} to activate."
 L["sanngror_note"] = "If he is not attackable, wait until he is not experimenting on souls."
@@ -1615,7 +1627,6 @@ L["venari_note"] = [[
 Use {currency:1767} to purchase Maw and Torghast upgrades.
 
 |cFFFF8C00Account-wide Torghast upgrades will show as incomplete on alts!|r
-|cFFFF8C00Completion status below will be updated as we unlock them!|r
 ]]
 L["venari_upgrade"] = "{npc:162804} Upgrade"
 L["torghast"] = "Torghast"
@@ -1691,8 +1702,8 @@ L["Show Shrines which Jewelercrafters can use to create gems"] = true
 
 --config.options
 
-L["config_plugin_name"] = "TravelGuide"
-L["config_plugin_desc"] = "Shows the portal, zeppelin and boat locations on the World Map and the MiniMap."
+L["TravelGuide_plugin_name"] = "TravelGuide"
+L["TravelGuide_plugin_desc"] = "Displays the portal, zeppelin and boat locations on the world map and minimap."
 
 L["config_tab_general"] = "General"
 L["config_tab_scale_alpha"] = "Scale / Alpha"

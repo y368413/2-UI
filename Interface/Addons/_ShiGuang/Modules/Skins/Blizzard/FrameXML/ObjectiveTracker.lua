@@ -40,7 +40,7 @@ local function reskinHeader(header)
 	bg:SetTexCoord(0, .66, 0, .31)
 	bg:SetVertexColor(r, g, b, .8)
 	bg:SetPoint("BOTTOMLEFT", 0, -4)
-	bg:SetSize(250, 30)
+	bg:SetSize(260, 31)
 	header.bg = bg -- accessable for other addons
 end
 
@@ -136,7 +136,7 @@ tinsert(R.defaultThemes, function()
 	--hooksecurefunc(SCENARIO_TRACKER_MODULE, "AddTimerBar", reskinTimerBar)
 	--hooksecurefunc(ACHIEVEMENT_TRACKER_MODULE, "AddTimerBar", reskinTimerBar)
 
-	-- Reskin Blocks
+	--[[ Reskin Blocks
 	hooksecurefunc("ScenarioStage_CustomizeBlock", function(block)
 		block.NormalBG:SetTexture("")
 		if not block.bg then
@@ -182,7 +182,7 @@ tinsert(R.defaultThemes, function()
 		end
 	end)
 
-	hooksecurefunc("Scenario_ChallengeMode_SetUpAffixes", M.AffixesSetup)
+	hooksecurefunc("Scenario_ChallengeMode_SetUpAffixes", M.AffixesSetup)]]
 
 	-- Reskin Headers
 	local headers = {

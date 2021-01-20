@@ -66,8 +66,8 @@ hooksecurefunc("HealthBar_OnValueChanged", function(self)
 	whoaUnitClass(self, self.unit)
 end)
 
---	Unit faction colors.
-function whoaUnitReaction(healthbar, unit)
+-- Reaction color HP bars for non player units frames.
+local function whoaReactColor(healthbar, unit)
 	if UnitExists(unit) and (not UnitIsPlayer(unit)) then
 		if (UnitIsTapDenied(unit)) and not UnitPlayerControlled(unit) then
 			healthbar:SetStatusBarColor(0.5, 0.5, 0.5)
@@ -81,10 +81,111 @@ function whoaUnitReaction(healthbar, unit)
 		end
 	end
 end
-hooksecurefunc("UnitFrameHealthBar_Update", whoaUnitReaction)
+hooksecurefunc("UnitFrameHealthBar_Update", whoaReactColor)
 hooksecurefunc("HealthBar_OnValueChanged", function(self)
-	whoaUnitReaction(self, self.unit)
+	whoaReactColor(self, self.unit)
 end)
+
+-- Disable/enable unit frames click interaction.
+function disableFramesClick()
+	if (cfg.noClickFrame == true) then
+		for i, v in pairs({	PlayerFrame, PetFrame, TargetFrame, FocusFrame }) do v:SetMouseClickEnabled(false); end
+	elseif (cfg.noClickFrame == false) then
+		for i, v in pairs({	PlayerFrame, PetFrame, TargetFrame, FocusFrame }) do v:SetMouseClickEnabled(true); end
+	end
+end
+
+-- Text builder factory.
+local function CreateText(name, parentName, parent, point, x, y)
+	local fontString = parent:CreateFontString(parentName..name, nil, "GameFontNormalSmall")
+	fontString:SetPoint(point, parent, point, x, y)
+	return fontString
+end
+
+-- Create text frames for dead and ghost.
+function createDeadTextFrames()
+	whoaPlayerFrameDeadText = CreateText("DeadText", "PlayerFrame", PlayerFrameHealthBar, "CENTER", 0, 0);
+	whoaPlayerFrameGhostText = CreateText("GhostText", "PlayerFrame", PlayerFrameHealthBar, "CENTER", 0, 0);
+	whoaPlayerFrameDeadText:SetText(DEAD);
+	whoaPlayerFrameGhostText:SetText("Ghost");
+	
+	whoaTargetFrameGhostText = CreateText("GhostText", "TargetFrame", TargetFrameHealthBar, "CENTER", 0, 0);
+	whoaTargetFrameGhostText:SetText("Ghost");
+	whoaTargetFrameOfflineText = CreateText("OfflineText", "TargetFrame", TargetFrameHealthBar, "CENTER", 0, 0);
+	whoaTargetFrameOfflineText:SetText("Offline");
+	
+	whoaFocusFrameGhostText = CreateText("GhostText", "FocusFrame", FocusFrameHealthBar, "CENTER", 0, 0);
+	whoaFocusFrameGhostText:SetText("Ghost");
+	whoaFocusFrameOfflineText = CreateText("OfflineText", "FocusFrame", FocusFrameHealthBar, "CENTER", 0, 0);
+	whoaFocusFrameOfflineText:SetText("Offline");
+end
+
+--	Player dead text switch.
+function playerDeadText()
+	if UnitIsDead("player") then
+		whoaPlayerFrameDeadText:Show();
+		whoaPlayerFrameGhostText:Hide();
+		PlayerFrameAlternateManaBar:Hide();
+	elseif UnitIsGhost("player") then
+		whoaPlayerFrameDeadText:Hide();
+		whoaPlayerFrameGhostText:Show();
+		PlayerFrameAlternateManaBar:Hide();
+	else
+		whoaPlayerFrameDeadText:Hide();
+		whoaPlayerFrameGhostText:Hide();
+		PlayerFrameAlternateManaBar:Show();
+	end
+	if UnitExists("player") and UnitIsDead("player") or UnitIsGhost("player") then
+		for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameTextureFrameManaBarText, PlayerFrameManaBar }) do v:SetAlpha(0); end
+	else
+		for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameTextureFrameManaBarText, PlayerFrameManaBar }) do v:SetAlpha(1); end
+	end
+end
+
+-- Target frame dead text switch.
+function targetDeadText()
+	if UnitIsDead("target") then
+		whoaTargetFrameGhostText:Hide();
+		whoaTargetFrameOfflineText:Hide();
+	elseif UnitIsGhost("target") then
+		whoaTargetFrameGhostText:Show();
+		whoaTargetFrameOfflineText:Hide();
+	elseif UnitIsPlayer("target") and not UnitIsConnected("target") then
+		whoaTargetFrameGhostText:Hide();
+		whoaTargetFrameOfflineText:Show();
+	else
+		whoaTargetFrameGhostText:Hide();
+		whoaTargetFrameOfflineText:Hide();
+	end
+	if UnitExists("target") and UnitIsDead("target") or UnitIsGhost("target") or not UnitIsConnected("target") then
+		for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameTextureFrameManaBarText, TargetFrameManaBar }) do v:SetAlpha(0); end
+	else
+		for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameTextureFrameManaBarText, TargetFrameManaBar }) do v:SetAlpha(1); end
+	end
+end
+
+-- Focus frame dead text switch.
+function focusDeadText()
+	if UnitIsDead("focus") then
+		whoaFocusFrameGhostText:Hide();
+		whoaFocusFrameOfflineText:Hide();
+	elseif UnitIsGhost("focus") then
+		whoaFocusFrameGhostText:Show();
+		whoaFocusFrameOfflineText:Hide();
+	elseif UnitIsPlayer("focus") and not UnitIsConnected("focus") then
+		whoaFocusFrameGhostText:Hide();
+		whoaFocusFrameOfflineText:Show();
+	else
+		whoaFocusFrameGhostText:Hide();
+		whoaFocusFrameOfflineText:Hide();
+	end
+	if UnitExists("focus") and UnitIsDead("focus") or UnitIsGhost("focus") or not UnitIsConnected("focus") then
+		for i, v in pairs({	FocusFrameHealthBar.LeftText, FocusFrameHealthBar.RightText, FocusFrameManaBar.LeftText, FocusFrameManaBar.RightText, FocusFrameTextureFrameManaBarText, FocusFrameManaBar }) do v:SetAlpha(0); end
+	else
+		for i, v in pairs({	FocusFrameHealthBar.LeftText, FocusFrameHealthBar.RightText, FocusFrameManaBar.LeftText, FocusFrameManaBar.RightText, FocusFrameTextureFrameManaBarText, FocusFrameManaBar }) do v:SetAlpha(1); end
+	end
+end
+
 
 ---------------------------------------------------------------------------------	Aura positioning constants.
 local LARGE_AURA_SIZE, SMALL_AURA_SIZE, AURA_OFFSET_Y, AURA_ROW_WIDTH, NUM_TOT_AURA_ROWS = 26, 21, 1, 121, 3   -- Set aura size.
@@ -124,12 +225,12 @@ hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(statusFrame, 
 	local xpValue = UnitXP("player");
 	local xpMaxValue = UnitXPMax("player");
 	
-	if( statusFrame.LeftText and statusFrame.RightText ) then
-		statusFrame.LeftText:SetText("");
-		statusFrame.RightText:SetText("");
-		statusFrame.LeftText:Hide();
-		statusFrame.RightText:Hide();
-	end
+	-- if( statusFrame.LeftText and statusFrame.RightText ) then
+		-- statusFrame.LeftText:SetText("");
+		-- statusFrame.RightText:SetText("");
+		-- statusFrame.LeftText:Hide();
+		-- statusFrame.RightText:Hide();
+	-- end
 	
 	valueDisplay	=	M.Numb(value)
 	valueMaxDisplay	=	M.Numb(valueMax)			
@@ -145,7 +246,6 @@ hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(statusFrame, 
 			textString:Hide();
 			return;
 		end
-		
 		local textDisplay = GetCVar("statusTextDisplay");
 		if ( value and valueMax > 0 and ( (textDisplay ~= "NUMERIC" and textDisplay ~= "NONE") or statusFrame.showPercentage ) and not statusFrame.showNumeric) then
 			if ( value == 0 and statusFrame.zeroText ) then
@@ -170,7 +270,7 @@ hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(statusFrame, 
 				textString:SetText(valueDisplay);
 			else
 				valueDisplay = math.ceil((value / valueMax) * 100) .. "%";
-				if (statusFrame.prefix and (statusFrame.alwaysPrefix or not (statusFrame.cvar and GetCVar(statusFrame.cvar) == "1" and statusFrame.textLockable))) then
+				if ( statusFrame.prefix and (statusFrame.alwaysPrefix or not (statusFrame.cvar and GetCVar(statusFrame.cvar) == "1" and statusFrame.textLockable) ) ) then
 					textString:SetText(statusFrame.prefix .. " " .. valueDisplay);
 				else
 					textString:SetText(valueDisplay);
@@ -184,7 +284,7 @@ hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(statusFrame, 
 			return;
 		else
 			statusFrame.isZero = nil;
-			if (statusFrame.prefix and (statusFrame.alwaysPrefix or not (statusFrame.cvar and GetCVar(statusFrame.cvar) == "1" and statusFrame.textLockable))) then
+			if ( statusFrame.prefix and (statusFrame.alwaysPrefix or not (statusFrame.cvar and GetCVar(statusFrame.cvar) == "1" and statusFrame.textLockable) ) ) then
 				textString:SetText(statusFrame.prefix.." "..valueDisplay.." / "..valueMaxDisplay)
 			elseif valueMax == value then
 			  textString:SetText(valueMaxDisplay)
@@ -203,6 +303,43 @@ hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(statusFrame, 
 		end
 	end
 end)
+
+-- Events triggers.
+function whoaInit(event)
+	if (event == "PLAYER_ENTERING_WORLD") then
+		createDeadTextFrames()
+		playerDeadText ()
+		disableFramesClick()
+	end
+	if (event == "PLAYER_TARGET_CHANGED") then
+		targetDeadText()
+	end
+	if (event == "PLAYER_DEAD") then
+		playerDeadText()
+	end
+	if (event == "PLAYER_UNGHOST") then
+		playerDeadText()
+		targetDeadText()
+		focusDeadText()
+	end
+	if (event == "PLAYER_ALIVE") then
+		playerDeadText()
+		targetDeadText()
+		focusDeadText()
+	end
+	if (event == "PLAYER_FOCUS_CHANGED") then
+		focusDeadText()
+	end
+end
+-- Events listener.
+local whoaEvent = CreateFrame("Frame", "whoaEvent", UIParent)
+whoaEvent:RegisterEvent("PLAYER_ENTERING_WORLD");
+whoaEvent:RegisterEvent("PLAYER_TARGET_CHANGED")
+whoaEvent:RegisterEvent("PLAYER_DEAD")
+whoaEvent:RegisterEvent("PLAYER_UNGHOST")
+whoaEvent:RegisterEvent("PLAYER_ALIVE")
+whoaEvent:RegisterEvent("PLAYER_FOCUS_CHANGED")
+whoaEvent:SetScript("OnEvent", whoaInit)
 
 --	Player frame.
 hooksecurefunc("PlayerFrame_ToPlayerArt", function(self)
@@ -247,13 +384,6 @@ hooksecurefunc("TextStatusBar_UpdateTextStringWithValues", function()
 		end
 end)
 
---[[hooksecurefunc("PlayerFrame_UpdatePvPStatus", function()
-	local factionGroup, factionName = UnitFactionGroup("player");
-	if ( factionGroup and factionGroup ~= "Neutral" and UnitIsPVP("player") ) then
-			PlayerPVPIcon:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-PVP-"..factionGroup);
-	end
-end)]]
-
 --	Player vehicle frame.
 hooksecurefunc("PlayerFrame_ToVehicleArt", function(self, vehicleType)
 		if ( vehicleType == "Natural" ) then
@@ -277,60 +407,13 @@ hooksecurefunc("PlayerFrame_ToVehicleArt", function(self, vehicleType)
 	PlayerFrameBackground:SetWidth(114);
 end)
 
---	Player frame dead text.
-hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
-	if UnitIsDead("player") or UnitIsGhost("player") then
-		PlayerFrameHealthBarText:SetFontObject(GameFontNormalSmall);
-		for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameTextureFrameManaBarText, PlayerFrameManaBar }) do v:SetAlpha(0); end
-		if GetCVar("statusTextDisplay")=="BOTH" then
-			PlayerFrameHealthBarText:Show();
-		end
-		if UnitIsDead("player") then
-			PlayerFrameHealthBarText:SetText(DEAD);
-		elseif UnitIsGhost("player") then
-			PlayerFrameHealthBarText:SetText("Ghost");
-		end
-	elseif not UnitIsDead("player") and not UnitIsGhost("player") then
-		PlayerFrameHealthBarText:SetFontObject(TextStatusBarText);
-		for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameTextureFrameManaBarText, PlayerFrameManaBar }) do v:SetAlpha(1); end
-	end
-	
---	Target frame ghost text.
-	if UnitExists("target") and UnitIsDead("target") or UnitIsGhost("target") then
-		TargetFrameTextureFrameHealthBarText:SetFontObject(GameFontNormalSmall);
-		if GetCVar("statusTextDisplay")=="BOTH" then
-			TargetFrameTextureFrameHealthBarText:Show();
-		end
-		for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameTextureFrameManaBarText, TargetFrameManaBar }) do v:SetAlpha(0); end
-		if UnitIsGhost("target") and not UnitIsDead("target") then
-			TargetFrameTextureFrameHealthBarText:SetText(ghostText);
-		end
-	elseif not UnitIsDead("target") and not UnitIsGhost("target") then
-		TargetFrameTextureFrameHealthBarText:SetFontObject(TextStatusBarText);
-		for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameTextureFrameManaBarText, TargetFrameManaBar }) do v:SetAlpha(1); end
-	end
-	
---	Focus frame ghost text.
-	if UnitExists("focus") and UnitIsDead("focus") or UnitIsGhost("focus") then
-		FocusFrameTextureFrameHealthBarText:SetFontObject(GameFontNormalSmall);
-		if GetCVar("statusTextDisplay")=="BOTH" then
-			FocusFrameTextureFrameHealthBarText:Show();
-		end
-		for i, v in pairs({	FocusFrameHealthBar.LeftText, FocusFrameHealthBar.RightText, FocusFrameManaBar.LeftText, FocusFrameManaBar.RightText, FocusFrameTextureFrameManaBarText, FocusFrameManaBar }) do v:SetAlpha(0); end
-		if UnitIsGhost("focus") then
-			FocusFrameTextureFrameHealthBarText:SetText(ghostText);
-		end
-	elseif not UnitIsDead("focus") and not UnitIsGhost("focus") then
-		FocusFrameTextureFrameHealthBarText:SetFontObject(TextStatusBarText);
-		for i, v in pairs({	FocusFrameHealthBar.LeftText, FocusFrameHealthBar.RightText, FocusFrameManaBar.LeftText, FocusFrameManaBar.RightText, FocusFrameTextureFrameManaBarText, FocusFrameManaBar }) do v:SetAlpha(1); end
-	end
-end)
 
 --	Target frame
 hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalTexture)
 	local classification = UnitClassification(self.unit);
 	self.highLevelTexture:SetPoint("CENTER", self.levelText, "CENTER", 0,0);
 	self.deadText:SetPoint("CENTER", self.healthbar, "CENTER",0,0);
+	self.unconsciousText:SetPoint("CENTER", self.healthbar, "CENTER",0,0);
 	self.nameBackground:Hide();
 	self.threatIndicator:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame-Flash");
 	self.name:SetPoint("LEFT", self, 15, 36);
@@ -433,20 +516,20 @@ hooksecurefunc("TargetFrame_CheckClassification", function()
 	TargetFrameToTTextureFrameTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetofTargetFrame");
 	TargetFrameToTHealthBar:ClearAllPoints();
 	TargetFrameToTHealthBar:SetPoint("TOPLEFT", 45, -15);
-  TargetFrameToTHealthBar:SetHeight(10);
-  TargetFrameToTManaBar:ClearAllPoints();
-  TargetFrameToTManaBar:SetPoint("TOPLEFT", 45, -25);
-  TargetFrameToTManaBar:SetHeight(5);
+    TargetFrameToTHealthBar:SetHeight(10);
+    TargetFrameToTManaBar:ClearAllPoints();
+    TargetFrameToTManaBar:SetPoint("TOPLEFT", 45, -25);
+    TargetFrameToTManaBar:SetHeight(5);
 	FocusFrameToTTextureFrameDeadText:ClearAllPoints();
 	FocusFrameToTTextureFrameDeadText:SetPoint("CENTER", "FocusFrameToTHealthBar" ,"CENTER",1, 0);
 	FocusFrameToTTextureFrameName:SetSize(65,10);
 	FocusFrameToTTextureFrameTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetofTargetFrame");
 	FocusFrameToTHealthBar:ClearAllPoints();
-  FocusFrameToTHealthBar:SetPoint("TOPLEFT", 43, -15);
-  FocusFrameToTHealthBar:SetHeight(10);
-  FocusFrameToTManaBar:ClearAllPoints();
-  FocusFrameToTManaBar:SetPoint("TOPLEFT", 43, -25);
-  FocusFrameToTManaBar:SetHeight(5);
+    FocusFrameToTHealthBar:SetPoint("TOPLEFT", 43, -15);
+    FocusFrameToTHealthBar:SetHeight(10);
+    FocusFrameToTManaBar:ClearAllPoints();
+    FocusFrameToTManaBar:SetPoint("TOPLEFT", 43, -25);
+    FocusFrameToTManaBar:SetHeight(5);
 end)
 
 --	Boss target frames.

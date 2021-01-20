@@ -801,14 +801,14 @@ do
 		self.bg:SetBackdropColor(cr, cg, cb, .25)
 	end
 
-	local function resetTabAnchor(tab)
-		local text = tab.Text or _G[tab:GetName().."Text"]
+	function M:ResetTabAnchor()
+		local text = self.Text or (self.GetName and _G[self:GetName().."Text"])
 		if text then
-			text:SetPoint("CENTER", tab)
+			text:SetPoint("CENTER", self)
 		end
 	end
-	hooksecurefunc("PanelTemplates_DeselectTab", resetTabAnchor)
-	hooksecurefunc("PanelTemplates_SelectTab", resetTabAnchor)
+	hooksecurefunc("PanelTemplates_SelectTab", M.ResetTabAnchor)
+	hooksecurefunc("PanelTemplates_DeselectTab", M.ResetTabAnchor)
 
 	-- Handle scrollframe
 	local function Scroll_OnEnter(self)
@@ -902,6 +902,16 @@ do
 		self:HookScript("OnEnter", M.Texture_OnEnter)
 		self:HookScript("OnLeave", M.Texture_OnLeave)
 	end
+
+	function M:ReskinFilterButton()
+		M.StripTextures(self)
+		M.Reskin(self)
+		self.Text:SetPoint("CENTER")
+		M.SetupArrow(self.Icon, "right")
+		self.Icon:SetPoint("RIGHT")
+		self.Icon:SetSize(14, 14)
+	end
+
 	function M:ReskinNavBar()
 		if self.navBarStyled then return end
 
@@ -962,6 +972,7 @@ do
 
 	function M:CreateCheckBox()
 		local cb = CreateFrame("CheckButton", nil, self, "InterfaceOptionsCheckButtonTemplate")
+		cb:SetScript("OnClick", nil) -- reset onclick handler
 		--M.ReskinCheck(cb)
 
 		cb.Type = "CheckBox"

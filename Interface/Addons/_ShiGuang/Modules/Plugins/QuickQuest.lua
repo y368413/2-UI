@@ -32,8 +32,8 @@ QuickQuestCheckButton:SetPoint("TOPLEFT", ObjectiveTrackerBlocksFrame.QuestHeade
 QuickQuestCheckButton:SetSize(21, 21)
 QuickQuestCheckButton:SetHitRectInsets(0, -10, 0, 0)
 QuickQuestCheckButton:RegisterEvent("PLAYER_LOGIN")
-QuickQuestCheckButton:SetScript("OnEvent", function(self) self:SetChecked(R.db["Misc"].AutoQuest) end)
-QuickQuestCheckButton:SetScript("OnClick", function(self) R.db["Misc"].AutoQuest = self:GetChecked() end)
+QuickQuestCheckButton:SetScript("OnEvent", function(self) self:SetChecked(R.db["Misc"]["AutoQuest"]) end)
+QuickQuestCheckButton:SetScript("OnClick", function(self) R.db["Misc"]["AutoQuest"] = self:GetChecked() end)
 
 -- Main
 local QuickQuest = CreateFrame("Frame")
@@ -90,11 +90,16 @@ local ignoreQuestNPC = {
 	[142063] = true,	-- 特兹兰
 	[143388] = true,	-- 德鲁扎
 	[143555] = true,	-- 山德·希尔伯曼，祖达萨PVP军需官	
-	[150131] = true, -- 萨尔玛法师，部落
+	
 	[150122] = true, -- 荣耀堡法师，联盟
-	[154534] = true,	-- 大杂院阿畅
-	[150987] = true,	-- 肖恩·维克斯，斯坦索姆
+	[150131] = true, -- 萨尔玛法师，部落
 	[150563] = true,	-- 斯卡基特，麦卡贡订单日常
+	[150987] = true,	-- 肖恩·维克斯，斯坦索姆
+	[154534] = true,	-- 大杂院阿畅
+	[160248] = true,	-- 档案员费安，罪魂碎片
+	[168430] = true,	-- 戴克泰丽丝，格里恩挑战
+	[326027] = true,	-- 运输站回收生成器DX-82
+	
 }
 
 QuickQuest:Register("QUEST_GREETING", function()
@@ -151,7 +156,6 @@ local ignoreGossipNPC = {
 	[84511] = true, -- Lieutenant Thorn (Alliance)
 	[84684] = true, -- Lieutenant Thorn (Alliance)
 	[117871] = true, -- War Councilor Victoria (Class Challenges @ Broken Shore)
-	[143925] = true, -- Dark Iron Mole Machine (Dark Iron Dwarf racial)
 	[155101] = true, -- 元素精华融合器
 	[155261] = true, -- 肖恩·维克斯，斯坦索姆
 	[150122] = true, -- 荣耀堡法师
@@ -164,6 +168,7 @@ local ignoreGossipNPC = {
 	[171821] = true, -- 德拉卡女男爵
 	[172558] = true, -- 艾拉·引路者（导师）
 	[172572] = true, -- 瑟蕾丝特·贝利文科（导师）
+	[175513] = true, -- 纳斯利亚审判官，傲慢
 }
 
 local rogueClassHallInsignia = {
@@ -332,23 +337,13 @@ local itemBlacklist = {
 	[31664] = 88604, -- Nat's Fishing Journal
 }
 
-local ignoreProgressNPC = {
-	[119388] = true,
-	[127037] = true,
-	[126954] = true,
-	[124312] = true,
-	[141584] = true,
-	[326027] = true, -- 运输站回收生成器DX-82
-	[150563] = true, -- 斯卡基特，麦卡贡订单日常
-}
-
 QuickQuest:Register("QUEST_PROGRESS", function()
 	if IsQuestCompletable() then
 		local info = C_QuestLog_GetQuestTagInfo(GetQuestID())
 		if info and (info.tagID == 153 or info.worldQuestType) then return end
 
 		local npcID = GetNPCID()
-		if ignoreProgressNPC[npcID] then return end
+		if ignoreQuestNPC[npcID] then return end
 
 		local requiredItems = GetNumQuestItems()
 		if requiredItems > 0 then

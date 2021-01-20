@@ -97,10 +97,10 @@ function frame:CreateWidget(parent,widgetType,anchor,xoff)
   widget.text = widget:CreateFontString(nil,"OVERLAY","GameFontHighlight")
   widget.text:SetPoint("LEFT",widget.icon,"RIGHT",2,0)
   widget:SetPoint("TOP",parent,anchor,xoff,6)
-	widget.back = widget:CreateTexture(nil,"BACKGROUND")
-	widget.back:SetPoint("TOPLEFT",-2,2)
-	widget.back:SetPoint("BOTTOMRIGHT",widget.text,2,-2)
-	widget.back:SetColorTexture(0,0,0,0.35)
+	--widget.back = widget:CreateTexture(nil,"BACKGROUND")
+	--widget.back:SetPoint("TOPLEFT",-2,2)
+	--widget.back:SetPoint("BOTTOMRIGHT",widget.text,2,-2)
+	--widget.back:SetColorTexture(0,0,0,0.35)
   return widget
 end
 
@@ -133,10 +133,10 @@ function frame:SetUpWidgets()
     self.widgets[i] = {}
     local parent = i==1 and PetBattleFrame.ActiveAlly or PetBattleFrame.ActiveEnemy
     local anchor = i==1 and "BOTTOMRIGHT" or "BOTTOMLEFT"
-    local offset = i==1 and -180 or 21
+    local offset = i==1 and -160 or -21
     self.widgets[i].Health = self:CreateWidget(parent,"Health",anchor,offset)
-    self.widgets[i].Power = self:CreateWidget(parent,"Power",anchor,offset+60)
-    self.widgets[i].Speed = self:CreateWidget(parent,"Speed",anchor,offset+121)
+    self.widgets[i].Power = self:CreateWidget(parent,"Power",anchor,offset+80)
+    self.widgets[i].Speed = self:CreateWidget(parent,"Speed",anchor,offset+143)
 
 		self.ticks[i] = CreateFrame("Frame",nil,parent)
 		self.ticks[i]:Hide()

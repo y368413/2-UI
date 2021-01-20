@@ -1,4 +1,4 @@
-﻿--## Version: 9.0.30 ## Author: lteke
+﻿--## Version: 9.0.31 ## Author: lteke
 local InProgressMissions = {}
 
 InProgressMissions.frame = InProgressMissions.frame or CreateFrame("Frame", nil, _G.WorldFrame)
@@ -94,9 +94,9 @@ function InProgressMissions:InitDB()
 	if IPMDB.enableBfaMissions == nil then
 		IPMDB.enableBfaMissions = IPMDB.enableLegionMissions
 	end
-	if IPMDB.improveMissionUI == nil then
-		IPMDB.improveMissionUI = true
-	end
+	-- if IPMDB.improveCovenantMissionUI == nil then
+	-- 	IPMDB.improveCovenantMissionUI = false
+	-- end
 	if type(IPMDB.profiles) ~= "table" then
 		IPMDB.profiles = {}
 	end
@@ -117,6 +117,12 @@ function InProgressMissions:SaveInProgressMissions()
 	end
 	local profile = wipe(IPMDB.profiles[self.profileName])
 	self:GetMissions(GFT.FollowerType_9_0, profile)
+	if self.delayedSave then
+		self.delayedSave = nil
+	elseif not next(profile) then
+		self.delayedSave = true
+		self:QueueSaveInProgressMissions(1.0)
+	end
 	self:GetMissions(GFT.FollowerType_8_0, profile)
 	self:GetMissions(GFT.FollowerType_7_0, profile)
 	self:GetMissions(GFT.FollowerType_6_2, profile)
@@ -201,10 +207,10 @@ do
 		self:UpdateInProgressTabText()
 	end
 
-	local temp = {}
 	function InProgressMissions:GetMissions(followerType, dest, sort)
 		local isAutoCombatant = followerType == GFT.FollowerType_9_0 -- Shadowlands
-		C_Garrison.GetInProgressMissions(temp, followerType)
+		local temp = C_Garrison.GetInProgressMissions(followerType)
+		if not temp then return end
 		for k, mission in pairs(temp) do
 			if type(mission) == "table" then
 				mission.description = ""
@@ -1329,12 +1335,12 @@ function InProgressMissions:HookCovenantMissionFrame()
 		self.CovenantMissionsScrollFrame = _G.CovenantMissionFrameMissionsListScrollFrame
 		hooksecurefunc(_G.CovenantMissionFrame.MissionTab.MissionList, "Update", function()
 			MissionsScrollFrame_SetExpiresText(self.CovenantMissionsScrollFrame)
-			if IPMDB.improveMissionUIforceEnabled then
+			if IPMDB.improveCovenantMissionUI then
 				self:CovenantMissionFrame_SetRewardStyle()
 			end
 		end)
 	end
-	if IPMDB.improveMissionUIforceEnabled then
+	if IPMDB.improveCovenantMissionUI then
 		self:CovenantMissionFrame_SetStyle()
 		self:CovenantMissionFrame_EnableSmoothScroll()
 	end
@@ -1368,10 +1374,10 @@ local function OnMissionUpdate()
 	InProgressMissions:SaveInProgressMissions()
 end
 
-function InProgressMissions:QueueSaveInProgressMissions()
+function InProgressMissions:QueueSaveInProgressMissions(value)
 	if not self.missionUpdated then
 		self.missionUpdated = true
-		C_Timer.After(0.5, OnMissionUpdate)
+		C_Timer.After(value or 0.5, OnMissionUpdate)
 	end
 end
 
@@ -1385,6 +1391,7 @@ end
 
 function events:PLAYER_LOGIN(event, ...)
 	self:UnregisterEvent(event)
+	self:RegisterEvent("GARRISON_MISSION_LIST_UPDATE")
 	C_Timer.After(5, function()
 		if not self.saved then
 			self:SaveInProgressMissions()
@@ -1392,29 +1399,14 @@ function events:PLAYER_LOGIN(event, ...)
 	end)
 end
 
-local function OnShipmentCrafterClosed()
-	if InProgressMissions.shipmentUpdated then
-		InProgressMissions.shipmentUpdated = false
-		C_Garrison.RequestLandingPageShipmentInfo()
-	end
-end
-
-function events:SHIPMENT_CRAFTER_CLOSED(event, ...)
-	self.shipmentUpdated = true
-	C_Timer.After(0.01, OnShipmentCrafterClosed)
-end
-
-function events:GARRISON_LANDINGPAGE_SHIPMENTS(event, ...)
-	self:Refresh()
-	if not self.saved then
-		self:SaveInProgressMissions()
-	end
-end
-
 function events:PLAYER_ENTERING_WORLD(event, ...)
 	for k, v in pairs(ORDERHALL_ADDONS) do
 		ORDERHALL_ADDONS[k] = IsAddOnLoaded(k)
 	end
+end
+
+function InProgressMissions:GARRISON_MISSION_LIST_UPDATE(event, ...)
+	self:QueueSaveInProgressMissions()
 end
 
 function InProgressMissions:GET_ITEM_INFO_RECEIVED(event, ...)
@@ -1487,8 +1479,8 @@ local function SlashCommandHandler(msg)
 		end
 	else
 		msg = msg:lower()
-		if msg == "missionui" then
-			IPMDB.improveMissionUI = not IPMDB.improveMissionUI
+		if msg == "covenantui" then
+			IPMDB.improveCovenantMissionUI = not IPMDB.improveCovenantMissionUI
 			print(YELLOW_FONT_COLOR:WrapTextInColorCode("[InProgressMissions]"), RED_FONT_COLOR:WrapTextInColorCode(_G.REQUIRES_RELOAD))
 		else
 			print(YELLOW_FONT_COLOR:WrapTextInColorCode("[InProgressMissions]"), ORANGE_FONT_COLOR:WrapTextInColorCode("Unknown command:"), msg)

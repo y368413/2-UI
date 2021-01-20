@@ -56,7 +56,7 @@ local inaccurateQuestAreas = {
 	[25798] = 64, -- Thousand Needles (TODO: test if we need to associate the item with the zone instead)
 	[25799] = 64, -- Thousand Needles (TODO: test if we need to associate the item with the zone instead)
 	[34461] = 590, -- Horde Garrison
-	[60004] = 118, -- «∞œ¶»ŒŒÒ£∫”¢”¬÷ÆæŸ
+	[60004] = 118, -- ÂâçÂ§ï‰ªªÂä°ÔºöËã±Âãá‰πã‰∏æ
 }
 
 -- items that should be used for a quest but aren't (questID = itemID)
@@ -131,7 +131,7 @@ local onAttributeChanged = [[
 		end
 	end
 
-	if self:IsShown() and (name == "item" or name == "binding") then
+	if self:IsShown() then
 		self:ClearBindings()
 
 		local key1, key2 = GetBindingKey("EXTRAACTIONBUTTON1")
@@ -233,7 +233,7 @@ function ExtraQuestButton:PLAYER_LOGIN()
 	self.Icon = Icon
 
 	local HotKey = self:CreateFontString("$parentHotKey", nil, "NumberFontNormal")
-	HotKey:SetPoint("TOPLEFT", -3, -3)
+	HotKey:SetPoint("TOPLEFT", 3, -3)
 	self.HotKey = HotKey
 
 	local Count = self:CreateFontString("$parentCount", nil, "NumberFont_Shadow_Med")

@@ -224,7 +224,7 @@ esm.createSaveFrames = function()
 	esm.save:SetText(COMMUNITIES_CREATE)
 	esm.save:Disable()
 	
-	esm.itemBtn = CreateFrame("Button", nil, esm.save, "SecureActionButtonTemplate, UIPanelButtonTemplate");
+	esm.itemBtn = CreateFrame("Button", nil, esm.save, "InsecureActionButtonTemplate, UIPanelButtonTemplate");
 	esm.itemBtn:SetPoint("BOTTOMRIGHT", esm.save, "TOPRIGHT" , 0, 0)
 	esm.itemBtn:SetNormalFontObject("GameFontNormal")
 	--esm.itemBtn:SetSize(50, 50)

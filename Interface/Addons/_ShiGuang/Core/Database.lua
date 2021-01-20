@@ -72,6 +72,8 @@ I.rolesTex = Media.."UI-LFG-ICON-ROLES"
 I.chatLogo = Media.."2UI.blp"
 I.logoTex = Media.."2UI.blp"
 I.ArrowUp = Media.."Modules\\Raid\\ArrowLarge"
+I.afdianTex = Media.."Hutu\\Afdian"
+I.patreonTex = Media.."Hutu\\Patreon"
 I.mailTex = "Interface\\Minimap\\Tracking\\Mailbox"
 I.gearTex = "Interface\\WorldMap\\Gear_64"
 I.eyeTex = "Interface\\Minimap\\Raid_Icon"		-- blue: \\Dungeon_Icon
@@ -125,11 +127,6 @@ M:RegisterEvent("PLAYER_TALENT_UPDATE", CheckRole)
 -- Raidbuff Checklist
 I.BuffList = {
 	[1] = {		-- 合剂
-		298836,	-- 敏捷360
-		298837,	-- 智力360
-		298839,	-- 耐力360
-		298841,	-- 力量360
-
 		307166,	-- 大锅
 		307185,	-- 通用合剂
 		307187,	-- 耐力合剂

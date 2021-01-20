@@ -29,7 +29,7 @@
 		</Layers>
 	</Frame>
 	
-		<Frame name="CovenantForge_ConduitInfoTemplate" parentKey="SoulbindInfo" virtual="true" setAllPoints="true" frameLevel="150">
+	<Frame name="CovenantForge_ConduitInfoTemplate" parentKey="SoulbindInfo" virtual="true" setAllPoints="true" frameLevel="150">
 		<Anchors>
 			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
 			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>

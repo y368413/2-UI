@@ -8,7 +8,7 @@ if not MaxDps then return end
 local MaxDps = MaxDps;
 local UnitPower = UnitPower;
 
-local Druid = MaxDps:NewModule('Druid');
+local Druid = MaxDps:NewModule('Druid', 'AceEvent-3.0');
 MaxDps_DruidTable.Druid = Druid;
 
 Druid.spellMeta = {
@@ -18,12 +18,14 @@ Druid.spellMeta = {
 }
 
 function Druid:Enable()
+	Druid:UnregisterEvent('UNIT_SPELLCAST_SUCCEEDED');
 	if MaxDps.Spec == 1 then
 		MaxDps.NextSpell = Druid.Balance;
 		MaxDps:Print(MaxDps.Colors.Info .. 'Druid Balance');
 	elseif MaxDps.Spec == 2 then
 		MaxDps.NextSpell = Druid.Feral;
 		MaxDps:Print(MaxDps.Colors.Info .. 'Druid Feral');
+		Druid:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED');
 	elseif MaxDps.Spec == 3 then
 		MaxDps.NextSpell = Druid.Guardian;
 		MaxDps:Print(MaxDps.Colors.Info .. 'Druid Guardian');

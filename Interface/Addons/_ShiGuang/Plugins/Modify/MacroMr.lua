@@ -397,7 +397,7 @@ local hearthstones={
 local playerhas={}
 
 --通过宏"/click PBRH"调用随机炉石 
-local PolarBearRandomHearthstone = CreateFrame("Button", "PBRH", nil, "SecureActionButtonTemplate") 
+local PolarBearRandomHearthstone = CreateFrame("Button", "PBRH", nil, "secureActionButtonTemplate") 
 
 --随机选择一个炉石 
 local function randomhearthstone() 
@@ -428,5 +428,5 @@ end)
 --#showtooltip [nomod]黑暗之门;[mod:ctrl]达拉然炉石;[mod:alt]要塞炉石;[mod:shift]海军上将的罗盘;
 --/cast [btn:2]飞行管理员的哨子;[mod:ctrl]达拉然炉石;[mod:alt]要塞炉石;[mod:shift]海军上将的罗盘;
 --/castrandom [nomod]54452,64488,93672,142542,162973,163045,166746,
---/run local a={54452,64488,93672,142542,162973,163045,166746} rhs=rhs or CreateFrame("Button","rhs",nil,"SecureActionButtonTemplate") rhs:SetAttribute("type","item") --rhs:SetAttribute("item",GetItemInfo(a[random(#a)]))
+--/run local a={54452,64488,93672,142542,162973,163045,166746} rhs=rhs or CreateFrame("Button","rhs",nil,"secureActionButtonTemplate") rhs:SetAttribute("type","item") --rhs:SetAttribute("item",GetItemInfo(a[random(#a)]))
 --/click rhs

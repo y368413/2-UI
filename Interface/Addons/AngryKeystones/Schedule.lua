@@ -8,20 +8,20 @@ local seasonAffix = 121
 local affixSchedule = {
 	[1]  = {[1]=10, [2]=11,  [3]=3,   [4]=seasonAffix},
 	[2]  = {[1]=9,  [2]=7,   [3]=124, [4]=seasonAffix},
-	-- not sure about below
 	[3]  = {[1]=10, [2]=123, [3]=12,  [4]=seasonAffix},
+	-- not sure about below
 	[4]  = {[1]=9,  [2]=122, [3]=4,   [4]=seasonAffix},
 	[5]  = {[1]=10, [2]=8,   [3]=14,  [4]=seasonAffix},
 	[6]  = {[1]=9,  [2]=6,   [3]=13,  [4]=seasonAffix},
-	[7]  = {[1]=10, [2]=7,   [3]=4,   [4]=seasonAffix},
-	[8]  = {[1]=9,  [2]=123, [3]=3,   [4]=seasonAffix},
+	[7]  = {[1]=10, [2]=123, [3]=3,   [4]=seasonAffix},
+	[8]  = {[1]=9,  [2]=7,   [3]=4,   [4]=seasonAffix},
 	[9]  = {[1]=10, [2]=122, [3]=124, [4]=seasonAffix},
 	[10] = {[1]=9,  [2]=11,  [3]=13,  [4]=seasonAffix},
 	[11] = {[1]=10, [2]=8,   [3]=12,  [4]=seasonAffix},
 	[12] = {[1]=9,  [2]=6,   [3]=14,  [4]=seasonAffix},
 }
 
-local affixScheduleUnknown = true or not next(affixSchedule)
+local affixScheduleUnknown = not next(affixSchedule)
 local currentWeek
 local currentKeystoneMapID
 local currentKeystoneLevel

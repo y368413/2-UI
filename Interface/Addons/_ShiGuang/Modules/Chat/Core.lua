@@ -178,7 +178,19 @@ end
 hooksecurefunc("ChatEdit_CustomTabPressed", module.UpdateTabChannelSwitch)
 
 -- Quick Scroll
+local chatScrollInfo = {
+	text = U["ChatScrollHelp"],
+	buttonStyle = HelpTip.ButtonStyle.GotIt,
+	targetPoint = HelpTip.Point.RightEdgeCenter,
+	onAcknowledgeCallback = M.HelpInfoAcknowledge,
+	callbackArg = "ChatScroll",
+}
+
 function module:QuickMouseScroll(dir)
+	if not MaoRUIDB["Help"]["ChatScroll"] then
+		HelpTip:Show(ChatFrame1, chatScrollInfo)
+	end
+
 	if dir > 0 then
 		if IsShiftKeyDown() then
 			self:ScrollToTop()

@@ -76,6 +76,7 @@ local function CreateBossStyle(self)
 	UF:CreateAltPower(self)
 	UF:CreateBuffs(self)
 	UF:CreateDebuffs(self)
+	UF:CreateClickSets(self)
 end
 
 local function CreateArenaStyle(self)
@@ -227,6 +228,7 @@ function UF:OnLogin()
 		UF:UpdateTextScale()
 	if R.db["UFs"]["RaidFrame"] then
 		UF:AddClickSetsListener()
+		UF:UpdateCornerSpells()
 
 		-- Hide Default RaidFrame
 		if CompactRaidFrameManager_SetSetting then
@@ -237,8 +239,10 @@ function UF:OnLogin()
 		end
 
 		-- Group Styles
+		local partyMover
 		if showPartyFrame then
 			UF:SyncWithZenTracker()
+			UF:UpdatePartyWatcherSpells()
 
 			oUF:RegisterStyle("Party", CreatePartyStyle)
 			oUF:SetActiveStyle("Party")
@@ -431,29 +435,47 @@ function UF:OnLogin()
 
 		UF:UpdateRaidHealthMethod()
 
-		if raidMover then
-			if not R.db["UFs"]["SpecRaidPos"] then return end
-
+		if R.db["UFs"]["SpecRaidPos"] then
 			local function UpdateSpecPos(event, ...)
 				local unit, _, spellID = ...
-				if (event == "UNIT_SPELLCAST_SUCCEEDED" and unit == "player" and spellID == 200749) or event == "PLAYER_ENTERING_WORLD" then
-					if not GetSpecialization() then return end
+				if (event == "UNIT_SPELLCAST_SUCCEEDED" and unit == "player" and spellID == 200749) or event == "ON_LOGIN" then
 					local specIndex = GetSpecialization()
+					if not specIndex then return end
+
 					if not R.db["Mover"]["RaidPos"..specIndex] then
-						R.db["Mover"]["RaidPos"..specIndex] = {"TOPLEFT", "UIParent", "TOPLEFT", 35, -50}
+						R.db["Mover"]["RaidPos"..specIndex] = {"TOPLEFT", "UIParent", "TOPLEFT", 3, -26}
 					end
-					raidMover:ClearAllPoints()
-					raidMover:SetPoint(unpack(R.db["Mover"]["RaidPos"..specIndex]))
+					if raidMover then
+						raidMover:ClearAllPoints()
+						raidMover:SetPoint(unpack(R.db["Mover"]["RaidPos"..specIndex]))
+					end
+
+					if not R.db["Mover"]["PartyPos"..specIndex] then
+						R.db["Mover"]["PartyPos"..specIndex] = {"TOPLEFT", "UIParent", "TOPLEFT", 310, -120}
+					end
+					if partyMover then
+						partyMover:ClearAllPoints()
+						partyMover:SetPoint(unpack(R.db["Mover"]["PartyPos"..specIndex]))
+					end
 				end
 			end
-			M:RegisterEvent("PLAYER_ENTERING_WORLD", UpdateSpecPos)
+			UpdateSpecPos("ON_LOGIN")
 			M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", UpdateSpecPos)
 
-			raidMover:HookScript("OnDragStop", function()
-				if not GetSpecialization() then return end
-				local specIndex = GetSpecialization()
-				R.db["Mover"]["RaidPos"..specIndex] = R.db["Mover"]["RaidFrame"]
-			end)
+			if raidMover then
+				raidMover:HookScript("OnDragStop", function()
+					local specIndex = GetSpecialization()
+					if not specIndex then return end
+					R.db["Mover"]["RaidPos"..specIndex] = R.db["Mover"]["RaidFrame"]
+				end)
+			end
+			if partyMover then
+				partyMover:HookScript("OnDragStop", function()
+					local specIndex = GetSpecialization()
+					if not specIndex then return end
+					R.db["Mover"]["PartyPos"..specIndex] = R.db["Mover"]["PartyFrame"]
+				end)
+			end
 		end
 	end
 end

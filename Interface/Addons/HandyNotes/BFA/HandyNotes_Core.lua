@@ -480,7 +480,7 @@ function Addon:OnEnter(mapID, coord)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
     end
 
-    node:Render(GameTooltip, map:HasPOIs(node))
+    node:Render(GameTooltip, map:CanFocus(node))
     map:SetFocus(node, true, true)
     BattleForAzeroth.MinimapDataProvider:RefreshAllData()
     BattleForAzeroth.WorldMapDataProvider:RefreshAllData()
@@ -505,7 +505,7 @@ function Addon:OnClick(button, down, mapID, coord)
         end
         ToggleDropDownMenu(1, nil, DropdownMenu, self, 0, 0)
     elseif button == "LeftButton" and down then
-        if map:HasPOIs(node) then
+        if map:CanFocus(node) then
             map:SetFocus(node, not node._focus)
             Addon:Refresh()
         end
@@ -525,7 +525,7 @@ function Addon:OnInitialize()
     BattleForAzeroth.CreateGlobalGroupOptions()
 
     -- Add quick-toggle menu button to top-right corner of world map
-    WorldMapFrame:AddOverlayFrame(
+    BattleForAzeroth.world_map_button = WorldMapFrame:AddOverlayFrame(
         "HandyNotes_BattleForAzerothWorldMapOptionsButtonTemplate",
         "DROPDOWNTOGGLEBUTTON", "TOPRIGHT",
         WorldMapFrame:GetCanvasContainer(), "TOPRIGHT", -68, -2
@@ -731,6 +731,7 @@ BattleForAzeroth.GetGlowPath = GetGlowPath
 
 BattleForAzeroth.optionDefaults = {
     profile = {
+        show_worldmap_button = true,
         -- visibility
         hide_done_rares = false,
         hide_minimap = false,
@@ -743,6 +744,12 @@ BattleForAzeroth.optionDefaults = {
         show_loot = true,
         show_notes = true,
 
+        -- rewards
+        show_mount_rewards = true,
+        show_pet_rewards = true,
+        show_toy_rewards = true,
+        show_transmog_rewards = true,
+        
         -- development
         development = false,
         show_debug_map = false,
@@ -801,33 +808,21 @@ BattleForAzeroth.options = {
             desc = L["options_general_description"],
             order = 0,
             args = {
-                VisibilityHeader = {
+                GeneralHeader = {
                     type = "header",
-                    name = L["options_visibility_settings"],
-                    order = 10,
+                    name = L["options_general_settings"],
+                    order = 1,
                 },
-                show_completed_nodes = {
+                show_worldmap_button = {
                     type = "toggle",
-                    arg = "show_completed_nodes",
-                    name = L["options_show_completed_nodes"],
-                    desc = L["options_show_completed_nodes_desc"],
-                    order = 11,
-                    width = "full",
-                },
-                hide_done_rare = {
-                    type = "toggle",
-                    arg = "hide_done_rares",
-                    name = L["options_toggle_hide_done_rare"],
-                    desc = L["options_toggle_hide_done_rare_desc"],
-                    order = 12,
-                    width = "full",
-                },
-                hide_minimap = {
-                    type = "toggle",
-                    arg = "hide_minimap",
-                    name = L["options_toggle_hide_minimap"],
-                    desc = L["options_toggle_hide_minimap_desc"],
-                    order = 13,
+                    arg = "show_worldmap_button",
+                    name = L["options_show_worldmap_button"],
+                    desc = L["options_show_worldmap_button_desc"],
+                    set = function(info, v)
+                        BattleForAzeroth:SetOpt(info.arg, v)
+                        BattleForAzeroth.world_map_button:Refresh()
+                    end,
+                    order = 2,
                     width = "full",
                 },
                 maximized_enlarged = {
@@ -835,15 +830,7 @@ BattleForAzeroth.options = {
                     arg = "maximized_enlarged",
                     name = L["options_toggle_maximized_enlarged"],
                     desc = L["options_toggle_maximized_enlarged_desc"],
-                    order = 14,
-                    width = "full",
-                },
-                use_char_achieves = {
-                    type = "toggle",
-                    arg = "use_char_achieves",
-                    name = L["options_toggle_use_char_achieves"],
-                    desc = L["options_toggle_use_char_achieves_desc"],
-                    order = 15,
+                    order = 3,
                     width = "full",
                 },
                 per_map_settings = {
@@ -851,14 +838,88 @@ BattleForAzeroth.options = {
                     arg = "per_map_settings",
                     name = L["options_toggle_per_map_settings"],
                     desc = L["options_toggle_per_map_settings_desc"],
-                    order = 16,
+                    order = 4,
+                    width = "full",
+                },
+                RewardsHeader = {
+                    type = "header",
+                    name = L["options_rewards_settings"],
+                    order = 10,
+                },
+                show_mount_rewards = {
+                    type = "toggle",
+                    arg = "show_mount_rewards",
+                    name = L["options_mount_rewards"],
+                    desc = L["options_mount_rewards_desc"],
+                    order = 11,
+                    width = "full",
+                },
+                show_pet_rewards = {
+                    type = "toggle",
+                    arg = "show_pet_rewards",
+                    name = L["options_pet_rewards"],
+                    desc = L["options_pet_rewards_desc"],
+                    order = 11,
+                    width = "full",
+                },
+                show_toy_rewards = {
+                    type = "toggle",
+                    arg = "show_toy_rewards",
+                    name = L["options_toy_rewards"],
+                    desc = L["options_toy_rewards_desc"],
+                    order = 11,
+                    width = "full",
+                },
+                show_transmog_rewards = {
+                    type = "toggle",
+                    arg = "show_transmog_rewards",
+                    name = L["options_transmog_rewards"],
+                    desc = L["options_transmog_rewards_desc"],
+                    order = 11,
+                    width = "full",
+                },
+                VisibilityHeader = {
+                    type = "header",
+                    name = L["options_visibility_settings"],
+                    order = 20,
+                },
+                show_completed_nodes = {
+                    type = "toggle",
+                    arg = "show_completed_nodes",
+                    name = L["options_show_completed_nodes"],
+                    desc = L["options_show_completed_nodes_desc"],
+                    order = 21,
+                    width = "full",
+                },
+                hide_done_rare = {
+                    type = "toggle",
+                    arg = "hide_done_rares",
+                    name = L["options_toggle_hide_done_rare"],
+                    desc = L["options_toggle_hide_done_rare_desc"],
+                    order = 22,
+                    width = "full",
+                },
+                hide_minimap = {
+                    type = "toggle",
+                    arg = "hide_minimap",
+                    name = L["options_toggle_hide_minimap"],
+                    desc = L["options_toggle_hide_minimap_desc"],
+                    order = 23,
+                    width = "full",
+                },
+                use_char_achieves = {
+                    type = "toggle",
+                    arg = "use_char_achieves",
+                    name = L["options_toggle_use_char_achieves"],
+                    desc = L["options_toggle_use_char_achieves_desc"],
+                    order = 24,
                     width = "full",
                 },
                 restore_all_nodes = {
                     type = "execute",
                     name = L["options_restore_hidden_nodes"],
                     desc = L["options_restore_hidden_nodes_desc"],
-                    order = 17,
+                    order = 25,
                     width = "full",
                     func = function ()
                         wipe(BattleForAzeroth.addon.db.char)
@@ -868,7 +929,7 @@ BattleForAzeroth.options = {
                 FocusHeader = {
                     type = "header",
                     name = L["options_focus_settings"],
-                    order = 20,
+                    order = 30,
                 },
                 POI_scale = {
                     type = "range",
@@ -877,7 +938,7 @@ BattleForAzeroth.options = {
                     min = 1, max = 3, step = 0.01,
                     arg = "poi_scale",
                     width = "full",
-                    order = 21,
+                    order = 31,
                 },
                 POI_color = {
                     type = "color",
@@ -886,7 +947,7 @@ BattleForAzeroth.options = {
                     hasAlpha = true,
                     set = function(_, ...) BattleForAzeroth:SetColorOpt('poi_color', ...) end,
                     get = function() return BattleForAzeroth:GetColorOpt('poi_color') end,
-                    order = 22,
+                    order = 32,
                 },
                 PATH_color = {
                     type = "color",
@@ -895,13 +956,13 @@ BattleForAzeroth.options = {
                     hasAlpha = true,
                     set = function(_, ...) BattleForAzeroth:SetColorOpt('path_color', ...) end,
                     get = function() return BattleForAzeroth:GetColorOpt('path_color') end,
-                    order = 23,
+                    order = 33,
                 },
                 restore_poi_colors = {
                     type = "execute",
                     name = L["options_reset_poi_colors"],
                     desc = L["options_reset_poi_colors_desc"],
-                    order = 24,
+                    order = 34,
                     width = "full",
                     func = function ()
                         local df = BattleForAzeroth.optionDefaults.profile
@@ -912,21 +973,21 @@ BattleForAzeroth.options = {
                 TooltipsHeader = {
                     type = "header",
                     name = L["options_tooltip_settings"],
-                    order = 30,
+                    order = 40,
                 },
                 show_loot = {
                     type = "toggle",
                     arg = "show_loot",
                     name = L["options_toggle_show_loot"],
                     desc = L["options_toggle_show_loot_desc"],
-                    order = 31,
+                    order = 41,
                 },
                 show_notes = {
                     type = "toggle",
                     arg = "show_notes",
                     name = L["options_toggle_show_notes"],
                     desc = L["options_toggle_show_notes_desc"],
-                    order = 32,
+                    order = 42,
                 }
             }
         },
@@ -1400,7 +1461,8 @@ function Map:HasEnabledGroups()
     return false
 end
 
-function Map:HasPOIs(node)
+function Map:CanFocus(node)
+    if node.focusable then return true end
     if type(node.pois) == 'table' then return true end
     if node.fgroup then
         for i, coord in ipairs(self.fgroups[node.fgroup]) do
@@ -1738,6 +1800,7 @@ end
 function Group:IsEnabled()
     if self.class and self.class ~= BattleForAzeroth.class then return false end
     if self.faction and self.faction ~= BattleForAzeroth.faction then return false end
+    if self.display_option and not BattleForAzeroth:GetOpt(self.display_option) then return false end
     return true
 end
 
@@ -2121,8 +2184,10 @@ function Node:Prepare()
         end
     end
 
-    for reward in self:IterateRewards() do
-        reward:Prepare()
+    if self.rewards then
+        for i, reward in ipairs(self.rewards) do
+            reward:Prepare()
+        end
     end
 end
 
@@ -2132,7 +2197,7 @@ on the attributes set on this specific node, such as setting an `rlabel` or
 `sublabel` value.
 --]]
 
-function Node:Render(tooltip, hasPOIs)
+function Node:Render(tooltip, focusable)
     -- render the label text with NPC names resolved
     tooltip:SetText(BattleForAzeroth.RenderLinks(self.label, true))
 
@@ -2155,7 +2220,7 @@ function Node:Render(tooltip, hasPOIs)
         rlabel = rlabel..' '..BattleForAzeroth.GetIconLink(self.faction:lower(), 16, 1, -1)
     end
 
-    if hasPOIs then
+    if focusable then
         -- add an rlabel hint to use left-mouse to focus the node
         local focus = BattleForAzeroth.GetIconLink('left_mouse', 12)..BattleForAzeroth.status.Gray(L["focus"])
         rlabel = (#rlabel > 0) and focus..' '..rlabel or focus
@@ -2478,6 +2543,8 @@ function Section:Initialize(title)
     self.title = title
 end
 
+function Section:IsEnabled() return true end
+
 function Section:Prepare()
     BattleForAzeroth.PrepareLinks(self.title)
 end
@@ -2491,6 +2558,8 @@ end
 -------------------------------------------------------------------------------
 
 local Spacer = Class('Spacer', Reward)
+
+function Spacer:IsEnabled() return true end
 
 function Spacer:Render(tooltip)
     tooltip:AddLine(' ')
@@ -2621,6 +2690,10 @@ function Item:Initialize(attrs)
     end
 end
 
+function Item:Prepare()
+    BattleForAzeroth.PrepareLinks(self.note)
+end
+
 function Item:IsObtained()
     if self.quest then return C_QuestLog.IsQuestFlaggedCompleted(self.quest) end
     return true
@@ -2632,7 +2705,7 @@ function Item:GetText()
         text = text..' ('..self.type..')'
     end
     if self.note then -- additional info
-        text = text..' ('..self.note..')'
+        text = text..' ('..BattleForAzeroth.RenderLinks(self.note, true)..')'
     end
     return Icon(self.itemIcon)..text
 end
@@ -2651,9 +2724,10 @@ end
 ------------------------------------ MOUNT ------------------------------------
 -------------------------------------------------------------------------------
 
--- /run for i,m in ipairs(C_MountJournal.GetMountIDs()) do if (C_MountJournal.GetMountInfoByID(m) == "NAME") then print(m) end end
-
-local Mount = Class('Mount', Item, { type = L["mount"] })
+local Mount = Class('Mount', Item, {
+    display_option='show_mount_rewards',
+    type=L["mount"]
+})
 
 function Mount:IsObtained()
     return select(11, C_MountJournal.GetMountInfoByID(self.id))
@@ -2668,9 +2742,10 @@ end
 ------------------------------------- PET -------------------------------------
 -------------------------------------------------------------------------------
 
--- /run print(C_PetJournal.FindPetIDByName("NAME"))
-
-local Pet = Class('Pet', Item, { type = L["pet"] })
+local Pet = Class('Pet', Item, {
+    display_option='show_pet_rewards',
+    type=L["pet"]
+})
 
 function Pet:Initialize(attrs)
     if attrs.item then
@@ -2750,8 +2825,10 @@ end
 -------------------------------------------------------------------------------
 ------------------------------------- TOY -------------------------------------
 -------------------------------------------------------------------------------
-
-local Toy = Class('Toy', Item, { type = L["toy"] })
+local Toy = Class('Toy', Item, {
+    display_option='show_toy_rewards',
+    type=L["toy"]
+})
 
 function Toy:IsObtained()
     return PlayerHasToy(self.item)
@@ -2765,8 +2842,9 @@ end
 -------------------------------------------------------------------------------
 ---------------------------------- TRANSMOG -----------------------------------
 -------------------------------------------------------------------------------
-
-local Transmog = Class('Transmog', Item)
+local Transmog = Class('Transmog', Item, {
+    display_option='show_transmog_rewards'
+})
 local CTC = C_TransmogCollection
 
 function Transmog:Initialize(attrs)
@@ -2900,12 +2978,13 @@ function WorldMapOptionsButtonMixin:OnEnter()
 end
 
 function WorldMapOptionsButtonMixin:Refresh()
+    local enabled = BattleForAzeroth:GetOpt('show_worldmap_button')
     local map = BattleForAzeroth.maps[self:GetParent():GetMapID() or 0]
-    if map and map:HasEnabledGroups() then self:Show() else self:Hide() end
+    if enabled and map and map:HasEnabledGroups() then self:Show() else self:Hide() end
 end
 
 function WorldMapOptionsButtonMixin:InitializeDropDown(level)
-    local map, icon = BattleForAzeroth.maps[self:GetParent():GetMapID()]
+    local map, icon, iconLink = BattleForAzeroth.maps[self:GetParent():GetMapID()]
 
     if level == 1 then
         UIDropDownMenu_AddButton({
@@ -2916,13 +2995,25 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
 
         for i, group in ipairs(map.groups) do
             if group:IsEnabled() then
-                if type(group.icon) == 'number' then
-                    icon = BattleForAzeroth.GetIconLink(group.icon, 12, 1, 0)..' '
-                else
-                    icon = BattleForAzeroth.GetIconLink(group.icon, 16)
+                icon = group.icon
+                if group.name == 'misc' then
+                    -- find an icon from the misc nodes in the map
+                    for coord, node in pairs(map.nodes) do
+                        if node.group == group then
+                            icon = node.icon
+                            break
+                        end
+                    end
                 end
+
+                if type(icon) == 'number' then
+                    iconLink = BattleForAzeroth.GetIconLink(icon, 12, 1, 0)..' '
+                else
+                    iconLink = BattleForAzeroth.GetIconLink(icon, 16)
+                end
+
                 UIDropDownMenu_AddButton({
-                    text = icon..' '..BattleForAzeroth.RenderLinks(group.label, true),
+                    text = iconLink..' '..BattleForAzeroth.RenderLinks(group.label, true),
                     isNotRadio = true,
                     keepShownOnClick = true,
                     hasArrow = true,
@@ -2938,12 +3029,29 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
 
         UIDropDownMenu_AddSeparator()
         UIDropDownMenu_AddButton({
+            text = L["options_reward_types"],
+            isNotRadio = true,
+            notCheckable = true,
+            keepShownOnClick = true,
+            hasArrow = true,
+            value = 'rewards'
+        })
+        UIDropDownMenu_AddButton({
             text = L["options_show_completed_nodes"],
             isNotRadio = true,
             keepShownOnClick = true,
             checked = BattleForAzeroth:GetOpt('show_completed_nodes'),
             func = function (button, option)
                 BattleForAzeroth:SetOpt('show_completed_nodes', button.checked)
+            end
+        })
+        UIDropDownMenu_AddButton({
+            text = L["options_toggle_hide_done_rare"],
+            isNotRadio = true,
+            keepShownOnClick = true,
+            checked = BattleForAzeroth:GetOpt('hide_done_rares'),
+            func = function (button, option)
+                BattleForAzeroth:SetOpt('hide_done_rares', button.checked)
             end
         })
         UIDropDownMenu_AddButton({
@@ -2966,37 +3074,51 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
                 InterfaceOptionsFrame_Show()
                 InterfaceOptionsFrame_OpenToCategory('HandyNotes')
                 LibStub('AceConfigDialog-3.0'):SelectGroup(
-                    'HandyNotes', 'plugins', "HandyNotes_BattleForAzeroth", 'ZonesTab', 'Zone_'..map.id
+                    'HandyNotes', 'plugins', ADDON_NAME, 'ZonesTab', 'Zone_'..map.id
                 )
             end
         })
     elseif level == 2 then
-        -- Get correct map ID to query/set options for
-        local group = UIDROPDOWNMENU_MENU_VALUE
+        if UIDROPDOWNMENU_MENU_VALUE == 'rewards' then
+            for i, type in ipairs({'mount', 'pet', 'toy', 'transmog'}) do
+                UIDropDownMenu_AddButton({
+                    text = L["options_"..type.."_rewards"],
+                    isNotRadio = true,
+                    keepShownOnClick = true,
+                    checked = BattleForAzeroth:GetOpt('show_'..type..'_rewards'),
+                    func = function (button, option)
+                        BattleForAzeroth:SetOpt('show_'..type..'_rewards', button.checked)
+                    end
+                }, 2)
+            end
+        else
+            -- Get correct map ID to query/set options for
+            local group = UIDROPDOWNMENU_MENU_VALUE
 
-        self.GroupDesc.Text:SetText(BattleForAzeroth.RenderLinks(group.desc))
-        UIDropDownMenu_AddButton({ customFrame = self.GroupDesc }, 2)
-        UIDropDownMenu_AddButton({
-            notClickable = true,
-            notCheckable = true
-        }, 2)
+            self.GroupDesc.Text:SetText(BattleForAzeroth.RenderLinks(group.desc))
+            UIDropDownMenu_AddButton({ customFrame = self.GroupDesc }, 2)
+            UIDropDownMenu_AddButton({
+                notClickable = true,
+                notCheckable = true
+            }, 2)
 
-        UIDropDownMenu_AddSlider({
-            text = L["options_opacity"],
-            min = 0, max = 1, step=0.01,
-            value = group:GetAlpha(map.id),
-            frame = self.AlphaOption,
-            percentage = true,
-            func = function (v) group:SetAlpha(v, map.id) end
-        }, 2)
+            UIDropDownMenu_AddSlider({
+                text = L["options_opacity"],
+                min = 0, max = 1, step=0.01,
+                value = group:GetAlpha(map.id),
+                frame = self.AlphaOption,
+                percentage = true,
+                func = function (v) group:SetAlpha(v, map.id) end
+            }, 2)
 
-        UIDropDownMenu_AddSlider({
-            text = L["options_scale"],
-            min = 0.3, max = 3, step=0.05,
-            value = group:GetScale(map.id),
-            frame = self.ScaleOption,
-            func = function (v) group:SetScale(v, map.id) end
-        }, 2)
+            UIDropDownMenu_AddSlider({
+                text = L["options_scale"],
+                min = 0.3, max = 3, step=0.05,
+                value = group:GetScale(map.id),
+                frame = self.ScaleOption,
+                func = function (v) group:SetScale(v, map.id) end
+            }, 2)
+        end
     end
 end
 

@@ -10,215 +10,339 @@ local MaxDps = MaxDps;
 local UnitPower = UnitPower;
 local PowerTypeRage = Enum.PowerType.Rage;
 
--- Arms
+local Necrolord = Enum.CovenantType.Necrolord;
+local Venthyr = Enum.CovenantType.Venthyr;
+local NightFae = Enum.CovenantType.NightFae;
+local Kyrian = Enum.CovenantType.Kyrian;
+local debug = false
+
+function debugPrint(message, data)
+	if (debug) then
+		if data ~= nil then
+			print(message, data)
+		else
+			print(message)
+		end
+	end
+end
+
 local AR = {
-	Charge            = 100,
+	AncientAftershock = 325886,
 	Avatar            = 107574,
+	BloodFury         = 20572,
+	Bladestorm        = 227847,
+	Charge            = 100,
+	Cleave            = 845,
 	ColossusSmash     = 167105,
 	ColossusSmashAura = 208086,
-	Warbreaker        = 262161,
-	SweepingStrikes   = 260708,
-	Bladestorm        = 227847,
-	Massacre          = 281001,
-	Skullsplitter     = 260643,
+	ConquerorsBanner  = 324143,
+	Condemn           = 330334,
 	DeadlyCalm        = 262228,
-	Ravager           = 152277,
-	Cleave            = 845,
-	Slam              = 1464,
+	DeepWoundsAura    = 262115,
+	Dreadnaught       = 262150,
+	FervorOfBattle    = 202316,
+	Massacre          = 281001,
 	MortalStrike      = 12294,
 	Overpower         = 7384,
-	Dreadnaught       = 262150,
-	Execute           = 163201,
-	ExecuteMassacre   = 281000,
-	DeepWounds        = 262304,
+	Ravager           = 152277,
+	Rend              = 772,
+	Skullsplitter     = 260643,
+	Slam              = 1464,
+	SpearOfBastion    = 307865,
 	SuddenDeath       = 29725,
 	SuddenDeathAura   = 52437,
+	SweepingStrikes   = 260708,
+	Warbreaker        = 262161,
 	Whirlwind         = 1680,
-	FervorOfBattle    = 202316,
-	Rend              = 772,
-	AngerManagement   = 152278,
-	CrushingAssault   = 278826,
 };
 
-local A = {
-	ExecutionersPrecision = 272866,
-	TestOfMight           = 275529,
-	SeismicWave           = 277639,
-	CrushingAssault       = 278751,
-}
-
 setmetatable(AR, Warrior.spellMeta);
-setmetatable(A, Warrior.spellMeta);
 
-
-function Warrior:Arms()
+function Warrior:SingleTarget()
 	local fd = MaxDps.FrameData;
 	local cooldown = fd.cooldown;
-	local azerite = fd.azerite;
 	local talents = fd.talents;
-	local buff = fd.buff;
-	local targets = MaxDps:SmartAoe();
-	local targetHp = MaxDps:TargetPercentHealth() * 100;
-	local canExecute = targetHp < (talents[AR.Massacre] and 35 or 20);
-	local rage = UnitPower('player', PowerTypeRage);
+	local debuff = fd.debuff;
+	local spellChosen = false
+	local chosenSpell = nil
+	local secondsRemainingOnDeepWoundsForRefreshPriority = 4
+	local secondsRemainingOnRendForRefreshPriority = 4
+	local colossusSmashReadyInTheNextEightSeconds = false
+	local colossusSmashReadyNow = false
+	local deepWoundsNeedsRefresh = false
+	local rendNeedsRefresh = false
 
-	fd.targets, fd.canExecute, fd.rage = targets, canExecute, rage;
-
-	MaxDps:GlowEssences();
-
-	if talents[AR.DeadlyCalm] then
-		MaxDps:GlowCooldown(AR.DeadlyCalm, cooldown[AR.DeadlyCalm].ready);
-	end
-
-	if talents[AR.Ravager] then
-		-- ravager,if=!buff.deadly_calm.up&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2));
-		-- ravager,if=(!talent.warbreaker.enabled|cooldown.warbreaker.remains<2);
-		MaxDps:GlowCooldown(
-			AR.Ravager,
-			cooldown[AR.Ravager].ready and (
-				not buff[AR.DeadlyCalm].up and
-				(
-					cooldown[AR.ColossusSmash].remains < 2 or
-					(talents[AR.Warbreaker] and cooldown[AR.Warbreaker].remains < 2)
-				)
-			)
-		);
+	if talents[AR.Warbreaker] then
+		colossusSmashReadyNow = cooldown[AR.Warbreaker].remains == 0
+		colossusSmashReadyInTheNextEightSeconds = cooldown[AR.Warbreaker].remains < 8
 	else
-		MaxDps:GlowCooldown(AR.Bladestorm, cooldown[AR.Bladestorm].ready and not buff[AR.DeadlyCalm].up);
+		colossusSmashReadyNow = cooldown[AR.ColossusSmash].remains == 0
+		colossusSmashReadyInTheNextEightSeconds = cooldown[AR.ColossusSmash].remains < 8
+	end
+	
+	if debuff[AR.DeepWoundsAura].remains < secondsRemainingOnDeepWoundsForRefreshPriority then
+		deepWoundsNeedsRefresh = true
 	end
 
-	if talents[AR.Avatar] then
-		--avatar,if=cooldown.colossus_smash.remains<8|(talent.warbreaker.enabled&cooldown.warbreaker.remains<8);
+	if talents[AR.Rend] and debuff[AR.Rend].remains < secondsRemainingOnRendForRefreshPriority then
+		rendNeedsRefresh = true
+	end
+
+	debugPrint(" ")
+	debugPrint("--- Running single target arms rotation ---");
+
+	-- Priority #-1: Casting Conqueror's Banner if you're a necrolord
+	if covenantId == Necrolord then
+		if cooldown[AR.ConquerorsBanner].ready then
+			debugPrint("* CHOOSING PRIORITY #-1 (CONQUERORS BANNER)")
+			MaxDps:GlowCooldown(
+				AR.ConquerorsBanner,
+				cooldown[AR.ConquerorsBanner].ready
+			);
+		else
+			debugPrint("SKIPPING PRIORITY #-1 (CONQUERORS BANNER)")
+		end
+	end
+
+	-- Priority #0: Casting avatar (if talented) in conjunction with colossus smash debuff
+	if talents[AR.Avatar] == 1 and
+	   cooldown[AR.Avatar].ready and
+	   colossusSmashReadyInTheNextEightSeconds then
 		MaxDps:GlowCooldown(
 			AR.Avatar,
 			cooldown[AR.Avatar].ready and
-			(cooldown[AR.ColossusSmash].remains < 8 or (talents[AR.Warbreaker] and cooldown[AR.Warbreaker].remains < 8))
+			colossusSmashReadyInTheNextEightSeconds
 		);
+		debugPrint("* CHOOSING PRIORITY #0 (AVATAR)")
+	else
+		debugPrint("SKIPPING PRIORITY #0 (AVATAR)")
 	end
 
-	-- sweeping_strikes,if=spell_targets.whirlwind>1&(cooldown.bladestorm.remains>10|cooldown.colossus_smash.remains>8|azerite.test_of_might.enabled);
-	if cooldown[AR.SweepingStrikes].ready and (targets > 1 and (
-		cooldown[AR.Bladestorm].remains > 10 or cooldown[AR.ColossusSmash].remains > 8 or azerite[A.TestOfMight] > 0
-	)) then
-		return AR.SweepingStrikes;
+	-- Priority 0a: Casting Ravager (if talented)
+	if talents[AR.Ravager] == 1 then
+		if cooldown[AR.Ravager].ready then
+		   chosenSpell = AR.Ravager
+		   spellChosen = true
+			debugPrint("* CHOOSING PRIORITY #0a (RAVAGAR)")
+		else
+			debugPrint("SKIPPING PRIORITY #0a (RAVAGAR)")
+		end
 	end
 
-	-- run_action_list,name=hac,if=raid_event.adds.exists;
-	--if targets > 1 then
-	--	return Warrior:ArmsHac();
-	--end
-
-	-- run_action_list,name=five_target,if=spell_targets.whirlwind>4;
-	if targets > 4 then
-		return Warrior:ArmsFiveTarget();
+	-- Priority #1: Casting colossus smash or warbreaker (if talented)
+	if colossusSmashReadyNow and spellChosen == false then
+		debugPrint("* CHOOSING PRIORITY #1 (WARBREAKER/COLOSSUS SMASH)")
+		spellChosen = true
+		if talents[AR.Warbreaker] then
+			chosenSpell = AR.Warbreaker
+		else
+			chosenSpell = AR.ColossusSmash
+		end
+	else
+		debugPrint("SKIPPING PRIORITY #1 (WARBREAKER/COLOSSUS SMASH)")
 	end
 
-	-- run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20;
-	if canExecute then
-		return Warrior:ArmsExecute();
+	-- Priority #1a (optional depends on if talented): Rend refresh
+	if talents[AR.Rend] then
+		if spellChosen == false and rendNeedsRefresh and fd.executePhase == false then
+			debugPrint("* CHOOSING PRIORITY #1a (REND REFRESH)")
+			spellChosen = true
+			chosenSpell = AR.Rend
+		else
+			debugPrint("SKIPPING PRIORITY #1a (REND REFRESH)")
+		end
 	end
 
-	-- run_action_list,name=single_target;
-	return Warrior:ArmsSingleTarget();
+	-- Priority #1b (optional depends on if talented): cast Skullsplitter when <60 rage, and bladestorm isn't gonna be used soon
+	if talents[AR.Skullsplitter] then
+		if spellChosen == false and cooldown[AR.Skullsplitter].ready and fd.rage < 60 and cooldown[AR.Bladestorm].ready == false then
+			debugPrint("* CHOOSING PRIORITY #1b (skullsplitter if talented, and low rage and not using bladestorm soon)")
+			spellChosen = true
+			chosenSpell = AR.Skullsplitter
+		else
+			debugPrint("SKIPPING PRIORITY #1b (skullsplitter if talented, and low rage and not using bladestorm soon)")
+		end
+	end
+
+	-- Priority #2: Mortal Strike for Deep Wounds Refresh
+	if spellChosen == false and deepWoundsNeedsRefresh and cooldown[AR.MortalStrike].ready then
+		debugPrint("* CHOOSING PRIORITY #2 (MORTAL STRIKE FOR DEEP WOUNDS REFRESH)")
+		spellChosen = true
+		chosenSpell = AR.MortalStrike
+	else
+		debugPrint("SKIPPING PRIORITY #2 (MORTAL STRIKE FOR DEEP WOUNDS REFRESH)")
+	end
+
+	-- Priority #2a: Deadly Calm if it's up
+	if talents[AR.DeadlyCalm] then
+		if spellChosen == false and cooldown[AR.DeadlyCalm].ready then
+			debugPrint("* CHOOSING PRIORITY #2a (DEADLY CALM)")
+			spellChosen = true
+			chosenSpell = AR.DeadlyCalm
+		else
+			debugPrint("SKIPPING PRIORITY #2a (DEADLY CALM)")
+		end
+	end
+
+	-- Priority #3: Overpower
+	if spellChosen == false and cooldown[AR.Overpower].ready then
+		debugPrint("* CHOOSING PRIORITY #3 (OVERPOWER)")
+		spellChosen = true
+		chosenSpell = AR.Overpower
+	else
+		debugPrint("SKIPPING PRIORITY #3 (OVERPOWER)")
+	end
+
+	-- Priority #4: Execute/Condemn
+	if spellChosen == false and fd.canExecute then
+		debugPrint("* CHOOSING PRIORITY #4 (CONDEMN/EXECUTE)")
+		spellChosen = true
+		if fd.covenantId == Venthyr then
+			chosenSpell = AR.Condemn
+		else
+			chosenSpell = AR.Execute
+		end
+	else
+		debugPrint("SKIPPING PRIORITY #4 (CONDEMN/EXECUTE)")
+	end
+
+	-- Priority #4a: Casting Spear of Bastion if you're a kyrian
+	if covenantId == Kyrian and fd.executePhase == false then
+		if cooldown[AR.SpearOfBastion].ready then
+			debugPrint("* CHOOSING PRIORITY #4a (SPEAR OF BASTION)")
+			chosenSpell = AR.SpearOfBastion
+			spellChosen = true
+		else
+			debugPrint("SKIPPING PRIORITY #4a (SPEAR OF BASTION)")
+		end
+	end
+
+	-- Priority #4b: Casting Ancient Aftershock if you're a night fae
+	if covenantId == NightFae and fd.executePhase == false then
+		if cooldown[AR.AncientAftershock].ready then
+			debugPrint("* CHOOSING PRIORITY #4b (ANCIENT AFTERSHOCK)")
+			chosenSpell = AR.AncientAftershock
+			spellChosen = true
+		else
+			debugPrint("SKIPPING PRIORITY #4b (ANCIENT AFTERSHOCK)")
+		end
+	end
+
+	-- Priority #5: Mortal Strike Generic
+	if spellChosen == false and cooldown[AR.MortalStrike].ready and fd.rage > 30 and fd.executePhase == false then
+		debugPrint("* CHOOSING PRIORITY #5 (MORTAL STRIKE GENERIC)")
+		spellChosen = true
+		chosenSpell = AR.MortalStrike
+	else
+		debugPrint("SKIPPING PRIORITY #5 (MORTAL STRIKE GENERIC)")
+	end
+
+	-- Priority #6: Bladestorm during colossus smash
+	if spellChosen == false and debuff[AR.ColossusSmashAura].remains > 5 and cooldown[AR.Bladestorm].ready then
+		debugPrint("* CHOOSING PRIORITY #6 (BLADESTORM DURING COLOSSUS SMASH)")
+		spellChosen = true
+		chosenSpell = AR.Bladestorm
+	else
+		debugPrint("SKIPPING PRIORITY #6 (BLADESTORM DURING COLOSSUS SMASH)")
+	end
+
+
+	-- Priority #7: Slam Or Whirlwind (depending on fervor talent)
+	if talents[AR.FervorOfBattle] then
+		if spellChosen == false and fd.rage > 30 and fd.executePhase == false then
+			debugPrint("* CHOOSING PRIORITY #7 (WHIRLWIND)")
+			spellChosen = true
+			chosenSpell = AR.Whirlwind
+		else 
+			debugPrint("SKIPPING PRIORITY #7 (WHIRLWIND)")
+		end
+	else
+		if spellChosen == false and fd.rage > 20 and fd.executePhase == false then
+			debugPrint("* CHOOSING PRIORITY #7 (SLAM)")
+			spellChosen = true
+			chosenSpell = AR.Slam
+		else
+			debugPrint("SKIPPING PRIORITY #7 (SLAM)")
+		end
+	end
+
+	if chosenSpell then
+		return chosenSpell
+	else
+		debugPrint(" -- NO ACTIONS DETERMINED THIS FRAME -- LITERALLY STAND THERE AND AUTO ATTACK --")
+	end
 end
 
-function Warrior:ArmsExecute()
+function Warrior:TwoOrThreeTargets()
+	-- TODO
+end
+
+function Warrior:FourOrMoreTargets()
+	-- TODO
+end
+
+function Warrior:ArmsHac()
 	local fd = MaxDps.FrameData;
 	local cooldown = fd.cooldown;
 	local buff = fd.buff;
 	local debuff = fd.debuff;
 	local talents = fd.talents;
-	local targets = fd.targets;
 	local rage = fd.rage;
+	local covenantId = fd.covenant.covenantId;
+	local canExecute = fd.canExecute;
 
-	local execute = talents[AR.Massacre] and AR.ExecuteMassacre or AR.Execute;
-
-	-- skullsplitter,if=rage<60&(!talent.deadly_calm.enabled|buff.deadly_calm.down);
-	if talents[AR.Skullsplitter] and cooldown[AR.Skullsplitter].ready and (
-		rage < 60 and (not talents[AR.DeadlyCalm] or not buff[AR.DeadlyCalm].up)
-	) then
+	-- skullsplitter,if=rage<60&buff.deadly_calm.down;
+	if talents[AR.Skullsplitter] and
+		cooldown[AR.Skullsplitter].ready and
+		rage < 60 and
+		not buff[AR.DeadlyCalm].up
+	then
 		return AR.Skullsplitter;
 	end
 
-	-- colossus_smash,if=debuff.colossus_smash.down;
-	if not talents[AR.Warbreaker] and cooldown[AR.ColossusSmash].ready and not debuff[AR.ColossusSmashAura].up then
-		return AR.ColossusSmash;
-	end
+	-- avatar,if=cooldown.colossus_smash.remains<1;
+	--if talents[AR.Avatar] and cooldown[AR.Avatar].ready and (cooldown[AR.ColossusSmash].remains < 1) then
+	--	return AR.Avatar;
+	--end
 
-	-- warbreaker,if=debuff.colossus_smash.down;
-	if talents[AR.Warbreaker] and cooldown[AR.Warbreaker].ready and not debuff[AR.ColossusSmashAura].up then
-		return AR.Warbreaker;
-	end
-
-	-- deadly_calm;
-	if talents[AR.DeadlyCalm] and cooldown[AR.DeadlyCalm].ready then
-		return AR.DeadlyCalm;
-	end
-
-	-- cleave,if=spell_targets.whirlwind>2;
-	if talents[AR.Cleave] and cooldown[AR.Cleave].ready and rage >= 20 and targets > 2 then
+	-- cleave,if=dot.deep_wounds.remains<=gcd;
+	if talents[AR.Cleave] and
+		cooldown[AR.Cleave].ready and
+		rage >= 20 and
+		debuff[AR.DeepWoundsAura].remains <= 2
+	then
 		return AR.Cleave;
 	end
 
-	-- slam,if=buff.crushing_assault.up;
-	if rage >= 20 and buff[AR.CrushingAssault].up then
-		return AR.Slam;
-	end
-
-	-- mortal_strike,if=buff.overpower.stack=2&talent.dreadnaught.enabled|buff.executioners_precision.stack=2;
-	if cooldown[AR.MortalStrike].ready and rage >= 30 and (
-		buff[AR.Overpower].count == 2 and talents[AR.Dreadnaught] or buff[A.ExecutionersPrecision].count == 2
-	) then
-		return AR.MortalStrike;
-	end
-
-	-- execute,if=buff.deadly_calm.up;
-	if rage >= 20 and buff[AR.DeadlyCalm].up then
-		return execute;
-	end
-
-	-- overpower;
-	if cooldown[AR.Overpower].ready then
-		return AR.Overpower;
-	end
-
-	-- execute;
-	if rage >= 20 then
-		return execute;
-	end
-end
-
-function Warrior:ArmsFiveTarget()
-	local fd = MaxDps.FrameData;
-	local cooldown = fd.cooldown;
-	local azerite = fd.azerite;
-	local buff = fd.buff;
-	local debuff = fd.debuff;
-	local talents = fd.talents;
-	local canExecute = fd.canExecute;
-	local rage = fd.rage;
-	local execute = talents[AR.Massacre] and AR.ExecuteMassacre or AR.Execute;
-
-	-- skullsplitter,if=rage<60&(!talent.deadly_calm.enabled|buff.deadly_calm.down);
-	if talents[AR.Skullsplitter] and cooldown[AR.Skullsplitter].ready and (
-		rage < 60 and (not talents[AR.DeadlyCalm] or not buff[AR.DeadlyCalm].up)
-	) then
-		return AR.Skullsplitter;
-	end
-
-	-- colossus_smash,if=debuff.colossus_smash.down;
-	if not talents[AR.Warbreaker] and cooldown[AR.ColossusSmash].ready and not debuff[AR.ColossusSmashAura].up then
-		return AR.ColossusSmash;
-	end
-
-	-- warbreaker,if=debuff.colossus_smash.down;
-	if talents[AR.Warbreaker] and cooldown[AR.Warbreaker].ready and not debuff[AR.ColossusSmashAura].up then
+	-- warbreaker;
+	if talents[AR.Warbreaker] and cooldown[AR.Warbreaker].ready then
 		return AR.Warbreaker;
 	end
 
-	-- deadly_calm;
-	if talents[AR.DeadlyCalm] and cooldown[AR.DeadlyCalm].ready then
-		return AR.DeadlyCalm;
+	if talents[AR.Ravager] then
+		-- ravager;
+		if cooldown[AR.Ravager].ready then
+			return AR.Ravager;
+		end
+	else
+		-- bladestorm;
+		if cooldown[AR.Bladestorm].ready then
+			return AR.Bladestorm;
+		end
+	end
+
+	-- colossus_smash;
+	if not talents[AR.Warbreaker] and cooldown[AR.ColossusSmash].ready then
+		return AR.ColossusSmash;
+	end
+
+	-- rend,if=remains<=duration*0.3&buff.sweeping_strikes.up;
+	if talents[AR.Rend] and
+		rage >= 30 and
+		debuff[AR.Rend].refreshable and
+		buff[AR.SweepingStrikes].up
+	then
+		return AR.Rend;
 	end
 
 	-- cleave;
@@ -226,35 +350,32 @@ function Warrior:ArmsFiveTarget()
 		return AR.Cleave;
 	end
 
-	-- execute,if=(!talent.cleave.enabled&dot.deep_wounds.remains<2)|(buff.sudden_death.react|buff.stone_heart.react)&(buff.sweeping_strikes.up|cooldown.sweeping_strikes.remains>8);
-	if (not talents[AR.Cleave] and debuff[AR.DeepWounds].remains < 2 and canExecute) or
-		(buff[AR.SuddenDeathAura].up) and
-		(buff[AR.SweepingStrikes].up or cooldown[AR.SweepingStrikes].remains > 8)
+	-- mortal_strike,if=buff.sweeping_strikes.up|dot.deep_wounds.remains<gcd&!talent.cleave.enabled;
+	if cooldown[AR.MortalStrike].ready and
+		rage >= 30 and
+		(
+			buff[AR.SweepingStrikes].up or
+			debuff[AR.DeepWoundsAura].remains < 2 and not talents[AR.Cleave]
+		)
 	then
-		return execute;
-	end
-
-	-- mortal_strike,if=(!talent.cleave.enabled&dot.deep_wounds.remains<2)|buff.sweeping_strikes.up&buff.overpower.stack=2&(talent.dreadnaught.enabled|buff.executioners_precision.stack=2);
-	if cooldown[AR.MortalStrike].ready and rage >= 30 and (
-		(not talents[AR.Cleave] and debuff[AR.DeepWounds].remains < 2) or
-		buff[AR.SweepingStrikes].up and buff[AR.Overpower].count == 2 and
-		(talents[AR.Dreadnaught] or buff[AR.ExecutionersPrecision].count == 2)
-	) then
 		return AR.MortalStrike;
 	end
 
-	-- whirlwind,if=debuff.colossus_smash.up|(buff.crushing_assault.up&talent.fervor_of_battle.enabled);
-	if rage >= 30 and (
-		debuff[AR.ColossusSmashAura].up or (buff[AR.CrushingAssault].up and talents[AR.FervorOfBattle])
-	) then
-		return AR.Whirlwind;
+	-- overpower,if=talent.dreadnaught.enabled;
+	if cooldown[AR.Overpower].ready and talents[AR.Dreadnaught] then
+		return AR.Overpower;
 	end
 
-	-- whirlwind,if=buff.deadly_calm.up|rage>60;
-	if rage >= 30 and (
-		buff[AR.DeadlyCalm].up or rage > 60
-	) then
-		return AR.Whirlwind;
+	if covenantId == Venthyr then
+		-- condemn;
+		if rage >= 20 and canExecute then
+			return AR.Condemn;
+		end
+	else
+		-- execute,if=buff.sweeping_strikes.up;
+		if rage >= 20 and buff[AR.SweepingStrikes].up and cooldown[AR.Execute].ready then
+			return AR.Execute;
+		end
 	end
 
 	-- overpower;
@@ -267,180 +388,43 @@ function Warrior:ArmsFiveTarget()
 		return AR.Whirlwind;
 	end
 end
---[[
-function Warrior:ArmsHac()
+
+function Warrior:Arms()
 	local fd = MaxDps.FrameData;
-	local cooldown = fd.cooldown;
-	local azerite = fd.azerite;
-	local buff = fd.buff;
-	local debuff = fd.debuff;
 	local talents = fd.talents;
-	local targets = fd.targets;
-	local rage = UnitPower('player', Enum.PowerType.Rage);
+	local targets = 1 --MaxDps:SmartAoe();
+	local targetHp = MaxDps:TargetPercentHealth() * 100;
+	local covenantId = fd.covenant.covenantId;
+	local rage = UnitPower('player', PowerTypeRage);
+	local executePhase = ((targetHp < 20) or                                           -- target is <20% hp
+						  (talents[AR.Massacre] and targetHp < 35) or                  -- massacre is talented, and the target is <35% hp
+						  (targetHp > 80 and covenantId == Venthyr))                   -- player is venthyr, and target is >80% hp
+	local canExecute = rage > 20 and                                                   -- player has enough rage to execute
+					   (executePhase or                                                -- its execute phase
+		                (talents[AR.SuddenDeath] and fd.buff[AR.SuddenDeathAura].up)); -- sudden death is talented, and the sudden death aura is active on the player
 
-	-- rend,if=remains<=duration*0.3&(!raid_event.adds.up|buff.sweeping_strikes.up);
-	if talents[AR.Rend] and rage >= 30 and (debuff[AR.AR.Rend].remains <= cooldown[AR.AR.Rend].duration * 0.3 and ( not buff[AR.SweepingStrikes].up )) then
-		return AR.Rend;
+	fd.rage = rage;
+	fd.targetHp = targetHp;
+	fd.targets = targets;
+	fd.covenantId = covenantId;
+	fd.canExecute = canExecute;
+	fd.executePhase = executePhase
+
+	-- if targets >= 4 then
+	-- 	return Warrior:FourOrMoreTargets();
+	-- end
+
+	if (targets >= 2) then
+		if cooldown[AR.SweepingStrikes].ready and
+			targets > 1 and
+			(cooldown[AR.Bladestorm].remains > 15 or talents[AR.Ravager])
+		then
+			return AR.SweepingStrikes;
+		end
+
+		return Warrior:ArmsHac();
+		-- return Warrior:TwoOrThreeTargets();
 	end
 
-	-- skullsplitter,if=rage<60&(cooldown.deadly_calm.remains>3|!talent.deadly_calm.enabled);
-	if cooldown[AR.Skullsplitter].ready and (rage < 60 and ( cooldown[AR.DeadlyCalm].remains > 3 or not talents[AR.DeadlyCalm] )) then
-		return AR.Skullsplitter;
-	end
-
-	-- deadly_calm,if=(cooldown.bladestorm.remains>6|talent.ravager.enabled&cooldown.ravager.remains>6)&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2));
-	if talents[AR.DeadlyCalm] and cooldown[AR.DeadlyCalm].ready and (( cooldown[AR.Bladestorm].remains > 6 or talents[AR.Ravager] and cooldown[AR.Ravager].remains > 6 ) and ( cooldown[AR.ColossusSmash].remains < 2 or ( talents[AR.Warbreaker] and cooldown[AR.Warbreaker].remains < 2 ) )) then
-		return AR.DeadlyCalm;
-	end
-
-	-- ravager,if=(raid_event.adds.up|raid_event.adds.in>target.time_to_die)&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2));
-	if talents[AR.Ravager] and cooldown[AR.Ravager].ready and (( timeToDie ) and ( cooldown[AR.ColossusSmash].remains < 2 or ( talents[AR.Warbreaker] and cooldown[AR.Warbreaker].remains < 2 ) )) then
-		return AR.Ravager;
-	end
-
-	-- colossus_smash,if=raid_event.adds.up|raid_event.adds.in>40|(raid_event.adds.in>20&talent.anger_management.enabled);
-	if cooldown[AR.ColossusSmash].ready and (40 or ( 20 and talents[AR.AngerManagement] )) then
-		return AR.ColossusSmash;
-	end
-
-	-- warbreaker,if=raid_event.adds.up|raid_event.adds.in>40|(raid_event.adds.in>20&talent.anger_management.enabled);
-	if talents[AR.Warbreaker] and cooldown[AR.Warbreaker].ready and (40 or ( 20 and talents[AR.AngerManagement] )) then
-		return AR.Warbreaker;
-	end
-
-	-- bladestorm,if=(debuff.colossus_smash.up&raid_event.adds.in>target.time_to_die)|raid_event.adds.up&((debuff.colossus_smash.remains>4.5&!azerite.test_of_might.enabled)|buff.test_of_might.up);
-	if cooldown[AR.Bladestorm].ready and (( debuff[AR.ColossusSmashAura].up and timeToDie ) or ( ( debuff[AR.ColossusSmashAura].remains > 4.5 and not azerite[AR.TestOfMight] > 0 ) or buff[AR.TestOfMight].up )) then
-		return AR.Bladestorm;
-	end
-
-	-- overpower,if=!raid_event.adds.up|(raid_event.adds.up&azerite.seismic_wave.enabled);
-	if cooldown[AR.Overpower].ready and (not ( azerite[AR.SeismicWave] > 0 )) then
-		return AR.Overpower;
-	end
-
-	-- cleave,if=spell_targets.whirlwind>2;
-	if talents[AR.Cleave] and cooldown[AR.Cleave].ready and rage >= 20 and (targets > 2) then
-		return AR.Cleave;
-	end
-
-	-- execute,if=!raid_event.adds.up|(!talent.cleave.enabled&dot.deep_wounds.remains<2)|buff.sudden_death.react;
-	if rage >= 20 and (not ( not talents[AR.Cleave] and debuff[AR.DeepWounds].remains < 2 ) or buff[AR.SuddenDeath].count) then
-		return AR.Execute;
-	end
-
-	-- mortal_strike,if=!raid_event.adds.up|(!talent.cleave.enabled&dot.deep_wounds.remains<2);
-	if cooldown[AR.MortalStrike].ready and rage >= 30 and (not ( not talents[AR.Cleave] and debuff[AR.DeepWounds].remains < 2 )) then
-		return AR.MortalStrike;
-	end
-
-	-- whirlwind,if=raid_event.adds.up;
-	if rage >= 30 and () then
-		return AR.Whirlwind;
-	end
-
-	-- overpower;
-	if cooldown[AR.Overpower].ready then
-		return AR.Overpower;
-	end
-
-	-- whirlwind,if=talent.fervor_of_battle.enabled;
-	if rage >= 30 and (talents[AR.FervorOfBattle]) then
-		return AR.Whirlwind;
-	end
-
-	-- slam,if=!talent.fervor_of_battle.enabled&!raid_event.adds.up;
-	if rage >= 20 and (not talents[AR.FervorOfBattle] and not) then
-		return AR.Slam;
-	end
-end
-]]--
-function Warrior:ArmsSingleTarget()
-	local fd = MaxDps.FrameData;
-	local cooldown = fd.cooldown;
-	local azerite = fd.azerite;
-	local buff = fd.buff;
-	local debuff = fd.debuff;
-	local gcd = fd.gcd;
-	local talents = fd.talents;
-	local targets = fd.targets;
-	local canExecute = fd.canExecute;
-	local rage = fd.rage;
-	local execute = talents[AR.Massacre] and AR.ExecuteMassacre or AR.Execute;
-
-	-- rend,if=remains<=duration*0.3&debuff.colossus_smash.down;
-	if talents[AR.Rend] and rage >= 30 and (
-		debuff[AR.Rend].remains <= 12 * 0.3 and not debuff[AR.ColossusSmashAura].up
-	) then
-		return AR.Rend;
-	end
-
-	-- skullsplitter,if=rage<60&(!talent.deadly_calm.enabled|buff.deadly_calm.down);
-	if talents[AR.Skullsplitter] and cooldown[AR.Skullsplitter].ready and (
-		rage < 60 and
-		(not talents[AR.DeadlyCalm] or not buff[AR.DeadlyCalm].up)
-	) then
-		return AR.Skullsplitter;
-	end
-
-	-- colossus_smash,if=debuff.colossus_smash.down;
-	if not talents[AR.Warbreaker] and cooldown[AR.ColossusSmash].remains < 0.3 and not debuff[AR.ColossusSmashAura].up
-	then
-		return AR.ColossusSmash;
-	end
-
-	-- warbreaker,if=debuff.colossus_smash.down;
-	if talents[AR.Warbreaker] and cooldown[AR.Warbreaker].remains < 0.3 and not debuff[AR.ColossusSmashAura].up then
-		return AR.Warbreaker;
-	end
-
-	-- deadly_calm;
-	if talents[AR.DeadlyCalm] and cooldown[AR.DeadlyCalm].ready then
-		return AR.DeadlyCalm;
-	end
-
-	-- execute,if=buff.sudden_death.react;
-	if buff[AR.SuddenDeathAura].up then
-		return execute;
-	end
-
-	-- cleave,if=spell_targets.whirlwind>2;
-	if talents[AR.Cleave] and cooldown[AR.Cleave].ready and rage >= 20 and targets > 2 then
-		return AR.Cleave;
-	end
-
-	-- overpower,if=azerite.seismic_wave.rank=3;
-	if cooldown[AR.Overpower].ready and azerite[A.SeismicWave] == 3 then
-		return AR.Overpower;
-	end
-
-	-- mortal_strike;
-	if cooldown[AR.MortalStrike].remains < 0.2 then
-		return AR.MortalStrike;
-	end
-
-	-- whirlwind,if=talent.fervor_of_battle.enabled&(buff.deadly_calm.up|rage>=60);
-	if rage >= 60 and (talents[AR.FervorOfBattle] and (buff[AR.DeadlyCalm].up or rage >= 60)) then
-		return AR.Whirlwind;
-	end
-
-	-- overpower;
-	if cooldown[AR.Overpower].ready then
-		return AR.Overpower;
-	end
-
-	-- whirlwind,if=talent.fervor_of_battle.enabled&(!azerite.test_of_might.enabled|debuff.colossus_smash.up);
-	if rage >= 60 and cooldown[AR.MortalStrike].remains > gcd and (
-		talents[AR.FervorOfBattle] and
-		(not azerite[A.TestOfMight] > 0 or debuff[AR.ColossusSmashAura].up)
-	) then
-		return AR.Whirlwind;
-	end
-
-	-- slam,if=!talent.fervor_of_battle.enabled&(!azerite.test_of_might.enabled|debuff.colossus_smash.up|buff.deadly_calm.up|rage>=60);
-	if rage >= 50 and cooldown[AR.MortalStrike].remains > gcd and (
-		not talents[AR.FervorOfBattle] and
-		(azerite[A.TestOfMight] < 1 or debuff[AR.ColossusSmashAura].up or buff[AR.DeadlyCalm].up or rage >= 60)
-	) then
-		return AR.Slam;
-	end
+	return Warrior:SingleTarget();
 end

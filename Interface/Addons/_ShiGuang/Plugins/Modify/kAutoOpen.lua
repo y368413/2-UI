@@ -542,6 +542,7 @@ local autoOpenItems = {
 	[163613] = true,	-- Sack of Plunder
 	[173312] = true,	-- 
 	[174959] = true,	-- 
+	[144345] = true,	--[一堆宠物补给]
 }
 
 local autoOpenItemsSalvage = {

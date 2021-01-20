@@ -106,13 +106,36 @@ function module:RegisterDebuff(_, instID, _, spellID, level)
 end
 
 -- Party watcher spells
-function module:UpdatePartyWatcherSpells()
-	if not next(MaoRUIDB["PartyWatcherSpells"]) then
-		for spellID, duration in pairs(R.PartySpells) do
-			local name = GetSpellInfo(spellID)
-			if name then
-				MaoRUIDB["PartyWatcherSpells"][spellID] = duration
+function module:CheckPartySpells()
+	for spellID, duration in pairs(R.PartySpells) do
+		local name = GetSpellInfo(spellID)
+		if name then
+			local modDuration = MaoRUIDB["PartySpells"][spellID]
+			if modDuration and modDuration == duration then 
+				MaoRUIDB["PartySpells"][spellID] = nil
 			end
+		else
+			if I.isDeveloper then print("Invalid partyspell ID: "..spellID) end
+		end
+	end
+end
+
+R.bloodlustID = {57723, 57724, 80354, 264689}
+function module:CheckCornerSpells()
+	if not MaoRUIDB["CornerSpells"][I.MyClass] then MaoRUIDB["CornerSpells"][I.MyClass] = {} end
+	local data = R.CornerBuffs[I.MyClass]
+	if not data then return end
+
+	for spellID, value in pairs(data) do
+		local name = GetSpellInfo(spellID)
+		if not name then
+			if I.isDeveloper then print("Invalid cornerspell ID: "..spellID) end
+		end
+	end
+
+	for spellID, value in pairs(MaoRUIDB["CornerSpells"][I.MyClass]) do
+		if not next(value) and R.CornerBuffs[I.MyClass][spellID] == nil or R.bloodlustID[spellID] then
+			MaoRUIDB["CornerSpells"][I.MyClass][spellID] = nil
 		end
 	end
 end
@@ -131,23 +154,17 @@ function module:OnLogin()
 		end
 	end
 
-	self:AddDeprecatedGroup()
+	module:AddDeprecatedGroup()
 	R.AuraWatchList = AuraWatchList
 	R.RaidBuffs = RaidBuffs
 	R.RaidDebuffs = RaidDebuffs
 
-	if not MaoRUIDB["CornerBuffs"][I.MyClass] then MaoRUIDB["CornerBuffs"][I.MyClass] = {} end
-	if not next(MaoRUIDB["CornerBuffs"][I.MyClass]) then
-		M.CopyTable(R.CornerBuffs[I.MyClass], MaoRUIDB["CornerBuffs"][I.MyClass])
-	end
-
-	self:UpdatePartyWatcherSpells()
+	module:CheckPartySpells()
+	module:CheckCornerSpells()
 
 	-- Filter bloodlust for healers
-	local bloodlustList = {57723, 57724, 80354, 264689}
 	local function filterBloodlust()
-		for _, spellID in pairs(bloodlustList) do
-			MaoRUIDB["CornerBuffs"][I.MyClass][spellID] = I.Role ~= "Healer" and {"BOTTOMLEFT", {1, .8, 0}, true} or nil
+		for _, spellID in pairs(R.bloodlustID) do
 			R.RaidBuffs["WARNING"][spellID] = (I.Role ~= "Healer")
 		end
 	end

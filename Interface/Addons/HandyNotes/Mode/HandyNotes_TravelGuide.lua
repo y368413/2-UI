@@ -105,7 +105,9 @@ HandyNotes_TravelGuide.constants = TravelGuide.constants
 _G.HandyNotes_TravelGuide = HandyNotes_TravelGuide
 
 local IsQuestCompleted = C_QuestLog.IsQuestFlaggedCompleted
-local constantsicon = TravelGuide.constants.icon
+
+local MagePortalHorde  = TravelGuide.constants.icon.MagePortalHorde
+local BoatX            = TravelGuide.constants.icon.boat_x
 
 ----------------------------------------------------------------------------------------------------
 -----------------------------------------------LOCALS-----------------------------------------------
@@ -121,6 +123,63 @@ local sanctum_feature   = L["handler_tooltip_sanctum_feature"]
 local TNRank            = L["handler_tooltip_TNTIER"]
 
 ----------------------------------------------------------------------------------------------------
+----------------------------------------------FUNCTIONS---------------------------------------------
+----------------------------------------------------------------------------------------------------
+
+-- returns the controlling faction
+local function GetWarfrontState(id)
+    -- Battle for Stromgarde 11, Battle for Darkshore 118
+    state = C_ContributionCollector.GetState(id)
+    return (state == 1 or state == 2) and "Alliance" or "Horde"
+end
+
+-- returns the note for mixed portals
+local function SetWarfrontNote()
+    astate = GetWarfrontState(11) -- Battle for Stromgarde
+    dstate = GetWarfrontState(118) -- Battle for Darkshore
+
+    return (astate ~= select(1, UnitFactionGroup("player")) and notavailable or " ").."\n"..(dstate ~= select(1, UnitFactionGroup("player")) and notavailable or " ")
+end
+
+-- returns true when all requirements are fullfilled
+local function ReqFullfilled(req, ...)
+    if (req.quest and not IsQuestCompleted(req.quest))
+    or (req.level and (UnitLevel("player") < req.level))
+    or (req.sanctumtalent and not C_Garrison.GetTalentInfo(req.sanctumtalent).researched)
+    or (req.timetravel and UnitLevel("player") >= 50 and not IsQuestCompleted(req.timetravel.quest) and not req.warfront and not req.timetravel.turn)
+    or (req.timetravel and UnitLevel("player") >= 50 and IsQuestCompleted(req.timetravel.quest) and req.warfront and not req.timetravel.turn)
+    or (req.timetravel and UnitLevel("player") >= 50 and IsQuestCompleted(req.timetravel.quest) and not req.warfront and req.timetravel.turn)
+    or (req.warfront and GetWarfrontState(req.warfront) ~= select(1, UnitFactionGroup("player")))
+    or (req.spell and not IsSpellKnown(req.spell))
+    then
+        return false
+    end
+
+	return true
+end
+
+-- workaround to prepare the multilabels with and without notes
+-- because the game displays the first line in 14px and
+-- the following lines in 13px with a normal for loop.
+local function PrepareLabel(label, note)
+    local t = {}
+    for i, name in ipairs(label) do
+        if (label and TravelGuide.db.show_note) then
+            if label[i] and note[i] then
+                t[i] = name.." ("..note[i]..")"
+             else
+            -- if there is no note for this Portal
+                t[i] = name
+            end
+        else
+        -- if the TravelGuide.db.show_note == false
+            t[i] = name
+        end
+    end
+    return table.concat(t, "\n")
+end
+
+----------------------------------------------------------------------------------------------------
 ------------------------------------------------ICON------------------------------------------------
 ----------------------------------------------------------------------------------------------------
 
@@ -134,66 +193,23 @@ local function SetIcon(point)
         if point[k] then icon_key = k end
     end
 
-    if (icon_key and constantsicon[icon_key]) then
-        return constantsicon[icon_key]
+    if (icon_key and TravelGuide.constants.icon[icon_key]) then
+        return TravelGuide.constants.icon[icon_key]
     end
 end
 
 local GetPointInfo = function(point)
     local icon
-    local MagePortalHorde = constantsicon.MagePortalHorde
+
     if point then
         local spellName = GetSpellInfo(point.spell)
-        local label = point.label or table.concat(point.multilabel, "\n") or spellName or UNKNOWN
-        if (point.lvl or point.quest or point.sanctumtalent or point.timetravel or point.spell) and not point.mixedportal then
-        if (point.portal and (point.lvl or point.quest or point.timetravel)) then
-            if (point.lvl and (UnitLevel("player") < point.lvl)) and (point.quest and not IsQuestCompleted(point.quest)) then
-                icon = MagePortalHorde
-            elseif (point.timetravel and UnitLevel("player") >= 50 and not IsQuestCompleted(point.timetravel["quest"]) and not point.warfront and not point.timetravel["turn"]) then
-                icon = MagePortalHorde
-            elseif (point.timetravel and UnitLevel("player") >= 50 and IsQuestCompleted(point.timetravel["quest"]) and point.warfront and not point.timetravel["turn"]) then
-                icon = MagePortalHorde
-            elseif (point.timetravel and UnitLevel("player") >= 50 and IsQuestCompleted(point.timetravel["quest"]) and not point.warfront and point.timetravel["turn"]) then
-                icon = MagePortalHorde
-            elseif (point.lvl and (UnitLevel("player") < point.lvl)) then
-                icon = MagePortalHorde
-            elseif (point.quest and not IsQuestCompleted(point.quest)) then
-                icon = MagePortalHorde
-            else
-                icon = SetIcon(point)
-            end
+        local label = point.label or point.multilabel and table.concat(point.multilabel, "\n") or spellName or UNKNOWN
+        if point.requirements and not ReqFullfilled(point.requirements) then
+            icon = ((point.portal or point.orderhall) and MagePortalHorde) or (point.boat and BoatX)
+        else
+            icon = SetIcon(point)
         end
-        if (point.covenant and point.sanctumtalent) then
-            local TALENT = C_Garrison.GetTalentInfo(point.sanctumtalent)
-            icon = TALENT["researched"] and SetIcon(point) or MagePortalHorde
-        end
-        if (point.orderhall and point.spell) then
-            icon = IsSpellKnown(point.spell) and SetIcon(point) or MagePortalHorde
-        end
-        if (point.boat and point.quest) then
-            icon = IsQuestCompleted(point.quest) and SetIcon(point) or constantsicon.boat_X
-        end
-        if (point.warfront and point.warfront == "arathi" and UnitLevel("player") >= 50) then
-            if ((astate == 1 or astate == 2) and point.faction == "Alliance" and not IsQuestCompleted(point.timetravel["quest"])) then
-                icon = SetIcon(point)
-            elseif ((astate == 3 or astate == 4) and point.faction == "Horde"and not IsQuestCompleted(point.timetravel["quest"])) then
-                icon = SetIcon(point)
-            else
-                icon = MagePortalHorde
-            end
-        end
-        if (point.warfront and point.warfront == "darkshore" and UnitLevel("player") >= 50) then
-            if ((dstate == 1 or dstate == 2) and point.faction == "Alliance" and not IsQuestCompleted(point.timetravel["quest"])) then
-                icon = SetIcon(point)
-            elseif ((dstate == 3 or dstate == 4) and point.faction == "Horde" and not IsQuestCompleted(point.timetravel["quest"])) then
-                icon = SetIcon(point)
-            else
-                icon = MagePortalHorde
-            end
-        end
-            else icon = SetIcon(point)
-        end
-            return label, multilabel, icon, point.scale, point.alpha, point.portal, point.orderhall, point.mixedportal, point.zeppelin, point.hzeppelin, point.boat, point.aboat, point.covenant
+        return label, icon, point.scale, point.alpha, point.portal, point.orderhall, point.mixedportal, point.zeppelin, point.hzeppelin, point.boat, point.aboat, point.covenant
     end
 end
 
@@ -206,51 +222,7 @@ end
 ----------------------------------------------------------------------------------------------------
 
 local function SetTooltip(tooltip, point)
-if ((astate == 4 and dstate == 4) and point.faction == "Horde") then
---  warfrontnote =
-    asetnote = 0
-    dsetnote = 0
-elseif ((astate == 1 or astate == 2) and point.faction == "Alliance") then
-    warfrontnote = " ".."\n"..notavailable
-    asetnote = 0
-    dsetnote = 1
-elseif ((astate == 3 or astate == 4) and point.faction == "Horde") then
-    warfrontnote = " ".."\n"..notavailable
-    asetnote = 0
-    dsetnote = 1
-elseif ((dstate == 1 or dstate == 2) and point.faction == "Alliance") then
-    warfrontnote = notavailable.."\n".." "
-    asetnote = 1
-    dsetnote = 0
-elseif ((dstate == 3 or dstate == 4) and point.faction == "Horde") then
-    warfrontnote = notavailable.."\n".." "
-    asetnote = 1
-    dsetnote = 0
-else
-    warfrontnote = notavailable.."\n"..notavailable
-    asetnote = 1
-    dsetnote = 1
-end
-
-    function preparelabel()
-    -- workaround to prepare the multilabels with and without notes
-    -- because the game displays the first line in 14px and
-    -- the following lines in 13px with a normal for loop.
-        local label = {}
-        for i, name in ipairs(point.multilabel) do
-            if (point.multilabel and TravelGuide.db.show_note) then
-                if point.multilabel[i] and point.multinote[i] then
-                    label[i] = name.." ("..point.multinote[i]..")"
-                else
-                    label[i] = name -- if there is no note for this Portal
-                end
-            else
-                label[i] = name -- if the TravelGuide.db.show_note == false
-            end
-        end
-    return table.concat(label, "\n")
-    end
-
+    local pointreq = point.requirements
     if point then
         if (point.label) then
             tooltip:AddLine(point.label)
@@ -263,55 +235,57 @@ end
             tooltip:AddLine("("..point.note..")")
         end
         if (point.multilabel and not point.mixedportal) then
-            tooltip:AddLine(preparelabel())
+            tooltip:AddLine(PrepareLabel(point.multilabel, point.multinote))
         end
         if (point.npc) then
             tooltip:SetHyperlink(("unit:Creature-0-0-0-0-%d"):format(point.npc))
         end
         if (point.mixedportal) then
-            tooltip:AddDoubleLine(preparelabel(), warfrontnote, nil,nil,nil,1) -- only the second line is red
+            tooltip:AddDoubleLine(PrepareLabel(point.multilabel, point.multinote), SetWarfrontNote(), nil,nil,nil,1) -- only the second line is red
         end
-        if (point.warfront and (point.warfront == "arathi" and asetnote == 1) or (point.warfront == "darkshore" and dsetnote == 1)) then
-            tooltip:AddLine(notavailable, 1) -- red
-        end
-        if (point.lvl and UnitLevel("player") < point.lvl) then
-            tooltip:AddLine(RequiresPlayerLvl..": "..point.lvl, 1) -- red
-        end
-        if (point.quest and not IsQuestCompleted(point.quest)) then
-            if C_QuestLog.GetTitleForQuestID(point.quest) ~= nil then
-                tooltip:AddLine(RequiresQuest..": ["..C_QuestLog.GetTitleForQuestID(point.quest).."] (ID: "..point.quest..")",1,0,0)
-            else
-                tooltip:AddLine(RetrievindData,1,0,1) -- pink
-                C_Timer.After(1, function() HandyNotes_TravelGuide:Refresh() end) -- Refresh
---              print("refreshed")
+        if pointreq then
+            if (pointreq.warfront and GetWarfrontState(pointreq.warfront) ~= select(1, UnitFactionGroup("player"))) then
+                tooltip:AddLine(notavailable, 1) -- red
             end
-        end
-        if (point.timetravel and UnitLevel("player") >= 50) then -- don't show this under level 50
-            local spellName = GetSpellInfo(point.timetravel["spell"])
-            if spellName then
-                if (not IsQuestCompleted(point.timetravel["quest"]) and not point.warfront and not point.timetravel["turn"]) then
-                    tooltip:AddLine(requires..': '..spellName, 1) -- text red / uncompleted
-                elseif (IsQuestCompleted(point.timetravel["quest"]) and point.warfront and not point.timetravel["turn"]) then
-                    tooltip:AddLine(requires..': '..spellName, 1) -- text red / uncompleted
-                elseif (IsQuestCompleted(point.timetravel["quest"]) and not point.warfront and point.timetravel["turn"]) then
-                    tooltip:AddLine(requires..': '..spellName, 1) -- text red / uncompleted
+            if (pointreq.level and UnitLevel("player") < pointreq.level) then
+                tooltip:AddLine(RequiresPlayerLvl..": "..pointreq.level, 1) -- red
+            end
+            if (pointreq.quest and not IsQuestCompleted(pointreq.quest)) then
+                if C_QuestLog.GetTitleForQuestID(pointreq.quest) ~= nil then
+                    tooltip:AddLine(RequiresQuest..": ["..C_QuestLog.GetTitleForQuestID(pointreq.quest).."] (ID: "..pointreq.quest..")",1,0,0)
+                else
+                    tooltip:AddLine(RetrievindData,1,0,1) -- pink
+                    C_Timer.After(1, function() HandyNotes_TravelGuide:Refresh() end) -- Refresh
+    --              print("refreshed")
                 end
             end
-        end
-        if (point.spell) then -- don't show this if the spell is known
-            local spellName = GetSpellInfo(point.spell)
-            local isKnown = IsSpellKnown(point.spell)
-            if spellName and not isKnown then
-                tooltip:AddLine(requires..': '..spellName, 1) -- red
+            if (pointreq.timetravel and UnitLevel("player") >= 50) then -- don't show this under level 50
+                local spellName = GetSpellInfo(pointreq.timetravel["spell"])
+                if spellName then
+                    if (not IsQuestCompleted(pointreq.timetravel["quest"]) and not pointreq.warfront and not pointreq.timetravel["turn"]) then
+                        tooltip:AddLine(requires..': '..spellName, 1) -- text red / uncompleted
+                    elseif (IsQuestCompleted(pointreq.timetravel["quest"]) and pointreq.warfront and not pointreq.timetravel["turn"]) then
+                        tooltip:AddLine(requires..': '..spellName, 1) -- text red / uncompleted
+                    elseif (IsQuestCompleted(pointreq.timetravel["quest"]) and not pointreq.warfront and pointreq.timetravel["turn"]) then
+                        tooltip:AddLine(requires..': '..spellName, 1) -- text red / uncompleted
+                    end
+                end
             end
-        end
-        if point.covenant and point.sanctumtalent then
-            local TALENT = C_Garrison.GetTalentInfo(point.sanctumtalent)
-            if not TALENT["researched"] then
-                tooltip:AddLine(requires.." "..sanctum_feature..":", 1) -- red
-                tooltip:AddLine(TALENT["name"], 1, 1, 1) -- white
-                tooltip:AddTexture(TALENT["icon"], {margin={right=2}})
-                tooltip:AddLine("   ? "..format(TNRank, TALENT["tier"]+1), 0.6, 0.6, 0.6) -- grey
+            if (pointreq.spell) then -- don't show this if the spell is known
+                local spellName = GetSpellInfo(pointreq.spell)
+                local isKnown = IsSpellKnown(pointreq.spell)
+                if spellName and not isKnown then
+                    tooltip:AddLine(requires..': '..spellName, 1) -- red
+                end
+            end
+            if point.covenant and pointreq.sanctumtalent then
+                local TALENT = C_Garrison.GetTalentInfo(pointreq.sanctumtalent)
+                if not TALENT["researched"] then
+                    tooltip:AddLine(requires.." "..sanctum_feature..":", 1) -- red
+                    tooltip:AddLine(TALENT["name"], 1, 1, 1) -- white
+                    tooltip:AddTexture(TALENT["icon"], {margin={right=2}})
+                    tooltip:AddLine("   ? "..format(TNRank, TALENT["tier"]+1), 0.6, 0.6, 0.6) -- grey
+                end
             end
         end
     else
@@ -453,7 +427,7 @@ local currentMapID = nil
         local state, value = next(t, prestate)
         while state do
             if value and TravelGuide:ShouldShow(state, value, currentMapID) then
-                local _, _, icon, scale, alpha, portal, orderhall, mixedportal, zeppelin, hzeppelin, boat, aboat, covenant = GetPointInfo(value)
+                local _, icon, scale, alpha, portal, orderhall, mixedportal, zeppelin, hzeppelin, boat, aboat, covenant = GetPointInfo(value)
                 if portal or orderhall or mixedportal then
                 scale = (scale or 1) * TravelGuide.db.icon_scale_portal
                 alpha = (alpha or 1) * TravelGuide.db.icon_alpha_portal
@@ -497,19 +471,19 @@ local currentMapID = nil
         if (point.covenant and point.covenant ~= C_Covenants.GetActiveCovenantID()) then
             return false
         end
-        if (point.portal and not TravelGuide.db.show_portal) then return false; end
-        if (point.orderhall and not TravelGuide.db.show_orderhall) then return false; end
-        if (point.worderhall and not TravelGuide.db.show_orderhall) then return false; end
-        if (point.warfront and not TravelGuide.db.show_warfront) then return false; end
-        if (point.mixedportal and not TravelGuide.db.show_warfront) then return false; end
-        if (point.flightmaster and not TravelGuide.db.show_orderhall) then return false; end
-        if (point.tram and not TravelGuide.db.show_tram) then return false; end
-        if (point.boat and not TravelGuide.db.show_boat) then return false; end
-        if (point.aboat and not TravelGuide.db.show_aboat) then return false; end
-        if (point.zeppelin and not TravelGuide.db.show_zeppelin) then return false; end
-        if (point.hzeppelin and not TravelGuide.db.show_hzeppelin) then return false; end
-        if (point.herosrestgate and not TravelGuide.db.show_herorestgate) then return false; end
-        if (point.tpplatform and not TravelGuide.db.show_tpplatform) then return false; end
+        if (point.portal and not TravelGuide.db.show_portal) then return false end
+        if (point.orderhall and not TravelGuide.db.show_orderhall) then return false end
+        if (point.worderhall and not TravelGuide.db.show_orderhall) then return false end
+        if (point.requirements and point.requirements.warfront and not TravelGuide.db.show_warfront) then return false end
+        if (point.mixedportal and not TravelGuide.db.show_warfront) then return false end
+        if (point.flightmaster and not TravelGuide.db.show_orderhall) then return false end
+        if (point.tram and not TravelGuide.db.show_tram) then return false end
+        if (point.boat and not TravelGuide.db.show_boat) then return false end
+        if (point.aboat and not TravelGuide.db.show_aboat) then return false end
+        if (point.zeppelin and not TravelGuide.db.show_zeppelin) then return false end
+        if (point.hzeppelin and not TravelGuide.db.show_hzeppelin) then return false end
+        if (point.herosrestgate and not TravelGuide.db.show_herorestgate) then return false end
+        if (point.tpplatform and not TravelGuide.db.show_tpplatform) then return false end
     end
         return true
     end
@@ -535,22 +509,7 @@ function HandyNotes_TravelGuide:OnInitialize()
     end
 
     -- Initialize database with HandyNotes
-    HandyNotes:RegisterPluginDB("TravelGuide", PluginHandler, TravelGuide.config.options) --HandyNotes_TravelGuide.pluginName
-    self:RegisterEvent("PLAYER_ENTERING_WORLD", "WorldEnter");
-end
-
-function HandyNotes_TravelGuide:WorldEnter()
-    self:UnregisterEvent("PLAYER_ENTERING_WORLD");
-    self:ScheduleTimer("RegisterWithHandyNotes", 2);
-    C_Timer.After(5, function()
-    end );
-end
-
-function HandyNotes_TravelGuide:RegisterWithHandyNotes()
-    astate = C_ContributionCollector.GetState(11)  -- Battle for Stromgarde
-    dstate = C_ContributionCollector.GetState(118) -- Battle for Darkshore
---  astate = 1  -- Battle for Stromgarde only for testing
---  dstate = 2  -- Battle for Darkshore only for testing
+    HandyNotes:RegisterPluginDB(HandyNotes_TravelGuide.pluginName, PluginHandler, TravelGuide.config.options)
 end
 
 function HandyNotes_TravelGuide:Refresh()
@@ -598,8 +557,8 @@ end
 ----------------------------------------------------------------------------------------------------
 ------------------------------------------AddOn NAMESPACE-------------------------------------------
 ----------------------------------------------------------------------------------------------------
-HandyNotes_TravelGuide.pluginName  = L["config_plugin_name"]
-HandyNotes_TravelGuide.description = L["config_plugin_desc"]
+HandyNotes_TravelGuide.pluginName  = L["TravelGuide_plugin_name"]
+HandyNotes_TravelGuide.description = L["TravelGuide_plugin_desc"]
 
 ----------------------------------------------------------------------------------------------------
 -----------------------------------------------CONFIG-----------------------------------------------
@@ -1029,14 +988,14 @@ local DunMorogh = GetMapNames(13, 27)
 local PtoIF = L["Portal to Ironforge"]
 local DrTtoIF = L["Deeprun Tram to Ironforge"]
 local BtoMenethilHarbor = L["Boat to Menethil Harbor"]
-local EasternKingdoms = L["Eastern Kingdoms"]
+local EasternKingdoms = GetMapNames(13)
 local Wetlands = GetMapNames(13, 56)
 local ZtoStranglethornVale = L["Zeppelin to Stranglethorn Vale"]
 local PtoStranglethornVale = L["Portal to Stranglethorn Vale"]
 local StranglethornVale = GetMapNames(13, 224)
 local BtoBootyBay = L["Boat to Booty Bay"]
 local GromgolBaseCamp = GetMapNames(13)..", "..C_Map.GetAreaInfo(117)
-local Kalimdor = L["Kalimdor"]
+local Kalimdor = GetMapNames(12)
 local DustwallowMarsh = GetMapNames(12, 70)
 local BtoTheramore = L["Boat to Theramore"]
 local PtoCavernsofTime = L["Portal to Caverns of Time"]
@@ -1056,138 +1015,143 @@ local DB = {}
 TravelGuide.DB = DB
 
 DB.points = {
--- /dump C_Map.GetBestMapForUnit("player")
--- /dump WorldMapFrame:GetMapID()
--- /dump UnitClass("player")
 --[[ structure:
     [UiMapID] = { -- "_terrain1" etc will be stripped from attempts to fetch this
         [coord] = {
-            label         = ["string"],     -- label: text that'll be the label, optional
-            labelspell    = [ID],           -- show the spell name as the label
-            note          = ["string"],     -- additional notes for this node
-            spell         = [ID],           -- show spell in the tooltip
-            lvl           = [PLAYERlvl],    -- additional notes for required PLAYERLEVEL
-            quest         = [ID],           -- additional notes for required QUEST
-            timetravel    = [ID],           -- additional notes for required timetravel
-            sanctumtalent = [ID],           -- additional notes for required sanctum upgrade
-            faction       = ["FACTION"],    -- shows only for selected faction
-            class         = [CLASS NAME],   -- shows only for selected class
-            covenant      = [COVENAT NAME], -- shows only for selected covenant
-            npc           = [id],           -- related npc id, used to display names in tooltip
-            type          = ["string"],     -- the pre-define icon type which can be found in Constant.lua
+            label         = ["STRING"],         -- label for singel destination nodes
+            multilabel    = {TABLE},            -- label for multi destination nodes
+            note          = ["STRING"],         -- additional destination notes
+            multinote     = {TABLE},            -- additional notes for multi destination nodes
+            requirements  = {                   -- additional notes for requirements
+                TABLE FOR:
+                quest         = [ID],           -- additional notes for a required quest
+                spell         = [ID],           -- additional notes for a required spell
+                level         = [PLAYERLEVEL],  -- additional notes for a required player level
+                sanctumtalent = [ID],           -- additional notes for a required sanctum upgrade
+                warfront      = [ID],           -- additional notes for warfront nodes
+                timetravel    = {               -- additional requirement for nodes
+                TABLE FOR:
+                    quest = [ID],               -- hidden quest id to track the timezone from Zidormi
+                    spell = [ID],               -- time travel spell id
+                    turn = [BOOLEAN]            -- to turn the timezone in Sillithus
+                },
+            },
+            faction       = ["FACTION"],        -- shows only for selected faction
+            class         = [CLASS NAME],       -- shows only for selected class
+            covenant      = [COVENAT NAME],     -- shows only for selected covenant
         },
     },
---]]
+]]
 
 ------------------------------------------------------------------------------------------SHADOWLANDS------------------------------------------------------------------------------------------
 
     [1550] = { -- Shadowlands
-        [45665085] = { portal=true, label=PtoOG, note=Durotar, faction="Horde", quest=60151 },
-        [45665054] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance", quest=60151 },
-        [23411094] = { portal=true, label=WstoOribos, lvl=60 },
-        [76015007] = { portal=true, label=PtoOribos, covenant=Kyrian, sanctumtalent=1058 },
-        [47928153] = { portal=true, label=PtoOribos, covenant=Nightfae, sanctumtalent=1055 },
-        [62772775] = { portal=true, label=PtoOribos, covenant=Necrolord, sanctumtalent=1052 },
+        [45665085] = { portal=true, label=PtoOG, note=Durotar, faction="Horde", requirements={quest=60151} },
+        [45665054] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance", requirements={quest=60151} },
+        [23411094] = { portal=true, label=WstoOribos },
+        [76015007] = { portal=true, label=PtoOribos, covenant=Kyrian, requirements={sanctumtalent=1058} },
+        [47928153] = { portal=true, label=PtoOribos, covenant=Nightfae, requirements={sanctumtalent=1055} },
+        [62772775] = { portal=true, label=PtoOribos, covenant=Necrolord, requirements={sanctumtalent=1052} },
         },
     [1670] = { -- Oribos - Ring of Fates
-        [20835477] = { portal=true, label=PtoOG, note=Durotar, faction="Horde", quest=60151 },
-        [20894567] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance", quest=60151 },
+        [20835477] = { portal=true, label=PtoOG, note=Durotar, faction="Horde", requirements={quest=60151} },
+        [20894567] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance", requirements={quest=60151} },
         [52094278] = { tpplatform=true, label=RingTransference },
         [57145040] = { tpplatform=true, label=RingTransference },
         [52095784] = { tpplatform=true, label=RingTransference },
         [47055029] = { tpplatform=true, label=RingTransference },
         },
     [1671] = { -- Oribos - Ring of Transference
-        [49525107] = { portal=true, label=IntoTheMaw, lvl=60 },
+        [49525107] = { portal=true, label=IntoTheMaw },
         [49504243] = { tpplatform=true, label=RingFates },
         [55735162] = { tpplatform=true, label=RingFates },
         [49506073] = { tpplatform=true, label=RingFates },
         [43375150] = { tpplatform=true, label=RingFates },
         },
     [1536] = { -- Maldraxxus
-        [51147034] = { portal=true, label=PtoOribos, covenant=Necrolord, sanctumtalent=1052 },
+        [51147034] = { portal=true, label=PtoOribos, covenant=Necrolord, requirements={sanctumtalent=1052} },
         },
     [1698] = { -- Seat of the Primus
-        [56373149] = { portal=true, label=PtoOribos, covenant=Necrolord, sanctumtalent=1052 },
+        [56373149] = { portal=true, label=PtoOribos, covenant=Necrolord, requirements={sanctumtalent=1052} },
         },
     [1533] = { -- Bastion
         [55985276] = { herosrestgate=true, label=AGtoHerosrest }, --1 --Blizzard marked
         [46964891] = { herosrestgate=true, label=AGtoHerosrest }, --2 --Blizzard marked
         [52983802] = { herosrestgate=true, label=AGtoHerosrest }, --3 --Blizzard marked
-        [65581959] = { portal=true, label=PtoOribos, covenant=Kyrian, sanctumtalent=1058 },
+        [65581959] = { portal=true, label=PtoOribos, covenant=Kyrian, requirements={sanctumtalent=1058} },
         },
         [1707] = { -- Elysian Hold
-        [48816478] = { portal=true, label=PtoOribos, covenant=Kyrian, sanctumtalent=1058 },
+        [48816478] = { portal=true, label=PtoOribos, covenant=Kyrian, requirements={sanctumtalent=1058} },
         },
     [1565] = { -- Ardenweald
-        [46605126] = { portal=true, label=PtoOribos, covenant=Nightfae, sanctumtalent=1055 },
+        [46605126] = { portal=true, label=PtoOribos, covenant=Nightfae, requirements={sanctumtalent=1055} },
         },
     [1702] = { -- Hearth of the Forest - The Roots
-        [59972842] = { portal=true, label=PtoOribos, covenant=Nightfae, sanctumtalent=1055 },
+        [59972842] = { portal=true, label=PtoOribos, covenant=Nightfae, requirements={sanctumtalent=1055} },
         },
     [1543] = { -- The Maw
-        [42374215] = { portal=true, label=WstoOribos, lvl=60 },
-        [48183943] = { portal=true, label=PtoThorghast, lvl=60 },
+        [42374215] = { portal=true, label=WstoOribos },
+        [48183943] = { portal=true, label=PtoThorghast, requirements={level=60} },
         },
 
 ----------------------------------------------------------------------------------------------BfA----------------------------------------------------------------------------------------------
 
     [875] = { -- Zandalar
         [58206200] = { portal=true, multilabel={PtoSM, PtoOG, PtoTB, PtoSilithus, PtoNazjatar}, multinote={EversongWoods, Durotar, Mulgore, Kalimdor}, faction="Horde" },
-        [56307065] = { boat=true, label=StoMechagon, note=KulTiras, quest=55651, faction="Horde" },
-        [33201921] = { boat=true, label=returntoBoralus, note=TiragardeSound, quest=51229, faction="Alliance" }, -- Vol'Dun Barnard "The Smasher" Baysworth
-        [62492642] = { boat=true, label=returntoBoralus, note=TiragardeSound, quest=51088, faction="Alliance" }, -- Nazmir Desha Stormwallow
-        [47137856] = { boat=true, label=returntoBoralus, note=TiragardeSound, quest=51359, faction="Alliance" }, -- Zuldazar Daria Smithson
+        [56307065] = { boat=true, label=StoMechagon, note=KulTiras, requirements={quest=55651}, faction="Horde" },
+        [33201921] = { boat=true, label=returntoBoralus, note=TiragardeSound, requirements={quest=51229}, faction="Alliance" }, -- Vol'Dun Barnard "The Smasher" Baysworth
+        [62492642] = { boat=true, label=returntoBoralus, note=TiragardeSound, requirements={quest=51088}, faction="Alliance" }, -- Nazmir Desha Stormwallow
+        [47137856] = { boat=true, label=returntoBoralus, note=TiragardeSound, requirements={quest=51359}, faction="Alliance" }, -- Zuldazar Daria Smithson
         [58287605] = { boat=true, multilabel={BtoDrustvar, BtoStormsongValley, BtoTiragardeSound}, multinote={KulTiras, KulTiras, KulTiras}, faction="Horde" },
-        [58367208] = { mixedportal=true, multilabel={PtoArathiHighlands, PtoDarkshore}, multinote={EasternKingdoms, Kalimdor}, lvl=50, faction="Horde", warfront="both" },
+        [58367208] = { mixedportal=true, multilabel={PtoArathiHighlands, PtoDarkshore}, multinote={EasternKingdoms, Kalimdor}, requirements={level=50}, faction="Horde" },
         },
     [862] = { -- Zuldazar
         [58304450] = { portal=true, multilabel={PtoSM, PtoOG, PtoTB, PtoSilithus, PtoNazjatar}, multinote={EversongWoods, Durotar, Mulgore, Kalimdor}, faction="Horde" },
-        [55255824] = { boat=true, label=StoMechagon, note=KulTiras, quest=55651, faction="Horde" },
+        [55255824] = { boat=true, label=StoMechagon, note=KulTiras, requirements={quest=55651}, faction="Horde" },
         [58466293] = { boat=true, multilabel={BtoDrustvar, BtoStormsongValley, BtoTiragardeSound}, multinote={KulTiras, KulTiras, KulTiras}, faction="Horde" },
-        [58596055] = { mixedportal=true, multilabel={PtoArathiHighlands, PtoDarkshore}, multinote={EasternKingdoms, Kalimdor}, lvl=50, faction="Horde", warfront="both" },
+        [58596055] = { mixedportal=true, multilabel={PtoArathiHighlands, PtoDarkshore}, multinote={EasternKingdoms, Kalimdor}, requirements={level=50}, faction="Horde" },
         },                               -- quest=51340, Drustvar   quest=51532, Stormsong valley   quest=51421, tiragard sound
     [1165] = { -- Dazar'alor
         [51004600] = { portal=true, multilabel={PtoSM, PtoOG, PtoTB, PtoSilithus, PtoNazjatar}, multinote={EversongWoods, Durotar, Mulgore, Kalimdor}, faction="Horde" },
-        [41808760] = { boat=true, label=StoMechagon, note=KulTiras, quest=55651, faction="Horde" },
-        [51859453] = { mixedportal=true, multilabel={PtoArathiHighlands, PtoDarkshore}, multinote={EasternKingdoms, Kalimdor}, lvl=50, faction="Horde", warfront="both" },
+        [41808760] = { boat=true, label=StoMechagon, note=KulTiras, requirements={quest=55651}, faction="Horde" },
+        [51859453] = { mixedportal=true, multilabel={PtoArathiHighlands, PtoDarkshore}, multinote={EasternKingdoms, Kalimdor}, requirements={level=50}, faction="Horde" },
         },
     [1163] = { -- Dazar'alor - The Great Seal
         [73706210] = { portal=true, label=PtoSM, note=EversongWoods, faction="Horde" },
-        [73706980] = { portal=true, label=PtoOG, note=Durotar, quest=46931, faction="Horde" },
+        [73706980] = { portal=true, label=PtoOG, note=Durotar, requirements={quest=46931}, faction="Horde" },
         [73707730] = { portal=true, label=PtoTB, note=Mulgore, faction="Horde" },
-        [73708530] = { portal=true, label=PtoSilithus, note=Kalimdor, quest=46931, lvl=50, faction="Horde" },
-        [63008530] = { portal=true, label=PtoNazjatar, quest=55053, lvl=50, faction="Horde" },
+        [73708530] = { portal=true, label=PtoSilithus, note=Kalimdor, requirements={quest=46931,level=50}, faction="Horde" },
+        [63008530] = { portal=true, label=PtoNazjatar, requirements={quest=55053, level=50}, faction="Horde" },
         },
     [1355] = { -- Nazjatar
-        [47286278] = { portal=true, label=PtoZuldazar, note=Zandalar, quest=55053, lvl=50, faction="Horde" },
-        [40005260] = { portal=true, label=PtoBoralus, note=KulTiras, quest=54972, lvl=50, faction="Alliance" },
+        [47286278] = { portal=true, label=PtoZuldazar, note=Zandalar, requirements={quest=55053, level=50}, faction="Horde" },
+        [40005260] = { portal=true, label=PtoBoralus, note=KulTiras, requirements={quest=54972, level=50}, faction="Alliance" },
         },
     [876] = { -- Kul Tiras
         [61404950] = { portal=true, multilabel={PtoSW, PtoIF, PtoExodar, PtoSilithus, PtoNazjatar}, multinote={ElwynnForest, DunMorogh, AzuremystIsle, Kalimdor}, faction="Alliance" },
-        [69046516] = { boat=true, label=returntoZuldazar, note=Zandalar, quest=51438, faction="Horde" }, -- Tiragarde Sound speak: Erul Dawnbrook
-        [25936716] = { boat=true, label=returntoZuldazar, note=Zandalar, quest=51340, faction="Horde" }, -- Drustvar
-        [54371416] = { boat=true, label=returntoZuldazar, note=Zandalar, quest=51696, faction="Horde" }, -- Stormsong Valley 51902450 boat Grok Seahandler
-        [54141818] = { boat=true, label=returntoZuldazar, note=Zandalar, quest=51696, faction="Horde" }, -- Stormsong Valley 51403370 Flightmaster Muka Stormbreaker
-        [20332457] = { boat=true, label=returntoZuldazar, note=Zandalar, quest=55651, faction="Horde" }, -- Mechagon
+        [69046516] = { boat=true, label=returntoZuldazar, note=Zandalar, requirements={quest=51438}, faction="Horde" }, -- Tiragarde Sound speak: Erul Dawnbrook
+        [25936716] = { boat=true, label=returntoZuldazar, note=Zandalar, requirements={quest=51340}, faction="Horde" }, -- Drustvar
+        [54371416] = { boat=true, label=returntoZuldazar, note=Zandalar, requirements={quest=51696}, faction="Horde" }, -- Stormsong Valley 51902450 boat Grok Seahandler
+        [54141818] = { boat=true, label=returntoZuldazar, note=Zandalar, requirements={quest=51696}, faction="Horde" }, -- Stormsong Valley 51403370 Flightmaster Muka Stormbreaker
+        [20332457] = { boat=true, label=returntoZuldazar, note=Zandalar, requirements={quest=55651}, faction="Horde" }, -- Mechagon
 --noboat        [20742783] = { boat=true, label=returntoBoralus, note=TiragardeSound, quest=54992, faction="Alliance" }, --Mechagon --quest=54992,
         [62095274] = { boat=true, multilabel={BtoVolDun, BtoNazmir, BtoZuldazar}, multinote={Zandalar, Zandalar, Zandalar}, faction="Alliance" },
-        [60855074] = { mixedportal=true, multilabel={PtoArathiHighlands, PtoDarkshore}, multinote={EasternKingdoms, Kalimdor}, lvl=50, faction="Alliance", warfront="both" },
+        [60855074] = { mixedportal=true, multilabel={PtoArathiHighlands, PtoDarkshore}, multinote={EasternKingdoms, Kalimdor}, requirements={level=50}, faction="Alliance" },
         },      -- Voldun 51283, nazmir 51088, zuldazar 51308
     [895] = { -- Tiragarde Sound
         [74302350] = { portal=true, multilabel={PtoSW, PtoIF, PtoExodar, PtoSilithus, PtoNazjatar}, multinote={ElwynnForest, DunMorogh, AzuremystIsle, Kalimdor}, faction="Alliance" },
         [73692628] = { boat=true, multilabel={BtoVolDun, BtoNazmir, BtoZuldazar}, multinote={Zandalar, Zandalar, Zandalar}, faction="Alliance" },
-        [73362568] = { mixedportal=true, multilabel={PtoArathiHighlands, PtoDarkshore}, multinote={EasternKingdoms, Kalimdor}, lvl=50, faction="Alliance", warfront="both" },
+        [73362568] = { mixedportal=true, multilabel={PtoArathiHighlands, PtoDarkshore}, multinote={EasternKingdoms, Kalimdor}, requirements={level=50}, faction="Alliance" },
 
         },
     [942] = { -- Stormsong Valley
-        [51902450] = { boat=true, label=returntoZuldazar, note=Zandalar, quest=51696, faction="Horde" }, --Stormsong valley 51902450 boat Grok Seahandler
-        [51403370] = { boat=true, label=returntoZuldazar, note=Zandalar, quest=51696, faction="Horde" }, --Stormsong Valley 51403370 Flightmaster Muka Stormbreaker
+        [51902450] = { boat=true, label=returntoZuldazar, note=Zandalar, requirements={quest=51696}, faction="Horde" }, --Stormsong valley 51902450 boat Grok Seahandler
+        [51403370] = { boat=true, label=returntoZuldazar, note=Zandalar, requirements={quest=51696}, faction="Horde" }, --Stormsong Valley 51403370 Flightmaster Muka Stormbreaker
         },
     [1161] = { -- Boralus
         [70401600] = { portal=true, multilabel={PtoSW, PtoIF, PtoExodar, PtoSilithus, PtoNazjatar}, multinote={ElwynnForest, DunMorogh, AzuremystIsle, Kalimdor}, faction="Alliance" },
         [67952669] = { boat=true, multilabel={BtoVolDun, BtoNazmir, BtoZuldazar}, multinote={Zandalar, Zandalar, Zandalar}, faction="Alliance" },
-        [66352486] = { mixedportal=true, multilabel={PtoArathiHighlands, PtoDarkshore}, multinote={EasternKingdoms, Kalimdor}, lvl=50, faction="Alliance", warfront="both" }, --quest=53194,
+        [66352486] = { mixedportal=true, multilabel={PtoArathiHighlands, PtoDarkshore}, multinote={EasternKingdoms, Kalimdor}, requirements={level=50}, faction="Alliance" }, --quest=53194,
         },
 
 --------------------------------------------------------------------------------------------LEGION---------------------------------------------------------------------------------------------
@@ -1280,11 +1244,11 @@ DB.points = {
         },
     [734] = { -- Hall of the Guardian *MAGE*
         [57299056] = { orderhall=true, label=PtoDala, note=BrokenIsles, class="MAGE" },
-        [66784670] = { orderhall=true, spell=223413, label=PtoValsharah, note=BrokenIsles, class="MAGE" },
-        [67214172] = { orderhall=true, spell=223413, label=PtoStormheim, note=BrokenIsles, class="MAGE" },
-        [60235191] = { orderhall=true, spell=223413, label=PtoSuramar, note=BrokenIsles, class="MAGE" },
-        [54684456] = { orderhall=true, spell=223413, label=PtoHighmountain, note=BrokenIsles, class="MAGE" },
-        [54993963] = { orderhall=true, spell=223413, label=PtoAzsuna, note=BrokenIsles, class="MAGE" },
+        [66784670] = { orderhall=true, requirements={spell=223413}, label=PtoValsharah, note=BrokenIsles, class="MAGE" },
+        [67214172] = { orderhall=true, requirements={spell=223413}, label=PtoStormheim, note=BrokenIsles, class="MAGE" },
+        [60235191] = { orderhall=true, requirements={spell=223413}, label=PtoSuramar, note=BrokenIsles, class="MAGE" },
+        [54684456] = { orderhall=true, requirements={spell=223413}, label=PtoHighmountain, note=BrokenIsles, class="MAGE" },
+        [54993963] = { orderhall=true, requirements={spell=223413}, label=PtoAzsuna, note=BrokenIsles, class="MAGE" },
         },
     [726] = { -- The Maelstrom *SHAMAN*
         [29835200] = { orderhall=true, label=PtoDala, note=BrokenIsles, class="SHAMAN" },
@@ -1314,49 +1278,49 @@ DB.points = {
 ----------------------------------------------------------------------------------------------WoD----------------------------------------------------------------------------------------------
 
     [572] = { -- Draenor
-        [73004300] = { portal=true, multilabel={PtoOG, PtoVolmar}, multinote={Durotar, TanaanJungle}, faction="Horde"},
-        [73014305] = { portal=true, multilabel={PtoSW, PtoLionswatch}, multinote={ElwynnForest, TanaanJungle}, faction="Alliance"},
-        [34683698] = { portal=true, label=PtoWarspear, note=Ashran, quest=36614, faction="Horde"},
-        [53556087] = { portal=true, label=PtoStormshield, note=Ashran, quest=36615, faction="Alliance"},
-        [60424563] = { portal=true, label=PtoWarspear, note=Ashran, quest=37935, faction="Horde"},
-        [59594867] = { portal=true, label=PtoStormshield, note=Ashran, quest=38445, faction="Alliance"},
+        [73004300] = { portal=true, multilabel={PtoOG, PtoVolmar}, multinote={Durotar, TanaanJungle}, faction="Horde" },
+        [73014305] = { portal=true, multilabel={PtoSW, PtoLionswatch}, multinote={ElwynnForest, TanaanJungle}, faction="Alliance" },
+        [34683698] = { portal=true, label=PtoWarspear, note=Ashran, requirements={quest=36614}, faction="Horde" },
+        [53556087] = { portal=true, label=PtoStormshield, note=Ashran, requirements={quest=36615}, faction="Alliance" },
+        [60424563] = { portal=true, label=PtoWarspear, note=Ashran, requirements={quest=37935}, faction="Horde" },
+        [59594867] = { portal=true, label=PtoStormshield, note=Ashran, requirements={quest=38445}, faction="Alliance" },
         },
     [588] = { -- Ashran
-        [44001300] = { portal=true, multilabel={PtoOG, PtoVolmar}, multinote={Durotar, TanaanJungle}, faction="Horde"},
-        [40009000] = { portal=true, multilabel={PtoSW, PtoLionswatch}, multinote={ElwynnForest, TanaanJungle}, faction="Alliance"},
+        [44001300] = { portal=true, multilabel={PtoOG, PtoVolmar}, multinote={Durotar, TanaanJungle}, faction="Horde" },
+        [40009000] = { portal=true, multilabel={PtoSW, PtoLionswatch}, multinote={ElwynnForest, TanaanJungle}, faction="Alliance" },
         },
     [590] = { -- Frostwall (Garrison)
-        [75104890] = { portal=true, label=PtoWarspear, note=Ashran, quest=36614, faction="Horde"},
+        [75104890] = { portal=true, label=PtoWarspear, note=Ashran, requirements={quest=36614}, faction="Horde" },
         },
     [525] = { -- Frostfire Ridge
-        [51496593] = { portal=true, label=PtoWarspear, note=Ashran, quest=36614, faction="Horde"},
+        [51496593] = { portal=true, label=PtoWarspear, note=Ashran, requirements={quest=36614}, faction="Horde" },
         },
     [582] = { -- Lunarfall (Garrison)
-        [70102750] = { portal=true, label=PtoStormshield, note=Ashran, quest=36615, faction="Alliance"},
+        [70102750] = { portal=true, label=PtoStormshield, note=Ashran, requirements={quest=36615}, faction="Alliance" },
         },
     [539] = { -- Shadowmoon Valley
-        [32871553] = { portal=true, label=PtoStormshield, note=Ashran, quest=36615, faction="Alliance"},
+        [32871553] = { portal=true, label=PtoStormshield, note=Ashran, requirements={quest=36615}, faction="Alliance" },
         },
     [534] = { -- Tanaan Jungle
-        [61004734] = { portal=true, label=PtoWarspear, note=Ashran, quest=37935, faction="Horde"},
-        [57446050] = { portal=true, label=PtoStormshield, note=Ashran, quest=38445, faction="Alliance"},
+        [61004734] = { portal=true, label=PtoWarspear, note=Ashran, requirements={quest=37935}, faction="Horde" },
+        [57446050] = { portal=true, label=PtoStormshield, note=Ashran, requirements={quest=38445}, faction="Alliance" },
         },
     [624] = { -- Warspear (Ashran)
-        [60705160] = { portal=true, label=PtoOG, note=Durotar, faction="Horde"},
-        [53104390] = { portal=true, label=PtoVolmar, note=TanaanJungle, quest=37935, faction="Horde"},
+        [60705160] = { portal=true, label=PtoOG, note=Durotar, faction="Horde" },
+        [53104390] = { portal=true, label=PtoVolmar, note=TanaanJungle, requirements={quest=37935}, faction="Horde" },
         },
     [622] = { -- Stormshield (Ashran)
-        [60903800] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance"},
-        [36314116] = { portal=true, label=PtoLionswatch, note=TanaanJungle, quest=38445, faction="Alliance"},
+        [60903800] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance" },
+        [36314116] = { portal=true, label=PtoLionswatch, note=TanaanJungle, requirements={quest=38445}, faction="Alliance" },
         },
 
 ----------------------------------------------------------------------------------------------MoP----------------------------------------------------------------------------------------------
 
     [424] = { -- Pandaria
-        [29534767] = { portal=true, label=PtoIofT, note=Pandaria, quest=32680, faction="Horde" },
-        [29144595] = { portal=true, label=PtoIofT, note=Pandaria, quest=32681, faction="Alliance" },
-        [19100943] = { portal=true, label=PtoSPG, note=TownlongSteppes, quest=32212, faction="Horde" },
-        [24331611] = { portal=true, label=PtoSPG, note=TownlongSteppes, quest=32644, faction="Alliance" },
+        [29534767] = { portal=true, label=PtoIofT, note=Pandaria, requirements={quest=32680}, faction="Horde" },
+        [29144595] = { portal=true, label=PtoIofT, note=Pandaria, requirements={quest=32681}, faction="Alliance" },
+        [19100943] = { portal=true, label=PtoSPG, note=TownlongSteppes, requirements={quest=32212}, faction="Horde" },
+        [24331611] = { portal=true, label=PtoSPG, note=TownlongSteppes, requirements={quest=32644}, faction="Alliance" },
         [55215658] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance" },
         [67816760] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance" },
         [59883557] = { portal=true, label=PtoOG, note=Durotar, faction="Horde" },
@@ -1379,8 +1343,8 @@ DB.points = {
         [71703570] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance" },
         },
     [388] = { -- Townlong Steppes
-        [49746867] = { portal=true, label=PtoIofT, note=Pandaria, quest=32681, faction="Alliance" },
-        [50607340] = { portal=true, label=PtoIofT, note=Pandaria, quest=32680, faction="Horde" },
+        [49746867] = { portal=true, label=PtoIofT, note=Pandaria, requirements={quest=32681}, faction="Alliance" },
+        [50607340] = { portal=true, label=PtoIofT, note=Pandaria, requirements={quest=32680}, faction="Horde" },
         },
     [379] = { -- Kun-Lai Summit
         [48534357] = { orderhall=true, label=PtoOG, note=Durotar, class="MONK", faction="Horde" },
@@ -1392,8 +1356,8 @@ DB.points = {
         },
 ]]--
     [504] = { -- Isle of Thunder
-        [64707348] = { portal=true, label=PtoSPG, note=TownlongSteppes, quest=32644, faction="Alliance" },
-        [33213269] = { portal=true, label=PtoSPG, note=TownlongSteppes, quest=32212, faction="Horde" },
+        [64707348] = { portal=true, label=PtoSPG, note=TownlongSteppes, requirements={quest=32644}, faction="Alliance" },
+        [33213269] = { portal=true, label=PtoSPG, note=TownlongSteppes, requirements={quest=32212}, faction="Horde" },
         },
 
 ---------------------------------------------------------------------------------------------CATA----------------------------------------------------------------------------------------------
@@ -1405,24 +1369,24 @@ DB.points = {
     [207] = { -- Deepholm
         [48515381] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance" },
         [50935310] = { portal=true, label=PtoOG, note=Durotar, faction="Horde" },
-        [49325034] = { portal=true, label=PtoTherazanesThrone, note=Deepholm, quest=26709 },
-        [57211352] = { portal=true, label=PtoTempleofEarth, note=Deepholm, quest=26971 },
+        [49325034] = { portal=true, label=PtoTherazanesThrone, note=Deepholm, requirements={quest=26709} },
+        [57211352] = { portal=true, label=PtoTempleofEarth, note=Deepholm, requirements={quest=26971} },
         },
     [948] = { -- Maelstrom
         [51182842] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance" },
         [51172840] = { portal=true, label=PtoOG, note=Durotar, faction="Horde" },
         },
     [241] = { -- Twilight Highlands
-        [79517782] = { portal=true, label=PtoSW, note=ElwynnForest, quest=27537, faction="Alliance" },
-        [73625351] = { portal=true, label=PtoOG, note=Durotar, quest=26798, faction="Horde" },
+        [79517782] = { portal=true, label=PtoSW, note=ElwynnForest, requirements={quest=27537}, faction="Alliance" },
+        [73625351] = { portal=true, label=PtoOG, note=Durotar, requirements={quest=26798}, faction="Horde" },
         },
     [244] = { -- Tol Barad
-        [47115193] = { portal=true, label=PtoSW, note=ElwynnForest, lvl=30, faction="Alliance" },
-        [47115192] = { portal=true, label=PtoOG, note=Durotar, lvl=30, faction="Horde" },
+        [47115193] = { portal=true, label=PtoSW, note=ElwynnForest, requirements={level=30}, faction="Alliance" },
+        [47115192] = { portal=true, label=PtoOG, note=Durotar, requirements={level=30}, faction="Horde" },
         },
     [245] = { -- Tol Barad Peninsula
-        [75255887] = { portal=true, label=PtoSW, note=ElwynnForest, lvl=30, faction="Alliance" },
-        [56277966] = { portal=true, label=PtoOG, note=Durotar, lvl=30, faction="Horde" },
+        [75255887] = { portal=true, label=PtoSW, note=ElwynnForest, requirements={level=30}, faction="Alliance" },
+        [56277966] = { portal=true, label=PtoOG, note=Durotar, requirements={level=30}, faction="Horde" },
         },
 
 ---------------------------------------------------------------------------------------------WotLK---------------------------------------------------------------------------------------------
@@ -1474,7 +1438,7 @@ DB.points = {
         },
     [111] = { -- Shattrath City
         [57224827] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance" },
-        [48594200] = { portal=true, label=PtoIofQD, note=EasternKingdoms, },
+        [48594200] = { portal=true, label=PtoIofQD, note=EasternKingdoms },
         [56834888] = { portal=true, label=PtoOG, note=Durotar, faction="Horde" },
         },
     [101] = { -- Outland
@@ -1491,7 +1455,7 @@ DB.points = {
         [48306290] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance" },
         },
     [97] = { -- Azuremyst Isle
-        [20335407] = { timetravel={quest=54411, spell=290245}, portal=true, label=PtoDarnassus, note=Teldrassil },
+        [20335407] = { requirements={timetravel={quest=54411, spell=290245}}, portal=true, label=PtoDarnassus, note=Teldrassil },
         [26364616] = { portal=true, label=PtoSW, note=ElwynnForest..")\n("..inExodar.."", faction="Alliance" },
         },
     [110] = { -- Silvermoon City
@@ -1508,25 +1472,25 @@ DB.points = {
         [59236650] = { aboat=true, label=BtoMenethilHarbor, note=Wetlands, faction="Horde" },
         [59246651] = { boat=true, label=BtoMenethilHarbor, note=Wetlands, faction="Alliance" },
         [56835629] = { boat=true, label=BtoBootyBay, note=StranglethornVale },
-        [43561640] = { timetravel={quest=54411, spell=290245}, portal=true, multilabel={PtoSW, PtoExodar}, multinote={ElwynnForest, AzuremystIsle},faction="Alliance" },
-        [39401090] = { timetravel={quest=54411, spell=290245}, portal=true, multilabel={PtoExodar, PtoHellfirePeninsula}, multinote={AzuremystIsle, Outland}, faction="Alliance" },
-        [43211616] = { timetravel={quest=54411, spell=290245}, portal=true, label=PtoExodar, note=Teldrassil, faction="Horde" },
+        [43561640] = { requirements={timetravel={quest=54411, spell=290245}}, portal=true, multilabel={PtoSW, PtoExodar}, multinote={ElwynnForest, AzuremystIsle},faction="Alliance" },
+        [39401090] = { requirements={timetravel={quest=54411, spell=290245}}, portal=true, multilabel={PtoExodar, PtoHellfirePeninsula}, multinote={AzuremystIsle, Outland}, faction="Alliance" },
+        [43211616] = { requirements={timetravel={quest=54411, spell=290245}}, portal=true, label=PtoExodar, note=Teldrassil, faction="Horde" },
         [29922620] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance" },
         [59468340] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance" },
         [59448340] = { portal=true, label=PtoOG, note=Durotar, faction="Horde" },
         [56122758] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance" },
         [56222774] = { portal=true, label=PtoOG, note=Durotar, faction="Horde" },
-        [29332713] = { timetravel={quest=54411, spell=290245}, portal=true, label=PtoDarnassus, note=Teldrassil },
+        [29332713] = { requirements={timetravel={quest=54411, spell=290245}}, portal=true, label=PtoDarnassus, note=Teldrassil },
         [45405420] = { zeppelin=true, label=ZtoOG, note=Durotar, faction="Horde" },
         [45405421] = { hzeppelin=true, label=ZtoOG, note=Durotar, faction="Alliance" },
         [58154245] = { zeppelin=true, multilabel={ZtoTB, ZtoStranglethornVale, ZtoBoreanTundra}, multinote={Mulgore, GromgolBaseCamp, WarsongHold}, faction="Horde" },
         [58154246] = { hzeppelin=true, multilabel={ZtoTB, ZtoStranglethornVale, ZtoBoreanTundra}, multinote={Mulgore, GromgolBaseCamp, WarsongHold}, faction="Alliance" },
-        [42857909] = { timetravel={quest=50659, spell=255152, turn=true}, portal=true, label=PtoZuldazar, note=Zandalar, lvl=50, quest=46931, faction="Horde" },
-        [42847905] = { timetravel={quest=50659, spell=255152, turn=true}, portal=true, label=PtoBoralus, note=TiragardeSound, lvl=50, faction="Alliance" },
+        [42857909] = { requirements={quest=46931, level=50, timetravel={quest=50659, spell=255152, turn=true}}, portal=true, label=PtoZuldazar, note=Zandalar, faction="Horde" },
+        [42847905] = { requirements={level=50, timetravel={quest=50659, spell=255152, turn=true}}, portal=true, label=PtoBoralus, note=TiragardeSound, faction="Alliance" },
         [59414237] = { portal=true, multilabel={PtoTolBarad, PtoUldum, PtoDeepholm, PtoVashjir, PtoHyjal, PtoTwilightHighlands, PtoUC, PtoDala, PtoJadeForest, PtoZuldazar, PtoAzsuna, PtoWarspear, PtoShattrath, PtoCavernsofTime, PtoOribos},
                                     multinote={EasternKingdoms, Kalimdor, Maelstrom, EasternKingdoms, Kalimdor, EasternKingdoms, Tirisfal, CrystalsongForest, Pandaria, Zandalar, BrokenIsles, Ashran, TerokkarForest, Tanaris, Shadowlands}, faction="Horde" },
-        [46612303] = { timetravel={quest=54411, spell=290245}, portal=true, label=PtoPortofBoralus, note=TiragardeSound, lvl=50, faction="Alliance", warfront="darkshore"},
-        [46302282] = { timetravel={quest=54411, spell=290245}, portal=true, label=PtoPortofZandalar, note=Zuldazar, lvl=50, faction="Horde", warfront="darkshore" },
+        [46612303] = { requirements={level=50, warfront=118, timetravel={quest=54411, spell=290245}}, portal=true, label=PtoPortofBoralus, note=TiragardeSound, faction="Alliance" },
+        [46302282] = { requirements={level=50, warfront=118, timetravel={quest=54411, spell=290245}}, portal=true, label=PtoPortofZandalar, note=Zuldazar, faction="Horde" },
         },-- Portal to Oribos quest=60151
     [7] = { -- Mulgore
         [33692368] = { zeppelin=true, label=ZtoOG, note=Durotar, faction="Horde" },
@@ -1548,10 +1512,10 @@ DB.points = {
         [50435651] = { portal=true, label=PtoUC, note=Tirisfal, faction="Horde" },
         [43126480] = { zeppelin=true, label=ZtoTB, note=Mulgore, faction="Horde" },
         [43126481] = { hzeppelin=true, label=ZtoTB, note=Mulgore, faction="Alliance" },
-        [50103773] = { portal=true, multilabel={PtoTolBarad, PtoUldum, PtoDeepholm, PtoVashjir, PtoHyjal, PtoTwilightHighlands}, multinote={EasternKingdoms, Kalimdor, Maelstrom, EasternKingdoms, Kalimdor, EasternKingdoms}, faction="Horde", },
+        [50103773] = { portal=true, multilabel={PtoTolBarad, PtoUldum, PtoDeepholm, PtoVashjir, PtoHyjal, PtoTwilightHighlands}, multinote={EasternKingdoms, Kalimdor, Maelstrom, EasternKingdoms, Kalimdor, EasternKingdoms}, faction="Horde" },
                                     -- Vashj'ir complete quest 25924
-                                    -- TolBarad at lvl 30
-                                    -- other portals at lvl ?? Shadowlands
+                                    -- TolBarad at level 30
+                                    -- other portals at level ?? Shadowlands
         [45306178] = { hzeppelin=true, label=ZtoBoreanTundra, note=WarsongHold, faction="Alliance" },
         [52885242] = { hzeppelin=true, label=ZtoStranglethornVale, note=GromgolBaseCamp, faction="Alliance" },
         },
@@ -1564,24 +1528,24 @@ DB.points = {
         [59002670] = { portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance" },
         },
     [81] = { -- Silithus
-        [41604520] = { timetravel={quest=50659, spell=255152, turn=true}, portal=true, label =PtoZuldazar, note=Zandalar, lvl=50, quest=46931, faction="Horde" },
-        [41474479] = { timetravel={quest=50659, spell=255152, turn=true}, portal=true, label =PtoBoralus, note=TiragardeSound, lvl=50, faction="Alliance" },
+        [41604520] = { requirements={quest=46931, level=50, timetravel={quest=50659, spell=255152, turn=true}}, portal=true, label=PtoZuldazar, note=Zandalar, faction="Horde" },
+        [41474479] = { requirements={level=50, timetravel={quest=50659, spell=255152, turn=true}}, portal=true, label=PtoBoralus, note=TiragardeSound, faction="Alliance" },
         },
     [70] = { -- Dustwallow Marsh
         [71625648] = { aboat=true, label=BtoMenethilHarbor, note=Wetlands, faction="Horde" },
         [71625647] = { boat=true, label=BtoMenethilHarbor, note=Wetlands, faction="Alliance" },
         },
     [62] = { -- Darkshore
-        [48023627] = { timetravel={quest=54411, spell=290245}, portal=true, label=PtoPortofBoralus, note=TiragardeSound, lvl=50, faction="Alliance", warfront="darkshore" },
-        [46243511] = { timetravel={quest=54411, spell=290245}, portal=true, label=PtoPortofZandalar, note=Zuldazar, lvl=50, faction="Horde", warfront="darkshore" },
+        [48023627] = { requirements={level=50, warfront=118, timetravel={quest=54411, spell=290245}}, portal=true, label=PtoPortofBoralus, note=TiragardeSound, faction="Alliance" },
+        [46243511] = { requirements={level=50, warfront=118, timetravel={quest=54411, spell=290245}}, portal=true, label=PtoPortofZandalar, note=Zuldazar, faction="Horde" },
         },
     [89] = { -- Darnassus
-        [44247867] = { timetravel={quest=54411, spell=290245}, portal=true, multilabel={PtoExodar, PtoHellfirePeninsula}, multinote={AzuremystIsle, Outland}, faction="Alliance" },
+        [44247867] = { requirements={timetravel={quest=54411, spell=290245}}, portal=true, multilabel={PtoExodar, PtoHellfirePeninsula}, multinote={AzuremystIsle, Outland}, faction="Alliance" },
         },
     [57] = { -- Teldrassil
-        [29085646] = { timetravel={quest=54411, spell=290245}, portal=true, multilabel={PtoExodar, PtoHellfirePeninsula}, multinote={AzuremystIsle, Outland}, faction="Alliance" },
-        [55009370] = { timetravel={quest=54411, spell=290245}, portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance" },
-        [52048951] = { timetravel={quest=54411, spell=290245}, portal=true, label=PtoExodar, note=AzuremystIsle },
+        [29085646] = { requirements={timetravel={quest=54411, spell=290245}}, portal=true, multilabel={PtoExodar, PtoHellfirePeninsula}, multinote={AzuremystIsle, Outland}, faction="Alliance" },
+        [55009370] = { requirements={timetravel={quest=54411, spell=290245}}, portal=true, label=PtoSW, note=ElwynnForest, faction="Alliance" },
+        [52048951] = { requirements={timetravel={quest=54411, spell=290245}}, portal=true, label=PtoExodar, note=AzuremystIsle },
         },
     [56] = { -- Wetlands
         [06216261] = { aboat=true, label=BtoTheramore, note=DustwallowMarsh, faction="Horde" },
@@ -1607,17 +1571,17 @@ DB.points = {
         [43637155] = { portal=true, multilabel={PtoTolBarad, PtoUldum, PtoDeepholm, PtoVashjir, PtoHyjal, PtoTwilightHighlands, DrTtoIF, PtoDarnassus, PtoDala, PtoJadeForest, PtoBoralus, PtoAzsuna, PtoStormshield, PtoShattrath, PtoExodar, PtoCavernsofTime, PtoOribos},
                                     multinote={EasternKingdoms, Kalimdor, Maelstrom, EasternKingdoms, Kalimdor, EasternKingdoms, DunMorogh, Teldrassil, CrystalsongForest, Pandaria, TiragardeSound, BrokenIsles, Ashran, TerokkarForest, AzuremystIsle, Tanaris, Shadowlands}, faction="Alliance" },
         [43337195] = { tram=true, label=DrTtoIF, note=DunMorogh, faction="Horde" },
-        [43863354] = { timetravel={quest=52758, spell=276824}, portal=true, multilabel={PtoHowlingFjord, PtoOG, PtoStranglethornVale, PtoSM, PtoHellfirePeninsula}, multinote={VengeanceLanding, Durotar, GromgolBaseCamp, EversongWoods, Outland}, faction="Horde" },
-        [47835898] = { tram=true, label=DrTtoSW, note=ElwynnForest, },
-        [60835906] = { portal=true, label=PtoSW, note=ElwynnForest, quest=27537, faction="Alliance" },
-        [35224839] = { portal=true, label=PtoSW, note=ElwynnForest, lvl=30, faction="Alliance" },
-        [60105603] = { portal=true, label=PtoOG, note=Durotar, quest=26798, faction="Horde" }, --quest=26798,
-        [34394957] = { portal=true, label=PtoOG, note=Durotar, lvl=30, faction="Horde" },
+        [43863354] = { requirements={timetravel={quest=52758, spell=276824}}, portal=true, multilabel={PtoHowlingFjord, PtoOG, PtoStranglethornVale, PtoSM, PtoHellfirePeninsula}, multinote={VengeanceLanding, Durotar, GromgolBaseCamp, EversongWoods, Outland}, faction="Horde" },
+        [47835898] = { tram=true, label=DrTtoSW, note=ElwynnForest },
+        [60835906] = { portal=true, label=PtoSW, note=ElwynnForest, requirements={quest=27537}, faction="Alliance" },
+        [35224839] = { portal=true, label=PtoSW, note=ElwynnForest, requirements={level=30}, faction="Alliance" },
+        [60105603] = { portal=true, label=PtoOG, note=Durotar, requirements={quest=26798}, faction="Horde" }, --quest=26798,
+        [34394957] = { portal=true, label=PtoOG, note=Durotar, requirements={level=30}, faction="Horde" },
         [57663241] = { orderhall=true, label=PtoDala, note=BrokenIsles, class="PALADIN" },
-        [49714419] = { timetravel={quest=52781, spell=276950}, portal=true, label=PtoPortofZandalar, note=Zuldazar, lvl=50, faction="Horde", warfront="arathi" },
-        [49244725] = { timetravel={quest=52781, spell=276950}, portal=true, label=PtoPortofBoralus, note=TiragardeSound, lvl=50, faction="Alliance", warfront="arathi" },
-        [41003949] = { portal=true, label=PtoDalaCrater, note=HillsbradFoothills, faction="Horde", quest=27478 },
-        [43674008] = { portal=true, label=PtoSepulcher, note=SilverpineForest, faction="Horde", quest=27478 },
+        [49714419] = { requirements={level=50, warfront=11, timetravel={quest=52781, spell=276950}}, portal=true, label=PtoPortofZandalar, note=Zuldazar, faction="Horde" },
+        [49244725] = { requirements={level=50, warfront=11, timetravel={quest=52781, spell=276950}}, portal=true, label=PtoPortofBoralus, note=TiragardeSound, faction="Alliance" },
+        [41003949] = { portal=true, label=PtoDalaCrater, note=HillsbradFoothills, faction="Horde", requirements={quest=27478} },
+        [43674008] = { portal=true, label=PtoSepulcher, note=SilverpineForest, faction="Horde", requirements={quest=27478} },
         },-- Portal to Oribos quest=60151
     [84] = { -- Stormwind City
         [74481841] = { portal=true, multilabel={PtoTolBarad, PtoUldum, PtoDeepholm, PtoVashjir, PtoHyjal, PtoTwilightHighlands}, multinote={EasternKingdoms, Kalimdor, Maelstrom, EasternKingdoms, Kalimdor, EasternKingdoms}, faction="Alliance" },
@@ -1629,8 +1593,8 @@ DB.points = {
         [69403140] = { tram=true, label=DrTtoIF, note=DunMorogh },
         },
     [499] = { -- Deeprun Tram
-        [42554350] = { tram=true, label=DrTtoIF, note=DunMorogh, },
-        [42556750] = { tram=true, label=DrTtoIF, note=DunMorogh, },
+        [42554350] = { tram=true, label=DrTtoIF, note=DunMorogh },
+        [42556750] = { tram=true, label=DrTtoIF, note=DunMorogh },
         },
     [37] = { -- Elwynn Forest
         [17804775] = { portal=true, multilabel={PtoDala, PtoJadeForest, PtoBoralus, PtoAzsuna, PtoStormshield, PtoShattrath, PtoExodar, PtoCavernsofTime, PtoOribos},
@@ -1642,24 +1606,24 @@ DB.points = {
         [29251812] = { tram=true, label=DrTtoIF, note=DunMorogh },
         },
     [90] = { -- Undercity
-        [85301700] = { timetravel={quest=52758, spell=276824}, portal=true, label=PtoHellfirePeninsula, note=Outland, faction="Horde" },
+        [85301700] = { requirements={timetravel={quest=52758, spell=276824}}, portal=true, label=PtoHellfirePeninsula, note=Outland, faction="Horde" },
         },
     [18] = { -- Tirisfal Glades
-        [65906865] = { timetravel={quest=52758, spell=276824}, portal=true, label=PtoHellfirePeninsula, note=Outland..")\n("..inUCMq.."", faction="Horde" },
-        [59416743] = { timetravel={quest=52758, spell=276824}, portal=true, label=PtoSM, note=EversongWoods..")\n("..Orboftranslocation.."", faction="Horde" },
-        [60475885] = { timetravel={quest=52758, spell=276824}, portal=true, label=PtoOG, note=Durotar, faction="Horde" },
-        [62035926] = { timetravel={quest=52758, spell=276824}, portal=true, label=PtoStranglethornVale, note=GromgolBaseCamp, faction="Horde" },
-        [58875901] = { timetravel={quest=52758, spell=276824}, portal=true, label=PtoHowlingFjord, note=VengeanceLanding, faction="Horde" },
+        [65906865] = { requirements={timetravel={quest=52758, spell=276824}}, portal=true, label=PtoHellfirePeninsula, note=Outland..")\n("..inUCMq.."", faction="Horde" },
+        [59416743] = { requirements={timetravel={quest=52758, spell=276824}}, portal=true, label=PtoSM, note=EversongWoods..")\n("..Orboftranslocation.."", faction="Horde" },
+        [60475885] = { requirements={timetravel={quest=52758, spell=276824}}, portal=true, label=PtoOG, note=Durotar, faction="Horde" },
+        [62035926] = { requirements={timetravel={quest=52758, spell=276824}}, portal=true, label=PtoStranglethornVale, note=GromgolBaseCamp, faction="Horde" },
+        [58875901] = { requirements={timetravel={quest=52758, spell=276824}}, portal=true, label=PtoHowlingFjord, note=VengeanceLanding, faction="Horde" },
         },
     [21] = { -- Silverpine Forest
-        [47254337] = { portal=true, label=PtoDalaCrater, note=HillsbradFoothills, faction="Horde", quest=27478 },
+        [47254337] = { portal=true, label=PtoDalaCrater, note=HillsbradFoothills, faction="Horde", requirements={quest=27478} },
         },
     [25] = { -- Hillsbrad Foothills
-        [30293662] = { portal=true, label=PtoSepulcher, note=SilverpineForest, faction="Horde", quest=27478 },
+        [30293662] = { portal=true, label=PtoSepulcher, note=SilverpineForest, faction="Horde", requirements={quest=27478} },
         },
     [14] = { -- Arathi Highlands
-        [27432937] = { timetravel={quest=52781, spell=276950}, portal=true, label=PtoPortofZandalar, note=Zuldazar, lvl=50, faction="Horde", warfront="arathi" },
-        [21956514] = { timetravel={quest=52781, spell=276950}, portal=true, label=PtoPortofBoralus, note=TiragardeSound, lvl=50, faction="Alliance", warfront="arathi" },
+        [27432937] = { requirements={level=50, warfront=11, timetravel={quest=52781, spell=276950}}, portal=true, label=PtoPortofZandalar, note=Zuldazar, faction="Horde" },
+        [21956514] = { requirements={level=50, warfront=11, timetravel={quest=52781, spell=276950}}, portal=true, label=PtoPortofBoralus, note=TiragardeSound, faction="Alliance" },
         },
     [50] = { -- Northern Stranglethorn
         [37195161] = { hzeppelin=true, label=ZtoOG, note=Durotar, faction="Alliance" },
@@ -1671,10 +1635,10 @@ DB.points = {
         [75234942] = { orderhall=true, label=PtoDala, note=BrokenIsles, class="PALADIN" },
         },
     [27] = { -- Dun Morogh
-        [70452731] = { tram=true, label=DrTtoSW, note=ElwynnForest, },
+        [70452731] = { tram=true, label=DrTtoSW, note=ElwynnForest },
         },
     [87] = { -- Ironforge
-        [76205120] = { tram=true, label=DrTtoSW, note=ElwynnForest, },
+        [76205120] = { tram=true, label=DrTtoSW, note=ElwynnForest },
         },
 
 }

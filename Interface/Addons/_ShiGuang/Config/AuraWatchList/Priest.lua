@@ -42,7 +42,6 @@ local list = {
 	},
 	["Special Aura"] = {	-- 玩家重要光环组
 		{AuraID = 27827, UnitID = "player"},	-- 救赎之魂
-		{AuraID = 10060, UnitID = "player"},	-- 能量灌注
 		{AuraID = 47536, UnitID = "player"},	-- 全神贯注
 		{AuraID = 65081, UnitID = "player"},	-- 身心合一
 		{AuraID = 47585, UnitID = "player"},	-- 消散

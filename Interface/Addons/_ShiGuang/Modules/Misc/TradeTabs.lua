@@ -100,7 +100,7 @@ function MISC:TradeTabs_Create(spellID, toyID, itemID)
 		name, _, texture = GetSpellInfo(spellID)
 	end
 
-	local tab = CreateFrame("CheckButton", nil, TradeSkillFrame, "SpellBookSkillLineTabTemplate, SecureActionButtonTemplate")
+	local tab = CreateFrame("CheckButton", nil, TradeSkillFrame, "SpellBookSkillLineTabTemplate, InsecureActionButtonTemplate")
 	tab.tooltip = name
 	tab.spellID = spellID
 	tab.itemID = toyID or itemID

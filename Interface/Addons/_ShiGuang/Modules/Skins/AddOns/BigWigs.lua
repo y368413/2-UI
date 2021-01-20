@@ -2,93 +2,94 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local S = M:GetModule("Skins")
 
+local function removeStyle(bar)
+	bar.candyBarBackdrop:Hide()
+	local height = bar:Get("bigwigs:restoreheight")
+	if height then
+		bar:SetHeight(height)
+	end
+
+	local tex = bar:Get("bigwigs:restoreicon")
+	if tex then
+		bar:SetIcon(tex)
+		bar:Set("bigwigs:restoreicon", nil)
+		bar.candyBarIconFrameBackdrop:Hide()
+	end
+
+	bar.candyBarDuration:ClearAllPoints()
+	bar.candyBarDuration:SetPoint("TOPLEFT", bar.candyBarBar, "TOPLEFT", 2, 0)
+	bar.candyBarDuration:SetPoint("BOTTOMRIGHT", bar.candyBarBar, "BOTTOMRIGHT", -2, 0)
+	bar.candyBarLabel:ClearAllPoints()
+	bar.candyBarLabel:SetPoint("TOPLEFT", bar.candyBarBar, "TOPLEFT", 2, 0)
+	bar.candyBarLabel:SetPoint("BOTTOMRIGHT", bar.candyBarBar, "BOTTOMRIGHT", -2, 0)
+end
+
+local function styleBar(bar)
+	local height = bar:GetHeight()
+	bar:Set("bigwigs:restoreheight", height)
+	bar:SetHeight(height/2)
+	bar.candyBarBackdrop:Hide()
+	if not bar.styled then
+		M.StripTextures(bar.candyBarBar, true)
+		M.SetBD(bar.candyBarBar)
+		bar.styled = true
+	end
+	bar:SetTexture(I.normTex)
+
+	local tex = bar:GetIcon()
+	if tex then
+		local icon = bar.candyBarIconFrame
+		bar:SetIcon(nil)
+		icon:SetTexture(tex)
+		icon:Show()
+		if bar.iconPosition == "RIGHT" then
+			icon:SetPoint("BOTTOMLEFT", bar, "BOTTOMRIGHT", 5, 0)
+		else
+			icon:SetPoint("BOTTOMRIGHT", bar, "BOTTOMLEFT", -5, 0)
+		end
+		icon:SetSize(height, height)
+		bar:Set("bigwigs:restoreicon", tex)
+		bar.candyBarIconFrameBackdrop:Hide()
+
+		if not icon.styled then
+			M.SetBD(icon)
+			icon.styled = true
+		end
+	end
+
+	bar.candyBarLabel:ClearAllPoints()
+	bar.candyBarLabel:SetPoint("LEFT", bar.candyBarBar, "LEFT", 2, 8)
+	bar.candyBarLabel:SetPoint("RIGHT", bar.candyBarBar, "RIGHT", -2, 8)
+	bar.candyBarDuration:ClearAllPoints()
+	bar.candyBarDuration:SetPoint("RIGHT", bar.candyBarBar, "RIGHT", -2, 8)
+	bar.candyBarDuration:SetPoint("LEFT", bar.candyBarBar, "LEFT", 2, 8)
+end
+
+local function registerStyle()
+	if not BigWigsAPI then return end
+	BigWigsAPI:RegisterBarStyle("NDui", {
+		apiVersion = 1,
+		version = 3,
+		GetSpacing = function(bar) return bar:GetHeight()+5 end,
+		ApplyStyle = styleBar,
+		BarStopped = removeStyle,
+		fontSizeNormal = 13,
+		fontSizeEmphasized = 14,
+		fontOutline = "OUTLINE",
+		GetStyleName = function() return "NDui" end,
+	})
+
+	local bars = BigWigs:GetPlugin("Bars", true)
+	hooksecurefunc(bars, "SetBarStyle", function(self, style)
+		if style ~= "NDui" then
+			self:SetBarStyle("NDui")
+		end
+	end)
+end
+
 function S:BigWigsSkin()
 	if not R.db["Skins"]["Bigwigs"] or not IsAddOnLoaded("BigWigs") then return end
 	if not BigWigs3DB then return end
-
-	local function removeStyle(bar)
-		bar.candyBarBackdrop:Hide()
-		local height = bar:Get("bigwigs:restoreheight")
-		if height then
-			bar:SetHeight(height)
-		end
-
-		local tex = bar:Get("bigwigs:restoreicon")
-		if tex then
-			bar:SetIcon(tex)
-			bar:Set("bigwigs:restoreicon", nil)
-			bar.candyBarIconFrameBackdrop:Hide()
-		end
-
-		bar.candyBarDuration:ClearAllPoints()
-		bar.candyBarDuration:SetPoint("TOPLEFT", bar.candyBarBar, "TOPLEFT", 2, 0)
-		bar.candyBarDuration:SetPoint("BOTTOMRIGHT", bar.candyBarBar, "BOTTOMRIGHT", -2, 0)
-		bar.candyBarLabel:ClearAllPoints()
-		bar.candyBarLabel:SetPoint("TOPLEFT", bar.candyBarBar, "TOPLEFT", 2, 0)
-		bar.candyBarLabel:SetPoint("BOTTOMRIGHT", bar.candyBarBar, "BOTTOMRIGHT", -2, 0)
-	end
-
-	local function styleBar(bar)
-		local height = bar:GetHeight()
-		bar:Set("bigwigs:restoreheight", height)
-		bar:SetHeight(height/2)
-		bar.candyBarBackdrop:Hide()
-		if not bar.styled then
-			M.StripTextures(bar.candyBarBar, true)
-			M.SetBD(bar.candyBarBar)
-			bar.styled = true
-		end
-		bar:SetTexture(I.normTex)
-
-		local tex = bar:GetIcon()
-		if tex then
-			local icon = bar.candyBarIconFrame
-			bar:SetIcon(nil)
-			icon:SetTexture(tex)
-			icon:Show()
-			if bar.iconPosition == "RIGHT" then
-				icon:SetPoint("BOTTOMLEFT", bar, "BOTTOMRIGHT", 5, 0)
-			else
-				icon:SetPoint("BOTTOMRIGHT", bar, "BOTTOMLEFT", -5, 0)
-			end
-			icon:SetSize(height, height)
-			bar:Set("bigwigs:restoreicon", tex)
-			bar.candyBarIconFrameBackdrop:Hide()
-
-			if not icon.styled then
-				M.SetBD(icon)
-				icon.styled = true
-			end
-		end
-
-		bar.candyBarLabel:ClearAllPoints()
-		bar.candyBarLabel:SetPoint("LEFT", bar.candyBarBar, "LEFT", 2, 8)
-		bar.candyBarLabel:SetPoint("RIGHT", bar.candyBarBar, "RIGHT", -2, 8)
-		bar.candyBarLabel:SetFont(I.Font[1], 13, I.Font[3])
-		bar.candyBarLabel.SetFont = M.Dummy
-		bar.candyBarDuration:ClearAllPoints()
-		bar.candyBarDuration:SetPoint("RIGHT", bar.candyBarBar, "RIGHT", -2, 8)
-		bar.candyBarDuration:SetPoint("LEFT", bar.candyBarBar, "LEFT", 2, 8)
-		bar.candyBarDuration:SetFont(I.Font[1], 13, I.Font[3])
-		bar.candyBarDuration.SetFont = M.Dummy
-	end
-
-	local function registerStyle()
-		local bars = BigWigs:GetPlugin("Bars", true)
-		bars:RegisterBarStyle("NDui", {
-			apiVersion = 1,
-			version = 2,
-			GetSpacing = function(bar) return bar:GetHeight()+5 end,
-			ApplyStyle = styleBar,
-			BarStopped = removeStyle,
-			GetStyleName = function() return "NDui" end,
-		})
-		hooksecurefunc(bars, "SetBarStyle", function(self, style)
-			if style ~= "NDui" then
-				self:SetBarStyle("NDui")
-			end
-		end)
-	end
 
 	if IsAddOnLoaded("BigWigs_Plugins") then
 		registerStyle()

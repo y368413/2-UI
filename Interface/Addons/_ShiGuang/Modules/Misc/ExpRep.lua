@@ -130,6 +130,7 @@ function MISC:ExpBar_UpdateTooltip()
 				name = name.." ("..currentRank.." / "..maxRank..")"
 			end
 			if not nextFriendThreshold then
+				barMax = barMin + 1e3
 				value = barMax - 1
 			end
 			standingtext = friendTextLevel
@@ -149,6 +150,16 @@ function MISC:ExpBar_UpdateTooltip()
 			local paraCount = floor(currentValue/threshold)
 			currentValue = mod(currentValue, threshold)
 			GameTooltip:AddDoubleLine("★"..paraCount, currentValue.."/"..threshold.." ("..floor(currentValue/threshold*100).."%)", .6,.8,1, 1,1,1)
+		end
+
+		if factionID == 2465 then -- 荒猎团
+			local _, rep, _, name, _, _, reaction, threshold, nextThreshold = GetFriendshipReputation(2463) -- 玛拉斯缪斯
+			if nextThreshold and rep > 0 then
+				local current = rep - threshold
+				local currentMax = nextThreshold - threshold
+				GameTooltip:AddLine(name, 0,.6,1)
+				GameTooltip:AddDoubleLine(reaction, current.." / "..currentMax.." ("..floor(current/currentMax*100).."%)", .6,.8,1, 1,1,1)
+			end
 		end
 	end
 

@@ -1,4 +1,4 @@
---- @type MaxDps MaxDps
+﻿--- @type MaxDps MaxDps
 local _, MaxDps = ...;
 
 -- Global cooldown spell id
@@ -216,8 +216,9 @@ function MaxDps:CheckTalents()
 
 	for talentRow = 1, 7 do
 		for talentCol = 1, 3 do
-			local _, name, _, sel, _, id = GetTalentInfo(talentRow, talentCol, 1);
-			if sel then
+            --修正在托加斯特天赋获取不正确的bug
+			local _, name, _, sel, _, id , unknown, row, column, known, grantedByAura = GetTalentInfo(talentRow, talentCol, 1);
+			if sel or grantedByAura then
 				self.PlayerTalents[id] = 1;
 			end
 		end

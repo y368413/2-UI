@@ -415,7 +415,7 @@ function G:ExportGUIData()
 	end
 
 	for KEY, VALUE in pairs(MaoRUIDB) do
-		if KEY == "RaidAuraWatch" or KEY == "CustomJunkList" then
+		if KEY == "RaidAuraWatch" then
 			text = text..";ACCOUNT:"..KEY
 			for spellID in pairs(VALUE) do
 				text = text..":"..spellID
@@ -433,16 +433,18 @@ function G:ExportGUIData()
 					text = text..":"..spellID
 				end
 			end
-		elseif KEY == "CornerBuffs" then
+		elseif KEY == "CornerSpells" then
 			for class, value in pairs(VALUE) do
 				for spellID, data in pairs(value) do
 					if not bloodlustFilter[spellID] and class == I.MyClass then
 						local anchor, color, filter = unpack(data)
+						anchor = anchor or ""
+						color = color or {"", "", ""}
 						text = text..";ACCOUNT:"..KEY..":"..class..":"..spellID..":"..anchor..":"..color[1]..":"..color[2]..":"..color[3]..":"..tostring(filter or false)
 					end
 				end
 			end
-		elseif KEY == "PartyWatcherSpells" then
+		elseif KEY == "PartySpells" then
 			text = text..";ACCOUNT:"..KEY
 			for spellID, duration in pairs(VALUE) do
 				local name = GetSpellInfo(spellID)
@@ -488,7 +490,7 @@ local function reloadDefaultSettings()
 			R.db[i] = j
 		end
 	end
-	R.db["BFA"] = true -- don't empty data on next loading
+	R.db["SL"] = true -- don't empty data on next loading
 end
 
 function G:ImportGUIData()
@@ -560,7 +562,7 @@ function G:ImportGUIData()
 			itemID = tonumber(itemID)
 			R.db[key][spellID] = {spellID, duration, indicator, unit, itemID}
 		elseif key == "ACCOUNT" then
-			if value == "RaidAuraWatch" or value == "CustomJunkList" then
+			if value == "RaidAuraWatch" then
 				local spells = {select(3, strsplit(":", option))}
 				for _, spellID in next, spells do
 					MaoRUIDB[value][tonumber(spellID)] = true
@@ -574,7 +576,7 @@ function G:ImportGUIData()
 				for _, spellID in next, spells do
 					MaoRUIDB[value][tonumber(arg1)][tonumber(spellID)] = true
 				end
-			elseif value == "CornerBuffs" then
+			elseif value == "CornerSpells" then
 				local class, spellID, anchor, r, g, b, filter = select(3, strsplit(":", option))
 				spellID = tonumber(spellID)
 				r = tonumber(r)
@@ -582,8 +584,12 @@ function G:ImportGUIData()
 				b = tonumber(b)
 				filter = toBoolean(filter)
 				if not MaoRUIDB[value][class] then MaoRUIDB[value][class] = {} end
-				MaoRUIDB[value][class][spellID] = {anchor, {r, g, b}, filter}
-			elseif value == "PartyWatcherSpells" then
+				if anchor == "" then
+					MaoRUIDB[value][class][spellID] = {}
+				else
+					MaoRUIDB[value][class][spellID] = {anchor, {r, g, b}, filter}
+				end
+			elseif value == "PartySpells" then
 				local options = {strsplit(":", option)}
 				local index = 3
 				local spellID = options[index]

@@ -16,33 +16,36 @@ local NightFae = Enum.CovenantType.NightFae;
 local Kyrian = Enum.CovenantType.Kyrian;
 
 local VG = {
-	AgonizingFlames  = 207548,
-	BurningAlive     = 207739,
-	CharredFlesh     = 264002,
-	Disrupt          = 183752,
-	ConsumeMagic     = 278326,
-	ThrowGlaive      = 204157,
-	ImmolationAura   = 258920,
-	Metamorphosis    = 187827,
-	FieryBrand       = 204021,
-	SinfulBrand      = 317009,
-	TheHunt          = 323639,
-	FodderToTheFlame = 329554,
-	ElysianDecree    = 306830,
-	DemonSpikes      = 203720,
-	DemonSpikesAura  = 203819,
-	InfernalStrike   = 189110,
-	BulkExtraction   = 320341,
-	SpiritBomb       = 247454,
-	Fracture         = 263642,
-	FelDevastation   = 212084,
-	SoulCleave       = 228477,
-	Felblade         = 232893,
-	SigilOfFlame     = 204596,
-	Shear            = 203782,
+	AgonizingFlames    = 207548,
+	BurningAlive       = 207739,
+	CharredFlesh       = 264002,
+	Disrupt            = 183752,
+	ConsumeMagic       = 278326,
+	ThrowGlaive        = 204157,
+	ImmolationAura     = 258920,
+	Metamorphosis      = 187827,
+	FieryBrand         = 204021,
+	SinfulBrand        = 317009,
+	TheHunt            = 323639,
+	FodderToTheFlame   = 329554,
+	ElysianDecree      = 306830,
+	ElysianDecreeConc  = 327839,
+	DemonSpikes        = 203720,
+	DemonSpikesAura    = 203819,
+	InfernalStrike     = 189110,
+	BulkExtraction     = 320341,
+	SpiritBomb         = 247454,
+	Fracture           = 263642,
+	FelDevastation     = 212084,
+	SoulCleave         = 228477,
+	Felblade           = 232893,
+	SigilOfFlame       = 204596,
+	SigilOfFlameConc   = 204513,
+	Shear              = 203782,
+	ConcentratedSigils = 207666,
 
 	-- Leggo buffs
-	FelBombardment   = 337849,
+	FelBombardment     = 337849,
 
 	-- Leggo bonus Id
 	RazelikhsDefilementBonusId = 7046
@@ -119,6 +122,7 @@ function DemonHunter:VengeanceCooldowns()
 	local cooldown = fd.cooldown;
 	local debuff = fd.debuff;
 	local currentSpell = fd.currentSpell;
+	local talents = fd.talents;
 	local covenantId = fd.covenant.covenantId;
 
 	-- sinful_brand,if=!dot.sinful_brand.ticking;
@@ -137,8 +141,9 @@ function DemonHunter:VengeanceCooldowns()
 	end
 
 	-- elysian_decree;
-	if covenantId == Kyrian and cooldown[VG.ElysianDecree].ready then
-		return VG.ElysianDecree;
+	local ElysianDecree = talents[VG.ConcentratedSigils] and VG.ElysianDecreeConc or VG.ElysianDecree;
+	if covenantId == Kyrian and cooldown[ElysianDecree].ready then
+		return ElysianDecree;
 	end
 end
 
@@ -242,10 +247,11 @@ function DemonHunter:VengeanceNormal()
 	end
 
 	-- sigil_of_flame,if=!(covenant.kyrian.enabled&runeforge.razelikhs_defilement);
-	if cooldown[VG.SigilOfFlame].ready and
+	local SigilOfFlame = talents[VG.ConcentratedSigils] and VG.SigilOfFlameConc or VG.SigilOfFlame;
+	if cooldown[SigilOfFlame].ready and
 		not (covenantId == Kyrian and runeforge[VG.RazelikhsDefilementBonusId])
 	then
-		return VG.SigilOfFlame;
+		return SigilOfFlame;
 	end
 
 	-- shear;
