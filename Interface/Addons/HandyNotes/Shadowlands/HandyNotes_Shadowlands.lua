@@ -4535,7 +4535,7 @@ map.nodes[51456859] = Rare({
 
 map.nodes[30365517] = Rare({
     id=171327,
-    quest=61101,
+    quest=61108,
     note=L["reekmonger_note"],
     rewards={
         Achievement({id=14307, criteria=50616}),
@@ -4560,13 +4560,14 @@ map.nodes[22432285] = Rare({
    requires=Shadowlands.requirement.GarrisonTalent(1241, L["anima_channeled"]),
    note=L["sotiros_orstus_note"],
    rewards={
-       Achievement({id=14307, criteria=50618})
+       Achievement({id=14307, criteria=50618}),
+       Transmog({item=184365, slot=L["shield"]}) -- Aegis of Salvation
    }
 }) -- Orstus and Sotiros
 
 map.nodes[61409050] = Rare({
     id=170548,
-    quest=60860,
+    quest=60862,
     note=L["sundancer_note"],
     rewards={
         Achievement({id=14307, criteria=50601}),
@@ -5233,7 +5234,7 @@ map.nodes[52663542] = Rare({
     rewards={
         Achievement({id=14308, criteria=48876}),
         Transmog({item=184290, slot=L["dagger"]}), -- Blood-Dyed Bonesaw
-        Transmog({item=184154, slot=L["cosmetic"]}), -- Grungy Containment Pack
+        Transmog({item=184154, slot=L["cosmetic"], covenant=NECROLORD}), -- Grungy Containment Pack
         Toy({item=184476}) -- Regenerating Slime Vial
     }
 }) -- Bubbleblood
@@ -5330,7 +5331,7 @@ map.nodes[72872891] = Rare({
     rewards={
         Achievement({id=14308, criteria=49724}),
         -- Item({item=184174, note=L["ring"]}), -- Clasp of Death
-        Transmog({item=181810, slot=L["cosmetic"]}) -- Phylactery of the Dead Conniver
+        Transmog({item=181810, slot=L["cosmetic"], covenant=NECROLORD}) -- Phylactery of the Dead Conniver
     }
 }) -- Necromantic Anomaly
 
@@ -5366,6 +5367,7 @@ map.nodes[53726132] = Rare({
 map.nodes[53841877] = Rare({
     id=159753,
     quest=58004,
+    note=L["ravenomous_note"],
     rewards={
         Achievement({id=14308, criteria=48865}),
         Transmog({item=184184, slot=L["dagger"]}), -- Ravenomous's Acid-Tipped Stinger
@@ -5502,6 +5504,9 @@ map.nodes[58197421] = Rare({
         Shadowlands.reward.Spacer(),
         Shadowlands.reward.Section('{npc:157308}'), -- Corrupted Sediment
         Transmog({item=184302, slot=L["mail"], indent=true}), -- Residue-Coated Muck Waders
+        Shadowlands.reward.Spacer(),
+        Shadowlands.reward.Section('{npc:157311}'), -- Burnblister
+        Transmog({item=184175, slot=L["wand"], indent=true}), -- Bone-Blistering Wand
         Shadowlands.reward.Spacer(),
         Shadowlands.reward.Section('{npc:157309}'), -- Violet Mistake
         Transmog({item=184301, slot=L["leather"], indent=true}), -- Twenty-Loop Violet Girdle
@@ -6002,7 +6007,7 @@ map.nodes[32641545] = Rare({
     requires=Shadowlands.requirement.GarrisonTalent(1259, L["anima_channeled"]),
     note=L["madalav_note"],
     rewards={
-        Transmog({item=180939, slot=L["cosmetic"]}) -- Mantle of the Forgemaster's Dark Blades
+        Transmog({item=180939, slot=L["cosmetic"], covenant=VENTHYR}) -- Mantle of the Forgemaster's Dark Blades
     },
     pois={
         POI({32661483}) -- Madalav's Hammer
