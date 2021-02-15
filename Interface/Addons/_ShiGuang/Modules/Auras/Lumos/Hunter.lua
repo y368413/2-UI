@@ -275,11 +275,11 @@ PetStableFrame.page = 1
 
 
 --PetHealthWarning------------------
-PetHealthWarningFrame.Threshold=35
-PetHealthWarningFrame.Warned=false
 local PetHealthWarningFrame=CreateFrame("ScrollingMessageFrame","PHA",UIParent)	
 PetHealthWarningFrame:RegisterEvent("PLAYER_LOGIN")
 PetHealthWarningFrame:RegisterEvent("UNIT_HEALTH")
+PetHealthWarningFrame.Threshold=35
+PetHealthWarningFrame.Warned=false
 PetHealthWarningFrame:SetScript("OnEvent",function(Event,Arg1,...)
 	if(Event=="PLAYER_LOGIN")then
 			PetHealthWarningFrame:SetWidth(450)
@@ -297,14 +297,14 @@ PetHealthWarningFrame:SetScript("OnEvent",function(Event,Arg1,...)
 		return
 	end	
 	if(Event=="UNIT_HEALTH" and Arg1=="pet")then
-			if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)<=PetHealthWarningFrame.Threshold and PetHealthWarningFrame.Warned==false)then
+			if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)<=PetHealthWarningFrame_Threshold and PetHealthWarningFrame_Warned==false)then
 				PlaySoundFile("Interface\\AddOns\\Ace3\\ShiGuang\\Media\\Sounds\\Beep.ogg")	
 				PetHealthWarningFrame:AddMessage("- CRITICAL PET HEALTH -", 1, 0, 0, nil, 3)
-				PetHealthWarningFrame.Warned=true
+				PetHealthWarningFrame_Warned=true
 				return
 			end
-			if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)>PetHealthWarningFrame.Threshold) then
-				PetHealthWarningFrame.Warned=false
+			if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)>PetHealthWarningFrame_Threshold) then
+				PetHealthWarningFrame_Warned=false
 				return
 			end	
 		return

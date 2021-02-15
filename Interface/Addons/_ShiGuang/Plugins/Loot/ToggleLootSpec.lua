@@ -74,19 +74,13 @@ local function CreateDropDown(bossIndex, bossID, bossName, checkedSpecName)
     end
 end
 
-local cachedBossId = 0
+--[[local cachedBossId = 0
 CreateFrame("Frame"):SetScript("OnUpdate", function()
     --界面没打开，返回
     local name, description, bossID, rootSectionID, link = EJ_GetEncounterInfoByIndex(1)
-    
-    if not bossID then
-        return
-    end
-    
+    if not bossID then return end
     --boss没变，返回
-    if bossID == cachedBossId then
-        return
-    end
+    if bossID == cachedBossId then return end
     --print("reinit", bossID, name, time())
     for i, v in ipairs(dropdownFrames) do
         v:Hide()
@@ -101,30 +95,30 @@ CreateFrame("Frame"):SetScript("OnUpdate", function()
         end
         CreateDropDown(bossIndex, bossID, name, GetLootSpecByBossName(name))
     end
-end)
+end)]]
 
 --hook
---local hookFrame = CreateFrame("Frame");
---hookFrame:RegisterEvent("ADDON_LOADED");
---hookFrame:SetScript("OnEvent", function(self, event,moduleName)
---  if moduleName=="Blizzard_EncounterJournal" then
---    local EncounterJournal_DisplayInstance_original = EncounterJournal_DisplayInstance
---    EncounterJournal_DisplayInstance = function(self,instanceID, noButton)
---      if noButton then return;end
---
---      for i,v in ipairs(dropdownFrames) do
---        v:Hide()
---      end
---      for bossIndex=1,50,1 do
---        local name, description, bossID, rootSectionID, link = EJ_GetEncounterInfoByIndex(bossIndex)
---        if not bossID then break;end
---        CreateDropDown(bossIndex,bossID,name,GetLootSpecByBossName(name))
---      end
---      return EncounterJournal_DisplayInstance_original(self,instanceID, noButton)
---    end
---    hookFrame:UnregisterEvent("ADDON_LOADED") --注销事件
---  end
---end)
+local hookFrame = CreateFrame("Frame");
+hookFrame:RegisterEvent("ADDON_LOADED");
+hookFrame:SetScript("OnEvent", function(self, event,moduleName)
+  if moduleName=="Blizzard_EncounterJournal" then
+    local EncounterJournal_DisplayInstance_original = EncounterJournal_DisplayInstance
+    EncounterJournal_DisplayInstance = function(self,instanceID, noButton)
+      if noButton then return;end
+
+      for i,v in ipairs(dropdownFrames) do
+        v:Hide()
+      end
+      for bossIndex=1,50,1 do
+        local name, description, bossID, rootSectionID, link = EJ_GetEncounterInfoByIndex(bossIndex)
+        if not bossID then break;end
+        CreateDropDown(bossIndex,bossID,name,GetLootSpecByBossName(name))
+      end
+      return EncounterJournal_DisplayInstance_original(self,instanceID, noButton)
+    end
+    hookFrame:UnregisterEvent("ADDON_LOADED") --注销事件
+  end
+end)
 
 function GetLootSpecByBossName(bossName)
     local lootSpec = ShiGuangPerDB[bossName]
