@@ -140,6 +140,25 @@ function module:CheckCornerSpells()
 	end
 end
 
+function module:CheckMajorSpells()
+	for spellID in pairs(R.MajorSpells) do
+		local name = GetSpellInfo(spellID)
+		if name then
+			if MaoRUIDB["MajorSpells"][spellID] then
+				MaoRUIDB["MajorSpells"][spellID] = nil
+			end
+		else
+			if I.isDeveloper then print("Invalid cornerspell ID: "..spellID) end
+		end
+	end
+
+	for spellID, value in pairs(MaoRUIDB["MajorSpells"]) do
+		if value == false and R.MajorSpells[spellID] == nil then
+			MaoRUIDB["MajorSpells"][spellID] = nil
+		end
+	end
+end
+
 function module:OnLogin()
 	for instName, value in pairs(RaidDebuffs) do
 		for spell, priority in pairs(value) do
@@ -161,6 +180,7 @@ function module:OnLogin()
 
 	module:CheckPartySpells()
 	module:CheckCornerSpells()
+	module:CheckMajorSpells()
 
 	-- Filter bloodlust for healers
 	local function filterBloodlust()

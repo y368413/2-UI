@@ -306,11 +306,6 @@ function DeathKnight:FrostAoe()
 		return FR.FrostStrike;
 	end
 
-	-- remorseless_winter;
-	if cooldown[FR.RemorselessWinter].ready and runes >= 1 then
-		return FR.RemorselessWinter;
-	end
-
 	-- frostscythe,if=!death_and_decay.ticking&covenant.night_fae|!covenant.night_fae;
 	if talents[FR.Frostscythe] and
 		runes >= 1 and
@@ -534,10 +529,11 @@ function DeathKnight:FrostColdHeart()
 		return FR.ChainsOfIce;
 	end
 
-	-- chains_of_ice,if=!talent.obliteration&death_knight.runeforge.fallen_crusader&(buff.cold_heart.stack>=16&buff.unholy_strength.up|buff.cold_heart.stack>=19&cooldown.pillar_of_frost.remains>10);
+	-- chains_of_ice,if=!talent.obliteration&death_knight.runeforge.fallen_crusader&!buff.pillar_of_frost.up&(buff.cold_heart.stack>=16&buff.unholy_strength.up|buff.cold_heart.stack>=19&cooldown.pillar_of_frost.remains>10)
 	if runes >= 1 and
 		not talents[FR.Obliteration] and
 		deathKnightRuneforgeFallenCrusader and
+		not buff[FR.PillarOfFrost].up and
 		(
 			buff[FR.ColdHeartBuff].count >= 16 and buff[FR.UnholyStrength].up or
 			buff[FR.ColdHeartBuff].count >= 19 and cooldown[FR.PillarOfFrost].remains > 10
@@ -546,12 +542,12 @@ function DeathKnight:FrostColdHeart()
 		return FR.ChainsOfIce;
 	end
 
-	-- chains_of_ice,if=!talent.obliteration&!death_knight.runeforge.fallen_crusader&buff.cold_heart.stack>=10&buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains>20;
+	-- chains_of_ice,if=!talent.obliteration&!death_knight.runeforge.fallen_crusader&buff.cold_heart.stack>=10&!buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains>20
 	if runes >= 1 and
 		not talents[FR.Obliteration] and
 		not deathKnightRuneforgeFallenCrusader and
 		buff[FR.ColdHeartBuff].count >= 10 and
-		buff[FR.PillarOfFrost].up and
+		not buff[FR.PillarOfFrost].up and
 		cooldown[FR.PillarOfFrost].remains > 20
 	then
 		return FR.ChainsOfIce;

@@ -399,6 +399,23 @@ function module:HybridMinimapOnLoad(addon)
 	end
 end
 
+local minimapInfo = {
+	text = U["MinimapHelp"],
+	buttonStyle = HelpTip.ButtonStyle.GotIt,
+	targetPoint = HelpTip.Point.LeftEdgeBottom,
+	onAcknowledgeCallback = M.HelpInfoAcknowledge,
+	callbackArg = "MinimapInfo",
+	alignment = 3,
+}
+
+function module:ShowMinimapHelpInfo()
+	Minimap:HookScript("OnEnter", function()
+		if not MaoRUIDB["Help"]["MinimapInfo"] then
+			HelpTip:Show(MinimapCluster, minimapInfo)
+		end
+	end)
+end
+
 function module:SetupMinimap()
 	-- Shape and Position
 	Minimap:ClearAllPoints()
@@ -446,6 +463,7 @@ function module:SetupMinimap()
 	self:CreatePulse()
 	self:ReskinRegions()
 	self:WhoPingsMyMap()
+	self:ShowMinimapHelpInfo()
 
 	-- HybridMinimap
 	M:RegisterEvent("ADDON_LOADED", module.HybridMinimapOnLoad)

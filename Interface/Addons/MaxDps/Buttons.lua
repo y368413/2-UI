@@ -1,6 +1,11 @@
 local _, MaxDps = ...;
 
 local TableInsert = tinsert;
+local TableRemove = tremove;
+local GetItemSpell = GetItemSpell;
+local GetSpellInfo = GetSpellInfo;
+local pairs = pairs;
+local select = select;
 
 MaxDps.Spells = {};
 MaxDps.ItemSpells = {}; -- hash map of itemId -> itemSpellId
@@ -21,7 +26,7 @@ local LABs = {
 -- @param type - optional type of overlay, standard types are 'normal' and 'cooldown' - used to select overlay color
 -- @param color - optional custom color in standard structure {r = 1, g = 1, b = 1, a = 1}
 function MaxDps:CreateOverlay(parent, id, texture, type, color)
-	local frame = tremove(self.FramePool);
+	local frame = TableRemove(self.FramePool);
 	if not frame then
 		frame = CreateFrame('Frame', 'MaxDps_Overlay_' .. id, parent);
 	end
@@ -63,7 +68,7 @@ function MaxDps:CreateOverlay(parent, id, texture, type, color)
 end
 
 function MaxDps:DestroyAllOverlays()
-	for key, frame in pairs(self.Frames) do
+	for _, frame in pairs(self.Frames) do
 		frame:GetParent().MaxDpsOverlays = nil;
 		frame:ClearAllPoints();
 		frame:Hide();
@@ -185,7 +190,6 @@ function MaxDps:AddStandardButton(button)
 	local type = button:GetAttribute('type');
 	if type then
 		local actionType = button:GetAttribute(type);
-		local id;
 		local spellId;
 
 		if type == 'action' then
@@ -311,7 +315,7 @@ function MaxDps:FetchButtonForge()
 end
 
 function MaxDps:Dump()
-	for k, v in pairs(self.Spells) do
+	for k, _ in pairs(self.Spells) do
 		print(k, GetSpellInfo(k));
 	end
 end
@@ -322,7 +326,7 @@ end
 
 function MaxDps:GlowIndependent(spellId, id, texture, color)
 	if self.Spells[spellId] ~= nil then
-		for k, button in pairs(self.Spells[spellId]) do
+		for _, button in pairs(self.Spells[spellId]) do
 			self:Glow(button, id, texture, 'cooldown', color);
 		end
 	end
@@ -330,7 +334,7 @@ end
 
 function MaxDps:ClearGlowIndependent(spellId, id)
 	if self.Spells[spellId] ~= nil then
-		for k, button in pairs(self.Spells[spellId]) do
+		for _, button in pairs(self.Spells[spellId]) do
 			self:HideGlow(button, id);
 		end
 	end
@@ -354,14 +358,14 @@ end
 
 function MaxDps:GlowSpell(spellId)
 	if self.Spells[spellId] ~= nil then
-		for k, button in pairs(self.Spells[spellId]) do
+		for _, button in pairs(self.Spells[spellId]) do
 			self:Glow(button, 'next', nil, 'normal');
 		end
 
 		self.SpellsGlowing[spellId] = 1;
 	else
 		local spellName = GetSpellInfo(spellId);
-		self:Print(self.Colors.Error .. 'Spell not found on action bars: ' .. spellName .. '(' .. spellId .. ')');
+		--self:Print('Spell not found on action bars: ' .. (spellName and spellName or 'Unknown') '(' .. spellId .. ')' );
 	end
 end
 
@@ -373,7 +377,7 @@ end
 function MaxDps:GlowClear()
 	for spellId, v in pairs(self.SpellsGlowing) do
 		if v == 1 then
-			for k, button in pairs(self.Spells[spellId]) do
+			for _, button in pairs(self.Spells[spellId]) do
 				self:HideGlow(button, 'next');
 			end
 			self.SpellsGlowing[spellId] = 0;

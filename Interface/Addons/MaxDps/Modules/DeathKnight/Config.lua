@@ -13,6 +13,7 @@ local defaultOptions = {
 	bloodDancingRuneWeaponAsCooldown = false,
 	unholyArmyOfTheDeadAsCooldown = true,
 	unholySummonGargoyleAsCooldown = false,
+	unholySacrificialPactAsCooldown = true,
 	frostFrostwyrmsFuryAsCooldown = true,
 };
 
@@ -81,18 +82,24 @@ function DeathKnight:GetConfig()
 				},
 			},
 			[10] = {
+				unholySacrificialPactAsCooldown = {
+					type = 'checkbox',
+					label = 'Sacrificial Pact as cooldown'
+				}
+			},
+			[11] = {
 				advanced = {
 					type = 'header',
 					label = 'Advanced options'
 				}
 			},
-			[11] = {
+			[12] = {
 				alwaysGlowCooldowns = {
 					type = 'checkbox',
 					label = 'Always glow "X as Cooldown" abilities'
 				}
 			},
-			[12] = {
+			[13] = {
 				infoText = {
 					type  = 'label',
 					label = 'LEAVE THIS CHECKED UNLESS YOU\'VE READ AND UNDERSTOOD THIS DISCLAIMER! ' ..

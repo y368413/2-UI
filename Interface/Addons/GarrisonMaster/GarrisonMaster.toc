@@ -50,5 +50,4 @@ LandingAlts.lua
 
 MoreRewardsFormOrderHall.lua
 InProgressMissions.lua
-##GarrisonSwitch.lua
 GarrisonJK.lua

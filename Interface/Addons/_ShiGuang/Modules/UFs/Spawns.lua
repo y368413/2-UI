@@ -166,6 +166,7 @@ function UF:OnLogin()
 		UF:UpdateGroupRoles()
 		UF:QuestIconCheck()
 		UF:RefreshPlateOnFactionChanged()
+		UF:RefreshMajorSpells()
 
 		oUF:RegisterStyle("Nameplates", UF.CreatePlates)
 		oUF:SetActiveStyle("Nameplates")

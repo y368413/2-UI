@@ -174,7 +174,7 @@ function DeathKnight:BloodCovenants()
 	-- deaths_due,if=!buff.deaths_due.up|buff.deaths_due.remains<4|buff.crimson_scourge.up;
 	if covenantId == NightFae and
 		cooldown[BL.DeathsDue].ready and
-		runes >= 1 and
+		(runes >= 1 or  buff[BL.CrimsonScourge].up) and
 		(not buff[BL.DeathsDueBuff].up or buff[BL.DeathsDueBuff].remains < 4 or buff[BL.CrimsonScourge].up)
 	then
 		return BL.DeathsDue;
@@ -326,7 +326,6 @@ function DeathKnight:BloodStandard()
 
 	-- death_and_decay,if=(buff.crimson_scourge.up&talent.relish_in_blood.enabled)&runic_power.deficit>10;
 	if cooldown[BL.DeathAndDecay].ready and
-		runes >= 1 and
 		buff[BL.CrimsonScourge].up and
 		talents[BL.RelishInBlood] and
 		runicPowerDeficit > 10
@@ -383,7 +382,7 @@ function DeathKnight:BloodStandard()
 
 	-- death_and_decay,if=buff.crimson_scourge.up|talent.rapid_decomposition.enabled|spell_targets.death_and_decay>=2;
 	if cooldown[BL.DeathAndDecay].ready and
-		runes >= 1 and
+		(runes >= 1 or  buff[BL.CrimsonScourge].up) and
 		(
 			buff[BL.CrimsonScourge].up or
 				talents[BL.RapidDecomposition] or

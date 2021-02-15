@@ -1,4 +1,4 @@
--- Author: Theck, navv_, seriallos  Version: 9.0.2-15
+-- Author: Theck, navv_, seriallos  Version: 9.0.2-16
 
 local Simulationcraft = {}
 
@@ -359,6 +359,7 @@ function Simulationcraft:HandleChatCommand(input)
 
   local debugOutput = false
   local noBags = false
+  local showMerchant = false
   local links = getLinks(input)
 
   for _, arg in ipairs(args) do
@@ -367,7 +368,7 @@ function Simulationcraft:HandleChatCommand(input)
     end
   end
 
-  self:PrintSimcProfile(debugOutput, noBags, links)
+  self:PrintSimcProfile(debugOutput, noBags, showMerchant, links)
 end
 
 local function GetItemSplit(itemLink)
@@ -849,9 +850,9 @@ function Simulationcraft:GetMainFrame(text)
 end
 
 -- This is the workhorse function that constructs the profile
-function Simulationcraft:PrintSimcProfile(debugOutput, noBags, links)
+function Simulationcraft:PrintSimcProfile(debugOutput, noBags, showMerchant, links)
   -- addon metadata
-  local versionComment = '# SimC Addon ' .. '9.0.2-15'
+  local versionComment = '# SimC Addon ' .. '9.0.2-16'
   local simcVersionWarning = '# Requires SimulationCraft 901-01 or newer'
 
   -- Basic player info
@@ -1070,6 +1071,26 @@ function Simulationcraft:PrintSimcProfile(debugOutput, noBags, links)
       end
     end
   end
+
+  -- Dump out equippable items from a vendor, this is mostly for debugging / data collection
+  local numMerchantItems = GetMerchantNumItems()
+  if showMerchant and numMerchantItems > 0 then
+    simulationcraftProfile = simulationcraftProfile .. '\n'
+    simulationcraftProfile = simulationcraftProfile .. '\n### Merchant items\n'
+    for i=1,numMerchantItems do
+      local link = GetMerchantItemLink(i)
+      local name,_,_,_,_,_,_,_,invType = GetItemInfo(link)
+      if name and invType ~= "" then
+        local slotNum = Simulationcraft.invTypeToSlotNum[invType]
+        -- Doesn't work, seems to always return base item level
+        -- local level, _, _ = GetDetailedItemLevelInfo(itemLink)
+        simulationcraftProfile = simulationcraftProfile .. '#\n'
+        simulationcraftProfile = simulationcraftProfile .. '# ' .. name .. '\n'
+        simulationcraftProfile = simulationcraftProfile .. '# ' .. GetItemStringFromItemLink(slotNum, link, nil, false) .. "\n"
+      end
+    end
+  end
+
 
   -- output item links that were included in the /simc chat line
   if links and #links > 0 then

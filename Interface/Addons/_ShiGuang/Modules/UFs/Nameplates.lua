@@ -143,15 +143,15 @@ function UF:UpdateGroupRoles()
 	M:RegisterEvent("GROUP_LEFT", resetGroupRoles)
 end
 
-function UF:CheckTankStatus(unit)
-	local index = unit.."target"
-	local unitRole = isInGroup and UnitExists(index) and not UnitIsUnit(index, "player") and groupRoles[UnitName(index)] or "NONE"
-	if unitRole == "TANK" and I.Role == "Tank" then
-		self.feedbackUnit = index
-		self.isOffTank = true
+function UF:CheckThreatStatus(unit)
+	if not UnitExists(unit) then return end
+
+	local unitTarget = unit.."target"
+	local unitRole = isInGroup and UnitExists(unitTarget) and not UnitIsUnit(unitTarget, "player") and groupRoles[UnitName(unitTarget)] or "NONE"
+	if I.Role == "Tank" and unitRole == "TANK" then
+		return true, UnitThreatSituation(unitTarget, unit)
 	else
-		self.feedbackUnit = "player"
-		self.isOffTank = false
+		return false, UnitThreatSituation("player", unit)
 	end
 end
 
@@ -165,7 +165,7 @@ function UF:UpdateColor(_, unit)
 	local isCustomUnit = customUnits[name] or customUnits[npcID]
 	local isPlayer = self.isPlayer
 	local isFriendly = self.isFriendly
-	local status = self.feedbackUnit and UnitThreatSituation(self.feedbackUnit, unit) or false -- just in case
+	local isOffTank, status = UF:CheckThreatStatus(unit)
 	local customColor = R.db["Nameplate"]["CustomColor"]
 	local secureColor = R.db["Nameplate"]["SecureColor"]
 	local transColor = R.db["Nameplate"]["TransColor"]
@@ -201,7 +201,7 @@ function UF:UpdateColor(_, unit)
 					if I.Role ~= "Tank" and revertThreat then
 						r, g, b = insecureColor.r, insecureColor.g, insecureColor.b
 					else
-						if self.isOffTank then
+						if isOffTank then
 							r, g, b = offTankColor.r, offTankColor.g, offTankColor.b
 						else
 							r, g, b = secureColor.r, secureColor.g, secureColor.b
@@ -224,18 +224,15 @@ function UF:UpdateColor(_, unit)
 		element:SetStatusBarColor(r, g, b)
 	end
 
-	if isCustomUnit or (not R.db["Nameplate"]["TankMode"] and I.Role ~= "Tank") then
-		if status and status == 3 then
+	self.ThreatIndicator:Hide()
+	if status and (isCustomUnit or (not R.db["Nameplate"]["TankMode"] and I.Role ~= "Tank")) then
+		if status == 3 then
 			self.ThreatIndicator:SetBackdropBorderColor(1, 0, 0)
 			self.ThreatIndicator:Show()
-		elseif status and (status == 2 or status == 1) then
+		elseif status == 2 or status == 1 then
 			self.ThreatIndicator:SetBackdropBorderColor(1, 1, 0)
 			self.ThreatIndicator:Show()
-		else
-			self.ThreatIndicator:Hide()
 		end
-	else
-		self.ThreatIndicator:Hide()
 	end
 
 	if executeRatio > 0 and healthPerc <= executeRatio then
@@ -247,8 +244,6 @@ end
 
 function UF:UpdateThreatColor(_, unit)
 	if unit ~= self.unit then return end
-
-	UF.CheckTankStatus(self, unit)
 	UF.UpdateColor(self, _, unit)
 end
 
@@ -715,6 +710,13 @@ function UF:CreatePlates()
 	self:Tag(title, "[npctitle]")
 	self.npcTitle = title
 
+	local tarName = M.CreateFS(self, R.db["Nameplate"]["NameTextSize"]+4)
+	tarName:ClearAllPoints()
+	tarName:SetPoint("TOP", self, "BOTTOM", 0, -10)
+	tarName:Hide()
+	self:Tag(tarName, "[tarname]")
+	self.tarName = tarName
+
 	UF:CreateHealthText(self)
 	UF:CreateCastBar(self)
 	UF:CreateRaidMark(self)
@@ -788,12 +790,20 @@ function UF:UpdateNameplateAuras()
 end
 
 function UF:RefreshNameplats()
+	local plateHeight = R.db["Nameplate"]["PlateHeight"]
+	local nameTextSize = R.db["Nameplate"]["NameTextSize"]
+	local iconSize = plateHeight*2 + 5
+
 	for nameplate in pairs(platesList) do
-		nameplate:SetSize(R.db["Nameplate"]["PlateWidth"], R.db["Nameplate"]["PlateHeight"])
-		nameplate.nameText:SetFont(I.Font[1], R.db["Nameplate"]["NameTextSize"], I.Font[3])
-		nameplate.npcTitle:SetFont(I.Font[1], R.db["Nameplate"]["NameTextSize"]-1, I.Font[3])
-		nameplate.Castbar.Time:SetFont(I.Font[1], R.db["Nameplate"]["NameTextSize"], I.Font[3])
-		nameplate.Castbar.Text:SetFont(I.Font[1], R.db["Nameplate"]["NameTextSize"], I.Font[3])
+		nameplate:SetSize(R.db["Nameplate"]["PlateWidth"], plateHeight)
+		nameplate.nameText:SetFont(I.Font[1], nameTextSize, I.Font[3])
+		nameplate.npcTitle:SetFont(I.Font[1], nameTextSize-1, I.Font[3])
+		nameplate.tarName:SetFont(I.Font[1], nameTextSize+4, I.Font[3])
+		nameplate.Castbar.Icon:SetSize(iconSize, iconSize)
+		nameplate.Castbar.glowFrame:SetSize(iconSize+8, iconSize+8)
+		nameplate.Castbar:SetHeight(plateHeight)
+		nameplate.Castbar.Time:SetFont(I.Font[1], nameTextSize, I.Font[3])
+		nameplate.Castbar.Text:SetFont(I.Font[1], nameTextSize, I.Font[3])
 		nameplate.healthValue:SetFont(I.Font[1], R.db["Nameplate"]["HealthTextSize"], I.Font[3])
 		nameplate.healthValue:UpdateTag()
 		UF.UpdateNameplateAuras(nameplate)
@@ -840,7 +850,6 @@ function UF:UpdatePlateByType()
 		title:Show()
 
 		raidtarget:SetPoint("TOP", title, "BOTTOM", 0, -5)
-		raidtarget:SetParent(self)
 		classify:Hide()
 		if questIcon then questIcon:SetPoint("LEFT", name, "RIGHT", -1, 0) end
 
@@ -914,7 +923,7 @@ function UF:PostUpdatePlates(event, unit)
 		self.widgetsOnly = UnitNameplateShowsWidgetsOnly(unit)
 
 		local blizzPlate = self:GetParent().UnitFrame
-		self.widgetContainer = blizzPlate.WidgetContainer
+		self.widgetContainer = blizzPlate and blizzPlate.WidgetContainer
 		if self.widgetContainer then
 			self.widgetContainer:SetParent(self)
 			self.widgetContainer:SetScale(1/MaoRUIDB["UIScale"])
@@ -935,6 +944,8 @@ function UF:PostUpdatePlates(event, unit)
 		UF.UpdateUnitClassify(self, unit)
 		UF.UpdateDungeonProgress(self, unit)
 		UF:UpdateClassPowerAnchor()
+
+		self.tarName:SetShown(self.npcID == 174773)
 	end
 	UF.UpdateExplosives(self, event, unit)
 end
@@ -1095,4 +1106,25 @@ function UF:ToggleGCDTicker()
 	if not ticker then return end
 
 	ticker:SetShown(R.db["Nameplate"]["PPGCDTicker"])
+end
+
+UF.MajorSpells = {}
+function UF:RefreshMajorSpells()
+	wipe(UF.MajorSpells)
+
+	for spellID in pairs(R.MajorSpells) do
+		local name = GetSpellInfo(spellID)
+		if name then
+			local modValue = MaoRUIDB["MajorSpells"][spellID]
+			if modValue == nil then
+				UF.MajorSpells[spellID] = true
+			end
+		end
+	end
+
+	for spellID, value in pairs(MaoRUIDB["MajorSpells"]) do
+		if value then
+			UF.MajorSpells[spellID] = true
+		end
+	end
 end

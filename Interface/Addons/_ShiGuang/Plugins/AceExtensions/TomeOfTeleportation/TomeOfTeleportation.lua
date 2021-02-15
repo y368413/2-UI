@@ -15,12 +15,12 @@ TeleporterFlightString = "2 Flight Master"
 
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1")
 local icon = LibStub("LibDBIcon-1.0")
-local dataobj = ldb:NewDataObject("TomeTele", {
+--[[local dataobj = ldb:NewDataObject("TomeTele", {
 	label = TOMEOFTELEPORTATIONTITLE, 
 	type = "data source", 
 	icon = "Interface\\Icons\\Spell_arcane_portalshattrath",  --Interface\\Icons\\Spell_Arcane_TeleportDalaran
 	text = "Teleport"
-})
+})]]
 
 local TeleporterParentFrame = nil
 local CastSpell = nil
@@ -985,6 +985,8 @@ function TeleporterOpenFrame()
 	
 	if not ShiGuangPerDB["showSpells"] then ShiGuangPerDB["showSpells"] = {} end
 	if not ShiGuangPerDB["sortOrder"] then ShiGuangPerDB["sortOrder"] = {} end
+	if not ShiGuangPerDB["randomHearth"] then ShiGuangPerDB["randomHearth"] = true end
+	--extraSpells extraItems sort hideItems hideConsumable hideSpells hideChallenge
 	
 	if not IsVisible then		
 		local buttonHeight = GetScaledOption("buttonHeight")
@@ -1422,11 +1424,11 @@ function TeleporterCreateMacroSlashCmdFunction( spell )
 end
 
 function Teleporter_OnAddonLoaded()
-	if TomeOfTele_Icon == nil then
-		TomeOfTele_Icon = {}
-	end
+	--if TomeOfTele_Icon == nil then
+		--TomeOfTele_Icon = {}
+	--end
 	
-	icon:Register("TomeTele", dataobj, TomeOfTele_Icon)		
+	--icon:Register("TomeTele", dataobj, TomeOfTele_Icon)		
 	RebuildSpellList()
 	for index, spell in ipairs(TeleporterSpells) do		
 		if (spell.spellType == ST_Item) then
@@ -1523,7 +1525,7 @@ function TeleporterHideCreatedUI()
 	uiElements = {}
 end
 
---------- Isle of Thunder Weekly Check---- by Fluffies------DIY by y368413-------------------------------------------
+--[[------- Isle of Thunder Weekly Check---- by Fluffies------DIY by y368413-------------------------------------------
 local chest_icon = "|TInterface\\Icons\\Trade_Archaeology_ChestofTinyGlassAnimals:12|t "
 local rare_icon = "|TInterface\\Icons\\Achievement_Boss_Archaedas:12|t "
 local quest_icon = "|TInterface\\CURSOR\\QUEST:12|t "
@@ -1616,7 +1618,7 @@ end
 
 function dataobj:OnClick(button)
 	TeleporterFunction()
-end
+end]]
 
 function TeleporterAddSpell(id, dest)
 	TeleporterSpells[#TeleporterSpells + 1] = {spellId = id, spellType = ST_Spell, zone = dest}

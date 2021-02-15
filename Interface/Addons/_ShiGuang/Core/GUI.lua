@@ -225,6 +225,7 @@ G.DefaultSettings = {
 		ExecuteRatio = 0,
 		ColoredTarget = false,
 		TargetColor = {r=0, g=.6, b=1},
+		CastbarGlow = true,
 	},
 	Skins = {
 		DBM = true,
@@ -313,6 +314,7 @@ G.DefaultSettings = {
 		NzothVision = true,
 		SendActionCD = false,
 		MawThreatBar = true,
+		MDGuildBest = true,
 		QuickQueue = true,
 		--AltTabLfgNotification = false,
 		--CrazyCatLady = true,
@@ -371,6 +373,8 @@ G.AccountSettings = {
 	Help = {},
 	PartySpells = {},
 	CornerSpells = {},
+	CustomTex = "",
+	MajorSpells = {},
 }
 
 -- Initial settings
@@ -432,10 +436,14 @@ loader:SetScript("OnEvent", function(self, _, addon)
 	InitialSettings(G.DefaultSettings, R.db, true)
 
 	M:SetupUIScale(true)
-	if not G.TextureList[MaoRUIDB["TexStyle"]] then
-		MaoRUIDB["TexStyle"] = 2 -- reset value if not exists
+	if MaoRUIDB["CustomTex"] ~= "" then
+		I.normTex = "Interface\\"..MaoRUIDB["CustomTex"]
+	else
+		if not G.TextureList[MaoRUIDB["TexStyle"]] then
+			MaoRUIDB["TexStyle"] = 2 -- reset value if not exists
+		end
+		I.normTex = G.TextureList[MaoRUIDB["TexStyle"]].texture
 	end
-	I.normTex = G.TextureList[MaoRUIDB["TexStyle"]].texture
 
 	self:UnregisterAllEvents()
 end)
@@ -467,6 +475,10 @@ end
 
 local function setupNameplateFilter()
 	G:SetupNameplateFilter(guiPage[2])
+end
+
+local function setupPlateCastbarGlow()
+	G:PlateCastbarGlow(guiPage[5])
 end
 
 local function setupAuraWatch()
@@ -918,7 +930,7 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		--{4, "Skins", "ToggleDirection", U["ToggleDirection"].."*", true, true, {U["LEFT"], U["RIGHT"], U["TOP"], U["BOTTOM"]}, updateToggleDirection},
 		{4, "ACCOUNT", "TexStyle", U["Texture Style"], false, false, {}},
 		{4, "ACCOUNT", "NumberFormat", U["Numberize"], true, false, {U["Number Type1"], U["Number Type2"], U["Number Type3"]}},
-		{2, "Misc", "DBMCount", U["Countdown Sec"].."*", true, true},
+		{2, "Misc", "DBMCount", U["DBMCount"].."*", true, true},
 	},
 	[8] = {
 	  --{1, "Misc", "RaidTool", "|cff00cc4c"..U["Raid Manger"]},
@@ -1106,11 +1118,11 @@ local function CreateOption(i)
 				NDUI_VARIABLE(key, value, eb:GetText())
 				if callback then callback() end
 			end)
+			M.CreateFS(eb, 14, name, "system", "CENTER", 0, 25)
 			eb.title = U["Tips"]
 			local tip = U["EditBox Tip"]
 			if tooltip then tip = tooltip.."|n"..tip end
 			M.AddTooltip(eb, "ANCHOR_RIGHT", tip, "info")
-			M.CreateFS(eb, 14, name, "system", "CENTER", 0, 25)
 		-- Slider
 		elseif optType == 3 then
 			local min, max, step = unpack(data)

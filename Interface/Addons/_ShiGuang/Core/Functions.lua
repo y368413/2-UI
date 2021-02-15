@@ -871,6 +871,25 @@ do
 			self.__texture:SetVertexColor(1, 1, 1)
 		end
 	end
+	-- Handle editbox
+	function M:ReskinEditBox(height, width)
+		local frameName = self.GetName and self:GetName()
+		for _, region in pairs(blizzRegions) do
+			region = frameName and _G[frameName..region] or self[region]
+			if region then
+				region:SetAlpha(0)
+			end
+		end
+
+		local bg = M.CreateBDFrame(self, 0, true)
+		bg:SetPoint("TOPLEFT", -2, 0)
+		bg:SetPoint("BOTTOMRIGHT")
+
+		if height then self:SetHeight(height) end
+		if width then self:SetWidth(width) end
+	end
+	M.ReskinInput = M.ReskinEditBox -- Deprecated
+
 	-- Handle arrows
 	local arrowDegree = {
 		["up"] = 0,
@@ -1111,6 +1130,13 @@ do
 		return r, g, b
 	end
 
+	local function resetColorPicker(swatch)
+		local defaultColor = swatch.__default
+		if defaultColor then
+			ColorPickerFrame:SetColorRGB(defaultColor.r, defaultColor.g, defaultColor.b)
+		end
+	end
+
 	function M:CreateColorSwatch(name, color)
 		color = color or {r=1, g=1, b=1}
 
@@ -1127,6 +1153,7 @@ do
 		swatch.tex = tex
 		swatch.color = color
 		swatch:SetScript("OnClick", openColorPicker)
+		swatch:SetScript("OnDoubleClick", resetColorPicker)
 
 		return swatch
 	end

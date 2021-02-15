@@ -786,7 +786,7 @@ function G:SetupBuffIndicator(parent)
 			local showAll = M.CreateCheckBox(frame)
 			showAll:SetPoint("LEFT", swatch, "RIGHT", 2, 0)
 			showAll:SetHitRectInsets(0, 0, 0, 0)
-			showAll.bg:SetBackdropBorderColor(1, .8, 0, .5)
+			--showAll.bg:SetBackdropBorderColor(1, .8, 0, .5)
 			showAll.title = U["Tips"]
 			M.AddTooltip(showAll, "ANCHOR_RIGHT", U["ShowAllTip"], "info")
 			scroll.showAll = showAll
@@ -1011,4 +1011,89 @@ local function createOptionCheck(parent, offset, text)
 	box:SetPoint("TOPLEFT", 10, -offset)
 	M.CreateFS(box, 14, text, false, "LEFT", 30, 0)
 	return box
+end
+local function refreshMajorSpells()
+	M:GetModule("UnitFrames"):RefreshMajorSpells()
+end
+
+function G:PlateCastbarGlow(parent)
+	local guiName = "UIGUI_PlateCastbarGlow"
+	toggleExtraGUI(guiName)
+	if extraGUIs[guiName] then return end
+
+	local panel = createExtraGUI(parent, guiName, U["PlateCastbarGlow"].."*", true)
+	panel:SetScript("OnHide", refreshMajorSpells)
+
+	local barTable = {}
+
+	local function createBar(parent, spellID)
+		local spellName = GetSpellInfo(spellID)
+		local texture = GetSpellTexture(spellID)
+
+		local bar = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+		bar:SetSize(220, 30)
+		M.CreateBD(bar, .25)
+		barTable[spellID] = bar
+
+		local icon, close = G:CreateBarWidgets(bar, texture)
+		M.AddTooltip(icon, "ANCHOR_RIGHT", spellID, "system")
+		close:SetScript("OnClick", function()
+			bar:Hide()
+			barTable[spellID] = nil
+			if R.MajorSpells[spellID] then
+				MaoRUIDB["MajorSpells"][spellID] = false
+			else
+				MaoRUIDB["MajorSpells"][spellID] = nil
+			end
+			sortBars(barTable)
+		end)
+
+		local name = M.CreateFS(bar, 14, spellName, false, "LEFT", 30, 0)
+		name:SetWidth(120)
+		name:SetJustifyH("LEFT")
+
+		sortBars(barTable)
+	end
+
+	local frame = panel.bg
+	local scroll = G:CreateScroll(frame, 240, 450)
+	scroll.box = G:CreateEditbox(frame, "ID*", 10, -30, U["ID Intro"], 100, 30)
+
+	local function addClick(button)
+		local parent = button.__owner
+		local spellID = tonumber(parent.box:GetText())
+		if not spellID or not GetSpellInfo(spellID) then UIErrorsFrame:AddMessage(I.InfoColor..U["Incorrect SpellID"]) return end
+		local modValue = MaoRUIDB["MajorSpells"][spellID]
+		if modValue or modValue == nil and R.MajorSpells[spellID] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ID"]) return end
+		MaoRUIDB["MajorSpells"][spellID] = true
+		createBar(parent.child, spellID)
+		parent.box:SetText("")
+	end
+	scroll.add = M.CreateButton(frame, 70, 25, ADD)
+	scroll.add:SetPoint("LEFT", scroll.box, "RIGHT", 10, 0)
+	scroll.add.__owner = scroll
+	scroll.add:SetScript("OnClick", addClick)
+
+	scroll.reset = M.CreateButton(frame, 70, 25, RESET)
+	scroll.reset:SetPoint("LEFT", scroll.add, "RIGHT", 10, 0)
+	StaticPopupDialogs["RESET_NDUI_MAJORSPELLS"] = {
+		text = U["Reset your raiddebuffs list?"],
+		button1 = YES,
+		button2 = NO,
+		OnAccept = function()
+			MaoRUIDB["MajorSpells"] = {}
+			ReloadUI()
+		end,
+		whileDead = 1,
+	}
+	scroll.reset:SetScript("OnClick", function()
+		StaticPopup_Show("RESET_NDUI_MAJORSPELLS")
+	end)
+
+	local UF = M:GetModule("UnitFrames")
+	for spellID, value in pairs(UF.MajorSpells) do
+		if value then
+			createBar(scroll.child, spellID)
+		end
+	end
 end

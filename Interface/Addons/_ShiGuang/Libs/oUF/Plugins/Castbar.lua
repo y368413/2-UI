@@ -147,6 +147,14 @@ function M:PostCastStart(unit)
 		color = R.db["UFs"]["NotInterruptColor"]
 		self:SetStatusBarColor(color.r, color.g, color.b)
 	end
+
+	if self.__owner.mystyle == "nameplate" then
+		if R.db["Nameplate"]["CastbarGlow"] and M:GetModule("UnitFrames").MajorSpells[self.spellID] then
+			M.ShowOverlayGlow(self.glowFrame)
+		else
+			M.HideOverlayGlow(self.glowFrame)
+		end
+	end
 end
 
 function M:PostUpdateInterruptible(unit)

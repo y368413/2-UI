@@ -2,7 +2,7 @@
   <Script file="Castbars.lua"/>
   <Script file="LegionToDo.lua"/>
   <Script file="WQAchievements.lua"/>
-  <Script file="EssenceSetManager.lua"/>
+  <Script file="WorldBossStatus.lua"/>
   <Script file="AzeritePowerWeights.lua"/>
 	<Include file="InboxMailBag\InboxMailBag.xml"/>
 	<Include file="CovenantForge\CovenantForge.xml"/>

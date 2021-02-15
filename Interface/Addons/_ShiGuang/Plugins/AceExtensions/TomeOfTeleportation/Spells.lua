@@ -778,3 +778,460 @@ CreateDestination(
 		CreateConsumable(157542),	-- Portal Scroll of Specificity
 		CreateConsumable(160218),	-- Portal Scroll of Specificity
 	})
+
+----------------------------------------------------------------------------------
+CreateDestination(
+	"potions",		-- No localization.
+	{
+		CreateItem(5512),								-- 治療石
+		CreateItem(177278),								-- 寧靜之瓶
+    CreateItem(114124),								--幽靈藥水
+    CreateItem(115531),								--迴旋艾斯蘭藥水
+    CreateItem(116925),								--舊式的自由行動藥水
+    CreateItem(118910),								--打鬥者的德拉諾敏捷藥水
+    CreateItem(118911),								--打鬥者的德拉諾智力藥水
+    CreateItem(118912),								--打鬥者的德拉諾力量藥水
+    CreateItem(118913),								--打鬥者的無底德拉諾敏捷藥水
+    CreateItem(118914),								--打鬥者的無底德拉諾智力藥水
+    CreateItem(118915),								--打鬥者的無底德拉諾力量藥水
+    CreateItem(127834),								--上古治療藥水
+    CreateItem(127835),								--上古法力藥水
+    CreateItem(127836),								--上古活力藥水 P
+    CreateItem(127843),								--致命恩典藥水
+    CreateItem(127844),								--遠古戰役藥水
+    CreateItem(127845),								--不屈藥水
+    CreateItem(127846),								--脈流藥水
+    CreateItem(136569),								--陳年的生命藥水
+    CreateItem(142117),								--持久之力藥水
+    CreateItem(142325),								--打鬥者上古治療藥水
+    CreateItem(142326),								--打鬥者持久之力藥水
+    CreateItem(144396),								--悍勇治療藥水
+    CreateItem(144397),								--悍勇護甲藥水
+    CreateItem(144398),								--悍勇怒氣藥水
+    CreateItem(152494),								--濱海治療藥水
+    CreateItem(152495),								--濱海法力藥水
+    CreateItem(152497),								--輕足藥水
+    CreateItem(152503),								--隱身藥水
+    CreateItem(152550),								--海霧藥水
+    CreateItem(152557),								--鋼膚藥水
+    CreateItem(152559),								--死亡湧升藥水
+    CreateItem(152560),								--澎湃鮮血藥水
+    CreateItem(152561),								--回復藥水
+    CreateItem(152615),								--暗星治療藥水
+    CreateItem(152619),								--暗星法力藥水
+    CreateItem(163082),								--濱海回春藥水
+    CreateItem(163222),								--智力戰鬥藥水
+    CreateItem(163223),								--敏捷戰鬥藥水
+    CreateItem(163224),								--力量戰鬥藥水
+    CreateItem(163225),								--耐力戰鬥藥水
+    CreateItem(167917),								--鬥陣濱海治療藥水
+    CreateItem(167918),								--鬥陣力量戰鬥藥水
+    CreateItem(167919),								--鬥陣敏捷戰鬥藥水
+    CreateItem(167920),								--鬥陣智力戰鬥藥水
+    CreateItem(168489),								--精良敏捷戰鬥藥水
+    CreateItem(168498),								--精良智力戰鬥藥水
+    CreateItem(168499),								--精良耐力戰鬥藥水
+    CreateItem(168500),								--精良力量戰鬥藥水
+    CreateItem(168501),								--精良鋼膚藥水
+    CreateItem(168502),								--重組藥水
+    CreateItem(168506),								--凝神決心藥水
+    CreateItem(168529),								--地緣強化藥水
+    CreateItem(169299),								--無盡狂怒藥水
+    CreateItem(169300),								--野性癒合藥水
+    CreateItem(169451),								--深淵治療藥水
+    CreateItem(171263),								--靈魂純淨藥水
+    CreateItem(171264),								--靈視藥水
+    CreateItem(171266),								--魂隱藥水
+    CreateItem(171267),								--鬼靈治療藥水
+    CreateItem(171268),								--鬼靈法力藥水
+    CreateItem(171269),								--鬼靈活力藥水
+    CreateItem(171270),								--鬼靈敏捷藥水
+    CreateItem(171271),								--堅實暗影藥水
+    CreateItem(171272),								--鬼靈清晰藥水
+    CreateItem(171273),								--鬼靈智力藥水
+    CreateItem(171274),								--鬼靈耐力藥水
+    CreateItem(171275),								--鬼靈力量藥水
+    CreateItem(171349),								--魅影之火藥水
+    CreateItem(171350),								--神性覺醒藥水
+    CreateItem(171351),								--死亡凝視藥水
+    CreateItem(171352),								--強力驅邪藥水
+    CreateItem(171370),								--幽魂迅捷藥水
+    CreateItem(176811),								--靈魄獻祭藥水
+    CreateItem(183823),								--暢行無阻藥水
+    CreateItem(184090),							 --導靈者之速藥水
+	})
+
+CreateDestination(
+	"potionsShadowlands",		-- No localization.
+	{
+		CreateItem(5512),							 --治療石
+    CreateItem(177278),							 -- 寧靜之瓶
+    CreateItem(171263),							 --靈魂純淨藥水
+    CreateItem(171264),							 --靈視藥水
+    CreateItem(171266),							 --魂隱藥水
+    CreateItem(171267),							 --鬼靈治療藥水
+    CreateItem(171268),							 --鬼靈法力藥水
+    CreateItem(171269),							 --鬼靈活力藥水
+    CreateItem(171270),							 --鬼靈敏捷藥水
+    CreateItem(171271),							 --堅實暗影藥水
+    CreateItem(171272),							 --鬼靈清晰藥水
+    CreateItem(171273),							 --鬼靈智力藥水
+    CreateItem(171274),							 --鬼靈耐力藥水
+    CreateItem(171275),							 --鬼靈力量藥水
+    CreateItem(171349),							 --魅影之火藥水
+    CreateItem(171350),							 --神性覺醒藥水
+    CreateItem(171351),							 --死亡凝視藥水
+    CreateItem(171352),							 --強力驅邪藥水
+    CreateItem(171370),							 --幽魂迅捷藥水
+    CreateItem(176811),							 --靈魄獻祭藥水
+    CreateItem(183823),							 --暢行無阻藥水
+    CreateItem(184090),							 --導靈者之速藥水
+	})	
+
+CreateDestination(
+	"flasks",		-- No localization.
+	{
+		CreateItem(127847),							 --低語契約精煉藥劑
+    CreateItem(127848),							 --七魔精煉藥劑
+    CreateItem(127849),							 --無盡軍士精煉藥劑
+    CreateItem(127850),							 --萬道傷痕精煉藥劑
+    CreateItem(127858),							 --靈魂精煉藥劑
+    CreateItem(152638),							 --洪流精煉藥劑
+    CreateItem(152639),							 --無盡深淵精煉藥劑
+    CreateItem(152640),							 --遼闊地平線精煉藥劑
+    CreateItem(152641),							 --暗流精煉藥劑
+    CreateItem(162518),							 --神秘精煉藥劑
+    CreateItem(168651),							 --強效洪流精煉藥劑
+    CreateItem(168652),							 --強效無盡深淵精煉藥劑
+    CreateItem(168653),							 --強效遼闊地平線精煉藥劑
+    CreateItem(168654),							 --強效暗流精煉藥劑
+    CreateItem(168655),							 --強效神秘精煉藥劑
+    CreateItem(171276),							 --鬼靈威力精煉藥劑
+    CreateItem(171278),							 --鬼靈耐力精煉藥劑
+    CreateItem(171280),							 -- --永恆精煉藥劑
+	})	
+
+CreateDestination(
+	"flasksShadowlands",		-- Flasks added in Shadowlands (require level >= 50)
+	{
+    CreateItem(171276),							 --鬼靈威力精煉藥劑
+    CreateItem(171278),							 --鬼靈耐力精煉藥劑
+    CreateItem(171280),							 -- --永恆精煉藥劑
+	})	
+
+CreateDestination(
+	"torghastItems",		-- 
+	{
+    CreateItem(168207),							 --掠奪的靈魄能量球
+    CreateItem(170540),							 --飢餓的靈魄能量球
+    CreateItem(184662),							 --被徵用的靈魄能量球
+    CreateItem(176331),							 --精華掩蔽藥水
+    CreateItem(176409),							 --活力虹吸精華
+    CreateItem(176443),							 --消逝狂亂藥水
+    CreateItem(168035),							 --淵喉污鼠韁繩
+    CreateItem(170499),							 --淵喉巡者韁繩
+    CreateItem(174464),							 --鬼靈鞍具
+	})	
+	
+CreateDestination(
+	"food",		-- Food (Crafted by cooking)
+	{
+    CreateItem(133557),							 --椒鹽火腿
+    CreateItem(133561),							 --酥炸蘚鰓鱸魚
+    CreateItem(133562),							 --醃漬風暴魟魚
+    CreateItem(133563),							 --法隆納氣泡飲
+    CreateItem(133564),							 --香料烤肋排
+    CreateItem(133565),							 --脈燒肋排
+    CreateItem(133566),							 --蘇拉瑪爾海陸大餐
+    CreateItem(133567),							 --梭子魚莫古嘎古
+    CreateItem(133568),							 --鯉香風暴魟魚
+    CreateItem(133569),							 --卓格巴風味鮭魚
+    CreateItem(133570),							 --飢腸盛宴
+    CreateItem(133571),							 --艾薩拉沙拉
+    CreateItem(133572),							 --夜裔精緻拼盤
+    CreateItem(133573),							 --種籽風味炸魚盤
+    CreateItem(133574),							 --魚卜魯特餐
+    CreateItem(133575),							 --風乾鯖魚肉
+    CreateItem(133576),							 --韃靼熊排
+    CreateItem(133577),							 --戰士雜煮
+    CreateItem(133578),							 --澎湃盛宴
+    CreateItem(133579),							 --蘇拉瑪爾豪宴
+    CreateItem(133681),							 --香脆培根
+    CreateItem(142334),							 --香料龍隼煎蛋捲
+    CreateItem(154881),							 --庫爾提拉米蘇
+    CreateItem(154882),							 --蜜汁烤後腿
+    CreateItem(154883),							 --鴉莓塔
+    CreateItem(154884),							 --沼澤炸魚薯條
+    CreateItem(154885),							 --蒙達吉
+    CreateItem(154886),							 --香料笛鯛
+    CreateItem(154887),							 --羅亞肉餅
+    CreateItem(154889),							 --燒烤鯰魚
+    CreateItem(154891),							 --調味腰內肉
+    CreateItem(156525),							 --艦上盛宴
+    CreateItem(156526),							 --豐盛的船長饗宴
+    CreateItem(163781),							 --禍心巫術香腸
+    CreateItem(165755),							 --蜂蜜餡餅
+    CreateItem(166240),							 --血潤盛宴
+    CreateItem(166343),							 --野莓麵包
+    CreateItem(166344),							 --精心調味的肉排和馬鈴薯
+    CreateItem(166804),							 --波拉勒斯血腸
+    CreateItem(168310),							 --機當勞的「大機克」
+    CreateItem(168312),							 --噴香燉魚
+    CreateItem(168313),							 --烘焙港口薯
+    CreateItem(168314),							 --比爾通肉乾
+    CreateItem(168315),							 --超澎湃饗宴
+    CreateItem(169280),							 --串烤鰻魚肉
+    CreateItem(172040),							 --奶油糖醃製肋排
+    CreateItem(172041),							 --刺鰭舒芙蕾佐炸物
+    CreateItem(172042),							 --意外可口盛宴
+    CreateItem(172043),							 --暴食享樂盛宴
+    CreateItem(172044),							 --肉桂燉骨魚
+    CreateItem(172045),							 --陰暗皇冠肉排凍
+    CreateItem(172046),							 --魚子醬餅乾
+    CreateItem(172047),							 --蜜糖鰤魚蛋糕
+    CreateItem(172048),							 --肉餡蘋果餃子
+    CreateItem(172049),							 --蘋果醬彩色餡餃
+    CreateItem(172050),							 --蜜汁銀鰓香腸
+    CreateItem(172051),							 --濃醬牛排
+    CreateItem(172060),							 --靜謐魂食
+    CreateItem(172061),							 --天使雞翅
+    CreateItem(172062),							 --燉煮腿肉
+    CreateItem(172063),							 --炸骨魚
+    CreateItem(172068),							 --醃肉奶昔
+    CreateItem(172069),							 --香蕉牛肉布丁
+    CreateItem(184682),							 --特大號香檸魚排
+	})	
+
+CreateDestination(
+	"foodShadowlands",		-- Food added in Shadowlands (Crafted by cooking)
+	{
+    CreateItem(172040),							 --奶油糖醃製肋排
+    CreateItem(172041),							 --刺鰭舒芙蕾佐炸物
+    CreateItem(172042),							 --意外可口盛宴
+    CreateItem(172043),							 --暴食享樂盛宴
+    CreateItem(172044),							 --肉桂燉骨魚
+    CreateItem(172045),							 --陰暗皇冠肉排凍
+    CreateItem(172046),							 --魚子醬餅乾
+    CreateItem(172047),							 --蜜糖鰤魚蛋糕
+    CreateItem(172048),							 --肉餡蘋果餃子
+    CreateItem(172049),							 --蘋果醬彩色餡餃
+    CreateItem(172050),							 --蜜汁銀鰓香腸
+    CreateItem(172051),							 --濃醬牛排
+    CreateItem(172060),							 --靜謐魂食
+    CreateItem(172061),							 --天使雞翅
+    CreateItem(172062),							 --燉煮腿肉
+    CreateItem(172063),							 --炸骨魚
+    CreateItem(172068),							 --醃肉奶昔
+    CreateItem(172069),							 --香蕉牛肉布丁
+    CreateItem(184682),							 --特大號香檸魚排
+	})	
+
+CreateDestination(
+	"foodShadowlandsVendor",		-- Food sold by a vendor (Shadowlands)
+	{
+    CreateItem(173759),							 --糖霜亮皮
+    CreateItem(173760),							 --銀莓雪糕
+    CreateItem(173761),							 --糖衣光莓
+    CreateItem(173762),							 --一瓶亞登露水
+    CreateItem(173859),							 --靈體石榴
+    CreateItem(174281),							 --淨化過的天泉水
+    CreateItem(174282),							 --蓬鬆的巧巴達麵包
+    CreateItem(174283),							 --冥魄湯
+    CreateItem(174284),							 --秘天水果沙拉
+    CreateItem(174285),							 --糖漬核桃
+    CreateItem(177040),							 --安柏里亞露水
+    CreateItem(178216),							 --燒烤沉睡菇
+    CreateItem(178217),							 --蔚藍花茶
+    CreateItem(178222),							 --蜜李派
+    CreateItem(178223),							 --水煮絲行者卵
+    CreateItem(178224),							 --清蒸果姆尾巴
+    CreateItem(178225),							 --曠野獵者燉肉
+    CreateItem(178226),							 --焦烤符文腹肉
+    CreateItem(178227),							 --午夜星椒
+    CreateItem(178228),							 --燉雪豌豆
+    CreateItem(178247),							 --成熟的冬果
+    CreateItem(178252),							 --一綑炬莓
+    CreateItem(178534),							 --科比尼漿
+    CreateItem(178535),							 --可疑的軟泥特調
+    CreateItem(178536),							 --牛獸骨髓
+    CreateItem(178537),							 --縛毛真菌
+    CreateItem(178538),							 --甲蟲果昔
+    CreateItem(178539),							 --溫熱牛獸奶
+    CreateItem(178541),							 --烤髓骨
+    CreateItem(178542),							 --顱骨特調
+    CreateItem(178545),							 --骨蘋果茶
+    CreateItem(178546),							 --可疑的肉品
+    CreateItem(178547),							 --可疑的油炸禽類
+    CreateItem(178548),							 --風味茶骨
+    CreateItem(178549),							 --水煮肉
+    CreateItem(178550),							 --陰暗松露
+    CreateItem(178552),							 --血橘
+    CreateItem(178900),							 --死亡胡椒腐肉
+    CreateItem(179011),							 --蝙蝠肉麵包
+    CreateItem(179012),							 --泥沼爬行者燉肉
+    CreateItem(179013),							 --煙燻泥魚
+    CreateItem(179014),							 --霜降吞食者肉排
+    CreateItem(179015),							 --大蒜蜘蛛腿
+    CreateItem(179016),							 --小屋乳酪
+    CreateItem(179017),							 --綿羊奶酪
+    CreateItem(179018),							 --骸豬肉排
+    CreateItem(179019),							 --燒烤懼翼
+    CreateItem(179020),							 --大蒜切片
+    CreateItem(179021),							 --玫瑰甜椒
+    CreateItem(179022),							 --清葉捲心菜
+    CreateItem(179023),							 --大黃莖乾
+    CreateItem(179025),							 --香米
+    CreateItem(179026),							 --永夜麥片粥
+    CreateItem(179166),							 --夜穫捲
+    CreateItem(179267),							 --歿路沼澤白閃菇
+    CreateItem(179268),							 --禍孽牛肝菌
+    CreateItem(179269),							 --暮色杏仁慕斯
+    CreateItem(179270),							 --影皮梅果
+    CreateItem(179271),							 --掘息坑蘋果
+    CreateItem(179272),							 --懼獵者的點心
+    CreateItem(179273),							 --黑暗犬腰肉
+    CreateItem(179274),							 --羔羊麵包
+    CreateItem(179275),							 --捲心菜包肉塊
+    CreateItem(179281),							 --尊殞羅宋湯
+    CreateItem(179283),							 --小米薄酥餅
+    CreateItem(179992),							 --幽影泉水
+    CreateItem(179993),							 --灌能泥水
+    CreateItem(180430),							 --手指點心
+    CreateItem(184201),							 --泥濘水
+    CreateItem(184202),							 --凍乾鹽漬肉
+    CreateItem(184281),							 --泥霜凍飲
+	})
+
+CreateDestination(
+	"conjuredManaFood",		-- Food crafted by mage
+	{
+    CreateItem(34062),							 --魔法法力軟餅
+    CreateItem(43518),							 --魔法法力派
+    CreateItem(43523),							 --魔法法力餡餅
+    CreateItem(65499),							 --魔法法力蛋糕
+    CreateItem(65500),							 --魔法法力餅乾
+    CreateItem(65515),							 --魔法法力布朗尼
+    CreateItem(65516),							 --魔法法力杯子蛋糕
+    CreateItem(65517),							 --魔法法力棒棒糖
+    CreateItem(80610),							 --魔法法力布丁
+    CreateItem(80618),							 --魔法法力甜餅
+    CreateItem(113509),							 --魔法法力餐包
+	})
+
+CreateDestination(
+	"banners",		-- 战旗
+	{
+    CreateItem(63359),							 -- 合作旌旗
+    CreateItem(64400),							 -- 合作旌旗
+    CreateItem(64398),							 -- 團結軍旗
+    CreateItem(64401),							 -- 團結軍旗
+    CreateItem(64399),							 -- 協調戰旗
+    CreateItem(64402),							 -- 協調戰旗
+    CreateItem(18606),							 -- 聯盟戰旗
+    CreateItem(18607),							 -- 部落戰旗
+	})
+
+CreateDestination(
+	"utilities",		-- 实用工具
+	{
+    CreateItem(49040),							 -- 吉福斯
+    CreateItem(109076),							 -- 哥布林滑翔工具組
+    CreateItem(132514),							 -- 自動鐵錘
+    CreateItem(153023),							 -- 光鑄增強符文
+    CreateItem(171285),							 --影核之油
+    CreateItem(171286),							 --防腐之油
+    CreateItem(171436),							 --孔岩磨刀石
+    CreateItem(171437),							 --幽影磨刀石
+    CreateItem(171438),							 --孔岩平衡石
+    CreateItem(171439),							 --幽影平衡石
+    CreateItem(172346),							 --荒寂護甲片
+    CreateItem(172347),							 --厚重荒寂護甲片
+    CreateItem(172233),							 --致命兇殘之鼓
+	})
+
+CreateDestination(
+	"openableItems",		-- 
+	{
+    CreateItem(171209),							 --沾血的袋子
+    CreateItem(171210),							 --一袋自然的恩賜
+    CreateItem(171211),							 --汎希爾的錢包
+    CreateItem(174652),							 --一袋被遺忘的傳家寶
+    CreateItem(178078),							 --重生之靈寶箱
+    CreateItem(178513),							 --週年慶禮物
+    CreateItem(178965),							 --小型的園丁袋子
+    CreateItem(178966),							 --園丁的袋子
+    CreateItem(178967),							 --大型的園丁袋子
+    CreateItem(178968),							 --每週的園丁袋子
+    CreateItem(178969),							 --Test Container
+    CreateItem(180085),							 --琪瑞安紀念品
+    CreateItem(180355),							 --華麗聖盒
+    CreateItem(180378),							 --鍛造大師的箱子
+    CreateItem(180379),							 --精緻紡織地毯
+    CreateItem(180380),							 --精細網織品
+    CreateItem(180386),							 --草藥師小袋
+    CreateItem(180442),							 --一袋罪孽石
+    CreateItem(180646),							 --不死軍團補給品
+    CreateItem(180647),							 --晉升者補給品
+    CreateItem(180648),							 --收割者廷衛補給品
+    CreateItem(180649),							 --曠野獵者補給品
+    CreateItem(180875),							 --馬車貨物
+    CreateItem(180974),							 --學徒的袋子
+    CreateItem(180975),							 --熟工的袋子
+    CreateItem(180976),							 --專家的袋子
+    CreateItem(180977),							 --靈魂看管者的袋子
+    CreateItem(180979),							 --專家的大型袋子
+    CreateItem(180980),							 --熟工的大型袋子
+    CreateItem(180981),							 --學徒的大型袋子
+    CreateItem(180983),							 --專家滿載的袋子
+    CreateItem(180984),							 --熟工滿載的袋子
+    CreateItem(180985),							 --學徒滿載的袋子
+    CreateItem(180988),							 --熟工滿溢的袋子
+    CreateItem(180989),							 --學徒滿溢的袋子
+    CreateItem(181767),							 --小錢包
+    CreateItem(181372),							 --晉升者的獻禮
+    CreateItem(181475),							 --林地看守者的獎賞
+    CreateItem(181476),							 --曠野獵者的獻禮
+    CreateItem(181556),							 --廷尉的獻禮
+    CreateItem(181557),							 --廷尉的大禮
+    CreateItem(181732),							 --野心家獻禮
+    CreateItem(181733),							 --盡責者獻禮
+    CreateItem(181741),							 --楷模的獻禮
+    CreateItem(182590),							 --爬藤蠕動的零錢包
+    CreateItem(182591),							 --覆藤灌能紅寶石
+    CreateItem(183699),							 --特選材料
+    CreateItem(183701),							 --淨化儀式材料
+    CreateItem(183702),							 --自然光采
+    CreateItem(183703),							 --骸骨工匠背袋
+    CreateItem(184045),							 --收割者廷衛的軍稅
+    CreateItem(184046),							 --不死軍團武器箱
+    CreateItem(184047),							 --晉升者武器箱
+    CreateItem(184048),							 --曠野獵者武器袋
+    CreateItem(184158),							 --黏黏的死靈魟魚卵
+    CreateItem(184444),							 --晉升之路補給
+    CreateItem(184522),							 --協力朦朧布包
+    CreateItem(184589),							 --藥水袋
+    CreateItem(184630),							 --冒險者布料箱
+    CreateItem(184631),							 --冒險者附魔箱
+    CreateItem(184632),							 --勇士魚類箱
+    CreateItem(184633),							 --勇士肉類箱
+    CreateItem(184634),							 --冒險者草藥箱
+    CreateItem(184635),							 --冒險者礦石箱
+    CreateItem(184636),							 --冒險者皮革箱
+    CreateItem(184637),							 --英雄肉類箱
+    CreateItem(184638),							 --英雄魚類箱
+    CreateItem(184639),							 --勇士布料箱
+    CreateItem(184640),							 --勇士皮革箱
+    CreateItem(184641),							 --勇士礦石箱
+    CreateItem(184642),							 --勇士草藥箱
+    CreateItem(184643),							 --勇士附魔箱
+    CreateItem(184644),							 --英雄布料箱
+    CreateItem(184645),							 --英雄皮革箱
+    CreateItem(184646),							 --英雄礦石箱
+    CreateItem(184647),							 --英雄草藥箱
+    CreateItem(184648),							 --英雄附魔箱
+    CreateItem(184811),							 --阿特米德的恩賜
+    CreateItem(184812),							 --阿波隆的恩賜
+    CreateItem(184843),							 --回收的補給物資
+    CreateItem(184868),							 --納撒亞寶物箱
+    CreateItem(184869),							 --納撒亞寶物箱
+	})

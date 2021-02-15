@@ -362,3 +362,13 @@ Petmapshow:SetScript("OnEvent", function(self, event, ...)
 		FRAMELOCK_STATES["PETBATTLES"]["MinimapCluster"]=""
 		FRAMELOCK_STATES["PETBATTLES"]["WatchFrame"]=""
 end)
+
+--[[BattlePet Tooltip Plus]]
+hooksecurefunc (_G, "BattlePetToolTip_Show",
+  function(speciesID, ...)
+      BattlePetTooltip:AddLine(" ")
+      local petInfo = {C_PetJournal.GetPetInfoBySpeciesID(speciesID)}
+      local colored = petInfo[5]:gsub("|n$", ""):gsub("|r", "|cffffffff") .. "|r"
+      GameTooltip_AddNormalLine(BattlePetTooltip, colored, true)
+  end
+)

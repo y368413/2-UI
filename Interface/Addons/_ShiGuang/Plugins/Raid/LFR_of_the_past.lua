@@ -31,6 +31,17 @@ function LFRofthepast.npcs_update()
 		if strs[1] and strs[1]~="" then
 			LFRofthepast.npcs[i][1] = strs[1];  --L["NPC"..LFRofthepast.npcs[i][1]]
 		end
+		local mapInfo = C_Map.GetMapInfo(LFRofthepast.npcs[i][2]);
+		if mapInfo then
+			if mapInfo.name == DUNGEON_FLOOR_DALARANCITY1 then
+				local spell = GetSpellInfo(224869);
+				local _,target = strsplit(HEADER_COLON,spell,2);
+				if target then
+					mapInfo.name = target:trim(); -- replace "Dalaran" by "Dalaran - Broken Isles"
+				end
+			end
+			LFRofthepast.npcs[i].zoneName = mapInfo.name;
+		end
 	end
 end
 
@@ -53,10 +64,10 @@ LFRofthepast.instance2bosses = {
 	[1494]={1,3,5},[1495]={2,4,6},[1496]={7,8},[1497]={9}, -- 4
 	[1610]={1,2,4},[1611]={5,3,6},[1612]={7,8,9},[1613]={10,11}, -- 5
 	-- bfa
-	--[1731]={1,2,3},[1732]={4,5,6},[1733]={7,8}, -- Uldir
+	--[1731]={1,2,4},[1732]={3,5,6},[1733]={7,8}, -- Uldir
 	--[1945]={1,2,3},[1946]={4,5,6},[1947]={7,8}, -- dazar'alor
 	-- eternal palace
-	-- ?
+	-- ny'alotha
 };
 
 LFRofthepast.noSubtitle = { -- by npc id
@@ -115,7 +126,7 @@ function LFRofthepast.scanTT:GetStringRegions(dataFunction,...)
 	local regions,strs = {LFRofthepast.scanTT:GetRegions()},{};
 	for i=1,#regions do
 		if (regions[i]~=nil) and (regions[i]:GetObjectType()=="FontString") then
-			str = (regions[i]:GetText() or ""):trim();
+			local str = (regions[i]:GetText() or ""):trim();
 			if str~="" then
 				tinsert(strs,str);
 			end
@@ -261,18 +272,8 @@ local function OnGossipShow()
 		ScanSavedInstances();
 		NPC_ID = id;
 		local Buttons = {};
-		if GossipFrame.buttons then -- GossipFrame // since SL prepatch
+		if GossipFrame.buttons then
 			Buttons = GossipFrame.buttons;
-		elseif _G["GossipTitleButton1"] then -- GossipFrame // before SL prepatch
-			local index,button,icon = 1,_G["GossipTitleButton1"],_G["GossipTitleButton1GossipIcon"];
-			while button do
-				tinsert(Buttons,button);
-				index = index + 1;
-				button = _G["GossipTitleButton"..index];
-				if button then
-					icon = _G["GossipTitleButton"..index.."GossipIcon"];
-				end
-			end
 		end
 		for i,button in ipairs(Buttons)do
 			if button:IsShown() then
@@ -313,29 +314,17 @@ local function OnGossipShow()
 							tinsert(data.encounters,boss);
 						end
 					end
-					-- GossipFrame
 						local label = data.instance[name].."\n|Tinterface\\lfgframe\\ui-lfg-icon-heroic:12:12:0:0:32:32:0:16:0:16|t ".."|cFF800000".._G.GENERIC_FRACTION_STRING:format(data.numEncounters[1],data.numEncounters[2]).."|r";
 						if data.instance[name]~=data.instance[name2] then
-							label = label .. " || ".. "|cFF404040"..data.instance[name2].."|r"; 
+							label = label .. " || ".. "|cFF404040"..data.instance[name2].."|r";
 						end
-						if GossipFrame.buttons then -- GossipFrame // since SL prepatch
-							-- gossip text replacement
-							button:SetText(label);
-							-- gossip icon replacement
-							iconTexCoords[button.Icon] = {button.Icon:GetTexCoord()};
-							button.Icon:SetTexture("interface\\minimap\\raid");
-							button.Icon:SetTexCoord(0.20,0.80,0.20,0.80);
-							button:Resize();
-						elseif _G["GossipTitleButton1"] then -- GossipFrame // before SL prepatch
-							-- gossip text replacement
-							button:SetText(label);
-							-- gossip icon replacement
-							local icon = _G[button:GetName().."GossipIcon"];
-							iconTexCoords[icon] = {icon:GetTexCoord()};
-							icon:SetTexture("interface\\minimap\\raid");
-							icon:SetTexCoord(0.20,0.80,0.20,0.80);
-							GossipResize(button);
-						end
+						-- gossip text replacement
+						button:SetText(label);
+						-- gossip icon replacement
+						iconTexCoords[button.Icon] = {button.Icon:GetTexCoord()};
+						button.Icon:SetTexture("interface\\minimap\\raid");
+						button.Icon:SetTexCoord(0.20,0.80,0.20,0.80);
+						button:Resize();
 					if not hookedButton["button"..buttonID] then
 						button:HookScript("OnEnter",buttonHook_OnEnter);
 						button:HookScript("OnLeave",buttonHook_OnLeave);
@@ -357,9 +346,7 @@ local function OnGossipHide()
 	end
 end
 
-GossipFrame:HookScript("OnHide",function()
-	OnGossipHide(self)
-end);
+GossipFrame:HookScript("OnHide",OnGossipHide);
 
 ----------------------------------------------------
 -- create into tooltip for raids

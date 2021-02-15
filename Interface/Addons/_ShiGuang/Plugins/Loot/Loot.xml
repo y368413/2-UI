@@ -1,9 +1,8 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="BGRoll.lua"/>
-	<Script file="RollHistory.lua"/>
-	<!--Script file="ChatLoot.lua"/-->
-	<Include file="AtlasLootReverse\AtlasLootReverse.xml"/>
 	<Script file="MasterGypsy.lua"/>
+	<Script file="RollHistory.lua"/>
+	<Script file="ToggleLootSpec.lua"/>
 	<Script file="EncounterJournalPlusInstanceInfo.lua"/>
 	<Frame name="EncounterJournalPlus_InstanceInfo">
     <Scripts>
@@ -11,4 +10,5 @@
       <OnEvent function="EncounterJournalPlus_InstanceInfo_OnEvent"></OnEvent>
     </Scripts>
   </Frame>
+  <Include file="AtlasLootReverse\AtlasLootReverse.xml"/>
 </Ui>

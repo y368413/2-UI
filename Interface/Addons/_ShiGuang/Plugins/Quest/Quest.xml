@@ -4,7 +4,6 @@
 	<Script file="bfaPetQuest.lua"/>
 	<Script file="DarkmoonFaire.lua"/>
 	<Script file="AngrierWorldQuests.lua"/>
-	<Script file="KayrCovenantMissions.lua"/>
 	<Script file="WorldMapQuestRewardIcon.lua"/>
 	<Frame name="BountyCounterTemplate" virtual="true" hidden="false">
 		<Size x="10" y="10"/>

@@ -1,14 +1,14 @@
 ﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
-local oUF = ns.oUF or oUF
+local oUF = ns.oUF
 
 local AFK, DND, DEAD, PLAYER_OFFLINE, LEVEL = AFK, DND, DEAD, PLAYER_OFFLINE, LEVEL
-local format, strfind, GetCVarBool = format, strfind, GetCVarBool
+local select, format, strfind, GetCVarBool = select, format, strfind, GetCVarBool
 local ALTERNATE_POWER_INDEX = Enum.PowerType.Alternate or 10
 local UnitIsDeadOrGhost, UnitIsConnected, UnitHasVehicleUI, UnitIsTapDenied, UnitIsPlayer = UnitIsDeadOrGhost, UnitIsConnected, UnitHasVehicleUI, UnitIsTapDenied, UnitIsPlayer
 local UnitHealth, UnitHealthMax, UnitPower, UnitPowerType, UnitStagger = UnitHealth, UnitHealthMax, UnitPower, UnitPowerType, UnitStagger
 local UnitClass, UnitReaction, UnitLevel, UnitClassification, UnitEffectiveLevel = UnitClass, UnitReaction, UnitLevel, UnitClassification, UnitEffectiveLevel
-local UnitIsAFK, UnitIsDND, UnitIsDead, UnitIsGhost = UnitIsAFK, UnitIsDND, UnitIsDead, UnitIsGhost
+local UnitIsAFK, UnitIsDND, UnitIsDead, UnitIsGhost, UnitName, UnitExists = UnitIsAFK, UnitIsDND, UnitIsDead, UnitIsGhost, UnitName, UnitExists
 local UnitIsWildBattlePet, UnitIsBattlePetCompanion, UnitBattlePetLevel = UnitIsWildBattlePet, UnitIsBattlePetCompanion, UnitBattlePetLevel
 local GetNumArenaOpponentSpecs, GetCreatureDifficultyColor = GetNumArenaOpponentSpecs, GetCreatureDifficultyColor
 
@@ -234,6 +234,15 @@ oUF.Tags.Methods["npctitle"] = function(unit)
 	end
 end
 oUF.Tags.Events["npctitle"] = "UNIT_NAME_UPDATE"
+
+oUF.Tags.Methods["tarname"] = function(unit)
+	local tarUnit = unit.."target"
+	if UnitExists(tarUnit) then
+		local tarClass = select(2, UnitClass(tarUnit))
+		return M.HexRGB(oUF.colors.class[tarClass])..UnitName(tarUnit)
+	end
+end
+oUF.Tags.Events["tarname"] = "UNIT_NAME_UPDATE UNIT_THREAT_SITUATION_UPDATE UNIT_HEALTH"
 
 -- AltPower value tag
 oUF.Tags.Methods["altpower"] = function(unit)
