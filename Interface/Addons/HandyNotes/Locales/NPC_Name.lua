@@ -1,4 +1,4 @@
-NPC_Name_CacheDBtemp = {
+﻿NPC_Name_CacheDBtemp = {
 	["enUS"] = {
 		[123502] = "King K'tal",
 		[123639] = "Harold Atkey",

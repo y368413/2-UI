@@ -1,4 +1,4 @@
-Item_Name_CacheDBtemp = {
+﻿Item_Name_CacheDBtemp = {
 	["enUS"] = {
 		[157794] = {
 			["name"] = "Feathered Viper Scale",
