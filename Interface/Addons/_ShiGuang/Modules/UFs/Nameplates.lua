@@ -175,6 +175,7 @@ function UF:UpdateColor(_, unit)
 	local executeRatio = R.db["Nameplate"]["ExecuteRatio"]
 	local healthPerc = UnitHealth(unit) / (UnitHealthMax(unit) + .0001) * 100
 	local targetColor = R.db["Nameplate"]["TargetColor"]
+	local focusColor = R.db["Nameplate"]["FocusColor"]
 	local r, g, b
 
 	if not UnitIsConnected(unit) then
@@ -182,6 +183,8 @@ function UF:UpdateColor(_, unit)
 	else
 		if R.db["Nameplate"]["ColoredTarget"] and UnitIsUnit(unit, "target") then
 			r, g, b = targetColor.r, targetColor.g, targetColor.b
+		elseif R.db["Nameplate"]["ColoredFocus"] and UnitIsUnit(unit, "focus") then
+			r, g, b = focusColor.r, focusColor.g, focusColor.b
 		elseif isCustomUnit then
 			r, g, b = customColor.r, customColor.g, customColor.b
 		elseif isPlayer and isFriendly then
@@ -254,6 +257,12 @@ function UF:CreateThreatColor(self)
 
 	self.ThreatIndicator = threatIndicator
 	self.ThreatIndicator.Override = UF.UpdateThreatColor
+end
+
+function UF:UpdateFocusColor()
+	if R.db["Nameplate"]["ColoredFocus"] then
+		UF.UpdateThreatColor(self, _, self.unit)
+	end
 end
 
 -- Target indicator
@@ -736,6 +745,8 @@ function UF:CreatePlates()
 	UF:AddQuestIcon(self)
 	UF:AddDungeonProgress(self)
 
+	self:RegisterEvent("PLAYER_FOCUS_CHANGED", UF.UpdateFocusColor, true)
+
 	platesList[self] = self:GetName()
 end
 
@@ -804,6 +815,7 @@ function UF:RefreshNameplats()
 		nameplate.Castbar:SetHeight(plateHeight)
 		nameplate.Castbar.Time:SetFont(I.Font[1], nameTextSize, I.Font[3])
 		nameplate.Castbar.Text:SetFont(I.Font[1], nameTextSize, I.Font[3])
+		nameplate.Castbar.spellTarget:SetFont(I.Font[1], nameTextSize+3, I.Font[3])
 		nameplate.healthValue:SetFont(I.Font[1], R.db["Nameplate"]["HealthTextSize"], I.Font[3])
 		nameplate.healthValue:UpdateTag()
 		UF.UpdateNameplateAuras(nameplate)

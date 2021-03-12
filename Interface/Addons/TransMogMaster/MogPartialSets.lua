@@ -1,4 +1,4 @@
---## Version: 0.7.0 ## Author: romdeau23
+--## Version: 0.7.1 ## Author: romdeau23
 local MogPartialSets = {}
 
 MogPartialSets.frame = CreateFrame('Frame')

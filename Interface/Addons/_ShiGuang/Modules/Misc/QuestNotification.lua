@@ -88,7 +88,12 @@ function MISC:FindQuestProgress(_, msg)
 	end
 end
 
+local WQcache = {}
 function MISC:FindQuestAccept(questID)
+	if not questID then return end
+	if C_QuestLog_IsWorldQuest(questID) and WQcache[questID] then return end
+	WQcache[questID] = true
+
 	local tagInfo = C_QuestLog_GetQuestTagInfo(questID)
 	if tagInfo and tagInfo.worldQuestType == LE_QUEST_TAG_TYPE_PROFESSION then return end
 

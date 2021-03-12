@@ -133,7 +133,7 @@ function MISC:ItemLevel_UpdateInfo(index, slotFrame, info, quality)
 		if enchant then
 			slotFrame.enchantText:SetText(enchant)
 		else
-			if index == 10 or index == 11 or index == 12 or index == 16 or index == 17 then
+			if index == 5 or index == 8 or index == 9 or index == 11 or index == 12 or index == 15 or index == 16 or index == 17 then  -- or index == 10
 				slotFrame.enchantText:SetText("|cFFFF0000FM|r")
 			end
 		end
@@ -289,6 +289,19 @@ function MISC.ItemLevel_ScrappingShow(event, addon)
 	end
 end
 
+function MISC:ItemLevel_UpdateMerchant(link)
+	local quality = link and select(3, GetItemInfo(link)) or nil
+	if quality then
+		if not self.iLvl then
+			self.iLvl = M.CreateFS(self.ItemButton, I.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
+		end
+		local level = M.GetItemLevel(link)
+		local color = I.QualityColors[quality]
+		self.iLvl:SetText(level)
+		self.iLvl:SetTextColor(color.r, color.g, color.b)
+	end
+end
+
 function MISC:ShowItemLevel()
 	if not R.db["Misc"]["ItemLevel"] then return end
 
@@ -304,5 +317,8 @@ function MISC:ShowItemLevel()
 
 	-- iLvl on ScrappingMachineFrame
 	M:RegisterEvent("ADDON_LOADED", MISC.ItemLevel_ScrappingShow)
+
+	-- iLvl on MerchantFrame
+	hooksecurefunc("MerchantFrameItem_UpdateQuality", MISC.ItemLevel_UpdateMerchant)
 end
 MISC:RegisterMisc("GearInfo", MISC.ShowItemLevel)

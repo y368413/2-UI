@@ -504,6 +504,12 @@ function UF:CreateCastBar(self)
 
 		cb.glowFrame = M.CreateGlowFrame(cb, iconSize)
 		cb.glowFrame:SetPoint("CENTER", cb.Icon)
+
+		local spellTarget = M.CreateFS(cb, R.db["Nameplate"]["NameTextSize"]+3)
+		spellTarget:ClearAllPoints()
+		spellTarget:SetJustifyH("LEFT")
+		spellTarget:SetPoint("TOPLEFT", name, "BOTTOMLEFT", 0, -2)
+		cb.spellTarget = spellTarget
 	end
 
 	--if mystyle == "nameplate" or mystyle == "boss" or mystyle == "arena" then
@@ -516,6 +522,7 @@ function UF:CreateCastBar(self)
 	cb.Text = name
 	cb.OnUpdate = M.OnCastbarUpdate
 	cb.PostCastStart = M.PostCastStart
+	cb.PostCastUpdate = M.PostCastUpdate
 	cb.PostCastStop = M.PostCastStop
 	cb.PostCastFail = M.PostCastFailed
 	cb.PostCastInterruptible = M.PostUpdateInterruptible

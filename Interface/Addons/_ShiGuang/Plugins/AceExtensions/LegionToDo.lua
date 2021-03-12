@@ -1,6 +1,6 @@
 ﻿--## Author: ykiigor  ## SavedVariables: VLegionToDo
-local LegionToDoVersion = "4.7"
-local VERSION_NUMERIC = 47
+local LegionToDoVersion = "4.8"
+local VERSION_NUMERIC = 48
 
 local GetCurrentRegion
 do
@@ -278,6 +278,20 @@ tinsert(ToDoFunc,function(self,collect)
 
 	local name, amount, texturePath, earnedThisWeek, weeklyMax, totalMax, isDiscovered, quality = GetCurrencyInfo(1792)
 	collect.honor = amount
+
+	local data = C_CurrencyInfo.GetCurrencyInfo(1191)
+	if data then
+		collect.valor = data.quantity
+		collect.valorEarned = data.totalEarned
+		collect.valorMax = data.maxQuantity
+
+		self:AddDoubleLine(data.name, data.quantity, 1,1,1)
+		self:AddTexture(data.iconFileID)
+	else
+		collect.valor = nil
+		collect.valorEarned = nil
+		collect.valorMax = nil
+	end
 end)
 
 tinsert(ToDoFunc,function(self,collect)
@@ -1155,16 +1169,22 @@ end)
 
 
 tinsert(ToDoFunc,function(self,collect)
-	local rewardsDone = 1
-	while collect["sl_reward"..rewardsDone] do
-		collect["sl_reward"..rewardsDone] = nil
-		rewardsDone = rewardsDone + 1
+	local rewardCounter = 1
+	while collect["sl_reward"..rewardCounter] do
+		collect["sl_reward"..rewardCounter] = nil
+		rewardCounter = rewardCounter + 1
 	end
-	rewardsDone = 1
+	rewardCounter = 1
+	while collect["sl_reward"..rewardCounter.."_progress"] do
+		collect["sl_reward"..rewardCounter.."_progress"] = nil
+		rewardCounter = rewardCounter + 1
+	end
+	rewardCounter = 1
+	local rewardCounterProgress = 1
 	local data = C_WeeklyRewards.GetActivities()
 	for i=1,#data do
 		local activityInfo = data[i]
-		if (activityInfo.progress >= activityInfo.threshold) then
+		if (activityInfo.progress >= activityInfo.threshold) or (activityInfo.progress > 0) then
 			local ilvl = nil
 			if activityInfo.id then
 				local itemLink = C_WeeklyRewards.GetExampleRewardItemHyperlinks(activityInfo.id)
@@ -1173,16 +1193,34 @@ tinsert(ToDoFunc,function(self,collect)
 				end
 			end
 
+			local isDone = activityInfo.progress >= activityInfo.threshold
+			local colorStr = isDone and "|cff00ff00" or "|cffff0000"
+
 			if activityInfo.type == Enum.WeeklyRewardChestThresholdType.Raid then
 				local name = DifficultyUtil.GetDifficultyName(activityInfo.level)
-				collect["sl_reward"..rewardsDone] = "Raid "..(name or "")..(ilvl and " ilvl:"..ilvl or "")
-				rewardsDone = rewardsDone + 1
+				local key = isDone and "sl_reward"..rewardCounter or "sl_reward"..rewardCounterProgress.."_progress"
+				collect[key] = colorStr.."Raid "..(name or "")..(ilvl and " ilvl:"..ilvl or "")..format(" %d/%d",min(activityInfo.progress,activityInfo.threshold),activityInfo.threshold)
+				if activityInfo.progress >= activityInfo.threshold then
+					rewardCounter = rewardCounter + 1
+				else
+					rewardCounterProgress = rewardCounterProgress + 1
+				end
 			elseif activityInfo.type == Enum.WeeklyRewardChestThresholdType.MythicPlus then
-				collect["sl_reward"..rewardsDone] = "M+ "..format(WEEKLY_REWARDS_MYTHIC, activityInfo.level)..(ilvl and " ilvl:"..ilvl or "")
-				rewardsDone = rewardsDone + 1
+				local key = isDone and "sl_reward"..rewardCounter or "sl_reward"..rewardCounterProgress.."_progress"
+				collect[key] = colorStr.."M+ "..format(WEEKLY_REWARDS_MYTHIC, activityInfo.level)..(ilvl and " ilvl:"..ilvl or "")..format(" %d/%d",min(activityInfo.progress,activityInfo.threshold),activityInfo.threshold)
+				if activityInfo.progress >= activityInfo.threshold then
+					rewardCounter = rewardCounter + 1
+				else
+					rewardCounterProgress = rewardCounterProgress + 1
+				end
 			elseif activityInfo.type == Enum.WeeklyRewardChestThresholdType.RankedPvP then
-				collect["sl_reward"..rewardsDone] = "PvP "..(PVPUtil.GetTierName(activityInfo.level) or "")..(ilvl and " ilvl:"..ilvl or "")
-				rewardsDone = rewardsDone + 1
+				local key = isDone and "sl_reward"..rewardCounter or "sl_reward"..rewardCounterProgress.."_progress"
+				collect[key] = colorStr.."PvP "..(PVPUtil.GetTierName(activityInfo.level) or "")..(ilvl and " ilvl:"..ilvl or "")..format(" %d/%d",min(activityInfo.progress,activityInfo.threshold),activityInfo.threshold)
+				if activityInfo.progress >= activityInfo.threshold then
+					rewardCounter = rewardCounter + 1
+				else
+					rewardCounterProgress = rewardCounterProgress + 1
+				end
 			end
 		end
 	end
@@ -2405,6 +2443,8 @@ LegionToDo:SetScript("OnShow",function(self)
 	local name, _, texturePath = GetCurrencyInfo(1810)
 	count = LineUpdate(count,"rsouls",name,texturePath)
 
+	local name, _, texturePath = GetCurrencyInfo(1191)
+	count = LineUpdate(count,"valor",name,texturePath,'small-left2')
 
 	count = LineUpdate(count,"miniVision","Mini Vision")
 	count = LineUpdate(count,"visionReward","Vision Reward")
@@ -2754,6 +2794,11 @@ LegionToDo:SetScript("OnShow",function(self)
 				lines[lineCount].cols[col]:SetText(db.rsouls or "0")
 			end
 
+			if not optData["valor"] or OPTIONS_TOGGLED then
+				lineCount = lineCount + 1
+				lines[lineCount].cols[col]:SetText((db.valor or "0") .. (db.valorEarned and ("\n" ..db.valorEarned.."/"..(db.valorMax or 0)) or ""))
+			end
+
 			if not optData["miniVision"] or OPTIONS_TOGGLED  then
 				lineCount = lineCount + 1
 				if needDailiyReset then
@@ -2923,6 +2968,12 @@ LegionToDo:SetScript("OnShow",function(self)
 					tooltip = tooltip .. db["sl_reward"..rewardsDone] .. "\n"
 					rewardsDone = rewardsDone + 1
 				end
+				local rewardsCountProgress = 1
+				while db["sl_reward"..rewardsCountProgress.."_progress"] do
+					tooltip = tooltip .. db["sl_reward"..rewardsCountProgress.."_progress"] .. "\n"
+					rewardsCountProgress = rewardsCountProgress + 1
+				end
+
 				if needReset then
 					lines[lineCount].cols[col]:SetText("|cffff00000/"..(db.sl_rewardMax or 9))
 				else
@@ -3102,19 +3153,21 @@ LegionToDo:SetScript("OnShow",function(self)
 					lineCount = lineCount + 1
 					local t = (db.s and db.s["bounty"..i] or ""):gsub(":0|t",":18|t")
 					lines[lineCount].cols[col]:SetText(t)
-					if db.s and db.s["bounty"..i.."end"] and db.s["bounty"..i.."end"] < currTime then
-						local icon = t:gsub("|t.*$","|t")
-						lines[lineCount].cols[col]:SetText(icon.." |cffffff00expired")
+					if db.s["bounty"..i] then
+						if db.s and db.s["bounty"..i.."end"] and db.s["bounty"..i.."end"] < currTime then
+							local icon = t:gsub("|t.*$","|t")
+							lines[lineCount].cols[col]:SetText(icon.." |cffffff00expired")
+						end
+	
+						local tooltip = {
+							[-1]=(db.s and db.s["bounty"..i.."name"] or ""),
+						}
+						if db.s and not db.s["bounty"..i.."notime"] then
+							tooltip[#tooltip+1] = "Expire on"
+							tooltip[#tooltip+1] = (db.s and db.s["bounty"..i.."end"] and date("%d/%m/%Y %H:%M:%S",db.s["bounty"..i.."end"]) or "")
+						end
+						AddColTooltip(lines[lineCount].cols[col],tooltip)
 					end
-
-					local tooltip = {
-						[-1]=(db.s and db.s["bounty"..i.."name"] or ""),
-					}
-					if db.s and not db.s["bounty"..i.."notime"] then
-						tooltip[#tooltip+1] = "Expire on"
-						tooltip[#tooltip+1] = (db.s and db.s["bounty"..i.."end"] and date("%d/%m/%Y %H:%M:%S",db.s["bounty"..i.."end"]) or "")
-					end
-					AddColTooltip(lines[lineCount].cols[col],tooltip)
 				end
 			end
 			

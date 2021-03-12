@@ -116,6 +116,28 @@ function M:OnCastSent()
 	element.SafeZone.castSent = true
 end
 
+local function UpdateSpellTarget(self, unit)
+	if not R.db["Nameplate"]["CastTarget"] then return end
+	if not self.spellTarget or not unit then return end
+
+	local unitTarget = unit.."target"
+	if UnitExists(unitTarget) then
+		local nameString
+		if UnitIsUnit(unitTarget, "player") then
+			nameString = format("|cffff0000%s|r", ">"..strupper(YOU).."<")
+		else
+			nameString = M.HexRGB(M.UnitColor(unitTarget))..UnitName(unitTarget)
+		end
+		self.spellTarget:SetText(nameString)
+	end
+end
+
+local function ResetSpellTarget(self)
+	if self.spellTarget then
+		self.spellTarget:SetText("")
+	end
+end
+
 function M:PostCastStart(unit)
 	self:SetAlpha(1)
 	self.Spark:Show()
@@ -149,12 +171,20 @@ function M:PostCastStart(unit)
 	end
 
 	if self.__owner.mystyle == "nameplate" then
+		-- Major spells
 		if R.db["Nameplate"]["CastbarGlow"] and M:GetModule("UnitFrames").MajorSpells[self.spellID] then
 			M.ShowOverlayGlow(self.glowFrame)
 		else
 			M.HideOverlayGlow(self.glowFrame)
 		end
+
+		-- Spell target
+		UpdateSpellTarget(self, unit)
 	end
+end
+
+function M:PostCastUpdate(unit)
+	UpdateSpellTarget(self, unit)
 end
 
 function M:PostUpdateInterruptible(unit)
@@ -171,6 +201,7 @@ function M:PostCastStop()
 		self.fadeOut = true
 	end
 	self:Show()
+	ResetSpellTarget(self)
 end
 
 function M:PostCastFailed()
@@ -178,4 +209,5 @@ function M:PostCastFailed()
 	self:SetValue(self.max)
 	self.fadeOut = true
 	self:Show()
+	ResetSpellTarget(self)
 end

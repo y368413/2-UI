@@ -1,4 +1,4 @@
-## Interface: 90002
+## Interface: 90005
 ## Title: Skada
 ## Notes: Modular damage meter.
 ## Title-zhCN:|cff8000ff[战斗]|r伤害统计

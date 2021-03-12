@@ -1,7 +1,7 @@
 ﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
 local module = M:GetModule("Chat")
-local gsub, gmatch, tinsert, pairs, ipairs, select= string.gsub, string.gmatch, table.insert, pairs, ipairs, select
+local gsub, gmatch, ipairs, select= string.gsub, string.gmatch, ipairs, select
 
 ------------------------------------------------------------------------------------- 属性通报 ----------------------------------------
 local function Talent()  -- 本地化专精
@@ -248,6 +248,7 @@ function module:Chatbar()
 	local chatFrame = SELECTED_DOCK_FRAME
 	local editBox = chatFrame.editBox
 	local width, height, padding, buttonList = 16, 18, 6, {}
+	local tinsert, pairs = table.insert, pairs
 	
 	local Chatbar = CreateFrame("Frame", "ChatBar", UIParent)
 	Chatbar:SetSize(width, height)

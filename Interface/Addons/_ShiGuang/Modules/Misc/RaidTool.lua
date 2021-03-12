@@ -10,7 +10,7 @@ local IsPartyLFG, IsLFGComplete, HasLFGRestrictions = IsPartyLFG, IsLFGComplete,
 local GetInstanceInfo, GetNumGroupMembers, GetRaidRosterInfo, GetRaidTargetIndex = GetInstanceInfo, GetNumGroupMembers, GetRaidRosterInfo, GetRaidTargetIndex
 local GetSpellCharges, GetSpellInfo, UnitAura = GetSpellCharges, GetSpellInfo, UnitAura
 local GetTime, SendChatMessage, IsAddOnLoaded = GetTime, SendChatMessage, IsAddOnLoaded
-local IsAltKeyDown, IsControlKeyDown, InCombatLockdown = IsAltKeyDown, IsControlKeyDown, InCombatLockdown
+local IsAltKeyDown, IsControlKeyDown, IsShiftKeyDown, InCombatLockdown = IsAltKeyDown, IsControlKeyDown, IsShiftKeyDown, InCombatLockdown
 local UnitExists, UninviteUnit = UnitExists, UninviteUnit
 local DoReadyCheck, InitiateRolePoll, GetReadyCheckStatus = DoReadyCheck, InitiateRolePoll, GetReadyCheckStatus
 local C_Timer_After = C_Timer.After
@@ -545,9 +545,20 @@ function MISC:RaidTool_EasyMarker()
 		{text = M.HexRGB(.98, .98, .98)..RAID_TARGET_8.." "..ICON_LIST[8].."12|t", func = function() SetRaidTarget("target", 8) end},
 	}
 
-	WorldFrame:HookScript("OnMouseDown", function(_, btn)
-		if not R.db["Misc"]["EasyMarking"] then return end
+	local function GetModifiedState()
+		local index = R.db["Misc"]["EasyMarkKey"]
+		if index == 1 then
+			return IsControlKeyDown()
+		elseif index == 2 then
+			return IsAltKeyDown()
+		elseif index == 3 then
+			return IsShiftKeyDown()
+		elseif index == 4 then
+			return false
+		end
+	end
 
+	WorldFrame:HookScript("OnMouseDown", function(_, btn)
 		if btn == "LeftButton" and IsControlKeyDown() and UnitExists("mouseover") then
 			if not IsInGroup() or (IsInGroup() and not IsInRaid()) or UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") then
 				local ricon = GetRaidTargetIndex("mouseover")

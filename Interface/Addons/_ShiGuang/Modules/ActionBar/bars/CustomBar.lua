@@ -2,6 +2,8 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local Bar = M:GetModule("Actionbar")
 
+local tinsert = tinsert
+local mod, min, ceil = mod, min, ceil
 local cfg = R.Bars.bar4
 local margin, padding = R.Bars.margin, R.Bars.padding
 

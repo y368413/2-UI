@@ -28,7 +28,7 @@ local UTF8Symbols = {
 	['|']='',['@']='',['!']='',['/']='',['<']='',['>']='',['"']='',['`']='',['_']='',["'"]='',['#']='',['&']='',[';']='',[':']='',['~']='',['\\']='',['=']='',['\t']='',['\n']='',['\r']='',[' ']='',
 }
 local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡:", "|Hspell.+[=>%- ]+> ", "受伤源自 |Hspell", "已打断.*|Hspell", "→.?|Hspell", "打断了.+|Hspell", "打断：.+|Hspell", "打断.+>.+<", "<iLvl>", "^%-+$", "EH: ", "<友情提示>", "挂了。%("}
-local QuestReportTagList = {"任务进度提示", "任务完成[%)%-]", "<大脚", "接受任务[%]:%-]", "进度:.+: %d+/%d+", "【爱不易】", "【有爱插件】","任务.*%[%d+%].+ 已完成!"}
+local QuestReportTagList = {"任务进度提示", "任务完成[%)%-]", "<大脚", "接受任务[%]:%-]", "进度:.+: %d+/%d+", "【有·爱】", "【爱不易】","任务.*%[%d+%].+ 已完成!"}
 local RegexCharList = "[().%%%+%-%*?%[%]$^{}]" -- won't work on regex blackWord, but works on others
 
 -- utf8 functions are taken and modified from utf8replace from @Phanx @Pastamancer
@@ -127,15 +127,15 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if msgLine == "" then msgLine = msg end
 	local annoying = (oriLen - #msgLine) / oriLen
 
-	-- filter blocked players and blocked msg
-	if not good and (blockedPlayers[player] >= 3 or blockedMsgs[msgLine] >= 3) then return msgLine end
-
 	-- filter status for each channel
 	local filtersStatus = eventStatus[Event]
 
-	-- AggressiveFilter: Filter strings that has too much symbols
-	-- AggressiveFilter: Filter journal link and club link
+	-- AggressiveFilter:
+	-- Filter blocked players and blocked msg
+	-- Filter strings that has too much symbols
+	-- Filter journal link and club link
 	if filtersStatus[1] and not IsMyFriend then
+		if blockedPlayers[player] >= 3 or blockedMsgs[msgLine] >= 3 then return msgLine end
 		if annoying >= 0.25 and oriLen >= 30 then return msgLine end
 		if msg:find("|Hjournal") or msg:find("|HclubTicket") then return msgLine end
 	end

@@ -1,4 +1,4 @@
-## Interface: 90002
+## Interface: 90005
 ## Title: TransMog Master
 ## Title-zhCN: |cff8080ff[幻化]|r功能增强
 ## Title-zhTW: |cff8080ff[幻化]|r功能增强

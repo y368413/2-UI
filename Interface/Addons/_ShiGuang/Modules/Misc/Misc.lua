@@ -65,6 +65,8 @@ function MISC:OnLogin()
 	MISC:ToggleBossEmote()
 	MISC:MawWidgetFrame()
 	MISC:WorldQuestTool()
+	MISC:FasterMovieSkip()
+	--MISC:EnhanceDressup()
 	
 	--MISC:CreateRM()
 	--MISC:FreeMountCD()
@@ -288,13 +290,14 @@ end
 -- Faster Looting
 local lootDelay = 0
 function MISC:DoFasterLoot()
-	if GetTime() - lootDelay >= .3 then
-		lootDelay = GetTime()
+	local thisTime = GetTime()
+	if thisTime - lootDelay >= .3 then
+		lootDelay = thisTime
 		if GetCVarBool("autoLootDefault") ~= IsModifiedClick("AUTOLOOTTOGGLE") then
 			for i = GetNumLootItems(), 1, -1 do
 				LootSlot(i)
 			end
-			lootDelay = GetTime()
+			lootDelay = thisTime
 		end
 	end
 end
@@ -648,6 +651,9 @@ function MISC:WorldQuestTool()
 		hasFound = nil
 	end
 
+	local fixedStrings = {
+		["低扫"] = "横扫",
+	}
 	M:RegisterEvent("CHAT_MSG_MONSTER_SAY", function(_, msg)
 		if not GetOverrideBarSkin() or not C_QuestLog_GetLogIndexForQuestID(59585) then
 			resetActionButtons()
@@ -655,6 +661,7 @@ function MISC:WorldQuestTool()
 		end
 
 		msg = gsub(msg, "[。%.]", "")
+		msg = fixedStrings[msg] or msg
 
 		for i = 1, 3 do
 			local button = _G["ActionButton"..i]
@@ -669,6 +676,55 @@ function MISC:WorldQuestTool()
 
 		hasFound = true
 	end)
+
+	M:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", resetActionButtons)
+end
+
+function MISC:FasterMovieSkip()
+	if not R.db["Misc"]["FasterSkip"] then return end
+
+	-- Allow space bar, escape key and enter key to cancel cinematic without confirmation
+	CinematicFrame:HookScript("OnKeyDown", function(self, key)
+		if key == "ESCAPE" then
+			if CinematicFrame:IsShown() and CinematicFrame.closeDialog and CinematicFrameCloseDialogConfirmButton then
+				CinematicFrameCloseDialog:Hide()
+			end
+		end
+	end)
+	CinematicFrame:HookScript("OnKeyUp", function(self, key)
+		if key == "SPACE" or key == "ESCAPE" or key == "ENTER" then
+			if CinematicFrame:IsShown() and CinematicFrame.closeDialog and CinematicFrameCloseDialogConfirmButton then
+				CinematicFrameCloseDialogConfirmButton:Click()
+			end
+		end
+	end)
+	MovieFrame:HookScript("OnKeyUp", function(self, key)
+		if key == "SPACE" or key == "ESCAPE" or key == "ENTER" then
+			if MovieFrame:IsShown() and MovieFrame.CloseDialog and MovieFrame.CloseDialog.ConfirmButton then
+				MovieFrame.CloseDialog.ConfirmButton:Click()
+			end
+		end
+	end)
+end
+
+function MISC:EnhanceDressup()
+	if not R.db["Misc"]["EnhanceDressup"] then return end
+
+	local parent = _G.DressUpFrameResetButton
+	local button = MISC:MailBox_CreatButton(parent, 80, 22, U["Undress"], {"RIGHT", parent, "LEFT", -1, 0})
+	button:RegisterForClicks("AnyUp")
+	button:SetScript("OnClick", function(_, btn)
+		local actor = DressUpFrame.ModelScene:GetPlayerActor()
+		if not actor then return end
+
+		if btn == "LeftButton" then
+			actor:Undress()
+		else
+			actor:UndressSlot(19)
+		end
+	end)
+
+	M.AddTooltip(button, "ANCHOR_TOP", format(U["UndressButtonTip"], I.LeftButton, I.RightButton))
 end
 
 --[[hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self,textString,value,_,maxValue)  ---	Custom status text format.
