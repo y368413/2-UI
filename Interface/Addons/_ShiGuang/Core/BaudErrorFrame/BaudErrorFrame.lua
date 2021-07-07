@@ -29,7 +29,9 @@ function BaudErrorFrame_OnLoad(self)
 		end
 	end	
 	SLASH_BaudErrorFrame1 = "/err"
-	seterrorhandler(BaudErrorFrameHandler)
+	local old_seterrorhandler = seterrorhandler
+	old_seterrorhandler(BaudErrorFrameHandler)
+	seterrorhandler = function() end
 end
 
 function BaudErrorFrame_OnEvent(self, event, ...)
@@ -74,7 +76,7 @@ function BaudErrorFrameShowError(Error)
 
 	if GetTime() > SoundTime then
 		--PlaySound(48942, "Master")
-		--PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Sonar.ogg", "Master")
+		PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Sonar.ogg", "Master")
 		SoundTime = GetTime() + 1
 	end
 end

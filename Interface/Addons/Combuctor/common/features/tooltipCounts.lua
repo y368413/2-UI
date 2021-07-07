@@ -179,7 +179,7 @@ function TooltipCounts:OnEnable()
 	if Addon.sets.tipCount then
 		if not ItemText then
 			ItemText, ItemCount = {}, {}
-			
+
 			HookTip(GameTooltip)
 			HookTip(ItemRefTooltip)
 		end

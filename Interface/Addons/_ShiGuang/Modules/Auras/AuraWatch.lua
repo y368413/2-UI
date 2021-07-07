@@ -5,7 +5,7 @@ local A = M:GetModule("Auras")
 local maxFrames = 12 -- Max Tracked Auras
 local updater = CreateFrame("Frame")
 local AuraList, FrameList, UnitIDTable, IntTable, IntCD, myTable, cooldownTable = {}, {}, {}, {}, {}, {}, {}
-local pairs, select, tinsert, tremove, wipe = pairs, select, table.insert, table.remove, table.wipe
+local pairs, select, tinsert, tremove, wipe, strfind = pairs, select, table.insert, table.remove, table.wipe, strfind
 local InCombatLockdown, UnitBuff, UnitDebuff, GetPlayerInfoByGUID, UnitInRaid, UnitInParty = InCombatLockdown, UnitBuff, UnitDebuff, GetPlayerInfoByGUID, UnitInRaid, UnitInParty
 local GetTime, GetSpellInfo, GetSpellCooldown, GetSpellCharges, GetTotemInfo, IsPlayerSpell = GetTime, GetSpellInfo, GetSpellCooldown, GetSpellCharges, GetTotemInfo, IsPlayerSpell
 local GetItemCooldown, GetItemInfo, GetInventoryItemLink, GetInventoryItemCooldown = GetItemCooldown, GetItemInfo, GetInventoryItemLink, GetInventoryItemCooldown
@@ -16,7 +16,11 @@ local function DataAnalyze(v)
 	if type(v[1]) == "number" then
 		newTable.IntID = v[1]
 		newTable.Duration = v[2]
-		if v[3] == "OnCastSuccess" then newTable.OnSuccess = true end
+		if v[3] == "OnCastSuccess" then
+			newTable.OnSuccess = true
+		elseif v[3] == "UnitCastSucceed" then
+			newTable.CastSucceed = true
+		end
 		newTable.UnitID = v[4]
 		newTable.ItemID = v[5]
 	else
@@ -422,12 +426,12 @@ function A:AuraWatch_UpdateCD()
 					if group.Mode:lower() == "icon" then name = nil end
 					if charges and maxCharges and maxCharges > 1 and charges < maxCharges then
 						A:AuraWatch_SetupCD(KEY, name, icon, chargeStart, chargeDuration, true, 1, value.SpellID, charges)
-					elseif start and duration > 5 then
+					elseif start and duration > 3 then
 						A:AuraWatch_SetupCD(KEY, name, icon, start, duration, true, 1, value.SpellID)
 					end
 				elseif value.ItemID then
 					local start, duration = GetItemCooldown(value.ItemID)
-					if start and duration > 5 then
+					if start and duration > 3 then
 						local name, _, _, _, _, _, _, _, _, icon = GetItemInfo(value.ItemID)
 						if group.Mode:lower() == "icon" then name = nil end
 						A:AuraWatch_SetupCD(KEY, name, icon, start, duration, false, 2, value.ItemID)
@@ -664,22 +668,40 @@ end
 
 local cache = {}
 local soundKitID = SOUNDKIT.ALARM_CLOCK_WARNING_3
-function A:AuraWatch_UpdateInt(_, ...)
+function A:AuraWatch_UpdateInt(event, ...)
 	if not IntCD.List then return end
 
-	local timestamp, eventType, _, sourceGUID, sourceName, sourceFlags, _, destGUID, destName, destFlags, _, spellID = ...
-	local value = IntCD.List[spellID]
-	if value and cache[timestamp] ~= spellID and A:IsAuraTracking(value, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags) then
-		local guid, name = destGUID, destName
-		if value.OnSuccess then guid, name = sourceGUID, sourceName end
+	if event == "UNIT_SPELLCAST_SUCCEEDED" then
+		local unit, _, spellID = ...
+		local value = IntCD.List[spellID]
+		if value and value.CastSucceed and unit then
+			local unitID = value.UnitID:lower()
+			local guid = UnitGUID(unit)
+			local isPassed
+			if unitID == "all" and (unit == "player" or strfind(unit, "pet") or UnitInRaid(unit) or UnitInParty(unit) or not GetPlayerInfoByGUID(guid)) then
+				isPassed = true
+			elseif unitID == "player" and (unit == "player" or unit == "pet") then
+				isPassed = true
+			end
+			if isPassed then
+				A:AuraWatch_SetupInt(value.IntID, value.ItemID, value.Duration, value.UnitID, guid, UnitName(unit))
+			end
+		end
+	else
+		local timestamp, eventType, _, sourceGUID, sourceName, sourceFlags, _, destGUID, destName, destFlags, _, spellID = ...
+		local value = IntCD.List[spellID]
+		if value and cache[timestamp] ~= spellID and A:IsAuraTracking(value, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags) then
+			local guid, name = destGUID, destName
+			if value.OnSuccess then guid, name = sourceGUID, sourceName end
 
-		A:AuraWatch_SetupInt(value.IntID, value.ItemID, value.Duration, value.UnitID, guid, name)
-		if R.db["AuraWatch"]["QuakeRing"] and spellID == 240447 then PlaySound(soundKitID, "Master") end -- 'Ding' on quake
+			A:AuraWatch_SetupInt(value.IntID, value.ItemID, value.Duration, value.UnitID, guid, name)
+			if R.db["AuraWatch"]["QuakeRing"] and spellID == 240447 then PlaySound(soundKitID, "Master") end -- 'Ding' on quake
 
-		cache[timestamp] = spellID
+			cache[timestamp] = spellID
+		end
+
+		if #cache > 666 then wipe(cache) end
 	end
-
-	if #cache > 666 then wipe(cache) end
 end
 
 -- CleanUp
@@ -704,6 +726,7 @@ end
 function A.AuraWatch_OnEvent(event, ...)
 	if not R.db["AuraWatch"]["Enable"] then
 		M:UnregisterEvent("PLAYER_ENTERING_WORLD", A.AuraWatch_OnEvent)
+		M:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.AuraWatch_OnEvent)
 		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", A.AuraWatch_OnEvent)
 		return
 	end
@@ -717,6 +740,7 @@ function A.AuraWatch_OnEvent(event, ...)
 	end
 end
 M:RegisterEvent("PLAYER_ENTERING_WORLD", A.AuraWatch_OnEvent)
+M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.AuraWatch_OnEvent)
 M:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", A.AuraWatch_OnEvent)
 
 function A:AuraWatch_OnUpdate(elapsed)

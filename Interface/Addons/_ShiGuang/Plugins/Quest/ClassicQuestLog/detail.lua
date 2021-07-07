@@ -31,12 +31,12 @@ function cql.detail:Update()
     end
 
     -- show portrait if one exists and there's enough room to the right of the main window
-	local questPortrait, questPortraitText, questPortraitName, questPortraitMount = GetQuestLogPortraitGiver()
+	local questPortrait, questPortraitText, questPortraitName, questPortraitMount, questPortraitModelSceneID = C_QuestLog.GetQuestLogPortraitGiver();
 	if questID>0 and (questPortrait and questPortrait ~= 0 and QuestLogShouldShowPortrait() and (UIParent:GetRight() - cql:GetRight() > QuestModelScene:GetWidth() + 6)) then
-        QuestFrame_ShowQuestPortrait(cql, questPortrait, questPortraitMount, questPortraitText, questPortraitName, -2, -43)
-        QuestModelScene:SetFrameStrata("HIGH")
+		QuestFrame_ShowQuestPortrait(cql, questPortrait, questPortraitMount, questPortraitModelSceneID, questPortraitText, questPortraitName, -2, -43);
+		QuestModelScene:SetFrameLevel(cql:GetFrameLevel() + 2);
 	else
-		QuestFrame_HideQuestPortrait()
+		QuestFrame_HideQuestPortrait();
 	end
 
 	StaticPopup_Hide("ABANDON_QUEST");

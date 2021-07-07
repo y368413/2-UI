@@ -97,12 +97,14 @@ function MISC:GuildBest_Update()
 	end
 
 	if not resize and hasAngryKeystones then
-		local schedule = AngryKeystones.Modules.Schedule.AffixFrame
+		local schedule = AngryKeystones.Modules.Schedule
 		frame:SetWidth(246)
 		frame:ClearAllPoints()
-		frame:SetPoint("BOTTOMLEFT", schedule, "TOPLEFT", 0, 10)
+		frame:SetPoint("BOTTOMLEFT", schedule.AffixFrame, "TOPLEFT", 0, 10)
 
 		self.WeeklyInfo.Child.ThisWeekLabel:SetPoint("TOP", -135, -25)
+		schedule.KeystoneText:SetScale(.0001)
+
 		local affix = self.WeeklyInfo.Child.Affixes[1]
 		if affix then
 			affix:ClearAllPoints()
@@ -133,9 +135,10 @@ end
 
 function MISC:KeystoneInfo_WeeklyRuns()
 	local runHistory = C_MythicPlus_GetRunHistory(false, true)
-	if #runHistory > 0 then
+	local numRuns = runHistory and #runHistory
+	if numRuns > 0 then
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(format(WEEKLY_REWARDS_MYTHIC_TOP_RUNS, WeeklyRunsThreshold), .6,.8,1)
+		GameTooltip:AddDoubleLine(format(WEEKLY_REWARDS_MYTHIC_TOP_RUNS, WeeklyRunsThreshold), "("..numRuns..")", .6,.8,1)
 		sort(runHistory, sortHistory)
 
 		for i = 1, WeeklyRunsThreshold do
@@ -200,6 +203,8 @@ function MISC:KeystoneInfo_Update()
 end
 
 function MISC:GuildBest()
+	if not R.db["Misc"]["MDGuildBest"] then return end
+
 	hasAngryKeystones = IsAddOnLoaded("AngryKeystones")
 	M:RegisterEvent("ADDON_LOADED", MISC.GuildBest_OnLoad)
 

@@ -4,6 +4,7 @@ local TT = M:RegisterModule("Tooltip")
 
 local strfind, format, strupper, strlen, pairs, unpack = string.find, string.format, string.upper, string.len, pairs, unpack
 local ICON_LIST = ICON_LIST
+local HIGHLIGHT_FONT_COLOR = HIGHLIGHT_FONT_COLOR
 local PVP, LEVEL, FACTION_HORDE, FACTION_ALLIANCE = PVP, LEVEL, FACTION_HORDE, FACTION_ALLIANCE
 local YOU, TARGET, AFK, DND, DEAD, PLAYER_OFFLINE = YOU, TARGET, AFK, DND, DEAD, PLAYER_OFFLINE
 local FOREIGN_SERVER_LABEL, INTERACTIVE_SERVER_LABEL = FOREIGN_SERVER_LABEL, INTERACTIVE_SERVER_LABEL
@@ -16,6 +17,8 @@ local UnitIsWildBattlePet, UnitIsBattlePetCompanion, UnitBattlePetLevel = UnitIs
 local UnitIsPlayer, UnitName, UnitPVPName, UnitClass, UnitRace, UnitLevel = UnitIsPlayer, UnitName, UnitPVPName, UnitClass, UnitRace, UnitLevel
 local GetRaidTargetIndex, UnitGroupRolesAssigned, GetGuildInfo, IsInGuild = GetRaidTargetIndex, UnitGroupRolesAssigned, GetGuildInfo, IsInGuild
 local C_PetBattles_GetNumAuras, C_PetBattles_GetAuraInfo = C_PetBattles.GetNumAuras, C_PetBattles.GetAuraInfo
+local C_ChallengeMode_GetDungeonScoreRarityColor = C_ChallengeMode.GetDungeonScoreRarityColor
+local C_PlayerInfo_GetPlayerMythicPlusRatingSummary = C_PlayerInfo.GetPlayerMythicPlusRatingSummary
 
 local classification = {
 	elite = " |cffcc8800"..ELITE.."|r",
@@ -35,8 +38,8 @@ function TT:GetUnit()
 end
 
 function TT:HideLines()
-    for i = 3, self:NumLines() do
-        local tiptext = _G["GameTooltipTextLeft"..i]
+	for i = 3, self:NumLines() do
+		local tiptext = _G["GameTooltipTextLeft"..i]
 		local linetext = tiptext:GetText()
 		if linetext then
 			if linetext == PVP then
@@ -58,7 +61,7 @@ function TT:HideLines()
 				end
 			end
 		end
-    end
+	end
 end
 
 function TT:GetLevelLine()
@@ -118,6 +121,17 @@ function TT:OnTooltipCleared()
 	if self.roleFrame and self.roleFrame:GetAlpha() ~= 0 then
 		self.roleFrame:SetAlpha(0)
 		self.roleFrame.bg:SetAlpha(0)
+	end
+end
+
+function TT:ShowUnitMythicPlusScore(unit)
+	if not R.db["Tooltip"]["MDScore"] then return end
+
+	local summary = C_PlayerInfo_GetPlayerMythicPlusRatingSummary(unit)
+	local score = summary and summary.currentSeasonScore
+	if score and score > 0 then
+		local color = C_ChallengeMode_GetDungeonScoreRarityColor(score) or HIGHLIGHT_FONT_COLOR
+		GameTooltip:AddLine(format(U["MythicScore"], color:WrapTextInColorCode(score)))
 	end
 end
 
@@ -243,11 +257,12 @@ function TT:OnTooltipSetUnit()
 		else
 			self.StatusBar:Hide()
 		end
+
+		TT.InspectUnitSpecAndLevel(self, unit)
+		TT.ShowUnitMythicPlusScore(self, unit)
 	else
 		self.StatusBar:SetStatusBarColor(0, .9, 0)
 	end
-
-	TT.InspectUnitSpecAndLevel(self)
 end
 
 function TT:StatusBar_OnValueChanged(value)
@@ -413,13 +428,15 @@ function TT:SetupTooltipFonts()
 	TooltipSetFont(GameTooltipText, textSize)
 	TooltipSetFont(GameTooltipTextSmall, textSize)
 
+	if not GameTooltip.hasMoney then
+		SetTooltipMoney(GameTooltip, 1, nil, "", "")
+		SetTooltipMoney(GameTooltip, 1, nil, "", "")
+		GameTooltip_ClearMoney(GameTooltip)
+	end
 	if GameTooltip.hasMoney then
 		for i = 1, GameTooltip.numMoneyFrames do
 			TooltipSetFont(_G["GameTooltipMoneyFrame"..i.."PrefixText"], textSize)
 			TooltipSetFont(_G["GameTooltipMoneyFrame"..i.."SuffixText"], textSize)
-			TooltipSetFont(_G["GameTooltipMoneyFrame"..i.."GoldButtonText"], textSize)
-			TooltipSetFont(_G["GameTooltipMoneyFrame"..i.."SilverButtonText"], textSize)
-			TooltipSetFont(_G["GameTooltipMoneyFrame"..i.."CopperButtonText"], textSize)
 		end
 	end
 
@@ -429,6 +446,15 @@ function TT:SetupTooltipFonts()
 			if region:IsObjectType("FontString") then
 				TooltipSetFont(region, textSize)
 			end
+		end
+	end
+end
+
+function TT:FixRecipeItemNameWidth()
+	for i = 1, self:NumLines() do
+		local line = _G["GameTooltipTextLeft"..i]
+		if line:GetHeight() > 40 then
+			line:SetWidth(line:GetWidth() + 1)
 		end
 	end
 end
@@ -443,9 +469,10 @@ function TT:OnLogin()
 	hooksecurefunc("GameTooltip_SetDefaultAnchor", TT.GameTooltip_SetDefaultAnchor)
 	hooksecurefunc("SharedTooltip_SetBackdropStyle", TT.SharedTooltip_SetBackdropStyle)
 	hooksecurefunc("GameTooltip_AnchorComparisonTooltips", TT.GameTooltip_ComparisonFix)
+	TT:SetupTooltipFonts()
+	GameTooltip:HookScript("OnTooltipSetItem", TT.FixRecipeItemNameWidth)
 
 	-- Elements
-	TT:SetupTooltipFonts()
 	TT:ReskinTooltipIcons()
 	TT:SetupTooltipID()
 	TT:TargetedInfo()
@@ -507,8 +534,9 @@ TT:RegisterTooltips("_ShiGuang", function()
 	end
 
 	-- DropdownMenu
+	local dropdowns = {"DropDownList", "L_DropDownList", "Lib_DropDownList"}
 	local function reskinDropdown()
-		for _, name in pairs({"DropDownList", "L_DropDownList", "Lib_DropDownList"}) do
+		for _, name in pairs(dropdowns) do
 			for i = 1, UIDROPDOWNMENU_MAXLEVELS do
 				local menu = _G[name..i.."MenuBackdrop"]
 				if menu and not menu.styled then
@@ -610,10 +638,11 @@ end)
 
 TT:RegisterTooltips("Blizzard_DebugTools", function()
 	TT.ReskinTooltip(FrameStackTooltip)
-	TT.ReskinTooltip(EventTraceTooltip)
 	FrameStackTooltip:SetScale(UIParent:GetScale())
-	EventTraceTooltip:SetParent(UIParent)
-	EventTraceTooltip:SetFrameStrata("TOOLTIP")
+end)
+
+TT:RegisterTooltips("Blizzard_EventTrace", function()
+	TT.ReskinTooltip(EventTraceTooltip)
 end)
 
 TT:RegisterTooltips("Blizzard_Collections", function()
@@ -661,11 +690,4 @@ end)
 TT:RegisterTooltips("Blizzard_Calendar", function()
 	CalendarContextMenu:HookScript("OnShow", TT.ReskinTooltip)
 	CalendarInviteStatusContextMenu:HookScript("OnShow", TT.ReskinTooltip)
-end)
-
-TT:RegisterTooltips("Blizzard_IslandsQueueUI", function()
-	local tooltip = IslandsQueueFrameTooltip:GetParent()
-	tooltip.IconBorder:SetAlpha(0)
-	tooltip.Icon:SetTexCoord(unpack(I.TexCoord))
-	tooltip:GetParent():HookScript("OnShow", TT.ReskinTooltip)
 end)

@@ -8,6 +8,7 @@ local UnitGUID, GetItemInfo, GetSpellInfo = UnitGUID, GetItemInfo, GetSpellInfo
 local GetContainerItemLink, GetInventoryItemLink = GetContainerItemLink, GetInventoryItemLink
 local EquipmentManager_UnpackLocation, EquipmentManager_GetItemInfoByLocation = EquipmentManager_UnpackLocation, EquipmentManager_GetItemInfoByLocation
 local C_AzeriteEmpoweredItem_IsPowerSelected = C_AzeriteEmpoweredItem.IsPowerSelected
+local GetTradePlayerItemLink, GetTradeTargetItemLink = GetTradePlayerItemLink, GetTradeTargetItemLink
 
 local inspectSlots = {
 	"Head", "Neck", "Shoulder", "Shirt", "Chest", "Waist", "Legs", "Feet", "Wrist", "Hands", "Finger0", "Finger1", "Trinket0", "Trinket1", "Back", "MainHand", "SecondaryHand",
@@ -290,16 +291,30 @@ function MISC.ItemLevel_ScrappingShow(event, addon)
 end
 
 function MISC:ItemLevel_UpdateMerchant(link)
+	if not self.iLvl then
+		self.iLvl = M.CreateFS(_G[self:GetName().."ItemButton"], I.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
+	end
 	local quality = link and select(3, GetItemInfo(link)) or nil
 	if quality then
-		if not self.iLvl then
-			self.iLvl = M.CreateFS(self.ItemButton, I.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
-		end
 		local level = M.GetItemLevel(link)
 		local color = I.QualityColors[quality]
 		self.iLvl:SetText(level)
 		self.iLvl:SetTextColor(color.r, color.g, color.b)
+	else
+		self.iLvl:SetText("")
 	end
+end
+
+function MISC.ItemLevel_UpdateTradePlayer(index)
+	local button = _G["TradePlayerItem"..index]
+	local link = GetTradePlayerItemLink(index)
+	MISC.ItemLevel_UpdateMerchant(button, link)
+end
+
+function MISC.ItemLevel_UpdateTradeTarget(index)
+	local button = _G["TradeRecipientItem"..index]
+	local link = GetTradeTargetItemLink(index)
+	MISC.ItemLevel_UpdateMerchant(button, link)
 end
 
 function MISC:ShowItemLevel()
@@ -320,5 +335,9 @@ function MISC:ShowItemLevel()
 
 	-- iLvl on MerchantFrame
 	hooksecurefunc("MerchantFrameItem_UpdateQuality", MISC.ItemLevel_UpdateMerchant)
+
+	-- iLvl on TradeFrame
+	hooksecurefunc("TradeFrame_UpdatePlayerItem", MISC.ItemLevel_UpdateTradePlayer)
+	hooksecurefunc("TradeFrame_UpdateTargetItem", MISC.ItemLevel_UpdateTradeTarget)
 end
 MISC:RegisterMisc("GearInfo", MISC.ShowItemLevel)

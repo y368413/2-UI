@@ -61,7 +61,7 @@ end
 function tooltip:PLAYER_LOGIN()
     tooltip.model:SetUnit("player")
     tooltip.modelZoomed:SetUnit("player")
-    C_TransmogCollection.SetShowMissingSourceInItemTooltips(true)
+    C_CVar.SetCVar("missingTransmogSourceInItemTooltips", "1")
 
     AppearanceTooltip.UpdateSources()
 end
@@ -562,7 +562,7 @@ end
 function AppearanceTooltip.CanTransmogItem(itemLink)
     local itemID = GetItemInfoInstant(itemLink)
     if itemID then
-        local canBeChanged, noChangeReason, canBeSource, noSourceReason = C_Transmog.GetItemInfo(itemID)
+        local canBeChanged, noChangeReason, canBeSource, noSourceReason = C_Transmog.CanTransmogItem(itemID)
         return canBeSource, noSourceReason
     end
 end
@@ -570,6 +570,7 @@ end
 local brokenItems = {
     -- itemid : {appearanceid, sourceid}
     [153268] = {25124, 90807}, -- Enclave Aspirant's Axe
+    [153316] = {25123, 90885}, -- Praetor's Ornamental Edge
 }
 -- /dump C_TransmogCollection.GetAppearanceSourceInfo(select(2, C_TransmogCollection.GetItemInfo("")))
 function AppearanceTooltip.PlayerHasAppearance(itemLinkOrID)
@@ -738,7 +739,7 @@ local subclasses = {
     [LE_ITEM_WEAPON_GENERIC] = "1HSword",
 }
 
-local _, playerRace = UnitRace("player")
+local _, _, playerRaceID = UnitRace("player")
 local playerSex
 if UnitSex("player") == 2 then
     playerSex = "Male"
@@ -752,7 +753,7 @@ local slots_to_cameraids, slot_override
 -- itemid: number/string Anything that GetItemInfoInstant will accept
 -- race: number raceid
 -- gender: number genderid (0: male, 1: female)
-function AppearanceTooltip:GetCameraID(itemLinkOrID, race, gender)
+function AppearanceTooltip:GetCameraID(itemLinkOrID, raceID, genderID)
     local key, itemcamera
     local itemid, _, _, slot, _, class, subclass = GetItemInfoInstant(itemLinkOrID)
     if item_slots[slot] then
@@ -763,16 +764,10 @@ function AppearanceTooltip:GetCameraID(itemLinkOrID, race, gender)
             key = "Weapon-" .. item_slots[slot]
         end
     else
-        race = races[race]
-        gender = genders[gender]
-        if not race then
-            race = playerRace
-            if race == 'Worgen' and select(2, HasAlternateForm()) then
-                race = 'Human'
-            end
-        end
-        if not gender then
-            gender = playerSex
+        local race = races[raceID or playerRaceID]
+        local gender = genderID and genders[genderID] or playerSex
+        if not raceID and race == 'Worgen' and select(2, HasAlternateForm()) then
+            race = 'Human'
         end
         key = ("%s-%s-%s"):format(race, gender, slot_override[itemid] or slots[slot] or "Default")
     end

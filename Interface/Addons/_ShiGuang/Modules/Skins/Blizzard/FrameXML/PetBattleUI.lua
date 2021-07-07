@@ -1,6 +1,7 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
 
+local LE_BATTLE_PET_ALLY = Enum.BattlePetOwner.Ally
 tinsert(R.defaultThemes, function()
 	if not R.db["Skins"]["PetBattle"] then return end
 

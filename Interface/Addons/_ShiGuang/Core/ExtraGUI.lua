@@ -74,6 +74,13 @@ local function updateRaidDebuffs()
 	M:GetModule("UnitFrames"):UpdateRaidDebuffs()
 end
 
+local function AddNewDungeon(dungeons, dungeonID)
+	local name = EJ_GetInstanceInfo(dungeonID)
+	if name then
+		tinsert(dungeons, name)
+	end
+end
+
 function G:SetupRaidDebuffs(parent)
 	local guiName = "NDuiGUI_RaidDebuffs"
 	toggleExtraGUI(guiName)
@@ -106,14 +113,13 @@ function G:SetupRaidDebuffs(parent)
 
 	local dungeons = {}
 	for dungeonID = 1182, 1189 do
-		local name = EJ_GetInstanceInfo(dungeonID)
-		if name then
-			tinsert(dungeons, name)
-		end
+		AddNewDungeon(dungeons, dungeonID)
 	end
+	AddNewDungeon(dungeons, 1194)
 
 	local raids = {
 		[1] = EJ_GetInstanceInfo(1190),
+		[2] = EJ_GetInstanceInfo(1193),
 	}
 
 	options[1] = G:CreateDropdown(frame, DUNGEONS.."*", 10, -30, dungeons, U["Dungeons Intro"], 110, 30)

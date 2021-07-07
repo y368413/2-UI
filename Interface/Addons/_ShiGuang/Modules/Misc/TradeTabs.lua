@@ -102,13 +102,18 @@ function MISC:TradeTabs_Create(spellID, toyID, itemID)
 		name, _, texture = GetSpellInfo(spellID)
 	end
 
-	local tab = CreateFrame("CheckButton", nil, TradeSkillFrame, "SpellBookSkillLineTabTemplate, InsecureActionButtonTemplate")
+	local tab = CreateFrame("CheckButton", nil, TradeSkillFrame, "SpellBookSkillLineTabTemplate, SecureActionButtonTemplate")
 	tab.tooltip = name
 	tab.spellID = spellID
 	tab.itemID = toyID or itemID
 	tab.type = (toyID and "toy") or (itemID and "item") or "spell"
-	tab:SetAttribute("type", tab.type)
-	tab:SetAttribute(tab.type, spellID or name)
+	if spellID == 818 then -- cooking fire
+		tab:SetAttribute("type", "macro")
+		tab:SetAttribute("macrotext", "/cast [@player]"..name)
+	else
+		tab:SetAttribute("type", tab.type)
+		tab:SetAttribute(tab.type, spellID or name)
+	end
 	tab:SetNormalTexture(texture)
 	tab:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
 	tab:Show()
@@ -215,7 +220,7 @@ function MISC:TradeTabs_QuickEnchanting()
 
 	local createButton = detailsFrame.CreateButton
 	createButton:RegisterForClicks("AnyUp")
-	createButton:HookScript("OnClick", function(self, btn)
+	createButton:HookScript("OnClick", function(_, btn)
 		if btn == "RightButton" and isEnchanting then
 			UseItemByName(ENCHANTING_VELLUM)
 		end

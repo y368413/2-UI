@@ -113,10 +113,21 @@ function module:SkinChat()
 	M.HideObject(self.buttonFrame)
 	M.HideObject(self.ScrollBar)
 	M.HideObject(self.ScrollToBottomButton)
+	module:ToggleChatFrameTextures(self)
 
 	self.oldAlpha = self.oldAlpha or 0 -- fix blizz error
 
 	self.styled = true
+end
+
+function module:ToggleChatFrameTextures(frame)
+	if R.db["Chat"]["ChatBGType"] == 1 then
+		frame:EnableDrawLayer("BORDER")
+		frame:EnableDrawLayer("BACKGROUND")
+	else
+		frame:DisableDrawLayer("BORDER")
+		frame:DisableDrawLayer("BACKGROUND")
+	end
 end
 
 function module:ToggleChatBackground()
@@ -128,6 +139,7 @@ function module:ToggleChatBackground()
 		if frame.__gradient then
 			frame.__gradient:SetShown(R.db["Chat"]["ChatBGType"] == 3)
 		end
+		module:ToggleChatFrameTextures(frame)
 	end
 end
 
@@ -307,11 +319,40 @@ local whisperEvents = {
 }
 function module:PlayWhisperSound(event)
 	if whisperEvents[event] then
+		if module.MuteThisTime then
+			module.MuteThisTime = nil
+			return
+		end
+
 		local currentTime = GetTime()
 		if not self.soundTimer or currentTime > self.soundTimer then
 			PlaySound(messageSoundID, "master")
 		end
 		self.soundTimer = currentTime + 5
+	end
+end
+
+local function FixLanguageFilterSideEffects()
+	HelpFrame:HookScript("OnShow", function()
+		UIErrorsFrame:AddMessage(I.InfoColor..U["LanguageFilterTip"])
+	end)
+
+	local OLD_GetFriendGameAccountInfo = C_BattleNet.GetFriendGameAccountInfo
+	function C_BattleNet.GetFriendGameAccountInfo(...)
+		local gameAccountInfo = OLD_GetFriendGameAccountInfo(...)
+		if gameAccountInfo then
+			gameAccountInfo.isInCurrentRegion = true
+		end
+		return gameAccountInfo
+	end
+
+	local OLD_GetFriendAccountInfo = C_BattleNet.GetFriendAccountInfo
+	function C_BattleNet.GetFriendAccountInfo(...)
+		local accountInfo = OLD_GetFriendAccountInfo(...)
+		if accountInfo and accountInfo.gameAccountInfo then
+			accountInfo.gameAccountInfo.isInCurrentRegion = true
+		end
+		return accountInfo
 	end
 end
 
@@ -335,7 +376,7 @@ function module:OnLogin()
 
 	hooksecurefunc("FCFTab_UpdateColors", module.UpdateTabColors)
 	hooksecurefunc("FloatingChatFrame_OnEvent", module.UpdateTabEventColors)
-	hooksecurefunc("ChatFrame_ConfigEventHandler", module.PlayWhisperSound)
+	hooksecurefunc("ChatFrame_MessageEventHandler", module.PlayWhisperSound)
 
 	-- Font size
 	for i = 1, 15 do
@@ -345,7 +386,7 @@ function module:OnLogin()
 	-- Default
 	if CHAT_OPTIONS then CHAT_OPTIONS.HIDE_FRAME_ALERTS = true end -- only flash whisper
 	SetCVar("chatStyle", "classic")
-	SetCVar("whisperMode", "inline") -- blizz reset this on NPE
+	--SetCVar("whisperMode", "inline") -- blizz reset this on NPE
 	M.HideOption(InterfaceOptionsSocialPanelChatStyle)
 	CombatLogQuickButtonFrame_CustomTexture:SetTexture(nil)
 
@@ -371,6 +412,7 @@ function module:OnLogin()
 	if R.db["Chat"]["Freedom"] then
 		if GetCVar("portal") == "CN" then
 			ConsoleExec("portal TW")
+			FixLanguageFilterSideEffects()
 		end
 		SetCVar("profanityFilter", 0)
 	else

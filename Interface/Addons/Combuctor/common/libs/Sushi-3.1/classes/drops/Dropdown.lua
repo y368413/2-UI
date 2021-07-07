@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with Sushi. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local Drop = LibStub('Sushi-3.1').Group:NewSushi('Dropdown', 4, 'Frame')
+local Drop = LibStub('Sushi-3.1').Group:NewSushi('Dropdown', 6, 'Frame')
 if not Drop then return end
 
 
@@ -29,7 +29,7 @@ function Drop:Construct()
   bg:SetFrameLevel(f:GetFrameLevel())
   bg:EnableMouse(true)
 
-  if WOW_PROJECT_ID ~= WOW_PROJECT_CLASSIC then
+  if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
     f:SetScript('OnHide', f.OnHide)
     f:SetScript('OnEvent', f.OnGlobalMouse)
     f:RegisterEvent('GLOBAL_MOUSE_DOWN')
@@ -82,7 +82,7 @@ function Drop:OnUpdate()
   local time = GetTime()
   if self.done then
     self:Release()
-  elseif MouseIsOver(self) or MouseIsOver(self:GetParent()) then
+  elseif self:IsMouseInteracting() then
     self.expires = time + 5
   elseif time >= self.expires then
     self:Release()
@@ -90,7 +90,7 @@ function Drop:OnUpdate()
 end
 
 function Drop:OnGlobalMouse()
-  if not MouseIsOver(self) and not MouseIsOver(self:GetParent()) then
+  if not self:IsMouseInteracting() then
     self.done = true
   end
 end
@@ -143,10 +143,26 @@ function Drop:SetBackdrop(backdrop)
   self.Bg:SetPoint('TOPRIGHT', padding, 11 + padding)
 end
 
+function Drop:IsMouseInteracting()
+  local function step(frame)
+    if frame:IsMouseOver() then
+      return true
+    end
+
+    for i, child in ipairs {frame:GetChildren()} do
+      if step(child) then
+        return true
+      end
+    end
+  end
+
+  return step(self:GetParent())
+end
+
 
 --[[ Proprieties ]]--
 
-if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC and not Drop.ButtonClass then
+if WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE and not Drop.ButtonClass then
   hooksecurefunc('ToggleDropDownMenu', function() Drop:Clear() end)
   hooksecurefunc('CloseDropDownMenus', function() Drop:Clear() end)
 end

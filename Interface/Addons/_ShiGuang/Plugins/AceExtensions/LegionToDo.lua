@@ -1,6 +1,6 @@
 ﻿--## Author: ykiigor  ## SavedVariables: VLegionToDo
-local LegionToDoVersion = "4.8"
-local VERSION_NUMERIC = 48
+local LegionToDoVersion = "4.9"
+local VERSION_NUMERIC = 49
 
 local GetCurrentRegion
 do
@@ -292,6 +292,41 @@ tinsert(ToDoFunc,function(self,collect)
 		collect.valorEarned = nil
 		collect.valorMax = nil
 	end
+
+	local data = C_CurrencyInfo.GetCurrencyInfo(1904)
+	if data then
+		collect.towerknowledge = data.quantity
+		collect.towerknowledgeEarned = data.totalEarned
+		collect.towerknowledgeMax = data.maxQuantity
+
+		self:AddDoubleLine(data.name, data.quantity, 1,1,1)
+		self:AddTexture(data.iconFileID)
+	else
+		collect.towerknowledge = nil
+		collect.towerknowledgeEarned = nil
+		collect.towerknowledgeMax = nil
+	end
+
+	local name, amount, texturePath, earnedThisWeek, weeklyMax, totalMax, isDiscovered, quality = GetCurrencyInfo(1906)
+	if isLevel60 then
+		self:AddDoubleLine(name, amount, 1,1,1)
+		self:AddTexture(texturePath)
+	end
+	collect.soulash91 = amount
+
+	local name, amount, texturePath, earnedThisWeek, weeklyMax, totalMax, isDiscovered, quality = GetCurrencyInfo(1931)
+	if isLevel60 then
+		self:AddDoubleLine(name, amount, 1,1,1)
+		self:AddTexture(texturePath)
+	end
+	collect.catalogedresearch = amount
+
+	local name, amount, texturePath, earnedThisWeek, weeklyMax, totalMax, isDiscovered, quality = GetCurrencyInfo(1977)
+	if isLevel60 then
+		self:AddDoubleLine(name, amount, 1,1,1)
+		self:AddTexture(texturePath)
+	end
+	collect.stygianember = amount
 end)
 
 tinsert(ToDoFunc,function(self,collect)
@@ -759,12 +794,12 @@ end)
 local instances = {
 	707,740,767,716,727,762,721,777,726,800,860,900,945,
 	968,1001,1041,1036,1023,1030,1012,1022,1002,1021, 1178,
-	1188,1185,1184,1183,1189,1186,1182,1187,
+	1188,1185,1184,1183,1189,1186,1182,1187,	1194,
 }
 local instancesInOptions = {
 	1,2,3,4,5,6,7,8,9,10,11,12,13,
 	14,15,16,17,18,19,20,21,22,23, 24,
-	25,26,27,28,29,30,31,32,
+	25,26,27,28,29,30,31,32,	33,
 }
 local instancesLastBoss = {}
 local instancesAttune = {
@@ -774,7 +809,7 @@ local instancesAttune = {
 local instancesShowStatus = {
 	isLevel48,isLevel48,isLevel48,isLevel48,isLevel48,isLevel48,isLevel48,isLevel48,isLevel48,isLevel48,isLevel48,isLevel48,isLevel48,
 	isLevel50,isLevel50,isLevel50,isLevel50,isLevel50,isLevel50,isLevel50,isLevel50,isLevel50,isLevel50, isLevel50,
-	isLevel60,isLevel60,isLevel60,isLevel60,isLevel60,isLevel60,isLevel60,isLevel60,
+	isLevel60,isLevel60,isLevel60,isLevel60,isLevel60,isLevel60,isLevel60,isLevel60,	isLevel60,
 }
 local instancesMaxBossesFix = {
 	[18] = 4,
@@ -865,12 +900,14 @@ local raids = {
 	1179,
 	1180,
 	1190,
+	1193,
 }
 local raids_max_bosses = {
 	7,3,10,9,11,
 	8,9,2,
 	8,
 	12,
+	10,
 	10,
 }
 
@@ -896,6 +933,7 @@ local LFRInstances = {
 	{ 2014,2015,2016 },	--EP
 	{ 2036,2037,2038,2039 }, --Nyalotha
 	{ 2090,2091,2092,2096 }, --Castle Nathria
+	{ 2221,2222,2223,2224 }, --SoD
 }
 local LFRInstancesShowStatus = {
 	isLevel48, isLevel48, isLevel48, isLevel48, isLevel48, 
@@ -903,12 +941,14 @@ local LFRInstancesShowStatus = {
 	isLevel50,
 	isLevel50,
 	isLevel60,
+	isLevel60,
 }
 local raidToHide = {
 	true,true,true,false,false,
 	true,true,true,
 	true,
 	false,
+	true,
 	false,
 }
 
@@ -1358,6 +1398,9 @@ local factionsToWatch = {
 	2407,
 
 	2432,
+
+	2470,
+	2472,
 }
 
 tinsert(ToDoFunc,function(self,collect)
@@ -1392,7 +1435,7 @@ tinsert(ToDoFunc,function(self,collect)
 					collect["reputation"..factionID.."m"] = 999
 				end
 
-				if factionID == 2432 and (standingID <= 4) then
+				if (factionID == 2432 and (standingID <= 4)) or factionID == 2472 then
 					collect["reputation"..factionID.."e"] = standingID
 				else
 					collect["reputation"..factionID.."e"] = nil
@@ -1505,10 +1548,10 @@ tinsert(ToDoFunc,function(self,collect)
 						def = tonumber(def)
 					end
 					if torghast1 then
-						torghast2 = (def==8 and "|cff00ff00" or def==0 and "|cffff0000" or "|cffffff00")..tostring(def).."/8" .. " " .. floorName
+						torghast2 = (def==12 and "|cff00ff00" or def==0 and "|cffff0000" or "|cffffff00")..tostring(def).."/12" .. " " .. floorName
 						break
 					else
-						torghast1 = (def==8 and "|cff00ff00" or def==0 and "|cffff0000" or "|cffffff00")..tostring(def).."/8" .. " " .. floorName
+						torghast1 = (def==12 and "|cff00ff00" or def==0 and "|cffff0000" or "|cffffff00")..tostring(def).."/12" .. " " .. floorName
 					end
 				end
 			end
@@ -2437,6 +2480,9 @@ LegionToDo:SetScript("OnShow",function(self)
 	local name, _, texturePath = GetCurrencyInfo(1828)
 	count = LineUpdate(count,"soulash",name,texturePath)
 
+	local name, _, texturePath = GetCurrencyInfo(1906)
+	count = LineUpdate(count,"soulash91",name,texturePath)
+
 	local name, _, texturePath = GetCurrencyInfo(1813)
 	count = LineUpdate(count,"anima",name,texturePath)
 
@@ -2445,6 +2491,15 @@ LegionToDo:SetScript("OnShow",function(self)
 
 	local name, _, texturePath = GetCurrencyInfo(1191)
 	count = LineUpdate(count,"valor",name,texturePath,'small-left2')
+
+	local name, _, texturePath = GetCurrencyInfo(1904)
+	count = LineUpdate(count,"towerknowledge",name,texturePath,'small-left2')
+
+	local name, _, texturePath = GetCurrencyInfo(1931)
+	count = LineUpdate(count,"catalogedresearch",name,texturePath)
+
+	local name, _, texturePath = GetCurrencyInfo(1977)
+	count = LineUpdate(count,"stygianember",name,texturePath)
 
 	count = LineUpdate(count,"miniVision","Mini Vision")
 	count = LineUpdate(count,"visionReward","Vision Reward")
@@ -2784,6 +2839,11 @@ LegionToDo:SetScript("OnShow",function(self)
 				lines[lineCount].cols[col]:SetText(db.soulash or "0")
 			end
 
+			if not optData["soulash91"] or OPTIONS_TOGGLED then
+				lineCount = lineCount + 1
+				lines[lineCount].cols[col]:SetText(db.soulash91 or "0")
+			end
+
 			if not optData["anima"] or OPTIONS_TOGGLED then
 				lineCount = lineCount + 1
 				lines[lineCount].cols[col]:SetText(db.anima or "0")
@@ -2797,6 +2857,21 @@ LegionToDo:SetScript("OnShow",function(self)
 			if not optData["valor"] or OPTIONS_TOGGLED then
 				lineCount = lineCount + 1
 				lines[lineCount].cols[col]:SetText((db.valor or "0") .. (db.valorEarned and ("\n" ..db.valorEarned.."/"..(db.valorMax or 0)) or ""))
+			end
+
+			if not optData["towerknowledge"] or OPTIONS_TOGGLED then
+				lineCount = lineCount + 1
+				lines[lineCount].cols[col]:SetText((db.towerknowledge or "0") .. (db.towerknowledgeEarned and ("\n" ..db.towerknowledgeEarned.."/"..(db.towerknowledgeMax or 0)) or ""))
+			end
+
+			if not optData["catalogedresearch"] or OPTIONS_TOGGLED then
+				lineCount = lineCount + 1
+				lines[lineCount].cols[col]:SetText(db.catalogedresearch or "0")
+			end
+
+			if not optData["stygianember"] or OPTIONS_TOGGLED then
+				lineCount = lineCount + 1
+				lines[lineCount].cols[col]:SetText(db.stygianember or "0")
 			end
 
 			if not optData["miniVision"] or OPTIONS_TOGGLED  then
@@ -3153,7 +3228,7 @@ LegionToDo:SetScript("OnShow",function(self)
 					lineCount = lineCount + 1
 					local t = (db.s and db.s["bounty"..i] or ""):gsub(":0|t",":18|t")
 					lines[lineCount].cols[col]:SetText(t)
-					if db.s["bounty"..i] then
+					if db.s and db.s["bounty"..i] then
 						if db.s and db.s["bounty"..i.."end"] and db.s["bounty"..i.."end"] < currTime then
 							local icon = t:gsub("|t.*$","|t")
 							lines[lineCount].cols[col]:SetText(icon.." |cffffff00expired")

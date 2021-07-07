@@ -1,7 +1,10 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
 local module = M:RegisterModule("AurasTable")
-local pairs, next, format, wipe = pairs, next, string.format, wipe
+
+local pairs, next, format, wipe, unpack = pairs, next, format, wipe, unpack
+local GetSpellInfo = GetSpellInfo
+local EJ_GetInstanceInfo = EJ_GetInstanceInfo
 
 -- AuraWatch
 local AuraWatchList = {}
@@ -111,7 +114,7 @@ function module:CheckPartySpells()
 		local name = GetSpellInfo(spellID)
 		if name then
 			local modDuration = MaoRUIDB["PartySpells"][spellID]
-			if modDuration and modDuration == duration then 
+			if modDuration and modDuration == duration then
 				MaoRUIDB["PartySpells"][spellID] = nil
 			end
 		else
@@ -120,13 +123,12 @@ function module:CheckPartySpells()
 	end
 end
 
-R.bloodlustID = {57723, 57724, 80354, 264689}
 function module:CheckCornerSpells()
 	if not MaoRUIDB["CornerSpells"][I.MyClass] then MaoRUIDB["CornerSpells"][I.MyClass] = {} end
 	local data = R.CornerBuffs[I.MyClass]
 	if not data then return end
 
-	for spellID, value in pairs(data) do
+	for spellID in pairs(data) do
 		local name = GetSpellInfo(spellID)
 		if not name then
 			if I.isDeveloper then print("Invalid cornerspell ID: "..spellID) end
@@ -134,7 +136,7 @@ function module:CheckCornerSpells()
 	end
 
 	for spellID, value in pairs(MaoRUIDB["CornerSpells"][I.MyClass]) do
-		if not next(value) and R.CornerBuffs[I.MyClass][spellID] == nil or R.bloodlustID[spellID] then
+		if not next(value) and R.CornerBuffs[I.MyClass][spellID] == nil then
 			MaoRUIDB["CornerSpells"][I.MyClass][spellID] = nil
 		end
 	end
@@ -148,7 +150,7 @@ function module:CheckMajorSpells()
 				MaoRUIDB["MajorSpells"][spellID] = nil
 			end
 		else
-			if I.isDeveloper then print("Invalid cornerspell ID: "..spellID) end
+			if I.isDeveloper then print("Invalid majorspells ID: "..spellID) end
 		end
 	end
 
@@ -181,13 +183,4 @@ function module:OnLogin()
 	module:CheckPartySpells()
 	module:CheckCornerSpells()
 	module:CheckMajorSpells()
-
-	-- Filter bloodlust for healers
-	local function filterBloodlust()
-		for _, spellID in pairs(R.bloodlustID) do
-			R.RaidBuffs["WARNING"][spellID] = (I.Role ~= "Healer")
-		end
-	end
-	filterBloodlust()
-	M:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", filterBloodlust)
 end

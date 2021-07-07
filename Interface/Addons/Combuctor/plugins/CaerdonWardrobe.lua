@@ -1133,7 +1133,7 @@ function CaerdonWardrobeMixin:GetTooltipInfo(item)
 		end
 	end
 
-	C_TransmogCollection.SetShowMissingSourceInItemTooltips(true)
+	--C_TransmogCollection.SetShowMissingSourceInItemTooltips(true)
 	SetCVar("missingTransmogSourceInItemTooltips", 1)
 	--SetCVar("alwaysCompareItems", originalAlwaysCompareItems)
 

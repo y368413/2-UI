@@ -1,5 +1,5 @@
 ﻿--## SavedVariables: IncentiveProgramDB
----------Incentive Program------Created by: Jacob Beu----Xubera @ US-Alleria------r17 | 9/8/2018------------
+---------Incentive Program------Created by: Jacob Beu----Xubera @ US-Alleria------r18 | 2/4/2021------------
 local IncentiveProgram = {}
 
 --Core
@@ -1018,7 +1018,7 @@ local IncentiveProgramToast = {
     end,
     
     CreateFrame = function(self)
-        local toastFrame = CreateFrame("Frame", "IncentiveProgramToastFrame", UIParent, "BackdropTemplate")
+        local toastFrame = CreateFrame("Frame", "IncentiveProgramToastFrame", UIParent, BackdropTemplateMixin and "BackdropTemplate")
         toastFrame:Hide()
         
         toastFrame:SetFrameStrata("HIGH")

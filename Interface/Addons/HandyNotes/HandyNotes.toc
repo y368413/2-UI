@@ -1,6 +1,6 @@
-## Interface: 90005
+## Interface: 90100
 ## Author: Xinhuan
-## Version: v1.6.1
+## Version: v1.6.2
 ## Title: HandyNotes
 ## Title-zhCN:|cff0080ff[地图]|r宝藏稀有
 ## Title-zhTW:|cff0080ff[地图]|r寶藏稀有
@@ -14,6 +14,7 @@
 
 # Locale files
 Locales\Locales.xml
+Krowi_WorldMapButtons-1.0.lua
 
 # Core files
 HandyNotes.lua

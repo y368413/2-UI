@@ -271,9 +271,9 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 				local p = 1
 				local questID = WorldQuestList_GetCallingQuests()
 				while questID do
-					local mapID = C_QuestLog.GetQuestAdditionalHighlights(questID)
+					local mapID, worldQuests, worldQuestsElite, dungeons, treasures = C_QuestLog.GetQuestAdditionalHighlights(questID)
 					if mapID and mapID ~= 0 then
-						local callingData = {questID = questID}
+						local callingData = {questID = questID, mapID = mapID, worldQuests = worldQuests, worldQuestsElite = worldQuestsElite, dungeons = dungeons, treasures = treasures}
 
 						local t = C_TaskQuest.GetQuestTimeLeftMinutes(questID) or 0
 						if t < 1440 then
@@ -285,7 +285,8 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 							callingData.completed = true
 						end
 
-						mapsToHighlightCallings[mapID] = callingData
+						--mapsToHighlightCallings[mapID] = callingData
+						mapsToHighlightCallings[#mapsToHighlightCallings+1] = callingData
 					end
 					p = p + 1
 					questID = select(p,WorldQuestList_GetCallingQuests())
@@ -356,7 +357,7 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 					local money = GetQuestLogRewardMoney(obj.questID)
 					if money > 0 then
 						iconAtlas = "Auctioneer"
-						amount = floor(money / 10000 * (warMode and C_QuestLog.QuestHasWarModeBonus(obj.questID) and warModeBonus or 1))
+						amount = floor(money / 10000 * (warMode and C_QuestLog.QuestCanHaveWarModeBonus(obj.questID) and warModeBonus or 1))
 					end
 					-- currency
 					for i = 1, GetNumQuestLogRewardCurrencies(obj.questID) do
@@ -365,14 +366,14 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 							iconTexture = texture
 							ajustMask = true
 							ajustSize = 8
-							amount = floor(numItems * (warMode and C_QuestLog.QuestHasWarModeBonus(obj.questID) and C_CurrencyInfo.DoesWarModeBonusApply(currencyID) and warModeBonus or 1))
+							amount = floor(numItems * (warMode and C_QuestLog.QuestCanHaveWarModeBonus(obj.questID) and C_CurrencyInfo.DoesWarModeBonusApply(currencyID) and warModeBonus or 1))
 							if not (currencyID == 1717 or currencyID == 1716) then
 								break
 							end
 						elseif currencyID == 1553 then	--azerite
 							--iconAtlas = "Islands-AzeriteChest"
 							iconAtlas = "AzeriteReady"
-							amount = floor(numItems * (warMode and C_QuestLog.QuestHasWarModeBonus(obj.questID) and C_CurrencyInfo.DoesWarModeBonusApply(currencyID) and warModeBonus or 1))
+							amount = floor(numItems * (warMode and C_QuestLog.QuestCanHaveWarModeBonus(obj.questID) and C_CurrencyInfo.DoesWarModeBonusApply(currencyID) and warModeBonus or 1))
 							ajustSize = 5
 							iconTexture, ajustMask = nil
 							--if WorldQuestList_IsAzeriteItemAtMaxLevel() then
@@ -382,7 +383,7 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 						elseif currencyID == 1220 or currencyID == 1560 then	--OR
 							iconAtlas = "legionmission-icon-currency"
 							ajustSize = 5
-							amount = floor(numItems * (warMode and C_QuestLog.QuestHasWarModeBonus(obj.questID) and C_CurrencyInfo.DoesWarModeBonusApply(currencyID) and warModeBonus or 1))
+							amount = floor(numItems * (warMode and C_QuestLog.QuestCanHaveWarModeBonus(obj.questID) and C_CurrencyInfo.DoesWarModeBonusApply(currencyID) and warModeBonus or 1))
 							iconTexture, ajustMask = nil
 							break
 						elseif WorldQuestList_IsFactionCurrency(currencyID or 0) then
@@ -480,13 +481,22 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 								ajustMask = true
 								ajustSize = 10
 								amount = numItems * CacheIsAnimaItem[itemID]
+								if warMode and C_QuestLog.QuestCanHaveWarModeBonus(obj.questID) then
+									local bonus = floor(amount * (warModeBonus - 1) + .5)
+									--if CacheIsAnimaItem[itemID] <= 35 then
+										bonus = bonus - bonus % 3
+									--else
+									--	bonus = bonus - bonus % 5
+									--end
+									amount = amount + bonus
+								end
 							elseif select(2,GetItemInfoInstant(itemID)) == MISCELLANEOUS then
 								inspectScantip:SetQuestLogItem("reward", 1, obj.questID)
 								local isAnima
 								for j=2, inspectScantip:NumLines() do
 									local tooltipLine = _G["WorldmapRewardIconWorldQuestListInspectScanningTooltipTextLeft"..j]								                       	
 									local text = tooltipLine:GetText()
-									if text and text:find(ANIMA.."|r$") then
+									if text and text:find(WORLD_QUEST_REWARD_FILTERS_ANIMA.."|r$") then
 										isAnima = 1
 									elseif text and isAnima and text:find("^"..LE.ITEM_SPELL_TRIGGER_ONUSE) then
 										local num = text:gsub("(%d+)[ %.,]+(%d+)","%1%2"):match("%d+")
@@ -502,6 +512,15 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 									ajustMask = true
 									ajustSize = 10
 									amount = numItems * isAnima
+									if warMode and C_QuestLog.QuestCanHaveWarModeBonus(obj.questID) then
+										local bonus = floor(amount * (warModeBonus - 1) + .5)
+										--if isAnima <= 35 then
+											bonus = bonus - bonus % 3
+										--else
+										--	bonus = bonus - bonus % 5
+										--end
+										amount = amount + bonus
+									end
 								end
 								inspectScantip:ClearLines()
 							end

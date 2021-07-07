@@ -28,7 +28,7 @@ end
 local function GetTransmogItemInfoByLink(itemLink)
 	local item = GetItemInfoInstant(itemLink)
 	if not item then return end
-	return C_Transmog.GetItemInfo(item)
+	return C_Transmog.CanTransmogItem(item)
 end
 
 local function collectedApperance(itemLink)

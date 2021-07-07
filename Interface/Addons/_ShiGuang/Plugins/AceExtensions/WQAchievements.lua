@@ -1,4 +1,4 @@
---## Author: Urtgard  ## Version: v9.0.2-2
+--## Author: Urtgard  ## Version: v9.1.0-2
 WQAchievements = LibStub("AceAddon-3.0"):NewAddon("WQAchievements", "AceConsole-3.0", "AceTimer-3.0")
 local WQA = WQAchievements
 WQA.data = {}
@@ -6,6 +6,7 @@ WQA.watched = {}
 WQA.watchedMissions = {}
 WQA.questList = {}
 WQA.missionList = {}
+WQA.itemList = {}
 WQA.links = {}
 
 -- Blizzard
@@ -1038,12 +1039,10 @@ do
 			{
 				name = "What Bastion Remembered",
 				id = 14737,
-				criteriaType = "QUESTS",
+				criteriaType = "QUEST_SINGLE",
 				criteria = {
-					{
-						59717,
-						59705
-					}
+					59717,
+					59705
 				}
 			},
 			{name = "Aerial Ace", id = 14741, criteriaType = "QUEST_SINGLE", criteria = 60911},
@@ -1079,13 +1078,25 @@ do
 				id = 14844,
 				criteriaType = "MISSION_TABLE",
 				criteria = {{2296, 2250}, {2251, 2297}, {2252, 2298}, {2299, 2253}, 2254, 2255, 2256, 2258, 2259, 2260}
+			},
+			{
+				name = "Impressing Zo'Sorg",
+				id = 14516,
+				criteriaType = "QUESTS",
+				criteria = {
+					{59658},
+					{59803},
+					{59825},
+					{60231}
+				}
 			}
 		},
 		pets = {
-			{name = "Dal", itemID = 183859, creatureID = 171136, quest = {{trackingID = 0, wqID = 60655}}}
+			{name = "Dal", itemID = 183859, creatureID = 171136, quest = {{trackingID = 0, wqID = 60655}}},
+			{name = "Carpal", itemID = 183114, creatureID = 173847, source = {type = "ITEM", itemID = 183111}}
 		},
 		toys = {
-			{name = "Tithe Collector's Vessel", itemID = 180947, quest = {{trackingID = 0, wqID = 59789}}}
+			{name = "Tithe Collector's Vessel", itemID = 180947, source = {type = "ITEM", itemID = 180947}}
 		}
 	}
 	WQA.data[9] = shadowlands
@@ -1147,7 +1158,13 @@ function WQA:AddAchievements(achievement, forced, forcedByMe)
 				self:AddAchievements(v, forced, forcedByMe)
 			end
 		elseif achievement.criteriaType == "QUEST_SINGLE" then
-			self:AddRewardToQuest(achievement.criteria, "ACHIEVEMENT", id)
+			if type(achievement.criteria) == "table" then
+				for _, questID in pairs(achievement.criteria) do
+					self:AddRewardToQuest(questID, "ACHIEVEMENT", id)
+				end
+			else
+				self:AddRewardToQuest(achievement.criteria, "ACHIEVEMENT", id)
+			end
 		elseif achievement.criteriaType == "QUEST_PIN" then
 			C_QuestLine.RequestQuestLinesForMap(achievement.mapID)
 			for i = 1, GetAchievementNumCriteria(id) do
@@ -1261,16 +1278,20 @@ function WQA:AddPets(pets)
 
 			if not owned or forced then
 				for _, pet in pairs(pets) do
-					if companionID == pet.creatureID then
-						if pet.emissary == true then
-							self:AddEmissaryReward(pet.questID, "CHANCE", pet.itemID)
-						else
-							if pet.questID then
-								self:AddRewardToQuest(pet.questID, "CHANCE", pet.itemID)
+					if pet.source and pet.source.type == "ITEM" then
+						self.itemList[pet.source.itemID] = true
+					else
+						if companionID == pet.creatureID then
+							if pet.emissary == true then
+								self:AddEmissaryReward(pet.questID, "CHANCE", pet.itemID)
 							else
-								for _, v in pairs(pet.quest) do
-									if not IsQuestFlaggedCompleted(v.trackingID) then
-										self:AddRewardToQuest(v.wqID, "CHANCE", pet.itemID)
+								if pet.questID then
+									self:AddRewardToQuest(pet.questID, "CHANCE", pet.itemID)
+								else
+									for _, v in pairs(pet.quest) do
+										if not IsQuestFlaggedCompleted(v.trackingID) then
+											self:AddRewardToQuest(v.wqID, "CHANCE", pet.itemID)
+										end
 									end
 								end
 							end
@@ -1296,12 +1317,16 @@ function WQA:AddToys(toys)
 			end
 
 			if not PlayerHasToy(toy.itemID) or forced then
-				if toy.questID then
-					self:AddRewardToQuest(toy.questID, "CHANCE", toy.itemID)
+				if toy.source and toy.source.type == "ITEM" then
+					self.itemList[toy.source.itemID] = true
 				else
-					for _, v in pairs(toy.quest) do
-						if not IsQuestFlaggedCompleted(v.trackingID) then
-							self:AddRewardToQuest(v.wqID, "CHANCE", toy.itemID)
+					if toy.questID then
+						self:AddRewardToQuest(toy.questID, "CHANCE", toy.itemID)
+					else
+						for _, v in pairs(toy.quest) do
+							if not IsQuestFlaggedCompleted(v.trackingID) then
+								self:AddRewardToQuest(v.wqID, "CHANCE", toy.itemID)
+							end
 						end
 					end
 				end
@@ -1954,7 +1979,7 @@ function WQA:IsTransmogable(itemLink)
 	local itemID, _, _, slotName = GetItemInfoInstant(itemLink)
 
 	-- See if the game considers it transmoggable
-	local transmoggable = select(3, C_Transmog.GetItemInfo(itemID))
+	local transmoggable = select(3, C_Transmog.CanTransmogItem(itemID))
 	if transmoggable == false then
 		return false
 	end
@@ -2315,6 +2340,12 @@ function WQA:CheckItems(questID, isEmissary)
 				end
 			end
 
+			-- Items
+			if self.itemList[itemID] == true then
+				local item = {itemLink = itemLink}
+				self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
+			end
+
 			-- Azerite Traits
 			if
 				self.db.profile.options.reward.gear.azeriteTraits ~= "" and
@@ -2329,6 +2360,11 @@ function WQA:CheckItems(questID, isEmissary)
 						end
 					end
 				end
+			end
+
+			-- Conduit
+			if self.db.profile.options.reward.gear.conduit and C_Soulbinds.IsItemConduitByItemInfo(itemLink) then
+				self:AddRewardToQuest(questID, "ITEM", {itemLink = itemLink}, isEmissary)
 			end
 		else
 			retry = true
@@ -2447,7 +2483,7 @@ function WQA:UpdateQTip(tasks)
 						GameTooltip:ClearAllPoints()
 						GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 0)
 						if task.type == "WORLD_QUEST" then
-							if linke then
+							if string.find(link, "|Hquest:") then
 								GameTooltip:SetHyperlink(link)
 							end
 						else
@@ -3165,11 +3201,16 @@ function WQA:CheckMissions()
 									if itemClassID == 2 or itemClassID == 4 then
 										local transmog
 										if AllTheThings then
-											local state = AllTheThings.SearchForLink(itemLink)[1].collected
-											if not state then
-												transmog = "|TInterface\\Addons\\AllTheThings\\assets\\unknown:0|t"
-											elseif state == 2 and self.db.profile.options.reward.gear.unknownSource then
-												transmog = "|TInterface\\Addons\\AllTheThings\\assets\\known_circle:0|t"
+											local searchForLinkResult = AllTheThings.SearchForLink(itemLink)
+											if not searchForLinkResult then
+												retry = true
+											else
+												local state = searchForLinkResult[1].collected
+												if not state then
+													transmog = "|TInterface\\Addons\\AllTheThings\\assets\\unknown:0|t"
+												elseif state == 2 and self.db.profile.options.reward.gear.unknownSource then
+													transmog = "|TInterface\\Addons\\AllTheThings\\assets\\known_circle:0|t"
+												end
 											end
 										elseif CanIMogIt then
 											if CanIMogIt:IsEquippable(itemLink) and CanIMogIt:CharacterCanLearnTransmog(itemLink) then
@@ -3188,6 +3229,12 @@ function WQA:CheckMissions()
 											addMission = true
 										end
 									end
+								end
+
+								-- Conduit
+								if self.db.profile.options.reward.gear.conduit and C_Soulbinds.IsItemConduitByItemInfo(itemLink) then
+									self:AddRewardToMission(missionID, "ITEM", {itemLink = itemLink})
+									addMission = true
 								end
 							end
 						end
@@ -3242,7 +3289,6 @@ local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
 local GetTitleForQuestID = C_QuestLog.GetTitleForQuestID
 
 local optionsTimer
-local start
 
 WQA.ExpansionList = {
 	[6] = "|cFFFF0000 WOD >>>|r",  --Warlords of Draenor
@@ -3658,6 +3704,18 @@ function WQA:UpdateOptions()
 								end,
 								get = function()
 									return WQA.db.profile.options.reward.gear.azeriteTraits
+								end
+							},
+							conduit = {
+								name = "Conduit",
+								desc = "Track conduit",
+								type = "toggle",
+								order = newOrder(),
+								set = function(info, val)
+									WQA.db.profile.options.reward.gear.conduit = val
+								end,
+								get = function()
+									return WQA.db.profile.options.reward.gear.conduit
 								end
 							}
 						}
@@ -4564,7 +4622,6 @@ function WQA:CreateGroup(options, data, groupName)
 			if object.itemID then
 				if not select(2,GetItemInfo(object.itemID)) then
 					self:CancelTimer(optionsTimer)
-					start = GetTime()
 					optionsTimer = self:ScheduleTimer(function() LibStub("AceConfigRegistry-3.0"):NotifyChange("WQAchievements") end, 2)
 				end
 				args[idString.."Name"].name = select(2,GetItemInfo(object.itemID)) or object.name

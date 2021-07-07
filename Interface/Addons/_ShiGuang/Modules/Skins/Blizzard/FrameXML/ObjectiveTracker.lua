@@ -148,21 +148,37 @@ tinsert(R.defaultThemes, function()
 
 	hooksecurefunc(SCENARIO_CONTENT_TRACKER_MODULE, "Update", function()
 		local widgetContainer = ScenarioStageBlock.WidgetContainer
-		if not widgetContainer then return end
+		if widgetContainer.widgetFrames then
+			for _, widgetFrame in pairs(widgetContainer.widgetFrames) do
+				if widgetFrame.Frame then widgetFrame.Frame:SetAlpha(0) end
 
-		local widgetFrame = widgetContainer:GetChildren()
-		if widgetFrame and widgetFrame.Frame then
-			widgetFrame.Frame:SetAlpha(0)
+				local bar = widgetFrame.TimerBar
+				if bar and not bar.bg then
+					hooksecurefunc(bar, "SetStatusBarAtlas", M.ReplaceWidgetBarTexture)
+					bar.bg = M.CreateBDFrame(bar, .25)
+				end
 
-			if widgetFrame.CurrencyContainer then -- this may be removed, needs review
-				for i = 1, widgetFrame.CurrencyContainer:GetNumChildren() do
-					local bu = select(i, widgetFrame.CurrencyContainer:GetChildren())
-					if bu and bu.Icon and not bu.styled then
-						M.ReskinIcon(bu.Icon)
-						bu.styled = true
+				if widgetFrame.CurrencyContainer then
+					for currencyFrame in widgetFrame.currencyPool:EnumerateActive() do
+						if not currencyFrame.bg then
+							currencyFrame.bg = M.ReskinIcon(currencyFrame.Icon)
+						end
 					end
 				end
 			end
+		end
+	end)
+
+	hooksecurefunc("ScenarioSpellButton_UpdateCooldown", function(spellButton)
+		if not spellButton.styled then
+			local bg = M.ReskinIcon(spellButton.Icon)
+			spellButton:SetNormalTexture(nil)
+			spellButton:SetPushedTexture(nil)
+			local hl = spellButton:GetHighlightTexture()
+			hl:SetColorTexture(1, 1, 1, .25)
+			hl:SetInside(bg)
+
+			spellButton.styled = true
 		end
 	end)
 
@@ -185,6 +201,29 @@ tinsert(R.defaultThemes, function()
 	end)
 
 	hooksecurefunc("Scenario_ChallengeMode_SetUpAffixes", M.AffixesSetup)]]
+
+	-- Block in jail tower
+	local mawBuffsBlock = ScenarioBlocksFrame.MawBuffsBlock
+	local bg = M.SetBD(mawBuffsBlock, nil, 20, -10, -20, 10)
+
+	local blockContainer = mawBuffsBlock.Container
+	M.StripTextures(blockContainer)
+	blockContainer:GetPushedTexture():SetAlpha(0)
+	blockContainer:GetHighlightTexture():SetAlpha(0)
+
+	local blockList = blockContainer.List
+	M.StripTextures(blockList)
+	blockList.__bg = bg
+	local bg = M.SetBD(blockList)
+	bg:SetPoint("TOPLEFT", 7, -12)
+	bg:SetPoint("BOTTOMRIGHT", -7, 12)
+
+	blockList:HookScript("OnShow", function(self)
+		self.__bg:SetBackdropBorderColor(1, .8, 0, .7)
+	end)
+	blockList:HookScript("OnHide", function(self)
+		self.__bg:SetBackdropBorderColor(0, 0, 0, 1)
+	end)
 
 	-- Reskin Headers
 	local headers = {

@@ -107,6 +107,7 @@ local questItems = {
 local ExtraQuestButton = CreateFrame("Button", "ExtraQuestButton", UIParent, "SecureActionButtonTemplate, SecureHandlerStateTemplate, SecureHandlerAttributeTemplate")
 ExtraQuestButton:SetMovable(true)
 ExtraQuestButton:RegisterEvent("PLAYER_LOGIN")
+ExtraQuestButton:Hide()
 ExtraQuestButton:SetScript("OnEvent", function(self, event, ...)
 	if self[event] then
 		self[event](self, event, ...)
@@ -159,13 +160,16 @@ function ExtraQuestButton:BAG_UPDATE_COOLDOWN()
 	end
 end
 
-function ExtraQuestButton:BAG_UPDATE_DELAYED()
-	self:Update()
-
+function ExtraQuestButton:UpdateCount()
 	if self:IsShown() then
 		local count = GetItemCount(self.itemLink)
 		self.Count:SetText(count and count > 1 and count or "")
 	end
+end
+
+function ExtraQuestButton:BAG_UPDATE_DELAYED()
+	self:Update()
+	self:UpdateCount()
 end
 
 function ExtraQuestButton:UpdateAttributes()
@@ -220,7 +224,6 @@ function ExtraQuestButton:PLAYER_LOGIN()
 
 	self.updateTimer = 0
 	self.rangeTimer = 0
-	self:Hide()
 
 	self:SetPushedTexture(I.textures.pushed)
 	local push = self:GetPushedTexture()
@@ -362,6 +365,7 @@ function ExtraQuestButton:SetItem(itemLink)
 		M:GetModule("Actionbar").UpdateHotKey(self)
 
 		self:UpdateAttributes()
+		self:UpdateCount()
 		self.updateRange = hasRange
 	end
 end

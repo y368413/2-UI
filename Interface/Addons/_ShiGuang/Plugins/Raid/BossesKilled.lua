@@ -327,7 +327,7 @@ BossesKilled.raidData = {
 	[1494] = { numEncounters = 3, startFrom =  1 }, -- The Gates of Hell
 	[1495] = { numEncounters = 3, startFrom =  1 }, -- Wailing Halls
 	[1496] = { numEncounters = 2, startFrom =  1 }, -- Chamber of the Avatar
-	[1497] = { numEncounters = 1, startFrom =  1 }, -- Deceiver’s Fall
+	[1497] = { numEncounters = 1, startFrom =  1 }, -- Deceiver¡¯s Fall
 
 	-- Antorus, the Burning Throne
 	[1610] = { numEncounters = 3, startFrom =  1 }, -- Light's Breach
@@ -367,4 +367,10 @@ BossesKilled.raidData = {
 	[2091] = { numEncounters = 3, startFrom =  1 }, -- Reliquary of Opulence
 	[2092] = { numEncounters = 3, startFrom =  1 }, -- Blood from Stone
 	[2096] = { numEncounters = 1, startFrom =  1 }, -- An Audience with Arrogance
+	
+	-- Sanctum of Domination
+	[2221] = { numEncounters = 3, startFrom =  1 }, -- The Jailer's Vanguard
+	[2222] = { numEncounters = 3, startFrom =  1 }, -- The Dark Bastille
+	[2223] = { numEncounters = 3, startFrom =  1 }, -- Shackles of Fate
+	[2224] = { numEncounters = 1, startFrom =  1 }, -- The Reckoning
 }

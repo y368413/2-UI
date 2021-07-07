@@ -145,7 +145,6 @@ function UF:CreateRaidDebuffs(self)
 
 	bu.ShowDispellableDebuff = true
 	bu.ShowDebuffBorder = true
-	bu.FilterDispellableDebuff = true
 	if R.db["UFs"]["InstanceAuras"] then
 		if not next(debuffList) then UF:UpdateRaidDebuffs() end
 		bu.Debuffs = debuffList
@@ -377,11 +376,6 @@ function UF:UpdateCornerSpells()
 	end
 end
 
-local bloodlustList = {}
-for _, spellID in pairs(R.bloodlustID) do
-	bloodlustList[spellID] = {"BOTTOMLEFT", {1, .8, 0}, true}
-end
-
 local found = {}
 local auraFilter = {"HELPFUL", "HARMFUL"}
 
@@ -397,7 +391,7 @@ function UF:UpdateBuffIndicator(event, unit)
 		for i = 1, 32 do
 			local name, texture, count, _, duration, expiration, caster, _, _, spellID = UnitAura(unit, i, filter)
 			if not name then break end
-			local value = spellList[spellID] or (I.Role ~= "HEALER" and bloodlustList[spellID])
+			local value = spellList[spellID]
 			if value and (value[3] or caster == "player" or caster == "pet") then
 				local bu = buttons[value[1]]
 				if bu then
@@ -423,7 +417,7 @@ function UF:UpdateBuffIndicator(event, unit)
 						end
 					end
 
-					if count > 1 then bu.count:SetText(count) end
+					bu.count:SetText(count > 1 and count)
 					bu:Show()
 					found[bu.anchor] = true
 				end

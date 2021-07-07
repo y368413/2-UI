@@ -51,13 +51,16 @@ local chatLines, prevLineID, filterResult = {}, 0, false
 function module:GetFilterResult(event, msg, name, flag, guid)
 	if name == I.MyName or (event == "CHAT_MSG_WHISPER" and flag == "GM") or flag == "DEV" then
 		return
-	elseif guid and R.db["Chat"]["AllowFriends"] and (IsGuildMember(guid) or C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGUIDInGroup(guid)) then
+	elseif guid and (IsGuildMember(guid) or C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGUIDInGroup(guid)) then
 		return
 	end
 
-	if R.db["Chat"]["BlockStranger"] and event == "CHAT_MSG_WHISPER" then return true end -- Block strangers
+	if R.db["Chat"]["BlockStranger"] and event == "CHAT_MSG_WHISPER" then -- Block strangers
+		module.MuteThisTime = true
+		return true
+	end
 
-	if R.BadBoys[name] and R.BadBoys[name] >= 5 then return true end
+	if R.db["Chat"]["BlockSpammer"] and R.BadBoys[name] and R.BadBoys[name] >= 5 then return true end
 
 	local filterMsg = gsub(msg, "|H.-|h(.-)|h", "%1")
 	filterMsg = gsub(filterMsg, "|c%x%x%x%x%x%x%x%x", "")
@@ -109,7 +112,7 @@ function module:GetFilterResult(event, msg, name, flag, guid)
 	chatLines[chatLinesSize+1] = msgTable
 	for i = 1, chatLinesSize do
 		local line = chatLines[i]
-		if line[1] == msgTable[1] and ((msgTable[3] - line[3] < .6) or module:CompareStrDiff(line[2], msgTable[2]) <= .1) then
+		if line[1] == msgTable[1] and ((event == "CHAT_MSG_CHANNEL" and msgTable[3] - line[3] < .6) or module:CompareStrDiff(line[2], msgTable[2]) <= .1) then
 			tremove(chatLines, i)
 			return true
 		end
@@ -123,7 +126,10 @@ function module:UpdateChatFilter(event, msg, author, _, _, _, flag, _, _, _, _, 
 
 		local name = Ambiguate(author, "none")
 		filterResult = module:GetFilterResult(event, msg, name, flag, guid)
-		if filterResult then R.BadBoys[name] = (R.BadBoys[name] or 0) + 1 end
+		if filterResult and filterResult ~= 0 then
+			R.BadBoys[name] = (R.BadBoys[name] or 0) + 1
+		end
+		if filterResult == 0 then filterResult = true end
 	end
 
 	return filterResult
@@ -158,6 +164,8 @@ function module:UpdateAddOnBlocker(event, msg, author)
 				module:ToggleChatBubble()
 			elseif event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" then
 				module:ToggleChatBubble(true)
+			elseif event == "CHAT_MSG_WHISPER" then
+				module.MuteThisTime = true
 			end
 			return true
 		end
@@ -210,6 +218,7 @@ local socketWatchList = {
 	["PUNCHCARDBLUE"] = true,
 	["PUNCHCARDRED"] = true,
 	["PUNCHCARDYELLOW"] = true,
+	["DOMINATION"] = true,
 }
 
 local function GetSocketTexture(socket, count)

@@ -313,7 +313,7 @@ function S:ReskinRematchElements()
 		S.RematchFilter(targetPanel.Top.BackButton)
 		S.RematchScroll(targetPanel.List)
 
-		hooksecurefunc(targetPanel, "FillHeader", function(_, button, targetIndex)
+		hooksecurefunc(targetPanel, "FillHeader", function(_, button)
 			if not button.styled then
 				button.Border:SetTexture(nil)
 				button.Back:SetTexture(nil)
@@ -567,6 +567,7 @@ function S:ReskinRematch()
 		S:RematchTeamGroup(frame)
 	end)
 
+	local direcButtons = {"UpButton", "DownButton"}
 	hooksecurefunc(RematchTeamTabs, "Update", function(self)
 		for _, tab in next, self.Tabs do
 			S.RematchIcon(tab)
@@ -574,7 +575,7 @@ function S:ReskinRematch()
 			tab.Icon:SetPoint("CENTER")
 		end
 
-		for _, direc in pairs({"UpButton", "DownButton"}) do
+		for _, direc in pairs(direcButtons) do
 			S.RematchIcon(self[direc])
 			self[direc]:SetSize(40, 40)
 			self[direc].Icon:SetPoint("CENTER")

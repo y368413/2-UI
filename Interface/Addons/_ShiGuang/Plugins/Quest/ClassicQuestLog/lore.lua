@@ -75,11 +75,11 @@ function cql.lore:Update(campaignID,lore)
     local campaign = CampaignCache:Get(campaignID)
     cql.lore.content.headerTitle:SetText(campaign.name)
     cql.lore.content.headerProgress:SetText(CampaignUtil.BuildChapterProgressText(campaign))
-    if UnitFactionGroup("player")=="Alliance" then
-        cql.lore.content.headerBack:SetTexCoord(0.283203, 0.537109, 0.785156, 0.841797)
-    else
-        cql.lore.content.headerBack:SetTexCoord(0.283203, 0.537109, 0.84375, 0.900391)
-    end
+    -- if UnitFactionGroup("player")=="Alliance" then
+    --     cql.lore.content.headerBack:SetTexCoord(0.283203, 0.537109, 0.785156, 0.841797)
+    -- else
+    --     cql.lore.content.headerBack:SetTexCoord(0.283203, 0.537109, 0.84375, 0.900391)
+    -- end
     -- add lore text using the fontstring/texture pools
     local yoff = -12
     local xoff = 16

@@ -17,4 +17,5 @@
 	<Script file="Keybind.lua"/>
 	<Script file="ButtonStyle.lua"/>
 	<Script file="Cooldown.lua"/>
+	<!--Script file="ExtraItemBar.lua"/-->
 </Ui>

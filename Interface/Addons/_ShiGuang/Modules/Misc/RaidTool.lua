@@ -559,7 +559,7 @@ function MISC:RaidTool_EasyMarker()
 	end
 
 	WorldFrame:HookScript("OnMouseDown", function(_, btn)
-		if btn == "LeftButton" and IsControlKeyDown() and UnitExists("mouseover") then
+		if btn == "LeftButton" and GetModifiedState() and UnitExists("mouseover") then
 			if not IsInGroup() or (IsInGroup() and not IsInRaid()) or UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") then
 				local ricon = GetRaidTargetIndex("mouseover")
 				for i = 1, 8 do
@@ -590,7 +590,6 @@ function MISC:RaidTool_WorldMarker()
 
 	local frame = CreateFrame("Frame", "NDui_WorldMarkers", UIParent)
 	frame:SetPoint("RIGHT", -100, 0)
-	frame:SetFrameStrata("HIGH")
 	M.CreateMF(frame, nil, true)
 	M.RestoreMF(frame)
 	M.SetBD(frame)

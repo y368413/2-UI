@@ -1,4 +1,4 @@
-## Interface: 90005
+## Interface: 90100
 ## Title: Angry Keystones
 ## Title-zhCN:|cff8000ff[战斗]|r秘境助手
 ## Title-zhTW:|cff8000ff[戰鬥]|r秘境助手
@@ -9,7 +9,7 @@
 ## Author: Ermad
 ## SavedVariables: AngryKeystones_Config, AngryKeystones_Data
 ## SavedVariablesPerCharacter: AngryKeystones_CharacterConfig
-## X-Packaged-Version: v0.19.8
+## X-Packaged-Version: v0.19.9
 
 ## X-Repple: 2 UI
 

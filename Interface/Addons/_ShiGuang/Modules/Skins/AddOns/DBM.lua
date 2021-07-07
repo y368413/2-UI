@@ -14,9 +14,9 @@ local function ReskinDBMIcon(icon, frame)
 		icon.SetSize = M.Dummy
 
 		local bg = M.ReskinIcon(icon, true)
-		bg.icon = bg:CreateTexture(nil, "BACKGROUND")
+		bg.icon = bg:CreateTexture(nil, "ARTWORK")
 		bg.icon:SetInside()
-		bg.icon:SetTexture("Interface\\Icons\\Spell_Nature_WispSplode")
+		bg.icon:SetTexture(icon:GetTexture())
 		bg.icon:SetTexCoord(unpack(I.TexCoord))
 
 		icon.styled = true
@@ -53,11 +53,11 @@ local function ApplyDBMStyle(self)
 	local timer = _G[frame_name.."BarTimer"]
 
 	if self.enlarged then
-		frame:SetWidth(self.owner.options.HugeWidth)
-		tbar:SetWidth(self.owner.options.HugeWidth)
+		frame:SetWidth(self.owner.Options.HugeWidth)
+		tbar:SetWidth(self.owner.Options.HugeWidth)
 	else
-		frame:SetWidth(self.owner.options.Width)
-		tbar:SetWidth(self.owner.options.Width)
+		frame:SetWidth(self.owner.Options.Width)
+		tbar:SetWidth(self.owner.Options.Width)
 	end
 
 	frame:SetScale(1)

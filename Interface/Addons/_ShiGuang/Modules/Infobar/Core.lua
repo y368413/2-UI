@@ -3,27 +3,31 @@ local M, R, U, I = unpack(ns)
 local module = M:RegisterModule("Infobar")
 local tinsert, pairs, unpack = table.insert, pairs, unpack
 
+local GOLD_AMOUNT_SYMBOL = "|cffffd700●|r"--format("|cffffd700%s|r", GOLD_AMOUNT_SYMBOL)
+local SILVER_AMOUNT_SYMBOL = "|cffb0b0b0●|r"--format("|cffd0d0d0%s|r", SILVER_AMOUNT_SYMBOL)
+local COPPER_AMOUNT_SYMBOL = "|cffc77050●|r"--format("|cffc77050%s|r", COPPER_AMOUNT_SYMBOL)
+
 function module:GetMoneyString(money, full)
 	if money >= 1e6 and not full then
-		return format("%.0f%s", money / 1e4, "|cffffd700●|r")
+		return format(" %.0f%s", money / 1e4, GOLD_AMOUNT_SYMBOL)
 	else
 		if money > 0 then
 			local moneyString = ""
 			local gold = floor(money / 1e4)
 			if gold > 0 then
-				moneyString = " "..gold.."|cffffd700●|r"
+				moneyString = " "..gold..GOLD_AMOUNT_SYMBOL
 			end
 			local silver = floor((money - (gold * 1e4)) / 100)
 			if silver > 0 then
-				moneyString = moneyString.." "..silver.."|cffb0b0b0●|r"
+				moneyString = moneyString.." "..silver..SILVER_AMOUNT_SYMBOL
 			end
 			local copper = mod(money, 100)
 			if copper > 0 then
-				moneyString = moneyString.." "..copper.."|cffc77050●|r"
+				moneyString = moneyString.." "..copper..COPPER_AMOUNT_SYMBOL
 			end
 			return moneyString
 		else
-			return " 0".."|cffc77050●|r"
+			return " 0"..COPPER_AMOUNT_SYMBOL
 		end
 	end
 end

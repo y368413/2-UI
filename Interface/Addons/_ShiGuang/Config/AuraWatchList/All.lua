@@ -102,6 +102,7 @@ local list = {
 		{AuraID = 208628, UnitID = "player", Flash = true},	-- 势如破竹
 		--QS
 		{AuraID = 132403, UnitID = "player", Flash = true},	-- 正义盾击
+		{AuraID = 354808, UnitID = "player"},	-- 棱彩之光，1万币的小宠物
 		-- 种族天赋
 		{AuraID = 26297, UnitID = "player"},	-- 狂暴 巨魔
 		{AuraID = 20572, UnitID = "player"},	-- 血性狂怒 兽人
@@ -117,6 +118,10 @@ local list = {
 		{AuraID = 307496, UnitID = "player"},	-- 神圣觉醒药水
 		{AuraID = 307497, UnitID = "player"},	-- 死亡偏执药水
 		{AuraID = 344314, UnitID = "player"},	-- 心华之速药水
+		{AuraID = 307195, UnitID = "player"},	-- 隐秘精魂药水
+		{AuraID = 342890, UnitID = "player"},	-- 无拘移动药水
+		{AuraID = 322302, UnitID = "player"},	-- 献祭心能药水
+		{AuraID = 307160, UnitID = "player"},	-- 硬化暗影药水
 		-- 9.0饰品
 		{AuraID = 344231, UnitID = "player"},	-- 赤红陈酿
 		{AuraID = 345228, UnitID = "player"},	-- 角斗士徽章
@@ -133,6 +138,10 @@ local list = {
 		{AuraID = 330367, UnitID = "player", Text = U["Versa"]},	-- 不可思议的量子装置，全能
 		{AuraID = 330368, UnitID = "player", Text = U["Haste"]},	-- 不可思议的量子装置，急速
 		{AuraID = 330380, UnitID = "player", Text = U["Mastery"]},	-- 不可思议的量子装置，精通
+		{AuraID = 351872, UnitID = "player"},	-- 钢铁尖刺
+		{AuraID = 355316, UnitID = "player"},	-- 安海尔德之盾
+		{AuraID = 356326, UnitID = "player"},	-- 折磨洞察
+		{AuraID = 355333, UnitID = "player"},	-- 回收的聚变增幅器
 		-- 盟约
 		{AuraID = 331937, UnitID = "player", Flash = true},	-- 沉醉
 		{AuraID = 323546, UnitID = "player"},	-- 饕餮狂乱
@@ -165,6 +174,14 @@ local list = {
 		{AuraID = 328908, UnitID = "player"},	-- 战斗冥想
 		{AuraID = 345499, UnitID = "player"},	-- 执政官的祝福
 		{AuraID = 339461, UnitID = "player"},	-- 猎手坚韧
+		{AuraID = 325381, UnitID = "player", Flash = true},	-- 争先打击
+		{AuraID = 342774, UnitID = "player"},	-- 繁华原野
+		{AuraID = 333218, UnitID = "player"},	-- 废土礼节
+		{AuraID = 336885, UnitID = "player"},	-- 抚慰阴影
+		{AuraID = 324156, UnitID = "player", Flash = true},	-- 劫掠射击
+		{AuraID = 328900, UnitID = "player"},	-- 放下过去
+		{AuraID = 333961, UnitID = "player"},	-- 行动的召唤：布隆
+		{AuraID = 333943, UnitID = "player"},	-- 源生重槌
 		-- 炼金石
 		{AuraID = 60233, UnitID = "player"},	-- 敏捷
 		{AuraID = 60229, UnitID = "player"},	-- 力量
@@ -232,7 +249,10 @@ local list = {
 		{AuraID = 306583, UnitID = "player"},	-- 灌铅脚步
 		{AuraID = 313698, UnitID = "player", Flash = true},	-- 泰坦之赐
 		-- 常驻词缀
-		{AuraID = 342466, UnitID = "player"},	-- 狂妄吹嘘
+		{AuraID = 355732, UnitID = "player"},	-- 融化灵魂
+		{AuraID = 356667, UnitID = "player"},	-- 刺骨之寒
+		{AuraID = 356925, UnitID = "player"},	-- 屠戮
+		{AuraID = 342466, UnitID = "player"},	-- 狂妄吹嘘，S1
 		{AuraID = 209858, UnitID = "player"},	-- 死疽溃烂
 		{AuraID = 240559, UnitID = "player"},	-- 重伤
 		{AuraID = 340880, UnitID = "player"},	-- 傲慢
@@ -251,16 +271,19 @@ local list = {
 		{AuraID = 330725, UnitID = "player", Flash = true},	-- 伤逝剧场，暗影易伤
 		{AuraID = 336258, UnitID = "player", Flash = true},	-- 凋魂之殇，落单狩猎
 		{AuraID = 331399, UnitID = "player"},	-- 凋魂之殇，感染毒雨
+		{AuraID = 333353, UnitID = "player"},	-- 凋魂之殇，暗影伏击
 		{AuraID = 327401, UnitID = "player", Flash = true},	-- 通灵战潮，共受苦难
 		{AuraID = 323471, UnitID = "player", Flash = true},	-- 通灵战潮，切肉飞刀
+		{AuraID = 328181, UnitID = "player"},	-- 通灵战潮，凌冽之寒
 		{AuraID = 327397, UnitID = "player"},	-- 通灵战潮，严酷命运
 		{AuraID = 322681, UnitID = "player"},	-- 通灵战潮，肉钩
 		{AuraID = 335161, UnitID = "player"},	-- 通灵战潮，残存心能
 		{AuraID = 345323, UnitID = "player", Flash = true},	-- 通灵战潮，勇士之赐
 		{AuraID = 322746, UnitID = "player"},	-- 彼界，堕落之血
-		{AuraID = 323687, UnitID = "player", Flash = true},	-- 彼界，奥术闪电
 		{AuraID = 323692, UnitID = "player"},	-- 彼界，奥术易伤
 		{AuraID = 331379, UnitID = "player"},	-- 彼界，润滑剂
+		{AuraID = 320786, UnitID = "player"},	-- 彼界，势不可挡
+		{AuraID = 323687, UnitID = "player", Flash = true},	-- 彼界，奥术闪电
 		{AuraID = 327893, UnitID = "player", Flash = true},	-- 彼界，邦桑迪的热情
 		{AuraID = 339978, UnitID = "player", Flash = true},	-- 彼界，安抚迷雾
 		{AuraID = 323569, UnitID = "player", Flash = true},	-- 彼界，溅洒精魂
@@ -268,6 +291,20 @@ local list = {
 		{AuraID = 328453, UnitID = "player"},	-- 晋升高塔，压迫
 		{AuraID = 335805, UnitID = "player", Flash = true},	-- 晋升高塔，执政官的壁垒
 		{AuraID = 325027, UnitID = "player", Flash = true},	-- 仙林，荆棘爆发
+		{AuraID = 356011, UnitID = "player"},	-- 集市，光线切分者
+		{AuraID = 353421, UnitID = "player"},	-- 集市，精力
+		{AuraID = 347949, UnitID = "player", Flash = true},	-- 集市，审讯
+		{AuraID = 355915, UnitID = "player"},	-- 集市，约束雕文
+		{AuraID = 347771, UnitID = "player"},	-- 集市，加急
+		{AuraID = 346962, UnitID = "player", Flash = true},	-- 集市，现金汇款
+		{AuraID = 348567, UnitID = "player"},	-- 集市，爵士乐
+		{AuraID = 349627, UnitID = "player"},	-- 集市，暴食
+		{AuraID = 350010, UnitID = "player", Flash = true},	-- 集市，被吞噬的心能
+		{AuraID = 346828, UnitID = "player", Flash = true},	-- 集市，消毒区域
+		{AuraID = 355581, UnitID = "player", Flash = true},	-- 集市，连环爆裂
+		{AuraID = 346961, UnitID = "player", Flash = true},	-- 集市，净化之地
+		{AuraID = 347481, UnitID = "player"},	-- 集市，奥能手里波
+		{AuraID = 350013, UnitID = "player"},	-- 集市，暴食盛宴
 		-- 团本
 		{AuraID = 342077, UnitID = "player"},	-- 回声定位，咆翼
 		{AuraID = 329725, UnitID = "player"},	-- 根除，毁灭者
@@ -278,10 +315,15 @@ local list = {
 		{AuraID = 335293, UnitID = "player"},	-- 锁链联结，泥拳
 		{AuraID = 333913, UnitID = "player"},	-- 锁链联结，泥拳
 		{AuraID = 327039, UnitID = "player"},	-- 邪恶撕裂，干将
+		{AuraID = 344655, UnitID = "player"},	-- 震荡易伤，干将
 		{AuraID = 327089, UnitID = "player"},	-- 喂食时间，德纳修斯
 		{AuraID = 327796, UnitID = "player"},	-- 午夜猎手，德纳修斯
+
+		{AuraID = 347283, UnitID = "player"},	-- 捕食者之嚎，塔拉格鲁
+		{AuraID = 347286, UnitID = "player"},	-- 不散之惧，塔拉格鲁
 	},
 	["Warning"] = { -- 目标重要光环组
+		{AuraID = 355596, UnitID = "target", Flash = true},	-- 橙弓，哀痛箭
 		-- 大幻象
 		{AuraID = 304975, UnitID = "target", Value = true},	-- 虚空哀嚎，吸收盾
 		{AuraID = 319643, UnitID = "target", Value = true},	-- 虚空哀嚎，吸收盾
@@ -318,6 +360,12 @@ local list = {
 		{AuraID = 326450, UnitID = "target"},	-- 赎罪大厅，忠心的野兽
 		{AuraID = 322433, UnitID = "target"},	-- 赤红深渊，石肤术
 		{AuraID = 321402, UnitID = "target"},	-- 赤红深渊，饱餐
+		{AuraID = 355640, UnitID = "target"},	-- 集市，重装方阵
+		{AuraID = 355782, UnitID = "target"},	-- 集市，力量增幅器
+		{AuraID = 351086, UnitID = "target"},	-- 集市，势不可挡
+		{AuraID = 347840, UnitID = "target"},	-- 集市，野性
+		{AuraID = 347992, UnitID = "target"},	-- 集市，回旋防弹衣
+		{AuraID = 347840, UnitID = "target"},	-- 集市，野性
 		-- 团本
 		{AuraID = 345902, UnitID = "target"},	-- 破裂的联结，猎手
 		{AuraID = 334695, UnitID = "target"},	-- 动荡的能量，猎手
@@ -372,6 +420,7 @@ local list = {
 	["InternalCD"] = { -- 自定义内置冷却组
 		{IntID = 240447, Duration = 20},	-- 大米，践踏
 		{IntID = 114018, Duration = 15, OnSuccess = true, UnitID = "all"},	-- 帷幕
+		{IntID = 316958, Duration = 30, OnSuccess = true, UnitID = "all"},	-- 红土
 	},
 }
 

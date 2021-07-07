@@ -2,8 +2,15 @@ local LFRofthepast = {};
 LFRofthepast.npcID = {};
 LFRofthepast.npcs = {};
 
-function LFRofthepast.npcs_update()
+function LFRofthepast.load_data()
 	local faction = LFRofthepast.faction(); --UnitFactionGroup("player")=="Alliance";
+
+	local npc_wod = {94870,582,33.2,37.2,5,"LFR"};
+	local npc_bfa = {177193,1161,74.21,13.53,7,"LFR"};
+	if faction=="horde" then
+		npc_wod[2],npc_wod[3],npc_wod[4] = 590,41.5,47.0;
+		npc_bfa[1],npc_bfa[2],npc_bfa[3],npc_bfa[4] = 177208,1165,68.62,30.27;
+	end
 
 	-- {<npcis>, <zoneid>, <posX>, <posY>, <expansionNumber>, <instanceType>}
 	-- expansionNumber is for _G["EXPANSION_NAME"..<expansionNumber>]
@@ -15,13 +22,82 @@ function LFRofthepast.npcs_update()
 		--{78777,390,83.05,30.48,4,"SZHC"}, -- hc szenarios
 		{80633,390,83.16,30.56,4,"LFR"}, -- lfr
 		-- WoD, lfr (same npc id and different location for alliance and horde)
-		faction=="alliance" and {94870,582,33.2,37.2,5,"LFR"} or {94870,590,41.5,47.0,5,"LFR"},
+		npc_wod,
 		-- legion
-		{31439,627,63.6,55.6,6,"LFR"},
+		--{31439,627,63.6,55.6,6,"LFR"},
 		{111246,627,63.6,55.6,6,"LFR"},
-		-- bfa // coming soon // 9.1 ?
-		--faction=="alliance" and {144383,1161,74.10,14.16,7,"LFR"} or {144384,1165,56.63,88.58,7,"LFR"},
+		-- bfa
+		npc_bfa
 	};
+
+	LFRofthepast.instance2bosses = {
+		-- cata
+		[416]={1,2,3,4},[417]={5,6,7,8},
+		-- mop
+		[527]={1,2,3},[528]={4,5,6}, -- 1
+		[529]={1,2,3},[530]={4,5,6}, -- 2
+		[610]={1,2,3},[611]={4,5,6},[612]={7,8,9},[613]={10,11,12}, -- 3
+		[716]={1,2,4},[717]={5,6,7,8},[724]={9,10,11},[725]={12,13,14}, -- 4
+		-- wod
+		[849]={1,2,3},[850]={4,5,6},[851]={7},  -- 1
+		[847]={1,2,7},[846]={3,8,5},[848]={4,6,9},[823]={10}, -- 2
+		[982]={1,2,3},[983]={4,5,6},[984]={7,8,11},[985]={9,10,12},[986]={13}, -- 3
+		-- legion
+		[1287]={1,5,3},[1288]={2,4,6},[1289]={7}, -- 1
+		[1290]={1,2,3},[1291]={4,8,6},[1292]={5,7,9},[1293]={10}, -- 2
+		[1411]={1,2,3}, -- 3
+		[1494]={1,3,5},[1495]={2,4,6},[1496]={7,8},[1497]={9}, -- 4
+		[1610]={1,2,4},[1611]={5,3,6},[1612]={7,8,9},[1613]={10,11}, -- 5
+		-- bfa
+		[1731]={1,2,4},[1732]={3,5,6},[1733]={7,8}, -- Uldir
+		[1945]={1,2,3},[1946]={4,5,6},[1947]={7,8}, -- dazar'alor // alliance
+		[1948]={1,2,3},[1949]={4,5,6},[1950]={7,8}, -- dazar'alor // horde
+		[1951]={1,2}, -- tiegel der stürme
+		[2009]={1,3,2},[2010]={4,5,6},[2011]={7,8}, -- eternal palace
+		[2036]={1,3,2},[2037]={4,6,5,7},[2038]={8,9,10},[2039]={11,12}, -- ny'alotha
+		-- sl
+		--[2090]={2,3,4},[2091]={5,6,7},[2092]={1,8,9},[2096]={10}, -- castle nathria
+	};
+
+
+	LFRofthepast.noSubtitle = { -- by npc id
+		[78709]=1,
+		[78777]=1,
+	};
+
+	LFRofthepast.gossip2instance = {
+		-- [<npcID>] = { <instanceIDs> }
+		-- cata
+		[80675] = {416,417}, -- lfr
+		-- mop
+		[78709] = {492,499,504,511,517,539,542,593,586,589,590,588,624,625,637}, -- szenarios (not lfr but usefull for somebody ^_^)
+		[78777] = {652,647,649,646,639,648}, -- heroic szenarios (not lfr but usefull for somebody ^_^)
+		[80633] = {527,528,529,530,526,610,611,612,613,716,717,724,725}, -- lfr
+		-- wod
+		[94870] = {849,850,851,847,846,848,823,982,983,984,985,986}, -- lfr
+		-- legion
+		[111246] = {1287,1288,1289,1290,1291,1292,1293,1411,1494,1495,1496,1497,1610,1611,1612,1613}, -- lfr
+		-- bfa
+		[npc_bfa[1]] = {1731,1732,1733, 1945,1946,1947, --[[1948,1949,1950,]] 1951, 2009,2010,2011,2036, 2037,2038,2039},
+		-- sl
+		--[] = {2090,2091,2092,2096},
+
+	};
+
+	if faction=="horde" then
+		LFRofthepast.gossip2instance[npc_bfa[1]][4] = 1948;
+		LFRofthepast.gossip2instance[npc_bfa[1]][5] = 1949;
+		LFRofthepast.gossip2instance[npc_bfa[1]][6] = 1950;
+	end
+
+	LFRofthepast.lfrID = {
+		416,417, -- cata 2
+		527,528,529,530,526,610,611,612,613,716,717,724,725, -- mop
+		849,850,851,847,846,848,823,982,983,984,985,986, -- wod
+		1287,1288,1289,1411,1290,1291,1292,1293,1494,1495,1496,1497,1610,1611,1612,1613, -- legion
+		1731,1732,1733,1945,1946,1947,1948,1949,1950,1951,2009,2010,2011,2036,2037,2038,2039, -- bfa
+		-- 2090,2091,2092,2096, -- sl
+	}
 
 	wipe(LFRofthepast.npcID);
 
@@ -218,8 +294,13 @@ local function buttonHook_OnEnter(self)
 		GameTooltip:SetOwner(self,"ANCHOR_NONE");
 		GameTooltip:SetPoint("LEFT",GossipFrame,"RIGHT");
 
+		local showID = "";
+		if false then
+			showID = " " .. "|cFF69ccf0".."("..buttons[buttonID].instanceID..")".."|r";
+		end
+
 		-- instance name
-		GameTooltip:AddLine(buttons[buttonID].instance[name]);
+		GameTooltip:AddLine(buttons[buttonID].instance[name].. showID);
 
 		-- instance group name (for raids splitted into multible lfr instances)
 		if not LFRofthepast.noSubtitle[NPC_ID] and buttons[buttonID].instance[name]~=buttons[buttonID].instance[name2] then
@@ -276,7 +357,7 @@ local function OnGossipShow()
 			Buttons = GossipFrame.buttons;
 		end
 		for i,button in ipairs(Buttons)do
-			if button:IsShown() then
+			if button:IsShown() and button.type=="Gossip" then
 				local buttonID = button:GetID()
 				local instanceID
 				if LFRofthepast.gossip2instance[NPC_ID] and #LFRofthepast.gossip2instance[NPC_ID]>0 then
@@ -298,7 +379,7 @@ local function OnGossipShow()
 						bossIndexes = LFRofthepast.instance2bosses[instanceID];
 						data.numEncounters[2] = #LFRofthepast.instance2bosses[instanceID];
 					else
-						data.numEncounters[2] = GetLFGDungeonNumEncounters(instanceID)
+						data.numEncounters[2] = GetLFGDungeonNumEncounters(instanceID);
 						for i=1, data.numEncounters[2] do
 							tinsert(bossIndexes,i);
 						end
@@ -314,12 +395,13 @@ local function OnGossipShow()
 							tinsert(data.encounters,boss);
 						end
 					end
-						local label = data.instance[name].."\n|Tinterface\\lfgframe\\ui-lfg-icon-heroic:12:12:0:0:32:32:0:16:0:16|t ".."|cFF800000".._G.GENERIC_FRACTION_STRING:format(data.numEncounters[1],data.numEncounters[2]).."|r";
-						if data.instance[name]~=data.instance[name2] then
-							label = label .. " || ".. "|cFF404040"..data.instance[name2].."|r";
-						end
+					local showID = "";
+					if false then
+						showID = " " .. "|cFF69ccf0".."("..instanceID..")".."|r";
+					end
+
 						-- gossip text replacement
-						button:SetText(label);
+						button:SetText(data.instance[name]..showID.."\n".."|Tinterface\\lfgframe\\ui-lfg-icon-heroic:12:12:0:0:32:32:0:16:0:16|t ".. "|cFF404040"..data.instance[name2].."|r");  --.."|cFF800000".._G.GENERIC_FRACTION_STRING:format(data.numEncounters[1],data.numEncounters[2])).."|r".. " || "
 						-- gossip icon replacement
 						iconTexCoords[button.Icon] = {button.Icon:GetTexCoord()};
 						button.Icon:SetTexture("interface\\minimap\\raid");
@@ -347,42 +429,6 @@ local function OnGossipHide()
 end
 
 GossipFrame:HookScript("OnHide",OnGossipHide);
-
-----------------------------------------------------
--- create into tooltip for raids
-
-local function CreateEncounterTooltip(parent)
-	if --[[IsInstance() or]] IsInRaid() then
-		local instanceName, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceMapID, instanceGroupSize = GetInstanceInfo()
-		if not (difficultyID==7 or difficultyID==17) then return end
-		local data = InstanceGroups[instanceName];
-		if data then
-			GameTooltip:SetOwner(parent,"ANCHOR_NONE");
-			GameTooltip:SetPoint("TOP",parent,"BOTTOM");
-			GameTooltip:SetText(instanceName);
-			GameTooltip:AddLine(difficultyName,1,1,1);
-
-			for i=1, #data do
-				GameTooltip:AddLine(" ");
-				GameTooltip:AddLine("|cFF69ccf0"..data[i][2].."|r");
-
-				local encounter = GetEncounterStatus(data[i][1]);
-				local i2b = LFRofthepast.instance2bosses[data[i][1]];
-				if i2b then -- lfr
-					for b=1, #i2b do
-						GameTooltip:AddDoubleLine("|Tinterface/questtypeicons:14:14:0:0:128:64:0:18:36:54|t "..encounter[i2b[b]][1],encounter[i2b[b]][2] and "|cFFff8080"..BOSS_DEAD.."|r" or "|cFF80ff80"..BOSS_ALIVE.."|r");
-					end
-				else -- normal raid
-					for b=1, #encounter do
-						GameTooltip:AddDoubleLine("|Tinterface/questtypeicons:14:14:0:0:128:64:0:18:36:54|t "..encounter[b][1],encounter[b][2] and "|cFFff8080"..BOSS_DEAD.."|r" or "|cFF80ff80"..BOSS_ALIVE.."|r");
-					end
-				end
-			end
-			GameTooltip:Show();
-		end
-	end
-end
-
 QueueStatusFrame:HookScript("OnHide",function(parent)
 	GameTooltip:Hide();
 end);
@@ -396,7 +442,7 @@ LFRofthepastFrame:SetScript("OnEvent",function(self,event,...)
 		end
 	elseif not LFRofthepast.faction(true) and (event=="PLAYER_LOGIN" or event=="NEUTRAL_FACTION_SELECT_RESULT") then
 		RequestRaidInfo();
-		LFRofthepast.npcs_update();
+		LFRofthepast.load_data();
 	elseif event=="BOSS_KILL" then
 		local encounterID,name = ...;
 		BossKillQueryUpdate=true;

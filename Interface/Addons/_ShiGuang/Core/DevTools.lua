@@ -14,7 +14,7 @@ local M, R, U, I = unpack(ns)
 ]]
 
 local strfind, format, strsplit = string.find, string.format, string.split
-local pairs, tonumber, tostring = pairs, tonumber, tostring
+local gsub, pairs, tonumber, tostring = gsub, pairs, tonumber, tostring
 local floor, ceil = math.floor, math.ceil
 local IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
 
@@ -23,7 +23,8 @@ I.Devs = {
 	["浩劫复仇-鬼雾峰"] = true,
 }
 local function isDeveloper()
-	return I.Devs[I.MyFullName]
+	local rawName = gsub(I.MyFullName, "%s", "")
+	return I.Devs[rawName]
 end
 I.isDeveloper = isDeveloper()
 
@@ -91,6 +92,24 @@ SlashCmdList["NDUI_CHECK_QUEST"] = function(msg)
 end
 SLASH_NDUI_CHECK_QUEST1 = "/ncq"
 
+
+SlashCmdList["NDUI_GET_INSTANCES"] = function()
+	if not EncounterJournal then return end
+	local tierID = EJ_GetCurrentTier()
+	print("local _, ns = ...")
+	print("local M, R, U, I = unpack(ns)")
+	print("local module = M:GetModule(\"AurasTable\")")
+	print("local TIER = "..tierID)
+	print("local INSTANCE")
+	local i = 0
+	while true do
+		i = i + 1
+		local instID, instName = EJ_GetInstanceByIndex(i, false)
+		if not instID then return end
+		print("INSTANCE = "..instID.." -- "..instName)
+	end
+end
+SLASH_NDUI_GET_INSTANCES1 = "/getinst"
 
 SlashCmdList["NDUI_GET_ENCOUNTERS"] = function()
 	if not EncounterJournal then return end

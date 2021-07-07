@@ -38,6 +38,7 @@ G.DefaultSettings = {
 		CustomBarNumButtons = 12,
 		CustomBarNumPerRow = 12,
 		ShowStance = true,
+		EquipColor = false,
 	},
 	Auras = {
 		Reminder = true,
@@ -71,6 +72,7 @@ G.DefaultSettings = {
 		SMUnitsPerColumn = 25,
 		SMGroupByIndex = 3,
 		InstanceAuras = true,
+		DispellOnly = false,
 		RaidDebuffScale = 1,
 		SpecRaidPos = false,
 		RaidHealthColor = 2,
@@ -112,6 +114,11 @@ G.DefaultSettings = {
 		RaidTextScale = 0.85, 
 		FrequentHealth = false,
 		HealthFrequency = .25,
+		ShowRaidBuff = false,
+		RaidBuffSize = 12,
+		ShowRaidDebuff = true,
+		RaidDebuffSize = 12,
+		SmartRaid = false,
 
 		PlayerWidth = 245,
 		PlayerHeight = 24,
@@ -160,6 +167,7 @@ G.DefaultSettings = {
 		BlockStranger = false,
 		AllowFriends = true,
 		Outline = false,
+		BlockSpammer = false,
 		ChatBGType = 1,
 	},
 	Map = {
@@ -252,6 +260,7 @@ G.DefaultSettings = {
 		FontOutline = true,
 		Loot = true,
 		Shadow = true,
+		GreyBD = false,
 		FontScale = 1,
 		CastBarstyle = true,
 		QuestTrackerSkinTitle = true,
@@ -273,10 +282,13 @@ G.DefaultSettings = {
 		OnlyArmorIcons = true,
 		ConduitInfo = true,
 		HideAllID = false,
+		MDScore = false,
 		QuestCompleteAnnoce = false,
 	},
 	Misc = {
 		Mail = true,
+		MailSaver = false,
+		MailTarget = "",
 		ItemLevel = true,
 		GemNEnchant = true,
 		AzeriteTraits = true,
@@ -311,7 +323,7 @@ G.DefaultSettings = {
 		RaidTool = true,
 		RMRune = false,
 		DBMCount = "10",
-		EasyMarking = true,
+		EasyMarkKey = 1,
 		ShowMarkerBar = 4,
 		BlockInvite = false,
 		NzothVision = true,
@@ -353,6 +365,7 @@ G.AccountSettings = {
 	RaidDebuffs = {},
 	Changelog = {},
 	totalGold = {},
+	ShowSlots = false,
 	RepairType = 1,
 	AutoSell = true,
 	GuildSortBy = 1,
@@ -505,6 +518,15 @@ local function updateHotkeys()
 	for _, button in pairs(Bar.buttons) do
 		if button.UpdateHotkeys then
 			button:UpdateHotkeys(button.buttonType)
+		end
+	end
+end
+
+local function updateEquipColor()
+	local Bar = M:GetModule("Actionbar")
+	for _, button in pairs(Bar.buttons) do
+		if button.Border and button.Update then
+			Bar.UpdateEquipItemColor(button)
 		end
 	end
 end
@@ -886,8 +908,8 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "HideBanner", U["Hide Bossbanner"].."*", true, false, nil, toggleBossBanner},
 		--{1, "Misc", "HideBossEmote", U["HideBossEmote"].."*", nil, nil, toggleBossEmote},
 		--{1, "Misc", "HideErrors", U["Hide Error"].."*", true, true, nil, updateErrorBlocker},
-		{1, "Chat", "AllowFriends", U["AllowFriendsSpam"].."*", false, false, nil, nil, U["AllowFriendsSpamTip"]},
-		{1, "Chat", "Lock", "|cff00cc4c"..U["Lock Chat"], true, false},
+		--{1, "Chat", "AllowFriends", U["AllowFriendsSpam"].."*", false, false, nil, nil, U["AllowFriendsSpamTip"]},
+		{1, "Chat", "Lock", "|cff00cc4c"..U["Lock Chat"], true, true},
 		{},--blank
 		{3, "Chat", "Matches", U["Keyword Match"].."*", false, false, {1, 3, 1}},
 		{3, "Chat", "ChatWidth", U["LockChatWidth"].."*", true, false, {200, 600, 1}, updateChatSize},

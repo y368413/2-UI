@@ -6,7 +6,6 @@ local module = M:GetModule("Infobar")
 local info = module:RegisterInfobar("Bags", R.Infobar.BagsPos)
 		
 info.eventList = {
-	"PLAYER_ENTERING_WORLD",
 	"BAG_UPDATE",
 }
 

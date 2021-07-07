@@ -133,6 +133,10 @@ local function RenderLinks(str, nameOnly)
                     return '|T'..info.iconFileID..':0:0:1:-1|t '..link
                 end
             end
+        elseif type == 'faction' then
+            local name = GetFactionInfoByID(id)
+            if nameOnly then return name end
+            return BattleForAzeroth.color.NPC(name) -- TODO: colorize based on standing?
         elseif type == 'item' then
             local name, link, _, _, _, _, _, _, _, icon = GetItemInfo(id)
             if link and icon then
@@ -293,43 +297,42 @@ BattleForAzeroth.Class = function (name, parent, attrs)
     Class.getters = Class.getters or {}
     Class.setters = Class.setters or {}
 
+    local instance_metatable = {
+        __tostring = function (self)
+            return '<'..name..' instance at '..self.__address..'>'
+        end,
+
+        __index = function (self, index)
+            -- Walk up the class hierarchy and check for a static value
+            -- followed by a getter function on each parent class
+            local _Class = Class
+            repeat
+                -- Use rawget to skip __index on Class, we want to
+                -- check each class object individually
+                local value = rawget(_Class, index)
+                if value ~= nil then return value end
+                local getter = _Class.getters[index]
+                if getter then return getter(self) end
+                _Class = _Class.__parent
+            until _Class == nil
+        end,
+
+        __newindex = function (self, index, value)
+            local setter = Class.setters[index]
+            if setter then
+                setter(self, value)
+            else
+                rawset(self, index, value)
+            end
+        end
+    }
+
     setmetatable(Class, {
         __call = function (self, ...)
             local instance = {}
             instance.__class = Class
-
-            local address = tostring(instance):gsub("table: ", "", 1)
-
-            setmetatable(instance, {
-                __tostring = function ()
-                    return '<'..name..' object at '..address..'>'
-                end,
-
-                __index = function (self, index)
-                    -- Walk up the class hierarchy and check for a static value
-                    -- followed by a getter function on each parent class
-                    local _Class = Class
-                    repeat
-                        -- Use rawget to skip __index on Class, we want to
-                        -- check each class object individually
-                        local value = rawget(_Class, index)
-                        if value ~= nil then return value end
-                        local getter = _Class.getters[index]
-                        if getter then return getter(self) end
-                        _Class = _Class.__parent
-                    until _Class == nil
-                end,
-
-                __newindex = function (self, index, value)
-                    local setter = Class.setters[index]
-                    if setter then
-                        setter(self, value)
-                    else
-                        rawset(self, index, value)
-                    end
-                end
-            })
-
+            instance.__address = tostring(instance):gsub("table: ", "", 1)
+            setmetatable(instance, instance_metatable)
             instance:Initialize(...)
             return instance
         end,
@@ -353,7 +356,6 @@ BattleForAzeroth.Class = function (name, parent, attrs)
 
     return Class
 end
-
 -------------------------------------------------------------------------------
 ----------------------------------- HELPERS -----------------------------------
 -------------------------------------------------------------------------------
@@ -525,11 +527,9 @@ function Addon:OnInitialize()
     BattleForAzeroth.CreateGlobalGroupOptions()
 
     -- Add quick-toggle menu button to top-right corner of world map
-    BattleForAzeroth.world_map_button = WorldMapFrame:AddOverlayFrame(
-        "HandyNotes_BattleForAzerothWorldMapOptionsButtonTemplate",
-        "DROPDOWNTOGGLEBUTTON", "TOPRIGHT",
-        WorldMapFrame:GetCanvasContainer(), "TOPRIGHT", -68, -2
-    )
+    local template = "HandyNotes_BattleForAzerothWorldMapOptionsButtonTemplate"
+    BattleForAzeroth.world_map_button = LibStub("Krowi_WorldMapButtons-1.0"):Add(template, "DROPDOWNTOGGLEBUTTON")
+
 
     -- Query localized expansion title
     if not BattleForAzeroth.expansion then error('Expansion not set: HandyNotes_BattleForAzeroth') end
@@ -629,6 +629,7 @@ local DEFAULT_GLOW = Glow('square_icon')
 
 BattleForAzeroth.icons = { -- name => path
 
+    -- Red, Blue, Yellow, Purple, Green, Pink, Lime, Navy, Teal
     chest_bk = {Icon('chest_black'), Glow('chest')},
     chest_bl = {Icon('chest_blue'), Glow('chest')},
     chest_bn = {Icon('chest_brown'), Glow('chest')},
@@ -662,11 +663,12 @@ BattleForAzeroth.icons = { -- name => path
     peg_rd = {Icon('peg_red'), Glow('peg')},
     peg_yw = {Icon('peg_yellow'), Glow('peg')},
 
-    portal_b = {Icon('portal_blue'), Glow('portal')},
-    portal_g = {Icon('portal_green'), Glow('portal')},
-    portal_p = {Icon('portal_purple'), Glow('portal')},
-    portal_r = {Icon('portal_red'), Glow('portal')},
-
+    portal_bl = {Icon('portal_blue'), Glow('portal')},
+    portal_gy = {Icon('portal_gray'), Glow('portal')},
+    portal_gn = {Icon('portal_green'), Glow('portal')},
+    portal_pp = {Icon('portal_purple'), Glow('portal')},
+    portal_rd = {Icon('portal_red'), Glow('portal')},
+    
     quest_ab = {Icon('quest_available_blue'), Glow('quest_available')},
     quest_ag = {Icon('quest_available_green'), Glow('quest_available')},
     quest_ao = {Icon('quest_available_orange'), Glow('quest_available')},
@@ -1059,12 +1061,16 @@ function BattleForAzeroth.CreateGroupOptions (map, group)
     if _INITIALIZED[group.name..map.id] then return end
     _INITIALIZED[group.name..map.id] = true
 
+    -- Check if map info exists (ignore if PTR/beta zone)
+    local map_info = C_Map.GetMapInfo(map.id)
+    if not map_info then return end
+
     -- Create map options group under zones tab
     local options = BattleForAzeroth.options.args.ZonesTab.args['Zone_'..map.id]
     if not options then
         options = {
             type = "group",
-            name = C_Map.GetMapInfo(map.id).name,
+            name = map_info.name,
             args = {
                 OpenWorldMap = {
                     type = "execute",
@@ -1359,6 +1365,22 @@ end
 
 -------------------------------------------------------------------------------
 
+_G['HandyNotes_BattleForAzerothScanQuestObjectives'] = function (start, end_)
+    local function attemptObjectiveInfo (quest, index)
+        local text, objectiveType, finished, fulfilled = GetQuestObjectiveInfo(quest, index, true)
+        if text or objectiveType or finished or fulfilled then
+            print(quest, index, text, objectiveType, finished, fulfilled)
+        end
+    end
+
+    for i = start, end_, 1 do
+        for j = 0, 10, 1 do
+            attemptObjectiveInfo(i, j)
+        end
+    end
+end
+
+-------------------------------------------------------------------------------
 BattleForAzeroth.BootstrapDevelopmentEnvironment = BootstrapDevelopmentEnvironment
 
 
@@ -1442,6 +1464,9 @@ function Map:AddNode(coord, node)
         -- Calculate world coordinates for the node
         local x, y = HandyNotes:getXY(coord)
         local wx, wy = HBD:GetWorldCoordinatesFromZone(x, y, self.id)
+        if not (wx and wy) then
+            error(format('Missing map coords: (%d: %d) => (%d: ???)', self.id, coord, parent.id))
+        end
         for i, parent in ipairs(node.parent) do
             -- Calculate parent zone coordinates and add node
             local px, py = HBD:GetZoneCoordinatesFromWorld(wx, wy, parent.id)
@@ -1472,23 +1497,30 @@ function Map:CanFocus(node)
     return false
 end
 
-function Map:IsNodeEnabled(node, coord, minimap)
-    local db = BattleForAzeroth.addon.db
-
-    -- Check for dev force enable
-    if BattleForAzeroth:GetOpt('force_nodes') or BattleForAzeroth.dev_force then return true end
-
+function Map:CanDisplay(node, coord, minimap)
     -- Check if the zone is still phased
     if node ~= self.intro and not self.phased then return false end
-
-    -- Check if we've been hidden by the user
-    if db.char[self.id..'_coord_'..coord] then return false end
 
     -- Minimap may be disabled for this node
     if not node.minimap and minimap then return false end
 
     -- Node may be faction restricted
     if node.faction and node.faction ~= BattleForAzeroth.faction then return false end
+
+    return true
+end
+
+function Map:IsNodeEnabled(node, coord, minimap)
+    local db = BattleForAzeroth.addon.db
+
+    -- Check for dev force enable
+    if BattleForAzeroth:GetOpt('force_nodes') or BattleForAzeroth.dev_force then return true end
+
+    -- Check if we've been hidden by the user
+    if db.char[self.id..'_coord_'..coord] then return false end
+
+    -- Check if the node is disabled in the current context
+    if not self:CanDisplay(node, coord, minimap) then return false end
 
     -- Check if node's group is disabled
     if not node.group:IsEnabled() then return false end
@@ -1586,7 +1618,9 @@ function MinimapDataProvider:RefreshAllData()
             -- Render any POIs this icon has registered
             if node.pois and (node._focus or node._hover) then
                 for i, poi in ipairs(node.pois) do
-                    poi:Render(self, MinimapPinTemplate)
+                    if not poi.quest or not C_QuestLog.IsQuestFlaggedCompleted(poi.quest) then
+                        poi:Render(self, MinimapPinTemplate)
+                    end
                 end
             end
         end
@@ -1686,7 +1720,9 @@ function WorldMapDataProvider:RefreshAllData(fromOnShow)
             -- Render any POIs this icon has registered
             if node.pois and (node._focus or node._hover) then
                 for i, poi in ipairs(node.pois) do
-                    poi:Render(self:GetMap(), WorldMapPinTemplate)
+                    if not poi.quest or not C_QuestLog.IsQuestFlaggedCompleted(poi.quest) then
+                        poi:Render(self:GetMap(), WorldMapPinTemplate)
+                    end
                 end
             end
         end
@@ -1794,6 +1830,15 @@ function Group:Initialize(name, icon, attrs)
     self.defaults.alpha = self.defaults.alpha or 1
     self.defaults.scale = self.defaults.scale or 1
     self.defaults.display = self.defaults.display ~= false
+end
+
+function Group:HasEnabledNodes(map)
+    for coord, node in pairs(map.nodes) do
+        if node.group == self and map:CanDisplay(node, coord) then
+            return true
+        end
+    end
+    return false
 end
 
 -- Override to hide this group in the UI under certain circumstances
@@ -2994,7 +3039,7 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
         })
 
         for i, group in ipairs(map.groups) do
-            if group:IsEnabled() then
+            if group:IsEnabled() and group:HasEnabledNodes(map) then
                 icon = group.icon
                 if group.name == 'misc' then
                     -- find an icon from the misc nodes in the map

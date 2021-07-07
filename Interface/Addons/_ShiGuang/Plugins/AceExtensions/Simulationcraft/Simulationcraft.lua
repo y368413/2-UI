@@ -1,4 +1,4 @@
--- Author: Theck, navv_, seriallos  Version: 9.0.2-16
+-- Author: Theck, navv_, seriallos  Version: 9.1.0-01
 
 local Simulationcraft = {}
 
@@ -365,6 +365,8 @@ function Simulationcraft:HandleChatCommand(input)
   for _, arg in ipairs(args) do
     if arg == 'nobag' or arg == 'nobags' or arg == 'nb' then
       noBags = true
+    elseif arg == 'merchant' then
+      showMerchant = true
     end
   end
 
@@ -766,7 +768,13 @@ function Simulationcraft:GetSoulbindString(id)
       if node.spellID ~= 0 then
         soulbindStrings[#soulbindStrings + 1] = node.spellID
       elseif node.conduitID ~= 0 then
-        soulbindStrings[#soulbindStrings + 1] = node.conduitID .. ":" .. node.conduitRank
+        local enhancedStr
+        if node.socketEnhanced then
+          enhancedStr = "1"
+        else
+          enhancedStr = "0"
+        end
+        soulbindStrings[#soulbindStrings + 1] = node.conduitID .. ":" .. node.conduitRank .. ":" .. enhancedStr
       end
     end
   end
@@ -852,8 +860,8 @@ end
 -- This is the workhorse function that constructs the profile
 function Simulationcraft:PrintSimcProfile(debugOutput, noBags, showMerchant, links)
   -- addon metadata
-  local versionComment = '# SimC Addon ' .. '9.0.2-16'
-  local simcVersionWarning = '# Requires SimulationCraft 901-01 or newer'
+  local versionComment = '# SimC Addon ' .. '9.1.0-01'
+  local simcVersionWarning = '# Requires SimulationCraft 910-01 or newer'
 
   -- Basic player info
   local _, realmName, _, _, _, _, region, _, _, realmLatinName, _ = LibRealmInfo:GetRealmInfoByUnit('player')
@@ -1003,7 +1011,7 @@ function Simulationcraft:PrintSimcProfile(debugOutput, noBags, showMerchant, lin
       if CovenantSanctumUI then
         local renown = CovenantSanctumUI.GetRenownLevel()
         if renown > 0 then
-          simulationcraftProfile = simulationcraftProfile .. '# renown=' .. renown .. '\n'
+          simulationcraftProfile = simulationcraftProfile .. 'renown=' .. renown .. '\n'
         end
       end
 

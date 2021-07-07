@@ -1,8 +1,8 @@
 <Bindings>
 	<Binding name="COMBUCTOR_TOGGLE" header="COMBUCTOR" category="BINDING_HEADER_ACE3">
-		Combuctor:ToggleFrame('inventory')
+		Combuctor.Frames:Toggle('inventory')
 	</Binding>
 	<Binding name="COMBUCTOR_BANK_TOGGLE" category="BINDING_HEADER_ACE3">
-		Combuctor:ToggleFrame('bank')
+		Combuctor.Frames:Toggle('bank')
 	</Binding>
 </Bindings>
