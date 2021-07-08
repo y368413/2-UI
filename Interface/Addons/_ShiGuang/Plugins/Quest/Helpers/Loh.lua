@@ -1,4 +1,5 @@
-﻿local quests = {
+﻿local BUTTON = 'ACTIONBUTTON%d'
+local quests = {
 	[51632] = { -- Make Loh Go (Tiragarde Sound)
 		[0] = {3, 2},
 		[1] = {1, 2, 3, 2, 2},
@@ -66,7 +67,7 @@ Handler:SetScript('OnEvent', function(self, event, ...)
 
 		self:UnregisterEvent(event)
 	elseif(event == 'QUEST_ACCEPTED') then
-		local questID = ...
+		local _, questID = ...
 		if(quests[questID]) then
 			self:Watch(questID)
 		end
@@ -128,7 +129,11 @@ function Handler:Uncontrol()
 	self:UnregisterEvent('UNIT_SPELLCAST_SUCCEEDED')
 	self:UnregisterEvent('UNIT_AURA')
 
-	ClearOverrideBindings(self)
+	if InCombatLockdown() then
+		self:RegisterEvent('PLAYER_REGEN_ENABLED')
+	else
+		ClearOverrideBindings(self)
+	end
 end
 
 function Handler:UpdateAction(_, _, spellID)
@@ -168,6 +173,5 @@ end
 
 function Handler:Next()
 	local nextAction = quests[currentQuestID][currentCheckpoint][nextActionIndex]
-	local BUTTON = 'OverrideActionBarButton%d'
-	SetOverrideBindingClick(self, true, 'SPACE', BUTTON:format(nextAction))
+	SetOverrideBinding(self, true, 'SPACE', BUTTON:format(nextAction))
 end

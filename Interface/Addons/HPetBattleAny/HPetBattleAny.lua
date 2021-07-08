@@ -31,21 +31,15 @@ HPetBattleAny = CreateFrame("frame");
 HPetBattleAny:SetScript('OnEvent', function(_, event, ...) return HPetBattleAny[event](HPetBattleAny, event, ...) end)
 HPetBattleAny:Hide()
 HPetBattleAny.addon = addon
-if BPBID_Arrays then
-	--提前检测BBPBID是否已经存在，并备份数据，防止被本插件下的PetData.lua覆盖
-	HPetBattleAny.BPBIDInit = BPBID_Arrays.InitializeArrays
-end
 
 function HPetBattleAny:Init_HPET()
 	if not self.initialized_HPET then
-		-- self:RegisterEvent("VARIABLES_LOADED");		bf@178.com
-		self:VARIABLES_LOADED()
+		self:RegisterEvent("VARIABLES_LOADED");
 		self.initialized_HPET = true
 		--printt("test:载入HPET部分")
 		self:LoadSomeAny()
 		if self.hook then self.hook:init() end
-		-- self:RegisterEvent("PLAYER_ENTERING_WORLD")	bf@178.com
-		self:PLAYER_ENTERING_WORLD()
+		self:RegisterEvent("PLAYER_ENTERING_WORLD")
 		if PetJournal then
 			HPetBattleAny:Init_BPET()
 		end
@@ -93,7 +87,7 @@ function HPetBattleAny:PlaySoundFile(t)
 	if t=="pvp" then
 		PlaySound(SOUNDKIT.IG_PLAYER_INVITE, "Master");	----PVP提示声
 	else
-		PlaySoundFile([[Sound\Events\scourge_horn.ogg]], "Master" ); 
+		PlaySound(23404, "master")
 	end
 end
 --------------------		data
@@ -106,7 +100,7 @@ HPetBattleAny.Default={
 
 	FastForfeit=true,
 	Tooltip=true,				--额外鼠标提示
-	HighGlow=false,				--战斗中用品质颜色对宠物头像着色
+	HighGlow=true,				--战斗中用品质颜色对宠物头像着色
 
 	AutoSaveAbility=true,			--自动保存技能
 	ShowBandageButton=false,
@@ -116,8 +110,8 @@ HPetBattleAny.Default={
 	BreedIDStyle=true,
 
 	PetGreedInfo=true,			--显示品值
-	PetBreedInfo=true,			--breeID
-	ShowBreedID=true,			--显示breedID
+	PetBreedInfo=false,			--breeID
+	ShowBreedID=false,			--显示breedID
 
 	EnemyAbility=true,			--显示敌对技能
 	LockAbilitys=false,
@@ -634,7 +628,7 @@ function HPetBattleAny:initforJournalFrame()
 	button:SetText(L["HPet Options"])
 	button:SetHeight(22)
 	button:SetWidth(#L["HPet Options"]*8)
-	button:SetPoint("TOPLEFT", PetJournalLoadout, "BOTTOMLEFT", -1, -1)		--bf@178.com
+	button:SetPoint("TOPLEFT", PetJournalPetCard, "BOTTOMLEFT", -5, 0)
 	button:SetScript("OnClick",function()
 		if HPetOption then
 			HPetOption:Toggle()

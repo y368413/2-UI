@@ -217,11 +217,7 @@ setmetatable(HPetBattleAny.GetBreedNames,{__index=function(self,key)return key a
 if BPBID_Arrays then	
 	addon.PetData = {}
 	addon.PetBaseData = {}
-	if HPetBattleAny.BPBIDInit then
-		HPetBattleAny.BPBIDInit()
-	else
-		BPBID_Arrays.InitializeArrays()
-	end
+	BPBID_Arrays.InitializeArrays()
 	HPetBattleAny.GetBaseState = function(id) return fixBaseData(id) or BPBID_Arrays.BasePetStats[id] end
 	HPetBattleAny.GetPetAState = function(id)
 		if fixData(id) then

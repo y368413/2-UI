@@ -2,12 +2,12 @@
 ## Title:- |TInterface\Addons\_ShiGuang\Media\2UI:0|t -
 ## Author: ShiGuang、TuTu、Siweia
 ## Notes: Time Flies...
-## Version: 3.9.5
+## Version: 3.9.6
 ## SavedVariables: MaoRUIDB,MaoRUISetDB,ShiGuangDB,CastbarsDB,CurrencyTrackingDB,VLegionToDo,WQADB,CovenantForgeDB,CovenantForgeSavedPaths,CovenantForgeWeights
 ## SavedVariablesPerCharacter: MaoRUIPerDB,ShiGuangPerDB,DEX_SAVE
 ## X-Support: 9.0.5
 ## X-Repple: 2 UI
-## X-StatsVersion: 20210708
+## X-StatsVersion: 20210709
 ## X-LoadOn-Always: Delayed
 ## X-Website: https://github.com/y368413/2-UI
 ## X-Credits: DDCQ、abin, ape47, Coolkid, Elv, Freebaser, Haleth, Haste, Loshine, Monolit, Neal, Neavo, p3lim, Qulight, Ray, superk, Tukz, Tuller, Warbaby, yleaf, Zork, EK, Rubgrsch, siweia & "PaoPao"...
