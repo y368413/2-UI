@@ -14,10 +14,7 @@ local PRIDEFUL_AFFIX_ID = 121
 
 local progressPresets = {
 	-- 通灵战潮
-	--[166264] = 1, -- 备用部件
-	--[166266] = 1, -- 备用部件
-	--[163623] = 3, -- 烂吐残渣
-	--[163622] = 3, -- 碎淤残块
+	[166264] = 1, -- 备用部件
 	[165138] = 1, -- 凋零之袋
 	[171500] = 1, -- 蹒跚的死尸
 	[162729] = 4, -- 帕奇维克士兵
@@ -447,6 +444,11 @@ local function ProgressBar_SetValue(self, percent)
 			self.ReapingFrame:Show()
 			self.ReapingFrame.Icon:Show()
 		elseif self.ReapingFrame then
+			self.ReapingFrame:Hide()
+			self.ReapingFrame.Icon:Hide()
+		end
+	else
+		if self.ReapingFrame then
 			self.ReapingFrame:Hide()
 			self.ReapingFrame.Icon:Hide()
 		end

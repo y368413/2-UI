@@ -1,4 +1,4 @@
-﻿-- $Id: Config.lua 202 2020-10-20 16:41:04Z arith $
+﻿-- $Id: Config.lua 219 2021-06-29 14:11:55Z arithmandar $
 -----------------------------------------------------------------------
 -- Upvalued Lua API.
 -----------------------------------------------------------------------
@@ -14,7 +14,7 @@ local format = string.format
 -- WoW
 local GetSpellTexture, GetSpellInfo, GetItemInfo, GetItemCount = _G.GetSpellTexture, _G.GetSpellInfo, _G.GetItemInfo, _G.GetItemCount
 local GetLocale = _G.GetLocale
-local WoWClassic = select(4, GetBuildInfo()) < 20000
+local WoWClassic = select(4, GetBuildInfo()) < 30000
 -- ----------------------------------------------------------------------------
 -- AddOn namespace.
 -- ----------------------------------------------------------------------------
@@ -342,6 +342,7 @@ end
 local function getCurrenciesOptions()
 	-- below to force currency category to be displayed in specific order
 	local tCurrencyCategory = {
+		--248, -- Torghast
 		245, -- Shadowlands
 		143, -- Battle for Azeroth
 		141, -- Legion

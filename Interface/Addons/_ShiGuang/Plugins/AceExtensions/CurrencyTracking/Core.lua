@@ -1,8 +1,17 @@
-﻿-- $Id: Constants.lua 204 2020-11-15 14:08:53Z arith $
+﻿-- $Id: Constants.lua 221 2021-06-29 14:18:03Z arithmandar $
 local _G = getfenv(0)
 local constants = {}
 
-local WoWClassic = select(4, GetBuildInfo()) < 20000
+local WoWClassicEra, WoWClassicTBC, WoWRetail
+local wowtocversion  = select(4, GetBuildInfo())
+if wowtocversion < 20000 then
+	WoWClassicEra = true
+elseif wowtocversion > 19999 and wowtocversion < 90000 then 
+	WoWClassicTBC = true
+else
+	WoWRetail = true
+end
+
 constants.defaults = {
 	profile = {
 		show_currency = true,
@@ -52,6 +61,7 @@ constants.items = {
 			-- Shadowland
 			173202, -- Shrouded Cloth
 			173204, -- Lightless Silk
+			172439, -- Enchanted Lightless Silk
 			-- RoA
 			167738, -- Gilded Seaweave
 			-- BfA
@@ -115,6 +125,23 @@ constants.items = {
 			2589, -- Linen Cloth
 		},
 		[2575] = { -- Mining: Metal & Stone
+			-- Shadowland
+			180733, -- Luminous Flux
+			171428, -- Shadowghast Ingot
+			171828, -- Laestrite Ore
+			171829, -- Solenium Ore
+			171830, -- Oxxein Ore
+			171831, -- Phaedrum Ore
+			171832, -- Sinvyr Ore
+			171833, -- Elethium Ore
+			171834, -- Laestrite Nugget
+			171835, -- Solenium Nugget
+			171836, -- Oxxein Nugget
+			171837, -- Phaedrum Nugget
+			171838, -- Sinvyr Nugget
+			171839, -- Elethium Nugget
+			171840, -- Porous Stone
+			171841, -- Shaded Stone
 			-- RoA
 			168185, -- Osmenite Ore
 			-- BfA
@@ -230,7 +257,7 @@ constants.items = {
 		},
 		[2108] = { -- Leatherworking
 			-- Shadowland
-			177281, --  Heavy Sorrowscale
+--			177281, --  Heavy Sorrowscale
 			177279, --  Gaunt Sinew
 			172438, --  Enchanted Heavy Desolate Hide
 			172333, --  Purified Leather
@@ -356,10 +383,14 @@ constants.items = {
 			783, --  Light Hide
 		},
 		[7411] = { -- Enchanting
+			-- Shadowland
+			172232, -- Eternal Crystal
+			172230, -- Soul Dust
+			172231, -- Sacred Shard
 			-- RoA
 			164766, -- Iwen's Enchanting Rod
 			-- BfA
-			152882, -- Runed Norgal Rod
+--			152882, -- Runed Norgal Rod
 			152877, -- Veiled Crystal
 			152876, -- Umbra Shard
 			152875, -- Gloom Dust
@@ -422,6 +453,14 @@ constants.items = {
 			10938, -- Lesser Magic Essence
 		},
 		[2366] = { -- Herbalism
+			-- Shadowland
+			170554, -- Vigil's Torch
+			171287, -- Ground Death Blossom
+			171288, -- Ground Vigil's Torch
+			171289, -- Ground Widowbloom
+			171290, -- Ground Marrowroot
+			171291, -- Ground Rising Glory
+			171292, -- Ground Nightshade
 			-- RoA
 			168487, -- Zin'anthid
 			-- BfA
@@ -588,6 +627,17 @@ constants.items = {
 			765, -- Silverleaf
 		},
 		[25229] = { -- Jewelcrafting
+			-- Shadowland
+			173108, -- Oriblase
+			173109, -- Angerseye
+			173110, -- Umbryl
+			173168, -- Laestrite Setting
+			173170, -- Essence of Rebirth
+			173171, -- Essence of Torment
+			173172, -- Essence of Servitude
+			173173, -- Essence of Valor
+			187532, -- Soulfire Chisel
+			
 			-- RoA
 			168190, -- Lava Lazuli
 			168188, -- Sage Agate
@@ -736,6 +786,13 @@ constants.items = {
 			774, -- Malachite
 		},
 		[4036] = { -- Engineering
+			-- Shadowland
+			183950, -- Distilled Death Extract
+			172934, -- Handful of Laestrite Bolts
+			172935, -- Porous Polishing Abrasive
+			172936, -- Mortal Coiled Spring
+			172937, -- Wormfed Gear Assembly
+			
 			-- RoA
 			169470, -- Pressure Relief Valve
 			167649, -- Hundred-Fathom Lure
@@ -819,6 +876,72 @@ constants.items = {
 			814, -- Flask of Oil
 		},
 		[2259] = { -- Alchemy
+			-- Shadowland
+			184090, -- Potion of the Psychopomp's Speed
+			183942, -- Novice Crafter's Mark
+			183823, -- Potion of Unhindered Passing
+			182072, -- Bramblethorn Juice
+			182071, -- Refined Submission
+			182048, -- Crushed Bones
+			182047, -- Brutal Oil
+			182026, -- Pulverized Breezebloom
+			182025, -- Distilled Resolve
+			181984, -- Powdered Dreamroot
+			181983, -- Liquid Sleep
+			181859, -- Flask of Measured Discipline
+			181858, -- Draught of Grotesque Strength
+			181857, -- Elixir of Humility
+			181375, -- Potion of Hibernal Rest
+			180457, -- Shadestone
+			176811, -- Potion of Sacrificial Anima
+			173384, -- Crafter's Mark of the Chained Isle
+			173383, -- Crafter's Mark III
+			173382, -- Crafter's Mark II
+			173381, -- Crafter's Mark I
+			171428, -- Shadowghast Ingot
+			171370, -- Potion of Specter Swiftness
+			171352, -- Potion of Empowered Exorcisms
+			171351, -- Potion of Deathly Fixation
+			171350, -- Potion of Divine Awakening
+			171349, -- Potion of Phantom Fire
+			171301, -- Spiritual Anti-Venom
+			171292, -- Ground Nightshade
+			171291, -- Ground Rising Glory
+			171290, -- Ground Marrowroot
+			171289, -- Ground Widowbloom
+			171288, -- Ground Vigil's Torch
+			171287, -- Ground Death Blossom
+			171286, -- Embalmer's Oil
+			171285, -- Shadowcore Oil
+			171284, -- Eternal Cauldron
+			171278, -- Spectral Flask of Stamina
+			171276, -- Spectral Flask of Power
+			171275, -- Potion of Spectral Strength
+			171274, -- Potion of Spectral Stamina
+			171273, -- Potion of Spectral Intellect
+			171272, -- Potion of Spiritual Clarity
+			171270, -- Potion of Spectral Agility
+			171269, -- Spiritual Rejuvenation Potion
+			171268, -- Spiritual Mana Potion
+			171267, -- Spiritual Healing Potion
+			171266, -- Potion of the Hidden Spirit
+			171264, -- Potion of Shaded Sight
+			171263, -- Potion of Soul Purity
+			-- BfA
+			169451, -- Abyssal Healing Potion
+			169300, -- Potion of Wild Mending
+			169299, -- Potion of Unbridled Fury
+			168656, -- Greater Mystical Cauldron
+			168654, -- Greater Flask of the Undertow
+			168653, -- Greater Flask of the Vast Horizon
+			168652, -- Greater Flask of Endless Fathoms
+			168651, -- Greater Flask of the Currents
+			168529, -- Potion of Empowered Proximity
+			168506, -- Potion of Focused Resolve
+			168500, -- Superior Battle Potion of Strength
+			168499, -- Superior Battle Potion of Stamina
+			168498, -- Superior Battle Potion of Intellect
+			168489, -- Superior Battle Potion of Agility
 			166270, -- Potion of the Unveiling Eye
 			163225, -- Battle Potion of Stamina
 			163224, -- Battle Potion of Strength
@@ -826,6 +949,8 @@ constants.items = {
 			163222, -- Battle Potion of Intellect
 			163082, -- Coastal Rejuvenation Potion
 			162519, -- Mystical Cauldron
+			162461, -- Sanguicell
+			162460, -- Hydrocore
 			162113, -- Potion of Herb Tracking
 			152668, -- Expulsom
 			152641, -- Flask of the Undertow
@@ -845,6 +970,7 @@ constants.items = {
 			151609, -- Tears of the Naaru
 			151608, -- Lightblood Elixir
 			151568, -- Primal Sargerite
+			
 			142117, -- Potion of Prolonged Power
 			141323, -- Wild Transmutation
 			136653, -- Silvery Salve
@@ -1230,6 +1356,40 @@ constants.items = {
 			118, -- Minor Healing Potion
 		},
 		[2018] = { -- Blacksmithing
+			-- Shadowland
+			185960, -- Vestige of Origins
+			183942, -- Novice Crafter's Mark
+			182093, -- Soft Manacle Chains
+			182092, -- Tempered Manacle Chains
+			182090, -- Binding Cuffs
+			182087, -- Soft Heavy Razor
+			182086, -- Hardened Heavy Razor
+			181792, -- Tarnished Kyrian Shield
+			181791, -- Polished Kyrian Shield
+			181790, -- Reforged Kyrian Shield
+			181788, -- Unrefined Arrowheads
+			181787, -- Molten Phaedrum
+			181784, -- Bundle of Stalker Arrowheads
+			180060, -- Relic of the Past V
+			180059, -- Relic of the Past IV
+			180058, -- Relic of the Past III
+			180057, -- Relic of the Past II
+			180055, -- Relic of the Past I
+			173384, -- Crafter's Mark of the Chained Isle
+			173383, -- Crafter's Mark III
+			173382, -- Crafter's Mark II
+			173381, -- Crafter's Mark I
+			171441, -- Laestrite Skeleton Key
+			171439, -- Shaded Weightstone
+			171438, -- Porous Weightstone
+			171437, -- Shaded Sharpening Stone
+			171436, -- Porous Sharpening Stone
+			171428, -- Shadowghast Ingot
+			-- BfA
+			162460, -- Hydrocore
+			162461, -- Sanguicell
+			168417, -- Inflatable Mount Shoes
+			
 			162120, -- Platinum Whetstone
 			162115, -- Magnetic Mining Pick
 			162109, -- Storm Silver Spurs
@@ -1344,17 +1504,48 @@ constants.items = {
 			2862, -- Rough Sharpening Stone
 		},
 		[7620] = { -- Fishing
-			174328, --  Aberrant Voidfin
-			174327, --  Malformed Gnasher
-			168646, --  Mauve Stinger
-			168302, --  Viper Fish
-			152549, --  Redtail Loach
-			152548, --  Tiragarde Perch
-			152547, --  Great Sea Catfish
-			152546, --  Lane Snapper
-			152545, --  Frenzied Fangtooth
-			152544, --  Slimy Mackerel
-			152543, --  Sand Shifter
+			-- Shadowland
+			171441, -- Laestrite Skeleton Key
+			173032, -- Lost Sole
+			173033, -- Iridescent Amberjack
+			173037, -- Elysian Thade
+			173192, -- Shrouded Cloth Bandage
+			177025, -- Partially Eaten Fish
+			177026, -- Lost Earring
+			177028, -- Rusty Chain
+			181387, -- Speckled Flametail
+			
+			-- 8.x.x
+			174758, -- Voidwarped Relic Fragment
+			174328, -- Aberrant Voidfin
+			174327, -- Malformed Gnasher
+			168646, -- Mauve Stinger
+			168302, -- Viper Fish
+			168262, -- Sentry Fish
+			167562, -- Ionized Minnow
+			166971, -- Empty Energy Cell
+			166970, -- Energy Cell
+			166846, -- Spare Parts
+			166287, -- Silver Dawning Salvage
+			164973, -- Severed Azurefin Head
+			164972, -- Severed Crimsonscale Head
+			162517, -- U'taka
+			162516, -- Rasboralus
+			162515, -- Midnight Salmon
+			158771, -- Spirit Ichor
+			157844, -- Iridescent Speck
+			155609, -- Springy Eyeball
+			152549, -- Redtail Loach
+			152548, -- Tiragarde Perch
+			152547, -- Great Sea Catfish
+			152546, -- Lane Snapper
+			152545, -- Frenzied Fangtooth
+			152544, -- Slimy Mackerel
+			152543, -- Sand Shifter
+			152511, -- Sea Stalk
+			152506, -- Star Moss
+			152505, -- Riverbud
+			
 			139669, --  Ancient Black Barracuda
 			139667, --  Axefish
 			139666, --  Tainted Runescale Koi
@@ -1501,6 +1692,29 @@ constants.items = {
 			4603, --  Raw Spotted Yellowtail
 		},
 		[2550] = { -- Cooking
+			-- Shadowland
+			184624, -- Extra Sugary Fish Feast
+			184682, -- Extra Lemony Herb Filet
+			184690, -- Extra Fancy Darkmoon Feast
+			186704, -- Twilight Tea
+			186725, -- Bonemeal Bread
+			186726, -- Porous Rock Candy
+			-- 8.x.x
+			174352, -- Baked Voidfin
+			174351, -- K'Bab
+			174350, -- Dubious Delight
+			174349, -- Ghastly Goulash
+			174348, -- Grilled Gnasher
+			169449, -- Mecha-Bytes
+			169280, -- Unagi Skewer
+			168315, -- Famine Evaluator And Snack Table
+			168314, -- Bil'Tong
+			168313, -- Baked Port Tato
+			168312, -- Fragrant Kakavia
+			168311, -- Abyssal-Fried Rissole
+			168310, -- Mech-Dowel's "Big Mech"
+			166804, -- Boralus Blood Sausage
+			
 			166344, -- Seasoned Steak and Potatoes
 			166343, -- Wild Berry Bread
 			166240, -- Sanguinated Feast
@@ -1971,6 +2185,9 @@ constants.items = {
 		26044, -- HALAA_RESEARCH_TOKEN 
 	},
 	elemental = {
+		-- Shadowland
+		186017, -- Korthite Crystal
+		178787, -- Orboreal Shard
 		-- BfA
 		165703, -- Breath of Bwonsamdi
 		165948, -- Tidalcore
@@ -3888,7 +4105,7 @@ constants.itemCategories = {
 	["professions"] = TRADE_SKILLS,
 }
 
-if WoWClassic then
+if (WoWClassicEra or WoWClassicTBC) then
 	constants.events = {
 		"PLAYER_REGEN_ENABLED",
 		"PLAYER_REGEN_DISABLED",
@@ -3944,7 +4161,7 @@ else
 end
 
 
--- $Id: Core.lua 199 2020-10-18 06:35:09Z arith $
+-- $Id: Core.lua 213 2021-05-18 17:19:28Z arithmandar $
 -----------------------------------------------------------------------
 -- Upvalued Lua API.
 -----------------------------------------------------------------------
@@ -3970,7 +4187,7 @@ local GetBuildInfo = _G.GetBuildInfo
 -- Determine WoW TOC Version
 local WoWClassic, WoWRetail
 local wowtocversion  = select(4, GetBuildInfo())
-if wowtocversion < 19999 then
+if wowtocversion < 30000 then
 	WoWClassic = true
 else
 	WoWRetail = true

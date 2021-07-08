@@ -1,6 +1,6 @@
 --[[
 Name: LibCurrencyInfo
-Revision: $Rev: 42 $
+Revision: $Rev: 48 $
 Maintainers: Arith
 Website: https://www.wowace.com/projects/libcurrencyinfo
 Dependencies: None
@@ -37,6 +37,7 @@ data.CurrencyByCategory = {
 --		321, -- Isle of Conquest Mark of Honor
 		391, -- Tol Barad Commendation
 		1602, -- Conquest, this one is actually under Hidden
+		1792, -- Honor, Used to purchase Unrated PvP equipment in Stormwind and Orgrimmar.
 
 	},
 	[21] = { -- Wrath of the Lich King
@@ -163,13 +164,13 @@ data.CurrencyByCategory = {
 		1600,	 -- Honorbound
 -- 		1602,	 -- Conquest, this to be categorize in PvP
 		1703,	 -- BFA Season Rated Participation Currency
-		1705,	 -- Warfronts - Personal Tracker - Iron in Chest (Hidden)
-		1714,	 -- Warfronts - Personal Tracker - Wood in Chest (Hidden)
+--		1705,	 -- Warfronts - Personal Tracker - Iron in Chest (Hidden)
+--		1714,	 -- Warfronts - Personal Tracker - Wood in Chest (Hidden)
 		1722,	 -- Azerite Ore
 		1723,	 -- Lumber
 		1738,	 -- Unshackled
 		1739,	 -- Ankoan
-		1740,	 -- Rustbolt Resistance (Hidden)
+--		1740,	 -- Rustbolt Resistance (Hidden)
 		1742,	 -- Rustbolt Resistance
 		1745,	 -- Nazjatar Ally - Neri Sharpfin
 		1746,	 -- Nazjatar Ally - Vim Brineheart
@@ -180,6 +181,48 @@ data.CurrencyByCategory = {
 		1752,	 -- Honeyback Hive
 		1757, 	 -- Uldum Accord
 		1758, 	 -- Rajani
+		1761, 	 -- Enemy Damage
+		1762, 	 -- Enemy Health
+		1763, 	 -- Deaths
+--		1769, 	 -- Quest Experience (Standard, Hidden)
+		1794, 	 -- Atonement Anima
+		1804, 	 -- Ascended
+		1805, 	 -- Undying Army
+		1806, 	 -- Wild Hunt
+		1807, 	 -- Court of Harvesters
+		1808, 	 -- Channeled Anima
+		1810, 	 -- Redeemed Soul
+		1822, 	 -- Renown
+		1837, 	 -- The Ember Court
+		1838, 	 -- The Countess
+		1839, 	 -- Rendle and Cudgelface
+		1840, 	 -- Stonehead
+		1841, 	 -- Cryptkeeper Kassir
+		1842, 	 -- Baroness Vashj
+		1843, 	 -- Plague Deviser Marileth
+		1844, 	 -- Grandmaster Vole
+		1845, 	 -- Alexandros Mograine
+		1846, 	 -- Sika
+		1847, 	 -- Kleia and Pelegos
+		1848, 	 -- Polemarch Adrestes
+		1849, 	 -- Mikanikos
+		1850, 	 -- Choofa
+		1851, 	 -- Droman Aliothe
+		1852, 	 -- Hunt-Captain Korayn
+		1853, 	 -- Lady Moonberry
+		1877, 	 -- Bonus Experience
+		1878, 	 -- Stitchmasters
+		1880, 	 -- Ve'nari
+		1883, 	 -- Soulbind Conduit Energy
+		1884, 	 -- The Avowed
+		1887, 	 -- Court of Night
+		1888, 	 -- Marasmius
+		1889, 	 -- Adventure Campaign Progress
+		1891, 	 -- Honor from Rated
+--		1902, 	 -- 9.1 - Torghast XP - Prototype - LJS, 
+--		1903, 	 -- Invisible Reward, 
+		1907, 	 -- Death's Advance	Grants reputation with the Death's Advance., 
+		1947, 	 -- Bonus Valor, 
 	},
 	[143] = { -- Battle for Azeroth
 		1299,	 -- Brawler's Gold
@@ -188,12 +231,12 @@ data.CurrencyByCategory = {
 		1580,	 -- Seal of Wartorn Fate
 		1587,	 -- War Supplies
 		1710,	 -- Seafarer's Dubloon
+		1715,	 -- Progenitor Shard
 		1716,	 -- Honorbound Service Medal
 		1717,	 -- 7th Legion Service Medal
 		1718,	 -- Titan Residuum
 		1719,	 -- Corrupted Memento
 		1721,	 -- Prismatic Manapearl
---		1743,	 -- 8.2 NOT CURRENTLY USED
 		1755, 	 -- Coalescing Visions
 		1803,	 -- Echoes of Ny'alotha
 	},
@@ -203,38 +246,103 @@ data.CurrencyByCategory = {
 		1586, -- Honor Level
 	},
 	[245] = { -- Shadowlands
-		1754, -- Argent Commendation
-		1767, -- Stygia
-		1828, -- Soul Ash
-		1813, -- Reservoir Anima
-		1816, -- Sinstone Fragments
-		1751, -- Freed Soul
-		1820, -- Infused Ruby
-		1830, -- Renown-Venthyr
-		1831, -- Renown-NightFae
-		1832, -- Renown-Necrolord
-		1829, -- Renown-Kyrian
-		1802, -- Shadowlands PvP Weekly Reward Progress
-		1743, -- Fake Anima for Quest Tracking
-		1859, -- Reservoir Anima-Kyrian
-		1868, -- Sanctum Architect-Venthyr
-		1819, -- Medallion of Service
-		1862, -- Reservoir Anima-Necrolord
-		--1812, -- zzoldSanctum Anima Weaver
-		1865, -- Sanctum Artisan-Night Fae
-		1867, -- Sanctum Architect-Kyrian
-		1871, -- Sanctum Anima Weaver-Kyrian
-		1874, -- Sanctum Anima Weaver-Necrolord
-		1863, -- Sanctum Artisan-Kyrian
-		--1811, -- zzoldSanctum Architect
-		1872, -- Sanctum Anima Weaver-Venthyr
-		1860, -- Reservoir Anima-Venthyr
-		1861, -- Reservoir Anima-Night Fae
-		1866, -- Sanctum Artisan-Necrolord
-		1870, -- Sanctum Architect-Necrolord
-		1873, -- Sanctum Anima Weaver-Night Fae
-		1864, -- Sanctum Artisan-Venthyr
-		1869, -- Sanctum Architect-Night Fae
+--		1743, 	 -- Fake Anima for Quest Tracking
+		1754, 	 -- Argent Commendation
+		1767, 	 -- Stygia
+		1802, 	 -- Shadowlands PvP Weekly Reward Progress
+--		1811, 	 -- zzoldSanctum Architect
+--		1812, 	 -- zzoldSanctum Anima Weaver
+		1813, 	 -- Reservoir Anima
+		1816, 	 -- Sinstone Fragments
+		1819, 	 -- Medallion of Service
+		1820, 	 -- Infused Ruby
+		1828, 	 -- Soul Ash
+		1829, 	 -- Renown-Kyrian
+		1830, 	 -- Renown-Venthyr
+		1831, 	 -- Renown-NightFae
+		1832, 	 -- Renown-Necrolord
+		1859, 	 -- Reservoir Anima-Kyrian
+		1860, 	 -- Reservoir Anima-Venthyr
+		1861, 	 -- Reservoir Anima-Night Fae
+		1862, 	 -- Reservoir Anima-Necrolord
+		1863, 	 -- Redeemed Soul-Kyrian
+		1864, 	 -- Redeemed Soul-Venthyr
+		1865, 	 -- Redeemed Soul-Night Fae
+		1866, 	 -- Redeemed Soul-Necrolord
+		1867, 	 -- Sanctum Architect-Kyrian
+		1868, 	 -- Sanctum Architect-Venthyr
+		1869, 	 -- Sanctum Architect-Night Fae
+		1870, 	 -- Sanctum Architect-Necrolord
+		1871, 	 -- Sanctum Anima Weaver-Kyrian
+		1872, 	 -- Sanctum Anima Weaver-Venthyr
+		1873, 	 -- Sanctum Anima Weaver-Night Fae
+		1874, 	 -- Sanctum Anima Weaver-Necrolord
+		1885, 	 -- Grateful Offering
+		1904, 	 -- Tower Knowledge, 
+		1906, 	 -- Soul Cinders, 
+		1931, 	 -- Cataloged Research, 
+		1977,	 -- Stygian Ember
+	},
+	[248] = { -- Torghast UI (Hidden)
+		1909, 	 -- Torghast - Scoreboard - Clear Percent, 
+		1910, 	 -- Torghast - Scoreboard - Souls Percent, 
+		1911, 	 -- Torghast - Scoreboard - Urns Percent, 
+		1912, 	 -- Torghast - Scoreboard - Hot Streak Percent, 
+		1913, 	 -- Torghast - Scoreboard - Total Time, 
+		1914, 	 -- Torghast - Scoreboard - Par Time, 
+		1915, 	 -- Torghast - Scoreboard - Deaths Excess Count, 
+		1916, 	 -- Torghast - Scoreboard - Deaths Start Count, 
+		1917, 	 -- Torghast - Scoreboard - Floor Reached, 
+		1918, 	 -- Torghast - Scoreboard - Toast Display - Time Score, 
+		1919, 	 -- Torghast - Scoreboard - Toast Display - Hot Streak Score, 
+		1920, 	 -- Torghast - Scoreboard - Toast Display - Deaths Excess Score, 
+		1921, 	 -- Torghast - Scoreboard - Toast Display - Total Score, 
+		1922, 	 -- Torghast - Scoreboard - Toast Display - Total Rewards, 
+		1923, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Souls Rescued, 
+		1924, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Urns Broken, 
+		1925, 	 -- Torghast - Scoreboard - Toast Display - Deaths Zero, 
+		1926, 	 -- Torghast - Scoreboard - Toast Display - Stars, 
+		1932, 	 -- Torghast - Scoreboard - Toast Display - Boss Killed, 
+		1933, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Chests Opened, 
+		1934, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Escorts Complete, 
+		1935, 	 -- Torghast - Scoreboard - Toast Display - Bonus - No Trap Damage, 
+		1936, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Kill Boss Fast, 
+		1937, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Single Stacks, 
+		1938, 	 -- Torghast - Scoreboard - Toast Display - Bonus - 5 Stacks, 
+		1939, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Broker Killer, 
+		1940, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Elite Slayer, 
+		1941, 	 -- Torghast - Scoreboard - Toast Display - Bonus - 1000 Phantasma, 
+		1942, 	 -- Torghast - Scoreboard - Toast Display - Bonus - 500 Phant Left, 
+		1943, 	 -- Torghast - Scoreboard - Toast Display - Bonus - No Deaths, 
+		1944, 	 -- Torghast - Scoreboard - Toast Display - Bonus - No Epics, 
+		1945, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Elite Unnatural, 
+		1946, 	 -- Torghast - Scoreboard - Toast Display - Total Rewards - AV Bonus, 
+		1948, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Kill Boss Faster, 
+		1949, 	 -- Torghast - Scoreboard - Toast Display - Bonus - 30+ Count, 
+		1950,	 -- Torghast - Scoreboard - Toast Display - 1 Star Value
+		1951,	 -- Torghast - Scoreboard - Toast Display - 2 Star Value
+		1952,	 -- Torghast - Scoreboard - Toast Display - 3 Star Value
+		1953,	 -- Torghast - Scoreboard - Toast Display - 4 Star Value
+		1954,	 -- Torghast - Scoreboard - Toast Display - 5 Star Value
+		1955,	 -- Torghast - Scoreboard - Toast Display - Points While Empowered
+		1956,	 -- Torghast - Scoreboard - Toast Display - Points Empowered Score
+		1957,	 -- Torghast - Scoreboard - Floor Clear Percent Floor 1
+		1958,	 -- Torghast - Scoreboard - Floor Clear Percent Floor 2
+		1959,	 -- Torghast - Scoreboard - Floor Clear Percent Floor 3
+		1960,	 -- Torghast - Scoreboard - Floor Clear Percent Floor 4
+		1961,	 -- Torghast - Scoreboard - Floor Empowered Percent Floor 1
+		1962,	 -- Torghast - Scoreboard - Floor Empowered Percent Floor 2
+		1963,	 -- Torghast - Scoreboard - Floor Empowered Percent Floor 3
+		1964,	 -- Torghast - Scoreboard - Floor Empowered Percent Floor 4
+		1965,	 -- Torghast - Scoreboard - Floor Time Floor 1
+		1966,	 -- Torghast - Scoreboard - Floor Time Floor 2
+		1967,	 -- Torghast - Scoreboard - Floor Time Floor 3
+		1968,	 -- Torghast - Scoreboard - Floor Time Floor 4
+		1969,	 -- Torghast - Scoreboard - Floor Par Time Floor 1
+		1970,	 -- Torghast - Scoreboard - Floor Par Time Floor 2
+		1971,	 -- Torghast - Scoreboard - Floor Par Time Floor 3
+		1972,	 -- Torghast - Scoreboard - Floor Par Time Floor 4
+		1976,	 -- Torghast - Scoreboard - Toast Display - Bonus - Phant Left Group
 	},
 }
 
@@ -255,6 +363,7 @@ data.CurrencyCategories = {
 	[143] = { enUS="Battle for Azeroth",zhCN="争霸艾泽拉斯",zhTW="決戰艾澤拉斯" },
 	[144] = { enUS="Virtual",zhCN="兑换",zhTW="兑换" },
 	[245] = { enUS=EXPANSION_NAME8,zhCN=EXPANSION_NAME8,zhTW=EXPANSION_NAME8},
+	[248] = { enUS="Torghast",zhCN="托加斯特",zhTW="托迦司", hide=true, },
 }
 
 data.Currencies = {
@@ -393,25 +502,26 @@ data.Currencies = {
 	[1599] = { id=1599, category=142 }, -- 7th Legion, Grants reputation with the 7th Legion.
 	[1600] = { id=1600, category=142 }, -- Honorbound, Grants reputation with the Honorbound.
 	[1602] = { id=1602, category=2 }, -- Conquest, Earned from PvP activities.
-	[1703] = { id=1703, category=142 }, -- BFA Season 1 Rated Participation Currency,  
-	[1704] = { id=1704, category=23 }, -- Spirit Shard, The shard pulses with energy.
-	[1705] = { id=1705, category=142 }, -- Warfronts - Personal Tracker - Iron in Chest (Hidden),  
+	[1703] = { id=1703, category=142 }, -- PVP Season Rated Participation Currency
+	[1704] = { id=1704, category=23 }, -- Spirit Shard
+	[1705] = { id=1705, category=142 }, -- Warfronts - Personal Tracker - Iron in Chest (Hidden)
 	[1710] = { id=1710, category=143 }, -- Seafarer's Dubloon
-	[1710] = { id=1710, category=143 }, -- Seafarer's Dubloon, Currency used by the many varied tribes of the Great Sea. Used to procure items from traders on Island Expeditions.
-	[1714] = { id=1710, category=142 }, -- Warfronts - Personal Tracker - Wood in Chest (Hidden)
+	[1714] = { id=1714, category=142 }, -- Warfronts - Personal Tracker - Wood in Chest (Hidden)
+	[1715] = { id=1715, category=143 }, -- Progenitor Shard
 	[1716] = { id=1716, category=143 }, -- Honorbound Service Medal
-	[1716] = { id=1716, category=143 }, -- Honorbound Service Medal
-	[1717] = { id=1717, category=143 }, -- 7th Legion Service Medal
 	[1717] = { id=1717, category=143 }, -- 7th Legion Service Medal
 	[1718] = { id=1718, category=143 }, -- Titan Residuum
-	[1719] = { id=1719, category=143 }, -- Corrupted Memento
+	[1719] = { id=1719, category=143 }, -- Corrupted Mementos
 	[1721] = { id=1721, category=143 }, -- Prismatic Manapearl
 	[1722] = { id=1722, category=142 }, -- Azerite Ore
 	[1723] = { id=1723, category=142 }, -- Lumber
+	[1728] = { id=1728, category=142 }, -- Phantasma
 	[1738] = { id=1738, category=142 }, -- Unshackled
 	[1739] = { id=1739, category=142 }, -- Ankoan
-	[1740] = { id=1740, category=142 }, -- Rustbolt Resistance (Hidden)
+	[1740] = { id=1740, category=142, hide=true }, -- Rustbolt Resistance (Hidden)
 	[1742] = { id=1742, category=142 }, -- Rustbolt Resistance
+	[1743] = { id=1743, category=245, hide=true }, -- Fake Anima for Quest Tracking
+	[1744] = { id=1744, category=142 }, -- Corrupted Memento
 	[1745] = { id=1745, category=142 }, -- Nazjatar Ally - Neri Sharpfin
 	[1746] = { id=1746, category=142 }, -- Nazjatar Ally - Vim Brineheart
 	[1747] = { id=1747, category=142 }, -- Nazjatar Ally - Poen Gillbrack
@@ -419,42 +529,150 @@ data.Currencies = {
 	[1749] = { id=1749, category=142 }, -- Nazjatar Ally - Hunter Akana
 	[1750] = { id=1750, category=142 }, -- Nazjatar Ally - Farseer Ori
 	[1752] = { id=1752, category=142 }, -- Honeyback Hive
+	[1754] = { id=1754, category=245 }, -- Argent Commendation
+	[1755] = { id=1755, category=143 }, -- Coalescing Visions
 	[1757] = { id=1757, category=142 }, -- Uldum Accord
 	[1758] = { id=1758, category=142 }, -- Rajani
-	[1755] = { id=1755, category=143 }, -- Coalescing Visions
-	[1803] = { id=1803, category=143 }, -- Echoes of Ny'alotha
-	[1754] = { id=1754, category=245 }, -- Argent Commendation
+	[1761] = { id=1761, category=142 }, -- Enemy Damage
+	[1762] = { id=1762, category=142 }, -- Enemy Health
+	[1763] = { id=1763, category=142 }, -- Deaths
 	[1767] = { id=1767, category=245 }, -- Stygia
-	[1828] = { id=1828, category=245 }, -- Soul Ash
+	[1769] = { id=1769, category=142, hide=true }, -- Quest Experience (Standard, Hidden)
+	[1792] = { id=1792, category=2 }, -- Honor
+	[1794] = { id=1794, category=142 }, -- Atonement Anima
+	[1802] = { id=1802, category=245 }, -- Shadowlands PvP Weekly Reward Progress
+	[1803] = { id=1803, category=143 }, -- Echoes of Ny'alotha
+	[1804] = { id=1804, category=142 }, -- Ascended
+	[1805] = { id=1805, category=142 }, -- Undying Army
+	[1806] = { id=1806, category=142 }, -- Wild Hunt
+	[1807] = { id=1807, category=142 }, -- Court of Harvesters
+	[1808] = { id=1808, category=142 }, -- Channeled Anima
+	[1810] = { id=1810, category=142 }, -- Redeemed Soul
+	[1811] = { id=1811, category=245, hide=true }, -- zzoldSanctum Architect
+	[1812] = { id=1812, category=245, hide=true }, -- zzoldSanctum Anima Weaver
 	[1813] = { id=1813, category=245 }, -- Reservoir Anima
 	[1816] = { id=1816, category=245 }, -- Sinstone Fragments
-	[1751] = { id=1751, category=245 }, -- Freed Soul
+	[1819] = { id=1819, category=245 }, -- Medallion of Service
 	[1820] = { id=1820, category=245 }, -- Infused Ruby
+	[1822] = { id=1822, category=142 }, -- Renown
+	[1828] = { id=1828, category=245 }, -- Soul Ash
+	[1829] = { id=1829, category=245 }, -- Renown-Kyrian
 	[1830] = { id=1830, category=245 }, -- Renown-Venthyr
 	[1831] = { id=1831, category=245 }, -- Renown-NightFae
 	[1832] = { id=1832, category=245 }, -- Renown-Necrolord
-	[1829] = { id=1829, category=245 }, -- Renown-Kyrian
-	[1802] = { id=1802, category=245 }, -- Shadowlands PvP Weekly Reward Progress
-	[1743] = { id=1743, category=245 }, -- Fake Anima for Quest Tracking
+	[1835] = { id=1835, category=1, hide=true }, -- Linked Currency Test (Src) - PTH
+	[1836] = { id=1836, category=1, hide=true }, -- Linked Currency Test (Dst) - PTH
+	[1837] = { id=1837, category=142 }, -- The Ember Court
+	[1838] = { id=1838, category=142 }, -- The Countess
+	[1839] = { id=1839, category=142 }, -- Rendle and Cudgelface
+	[1840] = { id=1840, category=142 }, -- Stonehead
+	[1841] = { id=1841, category=142 }, -- Cryptkeeper Kassir
+	[1842] = { id=1842, category=142 }, -- Baroness Vashj
+	[1843] = { id=1843, category=142 }, -- Plague Deviser Marileth
+	[1844] = { id=1844, category=142 }, -- Grandmaster Vole
+	[1845] = { id=1845, category=142 }, -- Alexandros Mograine
+	[1846] = { id=1846, category=142 }, -- Sika
+	[1847] = { id=1847, category=142 }, -- Kleia and Pelegos
+	[1848] = { id=1848, category=142 }, -- Polemarch Adrestes
+	[1849] = { id=1849, category=142 }, -- Mikanikos
+	[1850] = { id=1850, category=142 }, -- Choofa
+	[1851] = { id=1851, category=142 }, -- Droman Aliothe
+	[1852] = { id=1852, category=142 }, -- Hunt-Captain Korayn
+	[1853] = { id=1853, category=142 }, -- Lady Moonberry
 	[1859] = { id=1859, category=245 }, -- Reservoir Anima-Kyrian
-	[1868] = { id=1868, category=245 }, -- Sanctum Architect-Venthyr
-	[1819] = { id=1819, category=245 }, -- Medallion of Service
-	[1862] = { id=1862, category=245 }, -- Reservoir Anima-Necrolord
-	[1812] = { id=1812, category=245, hide=true }, -- zzoldSanctum Anima Weaver
-	[1865] = { id=1865, category=245 }, -- Sanctum Artisan-Night Fae
-	[1867] = { id=1867, category=245 }, -- Sanctum Architect-Kyrian
-	[1871] = { id=1871, category=245 }, -- Sanctum Anima Weaver-Kyrian
-	[1874] = { id=1874, category=245 }, -- Sanctum Anima Weaver-Necrolord
-	[1863] = { id=1863, category=245 }, -- Sanctum Artisan-Kyrian
-	[1811] = { id=1811, category=245, hide=true }, -- zzoldSanctum Architect
-	[1872] = { id=1872, category=245 }, -- Sanctum Anima Weaver-Venthyr
 	[1860] = { id=1860, category=245 }, -- Reservoir Anima-Venthyr
 	[1861] = { id=1861, category=245 }, -- Reservoir Anima-Night Fae
-	[1866] = { id=1866, category=245 }, -- Sanctum Artisan-Necrolord
-	[1870] = { id=1870, category=245 }, -- Sanctum Architect-Necrolord
-	[1873] = { id=1873, category=245 }, -- Sanctum Anima Weaver-Night Fae
-	[1864] = { id=1864, category=245 }, -- Sanctum Artisan-Venthyr
+	[1862] = { id=1862, category=245 }, -- Reservoir Anima-Necrolord
+	[1863] = { id=1863, category=245 }, -- Redeemed Soul-Kyrian
+	[1864] = { id=1864, category=245 }, -- Redeemed Soul-Venthyr
+	[1865] = { id=1865, category=245 }, -- Redeemed Soul-Night Fae
+	[1866] = { id=1866, category=245 }, -- Redeemed Soul-Necrolord
+	[1867] = { id=1867, category=245 }, -- Sanctum Architect-Kyrian
+	[1868] = { id=1868, category=245 }, -- Sanctum Architect-Venthyr
 	[1869] = { id=1869, category=245 }, -- Sanctum Architect-Night Fae
+	[1870] = { id=1870, category=245 }, -- Sanctum Architect-Necrolord
+	[1871] = { id=1871, category=245 }, -- Sanctum Anima Weaver-Kyrian
+	[1872] = { id=1872, category=245 }, -- Sanctum Anima Weaver-Venthyr
+	[1873] = { id=1873, category=245 }, -- Sanctum Anima Weaver-Night Fae
+	[1874] = { id=1874, category=245 }, -- Sanctum Anima Weaver-Necrolord
+	[1877] = { id=1877, category=142 }, -- Bonus Experience
+	[1878] = { id=1878, category=142 }, -- Stitchmasters
+	[1880] = { id=1880, category=142 }, -- Ve'nari
+	[1883] = { id=1883, category=142 }, -- Soulbind Conduit Energy
+	[1884] = { id=1884, category=142 }, -- The Avowed
+	[1885] = { id=1885, category=245 }, -- Grateful Offering
+	[1887] = { id=1887, category=142 }, -- Court of Night
+	[1888] = { id=1888, category=142 }, -- Marasmius
+	[1889] = { id=1889, category=142 }, -- Adventure Campaign Progress
+	[1891] = { id=1891, category=142 }, -- Honor from Rated
+	[1902] = { id=1902, category=142, hidden=true }, -- 9.1 - Torghast XP - Prototype - LJS
+	[1903] = { id=1903, category=142, hidden=true }, -- Invisible Reward
+	[1904] = { id=1904, category=245 }, -- Tower Knowledge
+	[1906] = { id=1906, category=245 }, -- Soul Cinders
+	[1907] = { id=1907, category=142 }, -- Death's Advance
+	[1909] = { id=1909, category=248, hidden=true }, -- Torghast - Scoreboard - Clear Percent
+	[1910] = { id=1910, category=248, hidden=true }, -- Torghast - Scoreboard - Souls Percent
+	[1911] = { id=1911, category=248, hidden=true }, -- Torghast - Scoreboard - Urns Percent
+	[1912] = { id=1912, category=248, hidden=true }, -- Torghast - Scoreboard - Hot Streak Percent
+	[1913] = { id=1913, category=248, hidden=true }, -- Torghast - Scoreboard - Total Time
+	[1914] = { id=1914, category=248, hidden=true }, -- Torghast - Scoreboard - Par Time
+	[1915] = { id=1915, category=248, hidden=true }, -- Torghast - Scoreboard - Deaths Excess Count
+	[1916] = { id=1916, category=248, hidden=true }, -- Torghast - Scoreboard - Deaths Start Count
+	[1917] = { id=1917, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Reached
+	[1918] = { id=1918, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Time Score
+	[1919] = { id=1919, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Hot Streak Score
+	[1920] = { id=1920, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Deaths Excess Score
+	[1921] = { id=1921, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Total Score
+	[1922] = { id=1922, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Total Rewards
+	[1923] = { id=1923, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - Souls Rescued
+	[1924] = { id=1924, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - Urns Broken
+	[1925] = { id=1925, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Deaths Zero
+	[1926] = { id=1926, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Stars
+	[1931] = { id=1931, category=245 }, -- Cataloged Research
+	[1932] = { id=1932, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Boss Killed
+	[1933] = { id=1933, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - Chests Opened
+	[1934] = { id=1934, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - Escorts Complete
+	[1935] = { id=1935, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - No Trap Damage
+	[1936] = { id=1936, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - Kill Boss Fast
+	[1937] = { id=1937, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - Single Stacks
+	[1938] = { id=1938, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - 5 Stacks
+	[1939] = { id=1939, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - Broker Killer
+	[1940] = { id=1940, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - Elite Slayer
+	[1941] = { id=1941, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - 1000 Phantasma
+	[1942] = { id=1942, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - 500 Phant Left
+	[1943] = { id=1943, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - No Deaths
+	[1944] = { id=1944, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - No Epics
+	[1945] = { id=1945, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - Elite Unnatural
+	[1946] = { id=1946, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Total Rewards - AV Bonus
+	[1947] = { id=1947, category=142 }, -- Bonus Valor
+	[1948] = { id=1948, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - Kill Boss Faster
+	[1949] = { id=1949, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - 30+ Count
+	[1950] = { id=1950, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - 1 Star Value
+	[1951] = { id=1951, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - 2 Star Value
+	[1952] = { id=1952, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - 3 Star Value
+	[1953] = { id=1953, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - 4 Star Value
+	[1954] = { id=1954, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - 5 Star Value
+	[1955] = { id=1955, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Points While Empowered
+	[1956] = { id=1956, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Points Empowered Score
+	[1957] = { id=1957, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Clear Percent Floor 1
+	[1958] = { id=1958, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Clear Percent Floor 2
+	[1959] = { id=1959, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Clear Percent Floor 3
+	[1960] = { id=1960, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Clear Percent Floor 4
+	[1961] = { id=1961, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Empowered Percent Floor 1
+	[1962] = { id=1962, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Empowered Percent Floor 2
+	[1963] = { id=1963, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Empowered Percent Floor 3
+	[1964] = { id=1964, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Empowered Percent Floor 4
+	[1965] = { id=1965, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Time Floor 1
+	[1966] = { id=1966, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Time Floor 2
+	[1967] = { id=1967, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Time Floor 3
+	[1968] = { id=1968, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Time Floor 4
+	[1969] = { id=1969, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Par Time Floor 1
+	[1970] = { id=1970, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Par Time Floor 2
+	[1971] = { id=1971, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Par Time Floor 3
+	[1972] = { id=1972, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Par Time Floor 4
+	[1976] = { id=1976, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - Phant Left Group
+	[1977] = { id=1977, category=245 }, -- Stygian Ember
+
 }
 
 
@@ -474,7 +692,7 @@ local GetLocale = _G.GetLocale
 -- Determine WoW TOC Version
 local WoWClassic, WoWRetail
 local wowtocversion  = select(4, GetBuildInfo())
-if wowtocversion < 19999 then
+if wowtocversion < 30000 then
 	WoWClassic = true
 else
 	WoWRetail = true
@@ -492,7 +710,7 @@ end
 local LibStub = _G.LibStub
 
 local MAJOR_VERSION = "LibCurrencyInfo"
-local MINOR_VERSION = 90000 + tonumber(("$Rev: 44 $"):match("%d+"))
+local MINOR_VERSION = 90000 + tonumber(("$Rev: 42 $"):match("%d+"))
 
 local lib = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
 if not lib then return end
@@ -529,14 +747,14 @@ function lib:GetCurrencyByID(currencyID, lang)
 	else
 		local curr = GetCurrencyInfo(currencyID)
 		if curr then
-			name = curr.name
-			currentAmount = curr.quantity
-			texture = curr.iconFileID
-			earnedThisWeek = curr.quantityEarnedThisWeek
-			weeklyMax = curr.maxWeeklyQuantity
-			totalMax = curr.maxQuantity
-			isDiscovered = curr.discovered
-			rarity = curr.quality
+		name = curr.name
+		currentAmount = curr.quantity
+		texture = curr.iconFileID
+		earnedThisWeek = curr.quantityEarnedThisWeek
+		weeklyMax = curr.maxWeeklyQuantity
+		totalMax = curr.maxQuantity
+		isDiscovered = curr.discovered
+		rarity = curr.quality
 		end
 	end
 	if not name then return end

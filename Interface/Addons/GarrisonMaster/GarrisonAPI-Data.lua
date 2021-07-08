@@ -3,8 +3,8 @@ if T.Mark ~= 50 then return end
 local NINE = select(4, GetBuildInfo()) > 9e4
 
 T.Affinities = {} do
-	local ht, hp = [[3Ñ´1#t<.´C³%ÐúpÇ6¢’]•11Šþ“!Ñ²6GAÚ¼¹wÌNH|pÈ‘¥ªÜ<œ+÷Èq!¦®ßÁ,ûéÄ‘{.ßÅûoXO{½}ôT²hTµèð$0‹Gúv÷P’²QÔÝš«†üqó¨2ÓÉ†gõ4ˆ£ãýÒƒjÒ´X°	P^‰3&U,@—áHV\®–ú;dÄQé”)*<¼-v‡!'@÷xÄv„ŸiG°Âñv˜¡Híª‚²ç¹E­í¼Q}ýäŠnY–Nè™©gc.œ,T¯t<•%‡ÌÎÃŒŠu[‡ù.8®x¾2O?ÍèW2JFIÍd`É½lT˜D(JèÄÁidfÉ9*ƒÂBcRb<î‹¡EÉç"Ù°‡qÂŠ¢Øz1ˆAè˜‹Œ¸&,šç„œÈ²ÊriÎå½ÉAä ÜÄ:o2"t¢äåÄ²#˜ÄÄ$"F)Š2IÓ›¦HÌˆ™È†%³Kì‘CÈÈ9â-3JHÃ¹ÑCœòLîtRÃ²H%4J"ˆú4’E&&qJÐÄÑy‚0ˆ“ÈµÔJ^×¡Ê£Öè@ë;(BÐE²tƒ%GÅ{ŠÆÊ9ãºƒ’Èó-4ué²(›Î˜¹(c„9¸)d#Q+td²±!å"6DÜÄJd‰Â¦IbÎC±Œ‚ 7±,L„’‡Q;ä8Í§;É:nú$‡¶Ž]], [[((­h®¯nip(qj¬krgolms]]
-	local p, G, V, Vp, by, hk, ak = {}, 127, 487, 255, ht.byte, UnitFactionGroup('player') == 'Horde' and 6724 or 60788, 31516
+	local ht, hp = [[0˜â„Úñv.Têè†G—õT%? WÇØÎrTÃpðxÎ¨¼hëàÌçó…ñ¸²<Ï™³8Un)\zñª2¸M|¦¨®Ç#.×c7°¤åÆÂ¢ Ê€òOÑ10Ý]‘ÀñÎ–•þü›º\}‘Øâ	ûä—-»—º½¬°0HÃ¬0µ(2ì*?°h˜ÆjËƒ˜õ¬ŸÞ„–ïÕ')^jë•€ôhî™RÒ–#ùIÄm	J\ä>êŠ6ºÅ;§Æz·óT­õcÍ„‚1‹LÁ¹pt×CºE#"I1ôAH’Žt”5(bdD“âÉœïdI'"2šQDÁ:ÐH(‘„$Â:ˆE8".AÎGs‘V˜BqAÜE©qÖÖQC"¶sZÎs’kybE¡[Ð¥‘§t†ÅQe2NRm!7É3Hi5¨C—h9âQÄ’F—$-&÷Ðˆ:ÎBIYäIÌ„aÞÃ"$CW±î#Èy&4a"¶0Š†&LjÉ25/CÜÂ1.cZÅÈŽ:ÓJ,£(ô9rÓ­Ž9—=9ÜxÐñ!ÃÉ’aöEœ&™¦2"	%ÊQ„™‘K"ôÄ‘3ã'=s–Øž“KäzI3$ÇŽšDéŒÌ´@‰JÈg|´ðJNö@ôL(¦jYß­0|„°Ÿ¤Ó$t#–D.3QÜ‚ ôcÔåÍ®$ä„¢g"þ—•ˆÿÿÿÊI]], [[((­h®(nip¯qj¬krgolms]]
+	local p, G, V, Vp, by, hk, ak = {}, 101, 547, 203, ht.byte, UnitFactionGroup('player') == 'Horde' and 40525 or 37644, 49501
 	for i=1,#hp do p[i] = by(hp, i) p[i] = p[i] + (p[i] > 128 and 80 or -40) end
 	setmetatable(T.Affinities, {__index=function(t, k)
 		local k, c, a, v, r, b, d, e = k or false, k, type(k)
@@ -25,7 +25,6 @@ T.Affinities = {} do
 		return t[k]
 	end})
 end
-
 T.UsableAffinities = UnitFactionGroup('player') == 'Horde' and {70,71,72,73,74,75,69,252,253,254,255} or {63,64,65,66,67,68,69,252,253,254,255}
 
 T.MissionExpire = {} do

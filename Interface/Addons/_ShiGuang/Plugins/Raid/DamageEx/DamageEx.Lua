@@ -190,6 +190,7 @@ DEX_RegisterAOE("WARRIOR", 6343) -- 雷霆一擊
 DEX_RegisterAOE("ROGUE", 51723) -- 飛舞刀刃
 DEX_RegisterAOE("PALADIN", 26573, 53595, 7294, 53385) -- 奉獻, 公正之錘, 懲罰光環, 神性風暴
 DEX_RegisterAOE("HUNTER", 2643, 214579, 120360, 191433) -- 多重射擊, 響尾蛇射擊, 彈幕, 爆炸陷阱
+DEX_RegisterAOE("HUNTER", 13795, 13818) -- 献祭陷阱，爆炸陷阱
 DEX_RegisterAOE("WARLOCK", 27243, 105174, 193440, 5740) -- 腐蝕種子, 古爾丹之手, 惡魔怒火, 火焰之雨
 DEX_RegisterAOE("MAGE", 120, 1449, 190356, 122, 2120, 31661) -- 冰錐術, 魔爆術, 暴風雪, 冰霜新星, 烈焰風暴, 龍之吐息
 DEX_RegisterAOE("PRIEST", 48045) -- 心靈烙印
