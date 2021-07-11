@@ -139,7 +139,7 @@ local CreateBar = function()
 	bar.backdrop = CreateFrame("Frame", nil, bar, "BackdropTemplate")
 	bar.backdrop:SetPoint("TOPLEFT", -2, 2)
 	bar.backdrop:SetPoint("BOTTOMRIGHT", 2, -2)
-	M.CreateBD(bar, 0.3)
+	--M.CreateBD(bar, 0.3)
 	bar.backdrop:SetFrameStrata("BACKGROUND")
 
 	bar.bg = bar:CreateTexture(nil, "BACKGROUND")
@@ -162,7 +162,7 @@ local CreateBar = function()
 	bar.icon.backdrop = CreateFrame("Frame", nil, bar.icon)
 	bar.icon.backdrop:SetPoint("TOPLEFT", -2, 2)
 	bar.icon.backdrop:SetPoint("BOTTOMRIGHT", 2, -2)
-	M.CreateBD(bar.icon, 0.6)
+	--M.CreateBD(bar.icon, 0.6)
 	bar.icon.backdrop:SetFrameStrata("BACKGROUND")
 	return bar
 end
