@@ -1414,7 +1414,7 @@ resultsFrameFactionLabel:SetJustifyV("MIDDLE")
 
 -- Realm formatting
 local function format_realm(realmName)
-	if realmName == T.realm or not ShiGuangDB["config"]["display_realm_names"] then
+	if realmName == T.realm or not ShiGuangDB["ParagonDBconfig"]["display_realm_names"] then
 		return "" -- Same realm as player or realm names are turned off
 	else
 		--[[if ShiGuangDB["ParagonDBconfig"]["short_realm_names"] then

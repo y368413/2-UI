@@ -1336,3 +1336,5 @@ U["PetTrashTip"] = "|n9.1補丁中，在奧睿博司可以用特定的垃圾物�
 U["MythicScore"] = "傳奇分數: %s"
 U["MDScore"] = "顯示目標傳奇鑰石分數"
 U["MDScoreTip"] = "|n啟用後，顯示目標在當前賽季的傳奇鑰石分數。|n當分數為0時不顯示信息。"
+U["ToggleCastbarTip"] = "|n施法條開關，無需重載插件。"
+U["ChatSwitchHelp"] = "按Tab鍵能直接在可用的頻道之間切換，一直按頻道按鈕有點笨。"

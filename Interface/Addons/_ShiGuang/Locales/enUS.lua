@@ -1316,3 +1316,5 @@ U["PetTrashTip"] = "|nIn patch 9.1, you can buy 3 battle pets by using specific 
 U["MythicScore"] = "Mythic Score: %s"
 U["MDScore"] = "Show Mythic+ Rating"
 U["MDScoreTip"] = "|nIf enabled, show unit Mythic+ Rating at current season.|nHide tooltip info if unit score is ZERO."
+U["ToggleCastbarTip"] = "|nOption to toggle castbars, no need to reload UI."
+U["ChatSwitchHelp"] = "Press key Tab to switch available channels, it's a bit silly to click on bars all the time."

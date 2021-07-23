@@ -111,7 +111,7 @@ info.onMouseUp = function(self, btn)
 	if not specIndex or specIndex == 5 then return end
 
 	if btn == "LeftButton" then
-		if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
+		--if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
 		ToggleTalentFrame(2)
 	else
 		menuList[2].menuList = {{}, {}, {}, {}}

@@ -111,6 +111,8 @@ function MISC:CalculateMoverPoints(mover, trimX, trimY)
 end
 
 function MISC:UpdateTrimFrame()
+	if not f then return end -- for aurawatch preview
+	
 	local x, y = MISC:CalculateMoverPoints(self)
 	x, y = M:Round(x), M:Round(y)
 	f.__x:SetText(x)

@@ -6,7 +6,7 @@ local cr, cg, cb = I.r, I.g, I.b
 local _G = _G
 local tostring, pairs, ipairs, strsub, strlower = tostring, pairs, ipairs, string.sub, string.lower
 local IsInGroup, IsInRaid, IsPartyLFG, IsInGuild, IsShiftKeyDown, IsControlKeyDown = IsInGroup, IsInRaid, IsPartyLFG, IsInGuild, IsShiftKeyDown, IsControlKeyDown
-local ChatEdit_UpdateHeader, GetChannelList, GetCVar, SetCVar, Ambiguate, GetTime = ChatEdit_UpdateHeader, GetChannelList, GetCVar, SetCVar, Ambiguate, GetTime
+local ChatEdit_UpdateHeader, GetCVar, SetCVar, Ambiguate, GetTime = ChatEdit_UpdateHeader, GetCVar, SetCVar, Ambiguate, GetTime
 local GetNumGuildMembers, GetGuildRosterInfo, IsGuildMember, UnitIsGroupLeader, UnitIsGroupAssistant = GetNumGuildMembers, GetGuildRosterInfo, IsGuildMember, UnitIsGroupLeader, UnitIsGroupAssistant
 local CanCooperateWithGameAccount, BNInviteFriend, BNFeaturesEnabledAndConnected, PlaySound = CanCooperateWithGameAccount, BNInviteFriend, BNFeaturesEnabledAndConnected, PlaySound
 local C_BattleNet_GetAccountInfoByID = C_BattleNet.GetAccountInfoByID
@@ -146,46 +146,37 @@ end
 -- Swith channels by Tab
 local cycles = {
 	{ chatType = "SAY", use = function() return 1 end },
-    { chatType = "PARTY", use = function() return IsInGroup() end },
-    { chatType = "RAID", use = function() return IsInRaid() end },
-    { chatType = "INSTANCE_CHAT", use = function() return IsPartyLFG() end },
-    { chatType = "GUILD", use = function() return IsInGuild() end },
+	{ chatType = "PARTY", use = function() return IsInGroup() end },
+	{ chatType = "RAID", use = function() return IsInRaid() end },
+	{ chatType = "INSTANCE_CHAT", use = function() return IsPartyLFG() end },
+	{ chatType = "GUILD", use = function() return IsInGuild() end },
 	{ chatType = "CHANNEL", use = function(_, editbox)
-		if GetCVar("portal") ~= "CN" then return false end
-		local channels, inWorldChannel, number = {GetChannelList()}
-		for i = 1, #channels do
-			if channels[i] == WORLD_CHANNEL_NAME then
-				inWorldChannel = true
-				number = channels[i-1]
-				break
-			end
-		end
-		if inWorldChannel then
-			editbox:SetAttribute("channelTarget", number)
+		if module.InWorldChannel and module.WorldChannelID then
+			editbox:SetAttribute("channelTarget", module.WorldChannelID)
 			return true
 		else
 			return false
 		end
 	end },
-    { chatType = "SAY", use = function() return 1 end },
+	{ chatType = "SAY", use = function() return 1 end },
 }
 
 function module:UpdateTabChannelSwitch()
 	if strsub(tostring(self:GetText()), 1, 1) == "/" then return end
-    local currChatType = self:GetAttribute("chatType")
-    for i, curr in ipairs(cycles) do
-        if curr.chatType == currChatType then
-            local h, r, step = i+1, #cycles, 1
-            if IsShiftKeyDown() then h, r, step = i-1, 1, -1 end
-            for j = h, r, step do
-                if cycles[j]:use(self, currChatType) then
-                    self:SetAttribute("chatType", cycles[j].chatType)
-                    ChatEdit_UpdateHeader(self)
-                    return
-                end
-            end
-        end
-    end
+	local currChatType = self:GetAttribute("chatType")
+	for i, curr in ipairs(cycles) do
+		if curr.chatType == currChatType then
+			local h, r, step = i+1, #cycles, 1
+			if IsShiftKeyDown() then h, r, step = i-1, 1, -1 end
+			for j = h, r, step do
+				if cycles[j]:use(self, currChatType) then
+					self:SetAttribute("chatType", cycles[j].chatType)
+					ChatEdit_UpdateHeader(self)
+					return
+				end
+			end
+		end
+	end
 end
 hooksecurefunc("ChatEdit_CustomTabPressed", module.UpdateTabChannelSwitch)
 

@@ -384,49 +384,44 @@ function module:Chatbar()
 	--combat:SetAttribute("macrotext", "/combatlog")
 	
 	-- WORLD CHANNEL
-	local locale = GetLocale()
-	if GetCVar("portal") == "CN" and (locale == "zhCN" or locale == "zhTW") then
-		local channelName, channelID, channels = WORLD_CHANNEL_NAME
-		local wc = AddButton(255/255, 200/255, 150/255, "世")  --U["World Channel"]
+	if GetCVar("portal") == "CN" then
+		local channelName = WORLD_CHANNEL_NAME
+		local wcButton = AddButton(255/255, 200/255, 150/255, "世")  --U["World Channel"]
 
 		local function updateChannelInfo()
 			local id = GetChannelName(channelName)
 			if not id or id == 0 then
-				wc.inChannel = false
-				channelID = nil
-				--wc.Icon:SetVertexColor(1, .1, .1)
+				module.InWorldChannel = false
+				module.WorldChannelID = nil
+				--wcButton.Icon:SetVertexColor(1, .1, .1)
 			else
-				wc.inChannel = true
-				channelID = id
-				--wc.Icon:SetVertexColor(0, .8, 1)
+				module.InWorldChannel = true
+				module.WorldChannelID = id
+				--wcButton.Icon:SetVertexColor(0, .8, 1)
 			end
 		end
 
-		local function isInChannel(event)
+		local function checkChannelStatus()
 			C_Timer.After(.2, updateChannelInfo)
-
-			if event == "PLAYER_ENTERING_WORLD" then
-				M:UnregisterEvent(event, isInChannel)
-			end
 		end
-		M:RegisterEvent("PLAYER_ENTERING_WORLD", isInChannel)
-		M:RegisterEvent("CHANNEL_UI_UPDATE", isInChannel)
-		hooksecurefunc("ChatConfigChannelSettings_UpdateCheckboxes", isInChannel) -- toggle in chatconfig
+		checkChannelStatus()
+		M:RegisterEvent("CHANNEL_UI_UPDATE", checkChannelStatus)
+		hooksecurefunc("ChatConfigChannelSettings_UpdateCheckboxes", checkChannelStatus) -- toggle in chatconfig
 
-		wc:SetScript("OnClick", function(_, btn)
-			if wc.inChannel then
+		wcButton:SetScript("OnClick", function(_, btn)
+			if module.InWorldChannel then
 				if btn == "RightButton" then
 					LeaveChannelByName(channelName)
 					print("<<<|cffFF7F50"..QUIT.."世界頻道|r")  --"|cffFF7F50"..QUIT.."|r "..I.InfoColor..U["World Channel"]
-					wc.inChannel = false
-				elseif channelID then
-					ChatFrame_OpenChat("/"..channelID, chatFrame)
+					module.InWorldChannel = false
+				elseif module.WorldChannelID then
+					ChatFrame_OpenChat("/"..module.WorldChannelID, chatFrame)
 				end
 			else
 				JoinPermanentChannel(channelName, nil, 1)
 				ChatFrame_AddChannel(ChatFrame1, channelName)
 				print(">>>|cff00C957"..JOIN.."世界頻道|r")  --"|cff00C957"..JOIN.."|r "..I.InfoColor..U["World Channel"]
-				wc.inChannel = true
+				module.InWorldChannel = true
 			end
 		end)
 	end

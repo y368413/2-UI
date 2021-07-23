@@ -1456,8 +1456,8 @@ function CovenantForge:Update()
 			local conduit = nodeFrame:GetConduit()
 			local conduitID = conduit:GetConduitID()
 			if conduit and conduitID > 0  then
-				local spellID = CovenantForge.Conduits[conduitID][2]
-				name = GetSpellInfo(spellID)
+				--local spellID = CovenantForge.Conduits[conduitID][2]
+				--name = GetSpellInfo(spellID)
 				--local rank = conduit:GetConduitRank()
 				--local itemLevel = C_Soulbinds.GetConduitItemLevel(conduitID, rank)
 				weight = CovenantForge:GetConduitWeight(CovenantForge.viewed_spec, conduitID)

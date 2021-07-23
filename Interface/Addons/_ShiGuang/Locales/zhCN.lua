@@ -1341,3 +1341,5 @@ U["PetTrashTip"] = "|n9.1补丁中，在奥利波斯可以用特定的垃圾物�
 U["MythicScore"] = "史诗评分: %s"
 U["MDScore"] = "显示目标史诗钥石评分"
 U["MDScoreTip"] = "|n启用后，显示目标在当前赛季的史诗钥石评分。|n当分数为0时不显示信息。"
+U["ToggleCastbarTip"] = "|n施法条开关，无需重载插件。"
+U["ChatSwitchHelp"] = "按Tab键能直接在可用的频道之间切换，一直按频道按钮有点笨。"
