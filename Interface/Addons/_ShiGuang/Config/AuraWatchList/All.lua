@@ -145,6 +145,8 @@ local list = {
 		{AuraID = 357185, UnitID = "player"},	-- 忠诚的力量，低语威能碎片
 		-- 盟约
 		{AuraID = 331937, UnitID = "player", Flash = true},	-- 沉醉
+		{AuraID = 354053, UnitID = "player", Flash = true, Text = U["Crit"]}, -- 致命缺陷，暴击
+		{AuraID = 354054, UnitID = "player", Flash = true, Text = U["Versa"]}, -- 致命缺陷，全能
 		{AuraID = 323546, UnitID = "player"},	-- 饕餮狂乱
 		{AuraID = 326860, UnitID = "player"},	-- 陨落僧众
 		{AuraID = 310143, UnitID = "player", Combat = true},-- 灵魂变形
@@ -252,6 +254,7 @@ local list = {
 		{AuraID = 306583, UnitID = "player"},	-- 灌铅脚步
 		{AuraID = 313698, UnitID = "player", Flash = true},	-- 泰坦之赐
 		-- 常驻词缀
+		{AuraID = 358777, UnitID = "player"},	-- 痛苦之链
 		{AuraID = 355732, UnitID = "player"},	-- 融化灵魂
 		{AuraID = 356667, UnitID = "player"},	-- 刺骨之寒
 		{AuraID = 356925, UnitID = "player"},	-- 屠戮
@@ -282,6 +285,7 @@ local list = {
 		{AuraID = 322681, UnitID = "player"},	-- 通灵战潮，肉钩
 		{AuraID = 335161, UnitID = "player"},	-- 通灵战潮，残存心能
 		{AuraID = 345323, UnitID = "player", Flash = true},	-- 通灵战潮，勇士之赐
+		{AuraID = 320366, UnitID = "player", Flash = true},	-- 通灵战潮，防腐剂
 		{AuraID = 322746, UnitID = "player"},	-- 彼界，堕落之血
 		{AuraID = 323692, UnitID = "player"},	-- 彼界，奥术易伤
 		{AuraID = 331379, UnitID = "player"},	-- 彼界，润滑剂
@@ -363,6 +367,7 @@ local list = {
 		{AuraID = 340191, UnitID = "target", Value = true},	-- 仙林，再生辐光
 		{AuraID = 323059, UnitID = "target", Flash = true},	-- 仙林，宗主之怒
 		{AuraID = 336499, UnitID = "target"},	-- 仙林，猜谜游戏
+		{AuraID = 322569, UnitID = "target"},	-- 仙林，兹洛斯之手
 		{AuraID = 326771, UnitID = "target"},	-- 赎罪大厅，岩石监视者
 		{AuraID = 326450, UnitID = "target"},	-- 赎罪大厅，忠心的野兽
 		{AuraID = 322433, UnitID = "target"},	-- 赤红深渊，石肤术

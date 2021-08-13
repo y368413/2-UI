@@ -521,11 +521,19 @@ do
 	R.frames = {}
 	local defaultBackdrop = {bgFile = I.bdTex, edgeFile = I.bdTex}
 
+	function M:SetBorderColor()
+		if R.db["Skins"]["GreyBD"] then
+			self:SetBackdropBorderColor(1, 1, 1, .2)
+		else
+			self:SetBackdropBorderColor(0, 0, 0)
+		end
+	end
+
 	function M:CreateBD(a)
 		defaultBackdrop.edgeSize = R.mult
 		self:SetBackdrop(defaultBackdrop)
 		self:SetBackdropColor(0, 0, 0, a or R.db["Skins"]["SkinAlpha"])
-		self:SetBackdropBorderColor(0, 0, 0)
+		M.SetBorderColor(self)
 		if not a then tinsert(R.frames, self) end
 	end
 
@@ -725,7 +733,7 @@ do
 		else
 			self.__bg:SetBackdropColor(0, 0, 0, 0)
 		end
-		self.__bg:SetBackdropBorderColor(0, 0, 0)
+		M.SetBorderColor(self.__bg)
 	end
 
 	local blizzRegions = {
@@ -792,7 +800,7 @@ do
 		self.bg:SetBackdropBorderColor(cr, cg, cb)
 	end
 	local function Menu_OnLeave(self)
-		self.bg:SetBackdropBorderColor(0, 0, 0)
+		M.SetBorderColor(self.bg)
 	end
 	local function Menu_OnMouseUp(self)
 		self.bg:SetBackdropColor(0, 0, 0, R.db["Skins"]["SkinAlpha"])
@@ -822,7 +830,7 @@ do
 		local thumb = self.thumb
 		if not thumb then return end
 		thumb.bg:SetBackdropColor(0, 0, 0, 0)
-		thumb.bg:SetBackdropBorderColor(0, 0, 0)
+		M.SetBorderColor(thumb.bg)
 	end
 
 	local function GrabScrollBarElement(frame, element)
@@ -954,6 +962,60 @@ do
 		overflowButton:HookScript("OnLeave", M.Texture_OnLeave)
 
 		self.navBarStyled = true
+	end
+	-- Handle slider
+	function M:ReskinSlider(vertical)
+		self:SetBackdrop(nil)
+		M.StripTextures(self)
+
+		local bg = M.CreateBDFrame(self, 0, true)
+		bg:SetPoint("TOPLEFT", 14, -2)
+		bg:SetPoint("BOTTOMRIGHT", -15, 3)
+
+		local thumb = self:GetThumbTexture()
+		thumb:SetTexture(I.sparkTex)
+		thumb:SetBlendMode("ADD")
+		if vertical then thumb:SetRotation(rad(90)) end
+	end
+	local buttonNames = {"MaximizeButton", "MinimizeButton"}
+	function M:ReskinMinMax()
+		for _, name in next, buttonNames do
+			local button = self[name]
+			if button then
+				button:SetSize(16, 16)
+				button:ClearAllPoints()
+				button:SetPoint("CENTER", -3, 0)
+				M.Reskin(button)
+
+				local tex = button:CreateTexture()
+				tex:SetAllPoints()
+				if name == "MaximizeButton" then
+					M.SetupArrow(tex, "up")
+				else
+					M.SetupArrow(tex, "down")
+				end
+				button.__texture = tex
+
+				button:SetScript("OnEnter", M.Texture_OnEnter)
+				button:SetScript("OnLeave", M.Texture_OnLeave)
+			end
+		end
+	end
+
+	-- UI templates
+	function M:ReskinPortraitFrame()
+		M.StripTextures(self)
+		local bg = M.SetBD(self)
+		local frameName = self.GetName and self:GetName()
+		local portrait = self.PortraitTexture or self.portrait or (frameName and _G[frameName.."Portrait"])
+		if portrait then
+			portrait:SetAlpha(0)
+		end
+		local closeButton = self.CloseButton or (frameName and _G[frameName.."CloseButton"])
+		--if closeButton then
+			--M.ReskinClose(closeButton)
+		--end
+		return bg
 	end
 end
 
@@ -1185,7 +1247,7 @@ do
 		slider:SetValueStep(step)
 		slider:SetObeyStepOnDrag(true)
 		slider:SetHitRectInsets(0, 0, 0, 0)
-		--M.ReskinSlider(slider)
+		M.ReskinSlider(slider)
 
 		slider.Low:SetText(minValue)
 		slider.Low:SetPoint("TOPLEFT", slider, "BOTTOMLEFT", 10, -2)

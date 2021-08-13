@@ -1,6 +1,6 @@
 ﻿--## Author: ykiigor  ## SavedVariables: VLegionToDo
-local LegionToDoVersion = "4.9"
-local VERSION_NUMERIC = 49
+local LegionToDoVersion = "5.0"
+local VERSION_NUMERIC = 50
 
 local GetCurrentRegion
 do
@@ -1581,6 +1581,24 @@ tinsert(ToDoFunc,function(self,collect)
 	else
 		collect.mawhunt = nil
 	end
+
+	if C_QuestLog.IsQuestFlaggedCompleted(63854) then
+		collect.mawtormentor = true
+	else
+		collect.mawtormentor = nil
+	end
+
+
+	if 
+		C_QuestLog.IsQuestFlaggedCompleted(63823) or 
+		C_QuestLog.IsQuestFlaggedCompleted(63824) or 
+		C_QuestLog.IsQuestFlaggedCompleted(63543) or
+		C_QuestLog.IsQuestFlaggedCompleted(63822)
+	then
+		collect.mawassault = true
+	else
+		collect.mawassault = nil
+	end
 end)
 
 
@@ -2531,6 +2549,8 @@ LegionToDo:SetScript("OnShow",function(self)
 
 	count = LineUpdate(count,"warfrontHC","Warfront HC: Stromgarde")
 
+	count = LineUpdate(count,"mawtormentor","Maw: Tormentors")
+	count = LineUpdate(count,"mawassault","Maw: Covenant Assault")
 	count = LineUpdate(count,"wrathofthejailer","Maw: Wrath of the Jailer")
 	count = LineUpdate(count,"mawhunt","Maw: The Hunt")
 
@@ -2989,6 +3009,24 @@ LegionToDo:SetScript("OnShow",function(self)
 			if not optData["warfrontHC"] or OPTIONS_TOGGLED  then
 				lineCount = lineCount + 1
 				lines[lineCount].cols[col]:SetText(db.warfrontHC and "|cff00ff00Done" or "|cffff0000Not done")				
+			end
+
+			if not optData["mawtormentor"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				if needReset then
+					lines[lineCount].cols[col]:SetText("|cffff0000Not done")
+				else
+					lines[lineCount].cols[col]:SetText(db.mawtormentor and "|cff00ff00Done" or "|cffff0000Not done")	
+				end			
+			end
+
+			if not optData["mawassault"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				if needHalfWeekReset then
+					lines[lineCount].cols[col]:SetText("|cffff0000Not done")
+				else
+					lines[lineCount].cols[col]:SetText(db.mawassault and "|cff00ff00Done" or "|cffff0000Not done")	
+				end			
 			end
 
 			if not optData["wrathofthejailer"] or OPTIONS_TOGGLED  then

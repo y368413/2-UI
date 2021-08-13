@@ -146,6 +146,11 @@ local Cache_GetItemLevel = function(button)
 
 		-- Move Pawn out of the way
 		RefreshPawn(button)
+local UpgradeIcon = button.UpgradeIcon
+		if UpgradeIcon then
+			UpgradeIcon:ClearAllPoints()
+			UpgradeIcon:SetPoint("BOTTOMRIGHT", 2, 0)
+		end
 
 		-- Store the reference for the next time
 		Cache_ItemLevel[button] = ItemLevel

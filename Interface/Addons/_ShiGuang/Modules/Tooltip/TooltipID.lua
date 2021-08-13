@@ -139,7 +139,7 @@ function TT:SetupTooltipID()
 	hooksecurefunc(GameTooltip, "SetCurrencyTokenByID", function(self, id)
 		if id then TT.AddLineForID(self, id, types.currency) end
 	end)
-	
+
 	-- Spell caster
 	hooksecurefunc(GameTooltip, "SetUnitAura", TT.UpdateSpellCaster)
 

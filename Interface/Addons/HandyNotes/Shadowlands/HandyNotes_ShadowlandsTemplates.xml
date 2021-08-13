@@ -1,4 +1,4 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/">
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
   <Frame name="HandyNotes_ShadowlandsWorldMapPinTemplate" hidden="true" mixin="HandyNotes_ShadowlandsWorldMapPinMixin" virtual="true">
     <Size x="30" y="30"/>
     <Layers>
@@ -110,7 +110,6 @@
       </Slider>
     </Frames>
   </Frame>
-  <!--Script file="HandyNotes_Shadowlands.lua"/-->
   <Script file="common.lua"/>
   <Script file="zones\ardenweald.lua"/>
   <Script file="zones\bastion.lua"/>

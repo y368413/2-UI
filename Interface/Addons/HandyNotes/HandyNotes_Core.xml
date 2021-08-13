@@ -1,5 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-  <Frame name="HandyNotes_BattleForAzerothWorldMapPinTemplate" hidden="true" mixin="HandyNotes_BattleForAzerothWorldMapPinMixin" virtual="true">
+  <Frame name="HandyNotes_CoreWorldMapPinTemplate" hidden="true" mixin="HandyNotes_CoreWorldMapPinMixin" virtual="true">
     <Size x="30" y="30"/>
     <Layers>
       <Layer>
@@ -9,7 +9,7 @@
     </Layers>
   </Frame>
 
-  <Button name="HandyNotes_BattleForAzerothMinimapPinTemplate" hidden="true" mixin="HandyNotes_BattleForAzerothMinimapPinMixin" virtual="true">
+  <Button name="HandyNotes_CoreMinimapPinTemplate" hidden="true" mixin="HandyNotes_CoreMinimapPinMixin" virtual="true">
     <Size x="12" y="12"/>
     <Layers>
       <Layer level="OVERLAY">
@@ -19,7 +19,7 @@
     </Layers>
   </Button>
 
-  <DropDownToggleButton name="HandyNotes_BattleForAzerothWorldMapOptionsButtonTemplate" frameStrata="HIGH" mixin="HandyNotes_BattleForAzerothWorldMapOptionsButtonMixin" virtual="true">
+  <DropDownToggleButton name="HandyNotes_CoreWorldMapOptionsButtonTemplate" frameStrata="HIGH" mixin="HandyNotes_CoreWorldMapOptionsButtonMixin" virtual="true">
     <Size x="32" y="32"/>
     <Layers>
       <Layer level="BACKGROUND">
@@ -70,7 +70,7 @@
     </Scripts>
   </DropDownToggleButton>
 
-  <Frame name="HandyNotes_BattleForAzerothTextMenuOptionTemplate" inherits="UIDropDownCustomMenuEntryTemplate" virtual="true">
+  <Frame name="HandyNotes_CoreTextMenuOptionTemplate" inherits="UIDropDownCustomMenuEntryTemplate" virtual="true">
     <Size x="240" y="20"/>
     <Layers>
       <Layer>
@@ -86,7 +86,7 @@
     </Layers>
   </Frame>
 
-  <Frame name="HandyNotes_BattleForAzerothSliderMenuOptionTemplate" inherits="UIDropDownCustomMenuEntryTemplate" virtual="true">
+  <Frame name="HandyNotes_CoreSliderMenuOptionTemplate" inherits="UIDropDownCustomMenuEntryTemplate" virtual="true">
     <Size x="240" y="20"/>
     <Layers>
       <Layer>
@@ -111,17 +111,4 @@
     </Frames>
   </Frame>
   <Script file="HandyNotes_Core.lua"/>
-  <Script file="zones\arathi_highlands.lua"/>
-  <Script file="zones\darkshore.lua"/>
-  <Script file="zones\drustvar.lua"/>
-  <Script file="zones\mechagon.lua"/>
-  <Script file="zones\nazjatar.lua"/>
-  <Script file="zones\nazmir.lua"/>
-  <Script file="zones\stormsong_valley.lua"/>
-  <Script file="zones\tiragarde_sound.lua"/>
-  <Script file="zones\uldum.lua"/>
-  <Script file="zones\vale.lua"/>
-  <Script file="zones\visions.lua"/>
-  <Script file="zones\voldun.lua"/>
-  <Script file="zones\zuldazar.lua"/>
 </Ui>

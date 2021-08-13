@@ -109,7 +109,7 @@ info.onMouseUp = function(self, btn)
 		MaoRUIDB["AutoSell"] = not MaoRUIDB["AutoSell"]
 		self:onEnter()
 	else
-		if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
+		--if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
 		ToggleCharacter("TokenFrame")
 	end
 end

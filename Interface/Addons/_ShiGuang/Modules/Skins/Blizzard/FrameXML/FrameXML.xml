@@ -1,6 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="CharacterFrame.lua"/>
+	<Script file="ChatBubbles.lua"/>
+	<Script file="ChatFrame.lua"/>
 	<Script file="Fonts.lua"/>
+	<Script file="LossOfControlFrame.lua"/>
 	<Script file="ObjectiveTracker.lua"/>
 	<Script file="PetBattleUI.lua"/>
 </Ui>

@@ -874,6 +874,8 @@ L["options_toy_rewards"] = "Show toy rewards"
 L["options_toy_rewards_desc"] = "Display toy rewards in tooltips and track their collected status."
 L["options_transmog_rewards"] = "Show transmog rewards"
 L["options_transmog_rewards_desc"] = "Display transmog rewards in tooltips and track their collected status."
+L["options_all_transmog_rewards"] = "Show unobtainable transmog rewards"
+L["options_all_transmog_rewards_desc"] = "Display transmog rewards obtainable by other classes."
 
 L["options_icons_misc_desc"] = "Display locations of other miscellaneous nodes."
 L["options_icons_misc"] = "Miscellaneous"
@@ -1442,30 +1444,23 @@ This rare will not drop loot until after it consumes 40x {npc:179758} to transfo
 
 This rare will drop extra research items after it consumes *another* 40x {npc:179758} to transform into its green-shaded form (Rare Elite).
 
-|cFFFF0000THE RARE WILL NOT SPAWN {npc:179758} TO CONSUME WHILE IN COMBAT.|r
+|cFFFF0000The rare will not spawn {npc:179758} to consume while in combat.|r
 ]]
-L["darkmaul_note"] = [[
-Collect {item:187153} from Invasive Mawshrooms and feed them to {npc:180063}. You must complete the event 10 times to obtain the mount.
-
-|cFFFF8C00Progress will not be counted if you are in a raid group!|r
-]]
+L["darkmaul_note"] = "Collect {item:187153} from Invasive Mawshrooms and feed them to {npc:180063}. You must complete the event 10 times to obtain the mount."
 L["dislodged_nest_note"] = "Click on a nearby Noxious Moth to gain {spell:355181}. Use the {spell:355131} extra action button on {npc:178547} to gain control and ride it into the tree the nest is in."
 L["escaped_wilderling_note"] = "Click on the {npc:180014} to start the taming event."
 L["flayedwing_transporter_note"] = "Click on {npc:178633} to fly to or from the Vault of Secrets."
 L["fleshwing_note"] = "Talk to {npc:180079} to start the collection event."
 L["forgotten_feather_note"] = "Floating on a small island accessed by jumping down from Keeper's Respite."
 L["konthrogz_note"] = "Spawns from a devourer's portal event. The event can appear in many places throughout Korthia."
+L["korthia_limited_rare"] = "|cFFFF8C00This rare is not available on some days.|r"
 L["krelva_note"] = "Moves to another platform at 80%, then moves to the mainland at 60%. |cFFFF8C00You must tag the rare after 60% to get kill credit!|r"
 L["kroke_note"] = "Slay {npc:179029s} in the area until he appears. Cannot spawn on days when {npc:179029s} are missing."
 L["maelie_wanderer"] = "{npc:179912} will spawn in a set location for the day. Once you have used {spell:355862} on her 6 different days return to {npc:179930} to earn the mount."
 L["malbog_note"] = "Talk to {npc:179729} to gain {spell:355078} and follow the foot prints until you find the fleshy remains."
 L["offering_box_note"] = "Requires Small Offering Key which can be found on the top of the west side wall of the near by ruins."
 L["pop_quiz_note"] = "The Pop Quiz event will spawn randomly on the map. Click on the Abandoned Veilstaff and answer the questions from {npc:180162}."
-L["razorwing_note"] = [[
-Hand in 10x {item:187054} dropped by devourers in the area.
-
-|cFFFF8C00Progress will not be counted if you are in a raid group!|r
-]]
+L["razorwing_note"] = "Hand in 10x {item:187054} dropped by devourers in the area."
 L["reliwik_note"] = "Click on the uncorrupted razorwing egg to pull him down."
 L["spectral_bound_chest"] = "Spectral Bound Chest"
 L["spectral_bound_note"] = "Click on 3 nearby Spectral Keys to unlock the chest."
@@ -1474,8 +1469,9 @@ L["towering_exterminator_note"] = "Spawns from a mawsworn portal event. The even
 L["worldcracker_note"] = "Talk to {npc:180028} to trigger the escort event."
 
 L["archivist_key_note"] = "Purchase %s from {npc:178257} to unlock."
-L["korthian_shrine_note"] = "Click on the shrine to gain {spell:352367} to see the hidden path to the alter."
+L["korthian_shrine_note"] = "Click on the shrine to gain {spell:352367} to see the hidden path to the altar."
 L["num_research"] = "%d Research"
+L["plus_research"] = "+Research"
 L["options_icons_relic"] = "{achievement:15066}"
 L["options_icons_relic_desc"] = "Display the locations of all 20 relics for {achievement:15066}."
 
@@ -1487,7 +1483,15 @@ Requires a {item:186731}, which can be purchased from {npc:178257} once you reac
 |cFFFF8C00Not all rift portals are active at any given time.|r
 ]]
 L["rift_rare_only_note"] = "This rare can only be seen and killed inside |cFFFFFF00The Rift|r phase."
-L["rift_rare_exit_note"] = "This rare will exit |cFFFFFF00The Rift|r phase once interacted with inside the rift."
+L["rift_rare_exit_note"] = [[
+This rare will exit |cFFFFFF00The Rift|r phase once interacted with inside the rift.
+
+The three rift rares typically spawn in a set order at about a 20 minute interval:
+
+  1. {npc:179913}
+  2. {npc:179608}
+  3. {npc:179911}
+]]
 L["options_icons_rift_portal"] = "{npc:179595s}"
 L["options_icons_rift_portal_desc"] = "Display the locations of {npc:179595s} used to enter |cFFFFFF00The Rift|r."
 
@@ -1508,13 +1512,13 @@ L["unusual_nest"] = "Nest of Unusual Materials"
 L["unusual_nest_note"] = "All 5 nest locations can be looted each day."
 
 L["options_icons_invasive_mawshroom_desc"] = "Display the locations of Invasive Mawshrooms."
-L["options_icons_invasive_mawshroom"] = "Invasive Mawshrooms (Daily)"
+L["options_icons_invasive_mawshroom"] = "Invasive Mawshrooms"
 L["options_icons_korthia_dailies_desc"] = "Display the locations of unmarked daily treasures."
-L["options_icons_korthia_dailies"] = "Hidden Treasures (Daily)"
+L["options_icons_korthia_dailies"] = "Hidden Treasures"
 L["options_icons_mawsworn_cache_desc"] = "Display the locations of Mawsworn Caches."
-L["options_icons_mawsworn_cache"] = "Mawsworn Cache (Daily)"
+L["options_icons_mawsworn_cache"] = "Mawsworn Caches"
 L["options_icons_nest_materials_desc"] = "Display the locations of Nests of Unusual Materials."
-L["options_icons_nest_materials"] = "Nests of Unusual Materials (Daily)"
+L["options_icons_nest_materials"] = "Nests of Unusual Materials"
 
 -------------------------------------------------------------------------------
 --------------------------------- MALDRAXXUS ----------------------------------
@@ -1530,6 +1534,7 @@ L["nirvaska_note"] = "Only appears when the {wq:Deadly Reminder} world quest is 
 L["ravenomous_note"] = "Squash {npc:159901s} in the area until the rare spawns."
 L["sabriel_note"] = "Can appear as one of the champions in the Theater of Pain."
 L["schmitd_note"] = "Use nearby {spell:313451} to break his shield."
+L["tahonta_note"] = "The mount only drops if you have {npc:159239} with you!"
 L["taskmaster_xox_note"] = "Shares a spawn with {npc:160204}, {npc:160230} and {npc:160226}."
 L["theater_of_pain_note"] = "Your first boss kill each day has a chance to drop the mount."
 L["zargox_the_reborn_note"] = [[
@@ -1678,6 +1683,17 @@ L["inquisitor_note"] = "Turn in 100 {currency:1816} to {npc:160248} for a chance
 L["options_icons_inquisitors"] = "Inquisitors"
 L["options_icons_inquisitors_desc"] = "Display inquisitor locations for the {achievement:14276} achievement."
 
+L["broken_mirror"] = "Broken Mirror"
+L["broken_mirror_note"] = "A group of three broken mirrors will be active each day. Use a {item:181363} to repair each mirror and open the |cFFFFFD00Forgotten Chest|r inside."
+L["broken_mirror_crypt"] = "Inside a crypt."
+L["broken_mirror_elite"] = "In a small room with elite mobs."
+L["broken_mirror_house"] = "Inside the house."
+L["broken_mirror_61818"] = "In a small room with {npc:173699}."
+L["broken_mirror_61819"] = "In a small room on the ground floor."
+L["broken_mirror_61827"] = "In a small room."
+L["options_icons_broken_mirror"] = "Broken Mirrors"
+L["options_icons_broken_mirror_desc"] = "Display the locations of broken mirrors."
+
 -------------------------------------------------------------------------------
 ----------------------------------- THE MAW -----------------------------------
 -------------------------------------------------------------------------------
@@ -1694,9 +1710,18 @@ L["etherwyrm_label"] = "Infused Etherwyrm Cage"
 L["etherwyrm_note"] = "Requires the Night Fae assault to be active. Kill an {npc:179030} while in the rift to gain the {item:186190}. Use the key on the Etherwyrm Cage (outside the rift) in the Desolate Hollow cavern (where {npc:175821} resides when the assault is not active)."
 L["fallen_charger_note"] = "After the zone-wide yell it will take either of the two paths until it reaches Korthia where it will despawn."
 L["ikras_note"] = "Flies around Perdition Hold. This is a good place to pull him."
-L["lilabom_note"] = "Collect All 5 parts to complete the pet."
+L["lilabom_note"] = [[
+Collect all 5 parts to complete the pet. Some parts may appear in multiple locations.
+
+• {item:186183}
+• {item:186184}
+• {item:186185}
+• {item:186186}
+• {item:186187}
+]]
 L["orophea_note"] = "Pick up {spell:337143} to the southeast and offer it to {npc:172577} to activate."
 L["sanngror_note"] = "If he is not attackable, wait until he is not experimenting on souls."
+L["sly_note"] = "Talk to {npc:179068} to get the buff {spell:353322} and find {npc:179096} on 3 different kyrian assaults."
 L["talaporas_note"] = "With 3 other players, stand on the corners of the platform and cast {spell:331800} to summon the rare."
 L["valis_note"] = "Click the three {npc:174810} in the correct order to summon the rare. The order changes each time and clicking the wrong rune deals damage and debuffs you with {spell:343636}."
 L["yero_note"] = "Approach {npc:172862} and then follow him down into a nearby cave where he becomes hostile."
@@ -1710,9 +1735,6 @@ Kill the other three Heralds of Grief, Pain and Loss to collect their etchings.
 
 Combine all three etchings to create the {item:182329}, which can be used to summon the rare at the Altar of Domination. Use the {npc:173892} to reach the upper level.
 ]]
-
-L["soul_well_note"] = "Catch the Stygia erupting from the Soul Well."
-L["obliterated_soul_shards_note"] = "Collect {item:177834s} on the bridges."
 
 L["animaflow_teleporter_note"] = "Activate to travel directly to other locations in the Maw."
 L["chaotic_riftstone_note"] = "Activate to {spell:344157} quickly across the Maw."
@@ -1758,9 +1780,10 @@ L["nexus_cave_anguish_outside"] = "Outside the Pit of Anguish"
 L["nexus_cave_anguish_upper"] = "In the Pit of Anguish (upper level)"
 L["nexus_cave_desmotaeron"] = "In a small cave outside the Desmotaeron"
 L["nexus_cave_echoing_outside"] = "Outside the Echoing Caverns"
-L["nexus_cave_forlorn"] = "Inside the Forlorn Respite cavern"
+L["nexus_cave_forlorn"] = "Inside the Forlorn Respite cavern."
 L["nexus_cave_howl_outside"] = "On the ground outside the Death's Howl cavern"
 L["nexus_cave_howl"] = "Inside the Death's Howl cavern"
+L["nexus_cave_roar"] = "Inside the Death's Roar cavern"
 L["nexus_cave_ledge"] = "In a small cave below a ledge"
 L["nexus_cave_prodigum"] = "In a small cave in the Prodigum"
 L["nexus_cave_soulstained"] = "In a small cave in the Soulstained Fields"
@@ -1795,7 +1818,7 @@ L["nexus_misc_three_chains"] = "On the ground by three chains"
 L["stolen_anima_vessel"] = "Stolen Anima Vessel"
 L["hidden_anima_cache"] = "Hidden Anima Cache"
 L["options_icons_anima_vessel"] = "Stolen Anima Vessels"
-L["options_icons_anima_vessel_desc"] = "Display the locations of anima vessels inside |cFFFFFF00The Rift|r."
+L["options_icons_anima_vessel_desc"] = "Display the locations of anima vessels during assaults and inside |cFFFFFF00The Rift|r."
 
 L["rift_hidden_cache"] = "Rift Hidden Cache"
 L["options_icons_rift_hidden_cache"] = "Rift Hidden Caches"
@@ -3086,3 +3109,39 @@ L["maw_mad_note"] = "Runs randomly around Perdition Hold, always spawns here."
 L["nilganihmaht_note"] = "You must collect the 5 rings and bring them to {npc:179572} in the rift."
 L["options_icons_nilganihmaht"] = "{npc:179572}"
 L["options_icons_nilganihmaht_desc"] = "Display the locations of parts for {spell:354354} mount."
+L["cov_assault_only"] = "Only available during the %s assault."
+
+L["helgarde_supply"] = "Helgarde Supply Cache"
+L["helgarde_supply_note"] = "Spawns throughout the Desmotaeron area. Your {npc:180598} can help you locate them."
+L["options_icons_helgarde_cache"] = "Helgarde Supply Caches"
+L["options_icons_helgarde_cache_desc"] = "Display possible locations for Helgarde Supply Caches in the Desmotaeron area."
+
+L["mawsworn_cache_ramparts_note"] = "This cache is on top of the ramparts. Use the grapple points or a {npc:177093} to reach them."
+L["mawsworn_cache_tower_note"] = "This cache is on top of the tower and requires a {npc:177093} to reach. Use the {spell:349853} ability to climb up."
+L["mawsworn_cache_quest_note"] = "The {item:186573} will only drop after you have completed the {quest:63545} quest!"
+
+L["nilg_silver_ring_note"] = "Collect 4 {item:186727} in the Desmotaeron and use them to open the Domination Sealed Chest."
+L["nilg_silver_ring_note1"] = "Kill {npc:177444} and open the {item:186970}."
+L["nilg_silver_ring_note2"] = "Loot the Harrower's Key Ring, located on the wall in an underground room next to {npc:178311}."
+L["nilg_silver_ring_note3"] = "Open Helgarde Supply Caches in the Desmotaeron area. Your {npc:180598} can help you locate them."
+L["nilg_silver_ring_note4"] = "Farm {npc:177134s} in the Desmotaeron area (low drop rate)."
+L["nilg_stone_ring_note"] = "Collect four {item:186600} during the Necrolord assault and combine them at any {npc:171492} in Zovaal's Cauldron."
+L["nilg_stone_ring_note1"] = "Found in certain Mawsworn Caches (yellow icon) on top of the ramparts in Perdition Hold."
+L["nilg_stone_ring_note2"] = "Complete the {quest:63545} quest, then loot Mawsworn Caches until you find the quest item {item:186573}. This quest is shareable!"
+L["nilg_stone_ring_note3"] = "Looted from {npc:179601} in the center area of Perdition Hold."
+L["nilg_stone_ring_note4"] = "Found on the ground in Perdition Hold near {npc:170634}. Your {npc:180598} can help you locate it."
+L["nilg_gold_band_note"] = "Use the grapple point and follow the path up to the top of the mountain."
+L["nilganihmaht_note"] = "You must collect the 5 rings and bring them to {npc:179572} in the rift."
+L["calcis"] = "Calcis"
+L["desmotaeron"] = "Desmotaeron"
+
+L["zovault_note"] = "Drag {npc:179883} to {npc:179904} once a day for guaranteed riftstones."
+L["options_icons_zovault"] = "{npc:179883}"
+L["options_icons_zovault_desc"] = "Display possible locations for {npc:179883}."
+
+L["tormentors"] = "Tormentors of Torghast"
+L["tormentors_note"] = [[
+A tormentor event spawns every 2 hours on the hour. The bosses will always spawn in the order listed below.
+
+The {item:185972} can be looted once a week and contains 50 {currency:1906}.
+]]

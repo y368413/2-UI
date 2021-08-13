@@ -1,9 +1,6 @@
-﻿local MaxDpsPro, MaxDps = ...;
+﻿local _, MaxDps = ...;
 
 LibStub('AceAddon-3.0'):NewAddon(MaxDps, 'MaxDps', 'AceConsole-3.0', 'AceEvent-3.0', 'AceTimer-3.0');
-
---- @class MaxDps
-_G[MaxDpsPro] = MaxDps;
 
 MaxDps.Textures = {
 	{text = 'Ping', value = 'Interface\\Cooldown\\ping4'},
@@ -273,12 +270,10 @@ function MaxDps:AZERITE_ESSENCE_ACTIVATED()
 end
 
 --修正部分日常（飞上目标坐骑杀怪的那种）MaxDps不工作的问题
-function MaxDps:UNIT_ENTERED_VEHICLE(_, unitTarget, showVehicleFrame)
-    -- print("------UNIT_ENTERED_VEHICLE------"..unitTarget,showVehicleFrame,isControlSeat, vehicleUIIndicatorID, vehicleGUID, mayChooseExit, hasPitch)
-    --------UNIT_ENTERED_VEHICLE------player false false 0 Vehicle-0-3117-2222-17469-170780-0000757E3E true false
-    if unitTarget == 'player' and self.rotationEnabled and showVehicleFrame then
-        self:DisableRotation();
-    end
+function MaxDps:UNIT_ENTERED_VEHICLE(_, unit, showVehicleFrame)
+    if unit == 'player' and self.rotationEnabled and showVehicleFrame then
+		self:DisableRotation();
+	end
 end
 
 function MaxDps:UNIT_EXITED_VEHICLE(_, unit)

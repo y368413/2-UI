@@ -6,7 +6,8 @@ local UF = M:RegisterModule("UnitFrames")
 local AURA = M:GetModule("Auras")
 
 local format, floor = string.format, math.floor
-local pairs, next = pairs, next
+local pairs, next, unpack = pairs, next, unpack
+local UnitGUID, IsItemInRange = UnitGUID, IsItemInRange
 local UnitFrame_OnEnter, UnitFrame_OnLeave = UnitFrame_OnEnter, UnitFrame_OnLeave
 local SpellGetVisibilityInfo, UnitAffectingCombat, SpellIsSelfBuff, SpellIsPriorityAura = SpellGetVisibilityInfo, UnitAffectingCombat, SpellIsSelfBuff, SpellIsPriorityAura
 
@@ -609,6 +610,9 @@ function UF.PostUpdateIcon(element, _, button, _, _, duration, expiration, debuf
 		button:SetSize(element.size, element.size)
 	end
 
+	local fontSize = element.fontSize or element.size*.6
+	button.count:SetFont(I.Font[1], fontSize, I.Font[3])
+
 	if button.isDebuff and filteredStyle[style] and not button.isPlayer then
 		button.icon:SetDesaturated(true)
 	else
@@ -683,8 +687,10 @@ function UF.CustomFilter(element, unit, button, name, _, _, _, _, _, caster, isS
 			local auraFilter = R.db["Nameplate"]["AuraFilter"]
 			return (auraFilter == 3 and nameplateShowAll) or (auraFilter ~= 1 and (caster == "player" or caster == "pet" or caster == "vehicle"))
 		end
-	elseif (element.onlyShowPlayer and button.isPlayer) or (not element.onlyShowPlayer and name) then
-		return true
+	elseif style == "focus" then
+		return (not button.isDebuff and isStealable) or (button.isDebuff and name)
+	else
+		return (element.onlyShowPlayer and button.isPlayer) or (not element.onlyShowPlayer and name)
 	end
 end
 
@@ -850,10 +856,47 @@ function UF:CreateDebuffs(self)
 	self.Debuffs = bu
 end
 
+function UF:UpdateRaidAuras()
+	for _, frame in pairs(oUF.objects) do
+		if frame.mystyle == "raid" then
+			local debuffs = frame.Debuffs
+			if debuffs then
+				debuffs.num = ((R.db["UFs"]["SimpleMode"] and not frame.isPartyFrame) or (not R.db["UFs"]["ShowRaidDebuff"])) and 0 or 3
+				debuffs.size = R.db["UFs"]["RaidDebuffSize"]
+				debuffs.fontSize = R.db["UFs"]["RaidDebuffSize"]-2
+				UF:UpdateAuraContainer(frame, debuffs, debuffs.num)
+				debuffs:ForceUpdate()
+			end
+
+			local buffs = frame.Buffs
+			if buffs then
+				buffs.num = ((R.db["UFs"]["SimpleMode"] and not frame.isPartyFrame) or (not R.db["UFs"]["ShowRaidBuff"])) and 0 or 3
+				buffs.size = R.db["UFs"]["RaidBuffSize"]
+				buffs.fontSize = R.db["UFs"]["RaidBuffSize"]-2
+				UF:UpdateAuraContainer(frame, buffs, buffs.num)
+				buffs:ForceUpdate()
+			end
+		end
+	end
+end
+
+local function refreshAurasElements(self)
+	local buffs = self.Buffs
+	if buffs then buffs:ForceUpdate() end
+
+	local debuffs = self.Debuffs
+	if debuffs then debuffs:ForceUpdate() end
+end
+
+function UF:RefreshAurasByCombat(self)
+	self:RegisterEvent("PLAYER_REGEN_ENABLED", refreshAurasElements, true)
+	self:RegisterEvent("PLAYER_REGEN_DISABLED", refreshAurasElements, true)
+end
+
 -- Class Powers
 local barWidth, barHeight = unpack(R.UFs.BarSize)
 
-function UF.PostUpdateClassPower(element, cur, max, diff, powerType, chargedIndex)
+function UF.PostUpdateClassPower(element, cur, max, diff, powerType, chargedPowerPoints)
 	if not cur or cur == 0 then
 		for i = 1, 6 do
 			element[i].bg:Hide()
@@ -888,15 +931,11 @@ function UF.PostUpdateClassPower(element, cur, max, diff, powerType, chargedInde
 		end
 	end
 
-	if chargedIndex and chargedIndex ~= element.thisCharge then
-		local bar = element[chargedIndex]
-		element.chargeStar:SetParent(bar)
-		element.chargeStar:SetPoint("CENTER", bar)
-		element.chargeStar:Show()
-		element.thisCharge = chargedIndex
-	else
-		element.chargeStar:Hide()
-		element.thisCharge = nil
+	for i = 1, 6 do
+		local bar = element[i]
+		if not bar.chargeStar then break end
+
+		bar.chargeStar:SetShown(chargedPowerPoints and tContains(chargedPowerPoints, i))
 	end
 end
 
@@ -965,6 +1004,14 @@ function UF:CreateClassPower(self)
 
 		if I.MyClass == "DEATHKNIGHT" and R.db["UFs"]["RuneTimer"] then
 			bars[i].timer = M.CreateFS(bars[i], 13, "")
+		elseif I.MyClass == "ROGUE" then
+			local chargeStar = bars[i]:CreateTexture()
+			chargeStar:SetAtlas("VignetteKill")
+			chargeStar:SetDesaturated(true)
+			chargeStar:SetSize(22, 22)
+			chargeStar:SetPoint("CENTER")
+			chargeStar:Hide()
+			bars[i].chargeStar = chargeStar
 		end
 	end
 
@@ -975,12 +1022,6 @@ function UF:CreateClassPower(self)
 		bars.__max = 6
 		self.Runes = bars
 	else
-		local chargeStar = bar:CreateTexture()
-		chargeStar:SetAtlas("VignetteKill")
-		chargeStar:SetSize(24, 24)
-		chargeStar:Hide()
-		bars.chargeStar = chargeStar
-
 		bars.PostUpdate = UF.PostUpdateClassPower
 		self.ClassPower = bars
 	end
@@ -1253,4 +1294,62 @@ function UF:CreateQuestSync(self)
 	self:RegisterEvent("QUEST_SESSION_LEFT", updatePartySync, true)
 	self:RegisterEvent("QUEST_SESSION_JOINED", updatePartySync, true)
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", updatePartySync, true)
+end
+
+-- Demonic Gateway
+local GatewayTexs = {
+	[59262] = 607512, -- green
+	[59271] = 607513, -- purple
+}
+local function DGI_UpdateGlow()
+	local frame = _G.oUF_Focus
+	if not frame then return end
+
+	local element = frame.DemonicGatewayIndicator
+	if element:IsShown() and IsItemInRange(37727, "focus") then
+		M.ShowOverlayGlow(element.glowFrame)
+	else
+		M.HideOverlayGlow(element.glowFrame)
+	end
+end
+
+local function DGI_Visibility()
+	local frame = _G.oUF_Focus
+	if not frame then return end
+
+	local element = frame.DemonicGatewayIndicator
+	local guid = UnitGUID("focus")
+	local npcID = guid and M.GetNPCID(guid)
+	local isGate = npcID and GatewayTexs[npcID]
+
+	element:SetTexture(isGate)
+	element:SetShown(isGate)
+	element.updater:SetShown(isGate)
+	DGI_UpdateGlow()
+end
+
+local function DGI_OnUpdate(self, elapsed)
+	self.elapsed = (self.elapsed or 0) + 0.1
+	if self.elapsed > .1 then
+		DGI_UpdateGlow()
+
+		self.elapsed = 0
+	end
+end
+
+function UF:DemonicGatewayIcon(self)
+	local icon = self:CreateTexture(nil, "ARTWORK")
+	icon:SetPoint("CENTER")
+	icon:SetSize(22, 22)
+	icon:SetTexture(607512) -- 607513 for purple
+	icon:SetTexCoord(unpack(I.TexCoord))
+	icon.glowFrame = M.CreateGlowFrame(self, 22)
+
+	local updater = CreateFrame("Frame")
+	updater:SetScript("OnUpdate", DGI_OnUpdate)
+	updater:Hide()
+
+	self.DemonicGatewayIndicator = icon
+	self.DemonicGatewayIndicator.updater = updater
+	M:RegisterEvent("PLAYER_FOCUS_CHANGED", DGI_Visibility)
 end

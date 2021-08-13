@@ -91,8 +91,9 @@ local function checkTexture(texture)
 end
 
 local questlist = {
-	{name = U["Blingtron"], id = 34774},
 	{name = U["Mean One"], id = 6983},
+	{name = U["Blingtron"], id = 34774},
+	{name = U["Tormentors of Torghast"], id = 63854},
 	{name = U["Timewarped"], id = 40168, texture = 1129674},	-- TBC
 	{name = U["Timewarped"], id = 40173, texture = 1129686},	-- WotLK
 	{name = U["Timewarped"], id = 40786, texture = 1304688},	-- Cata

@@ -2,7 +2,7 @@
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
 
-local HANDYNOTES_SHADOWLANDS, shadowlands = ...
+local ADDON_NAME, shadowlands = ...
 local Class = shadowlands.Class
 local Map = shadowlands.Map
 local L = shadowlands.locale
@@ -61,7 +61,8 @@ map.nodes[48397717] = Rare({
     id=163229,
     quest=58987,
     rewards={
-        Achievement({id=14309, criteria=48794})
+        Achievement({id=14309, criteria=48794}),
+        Transmog({item=181395, slot=L["2h_mace"]}) -- Dustbreak Maul
     }
 }) -- Dustbrawl
 

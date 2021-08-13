@@ -16,6 +16,7 @@ local messageSoundID = SOUNDKIT.TELL_MESSAGE
 
 local maxLines = 1024
 local fontOutline
+module.MuteCache = {}
 
 function module:TabSetAlpha(alpha)
 	if self.glow:IsShown() and alpha ~= 1 then
@@ -94,7 +95,7 @@ function module:SkinChat()
 	eb:ClearAllPoints()
 	eb:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 2, 21)
 	eb:SetPoint("TOPRIGHT", self, "TOPRIGHT", -12, 43)
-	--M.StripTextures(eb, 2)
+	M.StripTextures(eb, 2)
 	M.SetBD(eb)
 
 	local lang = _G[name.."EditBoxLanguage"]
@@ -308,14 +309,14 @@ local whisperEvents = {
 	["CHAT_MSG_WHISPER"] = true,
 	["CHAT_MSG_BN_WHISPER"] = true,
 }
-function module:PlayWhisperSound(event)
-	if whisperEvents[event] then
-		if module.MuteThisTime then
-			module.MuteThisTime = nil
-			return
-		end
+function module:PlayWhisperSound(event, _, author)
+	if not R.db["Chat"]["WhisperSound"] then return end
 
+	if whisperEvents[event] then
+		local name = Ambiguate(author, "none")
 		local currentTime = GetTime()
+		if module.MuteCache[name] == currentTime then return end
+
 		if not self.soundTimer or currentTime > self.soundTimer then
 			PlaySound(messageSoundID, "master")
 		end

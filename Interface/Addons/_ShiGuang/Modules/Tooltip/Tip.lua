@@ -125,7 +125,7 @@ function TT:OnTooltipCleared()
 end
 
 function TT:ShowUnitMythicPlusScore(unit)
-	if not R.db["Tooltip"]["MDScore"] then return end
+	if not R.db["Tooltip"]["MythicScore"] then return end
 
 	local summary = C_PlayerInfo_GetPlayerMythicPlusRatingSummary(unit)
 	local score = summary and summary.currentSeasonScore
@@ -397,7 +397,7 @@ function TT:ReskinTooltip()
 		self.tipStyled = true
 	end
 
-	self.bg:SetBackdropBorderColor(0, 0, 0)
+	M.SetBorderColor(self.bg)
 	if R.db["Tooltip"]["ClassColor"] and self.GetItem then
 		local _, item = self:GetItem()
 		if item then
@@ -478,6 +478,7 @@ function TT:OnLogin()
 	TT:TargetedInfo()
 	TT:AzeriteArmor()
 	TT:ConduitCollectionData()
+	TT:DominationRank()
 end
 
 -- Tooltip Skin Registration
@@ -610,6 +611,10 @@ TT:RegisterTooltips("_ShiGuang", function()
 		-- Narcissus
 		if NarciGameTooltip then
 			TT.ReskinTooltip(NarciGameTooltip)
+		end
+		-- Altoholic
+		if AltoTooltip then
+			TT.ReskinTooltip(AltoTooltip)
 		end
 	end)]]
 

@@ -159,7 +159,7 @@ function MISC:Mover_OnEnter()
 end
 
 function MISC:Mover_OnLeave()
-	self.bg:SetBackdropBorderColor(0, 0, 0)
+	M.SetBorderColor(self.bg)
 	self.text:SetTextColor(1, 1, 1)
 end
 

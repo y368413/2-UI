@@ -1,0 +1,58 @@
+<Ui><Script><![CDATA[--[[
+
+FixingThings [2021-07-05]
+https://www.patreon.com/goldpawsstuff
+
+All rights reserved.
+
+Permission is hereby granted to distribute unmodified copies of this file.
+]]
+
+if (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) then
+
+	local Version = 5
+	if (tonumber(QOSBBI_SPAWN_PATCH_VERSION) or 0) < Version then
+		QOSBBI_SPAWN_PATCH_VERSION = Version
+		
+		local frame = _G.QOSBBI_EventFrame or CreateFrame("Frame", "QOSBBI_EventFrame")
+		frame:UnregisterAllEvents()
+		frame:SetScript("OnEvent", nil)
+
+		local globalName = "QuestObjectiveSetupBlockButton_Item"
+		local global = function(...)
+			if (QOSBBI_SPAWN_PATCH_VERSION ~= Version) then
+				return
+			end
+			-- Only postpone spawns, not edits of existing buttons?
+			local block, questLogIndex, isQuestComplete = ...
+			if (InCombatLockdown()) and (not block.itemButton) then
+				frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+				frame:SetScript("OnEvent", function() 
+					frame:UnregisterAllEvents() 
+					frame:SetScript("OnEvent", nil)
+					ObjectiveTracker_Update(OBJECTIVE_TRACKER_UPDATE_ALL) 
+				end)
+				return 
+			end
+			return frame.global(...)
+		end
+
+		if (IsAddOnLoaded("Blizzard_ObjectiveTracker")) then
+			frame.global = frame.global or _G[globalName]
+			_G[globalName] = global
+		else
+			frame:RegisterEvent("ADDON_LOADED")
+			frame:SetScript("OnEvent", function(_, _, addon)
+				if (addon == "Blizzard_ObjectiveTracker") then
+					frame:UnregisterAllEvents() 
+					frame:SetScript("OnEvent", nil) 
+					frame.global = frame.global or _G[globalName]
+					_G[globalName] = global
+				end 
+			end)
+		end
+	end
+
+end
+
+]]></Script></Ui>

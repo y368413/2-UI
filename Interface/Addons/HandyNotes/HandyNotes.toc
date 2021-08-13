@@ -7,7 +7,7 @@
 ## Notes: Handynotes with Achievments+Treasures+Toys+Mounts
 ## Notes-zhCN: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已击杀过。并替换自带飞行地图，使之更加方便详细。
 ## Notes-zhTW: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已擊殺過。并替换自带飞行地图，使之更加方便详细。
-## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, Handynotes_PandariaDB, HandyNotes_LostAndFoundDB, HandyNotes_TimelessIsleChestsDB, HandyNotes_TimelessTreasuresDB, HandyNotes_DraenorDB, HandyNotes_ArathiDB, HandyNotes_WarfrontTreasuresDB, HandyNotes_BFA_HF_TrackerDB, NPC_Name_CacheDB, Item_Name_CacheDB, HNMoleMachineConfig, HandyNotes_MechagonAndNazjatarDB, HandyNotes_ScarabCoffersDB, HandyNotes_VisionsOfNZothDB, HandyNotes_PetDailiesDB,  HandyNotes_ShrinesForJewelcraftersDB, HandyNotes_Universal_ExplorerDB, HandyNotes_TravelGuideDB, HandyNotes_AzerothsTopTunesDB, HandyNotes_BFA_JellyDB, HandyNotes_HigherDimensionalLearningDB, HandyNotes_WitheredChestsDB, HandyNotes_ShadowlandsDB, HandyNotes_OribosDB, HandyNotes_BattleForAzerothDB, HandyNotes_MistsOfPandariaDB
+## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, HandyNotes_CoreDB, HandyNotes_LostAndFoundDB, HNMoleMachineConfig, HandyNotes_PetDailiesDB, HandyNotes_Universal_ExplorerDB, HandyNotes_TravelGuideDB, HandyNotes_HigherDimensionalLearningDB, HandyNotes_WitheredChestsDB, HandyNotes_OribosDB, HandyNotesArgusDB
 ## Dependencies: _ShiGuang, Blizzard_FlightMap
 
 ## X-Repple: 2 UI
@@ -23,9 +23,20 @@ HandyNotes_HandyNotes.lua
 HandyNotes_EditFrame.lua
 HandyNotes_WorldMapButton.lua
 
+# Core Mods
+HandyNotes_Core.xml
+
 # MOP
 MOP\HandyNotes_LostAndFound.lua
-MOP\HandyNotes_MistsOfPandaria.xml
+MOP\zones\dread_wastes.lua
+MOP\zones\jade_forest.lua
+MOP\zones\krasarang_wilds.lua
+MOP\zones\kunlai_summit.lua
+MOP\zones\townlong_steppes.lua
+MOP\zones\vale_of_eternal_blossoms.lua
+MOP\zones\valley_of_the_four_winds.lua
+MOP\zones\isle_of_thunder.lua
+MOP\zones\timeless_isle.lua
 
 # WOD
 WOD\HandyNotes_DraenorTreasures.lua
@@ -36,7 +47,19 @@ LEG\HandyNotes_Argus.lua
 LEG\HandyNotes_LegionRaresTreasures.lua
 
 # BFA
-BFA\HandyNotes_BattleForAzeroth.xml
+BFA\zones\arathi_highlands.lua
+BFA\zones\darkshore.lua
+BFA\zones\drustvar.lua
+BFA\zones\mechagon.lua
+BFA\zones\nazjatar.lua
+BFA\zones\nazmir.lua
+BFA\zones\stormsong_valley.lua
+BFA\zones\tiragarde_sound.lua
+BFA\zones\uldum.lua
+BFA\zones\vale.lua
+BFA\zones\visions.lua
+BFA\zones\voldun.lua
+BFA\zones\zuldazar.lua
 
 # Shadowlands
 Shadowlands\HandyNotes_ShadowlandsTemplates.xml
@@ -48,10 +71,8 @@ Mode\HandyNotes_MoleMachine.lua
 Mode\HandyNotes_LightningPaw.lua
 Mode\HandyNotes_Universal_Explorer.lua
 Mode\HandyNotes_TravelGuide.lua
-# Mode\HandyNotes_AzerothsTopTunes.lua
 Mode\HandyNotes_HigherDimensionalLearning.lua
 Mode\HandyNotes_PetDailies.lua
-# Mode\HandyNotes_Syd'sWitheredChests.lua
 
 # Others files
 CandyBuckets.lua

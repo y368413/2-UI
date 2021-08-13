@@ -452,7 +452,7 @@ function S:ReskinRematchElements()
 end
 
 function S:ReskinRematch()
-	if not R.db["Skins"]["BlizzardSkins"] then return end
+	--if not R.db["Skins"]["BlizzardSkins"] then return end
 	if not R.db["Skins"]["Rematch"] then return end
 
 	local RematchJournal = RematchJournal

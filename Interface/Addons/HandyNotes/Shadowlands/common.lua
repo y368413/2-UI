@@ -1,15 +1,14 @@
--------------------------------------------------------------------------------
+﻿-------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
 
-local HANDYNOTES_SHADOWLANDS, shadowlands = ...
+local ADDON_NAME, shadowlands = ...
 local Class = shadowlands.Class
 local Group = shadowlands.Group
 local L = shadowlands.locale
 
 local Map = shadowlands.Map
 
-local Item  = shadowlands.reward.Item
 local Mount = shadowlands.reward.Mount
 local Pet = shadowlands.reward.Pet
 local Reward = shadowlands.reward.Reward
@@ -24,13 +23,16 @@ shadowlands.expansion = 9
 ------------------------------------ ICONS ------------------------------------
 -------------------------------------------------------------------------------
 
-local ICONS = "Interface\\Addons\\"..HANDYNOTES_SHADOWLANDS.."\\artwork\\icons"
+local ICONS = "Interface\\Addons\\HandyNotes\\Icons\\artwork\\icons"
+local GLOWS = "Interface\\Addons\\HandyNotes\\Icons\\artwork\\glows"
 local function Icon(name) return ICONS..'\\'..name..'.blp' end
+local function Glow(name) return GLOWS..'\\'..name..'.blp' end
 
 shadowlands.icons.cov_sigil_ky = {Icon('covenant_kyrian'), nil}
 shadowlands.icons.cov_sigil_nl = {Icon('covenant_necrolord'), nil}
 shadowlands.icons.cov_sigil_nf = {Icon('covenant_nightfae'), nil}
 shadowlands.icons.cov_sigil_vn = {Icon('covenant_venthyr'), nil}
+shadowlands.icons.tormentor = {Icon('tormentor'), Glow('tormentor')}
 
 -------------------------------------------------------------------------------
 ---------------------------------- CALLBACKS ----------------------------------
@@ -160,24 +162,28 @@ end)
 -------------------------------------------------------------------------------
 
 shadowlands.covenants = {
-    KYR = { id = 1, icon = 'cov_sigil_ky' },
-    VEN = { id = 2, icon = 'cov_sigil_vn' },
-    FAE = { id = 3, icon = 'cov_sigil_nf' },
-    NEC = { id = 4, icon = 'cov_sigil_nl' }
+    KYR = { id = 1, icon = 'cov_sigil_ky', assault=63824 },
+    VEN = { id = 2, icon = 'cov_sigil_vn', assault=63822 },
+    FAE = { id = 3, icon = 'cov_sigil_nf', assault=63823 },
+    NEC = { id = 4, icon = 'cov_sigil_nl', assault=63543 }
 }
 
 local function ProcessCovenant (node)
-    if node.covenant == nil then return end
-    local data = C_Covenants.GetCovenantData(node.covenant.id)
+    local covenant = node.covenant or node.assault
+    if not covenant then return end
+    if node._covenantProcessed then return end
 
-    -- Add covenant sigil to top-right corner of tooltip
-    node.rlabel = shadowlands.GetIconLink(node.covenant.icon, 13)
+    local name = C_Covenants.GetCovenantData(covenant.id).name
+    local str = node.covenant and L["covenant_required"] or L["cov_assault_only"]
+    local subl = shadowlands.color.Orange(string.format(str, name))
+    local ricon = shadowlands.GetIconLink(covenant.icon, 13)
 
-    if not node._covenantProcessed then
-        local subl = shadowlands.color.Orange(string.format(L["covenant_required"], data.name))
-        node.sublabel = node.sublabel and subl..'\n'..node.sublabel or subl
-        node._covenantProcessed = true
+    -- not compatible with rlabel getters
+    if not node.getters.rlabel then
+        node.rlabel = node.rlabel and node.rlabel..' '..ricon or ricon
     end
+    node.sublabel = node.sublabel and subl..'\n'..node.sublabel or subl
+    node._covenantProcessed = true
 end
 
 function Reward:GetCategoryIcon()
@@ -205,23 +211,24 @@ shadowlands.groups.DREDBATS = Group('dredbats', 'flight_point_g', {defaults=shad
 shadowlands.groups.FAERIE_TALES = Group('faerie_tales', 355498, {defaults=shadowlands.GROUP_HIDDEN})
 shadowlands.groups.FUGITIVES = Group('fugitives', 236247, {defaults=shadowlands.GROUP_HIDDEN})
 shadowlands.groups.GRAPPLES = Group('grapples', 'peg_bk', {defaults=shadowlands.GROUP_HIDDEN})
+shadowlands.groups.HELGARDE_CACHE = Group('helgarde_cache', 'chest_gy', {defaults=shadowlands.GROUP_HIDDEN75})
 shadowlands.groups.HYMNS = Group('hymns', 'scroll', {defaults=shadowlands.GROUP_HIDDEN})
 shadowlands.groups.INQUISITORS = Group('inquisitors', 3528307, {defaults=shadowlands.GROUP_HIDDEN})
 shadowlands.groups.INVASIVE_MAWSHROOM = Group('invasive_mawshroom', 134534, {defaults=shadowlands.GROUP_HIDDEN75})
 shadowlands.groups.KORTHIA_SHARED = Group('korthia_dailies', 1506458, {defaults=shadowlands.GROUP_HIDDEN75})
-shadowlands.groups.MAW_LORE = Group('maw_lore', 'chest_gy')
 shadowlands.groups.MAWSWORN_CACHE = Group('mawsworn_cache', 3729814, {defaults=shadowlands.GROUP_HIDDEN75})
 shadowlands.groups.NEST_MATERIALS = Group('nest_materials', 136064, {defaults=shadowlands.GROUP_HIDDEN75})
 shadowlands.groups.NILGANIHMAHT_MOUNT = Group('nilganihmaht', 1391724, {defaults=shadowlands.GROUP_HIDDEN75})
-shadowlands.groups.STYGIA_NEXUS = Group('stygia_nexus', 'peg_gn', {defaults=shadowlands.GROUP_HIDDEN75})
-shadowlands.groups.RIFTSTONE = Group('riftstone', 'portal_bl')
-shadowlands.groups.RIFTBOUND_CACHE = Group('riftbound_cache', 'chest_bk', {defaults=shadowlands.GROUP_ALPHA75})
 shadowlands.groups.RIFT_HIDDEN_CACHE = Group('rift_hidden_cache', 'chest_bk', {defaults=shadowlands.GROUP_ALPHA75})
 shadowlands.groups.RIFT_PORTAL = Group('rift_portal', 'portal_gy')
+shadowlands.groups.RIFTBOUND_CACHE = Group('riftbound_cache', 'chest_bk', {defaults=shadowlands.GROUP_ALPHA75})
+shadowlands.groups.RIFTSTONE = Group('riftstone', 'portal_bl')
 shadowlands.groups.SINRUNNER = Group('sinrunners', 'horseshoe_o', {defaults=shadowlands.GROUP_HIDDEN})
 shadowlands.groups.SLIME_CAT = Group('slime_cat', 3732497, {defaults=shadowlands.GROUP_HIDDEN})
-shadowlands.groups.STYGIAN_CACHES = Group('stygian_caches', 'chest_nv', {defaults=shadowlands.GROUP_HIDDEN})
+shadowlands.groups.STYGIA_NEXUS = Group('stygia_nexus', 'peg_gn', {defaults=shadowlands.GROUP_HIDDEN75})
+shadowlands.groups.STYGIAN_CACHES = Group('stygian_caches', 'chest_nv', {defaults=shadowlands.GROUP_HIDDEN75})
 shadowlands.groups.VESPERS = Group('vespers', 3536181, {defaults=shadowlands.GROUP_HIDDEN})
+shadowlands.groups.ZOVAAL_VAULT = Group('zovault', 'star_chest_g', {defaults=shadowlands.GROUP_ALPHA75})
 
 shadowlands.groups.ANIMA_VESSEL = Group('anima_vessel', 'chest_tl', {
     defaults=shadowlands.GROUP_ALPHA75,
@@ -229,6 +236,17 @@ shadowlands.groups.ANIMA_VESSEL = Group('anima_vessel', 'chest_tl', {
         -- Anima vessels and caches cannot be seen until the "Vault Anima Tracker"
         -- upgrade is purchased from the Death's Advance quartermaster
         if not C_QuestLog.IsQuestFlaggedCompleted(64061) then return false end
+        return Group.IsEnabled(self)
+    end
+})
+
+shadowlands.groups.BROKEN_MIRROR = Group('broken_mirror', 3854020, {
+    defaults=shadowlands.GROUP_ALPHA75,
+    IsEnabled=function (self)
+        -- Broken mirrors are Venthyr-only (might have completed the quest and then swapped covenants)
+        if C_Covenants.GetActiveCovenantID() ~= 2 then return false end
+        -- Broken mirrors cannot be accessed until the quest "Repair and Restore" is completed
+        if not C_QuestLog.IsQuestFlaggedCompleted(59740) then return false end
         return Group.IsEnabled(self)
     end
 })
@@ -298,11 +316,3 @@ function Venari:IsMet()
 end
 
 shadowlands.requirement.Venari = Venari
-
--------------------------------------------------------------------------------
------------------------------ RELIC RESEARCH ITEMS ----------------------------
--------------------------------------------------------------------------------
-
-shadowlands.relics = {
-    relic_fragment = Item({item=186685, status=L["num_research"]:format(1)}) -- relic fragment
-}

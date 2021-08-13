@@ -38,53 +38,53 @@ elseif GetLocale() == "zhTW" then do end
 end
 
 local Wyr3d_StatTable = {}
-Wyr3d_StatTable["DEATHKNIGHT-250"] = "Str > ilvl > Vers > Haste > Crit > Mast"
-Wyr3d_StatTable["DEATHKNIGHT-251"] = "Str > Mast > Crit > Vers > Haste"
-Wyr3d_StatTable["DEATHKNIGHT-252"] = "Str > Mast > Haste > Crit = Vers"
+Wyr3d_StatTable["DEATHKNIGHT-250"] = "[Str]：ilvl > Vers > Haste > Crit > Mast"
+Wyr3d_StatTable["DEATHKNIGHT-251"] = "[Str]：Mast > Crit > Haste > Vers"
+Wyr3d_StatTable["DEATHKNIGHT-252"] = "[Str]：Mast(60%+) > Haste(20%) > Crit > Vers"
 
-Wyr3d_StatTable["DRUID-102"] = "Normal: Int > Mast > Haste > Vers > Crit \n Night Fae: Int > Mast > Vers > Haste > Crit"
+Wyr3d_StatTable["DRUID-102"] = "Int > Mast > Haste > Vers > Crit"
 Wyr3d_StatTable["DRUID-103"] = "Agil > Crit > Mast > Vers > Haste"
-Wyr3d_StatTable["DRUID-104"] = "Survival: ilvl > Armor = Agil = Stam > Vers > Mast > Haste > Crit \n Damage: Agil > Vers >= Haste >= Crit > Mast"
-Wyr3d_StatTable["DRUID-105"] = "Raid: Int > Haste > Mast = Crit = Vers > Int \n Dungeon: Int > Mast = Haste > Vers > Crit"
+Wyr3d_StatTable["DRUID-104"] = "[Survival]: ilvl > Armor = Agil = Stam > Vers > Mast > Haste > Crit \n [Damage]: Agil > Vers >= Haste >= Crit > Mast"
+Wyr3d_StatTable["DRUID-105"] = "[Raid]: Int > Haste > Mast = Crit = Vers > Int \n [Dungeon]: Int > Mast = Haste > Vers > Crit"
 
-Wyr3d_StatTable["HUNTER-253"] = "Agil > Haste > Crit > Vers > Mast"
-Wyr3d_StatTable["HUNTER-254"] = "Agil > Crit > Mast > Vers > Haste"
-Wyr3d_StatTable["HUNTER-255"] = "Agil > Haste > Vers = Crit > Mast"
+Wyr3d_StatTable["HUNTER-253"] = "[Agil]：Crit > Haste = Vers > Mast"
+Wyr3d_StatTable["HUNTER-254"] = "[Agil]：Mast > Crit > Vers > Haste"
+Wyr3d_StatTable["HUNTER-255"] = "[Agil]：Haste > Vers = Crit > Mast"
 
 Wyr3d_StatTable["MAGE-62"] = "Int > Crit > Mast > Vers > Haste"
-Wyr3d_StatTable["MAGE-63"] = "Solo: Int > Haste > Mast > Vers > Crit \n Multi: Int > Mast > Haste > Vers > Crit"
-Wyr3d_StatTable["MAGE-64"] = "Int > Crit 33% > Haste > Vers > Mast > Crit 33%+"
+Wyr3d_StatTable["MAGE-63"] = "Int > Haste > Vers > Mast > Crit"
+Wyr3d_StatTable["MAGE-64"] = "Int > Crit 33% > Haste > Vers > Mast"
 
-Wyr3d_StatTable["MONK-268"] = "Defense: Vers = Mast = Crit > Haste > Agil \n Offense: Vers = Crit > Haste > Mast > Agil"
+Wyr3d_StatTable["MONK-268"] = "Defense: Vers = Mast = Crit > Haste \n Offense: Vers = Crit > Haste > Mast"
 Wyr3d_StatTable["MONK-269"] = "Weapon Dam > Agi > Vers > Mast > Crit > Haste"
-Wyr3d_StatTable["MONK-270"] = "Mist: Int > Crit > Vers > Haste > Mast \n Fist: Int > Crit > Vers > Haste > Mast \n Dungeon: Int => Crit > Mast =  Vers >= Haste"
+Wyr3d_StatTable["MONK-270"] = "[Raid]: Int > Crit > Vers > Haste > Mast \n [Mythic]: Int > Crit ≥ Mast = Vers ≥ Haste"
 
-Wyr3d_StatTable["PALADIN-65"] = "Spread Group: (Leech) > Int > Crit > Haste > Mast > Vers \n Close Group: (Leech) > Int > Mast > Crit > Haste > Vers \n Glimmer: Int > Haste > Mast > Vers > Crit \n Dungeon: (Leech) > Int > Crit > Haste > Vers > Mast"
-Wyr3d_StatTable["PALADIN-66"] = "Haste > Mast > Vers > Crit > Str = Stam"
-Wyr3d_StatTable["PALADIN-70"] = "Str > Haste = Vers = Mast = Crit"
+Wyr3d_StatTable["PALADIN-65"] = "[Raid]: Int > Haste > Mast > Vers > Crit \n [Mythic]: Int > Haste > Vers > Crit > Mast"
+Wyr3d_StatTable["PALADIN-66"] = "Haste > Mast = Vers > Crit"
+Wyr3d_StatTable["PALADIN-70"] = "Str > Crit ≈ Vers ≈ Mast ≈ Haste"
 
-Wyr3d_StatTable["PRIEST-256"] = "Int > Haste > Crit > Vers > Mast"
-Wyr3d_StatTable["PRIEST-257"] = "Raid: (Leech = Avoid) > Int > Mast = Crit > Vers > Haste \n Dungeon: (Leech = Avoid) Int > Crit > Haste > Vers > Mast"
+Wyr3d_StatTable["PRIEST-256"] = "Int > Haste > Crit > Vers > Mas"
+Wyr3d_StatTable["PRIEST-257"] = "[Raid]: Int > Mast = Crit > Vers > Haste \n [Dungeon]: Int > Crit > Haste > Vers > Mast"
 Wyr3d_StatTable["PRIEST-258"] = "Int > Haste = Mast > Crit > Vers"
 
-Wyr3d_StatTable["ROGUE-259"] = "Raid: Agil > Haste > Crit > Vers > Mast \n Dungeon: Agil > Crit > Vers > Mast > Haste"
-Wyr3d_StatTable["ROGUE-260"] = "Agi > Vers > Haste > Crit > Mast"
-Wyr3d_StatTable["ROGUE-261"] = "Solo: Agil > Vers > Crit > Haste > Mast \n Multi: Agi > Crit > Vers > Mast > Haste"
+Wyr3d_StatTable["ROGUE-259"] = "[Raid]: Haste > Crit > Vers > Mast \n [Dungeon]: Crit > Mast > Haste > Vers"
+Wyr3d_StatTable["ROGUE-260"] = "[Raid]: Vers > Haste > Crit > Mast \n [Dungeon]: Vers > Crit > Haste > Mast"
+Wyr3d_StatTable["ROGUE-261"] = "Solo: Vers > Crit > Haste > Mast \n Multi: Crit > Vers > Mast > Haste"
 
-Wyr3d_StatTable["SHAMAN-262"] = "Int > Vers > Haste > Crit > Mast"
+Wyr3d_StatTable["SHAMAN-262"] = "Int > Vers > Crit > Haste > Mast"
 Wyr3d_StatTable["SHAMAN-263"] = "Agil > Haste > Crit = Vers > Mast"
-Wyr3d_StatTable["SHAMAN-264"] = "Heal: Int > ilvl > Vers = Crit > Haste = Mast > (Leech = Avoid > Speed) \n Damage: Int > ilvl > Vers = Haste > Crit > Mast" 
+Wyr3d_StatTable["SHAMAN-264"] = "[Heal]: Int > Vers = Crit > Haste = Mast \n [Damage]: Int > Vers = Haste > Crit > Mast" 
 
 Wyr3d_StatTable["WARLOCK-265"] = "Int > Mast > Haste > Crit > Vers"
-Wyr3d_StatTable["WARLOCK-266"] = "Solo: Int > Haste > Mast > Crit = Vers \n Multi: Int > Mast > Haste > Crit = Vers"
-Wyr3d_StatTable["WARLOCK-267"] = "Int > Haste >= Mastery > Crit > Vers"
+Wyr3d_StatTable["WARLOCK-266"] = "Solo: Int > Haste > Mast > Crit ≈ Vers \n Multi: Int > Haste = Mast > Crit ≈ Vers"
+Wyr3d_StatTable["WARLOCK-267"] = "Int > Haste ≥ Mast > Crit > Vers"
 
-Wyr3d_StatTable["WARRIOR-71"] = "Str > Haste 20% > Crit > Mast > Vers > Haste"
+Wyr3d_StatTable["WARRIOR-71"] = "Str > Crit > Mast > Vers > Haste"
 Wyr3d_StatTable["WARRIOR-72"] = "Str > Haste > Mast > Crit > Vers"
-Wyr3d_StatTable["WARRIOR-73"] = "Standard: Haste > Vers > Mast > Crit > Str > Armor \n Dungeon: Haste > Vers >= Crit > Mast > Str > Armor"
+Wyr3d_StatTable["WARRIOR-73"] = "[General]: Str > Haste > Vers > Mast > Crit \n [Mythic]: Str > Haste > Vers ≥ Crit > Mast"
 
 Wyr3d_StatTable["DEMONHUNTER-577"] = "Agil > Haste = Vers > Crit > Mast"
-Wyr3d_StatTable["DEMONHUNTER-581"] = "Agi > Haste >= Vers > Crit > Mast"
+Wyr3d_StatTable["DEMONHUNTER-581"] = "Agil > Haste ≥ Vers > Crit > Mast"
 
 local Wyr3d_STATS = CreateFrame("Frame",Wyr3d_STATS,UIParent, BackdropTemplateMixin and "BackdropTemplate")
 

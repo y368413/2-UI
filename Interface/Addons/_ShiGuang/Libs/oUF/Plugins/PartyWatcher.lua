@@ -35,8 +35,7 @@ local _, ns = ...
 local oUF = ns.oUF
 
 local wipe = wipe
-local GetNumGroupMembers = GetNumGroupMembers
-local GetTime, GetSpellTexture = GetTime, GetSpellTexture
+local GetTime, GetSpellTexture, UnitGUID = GetTime, GetSpellTexture, UnitGUID
 
 local function Update(self, event, unit, _, spellID)
 	if unit ~= self.unit then return end
@@ -86,10 +85,10 @@ end
 
 local function ResetButtonsWithCheck(self)
 	local element = self.PartyWatcher
-	local numMembers = GetNumGroupMembers()
-	if not element.lastCount or element.lastCount ~= numMembers then
+	local currentGUID = UnitGUID(self.unit)
+	if not element.lastGUID or element.lastGUID ~= currentGUID then
 		ResetButtons(self)
-		element.lastCount = numMembers
+		element.lastGUID = currentGUID
 	end
 end
 

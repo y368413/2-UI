@@ -7,9 +7,26 @@ local IsAddOnLoaded = IsAddOnLoaded
 
 R.defaultThemes = {}
 R.themes = {}
+R.otherSkins = {}
 
-function S:LoadDefaultSkins()
-	--if IsAddOnLoaded("AuroraClassic") or IsAddOnLoaded("Aurora") then return end
+function S:RegisterSkin(addonName, func)
+	R.otherSkins[addonName] = func
+end
+
+function S:LoadSkins(list)
+	if not next(list) then return end
+
+	for addonName, func in pairs(list) do
+		local isLoaded, isFinished = IsAddOnLoaded(addonName)
+		if isLoaded and isFinished then
+			func()
+			list[addonName] = nil
+		end
+	end
+end
+
+function S:LoadAddOnSkins()
+	if IsAddOnLoaded("AuroraClassic") or IsAddOnLoaded("Aurora") then return end
 
 	-- Reskin Blizzard UIs
 	for _, func in pairs(R.defaultThemes) do
@@ -17,19 +34,20 @@ function S:LoadDefaultSkins()
 	end
 	wipe(R.defaultThemes)
 
-	for addonName, func in pairs(R.themes) do
-		local isLoaded, isFinished = IsAddOnLoaded(addonName)
-		if isLoaded and isFinished then
-			func()
-			R.themes[addonName] = nil
-		end
-	end
+	S:LoadSkins(R.themes) -- blizzard ui
+	S:LoadSkins(R.otherSkins) -- other addons
 
 	M:RegisterEvent("ADDON_LOADED", function(_, addonName)
 		local func = R.themes[addonName]
 		if func then
 			func()
 			R.themes[addonName] = nil
+		end
+
+		local func = R.otherSkins[addonName]
+		if func then
+			func()
+			R.otherSkins[addonName] = nil
 		end
 	end)
 end
@@ -47,10 +65,11 @@ function S:OnLogin()
    --Bottomline:SetBackdropColor(I.r, I.g, I.b, 0.8)
    end
 
-	self:LoadDefaultSkins()
+	self:LoadAddOnSkins()
 	-- Add Skins
 	self:DBMSkin()
-	self:BigWigsSkin()
+	self:PGFSkin()
+	self:ReskinRematch()
 	self:LootEx()		-- 拾取增强
 	-- Register skin
 	local media = LibStub and LibStub("LibSharedMedia-3.0", true)
@@ -136,30 +155,22 @@ function S:SetToggleDirection(frame)
 	open:SetPoint(rel1, parent, rel1, -x, -y)
 	open:SetSize(width, height)
 	open.text:SetText(str2)
+
+	if R.db["Skins"]["ToggleDirection"] == 5 then
+		close:SetScale(.001)
+		close:SetAlpha(0)
+		open:SetScale(.001)
+		open:SetAlpha(0)
+	else
+		close:SetScale(1)
+		close:SetAlpha(1)
+		open:SetScale(1)
+		open:SetAlpha(1)
+	end
 end
 
 function S:RefreshToggleDirection()
 	for _, frame in pairs(toggleFrames) do
 		S:SetToggleDirection(frame)
 	end
-end
-
-function S:LoadWithAddOn(addonName, value, func)
-	local function loadFunc(event, addon)
-		if not R.db["Skins"][value] then return end
-
-		if event == "PLAYER_ENTERING_WORLD" then
-			M:UnregisterEvent(event, loadFunc)
-			if IsAddOnLoaded(addonName) then
-				func()
-				M:UnregisterEvent("ADDON_LOADED", loadFunc)
-			end
-		elseif event == "ADDON_LOADED" and addon == addonName then
-			func()
-			M:UnregisterEvent(event, loadFunc)
-		end
-	end
-
-	M:RegisterEvent("PLAYER_ENTERING_WORLD", loadFunc)
-	M:RegisterEvent("ADDON_LOADED", loadFunc)
 end

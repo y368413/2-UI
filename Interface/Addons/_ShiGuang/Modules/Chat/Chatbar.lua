@@ -246,7 +246,6 @@ function module:Chatbar()
 		ChatFrame_AddMessageEventFilter(v, Chatemotefilter)
 	end
 	local chatFrame = SELECTED_DOCK_FRAME
-	local editBox = chatFrame.editBox
 	local width, height, padding, buttonList = 16, 18, 6, {}
 	local tinsert, pairs = table.insert, pairs
 	

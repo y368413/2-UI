@@ -383,7 +383,7 @@ function MISC:RaidTool_BuffChecker(parent)
 		end
 	end
 
-	local potionCheck = IsAddOnLoaded("ExRT")
+	local potionCheck = IsAddOnLoaded("MRT")
 
 	frame:HookScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
@@ -394,7 +394,7 @@ function MISC:RaidTool_BuffChecker(parent)
 		GameTooltip:AddDoubleLine(I.ScrollButton..I.InfoColor..U["Count Down"])
 		GameTooltip:AddDoubleLine(I.RightButton.."(Ctrl) "..I.InfoColor..U["Check Status"])
 		if potionCheck then
-			GameTooltip:AddDoubleLine(I.RightButton.."(Alt) "..I.InfoColor..U["ExRT Potioncheck"])
+			GameTooltip:AddDoubleLine(I.RightButton.."(Alt) "..I.InfoColor..U["MRT Potioncheck"])
 		end
 		GameTooltip:Show()
 	end)
@@ -406,7 +406,7 @@ function MISC:RaidTool_BuffChecker(parent)
 	frame:HookScript("OnMouseDown", function(_, btn)
 		if btn == "RightButton" then
 			if IsAltKeyDown() and potionCheck then
-				SlashCmdList["exrtSlash"]("potionchat")
+				SlashCmdList["mrtSlash"]("potionchat")
 			elseif IsControlKeyDown() then
 				scanBuff()
 			end

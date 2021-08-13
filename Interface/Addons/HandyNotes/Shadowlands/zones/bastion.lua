@@ -2,7 +2,7 @@
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
 
-local HANDYNOTES_SHADOWLANDS, shadowlands = ...
+local ADDON_NAME, shadowlands = ...
 local Class = shadowlands.Class
 local L = shadowlands.locale
 local Map = shadowlands.Map

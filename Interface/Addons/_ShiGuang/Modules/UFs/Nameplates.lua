@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 local UF = M:GetModule("UnitFrames")
 
 local _G = getfenv(0)
-local strmatch, tonumber, pairs, unpack, rad = string.match, tonumber, pairs, unpack, math.rad
+local floor, strmatch, tonumber, pairs, unpack, rad = floor, string.match, tonumber, pairs, unpack, math.rad
 local UnitThreatSituation, UnitIsTapDenied, UnitPlayerControlled, UnitIsUnit = UnitThreatSituation, UnitIsTapDenied, UnitPlayerControlled, UnitIsUnit
 local UnitReaction, UnitIsConnected, UnitIsPlayer, UnitSelectionColor = UnitReaction, UnitIsConnected, UnitIsPlayer, UnitSelectionColor
 local GetInstanceInfo, UnitClassification, UnitExists, InCombatLockdown = GetInstanceInfo, UnitClassification, UnitExists, InCombatLockdown
@@ -15,7 +15,7 @@ local GetNumGroupMembers, GetNumSubgroupMembers, UnitGroupRolesAssigned = GetNum
 local C_NamePlate_GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit
 local GetSpellCooldown, GetTime = GetSpellCooldown, GetTime
 local UnitNameplateShowsWidgetsOnly = UnitNameplateShowsWidgetsOnly
-local INTERRUPTED = INTERRUPTED
+local INTERRUPTED, THREAT_TOOLTIP = INTERRUPTED, THREAT_TOOLTIP
 
 -- Init
 function UF:PlateInsideView()
@@ -395,6 +395,13 @@ function UF:QuestIconCheck()
 	M:RegisterEvent("PLAYER_ENTERING_WORLD", CheckInstanceStatus)
 end
 
+local function isQuestTitle(textLine)
+	local r, g, b = textLine:GetTextColor()
+	if r > .99 and g > .82 and b == 0 then
+		return true
+	end
+end
+
 function UF:UpdateQuestUnit(_, unit)
 	if not R.db["Nameplate"]["QuestIndicator"] then return end
 	if isInInstance then
@@ -405,43 +412,33 @@ function UF:UpdateQuestUnit(_, unit)
 
 	unit = unit or self.unit
 
-	local isLootQuest, questProgress
+	local startLooking, isLootQuest, questProgress
 	M.ScanTip:SetOwner(UIParent, "ANCHOR_NONE")
 	M.ScanTip:SetUnit(unit)
 
 	for i = 2, M.ScanTip:NumLines() do
 		local textLine = _G["NDui_ScanTooltipTextLeft"..i]
-		local text = textLine:GetText()
-		if textLine and text then
-			local r, g, b = textLine:GetTextColor()
-			if r > .99 and g > .82 and b == 0 then
-				if isInGroup and text == I.MyName or not isInGroup then
-					isLootQuest = true
+		local text = textLine and textLine:GetText()
+		if not text then break end
 
-					local questLine = _G["NDui_ScanTooltipTextLeft"..(i+1)]
-					local questText = questLine:GetText()
-					if questLine and questText then
-						local current, goal = strmatch(questText, "(%d+)/(%d+)")
-						local progress = strmatch(questText, "(%d+)%%")
-						if current and goal then
-							current = tonumber(current)
-							goal = tonumber(goal)
-							if current == goal then
-								isLootQuest = nil
-							elseif current < goal then
-								questProgress = goal - current
-								break
-							end
-						elseif progress then
-							progress = tonumber(progress)
-							if progress == 100 then
-								isLootQuest = nil
-							elseif progress < 100 then
-								questProgress = 100 - progress
-								--break -- lower priority on progress
-							end
-						end
+		if text ~= "" then
+			if isInGroup and text == I.MyName or (not isInGroup and isQuestTitle(textLine)) then
+				startLooking = true
+			elseif startLooking then
+				local current, goal = strmatch(text, "(%d+)/(%d+)")
+				local progress = strmatch(text, "(%d+)%%")
+				if current and goal then
+					local diff = floor(goal - current)
+					if diff > 0 then
+						questProgress = diff
+						break
 					end
+				elseif progress and not strmatch(text, THREAT_TOOLTIP) then
+					if floor(100 - progress) > 0 then
+						questProgress = 100 - progress  --.."%" -- lower priority on progress, keep looking
+					end
+				else
+					break
 				end
 			end
 		end
