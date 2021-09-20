@@ -8,7 +8,6 @@ end
 
 local Priest = MaxDps_PriestTable.Priest;
 
-
 local MaxDps = MaxDps;
 local UnitPower = UnitPower;
 

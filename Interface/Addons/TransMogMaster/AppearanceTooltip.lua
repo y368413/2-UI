@@ -1,4 +1,4 @@
-﻿--## Version: v26  ## Author: Kemayo
+﻿--## Version: v30  ## Author: Kemayo
 local AppearanceTooltip = {}
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
@@ -658,6 +658,12 @@ function setDefaults(options, defaults)
         end
         return defaults[k]
     end, })
+    -- and add defaults to existing tables
+    for k, v in pairs(options) do
+        if defaults[k] and type(v) == "table" then
+            setDefaults(v, defaults[k])
+        end
+    end
     return options
 end
 
@@ -677,13 +683,15 @@ local races = {
 	[11] = "Draenei",
 	[22] = "Worgen",
 	[24] = "Pandaren",
+	[25] = "Pandaren",
+	[26] = "Pandaren",
 	[27] = "Nightborne",
 	[28] = "HighmountainTauren",
 	[29] = "VoidElf",
 	[30] = "LightforgedDraenei",
 	[31] = "ZandalariTroll",
-	[32] = "KulTiranHuman",
-	[34] = "DarkIronDwarf",
+	[32] = "KulTiran",  --KulTiranHuman
+	[34] = "Dwarf",  --DarkIronDwarf
 	[35] = "Vulpera",
 	[36] = "MagharOrc",
 	[37] = "Mechagnome",
@@ -1756,12 +1764,12 @@ local function UpdateOverlay(button, link, ...)
     end
 end
 
-local function UpdateContainerButton(button, bag)
+local function UpdateContainerButton(button, bag, slot)
     if button.appearancetooltipoverlay then button.appearancetooltipoverlay:Hide() end
     if not AppearanceTooltip.db.bags then
         return
     end
-    local slot = button:GetID()
+    slot = slot or button:GetID()
     local item = Item:CreateFromBagAndSlot(bag, slot)
     if item:IsItemEmpty() then
         return

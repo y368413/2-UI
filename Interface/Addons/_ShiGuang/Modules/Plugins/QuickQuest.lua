@@ -84,7 +84,7 @@ local ignoreQuestNPC = {
 	[121263] = true,	-- 大技师罗姆尔
 	[124312] = true,	-- 图拉扬
 	[126954] = true,	-- 图拉扬
-	[127037] = true, -- Nabiru (repeatable resource quest)
+	[127037] = true, -- 纳毕鲁 (repeatable resource quest)
 	[135690] = true,	-- 亡灵舰长
 	[141584] = true,	-- 祖尔温
 	[142063] = true,	-- 特兹兰
@@ -97,6 +97,7 @@ local ignoreQuestNPC = {
 	[150987] = true,	-- 肖恩·维克斯，斯坦索姆
 	[154534] = true,	-- 大杂院阿畅
 	[160248] = true,	-- 档案员费安，罪魂碎片
+	[162804] = true,	-- 威娜莉
 	[168430] = true,	-- 戴克泰丽丝，格里恩挑战
 	[326027] = true,	-- 运输站回收生成器DX-82
 	

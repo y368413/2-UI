@@ -1,3 +1,5 @@
+local _, ns = ...
+local M, R, U, I = unpack(ns)
 -------------------------------------------------------------------------------
 -- 文件: SimpleInfo.lua ver 1.0  日期: 2010-12-11  作者: dugu@wowbox
 -- 描述: 在屏幕中下方显示玩家(宠物)和目标(ToT)的基本信息  版权所有@多玩游戏网
@@ -964,7 +966,7 @@ local function PowerTypeAscending()
 end
 
 local function AutoHidePlayerFrame(self,event, ...)
-	if (not MaoRUIPerDB["UFs"]["UFFade"]) or (ShiGuangPerDB["BHT"] == true) then return end
+	if (not R.db["UFs"]["UFFade"]) or (ShiGuangPerDB["BHT"] == true) then return end
 	--if (event == nil) then event = "TargetFrame or CharacterModelFrame toggled" end
 	if UnitHealth("player") < UnitHealthMax("player") * 0.99 or (powerTypeAscending and UnitPower("player") <= UnitPowerMax("player") * 0.99) or TargetFrame:IsShown() or UnitAffectingCombat("player") or CharacterFrame:IsShown() or ContainerFrame1:IsShown() then
 		if (not PlayerFrame:IsShown()) then

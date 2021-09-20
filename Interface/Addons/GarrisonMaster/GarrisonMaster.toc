@@ -11,9 +11,7 @@
 ## RequiredDeps: Blizzard_GarrisonUI, Blizzard_OrderHallUI
 ## SavedVariables: MasterPlanAG, SV_GarrisonMissionManager, IPMDB
 ## SavedVariablesPerCharacter: MasterPlanPC, SVPC_GarrisonMissionManager
-## Version: 0.119 + V61 + 1.4.0.2 + 8.1.25 + 0.1.2
-## X-Version-Key: toll
-
+## Version: 0.119 + V62 + 1.4.0.2 + 8.1.25 + 0.1.2
 ## X-Repple: 2 UI
 
 LazyWidget.lua

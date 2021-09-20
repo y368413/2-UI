@@ -1,4 +1,6 @@
-﻿----- Configuration file for Wallpaper_Kit Version 0.3 -----
+﻿local _, ns = ...
+local M, R, U, I = unpack(ns)
+----- Configuration file for Wallpaper_Kit Version 0.3 -----
 --object container
 local WallpaperKitcfg = {}
 local total, afk_minutes, afk_seconds, update, interval = 0, 0, 0, 0, 1.0
@@ -233,7 +235,7 @@ WallpaperKit:RegisterEvent("PLAYER_FLAGS_CHANGED")
 WallpaperKit:RegisterEvent("PLAYER_ENTERING_WORLD")
 WallpaperKit:RegisterEvent("PLAYER_LEAVING_WORLD")
 WallpaperKit:SetScript("OnEvent",function()
-  if not MaoRUIPerDB["Misc"]["WallpaperKit"] then return end
+  if not R.db["Misc"]["WallpaperKit"] then return end
 	if WallpaperKit:IsShown() then WallpaperKit:Disable() end
 	if UnitIsAFK("player") then WallpaperKit:Enable() AFK = true WallpaperKit:SetScript("OnUpdate", frame_OnUpdate) else AFK = false total = 0 WallpaperKit:SetScript("OnUpdate", nil) end  
 end)

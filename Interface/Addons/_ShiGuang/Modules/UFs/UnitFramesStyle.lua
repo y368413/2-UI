@@ -1,3 +1,5 @@
+local _, ns = ...
+local M, R, U, I = unpack(ns)
 hooksecurefunc("UnitFrame_Update", function(self)
 	if self.name and self.unit then
 		local color = RAID_CLASS_COLORS[select(2, UnitClass(self.unit))] or NORMAL_FONT_COLOR
@@ -19,7 +21,7 @@ hooksecurefunc("UnitFrame_Update", function(self)
 end)
 ------------------------------------------Class icon---------------------------------------
 hooksecurefunc("UnitFramePortrait_Update",function(self) 
-   if not MaoRUIPerDB["UFs"]["UFClassIcon"] then return end
+   if not R.db["UFs"]["UFClassIcon"] then return end
         if self.portrait then 
                 if UnitIsPlayer(self.unit) then                 
                         if CLASS_ICON_TCOORDS[select(2, UnitClass(self.unit))] then 

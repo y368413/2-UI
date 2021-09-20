@@ -58,6 +58,7 @@ local inaccurateQuestAreas = {
 	[34461] = 590, -- Horde Garrison
 	[59809] = true,
 	[60004] = 118, -- 前夕任务：英勇之举
+	[63971] = 1543, -- 法夜突袭，蜗牛践踏
 }
 
 -- items that should be used on specific mobs (npcID = itemID)
@@ -156,7 +157,7 @@ local questItems = {
 	[59809] = 177904, -- Night Fae Covenant
 	[59063] = 175137, -- Night Fae Covenant
 	[60188] = 178464, -- Night Fae Covenant
-	[60609] = 180009, -- Ardenweald
+	[60649] = 180170, -- Ardenweald
 	[60609] = 180008, -- Ardenweald
 	[58586] = 174465, -- Venthyr Covenant
 }

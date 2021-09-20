@@ -1,7 +1,7 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
 
-local oUF = ns.oUF or oUF
+local oUF = ns.oUF
 local UF = M:RegisterModule("UnitFrames")
 local AURA = M:GetModule("Auras")
 
@@ -449,6 +449,10 @@ local function createBarMover(bar, text, value, anchor)
 	bar.mover = mover
 end
 
+local function updateSpellTarget(self, _, unit)
+	M.PostCastUpdate(self.Castbar, unit)
+end
+
 function UF:CreateCastBar(self)
 	local mystyle = self.mystyle
 	if mystyle ~= "nameplate" and not R.db["UFs"]["Castbars"] then return end
@@ -507,6 +511,8 @@ function UF:CreateCastBar(self)
 		spellTarget:SetJustifyH("LEFT")
 		spellTarget:SetPoint("TOPLEFT", name, "BOTTOMLEFT", 0, -2)
 		cb.spellTarget = spellTarget
+
+		self:RegisterEvent("UNIT_TARGET", updateSpellTarget)
 	end
 
 	--if mystyle == "nameplate" or mystyle == "boss" or mystyle == "arena" then
@@ -710,6 +716,8 @@ end
 
 local debuffBlackList = {
 	[206151] = true,
+	[296847] = true,
+	[338906] = true,
 }
 function UF.RaidDebuffFilter(element, _, _, _, _, _, _, _, _, caster, _, _, spellID, _, isBossAura)
 	local parent = element.__owner
@@ -1329,7 +1337,7 @@ local function DGI_Visibility()
 end
 
 local function DGI_OnUpdate(self, elapsed)
-	self.elapsed = (self.elapsed or 0) + 0.1
+	self.elapsed = (self.elapsed or 0) + elapsed
 	if self.elapsed > .1 then
 		DGI_UpdateGlow()
 

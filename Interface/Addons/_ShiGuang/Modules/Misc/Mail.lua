@@ -37,6 +37,7 @@ function MISC:MailItem_AddDelete(i)
 end
 
 function MISC:InboxItem_OnEnter()
+	if not self.index then return end -- may receive fake mails from Narcissus
 	wipe(inboxItems)
 
 	local itemAttached = select(8, GetInboxHeaderInfo(self.index))
@@ -120,7 +121,7 @@ function MISC:ContactList_Refresh()
 
 	GenerateDataByRealm(I.MyRealm)
 
-	for realm, value in pairs(contactListByRealm) do
+	for realm in pairs(contactListByRealm) do
 		if realm ~= I.MyRealm then
 			GenerateDataByRealm(realm)
 		end

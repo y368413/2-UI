@@ -1,7 +1,7 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
 
-local oUF = ns.oUF or oUF
+local oUF = ns.oUF
 local UF = M:GetModule("UnitFrames")
 local format, tostring = string.format, tostring
 
@@ -200,7 +200,6 @@ function UF:OnLogin()
 		UF:CreateUnitTable()
 		UF:CreatePowerUnitTable()
 		UF:CheckExplosives()
-		UF:AddInterruptInfo()
 		UF:UpdateGroupRoles()
 		UF:QuestIconCheck()
 		UF:RefreshPlateOnFactionChanged()

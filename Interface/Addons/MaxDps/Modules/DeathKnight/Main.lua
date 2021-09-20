@@ -119,7 +119,7 @@ function DeathKnight:TimeToRunes(desiredRunes)
 		return 0;
 	end
 
-	-- Sort the table by remaining cooldown time, ascending
+	--[[ Sort the table by remaining cooldown time, ascending
 	table.sort(runes, function(l,r)
 		if l == nil then
 			return true;
@@ -128,7 +128,7 @@ function DeathKnight:TimeToRunes(desiredRunes)
 		else
 			return l.duration + l.start < r.duration + r.start;
 		end
-	end);
+	end);]]
 
 	-- How many additional runes need to come off cooldown before we hit our desired count?
 	local neededRunes = desiredRunes - readyRuneCount;

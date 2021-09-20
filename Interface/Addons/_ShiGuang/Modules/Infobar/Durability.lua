@@ -17,16 +17,16 @@ local repairCostString = gsub(REPAIR_COST, HEADER_COLON, ":")
 local lowDurabilityCap = .25
 
 local localSlots = {
-	[1] = {1, HEADSLOT, 1000},
-		[2] = {3, SHOULDERSLOT, 1000},
-		[3] = {5, CHESTSLOT, 1000},
-		[4] = {6, WAISTSLOT, 1000},
-		[5] = {9, WRISTSLOT, 1000},
-		[6] = {10, HANDSSLOT, 1000},
-		[7] = {7, LEGSSLOT, 1000},
-		[8] = {8, FEETSLOT, 1000},
-		[9] = {16, MAINHANDSLOT, 1000},
-		[10] = {17, SECONDARYHANDSLOT, 1000}
+	[1] = {1, INVTYPE_HEAD, 1000},
+	[2] = {3, INVTYPE_SHOULDER, 1000},
+	[3] = {5, INVTYPE_CHEST, 1000},
+	[4] = {6, INVTYPE_WAIST, 1000},
+	[5] = {9, INVTYPE_WRIST, 1000},
+	[6] = {10, U["Hands"], 1000},
+	[7] = {7, INVTYPE_LEGS, 1000},
+	[8] = {8, U["Feet"], 1000},
+	[9] = {16, INVTYPE_WEAPONMAINHAND, 1000},
+	[10] = {17, INVTYPE_WEAPONOFFHAND, 1000}
 }
 
 local function hideAlertWhileCombat()
@@ -91,14 +91,11 @@ info.onEvent = function(self, event)
 		self:UnregisterEvent(event)
 	end
 
-	local numSlots = UpdateAllSlots()
-	local isLow = isLowDurability()
-
 	if event == "PLAYER_REGEN_ENABLED" then
 		self:UnregisterEvent(event)
 		self:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
 	else
-		if numSlots > 0 then
+		if UpdateAllSlots() > 0 then
 			local r, g, b = getDurabilityColor(floor(localSlots[1][3]*100), 100)
 			self.text:SetFormattedText("%s%%|r", M.HexRGB(r, g, b)..floor(localSlots[1][3]*100))
 		else
@@ -106,7 +103,7 @@ info.onEvent = function(self, event)
 		end
 	end
 
-	if isLow then
+	if isLowDurability() then
 		HelpTip:Show(info, lowDurabilityInfo)
 	else
 		HelpTip:Hide(info, U["Low Durability"])
@@ -118,7 +115,7 @@ info.onMouseUp = function(self, btn)
 		MaoRUIDB["RepairType"] = mod(MaoRUIDB["RepairType"] + 1, 3)
 		self:onEnter()
 	else
-		if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
+		--if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
 		ToggleCharacter("PaperDollFrame")
 	end
 end

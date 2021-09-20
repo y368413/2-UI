@@ -339,6 +339,7 @@ G.DefaultSettings = {
 		MDGuildBest = true,
 		FasterSkip = false,
 		EnhanceDressup = true,
+		QuestTool = true,
 		QuickQueue = true,
 		--AltTabLfgNotification = false,
 		--CrazyCatLady = true,
@@ -727,7 +728,7 @@ end
 
 -- Config
 local HeaderTag = "|cff00cc4c"
-local NewFeatureTag = "|TInterface\\OptionsFrame\\UI-OptionsFrame-NewFeatureIcon:0|t"
+local NewTag = "|TInterface\\OptionsFrame\\UI-OptionsFrame-NewFeatureIcon:0|t"
 
 G.TabList = {
 	U["Actionbar"],

@@ -2,7 +2,7 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local module = M:GetModule("Chat")
 
-local strfind, strmatch, gsub, strrep = string.find, string.match, string.gsub, string.rep
+local strfind, strmatch, gsub, strrep, format = string.find, string.match, string.gsub, string.rep, string.format
 local pairs, ipairs, tonumber = pairs, ipairs, tonumber
 local min, max, tremove = math.min, math.max, table.remove
 local IsGuildMember, C_FriendList_IsFriend, IsGUIDInGroup, C_Timer_After = IsGuildMember, C_FriendList.IsFriend, IsGUIDInGroup, C_Timer.After
@@ -237,18 +237,10 @@ local function isItemHasGem(link)
 	return text
 end
 
-local itemCache = {}
+local itemCache, GetDungeonScoreInColor = {}
 local function convertItemLevel(link)
 	if itemCache[link] then return itemCache[link] end
 
-	--local itemLink = strmatch(link, "|Hitem:.-|h")
-	--if itemLink then
-		--local name, itemLevel = isItemHasLevel(itemLink)
-		--if name and itemLevel then
-			--link = gsub(link, "|h%[(.-)%]|h", "|h["..name.."("..itemLevel..isItemHasGem(itemLink)..")]|h")
-			--itemCache[link] = link
-		--end
-	--end
 	  local itemLink = strmatch(link, "|H(.-)|h")
 	  local itemLinkGem = strmatch(link, "|Hitem:.-|h")
     local name, _, _, _, _, class, subclass, _, equipSlot = GetItemInfo(itemLink)
@@ -268,15 +260,34 @@ local function convertItemLevel(link)
 	return link
 end
 
+function module.ReplaceChatHyperlink(link, linkType, value)
+	if not link then return end
+
+	if linkType == "item" then
+		if itemCache[link] then return itemCache[link] end
+		local name, itemLevel = isItemHasLevel(link)
+		if name and itemLevel then
+			link = gsub(link, "|h%[(.-)%]|h", "|h["..name.."("..itemLevel..")]|h"..isItemHasGem(link))
+			itemCache[link] = link
+		end
+		return link
+	elseif linkType == "dungeonScore" then
+		return value and gsub(link, "|h%[(.-)%]|h", "|h["..format(U["MythicScore"], GetDungeonScoreInColor(value)).."]|h")
+	end
+end
+
 function module:UpdateChatItemLevel(_, msg, ...)
 	if msg:find('Hitem:158923') or msg:find('Hkeystone') then return end
 	msg = gsub(msg, "(|H%w+:%d+:.-|h.-|h)", SetChatLinkIcon)
 	msg = gsub(msg, "(|Hitem:%d+:.-|h.-|h)", convertItemLevel)
+	msg = gsub(msg, "(|H([^:]+):(%d+):.-|h.-|h)", module.ReplaceChatHyperlink)
 	return false, msg, ...
 end
 
 function module:ChatFilter()
 	if R.db["Chat"]["ChatItemLevel"] then
+		GetDungeonScoreInColor = M:GetModule("Tooltip").GetDungeonScore
+	
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", self.UpdateChatItemLevel)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateChatItemLevel)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", self.UpdateChatItemLevel)

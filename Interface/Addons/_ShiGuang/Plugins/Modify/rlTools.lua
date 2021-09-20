@@ -1,4 +1,6 @@
-﻿---------------------------------------------------- MAIN ADDON FRAME
+﻿local _, ns = ...
+local M, R, U, I = unpack(ns)
+---------------------------------------------------- MAIN ADDON FRAME
 local MAF=CreateFrame("Frame","MyParent",UIParent, "BackdropTemplate")
 	MAF:SetSize(21,21)
 	MAF:SetPoint("RIGHT", UIParent, "RIGHT", -66, 88)
@@ -282,7 +284,7 @@ TankHealerMarkFrame:RegisterEvent("PLAYER_LOGIN")
 TankHealerMarkFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
 
 TankHealerMarkFrame:SetScript("OnEvent", function(self, event, ...)
-  if not MaoRUIPerDB["Misc"]["AutoMark"] then return end
+  if not R.db["Misc"]["AutoMark"] then return end
 	if (not IsInRaid()) and IsInGroup() then
 		local ROLEMARKS={["TANK"]=2,["HEALER"]=5}
 		for i=1,5 do 

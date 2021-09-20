@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 local MISC = M:RegisterModule("Misc")
 
 local _G = getfenv(0)
-local select, floor, unpack, gsub = select, floor, unpack, gsub
+local select, floor, unpack, tonumber, gsub, strsplit = select, floor, unpack, tonumber, gsub, strsplit
 local InCombatLockdown, IsModifiedClick, IsAltKeyDown = InCombatLockdown, IsModifiedClick, IsAltKeyDown
 local GetNumArchaeologyRaces = GetNumArchaeologyRaces
 local GetNumArtifactsByRace = GetNumArtifactsByRace
@@ -28,8 +28,7 @@ local RequestRaidInfo, RaidInfoFrame_Update = RequestRaidInfo, RaidInfoFrame_Upd
 local IsGuildMember, C_BattleNet_GetGameAccountInfoByGUID, C_FriendList_IsFriend = IsGuildMember, C_BattleNet.GetGameAccountInfoByGUID, C_FriendList.IsFriend
 local C_UIWidgetManager_GetDiscreteProgressStepsVisualizationInfo = C_UIWidgetManager.GetDiscreteProgressStepsVisualizationInfo
 local C_UIWidgetManager_GetTextureWithAnimationVisualizationInfo = C_UIWidgetManager.GetTextureWithAnimationVisualizationInfo
-local C_QuestLog_GetLogIndexForQuestID = C_QuestLog.GetLogIndexForQuestID
-local GetOverrideBarSkin, GetActionInfo, GetSpellInfo = GetOverrideBarSkin, GetActionInfo, GetSpellInfo
+local C_Map_GetMapInfo, C_Map_GetBestMapForUnit = C_Map.GetMapInfo, C_Map.GetBestMapForUnit
 
 --[[
 	Miscellaneous 各种有用没用的小玩意儿
@@ -65,10 +64,10 @@ function MISC:OnLogin()
 	MISC:ToggleBossBanner()
 	MISC:ToggleBossEmote()
 	MISC:MawWidgetFrame()
-	MISC:WorldQuestTool()
 	MISC:FasterMovieSkip()
 	MISC:EnhanceDressup()
 	MISC:FuckTrainSound()
+	MISC:JerryWay()
 	
 	--MISC:CreateRM()
 	--MISC:FreeMountCD()
@@ -658,49 +657,6 @@ do
 	M:RegisterEvent("ADDON_LOADED", fixGuildNews)
 	M:RegisterEvent("ADDON_LOADED", fixCommunitiesNews)
 end
-function MISC:WorldQuestTool()
-	if not R.db["Actionbar"]["Enable"] then return end
-	--https://www.wowhead.com/quest=59585/well-make-an-aspirant-out-of-you
-
-	local hasFound
-	local function resetActionButtons()
-		if not hasFound then return end
-		for i = 1, 3 do
-			M.HideOverlayGlow(_G["ActionButton"..i])
-		end
-		hasFound = nil
-	end
-
-	local fixedStrings = {
-		["横扫"] = "低扫",
-		["突刺"] = "突袭",
-	}
-	local function isActionMatch(msg, text)
-		return text and strfind(msg, text)
-	end
-
-	M:RegisterEvent("CHAT_MSG_MONSTER_SAY", function(_, msg)
-		if not GetOverrideBarSkin() or (not C_QuestLog_GetLogIndexForQuestID(59585) and not C_QuestLog_GetLogIndexForQuestID(64271)) then
-			resetActionButtons()
-			return
-		end
-
-		for i = 1, 3 do
-			local button = _G["ActionButton"..i]
-			local _, spellID = GetActionInfo(button.action)
-			local name = spellID and GetSpellInfo(spellID)
-			if isActionMatch(msg, fixedStrings[name]) or isActionMatch(msg, name) then
-				M.ShowOverlayGlow(button)
-			else
-				M.HideOverlayGlow(button)
-			end
-		end
-
-		hasFound = true
-	end)
-
-	M:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", resetActionButtons)
-end
 
 function MISC:FasterMovieSkip()
 	if not R.db["Misc"]["FasterSkip"] then return end
@@ -782,6 +738,44 @@ function MISC:FuckTrainSound()
 	for _, soundID in pairs(trainSounds) do
 		MuteSoundFile(soundID)
 	end
+end
+
+function MISC:JerryWay()
+	if IsAddOnLoaded("TomTom") then return end
+
+	local pointString = I.InfoColor.."|Hworldmap:%d+:%d+:%d+|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a%s (%s, %s)%s]|h|r"
+
+	local function GetCorrectCoord(x)
+		x = tonumber(x)
+		if x then
+			if x > 100 then
+				return 100
+			elseif x < 0 then
+				return 0
+			end
+			return x
+		end
+	end
+
+	SlashCmdList["NDUI_JERRY_WAY"] = function(msg)
+		msg = gsub(msg, "(%d)[%.,] (%d)", "%1 %2")
+		local x, y, z = strmatch(msg, "(%S+)%s(%S+)(.*)")
+		if x and y then
+			local mapID = C_Map_GetBestMapForUnit("player")
+			if mapID then
+				local mapInfo = C_Map_GetMapInfo(mapID)
+				local mapName = mapInfo and mapInfo.name
+				if mapName then
+					x = GetCorrectCoord(x)
+					y = GetCorrectCoord(y)
+					if x and y then
+						print(format(pointString, mapID, x*100, y*100, mapName, x, y, z or ""))
+					end
+				end
+			end
+		end
+	end
+	SLASH_NDUI_JERRY_WAY1 = "/way"
 end
 
 --[[hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self,textString,value,_,maxValue)  ---	Custom status text format.

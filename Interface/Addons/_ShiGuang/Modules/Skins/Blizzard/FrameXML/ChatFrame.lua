@@ -32,7 +32,7 @@ tinsert(R.defaultThemes, function()
 	-- Battlenet toast frame
 	BNToastFrame:SetBackdrop(nil)
 	M.SetBD(BNToastFrame)
-	BNToastFrame.TooltipFrame:SetBackdrop(nil)
+	M.HideBackdrop(BNToastFrame.TooltipFrame) -- isNewPatch
 	M.SetBD(BNToastFrame.TooltipFrame)
 
 	-- Battletag invite frame
@@ -88,7 +88,7 @@ tinsert(R.defaultThemes, function()
 		ReskinChatScroll(_G["ChatFrame"..i])
 	end
 
-	-- ChannelFrame
+	--[[ ChannelFrame
 	M.ReskinPortraitFrame(ChannelFrame)
 	M.Reskin(ChannelFrame.NewButton)
 	M.Reskin(ChannelFrame.SettingsButton)
@@ -106,7 +106,7 @@ tinsert(R.defaultThemes, function()
 				tab.styled = true
 			end
 		end
-	end)
+	end)]]
 
 	M.StripTextures(CreateChannelPopup)
 	M.SetBD(CreateChannelPopup)

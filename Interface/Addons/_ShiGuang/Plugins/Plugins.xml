@@ -6,5 +6,6 @@
 	<Include file="Quest\Quest.xml"/>
 	<Include file="Notice\Notice.xml"/>
 	<Include file="Modify\Modify.xml"/>
+	<Include file="Helements\Helements.xml"/>
 	<Include file="AceExtensions\AceExtensions.xml"/>
 </Ui>

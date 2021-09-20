@@ -1,3 +1,5 @@
+local _, ns = ...
+local M, R, U, I = unpack(ns)
 ----------------------------------------------------------------------------------------
 --	Says thanks for some spells(SaySapped by Bitbyte, modified by m2jest1c)
 ----------------------------------------------------------------------------------------
@@ -438,7 +440,7 @@ function Flashevents:TRADE_WITH_QUESTION(...) SendChatMessage("*TRADE_WITH_QUEST
 function Flashevents:TRADE_SHOW(...) SendChatMessage("-- 交易 --", "WHISPER", nil, UnitName("player")); end
 --------------------------------------------------------------------------- end of events
 AltTabLfgNotification:SetScript("OnEvent", function(self, event, ...)
- if not MaoRUIPerDB["Misc"]["AltTabLfgNotification"] then return end
+ if not R.db["Misc"]["AltTabLfgNotification"] then return end
  Flashevents[event](self, ...);
 end);
 for k, v in pairs(Flashevents) do AltTabLfgNotification:RegisterEvent(k);  end]]
@@ -446,7 +448,7 @@ for k, v in pairs(Flashevents) do AltTabLfgNotification:RegisterEvent(k);  end]]
 --  CtrlIndicator    Author: 图图   --检测Ctrl是否卡住,Ctrl按下4.5秒之后就会提示
 local ctrlCnt, AltCnt, ShiftCnt = 0, 0, 0;
 C_Timer.NewTicker(0.1, function()
-    if not MaoRUIPerDB["Misc"]["CtrlIndicator"] then return end
+    if not R.db["Misc"]["CtrlIndicator"] then return end
     if IsControlKeyDown() then ctrlCnt=ctrlCnt+1 else ctrlCnt = 0 end
     if ctrlCnt==45 then
         PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Legendary.ogg", "Master")
@@ -473,7 +475,7 @@ CrazyCatLady:RegisterEvent("UNIT_AURA")
 CrazyCatLady:RegisterEvent("PLAYER_DEAD")
 CrazyCatLady:RegisterEvent("PLAYER_UNGHOST")
 CrazyCatLady:SetScript("OnEvent", function(self, event, ...) 
-  if not MaoRUIPerDB["Misc"]["CrazyCatLady"] then self:UnregisterAllEvents() return end
+  if not R.db["Misc"]["CrazyCatLady"] then self:UnregisterAllEvents() return end
 	if event == "PLAYER_DEAD" then PlaySoundFile("Sound\\creature\\Auriaya\\UR_Auriaya_Death01.ogg", "Master")
 	elseif event == "PLAYER_UNGHOST" then StopMusic() end
 end)]]

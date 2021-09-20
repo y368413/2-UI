@@ -24,7 +24,7 @@ local tonumber = tonumber
 local C_TransmogCollection = _G.C_TransmogCollection
 local CreateFrame = _G.CreateFrame
 local GetContainerItemInfo = _G.GetContainerItemInfo
-local GetDetailedItemLevelInfo = _G.GetDetailedItemLevelInfo 
+local GetDetailedItemLevelInfo = _G.GetDetailedItemLevelInfo
 local GetItemInfo = _G.GetItemInfo
 local GetItemQualityColor = _G.GetItemQualityColor
 local IsArtifactRelicItem = _G.IsArtifactRelicItem 
@@ -146,12 +146,6 @@ local Cache_GetItemLevel = function(button)
 
 		-- Move Pawn out of the way
 		RefreshPawn(button)
-local UpgradeIcon = button.UpgradeIcon
-		if UpgradeIcon then
-			UpgradeIcon:ClearAllPoints()
-			UpgradeIcon:SetPoint("BOTTOMRIGHT", 2, 0)
-		end
-
 		-- Store the reference for the next time
 		Cache_ItemLevel[button] = ItemLevel
 	end

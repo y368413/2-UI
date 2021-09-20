@@ -143,6 +143,7 @@ local list = {
 		{AuraID = 356326, UnitID = "player"},	-- 折磨洞察
 		{AuraID = 355333, UnitID = "player"},	-- 回收的聚变增幅器
 		{AuraID = 357185, UnitID = "player"},	-- 忠诚的力量，低语威能碎片
+		{AuraID = 357773, UnitID = "player"},	-- 神圣使命，九武神长柄
 		-- 盟约
 		{AuraID = 331937, UnitID = "player", Flash = true},	-- 沉醉
 		{AuraID = 354053, UnitID = "player", Flash = true, Text = U["Crit"]}, -- 致命缺陷，暴击
@@ -182,11 +183,13 @@ local list = {
 		{AuraID = 333218, UnitID = "player"},	-- 废土礼节
 		{AuraID = 336885, UnitID = "player"},	-- 抚慰阴影
 		{AuraID = 324156, UnitID = "player", Flash = true},	-- 劫掠射击
-		{AuraID = 328900, UnitID = "player"},	-- 放下过去
+		--{AuraID = 328900, UnitID = "player"},	-- 放下过去
 		{AuraID = 333961, UnitID = "player"},	-- 行动的召唤：布隆
 		{AuraID = 333943, UnitID = "player"},	-- 源生重槌
-		-- 心能
+		{AuraID = 339928, UnitID = "player", Flash = true},	-- 残酷投射
+		-- S2，心能/统御碎片
 		{AuraID = 357852, UnitID = "player"},	-- 激励
+		{AuraID = 356364, UnitID = "player"},	-- 冰冷的心
 		-- 炼金石
 		{AuraID = 60233, UnitID = "player"},	-- 敏捷
 		{AuraID = 60229, UnitID = "player"},	-- 力量

@@ -1,4 +1,6 @@
-﻿--[[--------------Item Selling## Author: Spencer Sohn----------------------
+﻿local _, ns = ...
+local M, R, U, I = unpack(ns)
+--[[--------------Item Selling## Author: Spencer Sohn----------------------
 local ItemSelling = StaticPopupDialogs["CONFIRM_MERCHANT_TRADE_TIMER_REMOVAL"] 
 ItemSelling.OnAccept=nil 
 ItemSelling.OnShow=function() StaticPopup_Hide("CONFIRM_MERCHANT_TRADE_TIMER_REMOVAL"); SellCursorItem(); end
@@ -59,7 +61,7 @@ LFDParentFrame:HookScript("OnShow",function()
 local AutoReagentBank = CreateFrame("Frame")
 AutoReagentBank:RegisterEvent("BANKFRAME_OPENED")
 AutoReagentBank:SetScript("OnEvent", function(self, event, ...)
-  if not MaoRUIPerDB["Misc"]["AutoReagentInBank"] then self:UnregisterAllEvents() return end
+  if not R.db["Misc"]["AutoReagentInBank"] then self:UnregisterAllEvents() return end
 	if not BankFrameItemButton_Update_OLD then
 		BankFrameItemButton_Update_OLD = BankFrameItemButton_Update
 		BankFrameItemButton_Update = function(button)
@@ -609,5 +611,19 @@ ExtTransmogUI:SetScript("OnEvent",function(self,event,addon)
     WardrobeTransmogFrame.SecondaryHandEnchantButton:ClearAllPoints();
 	--WardrobeTransmogFrame.SecondaryHandEnchantButton:SetScale(1.25);
     WardrobeTransmogFrame.SecondaryHandEnchantButton:SetPoint("LEFT", WardrobeTransmogFrame.SecondaryHandButton, "RIGHT", 0, 0);
+	end
+end)
+
+local AutoViewDistance = CreateFrame("Frame", "AutoViewDistance")
+AutoViewDistance:RegisterEvent("LOADING_SCREEN_DISABLED") 
+AutoViewDistance:RegisterEvent("LOADING_SCREEN_ENABLED")
+AutoViewDistance:RegisterEvent("PLAYER_LOGOUT") 
+AutoViewDistance:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
+	if event == "LOADING_SCREEN_ENABLED" then
+		if GetCVar("graphicsViewDistance") ~= 1 then SetCVar("graphicsViewDistance", 1) end
+	elseif event == "LOADING_SCREEN_DISABLED" then
+		if GetCVar("graphicsViewDistance") ~= 5 then SetCVar("graphicsViewDistance", 5) end
+	elseif event == "PLAYER_LOGOUT" then
+		if GetCVar("graphicsViewDistance") ~= 1 then SetCVar("graphicsViewDistance", 1) end
 	end
 end)

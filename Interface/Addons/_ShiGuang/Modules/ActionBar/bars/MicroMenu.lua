@@ -71,7 +71,7 @@ function Bar:MicroMenu()
 	if not R.db["Actionbar"]["MicroMenu"] then return end
 
 	local menubar = CreateFrame("Frame", nil, UIParent)
-	menubar:SetSize(21, 186)  --*MaoRUIPerDB["Map"]["MinimapScale"]
+	menubar:SetSize(21, 186)  --*R.db["Map"]["MinimapScale"]
 	M.Mover(menubar, U["Menubar"], "Menubar", R.Skins.MicroMenuPos)
 
 	-- Generate Buttons

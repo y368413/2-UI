@@ -116,12 +116,18 @@ function M:OnCastSent()
 	element.SafeZone.castSent = true
 end
 
+local function ResetSpellTarget(self)
+	if self.spellTarget then
+		self.spellTarget:SetText("")
+	end
+end
+
 local function UpdateSpellTarget(self, unit)
 	if not R.db["Nameplate"]["CastTarget"] then return end
-	if not self.spellTarget or not unit then return end
+	if not self.spellTarget then return end
 
-	local unitTarget = unit.."target"
-	if UnitExists(unitTarget) then
+	local unitTarget = unit and unit.."target"
+	if unitTarget and UnitExists(unitTarget) then
 		local nameString
 		if UnitIsUnit(unitTarget, "player") then
 			nameString = format("|cffff0000%s|r", ">"..strupper(YOU).."<")
@@ -129,12 +135,8 @@ local function UpdateSpellTarget(self, unit)
 			nameString = M.HexRGB(M.UnitColor(unitTarget))..UnitName(unitTarget)
 		end
 		self.spellTarget:SetText(nameString)
-	end
-end
-
-local function ResetSpellTarget(self)
-	if self.spellTarget then
-		self.spellTarget:SetText("")
+	else
+		ResetSpellTarget(self) -- when unit loses target
 	end
 end
 
@@ -149,15 +151,15 @@ function M:PostCastStart(unit)
 		if self.Lag then self.Lag:Hide() end
 	elseif unit == "player" then
 		local safeZone = self.SafeZone
-		if not safeZone then return end
-
-		safeZone.timeDiff = 0
-		if safeZone.castSent then
-			safeZone.timeDiff = GetTime() - safeZone.sendTime
-			safeZone.timeDiff = safeZone.timeDiff > self.max and self.max or safeZone.timeDiff
-			safeZone:SetWidth(self:GetWidth() * (safeZone.timeDiff + .001) / self.max)
-			safeZone:Show()
-			safeZone.castSent = false
+		if safeZone then
+			safeZone.timeDiff = 0
+			if safeZone.castSent then
+				safeZone.timeDiff = GetTime() - safeZone.sendTime
+				safeZone.timeDiff = safeZone.timeDiff > self.max and self.max or safeZone.timeDiff
+				safeZone:SetWidth(self:GetWidth() * (safeZone.timeDiff + .001) / self.max)
+				safeZone:Show()
+				safeZone.castSent = nil
+			end
 		end
 
 		local numTicks = 0

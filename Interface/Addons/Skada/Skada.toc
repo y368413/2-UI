@@ -34,7 +34,7 @@ BrokerDisplay.lua
 modules.xml
 
 SkadaExplosiveOrbs.lua
-SkadaStagger.lua
+## SkadaStagger.lua
 SkadaAvoidableDamageTaken.lua
 ## SkadaActivity.lua
 ## SkadaPlus.lua

@@ -64,22 +64,25 @@ end
 function MISC:DomiShards_ListFrame()
 	if MISC.DomiShardsFrame then return end
 
+	local iconSize = 28
+	local frameSize = iconSize*3
+
 	local frame = CreateFrame("Frame", "NDuiDomiShards", ItemSocketingFrame)
-	frame:SetSize(102, 102)
-	frame:SetPoint("RIGHT", -35, 30)
+	frame:SetSize(frameSize, frameSize)
+	frame:SetPoint("BOTTOMLEFT", 32, 3)
 	frame.icons = {}
 	MISC.DomiShardsFrame = frame
 
 	for index, value in pairs(TT.DomiDataByGroup) do
 		for itemID in pairs(value) do
 			local button = CreateFrame("Button", nil, frame)
-			button:SetSize(30, 30)
-			button:SetPoint("TOPLEFT", 3 + mod(index-1, 3)*33, -3 - floor((index-1)/3)*33)
+			button:SetSize(iconSize, iconSize)
+			button:SetPoint("TOPLEFT", mod(index-1, 3)*iconSize, - floor((index-1)/3)*iconSize)
 			M.PixelIcon(button, GetItemIcon(itemID), true)
 			button:SetScript("OnClick", MISC.DomiShard_Equip)
 			button:SetScript("OnEnter", MISC.DomiShard_ShowTooltip)
 			button:SetScript("OnLeave", M.HideTooltip)
-			button.count = M.CreateFS(button, 12, "", "system", "BOTTOMRIGHT", -3, 3)
+			button.count = M.CreateFS(button, 14, "", "system", "BOTTOMRIGHT", -3, 3)
 
 			frame.icons[index] = button
 			break
