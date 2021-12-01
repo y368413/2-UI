@@ -3,13 +3,13 @@ local M, R, U, I = unpack(ns)
 if not R.Infobar.Bags then return end
 
 local module = M:GetModule("Infobar")
-local info = module:RegisterInfobar("Bags", R.Infobar.BagsPos)
+local info = module:RegisterInfobar("Bag", R.Infobar.BagsPos)
 		
 info.eventList = {
 	"BAG_UPDATE",
 }
 
-info.onUpdate = function(self, elapsed)
+info.onEvent = function(self)
   local free, total, used = 0, 0, 0
 		for i = 0, NUM_BAG_SLOTS do
 			free, total = free + GetContainerNumFreeSlots(i), total + GetContainerNumSlots(i)

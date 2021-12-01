@@ -3,6 +3,7 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 
 local next, ipairs, select = next, ipairs, select
+local IsAltKeyDown = IsAltKeyDown
 local UnitGUID, IsShiftKeyDown, GetItemInfoFromHyperlink = UnitGUID, IsShiftKeyDown, GetItemInfoFromHyperlink
 local GetNumTrackingTypes, GetTrackingInfo, GetInstanceInfo, GetQuestID = GetNumTrackingTypes, GetTrackingInfo, GetInstanceInfo, GetQuestID
 local GetNumActiveQuests, GetActiveTitle, GetActiveQuestID, SelectActiveQuest = GetNumActiveQuests, GetActiveTitle, GetActiveQuestID, SelectActiveQuest
@@ -99,13 +100,14 @@ local ignoreQuestNPC = {
 	[160248] = true,	-- 档案员费安，罪魂碎片
 	[162804] = true,	-- 威娜莉
 	[168430] = true,	-- 戴克泰丽丝，格里恩挑战
-	[326027] = true,	-- 运输站回收生成器DX-82
-	
+	[326027] = true,	-- 运输站回收生成器DX-82	
 }
+
+R.IgnoreQuestNPC = {}
 
 QuickQuest:Register("QUEST_GREETING", function()
 	local npcID = GetNPCID()
-	if ignoreQuestNPC[npcID] then return end
+	if R.IgnoreQuestNPC[npcID] then return end
 
 	local active = GetNumActiveQuests()
 	if active > 0 then
@@ -170,6 +172,8 @@ local ignoreGossipNPC = {
 	[172558] = true, -- 艾拉·引路者（导师）
 	[172572] = true, -- 瑟蕾丝特·贝利文科（导师）
 	[175513] = true, -- 纳斯利亚审判官，傲慢
+	[165196] = true, -- 灰烬王庭，西塔尔
+	[180458] = true, -- 灰烬王庭，大帝幻象
 }
 
 local rogueClassHallInsignia = {
@@ -204,7 +208,7 @@ local darkmoonDailyNPCs = {
 
 QuickQuest:Register("GOSSIP_SHOW", function()
 	local npcID = GetNPCID()
-	if ignoreQuestNPC[npcID] then return end
+	if R.IgnoreQuestNPC[npcID] then return end
 
 	local active = C_GossipInfo_GetNumActiveQuests()
 	if active > 0 then
@@ -273,7 +277,9 @@ QuickQuest:Register("QUEST_DETAIL", function()
 	elseif QuestGetAutoAccept() then
 		AcknowledgeAutoAcceptQuest()
 	elseif not C_QuestLog_IsQuestTrivial(GetQuestID()) or IsTrackingHidden() then
-		AcceptQuest()
+		if not R.IgnoreQuestNPC[GetNPCID()] then
+			AcceptQuest()
+		end
 	end
 end)
 
@@ -353,7 +359,7 @@ QuickQuest:Register("QUEST_PROGRESS", function()
 		if info and (info.tagID == 153 or info.worldQuestType) then return end
 
 		local npcID = GetNPCID()
-		if ignoreQuestNPC[npcID] then return end
+		if R.IgnoreQuestNPC[npcID] then return end
 
 		local requiredItems = GetNumQuestItems()
 		if requiredItems > 0 then
@@ -460,3 +466,68 @@ local function AttemptAutoComplete(event)
 	end
 end
 QuickQuest:Register("QUEST_LOG_UPDATE", AttemptAutoComplete)
+
+-- Handle ignore list
+local function UpdateIgnoreList()
+	wipe(R.IgnoreQuestNPC)
+
+	for npcID, value in pairs(ignoreQuestNPC) do
+		R.IgnoreQuestNPC[npcID] = value
+	end
+
+	for npcID, value in pairs(R.db["Misc"]["IgnoreQuestNPC"]) do
+		if value and ignoreQuestNPC[npcID] then
+			R.db["Misc"]["IgnoreQuestNPC"][npcID] = nil
+		else
+			R.IgnoreQuestNPC[npcID] = value
+		end
+	end
+end
+
+local function UnitQuickQuestStatus(self)
+	if not self.__ignore then
+		local frame = CreateFrame("Frame", nil, self)
+		frame:SetSize(100, 14)
+		frame:SetPoint("TOP", self, "BOTTOM", 0, -2)
+		frame.title = U["Tips"]
+		M.AddTooltip(frame, "ANCHOR_RIGHT", U["AutoQuestIgnoreTip"], "info")
+		M.CreateFS(frame, 14, IGNORED):SetTextColor(1, 0, 0)
+
+		self.__ignore = frame
+
+		UpdateIgnoreList()
+	end
+
+	local npcID = GetNPCID()
+	local isIgnored = R.db["Misc"]["AutoQuest"] and npcID and R.IgnoreQuestNPC[npcID]
+	self.__ignore:SetShown(isIgnored)
+end
+
+local function ToggleQuickQuestStatus(self)
+	if not self.__ignore then return end
+	if not R.db["Misc"]["AutoQuest"] then return end
+	if not IsAltKeyDown() then return end
+
+	self.__ignore:SetShown(not self.__ignore:IsShown())
+	local npcID = GetNPCID()
+	if self.__ignore:IsShown() then
+		if ignoreQuestNPC[npcID] then
+			R.db["Misc"]["IgnoreQuestNPC"][npcID] = nil
+		else
+			R.db["Misc"]["IgnoreQuestNPC"][npcID] = true
+		end
+	else
+		if ignoreQuestNPC[npcID] then
+			R.db["Misc"]["IgnoreQuestNPC"][npcID] = false
+		else
+			R.db["Misc"]["IgnoreQuestNPC"][npcID] = nil
+		end
+	end
+
+	UpdateIgnoreList()
+end
+
+QuestNpcNameFrame:HookScript("OnShow", UnitQuickQuestStatus)
+QuestNpcNameFrame:HookScript("OnMouseDown", ToggleQuickQuestStatus)
+GossipNpcNameFrame:HookScript("OnShow", UnitQuickQuestStatus)
+GossipNpcNameFrame:HookScript("OnMouseDown", ToggleQuickQuestStatus)

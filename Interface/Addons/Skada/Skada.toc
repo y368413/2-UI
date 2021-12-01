@@ -1,4 +1,4 @@
-## Interface: 90100
+## Interface: 90105
 ## Title: Skada
 ## Notes: Modular damage meter.
 ## Title-zhCN:|cff8000ff[战斗]|r伤害统计
@@ -8,7 +8,7 @@
 ## Author: Zarnivoop, OwnlyMe
 ## Version: 1.8.3
 ## SavedVariables: SkadaDB, PermanentActivity
-## SavedVariablesPerCharacter: SkadaPerCharDB, SessionActivity
+## SavedVariablesPerCharacter: SkadaPerCharDB, SessionActivity, DCovenant, DCovenantLog
 ## Dependencies: _ShiGuang
 ## X-License: MIT/X
 ## X-Category: Combat
@@ -33,8 +33,9 @@ BrokerDisplay.lua
 
 modules.xml
 
-SkadaExplosiveOrbs.lua
-## SkadaStagger.lua
-SkadaAvoidableDamageTaken.lua
-## SkadaActivity.lua
-## SkadaPlus.lua
+plugins\Skada_ExplosiveOrbs.lua
+## plugins\Skada_Stagger.lua
+plugins\Skada_AvoidableDamageTaken.lua
+## plugins\Skada_Activity.lua
+## plugins\Skada_Plus.lua
+plugins\Skada_Covenants.lua

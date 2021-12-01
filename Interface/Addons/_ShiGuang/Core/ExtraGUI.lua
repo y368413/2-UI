@@ -4,9 +4,10 @@ local G = M:GetModule("GUI")
 
 local _G = _G
 local unpack, pairs, ipairs, tinsert = unpack, pairs, ipairs, tinsert
-local min, max, strmatch, tonumber = min, max, strmatch, tonumber
+local min, max, strmatch, strfind, tonumber = min, max, strmatch, strfind, tonumber
 local GetSpellInfo, GetSpellTexture = GetSpellInfo, GetSpellTexture
 local GetInstanceInfo, EJ_GetInstanceInfo = GetInstanceInfo, EJ_GetInstanceInfo
+local IsControlKeyDown = IsControlKeyDown
 
 local function sortBars(barTable)
 	local num = 1
@@ -743,6 +744,8 @@ function G:SetupBuffIndicator(parent)
 		GameTooltip:Show()
 	end
 
+	local UF = M:GetModule("UnitFrames")
+
 	for index, value in ipairs(frameData) do
 		M.CreateFS(panel, 14, value.text, "system", "TOPLEFT", 20, value.offset)
 
@@ -797,7 +800,6 @@ function G:SetupBuffIndicator(parent)
 			M.AddTooltip(showAll, "ANCHOR_RIGHT", U["ShowAllTip"], "info")
 			scroll.showAll = showAll
 
-			local UF = M:GetModule("UnitFrames")
 			for spellID, value in pairs(UF.CornerSpells) do
 				local r, g, b = unpack(value[2])
 				createBar(scroll.child, index, spellID, value[1], r, g, b, value[3])
@@ -815,18 +817,57 @@ end
 local function sliderValueChanged(self, v)
 	local current = tonumber(format("%.0f", v))
 	self.value:SetText(current)
-	R.db["UFs"][self.__value] = current
+	R.db[self.__key][self.__value] = current
 	self.__update()
 end
 
-local function createOptionSlider(parent, title, minV, maxV, defaultV, x, y, value, func)
+local function createOptionSlider(parent, title, minV, maxV, defaultV, x, y, value, func, key)
 	local slider = M.CreateSlider(parent, title, minV, maxV, 1, x, y)
-	slider:SetValue(R.db["UFs"][value])
-	slider.value:SetText(R.db["UFs"][value])
+	if not key then key = "UFs" end
+	slider:SetValue(R.db[key][value])
+	slider.value:SetText(R.db[key][value])
+	slider.__key = key
 	slider.__value = value
 	slider.__update = func
 	slider.__default = defaultV
 	slider:SetScript("OnValueChanged", sliderValueChanged)
+end
+
+local function updateDropdownHighlight(self)
+	local dd = self.__owner
+	for i = 1, #dd.__options do
+		local option = dd.options[i]
+		if i == R.db[dd.__key][dd.__value] then
+			option:SetBackdropColor(1, .8, 0, .3)
+			option.selected = true
+		else
+			option:SetBackdropColor(0, 0, 0, .3)
+			option.selected = false
+		end
+	end
+end
+
+local function updateDropdownState(self)
+	local dd = self.__owner
+	R.db[dd.__key][dd.__value] = self.index
+	if dd.__func then dd.__func() end
+end
+
+local function createOptionDropdown(parent, title, yOffset, options, tooltip, key, value, default, func)
+	local dd = G:CreateDropdown(parent, title, 40, yOffset, options, tooltip, 180, 28)
+	dd.__key = key
+	dd.__value = value
+	dd.__default = default
+	dd.__options = options
+	dd.__func = func
+	dd.Text:SetText(options[R.db[key][value]])
+
+	dd.button.__owner = dd
+	dd.button:HookScript("OnClick", updateDropdownHighlight)
+
+	for i = 1, #options do
+		dd.options[i]:HookScript("OnClick", updateDropdownState)
+	end
 end
 
 local function SetUnitFrameSize(self, unit)
@@ -1012,10 +1053,27 @@ function G:SetupCastbar(parent)
 	end)
 end
 
-local function createOptionCheck(parent, offset, text)
+local function toggleOptionCheck(self)
+	local value = R.db[self.__key][self.__value]
+	value = not value
+	self:SetChecked(value)
+	R.db[self.__key][self.__value] = value
+	if self.__callback then self:__callback() end
+end
+
+local function createOptionCheck(parent, offset, text, key, value, callback, tooltip)
 	local box = M.CreateCheckBox(parent)
-	box:SetPoint("TOPLEFT", 10, -offset)
+	box:SetPoint("TOPLEFT", 10, offset)
+	box:SetChecked(R.db[key][value])
+	box.__key = key
+	box.__value = value
+	box.__callback = callback
 	M.CreateFS(box, 14, text, false, "LEFT", 30, 0)
+	box:SetScript("OnClick", toggleOptionCheck)
+	if tooltip then
+		M.AddTooltip(box, "ANCHOR_RIGHT", tooltip, "info", true)
+	end
+
 	return box
 end
 local function refreshMajorSpells()

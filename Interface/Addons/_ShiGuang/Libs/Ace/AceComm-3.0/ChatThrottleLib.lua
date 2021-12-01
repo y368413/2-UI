@@ -50,7 +50,7 @@ local next = next
 local strlen = string.len
 local GetFramerate = GetFramerate
 local strlower = string.lower
-local unpack,type,pairs,wipe = unpack,type,pairs,wipe
+local unpack,type,pairs,wipe = unpack,type,pairs,table.wipe
 local UnitInRaid,UnitInParty = UnitInRaid,UnitInParty
 
 
@@ -297,8 +297,8 @@ function ChatThrottleLib.OnUpdate(this,delay)
 	-- See how many of our priorities have queued messages (we only have 3, don't worry about the loop)
 	local n = 0
 	for prioname,Prio in pairs(self.Prio) do
-		if Prio.Ring.pos or Prio.avail < 0 then 
-			n = n + 1 
+		if Prio.Ring.pos or Prio.avail < 0 then
+			n = n + 1
 		end
 	end
 

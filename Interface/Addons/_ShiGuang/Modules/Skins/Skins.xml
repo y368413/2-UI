@@ -9,6 +9,4 @@
 	
 	<Script file="AddOns\TMW.lua"/>
 	<Script file="AddOns\WeakAuras.lua"/>
-	<Script file="AddOns\PremadeGroupsFilter.lua"/>
-	<Script file="AddOns\Rematch.lua"/>
 </Ui>

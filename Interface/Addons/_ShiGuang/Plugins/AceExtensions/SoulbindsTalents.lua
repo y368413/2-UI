@@ -57,7 +57,7 @@ function SoulbindsTalents:SetupOptions()
 			},
 			version = {
 				type = "description",
-				name = "|cffffd100Version: 1.0.6|r",
+				name = "|cffffd100Version: 1.0.7|r",
 				order = 2
 			},
 			title = {
@@ -346,7 +346,6 @@ function SoulbindsTalents:AnimationFX(viewer)
 		viewer.GridSheen.Anim:SetPlaying(false);
 		viewer.BackgroundRuneLeft.Anim:SetPlaying(false);
 		viewer.BackgroundRuneRight.Anim:SetPlaying(false);
-		viewer.ConduitList.Fx.ChargeSheen.Anim:SetPlaying(false);
 	end
 end
 

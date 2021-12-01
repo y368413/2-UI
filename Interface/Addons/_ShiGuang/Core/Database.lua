@@ -52,6 +52,7 @@ end
 I.QualityColors[-1] = {r = 0, g = 0, b = 0}
 I.QualityColors[LE_ITEM_QUALITY_POOR] = {r = .61, g = .61, b = .61}
 I.QualityColors[LE_ITEM_QUALITY_COMMON] = {r = 0, g = 0, b = 0}
+I.QualityColors[99] = {r = 1, g = 0, b = 0}
 
 -- Fonts
 I.Font = {STANDARD_TEXT_FONT, 12, "OUTLINE"}

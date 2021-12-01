@@ -1,17 +1,15 @@
-## Interface: 90100
+## Interface: 90105
 ## Title: Angry Keystones
 ## Title-zhCN:|cff8000ff[战斗]|r秘境助手
 ## Title-zhTW:|cff8000ff[戰鬥]|r秘境助手
 ## Notes: Displays additional information for Mythic Keystone dungeons
 ## Notes-zhCN: 显示大秘境钥石的更多信息。
 ## Notes-zhTW: 顯示大秘境鑰石的更多資訊。
-## Version: 0.20.2
-## Author: Ermad
+## Version: 0.23.0
+## Author: Ermad + 嚣张的扇贝
 ## SavedVariables: AngryKeystones_Config, AngryKeystones_Data
-## SavedVariablesPerCharacter: AngryKeystones_CharacterConfig
-## X-Packaged-Version: v0.20.2
-
-## X-Repple: 2 UI
+## SavedVariablesPerCharacter: AngryKeystones_CharacterConfig, AngryKeystones_revise_Config, AngryKeystones_revise_Data
+## X-Packaged-Version: v0.23.0
 
 Core.lua
 Locale.lua
@@ -23,3 +21,4 @@ Keystone.lua
 Gossip.lua
 Splits.lua
 Schedule.lua
+TrackerManage.lua

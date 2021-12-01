@@ -4,7 +4,6 @@
 
 -- TODO:
 -- Improve speed
--- Mythic dungeon teleports (Spell IDs not yet known)
 
 -- Low priority:
 -- Better UI

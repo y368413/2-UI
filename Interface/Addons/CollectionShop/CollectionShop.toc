@@ -1,4 +1,4 @@
-## Interface: 90100
+## Interface: 90105
 ## Title: CollectionShop
 ## Title-zhCN: |cff69ccf0[藏品]|r购买助手
 ## Title-zhTW: |cff69ccf0[藏品]|r购买助手

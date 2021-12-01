@@ -4,7 +4,7 @@ local MISC = M:GetModule("Misc")
 
 local format, gsub, strsplit, strfind = string.format, string.gsub, string.split, string.find
 local pairs, tonumber, wipe, select = pairs, tonumber, wipe, select
-local GetInstanceInfo, PlaySound = GetInstanceInfo, PlaySound
+local GetInstanceInfo, PlaySound, print = GetInstanceInfo, PlaySound, print
 local IsPartyLFG, IsInRaid, IsInGroup, IsInInstance, IsInGuild = IsPartyLFG, IsInRaid, IsInGroup, IsInInstance, IsInGuild
 local UnitInRaid, UnitInParty, SendChatMessage = UnitInRaid, UnitInParty, SendChatMessage
 local UnitName, Ambiguate, GetTime = UnitName, Ambiguate, GetTime
@@ -12,7 +12,9 @@ local GetSpellLink, GetSpellInfo, GetSpellCooldown = GetSpellLink, GetSpellInfo,
 local GetActionInfo, GetMacroSpell, GetMacroItem = GetActionInfo, GetMacroSpell, GetMacroItem
 local GetItemInfo, GetItemInfoFromHyperlink = GetItemInfo, GetItemInfoFromHyperlink
 local C_Timer_After = C_Timer.After
+local C_Map_GetBestMapForUnit = C_Map.GetBestMapForUnit
 local C_VignetteInfo_GetVignetteInfo = C_VignetteInfo.GetVignetteInfo
+local C_VignetteInfo_GetVignettePosition = C_VignetteInfo.GetVignettePosition
 local C_Texture_GetAtlasInfo = C_Texture.GetAtlasInfo
 local C_ChatInfo_SendAddonMessage = C_ChatInfo.SendAddonMessage
 local C_ChatInfo_RegisterAddonMessagePrefix = C_ChatInfo.RegisterAddonMessagePrefix
@@ -100,18 +102,21 @@ function MISC:RareAlert_Update(id)
 
 		local atlasInfo = C_Texture_GetAtlasInfo(info.atlasName)
 		if not atlasInfo then return end
+		local tex = M:GetTextureStrByAtlas(atlasInfo)
+		if not tex then return end
 
-		local file, width, height, txLeft, txRight, txTop, txBottom = atlasInfo.file, atlasInfo.width, atlasInfo.height, atlasInfo.leftTexCoord, atlasInfo.rightTexCoord, atlasInfo.topTexCoord, atlasInfo.bottomTexCoord
-		if not file then return end
-
-		local atlasWidth = width/(txRight-txLeft)
-		local atlasHeight = height/(txBottom-txTop)
-		local tex = format("|T%s:%d:%d:0:0:%d:%d:%d:%d:%d:%d|t", file, 0, 0, atlasWidth, atlasHeight, atlasWidth*txLeft, atlasWidth*txRight, atlasHeight*txTop, atlasHeight*txBottom)
 		--UIErrorsFrame:AddMessage(I.InfoColor..U["Rare Found"]..tex..(info.name or ""))
 		RaidNotice_AddMessage(RaidWarningFrame, "----------   "..tex..(info.name or "").."   ----------", ChatTypeInfo["RAID_WARNING"])
-		if R.db["Misc"]["AlertinChat"] then
+		if R.db["Misc"]["RarePrint"] then
 			local currrentTime = MaoRUIDB["TimestampFormat"] == 1 and "|cff00ff00["..date("%H:%M:%S").."]|r" or ""
-			print(currrentTime.." -> "..I.InfoColor.." → "..tex..(info.name or ""))
+			local nameString
+			local mapID = C_Map_GetBestMapForUnit("player")
+			local position = mapID and C_VignetteInfo_GetVignettePosition(info.vignetteGUID, mapID)
+			if position then
+				local x, y = position:GetXY()
+				nameString = format(MISC.RareString, mapID, x*10000, y*10000, info.name, x*100, y*100, "")
+			end
+			print(currrentTime.." -> "..I.InfoColor..tex..(nameString or info.name or ""))  --.." → "
 		end
 		if not R.db["Misc"]["RareAlertInWild"] or MISC.RareInstType == "none" then
 			PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\Dadongda.ogg", "Master")
@@ -134,6 +139,8 @@ function MISC:RareAlert_CheckInstance()
 end
 
 function MISC:RareAlert()
+	MISC.RareString = "|Hworldmap:%d+:%d+:%d+|h[%s] <%.1f, %.1f>%s|h|r"
+
 	if R.db["Misc"]["RareAlerter"] then
 		self:RareAlert_CheckInstance()
 		M:RegisterEvent("UPDATE_INSTANCE_INFO", self.RareAlert_CheckInstance)
@@ -152,12 +159,22 @@ local function msgChannel()
 	return IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
 end
 
-local infoType = {
-	["SPELL_INTERRUPT"] = U["Interrupt"],
-	["SPELL_STOLEN"] = U["Steal"],
-	["SPELL_DISPEL"] = U["Dispel"],
-	["SPELL_AURA_BROKEN_SPELL"] = U["BrokenSpell"],
-}
+local infoType = {}
+
+function MISC:InterruptAlert_Toggle()
+	infoType["SPELL_STOLEN"] = R.db["Misc"]["DispellAlert"] and U["Steal"]
+	infoType["SPELL_DISPEL"] = R.db["Misc"]["DispellAlert"] and U["Dispel"]
+	infoType["SPELL_INTERRUPT"] = R.db["Misc"]["InterruptAlert"] and U["Interrupt"]
+	infoType["SPELL_AURA_BROKEN_SPELL"] = R.db["Misc"]["BrokenAlert"] and U["BrokenSpell"]
+end
+
+function MISC:InterruptAlert_IsEnabled()
+	for _, value in pairs(infoType) do
+		if value then
+			return true
+		end
+	end
+end
 
 local blackList = {
 	[99] = true,		-- 夺魂咆哮
@@ -181,48 +198,43 @@ local blackList = {
 	[207685] = true,	-- 悲苦咒符
 	[226943] = true,	-- 心灵炸弹
 	[228600] = true,	-- 冰川尖刺
+	[331866] = true,	-- 混沌代理人
 }
 
 function MISC:IsAllyPet(sourceFlags)
-	if I:IsMyPet(sourceFlags) or (not R.db["Misc"]["OwnInterrupt"] and (sourceFlags == I.PartyPetFlags or sourceFlags == I.RaidPetFlags)) then
+	if I:IsMyPet(sourceFlags) or sourceFlags == I.PartyPetFlags or sourceFlags == I.RaidPetFlags then
 		return true
 	end
 end
 
 function MISC:InterruptAlert_Update(...)
-	if R.db["Misc"]["AlertInInstance"] and (not IsInInstance() or IsPartyLFG()) then return end
-
 	local _, eventType, _, sourceGUID, sourceName, sourceFlags, _, _, destName, _, _, spellID, _, _, extraskillID, _, _, auraType = ...
 	if not sourceGUID or sourceName == destName then return end
 
 	if UnitInRaid(sourceName) or UnitInParty(sourceName) or MISC:IsAllyPet(sourceFlags) then
 		local infoText = infoType[eventType]
 		if infoText then
+			local sourceSpellID, destSpellID
 			if infoText == U["BrokenSpell"] then
-				if not R.db["Misc"]["BrokenSpell"] then return end
 				if auraType and auraType == AURA_TYPE_BUFF or blackList[spellID] then return end
-				if IsInInstance() then
-					SendChatMessage(format(infoText, sourceName..GetSpellLink(extraskillID), destName..GetSpellLink(spellID)), "SAY")  --msgChannel()
-				else
-					SendChatMessage(format(infoText, sourceName..GetSpellLink(extraskillID), destName..GetSpellLink(spellID)), "PARTY")  --msgChannel()
-				end
+				sourceSpellID, destSpellID = extraskillID, spellID
+			elseif infoText == U["Interrupt"] then
+				if R.db["Misc"]["OwnInterrupt"] and sourceName ~= I.MyName and not I:IsMyPet(sourceFlags) then return end
+				sourceSpellID, destSpellID = spellID, extraskillID
 			else
-				if R.db["Misc"]["OwnInterrupt"] and sourceName ~= I.MyName and not MISC:IsAllyPet(sourceFlags) then return end
-				   if R.db["Misc"]["InterruptSound"] then
-				      PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\ShutupFool.ogg", "Master")
-				   end
-				if IsInInstance() then
-					SendChatMessage(infoText .. GetSpellLink(extraskillID), "SAY")  --msgChannel()
-				else
-					SendChatMessage(infoText .. GetSpellLink(extraskillID), "PARTY")  --msgChannel()
-				end
+				if R.db["Misc"]["OwnDispell"] and sourceName ~= I.MyName and not I:IsMyPet(sourceFlags) then return end
+				sourceSpellID, destSpellID = spellID, extraskillID
+			end
+
+			if sourceSpellID and destSpellID then
+				SendChatMessage(format(infoText, sourceName..GetSpellLink(sourceSpellID), destName..GetSpellLink(destSpellID)), msgChannel())
 			end
 		end
 	end
 end
 
 function MISC:InterruptAlert_CheckGroup()
-	if IsInGroup() then
+	if IsInGroup() and (not R.db["Misc"]["InstAlertOnly"] or (IsInInstance() and not IsPartyLFG())) then
 		M:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.InterruptAlert_Update)
 	else
 		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.InterruptAlert_Update)
@@ -230,13 +242,17 @@ function MISC:InterruptAlert_CheckGroup()
 end
 
 function MISC:InterruptAlert()
-	if R.db["Misc"]["Interrupt"] then
+	MISC:InterruptAlert_Toggle()
+
+	if MISC:InterruptAlert_IsEnabled() then
 		self:InterruptAlert_CheckGroup()
 		M:RegisterEvent("GROUP_LEFT", self.InterruptAlert_CheckGroup)
 		M:RegisterEvent("GROUP_JOINED", self.InterruptAlert_CheckGroup)
+		M:RegisterEvent("PLAYER_ENTERING_WORLD", self.InterruptAlert_CheckGroup)
 	else
 		M:UnregisterEvent("GROUP_LEFT", self.InterruptAlert_CheckGroup)
 		M:UnregisterEvent("GROUP_JOINED", self.InterruptAlert_CheckGroup)
+		M:UnregisterEvent("PLAYER_ENTERING_WORLD", self.InterruptAlert_CheckGroup)
 		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.InterruptAlert_Update)
 	end
 end

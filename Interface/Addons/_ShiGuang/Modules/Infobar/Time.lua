@@ -30,8 +30,6 @@ local GetNumSavedInstances, GetSavedInstanceInfo = GetNumSavedInstances, GetSave
 local IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
 local C_TaskQuest_GetThreatQuests = C_TaskQuest.GetThreatQuests
 local C_TaskQuest_GetQuestInfoByQuestID = C_TaskQuest.GetQuestInfoByQuestID
-local CONQUEST_CURRENCY_ID = Constants.CurrencyConsts.CONQUEST_CURRENCY_ID
-local C_CurrencyInfo_GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
 
 local function updateTimerFormat(color, hour, minute)
 	if GetCVarBool("timeMgrUseMilitaryTime") then
@@ -223,9 +221,8 @@ info.onEnter = function(self)
 	RequestRaidInfo()
 
 	local r,g,b
-	--GameTooltip:SetOwner(self, "ANCHOR_NONE")
-	--GameTooltip:SetPoint("BOTTOMRIGHT", UIParent, -15, 30)
-	GameTooltip:SetOwner(self, "ANCHOR_TOP", 0, 15)
+	local _, anchor, offset = module:GetTooltipAnchor(info)
+	GameTooltip:SetOwner(self, "ANCHOR_"..anchor, 0, offset)
 	GameTooltip:ClearLines()
 	local today = C_DateAndTime_GetCurrentCalendarTime()
 	local w, m, d, y = today.weekday, today.month, today.monthDay, today.year
@@ -290,15 +287,6 @@ info.onEnter = function(self)
 	-- Quests
 	title = false
 
-	local currencyInfo = C_CurrencyInfo_GetCurrencyInfo(CONQUEST_CURRENCY_ID)
-	local totalEarned = currencyInfo.totalEarned
-	if currencyInfo and totalEarned > 0 then
-		addTitle(QUESTS_LABEL)
-		local maxProgress = currencyInfo.maxQuantity
-		local progress = min(totalEarned, maxProgress)
-		GameTooltip:AddDoubleLine(currencyInfo.name, progress.."/"..maxProgress, 1,1,1, 1,1,1)
-	end
-
 	for _, v in pairs(questlist) do
 		if v.name and IsQuestFlaggedCompleted(v.id) then
 			if v.name == U["Timewarped"] and isTimeWalker and checkTexture(v.texture) or v.name ~= U["Timewarped"] then
@@ -308,7 +296,7 @@ info.onEnter = function(self)
 		end
 	end
 
-	if IsShiftKeyDown() then
+	--if IsShiftKeyDown() then
 		-- Nzoth relavants
 		for _, v in ipairs(horrificVisions) do
 			if IsQuestFlaggedCompleted(v.id) then
@@ -350,10 +338,10 @@ info.onEnter = function(self)
 			local nextLocation = GetNextLocation(nextTime, index)
 			GameTooltip:AddDoubleLine(U["Next Invasion"]..nextLocation, date("%m/%d %H:%MISC", nextTime), 1,1,1, 1,1,1)
 		end
-	else
-		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(U["Hold Shift"], .6,.8,1)
-	end
+	--else
+		--GameTooltip:AddLine(" ")
+		--GameTooltip:AddLine(U["Hold Shift"], .6,.8,1)
+	--end
 
 	-- Help Info
 	GameTooltip:AddDoubleLine(" ", I.LineString)
@@ -380,7 +368,7 @@ info.onMouseUp = function(_, btn)
 			ToggleFrame(WeeklyRewardsFrame)
 		end
 	else
-		--if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
+		--if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
 		ToggleCalendar()
 	end
 end

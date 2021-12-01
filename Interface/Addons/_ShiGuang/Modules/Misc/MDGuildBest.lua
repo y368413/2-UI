@@ -191,6 +191,7 @@ function MISC:KeystoneInfo_Create()
 	button:SetScript("OnMouseUp", function(_, btn)
 		if btn == "MiddleButton" then
 			wipe(MaoRUIDB["KeystoneInfo"])
+			MISC:KeystoneInfo_Update() -- update own keystone info after reset
 		end
 	end)
 end

@@ -179,7 +179,7 @@ function MISC:MailBox_ContactList()
 
 	local list = CreateFrame("Frame", nil, bu)
 	list:SetSize(200, 424)
-	list:SetPoint("TOPLEFT", MailFrame, "TOPRIGHT", 3, 0)
+	list:SetPoint("TOPLEFT", MailFrame, "TOPRIGHT", 3, -R.mult)
 	list:SetFrameStrata("Tooltip")
 	M.SetBD(list)
 	M.CreateFS(list, 14, U["ContactList"], "system", "TOP", 0, -5)

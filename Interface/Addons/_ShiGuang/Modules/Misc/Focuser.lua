@@ -1,6 +1,6 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
-local oUF = ns.oUF or oUF
+local oUF = ns.oUF
 local MISC = M:GetModule("Misc")
 
 local _G = getfenv(0)

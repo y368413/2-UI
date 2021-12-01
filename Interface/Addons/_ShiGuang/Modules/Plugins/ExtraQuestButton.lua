@@ -19,7 +19,7 @@ local C_QuestLog_GetLogIndexForQuestID = C_QuestLog.GetLogIndexForQuestID
 local C_QuestLog_GetNumWorldQuestWatches = C_QuestLog.GetNumWorldQuestWatches
 local C_QuestLog_GetQuestIDForQuestWatchIndex = C_QuestLog.GetQuestIDForQuestWatchIndex
 local C_QuestLog_GetQuestIDForWorldQuestWatchIndex = C_QuestLog.GetQuestIDForWorldQuestWatchIndex
-local MAX_DISTANCE_YARDS = 1e5
+local MAX_DISTANCE_YARDS = 1e4 -- needs review
 local onlyCurrentZone = true
 
 -- Warlords of Draenor intro quest items which inspired this addon
@@ -154,12 +154,28 @@ local questItems = {
 	[13425] = 41612, -- Storm Peaks
 	[27384] = 12888, -- Eastern Plaguelands
 	[60649] = 180170, -- Ardenweald
-	[59809] = 177904, -- Night Fae Covenant
+	[58586] = 174465, -- Venthyr Covenant
 	[59063] = 175137, -- Night Fae Covenant
+	[59809] = 177904, -- Night Fae Covenant
 	[60188] = 178464, -- Night Fae Covenant
 	[60649] = 180170, -- Ardenweald
 	[60609] = 180008, -- Ardenweald
-	[58586] = 174465, -- Venthyr Covenant
+}
+
+-- items that need to be shown, but not. (itemID = bool/mapID)
+local completeShownItems = {
+	[35797] = 116, -- Grizzly Hills
+	[60273] = 50, -- Northern Stranglethorn Vale
+	[52853] = true, -- Mount Hyjal
+	[41058] = 120, -- Storm Peaks
+	[177904] = true,
+}
+
+-- items that need to be hidden, but not. (itemID = bool/mapID)
+local completeHiddenItems = {
+	[184876] = true, -- Cohesion Crystal
+	[186199] = true, -- Lady Moonberry's Wand
+	[187012] = true, -- Unbalanced Riftstone
 }
 
 local ExtraQuestButton = CreateFrame("Button", "ExtraQuestButton", UIParent, "SecureActionButtonTemplate, SecureHandlerStateTemplate, SecureHandlerAttributeTemplate")
@@ -451,9 +467,14 @@ local function GetQuestDistanceWithItem(questID)
 	end
 	if not itemLink then return end
 	if GetItemCount(itemLink) == 0 then return end
-	if blacklist[GetItemInfoFromHyperlink(itemLink)] then return end
 
-	if C_QuestLog_IsComplete(questID) and not showWhenComplete then return end
+	local itemID = GetItemInfoFromHyperlink(itemLink)
+	if blacklist[itemID] then return end
+
+	if C_QuestLog_IsComplete(questID) then
+		if showWhenComplete and completeHiddenItems[itemID] then return end -- hide item when quest completed
+		if not showWhenComplete and not completeShownItems[itemID] then return end -- show item even quest completed
+	end
 
 	local distanceSq = C_QuestLog_GetDistanceSqToQuest(questID)
 	local distanceYd = distanceSq and sqrt(distanceSq)

@@ -33,7 +33,7 @@ end
 local Enable, Disable, EnableModule, DisableModule, Embed, NewModule, GetModule, GetName, SetDefaultModuleState, SetDefaultModuleLibraries, SetEnabledState, SetDefaultModulePrototype
 
 -- used in the addon metatable
-local function addontostring( self ) return self.name end 
+local function addontostring( self ) return self.name end
 
 -- Check if the addon is queued for initialization
 local function queuedForInitialization(addon)

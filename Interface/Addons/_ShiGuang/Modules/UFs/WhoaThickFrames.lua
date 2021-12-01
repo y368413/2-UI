@@ -39,7 +39,7 @@ CreateBarPctText(FocusFrame, "RIGHT", "LEFT", -3, -8, "NumberFontNormalLarge", 3
 --for i = 1, 4 do CreateBarPctText(_G["PartyMemberFrame"..i], "LEFT", "RIGHT", 6, 0, "NumberFontNormal", 16) end
 --for i = 1, MAX_BOSS_FRAMES do CreateBarPctText(_G["Boss"..i.."TargetFrame"], "LEFT", "RIGHT", 8, 30, "NumberFontNormal", 36) end	
 
---[[	Player class colors.
+--	Player class colors.
 function whoaUnitClass(healthbar, unit)
 	if healthbar and not healthbar.lockValues and unit == healthbar.unit then
 		local min, max = healthbar:GetMinMaxValues()
@@ -67,11 +67,11 @@ end
 hooksecurefunc("UnitFrameHealthBar_Update", whoaUnitClass)
 hooksecurefunc("HealthBar_OnValueChanged", function(self)
 	whoaUnitClass(self, self.unit)
-end)]]
+end)
 
 -- palyer frame class color selector.
 function whoaUnitColor(unit)
-	--[[if (reactColor) then
+	--if (reactColor) then
 		if UnitIsTapDenied(unit) then
 			r, g, b = 0.5, 0.5, 0.5;
 		else
@@ -89,9 +89,9 @@ function whoaUnitColor(unit)
 				end
 			end
 		end
-	else
-		r, g, b = 0, 0.9, 0;
-	end]]
+	--else
+		--r, g, b = 0, 0.9, 0;
+	--end
 	if UnitIsPlayer(unit) then
 		if not UnitIsConnected(unit) then
 			r, g, b = 0.5, 0.5, 0.5;
@@ -122,6 +122,25 @@ end)
 		-- end
 	-- end
 -- end);
+
+function WhoaGroupIndicator()
+	local name, rank, subgroup;
+	if ( not IsInRaid() ) then
+		return;
+	end
+	local numGroupMembers = GetNumGroupMembers();
+	for i=1, MAX_RAID_MEMBERS do
+		if ( i <= numGroupMembers ) then
+			name, rank, subgroup = GetRaidRosterInfo(i);
+			if ( name == UnitName("player") ) then
+				PlayerFrameGroupIndicatorText:SetText("G"..subgroup);
+				PlayerFrameGroupIndicator:SetWidth(PlayerFrameGroupIndicatorText:GetWidth());-- +40);
+				PlayerFrameGroupIndicator:Show();
+			end
+		end
+	end
+end
+hooksecurefunc("PlayerFrame_UpdateGroupIndicator", WhoaGroupIndicator)
 
 -- Unit frames Status text reformat.
 local function customStatusTex(statusFrame, textString, value, valueMin, valueMax)
@@ -511,6 +530,8 @@ function wPlayerFrame(self)
 	PlayerStatusTexture:SetPoint("CENTER", PlayerFrame, "CENTER",16, 8);
 		PlayerFrameTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetingFrame");
 		PlayerStatusTexture:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\Modules\\UFs\\UI-Player-Status");
+	PlayerLevelText:ClearAllPoints();
+	PlayerLevelText:SetPoint("CENTER", PlayerFrameTexture, "CENTER", 200,0);
 	self.name:ClearAllPoints();
 	self.name:SetPoint("CENTER", PlayerFrame, "CENTER",50, 36);
 	self.healthbar:SetPoint("TOPLEFT",108,-24);
@@ -816,39 +837,80 @@ local whoaBossFrame = CreateFrame("Frame")
 whoaBossFrame:RegisterEvent("PLAYER_LOGIN")
 whoaBossFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 whoaBossFrame:SetScript('OnUpdate', function(self)
-	for i = 1, MAX_BOSS_FRAMES do
-		if _G["Boss"..i.."TargetFrame"] then
-			
-			_G["Boss"..i.."TargetFrameTextureFrameDeadText"]:ClearAllPoints();
-			_G["Boss"..i.."TargetFrameTextureFrameDeadText"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrameHealthBar"],"CENTER",0,0);
-			_G["Boss"..i.."TargetFrameTextureFrameName"]:ClearAllPoints();
-			_G["Boss"..i.."TargetFrameTextureFrameName"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrame"],"CENTER",-57,-23);
-			_G["Boss"..i.."TargetFrameTextureFrameTexture"]:SetTexture("Interface\\Addons\\"..whoaAddon.."\\media\\UI-UNITFRAME-BOSS");
-			_G["Boss"..i.."TargetFrameNameBackground"]:Hide();
-			_G["Boss"..i.."TargetFrameHealthBar"]:SetStatusBarColor(whoaUnitColor("boss"..i));
-			_G["Boss"..i.."TargetFrameHealthBar"]:SetSize(116,30);
-			_G["Boss"..i.."TargetFrameHealthBar"]:ClearAllPoints();
-			_G["Boss"..i.."TargetFrameHealthBar"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrame"],"CENTER",-51,13);
-			_G["Boss"..i.."TargetFrameManaBar"]:SetSize(116,10);
-			_G["Boss"..i.."TargetFrameManaBar"]:ClearAllPoints();
-			_G["Boss"..i.."TargetFrameManaBar"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrame"],"CENTER",-51,-10);
-			_G["Boss"..i.."TargetFrameTextureFrameUnconsciousText"]:ClearAllPoints();
-			_G["Boss"..i.."TargetFrameTextureFrameUnconsciousText"]:SetPoint("CENTER", _G["Boss"..i.."TargetFrameHealthBar"], "CENTER",0,0);
-			_G["Boss"..i.."TargetFrameTextureFrameHealthBarTextLeft"]:ClearAllPoints();
-			_G["Boss"..i.."TargetFrameTextureFrameHealthBarTextLeft"]:SetPoint("LEFT",_G["Boss"..i.."TargetFrameHealthBar"],"LEFT",2,0);
-			_G["Boss"..i.."TargetFrameTextureFrameHealthBarTextRight"]:ClearAllPoints();
-			_G["Boss"..i.."TargetFrameTextureFrameHealthBarTextRight"]:SetPoint("RIGHT",_G["Boss"..i.."TargetFrameHealthBar"],"RIGHT",0,0);
-			_G["Boss"..i.."TargetFrameTextureFrameHealthBarText"]:ClearAllPoints();
-			_G["Boss"..i.."TargetFrameTextureFrameHealthBarText"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrameHealthBar"],"CENTER",0,0);
-			_G["Boss"..i.."TargetFrameTextureFrameManaBarTextLeft"]:Hide();
-			_G["Boss"..i.."TargetFrameTextureFrameManaBarTextLeft"]:SetPoint("LEFT",_G["Boss"..i.."TargetFrameManaBar"],"LEFT",0,0);
-			_G["Boss"..i.."TargetFrameTextureFrameManaBarTextRight"]:Hide();
-			_G["Boss"..i.."TargetFrameTextureFrameManaBarTextRight"]:SetPoint("RIGHT",_G["Boss"..i.."TargetFrameManaBar"],"RIGHT",0,0);
-			_G["Boss"..i.."TargetFrameTextureFrameManaBarText"]:Hide();
-			_G["Boss"..i.."TargetFrameTextureFrameManaBarText"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrameManaBar"],"CENTER",0,0);
-			_G["Boss"..i.."TargetFrameTextureFrameManaBarTextLeft"]:Hide();
-			_G["Boss"..i.."TargetFrameTextureFrameManaBarTextRight"]:Hide();
-			_G["Boss"..i.."TargetFrameTextureFrameManaBarText"]:Hide();
+		for i = 1, MAX_BOSS_FRAMES do
+			if _G["Boss"..i.."TargetFrame"] then
+				_G["Boss"..i.."TargetFrameTextureFrameDeadText"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameTextureFrameDeadText"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrameHealthBar"],"CENTER",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameName"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameTextureFrameName"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrame"],"CENTER",-57,-23);
+				_G["Boss"..i.."TargetFrameTextureFrameTexture"]:SetTexture("Interface\\Addons\\"..whoaAddon.."\\media\\UI-UNITFRAME-BOSS");
+				_G["Boss"..i.."TargetFrameNameBackground"]:Hide();
+				_G["Boss"..i.."TargetFrameHealthBar"]:SetStatusBarColor(whoaUnitColor("boss"..i));
+				_G["Boss"..i.."TargetFrameHealthBar"]:SetSize(116,30);
+				_G["Boss"..i.."TargetFrameHealthBar"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameHealthBar"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrame"],"CENTER",-51,13);
+				_G["Boss"..i.."TargetFrameManaBar"]:SetSize(116,10);
+				_G["Boss"..i.."TargetFrameManaBar"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameManaBar"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrame"],"CENTER",-51,-10);
+				_G["Boss"..i.."TargetFrameTextureFrameUnconsciousText"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameTextureFrameUnconsciousText"]:SetPoint("CENTER", _G["Boss"..i.."TargetFrameHealthBar"], "CENTER",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameHealthBarTextLeft"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameTextureFrameHealthBarTextLeft"]:SetPoint("LEFT",_G["Boss"..i.."TargetFrameHealthBar"],"LEFT",2,0);
+				_G["Boss"..i.."TargetFrameTextureFrameHealthBarTextRight"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameTextureFrameHealthBarTextRight"]:SetPoint("RIGHT",_G["Boss"..i.."TargetFrameHealthBar"],"RIGHT",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameHealthBarText"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameTextureFrameHealthBarText"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrameHealthBar"],"CENTER",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarTextLeft"]:Hide();
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarTextLeft"]:SetPoint("LEFT",_G["Boss"..i.."TargetFrameManaBar"],"LEFT",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarTextRight"]:Hide();
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarTextRight"]:SetPoint("RIGHT",_G["Boss"..i.."TargetFrameManaBar"],"RIGHT",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarText"]:Hide();
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarText"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrameManaBar"],"CENTER",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarTextLeft"]:Hide();
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarTextRight"]:Hide();
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarText"]:Hide();
+			end
 		end
-	end
+end)
+
+
+
+
+
+	--	Boss target frames
+local whoaBossFrame = CreateFrame("Frame")
+whoaBossFrame:RegisterEvent("PLAYER_LOGIN")
+whoaBossFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+whoaBossFrame:SetScript('OnUpdate', function(self)
+		for i = 1, MAX_BOSS_FRAMES do
+			if i then
+				_G["Boss"..i.."TargetFrameTextureFrameDeadText"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameTextureFrameDeadText"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrameHealthBar"],"CENTER",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameUnconsciousText"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameTextureFrameUnconsciousText"]:SetPoint("CENTER", _G["Boss"..i.."TargetFrameHealthBar"], "CENTER",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameName"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameTextureFrameName"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrame"],"CENTER",-57,-23);
+				_G["Boss"..i.."TargetFrameTextureFrameTexture"]:SetTexture("Interface\\Addons\\whoaUnitFrames\\media\\UI-UNITFRAME-BOSS");
+				_G["Boss"..i.."TargetFrameNameBackground"]:SetAlpha(0);
+				_G["Boss"..i.."TargetFrameHealthBar"]:SetSize(116,20);
+				_G["Boss"..i.."TargetFrameHealthBar"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameHealthBar"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrame"],"CENTER",-51,18);
+				_G["Boss"..i.."TargetFrameManaBar"]:SetSize(116,18);
+				_G["Boss"..i.."TargetFrameManaBar"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameManaBar"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrame"],"CENTER",-51,-3);
+				_G["Boss"..i.."TargetFrameTextureFrameHealthBarTextLeft"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameTextureFrameHealthBarTextLeft"]:SetPoint("LEFT",_G["Boss"..i.."TargetFrameHealthBar"],"LEFT",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameHealthBarTextRight"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameTextureFrameHealthBarTextRight"]:SetPoint("RIGHT",_G["Boss"..i.."TargetFrameHealthBar"],"RIGHT",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameHealthBarText"]:ClearAllPoints();
+				_G["Boss"..i.."TargetFrameTextureFrameHealthBarText"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrameHealthBar"],"CENTER",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarTextLeft"]:Hide();
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarTextLeft"]:SetPoint("LEFT",_G["Boss"..i.."TargetFrameManaBar"],"LEFT",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarTextRight"]:Hide();
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarTextRight"]:SetPoint("RIGHT",_G["Boss"..i.."TargetFrameManaBar"],"RIGHT",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarText"]:Hide();
+				_G["Boss"..i.."TargetFrameTextureFrameManaBarText"]:SetPoint("CENTER",_G["Boss"..i.."TargetFrameManaBar"],"CENTER",0,0);
+				_G["Boss"..i.."TargetFrameTextureFrameTexture"]:SetTexture("Interface\\Addons\\"..whoaAddon.."\\media\\UI-UNITFRAME-BOSS");
+			end
+		end
 end)]]

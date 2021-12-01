@@ -10,7 +10,8 @@ local HolyPower = Enum.PowerType.HolyPower;
 local HL = {
     AvengingWrath = 31884,
     HammerOfWrath = 24275,
-    Judgment = 20271,
+    Judgment = 275773,
+    JudgmentDebuff = 214222,
     Consecration = 26573,
     CrusaderStrike = 35395,
     ShieldoftheRighteous = 53600,
@@ -61,12 +62,8 @@ function Paladin:Holy()
     local buff = fd.buff;
     local debuff = fd.debuff;
     local talents = fd.talents;
-    local targets = fd.targets;
     local gcd = fd.gcd;
     local targetHp = MaxDps:TargetPercentHealth() * 100;
-    local health = UnitHealth('player');
-    local healthMax = UnitHealthMax('player');
-    local healthPercent = ( health / healthMax ) * 100;
 
     -- Essences
     MaxDps:GlowEssences();
@@ -100,10 +97,7 @@ function Paladin:Holy()
     end
     --
     --NightFae
-    --Gives Healing
-    --if covenantId == CN.NightFae and cooldown[HL.BlessingofSpring].ready then
-    --    MaxDps:GlowCooldown(HL.BlessingofSpring, cooldown[HL.BlessingofSpring].ready)
-    --end
+    --HL.BlessingofSpring Gives Healing
 
     if covenantId == CN.NightFae and cooldown[HL.BlessingofSummer].ready then
         MaxDps:GlowCooldown(HL.BlessingofSummer, cooldown[HL.BlessingofSummer].ready);
@@ -137,15 +131,18 @@ function Paladin:Holy()
         return HL.HammerOfWrath;
     end
 
-    if cooldown[HL.Judgment].ready then
+    if cooldown[HL.Consecration].ready then
+        return HL.Consecration;
+    end
+
+    -- If judgement is coming off cd in less than or same time Holy Shock is coming up sugest judgment to get the debuff up for holy shock
+    if cooldown[HL.Judgment].ready or cooldown[HL.Judgment].remains <= gcd and cooldown[HL.Judgment].remains <= cooldown[HL.HolyShock].remains and not debuff[HL.JudgmentDebuff].up then
         return HL.Judgment;
     end
 
-    --if cooldown[HL.HolyShock].ready and debuff[HL.GlimmerofLight].remains < 2 or buff[HL.GlimmerofLight].remains < 2 then
-	--	return HL.HolyShock
-	--end
-
-    if cooldown[HL.HolyShock].ready then
+    -- If the Judgement Debuff is up we want to use Holy Shock before crusader strike or if its coming off cooldown in less time then we can apply another
+    --local currentCharges, maxCharges, cooldownStart, cooldownDuration, chargeModRate = GetSpellCharges(HL.CrusaderStrike)
+    if cooldown[HL.HolyShock].ready or debuff[HL.JudgmentDebuff].up and cooldown[HL.HolyShock].remains <= cooldown[HL.Judgment].remains then
         return HL.HolyShock;
     end
 
@@ -153,7 +150,5 @@ function Paladin:Holy()
         return HL.CrusaderStrike;
     end
 
-    if cooldown[HL.Consecration].ready then
-        return HL.Consecration;
-    end
 end
+

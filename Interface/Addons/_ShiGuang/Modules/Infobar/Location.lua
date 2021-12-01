@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 if not R.Infobar.Location then return end
 
 local module = M:GetModule("Infobar")
-local info = module:RegisterInfobar("Location", R.Infobar.LocationPos)
+local info = module:RegisterInfobar("Zone", R.Infobar.LocationPos)
 local mapModule = M:GetModule("Maps")
 info.text:SetFont(unpack(R.Infobar.TTFonts))
 local format, unpack = string.format, unpack
@@ -43,3 +43,58 @@ info.onEvent = function(self)
 	if subzone ~= '' and subzone ~= realzone then self.text:SetFormattedText('%s - %s', realzone, subzone) else self.text:SetText(realzone) end
 	self.text:SetTextColor(r, g, b)
 end
+
+--[[local function UpdateCoords(self, elapsed)
+	self.elapsed = (self.elapsed or 0) + elapsed
+	if self.elapsed > .1 then
+		local x, y = mapModule:GetPlayerMapPos(C_Map_GetBestMapForUnit("player"))
+		if x then
+			coordX, coordY = x, y
+		else
+			coordX, coordY = 0, 0
+			self:SetScript("OnUpdate", nil)
+		end
+		self:onEnter()
+
+		self.elapsed = 0
+	end
+end
+
+info.onEnter = function(self)
+	self:SetScript("OnUpdate", UpdateCoords)
+
+	local _, anchor, offset = module:GetTooltipAnchor(info)
+	GameTooltip:SetOwner(self, "ANCHOR_"..anchor, 0, offset)
+	GameTooltip:ClearLines()
+	GameTooltip:AddLine(format("%s |cffffffff(%s)", zone, formatCoords()), 0,.6,1)
+
+	if pvpType and not IsInInstance() then
+		local r, g, b = unpack(zoneInfo[pvpType][2])
+		if subzone and subzone ~= zone then
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddLine(subzone, r, g, b)
+		end
+		GameTooltip:AddLine(format(zoneInfo[pvpType][1], faction or ""), r, g, b)
+	end
+
+	GameTooltip:AddDoubleLine(" ", I.LineString)
+	GameTooltip:AddDoubleLine(" ", I.LeftButton..U["WorldMap"].." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", I.RightButton..U["Send My Pos"].." ", 1,1,1, .6,.8,1)
+	GameTooltip:Show()
+end
+
+info.onLeave = function(self)
+	self:SetScript("OnUpdate", nil)
+	GameTooltip:Hide()
+end
+
+info.onMouseUp = function(_, btn)
+	if btn == "LeftButton" then
+		--if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
+		ToggleFrame(WorldMapFrame)
+	elseif btn == "RightButton" then
+		local hasUnit = UnitExists("target") and not UnitIsPlayer("target")
+		local unitName = hasUnit and UnitName("target") or ""
+		ChatFrame_OpenChat(format("%s: %s (%s) %s", U["My Position"], zone, formatCoords(), unitName), SELECTED_DOCK_FRAME)
+	end
+end]]

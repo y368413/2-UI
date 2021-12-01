@@ -18,8 +18,6 @@ constants.defaults = {
         icon_alpha_banker = 1,
         icon_scale_barber = 1.25,
         icon_alpha_barber = 1,
-        icon_scale_greatvault = 1.5,
-        icon_alpha_greatvault = 1,
         icon_scale_guildvault = 1.3,
         icon_alpha_guildvault = 1,
         icon_scale_innkeeper = 1.25,
@@ -52,7 +50,6 @@ constants.defaults = {
         show_auctioneer = true,
         show_banker = true,
         show_barber = true,
-        show_greatvault = true,
         show_guildvault = true,
         show_innkeeper = true,
         show_mail = true,
@@ -95,7 +92,6 @@ constants.icongroup = {
     -- "anvil",
     "banker",
     "barber",
-    "greatvault",
     "guildvault",
     "innkeeper",
     "mail",
@@ -136,7 +132,6 @@ constants.icon = {
     anvil           = "Interface\\AddOns\\HandyNotes\\icons\\anvil",
     banker          = "Interface\\MINIMAP\\TRACKING\\Banker",
     barber          = "Interface\\MINIMAP\\TRACKING\\Barbershop",
-    greatvault      = "Interface\\AddOns\\HandyNotes\\icons\\greatvault",
     guildvault      = "Interface\\ICONS\\Achievement_ChallengeMode_Auchindoun_Gold",
     innkeeper       = "Interface\\MINIMAP\\TRACKING\\Innkeeper",
     mail            = "Interface\\MINIMAP\\TRACKING\\Mailbox",
@@ -194,7 +189,7 @@ local constantsicon = Oribos.constants.icon
 
 local requires          = L["handler_tooltip_requires"]
 local RequiresQuest     = L["handler_tooltip_quest"]
-local RetrievindData    = L["handler_tooltip_data"]
+local RetrievingData    = L["handler_tooltip_data"]
 
 ----------------------------------------------------------------------------------------------------
 --------------------------------------------GET NPC NAMES-------------------------------------------
@@ -230,6 +225,63 @@ local function HasTwoProfessions()
         return true
     end
     return false
+end
+
+----------------------------------------------------------------------------------------------------
+---------------------------------------FLIGHT MASTER WAYPOINT---------------------------------------
+----------------------------------------------------------------------------------------------------
+
+local fmaster_waypoint = 0
+local function CreateFlightMasterWaypoint()
+    local dropdown = Oribos.db.fmaster_waypoint_dropdown
+
+    if dropdown == 1 then
+        -- create Blizzard waypoint
+        C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(1550, 47.02/100, 51.16/100))
+        C_SuperTrack.SetSuperTrackedUserWaypoint(true)
+        fmaster_waypoint = 1
+        --HandyNotes_Oribos:debugmsg("Create Blizzard")
+    elseif IsAddOnLoaded("TomTom") and dropdown == 2 then
+        -- create TomTom waypoint
+        Oribos.uid = TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNamebyID(162666)})
+        fmaster_waypoint = 1
+        --HandyNotes_Oribos:debugmsg("Create TomTom")
+    elseif dropdown == 3 then
+        -- create both waypoints
+        C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(1550, 47.02/100, 51.16/100))
+        C_SuperTrack.SetSuperTrackedUserWaypoint(true)
+        if IsAddOnLoaded("TomTom") then
+            Oribos.uid = TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNamebyID(162666)})
+        end
+        fmaster_waypoint = 1
+        --HandyNotes_Oribos:debugmsg("Create Both")
+    end
+end
+
+local function RemoveFlightMasterWaypoint()
+    local dropdown = Oribos.db.fmaster_waypoint_dropdown
+
+    if fmaster_waypoint == 1 then
+        if dropdown == 1 then
+            -- remove Blizzard waypoint
+            C_Map.ClearUserWaypoint()
+            fmaster_waypoint = 0
+            --HandyNotes_Oribos:debugmsg("Remove Blizzard")
+        elseif IsAddOnLoaded("TomTom") and dropdown == 2 then
+            -- remove TomTom waypoint
+            TomTom:RemoveWaypoint(Oribos.uid)
+            fmaster_waypoint = 0
+            --HandyNotes_Oribos:debugmsg("Remove TomTom")
+        elseif dropdown == 3 then
+            -- remove both waypoints
+            C_Map.ClearUserWaypoint()
+            if IsAddOnLoaded("TomTom") then
+                TomTom:RemoveWaypoint(Oribos.uid)
+            end
+            fmaster_waypoint = 0
+            --HandyNotes_Oribos:debugmsg("Remove Both")
+        end
+    end
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -277,16 +329,8 @@ local GetPointInfo = function(point)
     local icon
     if point then
         local label = GetCreatureNamebyID(point.npc) or point.label or UNKNOWN
-        if (point.portal and (point.lvl or point.quest)) then
-            if (point.lvl and (UnitLevel("player") < point.lvl)) and (point.quest and not IsQuestCompleted(point.quest)) then
-                icon = Oribos.constants.icon["MagePortalHorde"]
-            elseif (point.lvl and (UnitLevel("player") < point.lvl)) then
-                icon = Oribos.constants.icon["MagePortalHorde"]
-            elseif (point.quest and not IsQuestCompleted(point.quest)) then
-                icon = Oribos.constants.icon["MagePortalHorde"]
-            else
-                icon = SetIcon(point)
-            end
+        if (point.icon == "portal" and point.quest and not IsQuestCompleted(point.quest)) then
+            icon = Oribos.constants.icon["MagePortalHorde"]
         else
             icon = SetIcon(point)
         end
@@ -324,7 +368,7 @@ local function SetTooltip(tooltip, point)
             if C_QuestLog.GetTitleForQuestID(point.quest) ~= nil then
                 tooltip:AddLine(RequiresQuest..": ["..C_QuestLog.GetTitleForQuestID(point.quest).."] (ID: "..point.quest..")",1,0,0)
             else
-                tooltip:AddLine(RetrievindData,1,0,1) -- pink
+                tooltip:AddLine(RetrievingData,1,0,1) -- pink
                 C_Timer.After(1, function() HandyNotes_Oribos:Refresh() end) -- Refresh
                 -- print("refreshed")
             end
@@ -557,64 +601,47 @@ end
 ----------------------------------------------EVENTS-----------------------------------------------
 
 local frame, events = CreateFrame("Frame"), {};
+function events:PLAYER_ENTERING_WORLD(...)
+    -- MapID is 1550 when you use the Portal to Korthia
+    if C_Map.GetBestMapForUnit("player") == 1550 then
+        RemoveFlightMasterWaypoint()
+    end
+end
+
 function events:ZONE_CHANGED(...)
     HandyNotes_Oribos:Refresh()
 
-    if Oribos.global.dev and Oribos.db.show_prints then
-        print("Oribos: refreshed after ZONE_CHANGED")
-        print("MapID: "..C_Map.GetBestMapForUnit("player"))
-    end
+    --HandyNotes_Oribos:debugmsg("Oribos: refreshed after ZONE_CHANGED")
+    --HandyNotes_Oribos:debugmsg("MapID: "..C_Map.GetBestMapForUnit("player"))
 
     if C_Map.GetBestMapForUnit("player") == 1671 then
-        if Oribos.db.fmaster_waypoint_dropdown == 1 or Oribos.db.fmaster_waypoint_dropdown == 3 then
-            C_Map.ClearUserWaypoint()
-        end
-        if IsAddOnLoaded("TomTom") and (Oribos.db.fmaster_waypoint_dropdown == 2 or Oribos.db.fmaster_waypoint_dropdown == 3) then
-            TomTom:RemoveWaypoint(Oribos.uid)
-        end
+        RemoveFlightMasterWaypoint()
     end
 end
 
 function events:ZONE_CHANGED_INDOORS(...)
     HandyNotes_Oribos:Refresh()
 
-    if Oribos.global.dev and Oribos.db.show_prints then
-        print("Oribos: refreshed after ZONE_CHANGED_INDOORS")
-    end
+    --HandyNotes_Oribos:debugmsg("Oribos: refreshed after ZONE_CHANGED_INDOORS")
 
     -- Set automatically a waypoint (Blizzard, TomTom or both) to the flightmaster.
     if Oribos.db.fmaster_waypoint and C_Map.GetBestMapForUnit("player") == 1671 then
-        if IsAddOnLoaded("TomTom") and Oribos.db.fmaster_waypoint_dropdown == 2 or Oribos.db.fmaster_waypoint_dropdown == 3 then
-            Oribos.uid = TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNamebyID(162666)})
-        end
-        if Oribos.db.fmaster_waypoint_dropdown == 1 or Oribos.db.fmaster_waypoint_dropdown == 3 then
-            C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(1550, 47.02/100, 51.16/100))
-            C_SuperTrack.SetSuperTrackedUserWaypoint(true)
-        end
+        CreateFlightMasterWaypoint()
     elseif C_Map.GetBestMapForUnit("player") == 1670 then
-        if Oribos.db.fmaster_waypoint_dropdown == 1 or Oribos.db.fmaster_waypoint_dropdown == 3 then
-            C_Map.ClearUserWaypoint()
-        end
-        if IsAddOnLoaded("TomTom") and (Oribos.db.fmaster_waypoint_dropdown == 2 or Oribos.db.fmaster_waypoint_dropdown == 3) then
-            TomTom:RemoveWaypoint(Oribos.uid)
-        end
+        RemoveFlightMasterWaypoint()
     end
 end
 
 function events:QUEST_FINISHED(...)
     HandyNotes_Oribos:Refresh()
 
-    if Oribos.global.dev and Oribos.db.show_prints then
-        print("Oribos: refreshed after QUEST_FINISHED")
-    end
+    --HandyNotes_Oribos:debugmsg("Oribos: refreshed after QUEST_FINISHED")
 end
 
 function events:SKILL_LINES_CHANGED(...)
     HandyNotes_Oribos:Refresh()
 
-    if Oribos.global.dev and Oribos.db.show_prints then
-        print("Oribos: refreshed after SKILL_LINES_CHANGED")
-    end
+    --HandyNotes_Oribos:debugmsg("Oribos: refreshed after SKILL_LINES_CHANGED")
 end
 
 frame:SetScript("OnEvent", function(self, event, ...)
@@ -759,7 +786,7 @@ config.options = {
     SCALEALPHA = {
         type = "group",
         name = L["config_tab_scale_alpha"],
-        desc = L["config_scale_alpha_desc"],
+        -- desc = L["config_scale_alpha_desc"],
         order = 1,
         args = {
         },
@@ -905,8 +932,9 @@ local ElwynnForest = GetMapNames(13, 37)
 local RingTransference = L["To Ring of Transference"]
 local RingFates = L["To Ring of Fates"]
 local IntoTheMaw = L["Into the Maw"]
+local Korthia = GetMapNames(1543, 1961)
+local KeepersRespite = L["To Keeper's Respite"]
 
-local greatvault = L["config_greatvault"]
 local guildvault = L["config_guildvault"]
 local mailbox = L["Mailbox"]
 
@@ -966,7 +994,7 @@ DB.points = {
     [60432950] = { icon="banker", npc=156479 },
     [58693031] = { icon="banker", npc=156479 },
     [58102771] = { icon="banker", npc=156479 },
-    [65233051] = { icon="greatvault", label=greatvault },
+    [58163602] = { icon="mail", label=mailbox },
     [65203600] = { icon="guildvault", label=guildvault },
 
     -- THE IDYLLIA
@@ -996,6 +1024,7 @@ DB.points = {
     [34645648] = { icon="reforge", npc=164096 },
 
     [23324895] = { icon="portaltrainer", npc=176186, class="MAGE" },
+    [30645226] = { icon="mail", label=mailbox },
 
     [20835477] = { icon="portal", label=PtoOG, note=Durotar, faction="Horde", quest=60151 },
     [20894567] = { icon="portal", label=PtoSW, note=ElwynnForest, faction="Alliance", quest=60151 },
@@ -1008,6 +1037,7 @@ DB.points = {
 
 [1671] = { -- Ring of Transference
     [49525107] = { icon="portal", label=IntoTheMaw },
+    [30702319] = { icon="portal", label=KeepersRespite, note=Korthia, quest=63665 },
     [49504243] = { icon="tpplatform", label=RingFates },
     [55735162] = { icon="tpplatform", label=RingFates },
     [49506073] = { icon="tpplatform", label=RingFates },

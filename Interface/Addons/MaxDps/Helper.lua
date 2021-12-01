@@ -291,7 +291,7 @@ function MaxDps:GetAzeriteEssences()
 
 	local result = self.AzeriteEssences;
 
-	local milestones = C_AzeriteEssence.GetMilestones();
+	--[[local milestones = C_AzeriteEssence.GetMilestones();
 	if not milestones then
 		return result;
 	end
@@ -315,7 +315,7 @@ function MaxDps:GetAzeriteEssences()
 				end
 			end
 		end
-	end
+	end]]
 
 	return result;
 end

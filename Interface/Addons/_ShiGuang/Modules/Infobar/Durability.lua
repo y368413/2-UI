@@ -4,7 +4,7 @@ local oUF = ns.oUF
 if not R.Infobar.Durability then return end
 
 local module = M:GetModule("Infobar")
-local info = module:RegisterInfobar("Durability", R.Infobar.DurabilityPos)
+local info = module:RegisterInfobar("Dura", R.Infobar.DurabilityPos)
 
 local format, sort, floor, select = string.format, table.sort, math.floor, select
 local GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture = GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture
@@ -128,7 +128,8 @@ local repairlist = {
 
 info.onEnter = function(self)
 	local total, equipped = GetAverageItemLevel()
-	GameTooltip:SetOwner(self, "ANCHOR_TOP", 0, 15)
+	local _, anchor, offset = module:GetTooltipAnchor(info)
+	GameTooltip:SetOwner(self, "ANCHOR_"..anchor, 0, offset)
 	GameTooltip:ClearLines()
 	GameTooltip:AddDoubleLine(DURABILITY, format("%s: %d/%d", STAT_AVERAGE_ITEM_LEVEL, equipped, total), 0,.6,1, 0,.6,1)
 	GameTooltip:AddLine(" ")

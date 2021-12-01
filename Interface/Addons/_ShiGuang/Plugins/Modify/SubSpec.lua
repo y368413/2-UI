@@ -371,14 +371,14 @@ local function CreateUi()
 		self:SetPoint("TOPLEFT", profileFrame.button, "TOPRIGHT", -3, -8)
 		if self.index ~= profileFrame.index then
 			self.index = profileFrame.index
-			if MSA_DROPDOWNMENU_OPEN_MENU == mainFrame.menuFrame then DropDownList1:Hide(); end
+			if Lib_UIDROPDOWNMENU_OPEN_MENU == mainFrame.menuFrame then DropDownList1:Hide(); end
 		end
 		self:Show()
 	end
 	mainFrame.menuButton = menuButton
 
-	--mainFrame.menuFrame = CreateFrame("Frame", "SubSpec_MenuFrame", menuButton, "UIDropDownMenuTemplate")
-	mainFrame.menuFrame = MSA_DropDownMenu_Create("SubSpec_MenuFrame", menuButton)
+	mainFrame.menuFrame = CreateFrame("Frame", "SubSpec_MenuFrame", menuButton, "UIDropDownMenuTemplate")
+	--mainFrame.menuFrame = Lib_UIDropDownMenu_Create("SubSpec_MenuFrame", menuButton)
 	mainFrame.menuFrame:Hide()
 	mainFrame.menuFrame.displayMode = "MENU"
 	menuTexts = {
@@ -388,11 +388,11 @@ local function CreateUi()
 		{text = SUBSPEC_RIGHTSHIFT, notCheckable = true, func = MenuMoveRight},
 		{text = CALENDAR_DELETE_EVENT, notCheckable = true, func = MenuRemove}
 	}
-	MSA_DropDownMenu_Initialize(mainFrame.menuFrame, EasyMenu_Initialize, "MENU", nil, menuTexts)
+	UIDropDownMenu_Initialize(mainFrame.menuFrame, EasyMenu_Initialize, "MENU", nil, menuTexts)
 	menuButton:SetScript("OnClick", function() ToggleDropDownMenu(1, nil, mainFrame.menuFrame, menuButton, 0, 0, menuTexts, nil, nil); end)
 	menuButton:SetScript("OnHide", function(self)
 		self.index = 0
-		if MSA_DROPDOWNMENU_OPEN_MENU == mainFrame.menuFrame then DropDownList1:Hide(); end
+		if Lib_UIDROPDOWNMENU_OPEN_MENU == mainFrame.menuFrame then DropDownList1:Hide(); end
 	end)
 	StaticPopupDialogs["SubSpec_RenameDialog"] = {
 		text = SUBSPEC_NEWPROFILENAME,
@@ -408,7 +408,7 @@ local function CreateUi()
 	}
 
 	mainFrame:SetScript("OnHide", function(self)
-		if MSA_DROPDOWNMENU_OPEN_MENU == mainFrame.menuFrame then DropDownList1:Hide(); end
+		if Lib_UIDROPDOWNMENU_OPEN_MENU == mainFrame.menuFrame then DropDownList1:Hide(); end
 		self.menuButton:Hide()
 		StaticPopup_Hide("SubSpec_RenameDialog")
 	end)

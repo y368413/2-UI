@@ -32,7 +32,7 @@ tinsert(R.defaultThemes, function()
 	-- Battlenet toast frame
 	BNToastFrame:SetBackdrop(nil)
 	M.SetBD(BNToastFrame)
-	M.HideBackdrop(BNToastFrame.TooltipFrame) -- isNewPatch
+	BNToastFrame.TooltipFrame:HideBackdrop()
 	M.SetBD(BNToastFrame.TooltipFrame)
 
 	-- Battletag invite frame

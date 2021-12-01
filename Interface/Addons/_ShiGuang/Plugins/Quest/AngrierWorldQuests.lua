@@ -167,12 +167,12 @@ local __filterTable
 
 local My_UIDropDownMenu_SetSelectedValue, My_UIDropDownMenu_GetSelectedValue, My_UIDropDownMenu_CreateInfo, My_UIDropDownMenu_AddButton, My_UIDropDownMenu_Initialize, My_UIDropDownMenuTemplate
 function Config:InitializeDropdown()
-	My_UIDropDownMenu_SetSelectedValue = MSA_DropDownMenu_SetSelectedValue or UIDropDownMenu_SetSelectedValue
-	My_UIDropDownMenu_GetSelectedValue = MSA_DropDownMenu_GetSelectedValue or UIDropDownMenu_GetSelectedValue
-	My_UIDropDownMenu_CreateInfo = MSA_DropDownMenu_CreateInfo or UIDropDownMenu_CreateInfo
-	My_UIDropDownMenu_AddButton = MSA_DropDownMenu_AddButton or UIDropDownMenu_AddButton
-	My_UIDropDownMenu_Initialize = MSA_DropDownMenu_Initialize or UIDropDownMenu_Initialize
-	My_UIDropDownMenuTemplate = MSA_DropDownMenu_Initialize and "MSA_DropDownMenuTemplate" or "UIDropDownMenuTemplate"
+	My_UIDropDownMenu_SetSelectedValue = Lib_UIDropDownMenu_SetSelectedValue or UIDropDownMenu_SetSelectedValue
+	My_UIDropDownMenu_GetSelectedValue = Lib_UIDropDownMenu_GetSelectedValue or UIDropDownMenu_GetSelectedValue
+	My_UIDropDownMenu_CreateInfo = Lib_UIDropDownMenu_CreateInfo or UIDropDownMenu_CreateInfo
+	My_UIDropDownMenu_AddButton = Lib_UIDropDownMenu_AddButton or UIDropDownMenu_AddButton
+	My_UIDropDownMenu_Initialize = Lib_UIDropDownMenu_Initialize or UIDropDownMenu_Initialize
+	My_UIDropDownMenuTemplate = Lib_UIDropDownMenu_Initialize and "Lib_UIDropDownMenuTemplate" or "UIDropDownMenuTemplate"
 end
 
 local lootUpgradeLevelValues = { -1, 0, 5, 10, 15, 20, 25, 30 }
@@ -433,7 +433,7 @@ local DropDown_Index = 0
 local function DropDown_Create(self)
 	DropDown_Index = DropDown_Index + 1
 	--local dropdown = CreateFrame("Frame", "AngrierWorldQuestsConfigDropDown"..DropDown_Index, self, My_UIDropDownMenuTemplate)
-	local dropdown = MSA_DropDownMenu_Create("AngryWorldQuestConfigDropDown"..DropDown_Index, self)
+	local dropdown = Lib_UIDropDownMenu_Create("AngryWorldQuestConfigDropDown"..DropDown_Index, self)
 	
 	local label = dropdown:CreateFontString("AngrierWorldQuestsConfigDropLabel"..DropDown_Index, "BACKGROUND", "GameFontNormal")
 	label:SetPoint("BOTTOMLEFT", dropdown, "TOPLEFT", 16, 3)
@@ -539,7 +539,7 @@ function Config:CreatePanel()
 end
 
 function Config:BeforeStartup()
-	--if AngryWorldQuests_Config == nil then AngryWorldQuests_Config = {} end
+	--if AngrierWorldQuests_Config == nil then AngrierWorldQuests_Config = {} end
 	if not self:Get('saveFilters') then
 		ShiGuangDB.AngrierWorldQuestsSelectedFilters = nil
 		ShiGuangDB.AngrierWorldQuestsFilterEmissary = nil
@@ -759,10 +759,10 @@ local My_HideDropDownMenu, My_DropDownList1, My_UIDropDownMenu_AddButton, My_UID
 local function MyDropDown_Init()
 	My_HideDropDownMenu = Lib_HideDropDownMenu or HideDropDownMenu
 	My_DropDownList1 = Lib_DropDownList1 or DropDownList1
-	My_UIDropDownMenu_AddButton = MSA_DropDownMenu_AddButton or UIDropDownMenu_AddButton
-	My_UIDropDownMenu_Initialize = MSA_DropDownMenu_Initialize or UIDropDownMenu_Initialize
-	My_ToggleDropDownMenu = MSA_ToggleDropDownMenu or ToggleDropDownMenu
-	My_UIDropDownMenuTemplate = MSA_DropDownMenu_Initialize and "MSA_DropDownMenuTemplate" or "UIDropDownMenuTemplate"
+	My_UIDropDownMenu_AddButton = Lib_UIDropDownMenu_AddButton or UIDropDownMenu_AddButton
+	My_UIDropDownMenu_Initialize = Lib_UIDropDownMenu_Initialize or UIDropDownMenu_Initialize
+	My_ToggleDropDownMenu = Lib_ToggleDropDownMenu or ToggleDropDownMenu
+	My_UIDropDownMenuTemplate = Lib_UIDropDownMenu_Initialize and "Lib_UIDropDownMenuTemplate" or "UIDropDownMenuTemplate"
 end
 
 -- ===================
@@ -1072,8 +1072,7 @@ end
 
 local function FilterButton_ShowMenu(self)
 	if not filterMenu then
-		--filterMenu = CreateFrame("Button", "DropDownMenuAWQ", QuestMapFrame, My_UIDropDownMenuTemplate)
-		filterMenu = MSA_DropDownMenu_Create("DropDownMenuAWQ", QuestMapFrame)
+		filterMenu = CreateFrame("Button", "DropDownMenuAWQ", QuestMapFrame, My_UIDropDownMenuTemplate)
 	end
 
 	filterMenu.filter = self.filter

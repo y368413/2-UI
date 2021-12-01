@@ -15,7 +15,7 @@ local HONOR, LEVEL, TUTORIAL_TITLE26, SPELLBOOK_AVAILABLE_AT = HONOR, LEVEL, TUT
 local ARTIFACT_POWER, ARTIFACT_RETIRED = ARTIFACT_POWER, ARTIFACT_RETIRED
 
 local UnitLevel, UnitXP, UnitXPMax, GetXPExhaustion, IsXPUserDisabled = UnitLevel, UnitXP, UnitXPMax, GetXPExhaustion, IsXPUserDisabled
-local GetText, UnitSex, BreakUpLargeNumbers, GetNumFactions, GetFactionInfo = GetText, UnitSex, BreakUpLargeNumbers, GetNumFactions, GetFactionInfo
+local BreakUpLargeNumbers, GetNumFactions, GetFactionInfo = BreakUpLargeNumbers, GetNumFactions, GetFactionInfo
 local GetWatchedFactionInfo, GetFriendshipReputation, GetFriendshipReputationRanks = GetWatchedFactionInfo, GetFriendshipReputation, GetFriendshipReputationRanks
 local HasArtifactEquipped, ArtifactBarGetNumArtifactTraitsPurchasableFromXP = HasArtifactEquipped, ArtifactBarGetNumArtifactTraitsPurchasableFromXP
 local IsWatchingHonorAsXP, UnitHonor, UnitHonorMax, UnitHonorLevel = IsWatchingHonorAsXP, UnitHonor, UnitHonorMax, UnitHonorLevel
@@ -56,17 +56,17 @@ function MISC:ExpBar_Update()
 	elseif GetWatchedFactionInfo() then
 		local _, standing, barMin, barMax, value, factionID = GetWatchedFactionInfo()
 		local friendID, friendRep, _, _, _, _, _, friendThreshold, nextFriendThreshold = GetFriendshipReputation(factionID)
-		if friendID then
+		if C_Reputation_IsFactionParagon(factionID) then
+			local currentValue, threshold = C_Reputation_GetFactionParagonInfo(factionID)
+			currentValue = mod(currentValue, threshold)
+			barMin, barMax, value = 0, threshold, currentValue
+		elseif friendID then
 			if nextFriendThreshold then
 				barMin, barMax, value = friendThreshold, nextFriendThreshold, friendRep
 			else
 				barMin, barMax, value = 0, 1, 1
 			end
 			standing = 5
-		elseif C_Reputation_IsFactionParagon(factionID) then
-			local currentValue, threshold = C_Reputation_GetFactionParagonInfo(factionID)
-			currentValue = mod(currentValue, threshold)
-			barMin, barMax, value = 0, threshold, currentValue
 		else
 			if standing == MAX_REPUTATION_REACTION then barMin, barMax, value = 0, 1, 1 end
 		end
@@ -139,7 +139,7 @@ function MISC:ExpBar_UpdateTooltip()
 				barMax = barMin + 1e3
 				value = barMax - 1
 			end
-			standingtext = GetText("FACTION_STANDING_LABEL"..standing, UnitSex("player"))
+			standingtext = _G["FACTION_STANDING_LABEL"..standing] or UNKNOWN
 		end
 		--GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(name, 0,.6,1)

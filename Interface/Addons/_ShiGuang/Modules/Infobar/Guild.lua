@@ -7,15 +7,15 @@ local info = module:RegisterInfobar("Guild", R.Infobar.GuildPos)
 
 info.guildTable = {}
 local r, g, b = I.r, I.g, I.b
-local infoFrame, gName, gOnline, gApps, gRank, prevTime
+local infoFrame, gName, gOnline, gRank, prevTime
 
 local wipe, sort, format, select = table.wipe, table.sort, format, select
-local CLASS_ICON_TCOORDS, SELECTED_DOCK_FRAME = CLASS_ICON_TCOORDS, SELECTED_DOCK_FRAME
-local LEVEL_ABBR, CLASS_ABBR, NAME, ZONE, RANK, GUILDINFOTAB_APPLICANTS, REMOTE_CHAT = LEVEL_ABBR, CLASS_ABBR, NAME, ZONE, RANK, GUILDINFOTAB_APPLICANTS, REMOTE_CHAT
+local SELECTED_DOCK_FRAME = SELECTED_DOCK_FRAME
+local LEVEL_ABBR, CLASS_ABBR, NAME, ZONE, RANK, REMOTE_CHAT = LEVEL_ABBR, CLASS_ABBR, NAME, ZONE, RANK, REMOTE_CHAT
 local IsAltKeyDown, IsShiftKeyDown, C_Timer_After, GetTime, Ambiguate, MouseIsOver = IsAltKeyDown, IsShiftKeyDown, C_Timer.After, GetTime, Ambiguate, MouseIsOver
 local MailFrame, MailFrameTab_OnClick, SendMailNameEditBox = MailFrame, MailFrameTab_OnClick, SendMailNameEditBox
 local ChatEdit_ChooseBoxForSend, ChatEdit_ActivateChat, ChatFrame_OpenChat, ChatFrame_GetMobileEmbeddedTexture = ChatEdit_ChooseBoxForSend, ChatEdit_ActivateChat, ChatFrame_OpenChat, ChatFrame_GetMobileEmbeddedTexture
-local GetNumGuildMembers, GetGuildInfo, GetNumGuildApplicants, GetGuildRosterInfo, IsInGuild = GetNumGuildMembers, GetGuildInfo, GetNumGuildApplicants, GetGuildRosterInfo, IsInGuild
+local GetNumGuildMembers, GetGuildInfo, GetGuildRosterInfo, IsInGuild = GetNumGuildMembers, GetGuildInfo, GetGuildRosterInfo, IsInGuild
 local GetQuestDifficultyColor, GetRealZoneText, UnitInRaid, UnitInParty = GetQuestDifficultyColor, GetRealZoneText, UnitInRaid, UnitInParty
 local HybridScrollFrame_GetOffset, HybridScrollFrame_Update = HybridScrollFrame_GetOffset, HybridScrollFrame_Update
 local C_GuildInfo_GuildRoster = C_GuildInfo.GuildRoster
@@ -78,15 +78,14 @@ function info:GuildPanel_UpdateButton(button)
 	local levelcolor = M.HexRGB(GetQuestDifficultyColor(level))
 	button.level:SetText(levelcolor..level)
 
-	local tcoords = CLASS_ICON_TCOORDS[class]
-	button.class:SetTexCoord(tcoords[1] + .022, tcoords[2] - .025, tcoords[3] + .022, tcoords[4] - .025)
+	M.ClassIconTexCoord(button.class, class)
 
 	local namecolor = M.HexRGB(M.ClassColor(class))
 	button.name:SetText(namecolor..name..status)
 
 	local zonecolor = I.GreyColor
 	if UnitInRaid(name) or UnitInParty(name) then
-		zonecolor = "|cff4c4cff"
+		zonecolor = I.InfoColor
 	elseif GetRealZoneText() == zone then
 		zonecolor = "|cff4cff4c"
 	end
@@ -161,12 +160,22 @@ local function isPanelCanHide(self, elapsed)
 	end
 end
 
+local function updateInfoFrameAnchor(frame)
+	local relFrom, relTo, offset = module:GetTooltipAnchor(info)
+	frame:ClearAllPoints()
+	frame:SetPoint(relFrom, info, relTo, 0, offset)
+end
+
 function info:GuildPanel_Init()
-	if infoFrame then infoFrame:Show() return end
+	if infoFrame then
+		infoFrame:Show()
+		updateInfoFrameAnchor(infoFrame)
+		return
+	end
 
 	infoFrame = CreateFrame("Frame", "NDuiGuildInfobar", info)
 	infoFrame:SetSize(335, 495)
-	infoFrame:SetPoint("TOPLEFT", UIParent, 15, -30)
+	updateInfoFrameAnchor(infoFrame)
 	infoFrame:SetClampedToScreen(true)
 	infoFrame:SetFrameStrata("TOOLTIP")
 	local bg = M.SetBD(infoFrame)
@@ -178,7 +187,6 @@ function info:GuildPanel_Init()
 
 	gName = M.CreateFS(infoFrame, 16, "Guild", true, "TOPLEFT", 15, -10)
 	gOnline = M.CreateFS(infoFrame, 13, "Online", false, "TOPLEFT", 15, -35)
-	gApps = M.CreateFS(infoFrame, 13, "Applications", false, "TOPRIGHT", -15, -35)
 	gRank = M.CreateFS(infoFrame, 13, "Rank", false, "TOPLEFT", 15, -51)
 
 	local bu = {}
@@ -258,7 +266,6 @@ function info:GuildPanel_Refresh()
 
 	gName:SetText("|cff0099ff<"..(guildName or "")..">")
 	gOnline:SetText(format(I.InfoColor.."%s:".." %d/%d", GUILD_ONLINE_LABEL, online, total))
-	gApps:SetText(format(I.InfoColor..GUILDINFOTAB_APPLICANTS, GetNumGuildApplicants()))
 	gRank:SetText(I.InfoColor..RANK..": "..(guildRank or ""))
 
 	for i = 1, total do
@@ -347,7 +354,7 @@ info.onLeave = function()
 end
 
 info.onMouseUp = function()
-	--if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
+	--if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
 
 	if not IsInGuild() then return end
 	infoFrame:Hide()

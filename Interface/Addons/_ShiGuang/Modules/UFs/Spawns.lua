@@ -20,10 +20,6 @@ local function CreatePlayerStyle(self)
 		--UF:ReskinMirrorBars()
 		--UF:ReskinTimerTrakcer(self)
 	--end
-	--if R.db["UFs"]["ClassPower"] and not R.db["Nameplate"]["ShowPlayerPlate"] then
-		--UF:CreateClassPower(self)
-		--UF:StaggerBar(self)
-	--end
 	if not R.db["Misc"]["ExpRep"] then UF:CreateExpRepBar(self) end
 	--if R.db["UFs"]["PlayerDebuff"] then UF:CreateDebuffs(self) end
 	if R.db["UFs"]["SwingBar"] then UF:CreateSwing(self) end
@@ -49,6 +45,7 @@ local function CreateFocusStyle(self)
 	UF:CreateIcons(self)
 	UF:CreatePrediction(self)
 	UF:CreateAuras(self)
+	UF:DemonicGatewayIcon(self)
 end
 
 local function CreateFocusTargetStyle(self)
@@ -87,6 +84,7 @@ local function CreateArenaStyle(self)
 	UF:CreateHealthBar(self)
 	UF:CreateHealthText(self)
 	UF:CreatePowerBar(self)
+	UF:CreatePowerText(self)
 	UF:CreateCastBar(self)
 	UF:CreateRaidMark(self)
 	UF:CreateBuffs(self)
@@ -113,6 +111,9 @@ local function CreateRaidStyle(self)
 	UF:CreateRaidDebuffs(self)
 	UF:CreateThreatBorder(self)
 	UF:CreateAuras(self)
+	UF:CreateBuffs(self)
+	UF:CreateDebuffs(self)
+	UF:RefreshAurasByCombat(self)
 	UF:CreateBuffIndicator(self)
 end
 
@@ -210,11 +211,19 @@ function UF:OnLogin()
 		oUF:SpawnNamePlates("oUF_NPs", UF.PostUpdatePlates)
 	end
 
-	if R.db["Nameplate"]["ShowPlayerPlate"] then
+	do -- a playerplate-like PlayerFrame
 		oUF:RegisterStyle("PlayerPlate", UF.CreatePlayerPlate)
 		oUF:SetActiveStyle("PlayerPlate")
 		local plate = oUF:Spawn("player", "oUF_PlayerPlate", true)
 		plate.mover = M.Mover(plate, U["PlayerPlate"], "PlayerPlate", R.UFs.PlayerPlate)
+		UF:TogglePlayerPlate()
+	end
+
+	do	-- fake nameplate for target class power
+		oUF:RegisterStyle("TargetPlate", UF.CreateTargetPlate)
+		oUF:SetActiveStyle("TargetPlate")
+		oUF:Spawn("player", "oUF_TargetPlate", true)
+		UF:ToggleTargetClassPower()
 	end
 
 	-- Default Clicksets for RaidFrame
@@ -264,6 +273,7 @@ function UF:OnLogin()
 		end
 
 		UF:UpdateTextScale()
+		UF:ToggleAllAuras()
 	if R.db["UFs"]["RaidFrame"] then
 		UF:AddClickSetsListener()
 		UF:UpdateCornerSpells()

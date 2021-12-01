@@ -1,4 +1,4 @@
---## Author: Urtgard  ## Version: v9.1.0-2
+--## Author: Urtgard  ## Version: v9.1.5-1
 WQAchievements = LibStub("AceAddon-3.0"):NewAddon("WQAchievements", "AceConsole-3.0", "AceTimer-3.0")
 local WQA = WQAchievements
 WQA.data = {}
@@ -56,7 +56,7 @@ local questZoneIDList = {
 	[56471] = 1462,
 	[56405] = 1462,
 	-- Periodic Destruction
-	[55121] = 1355,
+	[55121] = 1355
 }
 
 local function GetQuestZoneID(questID)
@@ -354,52 +354,56 @@ function WQA:OnEnable()
 	self.event = CreateFrame("Frame")
 	self.event:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self.event:RegisterEvent("GARRISON_MISSION_LIST_UPDATE")
-	self.event:SetScript("OnEvent", function (...)
-		local _, name, id = ...
-		if name == "PLAYER_ENTERING_WORLD" then
-			for i=1,#self.ZoneIDList do
-				for _,mapID in pairs(self.ZoneIDList[i]) do
-					if self.db.profile.options.zone[mapID] == true then
-						local quests = C_TaskQuest.GetQuestsForPlayerByMapID(mapID)
-						if quests then
-							for i=1,#quests do
-								local questID = quests[i].questId
-								local numQuestRewards = GetNumQuestLogRewards(questID)
-								if numQuestRewards > 0 then
-									local itemName, itemTexture, quantity, quality, isUsable, itemID = GetQuestLogRewardInfo(1, questID)
+	self.event:SetScript(		"OnEvent",		function(...)
+			local _, name, id = ...
+			if name == "PLAYER_ENTERING_WORLD" then
+				for i = 1, #self.ZoneIDList do
+					for _, mapID in pairs(self.ZoneIDList[i]) do
+						if self.db.profile.options.zone[mapID] == true then
+							local quests = C_TaskQuest.GetQuestsForPlayerByMapID(mapID)
+							if quests then
+								for i = 1, #quests do
+									local questID = quests[i].questId
+									local numQuestRewards = GetNumQuestLogRewards(questID)
+									if numQuestRewards > 0 then
+										local itemName, itemTexture, quantity, quality, isUsable, itemID = GetQuestLogRewardInfo(1, questID)
+									end
 								end
 							end
 						end
 					end
 				end
-			end
 
-			self.event:UnregisterEvent("PLAYER_ENTERING_WORLD")
-			self:ScheduleTimer("Show", self.db.profile.options.delay, nil, true)
-			self:ScheduleTimer(function ()
+				self.event:UnregisterEvent("PLAYER_ENTERING_WORLD")
+				self:ScheduleTimer("Show", self.db.profile.options.delay, nil, true)
+				self:ScheduleTimer(
+					function()
+						self:Show("new", true)
+						self:ScheduleRepeatingTimer("Show", 30 * 60, "new", true)
+					end,
+					(32 - (date("%M") % 30)) * 60
+				)
+			elseif name == "QUEST_LOG_UPDATE" or name == "GET_ITEM_INFO_RECEIVED" then
+				self.event:UnregisterEvent("QUEST_LOG_UPDATE")
+				self.event:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
+				self:CancelTimer(self.timer)
+				if GetTime() - self.start > 1 then
+					self:Reward()
+				else
+					self:ScheduleTimer("Reward", 1)
+				end
+			elseif name == "PLAYER_REGEN_ENABLED" then
+				self.event:UnregisterEvent("PLAYER_REGEN_ENABLED")
 				self:Show("new", true)
-				self:ScheduleRepeatingTimer("Show", 30*60, "new", true)
-			end, (32-(date("%M") % 30))*60)
-		elseif name == "QUEST_LOG_UPDATE" or name == "GET_ITEM_INFO_RECEIVED" then
-			self.event:UnregisterEvent("QUEST_LOG_UPDATE")
-			self.event:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
-			self:CancelTimer(self.timer)
-			if GetTime() - self.start > 1 then
-				self:Reward()
-			else
-				self:ScheduleTimer("Reward", 1)
+			elseif name == "QUEST_TURNED_IN" then
+				self.db.global.completed[id] = true
+			elseif name == "GARRISON_MISSION_LIST_UPDATE" then
+				self:CheckMissions()
 			end
-		elseif name == "PLAYER_REGEN_ENABLED" then
-			self.event:UnregisterEvent("PLAYER_REGEN_ENABLED")
-			self:Show("new", true)
-		elseif name == "QUEST_TURNED_IN" then
-			self.db.global.completed[id] = true
-		elseif name == "GARRISON_MISSION_LIST_UPDATE" then
-			self:CheckMissions()
 		end
-	end)
+	)
 
-	--LoadAddOn("Blizzard_GarrisonUI")
+	LoadAddOn("Blizzard_GarrisonUI")
 end
 
 WQA:RegisterChatCommand("wqa", "slash")
@@ -1670,13 +1674,13 @@ function WQA:AnnounceChat(tasks, silent)
 		end
 
 		local more
-		for k,v in pairs(l[task.id].reward) do
+		for k, v in pairs(l[task.id].reward) do
 			local rewardText = self:GetRewardTextByID(task.id, k, v, 1, task.type)
 			if k == "achievement" or k == "chance" or k == "azeriteTraits" then
-				for j = 2, 3 do 
+				for j = 2, 3 do
 					local t = self:GetRewardTextByID(task.id, k, v, j, task.type)
 					if t then
-						rewardText = rewardText.." & "..t
+						rewardText = rewardText .. " & " .. t
 					end
 				end
 				if self:GetRewardTextByID(task.id, k, v, 4, task.type) then
@@ -1686,13 +1690,13 @@ function WQA:AnnounceChat(tasks, silent)
 				
 			i = i + 1
 			if i > 1 then
-				text = text.." & "..rewardText
+				text = text .. " & " .. rewardText
 			else
 				text = rewardText
 			end
 		end
 		if more == true then
-			text = text.." & ..."
+			text = text .. " & ..."
 		end
 
 		if self.db.profile.options.chatShowTime then
@@ -4243,8 +4247,8 @@ function WQA:UpdateOptions()
 			self:CreateGroup(self.options.args.general.args[v.name].args, v, "toys")
 		end
 	end
-	
-	for _,i in ipairs(IDToExpansionID) do
+
+	for _, i in ipairs(IDToExpansionID) do
 		self.options.args.reward.args[self.ExpansionList[i]] = {
 			order = newOrder(),
 			name = self.ExpansionList[i],
@@ -4254,13 +4258,13 @@ function WQA:UpdateOptions()
 		
 		-- World Quests
 		if i > 6 then
-			self.options.args.reward.args[self.ExpansionList[i]].args[self.ExpansionList[i].."WorldQuests"] = {
+			self.options.args.reward.args[self.ExpansionList[i]].args[self.ExpansionList[i] .. "WorldQuests"] = {
 				order = newOrder(),
 				name = "World Quests",
 				type = "group",
 				args = {}
 			}
-			local args = self.options.args.reward.args[self.ExpansionList[i]].args[self.ExpansionList[i].."WorldQuests"].args
+			local args = self.options.args.reward.args[self.ExpansionList[i]].args[self.ExpansionList[i] .. "WorldQuests"].args
 
 			-- Zones
 			if WQA.ZoneIDList[i] then
@@ -4269,9 +4273,9 @@ function WQA:UpdateOptions()
 					name = "Zones",
 					type = "group",
 					args = {},
-					inline = false,
+					inline = false
 				}
-				for k,v in pairs(WQA.ZoneIDList[i]) do
+				for k, v in pairs(WQA.ZoneIDList[i]) do
 					local name = C_Map.GetMapInfo(v).name
 					args.zone.args[name] = {
 						type = "toggle",
@@ -4296,7 +4300,7 @@ function WQA:UpdateOptions()
 					type = "group",
 					args = {}
 				}
-				for k,v in pairs(CurrencyIDList[i]) do
+				for k, v in pairs(CurrencyIDList[i]) do
 					if not (type(v) == "table" and v.faction ~= self.faction) then
 						if type(v) == "table" then v = v.id end
 						args.currency.args[GetCurrencyInfo(v).name] = {
@@ -4325,7 +4329,7 @@ function WQA:UpdateOptions()
 				}
 				for _, factionGroup in pairs {"Neutral", UnitFactionGroup("player")} do
 					if FactionIDList[i][factionGroup] then
-						for k,v in pairs(FactionIDList[i][factionGroup]) do
+						for k, v in pairs(FactionIDList[i][factionGroup]) do
 							args.reputation.args[GetFactionInfoByID(v)] = {
 								type = "toggle",
 								name = GetFactionInfoByID(v),
@@ -4351,7 +4355,7 @@ function WQA:UpdateOptions()
 					type = "group",
 					args = {}
 				}
-				for k,v in pairs(self.EmissaryQuestIDList[i]) do
+				for k, v in pairs(self.EmissaryQuestIDList[i]) do
 					if not (type(v) == "table" and v.faction ~= self.faction) then
 						if type(v) == "table" then v = v.id end
 						args.emissary.args[GetTitleForQuestID(v) or tostring(v)] = {

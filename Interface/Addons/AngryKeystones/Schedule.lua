@@ -4,21 +4,20 @@ local Mod = Addon:NewModule('Schedule')
 local rowCount = 3
 local requestPartyKeystones
 
-local seasonAffix = 121
+local SEASON_AFFIX_ID = 128
 local affixSchedule = {
-	[1]  = {[1]=10, [2]=11,  [3]=3,   [4]=seasonAffix},
-	[2]  = {[1]=9,  [2]=7,   [3]=124, [4]=seasonAffix},
-	[3]  = {[1]=10, [2]=123, [3]=12,  [4]=seasonAffix},
-	-- not sure about below
-	[4]  = {[1]=9,  [2]=122, [3]=4,   [4]=seasonAffix},
-	[5]  = {[1]=10, [2]=8,   [3]=14,  [4]=seasonAffix},
-	[6]  = {[1]=9,  [2]=6,   [3]=13,  [4]=seasonAffix},
-	[7]  = {[1]=10, [2]=123, [3]=3,   [4]=seasonAffix},
-	[8]  = {[1]=9,  [2]=7,   [3]=4,   [4]=seasonAffix},
-	[9]  = {[1]=10, [2]=122, [3]=124, [4]=seasonAffix},
-	[10] = {[1]=9,  [2]=11,  [3]=13,  [4]=seasonAffix},
-	[11] = {[1]=10, [2]=8,   [3]=12,  [4]=seasonAffix},
-	[12] = {[1]=9,  [2]=6,   [3]=14,  [4]=seasonAffix},
+	[1]  = {[1]=10, [2]=11,  [3]=124},
+	[2]  = {[1]=9,  [2]=6,   [3]=3},
+	[3]  = {[1]=10, [2]=122, [3]=12},
+	[4]  = {[1]=9,  [2]=123, [3]=4},
+	[5]  = {[1]=10, [2]=7,   [3]=14},
+	[6]  = {[1]=9,  [2]=8,   [3]=124},
+	[7]  = {[1]=10, [2]=6,   [3]=13},
+	[8]  = {[1]=9,  [2]=11,  [3]=3},
+	[9]  = {[1]=10, [2]=123, [3]=12},
+	[10] = {[1]=9,  [2]=122, [3]=14},
+	[11] = {[1]=10, [2]=8,   [3]=4},
+	[12] = {[1]=9,  [2]=7,   [3]=13},
 }
 
 local affixScheduleUnknown = not next(affixSchedule)
@@ -84,11 +83,11 @@ local function UpdatePartyKeystones()
 	end
 	if e == 1 then
 		Mod.AffixFrame:ClearAllPoints()
-		Mod.AffixFrame:SetPoint("LEFT", ChallengesFrame.WeeklyInfo.Child.WeeklyChest, "RIGHT", 130, 0)
+		Mod.AffixFrame:SetPoint("LEFT", ChallengesFrame.WeeklyInfo.Child.WeeklyChest, "RIGHT", 130, -25)
 		Mod.PartyFrame:Hide()
 	else
 		Mod.AffixFrame:ClearAllPoints()
-		Mod.AffixFrame:SetPoint("TOPLEFT", ChallengesFrame.WeeklyInfo.Child.WeeklyChest, "TOPRIGHT", 130, 65)
+		Mod.AffixFrame:SetPoint("TOPLEFT", ChallengesFrame.WeeklyInfo.Child.WeeklyChest, "TOPRIGHT", 130, 40)
 		Mod.PartyFrame:Show()
 	end
 	while e <= 4 do
@@ -105,7 +104,7 @@ local function UpdateFrame()
 
 	local weeklyChest = ChallengesFrame.WeeklyInfo.Child.WeeklyChest
 	weeklyChest:ClearAllPoints()
-	weeklyChest:SetPoint("LEFT", 100, -30)
+	weeklyChest:SetPoint("LEFT", 105, -5)
 
 	local description = ChallengesFrame.WeeklyInfo.Child.Description
 	description:SetWidth(240)
@@ -131,6 +130,8 @@ local function UpdateFrame()
 				local affix = entry.Affixes[j]
 				affix:SetUp(affixes[j])
 			end
+			-- Update season affix
+			entry.Affixes[4]:SetUp(SEASON_AFFIX_ID)
 		end
 		Mod.AffixFrame.Label:Hide()
 	else
@@ -304,6 +305,9 @@ end
 function Mod:CheckAffixes()
 	currentWeek = nil
 	local currentAffixes = C_MythicPlus.GetCurrentAffixes()
+	if currentAffixes and currentAffixes[4] then
+		SEASON_AFFIX_ID = currentAffixes[4].id
+	end
 
 	if currentAffixes then
 		for index, affixes in ipairs(affixSchedule) do

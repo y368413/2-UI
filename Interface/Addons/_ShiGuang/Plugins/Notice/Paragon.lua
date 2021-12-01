@@ -23,19 +23,19 @@ T.standingColor = {
 T.friendStandingColor = {
 	["default"] = {
 		[1] = "|cffffff00", -- Stranger
-		[2] = "|cff00ff00", -- Acquaintance/Pal
-		[3] = "|cff00ff00", -- Buddy
-		[4] = "|cff00ff88", -- Friend
-		[5] = "|cff00ffcc", -- Good Friend
-		[6] = "|cff4cc2ff", -- Best Friend
-		[9] = "|cff4cc2ff", -- Paragon
+        [2] = "|cff00ff00", -- Acquaintance/Pal
+        [3] = "|cff00ff88", -- Buddy
+        [4] = "|cff00ff88", -- Friend
+        [5] = "|cff00ffcc", -- Good Friend
+        [6] = "|cff4cc2ff", -- Best Friend
+        [9] = "|cff4cc2ff", -- Paragon
 	},
 	["chromie"] = {
 		[1] = "|cffffff00", -- Whelpling
 		[2] = "|cff00ff00", -- Temporal Trainee
-		[3] = "|cff00ff00", -- Timehopper
+		[3] = "|cff00ff88", -- Timehopper
 		[4] = "|cff00ff88", -- Chrono-Friend
-		[5] = "|cff00ff88", -- Bronze Ally
+		[5] = "|cff00ffcc", -- Bronze Ally
 		[6] = "|cff00ffcc", -- Epoch-Mender
 		[7] = "|cff4cc2ff", -- Timelord
 	},
@@ -1488,12 +1488,12 @@ local function updateFactions()
 
 		if factionGroup == false or factionGroup == T.factionGroup then -- Only include same side and neutral factions
 			if currentValue then
-				local displayValue = currentValue % threshold
-				if hasRewardPending then displayValue = displayValue + threshold end
+				currentValue = currentValue % threshold
+				if hasRewardPending then currentValue = currentValue + threshold end
 
 				ShiGuangDB["ParagonDBcharacter"][T.charStr][faction] = {
 					["standingId"] = 9, -- Paragon
-					["current"] = displayValue,
+					["current"] = currentValue,
 					["max"] = threshold,
 					["hasRewardPending"] = hasRewardPending,
 				}

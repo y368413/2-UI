@@ -124,6 +124,18 @@ do
 			list[word] = true
 		end
 	end
+
+	-- Atlas info
+	function M:GetTextureStrByAtlas(info, sizeX, sizeY)
+		local file = info and info.file
+		if not file then return end
+
+		local width, height, txLeft, txRight, txTop, txBottom = info.width, info.height, info.leftTexCoord, info.rightTexCoord, info.topTexCoord, info.bottomTexCoord
+		local atlasWidth = width / (txRight-txLeft)
+		local atlasHeight = height / (txBottom-txTop)
+
+		return format("|T%s:%d:%d:0:0:%d:%d:%d:%d:%d:%d|t", file, (sizeX or 0), (sizeY or 0), atlasWidth, atlasHeight, atlasWidth*txLeft, atlasWidth*txRight, atlasHeight*txTop, atlasHeight*txBottom)
+	end
 end
 
 -- Color
@@ -259,8 +271,10 @@ do
 
 			for i = 1, tip:NumLines() do
 				local line = _G[tip:GetName().."TextLeft"..i]
-				if line then
-					local text = line:GetText() or ""
+				if not line then break end
+
+				local text = line:GetText()
+				if text then
 					if i == 1 and text == RETRIEVING_ITEM_INFO then
 						return "tooSoon"
 					else
@@ -290,14 +304,14 @@ do
 
 			for i = 2, 5 do
 				local line = _G[tip:GetName().."TextLeft"..i]
-				if line then
-					local text = line:GetText() or ""
-					local found = strfind(text, itemLevelString)
-					if found then
-						local level = strmatch(text, "(%d+)%)?$")
-						iLvlDB[link] = tonumber(level)
-						break
-					end
+				if not line then break end
+
+				local text = line:GetText()
+				local found = text and strfind(text, itemLevelString)
+				if found then
+					local level = strmatch(text, "(%d+)%)?$")
+					iLvlDB[link] = tonumber(level)
+					break
 				end
 			end
 
@@ -375,9 +389,11 @@ do
 							region:SetAlpha(0)
 						elseif i ~= kill then
 							region:SetTexture("")
+							region:SetAtlas("")
 						end
 					else
 						region:SetTexture("")
+						region:SetAtlas("")
 					end
 				end
 			end
@@ -442,10 +458,11 @@ do
 		end
 		GameTooltip:Show()
 	end
-	function M:AddTooltip(anchor, text, color)
+	function M:AddTooltip(anchor, text, color, showTips)
 		self.anchor = anchor
 		self.text = text
 		self.color = color
+		if showTips then self.title = U["Tips"] end
 		self:SetScript("OnEnter", Tooltip_OnEnter)
 		self:SetScript("OnLeave", M.HideTooltip)
 	end
@@ -548,14 +565,6 @@ do
 		end
 
 		return tex
-	end
-
-	function M:HideBackdrop()
-		if I.isNewPatch then
-			self.NineSlice:SetAlpha(0)
-		else
-			if self.SetBackdrop then self:SetBackdrop(nil) end
-		end
 	end
 
 	-- Handle frame
@@ -664,17 +673,20 @@ do
 	end
 
 	local AtlasToQuality = {
-		["auctionhouse-itemicon-border-gray"] = LE_ITEM_QUALITY_POOR,
-		["auctionhouse-itemicon-border-white"] = LE_ITEM_QUALITY_COMMON,
-		["auctionhouse-itemicon-border-green"] = LE_ITEM_QUALITY_UNCOMMON,
-		["auctionhouse-itemicon-border-blue"] = LE_ITEM_QUALITY_RARE,
-		["auctionhouse-itemicon-border-purple"] = LE_ITEM_QUALITY_EPIC,
-		["auctionhouse-itemicon-border-orange"] = LE_ITEM_QUALITY_LEGENDARY,
-		["auctionhouse-itemicon-border-artifact"] = LE_ITEM_QUALITY_ARTIFACT,
-		["auctionhouse-itemicon-border-account"] = LE_ITEM_QUALITY_HEIRLOOM,
+		["error"] = 99,
+		["uncollected"] = LE_ITEM_QUALITY_POOR,
+		["gray"] = LE_ITEM_QUALITY_POOR,
+		["white"] = LE_ITEM_QUALITY_COMMON,
+		["green"] = LE_ITEM_QUALITY_UNCOMMON,
+		["blue"] = LE_ITEM_QUALITY_RARE,
+		["purple"] = LE_ITEM_QUALITY_EPIC,
+		["orange"] = LE_ITEM_QUALITY_LEGENDARY,
+		["artifact"] = LE_ITEM_QUALITY_ARTIFACT,
+		["account"] = LE_ITEM_QUALITY_HEIRLOOM,
 	}
 	local function updateIconBorderColorByAtlas(self, atlas)
-		local quality = AtlasToQuality[atlas]
+		local atlasAbbr = atlas and strmatch(atlas, "%-(%w+)$")
+		local quality = atlasAbbr and AtlasToQuality[atlasAbbr]
 		local color = I.QualityColors[quality or 1]
 		self.__owner.bg:SetBackdropBorderColor(color.r, color.g, color.b)
 	end
@@ -684,15 +696,21 @@ do
 		end
 		self.__owner.bg:SetBackdropBorderColor(r, g, b)
 	end
-	local function resetIconBorderColor(self)
-		self.__owner.bg:SetBackdropBorderColor(0, 0, 0)
+	local function resetIconBorderColor(self, texture)
+		if not texture then
+			self.__owner.bg:SetBackdropBorderColor(0, 0, 0)
+		end
 	end
-	function M:ReskinIconBorder(needInit)
+	function M:ReskinIconBorder(needInit, useAtlas)
 		self:SetAlpha(0)
 		self.__owner = self:GetParent()
 		if not self.__owner.bg then return end
-		if self.__owner.useCircularIconBorder then -- for auction item display
+		if useAtlas or self.__owner.useCircularIconBorder then -- for auction item display
 			hooksecurefunc(self, "SetAtlas", updateIconBorderColorByAtlas)
+			hooksecurefunc(self, "SetTexture", resetIconBorderColor)
+			if needInit then
+				self:SetAtlas(self:GetAtlas()) -- for border with color before hook
+			end
 		else
 			hooksecurefunc(self, "SetVertexColor", updateIconBorderColor)
 			if needInit then
@@ -700,6 +718,12 @@ do
 			end
 		end
 		hooksecurefunc(self, "Hide", resetIconBorderColor)
+	end
+
+	local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
+	function M:ClassIconTexCoord(class)
+		local tcoords = CLASS_ICON_TCOORDS[class]
+		self:SetTexCoord(tcoords[1] + .022, tcoords[2] - .025, tcoords[3] + .022, tcoords[4] - .025)
 	end
 
 	-- Handle statusbar
@@ -791,6 +815,7 @@ do
 			region = buttonName and _G[buttonName..region] or self[region]
 			if region then
 				region:SetAlpha(0)
+				region:Hide()
 			end
 		end
 
@@ -1138,6 +1163,7 @@ do
 		bu:SetSize(26, 26)
 		local list = CreateFrame("Frame", nil, dd, "BackdropTemplate")
 		list:SetPoint("TOP", dd, "BOTTOM", 0, -2)
+		RaiseFrameLevel(list)
 		M.CreateBD(list, 0.85)
 		list:SetBackdropBorderColor(1, 1, 1, .85)
 		list:Hide()
@@ -1155,6 +1181,7 @@ do
 			local text = M.CreateFS(opt[i], 14, j, false, "LEFT", 5, 0)
 			text:SetPoint("RIGHT", -5, 0)
 			opt[i].text = j
+			opt[i].index = i
 			opt[i].__owner = dd
 			opt[i]:SetScript("OnClick", optOnClick)
 			opt[i]:SetScript("OnEnter", optOnEnter)
@@ -1336,10 +1363,16 @@ do
 		frame:SetPoint("BOTTOMRIGHT", anchor2 or anchor, "BOTTOMRIGHT", xOffset, -yOffset)
 	end
 
+	local function HideBackdrop(frame)
+		if frame.NineSlice then frame.NineSlice:SetAlpha(0) end
+		if frame.SetBackdrop then frame:SetBackdrop(nil) end
+	end
+
 	local function addapi(object)
 		local mt = getmetatable(object).__index
 		if not object.SetInside then mt.SetInside = SetInside end
 		if not object.SetOutside then mt.SetOutside = SetOutside end
+		if not object.HideBackdrop then mt.HideBackdrop = HideBackdrop end
 		if not object.DisabledPixelSnap then
 			if mt.SetTexture then hooksecurefunc(mt, "SetTexture", DisablePixelSnap) end
 			if mt.SetTexCoord then hooksecurefunc(mt, "SetTexCoord", DisablePixelSnap) end

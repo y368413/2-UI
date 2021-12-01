@@ -1,6 +1,6 @@
 ﻿--## Author: ykiigor  ## SavedVariables: VLegionToDo
-local LegionToDoVersion = "5.0"
-local VERSION_NUMERIC = 50
+local LegionToDoVersion = "5.2"
+local VERSION_NUMERIC = 52
 
 local GetCurrentRegion
 do
@@ -102,6 +102,14 @@ do
 		local regionID = 0
 		if serverID then
 			regionID = realmsDB[tonumber(serverID) or -1] or 0
+		end
+		if regionID == 0 then
+			local r = _G.GetCurrentRegion()
+			if r == 3 then
+				regionID = 2
+			elseif r == 1 then
+				regionID = 1
+			end
 		end
 		known = regionID
 		return regionID
@@ -785,7 +793,7 @@ tinsert(ToDoFunc,function(self,collect)
 			ashmission = ashmission + (3 * 24 * 60 * 60)
 		end
 
-		self:AddDoubleLine("Next Ash mission", date("%d.%m.%Y %H:%M",ashmission), 1,1,1,1,1,1)
+		--self:AddDoubleLine("Next Ash mission", date("%d.%m.%Y %H:%M",ashmission), 1,1,1,1,1,1)
 	end
 end)
 
@@ -858,14 +866,14 @@ tinsert(ToDoFunc,function(self,collect)
 			end
 		end
 	end
-	self:AddLine("Mythic:")
+	--self:AddLine("Mythic:")
 	for i=1,#instances do
 		if instancesShowStatus[i] then
 			if instancesAttune[i] and not res[i] and not C_QuestLog.IsQuestFlaggedCompleted(instancesAttune[i]) then
-				self:AddDoubleLine(instances[i], "|cffff0000Locked",1,1,1)
+	--			self:AddDoubleLine(instances[i], "|cffff0000Locked",1,1,1)
 				collect["instance"..i] = "|cffff0000Locked"
 			else
-				self:AddDoubleLine(instances[i], res[i] or "|cffff0000---",1,1,1)
+	--			self:AddDoubleLine(instances[i], res[i] or "|cffff0000---",1,1,1)
 				collect["instance"..i] = res[i] or "|cffff0000---"
 			end
 		end
@@ -1146,6 +1154,7 @@ CallingsUpdater:SetScript("OnEvent", function(self, event, ...)
 				end
 
 				self.collect.s["bounty"..i.."name"] = nil
+				self.collect.s["bounty"..i.."id"] = d.questID
 
 				local questIndex = C_QuestLog.GetLogIndexForQuestID(d.questID)
 				if questIndex and questIndex ~= 0 then
@@ -1464,6 +1473,9 @@ tinsert(ToDoFunc,function(self,collect)
 		if objectives and objectives[1] then
 			conq = objectives[1].numFulfilled .. "/" .. objectives[1].numRequired
 		end
+	else
+		local name, amount, texturePath, earnedThisWeek, weeklyMax, totalMax, isDiscovered, quality = GetCurrencyInfo(1602)
+		conq = amount
 	end
 	collect.conq = conq
 
@@ -1512,6 +1524,12 @@ tinsert(ToDoFunc,function(self,collect)
 end)
 
 tinsert(ToDoFunc,function(self,collect)
+	if C_QuestLog.IsQuestFlaggedCompleted(64347) then
+		collect.torghastav = true
+	else
+		collect.torghastav = nil
+	end
+
 	local torghast1 = nil
 	local torghast2 = nil
 
@@ -1588,7 +1606,6 @@ tinsert(ToDoFunc,function(self,collect)
 		collect.mawtormentor = nil
 	end
 
-
 	if 
 		C_QuestLog.IsQuestFlaggedCompleted(63823) or 
 		C_QuestLog.IsQuestFlaggedCompleted(63824) or 
@@ -1598,6 +1615,144 @@ tinsert(ToDoFunc,function(self,collect)
 		collect.mawassault = true
 	else
 		collect.mawassault = nil
+	end
+
+	if 
+		C_QuestLog.IsQuestFlaggedCompleted(63949)
+	then
+		collect.kortiaweekly = true
+	else
+		collect.kortiaweekly = nil
+		if C_QuestLog.GetLogIndexForQuestID(63949) then
+			local progress = GetQuestProgressBarPercent(63949)
+
+			if progress ~= 0 then
+				collect.kortiaweekly = progress .. "%"
+			end
+		end
+	end
+
+	if 
+		C_QuestLog.IsQuestFlaggedCompleted(61981) or 
+		C_QuestLog.IsQuestFlaggedCompleted(61982) or 
+		C_QuestLog.IsQuestFlaggedCompleted(61983) or
+		C_QuestLog.IsQuestFlaggedCompleted(61984)
+	then
+		collect.anima1k = true
+	else
+		collect.anima1k = nil
+		local questID = nil
+		if C_QuestLog.GetLogIndexForQuestID(61981) then questID = 61981
+		elseif C_QuestLog.GetLogIndexForQuestID(61982) then questID = 61982
+		elseif C_QuestLog.GetLogIndexForQuestID(61983) then questID = 61983
+		elseif C_QuestLog.GetLogIndexForQuestID(61984) then questID = 61984 end
+
+		if questID then
+			local objectives = C_QuestLog.GetQuestObjectives(questID)
+			if objectives and objectives[1] then
+				collect.anima1k = objectives[1].numFulfilled .. "/" .. objectives[1].numRequired
+			end
+		end
+	end
+
+	if C_QuestLog.IsQuestFlaggedCompleted(64531) then
+		collect.mawworldboss = true
+	else
+		collect.mawworldboss = nil
+	end
+
+	if C_QuestLog.IsQuestFlaggedCompleted(64531) then
+		collect.mawworldboss = true
+	else
+		collect.mawworldboss = nil
+	end
+
+	if C_QuestLog.IsQuestFlaggedCompleted(65266) then
+		collect.korthialostresearch = true
+	else
+		collect.korthialostresearch = nil
+	end
+end)
+
+local korthiaRaresList = {
+	64257,179802,"Chamber of Knowledge",
+	64278,179859,"Chamber of Wisdom",
+	64243,179768,"Consumption",
+	63830,177903,"Dominated Protector",
+	64349,180042,"Covenant: Necrolord",
+	64320,180014,"Covenant: Night Fae",
+	64313,179985,"Covenant: Venthyr",
+	64338,180032,"Covenant: Kyrian",
+	64428,179108,"Kroke the Tormented",
+	64291,179931,"Relic Breaker Krelva",
+	64455,180160,"Reliwik the Defiant",
+	64442,177336,"Zelnithop",
+	64246,179472,"Konthrogz the Obliterator",
+	64245,179760,"Towering Exterminator",
+	64457,180162,"Ve'rayn",
+	64285,179913,"Deadsoul Hatcher",
+	64369,179914,"Observer Yorik",
+	64263,179608,"Screaming Shade",
+	64284,179911,"Silent Soulstalker",
+}
+
+tinsert(ToDoFunc,function(self,collect)
+	local res = 0
+	collect.korthiaRares = res
+
+	for i=1,#korthiaRaresList,3 do
+		if C_QuestLog.IsQuestFlaggedCompleted(korthiaRaresList[i]) then
+			res = bit.bor(res,bit.lshift(1,(i-1)/3))
+		end
+	end
+	collect.korthiaRares = res
+end)
+
+tinsert(ToDoFunc,function(self,collect)
+	local chardata = {}
+	collect.missionList = chardata
+
+	for _,func in pairs({C_Garrison.GetInProgressMissions}) do
+		local missions = func(GetPrimaryGarrisonFollowerType(Enum.GarrisonType.Type_9_0))
+		if type(missions) == "table" then
+			for i=1,#missions do
+				local mission = missions[i]
+				
+				local fin = mission.offerEndTime and mission.offerEndTime-GetTime()+time() or 0
+				if mission.inProgress then
+					fin = mission.timeLeftSeconds and mission.timeLeftSeconds+time() or 0
+				end
+				local rewardStr
+				if type(mission.rewards)=="table" and #mission.rewards > 0 then
+					local reward = mission.rewards[1]
+
+					if (reward.currencyID) then
+						if reward.currencyID == 0 then
+							rewardStr = GetCoinTextureString(reward.quantity or 0)
+						else
+							local name, amount, texturePath = GetCurrencyInfo(reward.currencyID)
+							rewardStr = (reward.quantity and reward.quantity > 1 and reward.quantity.."x " or "").."|T"..(reward.icon or texturePath or 0)..":0|t "..(name or "Currency ID"..reward.currencyID)
+						end
+					elseif (reward.quality) then
+						rewardStr = ITEM_QUALITY_COLORS[reward.quality + 1].hex..reward.title..FONT_COLOR_CODE_CLOSE
+					elseif (reward.itemID) then
+						local itemName, _, itemRarity, _, _, _, _, _, _, itemTexture = GetItemInfo(reward.itemID);
+						if reward.itemLink and type(reward.itemLink) == "string" then
+							local color = reward.itemLink:match("|c........")
+							rewardStr = "|T"..itemTexture..":0|t "..(reward.quantity and reward.quantity > 1 and reward.quantity.."x " or "")..(color or "").. (reward.itemLink:match("|h%[(.-)%]|h") or itemName or "item"..reward.itemID)..(color and "|r" or "")
+						elseif itemName then
+							rewardStr = "|T"..itemTexture..":0|t "..(reward.quantity and reward.quantity > 1 and reward.quantity.."x " or "").. ITEM_QUALITY_COLORS[itemRarity].hex..itemName..FONT_COLOR_CODE_CLOSE
+						end
+					elseif (reward.followerXP) then
+						rewardStr = reward.name or reward.title
+					else
+						rewardStr = reward.title
+					end
+				end				
+ 				chardata[#chardata+1] = fin
+ 				chardata[#chardata+1] = rewardStr or ""
+			end
+		end
 	end
 end)
 
@@ -1648,6 +1803,7 @@ MiniMapIcon:SetScript("OnEnter",function(self)
 	GameTooltip:AddLine("Shadowlands ToDo") 
 	for _,func in pairs(ToDoFunc) do
 		pcall(func,GameTooltip,charData)
+		--local b,e = pcall(func,GameTooltip,charData) if not b then print(e) end
 		--func(GameTooltip,charData)
 	end
 	GameTooltip:Show() 
@@ -1770,6 +1926,7 @@ LegionToDo:SetScript("OnEvent",function(self,event,...)
 		VLegionToDo = VLegionToDo or {}
 		VLegionToDo.chars = VLegionToDo.chars or {}
 		VLegionToDo.black = VLegionToDo.black or {}
+		VLegionToDo.charprio = VLegionToDo.charprio or {}
 		VLegionToDo.opt = VLegionToDo.opt or {
 			amana = true,
 			warmy = true,
@@ -2202,13 +2359,17 @@ LegionToDo.Options:SetPushedTexture("Interface\\Buttons\\LockButton-Unlocked-Dow
 LegionToDo.Options:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
 LegionToDo.Options:SetSize(32, 32)
 
---local CharsListDropdown = CreateFrame("Frame", "LegionToDoCharsListMenuFrame", LegionToDo, "UIDropDownMenuTemplate")
-local CharsListDropdown = MSA_DropDownMenu_Create("LegionToDoCharsListMenuFrame", LegionToDo)
+local CharsListDropdown = CreateFrame("Frame", "LegionToDoCharsListMenuFrame", LegionToDo, "UIDropDownMenuTemplate")
+
+local function CharList_DropDown_SetCharPrio(guid,prio)
+	VLegionToDo.charprio[guid] = prio
+	LegionToDo:GetScript("OnShow")(LegionToDo)
+end
 
 LegionToDo.CharsList = CreateFrame("Button",nil,LegionToDo,"UIPanelButtonTemplate")
 LegionToDo.CharsList:SetPoint("TOPLEFT",200,-5)
 LegionToDo.CharsList:SetScript("OnClick",function(self)
-	if MSA_DROPDOWNMENU_OPEN_MENU then
+	if UIDROPDOWNMENU_OPEN_MENU then
 		CloseDropDownMenus()
 		return
 	end
@@ -2289,6 +2450,36 @@ LegionToDo.CharsList:SetScript("OnClick",function(self)
 								preferredIndex = 3,
 							}
 							StaticPopup_Show("LEGIONTODO_REMOVECHAR")	
+						end,
+					},
+					{
+						notCheckable = false, 
+						text = "Prio: Low", 
+						checked = function() 
+							return VLegionToDo.charprio[guid] == -1
+						end,
+						func = function()
+							CharList_DropDown_SetCharPrio(guid,-1)
+						end,
+					},
+					{
+						notCheckable = false, 
+						text = "Prio: Normal", 
+						checked = function() 
+							return not VLegionToDo.charprio[guid]
+						end,
+						func = function()
+							CharList_DropDown_SetCharPrio(guid,nil)
+						end,
+					},
+					{
+						notCheckable = false, 
+						text = "Prio: High", 
+						checked = function() 
+							return VLegionToDo.charprio[guid] == 1
+						end,
+						func = function()
+							CharList_DropDown_SetCharPrio(guid,1)
 						end,
 					},
 				},
@@ -2431,7 +2622,9 @@ local function ColTooltipOnLeave(self)
 	GameTooltip_Hide()
 end
 local function ColTooltipOnClick(self)
-	if self.click then
+	if type(self.click) == 'function' then
+		self.click(self.data)
+	elseif self.click then
 		ItemRefTooltip:SetHyperlink(self.click)
 	end
 end
@@ -2448,6 +2641,17 @@ local function AddColTooltip(self,tooltip,click)
 	self.tooltip:Show()
 	self.tooltip.data = tooltip
 	self.tooltip.click = click
+end
+
+local function UpdateCustomCheck(data)
+	if data.db then
+		if data.state then
+			data.db[data.name] = nil
+		else
+			data.db[data.name] = time()
+		end
+		LegionToDo:GetScript("OnShow")(LegionToDo)
+	end
 end
 
 local LINES_MAX = 25
@@ -2549,10 +2753,18 @@ LegionToDo:SetScript("OnShow",function(self)
 
 	count = LineUpdate(count,"warfrontHC","Warfront HC: Stromgarde")
 
+	count = LineUpdate(count,"anima1k","1000 anima")
+	count = LineUpdate(count,"kortiaweekly","Korthia: Weekly")
+	count = LineUpdate(count,"mawworldboss","Maw: World Boss")
 	count = LineUpdate(count,"mawtormentor","Maw: Tormentors")
 	count = LineUpdate(count,"mawassault","Maw: Covenant Assault")
 	count = LineUpdate(count,"wrathofthejailer","Maw: Wrath of the Jailer")
 	count = LineUpdate(count,"mawhunt","Maw: The Hunt")
+	count = LineUpdate(count,"korthialostresearch","Korthia: Lost Research")
+
+	count = LineUpdate(count,"korthiaRares","Korthia: Rares")
+
+	count = LineUpdate(count,"missionTable","Covenant table missions")
 
 	local name, _, texturePath = GetCurrencyInfo(1166)
 	count = LineUpdate(count,"timewarped",name,texturePath)
@@ -2568,8 +2780,9 @@ LegionToDo:SetScript("OnShow",function(self)
 	--count = LineUpdate(count,"mplusmax","Weekly max mythic+")
 	count = LineUpdate(count,"mpluskey","M+ Key",nil,'small')
 
-	count = LineUpdate(count,"torghast","Torghast",nil,'small-left2')
-	count = LineUpdate(count,"torghast","Torghast",nil,'small-left2')
+	--count = LineUpdate(count,"torghast","Torghast",nil,'small-left2')
+	--count = LineUpdate(count,"torghast","Torghast",nil,'small-left2')
+	count = LineUpdate(count,"torghastav","Torghast: Adamant Vaults")
 
 	count = LineUpdate(count,"conq_points","Conquest points")
 	count = LineUpdate(count,"pvp_cache","PvP cache")
@@ -2617,6 +2830,15 @@ LegionToDo:SetScript("OnShow",function(self)
 	count = LineUpdate(count,"artlvl","Aftifact LvL",nil,'center')
 	count = LineUpdate(count,"azeritelvl","Azerite LvL",nil,'small')
 	count = LineUpdate(count,"ilvl","Item Level",nil,'center')
+
+	
+	count = LineUpdate(count,"customcheckd1","Daily Check 1",nil,'center')
+	count = LineUpdate(count,"customcheckd2","Daily Check 2",nil,'center')
+	count = LineUpdate(count,"customcheckd3","Daily Check 3",nil,'center')
+	count = LineUpdate(count,"customcheckw1","Weekly Check 1",nil,'center')
+	count = LineUpdate(count,"customcheckw2","Weekly Check 2",nil,'center')
+	count = LineUpdate(count,"customcheckw3","Weekly Check 3",nil,'center')
+
 	count = LineUpdate(count,"lastupate","Last Update",nil,'small')
 	
 	LineHide(count)
@@ -2637,11 +2859,15 @@ LegionToDo:SetScript("OnShow",function(self)
 	end
 	for guid,db in pairs(VLegionToDo.chars) do
 		if not blacked[ db ] then
-			tinsert(sortedList,{guid,db,db.name})
+			tinsert(sortedList,{guid,db,db.name,VLegionToDo.charprio[guid] or 0})
 		end
 	end	
 	sort(sortedList,function(a,b)
-		return a[3] < b[3]
+		if a[4] == b[4] then
+			return a[3] < b[3]
+		else
+			return a[4] > b[4]
+		end
 	end)
 	
 	local curr = time()
@@ -2752,11 +2978,11 @@ LegionToDo:SetScript("OnShow",function(self)
 			while thursdayReset < currTime do
 				thursdayReset = thursdayReset + 86400
 			end
-			local prevReset = thursdayReset - 86400
+			local prevDailyReset = thursdayReset - 86400
 
 			local needDailiyReset = false
 
-			if db.t < prevReset then
+			if db.t < prevDailyReset then
 				needDailiyReset = true
 			end
 
@@ -2765,11 +2991,11 @@ LegionToDo:SetScript("OnShow",function(self)
 			while thursdayReset < currTime do
 				thursdayReset = thursdayReset + 302400
 			end
-			local prevReset = thursdayReset - 302400
+			local prevHalfWeekReset = thursdayReset - 302400
 
 			local needHalfWeekReset = false
 
-			if db.t < prevReset then
+			if db.t < prevHalfWeekReset then
 				needHalfWeekReset = true
 			end
 
@@ -2876,7 +3102,11 @@ LegionToDo:SetScript("OnShow",function(self)
 
 			if not optData["valor"] or OPTIONS_TOGGLED then
 				lineCount = lineCount + 1
-				lines[lineCount].cols[col]:SetText((db.valor or "0") .. (db.valorEarned and ("\n" ..db.valorEarned.."/"..(db.valorMax or 0)) or ""))
+				if not db.valorMax or db.valorMax == 0 then
+					lines[lineCount].cols[col]:SetText(db.valor or "0")
+				else
+					lines[lineCount].cols[col]:SetText((db.valor or "0") .. (db.valorEarned and ("\n" ..db.valorEarned.."/"..(db.valorMax or 0)) or ""))
+				end
 			end
 
 			if not optData["towerknowledge"] or OPTIONS_TOGGLED then
@@ -3011,6 +3241,33 @@ LegionToDo:SetScript("OnShow",function(self)
 				lines[lineCount].cols[col]:SetText(db.warfrontHC and "|cff00ff00Done" or "|cffff0000Not done")				
 			end
 
+			if not optData["anima1k"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				if needReset then
+					lines[lineCount].cols[col]:SetText("|cffff0000Not done")
+				else
+					lines[lineCount].cols[col]:SetText(db.anima1k and type(db.anima1k) == "string" and "|cffffff00"..db.anima1k or db.anima1k and "|cff00ff00Done" or "|cffff0000Not done")	
+				end
+			end
+
+			if not optData["kortiaweekly"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				if needReset then
+					lines[lineCount].cols[col]:SetText("|cffff0000Not done")
+				else
+					lines[lineCount].cols[col]:SetText(db.kortiaweekly and type(db.kortiaweekly) == "string" and "|cffffff00"..db.kortiaweekly or db.kortiaweekly and "|cff00ff00Done" or "|cffff0000Not done")	
+				end
+			end
+
+			if not optData["mawworldboss"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				if needReset then
+					lines[lineCount].cols[col]:SetText("|cffff0000Not done")
+				else
+					lines[lineCount].cols[col]:SetText(db.mawworldboss and "|cff00ff00Done" or "|cffff0000Not done")	
+				end			
+			end
+
 			if not optData["mawtormentor"] or OPTIONS_TOGGLED  then
 				lineCount = lineCount + 1
 				if needReset then
@@ -3047,6 +3304,82 @@ LegionToDo:SetScript("OnShow",function(self)
 				end			
 			end
 
+
+			if not optData["korthialostresearch"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				if needReset then
+					lines[lineCount].cols[col]:SetText("|cffff0000Not done")
+				else
+					lines[lineCount].cols[col]:SetText(db.korthialostresearch and "|cff00ff00Done" or "|cffff0000Not done")	
+				end			
+			end
+
+			if not optData["korthiaRares"] or OPTIONS_TOGGLED then
+				lineCount = lineCount + 1
+				lines[lineCount].cols[col]:SetText("")
+				
+				local c = 0
+				local tooltip = {[-1] = "Korthia Rares"}
+				local res = db.korthiaRares or 0
+				for i=1,#korthiaRaresList,3 do
+					if not self.localizated then
+						self.localizated = {}
+					end
+					if not self.localizated[ "mob"..korthiaRaresList[i+1] ] then
+						inspectScantip:SetHyperlink("unit:Creature-0-0-0-0-"..korthiaRaresList[i+1])
+						if inspectScantip:NumLines() > 0 then
+							local name = _G["LegToDoScanningTooltipTextLeft1"]:GetText()
+							self.localizated[ "mob"..korthiaRaresList[i+1] ] = name
+						end
+						inspectScantip:ClearLines()
+					end
+					tooltip[#tooltip+1] = self.localizated[ "mob"..korthiaRaresList[i+1] ] or korthiaRaresList[i+2]
+					if bit.band(res,bit.lshift(1,(i-1)/3)) > 0 and not needDailiyReset then
+						c = c + 1
+
+						tooltip[#tooltip+1] = "|cff00ff00Done"
+					else
+						tooltip[#tooltip+1] = "|cffff0000Not done"
+					end
+				end
+
+				if c > 0 then
+					lines[lineCount].cols[col]:SetText(c)
+				end
+				AddColTooltip(lines[lineCount].cols[col],tooltip)
+			end
+
+
+			if not optData["missionTable"] or OPTIONS_TOGGLED then
+				lineCount = lineCount + 1
+				lines[lineCount].cols[col]:SetText("")
+				
+				local tooltip = {[-1] = "Missions"}
+				local done,total = 0,0
+				if db.missionList then
+					local res = {}
+					for i=1,#db.missionList,2 do
+						res[#res+1] = {db.missionList[i],db.missionList[i+1]}
+					end
+					sort(res,function(a,b)return a[1]<b[1] end)
+					for i=1,#res do
+						local obj = res[i]
+						tooltip[#tooltip+1] = obj[2]
+	
+						local fin = max(obj[1]-time(),0)
+						tooltip[#tooltip+1] = fin > 0 and format("|cffaaaaaa(in %d:%02d)|r |cffffff00%s|r",fin/3600,(fin%3600)/60,date("%X",obj[1])) or "|cff00ff00done|r"
+						if fin == 0 then
+							done = done + 1
+						end
+						total = total + 1
+					end
+				end
+
+				if total > 0 then
+					lines[lineCount].cols[col]:SetText((done == 0 and "|cffff0000" or done == total and "|cff00ff00" or "|cffffff00")..done.."/"..total.."|r")
+				end
+				AddColTooltip(lines[lineCount].cols[col],tooltip)
+			end
 
 			if not optData["timewarped"] or OPTIONS_TOGGLED  then
 				lineCount = lineCount + 1				
@@ -3115,6 +3448,7 @@ LegionToDo:SetScript("OnShow",function(self)
 				end
 			end
 
+			--[[
 			if not optData["torghast"] or OPTIONS_TOGGLED  then
 				lineCount = lineCount + 1
 				if needReset then
@@ -3128,6 +3462,16 @@ LegionToDo:SetScript("OnShow",function(self)
 					lines[lineCount].cols[col]:SetText("|cffff0000-")
 				else
 					lines[lineCount].cols[col]:SetText(db.torghast2 or "|cffff0000-")
+				end
+			end
+			]]
+
+			if not optData["torghastav"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				if needReset then
+					lines[lineCount].cols[col]:SetText("")
+				else
+					lines[lineCount].cols[col]:SetText(db.torghastav and "|cff00ff00Done" or "|cffff0000Not done")
 				end
 			end
 
@@ -3273,13 +3617,18 @@ LegionToDo:SetScript("OnShow",function(self)
 						end
 	
 						local tooltip = {
-							[-1]=(db.s and db.s["bounty"..i.."name"] or ""),
+							[-1]=(db.s and db.s["bounty"..i.."name"] or (db.s["bounty"..i.."id"] and C_TaskQuest.GetQuestInfoByQuestID(db.s["bounty"..i.."id"])) or ""),
 						}
 						if db.s and not db.s["bounty"..i.."notime"] then
 							tooltip[#tooltip+1] = "Expire on"
 							tooltip[#tooltip+1] = (db.s and db.s["bounty"..i.."end"] and date("%d/%m/%Y %H:%M:%S",db.s["bounty"..i.."end"]) or "")
 						end
 						AddColTooltip(lines[lineCount].cols[col],tooltip)
+					elseif db.s and db.s["bounty"..i.."id"] then
+						local qname = C_TaskQuest.GetQuestInfoByQuestID(db.s["bounty"..i.."id"])
+						if qname then
+							AddColTooltip(lines[lineCount].cols[col],{[-1]=qname})
+						end
 					end
 				end
 			end
@@ -3345,7 +3694,26 @@ LegionToDo:SetScript("OnShow",function(self)
 			if not optData["ilvl"] or OPTIONS_TOGGLED  then
 				lineCount = lineCount + 1
 				lines[lineCount].cols[col]:SetText(db.ilvl or "")
-			end	
+			end
+
+			for k=1,2 do
+				for j=1,3 do
+					local name = "customcheck"..(k==1 and "d" or "w")..j
+					if not optData[name] or OPTIONS_TOGGLED  then
+						local state = false
+						if k == 1 and not needDailiyReset and db and db.s and type(db.s[name]) == "number" and db.s[name] > prevDailyReset then
+							state = true
+						elseif k == 2 and not needReset and db and db.s and type(db.s[name]) == "number" and db.s[name] > prevReset then
+							state = true
+						end
+
+						lineCount = lineCount + 1
+						lines[lineCount].cols[col]:SetText(state and "|A:achievementcompare-GreenCheckmark:0:0|a" or "|A:groupfinder-icon-redx:0:0|a")
+
+						AddColTooltip(lines[lineCount].cols[col],{[-1]="Click to change state",db=db and db.s,name=name,state=state},UpdateCustomCheck)
+					end
+				end	
+			end
 
 			if not optData["lastupate"] or OPTIONS_TOGGLED  then
 				lineCount = lineCount + 1

@@ -106,6 +106,7 @@ function MISC:CalculateMoverPoints(mover, trimX, trimY)
 
 	x = x + (trimX or 0)
 	y = y + (trimY or 0)
+	x, y = M:Round(x), M:Round(y)
 
 	return x, y, point
 end
@@ -114,7 +115,6 @@ function MISC:UpdateTrimFrame()
 	if not f then return end -- for aurawatch preview
 	
 	local x, y = MISC:CalculateMoverPoints(self)
-	x, y = M:Round(x), M:Round(y)
 	f.__x:SetText(x)
 	f.__y:SetText(y)
 	f.__x.__current = x
@@ -126,7 +126,6 @@ function MISC:DoTrim(trimX, trimY)
 	local mover = updater.__owner
 	if mover then
 		local x, y, point = MISC:CalculateMoverPoints(mover, trimX, trimY)
-		x, y = M:Round(x), M:Round(y)
 		f.__x:SetText(x)
 		f.__y:SetText(y)
 		f.__x.__current = x
@@ -186,7 +185,7 @@ end
 function MISC:UnlockElements()
 	for i = 1, #MoverList do
 		local mover = MoverList[i]
-		if not mover:IsShown() then
+		if not mover:IsShown() and not mover.isDisable then
 			mover:Show()
 		end
 	end

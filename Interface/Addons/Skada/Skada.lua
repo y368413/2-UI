@@ -448,7 +448,7 @@ local function SetLabelFormat(name, starttime, endtime, fmt)
 		elseif fmt == 7 then
 			timelabel = date("%H:%M:%S",starttime).." - "..date("%H:%M:%S",endtime)
 		elseif fmt == 8 then
-			timelabel = date("%H:%M",starttime).." - "..date("%H:%M",endtime).." "..duration
+			timelabel = date("%H:%M:%S",starttime).." - "..date("%H:%M:%S",endtime).." "..duration
 		end
 	end
 
@@ -831,7 +831,34 @@ local function slashHandler(param)
 	end
 end
 
+do
+local f = CreateFrame("Frame", nil, UIParent)
+    f:Hide()
+    f:SetScript("OnUpdate", function(self, elapsed)
+        self.timer = (self.timer or 0) + elapsed; if self.timer < 0.15 then return end; self.timer = 0
+        local t = table.remove(self.lines, 1)
+        if t then
+            skada_sendchat(unpack(t))
+        else
+            self:Hide()
+        end
+    end)
+	
+local sf = f
+    sf.lines = {}
+    skada_sendchat_start = function(...)
+        table.wipe(sf.lines)
+    end
+    skada_sendchat_add = function(...)
+        table.insert(sf.lines, {...})
+    end
+    skada_sendchat_finish = function(...)
+        sf:Show()
+    end
+end
+	
 local function sendchat(msg, chan, chantype)
+    msg = msg and msg:gsub("\124T.-\124t", "") or msg
 	if chantype == "self" then
 		-- To self.
 		Skada:Print(msg)
@@ -848,6 +875,7 @@ local function sendchat(msg, chan, chantype)
 		BNSendWhisper(chan,msg)
 	end
 end
+skada_sendchat = sendchat
 
 function Skada:Report(channel, chantype, report_mode_name, report_set_name, max, window)
 
@@ -892,6 +920,8 @@ function Skada:Report(channel, chantype, report_mode_name, report_set_name, max,
 	end
 
 	-- Title
+    skada_sendchat_start()
+    local sendchat = (channel == 'guild' or chantype == 'channel') and skada_sendchat_add or sendchat
 	sendchat(string.format(L["Skada: %s for %s:"], report_mode.title or report_mode:GetName(), Skada:GetSetLabel(report_set)), channel, chantype)
 
 	-- For each item in dataset, print label and valuetext.
@@ -902,7 +932,7 @@ function Skada:Report(channel, chantype, report_mode_name, report_set_name, max,
 			if report_mode.metadata and report_mode.metadata.showspots then
 				sendchat(("%2u. %s %s   %s"):format(nr, (data.specname and "["..data.specname.."]" or ""), label, data.valuetext), channel, chantype)
 			else
-				sendchat(("%s   %s"):format(label, data.valuetext), channel, chantype)
+				sendchat(("%s %s"):format(label, data.valuetext), channel, chantype)
 			end
 			nr = nr + 1
 		end
@@ -911,6 +941,7 @@ function Skada:Report(channel, chantype, report_mode_name, report_set_name, max,
 		end
 	end
 
+    skada_sendchat_finish()
 end
 
 function Skada:RefreshMMButton()

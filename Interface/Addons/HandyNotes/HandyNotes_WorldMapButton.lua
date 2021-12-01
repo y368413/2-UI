@@ -1,5 +1,4 @@
 -- HandyNotes Worldmap Button by fuba
---Version: 90002.01-Release ## Author: fuba
 
 local function SetIconTooltip(IsRev)
 	if not WorldMapTooltip then return end

@@ -74,31 +74,28 @@ R.Tooltips = {
 
 -- 信息条
 R.Infobar = {
-	Location		= true,												-- 区域信息
-	LocationPos		= {"TOP", UIParent,"TOP", 0, -3},					-- 区域信息位置
-	Spec			= true,												-- 天赋专精
-	SpecPos			= {"TOPLEFT", UIParent,"TOPLEFT",0, 0},				-- 天赋专精位置
-	Time			= true,												-- 时间信息
-	TimePos			= {"TOPLEFT", UIParent, "TOPLEFT", 25, 2},			-- 时间信息位置
+	CustomAnchor	= false,											-- 自定义位置
 	Guild	 		= true,												-- 公会信息
 	GuildPos 		= {"TOPLEFT", UIParent, "TOPLEFT", 95, -3},			-- 公会信息位置
 	Friends 		= true,												-- 好友模块
 	FriendsPos 		= {"TOPLEFT", UIParent, "TOPLEFT", 130, -3},		-- 好友模块位置
-	Durability		= true,												-- 耐久度
-	DurabilityPos	= {"TOPLEFT", UIParent, "TOPLEFT", 180, -3},		-- 耐久度位置
-	System			= true,												-- 帧数/延迟
-	SystemPos		= {"TOPLEFT", UIParent, "TOPLEFT", 220, -3},		-- 帧数/延迟位置
 	Latency			= true,												-- 内存占用
 	LatencyPos		= {"TOPLEFT", UIParent, "TOPLEFT", 320, -3},		-- 内存占用位置
-	MaxAddOns		= 21,												-- 插件信息显示数量
+	System			= true,												-- 帧数/延迟
+	SystemPos		= {"TOPLEFT", UIParent, "TOPLEFT", 220, -3},		-- 帧数/延迟位置
+	Location		= true,												-- 区域信息
+	LocationPos		= {"TOP", UIParent,"TOP", 0, -3},					-- 区域信息位置
+	Spec			= true,												-- 天赋专精
+	SpecPos			= {"TOPLEFT", UIParent,"TOPLEFT",0, 0},				-- 天赋专精位置
+	Durability		= true,												-- 耐久度
+	DurabilityPos	= {"TOPLEFT", UIParent, "TOPLEFT", 180, -3},		-- 耐久度位置
 	Bags            = true,
 	BagsPos         = {"TOPLEFT", UIParent, "TOPLEFT", 370, -3},
 	Gold			= true,												-- 金币信息
 	GoldPos			= {"TOPLEFT", UIParent, "TOPLEFT", 400, -3}, 	    -- 金币信息位置
+	Time			= true,												-- 时间信息
+	TimePos			= {"TOPLEFT", UIParent, "TOPLEFT", 25, 2},			-- 时间信息位置
 	
-	Fonts			= {"Interface\\Addons\\_ShiGuang\\Media\\Fonts\\Pixel.ttf", 14, "OUTLINE"},				-- 字体
 	TimeFonts       = {"Interface\\Addons\\_ShiGuang\\Media\\Fonts\\Pixel.ttf", 24, "outline"},
 	TTFonts         = {STANDARD_TEXT_FONT, 18, "outline"},
-	FontSize		= 13,
-	AutoAnchor		= true,												-- 自动对齐
 }

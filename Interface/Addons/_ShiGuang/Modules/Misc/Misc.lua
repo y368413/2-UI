@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 local MISC = M:RegisterModule("Misc")
 
 local _G = getfenv(0)
-local select, floor, unpack, tonumber, gsub, strsplit = select, floor, unpack, tonumber, gsub, strsplit
+local select, floor, unpack, tonumber, gsub = select, floor, unpack, tonumber, gsub
 local InCombatLockdown, IsModifiedClick, IsAltKeyDown = InCombatLockdown, IsModifiedClick, IsAltKeyDown
 local GetNumArchaeologyRaces = GetNumArchaeologyRaces
 local GetNumArtifactsByRace = GetNumArtifactsByRace
@@ -29,6 +29,7 @@ local IsGuildMember, C_BattleNet_GetGameAccountInfoByGUID, C_FriendList_IsFriend
 local C_UIWidgetManager_GetDiscreteProgressStepsVisualizationInfo = C_UIWidgetManager.GetDiscreteProgressStepsVisualizationInfo
 local C_UIWidgetManager_GetTextureWithAnimationVisualizationInfo = C_UIWidgetManager.GetTextureWithAnimationVisualizationInfo
 local C_Map_GetMapInfo, C_Map_GetBestMapForUnit = C_Map.GetMapInfo, C_Map.GetBestMapForUnit
+local UnitIsPlayer, GuildInvite, C_FriendList_AddFriend = UnitIsPlayer, GuildInvite, C_FriendList.AddFriend
 
 --[[
 	Miscellaneous 各种有用没用的小玩意儿
@@ -68,6 +69,8 @@ function MISC:OnLogin()
 	MISC:EnhanceDressup()
 	MISC:FuckTrainSound()
 	MISC:JerryWay()
+	MISC:QuickMenuButton()
+	MISC:BaudErrorFrameHelpTip()
 	
 	--MISC:CreateRM()
 	--MISC:FreeMountCD()
@@ -592,7 +595,7 @@ do
 		end
 	end
 
-	M:RegisterEvent("ADDON_LOADED", setupMisc)
+	--M:RegisterEvent("ADDON_LOADED", setupMisc) -- FIXME: collections is not dragable atm
 end
 
 -- Select target when click on raid units
@@ -707,6 +710,9 @@ function MISC:EnhanceDressup()
 	end)
 
 	M.AddTooltip(button, "ANCHOR_TOP", format(U["UndressButtonTip"], I.LeftButton, I.RightButton))
+
+	DressUpFrame.LinkButton:SetWidth(106)
+	DressUpFrame.LinkButton:SetText(SOCIAL_SHARE_TEXT)
 end
 
 function MISC:FuckTrainSound()
@@ -776,6 +782,91 @@ function MISC:JerryWay()
 		end
 	end
 	SLASH_NDUI_JERRY_WAY1 = "/way"
+end
+
+function MISC:BaudErrorFrameHelpTip()
+	if not IsAddOnLoaded("!BaudErrorFrame") then return end
+	local button, count = _G.BaudErrorFrameMinimapButton, _G.BaudErrorFrameMinimapCount
+	if not button then return end
+
+	local errorInfo = {
+		text = U["BaudErrorTip"],
+		buttonStyle = HelpTip.ButtonStyle.GotIt,
+		targetPoint = HelpTip.Point.TopEdgeCenter,
+		alignment = HelpTip.Alignment.Right,
+		offsetX = -15,
+		onAcknowledgeCallback = M.HelpInfoAcknowledge,
+		callbackArg = "BaudError",
+	}
+	hooksecurefunc(count, "SetText", function(_, text)
+		if not MaoRUIDB["Help"]["BaudError"] then
+			text = tonumber(text)
+			if text and text > 0 then
+				HelpTip:Show(button, errorInfo)
+			end
+		end
+	end)
+end
+
+-- Buttons to enhance popup menu
+function MISC:MenuButton_AddFriend()
+	C_FriendList_AddFriend(MISC.MenuButtonName)
+end
+
+function MISC:MenuButton_CopyName()
+	local editBox = ChatEdit_ChooseBoxForSend()
+	local hasText = (editBox:GetText() ~= "")
+	ChatEdit_ActivateChat(editBox)
+	editBox:Insert(MISC.MenuButtonName)
+	if not hasText then editBox:HighlightText() end
+end
+
+function MISC:MenuButton_GuildInvite()
+	GuildInvite(MISC.MenuButtonName)
+end
+
+function MISC:QuickMenuButton()
+	if not R.db["Misc"]["MenuButton"] then return end
+
+	local menuList = {
+		{text = ADD_FRIEND, func = MISC.MenuButton_AddFriend, color = {0, .6, 1}},
+		{text = gsub(CHAT_GUILD_INVITE_SEND, HEADER_COLON, ""), func = MISC.MenuButton_GuildInvite, color = {0, .8, 0}},
+		{text = COPY_NAME, func = MISC.MenuButton_CopyName, color = {1, 0, 0}},
+	}
+
+	local frame = CreateFrame("Frame", "NDuiMenuButtonFrame", DropDownList1)
+	frame:SetSize(10, 10)
+	frame:SetPoint("TOPLEFT")
+	frame:Hide()
+	for i = 1, 3 do
+		local button = CreateFrame("Button", nil, frame)
+		button:SetSize(25, 10)
+		button:SetPoint("TOPLEFT", frame, (i-1)*28 + 2, -2)
+		M.PixelIcon(button, nil, true)
+		button.Icon:SetColorTexture(unpack(menuList[i].color))
+		button:SetScript("OnClick", menuList[i].func)
+		M.AddTooltip(button, "ANCHOR_TOP", menuList[i].text)
+	end
+
+	hooksecurefunc("ToggleDropDownMenu", function(level, _, dropdownMenu)
+		if level and level > 1 then return end
+
+		local name = dropdownMenu.name
+		local unit = dropdownMenu.unit
+		local isPlayer = unit and UnitIsPlayer(unit)
+		local isFriendMenu = dropdownMenu == FriendsDropDown and not dropdownMenu.bnetIDAccount -- menus on FriendsFrame
+		if not name or (not isPlayer and not dropdownMenu.chatType and not isFriendMenu) then
+			frame:Hide()
+			return
+		end
+
+		local server = dropdownMenu.server
+		if not server or server == "" then
+			server = I.MyRealm
+		end
+		MISC.MenuButtonName = name.."-"..server
+		frame:Show()
+	end)
 end
 
 --[[hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self,textString,value,_,maxValue)  ---	Custom status text format.
