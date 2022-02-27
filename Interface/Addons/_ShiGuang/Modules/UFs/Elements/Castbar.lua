@@ -1,13 +1,15 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
-local UF
+local UF = M:GetModule("UnitFrames")
 
-local unpack, GetTime, IsPlayerSpell = unpack, GetTime, IsPlayerSpell
-local UnitInVehicle, UnitIsUnit = UnitInVehicle, UnitIsUnit
+local unpack, min, format, strupper = unpack, min, format, strupper
+local GetTime, IsPlayerSpell, UnitName = GetTime, IsPlayerSpell, UnitName
+local UnitInVehicle, UnitIsUnit, UnitExists = UnitInVehicle, UnitIsUnit, UnitExists
 
-local CastbarCompleteColor = {.2, .6, .8}  --.1, .8, 0
-local CastbarFailColor = {0.1, 0.6, 0.9}  --1, .1, 0
+local CastbarCompleteColor = {.1, .8, 0}
+local CastbarFailColor = {1, .1, 0}
 
+local ticks = {}
 local channelingTicks = {
 	[740] = 4,		-- 宁静
 	[755] = 5,		-- 生命通道
@@ -43,30 +45,7 @@ if I.MyClass == "PRIEST" then
 	M:RegisterEvent("PLAYER_TALENT_UPDATE", updateTicks)
 end
 
-local ticks = {}
-local function updateCastBarTicks(bar, numTicks)
-	if numTicks and numTicks > 0 then
-		local delta = bar:GetWidth() / numTicks
-		for i = 1, numTicks do
-			if not ticks[i] then
-				ticks[i] = bar:CreateTexture(nil, "OVERLAY")
-				ticks[i]:SetTexture(I.normTex)
-				ticks[i]:SetVertexColor(0, 0, 0, .7)
-				ticks[i]:SetWidth(R.mult)
-				ticks[i]:SetHeight(bar:GetHeight())
-			end
-			ticks[i]:ClearAllPoints()
-			ticks[i]:SetPoint("CENTER", bar, "LEFT", delta * i, 0 )
-			ticks[i]:Show()
-		end
-	else
-		for _, tick in pairs(ticks) do
-			tick:Hide()
-		end
-	end
-end
-
-function M:OnCastbarUpdate(elapsed)
+function UF:OnCastbarUpdate(elapsed)
 	if self.casting or self.channeling then
 		local decimal = self.decimal
 
@@ -79,18 +58,15 @@ function M:OnCastbarUpdate(elapsed)
 
 		if self.__owner.unit == "player" then
 			if self.delay ~= 0 then
-				self.Time:SetFormattedText(decimal.."/|cffff0000"..decimal, duration, self.casting and self.max + self.delay or self.max - self.delay)
+				self.Time:SetFormattedText(decimal.." | |cffff0000"..decimal, duration, self.casting and self.max + self.delay or self.max - self.delay)
 			else
-				self.Time:SetFormattedText(decimal.."/"..decimal, duration, self.max)
-				if self.Lag and self.SafeZone and self.SafeZone.timeDiff and self.SafeZone.timeDiff ~= 0 then
-					self.Lag:SetFormattedText("%d ms", self.SafeZone.timeDiff * 1000)
-				end
+				self.Time:SetFormattedText(decimal.." | "..decimal, duration, self.max)
 			end
 		else
 			if duration > 1e4 then
-				self.Time:SetText("∞")
+				self.Time:SetText("∞ | ∞")
 			else
-				self.Time:SetFormattedText(decimal.."/"..decimal, duration, self.casting and self.max + self.delay or self.max - self.delay)
+				self.Time:SetFormattedText(decimal.." | "..decimal, duration, self.casting and self.max + self.delay or self.max - self.delay)
 			end
 		end
 		self.duration = duration
@@ -110,11 +86,10 @@ function M:OnCastbarUpdate(elapsed)
 	end
 end
 
-function M:OnCastSent()
+function UF:OnCastSent()
 	local element = self.Castbar
 	if not element.SafeZone then return end
-	element.SafeZone.sendTime = GetTime()
-	element.SafeZone.castSent = true
+	element.__sendTime = GetTime()
 end
 
 local function ResetSpellTarget(self)
@@ -141,42 +116,55 @@ local function UpdateSpellTarget(self, unit)
 	end
 end
 
-function M:PostCastStart(unit)
+local function UpdateCastBarColor(self, unit)
+	local color = R.db["UFs"]["CastingColor"]
+	if unit == "player" then
+		color = R.db["UFs"]["OwnCastColor"]
+	elseif not UnitIsUnit(unit, "player") and self.notInterruptible then
+		color = R.db["UFs"]["NotInterruptColor"]
+	end
+	self:SetStatusBarColor(color.r, color.g, color.b)
+end
+
+function UF:PostCastStart(unit)
 	self:SetAlpha(1)
 	self.Spark:Show()
-	local color = R.db["UFs"]["CastingColor"]
-	self:SetStatusBarColor(color.r, color.g, color.b)
+
+	local safeZone = self.SafeZone
+	local lagString = self.LagString
 
 	if unit == "vehicle" or UnitInVehicle("player") then
-		if self.SafeZone then self.SafeZone:Hide() end
-		if self.Lag then self.Lag:Hide() end
-	elseif unit == "player" then
-		local safeZone = self.SafeZone
 		if safeZone then
-			safeZone.timeDiff = 0
-			if safeZone.castSent then
-				safeZone.timeDiff = GetTime() - safeZone.sendTime
-				safeZone.timeDiff = safeZone.timeDiff > self.max and self.max or safeZone.timeDiff
-				safeZone:SetWidth(self:GetWidth() * (safeZone.timeDiff + .001) / self.max)
+			safeZone:Hide()
+			lagString:Hide()
+		end
+	elseif unit == "player" then
+		if safeZone then
+			local sendTime = self.__sendTime
+			local timeDiff = sendTime and min((GetTime() - sendTime), self.max)
+			if timeDiff and timeDiff ~= 0 then
+				safeZone:SetWidth(self:GetWidth() * timeDiff / self.max)
 				safeZone:Show()
-				safeZone.castSent = nil
+				lagString:SetFormattedText("%d ms", timeDiff * 1000)
+				lagString:Show()
+			else
+				safeZone:Hide()
+				lagString:Hide()
 			end
+			self.__sendTime = nil
 		end
 
 		local numTicks = 0
 		if self.channeling then
 			numTicks = channelingTicks[self.spellID] or 0
 		end
-		updateCastBarTicks(self, numTicks)
-	elseif not UnitIsUnit(unit, "player") and self.notInterruptible then
-		color = R.db["UFs"]["NotInterruptColor"]
-		self:SetStatusBarColor(color.r, color.g, color.b)
+		M:CreateAndUpdateBarTicks(self, ticks, numTicks)
 	end
+
+	UpdateCastBarColor(self, unit)
 
 	if self.__owner.mystyle == "nameplate" then
 		-- Major spells
-		if not UF then UF = M:GetModule("UnitFrames") end
-
 		if R.db["Nameplate"]["CastbarGlow"] and UF.MajorSpells[self.spellID] then
 			M.ShowOverlayGlow(self.glowFrame)
 		else
@@ -188,19 +176,15 @@ function M:PostCastStart(unit)
 	end
 end
 
-function M:PostCastUpdate(unit)
+function UF:PostCastUpdate(unit)
 	UpdateSpellTarget(self, unit)
 end
 
-function M:PostUpdateInterruptible(unit)
-	local color = R.db["UFs"]["CastingColor"]
-	if not UnitIsUnit(unit, "player") and self.notInterruptible then
-		color = R.db["UFs"]["NotInterruptColor"]
-	end
-	self:SetStatusBarColor(color.r, color.g, color.b)
+function UF:PostUpdateInterruptible(unit)
+	UpdateCastBarColor(self, unit)
 end
 
-function M:PostCastStop()
+function UF:PostCastStop()
 	if not self.fadeOut then
 		self:SetStatusBarColor(unpack(CastbarCompleteColor))
 		self.fadeOut = true
@@ -209,7 +193,7 @@ function M:PostCastStop()
 	ResetSpellTarget(self)
 end
 
-function M:PostCastFailed()
+function UF:PostCastFailed()
 	self:SetStatusBarColor(unpack(CastbarFailColor))
 	self:SetValue(self.max)
 	self.fadeOut = true

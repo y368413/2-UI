@@ -113,6 +113,7 @@ function S:GetToggleDirection()
 end
 
 local toggleFrames = {}
+
 local function CreateToggleButton(parent)
 	local bu = CreateFrame("Button", nil, parent)
 	bu:SetSize(20, 80)

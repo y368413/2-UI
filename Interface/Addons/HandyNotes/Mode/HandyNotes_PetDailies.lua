@@ -1,5 +1,4 @@
-
-------------------------------------------
+------------------------------------------ 显示未战斗过的宠物战斗
 --  This HandyNotes_PetDailies was heavily inspired by  --
 --    HandyNotes_SummerFestival         --
 --  by Ethan Centaurai                  --

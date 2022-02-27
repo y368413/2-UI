@@ -31,7 +31,7 @@ function Bar:CreateStancebar()
 	local NUM_POSSESS_SLOTS = NUM_POSSESS_SLOTS
 	local buttonList = {}
 
-	local frame = CreateFrame("Frame", "NDui_ActionBarStance", UIParent, "SecureHandlerStateTemplate")
+	local frame = CreateFrame("Frame", "UI_ActionBarStance", UIParent, "SecureHandlerStateTemplate")
 	if (R.db["Actionbar"]["Style"] == 7) or (R.db["Actionbar"]["Style"] == 8) or (R.db["Actionbar"]["Style"] == 10) then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -120, 82}
 	elseif (R.db["Actionbar"]["Style"] == 4) or (R.db["Actionbar"]["Style"] == 6) then

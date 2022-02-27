@@ -602,7 +602,7 @@ function MISC:RaidTool_WorldMarker()
 		"Interface\\Buttons\\UI-GroupLoot-Pass-Up",
 	}
 
-	local frame = CreateFrame("Frame", "NDui_WorldMarkers", UIParent)
+	local frame = CreateFrame("Frame", "UI_WorldMarkers", UIParent)
 	frame:SetPoint("RIGHT", -100, 0)
 	M.CreateMF(frame, nil, true)
 	M.RestoreMF(frame)
@@ -636,7 +636,7 @@ local markerTypeToRow = {
 	[4] = 3,
 }
 function MISC:RaidTool_UpdateGrid()
-	local frame = _G["NDui_WorldMarkers"]
+	local frame = _G["UI_WorldMarkers"]
 	if not frame then return end
 
 	local size, margin = R.db["Misc"]["MarkerSize"], 5

@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 local MISC = M:GetModule("Misc")
 
 local format, gsub, strsplit, strfind = string.format, string.gsub, string.split, string.find
-local pairs, tonumber, wipe, select = pairs, tonumber, wipe, select
+local pairs, wipe, select = pairs, wipe, select
 local GetInstanceInfo, PlaySound, print = GetInstanceInfo, PlaySound, print
 local IsPartyLFG, IsInRaid, IsInGroup, IsInInstance, IsInGuild = IsPartyLFG, IsInRaid, IsInGroup, IsInInstance, IsInGuild
 local UnitInRaid, UnitInParty, SendChatMessage = UnitInRaid, UnitInParty, SendChatMessage
@@ -18,7 +18,7 @@ local C_VignetteInfo_GetVignettePosition = C_VignetteInfo.GetVignettePosition
 local C_Texture_GetAtlasInfo = C_Texture.GetAtlasInfo
 local C_ChatInfo_SendAddonMessage = C_ChatInfo.SendAddonMessage
 local C_ChatInfo_RegisterAddonMessagePrefix = C_ChatInfo.RegisterAddonMessagePrefix
-local C_MythicPlus_GetCurrentAffixes = C_MythicPlus.GetCurrentAffixes
+local C_ChallengeMode_GetActiveKeystoneInfo = C_ChallengeMode.GetActiveKeystoneInfo
 
 --[[
 	SoloInfo是一个告知你当前副本难度的小工具，防止我有时候单刷时进错难度了。
@@ -282,12 +282,7 @@ function MISC:Explosive_Update(...)
 	end
 end
 
-local function startCount()
-	wipe(R.db["Misc"]["ExplosiveCache"])
-	M:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.Explosive_Update)
-end
-
-local function endCount()
+function MISC:Explosive_SendResult()
 	local text
 	for name, count in pairs(R.db["Misc"]["ExplosiveCache"]) do
 		text = (text or U["ExplosiveCount"])..name.."("..count..") "
@@ -297,37 +292,30 @@ local function endCount()
 	M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.Explosive_Update)
 end
 
-local function pauseCount()
-	local name, _, instID = GetInstanceInfo()
-	if name and instID == 8 then
+function MISC.Explosive_CheckAffixes(event)
+	local _, affixes = C_ChallengeMode_GetActiveKeystoneInfo()
+	if affixes[3] and affixes[3] == 13 then
+		if event == "CHALLENGE_MODE_START" then
+			wipe(R.db["Misc"]["ExplosiveCache"])
+		end
 		M:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.Explosive_Update)
+		M:RegisterEvent("CHALLENGE_MODE_COMPLETED", MISC.Explosive_SendResult)
 	else
 		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.Explosive_Update)
+		M:UnregisterEvent("CHALLENGE_MODE_COMPLETED", MISC.Explosive_SendResult)
 	end
-end
-
-function MISC.Explosive_CheckAffixes(event)
-	local affixes = C_MythicPlus_GetCurrentAffixes()
-	if not affixes then return end
-
-	if affixes[3] and affixes[3].id == 13 then
-		M:RegisterEvent("CHALLENGE_MODE_START", startCount)
-		M:RegisterEvent("CHALLENGE_MODE_COMPLETED", endCount)
-		M:RegisterEvent("UPDATE_INSTANCE_INFO", pauseCount)
-	end
-	M:UnregisterEvent("PLAYER_ENTERING_WORLD", MISC.Explosive_CheckAffixes)
 end
 
 function MISC:ExplosiveAlert()
 	if R.db["Misc"]["ExplosiveCount"] then
-		self:Explosive_CheckAffixes()
-		M:RegisterEvent("PLAYER_ENTERING_WORLD", self.Explosive_CheckAffixes)
+		MISC:Explosive_CheckAffixes()
+		M:RegisterEvent("ZONE_CHANGED_NEW_AREA", MISC.Explosive_CheckAffixes)
+		M:RegisterEvent("CHALLENGE_MODE_START", MISC.Explosive_CheckAffixes)
 	else
-		M:UnregisterEvent("CHALLENGE_MODE_START", startCount)
-		M:UnregisterEvent("CHALLENGE_MODE_COMPLETED", endCount)
-		M:UnregisterEvent("UPDATE_INSTANCE_INFO", pauseCount)
-		M:UnregisterEvent("PLAYER_ENTERING_WORLD", self.Explosive_CheckAffixes)
-		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", self.Explosive_Update)
+		M:UnregisterEvent("ZONE_CHANGED_NEW_AREA", MISC.Explosive_CheckAffixes)
+		M:UnregisterEvent("CHALLENGE_MODE_START", MISC.Explosive_CheckAffixes)
+		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.Explosive_Update)
+		M:UnregisterEvent("CHALLENGE_MODE_COMPLETED", MISC.Explosive_SendResult)
 	end
 end
 
@@ -351,6 +339,7 @@ local itemList = {
 	[308462] = true,	-- 纵情饕餮盛宴
 	[345130] = true,	-- 9.0工程战复
 	[307157] = true,	-- 永恒药锅
+	[359336] = true,	-- 石头汤锅
 	[324029] = true,	-- 宁心圣典
 }
 

@@ -437,7 +437,7 @@ CaerdonAPI:OnLoad()
 local CombuctorMixin = {}
 
 function CombuctorMixin:GetName()
-    return 'Combuctor'
+    return "Combuctor"
 end
 
 function CombuctorMixin:Init()
@@ -539,7 +539,7 @@ function CombuctorMixin:OnUpdateSlot(button)
 end
 
 local Version = nil
-if select(4, GetAddOnInfo('Combuctor')) then
-		Version = GetAddOnMetadata('Combuctor', 'Version')
+if select(4, GetAddOnInfo("Combuctor")) then
+		Version = GetAddOnMetadata("Combuctor", "Version")
 		CaerdonWardrobe:RegisterFeature(CombuctorMixin)
 end

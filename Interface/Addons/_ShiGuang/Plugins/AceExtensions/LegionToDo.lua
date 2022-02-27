@@ -1,6 +1,6 @@
 ﻿--## Author: ykiigor  ## SavedVariables: VLegionToDo
-local LegionToDoVersion = "5.2"
-local VERSION_NUMERIC = 52
+local LegionToDoVersion = "5.4"
+local VERSION_NUMERIC = 54
 
 local GetCurrentRegion
 do
@@ -335,6 +335,20 @@ tinsert(ToDoFunc,function(self,collect)
 		self:AddTexture(texturePath)
 	end
 	collect.stygianember = amount
+
+	local name, amount, texturePath, earnedThisWeek, weeklyMax, totalMax, isDiscovered, quality = GetCurrencyInfo(2009)
+	if isLevel60 and name then
+		self:AddDoubleLine(name, amount, 1,1,1)
+		self:AddTexture(texturePath)
+	end
+	collect.cosmicflux = amount
+
+	local name, amount, texturePath, earnedThisWeek, weeklyMax, totalMax, isDiscovered, quality = GetCurrencyInfo(1979)
+	if isLevel60 and name then
+		self:AddDoubleLine(name, amount, 1,1,1)
+		self:AddTexture(texturePath)
+	end
+	collect.cyphers = amount
 end)
 
 tinsert(ToDoFunc,function(self,collect)
@@ -909,6 +923,7 @@ local raids = {
 	1180,
 	1190,
 	1193,
+	1195,
 }
 local raids_max_bosses = {
 	7,3,10,9,11,
@@ -917,6 +932,7 @@ local raids_max_bosses = {
 	12,
 	10,
 	10,
+	11,
 }
 
 for i=1,#raids do
@@ -942,6 +958,7 @@ local LFRInstances = {
 	{ 2036,2037,2038,2039 }, --Nyalotha
 	{ 2090,2091,2092,2096 }, --Castle Nathria
 	{ 2221,2222,2223,2224 }, --SoD
+	{ 2291,2292,2293,2294 },	--SotFO
 }
 local LFRInstancesShowStatus = {
 	isLevel48, isLevel48, isLevel48, isLevel48, isLevel48, 
@@ -950,12 +967,14 @@ local LFRInstancesShowStatus = {
 	isLevel50,
 	isLevel60,
 	isLevel60,
+	isLevel60,
 }
 local raidToHide = {
 	true,true,true,false,false,
 	true,true,true,
 	true,
 	false,
+	true,
 	true,
 	false,
 }
@@ -1410,6 +1429,8 @@ local factionsToWatch = {
 
 	2470,
 	2472,
+
+	2478,
 }
 
 tinsert(ToDoFunc,function(self,collect)
@@ -1672,6 +1693,23 @@ tinsert(ToDoFunc,function(self,collect)
 	else
 		collect.korthialostresearch = nil
 	end
+
+	if 
+		C_QuestLog.IsQuestFlaggedCompleted(64551) or 
+		C_QuestLog.IsQuestFlaggedCompleted(64549) or 
+		C_QuestLog.IsQuestFlaggedCompleted(64552) or
+		C_QuestLog.IsQuestFlaggedCompleted(64553)
+	then
+		collect.korthiaanimatablemission = true
+	else
+		collect.korthiaanimatablemission = nil
+	end
+
+	if C_QuestLog.IsQuestFlaggedCompleted(65143) then
+		collect.zerthworldboss = true
+	else
+		collect.zerthworldboss = nil
+	end
 end)
 
 local korthiaRaresList = {
@@ -1696,6 +1734,42 @@ local korthiaRaresList = {
 	64284,179911,"Silent Soulstalker",
 }
 
+local zerthRaresList = {
+	65544,183646,"Furidian",
+	65579,178778,"Gluttonous Overgrowth",
+	65272,183925,"Tahkwitz",
+	65556,183746,"Otiosen",
+	65273,183953,"Corrupted Architect",
+	65239,181360,"Vexis",
+	65555,184409,"Euv'ouk",
+	65549,184413,"Shifting Stargorger",
+	65251,183764,"Zatojin",
+	65587,182158,"Reanimatrox Marzan",
+	65240,183722,"Sorranos",
+	65557,178229,"Feasting",
+	65553,183596,"Chitali the Eldest",
+	65582,179043,"Orixal",
+	65584,183747,"Vitiane",
+	65241,183737,"Xy'rath the Covetous",
+	65586,182155,"High Reaver Damaris",
+	65581,178563,"Hadeon the Stonebreaker",
+	65583,182318,"General Zarathura",
+	65551,183748,"Helmix",
+	65257,183814,"Otaris the Provoked",
+	65548,180978,"Hirukon",
+	65550,181249,"Tethos",
+	65580,183516,"The Engulfer",
+	63988,178963,"Gorkek",
+	65574,183927,"Sand Matriarch Ileus",
+	64719,180924,"Garudeon",
+	65549,179006,"Akkaris",
+	64668,180746,"Protector of the First Ones",
+	65585,182114,"Iska, Outrider of Ruin",
+	64716,180917,"Destabilized Core",
+	65547,178508,"Mother Phestis",
+	--32 limit here
+}
+
 tinsert(ToDoFunc,function(self,collect)
 	local res = 0
 	collect.korthiaRares = res
@@ -1706,11 +1780,29 @@ tinsert(ToDoFunc,function(self,collect)
 		end
 	end
 	collect.korthiaRares = res
+
+
+	local res = 0
+	collect.zerthRares = res
+
+	for i=1,#zerthRaresList,3 do
+		if C_QuestLog.IsQuestFlaggedCompleted(zerthRaresList[i]) then
+			res = bit.bor(res,bit.lshift(1,(i-1)/3))
+		end
+	end
+	collect.zerthRares = res
+
 end)
 
 tinsert(ToDoFunc,function(self,collect)
 	local chardata = {}
 	collect.missionList = chardata
+
+	local followersList = C_Garrison.GetFollowers(GetPrimaryGarrisonFollowerType(Enum.GarrisonType.Type_9_0))
+	local followersTotal,followersOnMission = 0,0
+	for _,follower in pairs(followersList) do
+		followersTotal = followersTotal + 1
+	end
 
 	for _,func in pairs({C_Garrison.GetInProgressMissions}) do
 		local missions = func(GetPrimaryGarrisonFollowerType(Enum.GarrisonType.Type_9_0))
@@ -1736,7 +1828,10 @@ tinsert(ToDoFunc,function(self,collect)
 					elseif (reward.quality) then
 						rewardStr = ITEM_QUALITY_COLORS[reward.quality + 1].hex..reward.title..FONT_COLOR_CODE_CLOSE
 					elseif (reward.itemID) then
-						local itemName, _, itemRarity, _, _, _, _, _, _, itemTexture = GetItemInfo(reward.itemID);
+						local itemName, _, itemRarity, _, _, _, _, _, _, itemTexture = GetItemInfo(reward.itemID)
+						if not itemTexture then
+							itemTexture = select(5,GetItemInfoInstant(reward.itemID)) or 134400
+						end
 						if reward.itemLink and type(reward.itemLink) == "string" then
 							local color = reward.itemLink:match("|c........")
 							rewardStr = "|T"..itemTexture..":0|t "..(reward.quantity and reward.quantity > 1 and reward.quantity.."x " or "")..(color or "").. (reward.itemLink:match("|h%[(.-)%]|h") or itemName or "item"..reward.itemID)..(color and "|r" or "")
@@ -1751,9 +1846,24 @@ tinsert(ToDoFunc,function(self,collect)
 				end				
  				chardata[#chardata+1] = fin
  				chardata[#chardata+1] = rewardStr or ""
+
+				if type(mission.followers)=="table" then
+					for j=1,#mission.followers do
+						local guid = mission.followers[j]
+						for k,follower in pairs(followersList) do
+							if follower.followerID == guid then
+								followersOnMission = followersOnMission + 1
+								followersList[k] = nil
+								break
+							end
+						end
+					end
+				end
 			end
 		end
 	end
+
+	collect.missionFollowersCount = (followersTotal-followersOnMission).."/"..followersTotal
 end)
 
 
@@ -2705,6 +2815,9 @@ LegionToDo:SetScript("OnShow",function(self)
 	local name, _, texturePath = GetCurrencyInfo(1906)
 	count = LineUpdate(count,"soulash91",name,texturePath)
 
+	local name, _, texturePath = GetCurrencyInfo(2009)
+	count = LineUpdate(count,"cosmicflux",name,texturePath)
+
 	local name, _, texturePath = GetCurrencyInfo(1813)
 	count = LineUpdate(count,"anima",name,texturePath)
 
@@ -2722,6 +2835,10 @@ LegionToDo:SetScript("OnShow",function(self)
 
 	local name, _, texturePath = GetCurrencyInfo(1977)
 	count = LineUpdate(count,"stygianember",name,texturePath)
+
+	local name, _, texturePath = GetCurrencyInfo(1979)
+	count = LineUpdate(count,"cyphers",name,texturePath)
+
 
 	count = LineUpdate(count,"miniVision","Mini Vision")
 	count = LineUpdate(count,"visionReward","Vision Reward")
@@ -2755,16 +2872,19 @@ LegionToDo:SetScript("OnShow",function(self)
 
 	count = LineUpdate(count,"anima1k","1000 anima")
 	count = LineUpdate(count,"kortiaweekly","Korthia: Weekly")
+	count = LineUpdate(count,"zerthworldboss","Zerith Mortis: World Boss")
 	count = LineUpdate(count,"mawworldboss","Maw: World Boss")
 	count = LineUpdate(count,"mawtormentor","Maw: Tormentors")
 	count = LineUpdate(count,"mawassault","Maw: Covenant Assault")
 	count = LineUpdate(count,"wrathofthejailer","Maw: Wrath of the Jailer")
 	count = LineUpdate(count,"mawhunt","Maw: The Hunt")
-	count = LineUpdate(count,"korthialostresearch","Korthia: Lost Research")
+	count = LineUpdate(count,"korthialostresearch","Korthia: Lost Research")	
 
+	count = LineUpdate(count,"zerthRares","Zerith Mortis: Rares")
 	count = LineUpdate(count,"korthiaRares","Korthia: Rares")
 
 	count = LineUpdate(count,"missionTable","Covenant table missions")
+	count = LineUpdate(count,"korthiaanimatablemission","Korthia: anima table mission")
 
 	local name, _, texturePath = GetCurrencyInfo(1166)
 	count = LineUpdate(count,"timewarped",name,texturePath)
@@ -2858,10 +2978,10 @@ LegionToDo:SetScript("OnShow",function(self)
 		end
 	end
 	for guid,db in pairs(VLegionToDo.chars) do
-		if not blacked[ db ] then
+		if not blacked[ db ] or self.TempDiableBlack then
 			tinsert(sortedList,{guid,db,db.name,VLegionToDo.charprio[guid] or 0})
 		end
-	end	
+	end
 	sort(sortedList,function(a,b)
 		if a[4] == b[4] then
 			return a[3] < b[3]
@@ -3090,6 +3210,11 @@ LegionToDo:SetScript("OnShow",function(self)
 				lines[lineCount].cols[col]:SetText(db.soulash91 or "0")
 			end
 
+			if not optData["cosmicflux"] or OPTIONS_TOGGLED then
+				lineCount = lineCount + 1
+				lines[lineCount].cols[col]:SetText(db.cosmicflux or "0")
+			end
+
 			if not optData["anima"] or OPTIONS_TOGGLED then
 				lineCount = lineCount + 1
 				lines[lineCount].cols[col]:SetText(db.anima or "0")
@@ -3122,6 +3247,11 @@ LegionToDo:SetScript("OnShow",function(self)
 			if not optData["stygianember"] or OPTIONS_TOGGLED then
 				lineCount = lineCount + 1
 				lines[lineCount].cols[col]:SetText(db.stygianember or "0")
+			end
+
+			if not optData["cyphers"] or OPTIONS_TOGGLED then
+				lineCount = lineCount + 1
+				lines[lineCount].cols[col]:SetText(db.cyphers or "0")
 			end
 
 			if not optData["miniVision"] or OPTIONS_TOGGLED  then
@@ -3259,6 +3389,15 @@ LegionToDo:SetScript("OnShow",function(self)
 				end
 			end
 
+			if not optData["zerthworldboss"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				if needReset then
+					lines[lineCount].cols[col]:SetText("|cffff0000Not done")
+				else
+					lines[lineCount].cols[col]:SetText(db.zerthworldboss and "|cff00ff00Done" or "|cffff0000Not done")	
+				end			
+			end
+
 			if not optData["mawworldboss"] or OPTIONS_TOGGLED  then
 				lineCount = lineCount + 1
 				if needReset then
@@ -3312,6 +3451,41 @@ LegionToDo:SetScript("OnShow",function(self)
 				else
 					lines[lineCount].cols[col]:SetText(db.korthialostresearch and "|cff00ff00Done" or "|cffff0000Not done")	
 				end			
+			end
+
+			if not optData["zerthRares"] or OPTIONS_TOGGLED then
+				lineCount = lineCount + 1
+				lines[lineCount].cols[col]:SetText("")
+				
+				local c = 0
+				local tooltip = {[-1] = "Korthia Rares"}
+				local res = db.zerthRares or 0
+				for i=1,#zerthRaresList,3 do
+					if not self.localizated then
+						self.localizated = {}
+					end
+					if not self.localizated[ "mob"..zerthRaresList[i+1] ] then
+						inspectScantip:SetHyperlink("unit:Creature-0-0-0-0-"..zerthRaresList[i+1])
+						if inspectScantip:NumLines() > 0 then
+							local name = _G["LegToDoScanningTooltipTextLeft1"]:GetText()
+							self.localizated[ "mob"..zerthRaresList[i+1] ] = name
+						end
+						inspectScantip:ClearLines()
+					end
+					tooltip[#tooltip+1] = self.localizated[ "mob"..zerthRaresList[i+1] ] or zerthRaresList[i+2]
+					if bit.band(res,bit.lshift(1,(i-1)/3)) > 0 and not needDailiyReset then
+						c = c + 1
+
+						tooltip[#tooltip+1] = "|cff00ff00Done"
+					else
+						tooltip[#tooltip+1] = "|cffff0000Not done"
+					end
+				end
+
+				if c > 0 then
+					lines[lineCount].cols[col]:SetText(c)
+				end
+				AddColTooltip(lines[lineCount].cols[col],tooltip)
 			end
 
 			if not optData["korthiaRares"] or OPTIONS_TOGGLED then
@@ -3373,12 +3547,27 @@ LegionToDo:SetScript("OnShow",function(self)
 						end
 						total = total + 1
 					end
+					if db.missionFollowersCount then
+						tooltip[#tooltip+1] = " "
+						tooltip[#tooltip+1] = " "
+						tooltip[#tooltip+1] = "Free followers:"
+						tooltip[#tooltip+1] = (db.missionFollowersCount:find("^0/") and "|cffff0000" or "")..db.missionFollowersCount
+					end
 				end
 
 				if total > 0 then
 					lines[lineCount].cols[col]:SetText((done == 0 and "|cffff0000" or done == total and "|cff00ff00" or "|cffffff00")..done.."/"..total.."|r")
 				end
 				AddColTooltip(lines[lineCount].cols[col],tooltip)
+			end
+
+			if not optData["korthiaanimatablemission"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				if needReset then
+					lines[lineCount].cols[col]:SetText("|cffff0000Not done")
+				else
+					lines[lineCount].cols[col]:SetText(db.korthiaanimatablemission and "|cff00ff00Done" or "|cffff0000Not done")	
+				end			
 			end
 
 			if not optData["timewarped"] or OPTIONS_TOGGLED  then
@@ -3639,7 +3828,7 @@ LegionToDo:SetScript("OnShow",function(self)
 					lineCount = lineCount + 1
 					local r = ""
 					if db["reputation"..factionID.."c"] then
-						r = (db["reputation"..factionID.."p"] and (db["reputation"..factionID.."c"] > db["reputation"..factionID.."m"] and "|cff00ff00" or "") or db["reputation"..factionID.."c"] == -36000 and "|cff666666" or "|cffffff00")..db["reputation"..factionID.."c"].."/"..db["reputation"..factionID.."m"]..(db["reputation"..factionID.."e"] and " ["..db["reputation"..factionID.."e"].."]" or "")
+						r = (db["reputation"..factionID.."p"] and (db["reputation"..factionID.."c"] >= db["reputation"..factionID.."m"]*1.8 and "|cffff00ff")or db["reputation"..factionID.."p"] and (db["reputation"..factionID.."c"] > db["reputation"..factionID.."m"] and "|cff00ff00" or "")or db["reputation"..factionID.."c"] == -36000 and "|cff666666"or "|cffffff00")..db["reputation"..factionID.."c"].."/"..db["reputation"..factionID.."m"]..(db["reputation"..factionID.."e"] and " ["..db["reputation"..factionID.."e"].."]" or "")
 					
 					end
 					lines[lineCount].cols[col]:SetText(r)					
@@ -3723,6 +3912,7 @@ LegionToDo:SetScript("OnShow",function(self)
 	end
 	
 	
+	LINES_MAX = type(VLegionToDo.opt_height)=='number' and VLegionToDo.opt_height or LINES_MAX
 	local isScrollShown = false
 	if count > LINES_MAX then
 		LegionToDo.f:SetPoint("TOPLEFT",16,-35)
@@ -3738,6 +3928,7 @@ LegionToDo:SetScript("OnShow",function(self)
 		LegionToDo.leftScrollBar:SetValue(0)
 	end
 	
+	COLS_MAX = type(VLegionToDo.opt_width)=='number' and VLegionToDo.opt_width or COLS_MAX
 	local isVScrollShown = false
 	if col > COLS_MAX then
 		LegionToDo.bottomScrollBar:Show()
@@ -3790,7 +3981,9 @@ local menuTable = {
 MiniMapIcon:SetScript("OnMouseUp", function (self, button)
 	--if button == "LeftButton" then
 		wipe(hidden)
-		if IsShiftKeyDown() then
+		if IsControlKeyDown() and IsShiftKeyDown() then
+			LegionToDo.TempDiableBlack = true
+		elseif IsShiftKeyDown() then
 			wipe(VLegionToDo.black)
 		end
 		LegionToDo:Show()

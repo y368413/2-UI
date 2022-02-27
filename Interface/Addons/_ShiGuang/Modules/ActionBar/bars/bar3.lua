@@ -62,7 +62,7 @@ function Bar:CreateBar3()
 	--if layout > 3 then cfg = R.Bars.bar2 end
 	if layout ~= 1 then cfg = R.Bars.bar2 end
 
-	local frame = CreateFrame("Frame", "NDui_ActionBar3", UIParent, "SecureHandlerStateTemplate")
+	local frame = CreateFrame("Frame", "UI_ActionBar3", UIParent, "SecureHandlerStateTemplate")
 	if layout == 1 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 2}
 	elseif (layout == 2) or (layout == 3) then

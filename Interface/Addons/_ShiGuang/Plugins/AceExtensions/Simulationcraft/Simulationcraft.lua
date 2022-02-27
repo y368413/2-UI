@@ -1,4 +1,4 @@
--- Author: Theck, navv_, seriallos  Version: 9.1.0-01
+-- Author: Theck, navv_, seriallos  Version: 9.2.0
 
 local Simulationcraft = {}
 
@@ -455,7 +455,7 @@ local function CreateSimcTalentString()
   local maxColumns = 3
   for tier = 1, maxTiers do
     for column = 1, maxColumns do
-      local talentID, name, iconTexture, selected, available = GetTalentInfo(tier, column, GetActiveSpecGroup())
+      local _, _, _, selected, _ = GetTalentInfo(tier, column, GetActiveSpecGroup())
       if selected then
         talentInfo[tier] = column
       end
@@ -686,9 +686,9 @@ function Simulationcraft:GetBagItemStrings()
             container = BANK_CONTAINER
             slot = slot - 51
           end
-          _, _, _, _, _, _, itemLink, _, _, itemId = GetContainerItemInfo(container, slot)
+          local _, _, _, _, _, _, itemLink, _, _, _ = GetContainerItemInfo(container, slot)
           if itemLink then
-            local name, link, quality, baseItemLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(itemLink)
+            local name, _, quality, _, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
 
             -- get correct level for scaling gear
             local level, _, _ = GetDetailedItemLevelInfo(itemLink)
@@ -753,7 +753,7 @@ function Simulationcraft:GetCovenantString()
   return nil
 end
 
-function sortByRow(a, b)
+function SortByRow(a, b)
   return a.row < b.row
 end
 
@@ -762,7 +762,7 @@ function Simulationcraft:GetSoulbindString(id)
   local soulbindData = Soulbinds.GetSoulbindData(id)
   -- sort nodes by row order
   local nodes = soulbindData.tree.nodes
-  table.sort(nodes, sortByRow)
+  table.sort(nodes, SortByRow)
   for _, node in pairs(nodes) do
     if node.state == Enum.SoulbindNodeState.Selected then
       if node.spellID ~= 0 then
@@ -860,8 +860,8 @@ end
 -- This is the workhorse function that constructs the profile
 function Simulationcraft:PrintSimcProfile(debugOutput, noBags, showMerchant, links)
   -- addon metadata
-  local versionComment = '# SimC Addon ' .. '9.1.0-01'
-  local simcVersionWarning = '# Requires SimulationCraft 910-01 or newer'
+  local versionComment = '# SimC Addon ' .. '9.2.0'
+  local simcVersionWarning = '# Requires SimulationCraft 920-01 or newer'
 
   -- Basic player info
   local _, realmName, _, _, _, _, region, _, _, realmLatinName, _ = LibRealmInfo:GetRealmInfoByUnit('player')
@@ -894,7 +894,7 @@ function Simulationcraft:PrintSimcProfile(debugOutput, noBags, showMerchant, lin
   end
 
   -- Spec info
-  local role, globalSpecID
+  local role, globalSpecID, playerRole
   local specId = GetSpecialization()
   if specId then
     globalSpecID,_,_,_,_,role = GetSpecializationInfo(specId)

@@ -1,4 +1,4 @@
----------------------------- 感谢原作者 盒子哥 -- Fix and Updata by 冰色之舞、图图 、ShiGuang -----------------
+---------------------------- 感谢原作者 盒子哥 -- Fix and Updata by 冰色之舞、图图 、_ShiGuang -----------------
 local showHuahuaSet = true
 HuanhuaItemData = {};
 --------------------------------

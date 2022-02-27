@@ -20,6 +20,9 @@ local GetProfessions = _G.GetProfessions
 local GetProfessionInfo = _G.GetProfessionInfo
 local UnitLevel = _G.UnitLevel
 
+local SpellBook_GetSpellBookSlot = _G.SpellBook_GetSpellBookSlot
+
+
 -- WoW Strings
 local ITEM_MIN_SKILL = _G.ITEM_MIN_SKILL
 local ITEM_SPELL_KNOWN = _G.ITEM_SPELL_KNOWN
@@ -27,7 +30,131 @@ local LE_ITEM_CLASS_RECIPE = _G.LE_ITEM_CLASS_RECIPE
 local LE_ITEM_RECIPE_BOOK = _G.LE_ITEM_RECIPE_BOOK
 
 
+local locale = GetLocale()
 
+
+
+
+-- Very cool trick by MunkDev: https://www.wowinterface.com/forums/showthread.php?p=325688#post325688
+local function StopLastSound()
+  -- Play some sound to get a handle.
+  local _, handle = PlaySound(SOUNDKIT[next(SOUNDKIT)], "SFX", false)
+  if handle then
+    -- print("muting sound", handle)
+    -- Stop this sound and the previous.
+    StopSound(handle-1)
+    StopSound(handle)
+  end
+end
+
+
+
+-- For Classic there is no GetProfessions() so we have to scan the spell book for
+-- spells indicating that a profession was learned.
+local professionSpells = nil
+if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC or WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
+  
+  -- For the SpellButton frames to be available even before the SpellBook has been opened by a player,
+  -- I need to open it silently.
+  local learnedSpellEventFrame = CreateFrame("Frame")
+  learnedSpellEventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+  -- Listening to LEARNED_SPELL_IN_TAB should not be necessary, because SpellBookFrame itself
+  -- listens to it and calls SpellBookFrame_Update() then.
+  learnedSpellEventFrame:SetScript("OnEvent", function()
+  
+        -- Calling SpellBookFrame_Update() would be enough, but it spreads taint over the spellbook.
+        -- ToggleSpellBook() ToggleSpellBook() is also not possible for some reason.
+        -- But SpellBookFrame:Show() SpellBookFrame:Hide() works.
+        if not SpellBookFrame:IsShown() then
+          SpellBookFrame:Show()
+          StopLastSound()
+          SpellBookFrame:Hide()
+          StopLastSound()
+        end
+        
+        -- -- For testing:
+        -- for i = 1, 24 do
+          -- if _G["SpellButton" .. i] then
+            -- print(i, _G["SpellButton" .. i])
+            -- local slot, slotType, slotID = SpellBook_GetSpellBookSlot(_G["SpellButton" .. i])
+            -- if slot then
+              -- print(slot, slotType, slotID)
+            -- end
+          -- end
+        -- end
+    end)
+
+  -- This table maps spell IDs (as returned by SpellBook_GetSpellBookSlot())
+  -- e.g. https://classic.wowhead.com/spell=818/basic-campfire
+  -- to profession subclassID (as returned by GetItemInfo()).
+  -- https://wowpedia.fandom.com/wiki/ItemType#9:_Recipe
+  -- Thus, you can check if the player knows a certain profession, which does not
+  -- seem to be possible otherwise in Classic, where there is no GetProfessions().
+  professionSpells = {
+
+     [2108] = 1, -- Leatherworking Apprentice
+     [3104] = 1, -- Leatherworking Journeyman
+     [3811] = 1, -- Leatherworking Expert
+    [10662] = 1, -- Leatherworking Artisan
+    [32549] = 1, -- Leatherworking Master (BC)
+
+     [3908] = 2, -- Tailoring Apprentice
+     [3909] = 2, -- Tailoring Journeyman
+     [3910] = 2, -- Tailoring Expert
+    [12180] = 2, -- Tailoring Artisan
+    [26790] = 2, -- Tailoring Master (BC)
+
+     [4036] = 3, -- Engineering Apprentice
+     [4037] = 3, -- Engineering Journeyman
+     [4038] = 3, -- Engineering Expert
+    [12656] = 3, -- Engineering Artisan
+    [30350] = 3, -- Engineering Master (BC)
+
+     [2018] = 4, -- Blacksmithing Apprentice
+     [3100] = 4, -- Blacksmithing Journeyman
+     [3538] = 4, -- Blacksmithing Expert
+     [9785] = 4, -- Blacksmithing Artisan
+    [29844] = 4, -- Blacksmithing Master (BC)
+
+      [818] = 5, -- Basic Campfire (Cooking)
+
+     [2259] = 6, -- Alchemy Apprentice
+     [3101] = 6, -- Alchemy Journeyman
+     [3464] = 6, -- Alchemy Expert
+    [11611] = 6, -- Alchemy Artisan
+    [28596] = 6, -- Alchemy Master (BC)
+
+     [3273] = 7, -- First Aid Apprentice
+     [3274] = 7, -- First Aid Journeyman
+     [7924] = 7, -- First Aid Expert
+    [10846] = 7, -- First Aid Artisan
+    [27028] = 7, -- First Aid Master (BC)
+
+     [7411] = 8, -- Enchanting Apprentice
+     [7412] = 8, -- Enchanting Journeyman
+     [7413] = 8, -- Enchanting Expert
+    [13920] = 8, -- Enchanting Artisan
+    [28029] = 8, -- Enchanting Master (BC)
+
+     [7620] = 9, -- Fishing Apprentice
+     [7731] = 9, -- Fishing Journeyman
+     [7732] = 9, -- Fishing Expert
+    [18248] = 9, -- Fishing Artisan
+    [33095] = 9, -- Fishing Master (BC)
+
+    [25229] = 10, -- Jewelcrafting Apprentice
+    [25230] = 10, -- Jewelcrafting Journeyman
+    [28894] = 10, -- Jewelcrafting Expert
+    [28895] = 10, -- Jewelcrafting Artisan
+    [28897] = 10, -- Jewelcrafting Master (BC)
+
+    -- No Inscription as of BCC.
+
+    -- We are only interested in professions with recipes
+    -- so no gathering skills here!
+  }
+
+end
 
 
 
@@ -153,14 +280,51 @@ end
 -- Function to return if the character has a certain profession.
 -- For "Book" recipes we have to scan the tooltip
 -- in order to extract and return the profession name.
-local CharacterHasProfession = function(itemSlot)
+-- 
+-- For testing we allow the function call with itemId only and itemSlot == nil.
+local CharacterHasProfession = function(itemSlot, itemId)
 
-  local itemId = tonumber(string_match(itemSlot:GetItem(), "^.-:(%d+):"))
+  if not itemId then
+    -- We could also use the item link returned by itemSlot:GetItem() as
+    -- the argument for GetItemInfo() but we need itemId to check for
+    -- items with special treatment.
+    itemId = tonumber(string_match(itemSlot:GetItem(), "^.-:(%d+):"))
+  end
+  
   local _, _, _, _, _, _, itemSubType, _, _, _, _, _, itemSubTypeId = GetItemInfo(itemId)
 
+
+  -- For Classic there is no GetProfessions() so we have to scan the spell book for
+  -- spells indicating that a profession was learned.
+  if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC or WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
+
+    for i = 1, 24 do
+      if _G["SpellButton" .. i] then
+        local slot, slotType, slotID = SpellBook_GetSpellBookSlot(_G["SpellButton" .. i])
+        if slot then
+          -- print(slot, slotType, slotID, GetSpellBookItemName(slot, SpellBookFrame.bookType))
+          if professionSpells[slotID] == itemSubTypeId then
+            return true, itemSubType
+          end
+        end
+      end
+    end
+
+    return false, nil
+  end
+
+
+  -- "Design: Mass Prospect Empyrium" (152726) is falsely identified with itemSubType == "Inscription".
+  -- And for books we cannot get the profession at all, which is why we have to scan the tooltip.
   if itemId == 152726 or itemSubTypeId == LE_ITEM_RECIPE_BOOK then
 
-    SetTooltip(itemSlot)
+    if itemSlot then
+      SetTooltip(itemSlot)
+    else
+      -- If this was called for testing with itemId only.
+      scannerTooltip:ClearLines()
+      scannerTooltip:SetHyperlink("item:" .. itemId .. ":0:0:0:0:0:0:0")
+    end
 
     -- Cannot do "for .. in ipairs", because if one profession is missing,
     -- the iteration would stop...
@@ -192,7 +356,25 @@ local CharacterHasProfession = function(itemSlot)
       end
     end
 
-    return false, nil
+    -- Check if this is a book without any profession.
+    -- Like e.g. "Rockin' Rollin' Racer Pack" (187560).
+    -- (searchPattern is the same as above but with .- instead of professionName) 
+    searchPattern = string_gsub(string_gsub("^" .. ITEM_MIN_SKILL .. "$", "%s?%%.-s%s", ".-%%s"), "%(%%.-d%)%s?", ".-")
+    for i = scannerTooltip:NumLines(), 2, -1 do
+      local line = _G[scannerTooltip:GetName().."TextLeft"..i]
+      if line then
+        local msg = line:GetText()
+        if msg then
+          -- This book actually has a profession, which the character does not know.
+          if string_find(msg, searchPattern) then
+            return false, nil
+          end
+        end
+      end
+    end
+
+    -- This book has no profession.
+    return true, nil
 
   -- For all other recipes, itemSubType is also the profession name.
   else
@@ -244,7 +426,9 @@ local ReadRecipeTooltip = function(professionName, itemSlot)
   local searchOnlySkillPattern = nil
 
   -- If the locale is not known, just search for the required skill and ignore the expansion.
-  if not moduleData.itemMinSkillString[GetLocale()] or not moduleData.expansionIdentifierToVersionNumber[GetLocale()] then
+  -- The same, if we are in Classic or BCC, because there were no expansion specific profession levels then.
+  if not moduleData.itemMinSkillString[locale] or not moduleData.expansionIdentifierToVersionNumber[locale]
+      or WOW_PROJECT_ID == WOW_PROJECT_CLASSIC or WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
     searchOnlySkillPattern = "^.*%((%d+)%).*$"
   else
     -- ITEM_MIN_SKILL = "Requires %s (%d)"
@@ -252,7 +436,7 @@ local ReadRecipeTooltip = function(professionName, itemSlot)
     -- But watch out: For different locales the order of words is different (see below)!
 
     -- Need %%%%s here, because this string will be inserted twice.
-    local localisedItemMinSkill = string_gsub(string_gsub(string_gsub(moduleData.itemMinSkillString[GetLocale()], " ", "%%%%s?"), "e", "(.*)"), "p", professionName)
+    local localisedItemMinSkill = string_gsub(string_gsub(string_gsub(moduleData.itemMinSkillString[locale], " ", "%%%%s?"), "e", "(.*)"), "p", professionName)
 
     -- "%s?%%.-s%s" matches both " %s " (EN), "%s " (FR) and " %1$s " (DE) in ITEM_MIN_SKILL.
     -- "%(%%.-d%)%s?" matches both "(%d)" (EN), "(%d) " (FR) and "(%2$d)" (DE) in ITEM_MIN_SKILL.
@@ -260,7 +444,19 @@ local ReadRecipeTooltip = function(professionName, itemSlot)
   end
 
   -- Tooltip and scanning by Phanx (https://www.wowinterface.com/forums/showthread.php?p=270331#post270331)
-  for i = scannerTooltip:NumLines(), 2, -1 do
+
+  -- In classic we have to search from top to bottom, because the "Requires ingredients (amount)" line
+  -- is further below, which also matches our regular expression.
+  local start = scannerTooltip:NumLines()
+  local stop = 2
+  local incr = -1
+  if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC or WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
+    start = 2
+    stop = scannerTooltip:NumLines()
+    incr = 1
+  end
+
+  for i = start, stop, incr do
     local line = _G[scannerTooltip:GetName().."TextLeft"..i]
     if line then
       local msg = line:GetText()
@@ -280,9 +476,9 @@ local ReadRecipeTooltip = function(professionName, itemSlot)
           local _, g = line:GetTextColor()
 
           -- Check if the expansionIdentifier is actually known.
-          local expansionPrefix = moduleData.expansionIdentifierToVersionNumber[GetLocale()][expansionIdentifier]
+          local expansionPrefix = moduleData.expansionIdentifierToVersionNumber[locale][expansionIdentifier]
           if not expansionPrefix then
-            print ("Combuctor_RequiredLevel (ERROR): Could not find", expansionIdentifier, "for", GetLocale())
+            print ("Combuctor_RequiredLevel (ERROR): Could not find", expansionIdentifier, "for", locale)
             expansionPrefix = "?"
           end
 
@@ -310,141 +506,151 @@ local PostUpdateButton = function(itemSlot)
   local itemLink = itemSlot:GetItem()
   if itemLink then
   
-    -- Locked items should always be greyed out.
-    if itemSlot.info.locked then
-      local buttonIconTexture = _G[itemSlot:GetName().."IconTexture"]
-      buttonIconTexture:SetVertexColor(1,1,1)
-      buttonIconTexture:SetDesaturated(1)
-    end
+    local item = Item:CreateFromItemLink(itemLink)
+    if not item:IsItemEmpty() then
+      item:ContinueOnItemLoad(function()
 
-    -- Retrieve or create this itemSlot's RequiredLevel text.
-    local RequiredLevel = Cache_RequiredLevel[itemSlot] or Cache_GetRequiredLevel(itemSlot)
-    -- Got to set a default font.
-    RequiredLevel:SetFont("Fonts\\ARIALN.TTF", 14, "OUTLINE")
+        -- Locked items should always be greyed out.
+        if itemSlot.info.locked then
+          local buttonIconTexture = _G[itemSlot:GetName().."IconTexture"]
+          buttonIconTexture:SetVertexColor(1,1,1)
+          buttonIconTexture:SetDesaturated(1)
+        end
 
-    -- Get some blizzard info about the current item.
-    local _, _, _, _, itemMinLevel, _, itemSubType, _, _, _, _, itemTypeId, itemSubTypeId = GetItemInfo(itemLink)
+        -- Retrieve or create this itemSlot's RequiredLevel text.
+        local RequiredLevel = Cache_RequiredLevel[itemSlot] or Cache_GetRequiredLevel(itemSlot)
+        -- Got to set a default font.
+        RequiredLevel:SetFont("Fonts\\ARIALN.TTF", 14, "OUTLINE")
 
-
-    -- Get Goldpaw's "BoE" text and hide it, if it exists.
-    -- It will be shown later if not replaced by "required level" text.
-    local ItemBind = nil
-    if _G[itemSlot:GetName().."ExtraInfoFrame"] then
-      ItemBind = Cache_ItemBind[itemSlot] or Cache_GetItemBind(itemSlot)
-      if ItemBind then ItemBind:Hide() end
-    end
+        -- Get some blizzard info about the current item.
+        local _, _, _, _, itemMinLevel, _, itemSubType, _, _, _, _, itemTypeId, itemSubTypeId = GetItemInfo(itemLink)
 
 
-    -- Check for Junkboxes and Lockboxes (Miscellaneous Junk).
-    if itemTypeId == 15 and itemSubTypeId == 0 then
-      local itemNeedsLockpicking, notEnoughSkill, requiredSkill = ItemNeedsLockpicking(itemSlot)
+        -- Get Goldpaw's "BoE" text and hide it, if it exists.
+        -- It will be shown later if not replaced by "required level" text.
+        local ItemBind = nil
+        if _G[itemSlot:GetName().."ExtraInfoFrame"] then
+          ItemBind = Cache_ItemBind[itemSlot] or Cache_GetItemBind(itemSlot)
+          if ItemBind then ItemBind:Hide() end
+        end
 
-      if itemNeedsLockpicking then
-        if notEnoughSkill then
 
-          RequiredLevel:SetFont("Fonts\\ARIALN.TTF", 12, "OUTLINE")
-          RequiredLevel:SetText(requiredSkill)
+        -- Check for Junkboxes and Lockboxes (Miscellaneous Junk).
+        if itemTypeId == 15 and itemSubTypeId == 0 then
+          local itemNeedsLockpicking, notEnoughSkill, requiredSkill = ItemNeedsLockpicking(itemSlot)
 
+          if itemNeedsLockpicking then
+            if notEnoughSkill then
+
+              RequiredLevel:SetFont("Fonts\\ARIALN.TTF", 12, "OUTLINE")
+              RequiredLevel:SetText(requiredSkill)
+
+              if not itemSlot.info.locked then
+                local buttonIconTexture = _G[itemSlot:GetName().."IconTexture"]
+                buttonIconTexture:SetVertexColor(1,.3,.3)
+                buttonIconTexture:SetDesaturated(1)
+              end
+              return
+            end
+          end
+        end
+
+
+        if itemMinLevel then
+          if itemMinLevel > UnitLevel("player") then
+
+            if not Unfit:IsItemUnusable(itemLink) then
+              RequiredLevel:SetText(itemMinLevel)
+              if not itemSlot.info.locked then
+                local buttonIconTexture = _G[itemSlot:GetName().."IconTexture"]
+                buttonIconTexture:SetVertexColor(1,.3,.3)
+                buttonIconTexture:SetDesaturated(1)
+              end
+            else
+              if ItemBind then ItemBind:Show() end
+            end
+            return
+          end
+        end
+
+        -- LE_ITEM_CLASS_RECIPE by Kanegasi (https://www.wowinterface.com/forums/showthread.php?p=330514#post330514)
+        if itemTypeId == LE_ITEM_CLASS_RECIPE then
+
+          -- For almost all recipes, itemSubType is also the profession name.
+          -- https://wow.gamepedia.com/ItemType
+          -- However, for "Book" recipes we have to extract the profession name from
+          -- the tooltip. We do this at the same time as checking if the player has
+          -- the profession at all. Thus, we only have to scan the tooltip for the professions
+          -- the player has.
+          local hasProfession, professionName = CharacterHasProfession(itemSlot)
+
+          if not hasProfession then
+            if ItemBind then ItemBind:Show() end
+            RequiredLevel:SetText("")
+            if Addon.sets.glowUnusable then
+              r, g, b = RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b
+              itemSlot.IconBorder:SetTexture(id and C_ArtifactUI.GetRelicInfoByItemID(id) and 'Interface\\Artifacts\\RelicIconFrame' or 'Interface\\Common\\WhiteIconFrame')
+              itemSlot.IconBorder:SetVertexColor(r, g, b)
+              itemSlot.IconBorder:SetShown(r)
+              itemSlot.IconGlow:SetVertexColor(r, g, b, Addon.sets.glowAlpha)
+              itemSlot.IconGlow:SetShown(r)
+            end
+            return
+          end
+          
+          if not professionName then
+            -- print("This was a book without profession!")
+            return
+          end
+
+          -- Scan tooltip. (Not checking for itemSubTypeId != LE_ITEM_RECIPE_BOOK here because of efficiency.)
+          local alreadyKnown, notEnoughSkill, expansionPrefix, requiredSkill = ReadRecipeTooltip(professionName, itemSlot)
+
+          if alreadyKnown then
+            if ItemBind then ItemBind:Show() end
+            RequiredLevel:SetText("")
+            if not itemSlot.info.locked then
+              local buttonIconTexture = _G[itemSlot:GetName().."IconTexture"]
+              buttonIconTexture:SetVertexColor(.4,.4,.4)
+              buttonIconTexture:SetDesaturated(1)
+            end
+            return
+          end
+
+          if notEnoughSkill then
+
+            RequiredLevel:SetFont("Fonts\\ARIALN.TTF", 12, "OUTLINE")
+            RequiredLevel:SetText(expansionPrefix .. requiredSkill)
+
+            if not itemSlot.info.locked then
+              local buttonIconTexture = _G[itemSlot:GetName().."IconTexture"]
+              buttonIconTexture:SetVertexColor(1,.3,.3)
+              buttonIconTexture:SetDesaturated(1)
+            end
+            return
+          end
+
+          -- Recipe is actually learnable.
+          if ItemBind then ItemBind:Show() end
+          RequiredLevel:SetText("")
           if not itemSlot.info.locked then
             local buttonIconTexture = _G[itemSlot:GetName().."IconTexture"]
-            buttonIconTexture:SetVertexColor(1,.3,.3)
-            buttonIconTexture:SetDesaturated(1)
+            buttonIconTexture:SetVertexColor(1,1,1)
+            buttonIconTexture:SetDesaturated(nil)
           end
           return
         end
-      end
-    end
 
-
-    if itemMinLevel then
-      if itemMinLevel > UnitLevel("player") then
-
-        if not Unfit:IsItemUnusable(itemLink) then
-          RequiredLevel:SetText(itemMinLevel)
-          if not itemSlot.info.locked then
-            local buttonIconTexture = _G[itemSlot:GetName().."IconTexture"]
-            buttonIconTexture:SetVertexColor(1,.3,.3)
-            buttonIconTexture:SetDesaturated(1)
-          end
-        else
-          if ItemBind then ItemBind:Show() end
-        end
-        return
-      end
-    end
-
-    -- LE_ITEM_CLASS_RECIPE by Kanegasi (https://www.wowinterface.com/forums/showthread.php?p=330514#post330514)
-    if itemTypeId == LE_ITEM_CLASS_RECIPE then
-
-      -- For almost all recipes, itemSubType is also the profession name.
-      -- https://wow.gamepedia.com/ItemType
-      -- However, for "Book" recipes we have to extract the profession name from
-      -- the tooltip. We do this at the same time as checking if the player has
-      -- the profession at all. Thus, we only have to scan the tooltip for the professions
-      -- the player has.
-      local hasProfession, professionName = CharacterHasProfession(itemSlot)
-
-      if not hasProfession then
-        if ItemBind then ItemBind:Show() end
-        RequiredLevel:SetText("")
-        if Addon.sets.glowUnusable then
-          r, g, b = RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b
-          itemSlot.IconBorder:SetTexture(id and C_ArtifactUI.GetRelicInfoByItemID(id) and 'Interface\\Artifacts\\RelicIconFrame' or 'Interface\\Common\\WhiteIconFrame')
-          itemSlot.IconBorder:SetVertexColor(r, g, b)
-          itemSlot.IconBorder:SetShown(r)
-          itemSlot.IconGlow:SetVertexColor(r, g, b, Addon.sets.glowAlpha)
-          itemSlot.IconGlow:SetShown(r)
-        end
-        return
-      end
-
-      -- Scan tooltip. (Not checking for itemSubTypeId != LE_ITEM_RECIPE_BOOK here because of efficiency.)
-      local alreadyKnown, notEnoughSkill, expansionPrefix, requiredSkill = ReadRecipeTooltip(professionName, itemSlot)
-
-      if alreadyKnown then
+        -- Any other item.
         if ItemBind then ItemBind:Show() end
         RequiredLevel:SetText("")
         if not itemSlot.info.locked then
           local buttonIconTexture = _G[itemSlot:GetName().."IconTexture"]
-          buttonIconTexture:SetVertexColor(.4,.4,.4)
-          buttonIconTexture:SetDesaturated(1)
+          buttonIconTexture:SetVertexColor(1,1,1)
+          buttonIconTexture:SetDesaturated(nil)
         end
-        return
-      end
-
-      if notEnoughSkill then
-
-        RequiredLevel:SetFont("Fonts\\ARIALN.TTF", 12, "OUTLINE")
-        RequiredLevel:SetText(expansionPrefix .. requiredSkill)
-
-        if not itemSlot.info.locked then
-          local buttonIconTexture = _G[itemSlot:GetName().."IconTexture"]
-          buttonIconTexture:SetVertexColor(1,.3,.3)
-          buttonIconTexture:SetDesaturated(1)
-        end
-        return
-      end
-
-      -- Recipe is actually learnable.
-      if ItemBind then ItemBind:Show() end
-      RequiredLevel:SetText("")
-      if not itemSlot.info.locked then
-        local buttonIconTexture = _G[itemSlot:GetName().."IconTexture"]
-        buttonIconTexture:SetVertexColor(1,1,1)
-        buttonIconTexture:SetDesaturated(nil)
-      end
-      return
+      end)
     end
-
-    -- Any other item.
-    if ItemBind then ItemBind:Show() end
-    RequiredLevel:SetText("")
-    if not itemSlot.info.locked then
-      local buttonIconTexture = _G[itemSlot:GetName().."IconTexture"]
-      buttonIconTexture:SetVertexColor(1,1,1)
-      buttonIconTexture:SetDesaturated(nil)
-    end
-
   else
     if Cache_RequiredLevel[itemSlot] then
       Cache_RequiredLevel[itemSlot]:SetText("")

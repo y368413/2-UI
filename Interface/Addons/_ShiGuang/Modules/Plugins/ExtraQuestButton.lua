@@ -173,6 +173,7 @@ local completeShownItems = {
 
 -- items that need to be hidden, but not. (itemID = bool/mapID)
 local completeHiddenItems = {
+	[180899] = true, -- Riding Hook
 	[184876] = true, -- Cohesion Crystal
 	[186199] = true, -- Lady Moonberry's Wand
 	[187012] = true, -- Unbalanced Riftstone
@@ -289,8 +290,8 @@ function ExtraQuestButton:PLAYER_LOGIN()
 	self:SetToplevel(true)
 
 	if not self:GetPoint() then
-		if _G.NDui_ActionBarExtra then
-			self:SetPoint("CENTER", _G.NDui_ActionBarExtra)
+		if _G.UI_ActionBarExtra then
+			self:SetPoint("CENTER", _G.UI_ActionBarExtra)
 		else
 			M.Mover(self, U["ExtraQuestButton"], "Extrabar", {"BOTTOM", UIParent, "BOTTOM", 250, 100})
 		end

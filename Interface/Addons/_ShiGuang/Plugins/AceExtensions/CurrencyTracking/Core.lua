@@ -4160,8 +4160,7 @@ else
 	}
 end
 
-
--- $Id: Core.lua 213 2021-05-18 17:19:28Z arithmandar $
+-- $Id: Core.lua 223 2022-01-26 14:38:50Z arithmandar $
 -----------------------------------------------------------------------
 -- Upvalued Lua API.
 -----------------------------------------------------------------------
@@ -4375,7 +4374,7 @@ local function button_OnEnter(self)
 	if(CurrencyTracking.frame:IsVisible()) then
 		if (not GameTooltip:IsShown()) then
 			GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", -10, 0)
-			GameTooltip:SetBackdropColor(0, 0, 0, profile.tooltip_alpha)
+			GameTooltip.NineSlice:SetCenterColor(0, 0, 0, profile.tooltip_alpha)
 			GameTooltip:SetText("|cFFFFFFFF"..CurrencyTracking_TITLE, 1, 1, 1, nil, 1)
 			local tooltip = getTooltipText()
 			if (tooltip) then
@@ -4729,7 +4728,7 @@ local function setupLDB()
 	LDB_CurrencyTracking.OnTooltipShow = (function(tooltip)
 		if not tooltip or not tooltip.AddLine then return end
 		local tooltiptxt = getTooltipText()
-		GameTooltip:SetBackdropColor(0, 0, 0, profile.tooltip_alpha)
+		GameTooltip.NineSlice:SetCenterColor(0, 0, 0, profile.tooltip_alpha)
 		GameTooltip:SetText(CurrencyTracking_TITLE, 1, 1, 1, nil, 1)
 		if (tooltiptxt) then
 			addTooltipText(tooltiptxt)

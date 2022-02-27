@@ -136,27 +136,6 @@ local function ForceRaidFrame()
 	CompactUnitFrameProfiles_UpdateCurrentPanel()
 end
 
-local function ForceChatSettings()
-	M:GetModule("Chat"):UpdateChatSize()
-
-	for i = 1, NUM_CHAT_WINDOWS do
-		local cf = _G["ChatFrame"..i]
-		ChatFrame_RemoveMessageGroup(cf, "CHANNEL")
-	end
-	FCF_SavePositionAndDimensions(ChatFrame1)
-
-	R.db["Chat"]["Lock"] = true
-end
-
-StaticPopupDialogs["RELOAD_NDUI"] = {
-	text = U["ReloadUI Required"],
-	button1 = APPLY,
-	button2 = CLASS_TRIAL_THANKS_DIALOG_CLOSE_BUTTON,
-	OnAccept = function()
-		ReloadUI()
-	end,
-}
-
 -- DBM bars
 local function ForceDBMOptions()
 	if not IsAddOnLoaded("DBM-Core") then return end

@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2015-2021, Hendrik "nevcairiel" Leppkes <h.leppkes@gmail.com>
+Copyright (c) 2015-2022, Hendrik "nevcairiel" Leppkes <h.leppkes@gmail.com>
 
 All rights reserved.
 

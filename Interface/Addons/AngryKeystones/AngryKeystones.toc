@@ -1,4 +1,4 @@
-## Interface: 90105
+## Interface: 90200
 ## Title: Angry Keystones
 ## Title-zhCN:|cff8000ff[战斗]|r秘境助手
 ## Title-zhTW:|cff8000ff[戰鬥]|r秘境助手
@@ -9,7 +9,7 @@
 ## Author: Ermad + 嚣张的扇贝
 ## SavedVariables: AngryKeystones_Config, AngryKeystones_Data
 ## SavedVariablesPerCharacter: AngryKeystones_CharacterConfig, AngryKeystones_revise_Config, AngryKeystones_revise_Data
-## X-Packaged-Version: v0.23.0
+## X-Packaged-Version: v0.23.1
 
 Core.lua
 Locale.lua

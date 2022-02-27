@@ -5,7 +5,7 @@ local oUF = ns.oUF
 local AFK, DND, DEAD, PLAYER_OFFLINE, LEVEL = AFK, DND, DEAD, PLAYER_OFFLINE, LEVEL
 local select, format, strfind, GetCVarBool = select, format, strfind, GetCVarBool
 local ALTERNATE_POWER_INDEX = Enum.PowerType.Alternate or 10
-local UnitIsDeadOrGhost, UnitIsConnected, UnitHasVehicleUI, UnitIsTapDenied, UnitIsPlayer = UnitIsDeadOrGhost, UnitIsConnected, UnitHasVehicleUI, UnitIsTapDenied, UnitIsPlayer
+local UnitIsDeadOrGhost, UnitIsConnected, UnitIsTapDenied, UnitIsPlayer = UnitIsDeadOrGhost, UnitIsConnected, UnitIsTapDenied, UnitIsPlayer
 local UnitHealth, UnitHealthMax, UnitPower, UnitPowerType, UnitStagger = UnitHealth, UnitHealthMax, UnitPower, UnitPowerType, UnitStagger
 local UnitClass, UnitReaction, UnitLevel, UnitClassification, UnitEffectiveLevel = UnitClass, UnitReaction, UnitLevel, UnitClassification, UnitEffectiveLevel
 local UnitIsAFK, UnitIsDND, UnitIsDead, UnitIsGhost, UnitName, UnitExists = UnitIsAFK, UnitIsDND, UnitIsDead, UnitIsGhost, UnitName, UnitExists
@@ -47,6 +47,7 @@ oUF.Tags.Methods["VariousHP"] = function(unit, _, arg1)
 		return oUF.Tags.Methods["DDG"](unit)
 	end
 
+	if not arg1 then return end
 	local cur, max = UnitHealth(unit), UnitHealthMax(unit)
 	local per = max == 0 and 0 or M:Round(cur/max * 100, 1)
 
@@ -66,7 +67,7 @@ oUF.Tags.Methods["VariousHP"] = function(unit, _, arg1)
 		return loss ~= 0 and M:Round(loss/max*100, 1)
 	end
 end
-oUF.Tags.Events["VariousHP"] = "UNIT_HEALTH UNIT_MAXHEALTH UNIT_NAME_UPDATE UNIT_CONNECTION PLAYER_FLAGS_CHANGED"
+oUF.Tags.Events["VariousHP"] = "UNIT_HEALTH UNIT_MAXHEALTH UNIT_CONNECTION PLAYER_FLAGS_CHANGED PARTY_MEMBER_ENABLE PARTY_MEMBER_DISABLE"
 
 oUF.Tags.Methods["VariousMP"] = function(unit, _, arg1)
 	local cur, max = UnitPower(unit), UnitPowerMax(unit)
@@ -88,7 +89,7 @@ oUF.Tags.Methods["VariousMP"] = function(unit, _, arg1)
 		return loss ~= 0 and M:Round(loss/max*100, 1)
 	end
 end
-oUF.Tags.Events["power"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_DISPLAYPOWER"
+oUF.Tags.Events["VariousMP"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_DISPLAYPOWER"
 
 oUF.Tags.Methods["color"] = function(unit)
 	local class = select(2, UnitClass(unit))
@@ -166,15 +167,14 @@ end
 oUF.Tags.Events["fulllevel"] = "UNIT_LEVEL PLAYER_LEVEL_UP UNIT_CLASSIFICATION_CHANGED"
 
 -- RaidFrame tags
+local healthModeType = {
+	[2] = "percent",
+	[3] = "current",
+	[4] = "loss",
+	[5] = "losspercent",
+}
 oUF.Tags.Methods["raidhp"] = function(unit)
-	local healthType
-	if R.db["UFs"]["RaidHPMode"] == 2 then
-		healthType = "percent"
-	elseif R.db["UFs"]["RaidHPMode"] == 3 then
-		healthType = "current"
-	elseif R.db["UFs"]["RaidHPMode"] == 4 then
-		healthType = "loss"
-	end
+	local healthType = healthModeType[R.db["UFs"]["RaidHPMode"]]
 	return oUF.Tags.Methods["VariousHP"](unit, _, healthType)
 end
 oUF.Tags.Events["raidhp"] = oUF.Tags.Events["VariousHP"]
@@ -241,7 +241,7 @@ oUF.Tags.Methods["npctitle"] = function(unit)
 	M.ScanTip:SetOwner(UIParent, "ANCHOR_NONE")
 	M.ScanTip:SetUnit(unit)
 
-	local title = _G[format("NDui_ScanTooltipTextLeft%d", GetCVarBool("colorblindmode") and 3 or 2)]:GetText()
+	local title = _G[format("UI_ScanTooltipTextLeft%d", GetCVarBool("colorblindmode") and 3 or 2)]:GetText()
 	if title and not strfind(title, "^"..LEVEL) then
 		return title
 	end

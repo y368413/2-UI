@@ -411,7 +411,7 @@ function module:Chatbar()
 			if module.InWorldChannel then
 				if btn == "RightButton" then
 					LeaveChannelByName(channelName)
-					print("<<<|cffFF7F50"..QUIT.."世界頻道|r")  --"|cffFF7F50"..QUIT.."|r "..I.InfoColor..U["World Channel"]
+					print("<<<|cffFF7F50"..QUIT.."|r "..I.InfoColor..U["World Channel"])
 					module.InWorldChannel = false
 				elseif module.WorldChannelID then
 					ChatFrame_OpenChat("/"..module.WorldChannelID, chatFrame)
@@ -419,7 +419,7 @@ function module:Chatbar()
 			else
 				JoinPermanentChannel(channelName, nil, 1)
 				ChatFrame_AddChannel(ChatFrame1, channelName)
-				print(">>>|cff00C957"..JOIN.."世界頻道|r")  --"|cff00C957"..JOIN.."|r "..I.InfoColor..U["World Channel"]
+				print(">>>|cff00C957"..JOIN.."|r "..I.InfoColor..U["World Channel"])
 				module.InWorldChannel = true
 			end
 		end)

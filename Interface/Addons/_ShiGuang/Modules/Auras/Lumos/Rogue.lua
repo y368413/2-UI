@@ -20,7 +20,7 @@ function A:PostCreateLumos(self)
 
 	local iconSize = (self:GetWidth() - 10)/6
 	local buttons = {}
-	local offset = R.db["Nameplate"]["NameplateClassPower"] and R.margin or (R.margin*2 + R.db["Nameplate"]["PPBarHeight"])
+	local parent = R.db["Nameplate"]["TargetPower"] and self.Health or self.ClassPowerBar
 	for i = 1, 6 do
 		local bu = CreateFrame("Frame", nil, self.Health)
 		bu:SetSize(iconSize, iconSize/2)
@@ -28,7 +28,7 @@ function A:PostCreateLumos(self)
 		M.AuraIcon(bu)
 		bu.Icon:SetTexCoord(left, right, top, bottom)
 		if i == 1 then
-			bu:SetPoint("BOTTOMLEFT", self.Health, "TOPLEFT", 0, offset)
+			bu:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", 0, R.margin)
 		else
 			bu:SetPoint("LEFT", buttons[i-1], "RIGHT", 2, 0)
 		end

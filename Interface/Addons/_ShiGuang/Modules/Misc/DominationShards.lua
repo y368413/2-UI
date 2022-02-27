@@ -67,7 +67,7 @@ function MISC:DomiShards_ListFrame()
 	local iconSize = 28
 	local frameSize = iconSize*3
 
-	local frame = CreateFrame("Frame", "NDuiDomiShards", ItemSocketingFrame)
+	local frame = CreateFrame("Frame", "UIDomiShards", ItemSocketingFrame)
 	frame:SetSize(frameSize, frameSize)
 	frame:SetPoint("BOTTOMLEFT", 32, 3)
 	frame.icons = {}
@@ -100,7 +100,7 @@ function MISC:DomiShards_ExtractButton()
 	ItemSocketingSocketButton:SetWidth(80)
 	if InCombatLockdown() then return end
 
-	local button = CreateFrame("Button", "NDuiExtractorButton", ItemSocketingFrame, "UIPanelButtonTemplate, SecureActionButtonTemplate")
+	local button = CreateFrame("Button", "UIExtractorButton", ItemSocketingFrame, "UIPanelButtonTemplate, SecureActionButtonTemplate")
 	button:SetSize(80, 22)
 	button:SetText(U["Drop"])
 	button:SetPoint("RIGHT", ItemSocketingSocketButton, "LEFT", -3, 0)

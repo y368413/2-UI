@@ -93,13 +93,13 @@ local function getAboutPanel()
 								version = {
 									order = 21,
 									type = "description",
-									name = GAME_VERSION_LABEL..HEADER_COLON.." v6.10",
+									name = GAME_VERSION_LABEL..HEADER_COLON.." v6.35",
 									width = "full",
 								},
 								update = {
 									order = 22, 
 									type = "description",
-									name = UPDATE..HEADER_COLON.." 2018-11-13T13:28:02Z",
+									name = UPDATE..HEADER_COLON.." 2022-02-02T17:56:13Z",
 									width = "full",
 								},
 								author = {

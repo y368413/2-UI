@@ -1,4 +1,4 @@
-﻿--## Version: Chalcedony 1  ## Author: Leo Bolin
+﻿--## Version: Chalcedony 2  ## Author: Leo Bolin
 local T = {}
 
 -- Player variables
@@ -41,7 +41,7 @@ T.friendStandingColor = {
 	},
 	["vivianne"] = {
 		[1] = "|cff00ff00", -- Bodyguard
-		[2] = "|cff00ff88", -- Trusted Bodyguard
+		[2] = "|cff00ffcc", -- Trusted Bodyguard
 		[3] = "|cff4cc2ff", -- Personal Wingman
 	},
 	["court of night"] = {
@@ -172,6 +172,8 @@ T.reputationItemBoA = {
 	[173062] = "court of harvesters", -- Contract: Court of Harvesters
 	[186522] = "death's advance", -- Contract: Death's Advance
 	[173051] = "the ascended", -- Contract: The Ascended
+	[187796] = "the enlightened", -- Contract: The Enlightened
+	[191022] = "the enlightened", -- Eternal Curio
 	[175924] = "the undying army", -- Contract: The Undying Army
 	[173053] = "the wild hunt", -- Contract: The Wild Hunt
 
@@ -458,13 +460,14 @@ T.reputationItemBoP = {
 	[43155]  = "knights of the ebon blade", -- Tabard of the Ebon Blade
 	[43950]  = "kirin tor", -- Kirin Tor Commendation Badge
 	[43157]  = "kirin tor", -- Tabard of the Kirin Tor
-	[49702]  = "the Sons of hodir", -- Sons of Hodir Commendation Badge (520)
+	[49702]  = "the sons of hodir", -- Sons of Hodir Commendation Badge (520)
 	[44710]  = "wyrmrest cccord", -- Wyrmrest Commendation Badge (520)
 	[43156]  = "wyrmrest accord", -- Tabard of the Wyrmrest Accord
 
 	-- The Burning Crusade
 	[24290]  = "sporeggar", -- Mature Spore Sack (750 per 10, up to Friendly)
 	[32506]  = "netherwing", -- Netherwing Egg (250)
+	[32427]  = "netherwing", -- Netherwing Crystal (250 per 30)
 	[25433]  = "kurenai|the consortium|the mag'har", -- Obsidian Warbeads (250 Consortium per 10, or 500 Kurenai/Mag'har per 10)
 	[29209]  = "the consortium", -- Zaxxis Insignia (250 per 10)
 	[25416]  = "the consortium", -- Oshu'gun Crystal Fragment (250 per 10, up to Friendly)
@@ -526,6 +529,7 @@ T.faction = {
 	["the archivists' codex"]				= { ["id"] = 2472, 	["icon"] = 1506458, 	["paragon"] = true, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, },
 	["the ascended"]						= { ["id"] = 2407, 	["icon"] = 3257748, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
 	["the avowed"]							= { ["id"] = 2439, 	["icon"] = 3601526, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
+	["the enlightened"]						= { ["id"] = 2478, 	["icon"] = 4226232, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
 	["the ember court"]						= { ["id"] = 2445, 	["icon"] = 3641397, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
 	["the undying army"]					= { ["id"] = 2410, 	["icon"] = 3492310, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
 	["the wild hunt"]						= { ["id"] = 2465, 	["icon"] = 3575389, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
@@ -623,7 +627,7 @@ T.faction = {
 	["sho"]									= { ["id"] = 1278, 	["icon"] = 133975, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- lovely apple
 	["tina mudclaw"]						= { ["id"] = 1280, 	["icon"] = 237204, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- ruby shard
 	-- Hidden
-	["nomi"]								= { ["id"] = 1357, 	["icon"] = 571695, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "friendship",	 ["factionGroup"] = false, }, -- hidden from the Reputation Panel
+	["nomi"]								= { ["id"] = 1357, 	["icon"] = 654236, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "friendship",	 ["factionGroup"] = false, }, -- hidden from the Reputation Panel
 
 	-- Cataclysm
 	["avengers of hyjal"]					= { ["id"] = 1204, 	["icon"] = 512609, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
@@ -849,6 +853,7 @@ LL["enUS"] = {
 	["f the archivists' codex"]				= "The Archivists' Codex",
 	["f the ascended"]						= "The Ascended",
 	["f the avowed"]						= "The Avowed",
+	["f the enlightened"]					= "The Enlightened",
 	["f the ember court"]					= "The Ember Court",
 	["f the undying army"]					= "The Undying Army",
 	["f the wild hunt"]						= "The Wild Hunt",

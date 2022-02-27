@@ -1,4 +1,4 @@
-﻿--## Version: v30  ## Author: Kemayo
+﻿--## Version: v31  ## Author: Kemayo
 local AppearanceTooltip = {}
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight

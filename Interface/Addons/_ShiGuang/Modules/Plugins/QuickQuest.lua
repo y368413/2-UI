@@ -174,12 +174,15 @@ local ignoreGossipNPC = {
 	[175513] = true, -- 纳斯利亚审判官，傲慢
 	[165196] = true, -- 灰烬王庭，西塔尔
 	[180458] = true, -- 灰烬王庭，大帝幻象
+	[182681] = true, -- 扎雷殁提斯，强化控制台
 }
 
 local rogueClassHallInsignia = {
 	[97004] = true, -- "Red" Jack Findle
 	[96782] = true, -- Lucian Trias
 	[93188] = true, -- Mongar
+	[107486] = true, -- CoS rumors
+	[167839] = true, -- 灵魂残渣，爬塔
 }
 
 local followerAssignees = {
@@ -193,6 +196,11 @@ local autoGossipTypes = {
 	["banker"] = true,
 	["vendor"] = true,
 	["trainer"] = true,
+}
+
+local ignoreInstances = {
+	[1571] = true, -- 枯法者
+	[1626] = true, -- 群星庭院
 }
 
 local darkmoonDailyNPCs = {
@@ -243,7 +251,7 @@ QuickQuest:Register("GOSSIP_SHOW", function()
 			end
 
 			local _, instance, _, _, _, _, _, mapID = GetInstanceInfo()
-			if instance ~= "raid" and not ignoreGossipNPC[npcID] and not (instance == "scenario" and mapID == 1626) then
+			if instance ~= "raid" and not ignoreGossipNPC[npcID] and not ignoreInstances[mapID] then
 				local gossipInfoTable = C_GossipInfo_GetOptions()
 				local gType = gossipInfoTable[1] and gossipInfoTable[1].type
 				if gType and autoGossipTypes[gType] then
@@ -489,8 +497,7 @@ local function UnitQuickQuestStatus(self)
 		local frame = CreateFrame("Frame", nil, self)
 		frame:SetSize(100, 14)
 		frame:SetPoint("TOP", self, "BOTTOM", 0, -2)
-		frame.title = U["Tips"]
-		M.AddTooltip(frame, "ANCHOR_RIGHT", U["AutoQuestIgnoreTip"], "info")
+		M.AddTooltip(frame, "ANCHOR_RIGHT", U["AutoQuestIgnoreTip"], "info", true)
 		M.CreateFS(frame, 14, IGNORED):SetTextColor(1, 0, 0)
 
 		self.__ignore = frame

@@ -12,7 +12,7 @@ function Bar:CreateExtrabar()
 	local size = cfg.size
 
 	-- ExtraActionButton
-	local frame = CreateFrame("Frame", "NDui_ActionBarExtra", UIParent, "SecureHandlerStateTemplate")
+	local frame = CreateFrame("Frame", "UI_ActionBarExtra", UIParent, "SecureHandlerStateTemplate")
 	frame:SetWidth(size + 2*padding)
 	frame:SetHeight(size + 2*padding)
 	frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 210}
@@ -37,7 +37,7 @@ function Bar:CreateExtrabar()
 	end
 
 	-- ZoneAbility
-	local zoneFrame = CreateFrame("Frame", "NDui_ActionBarZone", UIParent)
+	local zoneFrame = CreateFrame("Frame", "UI_ActionBarZone", UIParent)
 	zoneFrame:SetWidth(size + 2*padding)
 	zoneFrame:SetHeight(size + 2*padding)
 	zoneFrame.Pos = {"BOTTOM", UIParent, "BOTTOM", -360, 100}

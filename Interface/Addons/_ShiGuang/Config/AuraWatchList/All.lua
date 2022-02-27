@@ -144,6 +144,10 @@ local list = {
 		{AuraID = 355333, UnitID = "player"},	-- 回收的聚变增幅器
 		{AuraID = 357185, UnitID = "player"},	-- 忠诚的力量，低语威能碎片
 		{AuraID = 357773, UnitID = "player"},	-- 神圣使命，九武神长柄
+
+		{AuraID = 367241, UnitID = "player"},	-- 原初印记
+		{AuraID = 363522, UnitID = "player"},	-- 角斗士的永恒结界
+		{AuraID = 362699, UnitID = "player"},	-- 角斗士的决心
 		-- 盟约
 		{AuraID = 331937, UnitID = "player", Flash = true},	-- 沉醉
 		{AuraID = 354053, UnitID = "player", Flash = true, Text = U["Crit"]}, -- 致命缺陷，暴击
@@ -179,6 +183,7 @@ local list = {
 		{AuraID = 345499, UnitID = "player"},	-- 执政官的祝福
 		{AuraID = 339461, UnitID = "player"},	-- 猎手坚韧
 		{AuraID = 325381, UnitID = "player", Flash = true},	-- 争先打击
+		{AuraID = 351414, UnitID = "player", Flash = true},	-- 切肉者之眼
 		{AuraID = 342774, UnitID = "player"},	-- 繁华原野
 		{AuraID = 333218, UnitID = "player"},	-- 废土礼节
 		{AuraID = 336885, UnitID = "player"},	-- 抚慰阴影
@@ -187,6 +192,7 @@ local list = {
 		{AuraID = 333961, UnitID = "player"},	-- 行动的召唤：布隆
 		{AuraID = 333943, UnitID = "player"},	-- 源生重槌
 		{AuraID = 339928, UnitID = "player", Flash = true},	-- 残酷投射
+		{AuraID = 352917, UnitID = "player"},	-- 崭新决心
 		-- S2，心能/统御碎片
 		{AuraID = 357852, UnitID = "player"},	-- 激励
 		{AuraID = 356364, UnitID = "player"},	-- 冰冷的心
@@ -258,6 +264,10 @@ local list = {
 		{AuraID = 306583, UnitID = "player"},	-- 灌铅脚步
 		{AuraID = 313698, UnitID = "player", Flash = true},	-- 泰坦之赐
 		-- 常驻词缀
+		{AuraID = 366288, UnitID = "player"},	-- 解构
+		{AuraID = 368239, UnitID = "player", Flash = true, Text = "CD"},	-- 减CD密文
+		{AuraID = 368240, UnitID = "player", Flash = true, Text = U["Haste"]},	-- 急速密文
+		{AuraID = 368241, UnitID = "player", Flash = true, Text = U["Speed"]},	-- 移速密文
 		{AuraID = 358777, UnitID = "player"},	-- 痛苦之链
 		{AuraID = 355732, UnitID = "player"},	-- 融化灵魂
 		{AuraID = 356667, UnitID = "player"},	-- 刺骨之寒

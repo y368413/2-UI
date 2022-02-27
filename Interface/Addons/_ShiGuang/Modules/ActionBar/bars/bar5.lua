@@ -53,7 +53,7 @@ function Bar:CreateBar5()
 	if (layout == 6) or (layout == 8) or (layout == 9) or (layout == 10) or (layout == 11) then cfg.size = 38 end
 
 	--create the frame to hold the buttons
-	local frame = CreateFrame("Frame", "NDui_ActionBar5", UIParent, "SecureHandlerStateTemplate")
+	local frame = CreateFrame("Frame", "UI_ActionBar5", UIParent, "SecureHandlerStateTemplate")
 	if layout == 1 or layout == 4 or layout == 5 then
 		frame.Pos = {"RIGHT", UIParent, "RIGHT", -(cfg.size + 3*margin), -88}
 	elseif layout == 3 then

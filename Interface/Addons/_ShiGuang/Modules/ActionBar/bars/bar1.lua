@@ -9,7 +9,7 @@ local cfg = R.Bars.bar1
 local margin, padding = R.Bars.margin, R.Bars.padding
 
 local function UpdateActionbarScale(bar)
-	local frame = _G["NDui_Action"..bar]
+	local frame = _G["UI_Action"..bar]
 	if not frame then return end
 
 	local size = frame.buttonSize * R.db["Actionbar"]["Scale"]
@@ -76,7 +76,7 @@ function Bar:CreateBar1()
 	local buttonList = {}
 	local layout = R.db["Actionbar"]["Style"]
 
-	local frame = CreateFrame("Frame", "NDui_ActionBar1", UIParent, "SecureHandlerStateTemplate")
+	local frame = CreateFrame("Frame", "UI_ActionBar1", UIParent, "SecureHandlerStateTemplate")
 
 	if layout == 5 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -108, 2}

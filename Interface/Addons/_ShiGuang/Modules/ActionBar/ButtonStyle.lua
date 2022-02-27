@@ -361,7 +361,7 @@ function Bar:StyleAllActionButtons(cfg)
 		Bar:StyleActionButton(_G["MultiBarBottomRightButton"..i], cfg)
 		Bar:StyleActionButton(_G["MultiBarRightButton"..i], cfg)
 		Bar:StyleActionButton(_G["MultiBarLeftButton"..i], cfg)
-		Bar:StyleActionButton(_G["NDui_CustomBarButton"..i], cfg)
+		Bar:StyleActionButton(_G["UI_CustomBarButton"..i], cfg)
 	end
 	for i = 1, 6 do
 		Bar:StyleActionButton(_G["OverrideActionBarButton"..i], cfg)
@@ -379,7 +379,7 @@ function Bar:StyleAllActionButtons(cfg)
 		Bar:StyleActionButton(_G["PossessButton"..i], cfg)
 	end
 	--leave vehicle
-	Bar:StyleActionButton(_G["NDui_LeaveVehicleButton"], cfg)
+	Bar:StyleActionButton(_G["UI_LeaveVehicleButton"], cfg)
 	--extra action button
 	Bar:StyleExtraActionButton(cfg)
 	--spell flyout

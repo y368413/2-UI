@@ -105,10 +105,10 @@ local function getProfileList(db, common, nocurrent)
 	
 	-- copy existing profiles into the table
 	local currentProfile = db:GetCurrentProfile()
-	for i,v in pairs(db:GetProfiles(tmpprofiles)) do 
-		if not (nocurrent and v == currentProfile) then 
-			profiles[v] = v 
-		end 
+	for i,v in pairs(db:GetProfiles(tmpprofiles)) do
+		if not (nocurrent and v == currentProfile) then
+			profiles[v] = v
+		end
 	end
 	
 	-- add our default profiles to choose from ( or rename existing profiles)

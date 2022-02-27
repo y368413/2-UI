@@ -538,7 +538,7 @@ AceGUI:RegisterLayout("Flow",
 		
 		local frameoffset
 		local lastframeoffset
-		local oversize 
+		local oversize
 		for i = 1, #children do
 			local child = children[i]
 			oversize = nil

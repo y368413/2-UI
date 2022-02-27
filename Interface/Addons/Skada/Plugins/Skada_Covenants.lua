@@ -329,9 +329,9 @@ end
 SkadaCovenants.addonPrefix = "DCOribos"
 SkadaCovenants.askMessage = "ASK"
 DCovenant = {
-    ["iconSize"] = 21,
+    ["iconSize"] = 30,
 }
-DCovenantLog = false --Ä¬ÈÏ¹Ø±ÕÄ¿±êÊÇÄÄ¸öÃËÔ¼µÄÔÚÆµµÀÀïÌáÊ¾
+DCovenantLog = false --ï¼Ÿ
 
 local isAsked = false
 

@@ -1,6 +1,6 @@
 --[[
 Name: LibCurrencyInfo
-Revision: $Rev: 48 $
+Revision: $Rev: 50 $
 Maintainers: Arith
 Website: https://www.wowace.com/projects/libcurrencyinfo
 Dependencies: None
@@ -223,6 +223,7 @@ data.CurrencyByCategory = {
 --		1903, 	 -- Invisible Reward, 
 		1907, 	 -- Death's Advance	Grants reputation with the Death's Advance., 
 		1947, 	 -- Bonus Valor, 
+		1997,	 -- Archivists' Codex
 	},
 	[143] = { -- Battle for Azeroth
 		1299,	 -- Brawler's Gold
@@ -343,27 +344,30 @@ data.CurrencyByCategory = {
 		1971,	 -- Torghast - Scoreboard - Floor Par Time Floor 3
 		1972,	 -- Torghast - Scoreboard - Floor Par Time Floor 4
 		1976,	 -- Torghast - Scoreboard - Toast Display - Bonus - Phant Left Group
+		1980,	 -- Torghast - Scoreboard - Run Layer
+		1981,	 -- Torghast - Scoreboard - Run ID
+
 	},
 }
 
 data.CurrencyCategories = {
-	[1] = { enUS="Miscellaneous",zhCN="其它",zhTW="雜項" },
-	[2] = { enUS="Player vs. Player",zhCN="PvP",zhTW="玩家對玩家" },
-	[3] = { enUS="Unused",zhCN="未使用",zhTW="未使用", hide=true, },
-	[4] = { enUS="Classic",zhCN="经典旧世",zhTW="艾澤拉斯", hide=true, },
-	[21] = { enUS="Wrath of the Lich King",zhCN="巫妖王之怒",zhTW="巫妖王之怒" },
-	[22] = { enUS="Dungeon and Raid",zhCN="地下城与团队",zhTW="地城與團隊" },
-	[23] = { enUS="Burning Crusade",zhCN="燃烧的远征",zhTW="燃燒的遠征", hide=true, },
-	[81] = { enUS="Cataclysm",zhCN="大地的裂变",zhTW="浩劫與重生" },
-	[82] = { enUS="Archaeology",zhCN="考古学",zhTW="考古學" },
-	[133] = { enUS="Mists of Pandaria",zhCN="熊猫人之谜",zhTW="潘達利亞之謎" },
-	[137] = { enUS="Warlords of Draenor",zhCN="德拉诺之王",zhTW="德拉諾之霸" },
-	[141] = { enUS="Legion",zhCN="军团再临",zhTW="軍團" },
-	[142] = { enUS="Hidden",zhCN="隐藏",zhTW="隱藏" },
-	[143] = { enUS="Battle for Azeroth",zhCN="争霸艾泽拉斯",zhTW="決戰艾澤拉斯" },
-	[144] = { enUS="Virtual",zhCN="兑换",zhTW="兑换" },
-	[245] = { enUS=EXPANSION_NAME8,zhCN=EXPANSION_NAME8,zhTW=EXPANSION_NAME8},
-	[248] = { enUS="Torghast",zhCN="托加斯特",zhTW="托迦司", hide=true, },
+	[1] = { enUS="Miscellaneous",deDE="Verschiedenes",esES="Miscelánea",esMX="Miscelánea",frFR="Divers",itIT="Varie",koKR="기타",ptBR="Diversos",ruRU="Разное",zhCN="其它",zhTW="雜項", },
+	[2] = { enUS="Player vs. Player",deDE="Spieler gegen Spieler",esES="Jugador contra Jugador",esMX="Jugador contra Jugador",frFR="JcJ",itIT="Personaggio vs Personaggio",koKR="플레이어 간 전투",ptBR="Jogador x Jogador",ruRU="PvP",zhCN="PvP",zhTW="玩家對玩家", },
+	[3] = { enUS="Unused",deDE="Unbenutzt",esES="No las uso",esMX="No las uso",frFR="Inutilisées",itIT="Non usato",koKR="미사용",ptBR="Não usado",ruRU="Неактивно",zhCN="未使用",zhTW="未使用", hide=true, },
+	[4] = { enUS="Classic",deDE="Classic",esES="Clásico",esMX="Clásico",frFR="Classique",itIT="Classico",koKR="오리지널",ptBR="Clássico",ruRU="World of Warcraft",zhCN="经典旧世",zhTW="艾澤拉斯", hide=true, },
+	[21] = { enUS="Wrath of the Lich King",deDE="Wrath of the Lich King",esES="Wrath of the Lich King",esMX="Wrath of the Lich King",frFR="Wrath of the Lich King",itIT="Wrath of the Lich King",koKR="리치 왕의 분노",ptBR="Wrath of the Lich King",ruRU="Wrath of the Lich King",zhCN="巫妖王之怒",zhTW="巫妖王之怒", },
+	[22] = { enUS="Dungeon and Raid",deDE="Dungeon und Schlachtzug",esES="Mazmorra y banda",esMX="Calabozo y banda",frFR="Donjons & Raids",itIT="Spedizioni e Incursioni",koKR="던전 및 공격대",ptBR="Masmorras e Raides",ruRU="Подземелья и рейды",zhCN="地下城与团队副本",zhTW="地城與團隊", },
+	[23] = { enUS="Burning Crusade",deDE="Burning Crusade",esES="Burning Crusade",esMX="Burning Crusade",frFR="Burning Crusade",itIT="Burning Crusade",koKR="불타는 성전",ptBR="Burning Crusade",ruRU="Burning Crusade",zhCN="燃烧的远征",zhTW="燃燒的遠征", hide=true, },
+	[81] = { enUS="Cataclysm",deDE="Cataclysm",esES="Cataclysm",esMX="Cataclysm",frFR="Cataclysm",itIT="Cataclysm",koKR="대격변",ptBR="Cataclysm",ruRU="Cataclysm",zhCN="大地的裂变",zhTW="浩劫與重生", },
+	[82] = { enUS="Archaeology",deDE="Archäologie",esES="Arqueología",esMX="Arqueología",frFR="Archéologie",itIT="Archeologia",koKR="고고학",ptBR="Arqueologia",ruRU="Археология",zhCN="考古学",zhTW="考古學", },
+	[133] = { enUS="Mists of Pandaria",deDE="Mists of Pandaria",esES="Mists of Pandaria",esMX="Mists of Pandaria",frFR="Mists of Pandaria",itIT="Mists of Pandaria",koKR="판다리아의 안개",ptBR="Mists of Pandaria",ruRU="Mists of Pandaria",zhCN="熊猫人之谜",zhTW="潘達利亞之謎", },
+	[137] = { enUS="Warlords of Draenor",deDE="Warlords of Draenor",esES="Warlords of Draenor",esMX="Warlords of Draenor",frFR="Warlords of Draenor",itIT="Warlords of Draenor",koKR="드레노어의 전쟁군주",ptBR="Warlords of Draenor",ruRU="Warlords of Draenor",zhCN="德拉诺之王",zhTW="德拉諾之霸", },
+	[141] = { enUS="Legion",deDE="Legion",esES="Legion",esMX="Legion",frFR="Legion",itIT="Legion",koKR="군단",ptBR="Legion",ruRU="Legion",zhCN="军团再临",zhTW="軍團", },
+	[142] = { enUS="Hidden",deDE="Versteckt",esES="Oculto",esMX="Oculto",frFR="Caché",itIT="Nascosto",koKR="숨김",ptBR="Escondido",ruRU="Невидимые чары",zhCN="隐藏",zhTW="隱藏", },
+	[143] = { enUS="Battle for Azeroth",deDE="Battle for Azeroth",esES="Battle for Azeroth",esMX="Battle for Azeroth",frFR="Battle for Azeroth",itIT="Battle for Azeroth",koKR="격전의 아제로스",ptBR="Battle for Azeroth",ruRU="Battle for Azeroth",zhCN="争霸艾泽拉斯",zhTW="決戰艾澤拉斯", },
+	[144] = { enUS="Virtual",deDE="Virtuell",esES="Virtual",esMX="Virtual",frFR="Virtuelle",itIT="Virtuale",koKR="가상",ptBR="Virtual",ruRU="Виртуальная валюта",zhCN="虚拟",zhTW="虛擬", },
+	[245] = { enUS=EXPANSION_NAME8,deDE=EXPANSION_NAME8,esES=EXPANSION_NAME8,esMX=EXPANSION_NAME8,frFR=EXPANSION_NAME8,itIT=EXPANSION_NAME8,koKR=EXPANSION_NAME8,ptBR=EXPANSION_NAME8,ruRU=EXPANSION_NAME8,zhCN=EXPANSION_NAME8,zhTW=EXPANSION_NAME8, },
+	[248] = { enUS="Torghast",deDE="Torghast",esES="Torghast",esMX="Torghast",frFR="Tourment",itIT="Torgast",koKR="토르가스트",ptBR="Thanator",ruRU="Торгаст",zhCN="托加斯特",zhTW="托迦司", hide=true, },
 }
 
 data.Currencies = {
@@ -672,8 +676,12 @@ data.Currencies = {
 	[1972] = { id=1972, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Par Time Floor 4
 	[1976] = { id=1976, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - Phant Left Group
 	[1977] = { id=1977, category=245 }, -- Stygian Ember
-
+	[1981] = { id=1980, category=248, hidden=true }, -- Torghast - Scoreboard - Run Layer
+	[1981] = { id=1981, category=248, hidden=true }, -- Torghast - Scoreboard - Run ID
+	[1997] = { id=1997, category=142 }, -- Archivists' Codex
 }
+
+
 
 
 

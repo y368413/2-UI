@@ -10,6 +10,8 @@ hooksecurefunc(StaticPopupDialogs["CONFIRM_LEAVE_BATTLEFIELD"],"OnShow",function
 end)]]
 --------------------------------------Hide the left/right end cap------------------------
 --MainMenuBarArtFrame.LeftEndCap:Hide()  MainMenuBarArtFrame.RightEndCap:Hide()   
+--------------------------------------NoHelpTips------------------------
+function HelpTip:AreHelpTipsEnabled() return false end
 -----------------------------------------	     随机队列倒计时    -----------------------------------------
 local timerBar = CreateFrame("StatusBar", nil, LFGDungeonReadyPopup, "BackdropTemplate")
 local timeLeft = 0

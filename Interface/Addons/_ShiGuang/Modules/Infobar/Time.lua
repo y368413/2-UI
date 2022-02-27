@@ -11,6 +11,7 @@ local mod, tonumber, pairs, ipairs = mod, tonumber, pairs, ipairs
 local IsShiftKeyDown = IsShiftKeyDown
 local C_Map_GetMapInfo = C_Map.GetMapInfo
 local C_DateAndTime_GetCurrentCalendarTime = C_DateAndTime.GetCurrentCalendarTime
+local C_Calendar_GetDayEvent = C_Calendar.GetDayEvent
 local C_Calendar_SetAbsMonth = C_Calendar.SetAbsMonth
 local C_Calendar_OpenCalendar = C_Calendar.OpenCalendar
 local C_Calendar_GetNumDayEvents = C_Calendar.GetNumDayEvents
@@ -70,7 +71,7 @@ local function checkTimeWalker(event)
 	if numEvents <= 0 then return end
 
 	for i = 1, numEvents do
-		local info = C_Calendar.GetDayEvent(0, today, i)
+		local info = C_Calendar_GetDayEvent(0, today, i)
 		if info and strfind(info.title, PLAYER_DIFFICULTY_TIMEWALKER) and info.sequenceType ~= "END" then
 			isTimeWalker = true
 			walkerTexture = info.iconTexture
@@ -97,6 +98,7 @@ local questlist = {
 	{name = U["Timewarped"], id = 40786, texture = 1304688},	-- Cata
 	{name = U["Timewarped"], id = 45563, texture = 1530590},	-- MoP
 	{name = U["Timewarped"], id = 55499, texture = 1129683},	-- WoD
+	{name = U["Timewarped"], id = 64710, texture = 1467047},	-- Legion
 }
 
 local lesserVisions = {58151, 58155, 58156, 58167, 58168}

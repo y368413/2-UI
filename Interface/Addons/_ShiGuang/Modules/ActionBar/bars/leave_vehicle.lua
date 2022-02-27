@@ -33,14 +33,14 @@ function Bar:CreateLeaveVehicle()
 	local num = 1
 	local buttonList = {}
 
-	local frame = CreateFrame("Frame", "NDui_ActionBarExit", UIParent, "SecureHandlerStateTemplate")
+	local frame = CreateFrame("Frame", "UI_ActionBarExit", UIParent, "SecureHandlerStateTemplate")
 	if R.db["Actionbar"]["Style"] == 3 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 130}
 	else
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 320, 100}
 	end
 
-	local button = CreateFrame("CheckButton", "NDui_LeaveVehicleButton", frame, "ActionButtonTemplate, SecureHandlerClickTemplate")
+	local button = CreateFrame("CheckButton", "UI_LeaveVehicleButton", frame, "ActionButtonTemplate, SecureHandlerClickTemplate")
 	tinsert(buttonList, button)
 	button:SetPoint("BOTTOMLEFT", frame, padding, padding)
 	button:RegisterForClicks("AnyUp")

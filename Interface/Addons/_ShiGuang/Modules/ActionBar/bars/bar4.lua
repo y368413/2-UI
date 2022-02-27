@@ -72,7 +72,7 @@ function Bar:CreateBar4()
 	local layout = R.db["Actionbar"]["Style"]
 
 	if (layout == 2) or (layout == 3) or (layout == 6) or (layout == 7)  or (layout == 8) or (layout == 9) or (layout == 10) or (layout == 11) then size = 38 end
-	local frame = CreateFrame("Frame", "NDui_ActionBar4", UIParent, "SecureHandlerStateTemplate")
+	local frame = CreateFrame("Frame", "UI_ActionBar4", UIParent, "SecureHandlerStateTemplate")
 	if (layout == 2) or (layout == 3) then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -9*size - 2*padding, 2}	
 	elseif layout == 6 then

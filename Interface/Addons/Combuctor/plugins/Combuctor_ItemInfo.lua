@@ -1,4 +1,4 @@
-﻿--## Author: Lars "Goldpaw" Norberg ## Version: 1.0
+﻿--## Author: Lars "Goldpaw" Norberg ## Version: 1.0.26-Release
 
 -- Using the Combuctor way to retrieve names, namespaces and stuff
 local MODULE =  ...
@@ -6,8 +6,8 @@ local ADDON, Addon = MODULE:match("[^_]+"), _G[MODULE:match("[^_]+")]
 local Module = Combuctor:NewModule("ItemInfo", Addon)
 
 -- Tooltip used for scanning
-local ScannerTip = _G.CombuctorItemInfoScannerTooltip or CreateFrame("GameTooltip", "CombuctorItemInfoScannerTooltip", WorldFrame, "GameTooltipTemplate")
-local ScannerTipName = ScannerTip:GetName()
+local ScannerTipName = "CombuctorItemInfoScannerTooltip"
+local ScannerTip = _G[ScannerTipName] or CreateFrame("GameTooltip", ScannerTipName, WorldFrame, "GameTooltipTemplate")
 
 -- Lua API
 local _G = _G
@@ -24,7 +24,7 @@ local tonumber = tonumber
 local C_TransmogCollection = _G.C_TransmogCollection
 local CreateFrame = _G.CreateFrame
 local GetContainerItemInfo = _G.GetContainerItemInfo
-local GetDetailedItemLevelInfo = _G.GetDetailedItemLevelInfo
+local GetDetailedItemLevelInfo = _G.GetDetailedItemLevelInfo 
 local GetItemInfo = _G.GetItemInfo
 local GetItemQualityColor = _G.GetItemQualityColor
 local IsArtifactRelicItem = _G.IsArtifactRelicItem 
@@ -57,58 +57,6 @@ local Cache_ItemGarbage = {}
 local Cache_ItemLevel = {}
 local Cache_Uncollected = {}
 --local Cache_CorruptionItems = {}
-
------------------------------------------------------------
--- Utility Functions
------------------------------------------------------------
--- Update our secret scanner tooltip with the current button
-local RefreshScanner = function(button)
-	local bag, slot = button:GetBag(), button:GetID()
-	ScannerTip.owner = button
-	ScannerTip.bag = bag
-	ScannerTip.slot = slot
-	ScannerTip:SetOwner(button, "ANCHOR_NONE")
-	ScannerTip:SetBagItem(button:GetBag(), button:GetID())
-end
-
--- Move Pawn out of the way
-local RefreshPawn = function(button)
-	local UpgradeIcon = button.UpgradeIcon
-	if UpgradeIcon then
-		UpgradeIcon:ClearAllPoints()
-		UpgradeIcon:SetPoint("BOTTOMRIGHT", 2, 0)
-	end
-end
-
-local IsItemBound = function(button)
-	-- We're trying line 2 to 6 for the bind texts, 
-	-- I don't think they're ever further down.
-	for i = 2,6 do 
-		local line = _G[ScannerTipName.."TextLeft"..i]
-		if (not line) then
-			break
-		end
-		local msg = line:GetText()
-		if msg and string_find(msg, S_ITEM_BOUND1) then 
-			return true
-		end
-	end
-end
-
-local IsItemAccount = function(button)
-	-- We're trying line 2 to 6 for the bind texts, 
-	-- I don't think they're ever further down.
-	for i = 2,6 do 
-		local line = _G[ScannerTipName.."TextLeft"..i]
-		if (not line) then
-			break
-		end
-		local msg = line:GetText()
-		if msg and (string_find(msg, S_ITEM_BOUND2) or string_find(msg, S_ITEM_BOUND3) or string_find(msg, S_ITEM_BOUND4) or string_find(msg, S_ITEM_BOUND5)) then 
-			return true
-		end
-	end
-end
 
 -- Check if it's a caged battle pet
 local GetBattlePetInfo = function(itemLink)
@@ -143,10 +91,11 @@ local Cache_GetItemLevel = function(button)
 	ItemLevel:SetTextColor(1, 0.65, 0.16);
 		ItemLevel:SetShadowOffset(1, -1)
 		ItemLevel:SetShadowColor(0, 0, 0, .5)
-
-		-- Move Pawn out of the way
-		RefreshPawn(button)
-		-- Store the reference for the next time
+		local UpgradeIcon = button.UpgradeIcon
+		if UpgradeIcon then
+			UpgradeIcon:ClearAllPoints()
+			UpgradeIcon:SetPoint("BOTTOMRIGHT", 2, 0)
+		end
 		Cache_ItemLevel[button] = ItemLevel
 	end
 	return Cache_ItemLevel[button]
@@ -161,11 +110,11 @@ local Cache_GetItemBind = function(button)
 		ItemBind:SetFont(ItemBind:GetFont(), 11, "OUTLINE")
 		ItemBind:SetShadowOffset(1, -1)
 		ItemBind:SetShadowColor(0, 0, 0, .5)
-
-		-- Move Pawn out of the way
-		RefreshPawn(button)
-
-		-- Store the reference for the next time
+		local UpgradeIcon = button.UpgradeIcon
+		if UpgradeIcon then
+			UpgradeIcon:ClearAllPoints()
+			UpgradeIcon:SetPoint("BOTTOMRIGHT", 2, 0)
+		end
 		Cache_ItemBind[button] = ItemBind
 	end
 	return Cache_ItemBind[button]
@@ -181,30 +130,26 @@ local Cache_GetItemGarbage = function(button)
 		ItemGarbage:SetColorTexture(51/255 * 1/5,  17/255 * 1/5,   6/255 * 1/5, .6)
 		ItemGarbage.owner = button
 
-		hooksecurefunc(Icon, "SetDesaturated", function() 
-			if ItemGarbage.tempLocked then 
+		hooksecurefunc(Icon, "SetDesaturated", function()
+			if (ItemGarbage.tempLocked) then 
 				return
 			end
-
 			ItemGarbage.tempLocked = true
-
-			--if (CombuctorItemInfo_DB.enableGarbage) then  
-				local itemLink = button:GetItem()
-				if itemLink then 
-					local _, _, itemRarity, iLevel, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink)
-					local texture, itemCount, locked, quality, readable, _, _, isFiltered, noValue, itemID = GetContainerItemInfo(button:GetBag(), button:GetID())
-				
-					local isBattlePet, battlePetLevel, battlePetRarity = GetBattlePetInfo(itemLink)
-					if isBattlePet then 
-						itemRarity = battlePetRarity
-					end
-
-					if not(((quality and (quality > 0)) or (itemRarity and (itemRarity > 0))) and (not locked)) then
-						Icon:SetDesaturated(true)
-					end 
+			local itemLink = button:GetItem()
+			if (itemLink) then 
+				local itemRarity
+				local _, _, locked, quality, _, _, _, _, noValue = GetContainerItemInfo(button:GetBag(),button:GetID())
+				if (string_find(itemLink, "battlepet")) then
+					local data = string_match(itemLink, "|H(.-)|h(.-)|h")
+					local  _, _, _, rarity = string_match(data, "(%w+):(%d+):(%d+):(%d+)")
+					itemRarity = tonumber(rarity) or 0
+				else
+					_, _, itemRarity = GetItemInfo(itemLink)
 				end
-			--end
-
+				if not(((quality and (quality > 0)) or (itemRarity and (itemRarity > 0))) and (not locked)) then
+					Icon:SetDesaturated(true)
+				end 
+			end
 			ItemGarbage.tempLocked = false
 		end)
 
@@ -222,11 +167,11 @@ local Cache_GetUncollected = function(button)
 		Uncollected:SetTexture([[Interface\Transmogrify\Transmogrify]])
 		Uncollected:SetTexCoord(0.804688, 0.875, 0.171875, 0.230469)
 		Uncollected:Hide()
-
-		-- Move Pawn out of the way
-		RefreshPawn(button)
-
-		-- Store the reference for the next time
+		local UpgradeIcon = button.UpgradeIcon
+		if UpgradeIcon then
+			UpgradeIcon:ClearAllPoints()
+			UpgradeIcon:SetPoint("BOTTOMRIGHT", 2, 0)
+		end
 		Cache_Uncollected[button] = Uncollected
 	end
 	return Cache_Uncollected[button]
@@ -242,19 +187,28 @@ local Update = function(self)
 
 		-- Get some blizzard info about the current item
 		local itemName, _itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, iconFileDataID, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, isCraftingReagent = GetItemInfo(itemLink)
-		local effectiveLevel, previewLevel, origLevel = GetDetailedItemLevelInfo(itemLink)
 		local isBattlePet, battlePetLevel, battlePetRarity = GetBattlePetInfo(itemLink)
 
 		-- Retrieve the itemID from the itemLink
 		local itemID = tonumber(string_match(itemLink, "item:(%d+)"))
 
 		-- Refresh the scanner a single time per update
-		RefreshScanner(self)
+		local bag,slot = self:GetBag(),self:GetID()
+		ScannerTip.owner = self
+		ScannerTip.bag = bag
+		ScannerTip.slot = slot
+		ScannerTip:SetOwner(self, "ANCHOR_NONE")
+		ScannerTip:SetBagItem(bag,slot)
 
+		-- Some more general info
+		local displayR, displayG, displayB
+			if (battlePetRarity) or (itemRarity and itemRarity > 1) then
+				displayR, displayG, displayB = GetItemQualityColor(battlePetRarity or itemRarity)
+			end
 		---------------------------------------------------
 		-- Uncollected Appearance
 		---------------------------------------------------
-		if (itemRarity and itemRarity > 1) and (not C_TransmogCollection.PlayerHasTransmog(itemID)) then 
+		if (itemRarity and itemRarity > 1) and (C_TransmogCollection and not C_TransmogCollection.PlayerHasTransmog(itemID)) then 
 			local unknown
 			for i = ScannerTip:NumLines(),2,-1 do 
 				local line = _G[ScannerTipName.."TextLeft"..i]
@@ -282,101 +236,124 @@ local Update = function(self)
 		end
 		
 		---------------------------------------------------
-		--[[ ItemBind
+		--[[ ItemBind (BoE, BoU)
 		---------------------------------------------------
-		if (itemRarity and (itemRarity > 1)) then
-		if  ((bindType == 2) or (bindType == 3)) and (not IsItemBound(self) or not IsItemAccount(self)) then
-			local ItemBind = Cache_ItemBind[self] or Cache_GetItemBind(self)
-			ItemBind:SetText((bindType == 3) and Combuctor_ItemInfoBoU or Combuctor_ItemInfoBoE)
-		elseif IsItemAccount(self) then
-			local ItemBind = Cache_ItemBind[self] or Cache_GetItemBind(self)
-			ItemBind:SetText(Combuctor_ItemInfoBoA)
-		elseif IsItemBound(self) then
-			local ItemBind = Cache_ItemBind[self] or Cache_GetItemBind(self)
-			ItemBind:SetText("|cFF00DDFF_|r")
+		if (itemRarity and (itemRarity > 1)) and ((bindType == 2) or (bindType == 3)) then
+
+			local showStatus = true
+			local _, _, _, _, _, _, _, _, _, _, isBound = GetContainerItemInfo(bag, slot)
+			if (isBound) then
+				showStatus = nil
+			end
+			--for i = 2,6 do 
+			--	local line = _G[ScannerTipName.."TextLeft"..i]
+			--	if (not line) then
+			--		break
+			--	end
+			--	local msg = line:GetText()
+			--	if (msg) then 
+			--		if (string_find(msg, S_ITEM_BOUND1) or string_find(msg, S_ITEM_BOUND2) or string_find(msg, S_ITEM_BOUND3)) then 
+			--			showStatus = nil
+			--		end
+			--	end
+			--end
+			if (showStatus) then
+				local ItemBind = Cache_ItemBind[self] or Cache_GetItemBind(self)
+				if (displayR) and (displayG) and (displayB) then
+					ItemBind:SetTextColor(displayR * 2/3, displayG * 2/3, displayB * 2/3)
+				else
+					ItemBind:SetTextColor(240/255, 240/255, 240/255)
+				end
+				ItemBind:SetText((bindType == 3) and Combuctor_ItemInfoBoU or Combuctor_ItemInfoBoE)
+			else
+				if Cache_ItemBind[self] then 
+					Cache_ItemBind[self]:SetText("")
+				end	
+			end
+
 		else 
 			if Cache_ItemBind[self] then 
 				Cache_ItemBind[self]:SetText("")
 			end	
-		end
 		end]]
 
 		---------------------------------------------------
 		-- ItemLevel
 		---------------------------------------------------
-		if (itemEquipLoc == "INVTYPE_BAG") then 
-			local scannedSlots
-			local line = _G[ScannerTipName.."TextLeft3"]
-			if line then
-				local msg = line:GetText()
-				if msg and string_find(msg, S_CONTAINER_SLOTS) then
-					local bagSlots = string_match(msg, S_CONTAINER_SLOTS)
-					if bagSlots and (tonumber(bagSlots) > 0) then
-						scannedSlots = bagSlots
-					end
-				else
-					line = _G[ScannerTipName.."TextLeft4"]
-					if line then
-						local msg = line:GetText()
-						if msg and string_find(msg, S_CONTAINER_SLOTS) then
-							local bagSlots = string_match(msg, S_CONTAINER_SLOTS)
-							if bagSlots and (tonumber(bagSlots) > 0) then
-								scannedSlots = bagSlots
-							end
-						end
-					end
-				end
-			end
+			local displayMsg
+				
+			local itemID = tonumber(string_match(itemLink, "item:(%d+)"))
 
-			if scannedSlots then 
-				local ItemLevel = Cache_ItemLevel[self] or Cache_GetItemLevel(self)
-				ItemLevel:SetTextColor(240/255, 240/255, 240/255)
-				ItemLevel:SetText(scannedSlots)
-			else 
-				if Cache_ItemLevel[self] then 
-					Cache_ItemLevel[self]:SetText("")
-				end
-			end 
-
-		-- Display item level of equippable gear and artifact relics
-		elseif ((itemRarity and (itemRarity > 0)) and ((itemEquipLoc and _G[itemEquipLoc]) or (itemID and IsArtifactRelicItem(itemID)))) or (isBattlePet) then
-
-			local scannedLevel
-			if (not isBattlePet) then
-				local line = _G[ScannerTipName.."TextLeft2"]
-				if line then
+			if (itemEquipLoc == "INVTYPE_BAG") then 
+				local line = _G[ScannerTipName.."TextLeft3"]
+				if (line) then
 					local msg = line:GetText()
-					if msg and string_find(msg, S_ITEM_LEVEL) then
-						local ItemLevel = string_match(msg, S_ITEM_LEVEL)
-						if ItemLevel and (tonumber(ItemLevel) > 0) then
-							scannedLevel = ItemLevel
+					if (msg) and (string_find(msg, S_CONTAINER_SLOTS)) then
+						local bagSlots = string_match(msg, S_CONTAINER_SLOTS)
+						if (bagSlots) and (tonumber(bagSlots) > 0) then
+							displayMsg = bagSlots
 						end
 					else
-						-- Check line 3, some artifacts have the ilevel there
-						line = _G[ScannerTipName.."TextLeft3"]
-						if line then
+						line = _G[ScannerTipName.."TextLeft4"]
+						if (line) then
 							local msg = line:GetText()
-							if msg and string_find(msg, S_ITEM_LEVEL) then
-								local ItemLevel = string_match(msg, S_ITEM_LEVEL)
-								if ItemLevel and (tonumber(ItemLevel) > 0) then
-									scannedLevel = ItemLevel
+							if (msg) and (string_find(msg, S_CONTAINER_SLOTS)) then
+								local bagSlots = string_match(msg, S_CONTAINER_SLOTS)
+								if (bagSlots) and (tonumber(bagSlots) > 0) then
+									displayMsg = bagSlots
 								end
 							end
 						end
 					end
 				end
+	
+			-- Display item level of equippable gear and artifact relics, and battle pet level
+			elseif ((itemRarity and (itemRarity > 0)) and ((itemEquipLoc and _G[itemEquipLoc]) or (itemID and IsArtifactRelicItem and IsArtifactRelicItem(itemID)))) or (isBattlePet) then
+	
+				local scannedLevel
+				if (not isBattlePet) then
+					local line = _G[ScannerTipName.."TextLeft2"]
+					if (line) then
+						local msg = line:GetText()
+						if (msg) and (string_find(msg, S_ITEM_LEVEL)) then
+							local ilvl = (string_match(msg, S_ITEM_LEVEL))
+							if (ilvl) and (tonumber(ilvl) > 0) then
+								scannedLevel = ilvl
+							end
+						else
+							-- Check line 3, some artifacts have the ilevel there
+							line = _G[ScannerTipName.."TextLeft3"]
+							if line then
+								local msg = line:GetText()
+								if (msg) and (string_find(msg, S_ITEM_LEVEL)) then
+									local ilvl = (string_match(msg, S_ITEM_LEVEL))
+									if (ilvl) and (tonumber(ilvl) > 0) then
+										scannedLevel = ilvl
+									end
+								end
+							end
+						end
+					end
+				end
+				displayMsg = scannedLevel or battlePetLevel or GetDetailedItemLevelInfo(itemLink) or itemLevel or ""
 			end
 
-			local r, g, b = GetItemQualityColor(battlePetRarity or itemRarity)
-			local ItemLevel = Cache_ItemLevel[self] or Cache_GetItemLevel(self)
-			ItemLevel:SetTextColor(240/255, 240/255, 240/255) --r, g, b品质染色
-			ItemLevel:SetText(scannedLevel or battlePetLevel or effectiveLevel or itemLevel or "")
+			if (displayMsg) then
+				local ItemLevel = Cache_ItemLevel[self] or Cache_GetItemLevel(self)
+				--if (displayR) and (displayG) and (displayB) then
+					--ItemLevel:SetTextColor(displayR, displayG, displayB)
+				--else
+					ItemLevel:SetTextColor(240/255, 240/255, 240/255)
+				--end
+				ItemLevel:SetText(displayMsg)
 
-		else
-			if Cache_ItemLevel[self] then 
+			elseif (Cache_ItemLevel[self]) then
 				Cache_ItemLevel[self]:SetText("")
 			end
-		end
+
+		--if (Cache_ItemLevel[self]) then
+			--Cache_ItemLevel[self]:SetText("")
+		--end
 
 		---------------------------------------------------
 		-- ItemGarbage

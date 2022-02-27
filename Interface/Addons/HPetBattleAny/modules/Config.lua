@@ -90,10 +90,10 @@ function HPetOption:InitButtons()
 			point="BOTTOMLEFT",x=5,y=5,width=100, height=20, text = L["Search Help"],
 			func=self.HelpButton_Click,
 		},
-		--{name="UpdateStone",type="Button",inherits="UIPanelButtonTemplate",
-			--point="BOTTOMRIGHT",x=-5,y=5,width=100, height=20, text = L["Battle Stone"],
-			--func=UpdateStoneButton_Click,
-		--},
+		{name="UpdateStone",type="Button",inherits="UIPanelButtonTemplate",
+			point="BOTTOMRIGHT",x=-5,y=5,width=100, height=20, text = L["Battle Stone"],
+			func=UpdateStoneButton_Click,
+		},
 
 		----value buttons
 		----综合
@@ -346,9 +346,9 @@ end
 function HPetOption:OnCheckButtonClicked()
 	isChecked = self:GetChecked()
 	if isChecked then
-		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 	else
-		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
+		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF);
 	end
 	value = HPetOption.Buttons[self:GetID()]
 	if value.var then

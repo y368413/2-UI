@@ -337,9 +337,7 @@ Core.Class = function (name, parent, attrs)
             return instance
         end,
 
-        __tostring = function ()
-            return '<class "'..name..'">'
-        end,
+        __tostring = function() return '<class "' .. name .. '">' end,
 
         -- Make parent class attributes accessible on child class objects
         __index = parent
@@ -377,9 +375,7 @@ end
 Core.Clone = function (instance, newattrs)
     local clone = {}
     for k, v in pairs(instance) do clone[k] = v end
-    if newattrs then
-        for k, v in pairs(newattrs) do clone[k] = v end
-    end
+    if newattrs then for k, v in pairs(newattrs) do clone[k] = v end end
     return instance.__class(clone)
 end
 
@@ -495,6 +491,7 @@ function Addon:OnLeave(mapID, coord)
     map:SetFocus(node, false, true)
     Core.MinimapDataProvider:RefreshAllData()
     Core.WorldMapDataProvider:RefreshAllData()
+    node:Unrender(GameTooltip)
     GameTooltip:Hide()
 end
 
@@ -528,7 +525,7 @@ function Addon:OnInitialize()
 
     -- Add quick-toggle menu button to top-right corner of world map
     local template = "HandyNotes_CoreWorldMapOptionsButtonTemplate"
-    Core.world_map_button = LibStub("Krowi_WorldMapButtons-1.0"):Add(template, "DROPDOWNTOGGLEBUTTON")
+    Core.world_map_button = LibStub("Krowi_WorldMapButtons-1.3"):Add(template, "DROPDOWNTOGGLEBUTTON")
 
     -- Query localized expansion title
     if not Core.expansion then error('Expansion not set: HandyNotes_Core') end
@@ -576,36 +573,27 @@ function Addon:RegisterWithHandyNotes()
         end
     end
 
-    if Core:GetOpt('development') then
-        Core.BootstrapDevelopmentEnvironment()
-    end
+    if Core:GetOpt('development') then Core.BootstrapDevelopmentEnvironment() end
 
     HandyNotes:RegisterPluginDB("HandyNotes_Core", self, Core.options)
 
     -- Refresh in any cases where node status may have changed
     self:RegisterBucketEvent({
-        "BAG_UPDATE",
-        "CRITERIA_EARNED",
-        "CRITERIA_UPDATE",
-        "LOOT_CLOSED",
-        "PLAYER_MONEY",
-        "SHOW_LOOT_TOAST",
-        "SHOW_LOOT_TOAST_UPGRADE",
-        "QUEST_TURNED_IN",
-        "ZONE_CHANGED_NEW_AREA"
-    }, 2, "Refresh")
+        'BAG_UPDATE', 'CRITERIA_EARNED', 'CRITERIA_UPDATE', 'LOOT_CLOSED',
+        'PLAYER_MONEY', 'SHOW_LOOT_TOAST', 'SHOW_LOOT_TOAST_UPGRADE',
+        'QUEST_TURNED_IN', 'ZONE_CHANGED_NEW_AREA'
+    }, 2, 'Refresh')
 
     -- Also refresh whenever the size of the world map frame changes
-    hooksecurefunc(WorldMapFrame, 'OnFrameSizeChanged', function ()
-        self:Refresh()
-    end)
+    hooksecurefunc(WorldMapFrame, 'OnFrameSizeChanged',
+        function() self:Refresh() end)
 
     self:Refresh()
 end
 
 function Addon:Refresh()
     if self._refreshTimer then return end
-    self._refreshTimer = C_Timer.NewTimer(0.1, function ()
+    self._refreshTimer = C_Timer.NewTimer(0.1, function()
         self._refreshTimer = nil
         self:SendMessage("HandyNotes_NotifyUpdate", "HandyNotes_Core")
         Core.MinimapDataProvider:RefreshAllData()
@@ -667,7 +655,7 @@ Core.icons = { -- name => path
     portal_gn = {Icon('portal_green'), Glow('portal')},
     portal_pp = {Icon('portal_purple'), Glow('portal')},
     portal_rd = {Icon('portal_red'), Glow('portal')},
-    
+
     quest_ab = {Icon('quest_available_blue'), Glow('quest_available')},
     quest_ag = {Icon('quest_available_green'), Glow('quest_available')},
     quest_ao = {Icon('quest_available_orange'), Glow('quest_available')},
@@ -694,7 +682,7 @@ Core.icons = { -- name => path
     envelope = {Icon('envelope'), Glow('envelope')},
     left_mouse = {Icon('left_mouse'), nil},
     scroll = {Icon('scroll'), Glow('scroll')},
-    world_quest = {Icon('world_quest'), Glow('world_quest')},
+    world_quest = {Icon('world_quest'), Glow('world_quest')}
 
 }
 
@@ -772,7 +760,7 @@ Core.optionDefaults = {
         path_color_G = 0.5,
         path_color_B = 1,
         path_color_A = 1
-    },
+    }
 }
 
 -------------------------------------------------------------------------------
@@ -780,16 +768,19 @@ Core.optionDefaults = {
 -------------------------------------------------------------------------------
 
 function Core:GetOpt(n) return Core.addon.db.profile[n] end
-function Core:SetOpt(n, v) Core.addon.db.profile[n] = v; Core.addon:Refresh() end
+function Core:SetOpt(n, v)
+    Core.addon.db.profile[n] = v;
+    Core.addon:Refresh()
+end
 
 function Core:GetColorOpt(n)
     local db = Core.addon.db.profile
-    return db[n..'_R'], db[n..'_G'], db[n..'_B'], db[n..'_A']
+    return db[n .. '_R'], db[n .. '_G'], db[n .. '_B'], db[n .. '_A']
 end
 
 function Core:SetColorOpt(n, r, g, b, a)
     local db = Core.addon.db.profile
-    db[n..'_R'], db[n..'_G'], db[n..'_B'], db[n..'_A'] = r, g, b, a
+    db[n .. '_R'], db[n .. '_G'], db[n .. '_B'], db[n .. '_A'] = r, g, b, a
     Core.addon:Refresh()
 end
 
@@ -931,7 +922,7 @@ Core.options = {
                     desc = L["options_restore_hidden_nodes_desc"],
                     order = 25,
                     width = "full",
-                    func = function ()
+                    func = function()
                         wipe(Core.addon.db.char)
                         Core.addon:Refresh()
                     end
@@ -1025,10 +1016,7 @@ Core.options = {
 
 function Core.CreateGlobalGroupOptions()
     for i, group in ipairs({
-        Core.groups.RARE,
-        Core.groups.TREASURE,
-        Core.groups.PETBATTLE,
-        Core.groups.MISC
+        Core.groups.RARE, Core.groups.TREASURE, Core.groups.PETBATTLE, Core.groups.MISC
     }) do
         Core.options.args.GlobalTab.args['group_icon_'..group.name] = {
             type = "header",
@@ -1228,10 +1216,12 @@ local function BootstrapDevelopmentEnvironment()
         if Core:GetOpt('show_debug_quest') then Core.Debug(...) end
     end
 
-    C_Timer.After(2, function ()
+    C_Timer.After(2, function()
         -- Give some time for quest info to load in before we start
-        for id = 0, max_quest_id do quests[id] = C_QuestLog.IsQuestFlaggedCompleted(id) end
-        QTFrame:SetScript('OnUpdate', function ()
+        for id = 0, max_quest_id do
+            quests[id] = C_QuestLog.IsQuestFlaggedCompleted(id)
+        end
+        QTFrame:SetScript('OnUpdate', function()
             if GetTime() - lastCheck > 1 and Core:GetOpt('show_debug_quest') then
                 for id = 0, max_quest_id do
                     local s = C_QuestLog.IsQuestFlaggedCompleted(id)
@@ -1277,7 +1267,7 @@ local function BootstrapDevelopmentEnvironment()
             groupPins:GetNextActive():Hide()
         end
     end)
-    IQFrame:SetScript('OnKeyUp', function (_, key)
+    IQFrame:SetScript('OnKeyUp', function(_, key)
         if key == 'LCTRL' or key == 'LALT' then
             IQFrame:SetPropagateKeyboardInput(true)
             for i, _ns in ipairs(_G[plugins]) do
@@ -1373,20 +1363,20 @@ end
 
 -------------------------------------------------------------------------------
 
-_G['HandyNotes_CoreScanQuestObjectives'] = function (start, end_)
-    local function attemptObjectiveInfo (quest, index)
-        local text, objectiveType, finished, fulfilled = GetQuestObjectiveInfo(quest, index, true)
-        if text or objectiveType or finished or fulfilled then
-            print(quest, index, text, objectiveType, finished, fulfilled)
+_G['HandyNotes_CoreScanQuestObjectives'] =
+    function(start, end_)
+        local function attemptObjectiveInfo(quest, index)
+            local text, objectiveType, finished, fulfilled =
+                GetQuestObjectiveInfo(quest, index, true)
+            if text or objectiveType or finished or fulfilled then
+                print(quest, index, text, objectiveType, finished, fulfilled)
+            end
         end
-    end
 
-    for i = start, end_, 1 do
-        for j = 0, 10, 1 do
-            attemptObjectiveInfo(i, j)
+        for i = start, end_, 1 do
+            for j = 0, 10, 1 do attemptObjectiveInfo(i, j) end
         end
     end
-end
 
 -------------------------------------------------------------------------------
 Core.BootstrapDevelopmentEnvironment = BootstrapDevelopmentEnvironment
@@ -1416,12 +1406,8 @@ Base class for all maps.
 
 --]]
 
-local Map = Class('Map', nil, {
-    id = 0,
-    intro = nil,
-    phased = true,
-    settings = false
-})
+local Map = Class('Map', nil,
+    {id = 0, intro = nil, phased = true, settings = false})
 
 function Map:Initialize(attrs)
     for k, v in pairs(attrs) do self[k] = v end
@@ -1432,13 +1418,13 @@ function Map:Initialize(attrs)
     self.settings = self.settings or false
 
     setmetatable(self.nodes, {
-        __newindex = function (nodes, coord, node)
+        __newindex = function(nodes, coord, node)
             self:AddNode(coord, node)
         end
     })
 
     -- auto-register this map
-    if Core.maps[self.id] then error('Map already registered: '..self.id) end
+    if Core.maps[self.id] then error('Map already registered: ' .. self.id) end
     Core.maps[self.id] = self
 end
 
@@ -1525,7 +1511,7 @@ function Map:IsNodeEnabled(node, coord, minimap)
     if Core:GetOpt('force_nodes') or Core.dev_force then return true end
 
     -- Check if we've been hidden by the user
-    if db.char[self.id..'_coord_'..coord] then return false end
+    if db.char[self.id .. '_coord_' .. coord] then return false end
 
     -- Check if the node is disabled in the current context
     if not self:CanDisplay(node, coord, minimap) then return false end
@@ -1643,7 +1629,7 @@ end
 
 function MinimapDataProvider:OnUpdate()
     local facing = GetPlayerFacing()
-    if facing ~= self.facing then
+    if facing and facing ~= self.facing then
         self.facing = facing
         self:RefreshAllRotations()
         self.updateTimer = 0
@@ -1673,24 +1659,19 @@ end
 function MinimapPinMixin:UpdateRotation()
     -- If the pin has a rotation, its original value will be stored in the
     -- `rotation` attribute. Update to accommodate player facing.
-    if self.rotation == nil then return end
-    self.texture:SetRotation(self.rotation + math.pi*2 - self.provider.facing)
+    if self.rotation == nil or self.provider.facing == nil then return end
+    self.texture:SetRotation(self.rotation + math.pi * 2 - self.provider.facing)
 end
 
-MinimapDataProvider:SetScript('OnUpdate', function ()
-    if GetCVar('rotateMinimap') == '1' then
-        MinimapDataProvider:OnUpdate()
-    end
+MinimapDataProvider:SetScript('OnUpdate', function()
+    if GetCVar('rotateMinimap') == '1' then MinimapDataProvider:OnUpdate() end
 end)
 
-Core.addon:RegisterEvent('MINIMAP_UPDATE_ZOOM', function (...)
-    MinimapDataProvider:RefreshAllData()
-end)
+Core.addon:RegisterEvent('MINIMAP_UPDATE_ZOOM',
+    function(...) MinimapDataProvider:RefreshAllData() end)
 
-Core.addon:RegisterEvent('CVAR_UPDATE', function (_, varname)
-    if varname == 'ROTATE_MINIMAP' then
-        MinimapDataProvider:RefreshAllData()
-    end
+Core.addon:RegisterEvent('CVAR_UPDATE', function(_, varname)
+    if varname == 'ROTATE_MINIMAP' then MinimapDataProvider:RefreshAllData() end
 end)
 
 -------------------------------------------------------------------------------
@@ -1740,7 +1721,7 @@ end
 function WorldMapPinMixin:OnLoad()
     -- The MAP_HIGHLIGHT frame level is well below the level standard
     -- HandyNotes pins use, preventing mouseover conflicts
-    self:UseFrameLevelType("PIN_FRAME_LEVEL_MAP_HIGHLIGHT")
+    self:UseFrameLevelType('PIN_FRAME_LEVEL_MAP_HIGHLIGHT')
 end
 
 function WorldMapPinMixin:OnAcquired(poi, ...)
@@ -1826,13 +1807,11 @@ function Group:Initialize(name, icon, attrs)
     Core.PrepareLinks(self.label)
     Core.PrepareLinks(self.desc)
 
-    if attrs then
-        for k, v in pairs(attrs) do self[k] = v end
-    end
+    if attrs then for k, v in pairs(attrs) do self[k] = v end end
 
-    self.alphaArg = 'icon_alpha_'..self.name
-    self.scaleArg = 'icon_scale_'..self.name
-    self.displayArg = 'icon_display_'..self.name
+    self.alphaArg = 'icon_alpha_' .. self.name
+    self.scaleArg = 'icon_scale_' .. self.name
+    self.displayArg = 'icon_display_' .. self.name
 
     if not self.defaults then self.defaults = {} end
     self.defaults.alpha = self.defaults.alpha or 1
@@ -1856,27 +1835,33 @@ function Group:IsEnabled()
     return true
 end
 
-function Group:_GetOpt (option, default, mapID)
+function Group:_GetOpt(option, default, mapID)
     local value
     if Core:GetOpt('per_map_settings') then
-        value = Core:GetOpt(option..'_'..mapID)
+        value = Core:GetOpt(option .. '_' .. mapID)
     else
         value = Core:GetOpt(option)
     end
     return (value == nil) and default or value
 end
 
-function Group:_SetOpt (option, value, mapID)
+function Group:_SetOpt(option, value, mapID)
     if Core:GetOpt('per_map_settings') then
-        return Core:SetOpt(option..'_'..mapID, value)
+        return Core:SetOpt(option .. '_' .. mapID, value)
     end
     return Core:SetOpt(option, value)
 end
 
 -- Get group settings
-function Group:GetAlpha(mapID) return self:_GetOpt(self.alphaArg, self.defaults.alpha, mapID) end
-function Group:GetScale(mapID) return self:_GetOpt(self.scaleArg, self.defaults.scale, mapID) end
-function Group:GetDisplay(mapID) return self:_GetOpt(self.displayArg, self.defaults.display, mapID) end
+function Group:GetAlpha(mapID)
+    return self:_GetOpt(self.alphaArg, self.defaults.alpha, mapID)
+end
+function Group:GetScale(mapID)
+    return self:_GetOpt(self.scaleArg, self.defaults.scale, mapID)
+end
+function Group:GetDisplay(mapID)
+    return self:_GetOpt(self.displayArg, self.defaults.display, mapID)
+end
 
 -- Set group settings
 function Group:SetAlpha(v, mapID) self:_SetOpt(self.alphaArg, v, mapID) end
@@ -1887,16 +1872,16 @@ function Group:SetDisplay(v, mapID) self:_SetOpt(self.displayArg, v, mapID) end
 
 Core.Group = Group
 
-Core.GROUP_HIDDEN = {display=false}
-Core.GROUP_HIDDEN75 = {alpha=0.75, display=false}
-Core.GROUP_ALPHA75 = {alpha=0.75}
+Core.GROUP_HIDDEN = {display = false}
+Core.GROUP_HIDDEN75 = {alpha = 0.75, display = false}
+Core.GROUP_ALPHA75 = {alpha = 0.75}
 
 Core.groups = {
     PETBATTLE = Group('pet_battles', 'paw_y'),
     QUEST = Group('quests', 'quest_ay'),
-    RARE = Group('rares', 'skull_w', {defaults=Core.GROUP_ALPHA75}),
-    TREASURE = Group('treasures', 'chest_gy', {defaults=Core.GROUP_ALPHA75}),
-    MISC = Group('misc', 454046),
+    RARE = Group('rares', 'skull_w', {defaults = Core.GROUP_ALPHA75}),
+    TREASURE = Group('treasures', 'chest_gy', {defaults = Core.GROUP_ALPHA75}),
+    MISC = Group('misc', 454046)
 }
 
 -------------------------------------------------------------------------------
@@ -1917,9 +1902,26 @@ Base class for all node requirements.
 
 --]]
 
-local Requirement = Class('Requirement', nil, { text = UNKNOWN })
+local Requirement = Class('Requirement', nil, {text = UNKNOWN})
 function Requirement:GetText() return self.text end
 function Requirement:IsMet() return false end
+
+-------------------------------------------------------------------------------
+--------------------------------- ACHIEVEMENT ---------------------------------
+-------------------------------------------------------------------------------
+
+local Achievement = Class('Achievement', Requirement)
+
+function Achievement:Initialize(id)
+    self.id = id
+    self.text = string.format('{achievement:%d}', self.id)
+end
+
+function Achievement:IsMet()
+    local _, _, _, completed = GetAchievementInfo(self.id)
+
+    return completed
+end
 
 -------------------------------------------------------------------------------
 ---------------------------------- CURRENCY -----------------------------------
@@ -1943,18 +1945,34 @@ end
 
 local GarrisonTalent = Class('GarrisonTalent', Requirement)
 
-function GarrisonTalent:Initialize(id, text)
-    self.id, self.text = id, text
-end
+function GarrisonTalent:Initialize(id, text) self.id, self.text = id, text end
 
 function GarrisonTalent:GetText()
     local info = C_Garrison.GetTalentInfo(self.id)
-    return self.text:format(info.name)
+    return self.text == UNKNOWN and info.name or self.text:format(info.name)
 end
 
 function GarrisonTalent:IsMet()
     local info = C_Garrison.GetTalentInfo(self.id)
     return info and info.researched
+end
+
+-------------------------------------------------------------------------------
+----------------------------- GARRISON TALENT RANK ----------------------------
+-------------------------------------------------------------------------------
+
+local GarrisonTalentRank = Class('GarrisonTalentRank', Requirement)
+
+function GarrisonTalentRank:Initialize(id, rank) self.id, self.rank = id, rank end
+
+function GarrisonTalentRank:GetText()
+    local info = C_Garrison.GetTalentInfo(self.id)
+    return L['ranked_research']:format(info.name, self.rank, info.talentMaxRank)
+end
+
+function GarrisonTalentRank:IsMet()
+    local info = C_Garrison.GetTalentInfo(self.id)
+    return info and info.talentRank and info.talentRank >= self.rank
 end
 
 -------------------------------------------------------------------------------
@@ -1967,12 +1985,43 @@ function Item:Initialize(id, count)
     self.id, self.count = id, count
     self.text = string.format('{item:%d}', self.id)
     if self.count and self.count > 1 then
-        self.text = self.text..' x'..self.count
+        self.text = self.text .. ' x' .. self.count
     end
 end
 
-function Item:IsMet()
-    return Core.PlayerHasItem(self.id, self.count)
+function Item:IsMet() return Core.PlayerHasItem(self.id, self.count) end
+
+-------------------------------------------------------------------------------
+------------------------------------ QUEST ------------------------------------
+-------------------------------------------------------------------------------
+
+local Quest = Class('Quest', Requirement)
+
+function Quest:Initialize(id) self.id = id end
+
+function Quest:GetText() return C_QuestLog.GetTitleForQuestID(self.id) end
+
+function Quest:IsMet() return C_QuestLog.IsQuestFlaggedCompleted(self.id) end
+
+-------------------------------------------------------------------------------
+--------------------------------- REPUTATION ----------------------------------
+-------------------------------------------------------------------------------
+
+local Reputation = Class('Reputation', Requirement)
+
+-- @todo will cause problems when requiring lower / negative reputations. Maybe add comparison as optional parameter with default value '>='.
+function Reputation:Initialize(id, level) self.id, self.level = id, level end
+
+function Reputation:GetText()
+    local name = GetFactionInfoByID(self.id)
+    local level = GetText('FACTION_STANDING_LABEL' .. self.level)
+    return string.format(name .. ' (' .. level .. ')')
+end
+
+function Reputation:IsMet()
+    local _, _, standingID = GetFactionInfoByID(self.id)
+
+    return standingID >= self.level
 end
 
 -------------------------------------------------------------------------------
@@ -2007,12 +2056,16 @@ local WarMode = Class('WarMode', Requirement, {
 -------------------------------------------------------------------------------
 
 Core.requirement = {
-    Currency=Currency,
-    GarrisonTalent=GarrisonTalent,
-    Item=Item,
-    Requirement=Requirement,
-    Spell=Spell,
-    WarMode=WarMode
+    Achievement = Achievement,
+    Currency = Currency,
+    GarrisonTalent = GarrisonTalent,
+    GarrisonTalentRank = GarrisonTalentRank,
+    Item = Item,
+    Quest = Quest,
+    Reputation = Reputation,
+    Requirement = Requirement,
+    Spell = Spell,
+    WarMode = WarMode
 }
 
 
@@ -2062,9 +2115,7 @@ local Node = Class('Node', nil, {
 
 function Node:Initialize(attrs)
     -- assign all attributes
-    if attrs then
-        for k, v in pairs(attrs) do self[k] = v end
-    end
+    if attrs then for k, v in pairs(attrs) do self[k] = v end end
 
     -- normalize table values
     self.quest = Core.AsTable(self.quest)
@@ -2074,7 +2125,7 @@ function Node:Initialize(attrs)
 
     -- ensure proper group is assigned
     if not IsInstance(self.group, Group) then
-        error('group attribute must be a Group class instance: '..self.group)
+        error('group attribute must be a Group class instance: ' .. self.group)
     end
 end
 
@@ -2175,7 +2226,7 @@ Iterate over rewards that are enabled for this character.
 
 function Node:IterateRewards()
     local index, reward = 0
-    return function ()
+    return function()
         if not (self.rewards and #self.rewards) then return end
         repeat
             index = index + 1
@@ -2210,16 +2261,14 @@ world map containing this node is opened.
 function Node:Prepare()
     -- verify chosen icon exists
     if type(self.icon) == 'string' and Core.icons[self.icon] == nil then
-        error('unknown icon: '..self.icon)
+        error('unknown icon: ' .. self.icon)
     end
 
     -- initialize glow POI (if glow icon available)
 
     if not self.glow then
         local icon = Core.GetGlowPath(self.icon)
-        if icon then
-            self.glow = Core.poi.Glow({ icon=icon })
-        end
+        if icon then self.glow = Core.poi.Glow({icon = icon}) end
     end
 
     Core.PrepareLinks(self.label)
@@ -2237,9 +2286,7 @@ function Node:Prepare()
     end
 
     if self.rewards then
-        for i, reward in ipairs(self.rewards) do
-            reward:Prepare()
-        end
+        for i, reward in ipairs(self.rewards) do reward:Prepare() end
     end
 end
 
@@ -2265,7 +2312,7 @@ function Node:Render(tooltip, focusable)
             end
         end
         color = (count == #self.quest) and Core.status.Green or Core.status.Gray
-        rlabel = rlabel..' '..color(tostring(count)..'/'..#self.quest)
+        rlabel = rlabel .. ' ' .. color(tostring(count) .. '/' .. #self.quest)
     end
 
     if self.faction then
@@ -2280,7 +2327,7 @@ function Node:Render(tooltip, focusable)
 
     -- render top-right label text
     if #rlabel > 0 then
-        local rtext = _G[tooltip:GetName()..'TextRight1']
+        local rtext = _G[tooltip:GetName() .. 'TextRight1']
         rtext:SetTextColor(1, 1, 1)
         rtext:SetText(rlabel)
         rtext:Show()
@@ -2307,7 +2354,9 @@ function Node:Render(tooltip, focusable)
     -- additional text for the node to describe how to interact with the
     -- object or summon the rare
     if self.note and Core:GetOpt('show_notes') then
-        if self.requires or self.sublabel then tooltip:AddLine(" ") end
+        if self.requires or self.sublabel then
+            GameTooltip_AddBlankLineToTooltip(tooltip)
+        end
         tooltip:AddLine(Core.RenderLinks(self.note), 1, 1, 1, true)
     end
 
@@ -2321,15 +2370,33 @@ function Node:Render(tooltip, focusable)
             local isAchieve = IsInstance(reward, Core.reward.Achievement)
             local isSpacer = IsInstance(reward, Core.reward.Spacer)
             if isAchieve and firstAchieve then
-                tooltip:AddLine(" ")
+                GameTooltip_AddBlankLineToTooltip(tooltip)
                 firstAchieve = false
             elseif not (isAchieve or isSpacer) and firstOther then
-                tooltip:AddLine(" ")
+                GameTooltip_AddBlankLineToTooltip(tooltip)
                 firstOther = false
             end
 
             reward:Render(tooltip)
         end
+    end
+
+    if self.spellID then
+        local spell = Spell:CreateFromSpellID(self.spellID)
+        self.cancelSpellDataCallback = spell:ContinueWithCancelOnSpellLoad(
+            function()
+                GameTooltip_AddBlankLineToTooltip(tooltip)
+                EmbeddedItemTooltip_SetSpellWithTextureByID(tooltip.ItemTooltip,
+                    self.spellID, spell:GetSpellTexture())
+                self.cancelSpellDataCallback = nil
+            end);
+    end
+end
+
+function Node:Unrender(tooltip)
+    if self.cancelSpellDataCallback then
+        self.cancelSpellDataCallback()
+        self.cancelSpellDataCallback = nil
     end
 end
 
@@ -2381,6 +2448,35 @@ function Intro.getters:label()
 end
 
 -------------------------------------------------------------------------------
+------------------------------------ ITEM -------------------------------------
+-------------------------------------------------------------------------------
+
+local Item = Class('Item', Node, {icon = 454046})
+
+function Item:Initialize(attrs)
+    Node.Initialize(self, attrs)
+    if not self.id then error('id required for Item nodes') end
+
+    local item = _G.Item:CreateFromItemID(self.id)
+    if not item:IsItemEmpty() then
+        item:ContinueOnItemLoad(function() self.icon = item:GetItemIcon() end)
+    end
+end
+
+function Item:IsCompleted()
+    if Core.PlayerHasItem(self.id) then return true end
+    return Node.IsCompleted(self)
+end
+
+function Item:Render(tooltip, focusable)
+    Node.Render(self, tooltip, focusable)
+    GameTooltip_AddBlankLineToTooltip(tooltip)
+    EmbeddedItemTooltip_SetItemByID(tooltip.ItemTooltip, self.id)
+end
+
+function Item.getters:label() return ('{item:%d}'):format(self.id) end
+
+-------------------------------------------------------------------------------
 ------------------------------------- NPC -------------------------------------
 -------------------------------------------------------------------------------
 
@@ -2391,9 +2487,7 @@ function NPC:Initialize(attrs)
     if not self.id then error('id required for NPC nodes') end
 end
 
-function NPC.getters:label()
-    return ("{npc:%d}"):format(self.id)
-end
+function NPC.getters:label() return ('{npc:%d}'):format(self.id) end
 
 -------------------------------------------------------------------------------
 ---------------------------------- PETBATTLE ----------------------------------
@@ -2409,19 +2503,15 @@ local PetBattle = Class('PetBattle', NPC, {
 ------------------------------------ QUEST ------------------------------------
 -------------------------------------------------------------------------------
 
-local Quest = Class('Quest', Node, {
-    note = AVAILABLE_QUEST,
-    group = Core.groups.QUEST
-})
+local Quest = Class('Quest', Node,
+    {note = AVAILABLE_QUEST, group = Core.groups.QUEST})
 
 function Quest:Initialize(attrs)
     Node.Initialize(self, attrs)
     C_QuestLog.GetTitleForQuestID(self.quest[1]) -- fetch info from server
 end
 
-function Quest.getters:icon()
-    return self.daily and 'quest_ab' or 'quest_ay'
-end
+function Quest.getters:icon() return self.daily and 'quest_ab' or 'quest_ay' end
 
 function Quest.getters:label()
     return C_QuestLog.GetTitleForQuestID(self.quest[1]) or UNKNOWN
@@ -2431,14 +2521,10 @@ end
 ------------------------------------ RARE -------------------------------------
 -------------------------------------------------------------------------------
 
-local Rare = Class('Rare', NPC, {
-    scale = 1.2,
-    group = Core.groups.RARE
-})
+local Rare = Class('Rare', NPC, {scale = 1.2, group = Core.groups.RARE})
 
-function Rare.getters:icon()
-    return self:IsCollected() and 'skull_w' or 'skull_b'
-end
+function Rare.getters:icon() return
+    self:IsCollected() and 'skull_w' or 'skull_b' end
 
 function Rare:IsEnabled()
     if Core:GetOpt('hide_done_rares') and self:IsCollected() then return false end
@@ -2493,14 +2579,15 @@ end
 -------------------------------------------------------------------------------
 
 Core.node = {
-    Node=Node,
-    Collectible=Collectible,
-    Intro=Intro,
-    NPC=NPC,
-    PetBattle=PetBattle,
-    Quest=Quest,
-    Rare=Rare,
-    Treasure=Treasure
+    Node = Node,
+    Collectible = Collectible,
+    Intro = Intro,
+    Item = Item,
+    NPC = NPC,
+    PetBattle = PetBattle,
+    Quest = Quest,
+    Rare = Rare,
+    Treasure = Treasure
 }
 
 
@@ -2518,7 +2605,7 @@ local Red = Core.status.Red
 
 -------------------------------------------------------------------------------
 
-local function Icon(icon) return '|T'..icon..':0:0:1:-1|t ' end
+local function Icon(icon) return '|T' .. icon .. ':0:0:1:-1|t ' end
 
 -- in zhCN’s built-in font, ARHei.ttf, the glyph of U+2022 <bullet> is missing.
 -- use U+00B7 <middle dot> instead.
@@ -2531,9 +2618,7 @@ local bullet = (GetLocale() == "zhCN" and "→" or "?")
 local Reward = Class('Reward')
 
 function Reward:Initialize(attrs)
-    if attrs then
-        for k, v in pairs(attrs) do self[k] = v end
-    end
+    if attrs then for k, v in pairs(attrs) do self[k] = v end end
 end
 
 function Reward:IsEnabled()
@@ -2547,7 +2632,7 @@ function Reward:IsObtainable() return true end
 function Reward:IsObtained() return true end
 
 -- These functions drive the appearance of the tooltip
-function Reward:GetLines() return function () end end
+function Reward:GetLines() return function() end end
 function Reward:GetCategoryIcon() end
 function Reward:GetStatus() end
 function Reward:GetText() return UNKNOWN end
@@ -2560,14 +2645,10 @@ function Reward:Render(tooltip)
 
     -- Add category icon (if registered)
     local icon = self:GetCategoryIcon()
-    if text and icon then
-        text = Icon(icon)..text
-    end
+    if text and icon then text = Icon(icon) .. text end
 
     -- Add indent if requested
-    if self.indent then
-        text = '   '..text
-    end
+    if self.indent then text = '   ' .. text end
 
     -- Render main line and optional status
     if text and status then
@@ -2592,18 +2673,14 @@ end
 
 local Section = Class('Section', Reward)
 
-function Section:Initialize(title)
-    self.title = title
-end
+function Section:Initialize(title) self.title = title end
 
 function Section:IsEnabled() return true end
 
-function Section:Prepare()
-    Core.PrepareLinks(self.title)
-end
+function Section:Prepare() Core.PrepareLinks(self.title) end
 
 function Section:Render(tooltip)
-    tooltip:AddLine(Core.RenderLinks(self.title, true)..':')
+    tooltip:AddLine(Core.RenderLinks(self.title, true) .. ':')
 end
 
 -------------------------------------------------------------------------------
@@ -2614,22 +2691,23 @@ local Spacer = Class('Spacer', Reward)
 
 function Spacer:IsEnabled() return true end
 
-function Spacer:Render(tooltip)
-    tooltip:AddLine(' ')
-end
+function Spacer:Render(tooltip) tooltip:AddLine(' ') end
 
 -------------------------------------------------------------------------------
 --------------------------------- ACHIEVEMENT ---------------------------------
 -------------------------------------------------------------------------------
 
 local Achievement = Class('Achievement', Reward)
-local GetCriteriaInfo = function (id, criteria)
+
+local GetCriteriaInfo = function(id, criteria)
     local results = {GetAchievementCriteriaInfoByID(id, criteria)}
     if not results[1] then
         if criteria <= GetAchievementNumCriteria(id) then
             results = {GetAchievementCriteriaInfo(id, criteria)}
         else
-            Core.Error('unknown achievement criteria ('..id..', '..criteria..')')
+            Core.Error(
+                'unknown achievement criteria (' .. id .. ', ' .. criteria ..
+                    ')')
             return UNKNOWN
         end
     end
@@ -2642,7 +2720,8 @@ function Achievement:Initialize(attrs)
 end
 
 function Achievement:IsObtained()
-    local _,_,_,completed,_,_,_,_,_,_,_,_,earnedByMe = GetAchievementInfo(self.id)
+    local _, _, _, completed, _, _, _, _, _, _, _, _, earnedByMe =
+        GetAchievementInfo(self.id)
     completed = completed and (not Core:GetOpt('use_char_achieves') or earnedByMe)
     if completed then return true end
     if self.criteria then
@@ -2656,8 +2735,8 @@ function Achievement:IsObtained()
 end
 
 function Achievement:GetText()
-    local _,name,_,_,_,_,_,_,_,icon = GetAchievementInfo(self.id)
-    return Icon(icon)..ACHIEVEMENT_COLOR_CODE..'['..name..']|r'
+    local _, name, _, _, _, _, _, _, _, icon = GetAchievementInfo(self.id)
+    return Icon(icon) .. ACHIEVEMENT_COLOR_CODE .. '[' .. name .. ']|r'
 end
 
 function Achievement:GetStatus()
@@ -2668,7 +2747,7 @@ end
 function Achievement:GetLines()
     local completed = self:IsObtained()
     local index = 0
-    return function ()
+    return function()
         -- ignore sub-lines if oneline is enabled or no criteria were given
         if self.oneline or not self.criteria then return end
 
@@ -2741,9 +2820,7 @@ function Item:Initialize(attrs)
     end
 end
 
-function Item:Prepare()
-    Core.PrepareLinks(self.note)
-end
+function Item:Prepare() Core.PrepareLinks(self.note) end
 
 function Item:IsObtained()
     if self.quest then return C_QuestLog.IsQuestFlaggedCompleted(self.quest) end
@@ -2781,10 +2858,8 @@ end
 ------------------------------------ MOUNT ------------------------------------
 -------------------------------------------------------------------------------
 
-local Mount = Class('Mount', Item, {
-    display_option='show_mount_rewards',
-    type=L["mount"]
-})
+local Mount = Class('Mount', Item,
+    {display_option = 'show_mount_rewards', type = L['mount']})
 
 function Mount:IsObtained()
     return select(11, C_MountJournal.GetMountInfoByID(self.id))
@@ -2799,10 +2874,8 @@ end
 ------------------------------------- PET -------------------------------------
 -------------------------------------------------------------------------------
 
-local Pet = Class('Pet', Item, {
-    display_option='show_pet_rewards',
-    type=L["pet"]
-})
+local Pet = Class('Pet', Item,
+    {display_option = 'show_pet_rewards', type = L['pet']})
 
 function Pet:Initialize(attrs)
     if attrs.item then
@@ -2815,9 +2888,7 @@ function Pet:Initialize(attrs)
     end
 end
 
-function Pet:IsObtained()
-    return C_PetJournal.GetNumCollectedInfo(self.id) > 0
-end
+function Pet:IsObtained() return C_PetJournal.GetNumCollectedInfo(self.id) > 0 end
 
 function Pet:GetStatus()
     local n, m = C_PetJournal.GetNumCollectedInfo(self.id)
@@ -2832,9 +2903,7 @@ local Quest = Class('Quest', Reward)
 
 function Quest:Initialize(attrs)
     Reward.Initialize(self, attrs)
-    if type(self.id) == 'number' then
-        self.id = {self.id}
-    end
+    if type(self.id) == 'number' then self.id = {self.id} end
     C_QuestLog.GetTitleForQuestID(self.id[1]) -- fetch info from server
 end
 
@@ -2857,7 +2926,9 @@ function Quest:GetStatus()
     else
         local count = 0
         for i, id in ipairs(self.id) do
-            if C_QuestLog.IsQuestFlaggedCompleted(id) then count = count + 1 end
+            if C_QuestLog.IsQuestFlaggedCompleted(id) then
+                count = count + 1
+            end
         end
         local status = count..'/'..#self.id
         return (count == #self.id) and Green(status) or Red(status)
@@ -2870,9 +2941,7 @@ end
 
 local Spell = Class('Spell', Item, { type = L["spell"] })
 
-function Spell:IsObtained()
-    return IsSpellKnown(self.spell)
-end
+function Spell:IsObtained() return IsSpellKnown(self.spell) end
 
 function Spell:GetStatus()
     local collected = IsSpellKnown(self.spell)
@@ -2882,14 +2951,11 @@ end
 -------------------------------------------------------------------------------
 ------------------------------------- TOY -------------------------------------
 -------------------------------------------------------------------------------
-local Toy = Class('Toy', Item, {
-    display_option='show_toy_rewards',
-    type=L["toy"]
-})
 
-function Toy:IsObtained()
-    return PlayerHasToy(self.item)
-end
+local Toy = Class('Toy', Item,
+    {display_option = 'show_toy_rewards', type = L['toy']})
+
+function Toy:IsObtained() return PlayerHasToy(self.item) end
 
 function Toy:GetStatus()
     local collected = PlayerHasToy(self.item)
@@ -2899,9 +2965,10 @@ end
 -------------------------------------------------------------------------------
 ---------------------------------- TRANSMOG -----------------------------------
 -------------------------------------------------------------------------------
-local Transmog = Class('Transmog', Item, {
-    display_option='show_transmog_rewards'
-})
+
+local Transmog = Class('Transmog', Item,
+    {display_option = 'show_transmog_rewards'})
+
 local CTC = C_TransmogCollection
 
 function Transmog:Initialize(attrs)
@@ -2988,18 +3055,18 @@ end
 -------------------------------------------------------------------------------
 
 Core.reward = {
-    Reward=Reward,
-    Section=Section,
-    Spacer=Spacer,
-    Achievement=Achievement,
-    Currency=Currency,
-    Item=Item,
-    Mount=Mount,
-    Pet=Pet,
-    Quest=Quest,
-    Spell=Spell,
-    Toy=Toy,
-    Transmog=Transmog
+    Reward = Reward,
+    Section = Section,
+    Spacer = Spacer,
+    Achievement = Achievement,
+    Currency = Currency,
+    Item = Item,
+    Mount = Mount,
+    Pet = Pet,
+    Quest = Quest,
+    Spell = Spell,
+    Toy = Toy,
+    Transmog = Transmog
 }
 
 
@@ -3008,8 +3075,8 @@ Core.reward = {
 --------------------------- UIDROPDOWNMENU_ADDSLIDER --------------------------
 -------------------------------------------------------------------------------
 
-local function UIDropDownMenu_AddSlider (info, level)
-    local function format (v)
+local function UIDropDownMenu_AddSlider(info, level)
+    local function format(v)
         if info.percentage then return FormatPercentage(v, true) end
         return string.format("%.2f", v)
     end
@@ -3172,14 +3239,16 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
         })
     elseif level == 2 then
         if UIDROPDOWNMENU_MENU_VALUE == 'rewards' then
-            for i, type in ipairs({'mount', 'pet', 'toy', 'transmog'}) do
+            for i, type in ipairs({
+                'mount', 'pet', 'toy', 'transmog', 'all_transmog'
+            }) do
                 UIDropDownMenu_AddButton({
                     text = L["options_"..type.."_rewards"],
                     isNotRadio = true,
                     keepShownOnClick = true,
-                    checked = Core:GetOpt('show_'..type..'_rewards'),
-                    func = function (button, option)
-                        Core:SetOpt('show_'..type..'_rewards', button.checked)
+                    checked = Core:GetOpt('show_' .. type .. '_rewards'),
+                    func = function(button, option)
+                        Core:SetOpt('show_' .. type .. '_rewards', button.checked)
                     end
                 }, 2)
             end
@@ -3188,11 +3257,9 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
             local group = UIDROPDOWNMENU_MENU_VALUE
 
             self.GroupDesc.Text:SetText(Core.RenderLinks(group.desc))
-            UIDropDownMenu_AddButton({ customFrame = self.GroupDesc }, 2)
-            UIDropDownMenu_AddButton({
-                notClickable = true,
-                notCheckable = true
-            }, 2)
+            UIDropDownMenu_AddButton({customFrame = self.GroupDesc}, 2)
+            UIDropDownMenu_AddButton({notClickable = true, notCheckable = true},
+                2)
 
             UIDropDownMenu_AddSlider({
                 text = L["options_opacity"],
@@ -3283,9 +3350,7 @@ end
 
 function POI:Render(map, template)
     -- draw a circle at every coord
-    for i=1, #self, 1 do
-        map:AcquirePin(template, self, self[i])
-    end
+    for i = 1, #self, 1 do map:AcquirePin(template, self, self[i]) end
 end
 
 function POI:Draw(pin, xy)
@@ -3320,9 +3385,7 @@ function Glow:Draw(pin, xy)
 
     t:SetTexture(self.icon)
 
-    if self.r then
-        t:SetVertexColor(self.r, self.g, self.b, self.a or 0.5)
-    end
+    if self.r then t:SetVertexColor(self.r, self.g, self.b, self.a or 0.5) end
 
     pin.frameOffset = 1
     if pin.SetScalingLimits then -- World map only!
@@ -3341,10 +3404,10 @@ local Path = Class('Path', POI)
 
 function Path:Render(map, template)
     -- draw a circle at every coord and a line between them
-    for i=1, #self, 1 do
+    for i = 1, #self, 1 do
         map:AcquirePin(template, self, CIRCLE, self[i])
         if i < #self then
-            map:AcquirePin(template, self, LINE, self[i], self[i+1])
+            map:AcquirePin(template, self, LINE, self[i], self[i + 1])
         end
     end
 end
@@ -3407,21 +3470,20 @@ function Line:Initialize(attrs)
     local x2, y2 = HandyNotes:getXY(self[2])
 
     -- find an appropriate number of segments
-    self.distance = sqrt(((x2-x1) * 1.85)^2 + (y2-y1)^2)
-    self.segments = floor(self.distance / 0.015)
+    self.distance = sqrt(((x2 - x1) * 1.85) ^ 2 + (y2 - y1) ^ 2)
+    self.segments = max(floor(self.distance / 0.015), 1)
 
     self.path = {}
-    for i=0, self.segments, 1 do
-        self.path[#self.path + 1] = HandyNotes:getCoord(
-            x1 + (x2-x1) / self.segments * i,
-            y1 + (y2-y1) / self.segments * i
-        )
+    for i = 0, self.segments, 1 do
+        local segX = x1 + ((x2 - x1) / self.segments) * i
+        local segY = y1 + ((y2 - y1) / self.segments) * i
+        self.path[#self.path + 1] = HandyNotes:getCoord(segX, segY)
     end
 end
 
 function Line:Render(map, template)
     if map.minimap then
-        for i=1, #self.path, 1 do
+        for i = 1, #self.path, 1 do
             map:AcquirePin(template, self, CIRCLE, self.path[i])
             if i < #self.path then
                 map:AcquirePin(template, self, LINE, self.path[i], self.path[i+1])
@@ -3463,13 +3525,13 @@ function Arrow:Draw(pin, type, xy1, xy2)
         local mapID = HBD:GetPlayerZone()
         local wx1, wy1 = HBD:GetWorldCoordinatesFromZone(x1, y1, mapID)
         local wx2, wy2 = HBD:GetWorldCoordinatesFromZone(x2, y2, mapID)
-        pin.rotation = -math.atan2(wy2-wy1, wx2-wx1) + (math.pi / 2)
+        pin.rotation = -math.atan2(wy2 - wy1, wx2 - wx1) + (math.pi / 2)
     else
         local x1p = x1 * pin.parentWidth
         local x2p = x2 * pin.parentWidth
         local y1p = y1 * pin.parentHeight
         local y2p = y2 * pin.parentHeight
-        pin.rotation = -math.atan2(y2p-y1p, x2p-x1p) - (math.pi / 2)
+        pin.rotation = -math.atan2(y2p - y1p, x2p - x1p) - (math.pi / 2)
     end
     pin.texture:SetRotation(pin.rotation)
 
@@ -3478,198 +3540,4 @@ end
 
 -------------------------------------------------------------------------------
 
-Core.poi = {
-    POI=POI,
-    Glow=Glow,
-    Path=Path,
-    Line=Line,
-    Arrow=Arrow
-}
-
--------------------------------------------------------------------------------
----------------------------------- NAMESPACE ----------------------------------
--------------------------------------------------------------------------------
-
-
-local Class = Core.Class
-local Group = Core.Group
-local Map = Core.Map
-
-local Node = Core.node.Node
-local Quest = Core.node.Quest
-local Achievement = Core.reward.Achievement
-
--------------------------------------------------------------------------------
-
-Core.expansion = 8
-
--------------------------------------------------------------------------------
-
-Core.groups.ASSAULT_EVENT = Group('assault_events', 'peg_yw')
-Core.groups.BOW_TO_YOUR_MASTERS = Group('bow_to_your_masters', 1850548, {defaults=Core.GROUP_HIDDEN, faction='Horde'})
-Core.groups.BRUTOSAURS = Group('brutosaurs', 1881827, {defaults=Core.GROUP_HIDDEN})
-Core.groups.CARVED_IN_STONE = Group('carved_in_stone', 134424, {defaults=Core.GROUP_HIDDEN})
-Core.groups.CATS_NAZJ = Group('cats_nazj', 454045)
-Core.groups.COFFERS = Group('coffers', 'star_chest_g')
-Core.groups.DAILY_CHESTS = Group('daily_chests', 'chest_bl', {defaults=Core.GROUP_ALPHA75})
-Core.groups.DRUST_FACTS = Group('drust_facts', 2101971, {defaults=Core.GROUP_HIDDEN})
-Core.groups.DUNE_RIDER = Group('dune_rider', 134962, {defaults=Core.GROUP_HIDDEN})
-Core.groups.EMBER_RELICS = Group('ember_relics', 514016, {defaults=Core.GROUP_HIDDEN, faction='Alliance'})
-Core.groups.GET_HEKD = Group('get_hekd', 1604165, {defaults=Core.GROUP_HIDDEN})
-Core.groups.HONEYBACKS = Group('honeybacks', 2066005, {defaults=Core.GROUP_HIDDEN, faction='Alliance'})
-Core.groups.HOPPIN_SAD = Group('hoppin_sad', 804969, {defaults=Core.GROUP_HIDDEN})
-Core.groups.LIFE_FINDS_A_WAY = Group('life_finds_a_way', 236192, {defaults=Core.GROUP_HIDDEN})
-Core.groups.LOCKED_CHEST = Group('locked_chest', 'chest_gy', {defaults=Core.GROUP_ALPHA75})
-Core.groups.MECH_CHEST = Group('mech_chest', 'chest_rd', {defaults=Core.GROUP_ALPHA75})
-Core.groups.MISC_NAZJ = Group('misc_nazj', 528288)
-Core.groups.MUSHROOM_HARVEST = Group('mushroom_harvest', 1869654, {defaults=Core.GROUP_HIDDEN})
-Core.groups.PAKU_TOTEMS = Group('paku_totems', 'flight_point_y', {defaults=Core.GROUP_HIDDEN, faction='Horde'})
-Core.groups.PRISMATICS = Group('prismatics', 'crystal_p', {defaults=Core.GROUP_HIDDEN})
-Core.groups.RECRIG = Group('recrig', 'peg_bl')
-Core.groups.SAUSAGE_SAMPLER = Group('sausage_sampler', 133200, {defaults=Core.GROUP_HIDDEN, faction='Alliance'})
-Core.groups.SCAVENGER_OF_THE_SANDS = Group('scavenger_of_the_sands', 135725, {defaults=Core.GROUP_HIDDEN})
-Core.groups.SECRET_SUPPLY = Group('secret_supplies', 'star_chest_b', {defaults=Core.GROUP_HIDDEN75})
-Core.groups.SHANTY_RAID = Group('shanty_raid', 1500866, {defaults=Core.GROUP_HIDDEN})
-Core.groups.SLIMES_NAZJ = Group('slimes_nazj', 132107)
-Core.groups.SQUIRRELS = Group('squirrels', 237182, {defaults=Core.GROUP_HIDDEN})
-Core.groups.SUPPLY = Group('supplies', 'star_chest_g', {defaults=Core.GROUP_HIDDEN75})
-Core.groups.TALES_OF_DE_LOA = Group('tales_of_de_loa', 1875083, {defaults=Core.GROUP_HIDDEN})
-Core.groups.THREE_SHEETS = Group('three_sheets', 135999, {defaults=Core.GROUP_HIDDEN})
-Core.groups.TIDESAGE_LEGENDS = Group('tidesage_legends', 1500881, {defaults=Core.GROUP_HIDDEN})
-Core.groups.UPRIGHT_CITIZENS = Group('upright_citizens', 516667, {defaults=Core.GROUP_HIDDEN, faction='Alliance'})
-Core.groups.VISIONS_BUFFS = Group('visions_buffs', 132183)
-Core.groups.VISIONS_CHEST = Group('visions_chest', 'chest_gy')
-Core.groups.VISIONS_CRYSTALS = Group('visions_crystals', 'crystal_o')
-Core.groups.VISIONS_MAIL = Group('visions_mail', 'envelope')
-Core.groups.VISIONS_MISC = Group('visions_misc', 2823166)
-
--------------------------------------------------------------------------------
----------------------------------- CALLBACKS ----------------------------------
--------------------------------------------------------------------------------
-
--- Listen for aura applied/removed events so we can refresh when the player
--- enters and exits the alternate future
-Core.addon:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED', function ()
-    local _,e,_,_,_,_,_,_,t,_,_,s  = CombatLogGetCurrentEventInfo()
-    if (e == 'SPELL_AURA_APPLIED' or e == 'SPELL_AURA_REMOVED') and
-        t == UnitName('player') and s == 296644 then
-        C_Timer.After(1, function() Core.addon:Refresh() end)
-    end
-end)
-
-Core.addon:RegisterEvent('QUEST_ACCEPTED', function (_, _, id)
-    if id == 56540 then
-        Core.Debug('Vale assaults unlock detected')
-        C_Timer.After(1, function() Core.addon:Refresh() end)
-    end
-end)
-
-Core.addon:RegisterEvent('QUEST_WATCH_UPDATE', function (_, index)
-    local info = C_QuestLog.GetInfo(index)
-    if info and info.questID == 56376 then
-        Core.Debug('Uldum assaults unlock detected')
-        C_Timer.After(1, function() Core.addon:Refresh() end)
-    end
-end)
-
-Core.addon:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', function (...)
-    -- Watch for a spellcast event that signals a ravenous slime was fed
-    -- https://www.wowhead.com/spell=293775/schleimphage-feeding-tracker
-    local _, source, _, spellID = ...
-    if source == 'player' and spellID == 293775 then
-        C_Timer.After(1, function() Core.addon:Refresh() end)
-    end
-end)
-
--------------------------------------------------------------------------------
--------------------------------- TIMED EVENTS ---------------------------------
--------------------------------------------------------------------------------
-
-local TimedEvent = Class('TimedEvent', Quest, {
-    icon = "peg_yw",
-    scale = 2,
-    group = Core.groups.ASSAULT_EVENT,
-    note = ''
-})
-
-function TimedEvent:PrerequisiteCompleted()
-    -- Timed events that are not active today return nil here
-    return C_TaskQuest.GetQuestTimeLeftMinutes(self.quest[1])
-end
-
-Core.node.TimedEvent = TimedEvent
-
--------------------------------------------------------------------------------
------------------------------- WAR SUPPLY CRATES ------------------------------
--------------------------------------------------------------------------------
-
--- quest = 53640 (50 conquest looted for today)
-
-Core.node.Supply = Class('Supply', Node, {
-    icon = 'star_chest_g',
-    scale = 1.5,
-    label = L["supply_chest"],
-    rlabel = Core.GetIconLink('war_mode_swords', 16),
-    note=L["supply_chest_note"],
-    requires = Core.requirement.WarMode,
-    rewards={ Achievement({id=12572}) },
-    group = Core.groups.SUPPLY
-})
-
-Core.node.SecretSupply = Class('SecretSupply', Core.node.Supply, {
-    icon = 'star_chest_b',
-    group = Core.groups.SECRET_SUPPLY,
-    label = L["secret_supply_chest"],
-    note = L["secret_supply_chest_note"]
-})
-
-Core.node.Coffer = Class('Coffer', Node, {
-    icon = 'star_chest_g',
-    scale = 1.5,
-    group = Core.groups.COFFERS
-})
-
--------------------------------------------------------------------------------
------------------------------ VISIONS ASSAULT MAP -----------------------------
--------------------------------------------------------------------------------
-
-local VisionsMap = Class('VisionsMap', Map)
-
-function VisionsMap:Prepare()
-    Map.Prepare(self)
-    self.assault = self.GetAssault()
-    self.phased = self.assault ~= nil
-end
-
-function VisionsMap:CanDisplay(node, coord, minimap)
-    local assault = node.assault
-    if assault then
-        assault = type(assault) == 'number' and {assault} or assault
-        for i=1, #assault + 1, 1 do
-            if i > #assault then return false end
-            if assault[i] == self.assault then break end
-        end
-    end
-
-    return Map.CanDisplay(self, node, coord, minimap)
-end
-
-Core.VisionsMap = VisionsMap
-
--------------------------------------------------------------------------------
--------------------------------- WARFRONT MAP ---------------------------------
--------------------------------------------------------------------------------
-
-local WarfrontMap = Class('WarfrontMap', Map)
-
-function WarfrontMap:CanDisplay(node, coord, minimap)
-    -- Disable nodes that are not available when the other faction controls
-    if node.controllingFaction then
-        local state = C_ContributionCollector.GetState(self.collector)
-        local faction = (state == 1 or state == 2) and 'Alliance' or 'Horde'
-        if faction ~= node.controllingFaction then return false end
-    end
-    return Map.CanDisplay(self, node, coord, minimap)
-end
-
-Core.WarfrontMap = WarfrontMap
+Core.poi = {POI = POI, Glow = Glow, Path = Path, Line = Line, Arrow = Arrow}

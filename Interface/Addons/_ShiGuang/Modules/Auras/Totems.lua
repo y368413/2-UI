@@ -15,9 +15,9 @@ function A:TotemBar_Init()
 	local width = vertical and (iconSize + margin*2) or (iconSize*4 + margin*5)
 	local height = vertical and (iconSize*4 + margin*5) or (iconSize + margin*2)
 
-	local totemBar = _G["NDui_TotemBar"]
+	local totemBar = _G["UI_TotemBar"]
 	if not totemBar then
-		totemBar = CreateFrame("Frame", "NDui_TotemBar", A.PetBattleFrameHider)
+		totemBar = CreateFrame("Frame", "UI_TotemBar", A.PetBattleFrameHider)
 	end
 	totemBar:SetSize(width, height)
 

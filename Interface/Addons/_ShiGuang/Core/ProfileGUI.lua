@@ -22,6 +22,16 @@ StaticPopupDialogs["RESET_NDUI"] = {
 	whileDead = 1,
 }
 
+StaticPopupDialogs["RESET_NDUI_HELPINFO"] = {
+	text = U["Reset NDui Helpinfo"],
+	button1 = YES,
+	button2 = NO,
+	OnAccept = function()
+		wipe(MaoRUIDB["Help"])
+	end,
+	whileDead = 1,
+}
+
 StaticPopupDialogs["NDUI_RESET_PROFILE"] = {
 	text = U["Reset current profile?"],
 	button1 = YES,
@@ -293,7 +303,7 @@ end
 
 function G:CreateProfileGUI(parent)
 	local reset = M.CreateButton(parent, 120, 24, U["NDui Reset"])
-	reset:SetPoint("BOTTOMLEFT", 100, 90)
+	reset:SetPoint("BOTTOMLEFT", 100, 30)
 	reset:SetScript("OnClick", function()
 		StaticPopup_Show("RESET_NDUI")
 	end)
@@ -325,10 +335,10 @@ function G:CreateProfileGUI(parent)
 	end)
 
 	--M.CreateFS(parent, 14, U["Profile Management"], "system", "TOPLEFT", 52, -40)
-	local description = M.CreateFS(parent, 14, U["Profile Description"], nil, "TOPLEFT", 52, -45)
-	description:SetPoint("TOPRIGHT", -90, -45)
-	description:SetWordWrap(true)
-	description:SetJustifyH("LEFT")
+	--local description = M.CreateFS(parent, 14, U["Profile Description"], nil, "TOPLEFT", 52, -45)
+	--description:SetPoint("TOPRIGHT", -90, -45)
+	--description:SetWordWrap(true)
+	--description:SetJustifyH("LEFT")
 
 	local delete = M.CreateEditBox(parent, 245, 26)
 	delete:SetPoint("LEFT", export, "RIGHT", 6, 0)

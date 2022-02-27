@@ -625,7 +625,7 @@ CreateDestination(
 	})
 	
 CreateDestination(
-	"Shadowlands Dungeons",					-- No localization
+	"[SL]Dungeons",					-- No localization
 	{
 		CreateChallengeSpell(354462),	-- Path of the Courageous
 		CreateChallengeSpell(354463),	-- Path of the Plagued
@@ -635,6 +635,7 @@ CreateDestination(
 		CreateChallengeSpell(354467),	-- Path of the Undefeated
 		CreateChallengeSpell(354468),	-- Path of the Scheming Loa
 		CreateChallengeSpell(354469),	-- Path of the Stone Warden
+		CreateChallengeSpell(367416),	-- Path of the Streetwise Merchant
 	})
 	
 CreateDestination(
@@ -719,6 +720,7 @@ CreateDestination(
 	LocZone("The Shadowlands", 1550),
 	{
 		CreateItem(172924),		-- Wormhole Generator: Shadowlands
+		CreateItem(189827)		-- Cartel Xy's Proof of Initiation	(Might be in the wrong category)
 	})
 
 CreateDestination(
@@ -882,7 +884,7 @@ CreateDestination(
 	})
 
 CreateDestination(
-	"potionsShadowlands",		-- No localization.
+	"Potions[SL]",		-- No localization.
 	{
 		CreateItem(5512),							 --治療石
     CreateItem(177278),							 -- 寧靜之瓶
@@ -932,7 +934,7 @@ CreateDestination(
 	})	
 
 CreateDestination(
-	"flasksShadowlands",		-- Flasks added in Shadowlands (require level >= 50)
+	"Flasks[SL]",		-- Flasks added in Shadowlands (require level >= 50)
 	{
     CreateItem(171276),							 --鬼靈威力精煉藥劑
     CreateItem(171278),							 --鬼靈耐力精煉藥劑
@@ -1023,7 +1025,7 @@ CreateDestination(
 	})	
 
 CreateDestination(
-	"foodShadowlands",		-- Food added in Shadowlands (Crafted by cooking)
+	"Food[SL]",		-- Food added in Shadowlands (Crafted by cooking)
 	{
     CreateItem(172040),							 --奶油糖醃製肋排
     CreateItem(172041),							 --刺鰭舒芙蕾佐炸物
@@ -1047,7 +1049,7 @@ CreateDestination(
 	})	
 
 CreateDestination(
-	"foodShadowlandsVendor",		-- Food sold by a vendor (Shadowlands)
+	"Food[SLVendor]",		-- Food sold by a vendor (Shadowlands)
 	{
     CreateItem(173759),							 --糖霜亮皮
     CreateItem(173760),							 --銀莓雪糕

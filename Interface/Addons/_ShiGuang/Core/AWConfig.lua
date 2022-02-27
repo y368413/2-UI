@@ -121,7 +121,7 @@ local function CreatePanel()
 	if f then f:Show() return end
 
 	-- Structure
-	f = CreateFrame("Frame", "NDui_AWConfig", UIParent)
+	f = CreateFrame("Frame", "UI_AWConfig", UIParent)
 	f:SetPoint("CENTER")
 	f:SetSize(800, 500)
 	M.SetBD(f)
@@ -130,7 +130,7 @@ local function CreatePanel()
 	M.CreateFS(f, 15, U["Groups"], true, "TOPLEFT", 30, -50)
 	f:SetFrameStrata("HIGH")
 	f:SetFrameLevel(5)
-	tinsert(UISpecialFrames, "NDui_AWConfig")
+	tinsert(UISpecialFrames, "UI_AWConfig")
 
 	local helpInfo = M.CreateHelpInfo(f, U["AWConfigTips"])
 	helpInfo:SetPoint("TOPLEFT", 20, -5)

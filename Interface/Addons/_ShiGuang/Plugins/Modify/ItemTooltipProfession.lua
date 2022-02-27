@@ -1857,7 +1857,7 @@ end
 
 local function CreateProfessionWidgets() 
 
-	profsCheck = CreateCheckbox( "ItemTooltipIconsConfigCheck0", 20, -50, " Enable Profession Icons", "If enabled profession icons will be displayed on items that are crafting materials" )
+	profsCheck = CreateCheckbox( "ItemTooltipIconsConfigCheck0", 20, -50, "启用专业图标", "如果启用，将在制作材料物品上显示专业图标。" )
 	profsCheck:SetScript( "OnClick", ToggleProfCheckbox )
 
 	-- Checkbox alignment offsets
@@ -1867,49 +1867,49 @@ local function CreateProfessionWidgets()
 	local dy = -20
 
 	-- undefined indices are error-prone:
-	PROF_CHECK[ 1 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0a", x0, y0+dy, " Cooking", nil )
-	PROF_CHECK[ 2 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0b", x1, y0+(2*dy), " First Aid", nil )
-	PROF_CHECK[ 4 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0c", x0, y0, " Alchemy", nil )
-	PROF_CHECK[ 8 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0d", x1, y0, " Blacksmithing", nil )
-	PROF_CHECK[ 16 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0e", x1, y0+dy, " Enchanting", nil )
-	PROF_CHECK[ 32 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0f", x0, y0+(2*dy), " Engineering", nil )
-	PROF_CHECK[ 64 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0g", x0, y0+(4*dy), " Leatherworking", nil )
-	PROF_CHECK[ 128 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0h", x1, y0+(4*dy), " Tailoring", nil )
-	PROF_CHECK[ 256 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0i", x0, y0+(3*dy), " Inscription", nil )
-	PROF_CHECK[ 512 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0j", x1, y0+(3*dy), " Jewelcrafting", nil )
+	PROF_CHECK[ 1 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0a", x0, y0+dy, "烹饪", nil )
+	PROF_CHECK[ 2 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0b", x1, y0+(2*dy), "急救", nil )
+	PROF_CHECK[ 4 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0c", x0, y0, "炼金", nil )
+	PROF_CHECK[ 8 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0d", x1, y0, "锻造", nil )
+	PROF_CHECK[ 16 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0e", x1, y0+dy, "附魔", nil )
+	PROF_CHECK[ 32 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0f", x0, y0+(2*dy), "工程", nil )
+	PROF_CHECK[ 64 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0g", x0, y0+(4*dy), "制皮", nil )
+	PROF_CHECK[ 128 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0h", x1, y0+(4*dy), "裁缝", nil )
+	PROF_CHECK[ 256 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0i", x0, y0+(3*dy), "铭文", nil )
+	PROF_CHECK[ 512 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0j", x1, y0+(3*dy), "珠宝", nil )
 	
-	vendorCheck = CreateCheckbox( "ItemTooltipIconsConfigCheck2", 20, -200, " Vendor Items", "Display icons on items sold by vendors" )
+	vendorCheck = CreateCheckbox( "ItemTooltipIconsConfigCheck2", 20, -200, "商人物品", "在商人出售的道具上显示图标。" )
 end
 
 
 local function CreateIconResizeWidgets()
 
 	iconSizeSlider = CreateFrame( "Slider", "ItemTooltipIconsConfigSlider0", frame, "OptionsSliderTemplate" )
-	iconSizeSlider:SetPoint( "TOPLEFT", 20, -300 )
+	iconSizeSlider:SetPoint( "TOPLEFT", 20, -250 )
 	iconSizeSlider:SetMinMaxValues( 8, 32 )
 	iconSizeSlider:SetValueStep( 1 )
 	iconSizeSlider:SetStepsPerPage( 1 )
 	iconSizeSlider:SetWidth( 200 )
 	iconSizeSlider:SetObeyStepOnDrag( true )
 	iconSizeSlider:SetScript( "OnValueChanged", IconSizeChanged )
-	_G[ "ItemTooltipIconsConfigSlider0Text" ]:SetText( "Icon Size" )
+	_G[ "ItemTooltipIconsConfigSlider0Text" ]:SetText( "图标尺寸" )
 	_G[ "ItemTooltipIconsConfigSlider0Low" ]:SetText( nil )
 	_G[ "ItemTooltipIconsConfigSlider0High" ]:SetText( nil )
 
 	iconSizeLabel = frame:CreateFontString( nil, "OVERLAY", "GameTooltipText" )
-	iconSizeLabel:SetFont( "Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE" )
-	iconSizeLabel:SetPoint( "TOPLEFT", 225, -302 )
+	iconSizeLabel:SetFont( "Fonts\\FRIZQT__.TTF", 14, "THINOUTLINE" )
+	iconSizeLabel:SetPoint( "TOPLEFT", 225, -250 )
 
 	iconDemoTexture = frame:CreateTexture( nil, "OVERLAY" )
-	iconDemoTexture:SetPoint( "TOPLEFT", 300, -300 )
+	iconDemoTexture:SetPoint( "TOPLEFT", 250, -250 )
 	iconDemoTexture:SetTexture( GetSpellTexture( 4036 ) )
 end
 
 
 local dialogHeader = frame:CreateFontString( nil, "OVERLAY", "GameTooltipText" )
-dialogHeader:SetFont( "Fonts\\FRIZQT__.TTF", 10, "THINOUTLINE" )
+dialogHeader:SetFont( "Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE" )
 dialogHeader:SetPoint( "TOPLEFT", 20, -20 )
-dialogHeader:SetText( "These options allow you control which icons are displayed on the item tooltips." )
+dialogHeader:SetText( "这些选项允许你调整鼠标提示中，是否显示道具的图标。" )
 
 
 CreateProfessionWidgets()

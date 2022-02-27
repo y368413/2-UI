@@ -16,8 +16,8 @@ local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes", true)
 if not HandyNotes then return end
 
 local iconDefaults = {
-    skull_grey = "Interface\\Addons\\HandyNotes\\\Icons\\Artwork\\icons\\skull_white.blp",
-    skull_blue = "Interface\\Addons\\HandyNotes\\\Icons\\Artwork\\icons\\skull_blue.blp",
+    skull_grey = "Interface\\Addons\\HandyNotes\\Icons\\Artwork\\icons\\skull_white.blp",
+    skull_blue = "Interface\\Addons\\HandyNotes\\Icons\\Artwork\\icons\\skull_blue.blp",
     default = "Interface\\Icons\\TRADE_ARCHAEOLOGY_CHESTOFTINYGLASSANIMALS",
 --[[swprare = "Interface\\Icons\\Trade_Archaeology_Fossil_SnailShell",
     shrine = "Interface\\Icons\\inv_misc_statue_02",

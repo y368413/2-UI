@@ -38,7 +38,7 @@ function Bar:CreateBar2()
 	local buttonList = {}
 	local layout = R.db["Actionbar"]["Style"]
 
-	local frame = CreateFrame("Frame", "NDui_ActionBar2", UIParent, "SecureHandlerStateTemplate")
+	local frame = CreateFrame("Frame", "UI_ActionBar2", UIParent, "SecureHandlerStateTemplate")
 	if layout == 5 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -108, 40}
 	elseif layout == 8 then
@@ -46,7 +46,7 @@ function Bar:CreateBar2()
 	elseif (layout == 9) or (layout == 10) or (layout == 11) then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 4}
 	else
-		frame.Pos = {"BOTTOM", _G.NDui_ActionBar1, "TOP", 0, -margin}
+		frame.Pos = {"BOTTOM", _G.UI_ActionBar1, "TOP", 0, -margin}
 	end
 
 	MultiBarBottomLeft:SetParent(frame)

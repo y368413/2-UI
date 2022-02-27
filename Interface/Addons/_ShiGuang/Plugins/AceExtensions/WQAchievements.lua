@@ -1,4 +1,4 @@
---## Author: Urtgard  ## Version: v9.1.5-1
+--## Author: Urtgard  ## Version: v9.1.5-2
 WQAchievements = LibStub("AceAddon-3.0"):NewAddon("WQAchievements", "AceConsole-3.0", "AceTimer-3.0")
 local WQA = WQAchievements
 WQA.data = {}
@@ -1093,6 +1093,11 @@ do
 					{59825},
 					{60231}
 				}
+			},
+			{
+				name = "The World Beyond",
+				id = 14758,
+				criteriaType = "SPECIAL"
 			}
 		},
 		pets = {
@@ -1100,7 +1105,8 @@ do
 			{name = "Carpal", itemID = 183114, creatureID = 173847, source = {type = "ITEM", itemID = 183111}}
 		},
 		toys = {
-			{name = "Tithe Collector's Vessel", itemID = 180947, source = {type = "ITEM", itemID = 180947}}
+			{name = "Tithe Collector's Vessel", itemID = 180947, source = {type = "ITEM", itemID = 180947}},
+			{name = "Gormling in a Bag", itemID = 184487, source = {type = "ITEM", itemID = 184487}}
 		}
 	}
 	WQA.data[9] = shadowlands
@@ -1389,6 +1395,11 @@ function WQA:AddReward(list, rewardType, reward, emissary)
 	l = l.reward
 	if rewardType == "ACHIEVEMENT" then
 		if not l.achievement then l.achievement = {} end
+		for _, achievement in ipairs(l.achievement) do
+			if achievement.id == reward then
+				return
+			end
+		end
 		l.achievement[#l.achievement + 1] = {id = reward}
 	elseif rewardType == "CHANCE" then
 		if not l.chance then l.chance = {} end
@@ -1877,7 +1888,7 @@ function WQA:Reward()
 								if
 									self.db.profile.achievements["Variety is the Spice of Life"] == true and
 										not select(4, GetAchievementInfo(11189)) == true and
-										exp == 1 and
+										exp == 7 and
 										not mapID == 885 and
 										not mapID == 830 and
 										not mapID == 882
@@ -1886,9 +1897,13 @@ function WQA:Reward()
 								elseif
 									self.db.profile.achievements["Wide World of Quests"] == true and
 										not select(4, GetAchievementInfo(13144)) == true and
-										exp == 2
+										exp == 8
 								 then
 									self:AddRewardToQuest(questID, "ACHIEVEMENT", 13144)
+								elseif
+									self.db.profile.achievements["The World Beyond"] and not select(4, GetAchievementInfo(14758)) and exp == 9
+								 then
+									self:AddRewardToQuest(questID, "ACHIEVEMENT", 14758)
 								end
 							end
 
@@ -3005,7 +3020,8 @@ function WQA:Special()
 	if
 		(self.db.profile.achievements["Variety is the Spice of Life"] == true and
 			not select(4, GetAchievementInfo(11189)) == true) or
-			(self.db.profile.achievements["Wide World of Quests"] == true and not select(4, GetAchievementInfo(13144)) == true)
+			(self.db.profile.achievements["Wide World of Quests"] == true and not select(4, GetAchievementInfo(13144)) == true) or
+			(self.db.profile.achievements["The World Beyond"] and not select(4, GetAchievementInfo(14758)))
 	 then
 		self.event:RegisterEvent("QUEST_TURNED_IN")
 	end
@@ -3061,11 +3077,11 @@ end
 
 function WQA:UpdateLDBText(activeTasks, newTasks)
 	if newTasks ~= nil then
-		dataobj.text = "New World Quests active"
+		dataobj.text = "新的世界任务已激活"
 	elseif activeTasks ~= nil then
-		dataobj.text = "World Quests active"
+		dataobj.text = "激活世界任务"
 	else
-		dataobj.text = "No World Quests active"
+		dataobj.text = "没有世界任务被激活"
 	end
 end
 
@@ -3419,7 +3435,8 @@ WQA.ZoneIDList = {
 		1525, -- Revendreth
 		1533, -- Bastion
 		1536, -- Maldraxxus
-		1565 -- Ardenweald
+		1565, -- Ardenweald
+		1543 -- The Maw
 	}
 }
 
@@ -3511,23 +3528,23 @@ function WQA:UpdateOptions()
 				order = newOrder(),
 				type = "group",
 				childGroups = "tree",
-				name = "General",
+				name = "通用",
 				args = {}
 			},
 			reward = {
 				order = newOrder(),
 				type = "group",
-				name = "Rewards",
+				name = "奖励",
 				args = {
 					general = {
 						order = newOrder(),
-						name = "General",
+						name = "通用",
 						type = "group",
 						-- inline = true,
 						args = {
 							gold = {
 								type = "toggle",
-								name = "Gold",
+								name = "金币",
 								set = function(info, val)
 									WQA.db.profile.options.reward.general.gold = val
 								end,
@@ -3538,7 +3555,7 @@ function WQA:UpdateOptions()
 								order = newOrder()
 							},
 							goldMin = {
-								name = "minimum Gold",
+								name = "最小金币数",
 								type = "input",
 								order = newOrder(),
 								set = function(info, val)
@@ -3552,13 +3569,13 @@ function WQA:UpdateOptions()
 					},
 					gear = {
 						order = newOrder(),
-						name = "Gear",
+						name = "装备",
 						type = "group",
 						-- inline = true,
 						args = {
 							itemLevelUpgrade = {
 								type = "toggle",
-								name = "ItemLevel Upgrade",
+								name = "装等提升",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.itemLevelUpgrade = val
 								end,
@@ -3570,7 +3587,7 @@ function WQA:UpdateOptions()
 							},
 							AzeriteArmorCache = {
 								type = "toggle",
-								name = "Azerite Armor Cache",
+								name = "艾泽里特装备",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.AzeriteArmorCache = val
 								end,
@@ -3581,7 +3598,7 @@ function WQA:UpdateOptions()
 								order = newOrder()
 							},
 							itemLevelUpgradeMin = {
-								name = "minimum ItemLevel Upgrade",
+								name = "最小装等提升",
 								type = "input",
 								order = newOrder(),
 								set = function(info, val)
@@ -3593,7 +3610,7 @@ function WQA:UpdateOptions()
 							},
 							armorCache = {
 								type = "toggle",
-								name = "Armor Cache",
+								name = "护甲",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.armorCache = val
 								end,
@@ -3605,7 +3622,7 @@ function WQA:UpdateOptions()
 							},
 							weaponCache = {
 								type = "toggle",
-								name = "Weapon Cache",
+								name = "武器",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.weaponCache = val
 								end,
@@ -3617,7 +3634,7 @@ function WQA:UpdateOptions()
 							},
 							jewelryCache = {
 								type = "toggle",
-								name = "Jewelry Cache",
+								name = "饰品",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.jewelryCache = val
 								end,
@@ -3635,7 +3652,7 @@ function WQA:UpdateOptions()
 							},
 							PawnUpgrade = {
 								type = "toggle",
-								name = "% Upgrade (Pawn)",
+								name = "百分比提升(降低)",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.PawnUpgrade = val
 								end,
@@ -3647,7 +3664,7 @@ function WQA:UpdateOptions()
 							},
 							StatWeightScore = {
 								type = "toggle",
-								name = "% Upgrade (Stat Weight Score)",
+								name = "百分比提升(统计权重评分)",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.StatWeightScore = val
 								end,
@@ -3658,7 +3675,7 @@ function WQA:UpdateOptions()
 								order = newOrder()
 							},
 							PercentUpgradeMin = {
-								name = "minimum % Upgrade",
+								name = "最小百分比提升",
 								type = "input",
 								order = newOrder(),
 								set = function(info, val)
@@ -3676,7 +3693,7 @@ function WQA:UpdateOptions()
 							},
 							unknownAppearance = {
 								type = "toggle",
-								name = "Unknown appearance",
+								name = "未知外观",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.unknownAppearance = val
 								end,
@@ -3688,7 +3705,7 @@ function WQA:UpdateOptions()
 							},
 							unknownSource = {
 								type = "toggle",
-								name = "Unknown source",
+								name = "未知来源",
 								set = function(info, val)
 									WQA.db.profile.options.reward.gear.unknownSource = val
 								end,
@@ -3699,8 +3716,8 @@ function WQA:UpdateOptions()
 								order = newOrder()
 							},
 							azeriteTraits = {
-								name = "Azerite Traits",
-								desc = "Comma separated spellIDs",
+								name = "艾泽里特能量",
+								desc = "多个物品ID之间英文逗号分隔",
 								type = "input",
 								order = newOrder(),
 								set = function(info, val)
@@ -3711,8 +3728,8 @@ function WQA:UpdateOptions()
 								end
 							},
 							conduit = {
-								name = "Conduit",
-								desc = "Track conduit",
+								name = "导灵器",
+								desc = "盟约导灵器",
 								type = "toggle",
 								order = newOrder(),
 								set = function(info, val)
@@ -3730,22 +3747,22 @@ function WQA:UpdateOptions()
 				order = newOrder(),
 				type = "group",
 				childGroups = "tree",
-				name = "Custom",
+				name = "自定义",
 				args = {
 					quest = {
 						order = newOrder(),
-						name = "World Quest",
+						name = "世界任务",
 						type = "group",
 						inline = true,
 						args = {
 							-- Add WQ
 							header1 = {
 								type = "header",
-								name = "Add a Quest you want to track",
+								name = "添加一个你想要追踪的任务",
 								order = newOrder()
 							},
 							addWQ = {
-								name = "QuestID",
+								name = "任务ID",
 								-- desc = "To add a worldquest, enter a unique name for the worldquest, and click Okay",
 								type = "input",
 								order = newOrder(),
@@ -3758,15 +3775,15 @@ function WQA:UpdateOptions()
 								end
 							},
 							questType = {
-								name = "Quest type",
+								name = "任务类型",
 								order = newOrder(),
-								desc = "IsActive:\nUse this as a last resort. Works for some daily quests.\n\nIsQuestFlaggedCompleted:\nUse this for quests, that are always active.\n\nQuest Pin:\nUse this, if the daily is marked with a quest pin on the world map.\n\nWorld Quest:\nUse this, if you want to track a world quest.",
+								desc = "活跃任务：\n这是最后的手段。适用于一些特别的日常任务。\n\n重复任务：\n对始终处于活跃状态的任务使用此选项。\n\n任务标记：\n如果日常任务在世界地图上有标记，请使用此选项。\n\n世界任务：\n如果你想追踪世界任务，请使用此选项。",
 								type = "select",
 								values = {
-									WORLD_QUEST = "World Quest",
-									QUEST_PIN = "Quest Pin",
-									QUEST_FLAG = "IsQuestFlaggedCompleted",
-									IsActive = "IsActive"
+									WORLD_QUEST = "世界任务",
+									QUEST_PIN = "任务标记",
+									QUEST_FLAG = "重复任务",
+									IsActive = "活跃任务"
 								},
 								set = function(info, val)
 									WQA.data.custom.questType = val
@@ -3776,8 +3793,8 @@ function WQA:UpdateOptions()
 								end
 							},
 							mapID = {
-								name = "mapID",
-								desc = "Quest pin tracking needs a mapID.\nSee https://wow.gamepedia.com/UiMapID for help.",
+								name = "地图ID",
+								desc = "追踪任务标记需要提供一个地图ID。\n详细请查阅 https://wow.gamepedia.com/UiMapID 。",
 								type = "input",
 								width = .5,
 								order = newOrder(),
@@ -3814,8 +3831,8 @@ function WQA:UpdateOptions()
 							button = {
 								order = newOrder(),
 								type = "execute",
-								name = "Add",
-								width = .3,
+								name = "添加",
+								width = .5,
 								func = function()
 									WQA:CreateCustomQuest()
 								end
@@ -3823,25 +3840,25 @@ function WQA:UpdateOptions()
 							-- Configure
 							header2 = {
 								type = "header",
-								name = "Configure custom World Quests",
+								name = "自定义世界任务",
 								order = newOrder()
 							}
 						}
 					},
 					reward = {
 						order = newOrder(),
-						name = "Reward",
+						name = "奖励",
 						type = "group",
 						inline = true,
 						args = {
 							-- Add item
 							header1 = {
 								type = "header",
-								name = "Add a World Quest Reward you want to track",
+								name = "添加你想要追踪的世界任务奖励",
 								order = newOrder()
 							},
 							itemID = {
-								name = "itemID",
+								name = "道具ID",
 								-- desc = "To add a worldquest, enter a unique name for the worldquest, and click Okay",
 								type = "input",
 								order = newOrder(),
@@ -3856,8 +3873,8 @@ function WQA:UpdateOptions()
 							button = {
 								order = newOrder(),
 								type = "execute",
-								name = "Add",
-								width = .3,
+								name = "添加",
+								width = .5,
 								func = function()
 									WQA:CreateCustomReward()
 								end
@@ -3865,25 +3882,25 @@ function WQA:UpdateOptions()
 							-- Configure
 							header2 = {
 								type = "header",
-								name = "Configure custom World Quest Rewards",
+								name = "自定义世界任务奖励",
 								order = newOrder()
 							}
 						}
 					},
 					mission = {
 						order = newOrder(),
-						name = "Mission",
+						name = "任务",
 						type = "group",
 						inline = true,
 						args = {
 							-- Add WQ
 							header1 = {
 								type = "header",
-								name = "Add a Mission you want to track",
+								name = "添加想要追踪的任务",
 								order = newOrder()
 							},
 							missionID = {
-								name = "MissionID",
+								name = "任务ID",
 								type = "input",
 								order = newOrder(),
 								width = .6,
@@ -3895,8 +3912,8 @@ function WQA:UpdateOptions()
 								end
 							},
 							rewardID = {
-								name = "Reward (optional)",
-								desc = "Enter an achievementID or itemID",
+								name = "奖励（可选）",
+								desc = "输入一个成就ID或道具ID",
 								type = "input",
 								width = .6,
 								order = newOrder(),
@@ -3908,13 +3925,13 @@ function WQA:UpdateOptions()
 								end
 							},
 							rewardType = {
-								name = "Reward type",
+								name = "奖励类型",
 								order = newOrder(),
 								type = "select",
 								values = {
-									item = "Item",
-									achievement = "Achievement",
-									none = "none"
+									item = "道具",
+									achievement = "成就",
+									none = "无"
 								},
 								width = .6,
 								set = function(info, val)
@@ -3927,8 +3944,8 @@ function WQA:UpdateOptions()
 							button = {
 								order = newOrder(),
 								type = "execute",
-								name = "Add",
-								width = .3,
+								name = "添加",
+								width = .5,
 								func = function()
 									WQA:CreateCustomMission()
 								end
@@ -3936,25 +3953,25 @@ function WQA:UpdateOptions()
 							-- Configure
 							header2 = {
 								type = "header",
-								name = "Configure custom Missions",
+								name = "自定义任务",
 								order = newOrder()
 							}
 						}
 					},
 					missionReward = {
 						order = newOrder(),
-						name = "Reward",
+						name = "奖励",
 						type = "group",
 						inline = true,
 						args = {
 							-- Add item
 							header1 = {
 								type = "header",
-								name = "Add a Mission Reward you want to track",
+								name = "添加你想要追踪的任务奖励",
 								order = newOrder()
 							},
 							itemID = {
-								name = "itemID",
+								name = "道具ID",
 								type = "input",
 								order = newOrder(),
 								width = .6,
@@ -3968,8 +3985,8 @@ function WQA:UpdateOptions()
 							button = {
 								order = newOrder(),
 								type = "execute",
-								name = "Add",
-								width = .3,
+								name = "添加",
+								width = .5,
 								func = function()
 									WQA:CreateCustomMissionReward()
 								end
@@ -3977,7 +3994,7 @@ function WQA:UpdateOptions()
 							-- Configure
 							header2 = {
 								type = "header",
-								name = "Configure custom Mission Rewards",
+								name = "自定义任务奖励",
 								order = newOrder()
 							}
 						}
@@ -3987,17 +4004,17 @@ function WQA:UpdateOptions()
 			options = {
 				order = newOrder(),
 				type = "group",
-				name = "Options",
+				name = "选项",
 				args = {
 					desc1 = {
 						type = "description",
 						fontSize = "medium",
-						name = "Select where WQA is allowed to post",
+						name = "选择[世界任务提醒]发送消息的区域",
 						order = newOrder()
 					},
 					chat = {
 						type = "toggle",
-						name = "Chat",
+						name = "聊天",
 						width = "double",
 						set = function(info, val)
 							WQA.db.profile.options.chat = val
@@ -4010,7 +4027,7 @@ function WQA:UpdateOptions()
 					},
 					PopUp = {
 						type = "toggle",
-						name = "PopUp",
+						name = "弹出框",
 						width = "double",
 						set = function(info, val)
 							WQA.db.profile.options.PopUp = val
@@ -4023,7 +4040,7 @@ function WQA:UpdateOptions()
 					},
 					popupRememberPosition = {
 						type = "toggle",
-						name = "Remember PopUp position",
+						name = "记住弹出框位置",
 						width = "double",
 						set = function(info, val)
 							WQA.db.profile.options.popupRememberPosition = val
@@ -4036,7 +4053,7 @@ function WQA:UpdateOptions()
 					},
 					sortByName = {
 						type = "toggle",
-						name = "Sort quests by name",
+						name = "任务列表名称排序",
 						width = "double",
 						set = function(info, val)
 							WQA.db.profile.options.sortByName = val
@@ -4049,7 +4066,7 @@ function WQA:UpdateOptions()
 					},
 					sortByZoneName = {
 						type = "toggle",
-						name = "Sort quests by zone name",
+						name = "任务列表地区排序",
 						width = "double",
 						set = function(info, val)
 							WQA.db.profile.options.sortByZoneName = val
@@ -4062,7 +4079,7 @@ function WQA:UpdateOptions()
 					},
 					chatShowExpansion = {
 						type = "toggle",
-						name = "Show expansion in chat",
+						name = "聊天中显示详情",
 						width = "double",
 						set = function(info, val)
 							WQA.db.profile.options.chatShowExpansion = val
@@ -4075,7 +4092,7 @@ function WQA:UpdateOptions()
 					},
 					chatShowZone = {
 						type = "toggle",
-						name = "Show zone in chat",
+						name = "聊天中显示地区",
 						width = "double",
 						set = function(info, val)
 							WQA.db.profile.options.chatShowZone = val
@@ -4088,7 +4105,7 @@ function WQA:UpdateOptions()
 					},
 					chatShowTime = {
 						type = "toggle",
-						name = "Show time left in chat",
+						name = "聊天中显示剩余时间",
 						width = "double",
 						set = function(info, val)
 							WQA.db.profile.options.chatShowTime = val
@@ -4101,7 +4118,7 @@ function WQA:UpdateOptions()
 					},
 					popupShowExpansion = {
 						type = "toggle",
-						name = "Show expansion in popup",
+						name = "弹出框中显示详情",
 						width = "double",
 						set = function(info, val)
 							WQA.db.profile.options.popupShowExpansion = val
@@ -4114,7 +4131,7 @@ function WQA:UpdateOptions()
 					},
 					popupShowZone = {
 						type = "toggle",
-						name = "Show zone in popup",
+						name = "弹出框中显示地区",
 						width = "double",
 						set = function(info, val)
 							WQA.db.profile.options.popupShowZone = val
@@ -4127,7 +4144,7 @@ function WQA:UpdateOptions()
 					},
 					popupShowTime = {
 						type = "toggle",
-						name = "Show time left in popup",
+						name = "弹出框中显示剩余时间",
 						width = "double",
 						set = function(info, val)
 							WQA.db.profile.options.popupShowTime = val
@@ -4139,7 +4156,7 @@ function WQA:UpdateOptions()
 						order = newOrder()
 					},
 					delay = {
-						name = "Delay on login in s",
+						name = "登陆时延后几秒加载",
 						type = "input",
 						order = newOrder(),
 						width = "double",
@@ -4151,7 +4168,7 @@ function WQA:UpdateOptions()
 						end
 					},
 					delayCombat = {
-						name = "Delay output while in combat",
+						name = "战斗时延后追踪",
 						type = "toggle",
 						order = newOrder(),
 						width = "double",
@@ -4164,7 +4181,7 @@ function WQA:UpdateOptions()
 					},
 					WorldQuestTracker = {
 						type = "toggle",
-						name = "Use World Quest Tracker",
+						name = "使用世界任务追踪器",
 						width = "double",
 						set = function(info, val)
 							WQA.db.profile.options.WorldQuestTracker = val
@@ -4177,8 +4194,7 @@ function WQA:UpdateOptions()
 					},
 					esc = {
 						type = "toggle",
-						name = "Close PopUp with ESC",
-						desc = "Requires a reload",
+						name = "ESC键关闭弹出框（需重载UI）",
 						width = "double",
 						set = function(info, val)
 							WQA.db.profile.options.esc = val
@@ -4191,7 +4207,7 @@ function WQA:UpdateOptions()
 					},
 					LibDBIcon = {
 						type = "toggle",
-						name = "Show Minimap Icon",
+						name = "显示小地图图标",
 						width = "double",
 						set = function(info, val)
 							WQA.db.profile.options.LibDBIcon.hide = not val
@@ -4213,7 +4229,7 @@ function WQA:UpdateOptions()
 	local args = self.options.args.reward.args.general.args
 	args.header1 = {
 		type = "header",
-		name = "World Quest Type",
+		name = "世界任务类型",
 		order = newOrder()
 	}
 	for k, v in pairs(worldQuestType) do
@@ -4241,10 +4257,10 @@ function WQA:UpdateOptions()
 				inline = true,
 				args = {}
 			}
-			self:CreateGroup(self.options.args.general.args[v.name].args, v, "achievements")
-			self:CreateGroup(self.options.args.general.args[v.name].args, v, "mounts")
-			self:CreateGroup(self.options.args.general.args[v.name].args, v, "pets")
-			self:CreateGroup(self.options.args.general.args[v.name].args, v, "toys")
+			self:CreateGroup(self.options.args.general.args[v.name].args, v, "achievements", "成就")
+			self:CreateGroup(self.options.args.general.args[v.name].args, v, "mounts","坐骑")
+			self:CreateGroup(self.options.args.general.args[v.name].args, v, "pets", "宠物")
+			self:CreateGroup(self.options.args.general.args[v.name].args, v, "toys", "玩具")
 		end
 	end
 
@@ -4260,7 +4276,7 @@ function WQA:UpdateOptions()
 		if i > 6 then
 			self.options.args.reward.args[self.ExpansionList[i]].args[self.ExpansionList[i] .. "WorldQuests"] = {
 				order = newOrder(),
-				name = "World Quests",
+				name = "世界任务",
 				type = "group",
 				args = {}
 			}
@@ -4270,7 +4286,7 @@ function WQA:UpdateOptions()
 			if WQA.ZoneIDList[i] then
 				args.zone = {
 					order = newOrder(),
-					name = "Zones",
+					name = "地区",
 					type = "group",
 					args = {},
 					inline = false
@@ -4296,7 +4312,7 @@ function WQA:UpdateOptions()
 			if CurrencyIDList[i] then
 				args.currency = {
 					order = newOrder(),
-					name = "Currencies",
+					name = "货币",
 					type = "group",
 					args = {}
 				}
@@ -4323,7 +4339,7 @@ function WQA:UpdateOptions()
 			if FactionIDList[i] then
 				args.reputation = {
 					order = newOrder(),
-					name = "Reputation",
+					name = "声望",
 					type = "group",
 					args = {}
 				}
@@ -4351,7 +4367,7 @@ function WQA:UpdateOptions()
 			if self.EmissaryQuestIDList[i] then
 				args.emissary = {
 					order = newOrder(),
-					name = "Emissary Quests",
+					name = "声望任务",
 					type = "group",
 					args = {}
 				}
@@ -4378,7 +4394,7 @@ function WQA:UpdateOptions()
 			if i > 6 then
 				args.profession = {
 					order = newOrder(),
-					name = "Professions",
+					name = "专业技能",
 					type = "group",
 					args = {}
 				}
@@ -4386,7 +4402,7 @@ function WQA:UpdateOptions()
 				-- Recipes
 				args.profession.args["Recipes"] = {
 					type = "toggle",
-					name = "Recipes",
+					name = "配方",
 					set = function(info, val)
 						WQA.db.profile.options.reward.recipe[i] = val
 					end,
@@ -4404,8 +4420,8 @@ function WQA:UpdateOptions()
 					args.profession.args[tradeskillLineID.."Header"] = { type = "header", name = professionName, order = newOrder(), }
 					args.profession.args[tradeskillLineID.."Skillup"] = {
 						type = "toggle",
-						name = "Skillup",
-						desc = "Track every World Quest until skill level is maxed out",
+						name = "提升技能",
+						desc = "追踪每个世界任务，直到技能等级达到上限",
 						set = function(info, val)
 							WQA.db.profile.options.reward[i].profession[tradeskillLineID].skillup = val
 						end,
@@ -4416,8 +4432,8 @@ function WQA:UpdateOptions()
 					}
 					args.profession.args[tradeskillLineID.."MaxLevel"] = {
 						type = "toggle",
-						name = "Skill level is maxed out*",
-						desc = "Setting is per character",
+						name = "技能等级已达上限*",
+						desc = "单独设置每一项",
 						set = function(info, val)
 							WQA.db.char[i].profession[tradeskillLineID].isMaxLevel = val
 						end,
@@ -4454,7 +4470,7 @@ function WQA:UpdateOptions()
 		-- Mission Table
 		self.options.args.reward.args[self.ExpansionList[i]].args[self.ExpansionList[i].."MissionTable"] = {
 			order = newOrder(),
-			name = (i ~= 6 and "Mission Table" or "Mission Table & Shipyard"),
+			name = (i ~= 6 and "任务台" or "任务台 & 造船厂"),
 			type = "group",
 			args = {}
 		}
@@ -4464,7 +4480,7 @@ function WQA:UpdateOptions()
 		if CurrencyIDList[i] then
 			args.currency = {
 				order = newOrder(),
-				name = "Currencies",
+				name = "货币",
 				type = "group",
 				args = {}
 			}
@@ -4472,7 +4488,7 @@ function WQA:UpdateOptions()
 				args.currency.args = {
 					gold = {
 						type = "toggle",
-						name = "Gold",
+						name = "金币",
 						set = function(info, val)
 							WQA.db.profile.options.missionTable.reward.gold = val
 						end,
@@ -4483,7 +4499,7 @@ function WQA:UpdateOptions()
 						order = newOrder()
 					},
 					goldMin = {
-						name = "minimum Gold",
+						name = "最小金币数",
 						type = "input",
 						order = newOrder(),
 						set = function(info, val)
@@ -4517,7 +4533,7 @@ function WQA:UpdateOptions()
 		if FactionIDList[i] then
 			args.reputation = {
 				order = newOrder(),
-				name = "Reputation",
+				name = "声望",
 				type = "group",
 				args = {}
 			}
@@ -4575,18 +4591,18 @@ end
 function WQA:ToggleGet()
 end
 
-function WQA:CreateGroup(options, data, groupName)
+function WQA:CreateGroup(options, data, groupName, Group_Name)
 	if data[groupName] then
 		options[groupName] = {
 			order = 1,
-			name = groupName,
+			name = Group_Name,
 			type = "group",
 			args = {}
 		}
 		local args = options[groupName].args
 
-		args["completed"] = { type = "header", name = "√", order = newOrder(), hidden = true, }
-		args["notCompleted"] = { type = "header", name = "X", order = newOrder(), hidden = true, }
+		args["completed"] = { type = "header", name = "已获得", order = newOrder(), hidden = true, }
+		args["notCompleted"] = { type = "header", name = "未获得", order = newOrder(), hidden = true, }
 
 		local expansion = data.name
 		local data = data[groupName]
@@ -4602,7 +4618,7 @@ function WQA:CreateGroup(options, data, groupName)
 			}
 			args[idString] = {
 				type = "select",
-				values = {disabled = "Don't track", default = "Default", always = "Always track", wasEarnedByMe = "Track if not earned by active character", exclusive = "Only track with this Character"},
+				values = {disabled = "不要追踪", default = "默认", always = "始终追踪", wasEarnedByMe = "追踪活跃角色未获得", exclusive = "仅追踪当前角色"},
 				width = 1.4,
 				--type = "toggle",
 				name = "",--idString,
@@ -4615,8 +4631,8 @@ function WQA:CreateGroup(options, data, groupName)
 			 		local name, server = UnitFullName("player")
 			 		name = name.."-"..server
 			 		if WQA.db.profile[info[#info-1]].exclusive[id] ~= name then
-			 			info.option.values.other = "Only tracked by "..WQA.db.profile[info[#info-1]].exclusive[id]
-			 			return "other"
+			 			info.option.values.other = "仅追踪于"..WQA.db.profile[info[#info-1]].exclusive[id]
+			 			return "其他"
 			 		end
 			 	end
 					return value
@@ -4663,7 +4679,7 @@ function WQA:UpdateCustomQuests()
 		}
 
 		args[id.."questType"] = {
-			name = "Quest type",
+			name = "任务类型",
 			order = newOrder(),
 			desc = "IsActive:\nUse this as a last resort. Works for some daily quests.\n\nIsQuestFlaggedCompleted:\nUse this for quests, that are always active.\n\nQuest Pin:\nUse this, if the daily is marked with a quest pin on the world map.\n\nWorld Quest:\nUse this, if you want to track a world quest.",
 			type = "select",
@@ -4675,7 +4691,7 @@ function WQA:UpdateCustomQuests()
 			get = function() return tostring(self.db.global.custom.worldQuest[id].questType or "") end
 		}
 		args[id.."mapID"] = {
-			name = "mapID",
+			name = "地图ID",
 			desc = "Quest pin tracking needs a mapID.\nSee https://wow.gamepedia.com/UiMapID for help.",
 			type = "input",
 			width = .4,

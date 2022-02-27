@@ -30,7 +30,7 @@ function Bar:CreatePetbar()
 	local num = NUM_PET_ACTION_SLOTS
 	local buttonList = {}
 
-	local frame = CreateFrame("Frame", "NDui_ActionBarPet", UIParent, "SecureHandlerStateTemplate")
+	local frame = CreateFrame("Frame", "UI_ActionBarPet", UIParent, "SecureHandlerStateTemplate")
 	if R.db["Actionbar"]["Style"] == 3 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 370, 84}
 	elseif (R.db["Actionbar"]["Style"] == 4) or (R.db["Actionbar"]["Style"] == 6) then

@@ -173,7 +173,7 @@ end
 local mixins = {
 	"Print",
 	"Printf",
-	"RegisterChatCommand", 
+	"RegisterChatCommand",
 	"UnregisterChatCommand",
 	"GetArgs",
 } 

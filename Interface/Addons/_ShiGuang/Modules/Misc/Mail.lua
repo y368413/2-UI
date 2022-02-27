@@ -139,7 +139,7 @@ function MISC:ContactButton_Update(button)
 end
 
 function MISC:ContactList_Update()
-	local scrollFrame = _G.NDuiMailBoxScrollFrame
+	local scrollFrame = _G.UIMailBoxScrollFrame
 	local usedHeight = 0
 	local buttons = scrollFrame.buttons
 	local height = scrollFrame.buttonHeight
@@ -190,8 +190,7 @@ function MISC:MailBox_ContactList()
 
 	local editbox = M.CreateEditBox(list, 120, 20)
 	editbox:SetPoint("TOPLEFT", 5, -25)
-	editbox.title = U["Tips"]
-	M.AddTooltip(editbox, "ANCHOR_BOTTOMRIGHT", I.InfoColor..U["AddContactTip"])
+	M.AddTooltip(editbox, "ANCHOR_BOTTOMRIGHT", I.InfoColor..U["AddContactTip"], true)
 	local swatch = M.CreateColorSwatch(list, "")
 	swatch:SetPoint("LEFT", editbox, "RIGHT", 5, 0)
 	local add = M.CreateButton(list, 42, 22, ADD, 14)
@@ -208,7 +207,7 @@ function MISC:MailBox_ContactList()
 		editbox:SetText("")
 	end)
 
-	local scrollFrame = CreateFrame("ScrollFrame", "NDuiMailBoxScrollFrame", list, "HybridScrollFrameTemplate")
+	local scrollFrame = CreateFrame("ScrollFrame", "UIMailBoxScrollFrame", list, "HybridScrollFrameTemplate")
 	scrollFrame:SetSize(175, 370)
 	scrollFrame:SetPoint("BOTTOMLEFT", 5, 5)
 	M.CreateBDFrame(scrollFrame, .25)

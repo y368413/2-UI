@@ -10,7 +10,7 @@ local margin, padding = R.Bars.margin, R.Bars.padding
 function Bar:CreateCustomBar(anchor)
 	local size = R.db["Actionbar"]["CustomBarButtonSize"]
 	local num = 12
-	local name = "NDui_CustomBar"
+	local name = "UI_CustomBar"
 	local page = 8
 
 	local frame = CreateFrame("Frame", name, UIParent, "SecureHandlerStateTemplate")
@@ -44,7 +44,7 @@ function Bar:CreateCustomBar(anchor)
 end
 
 function Bar:UpdateCustomBar()
-	local frame = _G.NDui_CustomBar
+	local frame = _G.UI_CustomBar
 	if not frame then return end
 
 	local size = R.db["Actionbar"]["CustomBarButtonSize"]

@@ -4,6 +4,7 @@
 	<Script file="Raid.lua"/>
 	<Script file="Nameplates.lua"/>
 	<Script file="Spawns.lua"/>
+	<Script file="Elements\Castbar.lua"/>
 	<Script file="BlinkHealthText.lua"/>
 	<Script file="WhoaThickFrames.lua"/>
 	<Script file="UnitFramesStyle.lua"/>

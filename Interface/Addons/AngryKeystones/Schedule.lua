@@ -29,6 +29,8 @@ local unitKeystones = {}
 local function GetNameForKeystone(keystoneMapID, keystoneLevel)
 	local keystoneMapName = keystoneMapID and C_ChallengeMode.GetMapUIInfo(keystoneMapID)
 	if keystoneMapID and keystoneMapName then
+		keystoneMapName = gsub(keystoneMapName, ".-%-", "") -- Mechagon
+		keystoneMapName = gsub(keystoneMapName, ".-"..HEADER_COLON, "") -- Tezavesh
 		return string.format("%s (%d)", keystoneMapName, keystoneLevel)
 	end
 end
@@ -69,11 +71,6 @@ local function UpdatePartyKeystones()
 					local color = RAID_CLASS_COLORS[class]
 					entry.Text:SetText(name)
 					entry.Text:SetTextColor(color:GetRGBA())
-
-					local _, suffix = strsplit("-", keystoneName)
-					if suffix then
-						keystoneName = suffix
-					end
 					entry.Text2:SetText(keystoneName)
 
 					e = e + 1
@@ -153,7 +150,7 @@ local function makeAffix(parent)
 	frame.Border = border
 
 	local portrait = frame:CreateTexture(nil, "ARTWORK")
-	portrait:SetSize(15, 15)
+	portrait:SetSize(14, 14)
 	portrait:SetPoint("CENTER", border)
 	frame.Portrait = portrait
 
@@ -328,7 +325,7 @@ local bagUpdateTimerStarted = false
 function Mod:BAG_UPDATE()
 	if not bagUpdateTimerStarted then
 		bagUpdateTimerStarted = true
-		C_Timer.After(1, function()
+		C_Timer.After(2, function()
 			Mod:CheckCurrentKeystone()
 			bagUpdateTimerStarted = false
 		end)

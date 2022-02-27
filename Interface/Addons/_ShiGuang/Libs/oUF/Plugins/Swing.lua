@@ -3,7 +3,6 @@
 -- NDui MOD
 -------------------------
 local _, ns = ...
-local M, R, U, I = unpack(ns)
 local oUF = ns.oUF
 
 local select = select
@@ -38,7 +37,7 @@ end
 local function UpdateBarValue(self, value)
 	self:SetValue(value)
 
-	if self.Text then
+	if self.Text and self.Text:IsShown() then
 		if self.__owner.OverrideText then
 			self.__owner.OverrideText(self, value)
 		else
@@ -74,8 +73,7 @@ do
 			end
 		end
 
-		local spell = UnitCastingInfo("player")
-		if slam == spell then
+		if UnitCastingInfo("player") == slam then
 			-- slamelapsed: time to add for one slam
 			slamelapsed = slamelapsed + elapsed
 			-- slamtime: needed for meleeing hack (see some lines above)

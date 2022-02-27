@@ -4,11 +4,27 @@ local oUF = ns.oUF
 local A = M:RegisterModule("Auras")
 
 local _G = getfenv(0)
-local format, floor, strmatch, select, unpack = format, floor, strmatch, select, unpack
+local format, floor, strmatch, select, unpack, tonumber = format, floor, strmatch, select, unpack, tonumber
 local UnitAura, GetTime = UnitAura, GetTime
-local GetInventoryItemQuality, GetInventoryItemTexture, GetItemQualityColor, GetWeaponEnchantInfo = GetInventoryItemQuality, GetInventoryItemTexture, GetItemQualityColor, GetWeaponEnchantInfo
+local GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo = GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo
 
 function A:OnLogin()
+	A:HideBlizBuff()
+	A:BuildBuffFrame()
+	A:Totems()
+	A:InitReminder()
+end
+
+function A:HideBlizBuff()
+	if not R.db["Auras"]["BuffFrame"] and not R.db["Auras"]["HideBlizBuff"] then return end
+
+	M.HideObject(_G.BuffFrame)
+	M.HideObject(_G.TemporaryEnchantFrame)
+end
+
+function A:BuildBuffFrame()
+	if not R.db["Auras"]["BuffFrame"] then return end
+
 	-- Config
 	A.settings = {
 		Buffs = {
@@ -16,20 +32,16 @@ function A:OnLogin()
 			size = R.db["Auras"]["BuffSize"],
 			wrapAfter = R.db["Auras"]["BuffsPerRow"],
 			maxWraps = 3,
-			reverseGrow = R.db["Auras"]["ReverseBuffs"],
+			reverseGrow = R.db["Auras"]["ReverseBuff"],
 		},
 		Debuffs = {
 			offset = 12,
 			size = R.db["Auras"]["DebuffSize"],
 			wrapAfter = R.db["Auras"]["DebuffsPerRow"],
 			maxWraps = 1,
-			reverseGrow = R.db["Auras"]["ReverseDebuffs"],
+			reverseGrow = R.db["Auras"]["ReverseDebuff"],
 		},
 	}
-
-	-- HideBlizz
-	M.HideObject(_G.BuffFrame)
-	M.HideObject(_G.TemporaryEnchantFrame)
 
 	-- Movers
 	A.BuffFrame = A:CreateAuraHeader("HELPFUL")
@@ -41,10 +53,6 @@ function A:OnLogin()
 	A.DebuffFrame.mover = M.Mover(A.DebuffFrame, "Debuffs", "DebuffAnchor", {"TOPRIGHT", A.BuffFrame.mover, "BOTTOMRIGHT", 0, -12})
 	A.DebuffFrame:ClearAllPoints()
 	A.DebuffFrame:SetPoint("TOPRIGHT", A.DebuffFrame.mover)
-
-	-- Elements
-	A:Totems()
-	A:InitReminder()
 end
 
 local day, hour, minute = 86400, 3600, 60
@@ -67,14 +75,16 @@ function A:FormatAuraTime(s)
 end
 
 function A:UpdateTimer(elapsed)
-	if self.offset then
-		local expiration = select(self.offset, GetWeaponEnchantInfo())
-		if expiration then
-			self.timeLeft = expiration / 1e3
-		else
-			self.timeLeft = 0
-		end
-	else
+	local onTooltip = GameTooltip:IsOwned(self)
+
+	if not (self.timeLeft or self.expiration or onTooltip) then
+		self:SetScript("OnUpdate", nil)
+		return
+	end
+
+	if self.expiration then
+		self.timeLeft = self.expiration / 1e3
+	elseif self.timeLeft then
 		self.timeLeft = self.timeLeft - elapsed
 	end
 
@@ -83,79 +93,69 @@ function A:UpdateTimer(elapsed)
 		return
 	end
 
-	if self.timeLeft >= 0 then
+	if self.timeLeft and self.timeLeft >= 0 then
 		local timer, nextUpdate = A:FormatAuraTime(self.timeLeft)
 		self.nextUpdate = nextUpdate
 		self.timer:SetText(timer)
 	end
+
+	if onTooltip then A:Button_SetTooltip(self) end
 end
 
 function A:UpdateAuras(button, index)
-	local filter = button:GetParent():GetAttribute("filter")
-	local unit = button:GetParent():GetAttribute("unit")
+	local unit, filter = button.header:GetAttribute("unit"), button.filter
 	local name, texture, count, debuffType, duration, expirationTime, _, _, _, spellID = UnitAura(unit, index, filter)
+	if not name then return end
 
-	if name then
-		if duration > 0 and expirationTime then
-			local timeLeft = expirationTime - GetTime()
-			if not button.timeLeft then
-				button.nextUpdate = -1
-				button.timeLeft = timeLeft
-				button:SetScript("OnUpdate", A.UpdateTimer)
-			else
-				button.timeLeft = timeLeft
-			end
+	if duration > 0 and expirationTime then
+		local timeLeft = expirationTime - GetTime()
+		if not button.timeLeft then
 			button.nextUpdate = -1
-			A.UpdateTimer(button, 0)
+			button.timeLeft = timeLeft
+			button:SetScript("OnUpdate", A.UpdateTimer)
 		else
-			button.timeLeft = nil
-			button.timer:SetText("|cff00ff00^-^|r")
-			button:SetScript("OnUpdate", nil)
+			button.timeLeft = timeLeft
 		end
-
-		if count and count > 1 then
-			button.count:SetText(count)
-		else
-			button.count:SetText("")
-		end
-
-		if filter == "HARMFUL" then
-			local color = oUF.colors.debuff[debuffType or "none"]
-			button:SetBackdropBorderColor(color[1], color[2], color[3])
-		else
-			button:SetBackdropBorderColor(0, 0, 0)
-		end
-
-		button.spellID = spellID
-		button.icon:SetTexture(texture)
-		button.offset = nil
+		button.nextUpdate = -1
+		A.UpdateTimer(button, 0)
+	else
+		button.timeLeft = nil
+		button.timer:SetText("|cff00ff00^-^|r")
 	end
+
+	if count and count > 1 then
+		button.count:SetText(count)
+	else
+		button.count:SetText("")
+	end
+
+	if filter == "HARMFUL" then
+		local color = oUF.colors.debuff[debuffType or "none"]
+		button:SetBackdropBorderColor(color[1], color[2], color[3])
+	else
+		button:SetBackdropBorderColor(0, 0, 0)
+	end
+
+	button.spellID = spellID
+	button.icon:SetTexture(texture)
+	button.expiration = nil
 end
 
 function A:UpdateTempEnchant(button, index)
-	local quality = GetInventoryItemQuality("player", index)
-	button.icon:SetTexture(GetInventoryItemTexture("player", index))
-
-	local offset = 2
-	local weapon = button:GetName():sub(-1)
-	if strmatch(weapon, "2") then
-		offset = 6
-	end
-
-	if quality then
-		button:SetBackdropBorderColor(GetItemQualityColor(quality))
-	end
-
-	local expirationTime = select(offset, GetWeaponEnchantInfo())
+	local expirationTime = select(button.enchantOffset, GetWeaponEnchantInfo())
 	if expirationTime then
-		button.offset = offset
+		local quality = GetInventoryItemQuality("player", index)
+		local color = I.QualityColors[quality or 1]
+		button:SetBackdropBorderColor(color.r, color.g, color.b)
+		button.icon:SetTexture(GetInventoryItemTexture("player", index))
+
+		button.expiration = expirationTime
 		button:SetScript("OnUpdate", A.UpdateTimer)
 		button.nextUpdate = -1
 		A.UpdateTimer(button, 0)
 	else
-		button.offset = nil
+		button.expiration = nil
 		button.timeLeft = nil
-		button:SetScript("OnUpdate", nil)
 		button.timer:SetText("")
 	end
 end
@@ -171,18 +171,18 @@ end
 function A:UpdateOptions()
 	A.settings.Buffs.size = R.db["Auras"]["BuffSize"]
 	A.settings.Buffs.wrapAfter = R.db["Auras"]["BuffsPerRow"]
-	A.settings.Buffs.reverseGrow = R.db["Auras"]["ReverseBuffs"]
+	A.settings.Buffs.reverseGrow = R.db["Auras"]["ReverseBuff"]
 	A.settings.Debuffs.size = R.db["Auras"]["DebuffSize"]
 	A.settings.Debuffs.wrapAfter = R.db["Auras"]["DebuffsPerRow"]
-	A.settings.Debuffs.reverseGrow = R.db["Auras"]["ReverseDebuffs"]
+	A.settings.Debuffs.reverseGrow = R.db["Auras"]["ReverseDebuff"]
 end
 
 function A:UpdateHeader(header)
 	local cfg = A.settings.Debuffs
-	if header:GetAttribute("filter") == "HELPFUL" then
+	if header.filter == "HELPFUL" then
 		cfg = A.settings.Buffs
 		header:SetAttribute("consolidateTo", 0)
-		header:SetAttribute("weaponTemplate", format("NDuiAuraTemplate%d", cfg.size))
+		header:SetAttribute("weaponTemplate", format("UIAuraTemplate%d", cfg.size))
 	end
 
 	header:SetAttribute("separateOwn", 1)
@@ -197,7 +197,7 @@ function A:UpdateHeader(header)
 	header:SetAttribute("yOffset", 0)
 	header:SetAttribute("wrapXOffset", 0)
 	header:SetAttribute("wrapYOffset", -(cfg.size + cfg.offset))
-	header:SetAttribute("template", format("NDuiAuraTemplate%d", cfg.size))
+	header:SetAttribute("template", format("UIAuraTemplate%d", cfg.size))
 
 	local fontSize = floor(cfg.size/30*12 + .5)
 	local index = 1
@@ -221,13 +221,16 @@ function A:UpdateHeader(header)
 end
 
 function A:CreateAuraHeader(filter)
-	local name = "NDuiPlayerDebuffs"
-	if filter == "HELPFUL" then name = "NDuiPlayerBuffs" end
+	local name = "UIPlayerDebuffs"
+	if filter == "HELPFUL" then name = "UIPlayerBuffs" end
 
 	local header = CreateFrame("Frame", name, UIParent, "SecureAuraHeaderTemplate")
 	header:SetClampedToScreen(true)
+	header:UnregisterEvent("UNIT_AURA") -- we only need to watch player and vehicle
+	header:RegisterUnitEvent("UNIT_AURA", "player", "vehicle")
 	header:SetAttribute("unit", "player")
 	header:SetAttribute("filter", filter)
+	header.filter = filter
 	RegisterStateDriver(header, "visibility", "[petbattle] hide; show")
 	RegisterAttributeDriver(header, "unit", "[vehicleui] vehicle; player")
 
@@ -249,10 +252,32 @@ function A:RemoveSpellFromIgnoreList()
 	end
 end
 
+function A:Button_SetTooltip(button)
+	if button:GetAttribute("index") then
+		GameTooltip:SetUnitAura(button.header:GetAttribute("unit"), button:GetID(), button.filter)
+	elseif button:GetAttribute("target-slot") then
+		GameTooltip:SetInventoryItem("player", button:GetID())
+	end
+end
+
+function A:Button_OnEnter()
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT", -5, -5)
+	-- Update tooltip
+	self.nextUpdate = -1
+	self:SetScript("OnUpdate", A.UpdateTimer)
+end
+
+local indexToOffset = {2, 6, 10}
+
 function A:CreateAuraIcon(button)
-	local header = button:GetParent()
+	button.header = button:GetParent()
+	button.filter = button.header.filter
+	button.name = button:GetName()
+	local enchantIndex = tonumber(strmatch(button.name, "TempEnchant(%d)$"))
+	button.enchantOffset = indexToOffset[enchantIndex]
+
 	local cfg = A.settings.Debuffs
-	if header:GetAttribute("filter") == "HELPFUL" then
+	if button.filter == "HELPFUL" then
 		cfg = A.settings.Buffs
 	end
 	local fontSize = floor(cfg.size/30*14 + .5)
@@ -276,6 +301,9 @@ function A:CreateAuraIcon(button)
 	M.CreateBD(button, .25)
 	M.CreateSD(button)
 
+	button:RegisterForClicks("RightButtonUp")
 	button:SetScript("OnAttributeChanged", A.OnAttributeChanged)
 	button:HookScript("OnMouseDown", A.RemoveSpellFromIgnoreList)
+	button:SetScript("OnEnter", A.Button_OnEnter)
+	button:SetScript("OnLeave", M.HideTooltip)
 end

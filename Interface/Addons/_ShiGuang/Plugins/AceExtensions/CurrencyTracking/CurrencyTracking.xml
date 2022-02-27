@@ -52,7 +52,7 @@ $Id: CurrencyTracking_Options.xml 60 2017-04-05 15:50:17Z arith $
 						local p = self:GetParent();
 						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 						GameTooltip:SetScale(CurrencyTracking.db.profile.tooltip_scale);
-						GameTooltip:SetBackdropColor(0, 0, 0, CurrencyTracking.db.profile.tooltip_alpha);
+						GameTooltip.NineSlice:SetCenterColor(0, 0, 0, CurrencyTracking.db.profile.tooltip_alpha);
 						if (self.tooltipText) then
 							if (p.isItem and p.itemLink) then 
 								GameTooltip:SetHyperlink(self.tooltipText);

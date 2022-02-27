@@ -1,3 +1,4 @@
+--安其拉甲虫箱子
 local ScarabCoffers = {}
 
 local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes")

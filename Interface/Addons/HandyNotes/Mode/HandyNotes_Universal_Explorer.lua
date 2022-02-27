@@ -1,3 +1,4 @@
+--探索者成就指引
 local Universal_Explorer	= {}
 local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes")
 local HL = LibStub("AceAddon-3.0"):NewAddon("HandyNotes_Universal_Explorer", "AceEvent-3.0")

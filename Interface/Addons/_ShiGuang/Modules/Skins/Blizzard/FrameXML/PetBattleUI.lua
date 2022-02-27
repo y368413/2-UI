@@ -1,11 +1,13 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
 
+local r, g, b, pairs = I.r, I.g, I.b, pairs
 local LE_BATTLE_PET_ALLY = Enum.BattlePetOwner.Ally
+
 tinsert(R.defaultThemes, function()
 	if not R.db["Skins"]["PetBattle"] then return end
 
-	local r, g, b, pairs = I.r, I.g, I.b, pairs
+	local mult = R.mult
 
 	-- Head Frame
 	local frame = PetBattleFrame
@@ -34,7 +36,7 @@ tinsert(R.defaultThemes, function()
 		unit.ActualHealthBar:SetTexture(I.normTex)
 		unit.healthBg = M.SetBD(unit.ActualHealthBar)
 		unit.healthBg:ClearAllPoints()
-		unit.healthBg:SetWidth(252)
+		unit.healthBg:SetWidth(unit.healthBarWidth + 2*mult)
 		unit.HealthText:ClearAllPoints()
 		unit.HealthText:SetPoint("CENTER", unit.healthBg)
 
@@ -62,8 +64,8 @@ tinsert(R.defaultThemes, function()
 
 		if index == 1 then
 			unit.ActualHealthBar:SetPoint("BOTTOMLEFT", unit.Icon, "BOTTOMRIGHT", 0, 0)
-			unit.healthBg:SetPoint("TOPLEFT", unit.ActualHealthBar, -1, 1)
-			unit.healthBg:SetPoint("BOTTOMLEFT", unit.ActualHealthBar, -1, -1)
+			unit.healthBg:SetPoint("TOPLEFT", unit.ActualHealthBar, -mult, mult)
+			unit.healthBg:SetPoint("BOTTOMLEFT", unit.ActualHealthBar, -mult, -mult)
 			unit.ActualHealthBar:SetGradient("VERTICAL", .26, 1, .22, .13, .5, .11)
 			unit.petIcon:SetPoint("BOTTOMLEFT", unit.ActualHealthBar, "TOPLEFT", 0, 4)
 			unit.Name:SetPoint("LEFT", unit.petIcon, "RIGHT", 5, 0)
@@ -74,8 +76,8 @@ tinsert(R.defaultThemes, function()
 			end
 		else
 			unit.ActualHealthBar:SetPoint("BOTTOMRIGHT", unit.Icon, "BOTTOMLEFT", 0, 0)
-			unit.healthBg:SetPoint("TOPRIGHT", unit.ActualHealthBar, 1, 1)
-			unit.healthBg:SetPoint("BOTTOMRIGHT", unit.ActualHealthBar, 1, -1)
+			unit.healthBg:SetPoint("TOPRIGHT", unit.ActualHealthBar, mult, mult)
+			unit.healthBg:SetPoint("BOTTOMRIGHT", unit.ActualHealthBar, mult, -mult)
 			unit.ActualHealthBar:SetGradient("VERTICAL", 1, .12, .24, .5, .06, .12)
 			unit.petIcon:SetPoint("BOTTOMRIGHT", unit.ActualHealthBar, "TOPRIGHT", 0, 4)
 			unit.Name:SetPoint("RIGHT", unit.petIcon, "LEFT", -5, 0)
@@ -107,8 +109,10 @@ tinsert(R.defaultThemes, function()
 		unit.ActualHealthBar:SetPoint("TOPLEFT", unit.Icon, "BOTTOMLEFT", 1, -4)
 		unit.ActualHealthBar:SetTexture(I.normTex)
 		unit.healthBg = M.SetBD(unit.ActualHealthBar)
-		unit.healthBg:SetPoint("TOPLEFT", unit.ActualHealthBar, -1, 1)
-		unit.healthBg:SetPoint("BOTTOMRIGHT", unit.ActualHealthBar, "TOPLEFT", 37, -8)
+		unit.healthBg:ClearAllPoints()
+		unit.healthBg:SetPoint("TOPLEFT", unit.ActualHealthBar, -mult, mult)
+		unit.healthBg:SetPoint("BOTTOMLEFT", unit.ActualHealthBar, -mult, -mult)
+		unit.healthBg:SetWidth(unit.healthBarWidth + 2*mult)
 		unit.healthBg:SetFrameLevel(unit:GetFrameLevel())
 
 		if index < 3 then
@@ -192,7 +196,7 @@ tinsert(R.defaultThemes, function()
 	end
 
 	-- Reskin Petbar
-	local bar = CreateFrame("Frame", "NDuiPetBattleBar", UIParent, "SecureHandlerStateTemplate")
+	local bar = CreateFrame("Frame", "UIPetBattleBar", UIParent, "SecureHandlerStateTemplate")
 	bar:SetPoint("BOTTOM", UIParent, 0, 28)
 	bar:SetSize(310, 40)
 	local visibleState = "[petbattle] show; hide"
@@ -205,7 +209,7 @@ tinsert(R.defaultThemes, function()
 		for i = 1, 6 do
 			local bu = buttonList[i]
 			bu:SetParent(bar)
-			bu:SetSize(43, 43)
+			bu:SetSize(42, 42)
 			bu:ClearAllPoints()
 			if i == 1 then
 				bu:SetPoint("LEFT", bar)

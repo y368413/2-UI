@@ -1,4 +1,4 @@
---## Version: 1.2.1 ## Author: AcidWeb
+--## Version: 1.2.1 ## Author: AcidWeb 黑铁矮人种族技能传送点
 local HN = {}
 local L = LibStub("AceLocale-3.0"):GetLocale("HandyNotes")
 local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes")

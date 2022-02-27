@@ -50,7 +50,7 @@ local function IsAlreadyKnown(link, index)
 			M.ScanTip:SetOwner(UIParent, "ANCHOR_NONE")
 			M.ScanTip:SetHyperlink(link)
 			for i = 1, M.ScanTip:NumLines() do
-				local text = _G["NDui_ScanTooltipTextLeft"..i]:GetText() or ""
+				local text = _G["UI_ScanTooltipTextLeft"..i]:GetText() or ""
 				if strfind(text, COLLECTED) or text == ITEM_SPELL_KNOWN then
 					knowns[link] = true
 					return true

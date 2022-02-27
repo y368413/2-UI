@@ -45,12 +45,16 @@ end
 
 -- Elements
 local function UF_OnEnter(self)
-	UnitFrame_OnEnter(self)
+	if not self.disableTooltip then
+		UnitFrame_OnEnter(self)
+	end
 	self.Highlight:Show()
 end
 
 local function UF_OnLeave(self)
-	UnitFrame_OnLeave(self)
+	if not self.disableTooltip then
+		UnitFrame_OnLeave(self)
+	end
 	self.Highlight:Hide()
 end
 
@@ -114,12 +118,12 @@ function UF:CreateHealthBar(self)
 	if mystyle == "PlayerPlate" then
 		healthHeight = R.db["Nameplate"]["PPHealthHeight"]
 	elseif mystyle == "raid" then
-		if self.isPartyFrame then
+		if self.raidType == "party" then
 			healthHeight = R.db["UFs"]["PartyHeight"]
-		elseif self.isPartyPet then
+		elseif self.raidType == "pet" then
 			healthHeight = R.db["UFs"]["PartyPetHeight"]
-		elseif R.db["UFs"]["SimpleMode"] then
-			local scale = R.db["UFs"]["SimpleRaidScale"]/10
+		elseif self.raidType == "simple" then
+			local scale = R.db["UFs"]["SMRScale"]/10
 			healthHeight = 20*scale - 2*scale - R.mult
 		else
 			healthHeight = R.db["UFs"]["RaidHeight"]
@@ -184,6 +188,58 @@ function UF:UpdateFrameHealthTag()
 	self.healthValue:UpdateTag()
 end
 
+function UF:UpdateFrameNameTag()
+	local name = self.nameText
+	if not name then return end
+
+	local mystyle = self.mystyle
+	if mystyle == "nameplate" then return end
+
+	local value = mystyle == "raid" and "RCCName" or "CCName"
+	local colorTag = R.db["UFs"][value] and "[color]" or ""
+
+	if mystyle == "focus" then
+		self:Tag(name, colorTag.."[name][afkdnd]")
+	elseif mystyle == "arena" then
+		self:Tag(name, "[arenaspec] "..colorTag.."[name]")
+	elseif self.raidType == "simple" and R.db["UFs"]["TeamIndex"] then
+		self:Tag(name, "[group] "..colorTag.."[name]")
+	else
+		self:Tag(name, colorTag.."[name]")
+	end
+	name:UpdateTag()
+end
+
+function UF:UpdateRaidNameAnchor(name)
+	if self.raidType == "pet" then
+		name:ClearAllPoints()
+		if R.db["UFs"]["RaidHPMode"] == 1 then
+			name:SetWidth(self:GetWidth()*.95)
+			name:SetJustifyH("CENTER")
+			name:SetPoint("CENTER")
+		else
+			name:SetWidth(self:GetWidth()*.65)
+			name:SetJustifyH("LEFT")
+			name:SetPoint("LEFT", 3, -1)
+		end
+	elseif self.raidType == "simple" then
+		if R.db["UFs"]["RaidHPMode"] == 1 then
+			name:SetWidth(self:GetWidth()*.95)
+		else
+			name:SetWidth(self:GetWidth()*.65)
+		end
+	else
+		name:ClearAllPoints()
+		name:SetWidth(self:GetWidth()*.95)
+		name:SetJustifyH("CENTER")
+		if R.db["UFs"]["RaidHPMode"] == 1 then
+			name:SetPoint("CENTER")
+		else
+			name:SetPoint("TOP", 0, -3)
+		end
+	end
+end
+
 function UF:CreateHealthText(self)
 	local mystyle = self.mystyle
 	local textFrame = CreateFrame("Frame", nil, self)
@@ -193,50 +249,26 @@ function UF:CreateHealthText(self)
 	self.nameText = name
 	name:SetJustifyH("LEFT")
 	if mystyle == "raid" then
-		name:SetWidth(self:GetWidth()*.95)
-		name:ClearAllPoints()
-		if self.isPartyPet then
-			name:SetWidth(self:GetWidth()*.55)
-			name:SetPoint("LEFT", 3, -1)
-		elseif R.db["UFs"]["SimpleMode"] and not self.isPartyFrame then
-			name:SetPoint("LEFT", 4, 0)
-		else
-			name:SetJustifyH("CENTER")
-			if R.db["UFs"]["RaidHPMode"] ~= 1 then
-				name:SetPoint("TOP", 0, -3)
-			else
-				name:SetPoint("CENTER")
-			end
-		end
+		UF.UpdateRaidNameAnchor(self, name)
 		name:SetScale(R.db["UFs"]["RaidTextScale"])
 	elseif mystyle == "nameplate" then
 		name:ClearAllPoints()
 		name:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 3, 6)
 		name:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", -3, 6)
+		self:Tag(name, "[nplevel][name]")
 	else
 		name:SetWidth(self:GetWidth()*.55)
 	end
 
-	if mystyle == "focus" then
-		self:Tag(name, "[color][name][afkdnd]")
-	elseif mystyle == "nameplate" then
-		self:Tag(name, "[nplevel][name]")
-	elseif mystyle == "arena" then
-		self:Tag(name, "[arenaspec] [color][name]")
-	elseif mystyle == "raid" and R.db["UFs"]["SimpleMode"] and R.db["UFs"]["ShowTeamIndex"] and not self.isPartyPet and not self.isPartyFrame then
-		self:Tag(name, "[group].[color][name]")
-	else
-		self:Tag(name, "[color][name]")
-	end
+	UF.UpdateFrameNameTag(self)
 
 	local hpval = M.CreateFS(textFrame, retVal(self, 14, 13, 13, 13, R.db["Nameplate"]["HealthTextSize"]), "", false, "RIGHT", -3, 0)
 	self.healthValue = hpval
 	if mystyle == "raid" then
 		self:Tag(hpval, "[raidhp]")
-		if self.isPartyPet then
+		if self.raidType == "pet" then
 			hpval:SetPoint("RIGHT", -3, -1)
-			self:Tag(hpval, "[VariousHP(percent)]")
-		elseif R.db["UFs"]["SimpleMode"] and not self.isPartyFrame then
+		elseif self.raidType == "simple" then
 			hpval:SetPoint("RIGHT", -4, 0)
 		else
 			hpval:ClearAllPoints()
@@ -249,26 +281,6 @@ function UF:CreateHealthText(self)
 		self:Tag(hpval, "[VariousHP(currentpercent)]")
 	else
 		UF.UpdateFrameHealthTag(self)
-	end
-end
-
-function UF:UpdateRaidNameText()
-	for _, frame in pairs(oUF.objects) do
-		if frame.mystyle == "raid" and not frame.isPartyPet then
-			local name = frame.nameText
-			name:ClearAllPoints()
-			if R.db["UFs"]["SimpleMode"] and not frame.isPartyFrame then
-				name:SetPoint("LEFT", 4, 0)
-			else
-				name:SetJustifyH("CENTER")
-				if R.db["UFs"]["RaidHPMode"] ~= 1 then
-					name:SetPoint("TOP", 0, -3)
-				else
-					name:SetPoint("CENTER")
-				end
-			end
-			frame.healthValue:UpdateTag()
-		end
 	end
 end
 
@@ -320,12 +332,12 @@ function UF:CreatePowerBar(self)
 	if mystyle == "PlayerPlate" then
 		powerHeight = R.db["Nameplate"]["PPPowerHeight"]
 	elseif mystyle == "raid" then
-		if self.isPartyFrame then
+		if self.raidType == "party" then
 			powerHeight = R.db["UFs"]["PartyPowerHeight"]
-		elseif self.isPartyPet then
+		elseif self.raidType == "pet" then
 			powerHeight = R.db["UFs"]["PartyPetPowerHeight"]
-		elseif R.db["UFs"]["SimpleMode"] then
-			powerHeight = 2*R.db["UFs"]["SimpleRaidScale"]/10
+		elseif self.raidType == "simple" then
+			powerHeight = 2*R.db["UFs"]["SMRScale"]/10
 		else
 			powerHeight = R.db["UFs"]["RaidPowerHeight"]
 		end
@@ -408,6 +420,7 @@ function UF:UpdateTextScale()
 			end
 			--UF:UpdateHealthBarColor(frame, true)
 			--UF:UpdatePowerBarColor(frame, true)
+			UF.UpdateFrameNameTag(frame)
 		end
 	end
 end
@@ -416,11 +429,15 @@ function UF:UpdateRaidTextScale()
 	local scale = R.db["UFs"]["RaidTextScale"]
 	for _, frame in pairs(oUF.objects) do
 		if frame.mystyle == "raid" then
+			UF.UpdateRaidNameAnchor(frame, frame.nameText)
 			frame.nameText:SetScale(scale)
 			frame.healthValue:SetScale(scale)
+			frame.healthValue:UpdateTag()
 			if frame.powerText then frame.powerText:SetScale(scale) end
 			UF:UpdateHealthBarColor(frame, true)
 			UF:UpdatePowerBarColor(frame, true)
+			UF.UpdateFrameNameTag(frame)
+			frame.disableTooltip = R.db["UFs"]["HideTip"]
 		end
 	end
 end
@@ -494,7 +511,23 @@ local function createBarMover(bar, text, value, anchor)
 end
 
 local function updateSpellTarget(self, _, unit)
-	M.PostCastUpdate(self.Castbar, unit)
+	UF.PostCastUpdate(self.Castbar, unit)
+end
+
+function UF:ToggleCastBarLatency(frame)
+	frame = frame or _G.oUF_Player
+	if not frame then return end
+
+	if R.db["UFs"]["LagString"] then
+		frame:RegisterEvent("GLOBAL_MOUSE_UP", UF.OnCastSent, true) -- Fix quests with WorldFrame interaction
+		frame:RegisterEvent("GLOBAL_MOUSE_DOWN", UF.OnCastSent, true)
+		frame:RegisterEvent("CURRENT_SPELL_CAST_CHANGED", UF.OnCastSent, true)
+	else
+		frame:UnregisterEvent("GLOBAL_MOUSE_UP", UF.OnCastSent)
+		frame:UnregisterEvent("GLOBAL_MOUSE_DOWN", UF.OnCastSent)
+		frame:UnregisterEvent("CURRENT_SPELL_CAST_CHANGED", UF.OnCastSent)
+		if frame.Castbar then frame.Castbar.__sendTime = nil end
+	end
 end
 
 function UF:CreateCastBar(self)
@@ -567,12 +600,12 @@ function UF:CreateCastBar(self)
 
 	cb.Time = timer
 	cb.Text = name
-	cb.OnUpdate = M.OnCastbarUpdate
-	cb.PostCastStart = M.PostCastStart
-	cb.PostCastUpdate = M.PostCastUpdate
-	cb.PostCastStop = M.PostCastStop
-	cb.PostCastFail = M.PostCastFailed
-	cb.PostCastInterruptible = M.PostUpdateInterruptible
+	cb.OnUpdate = UF.OnCastbarUpdate
+	cb.PostCastStart = UF.PostCastStart
+	cb.PostCastUpdate = UF.PostCastUpdate
+	cb.PostCastStop = UF.PostCastStop
+	cb.PostCastFail = UF.PostCastFailed
+	cb.PostCastInterruptible = UF.PostUpdateInterruptible
 
 	self.Castbar = cb
 end
@@ -650,6 +683,12 @@ local filteredStyle = {
 	["arena"] = true,
 }
 
+local replaceEncryptedIcons = {
+	[368078] = 348567, -- 移速
+	[368079] = 348567, -- 移速
+	[368103] = 648208, -- 急速
+	[368243] = 237538, -- CD
+}
 function UF.PostUpdateIcon(element, _, button, _, _, duration, expiration, debuffType)
 	if duration then button.iconbg:Show() end
 
@@ -685,6 +724,11 @@ function UF.PostUpdateIcon(element, _, button, _, _, duration, expiration, debuf
 			button:SetScript("OnUpdate", nil)
 			button.timer:Hide()
 		end
+	end
+
+	local newTexture = replaceEncryptedIcons[button.spellID]
+	if newTexture then
+		button.icon:SetTexture(newTexture)
 	end
 end
 
@@ -813,8 +857,8 @@ end
 
 function UF:ConfigureAuras(element)
 	local value = element.__value
-	element.numBuffs = R.db["UFs"][value.."BuffType"] ~= 1 and 20 or 0
-	element.numDebuffs = R.db["UFs"][value.."DebuffType"] ~= 1 and 16 or 0
+	element.numBuffs = R.db["UFs"][value.."BuffType"] ~= 1 and R.db["UFs"][value.."NumBuff"] or 0
+	element.numDebuffs = R.db["UFs"][value.."DebuffType"] ~= 1 and R.db["UFs"][value.."NumDebuff"] or 0
 	element.iconsPerRow = R.db["UFs"][value.."AurasPerRow"]
 	element.showDebuffType = R.db["UFs"]["DebuffColor"]
 	element.desaturateDebuff = R.db["UFs"]["Desaturate"]
@@ -830,11 +874,44 @@ function UF:RefreshUFAuras(frame)
 	element:ForceUpdate()
 end
 
+function UF:ConfigureBuffAndDebuff(element, isDebuff)
+	local value = element.__value
+	local vType = isDebuff and "Debuff" or "Buff"
+	element.num = R.db["UFs"][value..vType.."Type"] ~= 1 and R.db["UFs"][value.."Num"..vType] or 0
+	element.iconsPerRow = R.db["UFs"][value..vType.."PerRow"]
+	element.showDebuffType = R.db["UFs"]["DebuffColor"]
+	element.desaturateDebuff = R.db["UFs"]["Desaturate"]
+end
+
+function UF:RefreshBuffAndDebuff(frame)
+	if not frame then return end
+
+	local element = frame.Buffs
+	if element then
+		UF:ConfigureBuffAndDebuff(element)
+		UF:UpdateAuraContainer(frame, element, element.num)
+		element:ForceUpdate()
+	end
+
+	local element = frame.Debuffs
+	if element then
+		UF:ConfigureBuffAndDebuff(element, true)
+		UF:UpdateAuraContainer(frame, element, element.num)
+		element:ForceUpdate()
+	end
+end
+
 function UF:UpdateUFAuras()
 	UF:RefreshUFAuras(_G.oUF_Player)
 	UF:RefreshUFAuras(_G.oUF_Target)
 	UF:RefreshUFAuras(_G.oUF_Focus)
-	UF:RefreshUFAuras(_G.oUF_ToT)
+	--UF:RefreshUFAuras(_G.oUF_ToT)
+	--UF:RefreshUFAuras(_G.oUF_Pet)
+
+	for i = 1, 5 do
+		UF:RefreshBuffAndDebuff(_G["oUF_Boss"..i])
+		UF:RefreshBuffAndDebuff(_G["oUF_Arena"..i])
+	end
 end
 
 function UF:ToggleUFAuras(frame, enable)
@@ -856,7 +933,7 @@ function UF:ToggleAllAuras()
 	UF:ToggleUFAuras(_G.oUF_Player, enable)
 	UF:ToggleUFAuras(_G.oUF_Target, enable)
 	UF:ToggleUFAuras(_G.oUF_Focus, enable)
-	UF:ToggleUFAuras(_G.oUF_ToT, enable)
+	--UF:ToggleUFAuras(_G.oUF_ToT, enable)
 end
 
 function UF:CreateAuras(self)
@@ -878,7 +955,7 @@ function UF:CreateAuras(self)
 	elseif mystyle == "raid" then
 		bu.initialAnchor = "LEFT"
 		bu:SetPoint("LEFT", self, 15, 0)
-		bu.size = 18*R.db["UFs"]["SimpleRaidScale"]/10
+		bu.size = 18*R.db["UFs"]["SMRScale"]/10
 		bu.numTotal = 1
 		bu.disableCooldown = true
 		bu.gap = false
@@ -926,15 +1003,15 @@ function UF:CreateBuffs(self)
 		bu["growth-x"] = "LEFT"
 		bu:ClearAllPoints()
 		bu:SetPoint("BOTTOMRIGHT", self.Health, -R.mult, R.mult)
-		bu.num = ((R.db["UFs"]["SimpleMode"] and not self.isPartyFrame) or (not R.db["UFs"]["ShowRaidBuff"])) and 0 or 3
+		bu.num = (self.raidType == "simple" or not R.db["UFs"]["ShowRaidBuff"]) and 0 or 3
 		bu.size = R.db["UFs"]["RaidBuffSize"]
 		bu.CustomFilter = UF.RaidBuffFilter
 		bu.disableMouse = true
 		bu.fontSize = R.db["UFs"]["RaidBuffSize"]-2
-	else
-		bu.num = 6
-		bu.iconsPerRow = 6
-		bu.onlyShowPlayer = false
+	else -- boss and arena
+		bu.__value = "Boss"
+		UF:ConfigureBuffAndDebuff(bu)
+		bu.CustomFilter = UF.UnitCustomFilter
 	end
 
 	UF:UpdateAuraContainer(self, bu, bu.num)
@@ -954,20 +1031,20 @@ function UF:CreateDebuffs(self)
 	bu["growth-y"] = "DOWN"
 	bu.tooltipAnchor = "ANCHOR_BOTTOMLEFT"
 	bu.showDebuffType = true
-	if mystyle == "boss" or mystyle == "arena" then
-		bu:SetPoint("TOPRIGHT", self, "TOPLEFT", -5, 0)
-		bu.num = 10
-		bu.iconsPerRow = 5
-		bu.CustomFilter = UF.CustomFilter
-	elseif mystyle == "raid" then
+	if mystyle == "raid" then
 		bu.initialAnchor = "BOTTOMLEFT"
 		bu["growth-x"] = "RIGHT"
 		bu:SetPoint("BOTTOMLEFT", self.Health, R.mult, R.mult)
-		bu.num = ((R.db["UFs"]["SimpleMode"] and not self.isPartyFrame) or (not R.db["UFs"]["ShowRaidDebuff"])) and 0 or 3
+		bu.num = (self.raidType == "simple" or not R.db["UFs"]["ShowRaidDebuff"]) and 0 or 3
 		bu.size = R.db["UFs"]["RaidDebuffSize"]
 		bu.CustomFilter = UF.RaidDebuffFilter
 		bu.disableMouse = true
 		bu.fontSize = R.db["UFs"]["RaidDebuffSize"]-2
+	else -- boss and arena
+		bu:SetPoint("TOPRIGHT", self, "TOPLEFT", -5, 0)
+		bu.__value = "Boss"
+		UF:ConfigureBuffAndDebuff(bu, true)
+		bu.CustomFilter = UF.UnitCustomFilter
 	end
 
 	UF:UpdateAuraContainer(self, bu, bu.num)
@@ -982,7 +1059,7 @@ function UF:UpdateRaidAuras()
 		if frame.mystyle == "raid" then
 			local debuffs = frame.Debuffs
 			if debuffs then
-				debuffs.num = ((R.db["UFs"]["SimpleMode"] and not frame.isPartyFrame) or (not R.db["UFs"]["ShowRaidDebuff"])) and 0 or 3
+				debuffs.num = (frame.raidType == "simple" or not R.db["UFs"]["ShowRaidDebuff"]) and 0 or 3
 				debuffs.size = R.db["UFs"]["RaidDebuffSize"]
 				debuffs.fontSize = R.db["UFs"]["RaidDebuffSize"]-2
 				UF:UpdateAuraContainer(frame, debuffs, debuffs.num)
@@ -991,7 +1068,7 @@ function UF:UpdateRaidAuras()
 
 			local buffs = frame.Buffs
 			if buffs then
-				buffs.num = ((R.db["UFs"]["SimpleMode"] and not frame.isPartyFrame) or (not R.db["UFs"]["ShowRaidBuff"])) and 0 or 3
+				buffs.num = (frame.raidType == "simple" or not R.db["UFs"]["ShowRaidBuff"]) and 0 or 3
 				buffs.size = R.db["UFs"]["RaidBuffSize"]
 				buffs.fontSize = R.db["UFs"]["RaidBuffSize"]-2
 				UF:UpdateAuraContainer(frame, buffs, buffs.num)
@@ -1104,6 +1181,14 @@ function UF:CreateClassPower(self)
 	local bar = CreateFrame("Frame", "$parentClassPowerBar", self.Health)
 	bar:SetSize(barWidth, barHeight)
 	bar:SetPoint(unpack(barPoint))
+
+	-- show bg while size changed
+	if not isDK then
+		bar.bg = M.SetBD(bar)
+		bar.bg:SetFrameLevel(5)
+		bar.bg:SetBackdropBorderColor(1, .8, 0)
+		bar.bg:Hide()
+	end
 
 	local bars = {}
 	for i = 1, 6 do
@@ -1231,8 +1316,10 @@ function UF:UpdateUFClassPower()
 	local xOffset, yOffset = R.db["UFs"]["CPxOffset"], R.db["UFs"]["CPyOffset"]
 	local bars = playerFrame.ClassPower or playerFrame.Runes
 	if bars then
-		playerFrame.ClassPowerBar:SetSize(barWidth, barHeight)
-		playerFrame.ClassPowerBar:SetPoint("BOTTOMLEFT", playerFrame, "TOPLEFT", xOffset, yOffset)
+		local bar = playerFrame.ClassPowerBar
+		bar:SetSize(barWidth, barHeight)
+		bar:SetPoint("BOTTOMLEFT", playerFrame, "TOPLEFT", xOffset, yOffset)
+		if bar.bg then bar.bg:Show() end
 		local max = bars.__max
 		for i = 1, max do
 			bars[i]:SetHeight(barHeight)
@@ -1403,14 +1490,27 @@ function UF:CreateAddPower(self)
 	}
 end
 
+function UF:ToggleSwingBars()
+	local frame = _G.oUF_Player
+	if not frame then return end
+
+	if R.db["UFs"]["SwingBar"] then
+		if not frame:IsElementEnabled("Swing") then
+			frame:EnableElement("Swing")
+		end
+	elseif frame:IsElementEnabled("Swing") then
+		frame:DisableElement("Swing")
+	end
+end
+
 function UF:CreateSwing(self)
-	--if not R.db["UFs"]["Castbars"] then return end
+	local width, height = R.db["UFs"]["SwingWidth"], R.db["UFs"]["SwingHeight"]
 
 	local bar = CreateFrame("StatusBar", nil, self)
-	local width = R.db["UFs"]["PlayerCBWidth"] - R.db["UFs"]["PlayerCBHeight"] - 5
-	bar:SetSize(width, 3)
-	createBarMover(bar, U["UFs SwingBar"], "Swing", {"CENTER", UIParent, "CENTER", 0, -250})
-	--bar:SetPoint("TOP", self.Castbar.mover, "BOTTOM", 0, -3)
+	bar:SetSize(width, height)
+	bar.mover = M.Mover(bar, U["UFs SwingBar"], "Swing", {"CENTER", UIParent, "CENTER", 0, -250})
+	bar:ClearAllPoints()
+	bar:SetPoint("CENTER", bar.mover)
 
 	local two = CreateFrame("StatusBar", nil, bar)
 	two:Hide()
@@ -1425,14 +1525,16 @@ function UF:CreateSwing(self)
 	local off = CreateFrame("StatusBar", nil, bar)
 	off:Hide()
 	off:SetPoint("TOPLEFT", bar, "BOTTOMLEFT", 0, -3)
-	off:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 0, -6)
+	off:SetPoint("TOPRIGHT", bar, "BOTTOMRIGHT", 0, -3)
+	off:SetHeight(height)
 	M.CreateSB(off, true, .8, .8, .8)
 
-	if R.db["UFs"]["SwingTimer"] then
-		bar.Text = M.CreateFS(bar, 11, "")
-		bar.TextMH = M.CreateFS(main, 11, "")
-		bar.TextOH = M.CreateFS(off, 11, "", false, "CENTER", 1, -5)
-	end
+	bar.Text = M.CreateFS(bar, 11, "")
+	bar.Text:SetShown(R.db["UFs"]["SwingTimer"])
+	bar.TextMH = M.CreateFS(main, 11, "")
+	bar.TextMH:SetShown(R.db["UFs"]["SwingTimer"])
+	bar.TextOH = M.CreateFS(off, 11, "", false, "CENTER", 1, -5)
+	bar.TextOH:SetShown(R.db["UFs"]["SwingTimer"])
 
 	self.Swing = bar
 	self.Swing.Twohand = two
@@ -1442,7 +1544,6 @@ function UF:CreateSwing(self)
 end
 
 function UF:CreateQuakeTimer(self)
-	--if not R.db["UFs"]["Castbars"] then return end
 
 	local bar = CreateFrame("StatusBar", nil, self)
 	bar:SetSize(R.db["UFs"]["PlayerCBWidth"], R.db["UFs"]["PlayerCBHeight"])

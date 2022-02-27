@@ -284,6 +284,23 @@ function module:UpdateChatItemLevel(_, msg, ...)
 	return false, msg, ...
 end
 
+-- Filter azerite message on island expeditions
+local AZERITE_STR = ISLANDS_QUEUE_WEEKLY_QUEST_PROGRESS:gsub("%%d/%%d ", "")
+local function filterAzeriteGain(_, _, msg)
+	if strfind(msg, AZERITE_STR) then
+		return true
+	end
+end
+
+local function isPlayerOnIslands()
+	local _, instanceType, _, _, maxPlayers = GetInstanceInfo()
+	if instanceType == "scenario" and (maxPlayers == 3 or maxPlayers == 6) then
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", filterAzeriteGain)
+	else
+		ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", filterAzeriteGain)
+	end
+end
+
 function module:ChatFilter()
 	if R.db["Chat"]["ChatItemLevel"] then
 		GetDungeonScoreInColor = M:GetModule("Tooltip").GetDungeonScore
@@ -332,4 +349,6 @@ function module:ChatFilter()
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT_LEADER", self.UpdateAddOnBlocker)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateAddOnBlocker)
 	end
+
+	M:RegisterEvent("PLAYER_ENTERING_WORLD", isPlayerOnIslands) -- filter azerite msg
 end

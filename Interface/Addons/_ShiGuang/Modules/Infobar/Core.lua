@@ -3,7 +3,6 @@ local M, R, U, I = unpack(ns)
 local INFO = M:RegisterModule("Infobar")
 
 local tinsert, pairs, unpack = table.insert, pairs, unpack
-
 local GOLD_AMOUNT_SYMBOL = "|cffffd700●|r"--format("|cffffd700%s|r", GOLD_AMOUNT_SYMBOL)
 local SILVER_AMOUNT_SYMBOL = "|cffb0b0b0●|r"--format("|cffd0d0d0%s|r", SILVER_AMOUNT_SYMBOL)
 local COPPER_AMOUNT_SYMBOL = "|cffc77050●|r"--format("|cffc77050%s|r", COPPER_AMOUNT_SYMBOL)

@@ -21,7 +21,6 @@ local function reskinChatBubble(chatbubble)
 end
 
 tinsert(R.defaultThemes, function()
-	--if not R.db["Skins"]["BlizzardSkins"] then return end
 
 	local events = {
 		CHAT_MSG_SAY = "chatBubbles",

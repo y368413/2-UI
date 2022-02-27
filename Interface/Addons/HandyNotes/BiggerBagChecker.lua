@@ -1,4 +1,4 @@
-﻿--## Version: v1.4.3-release ## Author: KyrosKrane Sylvanblade
+﻿--## Version: v1.4.4-release ## Author: KyrosKrane Sylvanblade
 local L = {}
 
 local criteria =

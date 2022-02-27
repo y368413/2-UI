@@ -1,4 +1,4 @@
-﻿--## Author: GurliGebis  "0.34.1"
+﻿--## Author: GurliGebis  "0.35.0"
 local AngrierWorldQuests = {}
 local Listener = CreateFrame('Frame', 'AngrierWorldQuestListener')
 local EventListeners = {}
@@ -133,7 +133,7 @@ function AngrierWorldQuests:PLAYER_ENTERING_WORLD()
 end
 
 AngrierWorldQuests.Name = ANGRYWORLDQUEST_TITLE
-AngrierWorldQuests.Version = "v0.34.1"
+AngrierWorldQuests.Version = "v0.35.0"
 
 local Config = AngrierWorldQuests:NewModule('Config')
 local configDefaults = {
@@ -154,7 +154,6 @@ local configDefaults = {
 	hideUntrackedPOI = false,
 	hideFilteredPOI = true,
 	showContinentPOI = false,
-	showComparisonRight = false,
 	sortMethod = 2,
 	extendedInfo = false,
 	saveFilters = true,

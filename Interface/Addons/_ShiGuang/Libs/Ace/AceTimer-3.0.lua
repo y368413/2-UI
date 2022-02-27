@@ -28,7 +28,7 @@ local function new(self, loop, func, delay, ...)
 	activeTimers[timer] = timer
 
 	-- Create new timer closure to wrap the "timer" object
-	timer.callback = function() 
+	timer.callback = function()
 		if not timer.cancelled then
 			if type(timer.func) == "string" then
 

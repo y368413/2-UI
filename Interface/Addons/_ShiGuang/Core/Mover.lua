@@ -18,6 +18,7 @@ function M:CreateMF(parent, saved)
 		frame:StopMovingOrSizing()
 		if not saved then return end
 		local orig, _, tar, x, y = frame:GetPoint()
+		x, y = M:Round(x), M:Round(y)
 		R.db["TempAnchor"][frame:GetName()] = {orig, "UIParent", tar, x, y}
 	end)
 end
@@ -113,7 +114,7 @@ end
 
 function MISC:UpdateTrimFrame()
 	if not f then return end -- for aurawatch preview
-	
+
 	local x, y = MISC:CalculateMoverPoints(self)
 	f.__x:SetText(x)
 	f.__y:SetText(y)

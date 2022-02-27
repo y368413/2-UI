@@ -1,4 +1,4 @@
-﻿--## Author: Caerdon ## SavedVariables: CaerdonWardrobeConfig  ## Version: v2.9.0
+﻿--## Author: Caerdon ## SavedVariables: CaerdonWardrobeConfig  ## Version: v2.13.0
 	
 if GetLocale() == "zhCN" then
   CaerdonWardrobeBoA = "|cffe6cc80战网|r";
@@ -814,14 +814,14 @@ function CaerdonWardrobeMixin:ProcessItem(button, item, feature, locationInfo, o
 			if transmogInfo.isTransmog then
 				if transmogInfo.needsItem then
 					if not transmogInfo.isCompletionistItem then
-						if transmogInfo.hasMetRequirements then
+						if transmogInfo.hasMetRequirements and not tooltipInfo.foundRedRequirements then
 							mogStatus = "own"
 						else
 							mogStatus = "lowSkill"
 						end
 					else
 						if CaerdonWardrobeConfig.Icon.ShowLearnable.SameLookDifferentItem then
-							if transmogInfo.hasMetRequirements then
+							if transmogInfo.hasMetRequirements and not tooltipInfo.foundRedRequirements then
 								mogStatus = "ownPlus"
 							else
 								mogStatus = "lowSkillPlus"
@@ -1087,11 +1087,10 @@ function CaerdonWardrobeMixin:GetTooltipInfo(item)
 			local hex = string.format("%02x%02x%02x", r*255, g*255, b*255)
 			-- TODO: Provide option to show stars on BoE recipes that aren't for current toon
 			-- TODO: Surely there's a better way than checking hard-coded color values for red-like things
+			if hex == "fe1f1f" then
+				tooltipInfo.foundRedRequirements = true
+			end
 			if isRecipe then
-				if hex == "fe1f1f" then
-					tooltipInfo.foundRedRequirements = true
-				end
-
 				-- TODO: Cooking and fishing are not represented in trade skill lines right now
 				-- Assuming all toons have cooking for now.
 
@@ -1133,7 +1132,7 @@ function CaerdonWardrobeMixin:GetTooltipInfo(item)
 		end
 	end
 
-	--C_TransmogCollection.SetShowMissingSourceInItemTooltips(true)
+	-- C_TransmogCollection.SetShowMissingSourceInItemTooltips(true)
 	SetCVar("missingTransmogSourceInItemTooltips", 1)
 	--SetCVar("alwaysCompareItems", originalAlwaysCompareItems)
 

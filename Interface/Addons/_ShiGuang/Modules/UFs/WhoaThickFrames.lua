@@ -557,6 +557,25 @@ function wPlayerFrame(self)
 end
 hooksecurefunc("PlayerFrame_ToPlayerArt", wPlayerFrame)
 
+function WhoaGroupIndicator()
+	local name, rank, subgroup;
+	if ( not IsInRaid() ) then
+		return;
+	end
+	local numGroupMembers = GetNumGroupMembers();
+	for i=1, MAX_RAID_MEMBERS do
+		if ( i <= numGroupMembers ) then
+			name, rank, subgroup = GetRaidRosterInfo(i);
+			if ( name == UnitName("player") ) then
+				PlayerFrameGroupIndicatorText:SetText("G"..subgroup);
+				PlayerFrameGroupIndicator:SetWidth(PlayerFrameGroupIndicatorText:GetWidth());-- +40);
+				PlayerFrameGroupIndicator:Show();
+			end
+		end
+	end
+end
+hooksecurefunc("PlayerFrame_UpdateGroupIndicator", WhoaGroupIndicator)
+
 --[[ pet frame.
 function whoaPetFrame(self, override)
 	self.healthbar.LeftText:ClearAllPoints();

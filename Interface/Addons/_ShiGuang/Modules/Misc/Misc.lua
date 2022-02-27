@@ -71,6 +71,7 @@ function MISC:OnLogin()
 	MISC:JerryWay()
 	MISC:QuickMenuButton()
 	MISC:BaudErrorFrameHelpTip()
+	MISC:EnhancedPicker()
 	
 	--MISC:CreateRM()
 	--MISC:FreeMountCD()
@@ -206,7 +207,7 @@ end
 
 -- Reanchor Vehicle
 function MISC:VehicleSeatMover()
-	local frame = CreateFrame("Frame", "NDuiVehicleSeatMover", UIParent)
+	local frame = CreateFrame("Frame", "UIVehicleSeatMover", UIParent)
 	frame:SetSize(125, 125)
 	M.Mover(frame, U["VehicleSeat"], "VehicleSeat", {"BOTTOMRIGHT", UIParent, -285, 21})
 
@@ -220,7 +221,7 @@ end
 
 -- Reanchor UIWidgetBelowMinimapContainerFrame
 function MISC:UIWidgetFrameMover()
-	local frame = CreateFrame("Frame", "NDuiUIWidgetMover", UIParent)
+	local frame = CreateFrame("Frame", "UIWidgetMover", UIParent)
 	frame:SetSize(210, 60)
 	M.Mover(frame, U["UIWidgetFrame"], "UIWidgetFrame", {"TOPRIGHT", Minimap, "BOTTOMRIGHT", 0, -43})
 
@@ -234,7 +235,7 @@ end
 
 -- Reanchor MawBuffsBelowMinimapFrame
 function MISC:MoveMawBuffsFrame()
-	local frame = CreateFrame("Frame", "NDuiMawBuffsMover", UIParent)
+	local frame = CreateFrame("Frame", "UIMawBuffsMover", UIParent)
 	frame:SetSize(235, 28)
 	local mover = M.Mover(frame, MAW_POWER_DESCRIPTION, "MawBuffs", {"TOPRIGHT", UIParent, -80, -225})
 	frame:SetPoint("TOPLEFT", mover, 4, 12)
@@ -269,7 +270,7 @@ end
 
 -- Reanchor ObjectiveTracker
 function MISC:MoveQuestTracker()
-	local frame = CreateFrame("Frame", "NDuiQuestMover", UIParent)
+	local frame = CreateFrame("Frame", "UIQuestMover", UIParent)
 	frame:SetSize(240, 43)
 	M.Mover(frame, U["QuestTracker"], "QuestTracker", {"TOPLEFT","UIParent","TOPLEFT",26,-21})
 
@@ -502,7 +503,7 @@ end
 
 -- Drag AltPowerbar
 do
-	local mover = CreateFrame("Frame", "NDuiAltBarMover", PlayerPowerBarAlt)
+	local mover = CreateFrame("Frame", "UIAltBarMover", PlayerPowerBarAlt)
 	mover:SetPoint("CENTER", UIParent, 0, -260)
 	mover:SetSize(20, 20)
 	M.CreateMF(PlayerPowerBarAlt, mover)
@@ -763,7 +764,7 @@ function MISC:JerryWay()
 		end
 	end
 
-	SlashCmdList["NDUI_JERRY_WAY"] = function(msg)
+	SlashCmdList["UI_JERRY_WAY"] = function(msg)
 		msg = gsub(msg, "(%d)[%.,] (%d)", "%1 %2")
 		local x, y, z = strmatch(msg, "(%S+)%s(%S+)(.*)")
 		if x and y then
@@ -781,7 +782,7 @@ function MISC:JerryWay()
 			end
 		end
 	end
-	SLASH_NDUI_JERRY_WAY1 = "/way"
+	SLASH_UI_JERRY_WAY1 = "/way"
 end
 
 function MISC:BaudErrorFrameHelpTip()
@@ -834,7 +835,7 @@ function MISC:QuickMenuButton()
 		{text = COPY_NAME, func = MISC.MenuButton_CopyName, color = {1, 0, 0}},
 	}
 
-	local frame = CreateFrame("Frame", "NDuiMenuButtonFrame", DropDownList1)
+	local frame = CreateFrame("Frame", "UIMenuButtonFrame", DropDownList1)
 	frame:SetSize(10, 10)
 	frame:SetPoint("TOPLEFT")
 	frame:Hide()
@@ -866,6 +867,98 @@ function MISC:QuickMenuButton()
 		end
 		MISC.MenuButtonName = name.."-"..server
 		frame:Show()
+	end)
+end
+
+-- Enhanced ColorPickerFrame
+local function translateColor(r)
+	if not r then r = "ff" end
+	return tonumber(r, 16)/255
+end
+
+function MISC:EnhancedPicker_UpdateColor()
+	local r, g, b = strmatch(self.colorStr, "(%x%x)(%x%x)(%x%x)$")
+	r = translateColor(r)
+	g = translateColor(g)
+	b = translateColor(b)
+	_G.ColorPickerFrame:SetColorRGB(r, g, b)
+end
+
+local function GetBoxColor(box)
+	local r = box:GetText()
+	r = tonumber(r)
+	if not r or r < 0 or r > 255 then r = 255 end
+	return r
+end
+
+local function updateColorRGB(self)
+	local r = GetBoxColor(_G.ColorPickerFrame.__boxR)
+	local g = GetBoxColor(_G.ColorPickerFrame.__boxG)
+	local b = GetBoxColor(_G.ColorPickerFrame.__boxB)
+	self.colorStr = format("%02x%02x%02x", r, g, b)
+	MISC.EnhancedPicker_UpdateColor(self)
+end
+
+local function updateColorStr(self)
+	self.colorStr = self:GetText()
+	MISC.EnhancedPicker_UpdateColor(self)
+end
+
+local function createCodeBox(width, index, text)
+	local box = M.CreateEditBox(_G.ColorPickerFrame, width, 22)
+	box:SetMaxLetters(index == 4 and 6 or 3)
+	box:SetTextInsets(0, 0, 0, 0)
+	box:SetPoint("TOPLEFT", _G.ColorSwatch, "BOTTOMLEFT", 0, -index*24 + 2)
+	M.CreateFS(box, 14, text, "system", "LEFT", -15, 0)
+	if index == 4 then
+		box:HookScript("OnEnterPressed", updateColorStr)
+	else
+		box:HookScript("OnEnterPressed", updateColorRGB)
+	end
+	return box
+end
+
+function MISC:EnhancedPicker()
+	local pickerFrame = _G.ColorPickerFrame
+	pickerFrame:SetHeight(250)
+	M.CreateMF(pickerFrame.Header, pickerFrame) -- movable by header
+	_G.OpacitySliderFrame:SetPoint("TOPLEFT", _G.ColorSwatch, "TOPRIGHT", 50, 0)
+
+	local colorBar = CreateFrame("Frame", nil, pickerFrame)
+	colorBar:SetSize(1, 22)
+	colorBar:SetPoint("BOTTOM", 0, 38)
+
+	local count = 0
+	for name, class in pairs(I.ClassList) do
+		local value = I.ClassColors[class]
+		if value then
+			local bu = M.CreateButton(colorBar, 22, 22, true)
+			bu.Icon:SetColorTexture(value.r, value.g, value.b)
+			bu:SetPoint("LEFT", count*22, 0)
+			bu.colorStr = value.colorStr
+			bu:SetScript("OnClick", MISC.EnhancedPicker_UpdateColor)
+			M.AddTooltip(bu, "ANCHOR_TOP", "|c"..value.colorStr..name)
+
+			count = count + 1
+		end
+	end
+	colorBar:SetWidth(count*22)
+
+	pickerFrame.__boxR = createCodeBox(45, 1, "|cffff0000R")
+	pickerFrame.__boxG = createCodeBox(45, 2, "|cff00ff00G")
+	pickerFrame.__boxB = createCodeBox(45, 3, "|cff0000ffB")
+	pickerFrame.__boxH = createCodeBox(70, 4, "#")
+
+	pickerFrame:HookScript("OnColorSelect", function(self)
+		local r, g, b = self:GetColorRGB()
+		r = M:Round(r*255)
+		g = M:Round(g*255)
+		b = M:Round(b*255)
+
+		self.__boxR:SetText(r)
+		self.__boxG:SetText(g)
+		self.__boxB:SetText(b)
+		self.__boxH:SetText(format("%02x%02x%02x", r, g, b))
 	end)
 end
 

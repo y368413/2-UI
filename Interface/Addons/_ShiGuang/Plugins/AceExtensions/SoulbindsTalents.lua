@@ -1,3 +1,11 @@
+﻿if GetLocale() == "zhCN" then
+  SoulbindsTalentsLocal = "|cffe6cc80[心能]|r快捷按钮";
+elseif GetLocale() == "zhTW" then
+  SoulbindsTalentsLocal = "|cffe6cc80[心能]|r快捷按钮";
+else
+  SoulbindsTalentsLocal = "SoulbindsTalents";
+end
+
 local defaults_settings = {
 	profile = {
 		disableFX = false,
@@ -94,7 +102,7 @@ function SoulbindsTalents:SetupOptions()
 	}
 
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("SoulbindsTalents", self.options)
-	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("SoulbindsTalents", "SoulbindsTalents")
+	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("SoulbindsTalents", SoulbindsTalentsLocal)
 end
 
 function SoulbindsTalents:PlayerTalentFrame_Refresh()

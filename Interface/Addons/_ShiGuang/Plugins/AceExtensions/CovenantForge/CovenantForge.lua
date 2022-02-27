@@ -961,21 +961,21 @@ local options = {
 	inline = true,
 	args = {
 		settings={
-			name = "Options",
+			name = "选项",
 			type = "group",
 			inline = false,
 			order = 0,
 			args = {
 				Options_Header = {
 					order = 1,
-					name = "General Options",
+					name = "常规选项",
 					type = "header",
 					width = "full",
 				},
 				
 				ShowSoulbindNames = {
 					order = 3,
-					name = "Show Soulbind Name",
+					name = "显示羁绊名称",
 					type = "toggle",
 					width = "full",
 					arg = "ShowSoulbindNames",
@@ -983,21 +983,21 @@ local options = {
 
 				ShowNodeNames = {
 					order = 3.1,
-					name = "Show Node Ability Names",
+					name = "显示节点名称",
 					type = "toggle",
 					width = "full",
 					arg = "ShowNodeNames",
 				},
 				ShowWeights = {
 					order = 4,
-					name = "Show Weights",
+					name = "显示评分",
 					type = "toggle",
 					width = "full",
 					arg = "ShowWeights",
 				},
 				HideZeroValues = {
 					order = 5,
-					name = "Hide Weight Values That Are 0",
+					name = "隐藏0评分的项",
 					type = "toggle",
 					width = "full",
 					arg = "ShowWeights",
@@ -1005,7 +1005,7 @@ local options = {
 
 				ShowAsPercent = {
 					order = 4,
-					name = "Show Weight as Percent",
+					name = "评分显示为百分比",
 					type = "toggle",
 					width = "full",
 					arg = "ShowAsPercent",
@@ -1013,14 +1013,14 @@ local options = {
 
 				disableFX = {
 					order = 5.1,
-					name = "Disable FX",
+					name = "禁用FX",
 					width = "full",
 					type = "toggle",
 				},
 
 				ShowTooltipRank = {
 					order = 6,
-					name = "Show Conduit Rank on Tooltip",
+					name = "提示中显示羁绊等级",
 					type = "toggle",
 					width = "full",
 				},
@@ -1059,7 +1059,7 @@ function CovenantForge:OnInitialize()
 	CovenantForge.Profile = self.db.profile
 	options.args.profiles  = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 	options.args.weights  = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.weightdb)
-	options.args.weights.name = "Weights"
+	options.args.weights.name = "评分"
 	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, "CovenantForge")
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("CovenantForge", options)
 	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("CovenantForge", CovenantForgeLocal)
@@ -1220,7 +1220,7 @@ function CovenantForge.Init:CreateSoulbindFrames()
 	local DefaultsTab = CreateFrame("CheckButton", "$parentTab1", SoulbindViewer, "CovenantForge_TabTemplate", 1)
    -- PathTab:SetSize(50,50)
 	DefaultsTab:SetPoint("TOPRIGHT", SoulbindViewer, "TOPRIGHT", 30, -20)
-	DefaultsTab.tooltip = "Learned Conduits"
+	DefaultsTab.tooltip = "现有导灵器"
 	DefaultsTab:Show()
 	DefaultsTab.TabardEmblem:SetTexture("Interface/ICONS/Ability_Monk_EssenceFont")
 	DefaultsTab.tabIndex = 1
@@ -1231,7 +1231,7 @@ function CovenantForge.Init:CreateSoulbindFrames()
 	local PathTab = CreateFrame("CheckButton", "$parentTab2", SoulbindViewer, "CovenantForge_TabTemplate", 1)
    -- PathTab:SetSize(50,50)
 	PathTab:SetPoint("TOPRIGHT", DefaultsTab, "BOTTOMRIGHT", 0, -20)
-	PathTab.tooltip = "Saved Paths"
+	PathTab.tooltip = "保存配置"
 	PathTab:Show()
 	PathTab.TabardEmblem:SetTexture("Interface/ICONS/Ability_Druid_FocusedGrowth")
 	PathTab.tabIndex = 2
@@ -1240,7 +1240,7 @@ function CovenantForge.Init:CreateSoulbindFrames()
 	local ConduitTab = CreateFrame("CheckButton", "$parentTab3", SoulbindViewer, "CovenantForge_TabTemplate", 1)
    -- PathTab:SetSize(50,50)
 	ConduitTab:SetPoint("TOPRIGHT", PathTab, "BOTTOMRIGHT", 0, -20)
-	ConduitTab.tooltip = "Avaiable Conduits"
+	ConduitTab.tooltip = "可用导灵器"
 	ConduitTab:Show()
 	ConduitTab.TabardEmblem:SetTexture("Interface/ICONS/70_inscription_steamy_romance_novel_kit")
 	ConduitTab.tabIndex = 3
@@ -1249,7 +1249,7 @@ function CovenantForge.Init:CreateSoulbindFrames()
 	local WeightsTab = CreateFrame("CheckButton", "$parentTab4", SoulbindViewer, "CovenantForge_TabTemplate", 1)
    -- PathTab:SetSize(50,50)
 	WeightsTab:SetPoint("TOPRIGHT", ConduitTab, "BOTTOMRIGHT", 0, -20)
-	WeightsTab.tooltip = "Weights"
+	WeightsTab.tooltip = "评分"
 	WeightsTab:Show()
 	WeightsTab.TabardEmblem:SetTexture("Interface/ICONS/INV_Stone_WeightStone_06.blp")
 	WeightsTab.tabIndex = 4
@@ -1303,21 +1303,21 @@ function CovenantForgeSavedTab_OnClick(self)
 		SoulbindViewer.ConduitList:Hide()
 		CovenantForge.PathStorageFrame.EditBox:Show()
 		CovenantForge.PathStorageFrame.CreateButton:Show()
-		CovenantForge.PathStorageFrame.Title:SetText("Saved Paths")
+		CovenantForge.PathStorageFrame.Title:SetText("保存配置")
 		CovenantForge:UpdateSavedPathsList()
 	elseif currentTab == 3 then
 		CovenantForge.PathStorageFrame:Show()
 		SoulbindViewer.ConduitList:Hide()
 		CovenantForge.PathStorageFrame.EditBox:Hide()
 		CovenantForge.PathStorageFrame.CreateButton:Hide()
-		CovenantForge.PathStorageFrame.Title:SetText("Conduits")
+		CovenantForge.PathStorageFrame.Title:SetText("导灵器")
 		CovenantForge:UpdateConduitList()
 	elseif currentTab == 4 then
 		CovenantForge.PathStorageFrame:Show()
 		SoulbindViewer.ConduitList:Hide()
 		CovenantForge.PathStorageFrame.EditBox:Hide()
 		CovenantForge.PathStorageFrame.CreateButton:Hide()
-		CovenantForge.PathStorageFrame.Title:SetText("Weights")
+		CovenantForge.PathStorageFrame.Title:SetText("评分")
 		CovenantForge:UpdateWeightList()
 	end
 end
@@ -1328,7 +1328,7 @@ function CovenantForge:UpdateConduitList()
 	if not SoulbindViewer or (SoulbindViewer and not SoulbindViewer:IsShown()) or
  		not CovenantForge.scrollcontainer then return end
 
- 	local filter = {"All", 	Soulbinds.GetConduitName(0),Soulbinds.GetConduitName(1),Soulbinds.GetConduitName(2), "Soulbinds"}
+ 	local filter = {"全部", 	Soulbinds.GetConduitName(0),Soulbinds.GetConduitName(1),Soulbinds.GetConduitName(2), "羁绊"}
 
 	scrollcontainer:ReleaseChildren()
 	scrollcontainer:SetPoint("TOPLEFT", CovenantForge.PathStorageFrame,"TOPLEFT", 0, -25)
@@ -1439,7 +1439,7 @@ function CovenantForge:UpdateConduitList()
 		scroll:AddChild(topHeading)
 
 		local label = AceGUI:Create("Label") 
-		label:SetText("Soulbinds")
+		label:SetText("羁绊")
 
 		local covenantData = C_Covenants.GetCovenantData(C_Covenants.GetActiveCovenantID());
 		label:SetImage("Interface/Buttons/UI-OptionsButton")
@@ -2141,7 +2141,7 @@ function CovenantForge:UpdateSavedPathsList()
 				if (not StaticPopup_Visible("COVENANTFORGE_UPDATEPATHPOPUP")) then
 				CovenantForge:ShowPopup("COVENANTFORGE_UPDATEPATHPOPUP", i)
 				end  end)
-		UpdateButton:SetCallback("OnEnter", function() GameTooltip:SetOwner(UpdateButton.frame, "ANCHOR_RIGHT"); GameTooltip:AddLine("Options"); GameTooltip:Show() end)
+		UpdateButton:SetCallback("OnEnter", function() GameTooltip:SetOwner(UpdateButton.frame, "ANCHOR_RIGHT"); GameTooltip:AddLine("选项"); GameTooltip:Show() end)
 		UpdateButton:SetCallback("OnLeave", function() GameTooltip:Hide() end)
 		UpdateButton:SetRelativeWidth(.1)
 		UpdateButton.index = i
@@ -2523,7 +2523,7 @@ function CovenantForge:UpdateWeightList()
 	if not SoulbindViewer or (SoulbindViewer and not SoulbindViewer:IsShown()) or
  		not CovenantForge.scrollcontainer then return end	
 
- 	local filter = {"All", 	Soulbinds.GetConduitName(0),Soulbinds.GetConduitName(1),Soulbinds.GetConduitName(2), "Soulbinds"}
+ 	local filter = {"全部", 	Soulbinds.GetConduitName(0),Soulbinds.GetConduitName(1),Soulbinds.GetConduitName(2), "羁绊"}
 	local scrollcontainer = CovenantForge.scrollcontainer
 	scrollcontainer:ReleaseChildren()
 	scrollcontainer:SetPoint("TOPLEFT", CovenantForge.PathStorageFrame,"TOPLEFT", 0, -25)
@@ -2687,7 +2687,7 @@ function CovenantForge:UpdateWeightList()
 		topHeading:SetHeight(5)
 
 		local label = AceGUI:Create("Label") 
-		label:SetText("Soulbinds")
+		label:SetText("羁绊")
 
 		local covenantData = C_Covenants.GetCovenantData(C_Covenants.GetActiveCovenantID())
 		label:SetImage("Interface/Buttons/UI-OptionsButton")

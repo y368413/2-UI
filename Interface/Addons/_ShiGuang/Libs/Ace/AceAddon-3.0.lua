@@ -58,7 +58,7 @@ function AceAddon:NewAddon(objectorname, ...)
 	if type(name)~="string" then
 		error(("Usage: NewAddon([object,] name, [lib, lib, lib, ...]): 'name' - string expected got '%s'."):format(type(name)), 2)
 	end
-	if self.addons[name] then 
+	if self.addons[name] then
 		error(("Usage: NewAddon([object,] name, [lib, lib, lib, ...]): 'name' - Addon '%s' already exists."):format(name), 2)
 	end
 	
@@ -294,7 +294,7 @@ function AceAddon:DisableAddon(addon)
 	
 	safecall( addon.OnDisable, addon )
 
-	if not self.statuses[addon.name] then 
+	if not self.statuses[addon.name] then
 		local embeds = self.embeds[addon]
 		for i = 1, #embeds do
 			local lib = LibStub:GetLibrary(embeds[i], true)

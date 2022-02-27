@@ -4,6 +4,49 @@ local A = M:GetModule("Auras")
 
 if I.MyClass ~= "HUNTER" then return end
 
+local pairs, GetSpellPowerCost = pairs, GetSpellPowerCost
+local POWER_TYPE_FOCUS = 2
+
+local function GetSpellCost(spellID)
+	local costTable = GetSpellPowerCost(spellID)
+	if costTable then
+		for _, costInfo in pairs(costTable) do
+			if costInfo.type == POWER_TYPE_FOCUS then
+				return costInfo.cost
+			end
+		end
+	end
+end
+
+function A:UpdateFocusCost(unit, _, spellID)
+	if unit ~= "player" then return end
+
+	local focusCal = A.MMFocus
+	local cost = GetSpellCost(spellID)
+	if cost then
+		focusCal.cost = focusCal.cost + cost
+	end
+	focusCal:SetFormattedText("%d/40", focusCal.cost%40)
+end
+
+local oldSpec
+function A:ToggleFocusCalculation()
+	if not A.MMFocus then return end
+
+	local spec = GetSpecialization()
+	if R.db["Auras"]["MMT29X4"] and spec == 2 then
+		if self ~= "PLAYER_SPECIALIZATION_CHANGED" or spec ~= oldSpec then -- don't reset when talent changed only
+			A.MMFocus.cost = 0 -- reset calculation when switch on
+		end
+		A.MMFocus:Show()
+		M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.UpdateFocusCost)
+	else
+		A.MMFocus:Hide()
+		M:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.UpdateFocusCost)
+	end
+	oldSpec = spec
+end
+
 function A:PostCreateLumos(self)
 	local iconSize = self.lumos[1]:GetWidth()
 	local boom = CreateFrame("Frame", nil, self.Health)
@@ -13,6 +56,13 @@ function A:PostCreateLumos(self)
 	boom:Hide()
 
 	self.boom = boom
+
+	-- MM hunter T29 4sets
+	A.MMFocus = M.CreateFS(self.Health, 16)
+	A.MMFocus:ClearAllPoints()
+	A.MMFocus:SetPoint("BOTTOM", self.Health, "TOP", 0, 5)
+	A:ToggleFocusCalculation()
+	M:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", A.ToggleFocusCalculation)
 end
 
 function A:PostUpdateVisibility(self)
@@ -285,7 +335,7 @@ PetHealthWarningFrame:SetScript("OnEvent",function(Event,Arg1,...)
 			PetHealthWarningFrame:SetWidth(450)
 			PetHealthWarningFrame:SetHeight(200)
 			PetHealthWarningFrame:SetPoint("CENTER",UIParent,"CENTER",0,360)	
-			PetHealthWarningFrame:SetFont("Interface\\addons\\Ace3\\ShiGuang\\Media\\Fonts\\RedCircl.TTF",36,"THICKOUTLINE")
+			PetHealthWarningFrame:SetFont("Interface\\addons\\_ShiGuang\\Media\\Fonts\\RedCircl.TTF",36,"THICKOUTLINE")
 			PetHealthWarningFrame:SetShadowColor(0.00,0.00,0.00,0.75)
 			PetHealthWarningFrame:SetShadowOffset(3.00,-3.00)
 			PetHealthWarningFrame:SetJustifyH("CENTER")		
@@ -298,7 +348,7 @@ PetHealthWarningFrame:SetScript("OnEvent",function(Event,Arg1,...)
 	end	
 	if(Event=="UNIT_HEALTH" and Arg1=="pet")then
 			if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)<=PetHealthWarningFrame_Threshold and PetHealthWarningFrame_Warned==false)then
-				PlaySoundFile("Interface\\AddOns\\Ace3\\ShiGuang\\Media\\Sounds\\Beep.ogg")	
+				PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Beep.ogg")	
 				PetHealthWarningFrame:AddMessage("- CRITICAL PET HEALTH -", 1, 0, 0, nil, 3)
 				PetHealthWarningFrame_Warned=true
 				return
