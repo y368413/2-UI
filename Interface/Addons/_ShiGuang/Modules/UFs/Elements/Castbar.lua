@@ -58,15 +58,15 @@ function UF:OnCastbarUpdate(elapsed)
 
 		if self.__owner.unit == "player" then
 			if self.delay ~= 0 then
-				self.Time:SetFormattedText(decimal.." | |cffff0000"..decimal, duration, self.casting and self.max + self.delay or self.max - self.delay)
+				self.Time:SetFormattedText(decimal.."/|cffff0000"..decimal, duration, self.casting and self.max + self.delay or self.max - self.delay)
 			else
-				self.Time:SetFormattedText(decimal.." | "..decimal, duration, self.max)
+				self.Time:SetFormattedText(decimal.."/"..decimal, duration, self.max)
 			end
 		else
 			if duration > 1e4 then
-				self.Time:SetText("∞ | ∞")
+				self.Time:SetText("∞")
 			else
-				self.Time:SetFormattedText(decimal.." | "..decimal, duration, self.casting and self.max + self.delay or self.max - self.delay)
+				self.Time:SetFormattedText(decimal.."/"..decimal, duration, self.casting and self.max + self.delay or self.max - self.delay)
 			end
 		end
 		self.duration = duration

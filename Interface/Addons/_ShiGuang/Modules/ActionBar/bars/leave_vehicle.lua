@@ -4,6 +4,7 @@ local Bar = M:GetModule("Actionbar")
 
 local _G = _G
 local tinsert = tinsert
+local UnitOnTaxi, TaxiRequestEarlyLanding, VehicleExit = UnitOnTaxi, TaxiRequestEarlyLanding, VehicleExit
 local cfg = R.Bars.leave_vehicle
 local margin, padding = R.Bars.margin, R.Bars.padding
 

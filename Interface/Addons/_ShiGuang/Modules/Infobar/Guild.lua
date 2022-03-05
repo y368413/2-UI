@@ -93,7 +93,7 @@ function info:GuildPanel_UpdateButton(button)
 end
 
 function info:GuildPanel_Update()
-	local scrollFrame = NDuiGuildInfobarScrollFrame
+	local scrollFrame = UIGuildInfobarScrollFrame
 	local usedHeight = 0
 	local buttons = scrollFrame.buttons
 	local height = scrollFrame.buttonHeight
@@ -173,7 +173,7 @@ function info:GuildPanel_Init()
 		return
 	end
 
-	infoFrame = CreateFrame("Frame", "NDuiGuildInfobar", info)
+	infoFrame = CreateFrame("Frame", "UIGuildInfobar", info)
 	infoFrame:SetSize(335, 495)
 	updateInfoFrameAnchor(infoFrame)
 	infoFrame:SetClampedToScreen(true)
@@ -219,7 +219,7 @@ function info:GuildPanel_Init()
 	local copyInfo = I.InfoColor.."SHIFT +"..I.LeftButton..U["Copy Name"]
 	M.CreateFS(infoFrame, 13, copyInfo, false, "BOTTOMRIGHT", -15, 10)
 
-	local scrollFrame = CreateFrame("ScrollFrame", "NDuiGuildInfobarScrollFrame", infoFrame, "HybridScrollFrameTemplate")
+	local scrollFrame = CreateFrame("ScrollFrame", "UIGuildInfobarScrollFrame", infoFrame, "HybridScrollFrameTemplate")
 	scrollFrame:SetSize(305, 320)
 	scrollFrame:SetPoint("TOPLEFT", 10, -100)
 	infoFrame.scrollFrame = scrollFrame
@@ -334,8 +334,8 @@ end
 
 info.onEnter = function()
 	if not IsInGuild() then return end
-	if NDuiFriendsFrame and NDuiFriendsFrame:IsShown() then
-		NDuiFriendsFrame:Hide()
+	if UIFriendsFrame and UIFriendsFrame:IsShown() then
+		UIFriendsFrame:Hide()
 	end
 
 	info:GuildPanel_Init()

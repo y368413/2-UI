@@ -41,6 +41,7 @@ function S:PGFSkin()
 		M.ReskinDropDown(self.Difficulty.DropDown)
 		M.StripTextures(self.Advanced)
 		M.ReskinInput(self.Expression)
+		M.ReskinInput(self.Sorting.SortingExpression)
 		if self.MoveableToggle then
 			M.ReskinArrow(self.MoveableToggle, "left")
 			self.MoveableToggle:SetPoint("TOPLEFT", 5, -5)

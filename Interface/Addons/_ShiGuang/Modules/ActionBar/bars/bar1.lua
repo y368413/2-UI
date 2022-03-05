@@ -24,16 +24,14 @@ end
 
 function Bar:UpdateAllScale()
 	if not R.db["Actionbar"]["Enable"] then return end
-
-	UpdateActionbarScale("Bar1")
-	UpdateActionbarScale("Bar2")
-	UpdateActionbarScale("Bar3")
-	UpdateActionbarScale("Bar4")
-	UpdateActionbarScale("Bar5")
-
-	UpdateActionbarScale("BarExit")
-	UpdateActionbarScale("BarPet")
-	UpdateActionbarScale("BarStance")
+	Bar:UpdateActionSize("Bar1")
+	Bar:UpdateActionSize("Bar2")
+	Bar:UpdateActionSize("Bar3")
+	Bar:UpdateActionSize("Bar4")
+	Bar:UpdateActionSize("Bar5")
+	Bar:UpdateActionSize("BarPet")
+	Bar:UpdateStanceBar()
+	Bar:UpdateVehicleButton()
 end
 
 local function SetFrameSize(frame, size, num)
@@ -233,9 +231,11 @@ end
 
 function Bar:OnLogin()
 	Bar.buttons = {}
+	Bar:MicroMenu()
 
 	if not R.db["Actionbar"]["Enable"] then return end
 
+	Bar.movers = {}
 	Bar:CreateBar1()
 	Bar:CreateBar2()
 	Bar:CreateBar3()
@@ -248,6 +248,5 @@ function Bar:OnLogin()
 	Bar:CreateStancebar()
 	Bar:HideBlizz()
 	Bar:ReskinBars()
-	Bar:UpdateAllScale()
-	Bar:MicroMenu()
+	--Bar:UpdateAllScale()
 end

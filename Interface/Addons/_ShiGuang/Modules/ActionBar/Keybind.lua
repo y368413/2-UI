@@ -243,7 +243,7 @@ function Bar:Bind_CreateDialog()
 	M.SetBD(frame)
 	M.CreateFS(frame, 16, QUICK_KEYBIND_MODE, false, "TOP", 0, -10)
 
-	local helpInfo = M.CreateHelpInfo(frame, "|n"..QUICK_KEYBIND_DESCRIPTION)
+	local helpInfo = M.CreateHelpInfo(frame, "|n"..QUICK_KEYBIND_DESCRIPTION.."|n|n"..U["KeybindingTip"])
 	helpInfo:SetPoint("TOPRIGHT", 2, -2)
 
 	local text = M.CreateFS(frame, 14, CHARACTER_SPECIFIC_KEYBINDINGS, "system", "TOP", 0, -40)

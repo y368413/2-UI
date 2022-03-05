@@ -83,7 +83,7 @@ local function AddNewDungeon(dungeons, dungeonID)
 end
 
 function G:SetupRaidDebuffs(parent)
-	local guiName = "NDuiGUI_RaidDebuffs"
+	local guiName = "UIGUI_RaidDebuffs"
 	toggleExtraGUI(guiName)
 	if extraGUIs[guiName] then return end
 
@@ -166,7 +166,7 @@ function G:SetupRaidDebuffs(parent)
 	local scroll = G:CreateScroll(frame, 240, 370)
 	scroll.reset = M.CreateButton(frame, 70, 25, RESET)
 	scroll.reset:SetPoint("TOPLEFT", 10, -120)
-	StaticPopupDialogs["RESET_NDUI_RAIDDEBUFFS"] = {
+	StaticPopupDialogs["RESET_UI_RAIDDEBUFFS"] = {
 		text = U["Reset your raiddebuffs list?"],
 		button1 = YES,
 		button2 = NO,
@@ -177,7 +177,7 @@ function G:SetupRaidDebuffs(parent)
 		whileDead = 1,
 	}
 	scroll.reset:SetScript("OnClick", function()
-		StaticPopup_Show("RESET_NDUI_RAIDDEBUFFS")
+		StaticPopup_Show("RESET_UI_RAIDDEBUFFS")
 	end)
 	scroll.add = M.CreateButton(frame, 70, 25, ADD)
 	scroll.add:SetPoint("TOPRIGHT", -10, -120)
@@ -319,7 +319,7 @@ function G:SetupRaidDebuffs(parent)
 end
 
 function G:SetupClickCast(parent)
-	local guiName = "NDuiGUI_ClickCast"
+	local guiName = "UIGUI_ClickCast"
 	toggleExtraGUI(guiName)
 	if extraGUIs[guiName] then return end
 
@@ -383,7 +383,7 @@ function G:SetupClickCast(parent)
 	local scroll = G:CreateScroll(frame, 240, 350)
 	scroll.reset = M.CreateButton(frame, 70, 25, RESET)
 	scroll.reset:SetPoint("TOPLEFT", 10, -140)
-	StaticPopupDialogs["RESET_NDUI_CLICKSETS"] = {
+	StaticPopupDialogs["RESET_UI_CLICKSETS"] = {
 		text = U["Reset your click sets?"],
 		button1 = YES,
 		button2 = NO,
@@ -394,7 +394,7 @@ function G:SetupClickCast(parent)
 		whileDead = 1,
 	}
 	scroll.reset:SetScript("OnClick", function()
-		StaticPopup_Show("RESET_NDUI_CLICKSETS")
+		StaticPopup_Show("RESET_UI_CLICKSETS")
 	end)
 
 	local function addClick(scroll, options)
@@ -433,7 +433,7 @@ local function updatePartyWatcherSpells()
 end
 
 function G:SetupPartyWatcher(parent)
-	local guiName = "NDuiGUI_PartyWatcher"
+	local guiName = "UIGUI_PartyWatcher"
 	toggleExtraGUI(guiName)
 	if extraGUIs[guiName] then return end
 
@@ -488,7 +488,7 @@ function G:SetupPartyWatcher(parent)
 	scroll.reset = M.CreateButton(frame, 60, 25, RESET)
 	scroll.reset:SetPoint("TOPLEFT", 10, -80)
 	scroll.reset.text:SetTextColor(1, 0, 0)
-	StaticPopupDialogs["RESET_NDUI_PARTYWATCHER"] = {
+	StaticPopupDialogs["RESET_UI_PARTYWATCHER"] = {
 		text = U["Reset your raiddebuffs list?"],
 		button1 = YES,
 		button2 = NO,
@@ -499,7 +499,7 @@ function G:SetupPartyWatcher(parent)
 		whileDead = 1,
 	}
 	scroll.reset:SetScript("OnClick", function()
-		StaticPopup_Show("RESET_NDUI_PARTYWATCHER")
+		StaticPopup_Show("RESET_UI_PARTYWATCHER")
 	end)
 
 	local function addClick(scroll, options)
@@ -572,7 +572,7 @@ function G:SetupPartyWatcher(parent)
 end
 
 function G:SetupNameplateFilter(parent)
-	local guiName = "NDuiGUI_NameplateFilter"
+	local guiName = "UIGUI_NameplateFilter"
 	toggleExtraGUI(guiName)
 	if extraGUIs[guiName] then return end
 
@@ -645,7 +645,7 @@ local function updateCornerSpells()
 end
 
 function G:SetupBuffIndicator(parent)
-	local guiName = "NDuiGUI_BuffIndicator"
+	local guiName = "UIGUI_BuffIndicator"
 	toggleExtraGUI(guiName)
 	if extraGUIs[guiName] then return end
 
@@ -723,7 +723,7 @@ function G:SetupBuffIndicator(parent)
 	end
 
 	local currentIndex
-	StaticPopupDialogs["RESET_NDUI_RaidAuraWatch"] = {
+	StaticPopupDialogs["RESET_UI_RaidAuraWatch"] = {
 		text = U["Reset your raiddebuffs list?"],
 		button1 = YES,
 		button2 = NO,
@@ -771,7 +771,7 @@ function G:SetupBuffIndicator(parent)
 		scroll.reset:SetPoint("RIGHT", scroll.add, "LEFT", -5, 0)
 		scroll.reset:SetScript("OnClick", function()
 			currentIndex = index
-			StaticPopup_Show("RESET_NDUI_RaidAuraWatch")
+			StaticPopup_Show("RESET_UI_RaidAuraWatch")
 		end)
 		if index == 1 then
 			for spellID in pairs(MaoRUIDB["RaidAuraWatch"]) do
@@ -911,7 +911,7 @@ local function SetUnitFrameSize(self, unit)
 end
 
 function G:SetupUnitFrame(parent)
-	local guiName = "NDuiGUI_UnitFrameSetup"
+	local guiName = "UIGUI_UnitFrameSetup"
 	toggleExtraGUI(guiName)
 	if extraGUIs[guiName] then return end
 
@@ -992,7 +992,7 @@ function G:SetupUnitFrame(parent)
 end
 
 function G:SetupRaidFrame(parent)
-	local guiName = "NDuiGUI_RaidFrameSetup"
+	local guiName = "UIGUI_RaidFrameSetup"
 	toggleExtraGUI(guiName)
 	if extraGUIs[guiName] then return end
 
@@ -1042,7 +1042,7 @@ function G:SetupRaidFrame(parent)
 end
 
 function G:SetupSimpleRaidFrame(parent)
-	local guiName = "NDuiGUI_SimpleRaidFrameSetup"
+	local guiName = "UIGUI_SimpleRaidFrameSetup"
 	toggleExtraGUI(guiName)
 	if extraGUIs[guiName] then return end
 
@@ -1122,7 +1122,7 @@ function G:SetupPartyFrame(parent)
 end
 
 function G:SetupPartyPetFrame(parent)
-	local guiName = "NDuiGUI_PartyPetFrameSetup"
+	local guiName = "UIGUI_PartyPetFrameSetup"
 	toggleExtraGUI(guiName)
 	if extraGUIs[guiName] then return end
 
@@ -1169,7 +1169,7 @@ local function createOptionSwatch(parent, name, key, value, x, y)
 end
 
 function G:SetupSwingBars(parent)
-	local guiName = "NDuiGUI_SwingSetup"
+	local guiName = "UIGUI_SwingSetup"
 	toggleExtraGUI(guiName)
 	if extraGUIs[guiName] then return end
 
@@ -1205,7 +1205,7 @@ function G:SetupSwingBars(parent)
 end
 
 function G:SetupBagFilter(parent)
-	local guiName = "NDuiGUI_BagFilterSetup"
+	local guiName = "UIGUI_BagFilterSetup"
 	toggleExtraGUI(guiName)
 	if extraGUIs[guiName] then return end
 
@@ -1303,7 +1303,7 @@ function G:PlateCastbarGlow(parent)
 
 	scroll.reset = M.CreateButton(frame, 70, 25, RESET)
 	scroll.reset:SetPoint("LEFT", scroll.add, "RIGHT", 10, 0)
-	StaticPopupDialogs["RESET_NDUI_MAJORSPELLS"] = {
+	StaticPopupDialogs["RESET_UI_MAJORSPELLS"] = {
 		text = U["Reset your raiddebuffs list?"],
 		button1 = YES,
 		button2 = NO,
@@ -1314,7 +1314,7 @@ function G:PlateCastbarGlow(parent)
 		whileDead = 1,
 	}
 	scroll.reset:SetScript("OnClick", function()
-		StaticPopup_Show("RESET_NDUI_MAJORSPELLS")
+		StaticPopup_Show("RESET_UI_MAJORSPELLS")
 	end)
 
 	local UF = M:GetModule("UnitFrames")
@@ -1521,7 +1521,7 @@ function G:SetupActionbarStyle(parent)
 		Bar:ImportActionbarStyle(str)
 	end
 
-	StaticPopupDialogs["NDUI_BARSTYLE_EXPORT"] = {
+	StaticPopupDialogs["UI_BARSTYLE_EXPORT"] = {
 		text = U["Export"],
 		button1 = OKAY,
 		OnShow = function(self)
@@ -1536,7 +1536,7 @@ function G:SetupActionbarStyle(parent)
 		editBoxWidth = 250,
 	}
 
-	StaticPopupDialogs["NDUI_BARSTYLE_IMPORT"] = {
+	StaticPopupDialogs["UI_BARSTYLE_IMPORT"] = {
 		text = U["Import"],
 		button1 = OKAY,
 		button2 = CANCEL,
@@ -1566,18 +1566,18 @@ function G:SetupActionbarStyle(parent)
 	}
 
 	local function exportBarStyle()
-		StaticPopup_Hide("NDUI_BARSTYLE_IMPORT")
-		StaticPopup_Show("NDUI_BARSTYLE_EXPORT")
+		StaticPopup_Hide("UI_BARSTYLE_IMPORT")
+		StaticPopup_Show("UI_BARSTYLE_EXPORT")
 	end
 
 	local function importBarStyle()
-		StaticPopup_Hide("NDUI_BARSTYLE_EXPORT")
-		StaticPopup_Show("NDUI_BARSTYLE_IMPORT")
+		StaticPopup_Hide("UI_BARSTYLE_EXPORT")
+		StaticPopup_Show("UI_BARSTYLE_IMPORT")
 	end
 
 	M:RegisterEvent("PLAYER_REGEN_DISABLED", function()
-		StaticPopup_Hide("NDUI_BARSTYLE_EXPORT")
-		StaticPopup_Hide("NDUI_BARSTYLE_IMPORT")
+		StaticPopup_Hide("UI_BARSTYLE_EXPORT")
+		StaticPopup_Hide("UI_BARSTYLE_IMPORT")
 	end)
 
 	local function styleOnEnter(self)

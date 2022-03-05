@@ -206,7 +206,7 @@ function Bar:CreateBar3()
 	frame.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show"
 	RegisterStateDriver(frame, "visibility", frame.frameVisibility)
 
-	if R.Bars.bar3.fader then
-		Bar.CreateButtonFrameFader(frame, buttonList, R.Bars.bar3.fader)
+	if cfg.fader then
+		Bar.CreateButtonFrameFader(frame, buttonList, cfg.fader)
 	end
 end

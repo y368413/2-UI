@@ -148,7 +148,7 @@ DESTROY:SetScript("OnEvent", function(_, event, ...)
 end)]]
 
 ------------------------------------------------------------------------------- 
---## Version: 1.3.6 ## Author: Crinseth
+--## Version: 1.3.7 ## Author: Crinseth
 --local undressButton
 local toggleSheatheButton
 --local resizeButton
@@ -173,6 +173,7 @@ toggleSheatheButton:SetPoint("RIGHT", DressUpFrameResetButton, "LEFT", -82,0)
     playerActor:SetSheathed(not playerActor:GetSheathed())
     PlaySound(SOUNDKIT.GS_TITLE_OPTION_OK)
 end)]]
+
 toggleSheatheButton:Disable()
 toggleSheatheButton:SetScript("OnClick", function()
 	DressUpFrame.ModelScene:GetPlayerActor():SetModelByUnit("target", false, true)
@@ -203,6 +204,12 @@ resizeButton:SetScript("OnMouseUp", function(self, button)
     DressHeight = DressUpFrame:GetHeight()
     DressWidth = DressUpFrame:GetWidth()
 end)]]
+DressUpFrame.ResetButton:HookScript("OnHide", function ()
+    resizeButton:Hide()
+end)
+DressUpFrame.ResetButton:HookScript("OnShow", function ()
+    resizeButton:Show()
+end)
 
 -- Hook onto PlayerActor creation in order to hook onto its functions
 local _SetupPlayerForModelScene = SetupPlayerForModelScene
@@ -315,13 +322,6 @@ local function showButtons(show)
                 button:Hide()
             end
         end
-    --end
-    --if show then
-        --undressButton:Show()
-        --DressUpTargetBtn:Show()
-    --else
-        --undressButton:Hide()
-        --DressUpTargetBtn:Hide()
     end
 end
 

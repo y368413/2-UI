@@ -8,8 +8,8 @@
 ## Author: Qshine,Simca@Malfurion and Hugh@Burning Blade
 ## Author-zhCN: 上官晓雾,Simca@Malfurion and Hugh@Burning Blade
 ## Author-zhTW: 上官曉霧,Simca@Malfurion and Hugh@Burning Blade
-## X-Date: 2020-11-06,2020-12-29T14:37:33Z
-## Version: 2.2.17 + v1.17.5
+## X-Date: 2020-11-06,2022-02-26T14:37:33Z
+## Version: 2.2.17 + v1.20.1
 ## SavedVariables: HPetSaves,BID_Options
 ## DefaultState: disabled
 

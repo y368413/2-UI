@@ -92,7 +92,7 @@ function INFO:BackgroundLines()
 		--[2] = {"TOP", 0, 0, .5, "RightInfobar"},
 	}
 	for _, v in pairs(anchors) do
-		local frame = CreateFrame("Frame", "NDui"..v[5], parent)
+		local frame = CreateFrame("Frame", "UI"..v[5], parent)
 		frame:SetSize(width, height)
 		frame:SetFrameStrata("BACKGROUND")
 		M.Mover(frame, U[v[5]], v[5], {v[1], parent, v[1], 0, v[2]})
@@ -143,7 +143,7 @@ function INFO:Infobar_UpdateAnchor()
 		local info = INFO.modules[name]
 		info.text:ClearAllPoints()
 		if index == 1 then
-			info.text:SetPoint("LEFT", _G["NDuiLeftInfobar"], 0, 0)
+			info.text:SetPoint("LEFT", _G["UILeftInfobar"], 0, 0)
 		else
 			info.text:SetPoint("LEFT", previousLeft, "RIGHT", 3, 0)
 		end
@@ -158,7 +158,7 @@ function INFO:Infobar_UpdateAnchor()
 		local info = INFO.modules[name]
 		info.text:ClearAllPoints()
 		if index == 1 then
-			info.text:SetPoint("TOP", _G["NDuiRightInfobar"], 0, 0)
+			info.text:SetPoint("TOP", _G["UIRightInfobar"], 0, 0)
 		else
 			info.text:SetPoint("LEFT", previousRight, "RIGHT", 3, 0)
 		end

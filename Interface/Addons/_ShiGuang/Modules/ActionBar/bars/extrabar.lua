@@ -15,8 +15,7 @@ function Bar:CreateExtrabar()
 	local frame = CreateFrame("Frame", "UI_ActionBarExtra", UIParent, "SecureHandlerStateTemplate")
 	frame:SetWidth(size + 2*padding)
 	frame:SetHeight(size + 2*padding)
-	frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 210}
-	frame.mover = M.Mover(frame, U["Extrabar"], "Extrabar", frame.Pos)
+	frame.mover = M.Mover(frame, U["Extrabar"], "Extrabar", {"BOTTOM", UIParent, "BOTTOM", 0, 210})
 
 	ExtraActionBarFrame:EnableMouse(false)
 	ExtraAbilityContainer:SetParent(frame)
@@ -40,8 +39,7 @@ function Bar:CreateExtrabar()
 	local zoneFrame = CreateFrame("Frame", "UI_ActionBarZone", UIParent)
 	zoneFrame:SetWidth(size + 2*padding)
 	zoneFrame:SetHeight(size + 2*padding)
-	zoneFrame.Pos = {"BOTTOM", UIParent, "BOTTOM", -360, 100}
-	zoneFrame.mover = M.Mover(zoneFrame, U["Zone Ability"], "ZoneAbility", zoneFrame.Pos)
+	zoneFrame.mover = M.Mover(zoneFrame, U["Zone Ability"], "ZoneAbility", {"BOTTOM", UIParent, "BOTTOM", -360, 100})
 
 	ZoneAbilityFrame:SetParent(zoneFrame)
 	ZoneAbilityFrame:ClearAllPoints()

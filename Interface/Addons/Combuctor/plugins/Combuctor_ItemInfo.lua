@@ -1,4 +1,4 @@
-﻿--## Author: Lars "Goldpaw" Norberg ## Version: 1.0.26-Release
+﻿--## Author: Lars "Goldpaw" Norberg ## Version: 1.0.27-Release
 
 -- Using the Combuctor way to retrieve names, namespaces and stuff
 local MODULE =  ...
@@ -260,7 +260,8 @@ local Update = function(self)
 			if (showStatus) then
 				local ItemBind = Cache_ItemBind[self] or Cache_GetItemBind(self)
 				if (displayR) and (displayG) and (displayB) then
-					ItemBind:SetTextColor(displayR * 2/3, displayG * 2/3, displayB * 2/3)
+					local m = (itemRarity == 3 or itemRarity == 4) and 1 or 2/3
+					ItemBind:SetTextColor(displayR * m, displayG * m, displayB * m)
 				else
 					ItemBind:SetTextColor(240/255, 240/255, 240/255)
 				end

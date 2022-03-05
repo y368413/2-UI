@@ -3,4 +3,5 @@
 	<Script file="MapReveal.lua"/>
 	<Script file="Minimap.lua"/>
 	<Script file="zrMMbuttons.lua"/>
+	<!--Script file="MapShrinker.lua"/-->
 </Ui>

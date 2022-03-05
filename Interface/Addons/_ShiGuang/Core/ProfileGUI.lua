@@ -9,8 +9,8 @@ local cr, cg, cb = I.r, I.g, I.b
 local myFullName = I.MyFullName
 
 -- Static popups
-StaticPopupDialogs["RESET_NDUI"] = {
-	text = U["Reset NDui Check"],
+StaticPopupDialogs["RESET_UI"] = {
+	text = U["Reset UI Check"],
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function()
@@ -22,8 +22,8 @@ StaticPopupDialogs["RESET_NDUI"] = {
 	whileDead = 1,
 }
 
-StaticPopupDialogs["RESET_NDUI_HELPINFO"] = {
-	text = U["Reset NDui Helpinfo"],
+StaticPopupDialogs["RESET_UI_HELPINFO"] = {
+	text = U["Reset UI Helpinfo"],
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function()
@@ -32,7 +32,7 @@ StaticPopupDialogs["RESET_NDUI_HELPINFO"] = {
 	whileDead = 1,
 }
 
-StaticPopupDialogs["NDUI_RESET_PROFILE"] = {
+StaticPopupDialogs["UI_RESET_PROFILE"] = {
 	text = U["Reset current profile?"],
 	button1 = YES,
 	button2 = NO,
@@ -43,7 +43,7 @@ StaticPopupDialogs["NDUI_RESET_PROFILE"] = {
 	whileDead = 1,
 }
 
-StaticPopupDialogs["NDUI_APPLY_PROFILE"] = {
+StaticPopupDialogs["UI_APPLY_PROFILE"] = {
 	text = U["Apply selected profile?"],
 	button1 = YES,
 	button2 = NO,
@@ -54,7 +54,7 @@ StaticPopupDialogs["NDUI_APPLY_PROFILE"] = {
 	whileDead = 1,
 }
 
-StaticPopupDialogs["NDUI_DOWNLOAD_PROFILE"] = {
+StaticPopupDialogs["UI_DOWNLOAD_PROFILE"] = {
 	text = U["Download selected profile?"],
 	button1 = YES,
 	button2 = NO,
@@ -72,7 +72,7 @@ StaticPopupDialogs["NDUI_DOWNLOAD_PROFILE"] = {
 	whileDead = 1,
 }
 
-StaticPopupDialogs["NDUI_UPLOAD_PROFILE"] = {
+StaticPopupDialogs["UI_UPLOAD_PROFILE"] = {
 	text = U["Upload current profile?"],
 	button1 = YES,
 	button2 = NO,
@@ -86,7 +86,7 @@ StaticPopupDialogs["NDUI_UPLOAD_PROFILE"] = {
 	whileDead = 1,
 }
 
-StaticPopupDialogs["NDUI_DELETE_UNIT_PROFILE"] = {
+StaticPopupDialogs["UI_DELETE_UNIT_PROFILE"] = {
 	text = "",
 	button1 = YES,
 	button2 = NO,
@@ -122,22 +122,22 @@ function G:CreateProfileIcon(bar, index, texture, title, description)
 end
 
 function G:Reset_OnClick()
-	StaticPopup_Show("NDUI_RESET_PROFILE")
+	StaticPopup_Show("UI_RESET_PROFILE")
 end
 
 function G:Apply_OnClick()
 	G.currentProfile = self:GetParent().index
-	StaticPopup_Show("NDUI_APPLY_PROFILE")
+	StaticPopup_Show("UI_APPLY_PROFILE")
 end
 
 function G:Download_OnClick()
 	G.currentProfile = self:GetParent().index
-	StaticPopup_Show("NDUI_DOWNLOAD_PROFILE")
+	StaticPopup_Show("UI_DOWNLOAD_PROFILE")
 end
 
 function G:Upload_OnClick()
 	G.currentProfile = self:GetParent().index
-	StaticPopup_Show("NDUI_UPLOAD_PROFILE")
+	StaticPopup_Show("UI_UPLOAD_PROFILE")
 end
 
 function G:GetClassFromGoldInfo(name, realm)
@@ -291,7 +291,7 @@ function G:Delete_OnEnter()
 	end
 
 	if MaoRUIDB["ProfileIndex"][text] or (MaoRUIDB["totalGold"][realm] and MaoRUIDB["totalGold"][realm][name]) then
-		StaticPopup_Show("NDUI_DELETE_UNIT_PROFILE", text, G:GetClassFromGoldInfo(name, realm))
+		StaticPopup_Show("UI_DELETE_UNIT_PROFILE", text, G:GetClassFromGoldInfo(name, realm))
 	else
 		UIErrorsFrame:AddMessage(I.InfoColor..U["Incorrect unit name"])
 	end
@@ -305,13 +305,13 @@ function G:CreateProfileGUI(parent)
 	local reset = M.CreateButton(parent, 120, 24, U["NDui Reset"])
 	reset:SetPoint("BOTTOMLEFT", 100, 30)
 	reset:SetScript("OnClick", function()
-		StaticPopup_Show("RESET_NDUI")
+		StaticPopup_Show("RESET_UI")
 	end)
 
 	--[[local restore = M.CreateButton(parent, 120, 24, U["Reset Help"])
 	restore:SetPoint("BOTTOM", reset, "TOP", 0, 2)
 	restore:SetScript("OnClick", function()
-		StaticPopup_Show("RESET_NDUI_HELPINFO")
+		StaticPopup_Show("RESET_UI_HELPINFO")
 	end)]]
 
 	local import = M.CreateButton(parent, 120, 24, U["Import"])
@@ -672,7 +672,7 @@ function G:CreateDataFrame()
 	scrollArea:SetScrollChild(editBox)
 	dataFrame.editBox = editBox
 
-	StaticPopupDialogs["NDUI_IMPORT_DATA"] = {
+	StaticPopupDialogs["UI_IMPORT_DATA"] = {
 		text = U["Import data warning"],
 		button1 = YES,
 		button2 = NO,
@@ -686,7 +686,7 @@ function G:CreateDataFrame()
 	accept:SetPoint("BOTTOM", 0, 10)
 	accept:SetScript("OnClick", function(self)
 		if self.text:GetText() ~= OKAY and dataFrame.editBox:GetText() ~= "" then
-			StaticPopup_Show("NDUI_IMPORT_DATA")
+			StaticPopup_Show("UI_IMPORT_DATA")
 		end
 		dataFrame:Hide()
 	end)

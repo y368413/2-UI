@@ -104,6 +104,7 @@ G.DefaultSettings = {
 		SwingWidth = 275,
 		SwingHeight = 3,
 		SwingTimer = false,
+		OffOnTop = false,
 		RaidFrame = true,
 		AutoRes = true,
 		NumGroups = 8,
@@ -709,10 +710,6 @@ local function toggleBarFader(self)
 	M:GetModule("Actionbar"):ToggleBarFader(name)
 end
 
-local function updateActionbarScale()
-	M:GetModule("Actionbar"):UpdateAllScale()
-end
-
 local function updateReminder()
 	M:GetModule("Auras"):InitReminder()
 end
@@ -980,12 +977,12 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		--{1, "Actionbar", "Bar4Fader", U["Bar4 Fade"].."*", nil, nil, toggleBarFader},
 		--{1, "Actionbar", "Bar5Fader", U["Bar5 Fade"].."*", true, nil, toggleBarFader},
 		--{},--blank
-		--{1, "Actionbar", "CustomBar", HeaderTag..U["Enable CustomBar"], true, false, nil, nil, U["CustomBarTip"]},
+		{1, "Actionbar", "CustomBar", HeaderTag..U["Enable CustomBar"], true, false, nil, nil, U["CustomBarTip"]},
 		--{1, "Actionbar", "BarXFader", U["CustomBarFader"].."*", nil, nil, nil, toggleBarFader},
 		{4, "Actionbar", "Style", U["Actionbar Style"], true, true, {"-- 2*(3+12+3) --", "-- 2*(6+12+6) --", "-- 2*6+3*12+2*6 --", "-- 3*12 --", "-- 2*(12+6) --", "-- 3*(4+12+4) --", "-- What --", "-- MR --", "-- PVP2 --", "-- Cool --", "-- JK --"}},  --nop
-		--{3, "Actionbar", "CustomBarButtonSize", U["ButtonSize"].."*", false, false, {24, 60, 1}, updateCustomBar},
-		--{3, "Actionbar", "CustomBarNumButtons", U["MaxButtons"].."*", true, false, {1, 12, 1}, updateCustomBar},
-		--{3, "Actionbar", "CustomBarNumPerRow", U["ButtonsPerRow"].."*", true, true, {1, 12, 1}, updateCustomBar},
+		{3, "Actionbar", "CustomBarButtonSize", U["ButtonSize"].."*", false, false, {24, 60, 1}, updateCustomBar},
+		{3, "Actionbar", "CustomBarNumButtons", U["MaxButtons"].."*", true, false, {1, 12, 1}, updateCustomBar},
+		{3, "Actionbar", "CustomBarNumPerRow", U["ButtonsPerRow"].."*", true, true, {1, 12, 1}, updateCustomBar},
 		{},--blank
 		{1, "Actionbar", "CustomBarFader", U["CustomBarFader"]},
 		{1, "Actionbar", "MicroMenu", U["Micromenu"], true},
@@ -1640,7 +1637,7 @@ local function OpenGUI()
 end
 
 function G:OnLogin()
-	local gui = CreateFrame("Button", "GameMenuFrameNDui", GameMenuFrame, "GameMenuButtonTemplate, BackdropTemplate")
+	local gui = CreateFrame("Button", "GameMenuFrameUI", GameMenuFrame, "GameMenuButtonTemplate, BackdropTemplate")
 	gui:SetText("2 UI")
 	gui:SetPoint("TOP", GameMenuButtonAddons, "BOTTOM", 0, -2)
 	GameMenuFrame:HookScript("OnShow", function(self)

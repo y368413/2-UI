@@ -1,4 +1,4 @@
-local _, ns = ...
+﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
 local A = M:GetModule("Auras")
 
@@ -6,6 +6,7 @@ if I.MyClass ~= "HUNTER" then return end
 
 local pairs, GetSpellPowerCost = pairs, GetSpellPowerCost
 local POWER_TYPE_FOCUS = 2
+local playerGUID = UnitGUID("player")
 
 local function GetSpellCost(spellID)
 	local costTable = GetSpellPowerCost(spellID)
@@ -26,7 +27,39 @@ function A:UpdateFocusCost(unit, _, spellID)
 	if cost then
 		focusCal.cost = focusCal.cost + cost
 	end
+	if spellID == 19434 then
+		--print("带着技巧读条："..tostring(focusCal.isTrickCast), "消耗技巧层数："..focusCal.trickActive)
+		if (focusCal.isTrickCast and focusCal.trickActive == 1) or (not focusCal.isTrickCast and focusCal.trickActive == 0) then
+			focusCal.cost = 35
+			--print("此时重置集中值为35")
+		end
+	end
 	focusCal:SetFormattedText("%d/40", focusCal.cost%40)
+end
+
+function A:ResetFocusCost()
+	A.MMFocus.cost = 0
+	A.MMFocus:SetFormattedText("%d/40", A.MMFocus.cost%40)
+end
+
+local eventSpentIndex = {
+	["SPELL_AURA_APPLIED"] = 1,
+	["SPELL_AURA_REFRESH"] = 2,
+	["SPELL_AURA_REMOVED"] = 0,
+}
+
+function A:CheckTrickState(...)
+	local _, eventType, _, sourceGUID, _, _, _, _, _, _, _, spellID = ...
+	if eventSpentIndex[eventType] and spellID == 257622 and sourceGUID == playerGUID then
+		A.MMFocus.trickActive = eventSpentIndex[eventType]
+	end
+end
+
+function A:StartAimedShot(unit, _, spellID)
+	if unit ~= "player" then return end
+	if spellID == 19434 then
+		A.MMFocus.isTrickCast = A.MMFocus.trickActive ~= 0
+	end
 end
 
 local oldSpec
@@ -39,10 +72,16 @@ function A:ToggleFocusCalculation()
 			A.MMFocus.cost = 0 -- reset calculation when switch on
 		end
 		A.MMFocus:Show()
+		M:RegisterEvent("UNIT_SPELLCAST_START", A.StartAimedShot)
 		M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.UpdateFocusCost)
+		M:RegisterEvent("PLAYER_DEAD", A.ResetFocusCost)
+		M:RegisterEvent("CLEU", A.CheckTrickState)
 	else
 		A.MMFocus:Hide()
+		M:UnregisterEvent("UNIT_SPELLCAST_START", A.StartAimedShot)
 		M:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.UpdateFocusCost)
+		M:UnregisterEvent("PLAYER_DEAD", A.ResetFocusCost)
+		M:UnregisterEvent("CLEU", A.CheckTrickState)
 	end
 	oldSpec = spec
 end
@@ -61,6 +100,7 @@ function A:PostCreateLumos(self)
 	A.MMFocus = M.CreateFS(self.Health, 16)
 	A.MMFocus:ClearAllPoints()
 	A.MMFocus:SetPoint("BOTTOM", self.Health, "TOP", 0, 5)
+	A.MMFocus.trickActive = 0
 	A:ToggleFocusCalculation()
 	M:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", A.ToggleFocusCalculation)
 end

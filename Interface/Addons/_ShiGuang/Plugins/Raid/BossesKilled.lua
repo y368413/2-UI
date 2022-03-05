@@ -1,5 +1,5 @@
-﻿--## Author: wT  ## Version: 9.0.5
-local _, BossesKilled = ...
+﻿--## Author: wT  ## Version: 9.2.0
+local BossesKilled = {}
 if not BossesKilled.RegisterEvent and not BossesKilled.UnregisterEvent and not BossesKilled.UnregisterAllEvents then
 	local f = CreateFrame("frame")
 	f:SetScript("OnEvent", function(self, event, ...) BossesKilled[event](BossesKilled, ...) end)
@@ -26,7 +26,7 @@ function BossesKilled:PLAYER_LOGIN()
 
 		RaidFinderQueueFrame:HookScript("OnShow", myRaidFinderFrame_OnShow)
 		RaidFinderQueueFrame:HookScript("OnHide", myRaidFinderFrame_OnHide)
-		--hooksecurefunc("RaidFinderQueueFrame_SetRaid", self.UpdateArrow)
+		hooksecurefunc("RaidFinderQueueFrame_SetRaid", self.UpdateArrow)
 	end
 end
 BossesKilled:RegisterEvent("PLAYER_LOGIN")
@@ -60,7 +60,7 @@ function BossesKilled:CreateButtons(parentFrame, DungeonAmountFunc, DungeonInfoF
 
 			button:SetScript("OnClick", function(this)
 				SetDropdownMenuFunc(this.dungeonID)
-				--self.UpdateArrow()
+				self.UpdateArrow()
 				this:SetChecked(this.checked)
 			end)
 			button.checked = false
@@ -184,27 +184,27 @@ function BossesKilled:UpdateQueueStatuses()
 	end
 end
 
---[[ Not a method because it's used as callback for hooksecurefuncs so it would get the wrong "self"
+-- Not a method because it's used as callback for hooksecurefuncs so it would get the wrong "self"
 function BossesKilled.UpdateArrow()
-	--local self = BossesKilled
+	local self = BossesKilled
 
-	if not BossesKilled.arrow then BossesKilled.arrow = BossesKilled:CreateArrow() end
+	if not self.arrow then self.arrow = self:CreateArrow() end
 
 	local parent
 	if RaidFinderQueueFrame and RaidFinderQueueFrame:IsVisible() then
 		parent = RaidFinderQueueFrame
 	else
-		BossesKilled.arrow:Hide()
+		self.arrow:Hide()
 		return
 	end
 
 	if parent.raid and parent.BossesKilledButtons[parent.raid] then
 		local button = parent.BossesKilledButtons[parent.raid]
-		BossesKilled.arrow:SetParent(button) -- Re-set the parent so we inherit the scale, so our smaller LFR buttons get a smaller arrow
-		BossesKilled.arrow:SetPoint("LEFT", button, "RIGHT")
-		BossesKilled.arrow:Show()
+		self.arrow:SetParent(button) -- Re-set the parent so we inherit the scale, so our smaller LFR buttons get a smaller arrow
+		self.arrow:SetPoint("LEFT", button, "RIGHT")
+		self.arrow:Show()
 	end
-end]]
+end
 
 --------------------------------- Tooltip and colorization stuff -----------------------------
 
@@ -373,4 +373,10 @@ BossesKilled.raidData = {
 	[2222] = { numEncounters = 3, startFrom =  1 }, -- The Dark Bastille
 	[2223] = { numEncounters = 3, startFrom =  1 }, -- Shackles of Fate
 	[2224] = { numEncounters = 1, startFrom =  1 }, -- The Reckoning
+
+  -- Sepulcher of the First Ones
+  [2292] = { numEncounters = 4, startFrom =  1 }, -- Ephemeral Plains
+	[2291] = { numEncounters = 3, startFrom =  1 }, -- Cornerstone of Creation
+	[2293] = { numEncounters = 3, startFrom =  1 }, -- Domination's Grasp
+	[2294] = { numEncounters = 1, startFrom =  1 }, -- The Grand Design
 }

@@ -26,17 +26,19 @@ Core.color = {}
 Core.status = {}
 
 for name, color in pairs(Core.COLORS) do
-    Core.color[name] = function (t) return string.format('|c%s%s|r', color, t) end
-    Core.status[name] = function (t) return string.format('(|c%s%s|r)', color, t) end
+    Core.color[name] = function(t) return string.format('|c%s%s|r', color, t) end
+    Core.status[name] = function(t)
+        return string.format('(|c%s%s|r)', color, t)
+    end
 end
 
 -------------------------------------------------------------------------------
 ------------------------------ DATAMINE TOOLTIP -------------------------------
 -------------------------------------------------------------------------------
 
-local function CreateDatamineTooltip (name)
-    local f = CreateFrame("GameTooltip", name, UIParent, "GameTooltipTemplate")
-    f:SetOwner(UIParent, "ANCHOR_NONE")
+local function CreateDatamineTooltip(name)
+    local f = CreateFrame('GameTooltip', name, UIParent, 'GameTooltipTemplate')
+    f:SetOwner(UIParent, 'ANCHOR_NONE')
     return f
 end
 
@@ -47,12 +49,12 @@ local NameResolver = {
     resolver = CreateDatamineTooltip("HandyNotes_Core_NameResolver")
 }
 
-function NameResolver:IsLink (link)
+function NameResolver:IsLink(link)
     if link == nil then return link end
     return strsub(link, 1, 5) == 'unit:'
 end
 
-function NameResolver:Prepare (link)
+function NameResolver:Prepare(link)
     if self:IsLink(link) and not (self.cache[link] or self.prepared[link]) then
         -- use a separate tooltip to spam load NPC names, doing this with the
         -- main tooltip can sometimes cause it to become unresponsive and never
@@ -62,7 +64,7 @@ function NameResolver:Prepare (link)
     end
 end
 
-function NameResolver:Resolve (link)
+function NameResolver:Resolve(link)
     -- may be passed a raw name or a hyperlink to be resolved
     if not self:IsLink(link) then return link or UNKNOWN end
 
@@ -74,7 +76,7 @@ function NameResolver:Resolve (link)
     local name = self.cache[link]
     if name == nil then
         self.resolver:SetHyperlink(link)
-        name = _G[self.resolver:GetName().."TextLeft1"]:GetText() or UNKNOWN
+        name = _G[self.resolver:GetName() .. 'TextLeft1']:GetText() or UNKNOWN
         if name == UNKNOWN then
             Core.Debug('NameResolver returned UNKNOWN, recreating tooltip ...')
             self.resolver = CreateDatamineTooltip("HandyNotes_Core_NameResolver")
@@ -94,7 +96,7 @@ local function PrepareLinks(str)
     for type, id in str:gmatch('{(%l+):(%d+)(%l*)}') do
         id = tonumber(id)
         if type == 'npc' then
-            NameResolver:Prepare(("unit:Creature-0-0-0-0-%d"):format(id))
+            NameResolver:Prepare(('unit:Creature-0-0-0-0-%d'):format(id))
         elseif type == 'item' then
             C_Item.RequestLoadItemDataByID(id) -- prime item info
         elseif type == 'daily' or type == 'quest' then
@@ -107,11 +109,12 @@ end
 
 local function RenderLinks(str, nameOnly)
     -- render numberic ids
-    local links, _ = str:gsub('{(%l+):(%d+)(%l*)}', function (type, id, suffix)
+    local links, _ = str:gsub('{(%l+):(%d+)(%l*)}', function(type, id, suffix)
         id = tonumber(id)
         if type == 'npc' then
-            local name = NameResolver:Resolve(("unit:Creature-0-0-0-0-%d"):format(id))
-            name = name..(suffix or '')
+            local name = NameResolver:Resolve(
+                ('unit:Creature-0-0-0-0-%d'):format(id))
+            name = name .. (suffix or '')
             if nameOnly then return name end
             return Core.color.NPC(name)
         elseif type == 'achievement' then
@@ -121,7 +124,7 @@ local function RenderLinks(str, nameOnly)
             else
                 local link = GetAchievementLink(id)
                 if link then
-                    return Core.GetIconLink('achievement', 15)..link
+                    return Core.GetIconLink('achievement', 15) .. link
                 end
             end
         elseif type == 'currency' then
@@ -130,7 +133,7 @@ local function RenderLinks(str, nameOnly)
                 if nameOnly then return info.name end
                 local link = C_CurrencyInfo.GetCurrencyLink(id, 0)
                 if link then
-                    return '|T'..info.iconFileID..':0:0:1:-1|t '..link
+                    return '|T' .. info.iconFileID .. ':0:0:1:-1|t ' .. link
                 end
             end
         elseif type == 'faction' then
@@ -140,33 +143,35 @@ local function RenderLinks(str, nameOnly)
         elseif type == 'item' then
             local name, link, _, _, _, _, _, _, _, icon = GetItemInfo(id)
             if link and icon then
-                if nameOnly then return name..(suffix or '') end
-                return '|T'..icon..':0:0:1:-1|t '..link
+                if nameOnly then return name .. (suffix or '') end
+                return '|T' .. icon .. ':0:0:1:-1|t ' .. link
             end
         elseif type == 'daily' or type == 'quest' then
             local name = C_QuestLog.GetTitleForQuestID(id)
             if name then
                 if nameOnly then return name end
                 local icon = (type == 'daily') and 'quest_ab' or 'quest_ay'
-                return Core.GetIconLink(icon, 12)..Core.color.Yellow('['..name..']')
+                return Core.GetIconLink(icon, 12) ..
+                           Core.color.Yellow('[' .. name .. ']')
             end
         elseif type == 'spell' then
             local name, _, icon = GetSpellInfo(id)
             if name and icon then
                 if nameOnly then return name end
-                local spell = Core.color.Spell('|Hspell:'..id..'|h['..name..']|h')
-                return '|T'..icon..':0:0:1:-1|t '..spell
+                local spell = Core.color.Spell(
+                    '|Hspell:' .. id .. '|h[' .. name .. ']|h')
+                return '|T' .. icon .. ':0:0:1:-1|t ' .. spell
             end
         end
-        return type..'+'..id
+        return type .. '+' .. id
     end)
     -- render non-numeric ids
-    links, _ = links:gsub('{(%l+):([^}]+)}', function (type, id)
+    links, _ = links:gsub('{(%l+):([^}]+)}', function(type, id)
         if type == 'wq' then
             local icon = Core.GetIconLink('world_quest', 16, 0, -1)
-            return icon..Core.color.Yellow('['..id..']')
+            return icon .. Core.color.Yellow('[' .. id .. ']')
         end
-        return type..'+'..id
+        return type .. '+' .. id
     end)
     return links
 end
@@ -175,32 +180,8 @@ end
 -------------------------------- BAG FUNCTIONS --------------------------------
 -------------------------------------------------------------------------------
 
-local function IterateBagSlots()
-    local bag, slot, slots = nil, 1, 1
-    return function ()
-        if bag == nil or slot == slots then
-            repeat
-                bag = (bag or -1) + 1
-                slot = 1
-                slots = GetContainerNumSlots(bag)
-            until slots > 0 or bag > 4
-            if bag > 4 then return end
-        else
-            slot = slot + 1
-        end
-        return bag, slot
-    end
-end
-
 local function PlayerHasItem(item, count)
-    for bag, slot in IterateBagSlots() do
-        if GetContainerItemID(bag, slot) == item then
-            if count and count > 1 then
-                return select(2, GetContainerItemInfo(bag, slot)) >= count
-            else return true end
-        end
-    end
-    return false
+    return GetItemCount(item, true) >= (count and count > 1 and count or 1)
 end
 
 -------------------------------------------------------------------------------
@@ -233,14 +214,14 @@ same keys in the exact same order even before actual translations are done.
 --[[local AceLocale = LibStub("AceLocale-3.0")
 local LOCALES = {}
 
-local function NewLocale (locale)
+local function NewLocale(locale)
     if LOCALES[locale] then return LOCALES[locale] end
     local L = AceLocale:NewLocale("HandyNotes_Core", locale, (locale == 'enUS'), true)
     if not L then return end
     local wrapper = {}
     setmetatable(wrapper, {
-        __index = function (self, key) return L[key] end,
-        __newindex = function (self, key, value)
+        __index = function(self, key) return L[key] end,
+        __newindex = function(self, key, value)
             if value == nil then return end
             L[key] = value
         end
@@ -252,7 +233,7 @@ end]]
 ------------------------------ TABLE CONVERTERS -------------------------------
 -------------------------------------------------------------------------------
 
-local function AsTable (value, class)
+local function AsTable(value, class)
     -- normalize to table of scalars
     if type(value) == 'nil' then return end
     if type(value) ~= 'table' then return {value} end
@@ -260,13 +241,13 @@ local function AsTable (value, class)
     return value
 end
 
-local function AsIDTable (value)
+local function AsIDTable(value)
     -- normalize to table of id objects
     if type(value) == 'nil' then return end
-    if type(value) ~= 'table' then return {{id=value}} end
+    if type(value) ~= 'table' then return {{id = value}} end
     if value.id then return {value} end
     for i, v in ipairs(value) do
-        if type(v) == 'number' then value[i] = {id=v} end
+        if type(v) == 'number' then value[i] = {id = v} end
     end
     return value
 end
@@ -289,20 +270,22 @@ Core.RenderLinks = RenderLinks
 ------------------------------------ CLASS ------------------------------------
 -------------------------------------------------------------------------------
 
-Core.Class = function (name, parent, attrs)
+Core.Class = function(name, parent, attrs)
     if type(name) ~= 'string' then error('name param must be a string') end
-    if parent and not Core.IsClass(parent) then error('parent param must be a class') end
+    if parent and not Core.IsClass(parent) then
+        error('parent param must be a class')
+    end
 
     local Class = attrs or {}
     Class.getters = Class.getters or {}
     Class.setters = Class.setters or {}
 
     local instance_metatable = {
-        __tostring = function (self)
-            return '<'..name..' instance at '..self.__address..'>'
+        __tostring = function(self)
+            return '<' .. name .. ' instance at ' .. self.__address .. '>'
         end,
 
-        __index = function (self, index)
+        __index = function(self, index)
             -- Walk up the class hierarchy and check for a static value
             -- followed by a getter function on each parent class
             local _Class = Class
@@ -317,7 +300,7 @@ Core.Class = function (name, parent, attrs)
             until _Class == nil
         end,
 
-        __newindex = function (self, index, value)
+        __newindex = function(self, index, value)
             local setter = Class.setters[index]
             if setter then
                 setter(self, value)
@@ -328,10 +311,10 @@ Core.Class = function (name, parent, attrs)
     }
 
     setmetatable(Class, {
-        __call = function (self, ...)
+        __call = function(self, ...)
             local instance = {}
             instance.__class = Class
-            instance.__address = tostring(instance):gsub("table: ", "", 1)
+            instance.__address = tostring(instance):gsub('table: ', '', 1)
             setmetatable(instance, instance_metatable)
             instance:Initialize(...)
             return instance
@@ -346,10 +329,10 @@ Core.Class = function (name, parent, attrs)
     if parent then
         -- Set parent class and allow parent class setters to be used
         Class.__parent = parent
-        setmetatable(Class.setters, { __index = parent.setters })
+        setmetatable(Class.setters, {__index = parent.setters})
     elseif not Class.Initialize then
         -- Add default Initialize() method for base class
-        Class.Initialize = function (self) end
+        Class.Initialize = function(self) end
     end
 
     return Class
@@ -358,13 +341,13 @@ end
 ----------------------------------- HELPERS -----------------------------------
 -------------------------------------------------------------------------------
 
-Core.IsClass = function (class)
+Core.IsClass = function(class)
     return type(class) == 'table' and class.getters and class.setters
 end
 
-Core.IsInstance = function (instance, class)
+Core.IsInstance = function(instance, class)
     if type(instance) ~= 'table' then return false end
-    local function compare (c1, c2)
+    local function compare(c1, c2)
         if c2 == nil then return false end
         if c1 == c2 then return true end
         return compare(c1, c2.__parent)
@@ -372,7 +355,7 @@ Core.IsInstance = function (instance, class)
     return compare(class, instance.__class)
 end
 
-Core.Clone = function (instance, newattrs)
+Core.Clone = function(instance, newattrs)
     local clone = {}
     for k, v in pairs(instance) do clone[k] = v end
     if newattrs then for k, v in pairs(newattrs) do clone[k] = v end end
@@ -401,33 +384,38 @@ _G["HandyNotes_Core"] = Addon
 -------------------------------------------------------------------------------
 
 local DropdownMenu = CreateFrame("Frame", "HandyNotes_CoreDropdownMenu")
-DropdownMenu.displayMode = "MENU"
+DropdownMenu.displayMode = 'MENU'
 local function InitializeDropdownMenu(level, mapID, coord)
     if not level then return end
     local node = Core.maps[mapID].nodes[coord]
-    local spacer = {text='', disabled=1, notClickable=1, notCheckable=1}
+    local spacer = {text = '', disabled = 1, notClickable = 1, notCheckable = 1}
 
     if (level == 1) then
         UIDropDownMenu_AddButton({
-            text=Core.plugin_name, isTitle=1, notCheckable=1
+            text = Core.plugin_name,
+            isTitle = 1,
+            notCheckable = 1
         }, level)
 
         UIDropDownMenu_AddButton(spacer, level)
 
         UIDropDownMenu_AddButton({
-            text=L["context_menu_set_waypoint"], notCheckable=1,
-            disabled=not C_Map.CanSetUserWaypointOnMap(mapID),
-            func=function (button)
+            text = L['context_menu_set_waypoint'],
+            notCheckable = 1,
+            disabled = not C_Map.CanSetUserWaypointOnMap(mapID),
+            func = function(button)
                 local x, y = HandyNotes:getXY(coord)
-                C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(mapID, x, y))
+                C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(mapID, x,
+                    y))
                 C_SuperTrack.SetSuperTrackedUserWaypoint(true)
             end
         }, level)
 
         if select(2, IsAddOnLoaded('TomTom')) then
             UIDropDownMenu_AddButton({
-                text=L["context_menu_add_tomtom"], notCheckable=1,
-                func=function (button)
+                text = L['context_menu_add_tomtom'],
+                notCheckable = 1,
+                func = function(button)
                     local x, y = HandyNotes:getXY(coord)
                     TomTom:AddWaypoint(mapID, x, y, {
                         title = Core.RenderLinks(node.label, true),
@@ -440,26 +428,29 @@ local function InitializeDropdownMenu(level, mapID, coord)
         end
 
         UIDropDownMenu_AddButton({
-            text=L["context_menu_hide_node"], notCheckable=1,
-            func=function (button)
-                Addon.db.char[mapID..'_coord_'..coord] = true
-                Addon:Refresh()
+            text = L['context_menu_hide_node'],
+            notCheckable = 1,
+            func = function(button)
+                Addon.db.char[mapID .. '_coord_' .. coord] = true
+                Addon:RefreshImmediate()
             end
         }, level)
 
         UIDropDownMenu_AddButton({
-            text=L["context_menu_restore_hidden_nodes"], notCheckable=1,
-            func=function ()
+            text = L['context_menu_restore_hidden_nodes'],
+            notCheckable = 1,
+            func = function()
                 wipe(Addon.db.char)
-                Addon:Refresh()
+                Addon:RefreshImmediate()
             end
         }, level)
 
         UIDropDownMenu_AddButton(spacer, level)
 
         UIDropDownMenu_AddButton({
-            text=CLOSE, notCheckable=1,
-            func=function() CloseDropDownMenus() end
+            text = CLOSE,
+            notCheckable = 1,
+            func = function() CloseDropDownMenus() end
         }, level)
     end
 end
@@ -473,9 +464,9 @@ function Addon:OnEnter(mapID, coord)
     local node = map.nodes[coord]
 
     if self:GetCenter() > UIParent:GetCenter() then
-        GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+        GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
     else
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
     end
 
     node:Render(GameTooltip, map:CanFocus(node))
@@ -498,15 +489,15 @@ end
 function Addon:OnClick(button, down, mapID, coord)
     local map = Core.maps[mapID]
     local node = map.nodes[coord]
-    if button == "RightButton" and down then
-        DropdownMenu.initialize = function (_, level)
+    if button == 'RightButton' and down then
+        DropdownMenu.initialize = function(_, level)
             InitializeDropdownMenu(level, mapID, coord)
         end
         ToggleDropDownMenu(1, nil, DropdownMenu, self, 0, 0)
-    elseif button == "LeftButton" and down then
+    elseif button == 'LeftButton' and down then
         if map:CanFocus(node) then
             map:SetFocus(node, not node._focus)
-            Addon:Refresh()
+            Addon:RefreshImmediate()
         end
     end
 end
@@ -515,9 +506,9 @@ function Addon:OnInitialize()
     Core.class = select(2, UnitClass('player'))
     Core.faction = UnitFactionGroup('player')
     self.db = LibStub("AceDB-3.0"):New('HandyNotes_CoreDB', Core.optionDefaults, "Default")
-    self:RegisterEvent("PLAYER_ENTERING_WORLD", function ()
-        self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-        self:ScheduleTimer("RegisterWithHandyNotes", 1)
+    self:RegisterEvent('PLAYER_ENTERING_WORLD', function()
+        self:UnregisterEvent('PLAYER_ENTERING_WORLD')
+        self:ScheduleTimer('RegisterWithHandyNotes', 1)
     end)
 
     -- Add global groups to settings panel
@@ -530,8 +521,8 @@ function Addon:OnInitialize()
     -- Query localized expansion title
     if not Core.expansion then error('Expansion not set: HandyNotes_Core') end
     local expansion_name = EJ_GetTierInfo(Core.expansion)
-    Core.plugin_name = 'HandyNotes: '..expansion_name
-    Core.options.name = ('%02d - '):format(Core.expansion)..expansion_name
+    Core.plugin_name = 'HandyNotes: ' .. expansion_name
+    Core.options.name = ('%02d - '):format(Core.expansion) .. expansion_name
 end
 
 -------------------------------------------------------------------------------
@@ -547,7 +538,8 @@ function Addon:RegisterWithHandyNotes()
             local coord, node = next(nodes, precoord)
             while coord do -- Have we reached the end of this zone?
                 if node and (force or map:IsNodeEnabled(node, coord, minimap)) then
-                    local icon, scale, alpha = node:GetDisplayInfo(map.id, minimap)
+                    local icon, scale, alpha =
+                        node:GetDisplayInfo(map.id, minimap)
                     return coord, nil, icon, scale, alpha
                 end
                 coord, node = next(nodes, coord) -- Get next node
@@ -556,7 +548,8 @@ function Addon:RegisterWithHandyNotes()
         end
         function Addon:GetNodes2(mapID, _minimap)
             if Core:GetOpt('show_debug_map') then
-                Core.Debug('Loading nodes for map: '..mapID..' (minimap='..tostring(_minimap)..')')
+                Core.Debug('Loading nodes for map: ' .. mapID .. ' (minimap=' ..
+                             tostring(_minimap) .. ')')
             end
 
             map = Core.maps[mapID]
@@ -579,27 +572,38 @@ function Addon:RegisterWithHandyNotes()
 
     -- Refresh in any cases where node status may have changed
     self:RegisterBucketEvent({
-        'BAG_UPDATE', 'CRITERIA_EARNED', 'CRITERIA_UPDATE', 'LOOT_CLOSED',
-        'PLAYER_MONEY', 'SHOW_LOOT_TOAST', 'SHOW_LOOT_TOAST_UPGRADE',
-        'QUEST_TURNED_IN', 'ZONE_CHANGED_NEW_AREA'
+        'BAG_UPDATE_DELAYED', 'CRITERIA_EARNED', 'CRITERIA_UPDATE',
+        'LOOT_CLOSED', 'PLAYER_MONEY', 'SHOW_LOOT_TOAST',
+        'SHOW_LOOT_TOAST_UPGRADE', 'QUEST_TURNED_IN', 'ZONE_CHANGED_NEW_AREA'
     }, 2, 'Refresh')
 
     -- Also refresh whenever the size of the world map frame changes
-    hooksecurefunc(WorldMapFrame, 'OnFrameSizeChanged',
-        function() self:Refresh() end)
+    hooksecurefunc(WorldMapFrame, 'OnFrameSizeChanged', function(...)
+        if self.world_map_maximized ~= WorldMapFrame:IsMaximized() then
+            self.world_map_maximized = WorldMapFrame:IsMaximized()
+            self:RefreshImmediate()
+        end
+    end)
+    self.world_map_maximized = WorldMapFrame:IsMaximized()
 
     self:Refresh()
 end
 
 function Addon:Refresh()
-    if self._refreshTimer then return end
+    if self._refreshTimer or InCombatLockdown() then return end
     self._refreshTimer = C_Timer.NewTimer(0.1, function()
         self._refreshTimer = nil
-        self:SendMessage("HandyNotes_NotifyUpdate", "HandyNotes_Core")
-        Core.MinimapDataProvider:RefreshAllData()
-        Core.WorldMapDataProvider:RefreshAllData()
+        self:RefreshImmediate()
     end)
 end
+
+function Addon:RefreshImmediate()
+    self:SendMessage('HandyNotes_NotifyUpdate', "HandyNotes")
+    Core.MinimapDataProvider:RefreshAllData()
+    Core.WorldMapDataProvider:RefreshAllData()
+end
+
+
 
 -------------------------------------------------------------------------------
 -------------------------------- ICONS & GLOWS --------------------------------
@@ -608,8 +612,8 @@ end
 local ICONS = "Interface\\Addons\\HandyNotes\\Icons\\artwork\\icons"
 local GLOWS = "Interface\\Addons\\HandyNotes\\Icons\\artwork\\glows"
 
-local function Icon(name) return ICONS..'\\'..name..'.blp' end
-local function Glow(name) return GLOWS..'\\'..name..'.blp' end
+local function Icon(name) return ICONS .. '\\' .. name .. '.blp' end
+local function Glow(name) return GLOWS .. '\\' .. name .. '.blp' end
 
 local DEFAULT_ICON = 454046
 local DEFAULT_GLOW = Glow('square_icon')
@@ -697,11 +701,11 @@ local function GetIconPath(name)
 end
 
 local function GetIconLink(name, size, offsetX, offsetY)
-    local link = "|T"..GetIconPath(name)..":"..size..":"..size
+    local link = '|T' .. GetIconPath(name) .. ':' .. size .. ':' .. size
     if offsetX and offsetY then
-        link = link..':'..offsetX..':'..offsetY
+        link = link .. ':' .. offsetX .. ':' .. offsetY
     end
-    return link.."|t"
+    return link .. '|t'
 end
 
 local function GetGlowPath(name)
@@ -789,222 +793,236 @@ end
 -------------------------------------------------------------------------------
 
 Core.options = {
-    type = "group",
+    type = 'group',
     name = nil, -- populated in core.lua
-    childGroups = "tab",
+    childGroups = 'tab',
     get = function(info) return Core:GetOpt(info.arg) end,
     set = function(info, v) Core:SetOpt(info.arg, v) end,
     args = {
         GeneralTab = {
-            type = "group",
-            name = L["options_general_settings"],
-            desc = L["options_general_description"],
+            type = 'group',
+            name = L['options_general_settings'],
+            desc = L['options_general_description'],
             order = 0,
             args = {
                 GeneralHeader = {
-                    type = "header",
-                    name = L["options_general_settings"],
-                    order = 1,
+                    type = 'header',
+                    name = L['options_general_settings'],
+                    order = 1
                 },
                 show_worldmap_button = {
-                    type = "toggle",
-                    arg = "show_worldmap_button",
-                    name = L["options_show_worldmap_button"],
-                    desc = L["options_show_worldmap_button_desc"],
+                    type = 'toggle',
+                    arg = 'show_worldmap_button',
+                    name = L['options_show_worldmap_button'],
+                    desc = L['options_show_worldmap_button_desc'],
                     set = function(info, v)
                         Core:SetOpt(info.arg, v)
                         Core.world_map_button:Refresh()
                     end,
                     order = 2,
-                    width = "full",
+                    width = 'full'
                 },
                 maximized_enlarged = {
-                    type = "toggle",
-                    arg = "maximized_enlarged",
-                    name = L["options_toggle_maximized_enlarged"],
-                    desc = L["options_toggle_maximized_enlarged_desc"],
+                    type = 'toggle',
+                    arg = 'maximized_enlarged',
+                    name = L['options_toggle_maximized_enlarged'],
+                    desc = L['options_toggle_maximized_enlarged_desc'],
                     order = 3,
-                    width = "full",
+                    width = 'full'
                 },
                 per_map_settings = {
-                    type = "toggle",
-                    arg = "per_map_settings",
-                    name = L["options_toggle_per_map_settings"],
-                    desc = L["options_toggle_per_map_settings_desc"],
+                    type = 'toggle',
+                    arg = 'per_map_settings',
+                    name = L['options_toggle_per_map_settings'],
+                    desc = L['options_toggle_per_map_settings_desc'],
                     order = 4,
-                    width = "full",
+                    width = 'full'
                 },
                 RewardsHeader = {
-                    type = "header",
-                    name = L["options_rewards_settings"],
-                    order = 10,
+                    type = 'header',
+                    name = L['options_rewards_settings'],
+                    order = 10
                 },
                 show_mount_rewards = {
-                    type = "toggle",
-                    arg = "show_mount_rewards",
-                    name = L["options_mount_rewards"],
-                    desc = L["options_mount_rewards_desc"],
+                    type = 'toggle',
+                    arg = 'show_mount_rewards',
+                    name = L['options_mount_rewards'],
+                    desc = L['options_mount_rewards_desc'],
                     order = 11,
-                    width = "full",
+                    width = 'full'
                 },
                 show_pet_rewards = {
-                    type = "toggle",
-                    arg = "show_pet_rewards",
-                    name = L["options_pet_rewards"],
-                    desc = L["options_pet_rewards_desc"],
+                    type = 'toggle',
+                    arg = 'show_pet_rewards',
+                    name = L['options_pet_rewards'],
+                    desc = L['options_pet_rewards_desc'],
                     order = 11,
-                    width = "full",
+                    width = 'full'
                 },
                 show_toy_rewards = {
-                    type = "toggle",
-                    arg = "show_toy_rewards",
-                    name = L["options_toy_rewards"],
-                    desc = L["options_toy_rewards_desc"],
+                    type = 'toggle',
+                    arg = 'show_toy_rewards',
+                    name = L['options_toy_rewards'],
+                    desc = L['options_toy_rewards_desc'],
                     order = 11,
-                    width = "full",
+                    width = 'full'
                 },
                 show_transmog_rewards = {
-                    type = "toggle",
-                    arg = "show_transmog_rewards",
-                    name = L["options_transmog_rewards"],
-                    desc = L["options_transmog_rewards_desc"],
+                    type = 'toggle',
+                    arg = 'show_transmog_rewards',
+                    name = L['options_transmog_rewards'],
+                    desc = L['options_transmog_rewards_desc'],
                     order = 11,
-                    width = "full",
+                    width = 'full'
                 },
                 show_all_transmog_rewards = {
-                    type = "toggle",
-                    arg = "show_all_transmog_rewards",
-                    name = L["options_all_transmog_rewards"],
-                    desc = L["options_all_transmog_rewards_desc"],
+                    type = 'toggle',
+                    arg = 'show_all_transmog_rewards',
+                    name = L['options_all_transmog_rewards'],
+                    desc = L['options_all_transmog_rewards_desc'],
                     order = 12,
-                    width = "full",
+                    width = 'full'
                 },
                 VisibilityHeader = {
-                    type = "header",
-                    name = L["options_visibility_settings"],
-                    order = 20,
+                    type = 'header',
+                    name = L['options_visibility_settings'],
+                    order = 20
                 },
                 show_completed_nodes = {
-                    type = "toggle",
-                    arg = "show_completed_nodes",
-                    name = L["options_show_completed_nodes"],
-                    desc = L["options_show_completed_nodes_desc"],
+                    type = 'toggle',
+                    arg = 'show_completed_nodes',
+                    name = L['options_show_completed_nodes'],
+                    desc = L['options_show_completed_nodes_desc'],
                     order = 21,
-                    width = "full",
+                    width = 'full'
                 },
                 hide_done_rare = {
-                    type = "toggle",
-                    arg = "hide_done_rares",
-                    name = L["options_toggle_hide_done_rare"],
-                    desc = L["options_toggle_hide_done_rare_desc"],
+                    type = 'toggle',
+                    arg = 'hide_done_rares',
+                    name = L['options_toggle_hide_done_rare'],
+                    desc = L['options_toggle_hide_done_rare_desc'],
                     order = 22,
-                    width = "full",
+                    width = 'full'
                 },
                 hide_minimap = {
-                    type = "toggle",
-                    arg = "hide_minimap",
-                    name = L["options_toggle_hide_minimap"],
-                    desc = L["options_toggle_hide_minimap_desc"],
+                    type = 'toggle',
+                    arg = 'hide_minimap',
+                    name = L['options_toggle_hide_minimap'],
+                    desc = L['options_toggle_hide_minimap_desc'],
                     order = 23,
-                    width = "full",
+                    width = 'full'
                 },
                 use_char_achieves = {
-                    type = "toggle",
-                    arg = "use_char_achieves",
-                    name = L["options_toggle_use_char_achieves"],
-                    desc = L["options_toggle_use_char_achieves_desc"],
+                    type = 'toggle',
+                    arg = 'use_char_achieves',
+                    name = L['options_toggle_use_char_achieves'],
+                    desc = L['options_toggle_use_char_achieves_desc'],
                     order = 24,
-                    width = "full",
+                    width = 'full'
                 },
                 restore_all_nodes = {
-                    type = "execute",
-                    name = L["options_restore_hidden_nodes"],
-                    desc = L["options_restore_hidden_nodes_desc"],
+                    type = 'execute',
+                    name = L['options_restore_hidden_nodes'],
+                    desc = L['options_restore_hidden_nodes_desc'],
                     order = 25,
-                    width = "full",
+                    width = 'full',
                     func = function()
                         wipe(Core.addon.db.char)
                         Core.addon:Refresh()
                     end
                 },
                 FocusHeader = {
-                    type = "header",
-                    name = L["options_focus_settings"],
-                    order = 30,
+                    type = 'header',
+                    name = L['options_focus_settings'],
+                    order = 30
                 },
                 POI_scale = {
-                    type = "range",
-                    name = L["options_scale"],
-                    desc = L["options_scale_desc"],
-                    min = 1, max = 3, step = 0.01,
-                    arg = "poi_scale",
-                    width = "full",
-                    order = 31,
+                    type = 'range',
+                    name = L['options_scale'],
+                    desc = L['options_scale_desc'],
+                    min = 1,
+                    max = 3,
+                    step = 0.01,
+                    arg = 'poi_scale',
+                    width = 'full',
+                    order = 31
                 },
                 POI_color = {
-                    type = "color",
-                    name = L["options_poi_color"],
-                    desc = L["options_poi_color_desc"],
+                    type = 'color',
+                    name = L['options_poi_color'],
+                    desc = L['options_poi_color_desc'],
                     hasAlpha = true,
-                    set = function(_, ...) Core:SetColorOpt('poi_color', ...) end,
-                    get = function() return Core:GetColorOpt('poi_color') end,
-                    order = 32,
+                    set = function(_, ...)
+                        Core:SetColorOpt('poi_color', ...)
+                    end,
+                    get = function()
+                        return Core:GetColorOpt('poi_color')
+                    end,
+                    order = 32
                 },
                 PATH_color = {
-                    type = "color",
-                    name = L["options_path_color"],
-                    desc = L["options_path_color_desc"],
+                    type = 'color',
+                    name = L['options_path_color'],
+                    desc = L['options_path_color_desc'],
                     hasAlpha = true,
-                    set = function(_, ...) Core:SetColorOpt('path_color', ...) end,
-                    get = function() return Core:GetColorOpt('path_color') end,
-                    order = 33,
+                    set = function(_, ...)
+                        Core:SetColorOpt('path_color', ...)
+                    end,
+                    get = function()
+                        return Core:GetColorOpt('path_color')
+                    end,
+                    order = 33
                 },
                 restore_poi_colors = {
-                    type = "execute",
-                    name = L["options_reset_poi_colors"],
-                    desc = L["options_reset_poi_colors_desc"],
+                    type = 'execute',
+                    name = L['options_reset_poi_colors'],
+                    desc = L['options_reset_poi_colors_desc'],
                     order = 34,
-                    width = "full",
-                    func = function ()
+                    width = 'full',
+                    func = function()
                         local df = Core.optionDefaults.profile
-                        Core:SetColorOpt('poi_color', df.poi_color_R, df.poi_color_G, df.poi_color_B, df.poi_color_A)
-                        Core:SetColorOpt('path_color', df.path_color_R, df.path_color_G, df.path_color_B, df.path_color_A)
+                        Core:SetColorOpt('poi_color', df.poi_color_R,
+                            df.poi_color_G, df.poi_color_B, df.poi_color_A)
+                        Core:SetColorOpt('path_color', df.path_color_R,
+                            df.path_color_G, df.path_color_B, df.path_color_A)
                     end
                 },
                 TooltipsHeader = {
-                    type = "header",
-                    name = L["options_tooltip_settings"],
-                    order = 40,
+                    type = 'header',
+                    name = L['options_tooltip_settings'],
+                    order = 40
                 },
                 show_loot = {
-                    type = "toggle",
-                    arg = "show_loot",
-                    name = L["options_toggle_show_loot"],
-                    desc = L["options_toggle_show_loot_desc"],
-                    order = 41,
+                    type = 'toggle',
+                    arg = 'show_loot',
+                    name = L['options_toggle_show_loot'],
+                    desc = L['options_toggle_show_loot_desc'],
+                    order = 41
                 },
                 show_notes = {
-                    type = "toggle",
-                    arg = "show_notes",
-                    name = L["options_toggle_show_notes"],
-                    desc = L["options_toggle_show_notes_desc"],
-                    order = 42,
+                    type = 'toggle',
+                    arg = 'show_notes',
+                    name = L['options_toggle_show_notes'],
+                    desc = L['options_toggle_show_notes_desc'],
+                    order = 42
                 }
             }
         },
         GlobalTab = {
-            type = "group",
-            name = L["options_global"],
-            desc = L["options_global_description"],
-            disabled = function () return Core:GetOpt('per_map_settings') end,
+            type = 'group',
+            name = L['options_global'],
+            desc = L['options_global_description'],
+            disabled = function()
+                return Core:GetOpt('per_map_settings')
+            end,
             order = 1,
             args = {}
         },
         ZonesTab = {
-            type = "group",
-            name = L["options_zones"],
-            desc = L["options_zones_description"],
-            childGroups = "select",
+            type = 'group',
+            name = L['options_zones'],
+            desc = L['options_zones_description'],
+            childGroups = 'select',
             order = 2,
             args = {}
         }
@@ -1018,30 +1036,36 @@ function Core.CreateGlobalGroupOptions()
     for i, group in ipairs({
         Core.groups.RARE, Core.groups.TREASURE, Core.groups.PETBATTLE, Core.groups.MISC
     }) do
-        Core.options.args.GlobalTab.args['group_icon_'..group.name] = {
-            type = "header",
-            name = function () return Core.RenderLinks(group.label, true) end,
-            order = i * 10,
+        Core.options.args.GlobalTab.args['group_icon_' .. group.name] = {
+            type = 'header',
+            name = function()
+                return Core.RenderLinks(group.label, true)
+            end,
+            order = i * 10
         }
 
-        Core.options.args.GlobalTab.args['icon_scale_'..group.name] = {
-            type = "range",
-            name = L["options_scale"],
-            desc = L["options_scale_desc"],
-            min = 0.3, max = 3, step = 0.01,
+        Core.options.args.GlobalTab.args['icon_scale_' .. group.name] = {
+            type = 'range',
+            name = L['options_scale'],
+            desc = L['options_scale_desc'],
+            min = 0.3,
+            max = 3,
+            step = 0.01,
             arg = group.scaleArg,
             width = 1.13,
-            order = i * 10 + 1,
+            order = i * 10 + 1
         }
 
-        Core.options.args.GlobalTab.args['icon_alpha_'..group.name] = {
-            type = "range",
-            name = L["options_opacity"],
-            desc = L["options_opacity_desc"],
-            min = 0, max = 1, step = 0.01,
+        Core.options.args.GlobalTab.args['icon_alpha_' .. group.name] = {
+            type = 'range',
+            name = L['options_opacity'],
+            desc = L['options_opacity_desc'],
+            min = 0,
+            max = 1,
+            step = 0.01,
             arg = group.alphaArg,
             width = 1.13,
-            order = i * 10 + 2,
+            order = i * 10 + 2
         }
     end
 end
@@ -1052,29 +1076,29 @@ end
 
 local _INITIALIZED = {}
 
-function Core.CreateGroupOptions (map, group)
+function Core.CreateGroupOptions(map, group)
     -- Check if we've already initialized this group
-    if _INITIALIZED[group.name..map.id] then return end
-    _INITIALIZED[group.name..map.id] = true
+    if _INITIALIZED[group.name .. map.id] then return end
+    _INITIALIZED[group.name .. map.id] = true
 
     -- Check if map info exists (ignore if PTR/beta zone)
     local map_info = C_Map.GetMapInfo(map.id)
     if not map_info then return end
 
     -- Create map options group under zones tab
-    local options = Core.options.args.ZonesTab.args['Zone_'..map.id]
+    local options = Core.options.args.ZonesTab.args['Zone_' .. map.id]
     if not options then
         options = {
-            type = "group",
+            type = 'group',
             name = map_info.name,
             args = {
                 OpenWorldMap = {
-                    type = "execute",
-                    name = L["options_open_world_map"],
-                    desc = L["options_open_world_map_desc"],
+                    type = 'execute',
+                    name = L['options_open_world_map'],
+                    desc = L['options_open_world_map_desc'],
                     order = 1,
-                    width = "full",
-                    func = function ()
+                    width = 'full',
+                    func = function()
                         if not WorldMapFrame:IsShown() then
                             InterfaceOptionsFrame:Hide()
                             HideUIPanel(GameMenuFrame)
@@ -1083,64 +1107,72 @@ function Core.CreateGroupOptions (map, group)
                     end
                 },
                 IconsGroup = {
-                    type = "group",
-                    name = L["options_icon_settings"],
+                    type = 'group',
+                    name = L['options_icon_settings'],
                     inline = true,
                     order = 2,
                     args = {}
                 },
                 VisibilityGroup = {
-                    type = "group",
-                    name = L["options_visibility_settings"],
+                    type = 'group',
+                    name = L['options_visibility_settings'],
                     inline = true,
                     order = 3,
                     args = {}
                 }
             }
         }
-        Core.options.args.ZonesTab.args['Zone_'..map.id] = options
+        Core.options.args.ZonesTab.args['Zone_' .. map.id] = options
     end
 
     map._icons_order = map._icons_order or 0
     map._visibility_order = map._visibility_order or 0
 
-    options.args.IconsGroup.args["icon_toggle_"..group.name] = {
-        type = "toggle",
-        get = function () return group:GetDisplay(map.id) end,
-        set = function (info, v) group:SetDisplay(v, map.id) end,
-        name = function () return Core.RenderLinks(group.label, true) end,
-        desc = function () return Core.RenderLinks(group.desc) end,
-        disabled = function () return not group:IsEnabled() end,
+    options.args.IconsGroup.args['icon_toggle_' .. group.name] = {
+        type = 'toggle',
+        get = function() return group:GetDisplay(map.id) end,
+        set = function(info, v) group:SetDisplay(v, map.id) end,
+        name = function() return Core.RenderLinks(group.label, true) end,
+        desc = function() return Core.RenderLinks(group.desc) end,
+        disabled = function() return not group:IsEnabled() end,
         width = 0.9,
         order = map._icons_order
     }
 
-    options.args.VisibilityGroup.args["header_"..group.name] = {
-        type = "header",
-        name = function () return Core.RenderLinks(group.label, true) end,
+    options.args.VisibilityGroup.args['header_' .. group.name] = {
+        type = 'header',
+        name = function() return Core.RenderLinks(group.label, true) end,
         order = map._visibility_order
     }
 
-    options.args.VisibilityGroup.args['icon_scale_'..group.name] = {
-        type = "range",
-        name = L["options_scale"],
-        desc = L["options_scale_desc"],
-        get = function () return group:GetScale(map.id) end,
-        set = function (info, v) group:SetScale(v, map.id) end,
-        disabled = function () return not (group:IsEnabled() and group:GetDisplay(map.id)) end,
-        min = 0.3, max = 3, step = 0.01,
+    options.args.VisibilityGroup.args['icon_scale_' .. group.name] = {
+        type = 'range',
+        name = L['options_scale'],
+        desc = L['options_scale_desc'],
+        get = function() return group:GetScale(map.id) end,
+        set = function(info, v) group:SetScale(v, map.id) end,
+        disabled = function()
+            return not (group:IsEnabled() and group:GetDisplay(map.id))
+        end,
+        min = 0.3,
+        max = 3,
+        step = 0.01,
         width = 0.95,
         order = map._visibility_order + 1
     }
 
-    options.args.VisibilityGroup.args['icon_alpha_'..group.name] = {
-        type = "range",
-        name = L["options_opacity"],
-        desc = L["options_opacity_desc"],
-        get = function () return group:GetAlpha(map.id) end,
-        set = function (info, v) group:SetAlpha(v, map.id) end,
-        disabled = function () return not (group:IsEnabled() and group:GetDisplay(map.id)) end,
-        min = 0, max = 1, step = 0.01,
+    options.args.VisibilityGroup.args['icon_alpha_' .. group.name] = {
+        type = 'range',
+        name = L['options_opacity'],
+        desc = L['options_opacity_desc'],
+        get = function() return group:GetAlpha(map.id) end,
+        set = function(info, v) group:SetAlpha(v, map.id) end,
+        disabled = function()
+            return not (group:IsEnabled() and group:GetDisplay(map.id))
+        end,
+        min = 0,
+        max = 1,
+        step = 0.01,
         width = 0.95,
         order = map._visibility_order + 2
     }
@@ -1169,7 +1201,7 @@ To enable all development settings and functionality:
 --]]
 
 -- Register all addons objects for the CTRL+ALT handler
-local plugins = "HandyNotes_ZarPlugins"
+local plugins = 'HandyNotes_ZarPlugins'
 if _G[plugins] == nil then _G[plugins] = {} end
 _G[plugins][#_G[plugins] + 1] = Core
 
@@ -1178,30 +1210,30 @@ local function BootstrapDevelopmentEnvironment()
 
     -- Add development settings to the UI
     Core.options.args.GeneralTab.args.DevelopmentHeader = {
-        type = "header",
-        name = L["options_dev_settings"],
-        order = 100,
+        type = 'header',
+        name = L['options_dev_settings'],
+        order = 100
     }
     Core.options.args.GeneralTab.args.show_debug_map = {
-        type = "toggle",
-        arg = "show_debug_map",
-        name = L["options_toggle_show_debug_map"],
-        desc = L["options_toggle_show_debug_map_desc"],
-        order = 101,
+        type = 'toggle',
+        arg = 'show_debug_map',
+        name = L['options_toggle_show_debug_map'],
+        desc = L['options_toggle_show_debug_map_desc'],
+        order = 101
     }
     Core.options.args.GeneralTab.args.show_debug_quest = {
-        type = "toggle",
-        arg = "show_debug_quest",
-        name = L["options_toggle_show_debug_quest"],
-        desc = L["options_toggle_show_debug_quest_desc"],
-        order = 102,
+        type = 'toggle',
+        arg = 'show_debug_quest',
+        name = L['options_toggle_show_debug_quest'],
+        desc = L['options_toggle_show_debug_quest_desc'],
+        order = 102
     }
     Core.options.args.GeneralTab.args.force_nodes = {
-        type = "toggle",
-        arg = "force_nodes",
-        name = L["options_toggle_force_nodes"],
-        desc = L["options_toggle_force_nodes_desc"],
-        order = 103,
+        type = 'toggle',
+        arg = 'force_nodes',
+        name = L['options_toggle_force_nodes'],
+        desc = L['options_toggle_force_nodes_desc'],
+        order = 103
     }
 
     -- Print debug messages for each quest ID that is flipped
@@ -1235,7 +1267,8 @@ local function BootstrapDevelopmentEnvironment()
                     -- ids to flip state, we do not want to report on those
                     for i, args in ipairs(changed) do
                         table.insert(history, 1, args)
-                        DebugQuest('Quest', args[2], 'changed:', args[3], '=>', args[4])
+                        DebugQuest('Quest', args[2], 'changed:', args[3], '=>',
+                            args[4])
                     end
                 end
                 if #history > 100 then
@@ -1254,13 +1287,14 @@ local function BootstrapDevelopmentEnvironment()
     local IQFrame = CreateFrame('Frame', "HandyNotes_CoreIQ", WorldMapFrame)
     local groupPins = WorldMapFrame.pinPools.GroupMembersPinTemplate
     IQFrame:SetPropagateKeyboardInput(true)
-    IQFrame:SetScript('OnKeyDown', function (_, key)
-        if (key == 'LCTRL' or key == 'LALT') and IsLeftControlKeyDown() and IsLeftAltKeyDown() then
+    IQFrame:SetScript('OnKeyDown', function(_, key)
+        if (key == 'LCTRL' or key == 'LALT') and IsLeftControlKeyDown() and
+            IsLeftAltKeyDown() then
             IQFrame:SetPropagateKeyboardInput(false)
             for i, _ns in ipairs(_G[plugins]) do
                 if not _ns.dev_force then
                     _ns.dev_force = true
-                    _ns.addon:Refresh()
+                    _ns.addon:RefreshImmediate()
                 end
             end
             -- Hide player pins on the map
@@ -1273,7 +1307,7 @@ local function BootstrapDevelopmentEnvironment()
             for i, _ns in ipairs(_G[plugins]) do
                 if _ns.dev_force then
                     _ns.dev_force = false
-                    _ns.addon:Refresh()
+                    _ns.addon:RefreshImmediate()
                 end
             end
             -- Show player pins on the map
@@ -1282,26 +1316,26 @@ local function BootstrapDevelopmentEnvironment()
     end)
 
     -- Slash commands
-    SLASH_PETID1 = "/petid"
-    SlashCmdList["PETID"] = function(name)
+    SLASH_PETID1 = '/petid'
+    SlashCmdList['PETID'] = function(name)
         if #name == 0 then return print('Usage: /petid NAME') end
         local petid = C_PetJournal.FindPetIDByName(name)
         if petid then
-            print(name..": "..petid)
+            print(name .. ': ' .. petid)
         else
-            print("NO MATCH FOR: /petid "..name)
+            print('NO MATCH FOR: /petid ' .. name)
         end
     end
 
-    SLASH_MOUNTID1 = "/mountid"
-    SlashCmdList["MOUNTID"] = function(name)
+    SLASH_MOUNTID1 = '/mountid'
+    SlashCmdList['MOUNTID'] = function(name)
         if #name == 0 then return print('Usage: /mountid NAME') end
         for i, m in ipairs(C_MountJournal.GetMountIDs()) do
             if (C_MountJournal.GetMountInfoByID(m) == name) then
-                return print(name..": "..m)
+                return print(name .. ': ' .. m)
             end
         end
-        print("NO MATCH FOR: /mountid "..name)
+        print('NO MATCH FOR: /mountid ' .. name)
     end
 
 end
@@ -1388,8 +1422,8 @@ Core.BootstrapDevelopmentEnvironment = BootstrapDevelopmentEnvironment
 
 local Class = Core.Class
 
-local HBD = LibStub("HereBeDragons-2.0")
-local HBDPins = LibStub("HereBeDragons-Pins-2.0")
+local HBD = LibStub('HereBeDragons-2.0')
+local HBDPins = LibStub('HereBeDragons-Pins-2.0')
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -1430,11 +1464,14 @@ end
 
 function Map:AddNode(coord, node)
     if not Core.IsInstance(node, Core.node.Node) then
-        error(format('All nodes must be instances of the Node() class: %d %s', coord, tostring(node)))
+        error(format('All nodes must be instances of the Node() class: %d %s',
+            coord, tostring(node)))
     end
 
     if node.fgroup then
-        if not self.fgroups[node.fgroup] then self.fgroups[node.fgroup] = {} end
+        if not self.fgroups[node.fgroup] then
+            self.fgroups[node.fgroup] = {}
+        end
         local fgroup = self.fgroups[node.fgroup]
         fgroup[#fgroup + 1] = coord
     end
@@ -1459,16 +1496,20 @@ function Map:AddNode(coord, node)
         local x, y = HandyNotes:getXY(coord)
         local wx, wy = HBD:GetWorldCoordinatesFromZone(x, y, self.id)
         if not (wx and wy) then
-            error(format('Missing world coords: (%d: %d) => ???', self.id, coord))
+            error(
+                format('Missing world coords: (%d: %d) => ???', self.id, coord))
         end
         for i, parent in ipairs(node.parent) do
             -- Calculate parent zone coordinates and add node
             local px, py = HBD:GetZoneCoordinatesFromWorld(wx, wy, parent.id)
             if not (px and py) then
-                error(format('Missing map coords: (%d: %d) => (%d: ???)', self.id, coord, parent.id))
+                error(format('Missing map coords: (%d: %d) => (%d: ???)',
+                    self.id, coord, parent.id))
             end
-            local map = Core.maps[parent.id] or Map({id=parent.id})
-            map.nodes[HandyNotes:getCoord(px, py)] = Core.Clone(node, {pois=(parent.pois or false)})
+            local map = Core.maps[parent.id] or Map({id = parent.id})
+            map.nodes[HandyNotes:getCoord(px, py)] = Core.Clone(node, {
+                pois = (parent.pois or false)
+            })
         end
     end
 end
@@ -1485,7 +1526,9 @@ function Map:CanFocus(node)
     if type(node.pois) == 'table' then return true end
     if node.fgroup then
         for i, coord in ipairs(self.fgroups[node.fgroup]) do
-            if type(self.nodes[coord].pois) == 'table' then return true end
+            if type(self.nodes[coord].pois) == 'table' then
+                return true
+            end
         end
     end
     return false
@@ -1519,11 +1562,11 @@ function Map:IsNodeEnabled(node, coord, minimap)
     -- Check if node's group is disabled
     if not node.group:IsEnabled() then return false end
 
-    -- Check for prerequisites and quest (or custom) completion
-    if not node:IsEnabled() then return false end
+    -- Check if node's group is checked/unchecked
+    if not node.group:GetDisplay(self.id) then return false end
 
-    -- Display the node based off the group display setting
-    return node.group:GetDisplay(self.id)
+    -- Check for prerequisites and quest (or custom) completion
+    return node:IsEnabled()
 end
 
 function Map:Prepare()
@@ -1800,8 +1843,8 @@ function Group:Initialize(name, icon, attrs)
     self.name = name
     self.icon = icon
 
-    self.label = L["options_icons_"..name]
-    self.desc = L["options_icons_"..name.."_desc"]
+    self.label = L['options_icons_' .. name]
+    self.desc = L['options_icons_' .. name .. '_desc']
 
     -- Prepare any links in this group label/description
     Core.PrepareLinks(self.label)
@@ -2050,7 +2093,9 @@ end
 
 local WarMode = Class('WarMode', Requirement, {
     text = PVP_LABEL_WAR_MODE,
-    IsMet = function () return C_PvP.IsWarModeActive() or C_PvP.IsWarModeDesired() end
+    IsMet = function()
+        return C_PvP.IsWarModeActive() or C_PvP.IsWarModeDesired()
+    end
 })()
 
 -------------------------------------------------------------------------------
@@ -2109,7 +2154,7 @@ local Node = Class('Node', nil, {
     minimap = true,
     alpha = 1,
     scale = 1,
-    icon = "default",
+    icon = 'default',
     group = Core.groups.MISC
 })
 
@@ -2139,7 +2184,8 @@ function Node:GetDisplayInfo(mapID, minimap)
     local scale = self.scale * self.group:GetScale(mapID)
     local alpha = self.alpha * self.group:GetAlpha(mapID)
 
-    if not minimap and WorldMapFrame.isMaximized and Core:GetOpt('maximized_enlarged') then
+    if not minimap and WorldMapFrame.isMaximized and
+        Core:GetOpt('maximized_enlarged') then
         scale = scale * 1.3 -- enlarge on maximized world map
     end
 
@@ -2172,7 +2218,8 @@ associated rewards have been obtained (achievements, toys, pets, mounts).
 
 function Node:IsCollected()
     for reward in self:IterateRewards() do
-        if reward:IsEnabled() and reward:IsObtainable() and not reward:IsObtained() then return false end
+        if reward:IsEnabled() and reward:IsObtainable() and
+            not reward:IsObtained() then return false end
     end
     return true
 end
@@ -2192,12 +2239,16 @@ function Node:IsCompleted()
     if self.quest and self.questAny then
         -- Completed if *any* attached quest ids are true
         for i, quest in ipairs(self.quest) do
-            if C_QuestLog.IsQuestFlaggedCompleted(quest) then return true end
+            if C_QuestLog.IsQuestFlaggedCompleted(quest) then
+                return true
+            end
         end
     elseif self.quest then
         -- Completed only if *all* attached quest ids are true
         for i, quest in ipairs(self.quest) do
-            if not C_QuestLog.IsQuestFlaggedCompleted(quest) then return false end
+            if not C_QuestLog.IsQuestFlaggedCompleted(quest) then
+                return false
+            end
         end
         return true
     end
@@ -2247,7 +2298,9 @@ function Node:PrerequisiteCompleted()
     -- Prerequisite not met if any dependent quest ids are false
     if not self.questDeps then return true end
     for i, quest in ipairs(self.questDeps) do
-        if not C_QuestLog.IsQuestFlaggedCompleted(quest) then return false end
+        if not C_QuestLog.IsQuestFlaggedCompleted(quest) then
+            return false
+        end
     end
     return true
 end
@@ -2316,13 +2369,15 @@ function Node:Render(tooltip, focusable)
     end
 
     if self.faction then
-        rlabel = rlabel..' '..Core.GetIconLink(self.faction:lower(), 16, 1, -1)
+        rlabel = rlabel .. ' ' ..
+                     Core.GetIconLink(self.faction:lower(), 16, 1, -1)
     end
 
     if focusable then
         -- add an rlabel hint to use left-mouse to focus the node
-        local focus = Core.GetIconLink('left_mouse', 12)..Core.status.Gray(L["focus"])
-        rlabel = (#rlabel > 0) and focus..' '..rlabel or focus
+        local focus = Core.GetIconLink('left_mouse', 12) ..
+                          Core.status.Gray(L['focus'])
+        rlabel = (#rlabel > 0) and focus .. ' ' .. rlabel or focus
     end
 
     -- render top-right label text
@@ -2343,9 +2398,9 @@ function Node:Render(tooltip, focusable)
         for i, req in ipairs(self.requires) do
             if IsInstance(req, Requirement) then
                 color = req:IsMet() and Core.color.White or Core.color.Red
-                text = color(L["Requires"]..' '..req:GetText())
+                text = color(L['Requires'] .. ' ' .. req:GetText())
             else
-                text = Core.color.Red(L["Requires"]..' '..req)
+                text = Core.color.Red(L['Requires'] .. ' ' .. req)
             end
             tooltip:AddLine(Core.RenderLinks(text, true))
         end
@@ -2407,11 +2462,12 @@ end
 local Collectible = Class('Collectible', Node)
 
 function Collectible.getters:label()
-    if self.id then return ("{npc:%d}"):format(self.id) end
-    if self.item then return ("{item:%d}"):format(self.item) end
+    if self.id then return ('{npc:%d}'):format(self.id) end
+    if self.item then return ('{item:%d}'):format(self.item) end
     for reward in self:IterateRewards() do
         if IsInstance(reward, Core.reward.Achievement) then
-            return GetAchievementCriteriaInfoByID(reward.id, reward.criteria[1].id) or UNKNOWN
+            return GetAchievementCriteriaInfoByID(reward.id,
+                reward.criteria[1].id) or UNKNOWN
         end
     end
     return UNKNOWN
@@ -2457,9 +2513,14 @@ function Item:Initialize(attrs)
     Node.Initialize(self, attrs)
     if not self.id then error('id required for Item nodes') end
 
-    local item = _G.Item:CreateFromItemID(self.id)
-    if not item:IsItemEmpty() then
-        item:ContinueOnItemLoad(function() self.icon = item:GetItemIcon() end)
+    if not self.icon then
+        self.icon = 454046 -- temp loading icon
+        local item = _G.Item:CreateFromItemID(self.id)
+        if not item:IsItemEmpty() then
+            item:ContinueOnItemLoad(function()
+                self.icon = item:GetItemIcon()
+            end)
+        end
     end
 end
 
@@ -2557,7 +2618,8 @@ local Treasure = Class('Treasure', Node, {
 function Treasure.getters:label()
     for reward in self:IterateRewards() do
         if IsInstance(reward, Core.reward.Achievement) then
-            return GetAchievementCriteriaInfoByID(reward.id, reward.criteria[1].id) or UNKNOWN
+            return GetAchievementCriteriaInfoByID(reward.id,
+                reward.criteria[1].id) or UNKNOWN
         end
     end
     return UNKNOWN
@@ -2609,7 +2671,7 @@ local function Icon(icon) return '|T' .. icon .. ':0:0:1:-1|t ' end
 
 -- in zhCN’s built-in font, ARHei.ttf, the glyph of U+2022 <bullet> is missing.
 -- use U+00B7 <middle dot> instead.
-local bullet = (GetLocale() == "zhCN" and "→" or "?")
+local bullet = (GetLocale() == 'zhCN' and '·' or '?')
 
 -------------------------------------------------------------------------------
 ----------------------------------- REWARD ------------------------------------
@@ -2624,7 +2686,9 @@ end
 function Reward:IsEnabled()
     if self.class and self.class ~= Core.class then return false end
     if self.faction and self.faction ~= Core.faction then return false end
-    if self.display_option and not Core:GetOpt(self.display_option) then return false end
+    if self.display_option and not Core:GetOpt(self.display_option) then
+        return false
+    end
     return true
 end
 
@@ -2759,14 +2823,13 @@ function Achievement:GetLines()
         local cname, _, ccomp, qty, req = GetCriteriaInfo(self.id, c.id)
         if (cname == '' or c.qty) then
             cname = c.suffix or cname
-            cname = (completed and req..'/'..req or qty..'/'..req)..' '..cname
+            cname = (completed and req .. '/' .. req or qty .. '/' .. req) ..
+                        ' ' .. cname
         end
 
         local r, g, b = .6, .6, .6
-        local ctext = "   "..bullet.." "..cname
-        if (completed or ccomp) then
-            r, g, b = 0, 1, 0
-        end
+        local ctext = '   ' .. bullet .. ' ' .. cname
+        if (completed or ccomp) then r, g, b = 0, 1, 0 end
 
         local note, status = c.note
         if c.quest then
@@ -2775,7 +2838,7 @@ function Achievement:GetLines()
             else
                 status = Core.status.Red(L['undefeated'])
             end
-            note = note and (note..'  '..status) or status
+            note = note and (note .. '  ' .. status) or status
         end
 
         return ctext, note, r, g, b
@@ -2792,9 +2855,9 @@ function Currency:GetText()
     local info = C_CurrencyInfo.GetCurrencyInfo(self.id)
     local text = C_CurrencyInfo.GetCurrencyLink(self.id, 0)
     if self.note then -- additional info
-        text = text..' ('..self.note..')'
+        text = text .. ' (' .. self.note .. ')'
     end
-    return Icon(info.iconFileID)..text
+    return Icon(info.iconFileID) .. text
 end
 
 -------------------------------------------------------------------------------
@@ -2809,7 +2872,7 @@ function Item:Initialize(attrs)
     if not self.item then
         error('Item() reward requires an item id to be set')
     end
-    self.itemLink = L["retrieving"]
+    self.itemLink = L['retrieving']
     self.itemIcon = 'Interface\\Icons\\Inv_misc_questionmark'
     local item = _G.Item:CreateFromItemID(self.item)
     if not item:IsItemEmpty() then
@@ -2831,12 +2894,12 @@ end
 function Item:GetText()
     local text = self.itemLink
     if self.type then -- mount, pet, toy, etc
-        text = text..' ('..self.type..')'
+        text = text .. ' (' .. self.type .. ')'
     end
     if self.note then -- additional info
-        text = text..' ('..Core.RenderLinks(self.note, true)..')'
+        text = text .. ' (' .. Core.RenderLinks(self.note, true) .. ')'
     end
-    return Icon(self.itemIcon)..text
+    return Icon(self.itemIcon) .. text
 end
 
 function Item:GetStatus()
@@ -2867,7 +2930,7 @@ end
 
 function Mount:GetStatus()
     local collected = select(11, C_MountJournal.GetMountInfoByID(self.id))
-    return collected and Green(L["known"]) or Red(L["missing"])
+    return collected and Green(L['known']) or Red(L['missing'])
 end
 
 -------------------------------------------------------------------------------
@@ -2884,7 +2947,7 @@ function Pet:Initialize(attrs)
         Reward.Initialize(self, attrs)
         local name, icon = C_PetJournal.GetPetInfoBySpeciesID(self.id)
         self.itemIcon = icon
-        self.itemLink = '|cff1eff00['..name..']|r'
+        self.itemLink = '|cff1eff00[' .. name .. ']|r'
     end
 end
 
@@ -2892,7 +2955,7 @@ function Pet:IsObtained() return C_PetJournal.GetNumCollectedInfo(self.id) > 0 e
 
 function Pet:GetStatus()
     local n, m = C_PetJournal.GetNumCollectedInfo(self.id)
-    return (n > 0) and Green(n..'/'..m) or Red(n..'/'..m)
+    return (n > 0) and Green(n .. '/' .. m) or Red(n .. '/' .. m)
 end
 
 -------------------------------------------------------------------------------
@@ -2916,7 +2979,7 @@ end
 
 function Quest:GetText()
     local name = C_QuestLog.GetTitleForQuestID(self.id[1])
-    return Core.GetIconLink('quest_ay', 13)..' '..(name or UNKNOWN)
+    return Core.GetIconLink('quest_ay', 13) .. ' ' .. (name or UNKNOWN)
 end
 
 function Quest:GetStatus()
@@ -2930,7 +2993,7 @@ function Quest:GetStatus()
                 count = count + 1
             end
         end
-        local status = count..'/'..#self.id
+        local status = count .. '/' .. #self.id
         return (count == #self.id) and Green(status) or Red(status)
     end
 end
@@ -2939,13 +3002,13 @@ end
 ------------------------------------ SPELL ------------------------------------
 -------------------------------------------------------------------------------
 
-local Spell = Class('Spell', Item, { type = L["spell"] })
+local Spell = Class('Spell', Item, {type = L['spell']})
 
 function Spell:IsObtained() return IsSpellKnown(self.spell) end
 
 function Spell:GetStatus()
     local collected = IsSpellKnown(self.spell)
-    return collected and Green(L["known"]) or Red(L["missing"])
+    return collected and Green(L['known']) or Red(L['missing'])
 end
 
 -------------------------------------------------------------------------------
@@ -2959,7 +3022,7 @@ function Toy:IsObtained() return PlayerHasToy(self.item) end
 
 function Toy:GetStatus()
     local collected = PlayerHasToy(self.item)
-    return collected and Green(L["known"]) or Red(L["missing"])
+    return collected and Green(L['known']) or Red(L['missing'])
 end
 
 -------------------------------------------------------------------------------
@@ -2995,7 +3058,9 @@ end
 function Transmog:IsKnown()
     if CTC.PlayerHasTransmog(self.item) then return true end
     local appearanceID, sourceID = CTC.GetItemInfo(self.item)
-    if sourceID and CTC.PlayerHasTransmogItemModifiedAppearance(sourceID) then return true end
+    if sourceID and CTC.PlayerHasTransmogItemModifiedAppearance(sourceID) then
+        return true
+    end
     if appearanceID then
         local sources = CTC.GetAppearanceSources(appearanceID)
         if sources then
@@ -3021,7 +3086,8 @@ function Transmog:IsObtainable()
     -- Cosmetic cloaks do not behave well with the GetItemSpecInfo() function.
     -- They return an empty table even though you can get the item to drop.
     local _, _, _, ilvl, _, _, _, _, equipLoc = GetItemInfo(self.item)
-    if not (ilvl == 1 and equipLoc == 'INVTYPE_CLOAK' and self.slot == L["cosmetic"]) then
+    if not (ilvl == 1 and equipLoc == 'INVTYPE_CLOAK' and self.slot ==
+        L['cosmetic']) then
         -- Verify the item drops for any of the players specs
         local specs = GetItemSpecInfo(self.item)
         if type(specs) == 'table' and #specs == 0 then return false end
@@ -3039,13 +3105,13 @@ end
 
 function Transmog:GetStatus()
     local collected = self:IsKnown()
-    local status = collected and Green(L["known"]) or Red(L["missing"])
+    local status = collected and Green(L['known']) or Red(L['missing'])
 
     if not collected then
         if not self:IsLearnable() then
-            status = Orange(L["unlearnable"])
+            status = Orange(L['unlearnable'])
         elseif not self:IsObtainable() then
-            status = Orange(L["unobtainable"])
+            status = Orange(L['unobtainable'])
         end
     end
 
@@ -3078,7 +3144,7 @@ Core.reward = {
 local function UIDropDownMenu_AddSlider(info, level)
     local function format(v)
         if info.percentage then return FormatPercentage(v, true) end
-        return string.format("%.2f", v)
+        return string.format('%.2f', v)
     end
 
     info.frame.Label:SetText(info.text)
@@ -3086,14 +3152,14 @@ local function UIDropDownMenu_AddSlider(info, level)
     info.frame.Slider:SetMinMaxValues(info.min, info.max)
     info.frame.Slider:SetMinMaxValues(info.min, info.max)
     info.frame.Slider:SetValueStep(info.step)
-    info.frame.Slider:SetAccessorFunction(function () return info.value end)
-    info.frame.Slider:SetMutatorFunction(function (v)
+    info.frame.Slider:SetAccessorFunction(function() return info.value end)
+    info.frame.Slider:SetMutatorFunction(function(v)
         info.frame.Value:SetText(format(v))
         info.func(v)
     end)
     info.frame.Slider:UpdateVisibleState()
 
-    UIDropDownMenu_AddButton({ customFrame = info.frame }, level)
+    UIDropDownMenu_AddButton({customFrame = info.frame}, level)
 end
 
 -------------------------------------------------------------------------------
@@ -3104,10 +3170,11 @@ local WorldMapOptionsButtonMixin = {}
 _G["HandyNotes_CoreWorldMapOptionsButtonMixin"] = WorldMapOptionsButtonMixin
 
 function WorldMapOptionsButtonMixin:OnLoad()
-    UIDropDownMenu_SetInitializeFunction(self.DropDown, function (dropdown, level)
-        dropdown:GetParent():InitializeDropDown(level)
-    end)
-    UIDropDownMenu_SetDisplayMode(self.DropDown, "MENU")
+    UIDropDownMenu_SetInitializeFunction(self.DropDown,
+        function(dropdown, level)
+            dropdown:GetParent():InitializeDropDown(level)
+        end)
+    UIDropDownMenu_SetDisplayMode(self.DropDown, 'MENU')
 
     self.GroupDesc = CreateFrame('Frame', 'HandyNotes_CoreGroupMenuSliderOption',
         nil, 'HandyNotes_CoreTextMenuOptionTemplate')
@@ -3118,28 +3185,32 @@ function WorldMapOptionsButtonMixin:OnLoad()
 end
 
 function WorldMapOptionsButtonMixin:OnMouseDown(button)
-    self.Icon:SetPoint("TOPLEFT", 8, -8)
+    self.Icon:SetPoint('TOPLEFT', 8, -8)
     local xOffset = WorldMapFrame.isMaximized and 30 or 0
-    self.DropDown.point = WorldMapFrame.isMaximized and "TOPRIGHT" or "TOPLEFT"
+    self.DropDown.point = WorldMapFrame.isMaximized and 'TOPRIGHT' or 'TOPLEFT'
     ToggleDropDownMenu(1, nil, self.DropDown, self, xOffset, -5)
     PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 end
 
 function WorldMapOptionsButtonMixin:OnMouseUp()
-    self.Icon:SetPoint("TOPLEFT", self, "TOPLEFT", 6, -6)
+    self.Icon:SetPoint('TOPLEFT', self, 'TOPLEFT', 6, -6)
 end
 
 function WorldMapOptionsButtonMixin:OnEnter()
-    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+    GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
     GameTooltip_SetTitle(GameTooltip, Core.plugin_name)
-    GameTooltip_AddNormalLine(GameTooltip, L["map_button_text"])
+    GameTooltip_AddNormalLine(GameTooltip, L['map_button_text'])
     GameTooltip:Show()
 end
 
 function WorldMapOptionsButtonMixin:Refresh()
     local enabled = Core:GetOpt('show_worldmap_button')
     local map = Core.maps[self:GetParent():GetMapID() or 0]
-    if enabled and map and map:HasEnabledGroups() then self:Show() else self:Hide() end
+    if enabled and map and map:HasEnabledGroups() then
+        self:Show()
+    else
+        self:Hide()
+    end
 end
 
 function WorldMapOptionsButtonMixin:InitializeDropDown(level)
@@ -3166,20 +3237,20 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
                 end
 
                 if type(icon) == 'number' then
-                    iconLink = Core.GetIconLink(icon, 12, 1, 0)..' '
+                    iconLink = Core.GetIconLink(icon, 12, 1, 0) .. ' '
                 else
                     iconLink = Core.GetIconLink(icon, 16)
                 end
 
                 UIDropDownMenu_AddButton({
-                    text = iconLink..' '..Core.RenderLinks(group.label, true),
+                    text = iconLink .. ' ' .. Core.RenderLinks(group.label, true),
                     isNotRadio = true,
                     keepShownOnClick = true,
                     hasArrow = true,
                     value = group,
                     checked = group:GetDisplay(map.id),
                     arg1 = group,
-                    func = function (button, group)
+                    func = function(button, group)
                         group:SetDisplay(button.checked, map.id)
                     end
                 })
@@ -3188,7 +3259,7 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
 
         UIDropDownMenu_AddSeparator()
         UIDropDownMenu_AddButton({
-            text = L["options_reward_types"],
+            text = L['options_reward_types'],
             isNotRadio = true,
             notCheckable = true,
             keepShownOnClick = true,
@@ -3196,40 +3267,40 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
             value = 'rewards'
         })
         UIDropDownMenu_AddButton({
-            text = L["options_show_completed_nodes"],
+            text = L['options_show_completed_nodes'],
             isNotRadio = true,
             keepShownOnClick = true,
             checked = Core:GetOpt('show_completed_nodes'),
-            func = function (button, option)
+            func = function(button, option)
                 Core:SetOpt('show_completed_nodes', button.checked)
             end
         })
         UIDropDownMenu_AddButton({
-            text = L["options_toggle_hide_done_rare"],
+            text = L['options_toggle_hide_done_rare'],
             isNotRadio = true,
             keepShownOnClick = true,
             checked = Core:GetOpt('hide_done_rares'),
-            func = function (button, option)
+            func = function(button, option)
                 Core:SetOpt('hide_done_rares', button.checked)
             end
         })
         UIDropDownMenu_AddButton({
-            text = L["options_toggle_use_char_achieves"],
+            text = L['options_toggle_use_char_achieves'],
             isNotRadio = true,
             keepShownOnClick = true,
             checked = Core:GetOpt('use_char_achieves'),
-            func = function (button, option)
+            func = function(button, option)
                 Core:SetOpt('use_char_achieves', button.checked)
             end
         })
 
         UIDropDownMenu_AddSeparator()
         UIDropDownMenu_AddButton({
-            text = L["options_open_settings_panel"],
+            text = L['options_open_settings_panel'],
             isNotRadio = true,
             notCheckable = true,
             disabled = not map.settings,
-            func = function (button, option)
+            func = function(button, option)
                 InterfaceOptionsFrame_Show()
                 InterfaceOptionsFrame_OpenToCategory('HandyNotes')
                 LibStub('AceConfigDialog-3.0'):SelectGroup(
@@ -3243,7 +3314,7 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
                 'mount', 'pet', 'toy', 'transmog', 'all_transmog'
             }) do
                 UIDropDownMenu_AddButton({
-                    text = L["options_"..type.."_rewards"],
+                    text = L['options_' .. type .. '_rewards'],
                     isNotRadio = true,
                     keepShownOnClick = true,
                     checked = Core:GetOpt('show_' .. type .. '_rewards'),
@@ -3262,24 +3333,30 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
                 2)
 
             UIDropDownMenu_AddSlider({
-                text = L["options_opacity"],
-                min = 0, max = 1, step=0.01,
+                text = L['options_opacity'],
+                min = 0,
+                max = 1,
+                step = 0.01,
                 value = group:GetAlpha(map.id),
                 frame = self.AlphaOption,
                 percentage = true,
-                func = function (v) group:SetAlpha(v, map.id) end
+                func = function(v) group:SetAlpha(v, map.id) end
             }, 2)
 
             UIDropDownMenu_AddSlider({
-                text = L["options_scale"],
-                min = 0.3, max = 3, step=0.05,
+                text = L['options_scale'],
+                min = 0.3,
+                max = 3,
+                step = 0.05,
                 value = group:GetScale(map.id),
                 frame = self.ScaleOption,
-                func = function (v) group:SetScale(v, map.id) end
+                func = function(v) group:SetScale(v, map.id) end
             }, 2)
         end
     end
 end
+
+
 
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
@@ -3325,12 +3402,16 @@ function POI:IsCompleted()
     if self.quest and self.questAny then
         -- Completed if *any* attached quest ids are true
         for i, quest in ipairs(self.quest) do
-            if C_QuestLog.IsQuestFlaggedCompleted(quest) then return true end
+            if C_QuestLog.IsQuestFlaggedCompleted(quest) then
+                return true
+            end
         end
     elseif self.quest then
         -- Completed only if *all* attached quest ids are true
         for i, quest in ipairs(self.quest) do
-            if not C_QuestLog.IsQuestFlaggedCompleted(quest) then return false end
+            if not C_QuestLog.IsQuestFlaggedCompleted(quest) then
+                return false
+            end
         end
         return true
     end
@@ -3341,7 +3422,9 @@ function POI:IsEnabled()
     -- Not enabled if any dependent quest ids are false
     if self.questDeps then
         for i, quest in ipairs(self.questDeps) do
-            if not C_QuestLog.IsQuestFlaggedCompleted(quest) then return false end
+            if not C_QuestLog.IsQuestFlaggedCompleted(quest) then
+                return false
+            end
         end
     end
 
@@ -3437,22 +3520,22 @@ function Path:Draw(pin, type, xy1, xy2)
             local mapID = HBD:GetPlayerZone()
             local wx1, wy1 = HBD:GetWorldCoordinatesFromZone(x1, y1, mapID)
             local wx2, wy2 = HBD:GetWorldCoordinatesFromZone(x2, y2, mapID)
-            local wmapDistance = sqrt((wx2-wx1)^2 + (wy2-wy1)^2)
+            local wmapDistance = sqrt((wx2 - wx1) ^ 2 + (wy2 - wy1) ^ 2)
             local mmapDiameter = C_Minimap:GetViewRadius() * 2
             line_length = Minimap:GetWidth() * (wmapDistance / mmapDiameter)
-            pin.rotation = -math.atan2(wy2-wy1, wx2-wx1)
+            pin.rotation = -math.atan2(wy2 - wy1, wx2 - wx1)
         else
             local x1p = x1 * pin.parentWidth
             local x2p = x2 * pin.parentWidth
             local y1p = y1 * pin.parentHeight
             local y2p = y2 * pin.parentHeight
-            line_length = sqrt((x2p-x1p)^2 + (y2p-y1p)^2)
-            pin.rotation = -math.atan2(y2p-y1p, x2p-x1p)
+            line_length = sqrt((x2p - x1p) ^ 2 + (y2p - y1p) ^ 2)
+            pin.rotation = -math.atan2(y2p - y1p, x2p - x1p)
         end
         pin:SetSize(line_length, line_width)
         pin.texture:SetRotation(pin.rotation)
 
-        return (x1+x2)/2, (y1+y2)/2
+        return (x1 + x2) / 2, (y1 + y2) / 2
     end
 end
 
@@ -3486,7 +3569,8 @@ function Line:Render(map, template)
         for i = 1, #self.path, 1 do
             map:AcquirePin(template, self, CIRCLE, self.path[i])
             if i < #self.path then
-                map:AcquirePin(template, self, LINE, self.path[i], self.path[i+1])
+                map:AcquirePin(template, self, LINE, self.path[i],
+                    self.path[i + 1])
             end
         end
     else

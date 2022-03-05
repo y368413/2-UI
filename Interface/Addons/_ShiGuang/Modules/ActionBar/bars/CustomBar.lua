@@ -8,17 +8,12 @@ local cfg = R.Bars.bar4
 local margin, padding = R.Bars.margin, R.Bars.padding
 
 function Bar:CreateCustomBar(anchor)
-	local size = R.db["Actionbar"]["CustomBarButtonSize"]
 	local num = 12
-	local name = "UI_CustomBar"
+	local name = "UI_ActionBarX"
 	local page = 8
 
 	local frame = CreateFrame("Frame", name, UIParent, "SecureHandlerStateTemplate")
-	frame:SetWidth(num*size + (num-1)*margin + 2*padding)
-	frame:SetHeight(size + 2*padding)
-	frame:SetPoint(unpack(anchor))
 	frame.mover = M.Mover(frame, U[name], "CustomBar", anchor)
-	frame.buttons = {}
 
 	RegisterStateDriver(frame, "visibility", "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show")
 	RegisterStateDriver(frame, "page", page)
@@ -26,17 +21,17 @@ function Bar:CreateCustomBar(anchor)
 	local buttonList = {}
 	for i = 1, num do
 		local button = CreateFrame("CheckButton", "$parentButton"..i, frame, "ActionBarButtonTemplate")
-		button:SetSize(size, size)
 		button.id = (page-1)*12 + i
 		button.isCustomButton = true
-		button.commandName = U[name]..i
+		--button.commandName = U[name]..i
 		button:SetAttribute("action", button.id)
-		frame.buttons[i] = button
 		tinsert(buttonList, button)
 		tinsert(Bar.buttons, button)
 	end
+	frame.buttons = buttonList
 
-	if R.db["Actionbar"]["CustomBarFader"] and cfg.fader then
+	if cfg.fader then
+		frame.isDisable = not R.db["Actionbar"]["BarXFader"]
 		Bar.CreateButtonFrameFader(frame, buttonList, cfg.fader)
 	end
 
@@ -44,7 +39,7 @@ function Bar:CreateCustomBar(anchor)
 end
 
 function Bar:UpdateCustomBar()
-	local frame = _G.UI_CustomBar
+	local frame = _G.UI_ActionBarX
 	if not frame then return end
 
 	local size = R.db["Actionbar"]["CustomBarButtonSize"]

@@ -49,7 +49,7 @@ local function toggleButtonGrid()
 		local showgrid = tonumber(GetCVar("alwaysShowActionBars"))
 		buttonShowGrid("ActionButton", showgrid)
 		buttonShowGrid("MultiBarBottomRightButton", showgrid)
-		buttonShowGrid("UI_CustomBarButton", showgrid)
+		buttonShowGrid("UI_ActionBarXButton", showgrid)
 		if updateAfterCombat then
 			M:UnregisterEvent("PLAYER_REGEN_ENABLED", toggleButtonGrid)
 			updateAfterCombat = false
@@ -78,6 +78,10 @@ function Bar:HideBlizz()
 		DisableAllScripts(frame)
 	end
 
+	-- Hide blizz options
+	SetCVar("multiBarRightVerticalLayout", 0)
+	InterfaceOptionsActionBarsPanelStackRightBars:EnableMouse(false)
+	InterfaceOptionsActionBarsPanelStackRightBars:SetAlpha(0)
 	-- Fix maw block anchor
 	MainMenuBarVehicleLeaveButton:RegisterEvent("PLAYER_ENTERING_WORLD")
 	-- Update button grid

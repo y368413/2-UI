@@ -1506,7 +1506,7 @@ end
 function UF:CreateSwing(self)
 	local width, height = R.db["UFs"]["SwingWidth"], R.db["UFs"]["SwingHeight"]
 
-	local bar = CreateFrame("StatusBar", nil, self)
+	local bar = CreateFrame("Frame", nil, self)
 	bar:SetSize(width, height)
 	bar.mover = M.Mover(bar, U["UFs SwingBar"], "Swing", {"CENTER", UIParent, "CENTER", 0, -250})
 	bar:ClearAllPoints()
@@ -1524,8 +1524,13 @@ function UF:CreateSwing(self)
 
 	local off = CreateFrame("StatusBar", nil, bar)
 	off:Hide()
-	off:SetPoint("TOPLEFT", bar, "BOTTOMLEFT", 0, -3)
-	off:SetPoint("TOPRIGHT", bar, "BOTTOMRIGHT", 0, -3)
+	if R.db["UFs"]["OffOnTop"] then
+		off:SetPoint("BOTTOMLEFT", bar, "TOPLEFT", 0, 3)
+		off:SetPoint("BOTTOMRIGHT", bar, "TOPRIGHT", 0, 3)
+	else
+		off:SetPoint("TOPLEFT", bar, "BOTTOMLEFT", 0, -3)
+		off:SetPoint("TOPRIGHT", bar, "BOTTOMRIGHT", 0, -3)
+	end
 	off:SetHeight(height)
 	M.CreateSB(off, true, .8, .8, .8)
 
@@ -1533,7 +1538,7 @@ function UF:CreateSwing(self)
 	bar.Text:SetShown(R.db["UFs"]["SwingTimer"])
 	bar.TextMH = M.CreateFS(main, 11, "")
 	bar.TextMH:SetShown(R.db["UFs"]["SwingTimer"])
-	bar.TextOH = M.CreateFS(off, 11, "", false, "CENTER", 1, -5)
+	bar.TextOH = M.CreateFS(off, 11, "")
 	bar.TextOH:SetShown(R.db["UFs"]["SwingTimer"])
 
 	self.Swing = bar

@@ -182,7 +182,7 @@ function info:FriendsPanel_Init()
 		return
 	end
 
-	infoFrame = CreateFrame("Frame", "NDuiFriendsFrame", info)
+	infoFrame = CreateFrame("Frame", "UIFriendsFrame", info)
 	infoFrame:SetSize(400, 495)
 	updateInfoFrameAnchor(infoFrame)
 	infoFrame:SetClampedToScreen(true)
@@ -201,7 +201,7 @@ function info:FriendsPanel_Init()
 	infoFrame.friendCountText = M.CreateFS(infoFrame, 14, "-/-", nil, "TOPRIGHT", -15, -12)
 	infoFrame.friendCountText:SetTextColor(0, .6, 1)
 
-	local scrollFrame = CreateFrame("ScrollFrame", "NDuiFriendsInfobarScrollFrame", infoFrame, "HybridScrollFrameTemplate")
+	local scrollFrame = CreateFrame("ScrollFrame", "UIFriendsInfobarScrollFrame", infoFrame, "HybridScrollFrameTemplate")
 	scrollFrame:SetSize(370, 400)
 	scrollFrame:SetPoint("TOPLEFT", 10, -35)
 	infoFrame.scrollFrame = scrollFrame
@@ -451,7 +451,7 @@ function info:FriendsPanel_UpdateButton(button)
 end
 
 function info:FriendsPanel_Update()
-	local scrollFrame = NDuiFriendsInfobarScrollFrame
+	local scrollFrame = UIFriendsInfobarScrollFrame
 	local usedHeight = 0
 	local buttons = scrollFrame.buttons
 	local height = scrollFrame.buttonHeight
@@ -552,8 +552,8 @@ info.onEnter = function(self)
 		updateRequest = true
 	end
 
-	if NDuiGuildInfobar and NDuiGuildInfobar:IsShown() then
-		NDuiGuildInfobar:Hide()
+	if UIGuildInfobar and UIGuildInfobar:IsShown() then
+		UIGuildInfobar:Hide()
 	end
 
 	info:FriendsPanel_Init()
