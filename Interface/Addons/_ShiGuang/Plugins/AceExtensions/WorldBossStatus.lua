@@ -1,4 +1,4 @@
---## Version: v7.0  ## Author: Ludius of Caelestrasz-US
+--## Version: v9.0  ## Author: Ludius of Caelestrasz-US
 WorldBossStatus = LibStub("AceAddon-3.0"):NewAddon("WorldBossStatus", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceComm-3.0", "AceSerializer-3.0");
 
 local textures = {}
@@ -1159,6 +1159,8 @@ function AddShadowlands()
 		GetWorldBoss({worldQuestID = 61816, encounterID = 2431, prerequisite = criteria }),		-- Mortanis
 		GetWorldBoss({worldQuestID = 61815, encounterID = 2432, prerequisite = criteria }),		-- Oranonomos, the Everbreaching
 		GetWorldBoss({worldQuestID = 61814, encounterID = 2433, prerequisite = criteria }),		-- Nurgash Muckformed
+		GetWorldBoss({worldQuestID = 64531, encounterID = 2456, prerequisite = criteria }), -- Mor'Geth
+		GetWorldBoss({worldQuestID = 65143, encountered = 2468, prerequisite = criteria }), -- Antros
 	}
 	if GetAccountExpansionLevel() >= category.expansion and
 		(not WorldBossStatus.db.global.bossOptions.ignoredExpansions or

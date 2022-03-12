@@ -9,7 +9,7 @@
 ## Author: Ermad + 嚣张的扇贝
 ## SavedVariables: AngryKeystones_Config, AngryKeystones_Data
 ## SavedVariablesPerCharacter: AngryKeystones_CharacterConfig, AngryKeystones_revise_Config, AngryKeystones_revise_Data
-## X-Packaged-Version: v0.23.1
+## X-Packaged-Version: v0.24.0
 
 Core.lua
 Locale.lua

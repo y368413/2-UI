@@ -443,14 +443,15 @@ function UF:UpdateRaidTextScale()
 end
 
 
-local roleTexCoord = {
-	["TANK"] = {.5, .75, 0, 1},
-	["HEALER"] = {.75, 1, 0, 1},
-	["DAMAGER"] = {.25, .5, 0, 1},
+local roleTexes = {
+	["TANK"] = I.tankTex,
+	["HEALER"] = I.healTex,
+	["DAMAGER"] = I.dpsTex,
 }
 local function postUpdateRole(element, role)
 	if element:IsShown() then
-		element:SetTexCoord(unpack(roleTexCoord[role]))
+		element:SetTexture(roleTexes[role])
+		element:SetTexCoord(0, 1, 0, 1)
 	end
 end
 
@@ -473,7 +474,6 @@ function UF:CreateIcons(self)
 		ri:SetPoint("TOPRIGHT", self, 0, 8)
 	end
 	ri:SetSize(12, 12)
-	ri:SetTexture("Interface\\LFGFrame\\LFGROLE")
 	ri.PostUpdate = postUpdateRole
 	self.GroupRoleIndicator = ri
 
@@ -1549,6 +1549,7 @@ function UF:CreateSwing(self)
 end
 
 function UF:CreateQuakeTimer(self)
+	if not R.db["UFs"]["Castbars"] then return end
 
 	local bar = CreateFrame("StatusBar", nil, self)
 	bar:SetSize(R.db["UFs"]["PlayerCBWidth"], R.db["UFs"]["PlayerCBHeight"])

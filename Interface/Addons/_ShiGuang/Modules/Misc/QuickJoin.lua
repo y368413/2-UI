@@ -19,8 +19,9 @@ local C_LFGList_GetSearchResultInfo = C_LFGList.GetSearchResultInfo
 local C_LFGList_GetActivityInfoTable = C_LFGList.GetActivityInfoTable
 local C_LFGList_GetSearchResultMemberInfo = C_LFGList.GetSearchResultMemberInfo
 
+local LFGListFrame = _G.LFGListFrame
+local ApplicationViewerFrame = LFGListFrame.ApplicationViewer
 local LE_PARTY_CATEGORY_HOME = _G.LE_PARTY_CATEGORY_HOME or 1
-local ApplicationViewerFrame = _G.LFGListFrame.ApplicationViewer
 local LFG_LIST_GROUP_DATA_ATLASES = _G.LFG_LIST_GROUP_DATA_ATLASES
 local scoreFormat = I.GreyColor.."(%s) |r%s"
 
@@ -56,11 +57,7 @@ local roleOrder = {
 	["HEALER"] = 2,
 	["DAMAGER"] = 3,
 }
-local roleAtlas = {
-	[1] = "groupfinder-icon-role-large-tank",
-	[2] = "groupfinder-icon-role-large-heal",
-	[3] = "groupfinder-icon-role-large-dps",
-}
+local roleTexes = {I.tankTex, I.healTex, I.dpsTex}
 
 local function sortRoleOrder(a, b)
 	if a and b then
@@ -103,6 +100,7 @@ local function UpdateGroupRoles(self)
 			if not roleCache[count] then roleCache[count] = {} end
 			roleCache[count][1] = roleIndex
 			roleCache[count][2] = class
+			roleCache[count][3] = i == 1
 		end
 	end
 
@@ -123,9 +121,15 @@ function MISC:ReplaceGroupRoles(numPlayers, _, disabled)
 			end
 			icon:SetSize(26, 26)
 
-			icon.role = self:CreateTexture(nil, "OVERLAY")
-			icon.role:SetSize(17, 17)
-			icon.role:SetPoint("TOPLEFT", icon, -4, 5)
+			icon.role = self:CreateTexture(nil, "OVERLAY", nil, 2)
+			icon.role:SetSize(16, 16)
+			icon.role:SetPoint("TOPLEFT", icon, -3, 3)
+
+			icon.leader = self:CreateTexture(nil, "OVERLAY", nil, 1)
+			icon.leader:SetSize(14, 14)
+			icon.leader:SetPoint("TOP", icon, 4, 7)
+			icon.leader:SetTexture("Interface\\GroupFrame\\UI-Group-LeaderIcon")
+			icon.leader:SetRotation(rad(-15))
 		end
 
 		if i > numPlayers then
@@ -134,7 +138,10 @@ function MISC:ReplaceGroupRoles(numPlayers, _, disabled)
 			icon.role:Show()
 			icon.role:SetDesaturated(disabled)
 			icon.role:SetAlpha(disabled and .5 or 1)
+			icon.leader:SetDesaturated(disabled)
+			icon.leader:SetAlpha(disabled and .5 or 1)
 		end
+		icon.leader:Hide()
 	end
 
 	local iconIndex = numPlayers
@@ -143,13 +150,14 @@ function MISC:ReplaceGroupRoles(numPlayers, _, disabled)
 		if roleInfo then
 			local icon = self.Icons[iconIndex]
 			icon:SetAtlas(LFG_LIST_GROUP_DATA_ATLASES[roleInfo[2]])
-			icon.role:SetAtlas(roleAtlas[roleInfo[1]])
+			icon.role:SetTexture(roleTexes[roleInfo[1]])
+			icon.leader:SetShown(roleInfo[3])
 			iconIndex = iconIndex - 1
 		end
 	end
 
 	for i = 1, iconIndex do
-		self.Icons[i].role:SetAtlas(nil)
+		self.Icons[i].role:SetTexture(nil)
 	end
 end
 
@@ -207,21 +215,92 @@ function MISC:ShowLeaderOverallScore()
 	local searchResultInfo = resultID and C_LFGList_GetSearchResultInfo(resultID)
 	if searchResultInfo then
 		local activityInfo = C_LFGList_GetActivityInfoTable(searchResultInfo.activityID, nil, searchResultInfo.isWarMode)
-		local leaderOverallScore = searchResultInfo.leaderOverallDungeonScore
-		if activityInfo and activityInfo.isMythicPlusActivity and leaderOverallScore then
-			local oldName = self.ActivityName:GetText() 
-			oldName = gsub(oldName, ".-"..HEADER_COLON, "") -- Tazavesh
-			self.ActivityName:SetFormattedText(scoreFormat, TT.GetDungeonScore(leaderOverallScore), oldName)
+		if activityInfo then
+			local showScore = activityInfo.isMythicPlusActivity and searchResultInfo.leaderOverallDungeonScore
+				or activityInfo.isRatedPvpActivity and searchResultInfo.leaderPvpRatingInfo and searchResultInfo.leaderPvpRatingInfo.rating
+			if showScore then
+				local oldName = self.ActivityName:GetText() 
+				oldName = gsub(oldName, ".-"..HEADER_COLON, "") -- Tazavesh
+				self.ActivityName:SetFormattedText(scoreFormat, TT.GetDungeonScore(showScore), oldName)
+			end
+		end
+	end
+end
+
+function MISC:ReplaceFindGroupButton()
+	if not IsAddOnLoaded("PremadeGroupsFilter") then return end
+
+	local searchPanel = LFGListFrame.SearchPanel
+	local categorySelection = LFGListFrame.CategorySelection
+	categorySelection.FindGroupButton:Hide()
+
+	local bu = CreateFrame("Button", nil, categorySelection, "LFGListMagicButtonTemplate")
+	bu:SetText(LFG_LIST_FIND_A_GROUP)
+	bu:SetSize(135, 22)
+	bu:SetPoint("BOTTOMRIGHT", -3, 4)
+
+	local lastCategory = 0
+	bu:SetScript("OnClick", function()
+		local selectedCategory = categorySelection.selectedCategory
+		if not selectedCategory then return end
+
+		if lastCategory ~= selectedCategory then
+			categorySelection.FindGroupButton:Click()
+		else
+			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+			LFGListSearchPanel_SetCategory(searchPanel, selectedCategory, categorySelection.selectedFilters, LFGListFrame.baseFilters)
+			LFGListSearchPanel_DoSearch(searchPanel)
+			LFGListFrame_SetActivePanel(LFGListFrame, searchPanel)
+		end
+		lastCategory = selectedCategory
+	end)
+
+	if R.db["Skins"]["BlizzardSkins"] then M.Reskin(bu) end
+end
+
+local function clickSortButton(self)
+	self.__owner.Sorting.SortingExpression:SetText(self.sortStr)
+	self.__owner.RefreshButton:Click()
+end
+
+local function createSortButton(parent, texture, sortStr)
+	local bu = M.CreateButton(parent, 24, 24, true, texture)
+	bu.sortStr = sortStr
+	bu.__owner = parent
+	bu:SetScript("OnClick", clickSortButton)
+	M.AddTooltip(bu, "ANCHOR_RIGHT", CLUB_FINDER_SORT_BY)
+
+	tinsert(parent.__sortBu, bu)
+end
+
+function MISC:AddPGFSortingExpression()
+	if not IsAddOnLoaded("PremadeGroupsFilter") then return end
+
+	local PGFDialog = _G.PremadeGroupsFilterDialog
+	PGFDialog.__sortBu = {}
+
+	createSortButton(PGFDialog, 525134, "mprating desc")
+	createSortButton(PGFDialog, 1455894, "pvprating desc")
+	createSortButton(PGFDialog, 237538, "age asc")
+
+	for i = 1, #PGFDialog.__sortBu do
+		local bu = PGFDialog.__sortBu[i]
+		if i == 1 then
+			bu:SetPoint("BOTTOMLEFT", PGFDialog, "BOTTOMRIGHT", 3, 0)
+		else
+			bu:SetPoint("BOTTOM", PGFDialog.__sortBu[i-1], "TOP", 0, 3)
 		end
 	end
 end
 
 function MISC:QuickJoin()
+	if not R.db["Misc"]["QuickJoin"] then return end
+
 	for i = 1, 10 do
 		local bu = _G["LFGListSearchPanelScrollFrameButton"..i]
 		if bu then
 			bu.Name:SetFontObject(Game14Font)
-			bu.ActivityName:SetFontObject(Game13Font)
+			bu.ActivityName:SetFontObject(Game12Font)
 			bu:HookScript("OnDoubleClick", MISC.HookApplicationClick)
 		end
 	end
@@ -238,5 +317,7 @@ function MISC:QuickJoin()
 	hooksecurefunc("LFGListSearchEntry_Update", MISC.ShowLeaderOverallScore)
 
 	MISC:AddAutoAcceptButton()
+	MISC:ReplaceFindGroupButton()
+	MISC:AddPGFSortingExpression()
 end
 MISC:RegisterMisc("QuickJoin", MISC.QuickJoin)
