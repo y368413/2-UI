@@ -9,6 +9,9 @@ local POWER_TYPE_FOCUS = 2
 local playerGUID = UnitGUID("player")
 
 local function GetSpellCost(spellID)
+	if spellID == 19434 then -- aimed shot always 35
+		return 35
+	end
 	local costTable = GetSpellPowerCost(spellID)
 	if costTable then
 		for _, costInfo in pairs(costTable) do
@@ -75,12 +78,14 @@ function A:ToggleFocusCalculation()
 		M:RegisterEvent("UNIT_SPELLCAST_START", A.StartAimedShot)
 		M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.UpdateFocusCost)
 		M:RegisterEvent("PLAYER_DEAD", A.ResetFocusCost)
+		M:RegisterEvent("PLAYER_ENTERING_WORLD", A.ResetFocusCost)
 		M:RegisterEvent("CLEU", A.CheckTrickState)
 	else
 		A.MMFocus:Hide()
 		M:UnregisterEvent("UNIT_SPELLCAST_START", A.StartAimedShot)
 		M:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.UpdateFocusCost)
 		M:UnregisterEvent("PLAYER_DEAD", A.ResetFocusCost)
+		M:UnregisterEvent("PLAYER_ENTERING_WORLD", A.ResetFocusCost)
 		M:UnregisterEvent("CLEU", A.CheckTrickState)
 	end
 	oldSpec = spec

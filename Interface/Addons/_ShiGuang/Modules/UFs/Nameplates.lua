@@ -6,7 +6,7 @@ local _G = getfenv(0)
 local floor, strmatch, tonumber, pairs, unpack, rad = floor, string.match, tonumber, pairs, unpack, math.rad
 local UnitThreatSituation, UnitIsTapDenied, UnitPlayerControlled, UnitIsUnit = UnitThreatSituation, UnitIsTapDenied, UnitPlayerControlled, UnitIsUnit
 local UnitReaction, UnitIsConnected, UnitIsPlayer, UnitSelectionColor = UnitReaction, UnitIsConnected, UnitIsPlayer, UnitSelectionColor
-local UnitClassification, UnitExists, InCombatLockdown = UnitClassification, UnitExists, InCombatLockdown
+local UnitClassification, UnitExists, InCombatLockdown, UnitCanAttack = UnitClassification, UnitExists, InCombatLockdown, UnitCanAttack
 local C_Scenario_GetInfo, C_Scenario_GetStepInfo = C_Scenario.GetInfo, C_Scenario.GetStepInfo
 local C_ChallengeMode_GetActiveKeystoneInfo = C_ChallengeMode.GetActiveKeystoneInfo
 local UnitGUID, GetPlayerInfoByGUID, Ambiguate = UnitGUID, GetPlayerInfoByGUID, Ambiguate
@@ -23,7 +23,7 @@ local C_NamePlate_SetNamePlateEnemyClickThrough = C_NamePlate.SetNamePlateEnemyC
 local C_NamePlate_SetNamePlateFriendlyClickThrough = C_NamePlate.SetNamePlateFriendlyClickThrough
 
 -- Init
-function UF:PlateInsideView()
+function UF:UpdatePlateCVars()
 	if R.db["Nameplate"]["InsideView"] then
 		SetCVar("nameplateOtherTopInset", .05)
 		SetCVar("nameplateOtherBottomInset", .08)
@@ -31,33 +31,25 @@ function UF:PlateInsideView()
 		SetCVar("nameplateOtherTopInset", -1)
 		SetCVar("nameplateOtherBottomInset", -1)
 	end
-end
 
-function UF:UpdatePlateScale()
 	SetCVar("namePlateMinScale", R.db["Nameplate"]["MinScale"])
 	SetCVar("namePlateMaxScale", R.db["Nameplate"]["MinScale"])
-end
-
-function UF:UpdatePlateAlpha()
 	SetCVar("nameplateMinAlpha", R.db["Nameplate"]["MinAlpha"])
 	SetCVar("nameplateMaxAlpha", R.db["Nameplate"]["MinAlpha"])
-end
-
-function UF:UpdatePlateSpacing()
 	SetCVar("nameplateOverlapV", R.db["Nameplate"]["VerticalSpacing"])
+	SetCVar("nameplateShowOnlyNames", R.db["Nameplate"]["CVarOnlyNames"] and 1 or 0)
+	SetCVar("nameplateShowFriendlyNPCs", R.db["Nameplate"]["CVarShowNPCs"] and 1 or 0)
 end
 
 function UF:UpdateClickableSize()
 	if InCombatLockdown() then return end
 
 	local uiScale = MaoRUIDB["UIScale"]
-	local plateWidth, plateHeight = R.db["Nameplate"]["PlateWidth"], R.db["Nameplate"]["PlateHeight"]
-	local friendPlateWidth, friendPlateHeight = plateWidth, plateHeight
-	if R.db["Nameplate"]["FriendPlate"] and not R.db["Nameplate"]["NameOnlyMode"] then
-		friendPlateWidth, friendPlateHeight = R.db["Nameplate"]["FriendPlateWidth"], R.db["Nameplate"]["FriendPlateHeight"]
-	end
-	C_NamePlate_SetNamePlateEnemySize(plateWidth*uiScale, plateHeight*uiScale+40)
-	C_NamePlate_SetNamePlateFriendlySize(friendPlateWidth*uiScale, friendPlateHeight*uiScale+40)
+	local harmWidth, harmHeight = R.db["Nameplate"]["HarmWidth"], R.db["Nameplate"]["HarmHeight"]
+	local helpWidth, helpHeight = R.db["Nameplate"]["HelpWidth"], R.db["Nameplate"]["HelpHeight"]
+
+	C_NamePlate_SetNamePlateEnemySize(harmWidth*uiScale, harmHeight*uiScale)
+	C_NamePlate_SetNamePlateFriendlySize(helpWidth*uiScale, helpHeight*uiScale)
 end
 
 function UF:UpdatePlateClickThru()
@@ -68,14 +60,12 @@ function UF:UpdatePlateClickThru()
 end
 
 function UF:SetupCVars()
-	UF:PlateInsideView()
+	UF:UpdatePlateCVars()
 	SetCVar("nameplateOverlapH", .8)
-	UF:UpdatePlateSpacing()
-	UF:UpdatePlateAlpha()
 	SetCVar("nameplateSelectedAlpha", 1)
 	SetCVar("showQuestTrackingTooltips", 1)
+	SetCVar("predictedHealth", 1)
 
-	UF:UpdatePlateScale()
 	--SetCVar("nameplateSelectedScale", 1)
 	--SetCVar("nameplateLargerScale", 1)
 	SetCVar("nameplateGlobalScale", 1)
@@ -716,12 +706,6 @@ function UF:CreatePlates()
 	self.Health = health
 	self.Health.UpdateColor = UF.UpdateColor
 
-	local title = M.CreateFS(self, R.db["Nameplate"]["NameTextSize"]-1)
-	title:ClearAllPoints()
-	title:SetPoint("TOP", self, "BOTTOM", 0, -10)
-	title:Hide()
-	self:Tag(title, "[npctitle]")
-	self.npcTitle = title
 
 	local tarName = M.CreateFS(self, R.db["Nameplate"]["NameTextSize"]+4)
 	tarName:ClearAllPoints()
@@ -742,6 +726,13 @@ function UF:CreatePlates()
 	self.powerText:ClearAllPoints()
 	self.powerText:SetPoint("TOP", self.Castbar, "BOTTOM", 0, -3)
 	self:Tag(self.powerText, "[nppp]")
+
+	local title = M.CreateFS(self, R.db["Nameplate"]["NameOnlyTitleSize"])
+	title:ClearAllPoints()
+	title:SetPoint("TOP", self, "BOTTOM", 0, -10)
+	title:Hide()
+	self:Tag(title, "[npctitle]")
+	self.npcTitle = title
 
 	UF:MouseoverIndicator(self)
 	UF:AddTargetIndicator(self)
@@ -810,30 +801,37 @@ function UF:UpdateNameplateSize()
 	local font, fontFlag = I.Font[1], I.Font[3]
 	local iconSize = plateHeight + plateCBHeight + 5
 	local nameType = R.db["Nameplate"]["NameType"]
+	local nameOnlyTextSize, nameOnlyTitleSize = R.db["Nameplate"]["NameOnlyTextSize"], R.db["Nameplate"]["NameOnlyTitleSize"]
 
-	self:SetSize(plateWidth, plateHeight)
-	self.nameText:SetFont(font, nameTextSize, fontFlag)
-	if self.plateType ~= "NameOnly" then
+	if self.plateType == "NameOnly" then
+		self.nameText:SetFont(font, nameOnlyTextSize, fontFlag)
+		self:Tag(self.nameText, "[nprare][nplevel][color][name]")
+		self.__tagIndex = 6
+		self.npcTitle:SetFont(font, nameOnlyTitleSize, fontFlag)
+		self.npcTitle:UpdateTag()
+	else
+		self.nameText:SetFont(font, nameTextSize, fontFlag)
 		self:Tag(self.nameText, UF.PlateNameTags[nameType])
-		self.nameText:UpdateTag()
 		self.__tagIndex = nameType
+
+		self:SetSize(plateWidth, plateHeight)
+		self.tarName:SetFont(font, nameTextSize+4, fontFlag)
+		self.Castbar.Icon:SetSize(iconSize, iconSize)
+		self.Castbar.glowFrame:SetSize(iconSize+8, iconSize+8)
+		self.Castbar:SetHeight(plateCBHeight)
+		self.Castbar.Time:SetFont(font, CBTextSize, fontFlag)
+		self.Castbar.Time:SetPoint("TOPRIGHT", self.Castbar, "RIGHT", 0, plateCBOffset)
+		self.Castbar.Text:SetFont(font, CBTextSize, fontFlag)
+		self.Castbar.Text:SetPoint("TOPLEFT", self.Castbar, "LEFT", 0, plateCBOffset)
+		self.Castbar.Shield:SetPoint("TOP", self.Castbar, "CENTER", 0, plateCBOffset)
+		self.Castbar.Shield:SetSize(CBTextSize + 4, CBTextSize + 4)
+		self.Castbar.spellTarget:SetFont(font, CBTextSize+3, fontFlag)
+		self.healthValue:SetFont(font, healthTextSize, fontFlag)
+		self.healthValue:SetPoint("RIGHT", self, 0, healthTextOffset)
+		self:Tag(self.healthValue, "[VariousHP("..UF.VariousTagIndex[R.db["Nameplate"]["HealthType"]]..")]")
+		self.healthValue:UpdateTag()
 	end
-	self.npcTitle:SetFont(font, nameTextSize-1, fontFlag)
-	self.tarName:SetFont(font, nameTextSize+4, fontFlag)
-	self.Castbar.Icon:SetSize(iconSize, iconSize)
-	self.Castbar.glowFrame:SetSize(iconSize+8, iconSize+8)
-	self.Castbar:SetHeight(plateCBHeight)
-	self.Castbar.Time:SetFont(font, CBTextSize, fontFlag)
-	self.Castbar.Time:SetPoint("TOPRIGHT", self.Castbar, "RIGHT", 0, plateCBOffset)
-	self.Castbar.Text:SetFont(font, CBTextSize, fontFlag)
-	self.Castbar.Text:SetPoint("TOPLEFT", self.Castbar, "LEFT", 0, plateCBOffset)
-	self.Castbar.Shield:SetPoint("TOP", self.Castbar, "CENTER", 0, plateCBOffset)
-	self.Castbar.Shield:SetSize(CBTextSize + 4, CBTextSize + 4)
-	self.Castbar.spellTarget:SetFont(font, CBTextSize+3, fontFlag)
-	self.healthValue:SetFont(font, healthTextSize, fontFlag)
-	self.healthValue:SetPoint("RIGHT", self, 0, healthTextOffset)
-	self:Tag(self.healthValue, "[VariousHP("..UF.VariousTagIndex[R.db["Nameplate"]["HealthType"]]..")]")
-	self.healthValue:UpdateTag()
+	self.nameText:UpdateTag()
 end
 
 function UF:RefreshNameplats()
@@ -875,9 +873,6 @@ function UF:UpdatePlateByType()
 		end
 
 		name:SetJustifyH("CENTER")
-		self:Tag(name, "[nprare][nplevel][color][name]")
-		self.__tagIndex = 6
-		name:UpdateTag()
 		name:SetPoint("CENTER", self, "BOTTOM")
 		hpval:Hide()
 		title:Show()
@@ -909,17 +904,16 @@ function UF:UpdatePlateByType()
 			self.widgetContainer:ClearAllPoints()
 			self.widgetContainer:SetPoint("TOP", title, "BOTTOM", 0, -5)
 		end
-
-		UF.UpdateNameplateSize(self)
 	end
 
+	UF.UpdateNameplateSize(self)
 	UF.UpdateTargetIndicator(self)
 	UF.ToggleNameplateAuras(self)
 end
 
 function UF:RefreshPlateType(unit)
 	self.reaction = UnitReaction(unit, "player")
-	self.isFriendly = self.reaction and self.reaction >= 5
+	self.isFriendly = self.reaction and self.reaction >= 4 and not UnitCanAttack("player", unit)
 	if R.db["Nameplate"]["NameOnlyMode"] and self.isFriendly or self.widgetsOnly then
 		self.plateType = "NameOnly"
 	elseif R.db["Nameplate"]["FriendPlate"] and self.isFriendly then
@@ -962,7 +956,7 @@ function UF:PostUpdatePlates(event, unit)
 			self.widgetContainer:SetParent(self)
 			self.widgetContainer:SetScale(1/MaoRUIDB["UIScale"])
 		end
-		
+
 		UF.RefreshPlateType(self, unit)
 	elseif event == "NAME_PLATE_UNIT_REMOVED" then
 		self.npcID = nil

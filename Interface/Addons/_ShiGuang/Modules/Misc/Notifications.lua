@@ -156,7 +156,19 @@ end
 	打断、偷取及驱散法术时的警报
 ]]
 local function msgChannel()
-	return IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
+	--return IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
+	if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+		return "INSTANCE_CHAT"
+	--elseif IsInRaid(LE_PARTY_CATEGORY_HOME) then
+		--if warning and (UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") or IsEveryoneAssistant()) then
+			--return "RAID_WARNING"
+		--else
+			--return "RAID"
+		--end
+	elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
+		return "PARTY"
+	end
+	return "SAY"
 end
 
 local infoType = {}

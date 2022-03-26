@@ -15,7 +15,7 @@ function BossesKilled:PLAYER_LOGIN()
 			self:CreateButtons(frame, GetNumRFDungeons, GetRFDungeonInfo, RaidFinderQueueFrame_SetRaid)
 			self:UpdateButtonsAndTooltips(frame)
 			self:UpdateQueueStatuses()
-			--self.UpdateArrow()
+			self.UpdateArrow()
 			self:RegisterEvent("LFG_UPDATE")
 			self.LFG_UPDATE = self.UpdateQueueStatuses -- Our event dispatcher calls functions like addon[eventName](...), so point it to the right update function
 		end
@@ -74,7 +74,7 @@ function BossesKilled:CreateButton(parent, scale)
 	button:Show()
 
 	if parent.lastButton then
-		button:SetPoint("TOPLEFT", parent.lastButton, "BOTTOMLEFT", 0, -15)
+		button:SetPoint("TOPLEFT", parent.lastButton, "BOTTOMLEFT", 0, -25) -- -15
 	else
 		local x = 3
 		if IsAddOnLoaded("SocialTabs") then x = x + ceil(32 / scale) end
@@ -82,10 +82,17 @@ function BossesKilled:CreateButton(parent, scale)
 	end
 
 	button:SetScale(scale)
-	button:SetWidth(32 + 16) -- Originally 32
+	button:SetWidth(66) -- Originally 32
+	button:SetHeight(37)
 	for _, region in ipairs({button:GetRegions()}) do
-		if type(region) ~= "userdata" and region.GetTexture and region:GetTexture() == "Interface\\SpellBook\\SpellBook-SkillLineTab" then
-			region:SetWidth(64 + 24) -- Originally 64
+		--[[if type(region) ~= "userdata" and region.GetTexture and region:GetTexture() == "Interface\\SpellBook\\SpellBook-SkillLineTab" then
+			region:SetWidth(64 + 24) -- Originally 64 (64 + 24)
+			break
+		end]]
+		
+		if type(region) ~= "userdata" then
+			region:SetWidth(120) -- Originally 64 (64 + 24)
+			region:SetHeight(70)
 			break
 		end
 	end

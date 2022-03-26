@@ -9,7 +9,7 @@ I.Version = GetAddOnMetadata("_ShiGuang", "Version")
 I.Support = GetAddOnMetadata("_ShiGuang", "X-Support")
 I.Client = GetLocale()
 I.ScreenWidth, I.ScreenHeight = GetPhysicalScreenSize()
-I.isNewPatch = select(4, GetBuildInfo()) >= 90200 -- 9.2.0
+I.isNewPatch = select(4, GetBuildInfo()) >= 90205 -- 9.2.5
 
 -- Deprecated
 LE_ITEM_QUALITY_POOR = Enum.ItemQuality.Poor
@@ -174,13 +174,14 @@ I.ReminderBuffs = {
 			instance = true,
 			disable = true,
 		},
-		{	itemID = 185818, -- 究极秘术
+		{	itemID = 190958, -- 究极秘术
 			spells = {
-				[351952] = true,
+				[368512] = true,
 			},
 			equip = true,
 			instance = true,
 			combat = true,
+			inGroup = true,
 		},
 	},
 	MAGE = {

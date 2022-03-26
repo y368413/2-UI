@@ -442,16 +442,9 @@ function UF:UpdateRaidTextScale()
 	end
 end
 
-
-local roleTexes = {
-	["TANK"] = I.tankTex,
-	["HEALER"] = I.healTex,
-	["DAMAGER"] = I.dpsTex,
-}
 local function postUpdateRole(element, role)
 	if element:IsShown() then
-		element:SetTexture(roleTexes[role])
-		element:SetTexCoord(0, 1, 0, 1)
+		M.ReskinSmallRole(element, role)
 	end
 end
 
@@ -544,8 +537,9 @@ function UF:CreateCastBar(self)
 		cb:SetSize(R.db["UFs"]["FocusCBWidth"], R.db["UFs"]["FocusCBHeight"])
 		createBarMover(cb, U["Focus Castbar"], "FocusCB", R.UFs.Focuscb)
 	elseif mystyle == "boss" or mystyle == "arena" then
+		cb:SetPoint("TOPLEFT", self.Power, "BOTTOMLEFT", 0, -8)
 		cb:SetPoint("TOPRIGHT", self.Power, "BOTTOMRIGHT", 0, -8)
-		cb:SetSize(self:GetWidth(), 10)
+		cb:SetHeight(10)
 	elseif mystyle == "nameplate" then
 		cb:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
 		cb:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", 0, -2)

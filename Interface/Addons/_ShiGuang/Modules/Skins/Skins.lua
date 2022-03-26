@@ -162,11 +162,15 @@ function S:SetToggleDirection(frame)
 		close:SetAlpha(0)
 		open:SetScale(.001)
 		open:SetAlpha(0)
+		close.text:SetText("")
+		open.text:SetText("")
 	else
 		close:SetScale(1)
 		close:SetAlpha(1)
 		open:SetScale(1)
 		open:SetAlpha(1)
+		close.text:SetText(str1)
+		open.text:SetText(str2)
 	end
 end
 

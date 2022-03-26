@@ -24,8 +24,7 @@ function LFRofthepast.load_data()
 		-- WoD, lfr (same npc id and different location for alliance and horde)
 		npc_wod,
 		-- legion
-		--{31439,627,63.6,55.6,6,"LFR"},
-		{111246,627,63.6,55.6,6,"LFR"},
+		{111246,627,63.6,55.6,6,"LFR"},		--{31439,627,63.6,55.6,6,"LFR"},
 		-- bfa
 		npc_bfa
 	};
@@ -287,8 +286,7 @@ local InstanceGroups = setmetatable({},{
 ------------------------------------------------------- GossipFrame entries
 
 local function buttonHook_OnEnter(self)
-	if not NPC_ID then return end
-
+	if not (NPC_ID and self.type=="Gossip") then return end
 	local buttonID = self:GetID();
 	if buttonID and buttons[buttonID] then
 		GameTooltip:SetOwner(self,"ANCHOR_NONE");
@@ -429,6 +427,50 @@ local function OnGossipHide()
 end
 
 GossipFrame:HookScript("OnHide",OnGossipHide);
+
+------------------------------------------------------ create into tooltip for raids
+
+local function CreateEncounterTooltip(parent)
+	if --[[IsInstance() or]] IsInRaid() then
+		local instanceName, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceMapID, instanceGroupSize = GetInstanceInfo()
+		if not (difficultyID==7 or difficultyID==17) then return end
+		local data = InstanceGroups[instanceName];
+		if data then
+			GameTooltip:SetOwner(parent,"ANCHOR_NONE");
+			GameTooltip:SetPoint("TOP",parent,"BOTTOM");
+			GameTooltip:SetText(instanceName);
+			GameTooltip:AddLine(difficultyName,1,1,1);
+
+			for i=1, #data do
+				GameTooltip:AddLine(" ");
+				GameTooltip:AddLine("|cFF69ccf0"..data[i][2].."|r");
+
+				local encounter = GetEncounterStatus(data[i][1]);
+				local i2b = LFRofthepast.instance2bosses[data[i][1]];
+				local more = IsControlKeyDown();
+				if i2b then -- lfr
+					for b=1, #i2b do
+						GameTooltip:AddDoubleLine("|Tinterface/questtypeicons:14:14:0:0:128:64:0:18:36:54|t "..encounter[i2b[b]][1],encounter[i2b[b]][2] and "|cFFff8080"..BOSS_DEAD.."|r" or "|cFF80ff80"..BOSS_ALIVE.."|r");
+					end
+				else -- normal raid
+					for b=1, #encounter do
+						GameTooltip:AddDoubleLine("|Tinterface/questtypeicons:14:14:0:0:128:64:0:18:36:54|t "..encounter[b][1],encounter[b][2] and "|cFFff8080"..BOSS_DEAD.."|r" or "|cFF80ff80"..BOSS_ALIVE.."|r");
+					end
+				end
+			end
+
+			GameTooltip:Show();
+		end
+	end
+end
+
+-- QueueStatusFrame hook to add tooltip to the QueueStatusFrame tooltip
+QueueStatusFrame:HookScript("OnShow",function(parent)
+	if db.profile.queueStatusFrameETT then
+		CreateEncounterTooltip(parent);
+	end
+end);
+
 QueueStatusFrame:HookScript("OnHide",function(parent)
 	GameTooltip:Hide();
 end);

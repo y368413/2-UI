@@ -97,10 +97,8 @@ function MISC:GetRaidMaxGroup()
 end
 
 function MISC:RaidTool_RoleCount(parent)
-	local roleTexCoord = {
-		{.5, .75, 0, 1},
-		{.75, 1, 0, 1},
-		{.25, .5, 0, 1},
+	local roleTexes = {
+		I.tankTex, I.healTex, I.dpsTex
 	}
 
 	local frame = CreateFrame("Frame", nil, parent)
@@ -110,8 +108,7 @@ function MISC:RaidTool_RoleCount(parent)
 		role[i] = frame:CreateTexture(nil, "OVERLAY")
 		role[i]:SetPoint("LEFT", 36*i-30, 0)
 		role[i]:SetSize(15, 15)
-		role[i]:SetTexture("Interface\\LFGFrame\\LFGROLE")
-		role[i]:SetTexCoord(unpack(roleTexCoord[i]))
+		role[i]:SetTexture(roleTexes[i])
 		role[i].text = M.CreateFS(frame, 13, "0")
 		role[i].text:ClearAllPoints()
 		role[i].text:SetPoint("CENTER", role[i], "RIGHT", 12, 0)

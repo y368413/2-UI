@@ -25,8 +25,8 @@ shadowlands.expansion = 9
 
 local ICONS = "Interface\\Addons\\HandyNotes\\Icons\\artwork\\icons"
 local GLOWS = "Interface\\Addons\\HandyNotes\\Icons\\artwork\\glows"
-local function Icon(name) return ICONS..'\\'..name..'.blp' end
-local function Glow(name) return GLOWS..'\\'..name..'.blp' end
+local function Icon(name) return ICONS .. '\\' .. name .. '.blp' end
+local function Glow(name) return GLOWS .. '\\' .. name .. '.blp' end
 
 shadowlands.icons.cov_sigil_ky = {Icon('covenant_kyrian'), nil}
 shadowlands.icons.cov_sigil_nl = {Icon('covenant_necrolord'), nil}
@@ -233,6 +233,8 @@ shadowlands.groups.KORTHIA_SHARED = Group('korthia_dailies', 1506458,
     {defaults = shadowlands.GROUP_HIDDEN75})
 shadowlands.groups.MAWSWORN_CACHE = Group('mawsworn_cache', 3729814,
     {defaults = shadowlands.GROUP_HIDDEN75})
+shadowlands.groups.MAWSWORN_SUPPLY_CACHE = Group('mawsworn_supply_cache', 'chest_bk',
+    {defaults = shadowlands.GROUP_HIDDEN75})
 shadowlands.groups.NEST_MATERIALS = Group('nest_materials', 136064,
     {defaults = shadowlands.GROUP_HIDDEN75})
 shadowlands.groups.NILGANIHMAHT_MOUNT = Group('nilganihmaht', 1391724,
@@ -258,6 +260,8 @@ shadowlands.groups.STYGIAN_CACHES = Group('stygian_caches', 'chest_nv',
     {defaults = shadowlands.GROUP_HIDDEN75})
 shadowlands.groups.VESPERS = Group('vespers', 3536181, {defaults = shadowlands.GROUP_HIDDEN})
 shadowlands.groups.ZERETH_CACHE = Group('zereth_caches', 3950362,
+    {defaults = shadowlands.GROUP_HIDDEN75})
+shadowlands.groups.SHROUDED_CYPHER = Group('shrouded_cyphers', 'chest_pp',
     {defaults = shadowlands.GROUP_HIDDEN75})
 shadowlands.groups.ZOVAAL_VAULT = Group('zovault', 'star_chest_g',
     {defaults = shadowlands.GROUP_ALPHA75})

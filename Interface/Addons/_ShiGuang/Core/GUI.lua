@@ -27,8 +27,6 @@ G.DefaultSettings = {
 		Cooldown = true,
 		DecimalCD = true,
 		Style = 8,
-		Bar4Fade = false,
-		Bar5Fade = false,
 		Bar4Fader = false,
 		Bar5Fader = false,
 		Scale = 1,
@@ -36,7 +34,6 @@ G.DefaultSettings = {
 		OverrideWA = false,
 		MicroMenu = true,
 		CustomBar = false,
-		CustomBarFader = false,
 		BarXFader = false,
 		CustomBarButtonSize = 34,
 		CustomBarNumButtons = 12,
@@ -271,8 +268,9 @@ G.DefaultSettings = {
 		BlockStranger = false,
 		BlockSpammer = false,
 		ChatBGType = 1,
-		WhisperSound = false,
+		WhisperSound = true,
 		BottomBox = false,
+		Outline = false,
 	},
 	Map = {
 		DisableMap = false,
@@ -362,6 +360,16 @@ G.DefaultSettings = {
 		FriendNameSize = 14,
 		FriendHealthSize = 16,
 		FriendHealthOffset = 5,
+		HarmWidth = 190,
+		HarmHeight = 60,
+		HelpWidth = 190,
+		HelpHeight = 60,
+		NameOnlyTextSize = 14,
+		NameOnlyTitleSize = 12,
+		NameOnlyTitle = true,
+		NameOnlyGuild = false,
+		CVarOnlyNames = false,
+		CVarShowNPCs = false,
 	},
 	Skins = {
 		DBM = true,
@@ -664,6 +672,9 @@ local function setupNameplateSize()
 	G:SetupNameplateSize(guiPage[3])
 end
 
+local function setupNameOnlySize()
+	G:SetupNameOnlySize(guiPage[3])
+end
 local function setupPlateCastbarGlow()
 	G:PlateCastbarGlow(guiPage[3])
 end
@@ -757,12 +768,12 @@ local function updateToggleDirection()
 	M:GetModule("Skins"):RefreshToggleDirection()
 end
 
-local function updatePlateInsideView()
-	M:GetModule("UnitFrames"):PlateInsideView()
+local function updatePlateCVars()
+	M:GetModule("UnitFrames"):UpdatePlateCVars()
 end
 
-local function updatePlateSpacing()
-	M:GetModule("UnitFrames"):UpdatePlateSpacing()
+local function updateClickableSize()
+	M:GetModule("UnitFrames"):UpdateClickableSize()
 end
 
 local function updateCustomUnitList()
@@ -808,14 +819,6 @@ local function toggleFocusCalculation()
 	if A.ToggleFocusCalculation then
 		A:ToggleFocusCalculation()
 	end
-end
-
-local function updatePlateScale()
-	M:GetModule("UnitFrames"):UpdatePlateScale()
-end
-
-local function updatePlateAlpha()
-	M:GetModule("UnitFrames"):UpdatePlateAlpha()
 end
 
 local function updateUFTextScale()
@@ -1049,7 +1052,7 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Nameplate", "FriendPlate", U["FriendPlate"].."*", true, nil, nil, refreshNameplates, U["FriendPlateTip"]},
 		{1, "Nameplate", "NameOnlyMode", U["NameOnlyMode"].."*", true, true, nil, nil, U["NameOnlyModeTip"]},
 		{4, "Nameplate", "NameType", U["NameTextType"].."*", nil, nil, {DISABLE, U["Tag:name"], U["Tag:levelname"], U["Tag:rarename"], U["Tag:rarelevelname"]}, refreshNameplates, U["PlateLevelTagTip"]},
-		--{4, "Nameplate", "HealthType", U["HealthValueType"].."*", true, nil, G.HealthValues, refreshNameplates, U["100PercentTip"]},
+		{4, "Nameplate", "HealthType", U["HealthValueType"].."*", true, nil, G.HealthValues, refreshNameplates, U["100PercentTip"]},
 		{4, "Nameplate", "AuraFilter", U["NameplateAuraFilter"].."*", true, true, {U["BlackNWhite"], U["PlayerOnly"], U["IncludeCrowdControl"]}, refreshNameplates},
 		--{1, "Nameplate", "PlateAuras", HeaderTag..U["PlateAuras"].."*", nil, nil, nil, setupNameplateFilter, refreshNameplates},
 		--{1, "Nameplate", "Desaturate", U["DesaturateIcon"].."*", true, nil, nil, refreshNameplates, U["DesaturateIconTip"]},
@@ -1069,23 +1072,20 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		--{1, "Nameplate", "QuestIndicator", U["QuestIndicator"]},
 		--{1, "Nameplate", "AKSProgress", U["AngryKeystones Progress"], true},
 		{1, "Nameplate", "BlockDBM", U["BlockDBM"], true, true, nil, nil, U["BlockDBMTip"]},
-		{1, "Nameplate", "ColoredTarget", HeaderTag..U["ColoredTarget"].."*", nil, nil, nil, nil, U["ColoredTargetTip"]},
-		{1, "Nameplate", "ColoredFocus", HeaderTag..U["ColoredFocus"].."*", true, nil, nil, nil, U["ColoredFocusTip"]},
-		{5, "Nameplate", "TargetColor", U["TargetNP Color"].."*", 3},
-		{5, "Nameplate", "FocusColor", U["FocusNP Color"].."*", 4},
-		{5, "Nameplate", "CustomColor", U["Custom Color"].."*", 5},
 		{1, "Nameplate", "CustomUnitColor", HeaderTag..U["CustomUnitColor"].."*", nil, nil, nil, updateCustomUnitList, U["CustomUnitColorTip"]},
 		{1, "Nameplate", "TankMode", HeaderTag..U["Tank Mode"].."*", true, nil, nil, nil, U["TankModeTip"]},
 		{1, "Nameplate", "DPSRevertThreat", U["DPS Revert Threat"].."*", true, true, nil, nil, U["RevertThreatTip"]},	
-		{2, "Nameplate", "UnitList", U["UnitColor List"].."*", nil, nil, nil, updateCustomUnitList, U["CustomUnitTips"]},
-		{2, "Nameplate", "ShowPowerList", U["ShowPowerList"].."*", true, nil, nil, updatePowerUnitList, U["CustomUnitTips"]},
-		{5, "Nameplate", "SecureColor", U["Secure Color"].."*"},
-		{5, "Nameplate", "TransColor", U["Trans Color"].."*", 1},
-		{5, "Nameplate", "InsecureColor", U["Insecure Color"].."*", 2},
-		{5, "Nameplate", "OffTankColor", U["OffTank Color"].."*", 3},
-		{3, "Nameplate", "MinScale", U["Nameplate MinScale"].."*", false, nil, {.5, 1, .1}, updatePlateScale},
-		{3, "Nameplate", "MinAlpha", U["Nameplate MinAlpha"].."*", true, nil, {.3, 1, .1}, updatePlateAlpha},
-		{3, "Nameplate", "VerticalSpacing", U["NP VerticalSpacing"].."*", true, true, {.5, 1.5, .1}, updatePlateSpacing},
+		--{2, "Nameplate", "UnitList", U["UnitColor List"].."*", nil, nil, nil, updateCustomUnitList, U["CustomUnitTips"]},
+		--{2, "Nameplate", "ShowPowerList", U["ShowPowerList"].."*", true, nil, nil, updatePowerUnitList, U["CustomUnitTips"]},
+		{3, "Nameplate", "MinScale", U["Nameplate MinScale"].."*", false, nil, {.5, 1, .1}, updatePlateCVars},
+		{3, "Nameplate", "MinAlpha", U["Nameplate MinAlpha"].."*", true, nil, {.3, 1, .1}, updatePlateCVars},
+		{3, "Nameplate", "VerticalSpacing", U["NP VerticalSpacing"].."*", true, true, {.5, 1.5, .1}, updatePlateCVars},
+		{3, "Nameplate", "HarmWidth", NewTag..U["PlateHarmWidth"].."*", nil, nil, {1, 500, 1}, updateClickableSize},
+		{3, "Nameplate", "HarmHeight", NewTag..U["PlateHarmHeight"].."*", true, nil, {1, 500, 1}, updateClickableSize},
+		{3, "Nameplate", "HelpWidth", NewTag..U["PlateHelpWidth"].."*", true, true, {1, 500, 1}, updateClickableSize},
+		{3, "Nameplate", "HelpHeight", NewTag..U["PlateHelpHeight"].."*", nil, nil, {1, 500, 1}, updateClickableSize},
+		{1, "Nameplate", "CVarOnlyNames", NewTag..U["CVarOnlyNames"], true, nil, nil, updatePlateCVars, U["CVarOnlyNamesTip"]},
+		{1, "Nameplate", "CVarShowNPCs", NewTag..U["CVarShowNPCs"].."*", true, true, nil, updatePlateCVars, U["CVarShowNPCsTip"]},
 	},
 	[4] = {
 		{1, "Chat", "Lock", HeaderTag..U["Lock Chat"]},
@@ -1171,11 +1171,19 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Skins", "Bigwigs", U["Bigwigs Skin"]},
 		{1, "Skins", "TMW", U["TMW Skin"], true},
 		{1, "Skins", "WeakAuras", U["WeakAuras Skin"], true, true},
+		{},--blank
+		{1, "Nameplate", "ColoredTarget", HeaderTag..U["ColoredTarget"].."*", nil, nil, nil, nil, U["ColoredTargetTip"]},
+		{1, "Nameplate", "ColoredFocus", HeaderTag..U["ColoredFocus"].."*", true, nil, nil, nil, U["ColoredFocusTip"]},
+		{5, "Nameplate", "TargetColor", U["TargetNP Color"].."*", 3},
+		{5, "Nameplate", "FocusColor", U["FocusNP Color"].."*", 4},
+		{5, "Nameplate", "CustomColor", U["Custom Color"].."*", 5},
+		{5, "Nameplate", "SecureColor", U["Secure Color"].."*"},
+		{5, "Nameplate", "TransColor", U["Trans Color"].."*", 1},
+		{5, "Nameplate", "InsecureColor", U["Insecure Color"].."*", 2},
+		{5, "Nameplate", "OffTankColor", U["OffTank Color"].."*", 3},
 		--{1, "Skins", "PGFSkin", U["PGF Skin"], true},
 		--{1, "Skins", "Rematch", U["Rematch Skin"], true, true},
-		{4, "ACCOUNT", "TexStyle", U["Texture Style"], false, false, {}},
-		{4, "ACCOUNT", "NumberFormat", U["Numberize"], true, false, {U["Number Type1"], U["Number Type2"], U["Number Type3"]}},
-		{4, "Skins", "ToggleDirection", U["ToggleDirection"].."*", true, true, {U["LEFT"], U["RIGHT"], U["TOP"], U["BOTTOM"], DISABLE}, updateToggleDirection},
+		--{4, "Skins", "ToggleDirection", U["ToggleDirection"].."*", true, true, {U["LEFT"], U["RIGHT"], U["TOP"], U["BOTTOM"], DISABLE}, updateToggleDirection},
 	},
 	[7] = {
 	  --{1, "Misc", "RaidTool", "|cff00cc4c"..U["Raid Manger"]},
@@ -1219,7 +1227,7 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{4, "Tooltip", "CursorMode", U["Follow Cursor"].."*", true, nil, {DISABLE, U["LEFT"], U["TOP"], U["RIGHT"]}},
 		{1, "Tooltip", "CombatHide", U["Hide Tooltip"].."*"},
 		{1, "Tooltip", "ItemQuality", U["ShowItemQuality"].."*", true},
-		{1, "Tooltip", "HideTitle", U["Hide Title"].."*", true},
+		{1, "Tooltip", "HideTitle", U["Hide Title"].."*", true, true},
 		{1, "Tooltip", "HideRank", U["Hide Rank"].."*"},
 		{1, "Tooltip", "FactionIcon", U["FactionIcon"].."*", true},
 		{1, "Tooltip", "HideJunkGuild", U["HideJunkGuild"].."*", true, true},
@@ -1252,10 +1260,10 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "Screenshot", U["Auto ScreenShot"].."*", true, nil, nil, updateScreenShot},
 		{1, "Misc", "Focuser", U["Easy Focus"], true, true},
 		{1, "Misc", "MDGuildBest", U["MDGuildBest"], nil, nil, nil, nil, U["MDGuildBestTip"]},
-		{1, "Misc", "MawThreatBar", U["MawThreatBar"], true, nil, nil, nil, U["MawThreatBarTip"]},
+		{1, "Misc", "MenuButton", U["MenuButton"], true, nil, nil, nil, U["MenuButtonTip"]},
 		{1, "Misc", "EnhanceDressup", U["EnhanceDressup"], true, true, nil, nil, U["EnhanceDressupTip"]},
 		{1, "Misc", "QuestTool", U["QuestTool"], nil, nil, nil, nil, U["QuestToolTip"]},
-		{1, "Misc", "MenuButton", U["MenuButton"], true, nil, nil, nil, U["MenuButtonTip"]},
+		{1, "Misc", "QuickJoin", NewTag..HeaderTag..U["EnhancedPremade"], true, nil, nil, nil, U["EnhancedPremadeTip"]},
 	},
 	[9] = {
 		--{1, "Auras", "BuffFrame", HeaderTag..U["BuffFrame"], nil, setupBuffFrame, nil, nil, U["BuffFrameTip"]},

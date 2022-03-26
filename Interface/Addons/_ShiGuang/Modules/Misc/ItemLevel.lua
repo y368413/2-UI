@@ -307,7 +307,7 @@ function MISC:ItemLevel_UpdateMerchant(link)
 		self.iLvl = M.CreateFS(_G[self:GetName().."ItemButton"], I.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
 	end
 	local quality = link and select(3, GetItemInfo(link)) or nil
-	if quality then
+	if quality and quality > 1 then
 		local level = M.GetItemLevel(link)
 		local color = I.QualityColors[quality]
 		self.iLvl:SetText(level)

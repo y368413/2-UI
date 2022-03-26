@@ -1,4 +1,4 @@
-﻿--## Author: Caerdon ## SavedVariables: CaerdonWardrobeConfig  ## Version: v2.13.0
+﻿--## Author: Caerdon ## SavedVariables: CaerdonWardrobeConfig  ## Version: v2.14.0
 	
 if GetLocale() == "zhCN" then
   CaerdonWardrobeBoA = "|cffe6cc80战网|r";
@@ -1039,7 +1039,7 @@ function CaerdonWardrobeMixin:GetTooltipInfo(item)
 
 	-- Weird bug with scanning tooltips - have to disable showing
 	-- transmog info during the scan
-	--C_TransmogCollection.SetShowMissingSourceInItemTooltips(false)
+	-- C_TransmogCollection.SetShowMissingSourceInItemTooltips(false)
 	--SetCVar("missingTransmogSourceInItemTooltips", 0)
 	--local originalAlwaysCompareItems = GetCVarBool("alwaysCompareItems")
 	--SetCVar("alwaysCompareItems", 0)

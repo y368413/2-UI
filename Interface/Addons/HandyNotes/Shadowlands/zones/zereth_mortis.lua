@@ -32,6 +32,10 @@ local gpose = Map({id = 2029}) -- Gravid Repose
 local microd = Map({id = 2030}) -- Nexus of Actualization
 local cata = Map({id = 2066}) -- Catalyst Wards
 
+-- Sepulcher of the First Ones
+local immo = Map({id = 2047}) -- Immortal Hearth
+local ephe = Map({id = 2061}) -- Ephemeral Plains
+
 -------------------------------------------------------------------------------
 ------------------------------------ RARES ------------------------------------
 -------------------------------------------------------------------------------
@@ -40,6 +44,7 @@ map.nodes[64743369] = Rare({
     id = 179006,
     quest = 65552,
     vignette = 4747,
+    sublabel = L['sl_limited_rare'],
     rlabel = shadowlands.status.LightBlue('+15 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52977}), -- Adventurer of Zereth Mortis
@@ -53,6 +58,7 @@ map.nodes[49566751] = Rare({
     id = 183596,
     quest = 65553,
     vignette = 4948,
+    sublabel = L['sl_limited_rare'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52978}), -- Adventurer of Zereth Mortis
@@ -79,6 +85,7 @@ map.nodes[47486228] = Rare({
 map.nodes[53634435] = Rare({
     id = 180917,
     quest = 64716,
+    vignette = 4892,
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52974}), -- Adventurer of Zereth Mortis
@@ -94,6 +101,7 @@ map.nodes[47474516] = Rare({
     id = 184409,
     quest = 65555,
     vignette = 4961,
+    sublabel = L['sl_limited_rare'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52982}), -- Adventurer of Zereth Mortis
@@ -107,6 +115,7 @@ map.nodes[47474516] = Rare({
 map.nodes[61826060] = Rare({
     id = 178229,
     quest = 65557,
+    vignette = 4740,
     note = L['feasting_note'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
@@ -121,6 +130,7 @@ map.nodes[61826060] = Rare({
 map.nodes[64585865] = Rare({
     id = 183646,
     quest = 65544,
+    vignette = 4949,
     note = L['furidian_note'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
@@ -148,7 +158,8 @@ map.nodes[69073662] = Rare({
     rewards = {
         Achievement({id = 15391, criteria = 53025}), -- Adventurer of Zereth Mortis
         Transmog({item = 189951, slot = L['plate']}), -- Sunbathed Avian Armor
-        Transmog({item = 189937, slot = L['cloak']}) -- Garudeon's Blanket of Feathers
+        Transmog({item = 189937, slot = L['cloak']}), -- Garudeon's Blanket of Feathers
+        Transmog({item = 190057, slot = L['warglaive']}) -- Protective Raptora's Wing-Glaive
         -- Item({item = 187832}) -- Schematic: Pure-Air Sail Extensions (engineering)
     },
     pois = {
@@ -163,12 +174,12 @@ map.nodes[59862111] = Rare({
     id = 182318,
     quest = 65583,
     vignette = 4909,
+    sublabel = L['sl_limited_rare'],
     rlabel = shadowlands.status.LightBlue('+15 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52985}), -- Adventurer of Zereth Mortis
         Transmog({item = 189968, slot = L['leather']}), -- Dreadlord General's Tunic
         Transmog({item = 189948, slot = L['mail']}), -- Strangulating Chainlink Lasso
-        Transmog({item = 190124, slot = L['dagger']}), -- Interrogator's Vicious Dirk
         Transmog({item = 190125, slot = L['dagger']}) -- Kris of Intricate Secrets
     }
 }) -- General Zarathura
@@ -176,6 +187,7 @@ map.nodes[59862111] = Rare({
 map.nodes[53089305] = Rare({
     id = 178778,
     quest = 65579,
+    vignette = 4742,
     note = L['gluttonous_overgrowth_note'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
@@ -192,9 +204,11 @@ map.nodes[80384706] = Rare({
     id = 178963,
     quest = 63988,
     vignette = 4746,
+    sublabel = L['sl_limited_rare'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52986}), -- Adventurer of Zereth Mortis
+        Transmog({item = 189926, slot = L['leather']}), -- Poison-Licked Spaulders
         Transmog({item = 189960, slot = L['plate']}), -- Crouching Legs of the Bufonid
         Transmog({item = 190001, slot = L['shield']}) -- Gorkek's Glistening Throatguard
     },
@@ -204,6 +218,8 @@ map.nodes[80384706] = Rare({
 map.nodes[52612503] = Rare({
     id = 178563,
     quest = 65581,
+    vignette = 4738,
+    sublabel = L['sl_limited_rare'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52984}), -- Adventurer of Zereth Mortis
@@ -217,6 +233,7 @@ map.nodes[52612503] = Rare({
 map.nodes[58186837] = Rare({
     id = 183748,
     quest = 65551,
+    vignette = 4950,
     note = L['helmix_note'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
@@ -233,6 +250,7 @@ map.nodes[58186837] = Rare({
 map.nodes[52287541] = Rare({
     id = 180978,
     quest = 65548,
+    vignette = 4984,
     note = L['hirukon_note'],
     requires = shadowlands.requirement.Item(187923),
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
@@ -248,6 +266,7 @@ map.nodes[52287541] = Rare({
 map.nodes[58654039] = Rare({
     id = 183814,
     quest = 65257,
+    vignette = 4941,
     note = L['in_small_cave'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
@@ -255,17 +274,20 @@ map.nodes[58654039] = Rare({
         Transmog({item = 189909, slot = L['cloth']}), -- Pantaloons of Cold Recesses
         Transmog({item = 189945, slot = L['mail']}), -- Shoulders of the Missing Giant
         Transmog({item = 189957, slot = L['plate']}) -- Colossus' Focusing Headpiece
-    }
+    },
+    pois = {POI({58723789})} -- Cave entrance
 }) -- Otaris the Provoked
 
 map.nodes[54083493] = Rare({
     id = 178508,
     quest = 65547,
+    vignette = 4739,
     rlabel = shadowlands.status.LightBlue('+15 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 53020}), -- Adventurer of Zereth Mortis
         Transmog({item = 189923, slot = L['leather']}), -- Tarachnid's Terrifying Visage
         Transmog({item = 189950, slot = L['mail']}), -- Constrained Prey's Binds
+        Transmog({item = 189769, slot = L['dagger']}), -- Fang of Phestis
         Transmog({item = 190045, slot = L['staff']}) -- Flowing Sandbender's Staff
     },
     pois = {POI({55963261})} -- Cave entrance
@@ -274,6 +296,7 @@ map.nodes[54083493] = Rare({
 map.nodes[55736915] = Rare({
     id = 179043,
     quest = 65582,
+    vignette = 4770,
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     note = L['orixal_note'],
     rewards = {
@@ -293,6 +316,7 @@ map.nodes[55736915] = Rare({
 map.nodes[43308762] = Rare({
     id = 183746,
     quest = 65556,
+    vignette = 4939,
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52972}), -- Adventurer of Zereth Mortis
@@ -306,6 +330,7 @@ map.nodes[43308762] = Rare({
 map.nodes[38872762] = Rare({
     id = 180746,
     quest = 64668,
+    vignette = 4988,
     note = L['protector_first_ones_note'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
@@ -320,6 +345,7 @@ map.nodes[38872762] = Rare({
 map.nodes[53384707] = Rare({
     id = 183927,
     quest = 65574,
+    vignette = 4977,
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52975}), -- Adventurer of Zereth Mortis
@@ -332,6 +358,7 @@ map.nodes[53384707] = Rare({
 map.nodes[42302099] = Rare({
     id = 184413,
     quest = 65549,
+    vignette = 4959,
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52988}), -- Adventurer of Zereth Mortis
@@ -345,6 +372,8 @@ map.nodes[42302099] = Rare({
 map.nodes[35877121] = Rare({
     id = 183722,
     quest = 65240,
+    vignette = 4937,
+    sublabel = L['sl_limited_rare'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52980}), -- Adventurer of Zereth Mortis
@@ -358,12 +387,14 @@ map.nodes[35877121] = Rare({
 map.nodes[49783914] = Rare({
     id = 183925,
     quest = 65272,
+    vignette = 4943,
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52979}), -- Adventurer of Zereth Mortis
         Transmog({item = 189915, slot = L['cloth']}), -- Tahkwitz' Cloth Ribbon
         Transmog({item = 189933, slot = L['mail']}), -- Vigilant Raptora's Crest
-        Transmog({item = 189954, slot = L['plate']}) -- Lustrous Sentinel's Sabatons
+        Transmog({item = 189954, slot = L['plate']}), -- Lustrous Sentinel's Sabatons
+        Transmog({item = 190003, slot = L['dagger']}) -- Skyward Savior's Talon
         -- Item({item = 187832}) -- Schematic: Pure-Air Sail Extensions (engineering)
     }
 }) -- Tahkwitz
@@ -372,9 +403,11 @@ map.nodes[54507344] = Rare({
     id = 181249,
     quest = 65550,
     vignette = 4903,
+    sublabel = L['sl_limited_rare'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52987}), -- Adventurer of Zereth Mortis
+        Transmog({item = 189967, slot = L['cloth']}), -- Hood of Star Topology
         Transmog({item = 189928, slot = L['leather']}), -- Centripetal Waistband
         Transmog({item = 189966, slot = L['plate']}), -- Singing Metal Wristbands
         Transmog({item = 190055, slot = L['offhand']}) -- Coalescing Energy Implement
@@ -385,6 +418,7 @@ map.nodes[54507344] = Rare({
 map.nodes[43947530] = Rare({
     id = 183516,
     quest = 65580,
+    vignette = 4933,
     note = L['the_engulfer_note'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
@@ -398,6 +432,8 @@ map.nodes[43947530] = Rare({
 map.nodes[39555737] = Rare({
     id = 181360,
     quest = 65239,
+    vignette = 4936,
+    sublabel = L['sl_limited_rare'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 53049}), -- Adventurer of Zereth Mortis
@@ -411,6 +447,8 @@ map.nodes[39555737] = Rare({
 map.nodes[47044698] = Rare({
     id = 183747,
     quest = 65584,
+    vignette = 4967,
+    sublabel = L['sl_limited_rare'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52983}), -- Adventurer of Zereth Mortis
@@ -424,9 +462,12 @@ map.nodes[64054975] = Rare({
     id = 183737,
     quest = 65241,
     vignette = 4938,
+    sublabel = L['sl_limited_rare'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
         Achievement({id = 15391, criteria = 52976}), -- Adventurer of Zereth Mortis
+        Transmog({item = 189918, slot = L['leather']}), -- Fleeting Broker's Strides
+        Transmog({item = 189964, slot = L['plate']}), -- Multi-Faceted Belt
         Transmog({item = 190052, slot = L['dagger']}), -- Xy'rath's Letter Opener
         Transmog({item = 190007, slot = L['1h_sword']}), -- Xy'rath's Signature Saber
         Toy({item = 190238}) -- Xy'rath's Booby-Trapped Cache
@@ -437,6 +478,7 @@ map.nodes[64054975] = Rare({
 map.nodes[43513294] = Rare({
     id = 183764,
     quest = 65251,
+    vignette = 4990,
     note = L['zatojin_note'],
     rlabel = shadowlands.status.LightBlue('+10 ' .. L['rep']),
     rewards = {
@@ -471,17 +513,21 @@ map.nodes[63202603] = Rare({
                 {id = 52994, quest = 65587} -- Reanimatrox Marzan
             }
         }), -- Dune Dominance
+        Transmog({item = 190050, slot = L['fist']}), -- Entropic Broker's Ripper
+        Transmog({item = 190104, slot = L['crossbow']}), -- Deadeye's Spirit Piercer
         Transmog({item = 190107, slot = L['staff']}), -- Staff of Broken Coils
-        Transmog({item = 190458, slot = L['shield'], note = ISKA}), -- Atrophy's Ominous Bulwark
+        Transmog({item = 190124, slot = L['dagger']}), -- Interrogator's Vicious Dirk
+        Transmog({item = 190463, slot = L['warglaive']}), -- Dismal Mystic's Glaive
         Transmog({item = 190102, slot = L['1h_mace'], note = ISKA}), -- Chains of Infectious Serrations
         Transmog({item = 190103, slot = L['2h_mace'], note = ISKA}), -- Pillar of Noxious Dissemination
         Transmog({item = 190126, slot = L['polearm'], note = ISKA}), -- Rotculler's Encroaching Shears
+        Transmog({item = 190458, slot = L['shield'], note = ISKA}), -- Atrophy's Ominous Bulwark
         Transmog({item = 190105, slot = L['1h_mace'], note = DAMARIS}), -- Chilling Domination Mace
+        Transmog({item = 190106, slot = L['2h_mace'], note = DAMARIS}), -- Approaching Terror's Torch
         Transmog({item = 190459, slot = L['shield'], note = DAMARIS}), -- Cold Dispiriting Barricade
-        Transmog({item = 190104, slot = L['crossbow'], note = DAMARIS}), -- Deadeye's Spirit Piercer
-        Transmog({item = 190050, slot = L['fist'], note = DAMARIS}), -- Entropic Broker's Ripper
         Transmog({item = 190460, slot = L['polearm'], note = DAMARIS}), -- High Reaver's Sickle
-        Transmog({item = 190463, slot = L['warglaive'], note = MARZAN}), -- Dismal Mystic's Glaive
+        Transmog({item = 190108, slot = L['shield'], note = MARZAN}), -- Aegis of Laughing Souls
+        Transmog({item = 190109, slot = L['1h_mace'], note = MARZAN}), -- Cudgel of Mortality's Chains
         Transmog({item = 190127, slot = L['polearm'], note = MARZAN}), -- Marzan's Dancing Twin-Scythe
         Transmog({item = 190461, slot = L['2h_mace'], note = MARZAN}), -- Reanimator's Beguiling Baton
         Mount({item = 190765, id = 1584, note = '{npc:182120}'}) -- Iska's Mawrat Leash
@@ -616,7 +662,7 @@ map.nodes[60593053] = Treasure({
     }
 }) -- Mawsworn Cache
 
-map.nodes[53557223] = Treasure({
+map.nodes[53667261] = Treasure({
     quest = 65522,
     note = L['mistaken_ovoid_note'] .. '\n\n' .. L['schematic_treasure_note'],
     rewards = {
@@ -781,6 +827,8 @@ cata.nodes[49243441] = Class('Foliage', Treasure,
 
 -------------------------------------------------------------------------------
 
+-- ephe.nodes[23963780] = Treasure({label = 'High Value Cache'})
+
 map.nodes[42025181] = Treasure({
     quest = 65183,
     requires = shadowlands.requirement.Item(188231),
@@ -809,6 +857,27 @@ map.nodes[53402570] = Treasure({
     pois = {POI({41903400, 50304120, 52804580, 53402570, 64366347})}
 }) -- Pulp-Covered Relic
 
+gpose.nodes[30776440] = Treasure({
+    quest = 65532,
+    label = '{npc:185261}',
+    parent = map.id,
+    note = L['requisites_originator_note'] .. '\n\n' ..
+        shadowlands.color.Orange(L['repertory_alcove_note']),
+    pois = {POI({49613091})} -- Repertory Alcove Arrangement
+}) -- Requisites Originator
+
+map.nodes[42934005] = Treasure({
+    quest = 65567,
+    label = L['rondure_cache'],
+    note = L['rondure_cache_note'] .. '\n\n' ..
+        shadowlands.color.Orange(L['rondure_alcove_note']),
+    rewards = {
+        Achievement({id = 15508, criteria = 53293}), -- Fashion of the First Ones
+        Item({item = 190096, quest = 65534}) -- Pocobold
+    },
+    pois = {POI({50452759})} -- Rondure Alcove Arrangement
+}) -- Rondure Cache
+
 map.nodes[60022583] = Treasure({
     quest = 65611,
     icon = 'chest_yw',
@@ -820,6 +889,41 @@ map.nodes[60022583] = Treasure({
     },
     pois = {POI({60863786, 61401763, 63182603, 65972694})}
 }) -- Sandworn Chest
+
+map.nodes[44393666] = Treasure({
+    quest = {
+        65494, -- Lumpy Sand Pile
+        65495, -- Glinting Sand Pile
+        65496, -- Shifting Sand Pile
+        65497, -- Humming Sand Pile
+        65498, -- Misshapen Sand Pile
+        65499, -- Sparkling Sand Pile
+        65500 -- Ticking Sand Pile
+    },
+    questCount = true,
+    requires = shadowlands.requirement.Item(189863), -- Spatial Opener
+    label = L['sand_piles'],
+    note = L['sand_piles_note'] .. '\n' ..
+        shadowlands.color.Orange(L['dormant_alcove_note']),
+    rewards = {
+        Achievement({
+            id = 15502,
+            criteria = {53258, 53259, 53260, 53261, 53262, 53263, 53265}
+        }) -- Sand, Sand Everywhere!
+    },
+    pois = {POI({51033248})} -- Dormant Alcove Arrangement
+}) -- Sand Piles
+
+map.nodes[46893964] = Treasure({
+    quest = 65643,
+    label = L['torn_ethereal_drape'],
+    note = L['torn_ethereal_drape_note'] .. '\n\n' ..
+        shadowlands.color.Orange(L['fulgor_alcove_note']),
+    rewards = {
+        Transmog({item = 188054, slot = L['cloak']}) -- Antecedent Drape
+    },
+    pois = {POI({47853037})} -- Fulgor Alcove Arrangement
+}) -- Torn Ethereal Drape
 
 -------------------------------------------------------------------------------
 -------------------------------- PUZZLE CACHES --------------------------------
@@ -857,6 +961,7 @@ map.nodes[63103738] = Puzzle({quest = 65093, label = L['cache_fugueal']})
 map.nodes[33785427] = Puzzle({quest = 65321, label = L['cache_glissandian']})
 map.nodes[39937284] = Puzzle({quest = 65321, label = L['cache_glissandian']})
 map.nodes[41843130] = Puzzle({quest = 65092, label = L['cache_glissandian']})
+map.nodes[44093743] = Puzzle({quest = 65092, label = L['cache_glissandian']})
 map.nodes[44635053] = Puzzle({quest = 65321, label = L['cache_glissandian']})
 map.nodes[45069412] = Puzzle({quest = 65316, label = L['cache_glissandian']})
 map.nodes[51282573] = Puzzle({quest = 65412, label = L['cache_glissandian']}) -- 65418
@@ -904,12 +1009,6 @@ local AVIAN_NEST = Cache({label = L['cache_avian_nest']})
 local CYPHER_BOUND = Cache({label = L['cache_cypher_bound']})
 local DISCARDED_AUTOMA = Cache({label = L['cache_discarded_automa']})
 local FORGOTTEN_VAULT = Cache({label = L['cache_forgotten_vault']})
-local MAWSWORN_SUPPLY = Cache({
-    label = L['cache_mawsworn_supply'],
-    rewards = {
-        Mount({item = 190766, id = 1585}) -- Spectral Mawrat's Tail
-    }
-})
 local TARACHNID_EGGS = Cache({label = L['cache_tarachnid_eggs']})
 
 map.nodes[35495205] = AVIAN_NEST
@@ -1013,14 +1112,6 @@ map.nodes[69083683] = FORGOTTEN_VAULT
 map.nodes[75766263] = FORGOTTEN_VAULT
 map.nodes[78215435] = FORGOTTEN_VAULT
 
-map.nodes[45820524] = MAWSWORN_SUPPLY
-map.nodes[47394352] = MAWSWORN_SUPPLY
-map.nodes[57562297] = MAWSWORN_SUPPLY
-map.nodes[58444036] = MAWSWORN_SUPPLY
-map.nodes[59841661] = MAWSWORN_SUPPLY
-map.nodes[60963061] = MAWSWORN_SUPPLY
-map.nodes[62952498] = MAWSWORN_SUPPLY
-
 map.nodes[54253357] = TARACHNID_EGGS
 map.nodes[55263288] = TARACHNID_EGGS
 
@@ -1030,6 +1121,84 @@ microd.nodes[62764399] = Cache({
     label = L['cache_cypher_bound'],
     parent = map.id
 })
+
+-------------------------------------------------------------------------------
+--------------------------- SHROUDED CYPHER CACHES ----------------------------
+-------------------------------------------------------------------------------
+
+-- https://www.wowhead.com/search?q=Shrouded+Cypher+Cache
+
+local Shrouded = Class('ShroudedCypherCache', shadowlands.node.Node, {
+    group = shadowlands.groups.SHROUDED_CYPHER,
+    icon = 'chest_pp',
+    label = L['cache_shrouded_cypher'],
+    note = L['cache_shrouded_cypher_note'],
+    rewards = {
+        Item({item = 189983, quest = 65513, covenant = NIGHTFAE}) -- Gromit Soul
+    }
+})
+
+map.nodes[29404950] = Shrouded()
+map.nodes[34107050] = Shrouded()
+map.nodes[51008300] = Shrouded()
+map.nodes[61006950] = Shrouded()
+map.nodes[36304810] = Shrouded()
+map.nodes[40306270] = Shrouded()
+map.nodes[43908420] = Shrouded()
+map.nodes[54507780] = Shrouded()
+map.nodes[42805280] = Shrouded()
+map.nodes[44507150] = Shrouded()
+map.nodes[53009230] = Shrouded()
+map.nodes[57406500] = Shrouded()
+map.nodes[54204980] = Shrouded()
+map.nodes[56203400] = Shrouded()
+map.nodes[63704120] = Shrouded()
+map.nodes[66502520] = Shrouded()
+map.nodes[41903410] = Shrouded()
+map.nodes[50700460] = Shrouded()
+map.nodes[52706080] = Shrouded()
+map.nodes[59803350] = Shrouded()
+map.nodes[62005730] = Shrouded()
+map.nodes[49003050] = Shrouded()
+map.nodes[61201550] = Shrouded()
+map.nodes[62204630] = Shrouded()
+map.nodes[69503450] = Shrouded()
+
+-------------------------------------------------------------------------------
+--------------------------- MAWSWORN SUPPLY CACHES ----------------------------
+-------------------------------------------------------------------------------
+
+local Mawsworn = Class('MawsornCache', shadowlands.node.Node, {
+    label = L['cache_mawsworn_supply'],
+    group = shadowlands.groups.MAWSWORN_SUPPLY_CACHE,
+    icon = 'chest_bk',
+    rewards = {
+        Mount({item = 190766, id = 1585}) -- Spectral Mawrat's Tail
+    }
+})
+
+map.nodes[45504650] = Mawsworn()
+map.nodes[45820524] = Mawsworn()
+map.nodes[46002430] = Mawsworn()
+map.nodes[46702680] = Mawsworn()
+map.nodes[46801240] = Mawsworn()
+map.nodes[47394352] = Mawsworn()
+map.nodes[47800150] = Mawsworn()
+map.nodes[48104820] = Mawsworn()
+map.nodes[48804250] = Mawsworn()
+map.nodes[50104460] = Mawsworn()
+map.nodes[50801000] = Mawsworn()
+map.nodes[50805050] = Mawsworn()
+map.nodes[51700820] = Mawsworn()
+map.nodes[57562297] = Mawsworn()
+map.nodes[58444036] = Mawsworn()
+map.nodes[59503140] = Mawsworn()
+map.nodes[59841661] = Mawsworn()
+map.nodes[60203240] = Mawsworn()
+map.nodes[60963061] = Mawsworn()
+map.nodes[62952498] = Mawsworn()
+map.nodes[63302100] = Mawsworn()
+map.nodes[67602960] = Mawsworn()
 
 -------------------------------------------------------------------------------
 ----------------------------- PROTOFORM SCHEMATICS ----------------------------
@@ -1073,11 +1242,13 @@ map.nodes[53777246] = PetSchematic({
     note = L['in_cave'] .. '\n\n' .. L['schematic_treasure_pet_note']
 }) -- Multichicken
 
--- map.nodes[] = PetSchematic({
---     id = 189440,
---     quest = 65348,
---     note = L['schematic_omnipotential_core_note']
--- }) -- Omnipotential Core
+map.nodes[42764060] = PetSchematic({
+    id = 189440,
+    quest = 65348,
+    note = L['schematic_omnipotential_core_note'] .. '\n\n' ..
+        shadowlands.color.Orange(L['rondure_alcove_note']),
+    pois = {POI({50452759})} -- Rondure Alcove Arrangement
+}) -- Omnipotential Core
 
 map.nodes[52237533] = PetSchematic({
     id = 189442,
@@ -1099,11 +1270,11 @@ map.nodes[57837783] = PetSchematic({
     pois = {POI({59328128})}
 }) -- Shelly
 
--- map.nodes[] = PetSchematic({
---     id = 189437,
---     quest = 65336,
---     note = L['schematic_stabilized_geomental_note']
--- }) -- Stabilized Geomental
+map.nodes[83215337] = PetSchematic({
+    id = 189437,
+    quest = 65336,
+    note = L['schematic_stabilized_geomental_note']
+}) -- Stabilized Geomental
 
 map.nodes[67223261] = PetSchematic({
     id = 189443,
@@ -1118,11 +1289,11 @@ esper.nodes[74745037] = PetSchematic({
     note = L['schematic_tunneling_vombata_note']
 }) -- Tunneling Vombata
 
--- map.nodes[] = PetSchematic({
---     id = 189436,
---     quest = 65334,
---     note = L['schematic_violent_poultrid_note']
--- }) -- Violent Poultrid
+map.nodes[34224865] = PetSchematic({
+    id = 189436,
+    quest = 65334,
+    note = L['schematic_violent_poultrid_note']
+}) -- Violent Poultrid
 
 -- Currently no fallback "Protoform Schematic" object for this one, it will always be
 -- obtained from the Library Vault treasure even if you have not unlocked the pet
@@ -1137,7 +1308,7 @@ esper.nodes[74745037] = PetSchematic({
 
 local MountSchematic = Class('MountSchematic', shadowlands.node.Item, {
     sublabel = '{spell:366367}',
-    icon = 136103,
+    icon = 134060,
     group = shadowlands.groups.PROTOFORM_SCHEMATICS
 })
 
@@ -1169,11 +1340,14 @@ map.nodes[52804580] = MountSchematic({
     pois = {POI({41903400, 50304120, 52804580, 53402570, 64366347})}
 }) -- Buzz
 
--- map.nodes[] = MountSchematic({
---     id = 189476,
---     quest = 65399,
---     note = L['schematic_curious_crystalsniffer_note']
--- }) -- Curious Crystalsniffer
+local CURIOUS = MountSchematic({
+    id = 189476,
+    quest = 65399,
+    note = L['schematic_curious_crystalsniffer_note']
+}) -- Curious Crystalsniffer
+
+map.nodes[86215337] = CURIOUS
+ephe.nodes[63005200] = CURIOUS
 
 map.nodes[64223562] = MountSchematic({
     id = 189477,
@@ -1225,23 +1399,24 @@ map.nodes[53166386] = MountSchematic({
     note = L['in_cave'] .. ' ' .. L['schematic_heartbond_lupine_note']
 }) -- Heartbond Lupine
 
--- map.nodes[] = MountSchematic({
---     id = 189467,
---     quest = 65390,
---     note = L['schematic_ineffable_skitterer_note']
--- }) -- Ineffable Skitterer
+map.nodes[34974875] = MountSchematic({
+    id = 189467,
+    quest = 65390,
+    note = L['schematic_ineffable_skitterer_note']
+}) -- Ineffable Skitterer
 
--- map.nodes[] = MountSchematic({
---     id = 189459,
---     quest = 65382,
---     note = L['schematic_mawdapted_raptora_note']
--- }) -- Mawdapted Raptora
-
-map.nodes[33754950] = MountSchematic({
-    id = 189455,
-    quest = 65375,
-    note = L['schematic_pale_regal_cervid_note']
-}) -- Pale Regal Cervid
+-- Wowhead claims this drops from Dune Dominance, need more confirmation
+map.nodes[61342626] = MountSchematic({
+    id = 189459,
+    quest = 65382,
+    note = L['schematic_mawdapted_raptora_note'],
+    pois = {
+        POI({64152084}), Path({60812242, 61572342}),
+        Path({61732080, 61461947, 60941839}),
+        Path({64442377, 64882451, 65132565, 65022679, 64812747}),
+        Path({61342626, 61472708, 61902798, 62542853, 63312870, 63852858})
+    }
+}) -- Mawdapted Raptora
 
 map.nodes[66966942] = MountSchematic({
     id = 189469,
@@ -1268,11 +1443,12 @@ map.nodes[47680954] = MountSchematic({
     note = L['schematic_scarlet_helicid_note']
 }) -- Scarlet Helicid
 
--- map.nodes[] = MountSchematic({
---     id = 189461,
---     quest = 65384,
---     note = L['schematic_serenade_note']
--- }) -- Serenade
+immo.nodes[45623070] = MountSchematic({
+    id = 189461,
+    quest = 65384,
+    parent = map.id,
+    note = L['schematic_serenade_note']
+}) -- Serenade
 
 map.nodes[60603052] = MountSchematic({
     id = 189456,
@@ -1286,11 +1462,14 @@ map.nodes[63032149] = MountSchematic({
     note = L['schematic_tarachnid_creeper_note']
 }) -- Tarachnid Creeper
 
--- map.nodes[] = MountSchematic({
---     id = 189463,
---     quest = 65386,
---     note = L['schematic_prototype_fleetpod_note']
--- }) -- Unsuccessful Prototype Fleetpod
+gpose.nodes[49707196] = MountSchematic({
+    id = 189463,
+    quest = 65386,
+    parent = map.id,
+    note = L['schematic_prototype_fleetpod_note'] .. '\n\n' ..
+        shadowlands.color.Orange(L['camber_alcove_note']),
+    pois = {POI({47683448})} -- Camber Alcove Arrangement
+}) -- Unsuccessful Prototype Fleetpod
 
 map.nodes[50312704] = MountSchematic({
     id = 189472,
@@ -1312,18 +1491,18 @@ local Lore = Class('Concordance', shadowlands.node.Node, {
     note = L['concordance_note']
 })
 
-map.nodes[31775466] = Lore({label = L['concordance_excitable']}) -- quest=65179
-map.nodes[38953127] = Lore({label = L['concordance_excitable']}) -- quest=65213
-map.nodes[50405096] = Lore({label = L['concordance_excitable']}) -- quest=65216
-map.nodes[64616035] = Lore({label = L['concordance_excitable']}) -- quest=65210
-map.nodes[35037144] = Lore({label = L['concordance_mercurial']}) -- quest=65180
-map.nodes[39702572] = Lore({label = L['concordance_mercurial']}) -- quest=65214
-map.nodes[51579134] = Lore({label = L['concordance_mercurial']}) -- quest=65211
-map.nodes[64262397] = Lore({label = L['concordance_mercurial']}) -- quest=65217
-map.nodes[32196281] = Lore({label = L['concordance_tranquil']}) -- quest=64940
-map.nodes[38844857] = Lore({label = L['concordance_tranquil']}) -- quest=65212
-map.nodes[49367149] = Lore({label = L['concordance_tranquil']}) -- quest=65209
-map.nodes[60204707] = Lore({label = L['concordance_tranquil']}) -- quest=65215
+map.nodes[31775466] = Lore({quest = 65179, label = L['concordance_excitable']})
+map.nodes[38953127] = Lore({quest = 65213, label = L['concordance_excitable']})
+map.nodes[50405096] = Lore({quest = 65216, label = L['concordance_excitable']})
+map.nodes[64616035] = Lore({quest = 65210, label = L['concordance_excitable']})
+map.nodes[35037144] = Lore({quest = 65180, label = L['concordance_mercurial']})
+map.nodes[39702572] = Lore({quest = 65214, label = L['concordance_mercurial']})
+map.nodes[51579134] = Lore({quest = 65211, label = L['concordance_mercurial']})
+map.nodes[64262397] = Lore({quest = 65217, label = L['concordance_mercurial']})
+map.nodes[32196281] = Lore({quest = 64940, label = L['concordance_tranquil']})
+map.nodes[38844857] = Lore({quest = 65212, label = L['concordance_tranquil']})
+map.nodes[49367149] = Lore({quest = 65209, label = L['concordance_tranquil']})
+map.nodes[60204707] = Lore({quest = 65215, label = L['concordance_tranquil']})
 
 -------------------------------------------------------------------------------
 --------------------------------- ECHOED JIRO ---------------------------------
@@ -1342,13 +1521,13 @@ local Jiro = Class('Jiro', shadowlands.node.NPC, {
 })
 
 local Creatii = Class('Creatii', Jiro,
-    {spellID = 361831, icon = 'peg_gn', fgroup = 'creatii'})
+    {spellID = 361831, icon = 'peg_bl', fgroup = 'creatii'})
 
 local Genesii = Class('Genesii', Jiro,
-    {spellID = 362022, icon = 'peg_bl', fgroup = 'genesii'})
+    {spellID = 362022, icon = 'peg_rd', fgroup = 'genesii'})
 
 local Nascii_ = Class('Nascii', Jiro,
-    {spellID = 362023, icon = 'peg_rd', fgroup = 'nascii'})
+    {spellID = 362023, icon = 'peg_gn', fgroup = 'nascii'})
 
 local CREATIAN_SW = shadowlands.requirement.GarrisonTalentRank(1976, 1)
 local CREATIAN_SE = shadowlands.requirement.GarrisonTalentRank(1976, 2)
@@ -1380,7 +1559,7 @@ map.nodes[39995148] = Creatii({id = 184942, requires = CREATIAN_NW})
 map.nodes[38313215] = Genesii({id = 184943, requires = CREATIAN_NW})
 map.nodes[45363878] = Genesii({id = 184943, requires = CREATIAN_NW})
 map.nodes[42744478] = Nascii_({id = 184944, requires = CREATIAN_NW})
-map.nodes[42883191] = Nascii_({id = 184944, requires = CREATIAN_NW})
+map.nodes[44902980] = Nascii_({id = 184944, requires = CREATIAN_NW})
 
 --------------------------------- NORTH-EAST ----------------------------------
 
@@ -1701,3 +1880,53 @@ function Bufonid.getters:note()
 end
 
 map.nodes[34506548] = Bufonid()
+
+-------------------------------------------------------------------------------
+--------------------------------- SOULSHAPES ----------------------------------
+-------------------------------------------------------------------------------
+
+local Soulshape = Class('Soulshape', Collectible, {
+    IsEnabled = function(self)
+        if C_Covenants.GetActiveCovenantID() ~= NIGHTFAE.id then
+            return false
+        end
+        return Collectible.IsEnabled(self)
+    end
+})
+
+-------------------------------------------------------------------------------
+
+map.nodes[38207180] = Soulshape({
+    id = 185452,
+    icon = 136071,
+    covenant = NIGHTFAE,
+    note = L['multiple_spawns'],
+    rewards = {
+        Item({item = 189988, quest = 65516, covenant = NIGHTFAE}) -- Sheep Soul
+    },
+    pois = {
+        POI({
+            30606720, 37003420, 37607720, 38408060, 43807980, 49808000, 58407500
+        })
+    }
+}) -- Sheep Soul
+
+map.nodes[34407140] = Soulshape({
+    id = 185279,
+    icon = 655866,
+    covenant = NIGHTFAE,
+    note = L['soulshape_penguin_note'],
+    rewards = {
+        Item({item = 189989, quest = 65517, covenant = NIGHTFAE}) -- Penguin Soul
+    }
+}) -- Penguin Soul
+
+map.nodes[63206050] = Soulshape({
+    label = L['lost_comb'],
+    icon = 2027853,
+    covenant = NIGHTFAE,
+    note = L['schematic_desertwing_hunter_note'],
+    rewards = {
+        Item({item = 189990, quest = 65518, covenant = NIGHTFAE}) -- Bee Soul
+    }
+}) -- Bee Soul
