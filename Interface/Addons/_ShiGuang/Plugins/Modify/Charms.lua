@@ -699,7 +699,7 @@ ExtTransmogUI:SetScript("OnEvent",function(self,event,addon)
 	end
 end)
 
-local AutoViewDistance = CreateFrame("Frame", "AutoViewDistance")
+--[[local AutoViewDistance = CreateFrame("Frame", "AutoViewDistance")
 AutoViewDistance:RegisterEvent("LOADING_SCREEN_DISABLED") 
 AutoViewDistance:RegisterEvent("LOADING_SCREEN_ENABLED")
 AutoViewDistance:RegisterEvent("PLAYER_LOGOUT") 
@@ -711,4 +711,4 @@ AutoViewDistance:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 	elseif event == "PLAYER_LOGOUT" then
 		if GetCVar("graphicsViewDistance") ~= 1 then SetCVar("graphicsViewDistance", 1) end
 	end
-end)
+end)]]
