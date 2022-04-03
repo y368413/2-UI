@@ -1048,8 +1048,8 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "UFs", "SpecRaidPos", U["Spec RaidPos"], nil, nil, nil, nil, U["SpecRaidPosTip"]},
 	},
 	[3] = {
-		{1, "Nameplate", "Enable", HeaderTag..U["Enable Nameplate"], nil, nil, nil, setupNameplateSize, refreshNameplates},
-		{1, "Nameplate", "FriendPlate", U["FriendPlate"].."*", true, nil, nil, refreshNameplates, U["FriendPlateTip"]},
+		{1, "Nameplate", "Enable", HeaderTag..U["Enable Nameplate"], nil, nil, setupNameplateSize, refreshNameplates},
+		{1, "Nameplate", "FriendPlate", U["FriendPlate"].."*", true, nil, refreshNameplates, U["FriendPlateTip"]},
 		{1, "Nameplate", "NameOnlyMode", U["NameOnlyMode"].."*", true, true, nil, nil, U["NameOnlyModeTip"]},
 		{4, "Nameplate", "NameType", U["NameTextType"].."*", nil, nil, {DISABLE, U["Tag:name"], U["Tag:levelname"], U["Tag:rarename"], U["Tag:rarelevelname"]}, refreshNameplates, U["PlateLevelTagTip"]},
 		{4, "Nameplate", "HealthType", U["HealthValueType"].."*", true, nil, G.HealthValues, refreshNameplates, U["100PercentTip"]},
