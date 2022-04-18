@@ -58,15 +58,15 @@ end
 local day, hour, minute = 86400, 3600, 60
 function A:FormatAuraTime(s)
 	if s >= day then
-		return format("%d"..I.MyColor.."d", s/day), s%day
+		return format("%d"..I.MyColor.."d", s/day + .5), s%day
 	elseif s >= 2*hour then
-		return format("%d"..I.MyColor.."h", s/hour), s%hour
+		return format("%d"..I.MyColor.."h", s/hour + .5), s%hour
 	elseif s >= 10*minute then
-		return format("%d"..I.MyColor.."m", s/minute), s%minute
+		return format("%d"..I.MyColor.."m", s/minute + .5), s%minute
 	elseif s >= minute then
 		return format("%d:%.2d", s/minute, s%minute), s - floor(s)
 	elseif s > 10 then
-		return format("%d"..I.MyColor.."s", s), s - floor(s)
+		return format("%d"..I.MyColor.."s", s + .5), s - floor(s)
 	elseif s > 5 then
 		return format("|cffffff00%.1f|r", s), s - format("%.1f", s)
 	else
@@ -102,9 +102,13 @@ function A:UpdateTimer(elapsed)
 	if onTooltip then A:Button_SetTooltip(self) end
 end
 
+function A:GetSpellStat(arg16, arg17, arg18)
+	return (arg16 > 0 and U["Versa"]) or (arg17 > 0 and U["Mastery"]) or (arg18 > 0 and U["Haste"]) or U["Crit"]
+end
+
 function A:UpdateAuras(button, index)
 	local unit, filter = button.header:GetAttribute("unit"), button.filter
-	local name, texture, count, debuffType, duration, expirationTime, _, _, _, spellID = UnitAura(unit, index, filter)
+	local name, texture, count, debuffType, duration, expirationTime, _, _, _, spellID, _, _, _, _, _, arg16, arg17, arg18 = UnitAura(unit, index, filter)
 	if not name then return end
 
 	if duration > 0 and expirationTime then
@@ -134,6 +138,11 @@ function A:UpdateAuras(button, index)
 		button:SetBackdropBorderColor(color[1], color[2], color[3])
 	else
 		button:SetBackdropBorderColor(0, 0, 0)
+	end
+
+	-- Show spell stat for 'Soleahs Secret Technique'
+	if spellID == 368512 then
+		button.count:SetText(A:GetSpellStat(arg16, arg17, arg18))
 	end
 
 	button.spellID = spellID
@@ -248,7 +257,7 @@ end
 function A:RemoveSpellFromIgnoreList()
 	if IsAltKeyDown() and IsControlKeyDown() and self.spellID and R.db["AuraWatchList"]["IgnoreSpells"][self.spellID] then
 		R.db["AuraWatchList"]["IgnoreSpells"][self.spellID] = nil
-		print(format(U["RemoveFromIgnoreList"], I.NDuiString, self.spellID))
+		print(format(U["RemoveFromIgnoreList"], I.UIString, self.spellID))
 	end
 end
 

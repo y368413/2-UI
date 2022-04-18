@@ -1,7 +1,0 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="Main.lua"/>
-	<Script file="Config.lua"/>
-	<Script file="Assassination.lua"/>
-	<Script file="Outlaw.lua"/>
-	<Script file="Subtlety.lua"/>
-</Ui>

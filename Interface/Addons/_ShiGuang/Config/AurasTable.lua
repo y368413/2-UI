@@ -69,14 +69,14 @@ function module:AddNewAuraWatch(class, list)
 end
 
 function module:AddDeprecatedGroup()
-	if not R.db["AuraWatch"]["DeprecatedAuras"] then return end
-
-	for name, value in pairs(R.DeprecatedAuras) do
-		for _, list in pairs(AuraWatchList["ALL"]) do
-			if list.Name == name then
-				local newTable = newAuraFormat(value)
-				for spellID, v in pairs(newTable) do
-					list.List[spellID] = v
+	if R.db["AuraWatch"]["DeprecatedAuras"] then
+		for name, value in pairs(R.DeprecatedAuras) do
+			for _, list in pairs(AuraWatchList["ALL"]) do
+				if list.Name == name then
+					local newTable = newAuraFormat(value)
+					for spellID, v in pairs(newTable) do
+						list.List[spellID] = v
+					end
 				end
 			end
 		end
@@ -175,6 +175,7 @@ function module:OnLogin()
 		end
 	end
 
+	RaidDebuffs[0] = {} -- OTHER spells
 	module:AddDeprecatedGroup()
 	R.AuraWatchList = AuraWatchList
 	R.RaidBuffs = RaidBuffs

@@ -89,41 +89,32 @@ function TT:InsertFactionFrame(faction)
 		f:SetPoint("TOPRIGHT", 0, -6)
 		f:SetBlendMode("ADD")
 		f:SetScale(.3)
+		f:SetAlpha(.7)
 		self.factionFrame = f
 	end
 	self.factionFrame:SetTexture("Interface\\Timer\\"..faction.."-Logo")
-	self.factionFrame:SetAlpha(.5)
+	self.factionFrame:Show()
 end
-
-local roleTex = {
-	["HEALER"] = {.066, .222, .133, .445},
-	["TANK"] = {.375, .532, .133, .445},
-	["DAMAGER"] = {.66, .813, .133, .445},
-}
 
 function TT:InsertRoleFrame(role)
 	if not self.roleFrame then
 		local f = self:CreateTexture(nil, "OVERLAY")
 		f:SetPoint("TOPRIGHT", self, "TOPLEFT", -2, -2)
 		f:SetSize(20, 20)
-		f:SetTexture("Interface\\LFGFrame\\UI-LFG-ICONS-ROLEBACKGROUNDS")
-		f.bg = M.CreateBDFrame(f)
 		self.roleFrame = f
 	end
-	self.roleFrame:SetTexCoord(unpack(roleTex[role]))
-	self.roleFrame:SetAlpha(1)
-	self.roleFrame.bg:SetAlpha(1)
+	self.roleFrame:SetTexture(M.GetRoleTex(role))
+	self.roleFrame:Show()
 end
 
 function TT:OnTooltipCleared()
 	if self:IsForbidden() then return end
 
-	if self.factionFrame and self.factionFrame:GetAlpha() ~= 0 then
-		self.factionFrame:SetAlpha(0)
+	if self.factionFrame and self.factionFrame:IsShown() then
+		self.factionFrame:Hide()
 	end
-	if self.roleFrame and self.roleFrame:GetAlpha() ~= 0 then
-		self.roleFrame:SetAlpha(0)
-		self.roleFrame.bg:SetAlpha(0)
+	if self.roleFrame and self.roleFrame:IsShown() then
+		self.roleFrame:Hide()
 	end
 
 	GameTooltip_ClearMoney(self)
@@ -156,15 +147,6 @@ function TT:OnTooltipSetUnit()
 	if not unit or not UnitExists(unit) then return end
 
 	local isShiftKeyDown = IsShiftKeyDown()
-	local r, g, b = M.UnitColor(unit)
-	local hexColor = M.HexRGB(r, g, b)
-	local ricon = GetRaidTargetIndex(unit)
-	local text = GameTooltipTextLeft1:GetText()
-	if ricon and ricon > 8 then ricon = nil end
-	if ricon and text then
-		GameTooltipTextLeft1:SetFormattedText(("%s %s"), ICON_LIST[ricon].."18|t", text)
-	end
-
 	local isPlayer = UnitIsPlayer(unit)
 	if isPlayer then
 		local name, realm = UnitName(unit)
@@ -225,8 +207,15 @@ function TT:OnTooltipSetUnit()
 		end
 	end
 
-	local line1 = GameTooltipTextLeft1:GetText()
-	GameTooltipTextLeft1:SetFormattedText("%s", hexColor..line1)
+	local r, g, b = M.UnitColor(unit)
+	local hexColor = M.HexRGB(r, g, b)
+	local text = GameTooltipTextLeft1:GetText()
+	if text then
+		local ricon = GetRaidTargetIndex(unit)
+		if ricon and ricon > 8 then ricon = nil end
+		ricon = ricon and ICON_LIST[ricon].."18|t " or ""
+		GameTooltipTextLeft1:SetFormattedText(("%s%s%s"), ricon, hexColor, text)
+	end
 
 	local alive = not UnitIsDeadOrGhost(unit)
 	local level

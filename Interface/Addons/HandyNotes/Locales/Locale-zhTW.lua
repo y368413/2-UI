@@ -770,8 +770,10 @@ L["trinket"] = "飾品"
 
 L["activation_unknown"] = "啟動條件未知"
 L["requirement_not_found"] = "所需位置未知"
+L['multiple_spawns'] = '可能出現在多個位置'
 
 L["Requires"] = "需要"
+L['ranked_research'] = '%s (等級 %d/%d)'
 L["focus"] = "專注"
 L["retrieving"] = "接收物品連結 ..."
 L["in_cave"] = "在洞穴。"
@@ -798,40 +800,76 @@ L["unlearnable"] = "無法解鎖"
 L["defeated"] = "已擊敗"
 L["undefeated"] = "未擊敗"
 
+-------------------------------------------------------------------------------
+--------------------------------- CONTEXT MENU --------------------------------
+-------------------------------------------------------------------------------
+
+L['context_menu_set_waypoint'] = '設定地圖路徑點'
+L['context_menu_add_tomtom'] = '加入到TomTom'
+L['context_menu_hide_node'] = '隱藏此節點'
+L['context_menu_restore_hidden_nodes'] = '恢復所有隱藏節點'
+
+L['map_button_text'] = '調整此地圖上的圖示顯示、透明度與縮放'
+
+-------------------------------------------------------------------------------
+----------------------------------- OPTIONS -----------------------------------
+-------------------------------------------------------------------------------
+
+L['options_global'] = '整體'
+L['options_zones'] = '區域'
+
+L['options_general_description'] = '控制節點行為和獎勵的設定'
+L['options_global_description'] = '控制全部區域節點顯示的設定'
+L['options_zones_description'] = '控制每個單獨區域節點顯示的設定'
+
+L['options_open_settings_panel'] = '打開設定面板…'
+L['options_open_world_map'] = '打開世界地圖'
+L['options_open_world_map_desc'] = '在世界地圖中開啟此區域'
+
+------------------------------------ ICONS ------------------------------------
+
+L['options_icon_settings'] = '圖示設定'
+L['options_scale'] = '縮放'
+L['options_scale_desc'] = '1 = 100%'
+L['options_opacity'] = '透明度'
+L['options_opacity_desc'] = '0 = 透明, 1 = 不透明'
 ----------------------------------- OPTIONS -----------------------------------
 L["context_menu_title_Visions"] = "恩若司的幻象"
 L["options_title_Visions"] = "恩佐斯的幻象"
 ---------------------------------- VISIBILITY ---------------------------------
 
-L["options_visibility_settings"] = "可視性"
-L["options_general_settings"] = "一般"
-L["options_show_completed_nodes"] = "顯示已完成"
-L["options_show_completed_nodes_desc"] = "顯示所有的節點，即使它今天已被拾取或完成。"
-L["options_toggle_hide_done_rare"] = "隱藏所有戰利品已收藏的稀有"
-L["options_toggle_hide_done_rare_desc"] = "隱藏所有戰利品已收藏的稀有。"
-L["options_toggle_hide_minimap"] = "隱藏小地圖上的所有圖示"
-L["options_toggle_hide_minimap_desc"] = "在小地圖上隱藏此插件的所有圖示，並只在主地圖上顯示它們。"
-L["options_toggle_maximized_enlarged"] = "當世界地圖時最大化時放大圖示"
-L["options_toggle_maximized_enlarged_desc"] = "當世界地圖放到最大時，放大所有的圖示。"
-L["options_toggle_use_char_achieves"] = "使用角色成就"
-L["options_toggle_use_char_achieves_desc"] = "用此角色的成就進度來替代顯示整個帳號的進度。"
-L["options_toggle_per_map_settings"] = "使用區域個別設定"
-L["options_toggle_per_map_settings_desc"] = "只使用各個地圖各自獨立的切換、縮放和透明度設定"
-L["options_restore_hidden_nodes"] = "恢復隱藏的節點"
-L["options_restore_hidden_nodes_desc"] = "恢復所有使用右鍵選單隱藏的節點。"
+L['options_show_worldmap_button'] = '顯示世界地圖按鈕'
+L['options_show_worldmap_button_desc'] = '在世界地圖右上角新增一個快速切換內容的下拉式選單'
 
-L["options_rewards_settings"] = "獎勵"
-L["options_reward_types"] = "顯示獎勵類型"
-L["options_mount_rewards"] = "顯示坐騎獎勵"
-L["options_mount_rewards_desc"] = "在提示顯示坐騎獎勵並追蹤收集狀態"
-L["options_pet_rewards"] = "顯示戰寵獎勵"
-L["options_pet_rewards_desc"] = "在提示顯示戰寵獎勵並追蹤收集狀態"
-L["options_toy_rewards"] = "顯示玩具獎勵"
-L["options_toy_rewards_desc"] = "在提示顯示玩具獎勵並追蹤收集狀態"
-L["options_transmog_rewards"] = "顯示塑形獎勵"
-L["options_transmog_rewards_desc"] = "在提示顯示塑型獎勵並追蹤收集狀態"
-L["options_all_transmog_rewards"] = nil
-L["options_all_transmog_rewards_desc"] = nil
+L['options_visibility_settings'] = '可視性'
+L['options_general_settings'] = '一般'
+L['options_show_completed_nodes'] = '顯示已完成'
+L['options_show_completed_nodes_desc'] = '顯示所有的節點，即使它今天已被拾取或完成。'
+L['options_toggle_hide_done_rare'] = '隱藏所有戰利品已收藏的稀有'
+L['options_toggle_hide_done_rare_desc'] = '隱藏所有戰利品已收藏的稀有。'
+L['options_toggle_hide_minimap'] = '隱藏小地圖上的所有圖示'
+L['options_toggle_hide_minimap_desc'] = '在小地圖上隱藏此插件的所有圖示，並只在主地圖上顯示它們。'
+L['options_toggle_maximized_enlarged'] = '當世界地圖時最大化時放大圖示'
+L['options_toggle_maximized_enlarged_desc'] = '當世界地圖放到最大時，放大所有的圖示。'
+L['options_toggle_use_char_achieves'] = '使用角色成就'
+L['options_toggle_use_char_achieves_desc'] = '用此角色的成就進度來替代顯示整個帳號的進度。'
+L['options_toggle_per_map_settings'] = '使用區域個別設定'
+L['options_toggle_per_map_settings_desc'] = '只使用各個地圖各自獨立的切換、縮放和透明度設定'
+L['options_restore_hidden_nodes'] = '恢復隱藏的節點'
+L['options_restore_hidden_nodes_desc'] = '恢復所有使用右鍵選單隱藏的節點。'
+
+L['options_rewards_settings'] = '獎勵'
+L['options_reward_types'] = '顯示獎勵類型'
+L['options_mount_rewards'] = '顯示坐騎獎勵'
+L['options_mount_rewards_desc'] = '在提示顯示坐騎獎勵並追蹤收集狀態'
+L['options_pet_rewards'] = '顯示戰寵獎勵'
+L['options_pet_rewards_desc'] = '在提示顯示戰寵獎勵並追蹤收集狀態'
+L['options_toy_rewards'] = '顯示玩具獎勵'
+L['options_toy_rewards_desc'] = '在提示顯示玩具獎勵並追蹤收集狀態'
+L['options_transmog_rewards'] = '顯示塑形獎勵'
+L['options_transmog_rewards_desc'] = '在提示顯示塑型獎勵並追蹤收集狀態'
+L['options_all_transmog_rewards'] = '顯示無法取得的塑形獎勵'
+L['options_all_transmog_rewards_desc'] = '顯示其他職業可以取得的塑形獎勵'
 
 L["options_icons_misc_desc"] = "顯示其他節點的位置。"
 L["options_icons_misc"] = "其他"
@@ -849,6 +887,17 @@ L["options_icons_rares"] = "稀有"
 L["options_icons_supplies_desc"] = "顯示戰爭補給箱的所有可能位置。"
 L["options_icons_supplies"] = "戰爭補給空投"
 L["options_icons_treasures"] = "寶藏"
+L['options_icons_treasures_desc'] = '顯示隱藏寶藏的位置。'
+
+------------------------------------ FOCUS ------------------------------------
+
+L['options_focus_settings'] = '興趣點'
+L['options_poi_color'] = '興趣點顏色'
+L['options_poi_color_desc'] = '設定被設為專注的興趣點圖示顏色'
+L['options_path_color'] = '路徑顏色'
+L['options_path_color_desc'] = '設定圖示被設為專注的路徑顏色'
+L['options_reset_poi_colors'] = '重置顏色'
+L['options_reset_poi_colors_desc'] = '重置以上的顏色為預設值'
 
 ---------------------------------- TOOLTIP ---------------------------------
 
@@ -1304,8 +1353,8 @@ L['anima_shard_61292'] = '在石牌坊的頂部。'
 L['anima_shard_61293'] = '在比較低層的細石柱上。'
 L['anima_shard_61294'] = '隱藏在一堆桶子後面。'
 L['anima_shard_61295'] = '在書架上 {npc:156889} 後面。'
-L['anima_shard_61296'] = '在倒下的大鐘後面。\n\n' .. ('死靈戰地副本內。')
-L['anima_shard_61297'] = '在石柱後面。\n\n' .. ('死靈戰地副本內。')
+L['anima_shard_61296'] = '在倒下的大鐘後面。\n\n死靈戰地副本內。'
+L['anima_shard_61297'] = '在石柱後面。\n\n死靈戰地副本內。'
 L['anima_shard_61298'] = '位在躺椅後面。'
 L['anima_shard_61299'] = '隱藏在大火炬的後面。'
 L['anima_shard_61300'] = '掛在中央字體的岩架上。'
@@ -1484,7 +1533,7 @@ L['oonar_sorrowbane_note'] = [[
 ]]
 
 L['pet_cat'] = '寵愛該死的貓！'
-L['hairball'] = ('只在瘟疫之臨副本內的膿瘡聖所出現！')
+L['hairball'] = '只在瘟疫之臨副本內的膿瘡聖所出現！'
 L['lime'] = '位在大骨頭拱頂上。'
 L['moldstopheles'] = '繞到莖的後面並跳上莖上的平臺。使用坐騎對準莖和最後平台的夾角跳躍來到達目標。'
 L['pus_in_boots'] = '在橋的下面。'
@@ -1532,7 +1581,7 @@ L['gilded_plum_chest_note'] = '擊殺在路上徘徊的 {npc:166680}。'
 L['lost_quill_note'] = '從禁忌圖書館的桌上瓶子拾取 {item:182475}，然後把它交給外面拱門頂上的 {npc:173449}。'
 L['rapier_fearless_note'] = '點擊地上的劍杆，然後擊敗 {npc:173603}。'
 L['remlates_cache_note'] = '在暗隱村墓穴後面的外牆上。'
-L['smuggled_cache_note'] = ('*在拾取之前*：') .. '請確認已完成 {quest:60480} 支線任務否則寶藏和任務將缺少40個 {currency:1820}。'
+L['smuggled_cache_note'] = '*在拾取之前*：請確認已完成 {quest:60480} 支線任務否則寶藏和任務將缺少40個 {currency:1820}。'
 L['taskmaster_trove_note'] = '閱讀"出入口儀式"然後小心地閃過球走到寶箱。'
 L['the_count_note'] = '在歿路沼澤農99個 {currency:1820} 然後把它帶給 {npc:173488}。'
 
@@ -1764,11 +1813,21 @@ L['tormentors_note'] = [[
 -------------------------------- ZERETH MORTIS --------------------------------
 -------------------------------------------------------------------------------
 
-L['camber_alcove_note'] = nil
-L['dormant_alcove_note'] = nil
-L['fulgor_alcove_note'] = nil
-L['rondure_alcove_note'] = nil
-L['repertory_alcove_note'] = nil
+local HIDDEN_ALCOVE = [[
+要到達 |cFFFFFD00%s密室|r:
+
+1. 完成澤瑞斯莫提斯的第6章主線任務.
+2. 找到 |cFFFFFD00%s密室排列|r %s.
+3. 在 |cFFFFFD00鳴響山嶽|r, 殺掉有 {spell:362651} 的怪物或站在白池中來獲得60點 {npc:183569}.
+4. 使用育生棲地內的 {npc:184329} 來到達內部樞位. (需要30點 {npc:183569})
+5. 使用 {npc:184485} 來到達 %s密室. (需要30點 {npc:183569})
+]]
+
+L['camber_alcove_note'] = string.format(HIDDEN_ALCOVE, '弧形', '弧形', '位於 |cFFFFFD00最終樞位|r 的建築物後面', '弧形')
+L['dormant_alcove_note'] = string.format(HIDDEN_ALCOVE, '沉睡', '沉睡', '位於 |cFFFFFD00鳴響山嶽|r', '沉睡')
+L['fulgor_alcove_note'] = string.format(HIDDEN_ALCOVE, '絢爛', '絢爛', '位於 |cFFFFFD00鳴響山嶽|r', '絢爛')
+L['rondure_alcove_note'] = string.format(HIDDEN_ALCOVE, '圓弧', '圓弧', '位於 |cFFFFFD00第三樞位|r 平台上', '圓弧')
+L['repertory_alcove_note'] = string.format(HIDDEN_ALCOVE, '儲備', '儲備', '位於 |cFFFFFD00陸地生物貯藏所|r 山洞內', '儲備')
 
 L['corrupted_architect_note'] = '攻擊 {npc:183958} 和 {npc:183961} 來啟動稀有.'
 L['dune_dominance_note'] = '{achievement:15392} 成就所需的三個稀有菁英都重生在這裡'
@@ -1834,15 +1893,34 @@ L['provis_cache_note'] = [[
 L['prying_eye_discovery'] = '發現窺探之眼'
 L['prying_eye_discovery_note'] = '當飛行解鎖時會比較容易到達'
 L['pulp_covered_relic'] = '被泥巴覆蓋的聖物'
-L['requisites_originator_note'] = nil
-L['rondure_cache'] = nil
-L['rondure_cache_note'] = nil
+L['requisites_originator_note'] = [[
+一臺每周會給你不同獎勵的機器
+
+• {spell:366667} = 附魔材料
+• {spell:366668} = 靈魄
+• {spell:366669} = 暗語
+• {spell:366670} = 創始微粒 + {item:189179} (機率)
+• {spell:366671} = 暗語/微粒/靈魄
+• {spell:366672} = 暗語裝備
+]]
+L['rondure_cache'] = '朗杜爾貯藏'
+L['rondure_cache_note'] = '在 |cFFFFFD00圓弧密室|r 內的跳躍謎題最上方的可互動融爐'
 L['sandworn_chest'] = '砂蝕寶箱'
 L['sandworn_chest_note'] = '從附近的怪物上拾取5個 {item:190198} 來組合成 {item:190197}.'
-L['sand_piles'] = nil
-L['sand_piles_note'] = nil
-L['torn_ethereal_drape'] = nil
-L['torn_ethereal_drape_note'] = nil
+L['sand_piles'] = '沙堆'
+L['sand_piles_note'] = [[
+所有的沙堆都在隱藏的沉睡密室裡可以被找到. 每個沙堆需要一個 {item:189863}, 可以在此區域的其他寶藏中找到:
+
+• 統御儲物箱
+• 殞落寶庫
+• 失竊的聖物
+• 失竊卷軸
+• 隱沒寶箱
+• 交響樂寶庫
+• 波動之葉
+]]
+L['torn_ethereal_drape'] = '破損的乙太披氅'
+L['torn_ethereal_drape_note'] = '在 |cFFFFFD00絢爛密室|r 內可以找到. 啟動 |cFFFFFD00自主機控制臺|r, 然後騎著 {npc:183565} 來到達天花板.'
 
 L['cache_avian_nest'] = '鳥巢'
 L['cache_cypher_bound'] = '暗語束縛箱子'
@@ -1879,9 +1957,9 @@ L['schematic_ineffable_skitterer_note'] = '自殺! 是真的, 你只有在靈魂
 L['schematic_leaping_leporid_note'] = '在一顆漂浮的樹頂端可以找到'
 L['schematic_mawdapted_raptora_note'] = '低機率從 |cFFFFFD00無盡沙海|r 內的 {npc:181412} 掉落'
 L['schematic_microlicid_note'] = '在漂浮樹最低的枝幹上, 被蓋在一些葉子下方'
-L['schematic_omnipotential_core_note'] = nil
+L['schematic_omnipotential_core_note'] = '可以在 |cFFFFFD00圓弧密室|r 內找到. 設計圖隱藏在房間西南側的拱門的上沿後方.'
 L['schematic_prototickles_note'] = '在稀有 {npc:180978} 上方的藤蔓內，和一個漂浮的鍊子相連著'
-L['schematic_prototype_fleetpod_note'] = nil
+L['schematic_prototype_fleetpod_note'] = '可以在 |cFFFFFD00拱型密室|r 內找到. 和 {npc:184900} 互動來開始一個小遊戲. 指揮蝸牛穿過5個環並且不碰到 {npc:185455} 來贏得設計圖.'
 L['schematic_raptora_swooper_note'] = '在轉化廳內找到'
 L['schematic_resonant_echo_note'] = '有機率在 {item:189172} 內找到'
 L['schematic_russet_bufonid_note'] = '有機率在 {item:187780} 巔峰箱內找到'
@@ -1950,8 +2028,8 @@ L['options_icons_zereth_caches'] = '暗語箱'
 L['options_icons_zereth_caches_desc'] = '顯示暗語箱可能的位置'
 L['options_icons_shrouded_cyphers'] = '隱蔽的暗語寶箱'
 L['options_icons_shrouded_cyphers_desc'] = '顯示隱蔽的暗語寶箱可能的位置. 必須裝備一件 {spell:364478} 裝備'
-L['options_icons_mawsworn_supply_cache'] = nil
-L['options_icons_mawsworn_supply_cache_desc'] = nil
+L['options_icons_mawsworn_supply_cache'] = '淵誓補給箱'
+L['options_icons_mawsworn_supply_cache_desc'] = '顯示淵誓補給箱可能的位置'
 
 -------------------------------------------------------------------------------
 ----------------------------------- ICECROWN ----------------------------------

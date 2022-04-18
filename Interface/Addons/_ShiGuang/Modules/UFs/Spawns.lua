@@ -88,7 +88,7 @@ local function CreateRaidStyle(self)
 	self.Range = UFRangeAlpha
 	self.disableTooltip = R.db["UFs"]["HideTip"]
 
-	UF:CreateHeader(self)
+	UF:CreateHeader(self, true)
 	UF:CreateHealthBar(self)
 	UF:CreateHealthText(self)
 	UF:CreatePowerBar(self)
@@ -125,7 +125,7 @@ local function CreatePartyPetStyle(self)
 	self.Range = UFRangeAlpha
 	self.disableTooltip = R.db["UFs"]["HideTip"]
 
-	UF:CreateHeader(self)
+	UF:CreateHeader(self, true)
 	UF:CreateHealthBar(self)
 	UF:CreateHealthText(self)
 	UF:CreatePowerBar(self)
@@ -252,7 +252,7 @@ function UF:OnLogin()
 		UF:CheckExplosives()
 		UF:UpdateGroupRoles()
 		UF:QuestIconCheck()
-		UF:RefreshPlateOnFactionChanged()
+		UF:RefreshPlateByEvents()
 		UF:RefreshMajorSpells()
 
 		oUF:RegisterStyle("Nameplates", UF.CreatePlates)

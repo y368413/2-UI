@@ -58,7 +58,7 @@ local function UF_OnLeave(self)
 	self.Highlight:Hide()
 end
 
-function UF:CreateHeader(self)
+function UF:CreateHeader(self, onKeyDown)
 	local hl = self:CreateTexture(nil, "OVERLAY")
 	hl:SetAllPoints()
 	hl:SetTexture("Interface\\PETBATTLES\\PetBattle-SelectedPetGlow")
@@ -68,7 +68,7 @@ function UF:CreateHeader(self)
 	hl:Hide()
 	self.Highlight = hl
 
-	self:RegisterForClicks("AnyUp")
+	self:RegisterForClicks(onKeyDown and "AnyDown" or "AnyUp")
 	self:HookScript("OnEnter", UF_OnEnter)
 	self:HookScript("OnLeave", UF_OnLeave)
 end
@@ -1000,7 +1000,7 @@ function UF:CreateBuffs(self)
 		bu.num = (self.raidType == "simple" or not R.db["UFs"]["ShowRaidBuff"]) and 0 or 3
 		bu.size = R.db["UFs"]["RaidBuffSize"]
 		bu.CustomFilter = UF.RaidBuffFilter
-		bu.disableMouse = true
+		bu.disableMouse = R.db["UFs"]["BuffClickThru"]
 		bu.fontSize = R.db["UFs"]["RaidBuffSize"]-2
 	else -- boss and arena
 		bu.__value = "Boss"
@@ -1032,7 +1032,7 @@ function UF:CreateDebuffs(self)
 		bu.num = (self.raidType == "simple" or not R.db["UFs"]["ShowRaidDebuff"]) and 0 or 3
 		bu.size = R.db["UFs"]["RaidDebuffSize"]
 		bu.CustomFilter = UF.RaidDebuffFilter
-		bu.disableMouse = true
+		bu.disableMouse = R.db["UFs"]["DebuffClickThru"]
 		bu.fontSize = R.db["UFs"]["RaidDebuffSize"]-2
 	else -- boss and arena
 		bu:SetPoint("TOPRIGHT", self, "TOPLEFT", -5, 0)
@@ -1056,6 +1056,7 @@ function UF:UpdateRaidAuras()
 				debuffs.num = (frame.raidType == "simple" or not R.db["UFs"]["ShowRaidDebuff"]) and 0 or 3
 				debuffs.size = R.db["UFs"]["RaidDebuffSize"]
 				debuffs.fontSize = R.db["UFs"]["RaidDebuffSize"]-2
+				debuffs.disableMouse = R.db["UFs"]["DebuffClickThru"]
 				UF:UpdateAuraContainer(frame, debuffs, debuffs.num)
 				debuffs:ForceUpdate()
 			end
@@ -1065,6 +1066,7 @@ function UF:UpdateRaidAuras()
 				buffs.num = (frame.raidType == "simple" or not R.db["UFs"]["ShowRaidBuff"]) and 0 or 3
 				buffs.size = R.db["UFs"]["RaidBuffSize"]
 				buffs.fontSize = R.db["UFs"]["RaidBuffSize"]-2
+				buffs.disableMouse = R.db["UFs"]["BuffClickThru"]
 				UF:UpdateAuraContainer(frame, buffs, buffs.num)
 				buffs:ForceUpdate()
 			end

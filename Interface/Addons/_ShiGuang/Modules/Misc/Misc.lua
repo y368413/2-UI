@@ -69,6 +69,7 @@ function MISC:OnLogin()
 	MISC:QuickMenuButton()
 	MISC:BaudErrorFrameHelpTip()
 	MISC:EnhancedPicker()
+	MISC:UpdateMaxZoomLevel()
 	
 	--MISC:CreateRM()
 	--MISC:FreeMountCD()
@@ -216,16 +217,27 @@ function MISC:VehicleSeatMover()
 	end)
 end
 
--- Reanchor UIWidgetBelowMinimapContainerFrame
+-- Reanchor UIWidgets
 function MISC:UIWidgetFrameMover()
-	local frame = CreateFrame("Frame", "UIWidgetMover", UIParent)
-	frame:SetSize(210, 60)
-	M.Mover(frame, U["UIWidgetFrame"], "UIWidgetFrame", {"TOPRIGHT", Minimap, "BOTTOMRIGHT", 0, -43})
+	local frame1 = CreateFrame("Frame", "UIWidgetMover", UIParent)
+	frame1:SetSize(210, 60)
+	M.Mover(frame1, U["UIWidgetFrame"], "UIWidgetFrame", {"TOPRIGHT", Minimap, "BOTTOMRIGHT", 0, -43})
 
 	hooksecurefunc(UIWidgetBelowMinimapContainerFrame, "SetPoint", function(self, _, parent)
 		if parent == "MinimapCluster" or parent == MinimapCluster then
 			self:ClearAllPoints()
-			self:SetPoint("TOPRIGHT", frame)
+			self:SetPoint("TOPRIGHT", frame1)
+		end
+	end)
+
+	local frame2 = CreateFrame("Frame", "UIWidgetPowerBarMover", UIParent)
+	frame2:SetSize(260, 40)
+	M.Mover(frame2, U["UIWidgetPowerBar"], "UIWidgetPowerBar", {"BOTTOM", UIParent, "BOTTOM", 0, 150})
+
+	hooksecurefunc(UIWidgetPowerBarContainerFrame, "SetPoint", function(self, _, parent)
+		if parent == "UIParent" or parent == UIParent then
+			self:ClearAllPoints()
+			self:SetPoint("CENTER", frame2)
 		end
 	end)
 end
@@ -361,81 +373,6 @@ function MISC:BlockStrangerInvite()
 			StaticPopup_Hide("PARTY_INVITE")
 		end
 	end)
-end
-
--- Maw widget frame
-local maxValue = 1000
-local function GetMawBarValue()
-	local widgetInfo = C_UIWidgetManager_GetDiscreteProgressStepsVisualizationInfo(2885)
-	if widgetInfo and widgetInfo.shownState == 1 then
-		local value = widgetInfo.progressVal
-		return floor(value / maxValue), value % maxValue
-	end
-end
-
-local MawRankColor = {
-	[0] = {.6, .8, 1},
-	[1] = {0, 1, 0},
-	[2] = {0, .7, .3},
-	[3] = {1, .8, 0},
-	[4] = {1, .5, 0},
-	[5] = {1, 0, 0}
-}
-function MISC:UpdateMawBarLayout()
-	local bar = MISC.mawbar
-	local rank, value = GetMawBarValue()
-	if rank then
-		bar:SetStatusBarColor(unpack(MawRankColor[rank]))
-		if rank == 5 then
-			bar.text:SetText("Lv"..rank)
-			bar:SetValue(maxValue)
-		else
-			bar.text:SetText("Lv"..rank.." - "..value.."/"..maxValue)
-			bar:SetValue(value)
-		end
-		bar:Show()
-		UIWidgetTopCenterContainerFrame:Hide()
-	else
-		bar:Hide()
-		UIWidgetTopCenterContainerFrame:Show()
-	end
-end
-
-function MISC:MawWidgetFrame()
-	if not R.db["Misc"]["MawThreatBar"] then return end
-	if MISC.mawbar then return end
-
-	local bar = CreateFrame("StatusBar", nil, UIParent)
-	bar:SetPoint("TOP", 0, -50)
-	bar:SetSize(200, 16)
-	bar:SetMinMaxValues(0, maxValue)
-	bar.text = M.CreateFS(bar, 14)
-	M.CreateSB(bar)
-	M:SmoothBar(bar)
-	MISC.mawbar = bar
-
-	M.Mover(bar, U["MawThreatBar"], "MawThreatBar", {"TOP", UIParent, 0, -50})
-
-	bar:SetScript("OnEnter", function(self)
-		local rank = GetMawBarValue()
-		local widgetInfo = rank and C_UIWidgetManager_GetTextureWithAnimationVisualizationInfo(2873 + rank)
-		if widgetInfo and widgetInfo.shownState == 1 then
-			GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
-			local header, nonHeader = SplitTextIntoHeaderAndNonHeader(widgetInfo.tooltip)
-			if header then
-				GameTooltip:AddLine(header, nil,nil,nil, 1)
-			end
-			if nonHeader then
-				GameTooltip:AddLine(nonHeader, nil,nil,nil, 1)
-			end
-			GameTooltip:Show()
-		end
-	end)
-	bar:SetScript("OnLeave", M.HideTooltip)
-
-	MISC:UpdateMawBarLayout()
-	M:RegisterEvent("PLAYER_ENTERING_WORLD", MISC.UpdateMawBarLayout)
-	M:RegisterEvent("UPDATE_UI_WIDGET", MISC.UpdateMawBarLayout)
 end
 
 -- Archaeology counts
@@ -659,35 +596,33 @@ do
 	M:RegisterEvent("ADDON_LOADED", fixCommunitiesNews)
 end
 
-function MISC:FasterMovieSkip()
+local function skipOnKeyDown(self, key)
 	if not R.db["Misc"]["FasterSkip"] then return end
-
-	-- Allow space bar, escape key and enter key to cancel cinematic without confirmation
-	if CinematicFrame.closeDialog and not CinematicFrame.closeDialog.confirmButton then
-		CinematicFrame.closeDialog.confirmButton = CinematicFrameCloseDialogConfirmButton
+	if key == "ESCAPE" then
+		if self:IsShown() and self.closeDialog and self.closeDialog.confirmButton then
+			self.closeDialog:Hide()
+		end
 	end
+end
 
-	CinematicFrame:HookScript("OnKeyDown", function(self, key)
-		if key == "ESCAPE" then
-			if self:IsShown() and self.closeDialog and self.closeDialog.confirmButton then
-				self.closeDialog:Hide()
-			end
+local function skipOnKeyUp(self, key)
+	if not R.db["Misc"]["FasterSkip"] then return end
+	if key == "SPACE" or key == "ESCAPE" or key == "ENTER" then
+		if self:IsShown() and self.closeDialog and self.closeDialog.confirmButton then
+			self.closeDialog.confirmButton:Click()
 		end
-	end)
-	CinematicFrame:HookScript("OnKeyUp", function(self, key)
-		if key == "SPACE" or key == "ESCAPE" or key == "ENTER" then
-			if self:IsShown() and self.closeDialog and self.closeDialog.confirmButton then
-				self.closeDialog.confirmButton:Click()
-			end
-		end
-	end)
-	MovieFrame:HookScript("OnKeyUp", function(self, key)
-		if key == "SPACE" or key == "ESCAPE" or key == "ENTER" then
-			if self:IsShown() and self.CloseDialog and self.CloseDialog.ConfirmButton then
-				self.CloseDialog.ConfirmButton:Click()
-			end
-		end
-	end)
+	end
+end
+
+function MISC:FasterMovieSkip()
+	MovieFrame.closeDialog = MovieFrame.CloseDialog
+	MovieFrame.closeDialog.confirmButton = MovieFrame.CloseDialog.ConfirmButton
+	CinematicFrame.closeDialog.confirmButton = CinematicFrameCloseDialogConfirmButton
+
+	MovieFrame:HookScript("OnKeyDown", skipOnKeyDown)
+	MovieFrame:HookScript("OnKeyUp", skipOnKeyUp)
+	CinematicFrame:HookScript("OnKeyDown", skipOnKeyDown)
+	CinematicFrame:HookScript("OnKeyUp", skipOnKeyUp)
 end
 
 function MISC:EnhanceDressup()
@@ -852,18 +787,24 @@ function MISC:QuickMenuButton()
 		local name = dropdownMenu.name
 		local unit = dropdownMenu.unit
 		local isPlayer = unit and UnitIsPlayer(unit)
-		local isFriendMenu = dropdownMenu == FriendsDropDown and not dropdownMenu.bnetIDAccount -- menus on FriendsFrame
+		local isFriendMenu = dropdownMenu == FriendsDropDown -- menus on FriendsFrame
 		if not name or (not isPlayer and not dropdownMenu.chatType and not isFriendMenu) then
 			frame:Hide()
 			return
 		end
 
-		local server = dropdownMenu.server
-		if not server or server == "" then
-			server = I.MyRealm
+		local gameAccountInfo = dropdownMenu.accountInfo and dropdownMenu.accountInfo.gameAccountInfo
+		if gameAccountInfo and gameAccountInfo.characterName and gameAccountInfo.realmName then
+			MISC.MenuButtonName = gameAccountInfo.characterName.."-"..gameAccountInfo.realmName
+			frame:Show()
+		else
+			local server = dropdownMenu.server
+			if not server or server == "" then
+				server = I.MyRealm
+			end
+			MISC.MenuButtonName = name.."-"..server
+			frame:Show()
 		end
-		MISC.MenuButtonName = name.."-"..server
-		frame:Show()
 	end)
 end
 
@@ -957,6 +898,10 @@ function MISC:EnhancedPicker()
 		self.__boxB:SetText(b)
 		self.__boxH:SetText(format("%02x%02x%02x", r, g, b))
 	end)
+end
+
+function MISC:UpdateMaxZoomLevel()
+	SetCVar("cameraDistanceMaxZoomFactor", R.db["Misc"]["MaxZoom"])
 end
 
 --[[hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self,textString,value,_,maxValue)  ---	Custom status text format.

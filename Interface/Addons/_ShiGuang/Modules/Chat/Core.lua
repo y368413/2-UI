@@ -16,7 +16,7 @@ local GeneralDockManager = GeneralDockManager
 local messageSoundID = SOUNDKIT.TELL_MESSAGE
 
 local maxLines = 1024
-local fontOutline
+local fontFile, fontOutline
 module.MuteCache = {}
 
 function module:TabSetAlpha(alpha)
@@ -91,16 +91,16 @@ function module:SkinChat()
 
 	local name = self:GetName()
 	local fontStyle, fontSize, _= self:GetFont()
-	self:SetClampRectInsets(0, 0, 0, 0)
+	--self:SetClampRectInsets(0, 0, 0, 0)
 	self:SetMaxResize(I.ScreenWidth, I.ScreenHeight)
 	self:SetMinResize(120, 60)
 	if R.db["Chat"]["Outline"] then
-	  self:SetFont(I.Font[1], fontSize, "OUTLINE")
+	  self:SetFont(fontFile or fontStyle, fontSize, "OUTLINE")
+	  self:SetShadowColor(0, 0, 0, 0)
 	else
-	  self:SetFont(fontStyle, fontSize)
-	  self:SetShadowOffset(1, -1)
+	  self:SetFont(fontFile or fontStyle, fontSize)
+	  --self:SetShadowOffset(1, -1)
 	end
-	self:SetShadowColor(0, 0, 0, 0)
 	self:SetClampRectInsets(0, 0, 0, 0)
 	self:SetClampedToScreen(false)
 	if self:GetMaxLines() < maxLines then
@@ -127,7 +127,7 @@ function module:SkinChat()
 	
 	local tab = _G[name.."Tab"]
 	tab:SetAlpha(1)
-	tab.Text:SetFont(I.Font[1], I.Font[2]+2, fontOutline)
+	tab.Text:SetFont(fontFile or font, I.Font[2]+2, fontOutline)
 	tab.Text:SetShadowColor(0, 0, 0, 0)
 	M.StripTextures(tab, 0)
 	hooksecurefunc(tab, "SetAlpha", module.TabSetAlpha)
@@ -403,6 +403,7 @@ function module:ToggleLanguageFilter()
 end
 
 function module:OnLogin()
+	fontFile = not R.db["Chat"]["SysFont"] and I.Font[1]
 	fontOutline = R.db["Skins"]["FontOutline"] and "OUTLINE" or ""
 
 	for i = 1, NUM_CHAT_WINDOWS do

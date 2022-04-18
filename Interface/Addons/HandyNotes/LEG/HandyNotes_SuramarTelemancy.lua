@@ -190,7 +190,7 @@ function HL:OnInitialize()
     SuramarTelemancy.db = self.db.profile
     SuramarTelemancy.hidden = self.db.char.hidden
     -- Initialize our database with HandyNotes
-    HandyNotes:RegisterPluginDB("HandyNotes_SuramarTelemancy", HLHandler, SuramarTelemancy.options)
+    HandyNotes:RegisterPluginDB("SuramarTelemancy", HLHandler, SuramarTelemancy.options)
 
     -- watch for LOOT_CLOSED
     self:RegisterEvent("LOOT_CLOSED")

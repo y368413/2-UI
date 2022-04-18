@@ -3,6 +3,7 @@ local M, R, U, I = unpack(ns)
 local A = M:GetModule("Auras")
 
 local maxFrames = 12 -- Max Tracked Auras
+local hasCentralize
 local updater = CreateFrame("Frame")
 local AuraList, FrameList, UnitIDTable, IntTable, IntCD, myTable, cooldownTable = {}, {}, {}, {}, {}, {}, {}
 local pairs, select, tinsert, tremove, wipe, strfind = pairs, select, table.insert, table.remove, table.wipe, strfind
@@ -143,6 +144,7 @@ local function MakeMoveHandle(frame, text, value, anchor)
 	local mover = M.Mover(frame, I.InfoColor..text, value, anchor, nil, nil, true)
 	frame:ClearAllPoints()
 	frame:SetPoint("CENTER", mover)
+	frame.__width = mover:GetWidth()
 
 	return mover
 end
@@ -175,7 +177,7 @@ end
 function A:RemoveSpellFromAuraList()
 	if IsAltKeyDown() and IsControlKeyDown() and self.type == 4 and self.spellID then
 		R.db["AuraWatchList"]["IgnoreSpells"][self.spellID] = true
-		print(format(U["AddToIgnoreList"], I.NDuiString, self.spellID))
+		print(format(U["AddToIgnoreList"], I.UIString, self.spellID))
 	end
 end
 
@@ -328,22 +330,33 @@ end
 local function SetupAnchor()
 	for key, VALUE in pairs(FrameList) do
 		local value = AuraList[key]
+		local direction, interval = value.Direction, value.Interval
+		-- check whether using CENTER direction
+		if value.Mode == "BAR" and direction == "CENTER" then
+			direction = "UP" -- sorry, no "CENTER" for bars mode
+		end
+		if not hasCentralize then
+			hasCentralize = direction == "CENTER"
+		end
+
 		local previous
 		for i = 1, #VALUE do
 			local frame = VALUE[i]
 			if i == 1 then
 				frame:SetPoint("CENTER", frame.MoveHandle)
-			elseif (value.Name == "Target Aura" or value.Name == "Enchant Aura") and i == 7 then
-				frame:SetPoint("BOTTOM", VALUE[1], "TOP", 0, value.Interval)
+				frame.__direction = direction
+				frame.__interval = interval
+			elseif (value.Name == "Target Aura" or value.Name == "Enchant Aura") and i == 7 and direction ~= "CENTER" then
+				frame:SetPoint("BOTTOM", VALUE[1], "TOP", 0, interval)
 			else
-				if value.Direction == "RIGHT" then
-					frame:SetPoint("LEFT", previous, "RIGHT", value.Interval, 0)
-				elseif value.Direction == "LEFT" then
-					frame:SetPoint("RIGHT", previous, "LEFT", -value.Interval, 0)
-				elseif value.Direction == "UP" then
-					frame:SetPoint("BOTTOM", previous, "TOP", 0, value.Interval)
-				elseif value.Direction == "DOWN" then
-					frame:SetPoint("TOP", previous, "BOTTOM", 0, -value.Interval)
+				if direction == "RIGHT" or direction == "CENTER" then
+					frame:SetPoint("LEFT", previous, "RIGHT", interval, 0)
+				elseif direction == "LEFT" then
+					frame:SetPoint("RIGHT", previous, "LEFT", -interval, 0)
+				elseif direction == "UP" then
+					frame:SetPoint("BOTTOM", previous, "TOP", 0, interval)
+				elseif direction == "DOWN" then
+					frame:SetPoint("TOP", previous, "BOTTOM", 0, -interval)
 				end
 			end
 			previous = frame
@@ -459,13 +472,18 @@ function A:AuraWatch_UpdateCD()
 end
 
 -- UpdateAura
+local replacedTexture = {
+	[336892] = 135130, -- 无懈警戒换成瞄准射击图标
+}
 function A:AuraWatch_SetupAura(KEY, unit, index, filter, name, icon, count, duration, expires, spellID, flash)
 	if not KEY then return end
 
 	local frames = FrameList[KEY]
 	local frame = frames[frames.Index]
 	if frame then frame:Show() end
-	if frame.Icon then frame.Icon:SetTexture(icon) end
+	if frame.Icon then
+		frame.Icon:SetTexture(replacedTexture[spellID] or icon)
+	end
 	if frame.Count then frame.Count:SetText(count > 1 and count) end
 	if frame.Cooldown then
 		frame.Cooldown:SetReverse(true)
@@ -741,6 +759,22 @@ M:RegisterEvent("PLAYER_ENTERING_WORLD", A.AuraWatch_OnEvent)
 M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.AuraWatch_OnEvent)
 M:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", A.AuraWatch_OnEvent)
 
+function A:AuraWatch_Centralize(force)
+	if not hasCentralize then return end
+
+	for i = 1, #FrameList do
+		local frames = FrameList[i]
+		local frame1 = frames and frames[1]
+		if frame1.__direction == "CENTER" and frame1:IsShown() then
+			local numIndex = force and 7 or frames.Index
+			local width = frame1.__width
+			local interval = frame1.__interval
+			frame1:ClearAllPoints()
+			frame1:SetPoint("CENTER", frame1.MoveHandle, "CENTER",  - (width+interval)/2 * (numIndex-2), 0)
+		end
+	end
+end
+
 function A:AuraWatch_OnUpdate(elapsed)
 	self.elapsed = (self.elapsed or 0) + elapsed
 	if self.elapsed > .1 then
@@ -753,6 +787,8 @@ function A:AuraWatch_OnUpdate(elapsed)
 		for _, value in pairs(UnitIDTable) do
 			A:UpdateAuraWatch(value, inCombat)
 		end
+
+		A:AuraWatch_Centralize()
 	end
 end
 updater:SetScript("OnUpdate", A.AuraWatch_OnUpdate)
@@ -774,6 +810,7 @@ SlashCmdList.AuraWatch = function(msg)
 				if value[i].Spellname then value[i].Spellname:SetText("^-^") end
 				if value[i].glowFrame then M.HideOverlayGlow(value[i].glowFrame) end
 			end
+			A:AuraWatch_Centralize(true)
 			value[1].MoveHandle:Show()
 		end
 

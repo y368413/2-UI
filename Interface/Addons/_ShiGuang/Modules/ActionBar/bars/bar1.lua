@@ -24,14 +24,21 @@ end
 
 function Bar:UpdateAllScale()
 	if not R.db["Actionbar"]["Enable"] then return end
-	Bar:UpdateActionSize("Bar1")
-	Bar:UpdateActionSize("Bar2")
-	Bar:UpdateActionSize("Bar3")
-	Bar:UpdateActionSize("Bar4")
-	Bar:UpdateActionSize("Bar5")
-	Bar:UpdateActionSize("BarPet")
+	--Bar:UpdateActionSize("Bar1")
+	--Bar:UpdateActionSize("Bar2")
+	--Bar:UpdateActionSize("Bar3")
+	--Bar:UpdateActionSize("Bar4")
+	--Bar:UpdateActionSize("Bar5")
+	--Bar:UpdateActionSize("BarPet")
 	Bar:UpdateStanceBar()
 	Bar:UpdateVehicleButton()
+end
+
+function Bar:UpdateFontSize(button, fontSize)
+	local font, fontFlag = I.Font[1], I.Font[3]
+	button.Name:SetFont(font, fontSize, fontFlag)
+	button.Count:SetFont(font, fontSize, fontFlag)
+	button.HotKey:SetFont(font, fontSize, fontFlag)
 end
 
 local function SetFrameSize(frame, size, num)
@@ -248,5 +255,5 @@ function Bar:OnLogin()
 	Bar:CreateStancebar()
 	Bar:HideBlizz()
 	Bar:ReskinBars()
-	--Bar:UpdateAllScale()
+	Bar:UpdateAllScale()
 end

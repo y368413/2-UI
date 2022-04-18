@@ -4,29 +4,29 @@ local A = M:GetModule("Auras")
 
 if I.MyClass ~= "HUNTER" then return end
 
-local pairs, GetSpellPowerCost = pairs, GetSpellPowerCost
-local POWER_TYPE_FOCUS = 2
+local pairs, IsEquippedItem = pairs, IsEquippedItem
 local playerGUID = UnitGUID("player")
 
-local function GetSpellCost(spellID)
-	if spellID == 19434 then -- aimed shot always 35
-		return 35
-	end
-	local costTable = GetSpellPowerCost(spellID)
-	if costTable then
-		for _, costInfo in pairs(costTable) do
-			if costInfo.type == POWER_TYPE_FOCUS then
-				return costInfo.cost
-			end
-		end
-	end
-end
+local GetSpellCost = {
+	[53351]  = 10, -- 杀戮射击
+	[19434]  = 35, -- 瞄准射击
+	[185358] = 20, -- 奥术射击
+	[257620] = 20, -- 多重射击
+	[271788] = 10, -- 毒蛇钉刺
+	[212431] = 20, -- 爆炸射击
+	[186387] = 10, -- 爆裂射击
+	[157863] = 35, -- 复活宠物
+	[131894] = 20, -- 夺命黑鸦
+	[120360] = 30, -- 弹幕射击
+	[342049] = 20, -- 奇美拉射击
+	[355589] = 15, -- 哀痛箭
+}
 
 function A:UpdateFocusCost(unit, _, spellID)
 	if unit ~= "player" then return end
 
 	local focusCal = A.MMFocus
-	local cost = GetSpellCost(spellID)
+	local cost = GetSpellCost[spellID]
 	if cost then
 		focusCal.cost = focusCal.cost + cost
 	end
@@ -43,6 +43,12 @@ end
 function A:ResetFocusCost()
 	A.MMFocus.cost = 0
 	A.MMFocus:SetFormattedText("%d/40", A.MMFocus.cost%40)
+end
+
+function A:ResetOnRaidEncounter(_, _, _, groupSize)
+	if groupSize and groupSize > 5 then
+		A:ResetFocusCost()
+	end
 end
 
 local eventSpentIndex = {
@@ -65,6 +71,35 @@ function A:StartAimedShot(unit, _, spellID)
 	end
 end
 
+local hunterSets = {188856, 188858, 188859, 188860, 188861}
+
+function A:CheckSetsCount()
+	local count = 0
+	for _, itemID in pairs(hunterSets) do
+		if IsEquippedItem(itemID) then
+			count = count + 1
+		end
+	end
+
+	if count < 4 then
+		A.MMFocus:Hide()
+		M:UnregisterEvent("UNIT_SPELLCAST_START", A.StartAimedShot)
+		M:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.UpdateFocusCost)
+		M:UnregisterEvent("PLAYER_DEAD", A.ResetFocusCost)
+		M:UnregisterEvent("PLAYER_ENTERING_WORLD", A.ResetFocusCost)
+		M:UnregisterEvent("ENCOUNTER_START", A.ResetOnRaidEncounter)
+		M:UnregisterEvent("CLEU", A.CheckTrickState)
+	else
+		A.MMFocus:Show()
+		M:RegisterEvent("UNIT_SPELLCAST_START", A.StartAimedShot)
+		M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.UpdateFocusCost)
+		M:RegisterEvent("PLAYER_DEAD", A.ResetFocusCost)
+		M:RegisterEvent("PLAYER_ENTERING_WORLD", A.ResetFocusCost)
+		M:RegisterEvent("ENCOUNTER_START", A.ResetOnRaidEncounter)
+		M:RegisterEvent("CLEU", A.CheckTrickState)
+	end
+end
+
 local oldSpec
 function A:ToggleFocusCalculation()
 	if not A.MMFocus then return end
@@ -72,21 +107,13 @@ function A:ToggleFocusCalculation()
 	local spec = GetSpecialization()
 	if R.db["Auras"]["MMT29X4"] and spec == 2 then
 		if self ~= "PLAYER_SPECIALIZATION_CHANGED" or spec ~= oldSpec then -- don't reset when talent changed only
-			A.MMFocus.cost = 0 -- reset calculation when switch on
+			A:ResetFocusCost() -- reset calculation when switch on
 		end
 		A.MMFocus:Show()
-		M:RegisterEvent("UNIT_SPELLCAST_START", A.StartAimedShot)
-		M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.UpdateFocusCost)
-		M:RegisterEvent("PLAYER_DEAD", A.ResetFocusCost)
-		M:RegisterEvent("PLAYER_ENTERING_WORLD", A.ResetFocusCost)
-		M:RegisterEvent("CLEU", A.CheckTrickState)
+		A:CheckSetsCount()
+		M:RegisterEvent("PLAYER_EQUIPMENT_CHANGED", A.CheckSetsCount)
 	else
-		A.MMFocus:Hide()
-		M:UnregisterEvent("UNIT_SPELLCAST_START", A.StartAimedShot)
-		M:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.UpdateFocusCost)
-		M:UnregisterEvent("PLAYER_DEAD", A.ResetFocusCost)
-		M:UnregisterEvent("PLAYER_ENTERING_WORLD", A.ResetFocusCost)
-		M:UnregisterEvent("CLEU", A.CheckTrickState)
+		M:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED", A.CheckSetsCount)
 	end
 	oldSpec = spec
 end

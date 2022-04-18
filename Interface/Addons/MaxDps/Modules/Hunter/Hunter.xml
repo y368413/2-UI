@@ -1,7 +1,0 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="Main.lua"/>
-	<Script file="Beastmastery.lua"/>
-	<Script file="Survival.lua"/>
-	<Script file="Marksmanship.lua"/>
-	<Script file="Config.lua"/>
-</Ui>

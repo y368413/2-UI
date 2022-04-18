@@ -1,4 +1,4 @@
-﻿--## Author: Nils Ruesch  ## Version: 1.9.0
+﻿--## Author: Nils Ruesch  ## Version: 1.9.4
 --[[ xMerchant Copyright (c) 2010-2014, Nils Ruesch All rights reserved. ]]
 local _, ns = ...
 local M, R, U, I = unpack(ns)
@@ -24,9 +24,23 @@ local SKILL = "%1$s (%2$d)";
 local REQUIRES = "(.+)";
 local tooltip = CreateFrame("GameTooltip", "NuuhMerchantTooltip", UIParent, "GameTooltipTemplate");
 
-function getCurrentDB()
-	return xMerchantDB and xMerchantDB.global or {}
+local wow_ver
+if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+    -- vanilla
+    wow_ver = 10
+elseif WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
+    -- tbc
+    wow_ver = 20
+else
+    -- mainline
+    wow_ver = 90
 end
+
+-- get DB of config
+function xMerchant.getCurrentDB()
+    return ShiGuangDB and ShiGuangDB.xMerchant or {}
+end
+local GetCurrentDB = xMerchant.getCurrentDB
 local kRecipeDetailLine = 5
 local function GetError(index, link, isRecipe)
 	if ( not link ) then
@@ -162,7 +176,7 @@ end
 local function CurrencyUpdate()
 	wipe(currencies);
 	
-	local limit = C_CurrencyInfo.GetCurrencyListSize();
+    local limit = C_CurrencyInfo and C_CurrencyInfo.GetCurrencyListSize and C_CurrencyInfo.GetCurrencyListSize() or 0;
 	
 	for i=1, limit do
 		-- DONEY 6.0 http://wowpedia.org/API_GetCurrencyListInfo is out-dated, 2014-10-25
@@ -494,18 +508,18 @@ end
 local function xScrollFrame_OnShow(self)
 end
 local function xScrollFrame_OnVerticalScroll(self, offset)
-	local current_offset_n = FauxScrollFrame_GetOffset(self);
-	local offset_n = (offset >= 0 and 1 or -1) * math.floor(math.abs(offset) / xMerchant.kItemButtonHeight + 0.1);
-	local changed_n = offset_n - current_offset_n
-	if getCurrentDB().scroll_limit_enabled then
-		if changed_n > getCurrentDB().scroll_limit_amount or changed_n < -getCurrentDB().scroll_limit_amount then
-			changed_n = math.min(changed_n, getCurrentDB().scroll_limit_amount)
-			changed_n = math.max(changed_n, -getCurrentDB().scroll_limit_amount)
-			offset_n = (current_offset_n + changed_n)
-			offset = (offset_n > 0.1 and (offset_n - 0.1) or 0) * xMerchant.kItemButtonHeight
-		end
-	end
-	FauxScrollFrame_OnVerticalScroll(self, offset, xMerchant.kItemButtonHeight, MerchantUpdate);
+    local current_offset_n = FauxScrollFrame_GetOffset(self);
+    local offset_n = (offset >= 0 and 1 or -1) * math.floor(math.abs(offset) / xMerchant.kItemButtonHeight + 0.1);
+    local changed_n = offset_n - current_offset_n
+    if GetCurrentDB().scroll_limit_enabled then
+        if changed_n > GetCurrentDB().scroll_limit_amount or changed_n < -GetCurrentDB().scroll_limit_amount then
+            changed_n = math.min(changed_n, GetCurrentDB().scroll_limit_amount)
+            changed_n = math.max(changed_n, -GetCurrentDB().scroll_limit_amount)
+            offset_n = (current_offset_n + changed_n)
+            offset = (offset_n > 0.1 and (offset_n - 0.1) or 0) * xMerchant.kItemButtonHeight
+        end
+    end
+    FauxScrollFrame_OnVerticalScroll(self, offset, xMerchant.kItemButtonHeight, MerchantUpdate);
 end
 
 local function OnClick(self, button)
@@ -669,17 +683,25 @@ search:SetScript("OnEditFocusLost", OnEditFocusLost);
 search:SetScript("OnEditFocusGained", OnEditFocusGained);
 search:SetText(SEARCH);
 
+local function PlayCheckBoxSound(on)
+    if wow_ver < 73 then
+        PlaySound(on and "igMainMenuOptionCheckBoxOn" or "igMainMenuOptionCheckBoxOff")
+    else
+        PlaySound(on and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
+    end
+end
+
 local function Search_OnClick(self)
-	if ( self:GetChecked() ) then
-		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-		frame.tooltipsearching = 1;
-	else
-		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF);
-		frame.tooltipsearching = nil;
-	end
-	if ( searching ~= "" and searching ~= SEARCH:lower() ) then
-		MerchantUpdate();
-	end
+    if ( self:GetChecked() ) then
+        PlayCheckBoxSound(true);
+        frame.tooltipsearching = 1;
+    else
+        PlayCheckBoxSound(false);
+        frame.tooltipsearching = nil;
+    end
+    if ( searching ~= "" and searching ~= SEARCH:lower() ) then
+        MerchantUpdate();
+    end
 end
 
 local function Search_OnEnter(self)
@@ -750,8 +772,8 @@ local function xMerchant_InitItemsButtons()
 		highlight:SetTexture("Interface\\Buttons\\UI-Listbox-Highlight2");
 		highlight:Hide();
 		
-		local itemname_fontsize = getCurrentDB().itemname_fontsize or 15
-		local iteminfo_fontsize = getCurrentDB().iteminfo_fontsize or 12
+        local itemname_fontsize = GetCurrentDB().itemname_fontsize or 15
+        local iteminfo_fontsize = GetCurrentDB().iteminfo_fontsize or 12
 
 		local itemname = button:CreateFontString("ARTWORK", "$parentItemName");
 		button.itemname = itemname;
@@ -867,28 +889,40 @@ local function xMerchant_InitItemsButtons()
 end
 xMerchant_InitItemsButtons()
 
-hooksecurefunc("MerchantFrame_Update", function()
-	if ( MerchantFrame.selectedTab == 1 ) then
-		for i=1, 12, 1 do _G["MerchantItem"..i]:Hide(); end
-		frame:Show();
-		CurrencyUpdate();
-		-- DONEY
-		FactionsUpdate();
-		MerchantUpdate();
-	else
-		frame:Hide();
-		for i=1, 12, 1 do _G["MerchantItem"..i]:Show(); end
-		if (StackSplitFrame:IsShown()) then StackSplitFrame:Hide(); end
-	end
-end);
-		
-hooksecurefunc("MerchantFrame_OnHide", function() wipe(errors); wipe(currencies); end);
+local function Update()
+    if ( MerchantFrame.selectedTab == 1 ) then
+        for i=1, 12, 1 do
+            _G["MerchantItem"..i]:Hide();
+        end
+        frame:Show();
+        CurrencyUpdate();
+        FactionsUpdate();
+        MerchantUpdate();
+    else
+        frame:Hide();
+        for i=1, 12, 1 do
+            _G["MerchantItem"..i]:Show();
+        end
+        if ( StackSplitFrame:IsShown() ) then
+            StackSplitFrame:Hide();
+        end
+    end
+end
+hooksecurefunc("MerchantFrame_Update", Update);
+
+local function OnHide()
+    wipe(errors);
+    wipe(currencies);
+end
+hooksecurefunc("MerchantFrame_OnHide", OnHide);
+
+
 MerchantBuyBackItem:ClearAllPoints();
 MerchantBuyBackItem:SetPoint("BOTTOMLEFT", 175, 32);
 
 for _, frame in next, { MerchantNextPageButton, MerchantPrevPageButton, MerchantPageText } do
-	frame:Hide()
-	frame.Show = function() end;
+    frame:Hide()
+    frame.Show = function() end;
 end
 
 end

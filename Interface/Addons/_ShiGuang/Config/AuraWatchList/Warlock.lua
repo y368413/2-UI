@@ -2,6 +2,8 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local module = M:GetModule("AurasTable")
 
+if I.MyClass ~= "WARLOCK" then return end
+
 -- 术士的法术监控
 local list = {
 	["Player Aura"] = {		-- 玩家光环组

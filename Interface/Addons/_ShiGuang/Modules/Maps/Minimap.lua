@@ -348,6 +348,8 @@ function module:RecycleBin()
 		["GatherMatePin"] = true,
 		["HandyNotes.-Pin"] = true,
 	}
+	M.SplitList(ignoredButtons, MaoRUIDB["IgnoredButtons"])
+
 	local function isButtonIgnored(name)
 		for addonName in pairs(ignoredButtons) do
 			if strmatch(name, addonName) then

@@ -23,7 +23,7 @@ function Bar:CreateCustomBar(anchor)
 		local button = CreateFrame("CheckButton", "$parentButton"..i, frame, "ActionBarButtonTemplate")
 		button.id = (page-1)*12 + i
 		button.isCustomButton = true
-		--button.commandName = U[name]..i
+		button.commandName = U[name]..i
 		button:SetAttribute("action", button.id)
 		tinsert(buttonList, button)
 		tinsert(Bar.buttons, button)

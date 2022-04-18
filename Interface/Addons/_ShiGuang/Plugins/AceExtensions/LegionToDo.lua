@@ -1,6 +1,6 @@
 ﻿--## Author: ykiigor  ## SavedVariables: VLegionToDo
-local LegionToDoVersion = "5.4"
-local VERSION_NUMERIC = 54
+local LegionToDoVersion = "5.5"
+local VERSION_NUMERIC = 55
 
 local GetCurrentRegion
 do
@@ -1710,6 +1710,22 @@ tinsert(ToDoFunc,function(self,collect)
 	else
 		collect.zerthworldboss = nil
 	end
+
+
+	if 
+		C_QuestLog.IsQuestFlaggedCompleted(66042)
+	then
+		collect.patternswithinpatterns = true
+	else
+		collect.patternswithinpatterns = nil
+		if C_QuestLog.GetLogIndexForQuestID(66042) then
+			local progress = GetQuestProgressBarPercent(66042)
+
+			if progress ~= 0 then
+				collect.patternswithinpatterns = progress .. "%"
+			end
+		end
+	end
 end)
 
 local korthiaRaresList = {
@@ -2872,6 +2888,8 @@ LegionToDo:SetScript("OnShow",function(self)
 
 	count = LineUpdate(count,"anima1k","1000 anima")
 	count = LineUpdate(count,"kortiaweekly","Korthia: Weekly")
+	count = LineUpdate(count,"patternswithinpatterns","Zerith Mortis: Weekly")
+
 	count = LineUpdate(count,"zerthworldboss","Zerith Mortis: World Boss")
 	count = LineUpdate(count,"mawworldboss","Maw: World Boss")
 	count = LineUpdate(count,"mawtormentor","Maw: Tormentors")
@@ -3386,6 +3404,15 @@ LegionToDo:SetScript("OnShow",function(self)
 					lines[lineCount].cols[col]:SetText("|cffff0000Not done")
 				else
 					lines[lineCount].cols[col]:SetText(db.kortiaweekly and type(db.kortiaweekly) == "string" and "|cffffff00"..db.kortiaweekly or db.kortiaweekly and "|cff00ff00Done" or "|cffff0000Not done")	
+				end
+			end
+
+			if not optData["patternswithinpatterns"] or OPTIONS_TOGGLED  then
+				lineCount = lineCount + 1
+				if needReset then
+					lines[lineCount].cols[col]:SetText("|cffff0000Not done")
+				else
+					lines[lineCount].cols[col]:SetText(db.patternswithinpatterns and type(db.patternswithinpatterns) == "string" and "|cffffff00"..db.patternswithinpatterns or db.patternswithinpatterns and "|cff00ff00Done" or "|cffff0000Not done")	
 				end
 			end
 

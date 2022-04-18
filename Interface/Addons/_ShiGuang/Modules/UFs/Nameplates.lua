@@ -400,8 +400,6 @@ local function CheckInstanceStatus()
 end
 
 function UF:QuestIconCheck()
-	if not R.db["Nameplate"]["QuestIndicator"] then return end
-
 	CheckInstanceStatus()
 	M:RegisterEvent("PLAYER_ENTERING_WORLD", CheckInstanceStatus)
 end
@@ -671,6 +669,8 @@ end
 
 -- Interrupt info on castbars
 function UF:UpdateSpellInterruptor(...)
+	if not R.db["Nameplate"]["Interruptor"] then return end
+
 	local _, _, sourceGUID, sourceName, _, _, destGUID = ...
 	if destGUID == self.unitGUID and sourceGUID and sourceName and sourceName ~= "" then
 		local _, class = GetPlayerInfoByGUID(sourceGUID)
@@ -685,6 +685,20 @@ end
 function UF:SpellInterruptor(self)
 	if not self.Castbar then return end
 	self:RegisterCombatEvent("SPELL_INTERRUPT", UF.UpdateSpellInterruptor)
+end
+
+function UF:ShowUnitTargeted(self)
+	local tex = self:CreateTexture()
+	tex:SetSize(20, 20)
+	tex:SetPoint("LEFT", self, "RIGHT", 5, 0)
+	tex:SetAtlas("target")
+	tex:Hide()
+	local count = M.CreateFS(self, 22)
+	count:SetPoint("LEFT", tex, "RIGHT", 1, 0)
+	count:SetTextColor(1, .8, 0)
+
+	self.tarByTex = tex
+	self.tarBy = count
 end
 
 -- Create Nameplates
@@ -722,6 +736,7 @@ function UF:CreatePlates()
 	UF:CreatePVPClassify(self)
 	UF:CreateThreatColor(self)
 
+	self.Auras.showStealableBuffs = R.db["Nameplate"]["Dispellable"]
 	self.powerText = M.CreateFS(self, 21)
 	self.powerText:ClearAllPoints()
 	self.powerText:SetPoint("TOP", self.Castbar, "BOTTOM", 0, -3)
@@ -740,6 +755,7 @@ function UF:CreatePlates()
 	UF:AddQuestIcon(self)
 	UF:AddDungeonProgress(self)
 	UF:SpellInterruptor(self)
+	UF:ShowUnitTargeted(self)
 
 	self:RegisterEvent("PLAYER_FOCUS_CHANGED", UF.UpdateFocusColor, true)
 
@@ -772,6 +788,7 @@ function UF:UpdateNameplateAuras()
 	element.numTotal = R.db["Nameplate"]["maxAuras"]
 	element.size = R.db["Nameplate"]["AuraSize"]
 	element.showDebuffType = R.db["Nameplate"]["DebuffColor"]
+	element.showStealableBuffs = R.db["Nameplate"]["Dispellable"]
 	element.desaturateDebuff = R.db["Nameplate"]["Desaturate"]
 	element:SetWidth(self:GetWidth())
 	element:SetHeight((element.size + element.spacing) * 2)
@@ -936,8 +953,57 @@ function UF:OnUnitFactionChanged(unit)
 	end
 end
 
-function UF:RefreshPlateOnFactionChanged()
+local targetedList = {}
+
+local function GetGroupUnit(index, maxGroups, isInRaid)
+	if isInRaid then
+		return "raid"..index
+	elseif index == maxGroups then
+		return "player"
+	else
+		return "party"..index
+	end
+end
+
+function UF:OnUnitTargetChanged()
+	if not isInInstance then return end
+
+	wipe(targetedList)
+
+	local maxGroups = GetNumGroupMembers()
+	if maxGroups > 1 then
+		local isInRaid = IsInRaid()
+		for i = 1, maxGroups do
+			local member = GetGroupUnit(i, maxGroups, isInRaid)
+			local memberTarget = member.."target"
+			if not UnitIsDeadOrGhost(member) and UnitExists(memberTarget) then
+				local unitGUID = UnitGUID(memberTarget)
+				targetedList[unitGUID] = (targetedList[unitGUID] or 0) + 1
+			end
+		end
+	end
+
+	for nameplate in pairs(platesList) do
+		nameplate.tarBy:SetText(targetedList[nameplate.unitGUID] or "")
+		nameplate.tarByTex:SetShown(targetedList[nameplate.unitGUID])
+	end
+end
+
+function UF:RefreshPlateByEvents()
 	M:RegisterEvent("UNIT_FACTION", UF.OnUnitFactionChanged)
+
+	if R.db["Nameplate"]["UnitTargeted"] then
+		UF:OnUnitTargetChanged()
+		M:RegisterEvent("UNIT_TARGET", UF.OnUnitTargetChanged)
+		M:RegisterEvent("PLAYER_TARGET_CHANGED", UF.OnUnitTargetChanged)
+	else
+		for nameplate in pairs(platesList) do
+			nameplate.tarBy:SetText("")
+			nameplate.tarByTex:Hide()
+		end
+		M:UnregisterEvent("UNIT_TARGET", UF.OnUnitTargetChanged)
+		M:UnregisterEvent("PLAYER_TARGET_CHANGED", UF.OnUnitTargetChanged)
+	end
 end
 
 function UF:PostUpdatePlates(event, unit)

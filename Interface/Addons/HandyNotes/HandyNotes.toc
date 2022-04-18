@@ -7,7 +7,7 @@
 ## Notes: Handynotes with Achievments+Treasures+Toys+Mounts
 ## Notes-zhCN: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已击杀过。并替换自带飞行地图，使之更加方便详细。
 ## Notes-zhTW: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已擊殺過。并替换自带飞行地图，使之更加方便详细。
-## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, HandyNotes_CoreDB, HandyNotes_LostAndFoundDB, HNMoleMachineConfig, HandyNotes_PetDailiesDB, HandyNotes_Universal_ExplorerDB, HandyNotes_TravelGuideDB, HandyNotes_HigherDimensionalLearningDB, HandyNotes_WitheredChestsDB, HandyNotes_OribosDB, HandyNotesArgusDB
+## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, HandyNotes_CoreDB, HandyNotes_LostAndFoundDB, HNMoleMachineConfig, HandyNotes_PetDailiesDB, HandyNotes_Universal_ExplorerDB, HandyNotes_TravelGuideDB, HandyNotes_HigherDimensionalLearningDB, HandyNotes_WitheredChestsDB, HandyNotes_OribosDB, HandyNotesArgusDB, HandyNotes_SuramarTelemancyDB, HandyNotes_SuramarLeylinesDB
 ## Dependencies: _ShiGuang, Blizzard_FlightMap
 
 ## X-Repple: 2 UI
@@ -24,7 +24,7 @@ HandyNotes_EditFrame.lua
 HandyNotes_WorldMapButton.lua
 
 # Core Mods
-HandyNotes_Core.xml
+Core\core.xml
 
 # MOP
 MOP\HandyNotes_LostAndFound.lua

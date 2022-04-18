@@ -1,4 +1,4 @@
-local Lib = LibStub:NewLibrary('LibItemCache-2.0', 30)
+local Lib = LibStub:NewLibrary('LibItemCache-2.0', 32)
 if not Lib then return end
 
 local PLAYER, FACTION, REALM, REALMS

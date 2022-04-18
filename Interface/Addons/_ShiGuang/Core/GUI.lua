@@ -25,6 +25,8 @@ G.DefaultSettings = {
 		Count = true,
 		Classcolor = false,
 		Cooldown = true,
+		MmssTH = 60,
+		TenthTH = 3,
 		DecimalCD = true,
 		Style = 8,
 		Bar4Fader = false,
@@ -168,8 +170,10 @@ G.DefaultSettings = {
 		HealthFrequency = .25,
 		ShowRaidBuff = false,
 		RaidBuffSize = 12,
+		BuffClickThru = true,
 		ShowRaidDebuff = true,
 		RaidDebuffSize = 12,
+		DebuffClickThru = true,
 		SmartRaid = false,
 		Desaturate = true,
 		DebuffColor = true,
@@ -270,6 +274,7 @@ G.DefaultSettings = {
 		ChatBGType = 1,
 		WhisperSound = true,
 		BottomBox = false,
+		SysFont = false,
 		Outline = false,
 	},
 	Map = {
@@ -339,10 +344,13 @@ G.DefaultSettings = {
 		FocusColor = {r=1, g=.8, b=0},
 		CastbarGlow = true,
 		CastTarget = false,
+		Interruptor = true,
 		FriendPlate = false,
 		EnemyThru = false,
 		FriendlyThru = false,
 		BlockDBM = true,
+		Dispellable = true,
+		UnitTargeted = false,
 
 		PlateWidth = 160,
 		PlateHeight = 8,
@@ -468,7 +476,6 @@ G.DefaultSettings = {
 		BlockInvite = false,
 		NzothVision = true,
 		SendActionCD = false,
-		MawThreatBar = true,
 		MDGuildBest = true,
 		FasterSkip = false,
 		EnhanceDressup = true,
@@ -479,6 +486,7 @@ G.DefaultSettings = {
 		MaxAddOns = 21,
 		MenuButton = false,
 		QuickJoin = true,
+		MaxZoom = 2.6,
 		QuickQueue = true,
 		--AltTabLfgNotification = false,
 		--CrazyCatLady = true,
@@ -542,6 +550,7 @@ G.AccountSettings = {
 	MajorSpells = {},
 	SmoothAmount = .25,
 	AutoRecycle = true,
+	IgnoredButtons = "",
 }
 
 -- Initial settings
@@ -617,16 +626,9 @@ end)
 
 -- Callbacks
 local function setupCastbar()
-	G:SetupCastbar(guiPage[4])
+	G:SetupCastbar(guiPage[9])
 end
 
-local function setupClassPower()
-	G:SetupUFClassPower(guiPage[3])
-end
-
-local function setupUFAuras()
-	G:SetupUFAuras(guiPage[3])
-end
 
 local function setupSwingBars()
 	G:SetupSwingBars(guiPage[1])
@@ -680,7 +682,7 @@ local function setupPlateCastbarGlow()
 end
 
 local function setupBuffFrame()
-	G:SetupBuffFrame(guiPage[7])
+	G:SetupBuffFrame(guiPage[9])
 end
 
 local function setupAuraWatch()
@@ -878,6 +880,10 @@ local function updatePartyElements()
 	M:GetModule("UnitFrames"):UpdatePartyElements()
 end
 
+local function refreshPlateByEvents()
+	M:GetModule("UnitFrames"):RefreshPlateByEvents()
+end
+
 local function updateMinimapScale()
 	M:GetModule("Maps"):UpdateMinimapScale()
 end
@@ -928,6 +934,10 @@ end
 
 local function updateMarkerGrid()
 	M:GetModule("Misc"):RaidTool_UpdateGrid()
+end
+
+local function updateMaxZoomLevel()
+	M:GetModule("Misc"):UpdateMaxZoomLevel()
 end
 
 local function updateInfobarAnchor(self)
@@ -1049,12 +1059,12 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	},
 	[3] = {
 		{1, "Nameplate", "Enable", HeaderTag..U["Enable Nameplate"], nil, nil, setupNameplateSize, refreshNameplates},
-		{1, "Nameplate", "FriendPlate", U["FriendPlate"].."*", true, nil, refreshNameplates, U["FriendPlateTip"]},
+		{1, "Nameplate", "FriendPlate", U["FriendPlate"].."*", true, nil, nil, refreshNameplates, U["FriendPlateTip"]},
 		{1, "Nameplate", "NameOnlyMode", U["NameOnlyMode"].."*", true, true, nil, nil, U["NameOnlyModeTip"]},
 		{4, "Nameplate", "NameType", U["NameTextType"].."*", nil, nil, {DISABLE, U["Tag:name"], U["Tag:levelname"], U["Tag:rarename"], U["Tag:rarelevelname"]}, refreshNameplates, U["PlateLevelTagTip"]},
 		{4, "Nameplate", "HealthType", U["HealthValueType"].."*", true, nil, G.HealthValues, refreshNameplates, U["100PercentTip"]},
 		{4, "Nameplate", "AuraFilter", U["NameplateAuraFilter"].."*", true, true, {U["BlackNWhite"], U["PlayerOnly"], U["IncludeCrowdControl"]}, refreshNameplates},
-		--{1, "Nameplate", "PlateAuras", HeaderTag..U["PlateAuras"].."*", nil, nil, nil, setupNameplateFilter, refreshNameplates},
+		--{1, "Nameplate", "PlateAuras", HeaderTag..U["PlateAuras"].."*", nil, nil, setupNameplateFilter, refreshNameplates},
 		--{1, "Nameplate", "Desaturate", U["DesaturateIcon"].."*", true, nil, nil, refreshNameplates, U["DesaturateIconTip"]},
 		--{1, "Nameplate", "DebuffColor", U["DebuffColor"].."*", true, true, nil, refreshNameplates, U["DebuffColorTip"]},
 		{3, "Nameplate", "maxAuras", U["Max Auras"].."*", nil, nil, {1, 20, 1}, refreshNameplates},
@@ -1263,7 +1273,7 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "MenuButton", U["MenuButton"], true, nil, nil, nil, U["MenuButtonTip"]},
 		{1, "Misc", "EnhanceDressup", U["EnhanceDressup"], true, true, nil, nil, U["EnhanceDressupTip"]},
 		{1, "Misc", "QuestTool", U["QuestTool"], nil, nil, nil, nil, U["QuestToolTip"]},
-		{1, "Misc", "QuickJoin", NewTag..HeaderTag..U["EnhancedPremade"], true, nil, nil, nil, U["EnhancedPremadeTip"]},
+		{1, "Misc", "QuickJoin", HeaderTag..U["EnhancedPremade"], true, nil, nil, nil, U["EnhancedPremadeTip"]},
 	},
 	[9] = {
 		--{1, "Auras", "BuffFrame", HeaderTag..U["BuffFrame"], nil, setupBuffFrame, nil, nil, U["BuffFrameTip"]},
@@ -1298,6 +1308,7 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{3, "Nameplate", "PPBarHeight", U["PlayerPlate CPHeight"].."*", true, nil, {2, 15, 1}, refreshNameplates},
 		{3, "Nameplate", "PPHealthHeight", U["PlayerPlate HPHeight"].."*", true, true, {2, 15, 1}, refreshNameplates},
 		{3, "Nameplate", "PPPowerHeight", U["PlayerPlate MPHeight"].."*", false, nil, {2, 15, 1}, refreshNameplates},
+		{3, "Misc", "MaxZoom", NewTag..U["MaxZoom"].."*", true, nil, {1, 2.6, .1}, updateMaxZoomLevel},
 	},
 }
 

@@ -5,7 +5,7 @@
 	<Script file="SubSpec.lua"/>
 	<Script file="CopyMog.lua"/>
 	<Script file="Merchant.lua"/>
-	<Script file="kAutoOpen.lua"/>
+	<Script file="AutoOpenItems.lua"/>
 	<Script file="HardYards.lua"/>
 	<Script file="NomiCakes.lua"/>
 	<Script file="AcceptPopups.lua"/>

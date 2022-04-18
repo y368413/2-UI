@@ -203,13 +203,13 @@ resizeButton:SetScript("OnMouseUp", function(self, button)
     UpdateUIPanelPositions(self)
     DressHeight = DressUpFrame:GetHeight()
     DressWidth = DressUpFrame:GetWidth()
-end)]]
+end)
 DressUpFrame.ResetButton:HookScript("OnHide", function ()
     resizeButton:Hide()
 end)
 DressUpFrame.ResetButton:HookScript("OnShow", function ()
     resizeButton:Show()
-end)
+end)]]
 
 -- Hook onto PlayerActor creation in order to hook onto its functions
 local _SetupPlayerForModelScene = SetupPlayerForModelScene

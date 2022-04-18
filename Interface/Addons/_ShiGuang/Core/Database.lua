@@ -57,7 +57,7 @@ I.QualityColors[99] = {r = 1, g = 0, b = 0}
 -- Fonts
 I.Font = {STANDARD_TEXT_FONT, 12, "OUTLINE"}
 I.LineString = I.GreyColor.."---------------"
-I.NDuiString = "|cff0080ff*|r"
+I.UIString = "|cff0080ff*|r"
 
 -- Textures
 local Media = "Interface\\Addons\\_ShiGuang\\Media\\"

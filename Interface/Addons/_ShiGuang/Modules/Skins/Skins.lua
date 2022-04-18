@@ -151,11 +151,9 @@ function S:SetToggleDirection(frame)
 	close:ClearAllPoints()
 	close:SetPoint(rel1, parent, rel2, x, y)
 	close:SetSize(width, height)
-	close.text:SetText(str1)
 	open:ClearAllPoints()
 	open:SetPoint(rel1, parent, rel1, -x, -y)
 	open:SetSize(width, height)
-	open.text:SetText(str2)
 
 	if R.db["Skins"]["ToggleDirection"] == 5 then
 		close:SetScale(.001)

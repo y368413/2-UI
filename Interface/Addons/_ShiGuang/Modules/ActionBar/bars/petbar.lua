@@ -32,11 +32,11 @@ function Bar:CreatePetbar()
 
 	local frame = CreateFrame("Frame", "UI_ActionBarPet", UIParent, "SecureHandlerStateTemplate")
 	if R.db["Actionbar"]["Style"] == 3 then
-		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 370, 84}
+	    frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 370, 84}
 	elseif (R.db["Actionbar"]["Style"] == 4) or (R.db["Actionbar"]["Style"] == 6) then
-	  frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 80, 120}
+	    frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 80, 120}
 	else
-		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 100, 84}
+	    frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 100, 84}
 	end
 
 	PetActionBarFrame:SetParent(frame)

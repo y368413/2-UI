@@ -2,12 +2,17 @@
 local M, R, U, I = unpack(ns)
 local module = M:RegisterModule("Maps")
 
-local select = select
+local select, wipe, strmatch, gmatch, tinsert, pairs = select, wipe, strmatch, gmatch, tinsert, pairs
+local tonumber, format, ceil, mod = tonumber, format, ceil, mod
 local WorldMapFrame = WorldMapFrame
 local CreateVector2D = CreateVector2D
 local UnitPosition = UnitPosition
-local C_Map_GetWorldPosFromMapPos = C_Map.GetWorldPosFromMapPos
+local C_Map_GetMapArtID = C_Map.GetMapArtID
+local C_Map_GetMapArtLayers = C_Map.GetMapArtLayers
 local C_Map_GetBestMapForUnit = C_Map.GetBestMapForUnit
+local C_Map_GetWorldPosFromMapPos = C_Map.GetWorldPosFromMapPos
+local C_MapExplorationInfo_GetExploredMapTextures = C_MapExplorationInfo.GetExploredMapTextures
+local TexturePool_HideAndClearAnchors = TexturePool_HideAndClearAnchors
 
 local mapRects = {}
 local tempVec2D = CreateVector2D(0, 0)
@@ -118,10 +123,148 @@ function module:WorldMapScale()
 	hooksecurefunc(WorldMapFrame, "SynchronizeDisplayState", self.UpdateMapAnchor)
 end
 
+local shownMapCache, exploredCache, fileDataIDs = {}, {}, {}
+
+local function GetStringFromInfo(info)
+	return format("W%dH%dX%dY%d", info.textureWidth, info.textureHeight, info.offsetX, info.offsetY)
+end
+
+local function GetShapesFromString(str)
+	local w, h, x, y = strmatch(str, "W(%d*)H(%d*)X(%d*)Y(%d*)")
+	return tonumber(w), tonumber(h), tonumber(x), tonumber(y)
+end
+
+local function RefreshFileIDsByString(str)
+	wipe(fileDataIDs)
+
+	for fileID in gmatch(str, "%d+") do
+		tinsert(fileDataIDs, fileID)
+	end
+end
+
+function module:MapData_RefreshOverlays(fullUpdate)
+	wipe(shownMapCache)
+	wipe(exploredCache)
+
+	local mapID = WorldMapFrame.mapID
+	if not mapID then return end
+
+	local mapArtID = C_Map_GetMapArtID(mapID)
+	local mapData = mapArtID and module.RawMapData[mapArtID]
+	if not mapData then return end
+
+	local exploredMapTextures = C_MapExplorationInfo_GetExploredMapTextures(mapID)
+	if exploredMapTextures then
+		for _, exploredTextureInfo in pairs(exploredMapTextures) do
+			exploredCache[GetStringFromInfo(exploredTextureInfo)] = true
+		end
+	end
+
+	if not self.layerIndex then
+		self.layerIndex = WorldMapFrame.ScrollContainer:GetCurrentLayerIndex()
+	end
+	local layers = C_Map_GetMapArtLayers(mapID)
+	local layerInfo = layers and layers[self.layerIndex]
+	if not layerInfo then return end
+
+	local TILE_SIZE_WIDTH = layerInfo.tileWidth
+	local TILE_SIZE_HEIGHT = layerInfo.tileHeight
+
+	-- Blizzard_SharedMapDataProviders\MapExplorationDataProvider: MapExplorationPinMixin:RefreshOverlays
+	for i, exploredInfoString in pairs(mapData) do
+		if not exploredCache[i] then
+			local width, height, offsetX, offsetY = GetShapesFromString(i)
+			RefreshFileIDsByString(exploredInfoString)
+			local numTexturesWide = ceil(width/TILE_SIZE_WIDTH)
+			local numTexturesTall = ceil(height/TILE_SIZE_HEIGHT)
+			local texturePixelWidth, textureFileWidth, texturePixelHeight, textureFileHeight
+
+			for j = 1, numTexturesTall do
+				if j < numTexturesTall then
+					texturePixelHeight = TILE_SIZE_HEIGHT
+					textureFileHeight = TILE_SIZE_HEIGHT
+				else
+					texturePixelHeight = mod(height, TILE_SIZE_HEIGHT)
+					if texturePixelHeight == 0 then
+						texturePixelHeight = TILE_SIZE_HEIGHT
+					end
+					textureFileHeight = 16
+					while textureFileHeight < texturePixelHeight do
+						textureFileHeight = textureFileHeight * 2
+					end
+				end
+				for k = 1, numTexturesWide do
+					local texture = self.overlayTexturePool:Acquire()
+					if k < numTexturesWide then
+						texturePixelWidth = TILE_SIZE_WIDTH
+						textureFileWidth = TILE_SIZE_WIDTH
+					else
+						texturePixelWidth = width %TILE_SIZE_WIDTH
+						if texturePixelWidth == 0 then
+							texturePixelWidth = TILE_SIZE_WIDTH
+						end
+						textureFileWidth = 16
+						while textureFileWidth < texturePixelWidth do
+							textureFileWidth = textureFileWidth * 2
+						end
+					end
+					texture:SetWidth(texturePixelWidth)
+					texture:SetHeight(texturePixelHeight)
+					texture:SetTexCoord(0, texturePixelWidth/textureFileWidth, 0, texturePixelHeight/textureFileHeight)
+					texture:SetPoint("TOPLEFT", offsetX + (TILE_SIZE_WIDTH * (k-1)), -(offsetY + (TILE_SIZE_HEIGHT * (j - 1))))
+					texture:SetTexture(fileDataIDs[((j - 1) * numTexturesWide) + k], nil, nil, "TRILINEAR")
+
+					if R.db["Map"]["MapReveal"] then
+						if R.db["Map"]["MapRevealGlow"] then
+							texture:SetVertexColor(.7, .7, .7)
+						else
+							texture:SetVertexColor(1, 1, 1)
+						end
+						texture:SetDrawLayer("ARTWORK", -1)
+						texture:Show()
+						if fullUpdate then self.textureLoadGroup:AddTexture(texture) end
+					else
+						texture:Hide()
+					end
+					tinsert(shownMapCache, texture)
+				end
+			end
+		end
+	end
+end
+
+function module:MapData_ResetTexturePool(texture)
+	texture:SetVertexColor(1, 1, 1)
+	texture:SetAlpha(1)
+	return TexturePool_HideAndClearAnchors(self, texture)
+end
+
+function module:RemoveMapFog()
+	local bu = CreateFrame("CheckButton", nil, WorldMapFrame.BorderFrame, "OptionsCheckButtonTemplate")
+	bu:SetHitRectInsets(-5, -5, -5, -5)
+	bu:SetPoint("TOPRIGHT", -270, 0)
+	bu:SetSize(26, 26)
+	--M.ReskinCheck(bu)
+	bu:SetChecked(R.db["Map"]["MapReveal"])
+	bu.text = M.CreateFS(bu, 14, U["Map Reveal"], false, "LEFT", 25, 0)
+
+	for pin in WorldMapFrame:EnumeratePinsByTemplate("MapExplorationPinTemplate") do
+		hooksecurefunc(pin, "RefreshOverlays", module.MapData_RefreshOverlays)
+		pin.overlayTexturePool.resetterFunc = module.MapData_ResetTexturePool
+	end
+
+	bu:SetScript("OnClick", function(self)
+		R.db["Map"]["MapReveal"] = self:GetChecked()
+
+		for i = 1, #shownMapCache do
+			shownMapCache[i]:SetShown(R.db["Map"]["MapReveal"])
+		end
+	end)
+end
+
 function module:SetupWorldMap()
 	if R.db["Map"]["DisableMap"] then return end
 	if IsAddOnLoaded("Mapster") then return end
-	if IsAddOnLoaded("Leatrix_Maps") then return end
 
 	-- Remove from frame manager
 	WorldMapFrame:ClearAllPoints()
@@ -138,7 +281,7 @@ function module:SetupWorldMap()
 
 	self:WorldMapScale()
 	self:SetupCoords()
-	self:MapReveal()
+	self:RemoveMapFog()
 end
 
 function module:OnLogin()

@@ -218,7 +218,7 @@ function HL:OnInitialize()
     SuramarLeylines.db = self.db.profile
     SuramarLeylines.hidden = self.db.char.hidden
     -- Initialize our database with HandyNotes
-    HandyNotes:RegisterPluginDB("HandyNotes_SuramarLeylines", HLHandler, SuramarLeylines.options)
+    HandyNotes:RegisterPluginDB("SuramarLeylines", HLHandler, SuramarLeylines.options)
 
     -- watch for LOOT_CLOSED
     self:RegisterEvent("LOOT_CLOSED")

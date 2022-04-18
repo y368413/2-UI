@@ -75,9 +75,7 @@ function MISC:Focuser()
 	f:SetAttribute("macrotext", "/focus mouseover")
 	SetOverrideBindingClick(FocuserButton, true, modifier.."-BUTTON"..mouseButton, "FocuserButton")
 
-	if not I.isNewPatch then -- cause client crash in 9.2.5.42850
-		hooksecurefunc("CreateFrame", MISC.Focuser_CreateFrameHook)
-	end
+	hooksecurefunc("CreateFrame", MISC.Focuser_CreateFrameHook)
 	MISC:Focuser_OnEvent()
 	M:RegisterEvent("PLAYER_REGEN_ENABLED", MISC.Focuser_OnEvent)
 	M:RegisterEvent("GROUP_ROSTER_UPDATE", MISC.Focuser_OnEvent)

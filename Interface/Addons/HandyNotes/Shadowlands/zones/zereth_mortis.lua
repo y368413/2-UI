@@ -833,7 +833,10 @@ map.nodes[42025181] = Treasure({
     quest = 65183,
     requires = shadowlands.requirement.Item(188231),
     label = L['provis_cache'],
-    note = L['provis_cache_note']
+    note = L['provis_cache_note'],
+    rewards = {
+        Item({item = 189710, quest = 65474}) -- Pocopoc's Ruby and Platinum Body
+    }
 }) -- Provis Cache
 
 map.nodes[48016641] = Treasure({
@@ -842,7 +845,8 @@ map.nodes[48016641] = Treasure({
     note = L['multiple_spawns'] .. ' ' .. L['prying_eye_discovery_note'],
     rewards = {
         Achievement({id = 15508, criteria = 53293}), -- Fashion of the First Ones
-        Item({item = 190096, quest = 65534}) -- Pocobold
+        Item({item = 190096, quest = 65534}), -- Pocobold
+        Item({item = 189711, quest = 65476}) -- Pocopoc's Gold and Ruby Components
     },
     pois = {POI({35244371, 34334431, 51767789})}
 }) -- Prying Eye Discovery
@@ -885,7 +889,9 @@ map.nodes[60022583] = Treasure({
     label = L['sandworn_chest'],
     note = L['multiple_spawns'] .. ' ' .. L['sandworn_chest_note'],
     rewards = {
-        Toy({item = 190734}) -- Makaris's Satchel of Mines
+        Toy({item = 190734}), -- Makaris's Satchel of Mines
+        Item({item = 189713, quest = 65473}), -- Pocopoc's Copper and Cobalt Components
+        Item({item = 189714, quest = 65474}) -- Pocopoc's Platinum and Emerald Components
     },
     pois = {POI({60863786, 61401763, 63182603, 65972694})}
 }) -- Sandworn Chest
@@ -1134,35 +1140,44 @@ local Shrouded = Class('ShroudedCypherCache', shadowlands.node.Node, {
     label = L['cache_shrouded_cypher'],
     note = L['cache_shrouded_cypher_note'],
     rewards = {
-        Item({item = 189983, quest = 65513, covenant = NIGHTFAE}) -- Gromit Soul
+        Item({item = 189983, quest = 65513, covenant = NIGHTFAE}), -- Gromit Soul
+        Item({item = 189707, quest = 65471}), -- Pocopoc's Bronze and Gold Body
+        Item({item = 189708, quest = 65472}), -- Pocopoc's Beryllium and Silver Body
+        Item({item = 189712, quest = 65477}) -- Pocopoc's Silver and Beryllium Components
     }
 })
 
-map.nodes[29404950] = Shrouded()
-map.nodes[34107050] = Shrouded()
-map.nodes[51008300] = Shrouded()
-map.nodes[61006950] = Shrouded()
 map.nodes[36304810] = Shrouded()
 map.nodes[40306270] = Shrouded()
 map.nodes[43908420] = Shrouded()
 map.nodes[54507780] = Shrouded()
+-- Cypher Equipment Level 1/6 object=376041
+map.nodes[29404950] = Shrouded()
+map.nodes[34107050] = Shrouded()
+map.nodes[51008300] = Shrouded()
+map.nodes[60906950] = Shrouded()
+-- Cypher Equipment Level 2/6 object=376046
 map.nodes[42805280] = Shrouded()
 map.nodes[44507150] = Shrouded()
 map.nodes[53009230] = Shrouded()
 map.nodes[57406500] = Shrouded()
-map.nodes[54204980] = Shrouded()
-map.nodes[56203400] = Shrouded()
-map.nodes[63704120] = Shrouded()
-map.nodes[66502520] = Shrouded()
+-- Cypher Equipment Level 3/6 object=376047
 map.nodes[41903410] = Shrouded()
 map.nodes[50700460] = Shrouded()
 map.nodes[52706080] = Shrouded()
 map.nodes[59803350] = Shrouded()
-map.nodes[62005730] = Shrouded()
+map.nodes[62005720] = Shrouded()
+-- Cypher Equipment Level 4/6 object=3760418
+map.nodes[54304970] = Shrouded()
+map.nodes[56203410] = Shrouded()
+map.nodes[63704120] = Shrouded()
+map.nodes[66502520] = Shrouded()
+-- Cypher Equipment Level 5/6 object=376049
 map.nodes[49003050] = Shrouded()
-map.nodes[61201550] = Shrouded()
+map.nodes[61201560] = Shrouded()
 map.nodes[62204630] = Shrouded()
 map.nodes[69503450] = Shrouded()
+-- Cypher Equipment Level 6/6 object=376050
 
 -------------------------------------------------------------------------------
 --------------------------- MAWSWORN SUPPLY CACHES ----------------------------
@@ -1747,6 +1762,8 @@ map.nodes[67422518] = Tale({
 map.nodes[64833364] = Tale({
     rewards = {Achievement({id = 15509, criteria = 53305})} -- Part 7
 })
+
+-- Firim in Exile, Epilogue (34254871) (65747)
 
 -------------------------------------------------------------------------------
 --------------------------- TRAVERSING THE SPHERES ----------------------------

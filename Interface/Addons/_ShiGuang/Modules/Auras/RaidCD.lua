@@ -186,6 +186,7 @@ local StartTimer = function(name, spellId)
 		bar.icon:SetNormalTexture(icon)
 		bar.icon:GetNormalTexture():SetTexCoord(0.1, 0.9, 0.1, 0.9)
 		bar:Show()
+		if spellId == 264667 then color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)["HUNTER"] end -- Change color for Hunter's pet
 		if color then
 			bar:SetStatusBarColor(color.r, color.g, color.b)
 			bar.bg:SetVertexColor(color.r, color.g, color.b, 0.2)

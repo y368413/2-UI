@@ -1,7 +1,6 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="WorldMap.lua"/>
-	<Script file="MapReveal.lua"/>
 	<Script file="Minimap.lua"/>
+	<Script file="RawMapData.lua"/>
 	<Script file="zrMMbuttons.lua"/>
-	<!--Script file="MapShrinker.lua"/-->
 </Ui>
