@@ -75,6 +75,7 @@ I.healTex = Media.."Hutu\\Healer"
 I.dpsTex = Media.."Hutu\\DPS"
 I.chatLogo = Media.."2UI.blp"
 I.logoTex = Media.."2UI.blp"
+I.closeTex = Media.."Hutu\\close"
 I.ArrowUp = Media.."Modules\\Raid\\ArrowLarge"
 I.afdianTex = Media.."Hutu\\Afdian"
 I.patreonTex = Media.."Hutu\\Patreon"
@@ -166,13 +167,12 @@ I.ReminderBuffs = {
 			instance = true,
 			combat = true,
 		},
-		{	itemID = 174906, -- 属性符文
+		{	itemID = 190384, -- 9.0永久属性符文
 			spells = {
-				[317065] = true,
-				[270058] = true,
+				[347901] = true, -- 普通符文buff
+				[367405] = true, -- 永久符文buff
 			},
 			instance = true,
-			disable = true,
 		},
 		{	itemID = 190958, -- 究极秘术
 			spells = {

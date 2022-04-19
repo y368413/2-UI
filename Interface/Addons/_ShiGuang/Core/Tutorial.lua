@@ -168,11 +168,13 @@ local function ForceDBMOptions()
 				["EndColorG"] = 0,
 				["EndColorB"] = 0,
 				["Texture"] = I.normTex,
+				["MinimapIcon"] = "hide",
 			},
 		},
 	}
 	DBM_MinimapIcon["hide"] = true
 	if not DBM_AllSavedOptions["Default"] then DBM_AllSavedOptions["Default"] = {} end
+	DBM_AllSavedOptions["Default"]["MinimapIcon"] = "hide"
 	DBM_AllSavedOptions["Default"]["ChosenVoicePack"] = "Yike"
 	DBM_AllSavedOptions["Default"]["RangeFrameRadarPoint"] = "RIGHT"
 	DBM_AllSavedOptions["Default"]["RangeFrameRadarX"] = -90

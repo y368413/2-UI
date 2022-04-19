@@ -699,7 +699,7 @@ function MISC:RaidTool_Init()
 	if not R.db["Misc"]["RaidTool"] then return end
 
 	local frame = MISC:RaidTool_Header()
-	--MISC:RaidTool_RoleCount(frame)
+	MISC:RaidTool_RoleCount(frame)
 	MISC:RaidTool_CombatRes(frame)
 	--MISC:RaidTool_ReadyCheck(frame)
 	--MISC:RaidTool_Marker(frame)

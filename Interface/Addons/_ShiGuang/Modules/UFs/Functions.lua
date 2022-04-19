@@ -959,11 +959,11 @@ function UF:CreateAuras(self)
 	elseif mystyle == "nameplate" then
 		bu.initialAnchor = "BOTTOMLEFT"
 		bu["growth-y"] = "UP"
-		--if R.db["Nameplate"]["TargetPower"] then
-			--bu:SetPoint("BOTTOMLEFT", self.nameText, "TOPLEFT", 0, 10 + R.db["Nameplate"]["PPBarHeight"])
-		--else
+		if R.db["Nameplate"]["TargetPower"] then
+			bu:SetPoint("BOTTOMLEFT", self.nameText, "TOPLEFT", 0, 10 + R.db["Nameplate"]["PPBarHeight"])
+		else
 			bu:SetPoint("BOTTOMLEFT", self.nameText, "TOPLEFT", 0, 5)
-		--end
+		end
 		bu.numTotal = R.db["Nameplate"]["maxAuras"]
 		bu.size = R.db["Nameplate"]["AuraSize"]
 		bu.showDebuffType = R.db["Nameplate"]["DebuffColor"]

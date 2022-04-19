@@ -1002,9 +1002,10 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{},--blank
 		{1, "Actionbar", "Cooldown", HeaderTag..U["Show Cooldown"]},
 		{1, "Actionbar", "OverrideWA", U["HideCooldownOnWA"].."*", true},
-		{1, "Actionbar", "DecimalCD", U["Decimal Cooldown"].."*"},
 		--{1, "Misc", "SendActionCD", HeaderTag..U["SendActionCD"].."*", true, nil, nil, U["SendActionCDTip"]},
-		{1, "Actionbar", "Hotkeys", U["Actionbar Hotkey"].."*", true, nil, nil, updateHotkeys},
+		{1, "Actionbar", "Hotkeys", U["Actionbar Hotkey"].."*", true, true, nil, updateHotkeys},
+		{3, "Actionbar", "MmssTH", NewTag..U["MmssThreshold"].."*", nil, nil, {60, 600, 1}, nil, U["MmssThresholdTip"]},
+		{3, "Actionbar", "TenthTH", NewTag..U["TenthThreshold"].."*", true, nil, {0, 60, 1}, nil, U["TenthThresholdTip"]},
 		{},--blank
 		{1, "Actionbar", "Macro", U["Actionbar Macro"]},
 		{1, "Actionbar", "Count", U["Actionbar Item Counts"], true},
@@ -1184,13 +1185,13 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{},--blank
 		{1, "Nameplate", "ColoredTarget", HeaderTag..U["ColoredTarget"].."*", nil, nil, nil, nil, U["ColoredTargetTip"]},
 		{1, "Nameplate", "ColoredFocus", HeaderTag..U["ColoredFocus"].."*", true, nil, nil, nil, U["ColoredFocusTip"]},
-		{5, "Nameplate", "TargetColor", U["TargetNP Color"].."*", 3},
-		{5, "Nameplate", "FocusColor", U["FocusNP Color"].."*", 4},
-		{5, "Nameplate", "CustomColor", U["Custom Color"].."*", 5},
-		{5, "Nameplate", "SecureColor", U["Secure Color"].."*"},
-		{5, "Nameplate", "TransColor", U["Trans Color"].."*", 1},
-		{5, "Nameplate", "InsecureColor", U["Insecure Color"].."*", 2},
-		{5, "Nameplate", "OffTankColor", U["OffTank Color"].."*", 3},
+		{5, "Nameplate", "TargetColor", U["TargetNP Color"].."*"},
+		{5, "Nameplate", "FocusColor", U["FocusNP Color"].."*", 1},
+		{5, "Nameplate", "CustomColor", U["Custom Color"].."*", 2},
+		{5, "Nameplate", "SecureColor", U["Secure Color"].."*", 3},
+		{5, "Nameplate", "TransColor", U["Trans Color"].."*"},
+		{5, "Nameplate", "InsecureColor", U["Insecure Color"].."*", 1},
+		{5, "Nameplate", "OffTankColor", U["OffTank Color"].."*", 2},
 		--{1, "Skins", "PGFSkin", U["PGF Skin"], true},
 		--{1, "Skins", "Rematch", U["Rematch Skin"], true, true},
 		--{4, "Skins", "ToggleDirection", U["ToggleDirection"].."*", true, true, {U["LEFT"], U["RIGHT"], U["TOP"], U["BOTTOM"], DISABLE}, updateToggleDirection},
@@ -1468,7 +1469,7 @@ local function CreateOption(i)
 				eb:SetPoint("TOPLEFT", 300, -offset + 28)
 			else
 				eb:SetPoint("TOPLEFT", 60, -offset - 26)
-				offset = offset + 58
+				offset = offset + 55
 			end
 			eb:SetText(CheckUIOption(key, value))
 			eb:HookScript("OnEscapePressed", restoreEditbox)
@@ -1488,7 +1489,7 @@ local function CreateOption(i)
 				x, y = 300, -offset + 28
 			else
 				x, y = 55, -offset - 26
-				offset = offset + 58
+				offset = offset + 55
 			end
 			local s = M.CreateSlider(parent, name, min, max, step, x, y)
 			s.__key = key
@@ -1510,14 +1511,14 @@ local function CreateOption(i)
 				end
 			end
 
-			local dd = M.CreateDropDown(parent, 160, 26, data)
+			local dd = M.CreateDropDown(parent, 180, 26, data)
 			if horizon2 then
 				dd:SetPoint("TOPLEFT", 560, -offset + 28)
 			elseif horizon then
 				dd:SetPoint("TOPLEFT", 310, -offset + 28)
 			else
 				dd:SetPoint("TOPLEFT", 70, -offset - 26)
-				offset = offset + 58
+				offset = offset + 55
 			end
 			dd.Text:SetText(data[CheckUIOption(key, value)])
 			dd.__key = key
@@ -1542,14 +1543,12 @@ local function CreateOption(i)
 		-- Colorswatch
 		elseif optType == 5 then
 			local swatch = M.CreateColorSwatch(parent, name, CheckUIOption(key, value))
-			local width = 80 + (horizon or 0)*120
-			if horizon2 then
-				swatch:SetPoint("TOPLEFT", width, -offset + 26)
-			elseif horizon then
+			local width = 70 + (horizon or 0)*130
+			if horizon then
 				swatch:SetPoint("TOPLEFT", width, -offset + 26)
 			else
-				swatch:SetPoint("TOPLEFT", width, -offset - 3)
-				offset = offset + 26
+				swatch:SetPoint("TOPLEFT", width, -offset - 2)
+				offset = offset + 28
 			end
 			swatch.__default = (key == "ACCOUNT" and G.AccountSettings[value]) or G.DefaultSettings[key][value]
 		-- Blank, no optType

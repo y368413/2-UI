@@ -78,6 +78,7 @@ local list = {
 	},
 	["Spell Cooldown"] = {	-- 冷却计时组
 		{AuraID = 1784, UnitID = "player"},		-- 潜行
+		{AuraID = 115191, UnitID = "player"},	-- 潜行
 		{SlotID = 13},		-- 饰品1
 		{SlotID = 14},		-- 饰品2
 		{SpellID = 13750},	-- 冲动

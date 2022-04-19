@@ -94,8 +94,8 @@ function G:SetupRaidDebuffs(parent)
 	local frame = panel.bg
 	local bars, options = {}, {}
 
-	local iType = G:CreateDropdown(frame, U["Type*"], 10, -30, {DUNGEONS, RAID}, U["Instance Type"])
-	for i = 1, 2 do
+	local iType = G:CreateDropdown(frame, U["Type*"], 10, -30, {DUNGEONS, RAID, OTHER}, U["Instance Type"])
+	for i = 1, 3 do
 		iType.options[i]:HookScript("OnClick", function()
 			for j = 1, 2 do
 				G:ClearEdit(options[j])
@@ -108,6 +108,10 @@ function G:SetupRaidDebuffs(parent)
 
 			for k = 1, #bars do
 				bars[k]:Hide()
+			end
+
+			if i == 3 then
+				setupBars(0) -- add OTHER spells
 			end
 		end)
 	end
@@ -150,7 +154,7 @@ function G:SetupRaidDebuffs(parent)
 
 	local function addClick(options)
 		local dungeonName, raidName, spellID, priority = options[1].Text:GetText(), options[2].Text:GetText(), tonumber(options[3]:GetText()), tonumber(options[4]:GetText())
-		local instName = dungeonName or raidName
+		local instName = dungeonName or raidName or (iType.Text:GetText() == OTHER and 0)
 		if not instName or not spellID then UIErrorsFrame:AddMessage(I.InfoColor..U["Incomplete Input"]) return end
 		if spellID and not GetSpellInfo(spellID) then UIErrorsFrame:AddMessage(I.InfoColor..U["Incorrect SpellID"]) return end
 		if isAuraExisted(instName, spellID) then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ID"]) return end
@@ -262,7 +266,7 @@ function G:SetupRaidDebuffs(parent)
 	end
 
 	function setupBars(self)
-		local instName = self.text or self
+		local instName = tonumber(self) or self.text or self
 		local index = 0
 
 		if R.RaidDebuffs[instName] then
@@ -1184,19 +1188,30 @@ function G:SetupSwingBars(parent)
 		if not frame then return end
 
 		local width, height = R.db["UFs"]["SwingWidth"], R.db["UFs"]["SwingHeight"]
-		frame.Swing:SetSize(width, height)
-		frame.Swing.Offhand:SetHeight(height)
-		frame.Swing.mover:SetSize(width, height)
-		frame.Swing.mover:Show()
+		local swing = frame.Swing
+		swing:SetSize(width, height)
+		swing.Offhand:SetHeight(height)
+		swing.mover:SetSize(width, height)
+		swing.mover:Show()
 
-		frame.Swing.Text:SetShown(R.db["UFs"]["SwingTimer"])
-		frame.Swing.TextMH:SetShown(R.db["UFs"]["SwingTimer"])
-		frame.Swing.TextOH:SetShown(R.db["UFs"]["SwingTimer"])
+		swing.Text:SetShown(R.db["UFs"]["SwingTimer"])
+		swing.TextMH:SetShown(R.db["UFs"]["SwingTimer"])
+		swing.TextOH:SetShown(R.db["UFs"]["SwingTimer"])
+
+		swing.Offhand:ClearAllPoints()
+		if R.db["UFs"]["OffOnTop"] then
+			swing.Offhand:SetPoint("BOTTOMLEFT", swing, "TOPLEFT", 0, 3)
+			swing.Offhand:SetPoint("BOTTOMRIGHT", swing, "TOPRIGHT", 0, 3)
+		else
+			swing.Offhand:SetPoint("TOPLEFT", swing, "BOTTOMLEFT", 0, -3)
+			swing.Offhand:SetPoint("TOPRIGHT", swing, "BOTTOMRIGHT", 0, -3)
+		end
 	end
 
 	createOptionCheck(parent, offset, U["UFs SwingTimer"], "UFs", "SwingTimer", configureSwingBars, U["SwingTimer Tip"])
-	createOptionSlider(parent, U["Width"], 50, 1000, 275, offset-70, "SwingWidth", configureSwingBars)
-	createOptionSlider(parent, U["Height"], 1, 50, 3, offset-140, "SwingHeight", configureSwingBars)
+	createOptionCheck(parent, offset-35, U["OffhandOnTop"], "UFs", "OffOnTop", configureSwingBars)
+	createOptionSlider(parent, U["Width"], 50, 1000, 275, offset-105, "SwingWidth", configureSwingBars)
+	createOptionSlider(parent, U["Height"], 1, 50, 3, offset-175, "SwingHeight", configureSwingBars)
 
 	panel:HookScript("OnHide", function()
 		local mover = frame and frame.Swing and frame.Swing.mover
@@ -1352,6 +1367,22 @@ function G:SetupNameplateSize(parent)
 	local UF = M:GetModule("UnitFrames")
 	createOptionGroup(scroll.child, U["HostileNameplate"], -10, "enemy", UF.RefreshAllPlates)
 	createOptionGroup(scroll.child, U["FriendlyNameplate"], -650, "friend", UF.RefreshAllPlates)
+end
+
+function G:SetupNameOnlySize(parent)
+	local guiName = "UIGUI_NameOnlySetup"
+	toggleExtraGUI(guiName)
+	if extraGUIs[guiName] then return end
+
+	local panel = createExtraGUI(parent, guiName, U["NameOnlyMode"].."*")
+	local scroll = G:CreateScroll(panel, 260, 540)
+	local parent, offset = scroll.child, -10
+
+	local UF = M:GetModule("UnitFrames")
+	createOptionCheck(parent, offset, U["ShowNPCTitle"], "Nameplate", "NameOnlyTitle", UF.RefreshAllPlates)
+	createOptionCheck(parent, offset-35, U["ShowUnitGuild"], "Nameplate", "NameOnlyGuild", UF.RefreshAllPlates)
+	createOptionSlider(parent, U["NameTextSize"], 10, 50, 14, offset-105, "NameOnlyTextSize", UF.RefreshAllPlates, "Nameplate")
+	createOptionSlider(parent, U["TitleTextSize"], 10, 50, 12, offset-175, "NameOnlyTitleSize", UF.RefreshAllPlates, "Nameplate")
 end
 
 function G:SetupActionBar(parent)

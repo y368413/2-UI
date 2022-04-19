@@ -419,7 +419,7 @@ local function CreatePanel()
 			end
 			Option[13] = G:CreateEditbox(tabs[i].Page, U["IntID*"], 20, -30, U["IntID Intro"])
 			Option[14] = G:CreateEditbox(tabs[i].Page, U["Duration*"], 140, -30, U["Duration Intro"])
-			Option[15] = G:CreateDropdown(tabs[i].Page, U["Trigger"].."*", 260, -30, {"OnAuraGain", "OnCastSuccess"}, U["Trigger Intro"], 130, 30)
+			Option[15] = G:CreateDropdown(tabs[i].Page, U["Trigger"].."*", 260, -30, {"OnAuraGain", "OnCastSuccess", "UnitCastSucceed"}, U["Trigger Intro"], 130, 30)
 			Option[16] = G:CreateDropdown(tabs[i].Page, U["Unit*"], 420, -30, {"Player", "All"}, U["Trigger Unit Intro"])
 			Option[17] = G:CreateEditbox(tabs[i].Page, U["ItemID"], 20, -95, U["ItemID Intro"])
 		end
