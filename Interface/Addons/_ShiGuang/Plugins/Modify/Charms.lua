@@ -147,8 +147,8 @@ DESTROY:SetScript("OnEvent", function(_, event, ...)
    end
 end)]]
 
-------------------------------------------------------------------------------- 
---## Version: 1.3.7 ## Author: Crinseth
+------------------------------------------------------------------------------- DressingSlots
+--## Version: 1.3.8 ## Author: Crinseth
 --local undressButton
 local toggleSheatheButton
 --local resizeButton

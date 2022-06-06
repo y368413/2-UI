@@ -1,10 +1,10 @@
---## Version: 0.7.2 ## Author: romdeau23
+--## Version: 1.1.2 ## Author: romdeau23
 local MogPartialSets = {}
 
 MogPartialSets.frame = CreateFrame('Frame')
 MogPartialSets.loaded = false
 MogPartialSets.initialized = false
-MogPartialSets.configVersion = 7
+MogPartialSets.configVersion = 8
 MogPartialSets.updateTimer = nil
 MogPartialSets.pendingModelUpdate = false
 MogPartialSets.eventHandlers = {
@@ -99,7 +99,6 @@ function MogPartialSets:setDefaultConfiguration()
         onlyFavorite = false,
         favoriteVariants = false,
         ignoredSlotMap = {},
-        splash = true,
     }
 end
 
@@ -107,16 +106,14 @@ function MogPartialSets:migrateConfiguration(from)
     return pcall(function ()
         while from < self.configVersion do
             if from == 1 then
-                -- v1 => v2
                 MogPartialSetsAddonConfig.onlyFavorite = false
                 MogPartialSetsAddonConfig.favoriteVariants = false
             elseif from == 4 then
-                -- v4 => v5 (removes v3, v4)
+                -- this removes v3, v4
                 MogPartialSetsAddonConfig.showHidden = nil
                 MogPartialSetsAddonConfig.showUnusable = nil
                 MogPartialSetsAddonConfig.ignoreBracers = false
             elseif from == 5 then
-                -- v5 => v6
                 MogPartialSetsAddonConfig.ignoredSlotMap = {}
 
                 if MogPartialSetsAddonConfig.ignoreBracers then
@@ -126,6 +123,8 @@ function MogPartialSets:migrateConfiguration(from)
                 MogPartialSetsAddonConfig.ignoreBracers = nil
             elseif from == 6 then
                 MogPartialSetsAddonConfig.splash = true
+            elseif from == 7 then
+                MogPartialSetsAddonConfig.splash = nil
             end
 
             from = from + 1
@@ -276,7 +275,15 @@ function MogPartialSets:getUsableSource(appearanceId)
         local baseSourceInfo = self:getCachedSourceInfo(appearanceId)
 
         if baseSourceInfo then
-            local appearanceSources = C_TransmogCollection.GetAppearanceSources(baseSourceInfo.visualID)
+            local appearanceSources = C_TransmogCollection.GetAppearanceSources(
+                baseSourceInfo.visualID,
+                C_TransmogCollection.GetCategoryForItem(appearanceId),
+                TransmogUtil.GetTransmogLocation(
+                    C_Transmog.GetSlotForInventoryType(baseSourceInfo.invType),
+                    Enum.TransmogType.Appearance,
+                    Enum.TransmogModification.Main
+                )
+            )
 
             if appearanceSources then
                 for _, sourceInfo in pairs(appearanceSources) do
@@ -574,8 +581,6 @@ function MogPartialSets:updateUi()
         MogPartialSetsFilterFavoriteVariantsText,
         MogPartialSetsFilterMaxMissingPiecesEditBox,
         MogPartialSetsFilterMaxMissingPiecesText,
-        MogPartialSetsFilterSplashText,
-        MogPartialSetsFilterSplashButton,
         MogPartialSetsFilterIgnoredSlotsText,
         MogPartialSetsFilterIgnoreHeadButton,
         MogPartialSetsFilterIgnoreHeadText,

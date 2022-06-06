@@ -22,6 +22,21 @@ local GetSpellCost = {
 	[355589] = 15, -- 哀痛箭
 }
 
+function A:UpdateFocusColor(focusCal)
+	if A.MMFocus.trickActive > 0 then
+		A.MMFocus:SetTextColor(0, 1, 0) -- 有技巧绿色
+	elseif A.MMFocus.cost > 0 then
+		A.MMFocus:SetTextColor(1, 1, 0) -- 无技巧，但集中值不为0，则黄色
+	else
+		A.MMFocus:SetTextColor(1, 0, 0) -- 无技巧，且集中值为0，红色
+	end
+end
+
+function A:UpdateFocusText(value)
+	A.MMFocus.cost = value
+	A.MMFocus:SetFormattedText("%d/40", value)
+end
+
 function A:UpdateFocusCost(unit, _, spellID)
 	if unit ~= "player" then return end
 
@@ -37,12 +52,13 @@ function A:UpdateFocusCost(unit, _, spellID)
 			--print("此时重置集中值为35")
 		end
 	end
-	focusCal:SetFormattedText("%d/40", focusCal.cost%40)
+	A:UpdateFocusText(focusCal.cost % 40)
+	A:UpdateFocusColor()
 end
 
 function A:ResetFocusCost()
-	A.MMFocus.cost = 0
-	A.MMFocus:SetFormattedText("%d/40", A.MMFocus.cost%40)
+	A:UpdateFocusText(0)
+	A:UpdateFocusColor()
 end
 
 function A:ResetOnRaidEncounter(_, _, _, groupSize)
@@ -61,6 +77,7 @@ function A:CheckTrickState(...)
 	local _, eventType, _, sourceGUID, _, _, _, _, _, _, _, spellID = ...
 	if eventSpentIndex[eventType] and spellID == 257622 and sourceGUID == playerGUID then
 		A.MMFocus.trickActive = eventSpentIndex[eventType]
+		A:UpdateFocusColor()
 	end
 end
 
@@ -91,8 +108,8 @@ function A:CheckSetsCount()
 		M:UnregisterEvent("CLEU", A.CheckTrickState)
 	else
 		A.MMFocus:Show()
-		M:RegisterEvent("UNIT_SPELLCAST_START", A.StartAimedShot)
-		M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.UpdateFocusCost)
+		M:RegisterEvent("UNIT_SPELLCAST_START", A.StartAimedShot, "player")
+		M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.UpdateFocusCost, "player")
 		M:RegisterEvent("PLAYER_DEAD", A.ResetFocusCost)
 		M:RegisterEvent("PLAYER_ENTERING_WORLD", A.ResetFocusCost)
 		M:RegisterEvent("ENCOUNTER_START", A.ResetOnRaidEncounter)
@@ -114,31 +131,26 @@ function A:ToggleFocusCalculation()
 		M:RegisterEvent("PLAYER_EQUIPMENT_CHANGED", A.CheckSetsCount)
 	else
 		M:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED", A.CheckSetsCount)
+		-- if enabled already
+		A.MMFocus:Hide()
+		M:UnregisterEvent("UNIT_SPELLCAST_START", A.StartAimedShot)
+		M:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", A.UpdateFocusCost)
+		M:UnregisterEvent("PLAYER_DEAD", A.ResetFocusCost)
+		M:UnregisterEvent("PLAYER_ENTERING_WORLD", A.ResetFocusCost)
+		M:UnregisterEvent("ENCOUNTER_START", A.ResetOnRaidEncounter)
+		M:UnregisterEvent("CLEU", A.CheckTrickState)
 	end
 	oldSpec = spec
 end
 
 function A:PostCreateLumos(self)
-	local iconSize = self.lumos[1]:GetWidth()
-	local boom = CreateFrame("Frame", nil, self.Health)
-	boom:SetSize(iconSize, iconSize)
-	boom:SetPoint("BOTTOM", self.Health, "TOP", 0, 5)
-	M.AuraIcon(boom)
-	boom:Hide()
-
-	self.boom = boom
-
 	-- MM hunter T29 4sets
-	A.MMFocus = M.CreateFS(self.Health, 16)
+	A.MMFocus = M.CreateFS(self.Health, 18)
 	A.MMFocus:ClearAllPoints()
 	A.MMFocus:SetPoint("BOTTOM", self.Health, "TOP", 0, 5)
 	A.MMFocus.trickActive = 0
 	A:ToggleFocusCalculation()
 	M:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", A.ToggleFocusCalculation)
-end
-
-function A:PostUpdateVisibility(self)
-	if self.boom then self.boom:Hide() end
 end
 
 local function GetUnitAura(unit, spell, filter)
@@ -165,12 +177,6 @@ local function UpdateSpellStatus(button, spellID)
 		button.Icon:SetDesaturated(true)
 	end
 end
-
-local boomGroups = {
-	[270339] = 186270,
-	[270332] = 259489,
-	[271049] = 259491,
-}
 
 function A:ChantLumos(self)
 	local spec = GetSpecialization()
@@ -205,50 +211,17 @@ function A:ChantLumos(self)
 
 		do
 			local button = self.lumos[2]
-			if IsPlayerSpell(260248) then
-				UpdateBuff(button, 260248, 260249)
-			elseif IsPlayerSpell(162488) then
-				UpdateDebuff(button, 162488, 162487, true)
+			UpdateCooldown(button, 259489, true)
+			local name = GetUnitAura("target", 270332, "HARMFUL") -- 目标红炸弹高亮
+			if name then
+				M.ShowOverlayGlow(button)
 			else
-				UpdateDebuff(button, 131894, 131894, true)
+				M.HideOverlayGlow(button)
 			end
 		end
 
 		do
 			local button = self.lumos[3]
-			local boom = self.boom
-			if IsPlayerSpell(271014) then
-				boom:Show()
-
-				local name, _, duration, expire, caster, spellID = GetUnitAura("target", 270339, "HARMFUL")
-				if not name then name, _, duration, expire, caster, spellID = GetUnitAura("target", 270332, "HARMFUL") end
-				if not name then name, _, duration, expire, caster, spellID = GetUnitAura("target", 271049, "HARMFUL") end
-				if name and caster == "player" then
-					boom.Icon:SetTexture(GetSpellTexture(boomGroups[spellID]))
-					boom.CD:SetCooldown(expire-duration, duration)
-					boom.CD:Show()
-					boom.Icon:SetDesaturated(false)
-				else
-					local texture = GetSpellTexture(259495)
-					if texture == GetSpellTexture(270323) then
-						boom.Icon:SetTexture(GetSpellTexture(259489))
-					elseif texture == GetSpellTexture(271045) then
-						boom.Icon:SetTexture(GetSpellTexture(259491))
-					else
-						boom.Icon:SetTexture(GetSpellTexture(186270))	-- 270335
-					end
-					boom.Icon:SetDesaturated(true)
-				end
-
-				UpdateCooldown(button, 259495, true)
-			else
-				boom:Hide()
-				UpdateDebuff(button, 259495, 269747, true)
-			end
-		end
-
-		do
-			local button = self.lumos[4]
 			if IsPlayerSpell(260285) then
 				UpdateBuff(button, 260285, 260286)
 			elseif IsPlayerSpell(269751) then
@@ -258,9 +231,25 @@ function A:ChantLumos(self)
 			end
 		end
 
+		do
+			local button = self.lumos[4]
+			if IsPlayerSpell(271014) then
+				UpdateCooldown(button, 259495, true)
+				local name = GetUnitAura("player", 363805, "HELPFUL") -- 有疯狂投弹兵时高亮
+				if name then
+					M.ShowOverlayGlow(button)
+				else
+					M.HideOverlayGlow(button)
+				end
+			else
+				UpdateDebuff(button, 259495, 269747, true)
+			end
+		end
+
 		UpdateBuff(self.lumos[5], 266779, 266779, true, false, true)
 	end
 end
+
 
 --## Version: 3.4.0  ## Author: Cybeloras of Aerie Peak
 local clientVersion = select(4, GetBuildInfo())

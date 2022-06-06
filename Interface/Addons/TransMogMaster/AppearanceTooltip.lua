@@ -1,4 +1,4 @@
-﻿--## Version: v31  ## Author: Kemayo
+﻿--## Version: v32  ## Author: Kemayo
 local AppearanceTooltip = {}
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
@@ -528,14 +528,47 @@ AppearanceTooltip.modifiers = {
 ---
 
 do
+    local categorySlots = {
+        -- [Enum.TransmogCollectionType.] = "",
+        [Enum.TransmogCollectionType.Head] = "HEADSLOT",
+        [Enum.TransmogCollectionType.Shoulder] = "SHOULDERSLOT",
+        [Enum.TransmogCollectionType.Back] = "BACKSLOT",
+        [Enum.TransmogCollectionType.Chest] = "CHESTSLOT",
+        [Enum.TransmogCollectionType.Shirt] = "SHIRTSLOT",
+        [Enum.TransmogCollectionType.Tabard] = "TABARDSLOT",
+        [Enum.TransmogCollectionType.Wrist] = "WRISTSLOT",
+        [Enum.TransmogCollectionType.Hands] = "HANDSSLOT",
+        [Enum.TransmogCollectionType.Waist] = "WAISTSLOT",
+        [Enum.TransmogCollectionType.Legs] = "LEGSSLOT",
+        [Enum.TransmogCollectionType.Feet] = "FEETSLOT",
+        [Enum.TransmogCollectionType.Wand] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.OneHAxe] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.OneHSword] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.OneHMace] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.Dagger] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.Fist] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.TwoHAxe] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.TwoHSword] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.TwoHMace] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.Staff] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.Polearm] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.Bow] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.Gun] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.Crossbow] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.Warglaives] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.Paired] = "MAINHANDSLOT",
+        [Enum.TransmogCollectionType.Shield] = "SECONDARYHANDSLOT",
+        [Enum.TransmogCollectionType.Holdable] = "SECONDARYHANDSLOT",
+    }
     local categoryID = 1
     function AppearanceTooltip.UpdateSources()
-        if categoryID > 28 then return end
-        local categoryAppearances = C_TransmogCollection.GetCategoryAppearances(categoryID)
+        if categoryID > 28 then return end --AppearanceTooltip.Debug("Done updating")
+        local location = TransmogUtil.GetTransmogLocation(categorySlots[categoryID], Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+        local categoryAppearances = C_TransmogCollection.GetCategoryAppearances(categoryID, location)
         local acount, scount = 0, 0
         for _, categoryAppearance in pairs(categoryAppearances) do
             acount = acount + 1
-            local appearanceSources = C_TransmogCollection.GetAppearanceSources(categoryAppearance.visualID)
+            local appearanceSources = C_TransmogCollection.GetAppearanceSources(categoryAppearance.visualID, categoryID, location)
             local known_any
             for _, source in pairs(appearanceSources) do
                 if source.isCollected then
@@ -572,6 +605,40 @@ local brokenItems = {
     [153268] = {25124, 90807}, -- Enclave Aspirant's Axe
     [153316] = {25123, 90885}, -- Praetor's Ornamental Edge
 }
+local itemSlots = {
+    INVTYPE_HEAD = "HEADSLOT",
+    INVTYPE_SHOULDER = "SHOULDERSLOT",
+    INVTYPE_CLOAK = "BACKSLOT",
+    INVTYPE_CHEST = "CHESTSLOT",
+    INVTYPE_ROBE = "CHESTSLOT",
+    INVTYPE_TABARD = "TABARDSLOT",
+    INVTYPE_BODY = "SHIRTSLOT",
+    INVTYPE_WRIST = "WRISTSLOT",
+    INVTYPE_HAND = "HANDSSLOT",
+    INVTYPE_WAIST = "WAISTSLOT",
+    INVTYPE_LEGS = "LEGSSLOT",
+    INVTYPE_FEET = "FEETSLOT",
+    INVTYPE_WEAPON = "MAINHANDSLOT",
+    INVTYPE_RANGED = "MAINHANDSLOT",
+    INVTYPE_RANGEDRIGHT = "MAINHANDSLOT",
+    INVTYPE_THROWN = "MAINHANDSLOT",
+    INVTYPE_SHIELD = "SECONDARYHANDSLOT",
+    INVTYPE_2HWEAPON = "MAINHANDSLOT",
+    INVTYPE_WEAPONMAINHAND = "MAINHANDSLOT",
+    INVTYPE_WEAPONOFFHAND = "SECONDARYHANDSLOT",
+    INVTYPE_HOLDABLE = "SECONDARYHANDSLOT",
+}
+local function GetItemSlot(itemLinkOrID)
+    local _, _, _, slot = GetItemInfoInstant(itemLinkOrID)
+    if not slot then return end
+    return itemSlots[slot]
+end
+local function GetItemCategory(appearanceID, sourceID)
+    return C_TransmogCollection.GetCategoryForItem(appearanceID) or C_TransmogCollection.GetCategoryForItem(sourceID)
+end
+local function GetTransmogLocation(itemLinkOrID)
+    return TransmogUtil.GetTransmogLocation(GetItemSlot(itemLinkOrID), Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+end
 -- /dump C_TransmogCollection.GetAppearanceSourceInfo(select(2, C_TransmogCollection.GetItemInfo("")))
 function AppearanceTooltip.PlayerHasAppearance(itemLinkOrID)
     -- hasAppearance, appearanceFromOtherItem
@@ -602,7 +669,7 @@ function AppearanceTooltip.PlayerHasAppearance(itemLinkOrID)
         local _, _, _, _, sourceKnown = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
         return sourceKnown, false
     end
-    local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
+    local sources = C_TransmogCollection.GetAppearanceSources(appearanceID, GetItemCategory(appearanceID, sourceID), GetTransmogLocation(itemLinkOrID))
     if sources then
         local known_any = false
         for _, source in pairs(sources) do
@@ -1735,7 +1802,6 @@ local function UpdateOverlay(button, link, ...)
     end
     local hasAppearance, appearanceFromOtherItem = AppearanceTooltip.PlayerHasAppearance(link)
     local appropriateItem = LAI:IsAppropriate(link)
-    -- AppearanceTooltip.Debug("Considering item", link, hasAppearance, appearanceFromOtherItem)
     if
         (not hasAppearance or appearanceFromOtherItem) and
         (not AppearanceTooltip.db.currentClass or appropriateItem) and
@@ -1821,7 +1887,6 @@ hooksecurefunc("LootFrame_UpdateButton", function(index)
     if not button then return end
     if button.appearancetooltipoverlay then button.appearancetooltipoverlay:Hide() end
     if not AppearanceTooltip.db.loot then return end
-    -- AppearanceTooltip.Debug("LootFrame_UpdateButton", button:IsEnabled(), button.slot, button.slot and GetLootSlotLink(button.slot))
     if button:IsEnabled() and button.slot then
         local link = GetLootSlotLink(button.slot)
         if link then

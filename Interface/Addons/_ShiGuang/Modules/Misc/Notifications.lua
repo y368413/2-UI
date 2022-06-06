@@ -65,13 +65,13 @@ end
 
 function MISC:SoloInfo()
 	if R.db["Misc"]["SoloInfo"] then
-		self:SoloInfo_Update()
-		M:RegisterEvent("PLAYER_ENTERING_WORLD", self.SoloInfo_DelayCheck)
-		M:RegisterEvent("PLAYER_DIFFICULTY_CHANGED", self.SoloInfo_DelayCheck)
+		MISC:SoloInfo_Update()
+		M:RegisterEvent("PLAYER_ENTERING_WORLD", MISC.SoloInfo_DelayCheck)
+		M:RegisterEvent("PLAYER_DIFFICULTY_CHANGED", MISC.SoloInfo_DelayCheck)
 	else
 		if soloInfo then soloInfo:Hide() end
-		M:UnregisterEvent("PLAYER_ENTERING_WORLD", self.SoloInfo_DelayCheck)
-		M:UnregisterEvent("PLAYER_DIFFICULTY_CHANGED", self.SoloInfo_DelayCheck)
+		M:UnregisterEvent("PLAYER_ENTERING_WORLD", MISC.SoloInfo_DelayCheck)
+		M:UnregisterEvent("PLAYER_DIFFICULTY_CHANGED", MISC.SoloInfo_DelayCheck)
 	end
 end
 
@@ -142,12 +142,12 @@ function MISC:RareAlert()
 	MISC.RareString = "|Hworldmap:%d+:%d+:%d+|h[%s] <%.1f, %.1f>%s|h|r"
 
 	if R.db["Misc"]["RareAlerter"] then
-		self:RareAlert_CheckInstance()
-		M:RegisterEvent("UPDATE_INSTANCE_INFO", self.RareAlert_CheckInstance)
+		MISC:RareAlert_CheckInstance()
+		M:RegisterEvent("UPDATE_INSTANCE_INFO", MISC.RareAlert_CheckInstance)
 	else
 		wipe(cache)
-		M:UnregisterEvent("VIGNETTE_MINIMAP_UPDATED", self.RareAlert_Update)
-		M:UnregisterEvent("UPDATE_INSTANCE_INFO", self.RareAlert_CheckInstance)
+		M:UnregisterEvent("VIGNETTE_MINIMAP_UPDATED", MISC.RareAlert_Update)
+		M:UnregisterEvent("UPDATE_INSTANCE_INFO", MISC.RareAlert_CheckInstance)
 	end
 end
 
@@ -155,8 +155,11 @@ end
 	闭上你的嘴！
 	打断、偷取及驱散法术时的警报
 ]]
+function MISC:GetMsgChannel()
+	return IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
+end
+
 local function msgChannel()
-	--return IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
 	if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
 		return "INSTANCE_CHAT"
 	--elseif IsInRaid(LE_PARTY_CATEGORY_HOME) then
@@ -231,22 +234,25 @@ function MISC:InterruptAlert_Update(...)
 			if infoText == U["BrokenSpell"] then
 				if auraType and auraType == AURA_TYPE_BUFF or blackList[spellID] then return end
 				sourceSpellID, destSpellID = extraskillID, spellID
+				if sourceSpellID and destSpellID then
+					SendChatMessage(format(infoText, sourceName..GetSpellLink(sourceSpellID), destName..GetSpellLink(destSpellID)), msgChannel())
+				end
 			elseif infoText == U["Interrupt"] then
 				if R.db["Misc"]["OwnInterrupt"] and sourceName ~= I.MyName and not I:IsMyPet(sourceFlags) then return end
 				sourceSpellID, destSpellID = spellID, extraskillID
+				if sourceSpellID and destSpellID then
+					SendChatMessage(format(infoText, GetSpellLink(destSpellID)), msgChannel())
+				end
 			else
 				if R.db["Misc"]["OwnDispell"] and sourceName ~= I.MyName and not I:IsMyPet(sourceFlags) then return end
 				sourceSpellID, destSpellID = spellID, extraskillID
+				if sourceSpellID and destSpellID then
+					SendChatMessage(format(infoText, GetSpellLink(destSpellID)), msgChannel())
+				end
 			end
-
-			if sourceSpellID and destSpellID then
-				--SendChatMessage(format(infoText, sourceName..GetSpellLink(sourceSpellID), destName..GetSpellLink(destSpellID)), msgChannel())
-				SendChatMessage(format(infoText, GetSpellLink(destSpellID)), msgChannel())
-				   if R.db["Misc"]["InterruptSound"] then
-				      PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\ShutupFool.ogg", "Master")
-				   end
-
-			end
+				if R.db["Misc"]["InterruptSound"] then
+				    PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\ShutupFool.ogg", "Master")
+				end
 		end
 	end
 end
@@ -263,14 +269,14 @@ function MISC:InterruptAlert()
 	MISC:InterruptAlert_Toggle()
 
 	if MISC:InterruptAlert_IsEnabled() then
-		self:InterruptAlert_CheckGroup()
-		M:RegisterEvent("GROUP_LEFT", self.InterruptAlert_CheckGroup)
-		M:RegisterEvent("GROUP_JOINED", self.InterruptAlert_CheckGroup)
-		M:RegisterEvent("PLAYER_ENTERING_WORLD", self.InterruptAlert_CheckGroup)
+		MISC:InterruptAlert_CheckGroup()
+		M:RegisterEvent("GROUP_LEFT", MISC.InterruptAlert_CheckGroup)
+		M:RegisterEvent("GROUP_JOINED", MISC.InterruptAlert_CheckGroup)
+		M:RegisterEvent("PLAYER_ENTERING_WORLD", MISC.InterruptAlert_CheckGroup)
 	else
-		M:UnregisterEvent("GROUP_LEFT", self.InterruptAlert_CheckGroup)
-		M:UnregisterEvent("GROUP_JOINED", self.InterruptAlert_CheckGroup)
-		M:UnregisterEvent("PLAYER_ENTERING_WORLD", self.InterruptAlert_CheckGroup)
+		M:UnregisterEvent("GROUP_LEFT", MISC.InterruptAlert_CheckGroup)
+		M:UnregisterEvent("GROUP_JOINED", MISC.InterruptAlert_CheckGroup)
+		M:UnregisterEvent("PLAYER_ENTERING_WORLD", MISC.InterruptAlert_CheckGroup)
 		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.InterruptAlert_Update)
 	end
 end
@@ -340,8 +346,18 @@ end
 --[[
 	放大餐时叫一叫
 ]]
-local lastTime = 0
-local itemList = {
+local myGUID = UnitGUID("player")
+local groupUnits = {["player"] = true, ["pet"] = true}
+for i = 1, 4 do
+	groupUnits["party"..i] = true
+	groupUnits["partypet"..i] = true
+end
+for i = 1, 40 do
+	groupUnits["raid"..i] = true
+	groupUnits["raidpet"..i] = true
+end
+
+local spellList = {
 	[54710] = true,		-- 随身邮箱
 	[67826] = true,		-- 基维斯
 	[226241] = true,	-- 宁神圣典
@@ -352,40 +368,70 @@ local itemList = {
 	[276972] = true,	-- 秘法药锅
 	[286050] = true,	-- 鲜血大餐
 	[265116] = true,	-- 8.0工程战复
-
 	[308458] = true,	-- 惊异怡人大餐
 	[308462] = true,	-- 纵情饕餮盛宴
 	[345130] = true,	-- 9.0工程战复
 	[307157] = true,	-- 永恒药锅
 	[359336] = true,	-- 石头汤锅
 	[324029] = true,	-- 宁心圣典
+
+	[2825]   = true,	-- 嗜血
+	[32182]  = true,	-- 英勇
+	[80353]  = true,	-- 时间扭曲
+	[264667] = true,	-- 原始暴怒，宠物
+	[272678] = true,	-- 原始暴怒，宠物掌控
+	[178207] = true,	-- 狂怒战鼓
+	[230935] = true,	-- 高山战鼓
+	[256740] = true,	-- 漩涡战鼓
+	[292686] = true,	-- 雷皮之槌
+	[309658] = true,	-- 死亡凶蛮战鼓
 }
 
-function MISC:ItemAlert_Update(unit, _, spellID)
-	if not R.db["Misc"]["PlacedItemAlert"] then return end
+function MISC:ItemAlert_Update(unit, castID, spellID)
+	if groupUnits[unit] and spellList[spellID] and (spellList[spellID] ~= castID) then
+		SendChatMessage(format(U["SpellItemAlertStr"], UnitName(unit), GetSpellLink(spellID) or GetSpellInfo(spellID)), MISC:GetMsgChannel())
+		spellList[spellID] = castID
+	end
+end
 
-	if (UnitInRaid(unit) or UnitInParty(unit)) and spellID and itemList[spellID] and lastTime ~= GetTime() then
-		local who = UnitName(unit)
-		local link = GetSpellLink(spellID)
-		local name = GetSpellInfo(spellID)
-		SendChatMessage(format(U["Place item"], who, link or name), msgChannel())
+local bloodLustDebuffs = {
+	[57723]  = true, -- 筋疲力尽
+	[57724]  = true, -- 心满意足
+	[80354]  = true, -- 时空错位
+	[264689] = true, -- 疲倦
+}
 
-		lastTime = GetTime()
+function MISC:CheckBloodlustStatus(...)
+	local _, eventType, _, sourceGUID, _, _, _, _, _, _, _, spellID = ...
+	if eventType == "SPELL_AURA_REMOVED" and bloodLustDebuffs[spellID] and sourceGUID == myGUID then
+		SendChatMessage(format(U["BloodlustStr"], GetSpellLink(spellID), MISC.factionSpell), MISC:GetMsgChannel())
 	end
 end
 
 function MISC:ItemAlert_CheckGroup()
 	if IsInGroup() then
 		M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", MISC.ItemAlert_Update)
+		M:RegisterEvent("CLEU", MISC.CheckBloodlustStatus)
 	else
 		M:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", MISC.ItemAlert_Update)
+		M:UnregisterEvent("CLEU", MISC.CheckBloodlustStatus)
 	end
 end
 
-function MISC:PlacedItemAlert()
-	self:ItemAlert_CheckGroup()
-	M:RegisterEvent("GROUP_LEFT", self.ItemAlert_CheckGroup)
-	M:RegisterEvent("GROUP_JOINED", self.ItemAlert_CheckGroup)
+function MISC:SpellItemAlert()
+	MISC.factionSpell = I.MyFaction == "Alliance" and 32182 or 2825
+	MISC.factionSpell = GetSpellLink(MISC.factionSpell)
+
+	if R.db["Misc"]["SpellItemAlert"] then
+		MISC:ItemAlert_CheckGroup()
+		M:RegisterEvent("GROUP_LEFT", MISC.ItemAlert_CheckGroup)
+		M:RegisterEvent("GROUP_JOINED", MISC.ItemAlert_CheckGroup)
+	else
+		M:UnregisterEvent("GROUP_LEFT", MISC.ItemAlert_CheckGroup)
+		M:UnregisterEvent("GROUP_JOINED", MISC.ItemAlert_CheckGroup)
+		M:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", MISC.ItemAlert_Update)
+		M:UnregisterEvent("CLEU", MISC.CheckBloodlustStatus)
+	end
 end
 
 -- 大幻象水晶及箱子计数
@@ -564,9 +610,9 @@ function MISC:SendCurrentSpell(thisTime, spellID)
 	local spellLink = GetSpellLink(spellID)
 	if start and duration > 0 then
 		local remain = start + duration - thisTime
-		SendChatMessage(format(U["CooldownRemaining"], spellLink, GetRemainTime(remain)), msgChannel())
+		SendChatMessage(format(U["CooldownRemaining"], spellLink, GetRemainTime(remain)), MISC:GetMsgChannel())
 	else
-		SendChatMessage(format(U["CooldownCompleted"], spellLink), msgChannel())
+		SendChatMessage(format(U["CooldownCompleted"], spellLink), MISC:GetMsgChannel())
 	end
 end
 
@@ -574,13 +620,14 @@ function MISC:SendCurrentItem(thisTime, itemID, itemLink)
 	local start, duration = GetItemCooldown(itemID)
 	if start and duration > 0 then
 		local remain = start + duration - thisTime
-		SendChatMessage(format(U["CooldownRemaining"], itemLink, GetRemainTime(remain)), msgChannel())
+		SendChatMessage(format(U["CooldownRemaining"], itemLink, GetRemainTime(remain)), MISC:GetMsgChannel())
 	else
-		SendChatMessage(format(U["CooldownCompleted"], itemLink), msgChannel())
+		SendChatMessage(format(U["CooldownCompleted"], itemLink), MISC:GetMsgChannel())
 	end
 end
 
 function MISC:AnalyzeButtonCooldown()
+	if not self.action then return end -- no action for pet actionbar
 	if not R.db["Misc"]["SendActionCD"] then return end
 	if not IsInGroup() then return end
 
@@ -621,7 +668,7 @@ function MISC:AddAlerts()
 	MISC:RareAlert()
 	MISC:InterruptAlert()
 	MISC:ExplosiveAlert()
-	MISC:PlacedItemAlert()
+	MISC:SpellItemAlert()
 	MISC:NVision_Init()
 	MISC:CheckIncompatible()
 	MISC:SendCDStatus()

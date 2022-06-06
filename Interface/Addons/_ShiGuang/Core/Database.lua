@@ -31,6 +31,9 @@ I.ClassList = {}
 for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
 	I.ClassList[v] = k
 end
+for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do
+	I.ClassList[v] = k
+end
 I.ClassColors = {}
 local colors = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
 for class, value in pairs(colors) do
@@ -180,7 +183,6 @@ I.ReminderBuffs = {
 			},
 			equip = true,
 			instance = true,
-			combat = true,
 			inGroup = true,
 		},
 	},

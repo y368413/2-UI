@@ -2,9 +2,6 @@
 local WayPointPositionButton = CreateFrame("Button", "WayPointPositionButton", WorldMapFrame.BorderFrame, "UIPanelButtonTemplate")
 WayPointPositionButton:SetWidth(50)
 WayPointPositionButton:SetHeight(18)
--- WayPointPositionButton.Font = WayPointPositionButton:CreateFontString(nil,nil)
--- WayPointPositionButton.Font:SetFont("Fonts\\ZYKai_T.ttf",12)
--- WayPointPositionButton:SetFontString(WayPointPositionButton.Font)
 WayPointPositionButton:SetText("定位")
 WayPointPositionButton:SetPoint("TOPRIGHT", WorldMapFrame.BorderFrame, "TOPRIGHT", -90, -2)
 WayPointPositionButton:SetScript("OnShow", function() WayPointContainer:Close() end)
@@ -22,14 +19,17 @@ function WayPointPositionButton:SetWayPoint(desX, desY)
 end
 
 -- 点击定位按钮
-function WayPointPositionButton.OnClick(button, down)
+function WayPointPositionButton.OnClick(widget, button, down)
+    if button == "RightButton" then
+        C_Map.ClearUserWaypoint()
+        C_SuperTrack.SetSuperTrackedUserWaypoint(false);
+        return
+    end
     local currentViewMapID = WorldMapFrame:GetMapID()
     if not C_Map.CanSetUserWaypointOnMap(currentViewMapID) then
         print("|cFFFF0000当前地图无法标记！|r")
         return
     end
-    C_Map.ClearUserWaypoint()
-    C_SuperTrack.SetSuperTrackedUserWaypoint(false);
     if WayPointContainer then
         if WayPointContainer:IsShown() then
             local xl = WayPointContainer.CoordX:GetText():len()

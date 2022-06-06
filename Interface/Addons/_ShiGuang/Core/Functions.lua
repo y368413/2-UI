@@ -169,7 +169,7 @@ do
 	end
 end
 
--- Itemlevel
+-- Scan tooltip
 do
 	local iLvlDB = {}
 	local itemLevelString = "^"..gsub(ITEM_LEVEL, "%%d", "")
@@ -199,7 +199,7 @@ do
 
 		local step = 1
 		for i = 1, 10 do
-			local tex = _G[tip:GetName().."Texture"..i]
+			local tex = _G["UI_ScanTooltipTexture"..i]
 			local texture = tex and tex:IsShown() and tex:GetTexture()
 			if texture then
 				if texture == essenceTextureID then
@@ -237,7 +237,7 @@ do
 		local essence = slotInfo.essences[step]
 		if essence and next(essence) and (strfind(lineText, ITEM_SPELL_TRIGGER_ONEQUIP, nil, true) and strfind(lineText, essenceDescription, nil, true)) then
 			for i = 5, 2, -1 do
-				local line = _G[tip:GetName().."TextLeft"..index-i]
+				local line = _G["UI_ScanTooltipTextLeft"..index-i]
 				local text = line and line:GetText()
 
 				if text and (not strmatch(text, "^[ +]")) and essence and next(essence) then
@@ -264,7 +264,7 @@ do
 			slotInfo.gems, slotInfo.essences = M:InspectItemTextures()
 
 			for i = 1, tip:NumLines() do
-				local line = _G[tip:GetName().."TextLeft"..i]
+				local line = _G["UI_ScanTooltipTextLeft"..i]
 				if not line then break end
 
 				local text = line:GetText()
@@ -297,7 +297,7 @@ do
 			end
 
 			for i = 2, 5 do
-				local line = _G[tip:GetName().."TextLeft"..i]
+				local line = _G["UI_ScanTooltipTextLeft"..i]
 				if not line then break end
 
 				local text = line:GetText()
@@ -311,6 +311,61 @@ do
 
 			return iLvlDB[link]
 		end
+	end
+
+	local pendingNPCs, nameCache, callbacks = {}, {}, {}
+	local loadingStr = "..."
+	local pendingFrame = CreateFrame("Frame")
+	pendingFrame:Hide()
+	pendingFrame:SetScript("OnUpdate", function(self, elapsed)
+		self.elapsed = (self.elapsed or 0) + elapsed
+		if self.elapsed > 1 then
+			if next(pendingNPCs) then
+				for npcID, count in pairs(pendingNPCs) do
+					if count > 2 then
+						nameCache[npcID] = UNKNOWN
+						if callbacks[npcID] then
+							callbacks[npcID](UNKNOWN)
+						end
+						pendingNPCs[npcID] = nil
+					else
+						local name = M.GetNPCName(npcID, callbacks[npcID])
+						if name and name ~= loadingStr then
+							pendingNPCs[npcID] = nil
+						else
+							pendingNPCs[npcID] = pendingNPCs[npcID] + 1
+						end
+					end
+				end
+			else
+				self:Hide()
+			end
+
+			self.elapsed = 0
+		end
+	end)
+
+	function M.GetNPCName(npcID, callback)
+		local name = nameCache[npcID]
+		if not name then
+			tip:SetOwner(UIParent, "ANCHOR_NONE")
+			tip:SetHyperlink(format("unit:Creature-0-0-0-0-%d", npcID))
+			name = _G.UI_ScanTooltipTextLeft1:GetText() or loadingStr
+			if name == loadingStr then
+				if not pendingNPCs[npcID] then
+					pendingNPCs[npcID] = 1
+					pendingFrame:Show()
+				end
+			else
+				nameCache[npcID] = name
+			end
+		end
+		if callback then
+			callback(name)
+			callbacks[npcID] = callback
+		end
+
+		return name
 	end
 end
 
@@ -603,7 +658,7 @@ do
 		self.bg = M.CreateBDFrame(self)
 		self.bg:SetAllPoints()
 		self.Icon = self:CreateTexture(nil, "ARTWORK")
-		self.Icon:SetInside()
+		self.Icon:SetInside(self.bg)
 		self.Icon:SetTexCoord(unpack(I.TexCoord))
 		if texture then
 			local atlas = strmatch(texture, "Atlas:(.+)$")
@@ -617,7 +672,7 @@ do
 			self:EnableMouse(true)
 			self.HL = self:CreateTexture(nil, "HIGHLIGHT")
 			self.HL:SetColorTexture(1, 1, 1, .25)
-			self.HL:SetInside()
+			self.HL:SetInside(self.bg)
 		end
 	end
 
@@ -962,6 +1017,17 @@ do
 		self:HookScript("OnLeave", M.Texture_OnLeave)
 	end
 
+	function M:ReskinFilterReset()
+		M.StripTextures(self)
+		self:ClearAllPoints()
+		self:SetPoint("TOPRIGHT", -5, 10)
+
+		local tex = self:CreateTexture(nil, "ARTWORK")
+		tex:SetInside(nil, 2, 2)
+		tex:SetTexture(I.closeTex)
+		tex:SetVertexColor(1, 0, 0)
+	end
+
 	function M:ReskinFilterButton()
 		M.StripTextures(self)
 		M.Reskin(self)
@@ -972,6 +1038,9 @@ do
 			M.SetupArrow(self.Icon, "right")
 			self.Icon:SetPoint("RIGHT")
 			self.Icon:SetSize(14, 14)
+		end
+		if self.ResetButton then
+			M.ReskinFilterReset(self.ResetButton)
 		end
 	end
 
@@ -1326,7 +1395,9 @@ do
 		local swatch = CreateFrame("Button", nil, self, "BackdropTemplate")
 		swatch:SetSize(18, 18)
 		M.CreateBD(swatch, 1)
-		swatch.text = M.CreateFS(swatch, 14, name, false, "LEFT", 26, 0)
+		if name then
+			swatch.text = M.CreateFS(swatch, 14, name, false, "LEFT", 26, 0)
+		end
 		local tex = swatch:CreateTexture()
 		tex:SetInside()
 		tex:SetTexture(I.bdTex)

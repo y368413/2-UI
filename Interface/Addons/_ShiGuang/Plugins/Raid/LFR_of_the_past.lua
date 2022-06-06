@@ -1,3 +1,4 @@
+--## Author: Hizuro ## Version: 1.3.5-release
 local LFRofthepast = {};
 LFRofthepast.npcID = {};
 LFRofthepast.npcs = {};
@@ -466,9 +467,7 @@ end
 
 -- QueueStatusFrame hook to add tooltip to the QueueStatusFrame tooltip
 QueueStatusFrame:HookScript("OnShow",function(parent)
-	if db.profile.queueStatusFrameETT then
 		CreateEncounterTooltip(parent);
-	end
 end);
 
 QueueStatusFrame:HookScript("OnHide",function(parent)

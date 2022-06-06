@@ -78,12 +78,6 @@ R.BlackList = {
 	[206930] = true,	-- 心脏打击
 }
 
--- 取自地城手册的段落ID
--- 纯数字则为GUID，选择目标后输入/getnpc获取
-local function GetSectionInfo(id)
-	return C_EncounterJournal.GetSectionInfo(id).title
-end
-
 -- 特殊单位的染色列表
 R.CustomUnits = {
 	[179823] = true,	-- 圣物收集者，刻希亚
@@ -113,7 +107,7 @@ R.CustomUnits = {
 	[101008] = true, 	-- 黑鸦堡垒，针刺虫群
 	-- Raids
 	[175992] = true,	-- 猩红议会，忠实的侍从
-	[GetSectionInfo(21953)] = true,	-- 凯子，灵能灌注者
+	[165762] = true,	-- 凯子，灵能灌注者
 	-- Condemned Demon
 	[169430] = true,
 	[169428] = true,
@@ -125,9 +119,9 @@ R.CustomUnits = {
 }
 
 -- 显示能量值的单位
-R.ShowPowerList = {
+R.PowerUnits = {
 	[165556] = true,	-- 赤红深渊，瞬息具象
-	[GetSectionInfo(22339)] = true,	-- 猎手阿尔迪莫，巴加斯特之影
+	[171557] = true,	-- 猎手阿尔迪莫，巴加斯特之影
 }
 
 -- 显示姓名板单位的目标
@@ -168,8 +162,9 @@ R.MajorSpells = {
 	[320596] = true,	-- 通灵战潮，深重呕吐
 	[326827] = true,	-- 赤红深渊，恐惧之缚
 	[326831] = true,	-- 赤红深渊，恐惧之缚
-	[324667] = true,	-- 凋魂，潜行幼蛛
-	[328400] = true,	-- 凋魂，软泥浪潮
+	[327233] = true,	-- 凋魂，喷射魔药
+	[324667] = true,	-- 凋魂，软泥浪潮
+	[328400] = true,	-- 凋魂，潜行幼蛛
 	[351119] = true,	-- 集市，闪击手里剑
 	[356031] = true,	-- 集市，静滞射线
 	[357226] = true,	-- 集市，游移之星

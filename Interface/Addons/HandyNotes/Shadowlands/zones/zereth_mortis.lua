@@ -14,6 +14,7 @@ local Treasure = shadowlands.node.Treasure
 local Achievement = shadowlands.reward.Achievement
 local Item = shadowlands.reward.Item
 local Mount = shadowlands.reward.Mount
+local Pet = shadowlands.reward.Pet
 local Toy = shadowlands.reward.Toy
 local Transmog = shadowlands.reward.Transmog
 
@@ -891,7 +892,7 @@ map.nodes[60022583] = Treasure({
     rewards = {
         Toy({item = 190734}), -- Makaris's Satchel of Mines
         Item({item = 189713, quest = 65473}), -- Pocopoc's Copper and Cobalt Components
-        Item({item = 189714, quest = 65474}) -- Pocopoc's Platinum and Emerald Components
+        Item({item = 189714, quest = 65479}) -- Pocopoc's Platinum and Emerald Components
     },
     pois = {POI({60863786, 61401763, 63182603, 65972694})}
 }) -- Sandworn Chest
@@ -1586,6 +1587,81 @@ map.nodes[59713736] = Nascii_({id = 184947, requires = CREATIAN_NE})
 map.nodes[69743354] = Nascii_({id = 184947, requires = CREATIAN_NE})
 
 -------------------------------------------------------------------------------
+----------------------------- APOCOPOCOLYPSE NOW ------------------------------
+-------------------------------------------------------------------------------
+
+local Automa = Class('CorelessAutoma', shadowlands.node.NPC, {
+    group = shadowlands.groups.CORELESS_AUTOMA,
+    requires = shadowlands.requirement.GarrisonTalent(1932), -- Dealic Understanding
+    scale = 1.5,
+    rewards = {
+        Achievement({
+            id = 15542,
+            criteria = ({id = 1, qty = true, suffix = L['coreless_automa']})
+        })
+    }
+})
+
+function Automa.getters:note()
+    local note = L['coreless_automa_note']
+    note = note .. '\n\n{item:190980}'
+    note = note .. '\n{item:190986}'
+    note = note .. '\n{item:190992}'
+    note = note .. '\n{item:190998}'
+    note = note .. '\n\n' .. L['coreless_automa_warning']
+    return note
+end
+
+local CORELESS_VOMBATA_A = Automa({id = 181580, icon = 'peg_bl'})
+local CORELESS_VOMBATA_B = Automa({id = 185662, icon = 'peg_bl'})
+local CORELESS_HELICID = Automa({id = 181558, icon = 'peg_bk'})
+local CORELESS_SCARBID = Automa({id = 181385, icon = 'peg_gn'})
+local CORELESS_TARACHNID = Automa({id = 181556, icon = 'peg_rd'})
+local CORELESS_GEOMENTAL = Automa({id = 181586, icon = 'peg_yw'})
+
+map.nodes[33205620] = CORELESS_VOMBATA_A
+map.nodes[37203760] = CORELESS_VOMBATA_A
+map.nodes[37804720] = CORELESS_VOMBATA_A
+map.nodes[38407080] = CORELESS_VOMBATA_A
+map.nodes[45407580] = CORELESS_VOMBATA_A
+map.nodes[46807860] = CORELESS_VOMBATA_A
+map.nodes[56006660] = CORELESS_VOMBATA_B
+
+map.nodes[32605980] = CORELESS_HELICID
+map.nodes[37207080] = CORELESS_HELICID
+map.nodes[37805500] = CORELESS_HELICID
+map.nodes[42408820] = CORELESS_HELICID
+map.nodes[43806120] = CORELESS_HELICID
+map.nodes[44405640] = CORELESS_HELICID
+map.nodes[50006260] = CORELESS_HELICID
+map.nodes[52607500] = CORELESS_HELICID
+map.nodes[59008420] = CORELESS_HELICID
+map.nodes[63207040] = CORELESS_HELICID
+
+map.nodes[42604360] = CORELESS_SCARBID
+map.nodes[40803160] = CORELESS_SCARBID
+map.nodes[44403680] = CORELESS_SCARBID
+map.nodes[47602420] = CORELESS_SCARBID
+map.nodes[51404920] = CORELESS_SCARBID
+map.nodes[62003200] = CORELESS_SCARBID
+map.nodes[67202500] = CORELESS_SCARBID
+
+map.nodes[41602780] = CORELESS_TARACHNID
+map.nodes[44202460] = CORELESS_TARACHNID
+map.nodes[53602700] = CORELESS_TARACHNID
+map.nodes[57002540] = CORELESS_TARACHNID
+map.nodes[59004900] = CORELESS_TARACHNID
+map.nodes[59405480] = CORELESS_TARACHNID
+map.nodes[62806240] = CORELESS_TARACHNID
+map.nodes[64004380] = CORELESS_TARACHNID
+
+map.nodes[47204600] = CORELESS_GEOMENTAL
+map.nodes[50004160] = CORELESS_GEOMENTAL
+map.nodes[53809040] = CORELESS_GEOMENTAL
+map.nodes[55006040] = CORELESS_GEOMENTAL
+map.nodes[66403800] = CORELESS_GEOMENTAL
+
+-------------------------------------------------------------------------------
 ----------------------------- COMPLETING THE CODE -----------------------------
 -------------------------------------------------------------------------------
 
@@ -1863,6 +1939,29 @@ map.nodes[32814036] = Proto({
     note = L['wayward_essence_note'],
     rewards = {Achievement({id = 15229, criteria = 53057})}
 }) -- Wayward Essence
+
+-------------------------------------------------------------------------------
+---------------------------------- OLEA MANU ----------------------------------
+-------------------------------------------------------------------------------
+
+map.nodes[37164467] = shadowlands.node.NPC({
+    id = 183962,
+    icon = 4254892,
+    requires = {
+        shadowlands.requirement.GarrisonTalent(1902), shadowlands.requirement.Quest(65219)
+    },
+    note = L['olea_manu'],
+    rewards = {
+        Item({item = 187804, note = '25'}), -- Recipe: Empty Kettle of Stone Soup
+        Item({item = 187824, note = '25'}), -- Formula: Magically Regulated Automa Core
+        Item({item = 188793, quest = 65282, note = '150'}), -- Improved Cypher Analysis Tool
+        Item({item = 189986, quest = 65514, covenant = NIGHTFAE, note = '500'}), -- Armadillo Soul
+        Item({item = 189980, quest = 65510, covenant = NIGHTFAE, note = '1000'}), -- Brutosaur Soul
+        Toy({item = 190333, note = '100'}), -- Jiro Circle of Song
+        Pet({item = 191039, id = 3247, note = '500'}), -- Pocopoc Traveler
+        Item({item = 187781, note = '700'}) -- Olea Cache
+    }
+}) -- Olea Manu
 
 -------------------------------------------------------------------------------
 ------------------------------- PATIENT BUFONID -------------------------------

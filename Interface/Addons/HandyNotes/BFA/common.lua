@@ -28,7 +28,8 @@ BattleForAzeroth.groups.BRUTOSAURS =
     Group('brutosaurs', 1881827, {defaults = BattleForAzeroth.GROUP_HIDDEN})
 BattleForAzeroth.groups.CARVED_IN_STONE = Group('carved_in_stone', 134424,
     {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.CATS_NAZJ = Group('cats_nazj', 454045)
+BattleForAzeroth.groups.CATS_NAZJ = Group('cats_nazj', 454045, {defaults = BattleForAzeroth.GROUP_HIDDEN})
+BattleForAzeroth.groups.FABIOUS = Group('fabious', 2741477, {defaults = BattleForAzeroth.GROUP_HIDDEN})
 BattleForAzeroth.groups.COFFERS = Group('coffers', 'star_chest_g')
 BattleForAzeroth.groups.DAILY_CHESTS = Group('daily_chests', 'chest_bl',
     {defaults = BattleForAzeroth.GROUP_ALPHA75})
@@ -67,7 +68,8 @@ BattleForAzeroth.groups.SECRET_SUPPLY = Group('secret_supplies', 'star_chest_b',
     {defaults = BattleForAzeroth.GROUP_HIDDEN75})
 BattleForAzeroth.groups.SHANTY_RAID = Group('shanty_raid', 1500866,
     {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.SLIMES_NAZJ = Group('slimes_nazj', 132107)
+BattleForAzeroth.groups.SLIMES_NAZJ = Group('slimes_nazj', 132107,
+    {defaults = BattleForAzeroth.GROUP_HIDDEN})
 BattleForAzeroth.groups.SQUIRRELS = Group('squirrels', 237182,
     {defaults = BattleForAzeroth.GROUP_HIDDEN})
 BattleForAzeroth.groups.SUPPLY = Group('supplies', 'star_chest_g',

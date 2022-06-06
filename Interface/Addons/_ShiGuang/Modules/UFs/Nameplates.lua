@@ -98,30 +98,37 @@ function UF:BlockAddons()
 end
 
 -- Elements
-local customUnits = {}
-function UF:CreateUnitTable()
-	wipe(customUnits)
-	if not R.db["Nameplate"]["CustomUnitColor"] then return end
-	M.CopyTable(R.CustomUnits, customUnits)
-	M.SplitList(customUnits, R.db["Nameplate"]["UnitList"])
+local function refreshNameplateUnits(VALUE)
+	wipe(UF[VALUE])
+	if not R.db["Nameplate"]["Show"..VALUE] then return end
+
+	for npcID in pairs(R[VALUE]) do
+		if R.db["Nameplate"][VALUE][npcID] == nil then
+			UF[VALUE][npcID] = true
+		end
+	end
+	for npcID, value in pairs(R.db["Nameplate"][VALUE]) do
+		if value then
+			UF[VALUE][npcID] = true
+		end
+	end
 end
 
-local showPowerList = {}
+UF.CustomUnits = {}
+function UF:CreateUnitTable()
+	refreshNameplateUnits("CustomUnits")
+end
+
+UF.PowerUnits = {}
 function UF:CreatePowerUnitTable()
-	wipe(showPowerList)
-	M.CopyTable(R.ShowPowerList, showPowerList)
-	M.SplitList(showPowerList, R.db["Nameplate"]["ShowPowerList"])
+	refreshNameplateUnits("PowerUnits")
 end
 
 function UF:UpdateUnitPower()
 	local unitName = self.unitName
 	local npcID = self.npcID
-	local shouldShowPower = showPowerList[unitName] or showPowerList[npcID]
-	if shouldShowPower then
-		self.powerText:Show()
-	else
-		self.powerText:Hide()
-	end
+	local shouldShowPower = UF.PowerUnits[unitName] or UF.PowerUnits[npcID]
+	self.powerText:SetShown(shouldShowPower)
 end
 
 -- Off-tank threat color
@@ -173,7 +180,7 @@ function UF:UpdateColor(_, unit)
 	local element = self.Health
 	local name = self.unitName
 	local npcID = self.npcID
-	local isCustomUnit = customUnits[name] or customUnits[npcID]
+	local isCustomUnit = UF.CustomUnits[name] or UF.CustomUnits[npcID]
 	local isPlayer = self.isPlayer
 	local isFriendly = self.isFriendly
 	local isOffTank, status = UF:CheckThreatStatus(unit)
@@ -187,6 +194,7 @@ function UF:UpdateColor(_, unit)
 	local healthPerc = UnitHealth(unit) / (UnitHealthMax(unit) + .0001) * 100
 	local targetColor = R.db["Nameplate"]["TargetColor"]
 	local focusColor = R.db["Nameplate"]["FocusColor"]
+	local dotColor = R.db["Nameplate"]["DotColor"]
 	local r, g, b
 
 	if not UnitIsConnected(unit) then
@@ -198,6 +206,8 @@ function UF:UpdateColor(_, unit)
 			r, g, b = focusColor.r, focusColor.g, focusColor.b
 		elseif isCustomUnit then
 			r, g, b = customColor.r, customColor.g, customColor.b
+		elseif self.Auras.hasTheDot then
+			r, g, b = dotColor.r, dotColor.g, dotColor.b
 		elseif isPlayer and isFriendly then
 			if R.db["Nameplate"]["FriendlyCC"] then
 				r, g, b = M.UnitColor(unit)
@@ -736,7 +746,8 @@ function UF:CreatePlates()
 	UF:CreatePVPClassify(self)
 	UF:CreateThreatColor(self)
 
-	self.Auras.showStealableBuffs = R.db["Nameplate"]["Dispellable"]
+	self.Auras.showStealableBuffs = R.db["Nameplate"]["DispellMode"] == 1
+	self.Auras.alwaysShowStealable = R.db["Nameplate"]["DispellMode"] == 2
 	self.powerText = M.CreateFS(self, 21)
 	self.powerText:ClearAllPoints()
 	self.powerText:SetPoint("TOP", self.Castbar, "BOTTOM", 0, -3)
@@ -788,7 +799,8 @@ function UF:UpdateNameplateAuras()
 	element.numTotal = R.db["Nameplate"]["maxAuras"]
 	element.size = R.db["Nameplate"]["AuraSize"]
 	element.showDebuffType = R.db["Nameplate"]["DebuffColor"]
-	element.showStealableBuffs = R.db["Nameplate"]["Dispellable"]
+	element.showStealableBuffs = R.db["Nameplate"]["DispellMode"] == 1
+	element.alwaysShowStealable = R.db["Nameplate"]["DispellMode"] == 2
 	element.desaturateDebuff = R.db["Nameplate"]["Desaturate"]
 	element:SetWidth(self:GetWidth())
 	element:SetHeight((element.size + element.spacing) * 2)
@@ -1026,6 +1038,8 @@ function UF:PostUpdatePlates(event, unit)
 		UF.RefreshPlateType(self, unit)
 	elseif event == "NAME_PLATE_UNIT_REMOVED" then
 		self.npcID = nil
+		self.tarBy:SetText("")
+		self.tarByTex:Hide()
 	end
 
 	if event ~= "NAME_PLATE_UNIT_REMOVED" then
@@ -1328,4 +1342,33 @@ function UF:RefreshMajorSpells()
 			UF.MajorSpells[spellID] = true
 		end
 	end
+end
+
+UF.NameplateFilter = {[1]={}, [2]={}}
+
+local function refreshNameplateFilter(index)
+	wipe(UF.NameplateFilter[index])
+
+	local VALUE = (index == 1 and R.WhiteList) or (index == 2 and R.BlackList)
+	if VALUE then
+		for spellID in pairs(VALUE) do
+			local name = GetSpellInfo(spellID)
+			if name then
+				if MaoRUIDB["NameplateFilter"][index][spellID] == nil then
+					UF.NameplateFilter[index][spellID] = true
+				end
+			end
+		end
+	end
+
+	for spellID, value in pairs(MaoRUIDB["NameplateFilter"][index]) do
+		if value then
+			UF.NameplateFilter[index][spellID] = true
+		end
+	end
+end
+
+function UF:RefreshNameplateFilters()
+	refreshNameplateFilter(1)
+	refreshNameplateFilter(2)
 end

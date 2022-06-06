@@ -1,4 +1,4 @@
-## Interface: 90200
+## Interface: 90205
 ## Title: Garrison Master
 ## Title-zhCN: |cff00ff00[任务]|r收菜助手
 ## Title-zhTW: |cff00ff00[任务]|r收菜助手

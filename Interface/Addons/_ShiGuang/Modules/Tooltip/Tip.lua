@@ -444,8 +444,9 @@ function TT:SetupTooltipFonts()
 end
 
 function TT:FixRecipeItemNameWidth()
+	local name = self:GetName()
 	for i = 1, self:NumLines() do
-		local line = _G["GameTooltipTextLeft"..i]
+		local line = _G[name.."TextLeft"..i]
 		if line:GetHeight() > 40 then
 			line:SetWidth(line:GetWidth() + 1)
 		end
@@ -456,6 +457,17 @@ function TT:ResetUnit(btn)
 	if btn == "LSHIFT" and UnitExists("mouseover") then
 		GameTooltip:SetUnit("mouseover")
 	end
+end
+
+function TT:FixStoneSoupError()
+	local blockTooltips = {
+		[556] = true -- Stone Soup
+	}
+	hooksecurefunc(_G.UIWidgetTemplateStatusBarMixin, "Setup", function(self)
+		if self:IsForbidden() and blockTooltips[self.widgetSetID] and self.Bar then
+			self.Bar.tooltip = nil
+		end
+	end)
 end
 
 function TT:OnLogin()
@@ -469,6 +481,9 @@ function TT:OnLogin()
 	hooksecurefunc("GameTooltip_AnchorComparisonTooltips", TT.GameTooltip_ComparisonFix)
 	TT:SetupTooltipFonts()
 	GameTooltip:HookScript("OnTooltipSetItem", TT.FixRecipeItemNameWidth)
+	ItemRefTooltip:HookScript("OnTooltipSetItem", TT.FixRecipeItemNameWidth)
+	EmbeddedItemTooltip:HookScript("OnTooltipSetItem", TT.FixRecipeItemNameWidth)
+	TT:FixStoneSoupError()
 
 	-- Elements
 	TT:ReskinTooltipIcons()

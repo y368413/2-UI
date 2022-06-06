@@ -231,6 +231,8 @@ shadowlands.groups.INVASIVE_MAWSHROOM = Group('invasive_mawshroom', 134534,
     {defaults = shadowlands.GROUP_HIDDEN75})
 shadowlands.groups.KORTHIA_SHARED = Group('korthia_dailies', 1506458,
     {defaults = shadowlands.GROUP_HIDDEN75})
+shadowlands.groups.MAWSWORN_BLACKGUARD = Group('mawsworn_blackguard', 236173,
+    {defaults = shadowlands.GROUP_HIDDEN})
 shadowlands.groups.MAWSWORN_CACHE = Group('mawsworn_cache', 3729814,
     {defaults = shadowlands.GROUP_HIDDEN75})
 shadowlands.groups.MAWSWORN_SUPPLY_CACHE = Group('mawsworn_supply_cache', 'chest_bk',
@@ -296,6 +298,17 @@ shadowlands.groups.RELIC = Group('relic', 'star_chest_b', {
     IsEnabled = function(self)
         -- Relics cannot be collected until the quest "What Must Be Found" is completed
         if not C_QuestLog.IsQuestFlaggedCompleted(64506) then
+            return false
+        end
+        return Group.IsEnabled(self)
+    end
+})
+
+shadowlands.groups.CORELESS_AUTOMA = Group('coreless_automa', 4327618, {
+    defaults = shadowlands.GROUP_HIDDEN,
+    IsEnabled = function(self)
+        -- Coreless automa cannot be controlled by Pocopoc until the quest "Core Control" is complete
+        if not C_QuestLog.IsQuestFlaggedCompleted(65700) then
             return false
         end
         return Group.IsEnabled(self)

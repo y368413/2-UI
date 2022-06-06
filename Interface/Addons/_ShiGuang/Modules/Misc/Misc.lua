@@ -156,6 +156,8 @@ function MISC:NakedIcon()
 	bu:SetSize(21, 21)
 	bu:SetPoint("LEFT", PaperDollSidebarTab1, "RIGHT", 80, -2)
 	M.PixelIcon(bu, "Interface\\ICONS\\SPELL_SHADOW_TWISTEDFAITH", true)
+	bu.bg:SetPoint("TOPLEFT", 2, -3)
+	bu.bg:SetPoint("BOTTOMRIGHT", 0, -2)
 	M.AddTooltip(bu, "ANCHOR_RIGHT", U["Get Naked"])
 
 	local function UnequipItemInSlot(i)
@@ -513,6 +515,12 @@ do
 	local done
 	local function setupMisc(event, addon)
 		if event == "ADDON_LOADED" and addon == "Blizzard_Collections" then
+			-- Fix undragable issue
+			local checkBox = WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox
+			checkBox.Label:ClearAllPoints()
+			checkBox.Label:SetPoint("LEFT", checkBox, "RIGHT", 2, 1)
+			checkBox.Label:SetWidth(152)
+
 			CollectionsJournal:HookScript("OnShow", function()
 				if not done then
 					if InCombatLockdown() then
@@ -530,7 +538,7 @@ do
 		end
 	end
 
-	--M:RegisterEvent("ADDON_LOADED", setupMisc) -- FIXME: collections is not dragable atm
+	M:RegisterEvent("ADDON_LOADED", setupMisc)
 end
 
 -- Select target when click on raid units

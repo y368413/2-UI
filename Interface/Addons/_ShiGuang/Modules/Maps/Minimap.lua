@@ -1,5 +1,6 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
+local oUF = ns.oUF
 local module = M:GetModule("Maps")
 
 local _G = _G
@@ -97,12 +98,14 @@ function module:ReskinRegions()
 		GameTooltip:AddLine(U["SwitchGarrisonType"], nil, nil, nil, true)
 		GameTooltip:Show();
 	end)
+	GarrisonLandingPageMinimapButton:SetFrameLevel(999)
 
 	-- QueueStatus Button
 	QueueStatusMinimapButton:ClearAllPoints()
 	QueueStatusMinimapButton:SetPoint("BOTTOMLEFT", Minimap, "BOTTOMLEFT", -6, -6)
 	QueueStatusMinimapButtonBorder:Hide()
 	QueueStatusMinimapButtonIconTexture:SetTexture(nil)
+	QueueStatusMinimapButton:SetFrameLevel(999)
 
 	local queueIcon = Minimap:CreateTexture(nil, "ARTWORK")
 	queueIcon:SetPoint("CENTER", QueueStatusMinimapButton)
@@ -316,6 +319,7 @@ function module:RecycleBin()
 	bu.Icon:SetTexture(I.binTex)
 	bu:SetHighlightTexture(I.binTex)
 	bu.title = I.InfoColor..U["Minimap RecycleBin"]
+	bu:SetFrameLevel(999)
 	M.AddTooltip(bu, "ANCHOR_LEFT")
 	updateRecycleTip(bu)
 
@@ -378,9 +382,12 @@ function module:RecycleBin()
 				local texture = region:GetTexture() or ""
 				if removedTextures[texture] or strfind(texture, "Interface\\CharacterFrame") or strfind(texture, "Interface\\Minimap") then
 					region:SetTexture(nil)
+					region:Hide() -- hide CircleMask
 				end
-				region:ClearAllPoints()
-				region:SetAllPoints()
+				if not region.__ignored then
+					region:ClearAllPoints()
+					region:SetAllPoints()
+				end
 				if not isGoodLookingIcon[name] then
 					region:SetTexCoord(unpack(I.TexCoord))
 				end
@@ -584,11 +591,55 @@ function module:ShowCalendar()
 	end
 end
 
+local function GetVolumeColor(cur)
+	local r, g, b = oUF:RGBColorGradient(cur, 100, 1, 1, 1, 1, .8, 0, 1, 0, 0)
+	return r, g, b
+end
+
+local function GetCurrentVolume()
+	return M:Round(GetCVar("Sound_MasterVolume") * 100)
+end
+
+function module:SoundVolume()
+	if not R.db["Map"]["EasyVolume"] then return end
+
+	local f = CreateFrame("Frame", nil, Minimap)
+	f:SetAllPoints()
+	local text = M.CreateFS(f, 30)
+
+	local anim = f:CreateAnimationGroup()
+	anim:SetScript("OnPlay", function() f:SetAlpha(1) end)
+	anim:SetScript("OnFinished", function() f:SetAlpha(0) end)
+	anim.fader = anim:CreateAnimation("Alpha")
+	anim.fader:SetFromAlpha(1)
+	anim.fader:SetToAlpha(0)
+	anim.fader:SetDuration(3)
+	anim.fader:SetSmoothing("OUT")
+	anim.fader:SetStartDelay(1)
+
+	module.VolumeText = text
+	module.VolumeAnim = anim
+end
+
 function module:Minimap_OnMouseWheel(zoom)
-	if zoom > 0 then
-		Minimap_ZoomIn()
+	if IsControlKeyDown() and module.VolumeText then
+		local value = GetCurrentVolume()
+		local mult = IsAltKeyDown() and 100 or 5
+		value = value + zoom*mult
+		if value > 100 then value = 100 end
+		if value < 0 then value = 0 end
+
+		SetCVar("Sound_MasterVolume", tostring(value/100))
+		module.VolumeText:SetText(value)
+		module.VolumeText:SetTextColor(GetVolumeColor(value))
+		module.VolumeAnim:Stop()
+		module.VolumeAnim:Play()
 	else
-		Minimap_ZoomOut()
+		if zoom > 0 then
+			Minimap_ZoomIn()
+		else
+			Minimap_ZoomOut()
+		end
 	end
 end
 
@@ -602,7 +653,7 @@ _G.UIDropDownMenu_Initialize(UIMiniMapTrackingDropDown, _G.MiniMapTrackingDropDo
 function module:Minimap_OnMouseUp(btn)
 		if btn == "LeftButton" then 
 			if IsAltKeyDown() then ToggleFrame(WorldMapFrame) --Alt+鼠标左键点击显示大地图
-			elseif IsShiftKeyDown() then if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end ToggleCalendar()
+			elseif IsShiftKeyDown() then ToggleCalendar() --if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end 
 			elseif IsControlKeyDown() then ToggleDropDownMenu(1, nil, UIMiniMapTrackingDropDown, "cursor")
 			else Minimap_OnClick(self) --鼠标左键点击小地图显示Ping位置提示
 			end
@@ -687,6 +738,7 @@ function module:SetupMinimap()
 	--self:RecycleBin()
 	self:WhoPingsMyMap()
 	self:ShowMinimapHelpInfo()
+	self:SoundVolume()
 
 	-- HybridMinimap
 	M:RegisterEvent("ADDON_LOADED", module.HybridMinimapOnLoad)

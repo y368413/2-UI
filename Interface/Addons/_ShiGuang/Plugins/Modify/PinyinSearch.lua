@@ -1,4 +1,4 @@
---## Author: 绿毛龟12138 ## Version: 0.1.7
+--## Author: 绿毛龟12138 ## Version: 0.1.9
 local PinyinSearch = {}
 -------------------------------------------------------
 --              Pinyin lib                           --
@@ -458,6 +458,20 @@ function PinyinSearch.UTF8Sub(str, startChar, numChars)
     return string.sub(str, startIndex, currentIndex - 1)
 end
 
+-- 是否都为中文
+function PinyinSearch.IsAllChinese(str)
+    local currentIndex = 1
+    while currentIndex <= #str do
+        local char = string.byte(str, currentIndex)
+        local charSize = PinyinSearch.GetCharSize(char)
+        if charSize < 3 then
+            return false
+        end
+        currentIndex = currentIndex + charSize
+    end
+    return true
+end
+
 local pyTable = {}
 
 local delay = 1
@@ -669,7 +683,7 @@ local function FoundResult()
 
     local text = editbox:GetText()
     local results = {}
-    if text and strlen(text) >= 2 then
+    if text and strlen(text) >= 2 and not PinyinSearch.IsAllChinese(text) then
         local complePinyins, firstLetterPinyins = PinyinSearch.Pinyin(text)
 
         if #complePinyins > 0 then
@@ -791,7 +805,7 @@ local function OnTabPressed(self)
     end
 end
 
--- @displayTextOnTabPressed 当tab切换时，将选中结果显示在edibox
+-- @displayTextOnTabPressed 当tab切换时，将选中结果显示在editbox
 function PinyinSearch.AttachEditBox(editbox, source,  displayTextOnTabPressed)
     if editbox.pinyinAttach then return end
 
@@ -952,8 +966,9 @@ function Appearance:UpdateData()
     -- 外观：物品
     if WardrobeCollectionFrame.activeFrame == WardrobeCollectionFrame.ItemsCollectionFrame then
         local category = category or WardrobeCollectionFrame.ItemsCollectionFrame.activeCategory
-        if not category then return end
-
+        local transmogLocation = WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation
+        if not category or not transmogLocation then return end
+        
         local src = self[category]
         if not src then
             src = {}
@@ -962,10 +977,10 @@ function Appearance:UpdateData()
             self[category] = src
         end
 
-        local visualsList = C_TransmogCollection.GetCategoryAppearances(category)
+        local visualsList = C_TransmogCollection.GetCategoryAppearances(category, transmogLocation)
         for _, visualInfo in ipairs(visualsList) do
             if visualInfo.visualID then
-                local sources = C_TransmogCollection.GetAppearanceSources(visualInfo.visualID, category)
+                local sources = C_TransmogCollection.GetAppearanceSources(visualInfo.visualID, category, transmogLocation)
                 for _, source in ipairs(sources) do
                     if source.name and not src[source.name] then
                         saveData(src, source.name)

@@ -346,7 +346,7 @@ local function CreateConsole()
 	M:RegisterEvent("PLAYER_REGEN_DISABLED", showLater)
 end
 
-SlashCmdList["NDUI_MOVER"] = function()
+SlashCmdList["UI_MOVER"] = function()
 	if InCombatLockdown() then
 		UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT)
 		return
@@ -354,7 +354,7 @@ SlashCmdList["NDUI_MOVER"] = function()
 	CreateConsole()
 	MISC:UnlockElements()
 end
-SLASH_NDUI_MOVER1 = "/moveit"
+SLASH_UI_MOVER1 = "/moveit"
 
 function MISC:OnLogin()
 	updater = CreateFrame("Frame")

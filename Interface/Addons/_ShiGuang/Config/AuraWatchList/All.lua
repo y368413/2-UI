@@ -102,6 +102,8 @@ local list = {
 		{AuraID = 208628, UnitID = "player", Flash = true},	-- 势如破竹
 		--QS
 		{AuraID = 132403, UnitID = "player", Flash = true},	-- 正义盾击
+		--
+		{AuraID = 341260, UnitID = "player", Flash = true},	-- 学识爆发，传家宝套装
 		{AuraID = 354808, UnitID = "player"},	-- 棱彩之光，1万币的小宠物
 		-- 种族天赋
 		{AuraID = 26297, UnitID = "player"},	-- 狂暴 巨魔
@@ -196,6 +198,7 @@ local list = {
 		{AuraID = 339928, UnitID = "player", Flash = true},	-- 残酷投射
 		{AuraID = 358404, UnitID = "player", Flash = true},	-- 疑虑试炼
 		{AuraID = 352917, UnitID = "player"},	-- 崭新决心
+		{AuraID = 356263, UnitID = "player"},	-- 灵魂追踪者之契
 		{AuraID = 352875, UnitID = "player", Flash = true},	-- 虔敬者之路
 		-- S2，心能/统御碎片
 		{AuraID = 357852, UnitID = "player"},	-- 激励
@@ -457,8 +460,11 @@ local list = {
 	},
 	["InternalCD"] = { -- 自定义内置冷却组
 		{IntID = 240447, Duration = 20},	-- 大米，践踏
+		{IntID = 352875, Duration = 30},	-- 格里恩，虔敬者之路
 		{IntID = 114018, Duration = 15, OnSuccess = true, UnitID = "all"},	-- 帷幕
 		{IntID = 316958, Duration = 30, OnSuccess = true, UnitID = "all"},	-- 红土
+		{IntID = 327811, Duration = 19, OnSuccess = true, UnitID = "all"},	-- 赤红走廊闪步
+		{IntID = 353635, Duration = 27.5, OnSuccess = true, UnitID = "all"},-- 坍缩之星自爆时间
 	},
 }
 

@@ -27,7 +27,6 @@ G.DefaultSettings = {
 		Cooldown = true,
 		MmssTH = 60,
 		TenthTH = 3,
-		DecimalCD = true,
 		Style = 8,
 		Bar4Fader = false,
 		Bar5Fader = false,
@@ -133,6 +132,7 @@ G.DefaultSettings = {
 		AutoAttack = true,
 		FCTOverHealing = false,
 		PetCombatText = true,
+		ScrollingCT = false,
 		RaidClickSets = true,
 		TeamIndex = false,
 		ClassPower = true,
@@ -290,6 +290,7 @@ G.DefaultSettings = {
 		MapReveal = false,
 		MapRevealGlow = true,
 		Calendar = false,
+		EasyVolume = true,
 		zrMMbordersize = 2,
 		zrMMbuttonsize = 18,
 		zrMMbuttonpos = "Bottom",
@@ -306,10 +307,11 @@ G.DefaultSettings = {
 		TankMode = false,
 		TargetIndicator = 3,
 		InsideView = true,
-		CustomUnitColor = true,
+		ShowCustomUnits = true,
 		CustomColor = {r=0, g=.8, b=.3},
-		UnitList = "",
-		ShowPowerList = "",
+		CustomUnits = {},
+		ShowPowerUnits = true,
+		PowerUnits = {},
 		VerticalSpacing = .6,
 		ShowPlayerPlate = true,
 		PPWidth = 175,
@@ -349,8 +351,11 @@ G.DefaultSettings = {
 		EnemyThru = false,
 		FriendlyThru = false,
 		BlockDBM = true,
-		Dispellable = true,
+		DispellMode = 1,
 		UnitTargeted = false,
+		ColorByDot = false,
+		DotColor = {r=1, g=.5, b=.2},
+		DotSpells = {},
 
 		PlateWidth = 160,
 		PlateHeight = 8,
@@ -463,7 +468,7 @@ G.DefaultSettings = {
 		OnlyCompleteRing = false,
 		ExplosiveCount = false,
 		ExplosiveCache = {},
-		PlacedItemAlert = false,
+		SpellItemAlert = false,
 		RareAlertInWild = false,
 		ParagonRep = true,
 		InstantDelete = true,
@@ -609,6 +614,20 @@ loader:SetScript("OnEvent", function(self, _, addon)
 	else
 		R.db = MaoRUISetDB[MaoRUIDB["ProfileIndex"][I.MyFullName] - 1]
 	end
+	-- Transfer old data START
+	if R.db["Nameplate"] and R.db["Nameplate"]["UnitList"] then
+		if not R.db["Nameplate"]["CustomUnits"] then
+			R.db["Nameplate"]["CustomUnits"] = {}
+		end
+		M.SplitList(R.db["Nameplate"]["CustomUnits"], R.db["Nameplate"]["UnitList"])
+	end
+	if R.db["Nameplate"] and R.db["Nameplate"]["ColorDots"] then
+		if not R.db["Nameplate"]["DotSpells"] then
+			R.db["Nameplate"]["DotSpells"] = {}
+		end
+		M.SplitList(R.db["Nameplate"]["DotSpells"], R.db["Nameplate"]["ColorDots"])
+	end
+	-- Transfer old data END
 	InitialSettings(G.DefaultSettings, R.db, true)
 
 	M:SetupUIScale(true)
@@ -670,6 +689,18 @@ local function setupNameplateFilter()
 	G:SetupNameplateFilter(guiPage[3])
 end
 
+local function setupNameplateColorDots()
+	G:NameplateColorDots(guiPage[3])
+end
+
+local function setupNameplateUnitFilter()
+	G:NameplateUnitFilter(guiPage[3])
+end
+
+local function setupNameplatePowerUnits()
+	G:NameplatePowerUnits(guiPage[3])
+end
+
 local function setupNameplateSize()
 	G:SetupNameplateSize(guiPage[3])
 end
@@ -677,6 +708,7 @@ end
 local function setupNameOnlySize()
 	G:SetupNameOnlySize(guiPage[3])
 end
+
 local function setupPlateCastbarGlow()
 	G:PlateCastbarGlow(guiPage[3])
 end
@@ -884,6 +916,10 @@ local function refreshPlateByEvents()
 	M:GetModule("UnitFrames"):RefreshPlateByEvents()
 end
 
+local function updateScrollingFont()
+	M:GetModule("UnitFrames"):UpdateScrollingFont()
+end
+
 local function updateMinimapScale()
 	M:GetModule("Maps"):UpdateMinimapScale()
 end
@@ -910,6 +946,10 @@ end
 
 local function updateSoloInfo()
 	M:GetModule("Misc"):SoloInfo()
+end
+
+local function updateSpellItemAlert()
+	M:GetModule("Misc"):SpellItemAlert()
 end
 
 local function updateQuestNotification()
@@ -988,7 +1028,7 @@ G.TabList = {
 G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	[1] = {
 		{1, "Actionbar", "Enable", HeaderTag..U["Enable Actionbar"]}, --, nil, nil, setupActionBar
-		{1, "Actionbar", "MicroMenu", U["Micromenu"], true},
+		{1, "Actionbar", "MicroMenu", U["Micromenu"], true, nil, nil, nil, U["MicroMenuTip"]},
 		{1, "Actionbar", "ShowStance", U["ShowStanceBar"], true, true, setupStanceBar},
 		{1, "Actionbar", "Bar4Fader", U["Bar4 Fade"].."*", nil, nil, nil, toggleBarFader},
 		{1, "Actionbar", "Bar5Fader", U["Bar5 Fade"].."*", true, nil, nil, toggleBarFader},
@@ -1061,7 +1101,7 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	[3] = {
 		{1, "Nameplate", "Enable", HeaderTag..U["Enable Nameplate"], nil, nil, setupNameplateSize, refreshNameplates},
 		{1, "Nameplate", "FriendPlate", U["FriendPlate"].."*", true, nil, nil, refreshNameplates, U["FriendPlateTip"]},
-		{1, "Nameplate", "NameOnlyMode", U["NameOnlyMode"].."*", true, true, nil, nil, U["NameOnlyModeTip"]},
+		{1, "Nameplate", "NameOnlyMode", U["NameOnlyMode"].."*", true, true, setupNameOnlySize, nil, U["NameOnlyModeTip"]},
 		{4, "Nameplate", "NameType", U["NameTextType"].."*", nil, nil, {DISABLE, U["Tag:name"], U["Tag:levelname"], U["Tag:rarename"], U["Tag:rarelevelname"]}, refreshNameplates, U["PlateLevelTagTip"]},
 		{4, "Nameplate", "HealthType", U["HealthValueType"].."*", true, nil, G.HealthValues, refreshNameplates, U["100PercentTip"]},
 		{4, "Nameplate", "AuraFilter", U["NameplateAuraFilter"].."*", true, true, {U["BlackNWhite"], U["PlayerOnly"], U["IncludeCrowdControl"]}, refreshNameplates},
@@ -1083,7 +1123,7 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		--{1, "Nameplate", "QuestIndicator", U["QuestIndicator"]},
 		--{1, "Nameplate", "AKSProgress", U["AngryKeystones Progress"], true},
 		{1, "Nameplate", "BlockDBM", U["BlockDBM"], true, true, nil, nil, U["BlockDBMTip"]},
-		{1, "Nameplate", "CustomUnitColor", HeaderTag..U["CustomUnitColor"].."*", nil, nil, nil, updateCustomUnitList, U["CustomUnitColorTip"]},
+		{1, "Nameplate", "ShowCustomUnits", HeaderTag..U["ShowCustomUnits"].."*", nil, nil, setupNameplateUnitFilter, updateCustomUnitList, U["CustomUnitsTip"]},
 		{1, "Nameplate", "TankMode", HeaderTag..U["Tank Mode"].."*", true, nil, nil, nil, U["TankModeTip"]},
 		{1, "Nameplate", "DPSRevertThreat", U["DPS Revert Threat"].."*", true, true, nil, nil, U["RevertThreatTip"]},	
 		--{2, "Nameplate", "UnitList", U["UnitColor List"].."*", nil, nil, nil, updateCustomUnitList, U["CustomUnitTips"]},
@@ -1097,6 +1137,14 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{3, "Nameplate", "HelpHeight", NewTag..U["PlateHelpHeight"].."*", nil, nil, {1, 500, 1}, updateClickableSize},
 		{1, "Nameplate", "CVarOnlyNames", NewTag..U["CVarOnlyNames"], true, nil, nil, updatePlateCVars, U["CVarOnlyNamesTip"]},
 		{1, "Nameplate", "CVarShowNPCs", NewTag..U["CVarShowNPCs"].."*", true, true, nil, updatePlateCVars, U["CVarShowNPCsTip"]},
+		{1, "Nameplate", "ColoredTarget", HeaderTag..U["ColoredTarget"].."*", nil, nil, nil, nil, U["ColoredTargetTip"]},
+		{1, "Nameplate", "ColoredFocus", HeaderTag..U["ColoredFocus"].."*", true, nil, nil, nil, U["ColoredFocusTip"]},
+		{5, "Nameplate", "TargetColor", U["TargetNP Color"].."*"},
+		{5, "Nameplate", "FocusColor", U["FocusNP Color"].."*", 1},
+		{5, "Nameplate", "SecureColor", U["Secure Color"].."*", 2},
+		{5, "Nameplate", "TransColor", U["Trans Color"].."*", 3},
+		{5, "Nameplate", "InsecureColor", U["Insecure Color"].."*", 4},
+		{5, "Nameplate", "OffTankColor", U["OffTank Color"].."*", 5},
 	},
 	[4] = {
 		{1, "Chat", "Lock", HeaderTag..U["Lock Chat"]},
@@ -1126,19 +1174,6 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{2, "Chat", "Keyword", U["Whisper Keyword"].."*", true, true, nil, updateWhisperList, U["WhisperKeywordTip"]},
 	},
 	[5] = {
-		--{1, "ACCOUNT", "VersionCheck", U["Version Check"]},
-		{1, "ACCOUNT", "LockUIScale", U["Lock UIScale"]},
-		{3, "ACCOUNT", "UIScale", U["Setup UIScale"], true, nil, {.4, 1.15, .01}},
-		{3, "ACCOUNT", "SmoothAmount", U["SmoothAmount"].."*", true, true, {.1, 1, .05}, updateSmoothingAmount, U["SmoothAmountTip"]},
-		--{},--blank
-		--{1, "ACCOUNT", "DisableInfobars", "|cffff0000"..U["DisableInfobars"]},
-		--{3, "Misc", "MaxAddOns", U["SysMaxAddOns"].."*", nil, nil,  {1, 50, 1}, nil, U["SysMaxAddOnsTip"]},
-		--{3, "Misc", "InfoSize", U["InfobarFontSize"].."*", true, nil,  {10, 50, 1}, updateInfobarSize},
-		--{2, "Misc", "InfoStrLeft", U["LeftInfobar"].."*", nil, nil, nil, updateInfobarAnchor, U["InfobarStrTip"]},
-		--{2, "Misc", "InfoStrRight", U["RightInfobar"].."*", true, nil, nil, updateInfobarAnchor, U["InfobarStrTip"]},
-		{4, "ACCOUNT", "TexStyle", U["Texture Style"], false, nil, {}},
-		{4, "ACCOUNT", "NumberFormat", U["Numberize"], true, nil, {U["Number Type1"], U["Number Type2"], U["Number Type3"]}},
-		{2, "ACCOUNT", "CustomTex", U["CustomTex"], true, true, nil, nil, U["CustomTexTip"]},
 	},
 	[6] = {
 		{1, "UFs", "UFFade", U["UFFade"]},
@@ -1183,15 +1218,19 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Skins", "TMW", U["TMW Skin"], true},
 		{1, "Skins", "WeakAuras", U["WeakAuras Skin"], true, true},
 		{},--blank
-		{1, "Nameplate", "ColoredTarget", HeaderTag..U["ColoredTarget"].."*", nil, nil, nil, nil, U["ColoredTargetTip"]},
-		{1, "Nameplate", "ColoredFocus", HeaderTag..U["ColoredFocus"].."*", true, nil, nil, nil, U["ColoredFocusTip"]},
-		{5, "Nameplate", "TargetColor", U["TargetNP Color"].."*"},
-		{5, "Nameplate", "FocusColor", U["FocusNP Color"].."*", 1},
-		{5, "Nameplate", "CustomColor", U["Custom Color"].."*", 2},
-		{5, "Nameplate", "SecureColor", U["Secure Color"].."*", 3},
-		{5, "Nameplate", "TransColor", U["Trans Color"].."*"},
-		{5, "Nameplate", "InsecureColor", U["Insecure Color"].."*", 1},
-		{5, "Nameplate", "OffTankColor", U["OffTank Color"].."*", 2},
+		--{1, "ACCOUNT", "VersionCheck", U["Version Check"]},
+		{1, "ACCOUNT", "LockUIScale", U["Lock UIScale"]},
+		{3, "ACCOUNT", "UIScale", U["Setup UIScale"], nil, nil, {.4, 1.15, .01}},
+		{3, "ACCOUNT", "SmoothAmount", U["SmoothAmount"].."*", true, nil, {.1, 1, .05}, updateSmoothingAmount, U["SmoothAmountTip"]},
+		--{},--blank
+		--{1, "ACCOUNT", "DisableInfobars", "|cffff0000"..U["DisableInfobars"]},
+		--{3, "Misc", "MaxAddOns", U["SysMaxAddOns"].."*", nil, nil,  {1, 50, 1}, nil, U["SysMaxAddOnsTip"]},
+		--{3, "Misc", "InfoSize", U["InfobarFontSize"].."*", true, nil,  {10, 50, 1}, updateInfobarSize},
+		--{2, "Misc", "InfoStrLeft", U["LeftInfobar"].."*", nil, nil, nil, updateInfobarAnchor, U["InfobarStrTip"]},
+		--{2, "Misc", "InfoStrRight", U["RightInfobar"].."*", true, nil, nil, updateInfobarAnchor, U["InfobarStrTip"]},
+		{4, "ACCOUNT", "TexStyle", U["Texture Style"], false, nil, {}},
+		{4, "ACCOUNT", "NumberFormat", U["Numberize"], true, nil, {U["Number Type1"], U["Number Type2"], U["Number Type3"]}},
+		{2, "ACCOUNT", "CustomTex", U["CustomTex"], true, true, nil, nil, U["CustomTexTip"]},
 		--{1, "Skins", "PGFSkin", U["PGF Skin"], true},
 		--{1, "Skins", "Rematch", U["Rematch Skin"], true, true},
 		--{4, "Skins", "ToggleDirection", U["ToggleDirection"].."*", true, true, {U["LEFT"], U["RIGHT"], U["TOP"], U["BOTTOM"], DISABLE}, updateToggleDirection},
@@ -1214,14 +1253,12 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "InstAlertOnly", U["InstAlertOnly"].."*", true, nil, nil, updateInterruptAlert, U["InstAlertOnlyTip"]},
 		{},--blank
 		{1, "Misc", "ExplosiveCount", U["Explosive Alert"].."*", nil, nil, nil, updateExplosiveAlert, U["ExplosiveAlertTip"]},
-		{1, "Misc", "PlacedItemAlert", U["Placed Item Alert"].."*", true},
-		{1, "Misc", "SoloInfo", U["SoloInfo"].."*", true, true, nil, nil, updateSoloInfo},
+		{1, "Misc", "SoloInfo", U["SoloInfo"].."*", true, nil, nil, nil, updateSoloInfo},
 		{1, "Misc", "NzothVision", U["NzothVision"]},
 		{1, "Misc", "RareAlerter", "|cff00cc4c"..U["Rare Alert"].."*", true, false, nil, nil, updateRareAlert},
 		{1, "Misc", "RarePrint", U["Alert In Chat"].."*", true, true},
 		{1, "Misc", "RareAlertInWild", U["RareAlertInWild"].."*"},
-	  {1, "Misc", "PlacedItemAlert", U["Placed Item Alert"], true},
-	  {1, "Misc", "InterruptSound", U["Interrupt Alarm"], true, true},
+	  {1, "Misc", "InterruptSound", U["Interrupt Alarm"], true},
 	  --{1, "Misc", "CrazyCatLady", U["Death Alarm"]},
 	  {1, "Misc", "AutoMark", U["Auto Mark"]},
 	  {1, "Misc", "kAutoOpen", U["kAutoOpen"], true},
@@ -1423,7 +1460,7 @@ local function updateDropdownClick(self)
 end
 
 local function CreateOption(i)
-	local parent, offset = guiPage[i].child, 60
+	local parent, offset = guiPage[i].child, 40
 
 	for _, option in pairs(G.OptionList[i]) do
 		local optType, key, value, name, horizon, horizon2, data, callback, tooltip = unpack(option)
@@ -1543,7 +1580,7 @@ local function CreateOption(i)
 		-- Colorswatch
 		elseif optType == 5 then
 			local swatch = M.CreateColorSwatch(parent, name, CheckUIOption(key, value))
-			local width = 70 + (horizon or 0)*130
+			local width = 65 + (horizon or 0)*130
 			if horizon then
 				swatch:SetPoint("TOPLEFT", width, -offset + 26)
 			else

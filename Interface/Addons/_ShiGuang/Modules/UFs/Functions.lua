@@ -683,6 +683,12 @@ local replaceEncryptedIcons = {
 	[368103] = 648208, -- 急速
 	[368243] = 237538, -- CD
 }
+
+local dispellType = {
+	["Magic"] = true,
+	[""] = true,
+}
+
 function UF.PostUpdateIcon(element, _, button, _, _, duration, expiration, debuffType)
 	if duration then button.iconbg:Show() end
 
@@ -709,6 +715,10 @@ function UF.PostUpdateIcon(element, _, button, _, _, duration, expiration, debuf
 		button.iconbg:SetBackdropBorderColor(0, 0, 0)
 	end
 
+	if element.alwaysShowStealable and dispellType[debuffType] and not UnitIsPlayer(unit) and (not button.isDebuff) then
+		button.stealable:Show()
+	end
+
 	if element.disableCooldown then
 		if duration and duration > 0 then
 			button.expiration = expiration
@@ -729,6 +739,7 @@ end
 local function bolsterPreUpdate(element)
 	element.bolster = 0
 	element.bolsterIndex = nil
+	element.hasTheDot = nil
 end
 
 local function bolsterPostUpdate(element)
@@ -749,8 +760,13 @@ local isCasterPlayer = {
 	["pet"] = true,
 	["vehicle"] = true,
 }
-function UF.CustomFilter(element, unit, button, name, _, _, _, _, _, caster, isStealable, _, spellID, _, _, _, nameplateShowAll)
+function UF.CustomFilter(element, unit, button, name, _, _, debuffType, _, _, caster, isStealable, _, spellID, _, _, _, nameplateShowAll)
 	local style = element.__owner.mystyle
+
+	if R.db["Nameplate"]["ColorByDot"] and style == "nameplate" and caster == "player" and R.db["Nameplate"]["DotSpells"][spellID] then
+		element.hasTheDot = true
+	end
+
 	if name and spellID == 209859 then
 		element.bolster = element.bolster + 1
 		if not element.bolsterIndex then
@@ -766,12 +782,12 @@ function UF.CustomFilter(element, unit, button, name, _, _, _, _, _, caster, isS
 		end
 	elseif style == "nameplate" or style == "boss" or style == "arena" then
 		if element.__owner.plateType == "NameOnly" then
-			return MaoRUIDB["NameplateFilter"][1][spellID] or R.WhiteList[spellID]
-		elseif MaoRUIDB["NameplateFilter"][2][spellID] or R.BlackList[spellID] then
+			return UF.NameplateFilter[1][spellID]
+		elseif UF.NameplateFilter[2][spellID] then
 			return false
-		elseif element.showStealableBuffs and isStealable and not UnitIsPlayer(unit) then
+		elseif (element.showStealableBuffs and isStealable or element.alwaysShowStealable and dispellType[debuffType]) and not UnitIsPlayer(unit) and (not button.isDebuff) then
 			return true
-		elseif MaoRUIDB["NameplateFilter"][1][spellID] or R.WhiteList[spellID] then
+		elseif UF.NameplateFilter[1][spellID] then
 			return true
 		else
 			local auraFilter = R.db["Nameplate"]["AuraFilter"]

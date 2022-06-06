@@ -277,7 +277,7 @@ SlashCmdList["UI_KEYBIND"] = function()
 end
 SLASH_UI_KEYBIND1 = "/Keybind"
 
--- ## Author: Gello ## Version: 1.0.11
+-- ## Author: Gello ## Version: 1.0.14
 local FlyoutBindings = CreateFrame("Button",nil,SpellFlyout,"SecureHandlerShowHideTemplate")
 FlyoutBindings:SetAttribute("_onshow",[[
 	for i=1,10 do
