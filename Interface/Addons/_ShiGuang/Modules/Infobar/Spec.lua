@@ -20,8 +20,8 @@ end
 
 local menuList = {
 	{text = CHOOSE_SPECIALIZATION, isTitle = true, notCheckable = true},
-	{text = SPECIALIZATION, hasArrow = true, notCheckable = true},
-	{text = SELECT_LOOT_SPECIALIZATION, hasArrow = true, notCheckable = true},
+	{text = SPECIALIZATION, hasArrow = true, notCheckable = true, menuList = {}},
+	{text = SELECT_LOOT_SPECIALIZATION, hasArrow = true, notCheckable = true, menuList = {}},
 }
 
 info.eventList = {
@@ -32,7 +32,7 @@ info.eventList = {
 
 info.onEvent = function(self)
 	local specIndex = GetSpecialization()
-	if specIndex then
+	if specIndex and specIndex < 5 then
 		local _, name, _, icon = GetSpecializationInfo(specIndex)
 		if not name then return end
 		local specID = GetLootSpecialization()
@@ -97,14 +97,37 @@ end
 
 info.onLeave = M.HideTooltip
 
-local function clickFunc(i, isLoot)
-	if not i then return end
-	if isLoot then
-		SetLootSpecialization(i)
-	else
-		SetSpecialization(i)
-	end
+local function selectSpec(_, specIndex)
+	if GetSpecialization() == specIndex then return end
+	SetSpecialization(specIndex)
 	DropDownList1:Hide()
+end
+
+local function checkSpec(self)
+	return GetSpecialization() == self.arg1
+end
+
+local function selectLootSpec(_, index)
+	SetLootSpecialization(index)
+	DropDownList1:Hide()
+end
+
+local function checkLootSpec(self)
+	return GetLootSpecialization() == self.arg1
+end
+
+local function BuildSpecMenu()
+	local specList = menuList[2].menuList
+	local lootList = menuList[3].menuList
+	lootList[1] = {text = "", arg1 = 0, func = selectLootSpec, checked = checkLootSpec}
+
+	for i = 1, 4 do
+		local id, name = GetSpecializationInfo(i)
+		if id then
+			specList[i] = {text = name, arg1 = i, func = selectSpec, checked = checkSpec}
+			lootList[i+1] = {text = name, arg1 = id, func = selectLootSpec, checked = checkLootSpec}
+		end
+	end
 end
 
 info.onMouseUp = function(self, btn)
@@ -115,31 +138,11 @@ info.onMouseUp = function(self, btn)
 		--if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
 		ToggleTalentFrame(2)
 	else
-		menuList[2].menuList = {{}, {}, {}, {}}
-		menuList[3].menuList = {{}, {}, {}, {}, {}}
-		local specList, lootList = menuList[2].menuList, menuList[3].menuList
-		local spec, specName = GetSpecializationInfo(specIndex)
-		local lootSpec = GetLootSpecialization()
-		lootList[1] = {text = format(LOOT_SPECIALIZATION_DEFAULT, specName), func = function() clickFunc(0, true) end, checked = lootSpec == 0 and true or false}
-
-		for i = 1, 4 do
-			local id, name = GetSpecializationInfo(i)
-			if id then
-				specList[i].text = name
-				if id == spec then
-					specList[i].func = function() clickFunc() end
-					specList[i].checked = true
-				else
-					specList[i].func = function() clickFunc(i) end
-					specList[i].checked = false
-				end
-				lootList[i+1] = {text = name, func = function() clickFunc(id, true) end, checked = id == lootSpec and true or false}
-			else
-				specList[i] = nil
-				lootList[i+1] = nil
-			end
+		if not menuList[1].created then
+			BuildSpecMenu()
+			menuList[1].created = true
 		end
-
+		menuList[3].menuList[1].text = format(LOOT_SPECIALIZATION_DEFAULT, select(2, GetSpecializationInfo(specIndex)))
 		EasyMenu(menuList, M.EasyMenu, self, -80, 100, "MENU", 1)
 		GameTooltip:Hide()
 	end

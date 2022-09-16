@@ -269,6 +269,10 @@ function MISC:Expbar()
 	bar.restBar = rest
 
 	MISC:SetupScript(bar)
+
+	if I.isNewPatch then
+		StatusTrackingBarManager:UnregisterAllEvents()
+	end
 end
 MISC:RegisterMisc("ExpRep", MISC.Expbar)
 
@@ -302,6 +306,7 @@ function MISC:HookParagonRep()
 end
 
 function MISC:ParagonReputationSetup()
+	if I.isNewPatch then return end -- todo
 	if not R.db["Misc"]["ParagonRep"] then return end
 	hooksecurefunc("ReputationFrame_Update", MISC.HookParagonRep)
 end

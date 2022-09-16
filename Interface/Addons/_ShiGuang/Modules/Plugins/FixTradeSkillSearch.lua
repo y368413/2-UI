@@ -1,5 +1,7 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
+if I.isNewPatch then return end
+
 -------------------------------------- Author: Ketho (EU-Boulderfist)-- License: Public Domain-- NDui MOD------------------------------------
 local pairs, tonumber, strmatch = pairs, tonumber, string.match
 

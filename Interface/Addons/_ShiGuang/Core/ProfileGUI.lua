@@ -370,7 +370,8 @@ local bloodlustFilter = {
 	[57723] = true,
 	[57724] = true,
 	[80354] = true,
-	[264689] = true
+	[264689] = true,
+	[390435] = true, -- evoker
 }
 
 local accountStrValues = {
@@ -418,7 +419,7 @@ function G:ExportGUIData()
 								end
 							end
 						end
-					elseif KEY == "Mover" or KEY == "RaidClickSets" or KEY == "InternalCD" or KEY == "AuraWatchMover" then
+					elseif KEY == "Mover" or KEY == "InternalCD" or KEY == "AuraWatchMover" then
 						text = text..";"..KEY..":"..key
 						for _, v in ipairs(value) do
 							text = text..":"..tostring(v)
@@ -498,6 +499,15 @@ function G:ExportGUIData()
 			text = text..";ACCOUNT:"..KEY
 			for k, v in pairs(VALUE) do
 				text = text..":"..k..":"..v
+			end
+		elseif KEY == "ClickSets" then
+			text = text..";ACCOUNT:"..KEY
+			if MaoRUIDB[KEY][I.MyClass] then
+				text = text..":"..I.MyClass
+				for fullkey, value in pairs(MaoRUIDB[KEY][I.MyClass]) do
+					value = gsub(value, "%:", "`")
+					text = text..":"..fullkey..":"..value
+				end
 			end
 		elseif VALUE == true or VALUE == false or accountStrValues[KEY] then
 			text = text..";ACCOUNT:"..KEY..":"..tostring(VALUE)
@@ -607,10 +617,6 @@ function G:ImportGUIData()
 			x = tonumber(x)
 			y = tonumber(y)
 			R.db[key][value] = {relFrom, parent, relTo, x, y}
-		elseif key == "RaidClickSets" then
-			if I.MyClass == class then
-				R.db[key][value] = {select(3, strsplit(":", option))}
-			end
 		elseif key == "InternalCD" then
 			local spellID, duration, indicator, unit, itemID = select(3, strsplit(":", option))
 			spellID = tonumber(spellID)
@@ -682,6 +688,15 @@ function G:ImportGUIData()
 				for i = 1, #results, 2 do
 					MaoRUIDB[value][tonumber(results[i])] = results[i+1]
 				end
+			elseif value == "ClickSets" then
+				if arg1 == I.MyClass then
+					MaoRUIDB[value][arg1] = MaoRUIDB[value][arg1] or {}
+					local results = {select(4, strsplit(":", option))}
+					for i = 1, #results, 2 do
+						results[i+1] = gsub(results[i+1], "`", ":")
+						MaoRUIDB[value][arg1][results[i]] = tonumber(results[i+1]) or results[i+1]
+					end
+				end
 			end
 		elseif tonumber(arg1) then
 			if value == "DBMCount" then
@@ -730,7 +745,7 @@ function G:CreateDataFrame()
 	editBox:SetMaxLetters(99999)
 	editBox:EnableMouse(true)
 	editBox:SetAutoFocus(true)
-	editBox:SetFont(I.Font[1], 14)
+	editBox:SetFont(I.Font[1], 14, "")
 	editBox:SetWidth(scrollArea:GetWidth())
 	editBox:SetHeight(scrollArea:GetHeight())
 	editBox:SetScript("OnEscapePressed", function() dataFrame:Hide() end)

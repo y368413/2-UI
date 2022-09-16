@@ -7,8 +7,8 @@ local tinsert, mod, min, ceil = tinsert, mod, min, ceil
 local cfg = R.Bars.stancebar
 local margin, padding = R.Bars.margin, R.Bars.padding
 
-local num = NUM_STANCE_SLOTS
-local NUM_POSSESS_SLOTS = NUM_POSSESS_SLOTS
+local num = NUM_STANCE_SLOTS or 10
+local NUM_POSSESS_SLOTS = NUM_POSSESS_SLOTS or 2
 
 function Bar:UpdateStanceBar()
 	local frame = _G["UI_ActionBarStance"]

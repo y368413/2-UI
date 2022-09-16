@@ -1,4 +1,4 @@
-﻿--## Version: 9.0.32 ## Author: lteke
+﻿--## Version: 9.2.34 ## Author: lteke
 local InProgressMissions = {}
 
 InProgressMissions.frame = InProgressMissions.frame or CreateFrame("Frame", nil, _G.WorldFrame)
@@ -296,38 +296,37 @@ local function FormatRewardNumbers(value)
 end
 
 local function Reward_Update(Reward, info)
-	Reward.bonusAbilityID = info.bonusAbilityID
 	Reward.Quantity:Hide()
 	Reward.IconBorder:Hide()
 	Reward.Success:Hide()
-	if (info.itemID) then
+	Reward.bonusAbilityID = info.bonusAbilityID
+	Reward.title = nil
+	Reward.tooltip = nil
+	Reward.itemID = nil
+	Reward.itemLink = nil
+	Reward.currencyID = nil
+	Reward.currencyQuantity = nil
+	if (info.itemID or info.itemLink) then
 		Reward.itemID = info.itemID
+		Reward.itemLink = info.itemLink
 		local itemTexture = select(10, GetItemInfo(info.itemID))
 		Reward.Icon:SetTexture(itemTexture)
 		if ( info.quantity > 1 ) then
 			Reward.Quantity:SetText(info.quantity)
 			Reward.Quantity:Show()
 		else
-			local quality, itemLevel = select(3, GetItemInfo(info.itemID))
+			local quality, itemLevel = select(3, GetItemInfo(info.itemLink or info.itemID))
 			if ( itemLevel and itemLevel > 500 ) then
-				--local text = itemLevel > 500 and itemLevel or itemDifficulty[info.itemID]
-				--if text then
-				--	Reward.Quantity:SetText(ITEM_QUALITY_COLORS[quality].hex..text..FONT_COLOR_CODE_CLOSE)
-				--	Reward.Quantity:Show()
-				--end
 				Reward.Quantity:SetText(ITEM_QUALITY_COLORS[quality].hex..itemLevel..FONT_COLOR_CODE_CLOSE)
 				Reward.Quantity:Show()
 			end
 		end
 		--Reward.tooltip = nil
-		local quality = select(3, GetItemInfo(info.itemID))
-		if quality and quality > 1 then
-			local c = ITEM_QUALITY_COLORS[quality]
-			Reward.IconBorder:SetVertexColor(c.r, c.g, c.b)
-			Reward.IconBorder:Show()
-		end
+		local quality = select(3, GetItemInfo(info.itemLink or info.itemID))
+		local c = BAG_ITEM_QUALITY_COLORS[quality] or BAG_ITEM_QUALITY_COLORS[1]
+		Reward.IconBorder:SetVertexColor(c.r, c.g, c.b)
+		Reward.IconBorder:Show()
 	else
-		Reward.itemID = nil
 		Reward.Icon:SetTexture(info.icon)
 		Reward.title = info.title
 		if (info.currencyID and info.quantity) then
@@ -336,9 +335,18 @@ local function Reward_Update(Reward, info)
 				Reward.Quantity:SetText(BreakUpLargeNumbers(math.floor(info.quantity / COPPER_PER_GOLD)))
 				Reward.Quantity:Show()
 			else
-				local currencyTexture = C_CurrencyInfo.GetBasicCurrencyInfo(info.currencyID).icon
+				Reward.currencyID = info.currencyID
+				Reward.tooltip = info.tooltip
+				Reward.currencyQuantity = info.quantity
+				-- local currencyTexture = C_CurrencyInfo.GetBasicCurrencyInfo(info.currencyID).icon
+				local currencyName, currencyTexture, currencyQuantity, currencyQuality = CurrencyContainerUtil.GetCurrencyContainerInfo(info.currencyID, info.quantity, info.title, info.icon, nil)
 				Reward.tooltip = BreakUpLargeNumbers(info.quantity).." |T"..currencyTexture..":0:0:0:-1|t "
 				Reward.Quantity:SetText(info.quantity)
+				local c = BAG_ITEM_QUALITY_COLORS[currencyQuality]
+				if c then
+					Reward.IconBorder:SetVertexColor(c.r, c.g, c.b)
+					Reward.IconBorder:Show()
+				end
 				Reward.Quantity:Show()
 			end
 		elseif (info.bonusAbilityID) then
@@ -347,6 +355,10 @@ local function Reward_Update(Reward, info)
 			Reward.bonusAbilityIcon = info.icon
 			Reward.bonusAbilityName = info.name
 			Reward.bonusAbilityDescription = info.description
+			Reward.duration = info.duration
+			Reward.icon = info.icon
+			Reward.name = info.name
+			Reward.description = info.description
 		else
 			Reward.tooltip = info.tooltip
 			if ( info.followerXP ) then
@@ -997,6 +1009,7 @@ function InProgressMissions:MissionButton_SetStyle()
 				button.Rewards[i].Success = button.Rewards[i]:CreateFontString(nil, "ARTWORK", "GarrisonReportFontRewardQuantity")
 				button.Rewards[i].Success:SetPoint("TOPLEFT", -2, 2)
 				button.Rewards[i].Success:SetTextColor(0.9, 0.9, 0.9)
+				button.Rewards[i]:SetScript("OnEnter", _G.GarrisonMissionPage_RewardOnEnter)
 			end
 			if not button.Level then
 				button.Level = button:CreateFontString(nil, "ARTWORK", "GameFontHighlightMed2")
@@ -1395,12 +1408,103 @@ do -- CovenantMissionFrame Smooth Scroll
 	end
 
 	function InProgressMissions:CovenantMissionFrame_EnableSmoothScroll()
-		self.CovenantMissionsScrollFrame.scrollBar:SetValueStep(7)
-		self.CovenantMissionsScrollFrame.stepSize = 7
+		self.CovenantMissionsScrollFrame.scrollBar:SetValueStep(9)
+		self.CovenantMissionsScrollFrame.stepSize = 9
 		self.CovenantMissionsScrollFrame:SetScript("OnMouseWheel", CovenantMissionFrame_OnMouseWheel)
 		self.CovenantMissionsScrollFrame.scrollBar:SetScript("OnUpdate", CovenantMissionFrameScrollBar_OnUpdate)
 		self.CovenantMissionsScrollFrame:HookScript("OnHide", function(self) self.scrollBar.doScroll = 0 end)
 	end
+end
+
+local function CovenantMissionReward_OnEnter(frame)
+	if frame.info then
+		GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
+		if frame.info.itemLink then
+			GameTooltip:SetHyperlink(frame.info.itemLink)
+		elseif frame.info.itemID then
+			GameTooltip:SetItemByID(frame.info.itemID)
+		elseif frame.info.currencyID then
+			if frame.info.currencyID > 0 then
+				GameTooltip:SetCurrencyByID(frame.info.currencyID)
+			else -- Money
+				GameTooltip:SetText(frame.info.title)
+				GameTooltip:AddLine(GetMoneyString(frame.info.quantity), 1, 1, 1)
+				GameTooltip:Show()
+			end
+		else
+			if frame.info.title then
+				GameTooltip:SetText(frame.info.title)
+			end
+			if frame.info.tooltip then
+				GameTooltip:AddLine(frame.info.tooltip, 1, 1, 1, true)
+			end
+			GameTooltip:Show()
+		end
+	end
+end
+
+local function CovenantMissionFrame_ShowMission(frame, info)
+	for i, button in ipairs(InProgressMissions.CovenantMissionRewards) do
+		local reward = info.rewards[i]
+		button.info = reward
+		if reward then
+			button:EnableMouse(true)
+			button:SetAlpha(1)
+			button.iconBorder:Hide()
+			if reward.itemID then
+				local name, _, rarity, _, _, _, _, _, _, icon = GetItemInfo(reward.itemLink or reward.itemID)
+				button.icon:SetTexture(icon)
+				local color = BAG_ITEM_QUALITY_COLORS[rarity] or BAG_ITEM_QUALITY_COLORS[1]
+				button.iconBorder:SetVertexColor(color.r, color.g, color.b)
+				button.iconBorder:Show()
+			elseif reward.currencyID and reward.currencyID > 0 then
+				local currencyName, currencyTexture, currencyQuantity, currencyQuality = CurrencyContainerUtil.GetCurrencyContainerInfo(reward.currencyID, reward.quantity, reward.title, reward.icon, nil)
+				button.icon:SetTexture(currencyTexture)
+				local color = BAG_ITEM_QUALITY_COLORS[currencyQuality] or BAG_ITEM_QUALITY_COLORS[1]
+				button.iconBorder:SetVertexColor(color.r, color.g, color.b)
+				button.iconBorder:Show()
+			else
+				button.icon:SetTexture(reward.icon or nil)
+			end
+		else
+			button:EnableMouse(false)
+			button:SetAlpha(0)
+		end
+	end
+end
+
+local function CovenantMissionReward_OnLeave(frame)
+	GameTooltip:Hide()
+end
+
+function InProgressMissions:CovenantMissionAddRewardsIcons()
+	if not _G.CovenantMissionFrame.MissionTab.MissionPage then return end
+	self.CovenantMissionPage = _G.CovenantMissionFrame.MissionTab.MissionPage
+	local titleText = self.CovenantMissionPage.Stage.Title
+	self.CovenantMissionRewards = {}
+	local reward
+	reward = CreateFrame("Frame", nil, self.CovenantMissionPage.Stage.MouseOverTitleFrame)
+	reward:SetScript("OnEnter", CovenantMissionReward_OnEnter)
+	reward:SetScript("OnLeave", CovenantMissionReward_OnLeave)
+	reward:SetPoint("BOTTOMRIGHT", titleText, "BOTTOMRIGHT", 0, -6)
+	reward:SetSize(20, 20)
+	reward.icon = reward:CreateTexture(nil, "ARTWORK", nil, 6)
+	reward.icon:SetAllPoints()
+	reward.iconBorder = reward:CreateTexture(nil, "ARTWORK", nil, 7)
+	reward.iconBorder:SetAllPoints()
+	reward.iconBorder:SetTexture("Interface\\Common\\WhiteIconFrame")
+	self.CovenantMissionRewards[1] = reward
+	reward = CreateFrame("Frame", nil, self.CovenantMissionPage.Stage.MouseOverTitleFrame)
+	reward:SetScript("OnEnter", CovenantMissionReward_OnEnter)
+	reward:SetScript("OnLeave", CovenantMissionReward_OnLeave)
+	reward:SetPoint("BOTTOMRIGHT", self.CovenantMissionRewards[1], "BOTTOMLEFT", -3, 0)
+	reward:SetSize(20, 20)
+	reward.icon = reward:CreateTexture(nil, nil, nil, 6)
+	reward.icon:SetAllPoints()
+	reward.iconBorder = reward:CreateTexture(nil, "ARTWORK", nil, 7)
+	reward.iconBorder:SetAllPoints()
+	reward.iconBorder:SetTexture("Interface\\Common\\WhiteIconFrame")
+	self.CovenantMissionRewards[2] = reward
 end
 
 function InProgressMissions:HookCovenantMissionFrame()
@@ -1408,12 +1512,12 @@ function InProgressMissions:HookCovenantMissionFrame()
 		self.CovenantMissionsScrollFrame = _G.CovenantMissionFrameMissionsListScrollFrame
 		hooksecurefunc(_G.CovenantMissionFrame.MissionTab.MissionList, "Update", function()
 			MissionsScrollFrame_SetExpiresText(self.CovenantMissionsScrollFrame)
-			if IPMDB.improveCovenantMissionUI then
+			if IPMDB.improveCovenantMissionUI or IPMDB.improveCovenantMissionUI == nil then
 				self:CovenantMissionFrame_SetRewardStyle()
 			end
 		end)
 	end
-	if IPMDB.improveCovenantMissionUI then
+	if IPMDB.improveCovenantMissionUI or IPMDB.improveCovenantMissionUI == nil then
 		self:CovenantMissionFrame_SetStyle()
 		self:CovenantMissionFrame_EnableSmoothScroll()
 	else
@@ -1423,6 +1527,10 @@ function InProgressMissions:HookCovenantMissionFrame()
 				CovenantMissionFrameMissionsButton_OnEnter(self)
 			end
 		end)
+	end
+	if _G.CovenantMissionFrame then
+		self:CovenantMissionAddRewardsIcons()
+		hooksecurefunc(_G.CovenantMissionFrame, "ShowMission", CovenantMissionFrame_ShowMission)
 	end
 end
 

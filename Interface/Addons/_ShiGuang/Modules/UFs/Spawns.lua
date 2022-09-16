@@ -10,7 +10,9 @@ local UFRangeAlpha = {insideAlpha = 1, outsideAlpha = .4}
 
 local function SetUnitFrameSize(self, unit)
 	local width = R.db["UFs"][unit.."Width"]
-	local height = R.db["UFs"][unit.."Height"] + R.db["UFs"][unit.."PowerHeight"] + R.mult
+	local healthHeight = R.db["UFs"][unit.."Height"]
+	local powerHeight = R.db["UFs"][unit.."PowerHeight"]
+	local height = powerHeight == 0 and healthHeight or healthHeight + powerHeight + R.mult
 	self:SetSize(width, height)
 end
 
@@ -158,7 +160,7 @@ local function GetRaidVisibility()
 		end
 	else
 		if R.db["UFs"]["ShowSolo"] then
-			visibility = "show"
+			visibility = "[group,nogroup]show;hide"
 		else
 			visibility = "[group] show;hide"
 		end
@@ -332,6 +334,7 @@ function UF:OnLogin()
 		UF:ToggleAllAuras()
 		--UF:UpdateScrollingFont()
 	if R.db["UFs"]["RaidFrame"] then
+		SetCVar("predictedHealth", 1)
 		UF:AddClickSetsListener()
 		UF:UpdateCornerSpells()
 		UF.headers = {}
@@ -496,7 +499,7 @@ function UF:OnLogin()
 
 			local groupByTypes = {
 				[1] = {"1,2,3,4,5,6,7,8", "GROUP", "INDEX"},
-				[2] = {"DEATHKNIGHT,WARRIOR,DEMONHUNTER,ROGUE,MONK,PALADIN,DRUID,SHAMAN,HUNTER,PRIEST,MAGE,WARLOCK", "CLASS", "NAME"},
+				[2] = {"DEATHKNIGHT,WARRIOR,DEMONHUNTER,ROGUE,MONK,PALADIN,DRUID,SHAMAN,HUNTER,EVOKER,PRIEST,MAGE,WARLOCK", "CLASS", "NAME"},
 				[3] = {"TANK,HEALER,DAMAGER,NONE", "ASSIGNEDROLE", "NAME"},
 			}
 			function UF:UpdateSimpleModeHeader()
@@ -610,7 +613,7 @@ function UF:OnLogin()
 						group.index = i
 						group.groupType = "raid"
 						tinsert(UF.headers, group)
-						RegisterStateDriver(group, "visibility", "show")
+						RegisterStateDriver(group, "visibility", "[group,nogroup]show;hide")
 						RegisterStateDriver(group, "visibility", GetRaidVisibility())
 						CreateTeamIndex(group)
 
@@ -697,14 +700,14 @@ function UF:OnLogin()
 			M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", UpdateSpecPos)
 
 			if raidMover then
-				raidMover:HookScript("OnDragStop", function()
+				hooksecurefunc(raidMover, "SetPoint", function()
 					local specIndex = GetSpecialization()
 					if not specIndex then return end
 					R.db["Mover"]["RaidPos"..specIndex] = R.db["Mover"]["RaidFrame"]
 				end)
 			end
 			if partyMover then
-				partyMover:HookScript("OnDragStop", function()
+				hooksecurefunc(partyMover, "SetPoint", function()
 					local specIndex = GetSpecialization()
 					if not specIndex then return end
 					R.db["Mover"]["PartyPos"..specIndex] = R.db["Mover"]["PartyFrame"]

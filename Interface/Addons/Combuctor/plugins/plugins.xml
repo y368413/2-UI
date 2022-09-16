@@ -4,6 +4,7 @@
   <Script file="Combuctor_Binding.lua"/>
   <Script file="Combuctor_ItemInfo.lua"/>
   <Script file="Combuctor_RequiredLevel.lua"/>
+  <Script file="libs\WagoAnalytics\Shim.lua" />
 	<Script file="CaerdonWardrobe.lua" />
 
 	<!-- This is derived from GameTooltip in GameTooltip.xml -->
@@ -60,5 +61,7 @@
 	<Script file="types\MountMixin.lua" />
 	<Script file="types\QuestMixin.lua" />
 	<Script file="types\RecipeMixin.lua" />
-	<Script file="types\ToyMixin.lua" />	
+	<Script file="types\ToyMixin.lua" />
+	
+	<Include file="config\Config.xml" />	
 </Ui>

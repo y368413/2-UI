@@ -1,3 +1,4 @@
+--## Author: Kemayo ## Version: v5
 local SuramarLeylines = {}
 
 local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes")

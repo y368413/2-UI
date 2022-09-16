@@ -181,26 +181,32 @@ G.DefaultSettings = {
 		RCCName = true,
 		HideTip = false,
 		DescRole = true,
+		PlayerAbsorb = false,
 
 		PlayerWidth = 245,
 		PlayerHeight = 24,
+		PlayerNameOffset = 0,
 		PlayerPowerHeight = 6,
 		PlayerPowerOffset = 2,
 		PlayerHPTag = 2,
 		PlayerMPTag = 4,
 		FocusWidth = 160,
 		FocusHeight = 21,
+		FocusNameOffset = 0,
 		FocusPowerHeight = 3,
 		FocusPowerOffset = 2,
 		FocusHPTag = 2,
 		FocusMPTag = 4,
 		PetWidth = 100,
 		PetHeight = 16,
+		PetNameOffset = 0,
 		PetPowerHeight = 2,
 		PetHPTag = 4,
 		BossWidth = 120,
 		BossHeight = 21,
+		BossNameOffset = 0,
 		BossPowerHeight = 3,
+		BossPowerOffset = 2,
 		BossHPTag = 5,
 		BossMPTag = 5,
 		OwnCastColor = {r=.3, g=.7, b=1},
@@ -215,6 +221,7 @@ G.DefaultSettings = {
 		FocusCB = false,
 		FocusCBWidth = 245,
 		FocusCBHeight = 18,
+		PetCB = true,
 
 		PlayerNumBuff = 20,
 		PlayerNumDebuff = 20,
@@ -539,7 +546,8 @@ G.AccountSettings = {
 	SkadaRequest = false,
 	BWRequest = false,
 	RaidAuraWatch = {},
-	RaidClickSets = {},
+	RaidClickSets = {}, -- deprecated
+	ClickSets = {},
 	TexStyle = 3,
 	KeystoneInfo = {},
 	AutoBubbles = false,
@@ -565,6 +573,14 @@ G.TextureList = {
 	[3] = {texture = I.flatTex, name = U["Flat"]},
 }
 
+local ignoredTable = {
+	["AuraWatchList"] = true,
+	["AuraWatchMover"] = true,
+	["InternalCD"] = true,
+	["Mover"] = true,
+	["TempAnchor"] = true,
+}
+
 local function InitialSettings(source, target, fullClean)
 	for i, j in pairs(source) do
 		if type(j) == "table" then
@@ -581,9 +597,9 @@ local function InitialSettings(source, target, fullClean)
 
 	for i, j in pairs(target) do
 		if source[i] == nil then target[i] = nil end
-		if fullClean and type(j) == "table" then
+		if fullClean and type(j) == "table" and not ignoredTable[i] then
 			for k, v in pairs(j) do
-				if type(v) ~= "table" and source[i] and source[i][k] == nil then
+				if source[i] and source[i][k] == nil then
 					target[i][k] = nil
 				end
 			end
@@ -806,10 +822,6 @@ local function updatePlateCVars()
 	M:GetModule("UnitFrames"):UpdatePlateCVars()
 end
 
-local function updateClickableSize()
-	M:GetModule("UnitFrames"):UpdateClickableSize()
-end
-
 local function updateCustomUnitList()
 	M:GetModule("UnitFrames"):CreateUnitTable()
 end
@@ -857,6 +869,12 @@ end
 
 local function updateUFTextScale()
 	M:GetModule("UnitFrames"):UpdateTextScale()
+end
+
+local function togglePlayerAbsorb()
+	if _G.oUF_Player then
+		M:GetModule("UnitFrames").UpdateFrameHealthTag(_G.oUF_Player)
+	end
 end
 
 local function toggleUFClassPower()
@@ -1131,10 +1149,10 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{3, "Nameplate", "MinScale", U["Nameplate MinScale"].."*", false, nil, {.5, 1, .1}, updatePlateCVars},
 		{3, "Nameplate", "MinAlpha", U["Nameplate MinAlpha"].."*", true, nil, {.3, 1, .1}, updatePlateCVars},
 		{3, "Nameplate", "VerticalSpacing", U["NP VerticalSpacing"].."*", true, true, {.5, 1.5, .1}, updatePlateCVars},
-		{3, "Nameplate", "HarmWidth", NewTag..U["PlateHarmWidth"].."*", nil, nil, {1, 500, 1}, updateClickableSize},
-		{3, "Nameplate", "HarmHeight", NewTag..U["PlateHarmHeight"].."*", true, nil, {1, 500, 1}, updateClickableSize},
-		{3, "Nameplate", "HelpWidth", NewTag..U["PlateHelpWidth"].."*", true, true, {1, 500, 1}, updateClickableSize},
-		{3, "Nameplate", "HelpHeight", NewTag..U["PlateHelpHeight"].."*", nil, nil, {1, 500, 1}, updateClickableSize},
+		--{3, "Nameplate", "HarmWidth", NewTag..U["PlateHarmWidth"].."*", nil, nil, {1, 500, 1}, updateClickableSize},
+		--{3, "Nameplate", "HarmHeight", NewTag..U["PlateHarmHeight"].."*", true, nil, {1, 500, 1}, updateClickableSize},
+		--{3, "Nameplate", "HelpWidth", NewTag..U["PlateHelpWidth"].."*", true, true, {1, 500, 1}, updateClickableSize},
+		--{3, "Nameplate", "HelpHeight", NewTag..U["PlateHelpHeight"].."*", nil, nil, {1, 500, 1}, updateClickableSize},
 		{1, "Nameplate", "CVarOnlyNames", NewTag..U["CVarOnlyNames"], true, nil, nil, updatePlateCVars, U["CVarOnlyNamesTip"]},
 		{1, "Nameplate", "CVarShowNPCs", NewTag..U["CVarShowNPCs"].."*", true, true, nil, updatePlateCVars, U["CVarShowNPCsTip"]},
 		{1, "Nameplate", "ColoredTarget", HeaderTag..U["ColoredTarget"].."*", nil, nil, nil, nil, U["ColoredTargetTip"]},

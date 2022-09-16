@@ -9,7 +9,7 @@ I.Version = GetAddOnMetadata("_ShiGuang", "Version")
 I.Support = GetAddOnMetadata("_ShiGuang", "X-Support")
 I.Client = GetLocale()
 I.ScreenWidth, I.ScreenHeight = GetPhysicalScreenSize()
-I.isNewPatch = select(4, GetBuildInfo()) >= 90205 -- 9.2.5
+I.isNewPatch = select(4, GetBuildInfo()) >= 100000 -- 10.0
 
 -- Deprecated
 LE_ITEM_QUALITY_POOR = Enum.ItemQuality.Poor
@@ -65,12 +65,14 @@ I.UIString = "|cff0080ff*|r"
 -- Textures
 local Media = "Interface\\Addons\\_ShiGuang\\Media\\"
 I.bdTex = "Interface\\ChatFrame\\ChatFrameBackground"
+I.blankTex = Media.."blankTex"
 I.glowTex = Media.."glowTex"
 I.normTex = Media.."normTex"
 I.gradTex = Media.."gradTex"
 I.flatTex = Media.."flatTex"
 I.bgTex = Media.."bgTex"
 I.arrowTex = Media.."Modules\\Raid\\Arrow"  --"Interface\\BUTTONS\\UI-MicroStream-Red.blp"
+I.starTex = Media.."Hutu\\star"
 I.MicroTex = Media.."Hutu\\"
 I.rolesTex = Media.."Hutu\\RoleIcons"  --UI-LFG-ICON-ROLES
 I.tankTex = Media.."Hutu\\Tank"

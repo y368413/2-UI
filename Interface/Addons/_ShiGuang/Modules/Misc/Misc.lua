@@ -292,6 +292,14 @@ function MISC:MoveQuestTracker()
 	tracker:SetClampedToScreen(false)
 	tracker:SetMovable(true)
 	if tracker:IsMovable() then tracker:SetUserPlaced(true) end
+
+	if not I.isNewPatch then return end
+	hooksecurefunc(tracker, "SetPoint", function(self, _, parent)
+		if parent ~= frame then
+			self:ClearAllPoints()
+			self:SetPoint("TOPRIGHT", frame)
+		end
+	end)
 end
 
 -- Achievement screenshot
@@ -587,21 +595,7 @@ do
 
 		M:UnregisterEvent(event, fixGuildNews)
 	end
-
-	local function fixCommunitiesNews(event, addon)
-		if addon ~= "Blizzard_Communities" then return end
-
-		local _CommunitiesGuildNewsButton_OnEnter = CommunitiesGuildNewsButton_OnEnter
-		function CommunitiesGuildNewsButton_OnEnter(self)
-			if not (self.newsInfo and self.newsInfo.whatText) then return end
-			_CommunitiesGuildNewsButton_OnEnter(self)
-		end
-
-		M:UnregisterEvent(event, fixCommunitiesNews)
-	end
-
 	M:RegisterEvent("ADDON_LOADED", fixGuildNews)
-	M:RegisterEvent("ADDON_LOADED", fixCommunitiesNews)
 end
 
 local function skipOnKeyDown(self, key)

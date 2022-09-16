@@ -1,4 +1,4 @@
-﻿--## Author: Caerdon ## SavedVariables: CaerdonWardrobeConfig  ## Version: v2.14.0
+﻿--## Author: Caerdon ## SavedVariables: CaerdonWardrobeConfig  ## Version: v2.22.0
 	
 if GetLocale() == "zhCN" then
   CaerdonWardrobeBoA = "|cffe6cc80战网|r";
@@ -10,6 +10,9 @@ else
   CaerdonWardrobeBoA = "|cffe6cc80BoA|r";
   CaerdonWardrobeBoE = "|cff1eff00BoE|r";
 end
+
+
+WagoAnalytics = LibStub("WagoAnalytics"):Register("pkNMoqKz")
 
 CaerdonWardrobeFeatureMixin = {}
 function CaerdonWardrobeFeatureMixin:GetName()
@@ -84,6 +87,26 @@ end
 function CaerdonWardrobeFeatureMixin:OnUpdate()
 	-- Called from the main frame's OnUpdate
 end
+
+CaerdonWardrobeItemDataMixin = {}
+
+function CaerdonWardrobeItemDataMixin:ContinueOnItemDataLoad(callbackFunction)
+    if type(callbackFunction) ~= "function" or self.item:IsItemEmpty() then
+        error("Usage: NonEmptyItem:ContinueOnLoad(callbackFunction)", 2);
+    end
+
+    callbackFunction()
+end
+
+-- Allows for override of continue return if additional data needs to get loaded from a specific mixin (i.e. equipment sources)
+function CaerdonWardrobeItemDataMixin:ContinueWithCancelOnItemDataLoad(callbackFunction)
+    callbackFunction()
+
+    -- By default, there is nothing to cancel, but if you override, make sure to support canceling.
+    return function()
+    end;
+end
+
 --BINDING_HEADER_CAERDON = L["Caerdon Addons"]
 --BINDING_NAME_COPYMOUSEOVERLINK = L["Copy Mouseover Link"]
 --BINDING_NAME_PRINTMOUSEOVERLINKDETAILS = L["Print Mouseover Link Details"]
@@ -378,27 +401,10 @@ function CaerdonWardrobeMixin:SetItemButtonStatus(originalButton, item, feature,
 	local mogStatus = button.mogStatus
 	local mogAnim = button.mogAnim
 	local iconPosition, showSellables, isSellable
-	local otherIconSize = 43
-	local otherIconOffset = 0
-	local iconOffset = 0
 
 	if options then 
 		showSellables = options.showSellables
 		isSellable = options.isSellable
-		if options.iconOffset then
-			iconOffset = options.iconOffset
-			otherIconOffset = iconOffset
-		end
-
-		if options.otherIconSize then
-			otherIconSize = options.otherIconSize
-		else
-			otherIconSize = iconSize
-		end
-
-		if options.otherIconOffset then
-			otherIconOffset = options.otherIconOffset
-		end
 	else
 		options = {}
 	end
@@ -803,7 +809,7 @@ function CaerdonWardrobeMixin:ProcessItem(button, item, feature, locationInfo, o
 		end
 	end
 
-	local isQuestItem = itemClassID == LE_ITEM_CLASS_QUESTITEM
+	local isQuestItem = itemClassID == Enum.ItemClass.Questitem
 	if isQuestItem and CaerdonWardrobeConfig.Icon.ShowQuestItems then
 		mogStatus = "quest"
 	end
@@ -843,8 +849,9 @@ function CaerdonWardrobeMixin:ProcessItem(button, item, feature, locationInfo, o
 				else
 					if transmogInfo.hasMetRequirements then
 						mogStatus = "collected"
-					else
-						mogStatus = "lowSkill"
+					-- Don't mark as lowSkill for equipment if it's known but not the right level... too much noise
+					-- else
+					-- 	mogStatus = "lowSkill"
 					end
 				end
 
@@ -1308,7 +1315,7 @@ end
 
 function GetDefaultConfig()
 	return {
-		Version = 11,
+		Version = 17,
 		
 		Debug = {
 			Enabled = false
@@ -1323,7 +1330,8 @@ function GetDefaultConfig()
 				GuildBank = true,
 				Merchant = true,
 				Auction = true,
-				SameLookDifferentItem = false
+				SameLookDifferentItem = false,
+				SameLookDifferentLevel = true
 			},
 
 			ShowLearnableByOther = {
@@ -1331,8 +1339,7 @@ function GetDefaultConfig()
 				GuildBank = true,
 				Merchant = true,
 				Auction = true,
-				EncounterJournal = true,
-				SameLookDifferentItem = false
+				EncounterJournal = true
 			},
 
 			ShowSellable = {

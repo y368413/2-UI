@@ -185,19 +185,7 @@ function module:BlockTrashClub()
 		end
 	end
 end
--- Show icon on chat hyperlinks
-local function GetHyperlink(link, texture)
-    if (not texture) then return link else return "|T"..texture..":0|t" .. link end
-end
-local function SetChatLinkIcon(link)
-    local schema, id = string.match(link, "|H(%w+):(%d+):")
-    local texture
-    if (schema == "item") then texture = select(10, GetItemInfo(tonumber(id)))
-    elseif (schema == "spell") then texture = select(3, GetSpellInfo(tonumber(id)))
-    elseif (schema == "achievement") then texture = select(10, GetAchievementInfo(tonumber(id)))
-    end
-    return GetHyperlink(link, texture)
-end
+
 -- Show itemlevel on chat hyperlinks
 local function isItemHasLevel(link)
 	local name, _, rarity, level, _, _, _, _, _, _, _, classID = GetItemInfo(link)
@@ -225,61 +213,67 @@ local function GetSocketTexture(socket, count)
 	return strrep("|TInterface\\ItemSocketingFrame\\UI-EmptySocket-"..socket..":0|t", count)
 end
 
-local function isItemHasGem(link)
+function module.IsItemHasGem(link)
 	local text = ""
 	local stats = GetItemStats(link)
-	for stat, count in pairs(stats) do
-		local socket = strmatch(stat, "EMPTY_SOCKET_(%S+)")
-		if socket and socketWatchList[socket] then
-			text = text..GetSocketTexture(socket, count)
+	if stats then
+		for stat, count in pairs(stats) do
+			local socket = strmatch(stat, "EMPTY_SOCKET_(%S+)")
+			if socket and socketWatchList[socket] then
+				text = text..GetSocketTexture(socket, count)
+			end
 		end
 	end
 	return text
 end
 
 local itemCache, GetDungeonScoreInColor = {}
-local function convertItemLevel(link)
-	if itemCache[link] then return itemCache[link] end
-
-	  local itemLink = strmatch(link, "|H(.-)|h")
-	  local itemLinkGem = strmatch(link, "|Hitem:.-|h")
-    local name, _, _, _, _, class, subclass, _, equipSlot = GetItemInfo(itemLink)
-    local level = GetDetailedItemLevelInfo(itemLink)
-    if (level) then
-        if (equipSlot and strfind(equipSlot, "INVTYPE_")) then level = format("%s(%s)", level, _G[equipSlot] or equipSlot)
-        elseif (class == ARMOR) then level = format("%s(%s)", level, class)
-        elseif (subclass and strfind(subclass, RELICSLOT)) then level = format("%s(%s)", level, RELICSLOT)
-        end
-        if itemLinkGem then
-        link = gsub(link, "|h%[(.-)%]|h", "|h["..level..isItemHasGem(itemLinkGem)..":"..name.."]|h")
-        else
-        link = gsub(link, "|h%[(.-)%]|h", "|h["..level..":"..name.."]|h")
-        end
-        itemCache[link] = link
-    end
-	return link
-end
-
 function module.ReplaceChatHyperlink(link, linkType, value)
 	if not link then return end
-
+    local name, _, _, _, _, class, subclass, _, equipSlot = GetItemInfo(strmatch(link, "|H(.-)|h"))
 	if linkType == "item" then
 		if itemCache[link] then return itemCache[link] end
 		local name, itemLevel = isItemHasLevel(link)
 		if name and itemLevel then
-			link = gsub(link, "|h%[(.-)%]|h", "|h["..name.."("..itemLevel..")]|h"..isItemHasGem(link))
-			itemCache[link] = link
-		end
+			--link = gsub(link, "|h%[(.-)%]|h", "|h["..""..itemLevel.."."..name.."]|h"..module.IsItemHasGem(link))			
+			if (equipSlot and strfind(equipSlot, "INVTYPE_")) then 
+				itemLevel = format("%s(%s)", itemLevel, _G[equipSlot] or equipSlot)
+        	elseif (class == ARMOR) then 
+            	itemLevel = format("%s(%s)", itemLevel, class)
+        	elseif (subclass and strfind(subclass, RELICSLOT)) then 
+            	itemLevel = format("%s(%s)", itemLevel, RELICSLOT)
+        	end
+        	--if strmatch(link, "|Hitem:.-|h") then
+        		link = gsub(link, "|h%[(.-)%]|h", "|h["..itemLevel..":"..name.."]|h"..module.IsItemHasGem(link))
+        	--else
+        		--link = gsub(link, "|h%[(.-)%]|h", "|h["..itemLevel..":"..name.."]|h")
+        	--end
+				itemCache[link] = link
+			end
 		return link
 	elseif linkType == "dungeonScore" then
 		return value and gsub(link, "|h%[(.-)%]|h", "|h["..format(U["MythicScore"], GetDungeonScoreInColor(value)).."]|h")
 	end
 end
 
+-- Show icon on chat hyperlinks
+local function GetHyperlink(link, texture)
+    if (not texture) then return link else return "|T"..texture..":0|t" .. link end
+end
+
+local function SetChatLinkIcon(link)
+    local schema, id = string.match(link, "|H(%w+):(%d+):")
+    local texture
+    if (schema == "item") then texture = select(10, GetItemInfo(tonumber(id)))
+    elseif (schema == "spell") then texture = select(3, GetSpellInfo(tonumber(id)))
+    elseif (schema == "achievement") then texture = select(10, GetAchievementInfo(tonumber(id)))
+    end
+    return GetHyperlink(link, texture)
+end
+
 function module:UpdateChatItemLevel(_, msg, ...)
 	if msg:find('Hitem:158923') or msg:find('Hkeystone') then return end
 	msg = gsub(msg, "(|H%w+:%d+:.-|h.-|h)", SetChatLinkIcon)
-	msg = gsub(msg, "(|Hitem:%d+:.-|h.-|h)", convertItemLevel)
 	msg = gsub(msg, "(|H([^:]+):(%d+):.-|h.-|h)", module.ReplaceChatHyperlink)
 	return false, msg, ...
 end

@@ -190,7 +190,7 @@ function MISC:MailBox_ContactList()
 
 	local editbox = M.CreateEditBox(list, 120, 20)
 	editbox:SetPoint("TOPLEFT", 5, -25)
-	M.AddTooltip(editbox, "ANCHOR_BOTTOMRIGHT", I.InfoColor..U["AddContactTip"], true)
+	M.AddTooltip(editbox, "ANCHOR_BOTTOMRIGHT", I.InfoColor..U["AddContactTip"], "info", true)
 	local swatch = M.CreateColorSwatch(list, "")
 	swatch:SetPoint("LEFT", editbox, "RIGHT", 5, 0)
 	local add = M.CreateButton(list, 42, 22, ADD, 14)
@@ -309,8 +309,8 @@ function MISC:CollectGoldButton()
 
 	local button = MISC:MailBox_CreatButton(InboxFrame, 80, 25, "", {"LEFT", OpenAllMail, "RIGHT", 0, 0})
 	button:SetScript("OnClick", MISC.MailBox_CollectAllGold)
-	button:SetScript("OnEnter", MISC.TotalCash_OnEnter)
-	button:SetScript("OnLeave", MISC.TotalCash_OnLeave)
+	button:HookScript("OnEnter", MISC.TotalCash_OnEnter)
+	button:HookScript("OnLeave", MISC.TotalCash_OnLeave)
 	
 	MISC.GoldButton = button
 	MISC:UpdateOpeningText()
@@ -351,7 +351,7 @@ function MISC:CollectCurrentButton()
 end
 
 function MISC:LastMailSaver()
-	local mailSaver = CreateFrame("CheckButton", nil, SendMailFrame, "OptionsCheckButtonTemplate")
+	local mailSaver = CreateFrame("CheckButton", nil, SendMailFrame, "OptionsBaseCheckButtonTemplate")
 	mailSaver:SetHitRectInsets(0, 0, 0, 0)
 	mailSaver:SetPoint("LEFT", SendMailNameEditBox, "RIGHT", 0, 0)
 	mailSaver:SetSize(24, 24)
@@ -432,6 +432,38 @@ function MISC:MailBox()
 	MISC:LastMailSaver()
 end
 MISC:RegisterMisc("MailBox", MISC.MailBox)
+
+-- Temp fix for GM mails
+function OpenAllMail:AdvanceToNextItem()
+	local foundAttachment = false
+	while ( not foundAttachment ) do
+		local _, _, _, _, _, CODAmount, _, _, _, _, _, _, isGM = GetInboxHeaderInfo(self.mailIndex)
+		local itemID = select(2, GetInboxItem(self.mailIndex, self.attachmentIndex))
+		local hasBlacklistedItem = self:IsItemBlacklisted(itemID)
+		local hasCOD = CODAmount and CODAmount > 0
+		local hasMoneyOrItem = C_Mail.HasInboxMoney(self.mailIndex) or HasInboxItem(self.mailIndex, self.attachmentIndex)
+		if ( not hasBlacklistedItem and not isGM and not hasCOD and hasMoneyOrItem ) then
+			foundAttachment = true
+		else
+			self.attachmentIndex = self.attachmentIndex - 1
+			if ( self.attachmentIndex == 0 ) then
+				break
+			end
+		end
+	end
+	
+	if ( not foundAttachment ) then
+		self.mailIndex = self.mailIndex + 1
+		self.attachmentIndex = ATTACHMENTS_MAX
+		if ( self.mailIndex > GetInboxNumItems() ) then
+			return false
+		end
+		
+		return self:AdvanceToNextItem()
+	end
+	
+	return true
+end
 
 -- LockboxMailer ## Version: 0.1.5
 local LockboxMailer = CreateFrame("Frame")

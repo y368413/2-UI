@@ -1,4 +1,4 @@
-﻿-- $Id: Config.lua 219 2021-06-29 14:11:55Z arithmandar $
+﻿-- $Id: Config.lua 242 2022-07-23 08:25:29Z arithmandar $
 -----------------------------------------------------------------------
 -- Upvalued Lua API.
 -----------------------------------------------------------------------
@@ -14,7 +14,20 @@ local format = string.format
 -- WoW
 local GetSpellTexture, GetSpellInfo, GetItemInfo, GetItemCount = _G.GetSpellTexture, _G.GetSpellInfo, _G.GetItemInfo, _G.GetItemCount
 local GetLocale = _G.GetLocale
-local WoWClassic = select(4, GetBuildInfo()) < 30000
+
+local WoWClassicEra, WoWClassicTBC, WoWWOTLKC, WoWRetail, WoWDragonflight
+local wowversion  = select(4, GetBuildInfo())
+if wowversion < 20000 then
+	WoWClassicEra = true
+elseif wowversion < 30000 then 
+	WoWClassicTBC = true
+elseif wowversion < 40000 then 
+	WoWWOTLKC = true
+elseif wowversion < 100000 then
+	WoWRetail = true
+else
+	WoWDragonflight = true
+end
 -- ----------------------------------------------------------------------------
 -- AddOn namespace.
 -- ----------------------------------------------------------------------------
@@ -93,13 +106,13 @@ local function getAboutPanel()
 								version = {
 									order = 21,
 									type = "description",
-									name = GAME_VERSION_LABEL..HEADER_COLON.." v6.35",
+									name = GAME_VERSION_LABEL..HEADER_COLON.." v7.02",
 									width = "full",
 								},
 								update = {
 									order = 22, 
 									type = "description",
-									name = UPDATE..HEADER_COLON.." 2022-02-02T17:56:13Z",
+									name = UPDATE..HEADER_COLON.." 2022-08-21T14:39:55Z",
 									width = "full",
 								},
 								author = {
@@ -328,7 +341,7 @@ end
 -- Currencies
 -- /////////////////////////////////////////////////////////
 local currenciesOptions = nil
-local function tokenButton_ToggleTrack(id)
+local function currencyButton_ToggleTrack(id)
 	profile = CurrencyTracking.db.profile
 	if (not profile["currencies"][id]) then 
 		profile["currencies"][id] = true
@@ -340,24 +353,6 @@ local function tokenButton_ToggleTrack(id)
 end
 
 local function getCurrenciesOptions()
-	-- below to force currency category to be displayed in specific order
-	local tCurrencyCategory = {
-		--248, -- Torghast
-		245, -- Shadowlands
-		143, -- Battle for Azeroth
-		141, -- Legion
-		137, -- Warlords of Draenor
-		133, -- Mists of Pandaria
-		81, -- Cataclysm
-		23, -- Burning Crusade
-		21, -- Wrath of the Lich King
-		2, -- Player vs. Player
-		82, -- Archaeology
-		22, -- Dungeon and Raid
-		144, -- Virtual
-		142, -- Hidden
-		1, -- Miscellaneous
-	}
 	if not profile then profile = CurrencyTracking.db.profile end
 	local lang = GetLocale()
 	if not currenciesOptions then
@@ -370,7 +365,7 @@ local function getCurrenciesOptions()
 		local i = 1
 		
 		--for k,v in orderedpairs(LibCurrencyInfo.data.CurrencyByCategory) do
-		for ki,vi in ipairs(tCurrencyCategory) do
+		for ki,vi in ipairs(CurrencyTracking.constants.currencyCategories) do
 			local k = vi
 			local v = LibCurrencyInfo.data.CurrencyByCategory[k]
 			t["group"..i] = {}
@@ -402,7 +397,7 @@ local function getCurrenciesOptions()
 						tg["currency"..index].desc = NORMAL_FONT_COLOR_CODE..currencyDesc..format(CURRENCY_TOTAL, HIGHLIGHT_FONT_COLOR_CODE, count)
 					end
 					tg["currency"..index].get = (function() return profile["currencies"][id] end)
-					tg["currency"..index].set = (function() tokenButton_ToggleTrack(id) end)
+					tg["currency"..index].set = (function() currencyButton_ToggleTrack(id) end)
 				end
 				j = j + 1
 			end
@@ -432,7 +427,7 @@ local function getItemOptions()
 	if not profile then profile = CurrencyTracking.db.profile end
 	if not item_list then item_list = CurrencyTracking.db.item_list end
 	
-	local function getProfOptions(tp, itemID, n)
+	local function retrieveItems(tp, itemID, n)
 		local itemName, icon, _
 	
 		if (item_list[itemID] and item_list[itemID][1] and item_list[itemID][2]) then
@@ -471,68 +466,39 @@ local function getItemOptions()
 			args = { },
 		}
 		local i = 1
-		for k, v in pairs(CurrencyTracking.constants.items) do
+		for k, v in pairs(CurrencyTracking.items) do
 			itemOptions.args["group"..i] = {}
 			itemOptions.args["group"..i].order = i
 			itemOptions.args["group"..i].type = "group"
 			itemOptions.args["group"..i].name = CurrencyTracking.constants.itemCategories[k]
 			itemOptions.args["group"..i].args = { }
 			local t = itemOptions.args["group"..i].args
-			if k == "professions" then
-				local j = 1
-				for ka, profs in pairs(v) do
-					local spellInfo = GetSpellInfo(ka)
-					local spellTexture = GetSpellTexture(ka)
-					if (spellInfo ~= nil) then
-						t["group"..j] = {}
-						t["group"..j].order = j
-						t["group"..j].type = "group"
-						t["group"..j].name = format("|T%d:16:16:2:0|t |cffffffff%s|r", spellTexture, spellInfo)
-						--t["group"..j].inline = true
-						t["group"..j].args = { }
-						local n = 1
-						local tp = t["group"..j].args
-						for kb, vb in ipairs(profs) do
-							if (type(vb) == "number") then
-								tp, n = getProfOptions(tp, vb, n)
-							end
-						end
+			local j = 1
+			for ka, va in ipairs(v) do
+				if (WoWClassicEra and j > 1) then
+					break
+				elseif (WoWClassicTBC and j > 2) then 
+					break
+				elseif (WoWWOTLKC and j > 3) then
+					break
+				else
+					t["group"..j] = {}
+					t["group"..j].order = j
+					t["group"..j].type = "group"
+					t["group"..j].name = CurrencyTracking.constants.expansions[j]
+					t["group"..j].inline = true
+					t["group"..j].args = { }
 
-						j = j + 1
-					end
-				end
-			else
-				local j = 1
-				--Query:AddItemInfoList(v)
-				for ka, itemID in ipairs(v) do
---					t, j = getProfOptions(t, itemID, j)
-					local itemName, icon, _
-				
-					if (item_list[itemID] and item_list[itemID][1] and item_list[itemID][2]) then
-						itemName, icon = item_list[itemID][1], item_list[itemID][2]
-					else
-						itemName, _, _, _, _, _, _, _, _, icon = GetItemInfo(itemID)
-						if not (itemName) then 
-							itemName, _, _, _, _, _, _, _, _, icon = GetItemInfo(itemID)
-						end
-						if ( itemName and icon ) then
-							item_list[itemID] = { itemName, icon, }
+					local n = 1
+					local tp = t["group"..j].args
+
+					for kb, vb in ipairs(va) do
+						if (type(vb) == "number") then
+							tp, n = retrieveItems(tp, vb, n)
 						end
 					end
-					local count = GetItemCount(itemID, true)
-					if icon and itemName then
-						local displayString = format("|T%d:16:16:2:0|t %s%s|r", icon, count > 0 and HIGHLIGHT_FONT_COLOR_CODE or GRAY_FONT_COLOR_CODE, itemName)
-						t["item"..j] = {}
-						t["item"..j].order = j
-						t["item"..j].type = "toggle"
-						t["item"..j].name = displayString
-						t["item"..j].desc = format(NORMAL_FONT_COLOR_CODE..CURRENCY_TOTAL, HIGHLIGHT_FONT_COLOR_CODE, count or 0)
-						t["item"..j].get = (function() return profile["items"][itemID] end)
-						t["item"..j].set = (function() itemButton_ToggleTrack(itemID) end)
-					
-						j = j + 1
-					end
 				end
+				j = j + 1
 			end
 			i = i + 1
 		end
@@ -548,7 +514,7 @@ local function openOptions(openItems)
 	if (openItems) then
 		InterfaceOptionsFrame_OpenToCategory(CurrencyTracking.optionsFrames.Items)
 	else
-		if (WoWClassic) then
+		if (WoWClassicEra or WoWClassicTBC or WoWWOTLKC) then
 			InterfaceOptionsFrame_OpenToCategory(CurrencyTracking.optionsFrames.General)
 		else
 			InterfaceOptionsFrame_OpenToCategory(CurrencyTracking.optionsFrames.Currencies)
@@ -574,7 +540,7 @@ function CurrencyTracking:SetupOptions()
 	self:RegisterModuleOptions("Options", getOptions, BASE_SETTINGS )
 	self:RegisterModuleOptions("Items", getItemOptions, CurrencyTracking_TRACKED_ITEMS)
 	--addTokenOptionFrame()
-	if (not WoWClassic) then
+	if (WoWRetail) then
 	self:RegisterModuleOptions("Currencies", getCurrenciesOptions, CurrencyTracking_TRACKED_CURRENCY)
 	end
 	self:RegisterModuleOptions("Profiles", giveProfiles, CurrencyTracking_PROFILE_OPTIONS)

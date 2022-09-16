@@ -48,11 +48,9 @@ function UF:UpdateTargetBorder()
 end
 
 function UF:CreateTargetBorder(self)
-	local border = M.CreateSD(self, 5, true)
-	border:SetOutside(self.Health.backdrop, R.mult+5, R.mult+5, self.Power.backdrop)
-	border:SetBackdropBorderColor(1, 1, 1)
+	local border = M.CreateBDFrame(self, 0)
+	border:SetBackdropBorderColor(.9, .9, .9)
 	border:Hide()
-	self.__shadow = nil
 
 	self.TargetBorder = border
 	self:RegisterEvent("PLAYER_TARGET_CHANGED", UF.UpdateTargetBorder, true)
@@ -75,11 +73,9 @@ function UF:UpdateThreatBorder(_, unit)
 end
 
 function UF:CreateThreatBorder(self)
-	local threatIndicator = M.CreateSD(self, 3, true)
-	threatIndicator:SetOutside(self.Health.backdrop, R.mult+3, R.mult+3, self.Power.backdrop)
-	threatIndicator:SetBackdropBorderColor(.7, .7, .7)
-	threatIndicator:SetFrameLevel(0)
-	self.__shadow = nil
+	local threatIndicator = M.CreateSD(self.backdrop, 4, true)
+	threatIndicator:SetOutside(self, 4+R.mult, 4+R.mult)
+	self.backdrop.__shadow = nil
 
 	self.ThreatIndicator = threatIndicator
 	self.ThreatIndicator.Override = UF.UpdateThreatBorder
@@ -152,119 +148,51 @@ function UF:CreateRaidDebuffs(self)
 	self.RaidDebuffs = bu
 end
 
-local keyList = {
-	[1] = {KEY_BUTTON1, "", "%s1"},					-- 左键
-	[2] = {KEY_BUTTON1, "ALT", "ALT-%s1"},			-- ALT+左键
-	[3] = {KEY_BUTTON1, "CTRL", "CTRL-%s1"},		-- CTRL+左键
-	[4] = {KEY_BUTTON1, "SHIFT", "SHIFT-%s1"},		-- SHIFT+左键
+local keyList = {}
+local mouseButtonList = {"LMB","RMB","MMB","MB4","MB5"}
+local modKeyList = {"","ALT-","CTRL-","SHIFT-","ALT-CTRL-","ALT-SHIFT-","CTRL-SHIFT-","ALT-CTRL-SHIFT-"}
+local numModKeys = #modKeyList
 
-	[5] = {KEY_BUTTON2, "", "%s2"},					-- 右键
-	[6] = {KEY_BUTTON2, "ALT", "ALT-%s2"},			-- ALT+右键
-	[7] = {KEY_BUTTON2, "CTRL", "CTRL-%s2"},		-- CTRL+右键
-	[8] = {KEY_BUTTON2, "SHIFT", "SHIFT-%s2"},		-- SHIFT+右键
+for i = 1, #mouseButtonList do
+	local button = mouseButtonList[i]
+	for j = 1, numModKeys do
+		local modKey = modKeyList[j]
+		keyList[modKey..button] = modKey.."%s"..i
+	end
+end
 
-	[9] = {KEY_BUTTON3, "", "%s3"},					-- 中键
-	[10] = {KEY_BUTTON3, "ALT", "ALT-%s3"},			-- ALT+中键
-	[11] = {KEY_BUTTON3, "CTRL", "CTRL-%s3"},		-- CTRL+中键
-	[12] = {KEY_BUTTON3, "SHIFT", "SHIFT-%s3"},		-- SHIFT+中键
-
-	[13] = {KEY_BUTTON4, "", "%s4"},				-- 鼠标键4
-	[14] = {KEY_BUTTON4, "ALT", "ALT-%s4"},			-- ALT+鼠标键4
-	[15] = {KEY_BUTTON4, "CTRL", "CTRL-%s4"},		-- CTRL+鼠标键4
-	[16] = {KEY_BUTTON4, "SHIFT", "SHIFT-%s4"},		-- SHIFT+鼠标键4
-
-	[17] = {KEY_BUTTON5, "", "%s5"},				-- 鼠标键5
-	[18] = {KEY_BUTTON5, "ALT", "ALT-%s5"},			-- ALT+鼠标键5
-	[19] = {KEY_BUTTON5, "CTRL", "CTRL-%s5"},		-- CTRL+鼠标键5
-	[20] = {KEY_BUTTON5, "SHIFT", "SHIFT-%s5"},		-- SHIFT+鼠标键5
-
-	[21] = {U["WheelUp"], "", "%s6"},				-- 滚轮上
-	[22] = {U["WheelUp"], "ALT", "%s7"},			-- ALT+滚轮上
-	[23] = {U["WheelUp"], "CTRL", "%s8"},			-- CTRL+滚轮上
-	[24] = {U["WheelUp"], "SHIFT", "%s9"},			-- SHIFT+滚轮上
-
-	[25] = {U["WheelDown"], "", "%s10"},			-- 滚轮下
-	[26] = {U["WheelDown"], "ALT", "%s11"},			-- ALT+滚轮下
-	[27] = {U["WheelDown"], "CTRL", "%s12"},		-- CTRL+滚轮下
-	[28] = {U["WheelDown"], "SHIFT", "%s13"},		-- SHIFT+滚轮下
-}
-
-local defaultSpellList = {
-	["DRUID"] = {
-		[2] = 88423,		-- 驱散
-		[5] = 774,			-- 回春术
-		[6] = 33763,		-- 生命绽放
-	},
-	["HUNTER"] = {
-		[21] = 90361,		-- 灵魂治愈
-		[25] = 34477,		-- 误导
-	},
-	["ROGUE"] = {
-		[6] = 57934,		-- 嫁祸
-	},
-	["WARRIOR"] = {
-		[6] = 198304,		-- 拦截
-	},
-	["SHAMAN"] = {
-		[2] = 77130,		-- 驱散
-		[5] = 61295,		-- 激流
-		[6] = 546,			-- 水上行走
-	},
-	["PALADIN"] = {
-		[2] = 4987,			-- 驱散
-		[5] = 20473,		-- 神圣震击
-		[6] = 1022,			-- 保护祝福
-	},
-	["PRIEST"] = {
-		[2] = 527,			-- 驱散
-		[5] = 17,			-- 真言术盾
-		[6] = 1706,			-- 漂浮术
-	},
-	["MONK"] = {
-		[2] = 115450,		-- 驱散
-		[5] = 119611,		-- 复苏之雾
-	},
-	["MAGE"] = {
-		[6] = 130,			-- 缓落
-	},
-	["DEMONHUNTER"] = {},
-	["WARLOCK"] = {},
-	["DEATHKNIGHT"] = {},
-}
+local wheelGroupIndex = {}
+for i = 1, numModKeys do
+	local modKey = modKeyList[i]
+	wheelGroupIndex[5 + i] = modKey.."MOUSEWHEELUP"
+	wheelGroupIndex[numModKeys + 5 + i] = modKey.."MOUSEWHEELDOWN"
+end
+for keyIndex, keyString in pairs(wheelGroupIndex) do
+	keyString = gsub(keyString, "MOUSEWHEELUP", "MWU")
+	keyString = gsub(keyString, "MOUSEWHEELDOWN", "MWD")
+	keyList[keyString] = "%s"..keyIndex
+end
 
 function UF:DefaultClickSets()
-	if not MaoRUIDB["RaidClickSets"][I.MyClass] then MaoRUIDB["RaidClickSets"][I.MyClass] = {} end
-
-	if not next(MaoRUIDB["RaidClickSets"][I.MyClass]) then
-		for k, v in pairs(defaultSpellList[I.MyClass]) do
-			local clickSet = keyList[k][2]..keyList[k][1]
-			MaoRUIDB["RaidClickSets"][I.MyClass][clickSet] = {keyList[k][1], keyList[k][2], v}
+	if not MaoRUIDB["ClickSets"][I.MyClass] then MaoRUIDB["ClickSets"][I.MyClass] = {} end
+	if not next(MaoRUIDB["ClickSets"][I.MyClass]) then
+		for fullkey, spellID in pairs(R.ClickCastList[I.MyClass]) do
+			MaoRUIDB["ClickSets"][I.MyClass][fullkey] = spellID
 		end
 	end
 end
 
-local wheelBindingIndex = {
-	["MOUSEWHEELUP"] = 6,
-	["ALT-MOUSEWHEELUP"] = 7,
-	["CTRL-MOUSEWHEELUP"] = 8,
-	["SHIFT-MOUSEWHEELUP"] = 9,
-	["MOUSEWHEELDOWN"] = 10,
-	["ALT-MOUSEWHEELDOWN"] = 11,
-	["CTRL-MOUSEWHEELDOWN"] = 12,
-	["SHIFT-MOUSEWHEELDOWN"] = 13,
-}
-
 local onEnterString = "self:ClearBindings();"
 local onLeaveString = onEnterString
-for keyString, keyIndex in pairs(wheelBindingIndex) do
+for keyIndex, keyString in pairs(wheelGroupIndex) do
 	onEnterString = format("%sself:SetBindingClick(0, \"%s\", self:GetName(), \"Button%d\");", onEnterString, keyString, keyIndex)
 end
 local onMouseString = "if not self:IsUnderMouse(false) then self:ClearBindings(); end"
 
 local function setupMouseWheelCast(self)
 	local found
-	for _, data in pairs(MaoRUIDB["RaidClickSets"][I.MyClass]) do
-		if strmatch(data[1], U["Wheel"]) then
+	for fullkey in pairs(MaoRUIDB["ClickSets"][I.MyClass]) do
+		if strmatch(fullkey, "MW%w") then
 			found = true
 			break
 		end
@@ -282,29 +210,25 @@ end
 local function setupClickSets(self)
 	if self.clickCastRegistered then return end
 
-	for _, data in pairs(MaoRUIDB["RaidClickSets"][I.MyClass]) do
-		local key, modKey, value = unpack(data)
-		if key == KEY_BUTTON1 and modKey == "SHIFT" then self.focuser = true end
+	for fullkey, value in pairs(MaoRUIDB["ClickSets"][I.MyClass]) do
+		if fullkey == "SHIFT-LMB" then self.focuser = true end
 
-		for _, v in ipairs(keyList) do
-			if v[1] == key and v[2] == modKey then
-				if tonumber(value) then
-					local name = GetSpellInfo(value)
-					self:SetAttribute(format(v[3], "type"), "spell")
-					self:SetAttribute(format(v[3], "spell"), name)
-				elseif value == "target" then
-					self:SetAttribute(format(v[3], "type"), "target")
-				elseif value == "focus" then
-					self:SetAttribute(format(v[3], "type"), "focus")
-				elseif value == "follow" then
-					self:SetAttribute(format(v[3], "type"), "macro")
-					self:SetAttribute(format(v[3], "macrotext"), "/follow mouseover")
-				elseif strmatch(value, "/") then
-					self:SetAttribute(format(v[3], "type"), "macro")
-					value = gsub(value, "~", "\n")
-					self:SetAttribute(format(v[3], "macrotext"), value)
-				end
-				break
+		local keyIndex = keyList[fullkey]
+		if keyIndex then
+			if tonumber(value) then
+				self:SetAttribute(format(keyIndex, "type"), "spell")
+				self:SetAttribute(format(keyIndex, "spell"), value)
+			elseif value == "target" then
+				self:SetAttribute(format(keyIndex, "type"), "target")
+			elseif value == "focus" then
+				self:SetAttribute(format(keyIndex, "type"), "focus")
+			elseif value == "follow" then
+				self:SetAttribute(format(keyIndex, "type"), "macro")
+				self:SetAttribute(format(keyIndex, "macrotext"), "/follow mouseover")
+			elseif strmatch(value, "/") then
+				self:SetAttribute(format(keyIndex, "type"), "macro")
+				value = gsub(value, "~", "\n")
+				self:SetAttribute(format(keyIndex, "macrotext"), value)
 			end
 		end
 	end

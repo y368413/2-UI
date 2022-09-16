@@ -64,7 +64,6 @@ function UF:SetupCVars()
 	SetCVar("nameplateOverlapH", .8)
 	SetCVar("nameplateSelectedAlpha", 1)
 	SetCVar("showQuestTrackingTooltips", 1)
-	SetCVar("predictedHealth", 1)
 
 	--SetCVar("nameplateSelectedScale", 1)
 	--SetCVar("nameplateLargerScale", 1)
@@ -272,9 +271,9 @@ function UF:UpdateThreatColor(_, unit)
 end
 
 function UF:CreateThreatColor(self)
-	local threatIndicator = M.CreateSD(self, 3, true)
-	threatIndicator:SetOutside(self.Health.backdrop, 3, 3)
+	local threatIndicator = M.CreateSD(self.backdrop, nil, true)
 	threatIndicator:Hide()
+	self.backdrop.__shadow = nil
 
 	self.ThreatIndicator = threatIndicator
 	self.ThreatIndicator.Override = UF.UpdateThreatColor
@@ -416,7 +415,7 @@ end
 
 local function isQuestTitle(textLine)
 	local r, g, b = textLine:GetTextColor()
-	if r > .99 and g > .82 and b == 0 then
+	if r > .99 and g > .8 and b == 0 then
 		return true
 	end
 end
@@ -722,9 +721,10 @@ function UF:CreatePlates()
 	local health = CreateFrame("StatusBar", nil, self)
 	health:SetAllPoints()
 	health:SetStatusBarTexture(I.normTex)
-	--health.backdrop = M.SetBD(health) -- don't mess up with libs
-  M.CreateTex(health)
-  M.CreateSD(health, 3)
+  --M.CreateTex(health)
+  --M.CreateSD(health, 3)
+	self.backdrop = M.SetBD(health)
+	self.backdrop.__shadow = nil
 	M:SmoothBar(health)
 
 	self.Health = health

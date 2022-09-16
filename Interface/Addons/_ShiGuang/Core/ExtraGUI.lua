@@ -120,7 +120,11 @@ function G:SetupRaidDebuffs(parent)
 	for dungeonID = 1182, 1189 do
 		AddNewDungeon(dungeons, dungeonID)
 	end
-	AddNewDungeon(dungeons, 1194)
+	AddNewDungeon(dungeons, 1194) -- ¼¯ÊÐ
+	AddNewDungeon(dungeons, 536)  -- ¿Ö¹ì³µÕ¾
+	AddNewDungeon(dungeons, 558)  -- ¸ÖÌúÂëÍ·
+	AddNewDungeon(dungeons, 860)  -- ÖØ·µ¿¨À­ÔÞ
+	AddNewDungeon(dungeons, 1178) -- Âó¿¨¹±
 
 	local raids = {
 		[1] = EJ_GetInstanceInfo(1190),
@@ -329,60 +333,79 @@ function G:SetupClickCast(parent)
 
 	local panel = createExtraGUI(parent, guiName, U["Add ClickSets"], true)
 
+	local keyToLocale = {
+		["LMB"] = U["LeftButon"],
+		["RMB"] = U["RightButton"],
+		["MMB"] = U["MiddleButton"],
+		["MB4"] = U["Button4"],
+		["MB5"] = U["Button5"],
+		["MWU"] = U["WheelUp"],
+		["MWD"] = U["WheelDown"],
+	}
 	local textIndex, barTable = {
 		["target"] = TARGET,
 		["focus"] = SET_FOCUS,
 		["follow"] = FOLLOW,
 	}, {}
 
-	local function createBar(parent, data)
-		local key, modKey, value = unpack(data)
-		local clickSet = modKey..key
+	local function createBar(parent, fullkey, value)
+		local key = strsub(fullkey, -3)
+		local modKey = strmatch(fullkey, "(.+)%-%w+")
 		local texture
 		if tonumber(value) then
 			texture = GetSpellTexture(value)
 		else
 			value = textIndex[value] or value
-			texture = 136243
+			local itemID = strmatch(value, "item:(%d+)")
+			if itemID then
+				texture = GetItemIcon(itemID)
+			else
+				texture = 136243
+			end
 		end
 
 		local bar = CreateFrame("Frame", nil, parent, "BackdropTemplate")
 		bar:SetSize(220, 30)
 		M.CreateBD(bar, .25)
-		barTable[clickSet] = bar
+		barTable[fullkey] = bar
 
 		local icon, close = G:CreateBarWidgets(bar, texture)
 		M.AddTooltip(icon, "ANCHOR_RIGHT", value, "system")
 		close:SetScript("OnClick", function()
 			bar:Hide()
-			MaoRUIDB["RaidClickSets"][I.MyClass][clickSet] = nil
-			barTable[clickSet] = nil
+			MaoRUIDB["ClickSets"][I.MyClass][fullkey] = nil
+			barTable[fullkey] = nil
 			sortBars(barTable)
 		end)
 
-		local key1 = M.CreateFS(bar, 14, key, false, "LEFT", 35, 0)
+		local key1 = M.CreateFS(bar, 14, keyToLocale[key], false, "LEFT", 30, 0)
 		key1:SetTextColor(.6, .8, 1)
-		modKey = modKey ~= "" and "+ "..modKey or ""
-		local key2 = M.CreateFS(bar, 14, modKey, false, "LEFT", 130, 0)
-		key2:SetTextColor(0, 1, 0)
+		if modKey then
+			local key2 = M.CreateFS(bar, 14, modKey, false, "RIGHT", -25, 0)
+			key2:SetTextColor(0, 1, 0)
+		end
 
 		sortBars(barTable)
 	end
 
 	local frame = panel.bg
-	local keyList, options = {
-		KEY_BUTTON1,
-		KEY_BUTTON2,
-		KEY_BUTTON3,
-		KEY_BUTTON4,
-		KEY_BUTTON5,
-		U["WheelUp"],
-		U["WheelDown"],
-	}, {}
+	local keyList = {"LMB","RMB","MMB","MB4","MB5","MWU","MWD"}
+	local options = {}
+
+	local function optionOnEnter(self)
+		GameTooltip:SetOwner(self, "ANCHOR_TOP")
+		GameTooltip:ClearLines()
+		GameTooltip:AddLine(keyToLocale[self.text], 1, .8, 0)
+		GameTooltip:Show()
+	end
 
 	options[1] = G:CreateEditbox(frame, U["Action*"], 10, -30, U["Action Intro"], 260, 30)
 	options[2] = G:CreateDropdown(frame, U["Key*"], 10, -90, keyList, U["Key Intro"], 120, 30)
-	options[3] = G:CreateDropdown(frame, U["Modified Key"], 170, -90, {NONE, "ALT", "CTRL", "SHIFT"}, U["ModKey Intro"], 85, 30)
+	for i = 1, #keyList do
+		options[2].options[i]:HookScript("OnEnter", optionOnEnter)
+		options[2].options[i]:HookScript("OnLeave", M.HideTooltip)
+	end
+	options[3] = G:CreateDropdown(frame, U["Modified Key"], 170, -90, {NONE, "ALT", "CTRL", "SHIFT","ALT-CTRL","ALT-SHIFT","CTRL-SHIFT","ALT-CTRL-SHIFT"}, U["ModKey Intro"], 85, 30)
 
 	local scroll = G:CreateScroll(frame, 240, 350)
 	scroll.reset = M.CreateButton(frame, 70, 25, RESET)
@@ -392,7 +415,7 @@ function G:SetupClickCast(parent)
 		button1 = YES,
 		button2 = NO,
 		OnAccept = function()
-			wipe(MaoRUIDB["RaidClickSets"][I.MyClass])
+			wipe(MaoRUIDB["ClickSets"][I.MyClass])
 			ReloadUI()
 		end,
 		whileDead = 1,
@@ -405,13 +428,13 @@ function G:SetupClickCast(parent)
 		local value, key, modKey = options[1]:GetText(), options[2].Text:GetText(), options[3].Text:GetText()
 		if not value or not key then UIErrorsFrame:AddMessage(I.InfoColor..U["Incomplete Input"]) return end
 		if tonumber(value) and not GetSpellInfo(value) then UIErrorsFrame:AddMessage(I.InfoColor..U["Incorrect SpellID"]) return end
-		if (not tonumber(value)) and value ~= "target" and value ~= "focus" and value ~= "follow" and not strmatch(value, "/") then UIErrorsFrame:AddMessage(I.InfoColor..U["Invalid Input"]) return end
+		if (not tonumber(value)) and (not textIndex[value]) and not strmatch(value, "/") then UIErrorsFrame:AddMessage(I.InfoColor..U["Invalid Input"]) return end
 		if not modKey or modKey == NONE then modKey = "" end
-		local clickSet = modKey..key
-		if MaoRUIDB["RaidClickSets"][I.MyClass][clickSet] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ClickSet"]) return end
+		local fullkey = (modKey == "" and key or modKey.."-"..key)
+		if MaoRUIDB["ClickSets"][I.MyClass][fullkey] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ClickSet"]) return end
 
-		MaoRUIDB["RaidClickSets"][I.MyClass][clickSet] = {key, modKey, value}
-		createBar(scroll.child, MaoRUIDB["RaidClickSets"][I.MyClass][clickSet])
+		MaoRUIDB["ClickSets"][I.MyClass][fullkey] = tonumber(value) or value
+		createBar(scroll.child, fullkey, value)
 		clearEdit(options)
 	end
 
@@ -427,8 +450,23 @@ function G:SetupClickCast(parent)
 		clearEdit(options)
 	end)
 
-	for _, v in pairs(MaoRUIDB["RaidClickSets"][I.MyClass]) do
-		createBar(scroll.child, v)
+	for fullkey, value in pairs(MaoRUIDB["ClickSets"][I.MyClass]) do
+		createBar(scroll.child, fullkey, value)
+	end
+
+	if next(MaoRUIDB["RaidClickSets"][I.MyClass]) then
+		local oldTip = M.CreateButton(panel, 35, 35, true, 134400)
+		oldTip:SetPoint("TOPRIGHT", -10, -10)
+		oldTip:SetScript("OnEnter", function(self)
+			GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+			GameTooltip:ClearLines()
+			GameTooltip:AddLine("Old data:")
+			for fullkey, v in pairs(MaoRUIDB["RaidClickSets"][I.MyClass]) do
+				GameTooltip:AddDoubleLine(fullkey, v[3])
+			end
+			GameTooltip:Show()
+		end)
+		oldTip:SetScript("OnLeave", M.HideTooltip)
 	end
 end
 
@@ -943,12 +981,30 @@ local function SetUnitFrameSize(self, unit)
 	local width = R.db["UFs"][unit.."Width"]
 	local healthHeight = R.db["UFs"][unit.."Height"]
 	local powerHeight = R.db["UFs"][unit.."PowerHeight"]
-	local height = healthHeight + powerHeight + R.mult
+	local nameOffset = R.db["UFs"][unit.."NameOffset"]
+	local powerOffset = R.db["UFs"][unit.."PowerOffset"]
+	local height = powerHeight == 0 and healthHeight or healthHeight + powerHeight + R.mult
 	self:SetSize(width, height)
 	self.Health:SetHeight(healthHeight)
-	self.Power:SetHeight(powerHeight)
-	if self.powerText then
-		self.powerText:SetPoint("RIGHT", -3, R.db["UFs"][unit.."PowerOffset"])
+	if self.nameText and nameOffset then
+		self.nameText:SetPoint("LEFT", 3, nameOffset)
+		self.nameText:SetWidth(self:GetWidth()*(nameOffset == 0 and .55 or 1))
+	end
+	if powerHeight == 0 then
+		if self:IsElementEnabled("Power") then
+			self:DisableElement("Power")
+			if self.powerText then self.powerText:Hide() end
+		end
+	else
+		if not self:IsElementEnabled("Power") then
+			self:EnableElement("Power")
+			self.Power:ForceUpdate()
+			if self.powerText then self.powerText:Show() end
+		end
+		self.Power:SetHeight(powerHeight)
+		if self.powerText and powerOffset then
+			self.powerText:SetPoint("RIGHT", -3, powerOffset)
+		end
 	end
 end
 
@@ -967,11 +1023,11 @@ function G:SetupUnitFrame(parent)
 		["Boss"] = {100, 400},
 	}
 
-	local defaultValue = { -- healthWidth, healthHeight, powerHeight, healthTag, powerTag, powerOffset
-		["Player"] = {245, 24, 4, 2, 4, 2},
-		["Focus"] = {200, 22, 3, 2, 4, 2},
-		["Pet"] = {100, 18, 2, 5},
-		["Boss"] = {120, 21, 3, 5, 5},
+	local defaultValue = { -- healthWidth, healthHeight, powerHeight, healthTag, powerTag, powerOffset, nameOffset
+		["Player"] = {245, 24, 4, 2, 4, 2, 0},
+		["Focus"] = {200, 22, 3, 2, 4, 2, 0},
+		["Pet"] = {100, 18, 2, 5, 0},
+		["Boss"] = {120, 21, 3, 5, 5, 2, 0},
 	}
 
 	local function createOptionGroup(parent, title, offset, value, func)
@@ -980,13 +1036,16 @@ function G:SetupUnitFrame(parent)
 		local mult = 0
 		if value ~= "Pet" then
 			mult = 60
-			createOptionDropdown(parent, U["PowerValueType"], offset-50-mult, G.HealthValues, U["100PercentTip"], "UFs", value.."MPTag", defaultValue[value][4], func)
+			createOptionDropdown(parent, U["PowerValueType"], offset-50-mult, G.HealthValues, U["100PercentTip"], "UFs", value.."MPTag", defaultValue[value][5], func)
 		end
 		createOptionSlider(parent, U["Width"], sliderRange[value][1], sliderRange[value][2], defaultValue[value][1], offset-110-mult, value.."Width", func)
 		createOptionSlider(parent, U["Height"], 15, 50, defaultValue[value][2], offset-180-mult, value.."Height", func)
-		createOptionSlider(parent, U["Power Height"], 2, 30, defaultValue[value][3], offset-250-mult, value.."PowerHeight", func)
-		if defaultValue[value][6] then
-			createOptionSlider(parent, U["Power Offset"], -20, 20, defaultValue[value][4], offset-320-mult, value.."PowerOffset", func)
+		createOptionSlider(parent, U["Power Height"], 0, 30, defaultValue[value][3], offset-250-mult, value.."PowerHeight", func)
+		if value ~= "Pet" then
+			createOptionSlider(parent, U["Power Offset"], -20, 20, defaultValue[value][6], offset-320-mult, value.."PowerOffset", func)
+			createOptionSlider(parent, U["Name Offset"], -50, 50, defaultValue[value][7], offset-390-mult, value.."NameOffset", func)
+		else
+			createOptionSlider(parent, U["Name Offset"], -20, 20, defaultValue[value][5], offset-320-mult, value.."NameOffset", func)
 		end
 	end
 
@@ -1388,13 +1447,15 @@ function G:SetupNameplateSize(parent)
 	local scroll = G:CreateScroll(panel, 260, 540)
 
 	local optionValues = {
-		["enemy"] = {"PlateWidth", "PlateHeight", "NameTextSize", "HealthTextSize", "HealthTextOffset", "PlateCBHeight", "CBTextSize", "PlateCBOffset"},
-		["friend"] = {"FriendPlateWidth", "FriendPlateHeight", "FriendNameSize", "FriendHealthSize", "FriendHealthOffset", "FriendPlateCBHeight", "FriendCBTextSize", "FriendPlateCBOffset"},
+		["enemy"] = {"PlateWidth", "PlateHeight", "NameTextSize", "HealthTextSize", "HealthTextOffset", "PlateCBHeight", "CBTextSize", "PlateCBOffset", "HarmWidth", "HarmHeight"},
+		["friend"] = {"FriendPlateWidth", "FriendPlateHeight", "FriendNameSize", "FriendHealthSize", "FriendHealthOffset", "FriendPlateCBHeight", "FriendCBTextSize", "FriendPlateCBOffset", "HelpWidth", "HelpHeight"},
 	}
 	local function createOptionGroup(parent, title, offset, value, func)
 		createOptionTitle(parent, title, offset)
 		createOptionSlider(parent, U["Width"], 50, 500, 190, offset-60, optionValues[value][1], func, "Nameplate")
 		createOptionSlider(parent, U["Height"], 5, 50, 8, offset-130, optionValues[value][2], func, "Nameplate")
+		createOptionSlider(parent, U["InteractWidth"], 50, 500, 190, offset-200, optionValues[value][9], func, "Nameplate")
+		createOptionSlider(parent, U["InteractHeight"], 5, 50, 8, offset-270, optionValues[value][10], func, "Nameplate")
 		createOptionSlider(parent, U["NameTextSize"], 10, 50, 14, offset-200, optionValues[value][3], func, "Nameplate")
 		createOptionSlider(parent, U["HealthTextSize"], 10, 50, 16, offset-270, optionValues[value][4], func, "Nameplate")
 		createOptionSlider(parent, U["Health Offset"], -50, 50, 5, offset-340, optionValues[value][5], func, "Nameplate")
@@ -1434,7 +1495,7 @@ function G:SetupActionBar(parent)
 
 	local Bar = M:GetModule("Actionbar")
 	local defaultValues = {
-		-- defaultSize, minButtons, maxButtons, defaultButtons, defaultPerRow 
+		-- defaultSize, minButtons, maxButtons, defaultButtons, defaultPerRow
 		["Bar1"] = {34, 6, 12, 12, 12},
 		["Bar2"] = {34, 1, 12, 12, 12},
 		["Bar3"] = {32, 0, 12, 0, 12},

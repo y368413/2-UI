@@ -6,6 +6,7 @@ local _G = _G
 local type, pairs, tonumber, wipe, next, select, unpack = type, pairs, tonumber, table.wipe, next, select, unpack
 local strmatch, gmatch, strfind, format, gsub = string.match, string.gmatch, string.find, string.format, string.gsub
 local min, max, floor, rad = math.min, math.max, math.floor, math.rad
+local CreateColor = CreateColor
 
 function SenduiCmd(cmd) ChatFrame1EditBox:SetText(""); ChatFrame1EditBox:Insert(cmd); ChatEdit_SendText(ChatFrame1EditBox); end
 -- Math
@@ -85,7 +86,7 @@ do
 				self.timer:SetText(text)
 			else
 				self:SetScript("OnUpdate", nil)
-				self.timer:SetText(nil)
+				self.timer:SetText("")
 			end
 			self.elapsed = 0
 		end
@@ -389,6 +390,7 @@ do
 	end
 
 	function M:HideOption()
+		if not self then return end -- isNewPatch
 		self:SetAlpha(0)
 		self:SetScale(.0001)
 	end
@@ -461,9 +463,13 @@ do
 	M.EasyMenu = CreateFrame("Frame", "UI_EasyMenu", UIParent, "UIDropDownMenuTemplate")
 
 	-- Fontstring
+	function M:SetFontSize(size)
+		self:SetFont(I.Font[1], size, I.Font[3])
+	end
+
 	function M:CreateFS(size, text, color, anchor, x, y, r, g, b)
 		local fs = self:CreateFontString(nil, "OVERLAY")
-		fs:SetFont(I.Font[1], size, I.Font[3])
+		M.SetFontSize(fs, size)
 		fs:SetText(text)
 		fs:SetWordWrap(false)
 		if color and type(color) == "boolean" then
@@ -536,7 +542,11 @@ do
 
 		local tex = self:CreateTexture(nil, "BACKGROUND")
 		tex:SetTexture(I.bdTex)
-		tex:SetGradientAlpha(orientation, r, g, b, a1, r, g, b, a2)
+		if I.isNewPatch then
+			tex:SetGradient(orientation, CreateColor(r, g, b, a1), CreateColor(r, g, b, a2))
+		else
+			tex:SetGradientAlpha(orientation, r, g, b, a1, r, g, b, a2)
+		end
 		if width then tex:SetWidth(width) end
 		if height then tex:SetHeight(height) end
 
@@ -604,6 +614,7 @@ do
 		if not a then tinsert(R.frames, self) end
 	end
 
+	local gradientFrom, gradientTo = CreateColor(0, 0, 0, .5), CreateColor(.3, .3, .3, .3)
 	function M:CreateGradient()
 		local tex = self:CreateTexture(nil, "BORDER")
 		tex:SetInside()
@@ -611,7 +622,11 @@ do
 		if R.db["Skins"]["FlatMode"] then
 			tex:SetVertexColor(.3, .3, .3, .25)
 		else
-			tex:SetGradientAlpha("Vertical", 0, 0, 0, .5, .3, .3, .3, .3)
+			if I.isNewPatch then
+				tex:SetGradient("Vertical", gradientFrom, gradientTo)
+			else
+				tex:SetGradientAlpha("Vertical", 0, 0, 0, .5, .3, .3, .3, .3)
+			end
 		end
 
 		return tex
@@ -809,7 +824,7 @@ do
 				if not ticks[i] then
 					ticks[i] = bar:CreateTexture(nil, "OVERLAY")
 					ticks[i]:SetTexture(I.normTex)
-					ticks[i]:SetVertexColor(0, 0, 0, .7)
+					ticks[i]:SetVertexColor(0, 0, 0)
 					ticks[i]:SetWidth(R.mult)
 					ticks[i]:SetHeight(height)
 				end
@@ -877,10 +892,10 @@ do
 		"Center",
 	}
 	function M:Reskin(noHighlight, override)
-		if self.SetNormalTexture and not override then self:SetNormalTexture("") end
-		if self.SetHighlightTexture then self:SetHighlightTexture("") end
-		if self.SetPushedTexture then self:SetPushedTexture("") end
-		if self.SetDisabledTexture then self:SetDisabledTexture("") end
+		if self.SetNormalTexture and not override then self:SetNormalTexture(I.blankTex) end
+		if self.SetHighlightTexture then self:SetHighlightTexture(I.blankTex) end
+		if self.SetPushedTexture then self:SetPushedTexture(I.blankTex) end
+		if self.SetDisabledTexture then self:SetDisabledTexture(I.blankTex) end
 
 		local buttonName = self.GetName and self:GetName()
 		for _, region in pairs(blizzRegions) do
@@ -954,7 +969,7 @@ do
 			if self.bg then
 				self.bg:SetBackdropColor(cr, cg, cb, .25)
 			else
-				self.__texture:SetVertexColor(cr, cg, cb)
+				self.__texture:SetVertexColor(0, .6, 1)
 			end
 		end
 	end
@@ -979,6 +994,7 @@ do
 		local bg = M.CreateBDFrame(self, 0, true)
 		bg:SetPoint("TOPLEFT", -2, 0)
 		bg:SetPoint("BOTTOMRIGHT")
+		self.__bg = bg
 
 		if height then self:SetHeight(height) end
 		if width then self:SetWidth(width) end
@@ -1070,7 +1086,7 @@ do
 	end
 	-- Handle slider
 	function M:ReskinSlider(vertical)
-		self:SetBackdrop(nil)
+		if self.SetBackdrop then self:SetBackdrop(nil) end -- isNewPatch
 		M.StripTextures(self)
 
 		local bg = M.CreateBDFrame(self, 0, true)
@@ -1104,6 +1120,7 @@ do
 				button:SetSize(16, 16)
 				button:ClearAllPoints()
 				button:SetPoint("CENTER", -3, 0)
+				button:SetHitRectInsets(1, 1, 1, 1)
 				M.Reskin(button)
 
 				local tex = button:CreateTexture()
@@ -1236,7 +1253,7 @@ do
 	end
 
 	function M:CreateCheckBox()
-		local cb = CreateFrame("CheckButton", nil, self, "InterfaceOptionsCheckButtonTemplate")
+		local cb = CreateFrame("CheckButton", nil, self, "InterfaceOptionsBaseCheckButtonTemplate")
 		cb:SetScript("OnClick", nil) -- reset onclick handler
 		--M.ReskinCheck(cb)
 
@@ -1253,7 +1270,7 @@ do
 		eb:SetSize(width, height)
 		eb:SetAutoFocus(false)
 		eb:SetTextInsets(5, 5, 0, 0)
-		eb:SetFont(I.Font[1], I.Font[2]+2, I.Font[3])
+		M.SetFontSize(eb, I.Font[2]+2)
 		eb.bg = M.CreateBDFrame(eb, 0, true)
 		eb.bg:SetAllPoints()
 		eb:SetScript("OnEscapePressed", editBoxClearFocus)

@@ -19,7 +19,11 @@ function A:HideBlizBuff()
 	if not R.db["Auras"]["BuffFrame"] and not R.db["Auras"]["HideBlizBuff"] then return end
 
 	M.HideObject(_G.BuffFrame)
-	M.HideObject(_G.TemporaryEnchantFrame)
+	if I.isNewPatch then
+		M.HideObject(_G.DebuffFrame)
+	else
+		M.HideObject(_G.TemporaryEnchantFrame)
+	end
 end
 
 function A:BuildBuffFrame()
@@ -216,8 +220,8 @@ function A:UpdateHeader(header)
 			child:SetSize(cfg.size, cfg.size)
 		end
 
-		child.count:SetFont(I.Font[1], fontSize, I.Font[3])
-		child.timer:SetFont(I.Font[1], fontSize, I.Font[3])
+		M.SetFontSize(child.count, fontSize)
+		M.SetFontSize(child.timer, fontSize)
 
 		--Blizzard bug fix, icons arent being hidden when you reduce the amount of maximum buttons
 		if index > (cfg.maxWraps * cfg.wrapAfter) and child:IsShown() then
@@ -240,8 +244,16 @@ function A:CreateAuraHeader(filter)
 	header:SetAttribute("unit", "player")
 	header:SetAttribute("filter", filter)
 	header.filter = filter
-	RegisterStateDriver(header, "visibility", "[petbattle] hide; show")
 	RegisterAttributeDriver(header, "unit", "[vehicleui] vehicle; player")
+
+	header.visibility = CreateFrame("Frame", nil, UIParent, "SecureHandlerStateTemplate")
+	SecureHandlerSetFrameRef(header.visibility, "AuraHeader", header)
+	RegisterStateDriver(header.visibility, "customVisibility", "[petbattle] 0;1")
+	header.visibility:SetAttribute("_onstate-customVisibility", [[
+		local header = self:GetFrameRef("AuraHeader")
+		local hide, shown = newstate == 0, header:IsShown()
+		if hide and shown then header:Hide() elseif not hide and not shown then header:Show() end
+	]]) -- use custom script that will only call hide when it needs to, this prevents spam to `SecureAuraHeader_Update`
 
 	if filter == "HELPFUL" then
 		header:SetAttribute("consolidateDuration", -1)
@@ -297,11 +309,11 @@ function A:CreateAuraIcon(button)
 
 	button.count = button:CreateFontString(nil, "ARTWORK")
 	button.count:SetPoint("TOPRIGHT", -1, -3)
-	button.count:SetFont(I.Font[1], fontSize, I.Font[3])
+	M.SetFontSize(button.count, fontSize)
 
 	button.timer = button:CreateFontString(nil, "ARTWORK")
 	button.timer:SetPoint("TOP", button, "BOTTOM", 1, 2)
-	button.timer:SetFont(I.Font[1], fontSize, I.Font[3])
+	M.SetFontSize(button.timer, fontSize)
 
 	button.highlight = button:CreateTexture(nil, "HIGHLIGHT")
 	button.highlight:SetColorTexture(1, 1, 1, .25)

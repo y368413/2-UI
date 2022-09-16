@@ -13,6 +13,7 @@ CaerdonItemType = {
     CompanionPet = "Companion Pet", -- unlearned pets
     Conduit = "Conduit",
     Consumable = "Consumable",
+    Currency = "Currency",
     Equipment = "Equipment",
     Mount = "Mount",
     Recipe = "Recipe",
@@ -46,7 +47,8 @@ end
 	return item;
 end
 
---[[static]] function CaerdonItem:CreateFromItemID(itemID)
+--[[static]] function CaerdonItem:CreateFromItemID(itemIDCheck)
+    local itemID = tonumber(itemIDCheck)
 	if type(itemID) ~= "number" then
 		error("Usage: CaerdonItem:CreateFromItemID(itemID)", 2);
     end
@@ -83,15 +85,14 @@ end
 	return item;
 end
 
---[[static]] function CaerdonItem:CreateFromSpeciesInfo(speciesID, level, quality, health, power, speed, name, petID)
+--[[static]] function CaerdonItem:CreateFromSpeciesInfo(speciesID, level, quality, health, power, speed, customName, petID)
     -- TODO: This is a terrible hack until Blizzard gives me more to work with (mostly for tooltips where I don't have an itemLink).
 	if type(speciesID) ~= "number" then
-		error("Usage: CaerdonItem:CreateFromSpeciesInfo(speciesID, level, quality, health, power, speed, customName)", 2);
+		error("Usage: CaerdonItem:CreateFromSpeciesInfo(speciesID, level, quality, health, power, speed, customName, petID)", 2);
 	end
 
-    local _, _, _, creatureID, _, _, _, _, _, _, _, displayID = C_PetJournal.GetPetInfoBySpeciesID(speciesID);
-
-    local itemLink = format("|cff0070dd|Hbattlepet:%d:%d:%d:%d:%d:%d:%x:%d|h[%s]|h|r", speciesID, level, quality, health, power, speed, petID or 0, displayID, name)
+    local name, _, _, _, _, _, _, _, _, _, _, displayID = C_PetJournal.GetPetInfoBySpeciesID(speciesID);
+    local itemLink = format("|cff0070dd|Hbattlepet:%d:%d:%d:%d:%d:%d:%x:%d|h[%s]|h|r", speciesID, level, quality, health, power, speed, petID or 0, displayID, customName or name)
     return CaerdonItem:CreateFromItemLink(itemLink)
 end
 
@@ -109,7 +110,15 @@ function CaerdonItemMixin:ContinueOnItemLoad(callbackFunction)
 
     ItemEventListener:AddCallback(self:GetItemID(), function ()
         -- TODO: Update things and delay callback if needed for tooltip data
-        callbackFunction()
+        -- Make sure any dependent data is loaded
+        local itemData = self:GetItemData()
+
+        -- Allows for override of continue return if additional data needs to get loaded from a specific mixin (i.e. equipment sources)
+        if itemData then
+            itemData:ContinueOnItemDataLoad(callbackFunction)
+        else
+            callbackFunction()
+        end
     end);
 end
 
@@ -119,10 +128,24 @@ function CaerdonItemMixin:ContinueWithCancelOnItemLoad(callbackFunction)
         error("Usage: NonEmptyItem:ContinueWithCancelOnItemLoad(callbackFunction)", 2);
     end
 
-    return ItemEventListener:AddCancelableCallback(self:GetItemID(), function ()
+    local itemDataCancel
+    local itemCancel = ItemEventListener:AddCancelableCallback(self:GetItemID(), function ()
         -- TODO: Update things and delay callback if needed for tooltip data
-        callbackFunction()
+        local itemData = self:GetItemData()
+        if itemData then
+            itemDataCancel = itemData:ContinueWithCancelOnItemDataLoad(callbackFunction)
+        else
+            callbackFunction()
+        end
     end);
+
+    return function()
+        if itemDataCancel then
+            itemDataCancel()
+        end
+
+        itemCancel()
+    end;
 end
 
 function CaerdonItemMixin:SetItemLink(itemLink)
@@ -248,16 +271,16 @@ function CaerdonItemMixin:GetIsCraftingReagent()  -- requires item data to be lo
 end
 
 function IsUnhandledType(typeID, subTypeID)
-    return typeID == LE_ITEM_CLASS_CONTAINER or
-        typeID == LE_ITEM_CLASS_GEM or
-        typeID == LE_ITEM_CLASS_REAGENT or
-        typeID == LE_ITEM_CLASS_PROJECTILE or
-        typeID == LE_ITEM_CLASS_TRADEGOODS or
-        typeID == LE_ITEM_CLASS_ITEM_ENHANCEMENT or
-        typeID == LE_ITEM_CLASS_QUIVER or 
-        typeID == LE_ITEM_CLASS_KEY or
-        typeID == LE_ITEM_CLASS_GLYPH or
-        typeID == LE_ITEM_CLASS_WOW_TOKEN
+    return typeID == Enum.ItemClass.Container or
+        typeID == Enum.ItemClass.Gem or
+        typeID == Enum.ItemClass.Reagent or
+        typeID == Enum.ItemClass.Projectile or
+        typeID == Enum.ItemClass.Tradegoods or
+        typeID == Enum.ItemClass.ItemEnhancement or
+        typeID == Enum.ItemClass.Quiver or 
+        typeID == Enum.ItemClass.Key or
+        typeID == Enum.ItemClass.Glyph or
+        typeID == Enum.ItemClass.WoWToken
 end
 
 function CaerdonItemMixin:GetCaerdonItemType()
@@ -287,34 +310,36 @@ function CaerdonItemMixin:GetCaerdonItemType()
             -- Keep an eye on this
             if IsUnhandledType(typeID, subTypeID) then
                 caerdonType = CaerdonItemType.Unhandled
-            elseif typeID == LE_ITEM_CLASS_ARMOR or typeID == LE_ITEM_CLASS_WEAPON then
+            elseif typeID == Enum.ItemClass.Armor or typeID == Enum.ItemClass.Weapon then
                 caerdonType = CaerdonItemType.Equipment
-            elseif typeID == LE_ITEM_CLASS_BATTLEPET then
+            elseif typeID == Enum.ItemClass.Battlepet then
                 caerdonType = CaerdonItemType.BattlePet
-            elseif typeID == LE_ITEM_CLASS_CONSUMABLE then
+            elseif typeID == Enum.ItemClass.Consumable then
                 caerdonType = CaerdonItemType.Consumable
-            elseif typeID == LE_ITEM_CLASS_MISCELLANEOUS then
-                if subTypeID == LE_ITEM_MISCELLANEOUS_COMPANION_PET then
-                    local name, icon, petType, creatureID, sourceText, description, isWild, canBattle, tradeable, unique, obtainable, displayID, speciesID = C_PetJournal.GetPetInfoByItemID(self:GetItemID());
+            elseif typeID == Enum.ItemClass.Miscellaneous then
+                if subTypeID == Enum.ItemMiscellaneousSubclass.CompanionPet then
+                    local name, icon, petType, creatureID, sourceText, description, isWild, canBattle, isTradeable, isUnique, isObtainable, displayID, speciesID = C_PetJournal.GetPetInfoByItemID(self:GetItemID());
                     if creatureID and displayID then
                         caerdonType = CaerdonItemType.CompanionPet
                     else
                         caerdonType = CaerdonItemType.Unhandled
                     end
-                elseif subTypeID == LE_ITEM_MISCELLANEOUS_MOUNT or subTypeID == LE_ITEM_MISCELLANEOUS_MOUNT_EQUIPMENT then
+                elseif subTypeID == Enum.ItemMiscellaneousSubclass.Mount or subTypeID == Enum.ItemMiscellaneousSubclass.MountEquipment then
                     caerdonType = CaerdonItemType.Mount
                 else
                     caerdonType = CaerdonItemType.Unhandled
                 end
-            elseif typeID == LE_ITEM_CLASS_QUESTITEM then
+            elseif typeID == Enum.ItemClass.Questitem then
                 caerdonType = CaerdonItemType.Quest
-            elseif typeID == LE_ITEM_CLASS_RECIPE then
+            elseif typeID == Enum.ItemClass.Recipe then
                 caerdonType = CaerdonItemType.Recipe
             end
         elseif linkType == "battlepet" then
             caerdonType = CaerdonItemType.BattlePet
         elseif linkType == "quest" then
             caerdonType = CaerdonItemType.Quest
+        elseif linkType == "currency" then
+            caerdonType = CaerdonItemType.Currency
         end
 
         self.caerdonItemType = caerdonType
@@ -418,13 +443,13 @@ end
 -- function CaerdonAPIMixin:GetClassArmor()
 --     local playerClass, englishClass = UnitClass("player");
 --     if (englishClass == "ROGUE" or englishClass == "DRUID" or englishClass == "MONK" or englishClass == "DEMONHUNTER") then
---         classArmor = LE_ITEM_ARMOR_LEATHER;
+--         classArmor = Enum.ItemArmorSubclass.Leather;
 --     elseif (englishClass == "WARRIOR" or englishClass == "PALADIN" or englishClass == "DEATHKNIGHT") then
---         classArmor = LE_ITEM_ARMOR_PLATE;
+--         classArmor = Enum.ItemArmorSubclass.Plate;
 --     elseif (englishClass == "MAGE" or englishClass == "PRIEST" or englishClass == "WARLOCK") then
---         classArmor = LE_ITEM_ARMOR_CLOTH;
+--         classArmor = Enum.ItemArmorSubclass.Cloth;
 --     elseif (englishClass == "SHAMAN" or englishClass == "HUNTER") then
---         classArmor = LE_ITEM_ARMOR_MAIL;
+--         classArmor = Enum.ItemArmorSubclass.Mail;
 --     end
 
 --     return classArmor
@@ -539,7 +564,13 @@ function CombuctorMixin:OnUpdateSlot(button)
 end
 
 local Version = nil
+local isActive = false
 if select(4, GetAddOnInfo("Combuctor")) then
+	if IsAddOnLoaded("Combuctor") then
 		Version = GetAddOnMetadata("Combuctor", "Version")
 		CaerdonWardrobe:RegisterFeature(CombuctorMixin)
+		isActive = true
+	end
 end
+
+WagoAnalytics:Switch(addonName, isActive)

@@ -103,10 +103,12 @@ function Bar:MicroMenu()
 	end
 
 	-- Default elements
-	M.HideObject(MicroButtonPortrait)
-	M.HideObject(GuildMicroButtonTabard)
-	M.HideObject(MainMenuBarDownload)
+	if not I.isNewPatch then
+		M.HideObject(MicroButtonPortrait)
+		M.HideObject(GuildMicroButtonTabard)
+		M.HideObject(MainMenuBarDownload)
+		M.HideObject(MainMenuBarPerformanceBar)
+	end
 	M.HideObject(HelpOpenWebTicketButton)
-	M.HideObject(MainMenuBarPerformanceBar)
 	MainMenuMicroButton:SetScript("OnUpdate", nil)
 end

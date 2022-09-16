@@ -74,15 +74,15 @@ local styleData = {
 	fontSizeNormal = 13,
 	fontSizeEmphasized = 14,
 	fontOutline = "OUTLINE",
-	GetStyleName = function() return "NDui" end,
+	GetStyleName = function() return "UI" end,
 }
 
 function S:RegisterBWStyle()
 	if not R.db["Skins"]["Bigwigs"] then return end
 	if not BigWigsAPI then return end
 
-	BigWigsAPI:RegisterBarStyle("NDui", styleData)
-	-- Force to use NDui style
+	BigWigsAPI:RegisterBarStyle("UI", styleData)
+	-- Force to use UI style
 	local pending = true
 	hooksecurefunc(BigWigsAPI, "GetBarStyle", function()
 		if pending then

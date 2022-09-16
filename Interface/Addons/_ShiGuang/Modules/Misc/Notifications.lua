@@ -50,6 +50,7 @@ end
 
 function MISC:SoloInfo_Update()
 	local name, instType, diffID, diffName, _, _, _, instID = GetInstanceInfo()
+	if diffID == 8 then return end -- don't alert in mythic+
 
 	if (diffName and diffName ~= "") and instType ~= "none" and diffID ~= 24 and instList[instID] and instList[instID] ~= diffID then
 		MISC:SoloInfo_Create()
@@ -399,6 +400,7 @@ local bloodLustDebuffs = {
 	[57724]  = true, -- 心满意足
 	[80354]  = true, -- 时空错位
 	[264689] = true, -- 疲倦
+	[390435]  = true, -- 筋疲力尽，龙希尔
 }
 
 function MISC:CheckBloodlustStatus(...)

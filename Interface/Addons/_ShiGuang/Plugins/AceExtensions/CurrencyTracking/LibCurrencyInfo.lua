@@ -1,6 +1,6 @@
 --[[
 Name: LibCurrencyInfo
-Revision: $Rev: 59 $
+Revision: $Rev: 63 $
 Maintainers: Arith
 Website: https://www.wowace.com/projects/libcurrencyinfo
 Dependencies: None
@@ -21,6 +21,14 @@ data.CurrencyByCategory = {
 		1379, -- Trial of Style Token
 		1388, -- Armor Scraps
 		1401, -- Stronghold Supplies
+--		1835,	-- Linked Currency Test (Src) - PTH
+--		1836,	-- Linked Currency Test (Dst) - PTH
+--		2005,	-- Druid Talent Points (DNT)
+--		2006,	-- Restoration Talent Points (DNT)
+--		2012,	-- Death Knight Talent Points (DNT)
+--		2013,	-- Frost Talent Points (DNT)
+--		2014,	-- Unholy Talent Points (DNT)
+--		2015,	-- Blood Talent Points (DNT)
 	},
 	[2] = { -- Player vs. Player
 --		103, -- Arena Points
@@ -141,7 +149,6 @@ data.CurrencyByCategory = {
 --		395, -- Justice Points
 --		396, -- Valor Points
 --		1171,	 -- Artifact Knowledge, this to be categorize in Legion
-		1191,	 -- Valor
 		1324,	 -- Horde Qiraji Commendation
 		1325,	 -- Alliance Qiraji Commendation
 --		1347,	 -- Legionfall Building - Personal Tracker - Mage Tower (Hidden)
@@ -162,16 +169,17 @@ data.CurrencyByCategory = {
 		1598,	 -- Tortollan Seekers
 		1599,	 -- 7th Legion
 		1600,	 -- Honorbound
--- 		1602,	 -- Conquest, this to be categorize in PvP
-		1703,	 -- BFA Season Rated Participation Currency
+		1703,	-- PVP Season Rated Participation Currency
 --		1705,	 -- Warfronts - Personal Tracker - Iron in Chest (Hidden)
 --		1714,	 -- Warfronts - Personal Tracker - Wood in Chest (Hidden)
 		1722,	 -- Azerite Ore
 		1723,	 -- Lumber
+		1728,	-- Phantasma
 		1738,	 -- Unshackled
 		1739,	 -- Ankoan
 --		1740,	 -- Rustbolt Resistance (Hidden)
 		1742,	 -- Rustbolt Resistance
+		1744,	-- Corrupted Memento
 		1745,	 -- Nazjatar Ally - Neri Sharpfin
 		1746,	 -- Nazjatar Ally - Vim Brineheart
 		1747,	 -- Nazjatar Ally - Poen Gillbrack
@@ -219,13 +227,20 @@ data.CurrencyByCategory = {
 		1888, 	 -- Marasmius
 		1889, 	 -- Adventure Campaign Progress
 		1891, 	 -- Honor from Rated
---		1902, 	 -- 9.1 - Torghast XP - Prototype - LJS, 
---		1903, 	 -- Invisible Reward, 
-		1907, 	 -- Death's Advance	Grants reputation with the Death's Advance., 
-		1947, 	 -- Bonus Valor, 
-		1982,	 -- The Enlightened	Grants reputation with The Enlightened.
+--		1902, 	 -- 9.1 - Torghast XP - Prototype - LJS
+--		1903, 	 -- Invisible Reward
+		1907, 	 -- Death's Advance
+		1947, 	 -- Bonus Valor 
+		1982,	 -- The Enlightened
 		1997,	 -- Archivists' Codex
 		2000,	 -- Motes of Fate	
+		2002,	-- Renown-Maruuk Centaur
+		2021,	-- Renown-Dragonscale Expedition
+		2031,	-- Dragonscale Expedition
+		2036,	-- Ancient Waygate Energy
+		2087,	-- Renown-Tuskarr
+		2088,	-- Renown-Valdrakken
+--		2094,	-- [DNT] AC Major Faction Test Renown
 	},
 	[143] = { -- Battle for Azeroth
 		1299,	 -- Brawler's Gold
@@ -249,6 +264,7 @@ data.CurrencyByCategory = {
 		1586, -- Honor Level
 	},
 	[245] = { -- Shadowlands
+		1191,	 -- Valor
 --		1743, 	 -- Fake Anima for Quest Tracking
 		1754, 	 -- Argent Commendation
 		1767, 	 -- Stygia
@@ -281,77 +297,157 @@ data.CurrencyByCategory = {
 		1873, 	 -- Sanctum Anima Weaver-Night Fae
 		1874, 	 -- Sanctum Anima Weaver-Necrolord
 		1885, 	 -- Grateful Offering
-		1904, 	 -- Tower Knowledge, 
-		1906, 	 -- Soul Cinders, 
-		1931, 	 -- Cataloged Research, 
+		1904, 	 -- Tower Knowledge
+		1906, 	 -- Soul Cinders
+		1931, 	 -- Cataloged Research
 		1977,	 -- Stygian Ember
 		1979,	 -- Cyphers of the First Ones
-		2009,	 -- Cosmic Flux	Swirling fragments of creation energy that enable transformation, Cosmic Flux can be used to empower equipment at the Creation Catalyst in Zereth Mortis or fuel the Runecarver's Chamber in Torghast.
---		2010,	 -- [DNT] Byron Test Currency	A currency used to test currencies.
+		2009,	 -- Cosmic Flux
+--		2010,	 -- [DNT] Byron Test Currency
 	},
 	[248] = { -- Torghast UI (Hidden)
-		1909, 	 -- Torghast - Scoreboard - Clear Percent, 
-		1910, 	 -- Torghast - Scoreboard - Souls Percent, 
-		1911, 	 -- Torghast - Scoreboard - Urns Percent, 
-		1912, 	 -- Torghast - Scoreboard - Hot Streak Percent, 
-		1913, 	 -- Torghast - Scoreboard - Total Time, 
-		1914, 	 -- Torghast - Scoreboard - Par Time, 
-		1915, 	 -- Torghast - Scoreboard - Deaths Excess Count, 
-		1916, 	 -- Torghast - Scoreboard - Deaths Start Count, 
-		1917, 	 -- Torghast - Scoreboard - Floor Reached, 
-		1918, 	 -- Torghast - Scoreboard - Toast Display - Time Score, 
-		1919, 	 -- Torghast - Scoreboard - Toast Display - Hot Streak Score, 
-		1920, 	 -- Torghast - Scoreboard - Toast Display - Deaths Excess Score, 
-		1921, 	 -- Torghast - Scoreboard - Toast Display - Total Score, 
-		1922, 	 -- Torghast - Scoreboard - Toast Display - Total Rewards, 
-		1923, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Souls Rescued, 
-		1924, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Urns Broken, 
-		1925, 	 -- Torghast - Scoreboard - Toast Display - Deaths Zero, 
-		1926, 	 -- Torghast - Scoreboard - Toast Display - Stars, 
-		1932, 	 -- Torghast - Scoreboard - Toast Display - Boss Killed, 
-		1933, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Chests Opened, 
-		1934, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Escorts Complete, 
-		1935, 	 -- Torghast - Scoreboard - Toast Display - Bonus - No Trap Damage, 
-		1936, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Kill Boss Fast, 
-		1937, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Single Stacks, 
-		1938, 	 -- Torghast - Scoreboard - Toast Display - Bonus - 5 Stacks, 
-		1939, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Broker Killer, 
-		1940, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Elite Slayer, 
-		1941, 	 -- Torghast - Scoreboard - Toast Display - Bonus - 1000 Phantasma, 
-		1942, 	 -- Torghast - Scoreboard - Toast Display - Bonus - 500 Phant Left, 
-		1943, 	 -- Torghast - Scoreboard - Toast Display - Bonus - No Deaths, 
-		1944, 	 -- Torghast - Scoreboard - Toast Display - Bonus - No Epics, 
-		1945, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Elite Unnatural, 
-		1946, 	 -- Torghast - Scoreboard - Toast Display - Total Rewards - AV Bonus, 
-		1948, 	 -- Torghast - Scoreboard - Toast Display - Bonus - Kill Boss Faster, 
-		1949, 	 -- Torghast - Scoreboard - Toast Display - Bonus - 30+ Count, 
-		1950,	 -- Torghast - Scoreboard - Toast Display - 1 Star Value
-		1951,	 -- Torghast - Scoreboard - Toast Display - 2 Star Value
-		1952,	 -- Torghast - Scoreboard - Toast Display - 3 Star Value
-		1953,	 -- Torghast - Scoreboard - Toast Display - 4 Star Value
-		1954,	 -- Torghast - Scoreboard - Toast Display - 5 Star Value
-		1955,	 -- Torghast - Scoreboard - Toast Display - Points While Empowered
-		1956,	 -- Torghast - Scoreboard - Toast Display - Points Empowered Score
-		1957,	 -- Torghast - Scoreboard - Floor Clear Percent Floor 1
-		1958,	 -- Torghast - Scoreboard - Floor Clear Percent Floor 2
-		1959,	 -- Torghast - Scoreboard - Floor Clear Percent Floor 3
-		1960,	 -- Torghast - Scoreboard - Floor Clear Percent Floor 4
-		1961,	 -- Torghast - Scoreboard - Floor Empowered Percent Floor 1
-		1962,	 -- Torghast - Scoreboard - Floor Empowered Percent Floor 2
-		1963,	 -- Torghast - Scoreboard - Floor Empowered Percent Floor 3
-		1964,	 -- Torghast - Scoreboard - Floor Empowered Percent Floor 4
-		1965,	 -- Torghast - Scoreboard - Floor Time Floor 1
-		1966,	 -- Torghast - Scoreboard - Floor Time Floor 2
-		1967,	 -- Torghast - Scoreboard - Floor Time Floor 3
-		1968,	 -- Torghast - Scoreboard - Floor Time Floor 4
-		1969,	 -- Torghast - Scoreboard - Floor Par Time Floor 1
-		1970,	 -- Torghast - Scoreboard - Floor Par Time Floor 2
-		1971,	 -- Torghast - Scoreboard - Floor Par Time Floor 3
-		1972,	 -- Torghast - Scoreboard - Floor Par Time Floor 4
-		1976,	 -- Torghast - Scoreboard - Toast Display - Bonus - Phant Left Group
-		1980,	 -- Torghast - Scoreboard - Run Layer
-		1981,	 -- Torghast - Scoreboard - Run ID
-
+		1909,	-- Torghast - Scoreboard - Clear Percent
+		1910,	-- Torghast - Scoreboard - Souls Percent
+		1911,	-- Torghast - Scoreboard - Urns Percent
+		1912,	-- Torghast - Scoreboard - Hot Streak Percent
+		1913,	-- Torghast - Scoreboard - Total Time
+		1914,	-- Torghast - Scoreboard - Par Time
+		1915,	-- Torghast - Scoreboard - Deaths Excess Count
+		1916,	-- Torghast - Scoreboard - Deaths Start Count
+		1917,	-- Torghast - Scoreboard - Floor Reached
+		1918,	-- Torghast - Scoreboard - Toast Display - Time Score
+		1919,	-- Torghast - Scoreboard - Toast Display - Hot Streak Score
+		1920,	-- Torghast - Scoreboard - Toast Display - Deaths Excess Score
+		1921,	-- Torghast - Scoreboard - Toast Display - Total Score
+		1922,	-- Torghast - Scoreboard - Toast Display - Total Rewards
+		1923,	-- Torghast - Scoreboard - Toast Display - Bonus - Souls Rescued
+		1924,	-- Torghast - Scoreboard - Toast Display - Bonus - Urns Broken
+		1925,	-- Torghast - Scoreboard - Toast Display - Deaths Zero
+		1926,	-- Torghast - Scoreboard - Toast Display - Stars
+		1932,	-- Torghast - Scoreboard - Toast Display - Boss Killed
+		1933,	-- Torghast - Scoreboard - Toast Display - Bonus - Chests Opened
+		1934,	-- Torghast - Scoreboard - Toast Display - Bonus - Escorts Complete
+		1935,	-- Torghast - Scoreboard - Toast Display - Bonus - No Trap Damage
+		1936,	-- Torghast - Scoreboard - Toast Display - Bonus - Kill Boss Fast
+		1937,	-- Torghast - Scoreboard - Toast Display - Bonus - Single Stacks
+		1938,	-- Torghast - Scoreboard - Toast Display - Bonus - 5 Stacks
+		1939,	-- Torghast - Scoreboard - Toast Display - Bonus - Broker Killer
+		1940,	-- Torghast - Scoreboard - Toast Display - Bonus - Elite Slayer
+		1941,	-- Torghast - Scoreboard - Toast Display - Bonus - 1000 Phantasma
+		1942,	-- Torghast - Scoreboard - Toast Display - Bonus - 500 Phant Left
+		1943,	-- Torghast - Scoreboard - Toast Display - Bonus - No Deaths
+		1944,	-- Torghast - Scoreboard - Toast Display - Bonus - No Epics
+		1945,	-- Torghast - Scoreboard - Toast Display - Bonus - Elite Unnatural
+		1946,	-- Torghast - Scoreboard - Toast Display - Total Rewards - AV Bonus
+		1948,	-- Torghast - Scoreboard - Toast Display - Bonus - Kill Boss Faster
+		1949,	-- Torghast - Scoreboard - Toast Display - Bonus - 30+ Count
+		1950,	-- Torghast - Scoreboard - Toast Display - 1 Star Value
+		1951,	-- Torghast - Scoreboard - Toast Display - 2 Star Value
+		1952,	-- Torghast - Scoreboard - Toast Display - 3 Star Value
+		1953,	-- Torghast - Scoreboard - Toast Display - 4 Star Value
+		1954,	-- Torghast - Scoreboard - Toast Display - 5 Star Value
+		1955,	-- Torghast - Scoreboard - Toast Display - Points While Empowered
+		1956,	-- Torghast - Scoreboard - Toast Display - Points Empowered Score
+		1957,	-- Torghast - Scoreboard - Floor Clear Percent Floor 1
+		1958,	-- Torghast - Scoreboard - Floor Clear Percent Floor 2
+		1959,	-- Torghast - Scoreboard - Floor Clear Percent Floor 3
+		1960,	-- Torghast - Scoreboard - Floor Clear Percent Floor 4
+		1961,	-- Torghast - Scoreboard - Floor Empowered Percent Floor 1
+		1962,	-- Torghast - Scoreboard - Floor Empowered Percent Floor 2
+		1963,	-- Torghast - Scoreboard - Floor Empowered Percent Floor 3
+		1964,	-- Torghast - Scoreboard - Floor Empowered Percent Floor 4
+		1965,	-- Torghast - Scoreboard - Floor Time Floor 1
+		1966,	-- Torghast - Scoreboard - Floor Time Floor 2
+		1967,	-- Torghast - Scoreboard - Floor Time Floor 3
+		1968,	-- Torghast - Scoreboard - Floor Time Floor 4
+		1969,	-- Torghast - Scoreboard - Floor Par Time Floor 1
+		1970,	-- Torghast - Scoreboard - Floor Par Time Floor 2
+		1971,	-- Torghast - Scoreboard - Floor Par Time Floor 3
+		1972,	-- Torghast - Scoreboard - Floor Par Time Floor 4
+		1976,	-- Torghast - Scoreboard - Toast Display - Bonus - Phant Left Group
+		1980,	-- Torghast - Scoreboard - Run Layer
+		1981,	-- Torghast - Scoreboard - Run ID
+	},
+	[250] = {
+		2003,	-- Dragon Isles Supplies
+		2011,	-- Effigy Adornments
+		2023,	-- Dragon Isles Blacksmithing Knowledge
+		2024,	-- Dragon Isles Alchemy Knowledge
+		2025,	-- Dragon Isles Leatherworking Knowledge
+		2026,	-- Dragon Isles Tailoring Knowledge
+		2027,	-- Dragon Isles Engineering Knowledge
+		2028,	-- Dragon Isles Inscription Knowledge
+		2029,	-- Dragon Isles Jewelcrafting Knowledge
+		2030,	-- Dragon Isles Enchanting Knowledge
+		2033,	-- Dragon Isles Skinning Knowledge
+		2034,	-- Dragon Isles Herbalism Knowledge
+		2035,	-- Dragon Isles Mining Knowledge
+		2045,	-- Dragon Glyph Embers
+		2073,	-- [AC] Major Faction Test Currency
+	},
+	[251] = {
+		2016,	-- Dragon Racing - Scoreboard - Race Complete Time
+		2017,	-- Dragon Racing - Scoreboard - Race Complete Time - Fraction
+		2018,	-- Dragon Racing - Scoreboard - Race Quest ID
+		2019,	-- Dragon Racing - Scoreboard - Race Complete Time - Silver
+		2020,	-- Dragon Racing - Scoreboard - Race Complete Time - Gold
+		2022,	-- Dragon Racing - Multiplayer Race Placement
+		2037,	-- Dragon Racing - Scoreboard - Race Complete Time -Silver Fraction
+		2038,	-- Dragon Racing - Scoreboard - Race Complete Time - Gold Fraction
+		2039,	-- Dragon Racing - Scoreboard - Personal Best - Waking Shores 1
+		2040,	-- Dragon Racing - Scoreboard - Personal Best Time
+		2041,	-- Dragon Racing - Scoreboard - Personal Best Time - Fraction
+		2042,	-- Dragon Racing - Personal Best Record - Waking Shores 01 Easy
+		2043,	-- Dragon Racing - Personal Best Record - Waking Shores 01 Medium
+		2044,	-- Dragon Racing - Personal Best Record - Waking Shores 01 Hard
+		2046,	-- Dragon Racing - Personal Best Record - Waking Shores 07 Easy
+		2047,	-- Dragon Racing - Personal Best Record - Waking Shores 07 Hard
+		2048,	-- Dragon Racing - Personal Best Record - Waking Shores 02 Easy
+		2049,	-- Dragon Racing - Personal Best Record - Waking Shores 02 Hard
+		2050,	-- Dragon Racing - Personal Best Record - Waking Shores 08 Easy
+		2051,	-- Dragon Racing - Personal Best Record - Waking Shores 08 Hard
+		2052,	-- Dragon Racing - Personal Best Record - Waking Shores 03 Easy
+		2053,	-- Dragon Racing - Personal Best Record - Waking Shores 03 Hard
+		2054,	-- Dragon Racing - Personal Best Record - Waking Shores 04 Easy
+		2055,	-- Dragon Racing - Personal Best Record - Waking Shores 04 Hard
+		2056,	-- Dragon Racing - Personal Best Record - Waking Shores 05 Easy
+		2057,	-- Dragon Racing - Personal Best Record - Waking Shores 05 Hard
+		2058,	-- Dragon Racing - Personal Best Record - Waking Shores 06 Easy
+		2059,	-- Dragon Racing - Personal Best Record - Waking Shores 06 Hard
+		2060,	-- Dragon Racing - Personal Best Record - Ohn'ahran Plains 01 Easy
+		2061,	-- Dragon Racing - Personal Best Record - Ohn'ahran Plains 01 Hard
+		2062,	-- Dragon Racing - Personal Best Record - Ohn'ahran Plains 02 Easy
+		2063,	-- Dragon Racing - Personal Best Record - Ohn'ahran Plains 02 Hard
+		2064,	-- Dragon Racing - Personal Best Record - Ohn'ahran Plains 03 Easy
+		2065,	-- Dragon Racing - Personal Best Record - Ohn'ahran Plains 03 Hard
+		2066,	-- Dragon Racing - Personal Best Record - Ohn'ahran Plains 04 Easy
+		2067,	-- Dragon Racing - Personal Best Record - Ohn'ahran Plains 04 Hard
+		2069,	-- Dragon Racing - Personal Best Record - Ohn'ahran Plains D05 Easy
+		2070,	-- Dragon Racing - Personal Best Record - Ohn'ahran Plains D06 Easy
+		2074,	-- Dragon Racing - Personal Best Record - Azure Span 01 Easy
+		2075,	-- Dragon Racing - Personal Best Record - Azure Span 01 Hard
+		2076,	-- Dragon Racing - Personal Best Record - Azure Span 02 Easy
+		2077,	-- Dragon Racing - Personal Best Record - Azure Span 02 Hard
+		2078,	-- Dragon Racing - Personal Best Record - Azure Span 03 Easy
+		2079,	-- Dragon Racing - Personal Best Record - Azure Span 03 Hard
+		2080,	-- Dragon Racing - Personal Best Record - Thaldraszus 01 Easy
+		2081,	-- Dragon Racing - Personal Best Record - Thaldraszus 01 Hard
+		2082,	-- Dragon Racing - Personal Best Record - Waking Shores MP 1
+		2083,	-- Dragon Racing - Personal Best Record - Azure Span 04 Easy
+		2084,	-- Dragon Racing - Personal Best Record - Azure Span 04 Hard
+		2085,	-- Dragon Racing - Personal Best Record - Azure Span 05 Easy
+		2086,	-- Dragon Racing - Personal Best Record - Azure Span 05 Hard
+		2089,	-- Dragon Racing - Personal Best Record - Azure Span 06 Easy
+		2090,	-- Dragon Racing - Personal Best Record - Azure Span 06 Hard
+		2091,	-- Dragon Racing - Tracking
+		2092,	-- Dragon Racing - Personal Best Record - Thaldraszus 02 Easy
+		2093,	-- Dragon Racing - Personal Best Record - Thaldraszus 02 Hard
+		2095,	-- Dragon Racing - Personal Best Record - Thaldraszus MP 1
+		2096,	-- Dragon Racing - Personal Best Record - Thaldraszus 03 Easy
+		2097,	-- Dragon Racing - Personal Best Record - Thaldraszus 03 Hard
+		2098,	-- Dragon Racing - Personal Best Record - Thaldraszus 04 Easy
+		2099,	-- Dragon Racing - Personal Best Record - Thaldraszus 04 Hard
+		2100,	-- Dragon Racing - Versioning
 	},
 }
 
@@ -373,6 +469,8 @@ data.CurrencyCategories = {
 	[144] = { enUS="Virtual",deDE="Virtuell",esES="Virtual",esMX="Virtual",frFR="Virtuelle",itIT="Virtuale",koKR="가상",ptBR="Virtual",ruRU="Виртуальная валюта",zhCN="虚拟",zhTW="虛擬", },
 	[245] = { enUS=EXPANSION_NAME8,deDE=EXPANSION_NAME8,esES=EXPANSION_NAME8,esMX=EXPANSION_NAME8,frFR=EXPANSION_NAME8,itIT=EXPANSION_NAME8,koKR=EXPANSION_NAME8,ptBR=EXPANSION_NAME8,ruRU=EXPANSION_NAME8,zhCN=EXPANSION_NAME8,zhTW=EXPANSION_NAME8, },
 	[248] = { enUS="Torghast",deDE="Torghast",esES="Torghast",esMX="Torghast",frFR="Tourment",itIT="Torgast",koKR="토르가스트",ptBR="Thanator",ruRU="Торгаст",zhCN="托加斯特",zhTW="托迦司", hide=true, },
+	[250] = { enUS="Dragonflight",deDE="Dragonflight",esES="Dragonflight",esMX="Dragonflight",frFR="Vol draconique",itIT="Dragonflight",koKR="용군단",ptBR="Revoada Dragônica",ruRU="Dragonflight",zhCN="巨龙时代",zhTW="巨龍軍團", },
+	[251] = { enUS="Dragon Racing UI (Hidden)",deDE="Dragon Racing UI (Hidden)",esES="Dragon Racing UI (Hidden)",esMX="Dragon Racing UI (Hidden)",frFR="Dragon Racing UI (Hidden)",itIT="Dragon Racing UI (Hidden)",koKR="Dragon Racing UI (Hidden)",ptBR="Dragon Racing UI (Hidden)",ruRU="Dragon Racing UI (Hidden)",zhCN="Dragon Racing UI (Hidden)",zhTW="Dragon Racing UI (Hidden)",hide=true, },
 }
 
 data.Currencies = {
@@ -454,17 +552,16 @@ data.Currencies = {
 	[1154] = { id=1154, category=141 }, -- Shadowy Coins, Legion
 	[1155] = { id=1155, category=141 }, -- Ancient Mana, Legion
 	[1166] = { id=1166, category=22 }, -- Timewarped Badge, Dungeon and Raid
-	[1171] = { id=1171, category=141 }, -- Artifact Knowledge, Hidden
+	[1171] = { id=1171, category=142 }, -- Artifact Knowledge, Hidden
 	[1172] = { id=1172, category=82 }, -- Highborne Archaeology Fragment, Archaeology
 	[1173] = { id=1173, category=82 }, -- Highmountain Tauren Archaeology Fragment, Archaeology
 	[1174] = { id=1174, category=82 }, -- Demonic Archaeology Fragment, Archaeology
-	[1191] = { id=1191, category=22, hide=true }, -- Valor, Dungeon and Raid
+	[1191] = { id=1191, category=245, hide=true }, -- Valor, Dungeon and Raid
 	[1220] = { id=1220, category=141 }, -- Order Resources, Legion
 	[1226] = { id=1226, category=141 }, -- Nethershard, Legion
 	[1268] = { id=1268, category=141 }, -- Timeworn Artifact, Legion
 	[1273] = { id=1273, category=141 }, -- Seal of Broken Fate, Legion
 	[1275] = { id=1275, category=141 }, -- Curious Coin, Legion
-	[1299] = { id=1299, category=141 }, -- Brawler's Gold, Legion
 	[1299] = { id=1299, category=143 }, -- Brawler's Gold
 	[1314] = { id=1314, category=141 }, -- Lingering Soul Fragment, Legion
 	[1324] = { id=1324, category=142 }, -- Horde Qiraji Commendation, Hidden
@@ -480,8 +577,8 @@ data.Currencies = {
 	[1388] = { id=1388, category=1 }, -- Armor Scraps
 	[1401] = { id=1401, category=1 }, -- Stronghold Supplies
 	[1416] = { id=1416, category=141 }, -- Coins of Air, Legion
-	[1501] = { id=1501, category=141 }, -- Writhing Essence, Legion
-	[1506] = { id=1506, category=141 }, -- Argus Waystone, Legion
+	[1501] = { id=1501, category=142 }, -- Writhing Essence, Legion
+	[1506] = { id=1506, category=142 }, -- Argus Waystone, Legion
 	[1508] = { id=1508, category=141 }, -- Veiled Argunite, Legion
 	[1533] = { id=1533, category=141 }, -- Wakening Essence, Used by Arcanomancer Vridiel in Dalaran above the Broken Isles to create or upgrade Legion Legendary items.
 	[1534] = { id=1534, category=82 }, -- Zandalari Archaeology Fragment,  
@@ -491,16 +588,12 @@ data.Currencies = {
 	[1553] = { id=1553, category=144 }, -- Azerite, The blood of Azeroth crystalizes into chunks of Azerite, an extremely potent and powerful material.
 	[1559] = { id=1559, category=142 }, -- Essence of Storms, Extremely rare, found while killing enemies in the warfront. Used to grant yourself unbridled power at the Altar.
 	[1560] = { id=1560, category=143 }, -- War Resources
-	[1560] = { id=1560, category=143 }, -- War Resources, Used to recruit troops, run missions, and research upgrades for your war effort.
 	[1565] = { id=1565, category=143 }, -- Rich Azerite Fragment
-	[1565] = { id=1565, category=143 }, -- Rich Azerite Fragment, A fragment of rich Azerite. Turn-in to a nearby War Master for rewards.
 	[1579] = { id=1579, category=142 }, -- Champions of Azeroth, Grants reputation with the Champions of Azeroth.
 	[1580] = { id=1580, category=143 }, -- Seal of Wartorn Fate
-	[1580] = { id=1580, category=143 }, -- Seal of Wartorn Fate, Twists fate to provide an opportunity for additional treasure from Battle for Azeroth raid and dungeon bosses.
-	[1585] = { id=1585, category=144 }, -- Honor, Granted from slaying enemies of your faction
+	[1585] = { id=1585, category=144 }, -- Account Wide Honor
 	[1586] = { id=1586, category=144 }, -- Honor Level, Granted from slaying many enemies of your faction
 	[1587] = { id=1587, category=143 }, -- War Supplies
-	[1587] = { id=1587, category=143 }, -- War Supplies, Used to raise a force for the Battle of Stromgarde
 	[1592] = { id=1592, category=142 }, -- Order of Embers, Grants reputation with the Order of Embers.
 	[1593] = { id=1593, category=142 }, -- Proudmore Admiralty, Grants reputation with Proudmore Admiralty.
 	[1594] = { id=1594, category=142 }, -- Storm's Wake, Grants reputation with Storm's Wake.
@@ -681,17 +774,105 @@ data.Currencies = {
 	[1972] = { id=1972, category=248, hidden=true }, -- Torghast - Scoreboard - Floor Par Time Floor 4
 	[1976] = { id=1976, category=248, hidden=true }, -- Torghast - Scoreboard - Toast Display - Bonus - Phant Left Group
 	[1977] = { id=1977, category=245 }, -- Stygian Ember
-	[1981] = { id=1980, category=248, hidden=true }, -- Torghast - Scoreboard - Run Layer
-	[1981] = { id=1981, category=248, hidden=true }, -- Torghast - Scoreboard - Run ID
-	[1997] = { id=1997, category=142 }, -- Archivists' Codex
 	[1979] = { id=1979, category=245, }, -- Cyphers of the First Ones
 	[1980] = { id=1980, category=248, hidden=true }, -- Torghast - Scoreboard - Run Layer
 	[1981] = { id=1981, category=248, hidden=true }, -- Torghast - Scoreboard - Run ID
 	[1982] = { id=1982, category=142, }, -- The Enlightened
 	[1997] = { id=1997, category=142, }, -- Archivists' Codex
 	[2000] = { id=2000, category=142, }, -- Motes of Fate
+	[2002] = { id=2002, category=142, }, -- Renown-Maruuk Centaur
+	[2003] = { id=2003, category=250, }, -- Dragon Isles Supplies
+	[2005] = { id=2005, category=1, hidden=true }, -- Druid Talent Points (DNT)
+	[2006] = { id=2006, category=1, hidden=true }, -- Restoration Talent Points (DNT)
 	[2009] = { id=2009, category=245, }, -- Cosmic Flux
 	[2010] = { id=2010, category=245, hidden=true }, -- [DNT] Byron Test Currency
+	[2011] = { id=2011, category=250, }, -- Effigy Adornments
+	[2012] = { id=2012, category=1, hidden=true }, -- Death Knight Talent Points (DNT)
+	[2013] = { id=2013, category=1, hidden=true }, -- Frost Talent Points (DNT)
+	[2014] = { id=2014, category=1, hidden=true }, -- Unholy Talent Points (DNT)
+	[2015] = { id=2015, category=1, hidden=true }, -- Blood Talent Points (DNT)
+	[2016] = { id=2016, category=251, hidden=true }, -- Dragon Racing - Scoreboard - Race Complete Time
+	[2017] = { id=2017, category=251, hidden=true }, -- Dragon Racing - Scoreboard - Race Complete Time - Fraction
+	[2018] = { id=2018, category=251, hidden=true }, -- Dragon Racing - Scoreboard - Race Quest ID
+	[2019] = { id=2019, category=251, hidden=true }, -- Dragon Racing - Scoreboard - Race Complete Time - Silver
+	[2020] = { id=2020, category=251, hidden=true }, -- Dragon Racing - Scoreboard - Race Complete Time - Gold
+	[2021] = { id=2021, category=142, }, -- Renown-Dragonscale Expedition
+	[2022] = { id=2022, category=251, hidden=true }, -- Dragon Racing - Multiplayer Race Placement
+	[2023] = { id=2023, category=250, }, -- Dragon Isles Blacksmithing Knowledge
+	[2024] = { id=2024, category=250, }, -- Dragon Isles Alchemy Knowledge
+	[2025] = { id=2025, category=250, }, -- Dragon Isles Leatherworking Knowledge
+	[2026] = { id=2026, category=250, }, -- Dragon Isles Tailoring Knowledge
+	[2027] = { id=2027, category=250, }, -- Dragon Isles Engineering Knowledge
+	[2028] = { id=2028, category=250, }, -- Dragon Isles Inscription Knowledge
+	[2029] = { id=2029, category=250, }, -- Dragon Isles Jewelcrafting Knowledge
+	[2030] = { id=2030, category=250, }, -- Dragon Isles Enchanting Knowledge
+	[2031] = { id=2031, category=142, }, -- Dragonscale Expedition
+	[2033] = { id=2033, category=250, }, -- Dragon Isles Skinning Knowledge
+	[2034] = { id=2034, category=250, }, -- Dragon Isles Herbalism Knowledge
+	[2035] = { id=2035, category=250, }, -- Dragon Isles Mining Knowledge
+	[2036] = { id=2036, category=142, }, -- Ancient Waygate Energy
+	[2037] = { id=2037, category=251, hidden=true }, -- Dragon Racing - Scoreboard - Race Complete Time -Silver Fraction
+	[2038] = { id=2038, category=251, hidden=true }, -- Dragon Racing - Scoreboard - Race Complete Time - Gold Fraction
+	[2039] = { id=2039, category=251, hidden=true }, -- Dragon Racing - Scoreboard - Personal Best - Waking Shores 1
+	[2040] = { id=2040, category=251, hidden=true }, -- Dragon Racing - Scoreboard - Personal Best Time
+	[2041] = { id=2041, category=251, hidden=true }, -- Dragon Racing - Scoreboard - Personal Best Time - Fraction
+	[2042] = { id=2042, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 01 Easy
+	[2043] = { id=2043, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 01 Medium
+	[2044] = { id=2044, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 01 Hard
+	[2045] = { id=2045, category=250, }, -- Dragon Glyph Embers
+	[2046] = { id=2046, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 07 Easy
+	[2047] = { id=2047, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 07 Hard
+	[2048] = { id=2048, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 02 Easy
+	[2049] = { id=2049, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 02 Hard
+	[2050] = { id=2050, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 08 Easy
+	[2051] = { id=2051, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 08 Hard
+	[2052] = { id=2052, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 03 Easy
+	[2053] = { id=2053, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 03 Hard
+	[2054] = { id=2054, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 04 Easy
+	[2055] = { id=2055, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 04 Hard
+	[2056] = { id=2056, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 05 Easy
+	[2057] = { id=2057, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 05 Hard
+	[2058] = { id=2058, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 06 Easy
+	[2059] = { id=2059, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores 06 Hard
+	[2060] = { id=2060, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Ohn'ahran Plains 01 Easy
+	[2061] = { id=2061, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Ohn'ahran Plains 01 Hard
+	[2062] = { id=2062, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Ohn'ahran Plains 02 Easy
+	[2063] = { id=2063, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Ohn'ahran Plains 02 Hard
+	[2064] = { id=2064, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Ohn'ahran Plains 03 Easy
+	[2065] = { id=2065, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Ohn'ahran Plains 03 Hard
+	[2066] = { id=2066, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Ohn'ahran Plains 04 Easy
+	[2067] = { id=2067, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Ohn'ahran Plains 04 Hard
+	[2069] = { id=2069, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Ohn'ahran Plains D05 Easy
+	[2070] = { id=2070, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Ohn'ahran Plains D06 Easy
+	[2073] = { id=2073, category=250, }, -- [AC] Major Faction Test Currency
+	[2074] = { id=2074, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Azure Span 01 Easy
+	[2075] = { id=2075, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Azure Span 01 Hard
+	[2076] = { id=2076, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Azure Span 02 Easy
+	[2077] = { id=2077, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Azure Span 02 Hard
+	[2078] = { id=2078, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Azure Span 03 Easy
+	[2079] = { id=2079, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Azure Span 03 Hard
+	[2080] = { id=2080, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Thaldraszus 01 Easy
+	[2081] = { id=2081, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Thaldraszus 01 Hard
+	[2082] = { id=2082, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Waking Shores MP 1
+	[2083] = { id=2083, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Azure Span 04 Easy
+	[2084] = { id=2084, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Azure Span 04 Hard
+	[2085] = { id=2085, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Azure Span 05 Easy
+	[2086] = { id=2086, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Azure Span 05 Hard
+	[2087] = { id=2087, category=142, }, -- Renown-Tuskarr
+	[2088] = { id=2088, category=142, }, -- Renown-Valdrakken
+	[2089] = { id=2089, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Azure Span 06 Easy
+	[2090] = { id=2090, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Azure Span 06 Hard
+	[2091] = { id=2091, category=251, hidden=true }, -- Dragon Racing - Tracking
+	[2092] = { id=2092, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Thaldraszus 02 Easy
+	[2093] = { id=2093, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Thaldraszus 02 Hard
+	[2094] = { id=2094, category=142, }, -- [DNT] AC Major Faction Test Renown
+	[2095] = { id=2095, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Thaldraszus MP 1
+	[2096] = { id=2096, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Thaldraszus 03 Easy
+	[2097] = { id=2097, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Thaldraszus 03 Hard
+	[2098] = { id=2098, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Thaldraszus 04 Easy
+	[2099] = { id=2099, category=251, hidden=true }, -- Dragon Racing - Personal Best Record - Thaldraszus 04 Hard
+	[2100] = { id=2100, category=251, hidden=true }, -- Dragon Racing - Versioning
+
 }
 
 

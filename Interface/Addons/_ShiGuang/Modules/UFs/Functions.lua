@@ -90,6 +90,8 @@ local function UpdateHealthColorByIndex(health, index)
 	if index == 1 then
 		health:SetStatusBarColor(.1, .1, .1)
 		health.bg:SetVertexColor(.6, .6, .6)
+	elseif index == 4 then
+		health:SetStatusBarColor(0, 0, 0, 0)
 	end
 end
 
@@ -106,6 +108,41 @@ function UF:UpdateHealthBarColor(self, force)
 
 	if force then
 		health:ForceUpdate()
+	end
+end
+
+local endColor = CreateColor(0, 0, 0, .25)
+function UF.HealthPostUpdate(element, unit, cur, max)
+	local self = element.__owner
+	local mystyle = self.mystyle
+	local useGradient, useGradientClass
+	if mystyle == "PlayerPlate" then
+		-- do nothing
+	elseif mystyle == "raid" then
+		useGradient = R.db["UFs"]["RaidHealthColor"] > 3
+		useGradientClass = R.db["UFs"]["RaidHealthColor"] == 5
+	else
+		useGradient = R.db["UFs"]["HealthColor"] > 3
+		useGradientClass = R.db["UFs"]["HealthColor"] == 5
+	end
+	if useGradient then
+		element.bg:SetVertexColor(self:ColorGradient(cur or 1, max or 1, 1,0,0, 1,.7,0, .7,1,0))
+	end
+	if useGradientClass then
+		local color
+		if UnitIsPlayer(unit) then
+			local _, class = UnitClass(unit)
+			color = self.colors.class[class]
+		elseif UnitReaction(unit, "player") then
+			color = self.colors.reaction[UnitReaction(unit, "player")]
+		end
+		if color then
+			if I.isNewPatch then
+				element:GetStatusBarTexture():SetGradient("HORIZONTAL", CreateColor(color[1], color[2], color[3], .75), endColor)
+			else
+				element:GetStatusBarTexture():SetGradientAlpha("HORIZONTAL", color[1],color[2],color[3], .75, 0,0,0, .25)
+			end
+		end
 	end
 end
 
@@ -135,18 +172,25 @@ function UF:CreateHealthBar(self)
 	health:SetStatusBarTexture(I.normTex)
 	health:SetStatusBarColor(.1, .1, .1)
 	health:SetFrameLevel(self:GetFrameLevel() - 2)
-	health.backdrop = M.SetBD(health, 0) -- don't mess up with libs
-	health.shadow = health.backdrop.__shadow
+
+	self.backdrop = M.SetBD(health, 0)
+	if self.backdrop.__shadow then
+		self.backdrop.__shadow:SetOutside(self, 4+R.mult, 4+R.mult)
+		self.backdrop.__shadow:SetFrameLevel(0)
+		self.backdrop.__shadow = nil
+	end
 	M:SmoothBar(health)
 
-	local bg = health:CreateTexture(nil, "BACKGROUND")
-	bg:SetAllPoints()
+	local bg = self:CreateTexture(nil, "BACKGROUND")
+	bg:SetPoint("TOPLEFT", health:GetStatusBarTexture(), "TOPRIGHT", 0, 0)
+	bg:SetPoint("BOTTOMRIGHT", health)
 	bg:SetTexture(I.bdTex)
 	bg:SetVertexColor(.6, .6, .6)
 	bg.multiplier = .25
 
 	self.Health = health
 	self.Health.bg = bg
+	self.Health.PostUpdate = UF.HealthPostUpdate
 
 	UF:UpdateHealthBarColor(self)
 end
@@ -184,7 +228,8 @@ function UF:UpdateFrameHealthTag()
 		valueType = UF.VariousTagIndex[R.db["UFs"]["PetHPTag"]]
 	end
 
-	self:Tag(self.healthValue, "[VariousHP("..valueType..")]")
+	local showValue = R.db["UFs"]["PlayerAbsorb"] and mystyle == "player" and "[curAbsorb] " or ""
+	self:Tag(self.healthValue, showValue.."[VariousHP("..valueType..")]")
 	self.healthValue:UpdateTag()
 end
 
@@ -256,8 +301,12 @@ function UF:CreateHealthText(self)
 		name:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 3, 6)
 		name:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", -3, 6)
 		self:Tag(name, "[nplevel][name]")
+	elseif mystyle == "boss" or mystyle == "arena" then
+		name:SetPoint("LEFT", 3, R.db["UFs"]["BossNameOffset"])
+		name:SetWidth(self:GetWidth()*(R.db["UFs"]["BossNameOffset"] == 0 and .55 or 1))
 	else
-		name:SetWidth(self:GetWidth()*.55)
+		name:SetPoint("LEFT", 3, R.db["UFs"]["PetNameOffset"])
+		name:SetWidth(self:GetWidth()*(R.db["UFs"]["PetNameOffset"] == 0 and .55 or 1))
 	end
 
 	UF.UpdateFrameNameTag(self)
@@ -285,7 +334,7 @@ function UF:CreateHealthText(self)
 end
 
 local function UpdatePowerColorByIndex(power, index)
-	power.colorPower = (index == 2)
+	power.colorPower = (index == 2) or (index == 5)
 	power.colorClass = (index ~= 2)
 	power.colorReaction = (index ~= 2)
 	if power.SetColorTapping then
@@ -345,13 +394,10 @@ function UF:CreatePowerBar(self)
 		powerHeight = retVal(self, R.db["UFs"]["PlayerPowerHeight"], R.db["UFs"]["FocusPowerHeight"], R.db["UFs"]["BossPowerHeight"], R.db["UFs"]["PetPowerHeight"])
 	end
 	power:SetHeight(powerHeight)
+	power.wasHidden = powerHeight == 0
 	power:SetFrameLevel(self:GetFrameLevel() - 2)
 	power.backdrop = M.CreateBDFrame(power, 0)
 	M:SmoothBar(power)
-
-	if self.Health.shadow then
-		self.Health.shadow:SetPoint("BOTTOMRIGHT", power.backdrop, R.mult+3, -R.mult-3)
-	end
 
 	local bg = power:CreateTexture(nil, "BACKGROUND")
 	bg:SetAllPoints()
@@ -363,6 +409,15 @@ function UF:CreatePowerBar(self)
 
 	power.frequentUpdates = frequentUpdateCheck[mystyle]
 	UF:UpdatePowerBarColor(self)
+end
+
+function UF:CheckPowerBars()
+	for _, frame in pairs(oUF.objects) do
+		if frame.Power and frame.Power.wasHidden then
+			frame:DisableElement("Power")
+			if frame.powerText then frame.powerText:Hide() end
+		end
+	end
 end
 
 function UF:UpdateFramePowerTag()
@@ -390,6 +445,8 @@ function UF:CreatePowerText(self)
 		ppval:SetScale(R.db["UFs"]["RaidTextScale"])
 	elseif mystyle == "focus" then
 		ppval:SetPoint("RIGHT", -3, R.db["UFs"]["FocusPowerOffset"])
+	elseif mystyle == "boss" or mystyle == "arena" then
+		ppval:SetPoint("RIGHT", -3, R.db["UFs"]["BossPowerOffset"])
 	end
 	self.powerText = ppval
 	UF.UpdateFramePowerTag(self)
@@ -414,8 +471,8 @@ function UF:UpdateTextScale()
 			if frame.powerText then frame.powerText:SetScale(scale) end
 			local castbar = frame.Castbar
 			if castbar then
-				castbar.Text:SetScale(scale)
-				castbar.Time:SetScale(scale)
+				if castbar.Text then castbar.Text:SetScale(scale) end
+				if castbar.Time then castbar.Time:SetScale(scale) end
 				if castbar.Lag then castbar.Lag:SetScale(scale) end
 			end
 			--UF:UpdateHealthBarColor(frame, true)
@@ -612,7 +669,7 @@ local function reskinTimerBar(bar)
 	if statusbar then
 		statusbar:SetAllPoints()
 		statusbar:SetStatusBarTexture(I.normTex)
-	else
+	elseif bar.SetStatusBarTexture then -- isNewPatch
 		bar:SetStatusBarTexture(I.normTex)
 	end
 
@@ -677,11 +734,12 @@ local filteredStyle = {
 	["arena"] = true,
 }
 
-local replaceEncryptedIcons = {
+UF.ReplacedSpellIcons = {
 	[368078] = 348567, -- 移速
 	[368079] = 348567, -- 移速
 	[368103] = 648208, -- 急速
 	[368243] = 237538, -- CD
+	[373785] = 236293, -- S4，大魔王伪装
 }
 
 local dispellType = {
@@ -699,8 +757,7 @@ function UF.PostUpdateIcon(element, _, button, _, _, duration, expiration, debuf
 		button:SetSize(element.size, element.size)
 	end
 
-	local fontSize = element.fontSize or element.size*.6
-	button.count:SetFont(I.Font[1], fontSize, I.Font[3])
+	M.SetFontSize(button.count, element.fontSize or element.size*.6)
 
 	if element.desaturateDebuff and button.isDebuff and filteredStyle[style] and not button.isPlayer then
 		button.icon:SetDesaturated(true)
@@ -730,7 +787,7 @@ function UF.PostUpdateIcon(element, _, button, _, _, duration, expiration, debuf
 		end
 	end
 
-	local newTexture = replaceEncryptedIcons[button.spellID]
+	local newTexture = UF.ReplacedSpellIcons[button.spellID]
 	if newTexture then
 		button.icon:SetTexture(newTexture)
 	end
@@ -1007,6 +1064,7 @@ function UF:CreateBuffs(self)
 	bu["growth-x"] = "RIGHT"
 	bu["growth-y"] = "UP"
 	bu.spacing = 3
+	bu.tooltipAnchor = "ANCHOR_BOTTOMLEFT"
 
 	if self.mystyle == "raid" then
 		bu.initialAnchor = "BOTTOMRIGHT"
@@ -1151,7 +1209,7 @@ function UF:OnUpdateRunes(elapsed)
 	local duration = self.duration + elapsed
 	self.duration = duration
 	self:SetValue(duration)
-	self.timer:SetText(nil)
+	self.timer:SetText("")
 	if R.db["UFs"]["RuneTimer"] then
 		local remain = self.runeDuration - duration
 		if remain > 0 then
@@ -1168,7 +1226,7 @@ function UF.PostUpdateRunes(element, runemap)
 			if runeReady then
 				rune:SetAlpha(1)
 				rune:SetScript("OnUpdate", nil)
-				rune.timer:SetText(nil)
+				rune.timer:SetText("")
 			elseif start then
 				rune:SetAlpha(.6)
 				rune.runeDuration = duration
@@ -1224,11 +1282,16 @@ function UF:CreateClassPower(self)
 		if isDK then
 			bars[i].timer = M.CreateFS(bars[i], 13, "")
 		elseif I.MyClass == "ROGUE" then
-			local chargeStar = bars[i]:CreateTexture()
+			if not bar.chargeParent then
+				bar.chargeParent = CreateFrame("Frame", nil, bar)
+				bar.chargeParent:SetAllPoints()
+				bar.chargeParent:SetFrameLevel(8)
+			end
+			local chargeStar = bar.chargeParent:CreateTexture()
 			chargeStar:SetAtlas("VignetteKill")
 			chargeStar:SetDesaturated(true)
 			chargeStar:SetSize(22, 22)
-			chargeStar:SetPoint("CENTER")
+			chargeStar:SetPoint("CENTER", bars[i])
 			chargeStar:Hide()
 			bars[i].chargeStar = chargeStar
 		end

@@ -6,9 +6,56 @@ CaerdonEquipmentMixin = {}
 		error("Usage: CaerdonEquipment:CreateFromCaerdonItem(caerdonItem)", 2)
 	end
 
-    local itemType = CreateFromMixins(CaerdonEquipmentMixin)
+    local itemType = CreateFromMixins(CaerdonWardrobeItemDataMixin, CaerdonEquipmentMixin)
     itemType.item = caerdonItem
     return itemType
+end
+
+function CaerdonEquipmentMixin:LoadSources(callbackFunction)
+    local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(self.item:GetItemLink())
+    if not sourceID then
+        -- TODO: Not sure why this is the case?  EncounterJournal links aren't returning source info
+        appearanceID, sourceID = C_TransmogCollection.GetItemInfo(self.item:GetItemID())
+    end
+
+    local continuableContainer = ContinuableContainer:Create();
+    local cancelFunc = function() end;
+
+    if not appearanceID then
+        callbackFunction()
+    else
+        local appearanceSourceIDs = C_TransmogCollection.GetAllAppearanceSources(appearanceID)
+        for appearanceSourceIndex, appearanceSourceID in pairs(appearanceSourceIDs) do
+            local itemID = C_TransmogCollection.GetSourceItemID(appearanceSourceID);
+            -- Using Item here to avoid recursively diving
+            local item = Item:CreateFromItemID(itemID)
+            if not item:IsItemEmpty() then
+                continuableContainer:AddContinuable(item);
+            end
+        end
+
+        cancelFunc = continuableContainer:ContinueOnLoad(callbackFunction);
+    end
+
+    return cancelFunc
+end
+
+-- Allows for override of continue return if additional data needs to get loaded from a specific mixin (i.e. equipment sources)
+function CaerdonEquipmentMixin:ContinueOnItemDataLoad(callbackFunction)
+    if type(callbackFunction) ~= "function" or self.item:IsItemEmpty() then
+        error("Usage: NonEmptyItem:ContinueOnLoad(callbackFunction)", 2);
+    end
+
+    self:LoadSources(callbackFunction)
+end
+
+-- Allows for override of continue return if additional data needs to get loaded from a specific mixin (i.e. equipment sources)
+function CaerdonEquipmentMixin:ContinueWithCancelOnItemDataLoad(callbackFunction)
+    if type(callbackFunction) ~= "function" or self.item:IsItemEmpty() then
+        error("Usage: NonEmptyItem:ContinueOnLoad(callbackFunction)", 2);
+    end
+
+    return self:LoadSources(callbackFunction)
 end
 
 function CaerdonEquipmentMixin:GetEquipmentSets()
@@ -100,7 +147,7 @@ function CaerdonEquipmentMixin:GetTransmogInfo()
 
     -- Keep available for debug info
     local appearanceInfo, sourceInfo
-    local isInfoReady, canCollect
+    local isInfoReady, canCollect, accountCanCollect
     local shouldSearchSources
     local appearanceSources
     local currentSourceFound
@@ -117,6 +164,14 @@ function CaerdonEquipmentMixin:GetTransmogInfo()
         appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item:GetItemID())
     end
 
+    if sourceID then
+        -- TODO: Look into this more - doc indicates it's an itemModifiedAppearanceID returned from C_TransmogCollection.GetItemInfo (which may also be sourceID?)
+        -- PlayerKnowsSource just seems broken if that's true, though.
+        -- VisualID == AppearanceID, SourceID == ItemModifiedAppearanceID
+        -- Also check PlayerHasTransmog with the following
+        -- print(itemLink .. ",  PlayerHasTransmogItemModifiedAppearance: " .. tostring(C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(sourceID)) .. ", PlayerKnowsSource: " .. tostring(C_TransmogCollection.PlayerKnowsSource(sourceID)))
+    end
+
     if item:GetMinLevel() and item:GetMinLevel() > UnitLevel("player") then
         hasMetRequirements = false
     end
@@ -124,14 +179,26 @@ function CaerdonEquipmentMixin:GetTransmogInfo()
     if sourceID and sourceID ~= NO_TRANSMOG_SOURCE_ID then
         isTransmog = true
 
-        -- If canCollect, then the current toon can learn it.
+        -- If canCollect, then the current toon can learn it (but may already know it)
         isInfoReady, canCollect = C_TransmogCollection.PlayerCanCollectSource(sourceID)
+        -- hasItemData, accountCanCollect = C_TransmogCollection.AccountCanCollectSource(sourceID)
+
+        -- if not isInfoReady then
+        --     print('Info not ready - source ID ' .. tostring(sourceID) .. ' for ' .. itemLink)
+        -- end
 
          -- TODO: Forcing to always for now be true because a class could have an item it knows
          -- that no other class can use, so we actually need the item rather than just completionist
         shouldSearchSources = true
 
         sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+
+        -- if sourceInfo and sourceInfo.quality then
+        --     -- Item is ready
+        -- else
+        --     print('SourceInfo quality not available: ' .. itemLink)
+        -- end
+        
         sourceSpecs = GetItemSpecInfo(itemLink)
 
         -- If the source is already collected, we don't need to check anything else for the source / appearance
@@ -157,7 +224,18 @@ function CaerdonEquipmentMixin:GetTransmogInfo()
                 local sourceIndex, source
                 local appearanceSourceIDs = C_TransmogCollection.GetAllAppearanceSources(appearanceID)
                 for sourceIndex, source in pairs(appearanceSourceIDs) do
+                    local isInfoReadySearch, canCollectSearch = C_TransmogCollection.PlayerCanCollectSource(source)
+                    -- if not isInfoReadySearch then
+                    --     print('Search Info not ready - source ID ' .. tostring(source) .. ' for ' .. itemLink)
+                    -- end
+
                     local info = C_TransmogCollection.GetSourceInfo(source)
+                    -- if info and info.quality then
+                    --     -- Item is ready
+                    -- else
+                    --     print('Search SourceInfo quality not available: ' .. itemLink)
+                    -- end
+            
                     if info then
                         if not appearanceSources then
                             appearanceSources = {}
@@ -172,6 +250,7 @@ function CaerdonEquipmentMixin:GetTransmogInfo()
                 otherSourceFound = false
 
                 if appearanceSources then
+                    local sourceIndex, source
                     for sourceIndex, source in pairs(appearanceSources) do
                         local _, sourceType, sourceSubType, sourceEquipLoc, _, sourceTypeID, sourceSubTypeID = GetItemInfoInstant(source.itemID)
                         -- SubTypeID is returned from GetAppearanceSourceInfo, but it seems to be tied to the appearance, since it was wrong for an item that crossed over.
@@ -189,27 +268,53 @@ function CaerdonEquipmentMixin:GetTransmogInfo()
                             if lowestLevelFound == nil or sourceMinLevel and sourceMinLevel < lowestLevelFound then
                                 lowestLevelFound = sourceMinLevel
                             end
-                            local sourceSpecIndex, sourceSpec
-                            if sourceSpecs and source.specs and #source.specs > 0 then
-                                for sourceSpecIndex, sourceSpec in pairs(sourceSpecs) do
-                                    if tContains(source.specs, sourceSpec) then
-                                        otherSourceFound = true
-                                        table.insert(matchedSources, source)
-                                        break
-                                    end
-                                end
-                            else
-                                table.insert(matchedSources, source)
-                                otherSourceFound = true
-                            end
+
+                            -- Log any matched sources even if they're treated as not found due to logic below (for debug)
+                            table.insert(matchedSources, source)
+                            otherSourceFound = true -- remove this and do something like below if I can ever find a way to get full spec / class reqs for an item
+
+                            -- If this item covers classes that aren't already covered by another source, we want to learn it... 
+                            -- EXCEPT TODO: This doesn't work because GetItemSpecInfo appears to at least sometimes return just your own class specs for an item...
+                            -- Weapons may be accurate but also spec doesn't seem to matter for them to show up.
+                            -- local sourceSpecIndex, sourceSpec
+                            -- if sourceSpecs and #sourceSpecs > 0 and source.specs and #source.specs > 0 then
+                            --     local itemClasses = {}
+                            --     print("Checking classes for " .. itemLink)
+
+                            --     for sourceSpecIndex, sourceSpec in pairs(source.specs) do
+                            --         local id, name, description, icon, role, classFile, className = GetSpecializationInfoByID(sourceSpec)
+                            --         print(itemLink .. source.name .. " found " .. className)
+                            --         table.insert(itemClasses, className)
+                            --     end
+
+                            --     for sourceSpecIndex, sourceSpec in pairs(sourceSpecs) do
+                            --         -- print(itemLink .. ": " .. sourceSpec)
+                            --         local id, name, description, icon, role, classFile, className = GetSpecializationInfoByID(sourceSpec)
+                            --         if not tContains(itemClasses, className) then
+                            --             print(itemLink .. ": New Spec " .. sourceSpec .. " for " .. className .. " " .. source.itemID)
+                            --             otherSourceFound = false
+                            --             break
+                            --         else
+                            --             otherSourceFound = true
+                            --         end
+                            --     end
+                            -- else
+                            --     otherSourceFound = true
+                            -- end
                         end
                     end
 
                     -- Ignore the other source if this item is lower level than what we know
                     -- TODO: Find an item to add to tests
+                    local includeLevelDifferences = CaerdonWardrobeConfig.Icon.ShowLearnable.SameLookDifferentItem and CaerdonWardrobeConfig.Icon.ShowLearnable.SameLookDifferentLevel
+
                     local itemMinLevel = item:GetMinLevel()
-                    if lowestLevelFound ~= nil and itemMinLevel ~= nil and itemMinLevel < lowestLevelFound then
-                        otherSourceFound = false
+                    if lowestLevelFound ~= nil and itemMinLevel ~= nil and itemMinLevel < lowestLevelFound and includeLevelDifferences then
+                        -- This logic accounts for the changes to transmog that allow lower-level players to wear transmog up to a certain level.
+                        -- This changes "completionist" slightly in that you will no longer collect every single level difference of an appearance as it's no longer needed.
+                        if (lowestLevelFound > 9 and itemMinLevel <= 9) or (lowestLevelFound > 48 and itemMinLevel <= 48) or (lowestLevelFound > 60 and itemMinLevel <= 60) then
+                            otherSourceFound = false
+                        end
                     end
                 end
 
@@ -261,5 +366,18 @@ function CaerdonEquipmentMixin:GetTransmogInfo()
         otherNeedsItem = otherNeedsItem,
         isCompletionistItem = isCompletionistItem,
         matchesLootSpec = matchesLootSpec,
+        forDebugUseOnly = CaerdonWardrobeConfig.Debug.Enabled and {
+            matchedSources = matchedSources,
+            isInfoReady = isInfoReady,
+            shouldSearchSources = shouldSearchSources,
+            appearanceInfo = appearanceInfo,
+            sourceInfo = sourceInfo,
+            appearanceSources = appearanceSources,
+            itemTypeData = itemTypeData,
+            currentSourceFound = currentSourceFound,
+            otherSourceFound = otherSourceFound,
+            sourceSpecs = sourceSpecs,
+            lowestLevelFound = lowestLevelFound
+        }
     }
 end

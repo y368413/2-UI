@@ -452,7 +452,11 @@ function module:OnLogin()
 	if R.db["Chat"]["Lock"] then
 		module:UpdateChatSize()
 		M:RegisterEvent("UI_SCALE_CHANGED", module.UpdateChatSize)
-		hooksecurefunc("FCF_SavePositionAndDimensions", module.UpdateChatSize)
-		FCF_SavePositionAndDimensions(ChatFrame1)
+		if I.isNewPatch then
+			hooksecurefunc(ChatFrame1, "SetPoint", updateChatAnchor)
+		else
+			hooksecurefunc("FCF_SavePositionAndDimensions", module.UpdateChatSize)
+			FCF_SavePositionAndDimensions(ChatFrame1)
+		end
 	end
 end

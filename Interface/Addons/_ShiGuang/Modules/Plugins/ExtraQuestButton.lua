@@ -61,55 +61,6 @@ local inaccurateQuestAreas = {
 	[63971] = 1543, -- 法夜突袭，蜗牛践踏
 }
 
--- items that should be used on specific mobs (npcID = itemID)
--- these have high priority during collision
-local targetItems = {
-	[9999] = 11804, -- Un'Goro Crater
-	[26811] = 36859, -- Grizzly Hills
-	[26812] = 36859, -- Grizzly Hills
-	[34925] = 46954, -- Icecrown
-	[35092] = 46954, -- Icecrown
-	[36845] = 49647, -- Mulgore
-	[169206] = 179921, -- Ardenweald
-	[42681] = 58167, -- Deepholm
-	[42682] = 58167, -- Deepholm
-	[44218] = 60490, -- Deepholm
-	[25753] = 35352, -- Borean Tundra
-	[25752] = 35352, -- Borean Tundra
-	[25758] = 35352, -- Borean Tundra
-	[25814] = 35401, -- Borean Tundra
-	[25321] = 34711, -- Borean Tundra
-	[25322] = 34711, -- Borean Tundra
-	[26841] = 37887, -- Dragonblight
-	[27122] = 37887, -- Dragonblight
-	[27808] = 37887, -- Dragonblight
-	[28750] = 39157, -- Zul'Drak
-	[28843] = 39238, -- Zul'Drak
-	[28802] = 39206, -- Zul'Drak
-	[28931] = 39664, -- Zul'Drak
-	[29747] = 41265, -- Icecrown
-	[141501] = 162450, -- Zuldazar
-	[43923] = 60225, -- Duskwood
-	[43814] = 60206, -- Duskwood
-	[48269] = 63508, -- Hillsbrad Foothills
-	[48136] = 63426, -- Hillsbrad Foothills
-	[48741] = 64445, -- Hillsbrad Foothills
-	[48742] = 64445, -- Hillsbrad Foothills
-	[81183] = 115475, -- Spires of Arak
-	[166958] = 183689, -- Icecrown
-	[166959] = 183689, -- Icecrown
-	[158532] = 172950, -- Ardenweald
-	[167395] = 172020, -- Maldraxxus
-	[36922] = 49679, -- Azshara
-	[175857] = 186199, -- Night Fae Assault in Maw
-	[176131] = 186199, -- Night Fae Assault in Maw
-	[178786] = 186199, -- Night Fae Assault in Maw
-	[178855] = 186199, -- Night Fae Assault in Maw
-	[178859] = 186199, -- Night Fae Assault in Maw
-	[178878] = 186199, -- Night Fae Assault in Maw
-	[179217] = 186199, -- Night Fae Assault in Maw
-}
-
 -- items that should be used for a quest but aren't (questID = itemID)
 -- these have low priority during collision
 local questItems = {
@@ -150,10 +101,6 @@ local questItems = {
 	[49402] = 154878, -- Tiragarde Sound
 	[50164] = 154878, -- Tiragarde Sound
 	[51646] = 154878, -- Tiragarde Sound
-	[12925] = 41612, -- Storm Peaks
-	[13425] = 41612, -- Storm Peaks
-	[27384] = 12888, -- Eastern Plaguelands
-	[60649] = 180170, -- Ardenweald
 	[58586] = 174465, -- Venthyr Covenant
 	[59063] = 175137, -- Night Fae Covenant
 	[59809] = 177904, -- Night Fae Covenant
@@ -280,6 +227,7 @@ function ExtraQuestButton:UPDATE_BINDINGS()
 end
 
 function ExtraQuestButton:PLAYER_LOGIN()
+	if I.isNewPatch then return end
 	RegisterStateDriver(self, "visible", visibilityState)
 	self:SetAttribute("_onattributechanged", onAttributeChanged)
 	self:SetAttribute("type", "item")

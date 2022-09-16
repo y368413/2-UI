@@ -1480,7 +1480,7 @@ function WQA:AddReward(list, rewardType, reward, emissary)
 		l.gold = reward
 	elseif rewardType == "AZERITE_TRAIT" then
 		if not l.azeriteTraits then l.azeriteTraits = {} end
-		for k,v in pairs(l.azeriteTraits) do
+		for k, v in pairs(l.azeriteTraits) do
 			if v.spellID == reward then
 				return
 			end

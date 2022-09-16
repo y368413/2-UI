@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Frame Container
 -------------------------------------------------------------------------------]]
-local Type, Version = "Frame", 28
+local Type, Version = "Frame", 29
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -13,6 +13,9 @@ local wipe = table.wipe
 local PlaySound = PlaySound
 local CreateFrame, UIParent = CreateFrame, UIParent
 
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: CLOSE
 
 --[[-----------------------------------------------------------------------------
 Scripts
@@ -187,7 +190,11 @@ local function Constructor()
 	frame:SetFrameLevel(100) -- Lots of room to draw under it
 	frame:SetBackdrop(FrameBackdrop)
 	frame:SetBackdropColor(0, 0, 0, 1)
-	frame:SetMinResize(400, 200)
+	if frame.SetResizeBounds then -- WoW 10.0
+		-- frame:SetResizeBounds(400, 200) -- broken in 10.0.0.45335
+	else
+		frame:SetMinResize(400, 200)
+	end
 	frame:SetToplevel(true)
 	frame:SetScript("OnShow", Frame_OnShow)
 	frame:SetScript("OnHide", Frame_OnClose)

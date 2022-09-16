@@ -1167,7 +1167,7 @@ function CovenantForge.Init:CreateSoulbindFrames()
 		button.ForgeInfo = f
 	end
 
-	for buttonIndex, nodeFrame in pairs(SoulbindViewer.Tree:GetNodes()) do
+	for buttonIndex, nodeFrame in ipairs(SoulbindViewer.Tree:GetNodes()) do
 		local f = CreateFrame("Frame", "CovForge_Conduit"..buttonIndex, nodeFrame, "CovenantForge_ConduitInfoTemplate")
 		nodeFrame.ForgeInfo = f
 	end

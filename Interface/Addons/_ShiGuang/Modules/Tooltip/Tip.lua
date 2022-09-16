@@ -44,18 +44,18 @@ function TT:HideLines()
 		local linetext = tiptext:GetText()
 		if linetext then
 			if linetext == PVP then
-				tiptext:SetText(nil)
+				tiptext:SetText("")
 				tiptext:Hide()
 			elseif linetext == FACTION_HORDE then
 				if R.db["Tooltip"]["FactionIcon"] then
-					tiptext:SetText(nil)
+					tiptext:SetText("")
 					tiptext:Hide()
 				else
 					tiptext:SetText("|cffff5040"..linetext.."|r")
 				end
 			elseif linetext == FACTION_ALLIANCE then
 				if R.db["Tooltip"]["FactionIcon"] then
-					tiptext:SetText(nil)
+					tiptext:SetText("")
 					tiptext:Hide()
 				else
 					tiptext:SetText("|cff4080ff"..linetext.."|r")
@@ -409,7 +409,7 @@ function TT:ReskinTooltip()
 end
 
 local function TooltipSetFont(font, size)
-	font:SetFont(I.Font[1], size, I.Font[3])
+	M.SetFontSize(font, size)
 	font:SetShadowColor(0, 0, 0, 0)
 end
 

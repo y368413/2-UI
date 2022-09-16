@@ -1,4 +1,4 @@
--- Author: Theck, navv_, seriallos  Version: 9.2.0
+-- Author: Theck, navv_, seriallos  Version: 9.2.5
 
 local Simulationcraft = {}
 
@@ -311,9 +311,6 @@ local ITEM_MOD_TYPE_DROP_LEVEL = 9
 -- 28 shows frequently but is currently unknown
 local ITEM_MOD_TYPE_CRAFT_STATS_1 = 29
 local ITEM_MOD_TYPE_CRAFT_STATS_2 = 30
-
-local SocketInventoryItem   = _G.SocketInventoryItem
-local Timer                 = _G.C_Timer
 
 local Covenants             = _G.C_Covenants
 local Soulbinds             = _G.C_Soulbinds
@@ -860,7 +857,7 @@ end
 -- This is the workhorse function that constructs the profile
 function Simulationcraft:PrintSimcProfile(debugOutput, noBags, showMerchant, links)
   -- addon metadata
-  local versionComment = '# SimC Addon ' .. '9.2.0'
+  local versionComment = '# SimC Addon ' .. '9.2.5'
   local simcVersionWarning = '# Requires SimulationCraft 920-01 or newer'
 
   -- Basic player info

@@ -24,6 +24,20 @@ if not crossRealms or #crossRealms == 0 then
 	crossRealms = {[1]=myRealm}
 end
 
+StaticPopupDialogs["RESETGOLD"] = {
+	text = U["Are you sure to reset the gold count?"],
+	button1 = YES,
+	button2 = NO,
+	OnAccept = function()
+		for _, realm in pairs(crossRealms) do
+			if MaoRUIDB["totalGold"][realm] then
+				wipe(MaoRUIDB["totalGold"][realm])
+			end
+		end
+		MaoRUIDB["totalGold"][myRealm][myName] = {GetMoney(), I.MyClass}
+	end,
+	whileDead = 1,
+}
 local function getClassIcon(class)
 	local c1, c2, c3, c4 = unpack(CLASS_ICON_TCOORDS[class])
 	c1, c2, c3, c4 = (c1+.03)*50, (c2-.03)*50, (c3+.03)*50, (c4-.03)*50
@@ -82,20 +96,6 @@ info.onEvent = function(self, event, arg1)
 	oldMoney = newMoney
 end
 
-StaticPopupDialogs["RESETGOLD"] = {
-	text = U["Are you sure to reset the gold count?"],
-	button1 = YES,
-	button2 = NO,
-	OnAccept = function()
-		for _, realm in pairs(crossRealms) do
-			if MaoRUIDB["totalGold"][realm] then
-				wipe(MaoRUIDB["totalGold"][realm])
-			end
-		end
-		MaoRUIDB["totalGold"][myRealm][myName] = {GetMoney(), I.MyClass}
-	end,
-	whileDead = 1,
-}
 
 info.onMouseUp = function(self, btn)
 	if btn == "RightButton" then

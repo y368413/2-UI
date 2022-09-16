@@ -1,4 +1,4 @@
--- ## Notes:秒杀低于物品实际拍卖价的物品，专治拍卖行脚本。## Author: BG
+--## Version: 1.0   ## Notes:秒杀低于物品实际拍卖价的物品，专治拍卖行脚本。   ## Author: BG
 do
     local e = CreateFrame("Frame")
 

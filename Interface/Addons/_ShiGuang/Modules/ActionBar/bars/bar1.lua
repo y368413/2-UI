@@ -241,6 +241,7 @@ function Bar:OnLogin()
 	Bar:MicroMenu()
 
 	if not R.db["Actionbar"]["Enable"] then return end
+	if I.isNewPatch then return end
 
 	Bar.movers = {}
 	Bar:CreateBar1()

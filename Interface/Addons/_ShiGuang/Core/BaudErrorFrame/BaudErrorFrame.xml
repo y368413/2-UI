@@ -86,7 +86,7 @@
 			<AbsDimension x="600" y="500"/>
 		</Size>
 		<Anchors>
-		<Anchor point="CENTER"/>
+			<Anchor point="CENTER"/>
 		</Anchors>
 		<Layers>
 			<Layer level="ARTWORK">

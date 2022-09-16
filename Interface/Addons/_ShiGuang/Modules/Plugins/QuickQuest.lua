@@ -5,7 +5,7 @@ local M, R, U, I = unpack(ns)
 local next, ipairs, select = next, ipairs, select
 local IsAltKeyDown = IsAltKeyDown
 local UnitGUID, IsShiftKeyDown, GetItemInfoFromHyperlink = UnitGUID, IsShiftKeyDown, GetItemInfoFromHyperlink
-local GetNumTrackingTypes, GetTrackingInfo, GetInstanceInfo, GetQuestID = GetNumTrackingTypes, GetTrackingInfo, GetInstanceInfo, GetQuestID
+local GetTrackingInfo, GetInstanceInfo, GetQuestID = GetTrackingInfo, GetInstanceInfo, GetQuestID
 local GetNumActiveQuests, GetActiveTitle, GetActiveQuestID, SelectActiveQuest = GetNumActiveQuests, GetActiveTitle, GetActiveQuestID, SelectActiveQuest
 local IsQuestCompletable, GetNumQuestItems, GetQuestItemLink, QuestIsFromAreaTrigger = IsQuestCompletable, GetNumQuestItems, GetQuestItemLink, QuestIsFromAreaTrigger
 local QuestGetAutoAccept, AcceptQuest, CloseQuest, CompleteQuest, AcknowledgeAutoAcceptQuest = QuestGetAutoAccept, AcceptQuest, CloseQuest, CompleteQuest, AcknowledgeAutoAcceptQuest
@@ -17,13 +17,13 @@ local C_QuestLog_IsQuestTrivial = C_QuestLog.IsQuestTrivial
 local C_QuestLog_GetQuestTagInfo = C_QuestLog.GetQuestTagInfo
 local C_GossipInfo_GetOptions = C_GossipInfo.GetOptions
 local C_GossipInfo_SelectOption = C_GossipInfo.SelectOption
-local C_GossipInfo_GetNumOptions = C_GossipInfo.GetNumOptions
 local C_GossipInfo_GetActiveQuests = C_GossipInfo.GetActiveQuests
 local C_GossipInfo_SelectActiveQuest = C_GossipInfo.SelectActiveQuest
 local C_GossipInfo_GetAvailableQuests = C_GossipInfo.GetAvailableQuests
 local C_GossipInfo_GetNumActiveQuests = C_GossipInfo.GetNumActiveQuests
 local C_GossipInfo_SelectAvailableQuest = C_GossipInfo.SelectAvailableQuest
 local C_GossipInfo_GetNumAvailableQuests = C_GossipInfo.GetNumAvailableQuests
+local GetNumTrackingTypes = I.isNewPatch and C_Minimap.GetNumTrackingTypes or GetNumTrackingTypes
 local MINIMAP_TRACKING_TRIVIAL_QUESTS = MINIMAP_TRACKING_TRIVIAL_QUESTS
 
 local choiceQueue
@@ -246,7 +246,8 @@ QuickQuest:Register("GOSSIP_SHOW", function()
 	end
 
 	if available == 0 and active == 0 then
-		local numOptions = C_GossipInfo_GetNumOptions()
+		local gossipInfoTable = C_GossipInfo_GetOptions()
+		local numOptions = #gossipInfoTable
 		if numOptions == 1 then
 			if npcID == 57850 then
 				return C_GossipInfo_SelectOption(1)
@@ -254,7 +255,6 @@ QuickQuest:Register("GOSSIP_SHOW", function()
 
 			local _, instance, _, _, _, _, _, mapID = GetInstanceInfo()
 			if instance ~= "raid" and not ignoreGossipNPC[npcID] and not ignoreInstances[mapID] then
-				local gossipInfoTable = C_GossipInfo_GetOptions()
 				local gType = gossipInfoTable[1] and gossipInfoTable[1].type
 				if gType and autoGossipTypes[gType] then
 					C_GossipInfo_SelectOption(1)
@@ -538,5 +538,10 @@ end
 
 QuestNpcNameFrame:HookScript("OnShow", UnitQuickQuestStatus)
 QuestNpcNameFrame:HookScript("OnMouseDown", ToggleQuickQuestStatus)
-GossipNpcNameFrame:HookScript("OnShow", UnitQuickQuestStatus)
-GossipNpcNameFrame:HookScript("OnMouseDown", ToggleQuickQuestStatus)
+if I.isNewPatch then
+	GossipFrame.NameFrame:HookScript("OnShow", UnitQuickQuestStatus)
+	GossipFrame.NameFrame:HookScript("OnMouseDown", ToggleQuickQuestStatus)
+else
+	GossipNpcNameFrame:HookScript("OnShow", UnitQuickQuestStatus)
+	GossipNpcNameFrame:HookScript("OnMouseDown", ToggleQuickQuestStatus)
+end
