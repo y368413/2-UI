@@ -1,9 +1,17 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Include file="Ace\Ace.xml"/>
-	<Include file="oUF\oUF.xml"/>
-	<Include file="HereBeDragons\HereBeDragons.xml"/>
-	<Script file="LibButtonGlow.lua"/>
-	<Script file="LibBase64.lua"/>
+	<Script file="LibQTip-1.0.lua"/>
+	<Script file="LibDataBroker-1.1.lua"/>
+	<Script file="LibDBIcon-1.0.lua"/>
+	<Script file="LibSharedMedia-3.0.lua"/>
+	<!--Script file="LibButtonGlow.lua"/-->
+	<Script file="LibCustomGlow-1.0.lua"/>
+	<Script file="LibActionButton-1.0.lua"/>
 	<Script file="LibShowUIPanel-1.0.lua"/>
+	<Script file="LibBase64.lua"/>
 	<Script file="LibUIDropDownMenu.lua"/>
+	<!--Script file="LibItemUpgradeInfo-1.0.lua"/-->
+	<Script file="SlashIn.lua"/>
+	<Include file="HereBeDragons\HereBeDragons.xml"/>
+	<Include file="oUF\oUF.xml"/>
 </Ui>

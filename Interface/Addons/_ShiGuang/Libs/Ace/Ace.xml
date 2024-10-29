@@ -11,16 +11,10 @@
 	<Script file="AceLocale-3.0.lua"/>
 	<Script file="AceConsole-3.0.lua"/>
 	<Include file="AceGUI-3.0\AceGUI-3.0.xml"/>
+	<Include file="AceGUI-3.0-SharedMediaWidgets\widget.xml"/>
 	<Include file="AceConfig-3.0\AceConfig-3.0.xml"/>
 	<Include file="AceComm-3.0\AceComm-3.0.xml"/>
 	<Script file="AceTab-3.0.lua"/>
 	<Script file="AceSerializer-3.0.lua"/>
 	<Script file="Ace3.lua"/>
-	<Script file="LibQTip-1.0.lua"/>
-	<Script file="LibDataBroker-1.1.lua"/>
-	<Script file="LibDBIcon-1.0.lua"/>
-	<Script file="LibSharedMedia-3.0.lua"/>
-	<Include file="AceGUI-3.0-SharedMediaWidgets\widget.xml"/>
-	<!--Script file="LibItemUpgradeInfo-1.0.lua"/-->
-	<Script file="SlashIn.lua"/>
 </Ui>
