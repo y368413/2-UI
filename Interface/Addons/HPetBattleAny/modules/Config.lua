@@ -19,54 +19,72 @@ local hooksecurefunc, tinsert, pairs, wipe = _G.hooksecurefunc, _G.table.insert,
 local ipairs = _G.ipairs
 local C_PetJournal = _G.C_PetJournal
 --~ --------
-local addonname,addon = ...
+local addonName, addon = ...
 local L = addon.L
 
+local HPetOption = CreateFrame("Frame", "HPetOption", InterfaceOptionsFramePanelContainer, "BackdropTemplate")
+HPetOption.name = L["HPetBattleAny"]
+local category, layout = Settings.RegisterCanvasLayoutCategory(HPetOption, HPetOption.name)
+Settings.RegisterAddOnCategory(category);
+addon.settingsCategory = category
+-- InterfaceOptions_AddCategory(HPetOption)
 
-local HPetOption = CreateFrame("Frame","HPetOption",InterfaceOptionsFramePanelContainer,"BackdropTemplate")
 
-HPetOption:Hide()
+-- HPetOption:Hide()
 --~ tinsert(UISpecialFrames, "HPetOption")
-
 
 function HPetOption:Init()
 	-- init frame
-	self:SetWidth(320); self:SetHeight(400);
+	self:SetWidth(320)
+	self:SetHeight(400)
 	self:SetPoint("CENTER")
 	self:SetToplevel(true)
 	self:SetMovable(true)
 	self:SetClampedToScreen(true)
 
 	-- background
-	self:SetBackdrop( {
-	  bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-	  edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile = true, tileSize = 16, edgeSize = 16,
-	  insets = { left = 5, right = 5, top = 5, bottom = 5 }
-	});
-	self:SetBackdropColor(0,0,0)
+	self:SetBackdrop(
+		{
+			bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+			tile = true,
+			tileSize = 16,
+			edgeSize = 16,
+			insets = {left = 5, right = 5, top = 5, bottom = 5}
+		}
+	)
+	self:SetBackdropColor(0, 0, 0)
 
 	-- drag
 	self:EnableMouse(true)
 	self:RegisterForDrag("LeftButton")
-	self:SetScript("OnDragStart",function(self) self:StartMoving() end)
-	self:SetScript("OnDragStop",function(self) self:StopMovingOrSizing() end)
+	self:SetScript(
+		"OnDragStart",
+		function(self)
+			self:StartMoving()
+		end
+	)
+	self:SetScript(
+		"OnDragStop",
+		function(self)
+			self:StopMovingOrSizing()
+		end
+	)
 
 	-- title
-	self:CreateFontString("HPetOptionTitle","OVERLAY","GameFontHighlight")
-	HPetOptionTitle:SetPoint("TOP",0,-10)
-	HPetOptionTitle:SetTextColor(1,1,0)
+	self:CreateFontString("HPetOptionTitle", "OVERLAY", "GameFontHighlight")
+	HPetOptionTitle:SetPoint("TOP", 0, -10)
+	HPetOptionTitle:SetTextColor(1, 1, 0)
 	HPetOptionTitle:SetText(L["HPet Options"])
 
 	-- bottom title
-	self:CreateFontString("HPetOptionBTitle","OVERLAY","GameFontHighlight")
-	HPetOptionBTitle:SetPoint("BOTTOM",0,55)
-	HPetOptionBTitle:SetTextColor(1,1,0)
+	self:CreateFontString("HPetOptionBTitle", "OVERLAY", "GameFontHighlight")
+	HPetOptionBTitle:SetPoint("BOTTOM", 0, 55)
+	HPetOptionBTitle:SetTextColor(1, 1, 0)
 	HPetOptionBTitle:SetText(L["bottom title"])
-
 
 	-- buttons
 	HPetOption:InitButtons()
-
 
 	-- read options
 	HPetOption:LoadOptions()
@@ -76,176 +94,340 @@ function HPetOption:Init()
 end
 
 function HPetOption:InitButtons()
-	self.Buttons={
+	self.Buttons = {
 		---confing buttons
-		{name="Close",type="Button",inherits="UIPanelCloseButton",
-			point="TOPRIGHT",
-			func=function() HPetOption:Hide() end,
+		{
+			name = "Close",
+			type = "Button",
+			inherits = "UIPanelCloseButton",
+			point = "TOPRIGHT",
+			func = function()
+				HPetOption:Hide()
+			end
 		},
-		{name="Reset",type="Button",inherits="UIPanelButtonTemplate",
-			point="TOPLEFT",x=5,y=-5,width=50, height=20, text = RESET,
-			func=self.Reset,
+		{
+			name = "Reset",
+			type = "Button",
+			inherits = "UIPanelButtonTemplate",
+			point = "TOPLEFT",
+			x = 5,
+			y = -5,
+			width = 50,
+			height = 20,
+			text = "Reset",
+			func = self.Reset
 		},
-		{name="Help",type="Button",inherits="UIPanelButtonTemplate",
-			point="BOTTOMLEFT",x=5,y=5,width=100, height=20, text = L["Search Help"],
-			func=self.HelpButton_Click,
+		{
+			name = "Help",
+			type = "Button",
+			inherits = "UIPanelButtonTemplate",
+			point = "BOTTOMLEFT",
+			x = 5,
+			y = 5,
+			width = 100,
+			height = 20,
+			text = L["Search Help"],
+			func = self.HelpButton_Click
 		},
-		{name="UpdateStone",type="Button",inherits="UIPanelButtonTemplate",
-			point="BOTTOMRIGHT",x=-5,y=5,width=100, height=20, text = L["Battle Stone"],
-			func=UpdateStoneButton_Click,
+		{
+			name = "UpdateStone",
+			type = "Button",
+			inherits = "UIPanelButtonTemplate",
+			point = "BOTTOMRIGHT",
+			x = -5,
+			y = 5,
+			width = 100,
+			height = 20,
+			text = L["Battle Stone"],
+			func = UpdateStoneButton_Click
 		},
-
 		----value buttons
 		----综合
-		{name="Config",type="Text",
-			point="TOPLEFT",x=25,y=-35,
+		{
+			name = "Config",
+			type = "Text",
+			point = "TOPLEFT",
+			x = 25,
+			y = -35
 		},
-
-		{name="Message",type="CheckButton",var="ShowMsg",
-			point="TOP",relative="Config",rpoint="BOTTOM",
-			y=-7,
+		{
+			name = "Message",
+			type = "CheckButton",
+			var = "ShowMsg",
+			point = "TOP",
+			relative = "Config",
+			rpoint = "BOTTOM",
+			y = -7
 		},
-		{name="OnlyInPetInfo",type="CheckButton",var="OnlyInPetInfo",
-			point="LEFT",relative="Message",rpoint="RIGHT",
-			x=130,
+		{
+			name = "OnlyInPetInfo",
+			type = "CheckButton",
+			var = "OnlyInPetInfo",
+			point = "LEFT",
+			relative = "Message",
+			rpoint = "RIGHT",
+			x = 130
 		},
-		{name="MiniTip",type="CheckButton",var="MiniTip",
-			point="LEFT",relative="OnlyInPetInfo",rpoint="RIGHT",
-			x=130,
+		{
+			name = "MiniTip",
+			type = "CheckButton",
+			var = "MiniTip",
+			point = "LEFT",
+			relative = "OnlyInPetInfo",
+			rpoint = "RIGHT",
+			x = 130
 		},
-
-		{name="Sound",type="CheckButton",var="Sound",
-			point="TOP",relative="Message",rpoint="BOTTOM",
-			y=-7,
+		{
+			name = "Sound",
+			type = "CheckButton",
+			var = "Sound",
+			point = "TOP",
+			relative = "Message",
+			rpoint = "BOTTOM",
+			y = -7
 		},
-
-		{name="ACPEnable",type="CheckButton",var="ACPEnable",
-			point="LEFT",relative="Sound",rpoint="RIGHT",
-			x=130,
+		{
+			name = "ACPEnable",
+			type = "CheckButton",
+			var = "ACPEnable",
+			point = "LEFT",
+			relative = "Sound",
+			rpoint = "RIGHT",
+			x = 130
 		},
-
-		{name="AHSFEnable",type="CheckButton",var="AHSFEnable",
-			point="LEFT",relative="ACPEnable",rpoint="RIGHT",
-			x=130,
+		{
+			name = "AHSFEnable",
+			type = "CheckButton",
+			var = "AHSFEnable",
+			point = "LEFT",
+			relative = "ACPEnable",
+			rpoint = "RIGHT",
+			x = 130
 		},
-
-		{name="FastForfeit",type="CheckButton",var="FastForfeit",
-			point="TOP",relative="Sound",rpoint="BOTTOM",
-			y=-7,
+		{
+			name = "FastForfeit",
+			type = "CheckButton",
+			var = "FastForfeit",
+			point = "TOP",
+			relative = "Sound",
+			rpoint = "BOTTOM",
+			y = -7
 		},
-		{name="OtherTooltip",type="CheckButton",var="Tooltip",
-			point="LEFT",relative="FastForfeit",rpoint="RIGHT",
-			x=130,
+		{
+			name = "OtherTooltip",
+			type = "CheckButton",
+			var = "Tooltip",
+			point = "LEFT",
+			relative = "FastForfeit",
+			rpoint = "RIGHT",
+			x = 130
 		},
-		{name="HighGlow",type="CheckButton",var="HighGlow",
-			point="LEFT",relative="OtherTooltip",rpoint="RIGHT",
-			x=130,
+		{
+			name = "HighGlow",
+			type = "CheckButton",
+			var = "HighGlow",
+			point = "LEFT",
+			relative = "OtherTooltip",
+			rpoint = "RIGHT",
+			x = 130
 		},
-
-		{name="AutoSaveAbility",type="CheckButton",var="AutoSaveAbility",
-			point="TOP",relative="FastForfeit",rpoint="BOTTOM",
-			y=-7,
+		{
+			name = "AutoSaveAbility",
+			type = "CheckButton",
+			var = "AutoSaveAbility",
+			point = "TOP",
+			relative = "FastForfeit",
+			rpoint = "BOTTOM",
+			y = -7
 		},
-		{name="ShowBandageButton",type="CheckButton",var="ShowBandageButton",
-			point="LEFT",relative="AutoSaveAbility",rpoint="RIGHT",
-			x=130,
+		{
+			name = "ShowBandageButton",
+			type = "CheckButton",
+			var = "ShowBandageButton",
+			point = "LEFT",
+			relative = "AutoSaveAbility",
+			rpoint = "RIGHT",
+			x = 130
 		},
-		{name="ShowHideID",type="CheckButton",var="ShowHideID",
-			point="LEFT",relative="ShowBandageButton",rpoint="RIGHT",
-			x=130,
+		{
+			name = "ShowHideID",
+			type = "CheckButton",
+			var = "ShowHideID",
+			point = "LEFT",
+			relative = "ShowBandageButton",
+			rpoint = "RIGHT",
+			x = 130
 		},
-
-
-
 		----成长值
-		{name="GrowInfo",type="Text",
-			point="TOP",relative="AutoSaveAbility",rpoint="BOTTOM",
-			y=-7,
+		{
+			name = "GrowInfo",
+			type = "Text",
+			point = "TOP",
+			relative = "AutoSaveAbility",
+			rpoint = "BOTTOM",
+			y = -7
 		},
-
-		{name="PetGrowInfo",type="CheckButton",var="ShowGrowInfo",
-			point="TOP",relative="GrowInfo",rpoint="BOTTOM",
-			y=-7,
+		{
+			name = "PetGrowInfo",
+			type = "CheckButton",
+			var = "ShowGrowInfo",
+			point = "TOP",
+			relative = "GrowInfo",
+			rpoint = "BOTTOM",
+			y = -7
 		},
-		{name="BreedIDStyle",type="CheckButton",var="BreedIDStyle",
-			point="LEFT",relative="PetGrowInfo",rpoint="RIGHT",
-			x=130,func=function()HPetAllInfoFrame:Update()end
+		{
+			name = "BreedIDStyle",
+			type = "CheckButton",
+			var = "BreedIDStyle",
+			point = "LEFT",
+			relative = "PetGrowInfo",
+			rpoint = "RIGHT",
+			x = 130,
+			func = function()
+				HPetAllInfoFrame:Update()
+			end
 		},
-
-		{name="PetGreedInfo",type="CheckButton",var="PetGreedInfo",
-			point="TOP",relative="PetGrowInfo",rpoint="BOTTOM",
-			y=-7,
+		{
+			name = "PetGreedInfo",
+			type = "CheckButton",
+			var = "PetGreedInfo",
+			point = "TOP",
+			relative = "PetGrowInfo",
+			rpoint = "BOTTOM",
+			y = -7
 		},
-		{name="PetBreedInfo",type="CheckButton",var="PetBreedInfo",
-			point="LEFT",relative="PetGreedInfo",rpoint="RIGHT",
-			x=130,
+		{
+			name = "PetBreedInfo",
+			type = "CheckButton",
+			var = "PetBreedInfo",
+			point = "LEFT",
+			relative = "PetGreedInfo",
+			rpoint = "RIGHT",
+			x = 130
 		},
-		{name="ShowBreedID",type="CheckButton",var="ShowBreedID",
-			point="LEFT",relative="PetBreedInfo",rpoint="RIGHT",
-			x=130,
+		{
+			name = "ShowBreedID",
+			type = "CheckButton",
+			var = "ShowBreedID",
+			point = "LEFT",
+			relative = "PetBreedInfo",
+			rpoint = "RIGHT",
+			x = 130
 		},
-
 		----技能图标
-		{name="AbilityIcon",type="Text",
-			point="TOP",relative="PetGreedInfo",rpoint="BOTTOM",
-			y=-7,
+		{
+			name = "AbilityIcon",
+			type = "Text",
+			point = "TOP",
+			relative = "PetGreedInfo",
+			rpoint = "BOTTOM",
+			y = -7
 		},
-
-		{name="EnemyAbility",type="CheckButton",var="EnemyAbility",
-			point="TOP",relative="AbilityIcon",rpoint="BOTTOM",
-			y=-7,func=HPetBattleAny.AllAbilityRef
+		{
+			name = "EnemyAbility",
+			type = "CheckButton",
+			var = "EnemyAbility",
+			point = "TOP",
+			relative = "AbilityIcon",
+			rpoint = "BOTTOM",
+			y = -7,
+			func = HPetBattleAny.AllAbilityRef
 		},
-		{name="LockAbilitys",type="CheckButton",var="LockAbilitys",
-			point="LEFT",relative="EnemyAbility",rpoint="RIGHT",
-			x=130,
+		{
+			name = "LockAbilitys",
+			type = "CheckButton",
+			var = "LockAbilitys",
+			point = "LEFT",
+			relative = "EnemyAbility",
+			rpoint = "RIGHT",
+			x = 130
 		},
-		{name="ShowAbilitysName",type="CheckButton",var="ShowAbilitysName",
-			point="LEFT",relative="LockAbilitys",rpoint="RIGHT",
-			x=130,func=HPetBattleAny.AllAbilityRef,
+		{
+			name = "ShowAbilitysName",
+			type = "CheckButton",
+			var = "ShowAbilitysName",
+			point = "LEFT",
+			relative = "LockAbilitys",
+			rpoint = "RIGHT",
+			x = 130,
+			func = HPetBattleAny.AllAbilityRef
 		},
-
-
-		{name="OtherAbility",type="CheckButton",var="OtherAbility",
-			point="TOP",relative="EnemyAbility",rpoint="BOTTOM",
-			y=-7,func=function(self)
-					HPetBattleAny.AllAbilityRef()
-					if self:GetChecked() then
-						_G[self:GetParent():GetName().."AllyAbility"]:Enable()
-					else
-						_G[self:GetParent():GetName().."AllyAbility"]:Disable()
-					end
+		{
+			name = "OtherAbility",
+			type = "CheckButton",
+			var = "OtherAbility",
+			point = "TOP",
+			relative = "EnemyAbility",
+			rpoint = "BOTTOM",
+			y = -7,
+			func = function(self)
+				HPetBattleAny.AllAbilityRef()
+				if self:GetChecked() then
+					_G[self:GetParent():GetName() .. "AllyAbility"]:Enable()
+				else
+					_G[self:GetParent():GetName() .. "AllyAbility"]:Disable()
 				end
+			end
 		},
-		{name="AllyAbility",type="CheckButton",var="AllyAbility",
-			point="LEFT",relative="OtherAbility",rpoint="RIGHT",
-			x=130,func=HPetBattleAny.AllAbilityRef,loadfunc=function(self) if not HPetSaves.OtherAbility then self:Disable()end end
+		{
+			name = "AllyAbility",
+			type = "CheckButton",
+			var = "AllyAbility",
+			point = "LEFT",
+			relative = "OtherAbility",
+			rpoint = "RIGHT",
+			x = 130,
+			func = HPetBattleAny.AllAbilityRef,
+			loadfunc = function(self)
+				if not HPetSaves.OtherAbility then
+					self:Disable()
+				end
+			end
 		},
---~ 		{name="AutoShowHide",type="CheckButton",var="AutoShowHide",
---~ 			point="LEFT",relative="AutoSaveAbility",rpoint="RIGHT",
---~ 			x=130,
---~ 		},
+		--~ 		{name="AutoShowHide",type="CheckButton",var="AutoShowHide",
+		--~ 			point="LEFT",relative="AutoSaveAbility",rpoint="RIGHT",
+		--~ 			x=130,
+		--~ 		},
 
 		-- Sliders
-		{name="AbilitysScale",type="Slider",min=0.00,max=2.00,step=0.01,width=220,
+		{
+			name = "AbilitysScale",
+			type = "Slider",
+			min = 0.00,
+			max = 2.00,
+			step = 0.01,
+			width = 220,
 			var = "AbScale",
-			point="TOP",relative="EnemyAbility",rpoint="BOTTOM",
-			x=200,y=-60,
-			func = HPetOption.OnScaleChanged,
+			point = "TOP",
+			relative = "EnemyAbility",
+			rpoint = "BOTTOM",
+			x = 200,
+			y = -60,
+			func = HPetOption.OnScaleChanged
 		},
-		{name="ScaleBox",type="EditBox",width=32,height=20,var="Scale",
-			func = HPetOption.ScaleBoxChanged,parent = "AbilitysScale",
-			point="CENTER",relative="AbilitysScale",rpoint="BOTTOM",y=-15},
-
-
+		{
+			name = "ScaleBox",
+			type = "EditBox",
+			width = 32,
+			height = 20,
+			var = "Scale",
+			func = HPetOption.ScaleBoxChanged,
+			parent = "AbilitysScale",
+			point = "CENTER",
+			relative = "AbilitysScale",
+			rpoint = "BOTTOM",
+			y = -15
+		}
 	}
 
-	self:SetHeight(50*#self.Buttons/2)
+	self:SetHeight(50 * #self.Buttons / 2)
 
 	local button, text, name, value
-	for key,value in pairs(self.Buttons) do
+	for key, value in pairs(self.Buttons) do
 		-- pre settings
 		if value.type == "CheckButton" then
-			value.inherits = "OptionsCheckButtonTemplate"
+			value.inherits = "InterfaceOptionsCheckButtonTemplate"
 		elseif value.type == "Slider" then
 			value.inherits = "OptionsSliderTemplate"
 		elseif value.type == "EditBox" then
@@ -254,30 +436,32 @@ function HPetOption:InitButtons()
 			value.inherits = "GameFontHighlight"
 		end
 
-
 		-- create frame
-		if value.type~="Text" then
+		if value.type ~= "Text" then
 			local parent = self
-			if value.parent then parent = _G[self:GetName()..value.parent] end
-			button = CreateFrame(value.type,self:GetName()..value.name,parent,value.inherits)
+			if value.parent then
+				parent = _G[self:GetName() .. value.parent]
+			end
+			button = CreateFrame(value.type, self:GetName() .. value.name, parent, value.inherits)
 			button:SetID(key)
-			if value.parent then parent[value.type] = button end
+			if value.parent then
+				parent[value.type] = button
+			end
 		else
-			button = self:CreateFontString(self:GetName()..value.name,"ARTWORK","GameFontHighlight")
+			button = self:CreateFontString(self:GetName() .. value.name, "ARTWORK", "GameFontHighlight")
 			button:SetText(L[value.name])
 		end
 
 		if value.type == "CheckButton" then
-			text = button:CreateFontString(button:GetName().."Text","OVERLAY","GameFontNormal")
-			text:SetPoint("LEFT",button,"RIGHT",7,0)
-			text:SetVertexColor(1,1,1)
+			text = button:CreateFontString(button:GetName() .. "Text", "OVERLAY", "GameFontNormal")
+			text:SetPoint("LEFT", button, "RIGHT", 7, 0)
+			text:SetVertexColor(1, 1, 1)
 			button:SetFontString(text)
 		elseif value.type == "EditBox" then
-			text = button:CreateFontString(button:GetName().."Text","OVERLAY","GameFontNormal")
-			text:SetPoint("LEFT",button,"RIGHT",10,0)
+			text = button:CreateFontString(button:GetName() .. "Text", "OVERLAY", "GameFontNormal")
+			text:SetPoint("LEFT", button, "RIGHT", 10, 0)
 			button.text = text
 		end
-
 
 		-- setup
 		if value.width then
@@ -288,7 +472,7 @@ function HPetOption:InitButtons()
 		end
 		if value.point then
 			if value.relative then
-				value.relative = self:GetName()..value.relative
+				value.relative = self:GetName() .. value.relative
 			end
 			button:SetPoint(value.point, value.relative or HPetOption, value.rpoint or value.point, value.x or 0, value.y or 0)
 		end
@@ -302,31 +486,41 @@ function HPetOption:InitButtons()
 
 		-- post settings
 		if value.type == "Button" then
-			if value.text then button:SetText(value.text) end
-			if value.func then button:SetScript("OnClick",value.func) end
+			if value.text then
+				button:SetText(value.text)
+			end
+			if value.func then
+				button:SetScript("OnClick", value.func)
+			end
 		elseif value.type == "CheckButton" then
-			if not value.text then button:SetText(L[value.name]) end
+			if not value.text then
+				button:SetText(L[value.name])
+			end
 			button:SetScript("OnClick", HPetOption.OnCheckButtonClicked)
 			if value.func then
 				button:HookScript("OnClick", value.func)
 			end
 		elseif value.type == "Slider" then
-			button.text = _G["HPetOption"..value.name.."Text"]
-			button.SetDisplayValue = button.SetValue;
+			button.text = _G["HPetOption" .. value.name .. "Text"]
+			button.SetDisplayValue = button.SetValue
 			if value.text then
 				button.title = value.text
 			else
 				button.title = L[value.name]
 			end
 			button.text:SetText(button.title)
-			_G["HPetOption"..value.name.."Low"]:SetText(value.min)
-			_G["HPetOption"..value.name.."High"]:SetText(value.max)
+			_G["HPetOption" .. value.name .. "Low"]:SetText(value.min)
+			_G["HPetOption" .. value.name .. "High"]:SetText(value.max)
 			button:SetMinMaxValues(value.min, value.max)
 			button:SetValueStep(value.step)
-			if value.func then button:SetScript("OnValueChanged", value.func) end
+			if value.func then
+				button:SetScript("OnValueChanged", value.func)
+			end
 		elseif value.type == "EditBox" then
 			button:SetAutoFocus(false)
-			if not value.text then button.text:SetText(L[value.name]) end
+			if not value.text then
+				button.text:SetText(L[value.name])
+			end
 			if value.func then
 				button:SetScript("OnEnterPressed", value.func)
 			else
@@ -334,23 +528,38 @@ function HPetOption:InitButtons()
 			end
 			button:SetScript("OnEscapePressed", button.ClearFocus)
 		end
-		if value.type == "CheckButton" and L[value.name.."Tooltip"] then
-			button:SetScript("OnEnter", function(s)
-				self:CheckButton_OnEnter(s,L[value.name],L[value.name.."Tooltip"])
-			end)
+		if value.type == "CheckButton" and L[value.name .. "Tooltip"] then
+			button:SetScript(
+				"OnEnter",
+				function(s)
+					self:CheckButton_OnEnter(s, L[value.name], L[value.name .. "Tooltip"])
+				end
+			)
+			button:SetScript(
+				"OnLeave",
+				function(self)
+					if GameTooltip:IsOwned(self) then
+						GameTooltip:Hide()
+					end
+				end
+			)
 		end
-		if value.loadfunc then value.loadfunc(button) end
+		if value.loadfunc then
+			value.loadfunc(button)
+		end
 	end
 end
 
 function HPetOption:OnCheckButtonClicked()
-	isChecked = self:GetChecked()
+	local isChecked = self:GetChecked()
 	if isChecked then
-		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+		-- PlaySound("igMainMenuOptionCheckBoxOn")
+		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 	else
-		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF);
+		-- PlaySound("igMainMenuOptionCheckBoxOff")
+		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
 	end
-	value = HPetOption.Buttons[self:GetID()]
+	local value = HPetOption.Buttons[self:GetID()]
 	if value.var then
 		if isChecked then
 			HPetSaves[value.var] = true
@@ -368,12 +577,14 @@ function HPetOption:OnCheckButtonClicked()
 		end
 	elseif value.var == "AutoSaveAbility" and PetJournal_UpdatePetCard then
 		for i = 1, 6 do
-			_G["PetJournalPetCardSpell"..i].icon:SetVertexColor(1,1,1,1)
+			_G["PetJournalPetCardSpell" .. i].icon:SetVertexColor(1, 1, 1, 1)
 		end
 		PetJournal_UpdatePetCard(PetJournalPetCard)
 	elseif value.var == "ShowBandageButton" and PetJournalBandageButton then
 		if not UnitAffectingCombat("player") then
-			if not HPetBattleAny.SwathButton then HPetBattleAny.initSwathButton() end
+			if not HPetBattleAny.SwathButton then
+				HPetBattleAny.initSwathButton()
+			end
 			if isChecked then
 				PetJournalBandageButton:Show()
 			else
@@ -392,7 +603,6 @@ function HPetOption:OnCheckButtonClicked()
 	end
 end
 
-
 function HPetOption:OnScaleChanged(value)
 	--local scale = self:GetValue()
 	--if scale == 0 then scale = 0.01 end
@@ -400,67 +610,73 @@ function HPetOption:OnScaleChanged(value)
 	--HPetBattleAny.AllAbilityRef()
 	--self.text:SetText(self.title.." : "..math.floor(scale*100).."%")
 
-	local scale = math.floor(value*100)/100
+	local scale = math.floor(value * 100) / 100
 	self:SetDisplayValue(scale)
-	if scale == 0 then scale = 0.01 end
+	if scale == 0 then
+		scale = 0.01
+	end
 	HPetSaves.AbScale = scale
 	HPetBattleAny.AllAbilityRef()
-	self.text:SetText(self.title.." : "..math.floor(scale*100).."%")
-	self.EditBox:SetText(format("%.2f",scale))
+	self.text:SetText(self.title .. " : " .. math.floor(scale * 100) .. "%")
+	self.EditBox:SetText(format("%.2f", scale))
 end
 function HPetOption:ScaleBoxChanged()
 	local num = self:GetText()
 	local parent = self:GetParent()
-	if not num then return end
+	if not num then
+		return
+	end
 	num = tonumber(num)
-	if not num then return end
+	if not num then
+		return
+	end
 	parent.var = num
 	HPetBattleAny.AllAbilityRef()
-	parent.text:SetText(parent.title.." : "..math.floor(num).."%")
+	parent.text:SetText(parent.title .. " : " .. math.floor(num) .. "%")
 	parent:SetValue(num)
 	self:ClearFocus()
 end
 
-function HPetOption:CheckButton_OnEnter(button,name,message)
-	GameTooltip:SetOwner(button,"ANCHOR_NONE");
-	GameTooltip:SetPoint("BOTTOMLEFT",button,"TOPRIGHT")
-	GameTooltip:AddLine(name);
-	GameTooltip:AddLine(message,1,1,1);
+function HPetOption:CheckButton_OnEnter(button, name, message)
+	GameTooltip:SetOwner(button, "ANCHOR_NONE")
+	GameTooltip:SetPoint("BOTTOMLEFT", button, "TOPRIGHT")
+	GameTooltip:AddLine(name)
+	GameTooltip:AddLine(message, 1, 1, 1)
 	GameTooltip:Show()
 end
 
 function HPetOption:HelpButton_Click()
-	HPetBattleAny:PetPrintEX(L["searchhelp1"],1,1,0)
-	HPetBattleAny:PetPrintEX(L["searchhelp2"],1,1,0)
+	HPetBattleAny:PetPrintEX(L["searchhelp1"], 1, 1, 0)
+	HPetBattleAny:PetPrintEX(L["searchhelp2"], 1, 1, 0)
 end
 function UpdateStoneButton_Click()
---~ 	if not UpdateStoneButtons.ready then UpdateStoneButtons:Init() end
---~ 	if UpdateStoneButtons.ready then UpdateStoneButtons:Toggle() end
+	--~ 	if not UpdateStoneButtons.ready then UpdateStoneButtons:Init() end
+	--~ 	if UpdateStoneButtons.ready then UpdateStoneButtons:Toggle() end
 	if not BrotherBags then
 		if GetLocale() == "zhCN" or GetLocale() == "zhTW" then
-			print(format("没有开启BrotherBags",1,0,1))
+			print(format("没有开启BrotherBags", 1, 0, 1))
 		else
-			print(format("Not open BrotherBags",1,0,1))
+			print(format("Not open BrotherBags", 1, 0, 1))
 		end
 		return
 	end
-	  
+
 	local GetStringForBB = function(SearchId)
-		local StringTable={}
+		local StringTable = {}
 		local Max = 0
-		local GetItemLink=function(tid)
-			local link = select(2,GetItemInfo(tid))
+		local GetItemLink = function(tid)
+			local link = select(2, GetItemInfo(tid))
 			return link
 		end
-		for realmName,realmTable in pairs(BrotherBags) do
-			StringTable[realmName]={}
-			for playerName,playerTable in pairs(realmTable) do
+		for realmName, realmTable in pairs(BrotherBags) do
+			StringTable[realmName] = {}
+			for playerName, playerTable in pairs(realmTable) do
 				local counts = 0
-				for bagS,bagTable in pairs(playerTable) do
+				for bagS, bagTable in pairs(playerTable) do
 					if type(bagTable) == "table" then
-						for _,idString in pairs(bagTable) do
-							if type(idString)=="string" then
-								local id, count = strsplit(';',idString)
+						for _, idString in pairs(bagTable) do
+							if type(idString) == "string" then
+								local id, count = strsplit(";", idString)
 								if tonumber(SearchId) == tonumber(id) then
 									counts = counts + (count or 1)
 								end
@@ -469,43 +685,59 @@ function UpdateStoneButton_Click()
 					end
 				end
 				if counts and counts ~= 0 then
-					StringTable[realmName][playerName]=counts
+					StringTable[realmName][playerName] = counts
 					Max = Max + counts
 				end
 			end
 		end
-		local L_A,L_O
+		local L_A, L_O
 		if GetLocale() == "zhCN" then
-				L_A,L_O = "共","个"
+			L_A, L_O = "共", "个"
 		elseif GetLocale() == "zhTW" then
-				L_A,L_O = "共","個"
+			L_A, L_O = "共", "個"
 		else
-				L_A,L_O = "total",""
+			L_A, L_O = "total", ""
 		end
 		if Max ~= 0 then
 			local Tpstring = ""
-			for rname,t in pairs(StringTable) do
-				for pname,c in pairs(t) do
-					if UnitName("player") == pname and GetRealmName() == rname then pname = "|cff00ffff"..pname.."|r"end
-					if GetRealmName() == rname  then rname = "|cff00ffff"..rname.."|r" end
-					Tpstring = Tpstring..(Tpstring~="" and "\n" or "")..pname.."@"..rname..":|cffff00ff"..c.."|r"..L_O
+			for rname, t in pairs(StringTable) do
+				for pname, c in pairs(t) do
+					if UnitName("player") == pname and GetRealmName() == rname then
+						pname = "|cff00ffff" .. pname .. "|r"
+					end
+					if GetRealmName() == rname then
+						rname = "|cff00ffff" .. rname .. "|r"
+					end
+					Tpstring = Tpstring .. (Tpstring ~= "" and "\n" or "") .. pname .. "@" .. rname .. ":|cffff00ff" .. c .. "|r" .. L_O
 				end
 			end
-			print(GetItemLink(SearchId),L_A..":","|cffffff00"..Max.."|r",L_O.."\n"..Tpstring)
+			print(GetItemLink(SearchId), L_A .. ":", "|cffffff00" .. Max .. "|r", L_O .. "\n" .. Tpstring)
 		end
 	end
-	local Stone={92665,92675,92676,92677,92678,
-				92679,92680,92681,92682,92683,
-				92741,
-				90173,92797,92799,92800,
-				92742,
-				}
+	local Stone = {
+		92665,
+		92675,
+		92676,
+		92677,
+		92678,
+		92679,
+		92680,
+		92681,
+		92682,
+		92683,
+		92741,
+		90173,
+		92797,
+		92799,
+		92800,
+		92742
+	}
 	print("↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓-↓")
-	for _,id in ipairs(Stone) do
+	for _, id in ipairs(Stone) do
 		if (BrotherBags) then
 			GetStringBB(id)
 		-- elseif () then
-			-- GetStringBS(id)
+		-- GetStringBS(id)
 		end
 	end
 	print("↑-↑-↑-↑-↑-↑-↑-↑-↑-↑-↑-↑-↑-↑-↑")
@@ -516,7 +748,7 @@ end
 function HPetOption:LoadOptions()
 	local button
 	for key, value in ipairs(HPetOption.Buttons) do
-		button = _G["HPetOption"..value.name]
+		button = _G["HPetOption" .. value.name]
 		if value.type == "CheckButton" then
 			if value.var then
 				button:SetChecked(HPetSaves[value.var])
@@ -529,14 +761,14 @@ function HPetOption:LoadOptions()
 	end
 	-- for anchor
 	local anchor = HPetSaves["Anchor"]
-	local result = {false,false,false,false}
+	local result = {false, false, false, false}
 	if anchor then
 		if anchor > 2 then
 			anchor = anchor - 3
 		else
 			result[4] = true
 		end
-		result[anchor+1] = true
+		result[anchor + 1] = true
 	end
 end
 
@@ -551,117 +783,150 @@ function HPetOption:Open()
 	self:LoadOptions()
 end
 
-function HPetOption:Toggle()
-	if HPetOption:IsShown() and InterfaceOptionsFrame.selectedTab == 2 and InterfaceOptionsFrame:IsShown() then
-		InterfaceOptionsFrame_Show()
-	else
-		InterfaceOptionsFrame_Show()
-		InterfaceOptionsFrame_OpenToCategory(HPetOption)
-	end
+function HPetOption:Toggle() 
+    Settings.OpenToCategory(addon.settingsCategory.ID)
+	-- InterfaceOptionsFrame_OpenToCategory(HPetOption)
 end
 
 ----------new init
-HPetOption:SetScript("OnShow", function(frame)
-	frame:Init()
+HPetOption:SetScript(
+	"OnShow",
+	function(frame)
+		frame:Init()
 
-	frame:EnableMouse(false)
-	frame:SetToplevel(false)
-	frame:SetBackdrop(nil)
-	HPetOptionClose:Hide()
+		frame:EnableMouse(false)
+		frame:SetToplevel(false)
+		frame:SetBackdrop(nil)
+		HPetOptionClose:Hide()
 
-	frame:SetScript("OnShow", function() frame:LoadOptions() end)
-end)
-
-HPetOption.name = L["HPetBattleAny"]
-InterfaceOptions_AddCategory(HPetOption)
+		frame:SetScript(
+			"OnShow",
+			function()
+				frame:LoadOptions()
+			end
+		)
+	end
+)
 
 --------------------		SLASH
 SLASH_HPETBATTLEANY1 = "/hpq"
 SlashCmdList["HPETBATTLEANY"] = function(msg, editbox)
 	local comm, rest = msg:match("^(%S*)%s*(.-)$")
 	local command = string.lower(comm)
-	if command =="" then
+	if command == "" then
 		HPetOption:Toggle()
 	end
---~ 	这是搜索功能
-	if command =="s" or command =="搜索" or command == "ss" then
-		HPetBattleAny:Search(command,rest)
-	elseif command =="cc" then
-		HPetSaves.PetAbilitys={}
+	--~ 	这是搜索功能
+	if command == "s" or command == "搜索" or command == "ss" then
+		HPetBattleAny:Search(command, rest)
+	elseif command == "cc" then
+		HPetSaves.PetAbilitys = {}
 		DEFAULT_CHAT_FRAME:AddMessage(L["AutoSaveAbilityConfig"])
-	elseif command =="cz" then
-		local t={}
-		for k,v in pairs(HPetSaves.PetAbilitys) do
-			if not v or v=="000" or v=="123" or v==123 or v==0 then
+	elseif command == "cz" then
+		local t = {}
+		for k, v in pairs(HPetSaves.PetAbilitys) do
+			if not v or v == "000" or v == "123" or v == 123 or v == 0 then
 			else
-				t[k]=v
+				t[k] = v
 			end
 		end
 
-		HPetSaves.PetAbilitys=t
+		HPetSaves.PetAbilitys = t
 		DEFAULT_CHAT_FRAME:AddMessage(L["AutoSaveAbilityConfig"])
 	elseif command == "n" then
 		UpdateStoneButton_Click()
-	elseif command =="snp" then
+	elseif command == "snp" then
 		HPetBattleAny.SearchNoPet()
 	elseif command == "l" then
-		HP_L(strsplit(", /",rest))
+		HP_L(strsplit(", /", rest))
 	elseif command == "glp" then
-		HPetBattleAny.GetLimitPet(strsplit(", /",rest))
+		HPetBattleAny.GetLimitPet(strsplit(", /", rest))
 	elseif type(tonumber(command)) == "number" then
-		HP_L(strsplit(", /",msg))
+		HP_L(strsplit(", /", msg))
 	end
 end
 
 local InitSwathButton = function()
-	if UnitAffectingCombat("player") then return end
+	if UnitAffectingCombat("player") then
+		return
+	end
 	local itemName = "宠物绷带"
 	local icon = GetItemIcon(86143)
 	local itemCount = GetItemCount(86143)
 	local name = "PetJournalBandageButton"
-	local button = CreateFrame("Button","PetJournalBandageButton",nil,"SecureActionButtonTemplate")
+	local button = CreateFrame("Button", "PetJournalBandageButton", nil, "SecureActionButtonTemplate")
 	button:SetParent(PetJournal)
-
-
 
 	-------------init
 	button:SetAttribute("unit", "player")
 	button:SetAttribute("type", "macro")
-	button:SetAttribute("macrotext","/use item:86143" )
-	button:SetSize(35,35)
+	button:SetAttribute("macrotext", "/use item:86143")
+	button:SetSize(35, 35)
 
-	button.Icon = button:CreateTexture(name.."Icon","ARTWORK")
+	button.Icon = button:CreateTexture(name .. "Icon", "ARTWORK")
 	button.Icon:SetTexture(icon)
 	button.Icon:SetAllPoints()
 
-	button.Border = button:CreateTexture(name.."Border","OVERLAY","ActionBarFlyoutButton-IconFrame")
+	button.Border = button:CreateTexture(name .. "Border", "OVERLAY", "ActionBarFlyoutButton-IconFrame")
 	button:SetPushedTexture("Interface\\Buttons\\UI-Quickslot-Depress")
-	button:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square","ADD")
+	button:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
 
-	button.QuantityOwned = button:CreateFontString(nil,"OVERLAY","GameFontHighlight")
+	button.QuantityOwned = button:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	button.QuantityOwned:SetText(itemCount)
-	button.QuantityOwned:SetPoint("BOTTOMRIGHT",button,"BOTTOMRIGHT",-2,2)
+	button.QuantityOwned:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
 	button.QuantityOwned:SetJustifyH("RIGHT")
 
-	button:SetScript("OnEvent", function(self,event)
-		local itemCount = GetItemCount(86143)
-		self.QuantityOwned:SetText(itemCount)
-		self.Icon:SetDesaturated(itemCount <= 0 )
-	end)
-	button:SetScript("OnShow", function(self)self:RegisterEvent("SPELL_UPDATE_COOLDOWN")end)
-	button:SetScript("OnHide",function(self)self:UnregisterEvent("SPELL_UPDATE_COOLDOWN")end)
-	button:SetScript("OnEnter", function(self)GameTooltip:SetOwner(self, "ANCHOR_RIGHT");GameTooltip:SetItemByID(86143)end)
-	button:SetScript("OnLeave",function()GameTooltip:Hide()end)
+	button:SetScript(
+		"OnEvent",
+		function(self, event)
+			local itemCount = GetItemCount(86143)
+			self.QuantityOwned:SetText(itemCount)
+			self.Icon:SetDesaturated(itemCount <= 0)
+		end
+	)
+	button:SetScript(
+		"OnShow",
+		function(self)
+			self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
+		end
+	)
+	button:SetScript(
+		"OnHide",
+		function(self)
+			self:UnregisterEvent("SPELL_UPDATE_COOLDOWN")
+		end
+	)
+	button:SetScript(
+		"OnEnter",
+		function(self)
+			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+			GameTooltip:SetItemByID(86143)
+		end
+	)
+	button:SetScript(
+		"OnLeave",
+		function()
+			GameTooltip:Hide()
+		end
+	)
 	button:RegisterEvent("BAG_UPDATE")
 
-	button:SetPoint("RIGHT",PetJournalHealPetButton,"LEFT",-4)
+	button:SetPoint("RIGHT", PetJournalHealPetButton, "LEFT", -4)
 
-	hooksecurefunc(button,"Show",function()
-		PetJournalHealPetButton.spellname:SetPoint("RIGHT",button,"LEFT")
-	end)
-	hooksecurefunc(button,"Hide",function()
-		PetJournalHealPetButton.spellname:SetPoint("RIGHT",PetJournalHealPetButtonBorder,"LEFT",-2,0)
-	end)
+	hooksecurefunc(
+		button,
+		"Show",
+		function()
+			PetJournalHealPetButton.spellname:SetPoint("RIGHT", button, "LEFT")
+		end
+	)
+	hooksecurefunc(
+		button,
+		"Hide",
+		function()
+			PetJournalHealPetButton.spellname:SetPoint("RIGHT", PetJournalHealPetButtonBorder, "LEFT", -2, 0)
+		end
+	)
 
 	if HPetSaves.ShowBandageButton then
 		button:Show()
@@ -669,13 +934,13 @@ local InitSwathButton = function()
 		button:Hide()
 	end
 
-	HPetBattleAny.SwathButton=button
-	InitSwathButton=nil
+	HPetBattleAny.SwathButton = button
+	InitSwathButton = nil
 end
 
-HPetBattleAny.initSwathButton=function()
+HPetBattleAny.initSwathButton = function()
 	if UnitAffectingCombat("player") then
-		hooksecurefunc(PetJournal,"Show",InitSwathButton)
+		hooksecurefunc(PetJournal, "Show", InitSwathButton)
 	else
 		InitSwathButton()
 	end
@@ -683,121 +948,133 @@ end
 
 ---------filter还原,来源lib
 do
-	local fit={}
-    local PJ_FLAG_FILTERS = {
-        [LE_PET_JOURNAL_FILTER_COLLECTED] = true,
-        [LE_PET_JOURNAL_FILTER_NOT_COLLECTED] = true
-    }
+	local fit = {}
+	local PJ_FLAG_FILTERS = {
+		[LE_PET_JOURNAL_FILTER_COLLECTED] = true,
+		[LE_PET_JOURNAL_FILTER_NOT_COLLECTED] = true
+	}
 
-    local s_search_filter
-    local flag_filters = {}
-    local type_filters = {}
-    local source_filters = {}
+	local s_search_filter
+	local flag_filters = {}
+	local type_filters = {}
+	local source_filters = {}
 
-    fit._filter_hooks = fit._filter_hooks or {}
+	fit._filter_hooks = fit._filter_hooks or {}
 
-    local last_search_filter
-    if not fit._filter_hooks.SetSearchFilter then
-        hooksecurefunc(C_PetJournal, "SetSearchFilter", function(...)
-             fit._filter_hooks.SetSearchFilter(...)
-        end)
-    end
-    fit._filter_hooks.SetSearchFilter = function(str)
-        last_search_filter = str
-    end
+	local last_search_filter
+	if not fit._filter_hooks.SetSearchFilter then
+		hooksecurefunc(
+			C_PetJournal,
+			"SetSearchFilter",
+			function(...)
+				fit._filter_hooks.SetSearchFilter(...)
+			end
+		)
+	end
+	fit._filter_hooks.SetSearchFilter = function(str)
+		last_search_filter = str
+	end
 
-    if not fit._filter_hooks.ClearSearchFilter then
-        hooksecurefunc(C_PetJournal, "ClearSearchFilter", function(...)
-             fit._filter_hooks.ClearSearchFilter(...)
-        end)
-    end
-    fit._filter_hooks.ClearSearchFilter = function()
-        last_search_filter = ""
-    end
+	if not fit._filter_hooks.ClearSearchFilter then
+		hooksecurefunc(
+			C_PetJournal,
+			"ClearSearchFilter",
+			function(...)
+				fit._filter_hooks.ClearSearchFilter(...)
+			end
+		)
+	end
+	fit._filter_hooks.ClearSearchFilter = function()
+		last_search_filter = ""
+	end
 
-    function fit.ClearFilters()
-        if (fit._filters_cleared) then return end
-        fit._filters_cleared = true
+	function fit.ClearFilters()
+		if (fit._filters_cleared) then
+			return
+		end
+		fit._filters_cleared = true
 
-        if _G.PetJournal then
-            _G.PetJournal:UnregisterEvent("PET_JOURNAL_LIST_UPDATE")
-        end
-        HPetBattleAny:UnregisterEvent("PET_JOURNAL_LIST_UPDATE")
+		if _G.PetJournal then
+			_G.PetJournal:UnregisterEvent("PET_JOURNAL_LIST_UPDATE")
+		end
+		HPetBattleAny:UnregisterEvent("PET_JOURNAL_LIST_UPDATE")
 
-        for flag, value in pairs(PJ_FLAG_FILTERS) do
-            flag_filters[flag] = C_PetJournal.IsFilterChecked(flag)
-            if flag_filters[flag] ~= value then
-                C_PetJournal.SetFilterChecked(flag, value)
-            end
-        end
-		
-        local need_add_all = false
-        local ntypes = C_PetJournal.GetNumPetTypes()
-        for i=1,ntypes do
-            type_filters[i] = C_PetJournal.IsPetTypeChecked(i)
-            if not type_filters[i] then
-                need_add_all = true
-            end
-        end
-		
-        if need_add_all then
-            C_PetJournal.SetAllPetTypesChecked(true);
-        end
+		for flag, value in pairs(PJ_FLAG_FILTERS) do
+			flag_filters[flag] = C_PetJournal.IsFilterChecked(flag)
+			if flag_filters[flag] ~= value then
+				C_PetJournal.SetFilterChecked(flag, value)
+			end
+		end
 
-        need_add_all = false
-        local nsources = C_PetJournal.GetNumPetSources()
-        for i=0,nsources do
-            source_filters[i] = C_PetJournal.IsPetSourceChecked(i)
-            if not source_filters[i] then
-                need_add_all = true
-            end
-        end
-        if need_add_all then
-            C_PetJournal.SetAllPetSourcesChecked(true)
-        end
+		local need_add_all = false
+		local ntypes = C_PetJournal.GetNumPetTypes()
+		for i = 1, ntypes do
+			type_filters[i] = C_PetJournal.IsPetTypeChecked(i)
+			if not type_filters[i] then
+				need_add_all = true
+			end
+		end
 
-        if last_search_filter == nil then
-            last_search_filter = ""
-            C_PetJournal.ClearSearchFilter()
-        elseif last_search_filter ~= "" then
-            s_search_filter = last_search_filter
-            C_PetJournal.ClearSearchFilter()
-        else
-            s_search_filter = nil
-        end
-    end
+		if need_add_all then
+			C_PetJournal.SetAllPetTypesChecked(true)
+		end
 
-    function fit.RestoreFilters()
-        if (not fit._filters_cleared) then return end
-        fit._filters_cleared = false
+		need_add_all = false
+		local nsources = C_PetJournal.GetNumPetSources()
+		for i = 0, nsources do
+			source_filters[i] = C_PetJournal.IsPetSourceChecked(i)
+			if not source_filters[i] then
+				need_add_all = true
+			end
+		end
+		if need_add_all then
+			C_PetJournal.SetAllPetSourcesChecked(true)
+		end
 
-        if s_search_filter and s_search_filter ~= "" then
-            C_PetJournal.SetSearchFilter(s_search_filter)
-        end
+		if last_search_filter == nil then
+			last_search_filter = ""
+			C_PetJournal.ClearSearchFilter()
+		elseif last_search_filter ~= "" then
+			s_search_filter = last_search_filter
+			C_PetJournal.ClearSearchFilter()
+		else
+			s_search_filter = nil
+		end
+	end
 
-        for flag, value in pairs(flag_filters) do
-            if value ~= PJ_FLAG_FILTERS[flag] then
-                C_PetJournal.SetFilterChecked(flag, value)
-            end
-        end
+	function fit.RestoreFilters()
+		if (not fit._filters_cleared) then
+			return
+		end
+		fit._filters_cleared = false
 
-        for flag,value in pairs(type_filters) do
-            if value ~= true then
-                C_PetJournal.SetPetTypeFilter(flag, value)
-            end
-        end
+		if s_search_filter and s_search_filter ~= "" then
+			C_PetJournal.SetSearchFilter(s_search_filter)
+		end
 
-        for flag,value in pairs(source_filters) do
-            if value ~= true then
-                C_PetJournal.SetPetSourceChecked(flag, value)
-            end
-        end
+		for flag, value in pairs(flag_filters) do
+			if value ~= PJ_FLAG_FILTERS[flag] then
+				C_PetJournal.SetFilterChecked(flag, value)
+			end
+		end
 
-        if _G.PetJournal then
-            _G.PetJournal:RegisterEvent("PET_JOURNAL_LIST_UPDATE")
-			-- PetJournal_UpdatePetList()
-        end
-        HPetBattleAny:RegisterEvent("PET_JOURNAL_LIST_UPDATE")
-    end
+		for flag, value in pairs(type_filters) do
+			if value ~= true then
+				C_PetJournal.SetPetTypeFilter(flag, value)
+			end
+		end
+
+		for flag, value in pairs(source_filters) do
+			if value ~= true then
+				C_PetJournal.SetPetSourceChecked(flag, value)
+			end
+		end
+
+		if _G.PetJournal then
+			_G.PetJournal:RegisterEvent("PET_JOURNAL_LIST_UPDATE")
+		-- PetJournal_UpdatePetList()
+		end
+		HPetBattleAny:RegisterEvent("PET_JOURNAL_LIST_UPDATE")
+	end
 	HPetBattleAny.hookfilter = fit
 end

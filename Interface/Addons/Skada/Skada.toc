@@ -1,12 +1,13 @@
-## Interface: 90207
+## Interface: 110005
 ## Title: Skada
 ## Notes: Modular damage meter.
 ## Title-zhCN:|cff8000ff[战斗]|r伤害统计
 ## Title-zhTW:|cff8000ff[戰鬥]|r傷害统计
 ## Notes-zhCN: 模块化伤害统计。
 ## Notes-zhTW: 模組化的傷害統計。
-## Author: Zarnivoop, OwnlyMe
-## Version: 1.8.3
+## Author: Zarnivoop, OwnlyMe, Fadedtimes
+## Version: 11.0.2
+## IconTexture: Interface\AddOns\Skada\media\logo\pic
 ## SavedVariables: SkadaDB, PermanentActivity
 ## SavedVariablesPerCharacter: SkadaPerCharDB, SessionActivity, DCovenant, DCovenantLog
 ## Dependencies: _ShiGuang
@@ -33,9 +34,8 @@ BrokerDisplay.lua
 
 modules.xml
 
-plugins\Skada_ExplosiveOrbs.lua
 ## plugins\Skada_Stagger.lua
-plugins\Skada_AvoidableDamageTaken.lua
+## plugins\Skada_AvoidableDamageTaken.lua
 ## plugins\Skada_Activity.lua
 ## plugins\Skada_Plus.lua
-plugins\Skada_Covenants.lua
+## plugins\Skada_Covenants.lua

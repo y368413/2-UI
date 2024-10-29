@@ -64,7 +64,8 @@ function module:TimerOnUpdate(elapsed)
 	if self.nextUpdate > 0 then
 		self.nextUpdate = self.nextUpdate - elapsed
 	else
-		local remain = (self.duration - (GetTime() - self.start)) / self.modRate
+		local passTime = GetTime() - self.start
+		local remain = passTime >= 0 and ((self.duration - passTime) / self.modRate) or self.duration
 		if remain > 0 then
 			local getTime, nextUpdate = module.FormattedTimer(remain, self.modRate)
 			self.text:SetText(getTime)
@@ -131,7 +132,7 @@ function module:StartTimer(start, duration, modRate)
 			module.StopTimer(chargeTimer)
 		end
 
-		if timer.fontScale >= MIN_SCALE then
+		if timer.fontScale and timer.fontScale >= MIN_SCALE then
 			timer:Show()
 		end
 	elseif self.timer then
@@ -171,10 +172,10 @@ end
 
 function module:CooldownUpdate()
 	local button = self:GetParent()
-	local start, duration = GetActionCooldown(button.action)
+	local start, duration, _, modRate = GetActionCooldown(button.action)
 
 	if shouldUpdateTimer(self, start) then
-		module.StartTimer(self, start, duration)
+		module.StartTimer(self, start, duration, modRate)
 	end
 end
 
@@ -213,10 +214,9 @@ function module:OnLogin()
 
 	-- Hide Default Cooldown
 	SetCVar("countdownForCooldowns", 0)
-	M.HideOption(InterfaceOptionsActionBarsPanelCountdownCooldowns)
 end
 
---------------Fivecombo-----------------------------------------------
+--[[------------Fivecombo-----------------------------------------------
 local OverlayedSpellID = {};
 OverlayedSpellID["ROGUE"] = {
 	408,   --Éö»÷
@@ -305,4 +305,4 @@ hooksecurefunc(ActionBarButtonEventsFrameMixin, "RegisterFrame", function(self, 
 		M.HideOverlayGlow(parent);
 	end	
   end);
-end)
+end)]]

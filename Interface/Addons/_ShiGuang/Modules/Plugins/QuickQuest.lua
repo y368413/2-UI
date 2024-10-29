@@ -5,11 +5,11 @@ local M, R, U, I = unpack(ns)
 local next, ipairs, select = next, ipairs, select
 local IsAltKeyDown = IsAltKeyDown
 local UnitGUID, IsShiftKeyDown, GetItemInfoFromHyperlink = UnitGUID, IsShiftKeyDown, GetItemInfoFromHyperlink
-local GetTrackingInfo, GetInstanceInfo, GetQuestID = GetTrackingInfo, GetInstanceInfo, GetQuestID
+local GetInstanceInfo, GetQuestID = GetInstanceInfo, GetQuestID
 local GetNumActiveQuests, GetActiveTitle, GetActiveQuestID, SelectActiveQuest = GetNumActiveQuests, GetActiveTitle, GetActiveQuestID, SelectActiveQuest
 local IsQuestCompletable, GetNumQuestItems, GetQuestItemLink, QuestIsFromAreaTrigger = IsQuestCompletable, GetNumQuestItems, GetQuestItemLink, QuestIsFromAreaTrigger
 local QuestGetAutoAccept, AcceptQuest, CloseQuest, CompleteQuest, AcknowledgeAutoAcceptQuest = QuestGetAutoAccept, AcceptQuest, CloseQuest, CompleteQuest, AcknowledgeAutoAcceptQuest
-local GetNumQuestChoices, GetQuestReward, GetItemInfo, GetQuestItemInfo = GetNumQuestChoices, GetQuestReward, GetItemInfo, GetQuestItemInfo
+local GetNumQuestChoices, GetQuestReward, GetQuestItemInfo = GetNumQuestChoices, GetQuestReward, GetQuestItemInfo
 local GetNumAvailableQuests, GetAvailableQuestInfo, SelectAvailableQuest = GetNumAvailableQuests, GetAvailableQuestInfo, SelectAvailableQuest
 local GetNumAutoQuestPopUps, GetAutoQuestPopUp, ShowQuestOffer, ShowQuestComplete = GetNumAutoQuestPopUps, GetAutoQuestPopUp, ShowQuestOffer, ShowQuestComplete
 local C_QuestLog_IsWorldQuest = C_QuestLog.IsWorldQuest
@@ -23,13 +23,12 @@ local C_GossipInfo_GetAvailableQuests = C_GossipInfo.GetAvailableQuests
 local C_GossipInfo_GetNumActiveQuests = C_GossipInfo.GetNumActiveQuests
 local C_GossipInfo_SelectAvailableQuest = C_GossipInfo.SelectAvailableQuest
 local C_GossipInfo_GetNumAvailableQuests = C_GossipInfo.GetNumAvailableQuests
-local GetNumTrackingTypes = I.isNewPatch and C_Minimap.GetNumTrackingTypes or GetNumTrackingTypes
-local MINIMAP_TRACKING_TRIVIAL_QUESTS = MINIMAP_TRACKING_TRIVIAL_QUESTS
+local QuestLabelPrepend = Enum.GossipOptionRecFlags.QuestLabelPrepend
 
 local choiceQueue
 
-local QuickQuestCheckButton = CreateFrame("CheckButton", nil, ObjectiveTrackerBlocksFrame.QuestHeader, "OptionsCheckButtonTemplate")
-QuickQuestCheckButton:SetPoint("TOPLEFT", ObjectiveTrackerBlocksFrame.QuestHeader, -18, -2)
+local QuickQuestCheckButton = CreateFrame("CheckButton", nil, ObjectiveTrackerFrame.Header, "OptionsBaseCheckButtonTemplate")
+QuickQuestCheckButton:SetPoint("TOPLEFT", ObjectiveTrackerFrame.Header, -15, -5)
 QuickQuestCheckButton:SetSize(21, 21)
 QuickQuestCheckButton:SetHitRectInsets(0, -10, 0, 0)
 QuickQuestCheckButton:RegisterEvent("PLAYER_LOGIN")
@@ -53,13 +52,8 @@ local function GetNPCID()
 	return M.GetNPCID(UnitGUID("npc"))
 end
 
-local function IsTrackingHidden()
-	for index = 1, GetNumTrackingTypes() do
-		local name, _, active = GetTrackingInfo(index)
-		if name == MINIMAP_TRACKING_TRIVIAL_QUESTS then
-			return active
-		end
-	end
+local function IsAccountCompleted(questID)
+	return C_Minimap.IsFilteredOut(Enum.MinimapTrackingFilter.AccountCompletedQuests) and C_QuestLog.IsQuestFlaggedCompletedOnAccount(questID)
 end
 
 local ignoreQuestNPC = {
@@ -123,8 +117,8 @@ QuickQuest:Register("QUEST_GREETING", function()
 	local available = GetNumAvailableQuests()
 	if available > 0 then
 		for index = 1, available do
-			local isTrivial = GetAvailableQuestInfo(index)
-			if not isTrivial or IsTrackingHidden() then
+			local isTrivial, _, _, _, questID = GetAvailableQuestInfo(index)
+			if not IsAccountCompleted(questID) and (not isTrivial or C_Minimap.IsTrackingHiddenQuests()) then
 				SelectAvailableQuest(index)
 			end
 		end
@@ -179,11 +173,11 @@ local ignoreGossipNPC = {
 	[184587] = true, -- 集市，塔皮克斯
 }
 
-local rogueClassHallInsignia = {
-	[97004] = true, -- "Red" Jack Findle
-	[96782] = true, -- Lucian Trias
-	[93188] = true, -- Mongar
-	[107486] = true, -- CoS rumors
+local autoSelectFirstOptionList = {
+	[97004] = true, -- "Red" Jack Findle, Rogue ClassHall
+	[96782] = true, -- Lucian Trias, Rogue ClassHall
+	[93188] = true, -- Mongar, Rogue ClassHall
+	[107486] = true, -- 群星密探
 	[167839] = true, -- 灵魂残渣，爬塔
 }
 
@@ -216,6 +210,8 @@ local darkmoonDailyNPCs = {
 	[67370] = true, -- Jeremy Feasel
 }
 
+local QUEST_STRING = "cFF0000FF.-"..TRANSMOG_SOURCE_2
+
 QuickQuest:Register("GOSSIP_SHOW", function()
 	local npcID = GetNPCID()
 	if R.IgnoreQuestNPC[npcID] then return end
@@ -225,8 +221,8 @@ QuickQuest:Register("GOSSIP_SHOW", function()
 		for index, questInfo in ipairs(C_GossipInfo_GetActiveQuests()) do
 			local questID = questInfo.questID
 			local isWorldQuest = questID and C_QuestLog_IsWorldQuest(questID)
-			if questInfo.isComplete and (not questID or not isWorldQuest) then
-				C_GossipInfo_SelectActiveQuest(index)
+			if questInfo.isComplete and not isWorldQuest then
+				C_GossipInfo_SelectActiveQuest(questID)
 			end
 		end
 	end
@@ -235,47 +231,55 @@ QuickQuest:Register("GOSSIP_SHOW", function()
 	if available > 0 then
 		for index, questInfo in ipairs(C_GossipInfo_GetAvailableQuests()) do
 			local trivial = questInfo.isTrivial
-			if not trivial or IsTrackingHidden() or (trivial and npcID == 64337) then
-				C_GossipInfo_SelectAvailableQuest(index)
+			local questID = questInfo.questID
+			if not IsAccountCompleted(questID) and (not trivial or C_Minimap.IsTrackingHiddenQuests() or (trivial and npcID == 64337)) then
+				C_GossipInfo_SelectAvailableQuest(questInfo.questID)
 			end
 		end
 	end
 
-	if rogueClassHallInsignia[npcID] then
-		return C_GossipInfo_SelectOption(1)
-	end
+	local gossipInfoTable = C_GossipInfo_GetOptions()
+	if not gossipInfoTable then return end
 
-	if available == 0 and active == 0 then
-		local gossipInfoTable = C_GossipInfo_GetOptions()
-		local numOptions = #gossipInfoTable
-		if numOptions == 1 then
-			if npcID == 57850 then
-				return C_GossipInfo_SelectOption(1)
-			end
+	local numOptions = #gossipInfoTable
+	local firstOptionID = gossipInfoTable[1] and gossipInfoTable[1].gossipOptionID
 
+	if firstOptionID then
+		if autoSelectFirstOptionList[npcID] then
+			return C_GossipInfo_SelectOption(firstOptionID)
+		end
+
+		if available == 0 and active == 0 and numOptions == 1 then
 			local _, instance, _, _, _, _, _, mapID = GetInstanceInfo()
 			if instance ~= "raid" and not ignoreGossipNPC[npcID] and not ignoreInstances[mapID] then
-				local gType = gossipInfoTable[1] and gossipInfoTable[1].type
-				if gType and autoGossipTypes[gType] then
-					C_GossipInfo_SelectOption(1)
-					return
-				end
+				return C_GossipInfo_SelectOption(firstOptionID)
 			end
-		elseif followerAssignees[npcID] and numOptions > 1 then
-			return C_GossipInfo_SelectOption(1)
 		end
+	end
+
+	-- 自动选择只有一个带有任务选项的任务
+	local numQuestGossips = 0
+	local questGossipID
+	for i = 1, numOptions do
+		local option = gossipInfoTable[i]
+		if option.name and (strfind(option.name, QUEST_STRING) or option.flags == QuestLabelPrepend) then
+			numQuestGossips = numQuestGossips + 1
+			questGossipID = option.gossipOptionID
+		end
+	end
+	if numQuestGossips == 1 then
+		return C_GossipInfo_SelectOption(questGossipID)
 	end
 end)
 
-local darkmoonNPC = {
+local skipConfirmNPCs = {
 	[57850] = true, -- Teleportologist Fozlebub
 	[55382] = true, -- Darkmoon Faire Mystic Mage (Horde)
 	[54334] = true, -- Darkmoon Faire Mystic Mage (Alliance)
 }
 
 QuickQuest:Register("GOSSIP_CONFIRM", function(index)
-	local npcID = GetNPCID()
-	if npcID and darkmoonNPC[npcID] then
+	if skipConfirmNPCs[GetNPCID()] then
 		C_GossipInfo_SelectOption(index, "", true)
 		StaticPopup_Hide("GOSSIP_CONFIRM")
 	end
@@ -286,7 +290,7 @@ QuickQuest:Register("QUEST_DETAIL", function()
 		AcceptQuest()
 	elseif QuestGetAutoAccept() then
 		AcknowledgeAutoAcceptQuest()
-	elseif not C_QuestLog_IsQuestTrivial(GetQuestID()) or IsTrackingHidden() then
+	elseif not C_QuestLog_IsQuestTrivial(GetQuestID()) or C_Minimap.IsTrackingHiddenQuests() then
 		if not R.IgnoreQuestNPC[GetNPCID()] then
 			AcceptQuest()
 		end
@@ -332,32 +336,32 @@ local itemBlacklist = {
 	["progress_79268"] = 79268, -- Marsh Lily
 
 	-- Garrison scouting missives
-	[38180] = 122424, -- Scouting Missive: Broken Precipice
-	[38193] = 122423, -- Scouting Missive: Broken Precipice
-	[38182] = 122418, -- Scouting Missive: Darktide Roost
-	[38196] = 122417, -- Scouting Missive: Darktide Roost
-	[38179] = 122400, -- Scouting Missive: Everbloom Wilds
-	[38192] = 122404, -- Scouting Missive: Everbloom Wilds
-	[38194] = 122420, -- Scouting Missive: Gorian Proving Grounds
-	[38202] = 122419, -- Scouting Missive: Gorian Proving Grounds
-	[38178] = 122402, -- Scouting Missive: Iron Siegeworks
-	[38191] = 122406, -- Scouting Missive: Iron Siegeworks
-	[38184] = 122413, -- Scouting Missive: Lost Veil Anzu
-	[38198] = 122414, -- Scouting Missive: Lost Veil Anzu
-	[38177] = 122403, -- Scouting Missive: Magnarok
-	[38190] = 122399, -- Scouting Missive: Magnarok
-	[38181] = 122421, -- Scouting Missive: Mok'gol Watchpost
-	[38195] = 122422, -- Scouting Missive: Mok'gol Watchpost
-	[38185] = 122411, -- Scouting Missive: Pillars of Fate
-	[38199] = 122409, -- Scouting Missive: Pillars of Fate
-	[38187] = 122412, -- Scouting Missive: Shattrath Harbor
-	[38201] = 122410, -- Scouting Missive: Shattrath Harbor
-	[38186] = 122408, -- Scouting Missive: Skettis
-	[38200] = 122407, -- Scouting Missive: Skettis
-	[38183] = 122416, -- Scouting Missive: Socrethar's Rise
-	[38197] = 122415, -- Scouting Missive: Socrethar's Rise
-	[38176] = 122405, -- Scouting Missive: Stonefury Cliffs
-	[38189] = 122401, -- Scouting Missive: Stonefury Cliffs
+	["38180"] = 122424, -- Scouting Missive: Broken Precipice
+	["38193"] = 122423, -- Scouting Missive: Broken Precipice
+	["38182"] = 122418, -- Scouting Missive: Darktide Roost
+	["38196"] = 122417, -- Scouting Missive: Darktide Roost
+	["38179"] = 122400, -- Scouting Missive: Everbloom Wilds
+	["38192"] = 122404, -- Scouting Missive: Everbloom Wilds
+	["38194"] = 122420, -- Scouting Missive: Gorian Proving Grounds
+	["38202"] = 122419, -- Scouting Missive: Gorian Proving Grounds
+	["38178"] = 122402, -- Scouting Missive: Iron Siegeworks
+	["38191"] = 122406, -- Scouting Missive: Iron Siegeworks
+	["38184"] = 122413, -- Scouting Missive: Lost Veil Anzu
+	["38198"] = 122414, -- Scouting Missive: Lost Veil Anzu
+	["38177"] = 122403, -- Scouting Missive: Magnarok
+	["38190"] = 122399, -- Scouting Missive: Magnarok
+	["38181"] = 122421, -- Scouting Missive: Mok'gol Watchpost
+	["38195"] = 122422, -- Scouting Missive: Mok'gol Watchpost
+	["38185"] = 122411, -- Scouting Missive: Pillars of Fate
+	["38199"] = 122409, -- Scouting Missive: Pillars of Fate
+	["38187"] = 122412, -- Scouting Missive: Shattrath Harbor
+	["38201"] = 122410, -- Scouting Missive: Shattrath Harbor
+	["38186"] = 122408, -- Scouting Missive: Skettis
+	["38200"] = 122407, -- Scouting Missive: Skettis
+	["38183"] = 122416, -- Scouting Missive: Socrethar's Rise
+	["38197"] = 122415, -- Scouting Missive: Socrethar's Rise
+	["38176"] = 122405, -- Scouting Missive: Stonefury Cliffs
+	["38189"] = 122401, -- Scouting Missive: Stonefury Cliffs
 
 	-- Misc
 	[31664] = 88604, -- Nat's Fishing Journal
@@ -434,7 +438,7 @@ QuickQuest:Register("QUEST_COMPLETE", function()
 		for index = 1, choices do
 			local link = GetQuestItemLink("choice", index)
 			if link then
-				local value = select(11, GetItemInfo(link))
+				local value = select(11, C_Item.GetItemInfo(link))
 				local itemID = GetItemInfoFromHyperlink(link)
 				value = cashRewards[itemID] or value
 
@@ -468,6 +472,7 @@ local function AttemptAutoComplete(event)
 			elseif popUpType == "COMPLETE" then
 				ShowQuestComplete(questID)
 			end
+			RemoveAutoQuestPopUp(questID) -- needs review, taint?
 		end
 	end
 
@@ -538,10 +543,9 @@ end
 
 QuestNpcNameFrame:HookScript("OnShow", UnitQuickQuestStatus)
 QuestNpcNameFrame:HookScript("OnMouseDown", ToggleQuickQuestStatus)
-if I.isNewPatch then
-	GossipFrame.NameFrame:HookScript("OnShow", UnitQuickQuestStatus)
-	GossipFrame.NameFrame:HookScript("OnMouseDown", ToggleQuickQuestStatus)
-else
-	GossipNpcNameFrame:HookScript("OnShow", UnitQuickQuestStatus)
-	GossipNpcNameFrame:HookScript("OnMouseDown", ToggleQuickQuestStatus)
+local frame = GossipFrame.TitleContainer
+if frame then
+	GossipFrameCloseButton:SetFrameLevel(frame:GetFrameLevel()+1) -- fix clicking on gossip close button
+	frame:HookScript("OnShow", UnitQuickQuestStatus)
+	frame:HookScript("OnMouseDown", ToggleQuickQuestStatus)
 end

@@ -3,6 +3,7 @@ local M, R, U, I = unpack(ns)
 local A = M:GetModule("Auras")
 
 if I.MyClass ~= "WARLOCK" then return end
+local GetSpellTexture = C_Spell.GetSpellTexture
 
 function A:PostCreateLumos(self)
 	local frame = CreateFrame("Frame")

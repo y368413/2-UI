@@ -177,7 +177,7 @@ function BlinkHealth:CreateAnchorFrame()
 	self.anchor:SetHeight(80);
 	self.anchor:EnableMouse(true);
 	self.anchor:SetMovable(true);
-	self.anchor:SetPoint("CENTER", UIParent, "CENTER", 0, -200);
+	self.anchor:SetPoint("CENTER", UIParent, "CENTER", 0, -210);
 	local backdrop = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
 		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -778,7 +778,7 @@ function BlinkHealth:ConstructFrame(unit)
 	self.frame[unit]:SetWidth(200);
 	self.frame[unit]:SetHeight(50);
 	if (unit == "player") then
-		self.frame[unit]:SetPoint("BOTTOMRIGHT", self.anchor, "BOTTOM", -143, 0);
+		self.frame[unit]:SetPoint("BOTTOMRIGHT", self.anchor, "BOTTOM", -150, 0);
 ------------------RightClickMenu-Player-------------------------
     local RightClickPlayer = CreateFrame("Button", nil, self.frame[unit]) 
      RightClickPlayer:SetPoint("TOPLEFT",0,0)
@@ -790,7 +790,7 @@ function BlinkHealth:ConstructFrame(unit)
     end)
 -------------------------------------------------------------
 	else
-		self.frame[unit]:SetPoint("BOTTOMLEFT", self.anchor, "BOTTOM", 143, 0);
+		self.frame[unit]:SetPoint("BOTTOMLEFT", self.anchor, "BOTTOM", 150, 0);
 ------------------RightClickMenu-Target------------------------
     local RightClickTarget = CreateFrame("Button", nil, self.frame[unit]) 
       RightClickTarget:SetPoint("TOPLEFT",0,0)
@@ -1001,7 +1001,7 @@ iPlayerFrame:RegisterEvent("UNIT_MAXPOWER")
 iPlayerFrame:SetScript("OnEvent", AutoHidePlayerFrame)
 TargetFrame:HookScript("OnShow", AutoHidePlayerFrame)
 TargetFrame:HookScript("OnHide", AutoHidePlayerFrame)
-CharacterModelFrame:HookScript("OnShow", AutoHidePlayerFrame)
-CharacterModelFrame:HookScript("OnHide", AutoHidePlayerFrame)
+--CharacterModelFrame:HookScript("OnShow", AutoHidePlayerFrame)
+--CharacterModelFrame:HookScript("OnHide", AutoHidePlayerFrame)
 ContainerFrame1:HookScript("OnShow", AutoHidePlayerFrame)
 ContainerFrame1:HookScript("OnHide", AutoHidePlayerFrame)

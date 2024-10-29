@@ -1,14 +1,14 @@
 ﻿<Bindings>
-	<Binding name="SKADA_TOGGLE" header="Skada" category="BINDING_HEADER_ACE3">
+	<Binding name="SKADA_TOGGLE" header="Skada" category="Skada">
 		Skada:ToggleWindow()
 	</Binding>
-	<Binding name="SKADA_RESET" category="BINDING_HEADER_ACE3">
+	<Binding name="SKADA_RESET" category="Skada">
 		Skada:Reset()
 	</Binding>
-	<Binding name="SKADA_NEWSEGMENT" category="BINDING_HEADER_ACE3">
+	<Binding name="SKADA_NEWSEGMENT" category="Skada">
 		Skada:NewSegment()
 	</Binding>
-	<Binding name="SKADA_STOP" category="BINDING_HEADER_ACE3">
+	<Binding name="SKADA_STOP" category="Skada">
 		if Skada.current and Skada.current.stopped then
 			Skada:ResumeSegment()
 		elseif Skada.current then

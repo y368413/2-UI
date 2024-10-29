@@ -2,14 +2,14 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local TT = M:GetModule("Tooltip")
 
-local gsub, unpack = gsub, unpack
-local GetItemIcon, GetSpellTexture = GetItemIcon, GetSpellTexture
+local gsub, unpack, select = gsub, unpack, select
+local C_MountJournal_GetMountInfoByID = C_MountJournal.GetMountInfoByID
 local newString = "0:0:64:64:5:59:5:59"
 
 function TT:SetupTooltipIcon(icon)
 	local title = icon and _G[self:GetName().."TextLeft1"]
 	local titleText = title and title:GetText()
-	if titleText then
+	if titleText and not strfind(titleText, ":16:16:") then
 		title:SetFormattedText("|T%s:16:16:"..newString..":%d|t %s", icon, 16, titleText)
 	end
 
@@ -28,31 +28,7 @@ function TT:HookTooltipCleared()
 	self.tipModified = false
 end
 
-function TT:HookTooltipSetItem()
-	if not self.tipModified then
-		local _, link = self:GetItem()
-		if link then
-			TT.SetupTooltipIcon(self, GetItemIcon(link))
-		end
-
-		self.tipModified = true
-	end
-end
-
-function TT:HookTooltipSetSpell()
-	if not self.tipModified then
-		local _, id = self:GetSpell()
-		if id then
-			TT.SetupTooltipIcon(self, GetSpellTexture(id))
-		end
-
-		self.tipModified = true
-	end
-end
-
 function TT:HookTooltipMethod()
-	self:HookScript("OnTooltipSetItem", TT.HookTooltipSetItem)
-	self:HookScript("OnTooltipSetSpell", TT.HookTooltipSetSpell)
 	self:HookScript("OnTooltipCleared", TT.HookTooltipCleared)
 end
 
@@ -62,10 +38,39 @@ function TT:ReskinRewardIcon()
 	M.ReskinIconBorder(self.IconBorder)
 end
 
+local GetTooltipTextureByType = {
+	[Enum.TooltipDataType.Item] = function(id)
+		return C_Item.GetItemIconByID(id)
+	end,
+	[Enum.TooltipDataType.Toy] = function(id)
+		return C_Item.GetItemIconByID(id)
+	end,
+	[Enum.TooltipDataType.Spell] = function(id)
+		return C_Spell.GetSpellTexture(id)
+	end,
+	[Enum.TooltipDataType.Mount] = function(id)
+		return select(3, C_MountJournal_GetMountInfoByID(id))
+	end,
+}
+
 function TT:ReskinTooltipIcons()
+	-- Add Icons
 	TT.HookTooltipMethod(GameTooltip)
 	TT.HookTooltipMethod(ItemRefTooltip)
 
+	for tooltipType, getTex in next, GetTooltipTextureByType do
+		TooltipDataProcessor.AddTooltipPostCall(tooltipType, function(self)
+			if self == GameTooltip or self == ItemRefTooltip then
+				local data = self:GetTooltipData()
+				local id = data and data.id
+				if id then
+					TT.SetupTooltipIcon(self, getTex(id))
+				end
+			end
+		end)
+	end
+
+	-- Cut Icons
 	hooksecurefunc(GameTooltip, "SetUnitAura", function(self)
 		TT.SetupTooltipIcon(self)
 	end)

@@ -1084,7 +1084,7 @@ function CovenantForge:EventHandler(event, arg1 )
 		self:SecureHook(SoulbindTreeNodeLinkMixin, "SetState", "StopNodeFX")
 		self:UnregisterEvent("ADDON_LOADED")
 	elseif (event == "COVENANT_CHOSEN" and UnitLevel("player") == 60) or (event == "PLAYER_LEVEL_UP" and arg1 == 60 and C_Covenants.GetActiveCovenantID() ~= 0) then
-		if IsAddOnLoaded("Blizzard_Soulbinds") then 
+		if C_AddOns.IsAddOnLoaded("Blizzard_Soulbinds") then 
 			C_Timer.After(0, function() CovenantForge.Init:CreateSoulbindFrames() end)
 
 			self:SecureHook(SoulbindViewer, "Open", function()  C_Timer.After(.05, function() CovenantForge:Update() end) end , true)
@@ -1389,10 +1389,10 @@ function CovenantForge:UpdateConduitList()
 			for _,spec in ipairs(data[4]) do
 				if CovenantForge.viewed_spec == spec then 
 					local spellID = data[2]
-					local name = GetSpellInfo(spellID) or data[1]
+					local name = C_Spell.GetSpellInfo(spellID) or data[1]
 					local type = Soulbinds.GetConduitName(data[3])
 					local desc = GetSpellDescription(spellID)
-					local _,_, icon = GetSpellInfo(spellID)
+					local _,_, icon = C_Spell.GetSpellInfo(spellID)
 					local titleColor = ORANGE_FONT_COLOR_CODE
 					for _, data in ipairs(collectionData) do
 						local c_spellID = C_Soulbinds.GetConduitSpellID(data.conduitID, data.conduitRank)
@@ -1461,9 +1461,9 @@ function CovenantForge:UpdateConduitList()
 		for soulbindID, sb_powers in pairs(powers) do
 			local soulbind_data = C_Soulbinds.GetSoulbindData(soulbindID)
 			for i, spellID in pairs(sb_powers) do
-				local name = soulbind_data.name..": "..GetSpellInfo(spellID) or ""
+				local name = soulbind_data.name..": "..C_Spell.GetSpellInfo(spellID) or ""
 				local desc = GetSpellDescription(spellID)
-				local _,_, icon = GetSpellInfo(spellID)
+				local _,_, icon = C_Spell.GetSpellInfo(spellID)
 				local titleColor = ORANGE_FONT_COLOR_CODE
 
 				local weight = CovenantForge:GetTalentWeight(CovenantForge.viewed_spec, spellID)
@@ -1561,7 +1561,7 @@ function CovenantForge:Update()
 			local conduitID = conduit:GetConduitID()
 			if conduit and conduitID > 0  then
 				local spellID = CovenantForge.Conduits[conduitID][2]
-				name = GetSpellInfo(spellID)
+				name = C_Spell.GetSpellInfo(spellID)
 				--local rank = conduit:GetConduitRank()
 				--local itemLevel = C_Soulbinds.GetConduitItemLevel(conduitID, rank)
 				weight = CovenantForge:GetConduitWeight(CovenantForge.viewed_spec, conduitID)
@@ -1570,7 +1570,7 @@ function CovenantForge:Update()
 			end
 		else
 			local spellID =  nodeFrame.spell:GetSpellID()
-			name = GetSpellInfo(spellID) or ""
+			name = C_Spell.GetSpellInfo(spellID) or ""
 			weight = CovenantForge:GetTalentWeight(CovenantForge.viewed_spec, spellID)
 		end
 		f.Name:SetText(name)
@@ -1838,9 +1838,9 @@ local function GetPathData()
 			if node.row == 1 then 
 				icon = node.icon
 				local spellID = C_Soulbinds.GetConduitSpellID(node.conduitID, node.conduitRank)
-				_,_, icon = GetSpellInfo(spellID)
+				_,_, icon = C_Spell.GetSpellInfo(spellID)
 				--else
-				--_, _, icon = GetSpellInfo(node.spellID)
+				--_, _, icon = C_Spell.GetSpellInfo(node.spellID)
 				--end
 			end
 		end
@@ -1869,7 +1869,7 @@ function CovenantForge:PathTooltip(parent, index)
 				local collectionData = C_Soulbinds.GetConduitCollectionData(pathEntry.conduitID)
 				local quality = C_Soulbinds.GetConduitQuality(collectionData.conduitID, collectionData.conduitRank)
 				local spellID = C_Soulbinds.GetConduitSpellID(collectionData.conduitID, collectionData.conduitRank)
-				local name = GetSpellInfo(spellID)
+				local name = C_Spell.GetSpellInfo(spellID)
 				--local desc = GetSpellDescription(spellID)
 				local colormarkup = DARKYELLOW_FONT_COLOR:GenerateHexColorMarkup()
 				GameTooltip:AddLine(string.format(colormarkup.."Row %d: |r%s - Rank:%s |cffffffff(%s)|r",i, name, collectionData.conduitRank,Soulbinds.GetConduitName(collectionData.conduitType)), unpack({ITEM_QUALITY_COLORS[quality].color:GetRGB()}))
@@ -1878,7 +1878,7 @@ function CovenantForge:PathTooltip(parent, index)
 				--GameTooltip:AddLine(" ")
 			else
 				local spellID = pathEntry.spellID
-				local name = GetSpellInfo(spellID)
+				local name = C_Spell.GetSpellInfo(spellID)
 				local desc = GetSpellDescription(spellID)
 
 				GameTooltip:AddLine(string.format("Row %d: |cffffffff%s|r", i, name))
@@ -1900,14 +1900,14 @@ function CovenantForge:ShowNodeTooltip(parent, data)
 		local collectionData = C_Soulbinds.GetConduitCollectionData(data.conduitID)
 		local quality = C_Soulbinds.GetConduitQuality(collectionData.conduitID, collectionData.conduitRank)
 		local spellID = C_Soulbinds.GetConduitSpellID(collectionData.conduitID, collectionData.conduitRank)
-		local name = GetSpellInfo(spellID)
+		local name = C_Spell.GetSpellInfo(spellID)
 		--local desc = GetSpellDescription(spellID)
 		local colormarkup = DARKYELLOW_FONT_COLOR:GenerateHexColorMarkup()
 		GameTooltip:SetConduit(data.conduitID, collectionData.conduitRank)
 		CovenantForge:ConduitTooltip_Rank(GameTooltip, collectionData.conduitRank, data.row + 1)
 	else
 		local spellID = data.spellID
-		local name = GetSpellInfo(spellID)
+		local name = C_Spell.GetSpellInfo(spellID)
 		local desc = GetSpellDescription(spellID)
 		GameTooltip:AddLine(string.format("Row %d: |cffffffff%s|r", data.row + 1 , name))
 		GameTooltip:AddLine(desc, nil, nil, nil, true)
@@ -2170,10 +2170,10 @@ function CovenantForge:UpdateSavedPathsList()
 			local nodeIcon = AceGUI:Create("Icon")
 			if data.conduitID > 0 then 
 				local spellID = C_Soulbinds.GetConduitSpellID(data.conduitID, 1)
-				local _,_, icon = GetSpellInfo(spellID)
+				local _,_, icon = C_Spell.GetSpellInfo(spellID)
 				nodeIcon:SetImage(icon)
 			else
-				local _,_, icon = GetSpellInfo(data.spellID)
+				local _,_, icon = C_Spell.GetSpellInfo(data.spellID)
 				nodeIcon:SetImage(icon)
 			end
 			nodeIcon:SetImageSize(25,25)
@@ -2623,10 +2623,10 @@ function CovenantForge:UpdateWeightList()
 
 		for i, data in pairs(typedata) do
 			local spellID = data[2]
-			local name = GetSpellInfo(spellID) or data[1]
+			local name = C_Spell.GetSpellInfo(spellID) or data[1]
 			local type = Soulbinds.GetConduitName(data[3])
 			local desc = GetSpellDescription(spellID)
-			local _,_, icon = GetSpellInfo(spellID)
+			local _,_, icon = C_Spell.GetSpellInfo(spellID)
 			local titleColor = ORANGE_FONT_COLOR_CODE
 			for i, data in ipairs(collectionData) do
 				local c_spellID = C_Soulbinds.GetConduitSpellID(data.conduitID, data.conduitRank)
@@ -2704,10 +2704,10 @@ function CovenantForge:UpdateWeightList()
 		for soulbindID, sb_powers in pairs(powers) do
 			local soulbind_data = C_Soulbinds.GetSoulbindData(soulbindID)
 			for i, spellID in pairs(sb_powers) do
-				local spellname = GetSpellInfo(spellID)
+				local spellname = C_Spell.GetSpellInfo(spellID)
 				local name = soulbind_data.name..": "..spellname or ""
 				local desc = GetSpellDescription(spellID)
-				local _,_, icon = GetSpellInfo(spellID)
+				local _,_, icon = C_Spell.GetSpellInfo(spellID)
 				local titleColor = ORANGE_FONT_COLOR_CODE
 				local container = AceGUI:Create("SimpleGroup") 
 				container:SetLayout("Flow")

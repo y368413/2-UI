@@ -80,7 +80,7 @@ local function OnPlayerLogin(self, event, ...)
     _G.SystemFont_Shadow_Med1_Outline:SetFont(STANDARD_TEXT_FONT, 14, "OUTLINE")
     _G.SystemFont_Shadow_Med2:SetFont(STANDARD_TEXT_FONT, 14, "OUTLINE")
     _G.SystemFont_Shadow_Med3:SetFont(STANDARD_TEXT_FONT, 16, "OUTLINE")
-    _G.SystemFont_Shadow_Outline_Huge2:SetFont(STANDARD_TEXT_FONT, 22, "OUTLINE")
+    --_G.SystemFont_Shadow_Outline_Huge2:SetFont(STANDARD_TEXT_FONT, 22, "OUTLINE")
     _G.SystemFont_Shadow_Huge1:SetFont(STANDARD_TEXT_FONT, 20, "OUTLINE")
     _G.SystemFont_Shadow_Huge2:SetFont(STANDARD_TEXT_FONT, 24, "OUTLINE")
     _G.SystemFont_Shadow_Huge3:SetFont(STANDARD_TEXT_FONT, 25, "OUTLINE")
@@ -103,16 +103,16 @@ local function OnPlayerLogin(self, event, ...)
     _G.Tooltip_Small:SetShadowOffset(1, -1)
     
     -- Why?
-    _G.HelpFrameKnowledgebaseNavBarHomeButtonText:SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
-    _G.WorldMapFrameNavBarHomeButtonText:SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
+    --_G.HelpFrameKnowledgebaseNavBarHomeButtonText:SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
+    --_G.WorldMapFrameNavBarHomeButtonText:SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
     
     -- Extra
-    _G.PaperDollTitlesPane:HookScript("OnShow", function(titles)
-        for x, object in next, titles.buttons do
-            object:DisableDrawLayer("BACKGROUND")
-            object.text:SetFont(STANDARD_TEXT_FONT, 11, "OUTLINE")
-        end
-    end)
+   -- _G.PaperDollTitlesPane:HookScript("OnShow", function(titles)
+        --for x, object in next, titles.buttons do
+            --object:DisableDrawLayer("BACKGROUND")
+            --object.text:SetFont(STANDARD_TEXT_FONT, 11, "OUTLINE")
+        --end
+    --end)
 end
 
 -- Event
@@ -122,8 +122,8 @@ Event:SetScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_LOGIN" then
         OnPlayerLogin(self, event, ...)
     end
-end)
-----◊÷ÃÂ√Ë±ﬂ
+end)]]
+--[[--◊÷ÃÂ√Ë±ﬂ
 for i = 1, 7 do
    local m, r = _G["ChatFrame"..i]:GetFont()
    _G["ChatFrame"..i]:SetFont(m, r, "OUTLINE")
@@ -131,12 +131,7 @@ for i = 1, 7 do
    _G["ChatFrame"..i]:SetShadowColor(0, 0, 0, 0)
 end]]
 ----------------------------------------------------------------------
-local daftFrameHue_Custom = false;
-local daftFrameHue_R = 0.2;
-local daftFrameHue_G = 0.2;
-local daftFrameHue_B = 0.2;
 local daftFrameHue_classcolor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[select(2, UnitClass("player"))];
-
 local daftFrameHue = CreateFrame("Frame", "daftFrameHue", UIParent);
 daftFrameHue:RegisterEvent("ADDON_LOADED");
 local function ColorFrames()
@@ -194,7 +189,7 @@ local function ColorFrames()
 		FriendsFrame.TitleBg,
 		PVEFrameBg,
 		PVEFrame.TitleBg,
-		SpellBookFrame.TitleBg,
+		--SpellBookFrame.TitleBg,
 		PlayerTalentFrameBg,
 		PlayerTalentFrameInsetBg,
 		PlayerTalentFrameTitleBg,
@@ -230,11 +225,11 @@ local function ColorFrames()
 		MiniMapTrackingButtonBorder,
 		MinimapBorder,
 		MinimapBorderTop,
-		ObjectiveTrackerBlocksFrame.QuestHeader.Background,
-		ObjectiveTrackerBlocksFrame.ScenarioHeader.Background,
-		ObjectiveTrackerBlocksFrame.AchievementHeader.Background,
-		BONUS_OBJECTIVE_TRACKER_MODULE.Header.Background,
-		WORLD_QUEST_TRACKER_MODULE.Header.Background,
+		--ObjectiveTrackerFrame.QuestHeader.Background,
+		--ObjectiveTrackerFrame.ScenarioHeader.Background,
+		--ObjectiveTrackerFrame.AchievementHeader.Background,
+		--BONUS_OBJECTIVE_TRACKER_MODULE.Header.Background,
+		--WORLD_QUEST_TRACKER_MODULE.Header.Background,
 		PaladinPowerBarBG,
 		PaladinPowerBarBankBG,
 		--PartyMemberFrame1PetFrameTexture,
@@ -270,11 +265,7 @@ local function ColorFrames()
 		--TargetFrameTextureFrameTexture,
 		TargetFrameToTTextureFrameTexture,
 		}) do
-		if daftFrameHue_Custom then
-			texture:SetVertexColor(daftFrameHue_R, daftFrameHue_G, daftFrameHue_B, 1);
-		else
-			texture:SetVertexColor(daftFrameHue_classcolor.r, daftFrameHue_classcolor.g, daftFrameHue_classcolor.b, 1);
-		end;
+		texture:SetVertexColor(daftFrameHue_classcolor.r, daftFrameHue_classcolor.g, daftFrameHue_classcolor.b, 1);
 	end;
 end;
 

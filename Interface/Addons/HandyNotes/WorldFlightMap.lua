@@ -1,25 +1,31 @@
 ---- LINE POOL ----
 -- copy/pasta of TexturePoolMixin, just for lines
+local LinePoolMixin = {}
 
-local LinePoolMixin = CreateFromMixins(ObjectPoolMixin)
 local function LinePoolFactory(linePool)
-	return linePool.parent:CreateLine(nil, linePool.layer, linePool.textureTemplate, linePool.subLayer)
+    return linePool.parent:CreateLine(nil, linePool.layer, linePool.textureTemplate, linePool.subLayer)
 end
 
 function LinePoolMixin:OnLoad(parent, layer, subLayer, textureTemplate, resetterFunc)
-	ObjectPoolMixin.OnLoad(self, LinePoolFactory, resetterFunc)
-	self.parent = parent
-	self.layer = layer
-	self.subLayer = subLayer
-	self.textureTemplate = textureTemplate
+    Mixin(self, CreateUnsecuredObjectPool(LinePoolFactory, resetterFunc))
+    Mixin(self, CreateUnsecuredTexturePool(parent, layer, subLayer, textureTemplate, resetterFunc))
+    self:Init(LinePoolFactory, resetterFunc)
+    self.parent = parent
+    self.layer = layer
+    self.subLayer = subLayer
+    self.textureTemplate = textureTemplate
 end
 
---[[ global ]] function CreateLinePool(parent, layer, subLayer, textureTemplate, resetterFunc)
-	local linePool = CreateFromMixins(LinePoolMixin)
-	linePool:OnLoad(parent, layer, subLayer, textureTemplate, resetterFunc or FramePool_Hide)
-	return linePool
+function CreateLinePool(parent, layer, subLayer, textureTemplate, resetterFunc)
+    local linePool = CreateFromMixins(LinePoolMixin)
+    linePool:OnLoad(parent, layer, subLayer, textureTemplate, resetterFunc or Pool_HideAndClearAnchors)
+    return linePool
 end
 
+
+local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
+local ShowUIPanel = LibShowUIPanel.ShowUIPanel
+local HideUIPanel = LibShowUIPanel.HideUIPanel
 
 ---------------------------------------------------------
 -- Change IconScale to adjust the size of flight icons
@@ -180,10 +186,11 @@ function WorldFlightMapProvider:OnEvent(event, ...)
 		if InCombatLockdown() then
 			CloseTaxiMap()
 		else
+			local overrideMapID
 			if IsInInstance() then
 				local _, _, _, _, _, _, _, instanceID = GetInstanceInfo()
-				if instanceID == 2481 then
-					if not IsAddOnLoaded('Blizzard_FlightMap') then
+				if instanceID == 2481 or instanceID == 2657 then
+					if not C_AddOns.IsAddOnLoaded('Blizzard_FlightMap') then
 						UIParentLoadAddOn('Blizzard_FlightMap')
 						FlightMapFrame:UnregisterAllEvents()
 						flightMapFrame = FlightMapFrame
@@ -193,25 +200,27 @@ function WorldFlightMapProvider:OnEvent(event, ...)
 
 					ShowUIPanel(flightMapFrame)
 					return
+				elseif instanceID == 2516 then
+					overrideMapID = 2093
 				end
 			end
 
 			self:SetTaxiState(true)
-			self.taxiMap = GetMapSize(GetTaxiMapID())
+			self.taxiMap = GetMapSize(overrideMapID or GetTaxiMapID())
 			
 			local playerMapID = C_Map.GetBestMapForUnit('player')
 			local playerMapInfo = C_Map.GetMapInfo(playerMapID)
-			self.playerContinent = GetCurrentMapContinent(playerMapID)
+			self.playerContinent = GetCurrentMapContinent(overrideMapID or playerMapID)
 			
 			if not self:GetMap():IsShown() and not InCombatLockdown() then
-				ToggleWorldMap()
+				if not WorldMapFrame:IsShown() then ShowUIPanel(WorldMapFrame) else HideUIPanel(WorldMapFrame) end
 				--if self.playerContinent == 905 and playerMapInfo.mapType > Enum.UIMapType.Zone and playerMapInfo.parentMapID then
 				--	self:GetMap():SetMapID(playerMapInfo.parentMapID)
 				-- Zoom to parent zone if we're in a lower map
 				-- We used to zoom out until we could fit multiple flight points on the same map, but this is simpler
 				-- if playerMapInfo.mapType > Enum.UIMapType.Zone and playerMapInfo.parentMapID then
 				if playerMapInfo.parentMapID then
-					local parentZone = GetParentZone(playerMapID)
+					local parentZone = overrideMapID or GetParentZone(playerMapID)
 					if parentZone then
 						self:GetMap():SetMapID(parentZone)
 					end
@@ -231,9 +240,9 @@ function WorldFlightMapProvider:OnEvent(event, ...)
 
 		self:SetTaxiState(false)
 
-		CloseTaxiMap()
+		-- CloseTaxiMap()
 		if self:GetMap():IsShown() and not InCombatLockdown() then
-			ToggleWorldMap()
+			if not WorldMapFrame:IsShown() then ShowUIPanel(WorldMapFrame) else HideUIPanel(WorldMapFrame) end
 		end
 
 		self:RemoveAllData()
@@ -279,7 +288,7 @@ function WorldFlightMapProvider:AddFlightNode(taxiNodeData)
 			if drawPin then
 				-- Duplicating all of this from frameXML because we need to raise the frame level of the pins
 				local playAnim = taxiNodeData.state ~= Enum.FlightPathState.Unreachable;
-				local pin = self:GetMap():AcquirePin("FlightMap_FlightPointPinTemplate", playAnim);
+				local pin = self:GetMap():AcquirePin("WorldFlightPinTemplate", playAnim);
 				
 				-- For the sake of having other addons treat our buttons like normal taxi map buttons
 				_G['TaxiButton' .. taxiNodeData.slotIndex] = pin
@@ -287,7 +296,9 @@ function WorldFlightMapProvider:AddFlightNode(taxiNodeData)
 				
 				-- Only show arrows on zone maps
 				local arrow = GetArrow(pin)
-				if self.worldMap.mapInfo and self.worldMap.mapInfo.mapType and self.worldMap.mapInfo.mapType > 2 and taxiNodeData.state == Enum.FlightPathState.Reachable then
+				if taxiNodeData.textureKit == 'FlightMaster_ProgenitorObelisk' then
+					arrow:Hide()
+				elseif self.worldMap.mapInfo and self.worldMap.mapInfo.mapType and self.worldMap.mapInfo.mapType > 2 and taxiNodeData.state == Enum.FlightPathState.Reachable then
 					-- Restart animation so the arrows move in sync
 					ResetAnimation(arrow.group)
 					arrow:Show()
@@ -299,9 +310,11 @@ function WorldFlightMapProvider:AddFlightNode(taxiNodeData)
 
 				pin:SetPosition(taxiNodeData.position:GetXY());
 				pin.taxiNodeData = taxiNodeData;
+				pin.textureKit = taxiNodeData.textureKit;
+				pin.isMapLayerTransition = taxiNodeData.isMapLayerTransition;
 				pin.owner = self;
 				pin.linkedPins = {};
-				pin:SetFlightPathStyle(taxiNodeData.textureKitPrefix, taxiNodeData.state);
+				pin:SetFlightPathStyle(taxiNodeData.state);
 				
 				pin:UpdatePinSize(taxiNodeData.state);
 				
@@ -313,9 +326,9 @@ function WorldFlightMapProvider:AddFlightNode(taxiNodeData)
 				pin:SetScalingLimits(1.25, initialScaleFactor, initialScaleFactor * 1.25)
 				--pin:SetIgnoreGlobalPinScale(true)
 				
-				pin:SetShown(taxiNodeData.state ~= Enum.FlightPathState.Unreachable); -- Only show if part of a route, handled in the route building functions
+				pin:SetShown(taxiNodeData.state ~= Enum.FlightPathState.Unreachable or taxiNodeData.isMapLayerTransition); -- Only show if part of a route, handled in the route building functions
 
-				for poiPin in self:GetMap():EnumeratePinsByTemplate("FlightPointPinTemplate") do
+				for poiPin in self:GetMap():EnumeratePinsByTemplate("WorldFlightPinTemplate") do
 					if poiPin.name == taxiNodeData.name and playAnim then
 						poiPin:Hide()
 					else
@@ -325,6 +338,18 @@ function WorldFlightMapProvider:AddFlightNode(taxiNodeData)
 				end
 			end
 		end
+	end
+end
+
+function WorldFlightMapProvider:RemoveAllData()
+	self:GetMap():RemoveAllPinsByTemplate("WorldFlightPinTemplate")
+	self:GetMap():ResetTitleAndPortraitIcon()
+
+	if self.highlightLinePool then
+		self.highlightLinePool:ReleaseAll()
+	end
+	if self.backgroundLinePool then
+		self.backgroundLinePool:ReleaseAll()
 	end
 end
 
@@ -345,7 +370,7 @@ function WorldFlightMapProvider:HighlightRouteToPin(pin)
 
 		if startPin and destPin then
 			local Line = self.linePool:Acquire()
-			Line:SetNonBlocking(true)
+			-- Line:SetNonBlocking(true)
 			Line:SetAtlas('_UI-Taxi-Line-horizontal')
 			Line:SetThickness(32)
 			Line:SetStartPoint('CENTER', startPin)
@@ -398,3 +423,8 @@ function WorldMapFrame:UpdateTitleAndPortraitIcon()
 end
 
 WorldMapFrame:AddDataProvider(WorldFlightMapProvider)
+
+-- use modified pin mixin and template to prevent taint
+-- https://github.com/Stanzilla/WoWUIBugs/issues/453
+WorldFlightPinMixin = CreateFromMixins(FlightMap_FlightPointPinMixin)
+WorldFlightPinMixin.SetPassThroughButtons = function() end

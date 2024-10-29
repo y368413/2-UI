@@ -7,9 +7,10 @@ local hasCentralize
 local updater = CreateFrame("Frame")
 local AuraList, FrameList, UnitIDTable, IntTable, IntCD, myTable, cooldownTable = {}, {}, {}, {}, {}, {}, {}
 local pairs, select, tinsert, tremove, wipe, strfind = pairs, select, table.insert, table.remove, table.wipe, strfind
-local InCombatLockdown, UnitAura, GetPlayerInfoByGUID, UnitInRaid, UnitInParty = InCombatLockdown, UnitAura, GetPlayerInfoByGUID, UnitInRaid, UnitInParty
-local GetTime, GetSpellInfo, GetSpellCooldown, GetSpellCharges, GetTotemInfo, IsPlayerSpell = GetTime, GetSpellInfo, GetSpellCooldown, GetSpellCharges, GetTotemInfo, IsPlayerSpell
-local GetItemCooldown, GetItemInfo, GetInventoryItemLink, GetInventoryItemCooldown = GetItemCooldown, GetItemInfo, GetInventoryItemLink, GetInventoryItemCooldown
+local InCombatLockdown, GetPlayerInfoByGUID, UnitInRaid, UnitInParty = InCombatLockdown, GetPlayerInfoByGUID, UnitInRaid, UnitInParty
+local GetTime, GetTotemInfo, IsPlayerSpell = GetTime, GetTotemInfo, IsPlayerSpell
+local GetItemInfo, GetInventoryItemLink, GetInventoryItemCooldown = C_Item.GetItemInfo, GetInventoryItemLink, GetInventoryItemCooldown
+local GetSpellName, GetSpellTexture = C_Spell.GetSpellName, C_Spell.GetSpellTexture
 
 -- DataConvert
 local function DataAnalyze(v)
@@ -426,6 +427,10 @@ function A:AuraWatch_SetupCD(index, name, icon, start, duration, _, type, id, ch
 	frames.Index = (frames.Index + 1 > maxFrames) and maxFrames or frames.Index + 1
 end
 
+A.IgnoredItems = {
+	[193757] = true, -- 红玉雏龙蛋壳
+}
+
 function A:AuraWatch_UpdateCD()
 	for KEY, VALUE in pairs(cooldownTable) do
 		for spellID in pairs(VALUE) do
@@ -433,18 +438,27 @@ function A:AuraWatch_UpdateCD()
 			local value = group.List[spellID]
 			if value then
 				if value.SpellID then
-					local name, _, icon = GetSpellInfo(value.SpellID)
-					local start, duration = GetSpellCooldown(value.SpellID)
-					local charges, maxCharges, chargeStart, chargeDuration = GetSpellCharges(value.SpellID)
+					local name, icon = GetSpellName(value.SpellID), GetSpellTexture(value.SpellID)
+
+					local cooldownInfo = C_Spell.GetSpellCooldown(value.SpellID)
+					local start = cooldownInfo and cooldownInfo.startTime
+					local duration = cooldownInfo and cooldownInfo.duration
+
+					local chargeInfo = C_Spell.GetSpellCharges(spellID)
+					local charges = chargeInfo and chargeInfo.currentCharges
+					local maxCharges = chargeInfo and chargeInfo.maxCharges
+					local chargeStart = chargeInfo and chargeInfo.cooldownStartTime
+					local chargeDuration = chargeInfo and chargeInfo.cooldownDuration
+
 					if group.Mode == "ICON" then name = nil end
 					if charges and maxCharges and maxCharges > 1 and charges < maxCharges then
 						A:AuraWatch_SetupCD(KEY, name, icon, chargeStart, chargeDuration, true, 1, value.SpellID, charges)
-					elseif start and duration > 3 then
+					elseif start and duration > R.db["AuraWatch"]["MinCD"] then
 						A:AuraWatch_SetupCD(KEY, name, icon, start, duration, true, 1, value.SpellID)
 					end
 				elseif value.ItemID then
-					local start, duration = GetItemCooldown(value.ItemID)
-					if start and duration > 3 then
+					local start, duration = C_Item.GetItemCooldown(value.ItemID)
+					if start and duration > R.db["AuraWatch"]["MinCD"] then
 						local name, _, _, _, _, _, _, _, _, icon = GetItemInfo(value.ItemID)
 						if group.Mode == "ICON" then name = nil end
 						A:AuraWatch_SetupCD(KEY, name, icon, start, duration, false, 2, value.ItemID)
@@ -452,11 +466,14 @@ function A:AuraWatch_UpdateCD()
 				elseif value.SlotID then
 					local link = GetInventoryItemLink("player", value.SlotID)
 					if link then
-						local name, _, _, _, _, _, _, _, _, icon = GetItemInfo(link)
-						local start, duration = GetInventoryItemCooldown("player", value.SlotID)
-						if duration > 1.5 then
-							if group.Mode == "ICON" then name = nil end
-							A:AuraWatch_SetupCD(KEY, name, icon, start, duration, false, 3, value.SlotID)
+						local itemID = GetItemInfoFromHyperlink(link)
+						if not A.IgnoredItems[itemID] then
+							local name, _, _, _, _, _, _, _, _, icon = GetItemInfo(link)
+							local start, duration = GetInventoryItemCooldown("player", value.SlotID)
+							if duration > 1.5 then
+								if group.Mode == "ICON" then name = nil end
+								A:AuraWatch_SetupCD(KEY, name, icon, start, duration, false, 3, value.SlotID)
+							end
 						end
 					end
 				elseif value.TotemID then
@@ -474,6 +491,9 @@ end
 -- UpdateAura
 local replacedTexture = {
 	[336892] = 135130, -- 无懈警戒换成瞄准射击图标
+	[378770] = 236174, -- 夺命打击换成夺命射击图标
+	[389020] = 132330, -- 子弹风暴换成多重射击
+	[378747] = 132176, -- 凶暴兽群换成杀戮命令
 }
 function A:AuraWatch_SetupAura(KEY, unit, index, filter, name, icon, count, duration, expires, spellID, flash)
 	if not KEY then return end
@@ -554,9 +574,9 @@ function A:UpdateAuraWatchByFilter(unit, filter, inCombat)
 	local index = 1
 
 	while true do
-		local name, icon, count, _, duration, expires, caster, _, _, spellID, _, _, _, _, _, number = UnitAura(unit, index, filter)
-		if not name then break end
-		A:AuraWatch_UpdateAura(unit, index, filter, name, icon, count, duration, expires, caster, spellID, number, inCombat)
+		local auraData = C_UnitAuras.GetAuraDataByIndex(unit, index, filter)
+		if not auraData then break end
+		A:AuraWatch_UpdateAura(unit, index, filter, auraData.name, auraData.icon, auraData.applications, auraData.duration, auraData.expirationTime, auraData.sourceUnit, auraData.spellId, (auraData.points[1] == 0 and tonumber(auraData.points[2]) or tonumber(auraData.points[1])), inCombat)
 
 		index = index + 1
 	end
@@ -624,7 +644,7 @@ function A:AuraWatch_SetupInt(intID, itemID, duration, unitID, guid, sourceName)
 		frame.type = 2
 		frame.spellID = itemID
 	else
-		name, _, icon = GetSpellInfo(intID)
+		name, icon = GetSpellName(intID), GetSpellTexture(intID)
 		frame.type = 1
 		frame.spellID = intID
 	end
@@ -683,7 +703,7 @@ function A:IsAuraTracking(value, eventType, sourceGUID, sourceName, sourceFlags,
 end
 
 local cache = {}
-local soundKitID = SOUNDKIT.ALARM_CLOCK_WARNING_3
+
 function A:AuraWatch_UpdateInt(event, ...)
 	if not IntCD.List then return end
 
@@ -711,7 +731,6 @@ function A:AuraWatch_UpdateInt(event, ...)
 			if value.OnSuccess then guid, name = sourceGUID, sourceName end
 
 			A:AuraWatch_SetupInt(value.IntID, value.ItemID, value.Duration, value.UnitID, guid, name)
-			if R.db["AuraWatch"]["QuakeRing"] and spellID == 240447 then PlaySound(soundKitID, "Master") end -- 'Ding' on quake
 
 			cache[timestamp] = spellID
 		end
@@ -735,6 +754,30 @@ function A:AuraWatch_Cleanup()	-- FIXME: there should be a better way to do this
 			if frame.Spellname then frame.Spellname:SetText("") end
 		end
 		value.Index = 1
+	end
+end
+
+function A:AuraWatch_PreCleanup()
+	for _, value in pairs(FrameList) do
+		value.Index = 1
+	end
+end
+
+function A:AuraWatch_PostCleanup()
+	for _, value in pairs(FrameList) do
+		local currentIndex = value.Index == maxFrames and maxFrames + 1 or value.Index
+		for i = currentIndex, maxFrames do
+			local frame = value[i]
+			if not frame:IsShown() then break end
+			if frame then
+				frame:Hide()
+				frame:SetScript("OnUpdate", nil)
+			end
+			if frame.Icon then frame.Icon:SetTexture(nil) end
+			if frame.Count then frame.Count:SetText("") end
+			if frame.Spellname then frame.Spellname:SetText("") end
+			if frame.glowFrame then M.HideOverlayGlow(frame.glowFrame) end
+		end
 	end
 end
 
@@ -770,7 +813,7 @@ function A:AuraWatch_Centralize(force)
 			local width = frame1.__width
 			local interval = frame1.__interval
 			frame1:ClearAllPoints()
-			frame1:SetPoint("CENTER", frame1.MoveHandle, "CENTER",  - (width+interval)/2 * (numIndex-2), 0)
+			frame1:SetPoint("CENTER", frame1.MoveHandle, "CENTER", - (width+interval)/2 * (numIndex-2), 0)
 		end
 	end
 end
@@ -780,7 +823,7 @@ function A:AuraWatch_OnUpdate(elapsed)
 	if self.elapsed > .1 then
 		self.elapsed = 0
 
-		A:AuraWatch_Cleanup()
+		A:AuraWatch_PreCleanup()
 		A:AuraWatch_UpdateCD()
 
 		local inCombat = InCombatLockdown()
@@ -788,6 +831,7 @@ function A:AuraWatch_OnUpdate(elapsed)
 			A:UpdateAuraWatch(value, inCombat)
 		end
 
+		A:AuraWatch_PostCleanup()
 		A:AuraWatch_Centralize()
 	end
 end

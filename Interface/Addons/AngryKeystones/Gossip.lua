@@ -2,11 +2,14 @@ local ADDON, Addon = ...
 local Mod = Addon:NewModule('Gossip')
 
 local npcBlacklist = {
-	[107435] = true, [112697] = true, [112699] = true, [107486] = true, -- Suspicous Noble
+	[107435] = true, [112697] = true, [112699] = true, -- Suspicous Noble
 	[101462] = true, -- Reaves
 	[166663] = true, -- Kyrian Steward
-	[175513] = true, -- Prideful
 }
+local npcWhitelist = {
+	[197300] = true, -- Azure Vault, Book of Translocation
+}
+
 local cosRumorNPC = 107486
 
 local function GossipNPCID()
@@ -23,31 +26,6 @@ local function IsStaticPopupShown()
 		end
 	end
 	return false
-end
-
-function Mod:CoSRumor()
-	local clue = C_GossipInfo.GetText()
-	local shortClue = Addon.Locale:Rumor(clue)
-	if not shortClue then
-		AngryKeystones_Data.rumors[clue] = true
-	end
-	if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
-		SendChatMessage(shortClue or clue, "INSTANCE_CHAT")
-	elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
-		SendChatMessage(shortClue or clue, "PARTY")
-	else
-		SendChatMessage(shortClue or clue, "SAY")
-	end
-end
-
-function Mod:RumorCleanup()
-	local new = {}
-	for clue,_ in pairs(AngryKeystones_Data.rumors) do
-		if not Addon.Locale:Rumor(clue) then
-			new[clue] = true
-		end
-	end
-	AngryKeystones_Data.rumors = new
 end
 
 local function IsInActiveChallengeMode()
@@ -67,9 +45,22 @@ local function IsInActiveChallengeMode()
 	return false
 end
 
+function Mod:CoSRumor()
+	local clue = C_GossipInfo.GetText()
+	local shortClue = Addon.Locale:Rumor(clue)
+	if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+		SendChatMessage(shortClue or clue, "INSTANCE_CHAT")
+	elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
+		SendChatMessage(shortClue or clue, "PARTY")
+	else
+		SendChatMessage(shortClue or clue, "SAY")
+	end
+end
+
 function Mod:GOSSIP_SHOW()
 	local npcId = GossipNPCID()
-	local numOptions = C_GossipInfo.GetNumOptions()
+	local options = C_GossipInfo.GetOptions()
+	local numOptions = #options
 
 	if Addon.Config.cosRumors and Addon.Locale:HasRumors() and npcId == cosRumorNPC and numOptions == 0 then
 		self:CoSRumor()
@@ -79,10 +70,9 @@ function Mod:GOSSIP_SHOW()
 	if numOptions ~= 1 then return end -- only automate one gossip option
 
 	if Addon.Config.autoGossip and IsInActiveChallengeMode() and not npcBlacklist[npcId] then
-		local options = C_GossipInfo.GetOptions()
-		if options[1].type == "gossip" then
+		if npcWhitelist[npcId] or options[1].icon == 132053 or options[1].icon == 1019848 then -- the gossip icon, prevents auto-opening repair options etc
 			local popupWasShown = IsStaticPopupShown()
-			C_GossipInfo.SelectOption(1)
+			C_GossipInfo.SelectOption(options[1].gossipOptionID)
 			local popupIsShown = IsStaticPopupShown()
 			if popupIsShown then
 				if not popupWasShown then
@@ -93,7 +83,7 @@ function Mod:GOSSIP_SHOW()
 				C_GossipInfo.CloseGossip()
 			end
 		end
-	end
+	end	
 end
 
 local function PlayCurrent()
@@ -113,8 +103,6 @@ end
 
 function Mod:Startup()
 	if not AngryKeystones_Data then AngryKeystones_Data = {} end
-	if not AngryKeystones_Data.rumors then AngryKeystones_Data.rumors = {} end
-	if Addon.Config.cosRumors then self:RumorCleanup() end
 
 	self:RegisterEvent("GOSSIP_SHOW")
 

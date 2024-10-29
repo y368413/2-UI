@@ -9,8 +9,6 @@
 	<Script file="units.lua"/>
 	<Script file="colors.lua"/>
 
-	<Script file='Plugins\RaidDebuffs.lua' />
-
 	<Script file="elements\additionalpower.lua"/>
 	<Script file="elements\alternativepower.lua"/>
 	<Script file="elements\assistantindicator.lua"/>
@@ -20,7 +18,7 @@
 	<Script file="elements\combatindicator.lua"/>
 	<Script file="elements\grouproleindicator.lua"/>
 	<Script file="elements\health.lua"/>
-	<Script file="elements\healprediction.lua"/>
+	<Script file="elements\healthprediction.lua"/>
 	<Script file="elements\leaderindicator.lua"/>
 	<Script file="elements\phaseindicator.lua"/>
 	<Script file="elements\portrait.lua"/>
@@ -41,9 +39,8 @@
 
 	<Script file='Plugins\AutoResurrect.lua' />
 	<Script file='Plugins\FloatingCombatFeedback.lua' />
-	<Script file='Plugins\QuakeTimer.lua' />
 	<Script file='Plugins\Swing.lua' />
-	<Script file='Plugins\PartyWatcher.lua' />
+	<Script file='Plugins\RaidAuras.lua' />
 
 	<Script file="finalize.lua"/>
 

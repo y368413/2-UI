@@ -4,8 +4,9 @@ local MISC = M:GetModule("Misc")
 local TT = M:GetModule("Tooltip")
 
 local pairs, select, next, type, unpack = pairs, select, next, type, unpack
-local UnitGUID, GetItemInfo, GetSpellInfo = UnitGUID, GetItemInfo, GetSpellInfo
-local GetContainerItemLink, GetInventoryItemLink = GetContainerItemLink, GetInventoryItemLink
+local UnitGUID, GetItemInfo = UnitGUID, C_Item.GetItemInfo
+local GetContainerItemLink = C_Container.GetContainerItemLink
+local GetInventoryItemLink = GetInventoryItemLink
 local EquipmentManager_UnpackLocation, EquipmentManager_GetItemInfoByLocation = EquipmentManager_UnpackLocation, EquipmentManager_GetItemInfoByLocation
 local C_AzeriteEmpoweredItem_IsPowerSelected = C_AzeriteEmpoweredItem.IsPowerSelected
 local GetTradePlayerItemLink, GetTradeTargetItemLink = GetTradePlayerItemLink, GetTradeTargetItemLink
@@ -38,20 +39,36 @@ function MISC:CreateItemTexture(slot, relF, x, y)
 	return icon
 end
 
+function MISC:ItemString_Expand()
+	self:SetWidth(0)
+end
+
+function MISC:ItemString_Collapse()
+	self:SetWidth(100)
+end
+
 function MISC:CreateItemString(frame, strType)
 	if frame.fontCreated then return end
 
 	for index, slot in pairs(inspectSlots) do
 		if index ~= 4 then
 			local slotFrame = _G[strType..slot.."Slot"]
-			local relF, x, y = MISC:GetSlotAnchor(index)
-			slotFrame.iLvlText = M.CreateFS(slotFrame, I.Font[2]+3)
+			slotFrame.iLvlText = M.CreateFS(slotFrame, I.Font[2]+1)
 			slotFrame.iLvlText:ClearAllPoints()
-			slotFrame.iLvlText:SetPoint(relF, slotFrame, x, y)
+			slotFrame.iLvlText:SetPoint("BOTTOM", slotFrame, 1, 1)
+			local relF, x, y = MISC:GetSlotAnchor(index)
 			slotFrame.enchantText = M.CreateFS(slotFrame, I.Font[2]-3)
 			slotFrame.enchantText:ClearAllPoints()
-			slotFrame.enchantText:SetPoint(relF, slotFrame, x-1, y-12)
+			slotFrame.enchantText:SetPoint(relF, slotFrame, x, y)
 			slotFrame.enchantText:SetTextColor(0, 1, 0)
+
+			slotFrame.enchantText:SetJustifyH(strsub(relF, 7))
+			slotFrame.enchantText:SetWidth(100)
+			slotFrame.enchantText:EnableMouse(true)
+			slotFrame.enchantText:HookScript("OnEnter", MISC.ItemString_Expand)
+			slotFrame.enchantText:HookScript("OnLeave", MISC.ItemString_Collapse)
+			slotFrame.enchantText:HookScript("OnShow", MISC.ItemString_Collapse)
+
 			for i = 1, 10 do
 				local offset = (i-1)*18 + 5
 				local iconX = x > 0 and x+offset or x-offset
@@ -103,7 +120,7 @@ function MISC:ItemLevel_UpdateTraits(button, id, link)
 			local selected = C_AzeriteEmpoweredItem_IsPowerSelected(empoweredItemLocation, powerID)
 			if selected then
 				local spellID = TT:Azerite_PowerToSpell(powerID)
-				local name, _, icon = GetSpellInfo(spellID)
+				local name, icon = C_Spell.GetSpellName(spellID), C_Spell.GetSpellTexture(spellID)
 				local texture = button["textureIcon"..i]
 				if name and texture then
 					texture:SetTexture(icon)
@@ -144,10 +161,15 @@ function MISC:ItemLevel_UpdateInfo(index, slotFrame, info, quality)
 			local texture = slotFrame["textureIcon"..i]
 			local bg = texture.bg
 			local gem = info.gems and info.gems[gemStep]
+			local color = info.gemsColor and info.gemsColor[gemStep]
 			local essence = not gem and (info.essences and info.essences[essenceStep])
 			if gem then
 				texture:SetTexture(gem)
-				bg:SetBackdropBorderColor(0, 0, 0)
+				--if color then
+					--bg:SetBackdropBorderColor(color.r, color.g, color.b)
+				--else
+					bg:SetBackdropBorderColor(0, 0, 0)
+				--end
 				bg:Show()
 
 				gemStep = gemStep + 1
@@ -292,11 +314,17 @@ function MISC:ItemLevel_ScrappingUpdate()
 	self.iLvl:SetTextColor(color.r, color.g, color.b)
 end
 
-function MISC.ItemLevel_ScrappingShow(event, addon)
-	if addon == "Blizzard_ScrappingMachineUI" then
-		for button in pairs(ScrappingMachineFrame.ItemSlots.scrapButtons.activeObjects) do
+function MISC:ItemLevel_ScrappingSetup()
+	for button in self.ItemSlots.scrapButtons:EnumerateActive() do
+		if button and not button.iLvl then
 			hooksecurefunc(button, "RefreshIcon", MISC.ItemLevel_ScrappingUpdate)
 		end
+	end
+end
+
+function MISC.ItemLevel_ScrappingShow(event, addon)
+	if addon == "Blizzard_ScrappingMachineUI" then
+		hooksecurefunc(ScrappingMachineFrame, "SetupScrapButtonPool", MISC.ItemLevel_ScrappingSetup)
 
 		M:UnregisterEvent(event, MISC.ItemLevel_ScrappingShow)
 	end
@@ -346,11 +374,101 @@ function MISC.ItemLevel_ReplaceItemLink(link, name)
 	return modLink
 end
 
-function MISC:ItemLevel_ReplaceGuildNews()
+function MISC:GuildNewsButtonOnClick(btn)
+	if self.isEvent or not self.playerName then return end
+	if btn == "LeftButton" and IsShiftKeyDown() then
+		if MailFrame:IsShown() then
+			MailFrameTab_OnClick(nil, 2)
+			SendMailNameEditBox:SetText(self.playerName)
+			SendMailNameEditBox:HighlightText()
+		else
+			local editBox = ChatEdit_ChooseBoxForSend()
+			local hasText = (editBox:GetText() ~= "")
+			ChatEdit_ActivateChat(editBox)
+			editBox:Insert(self.playerName)
+			if not hasText then editBox:HighlightText() end
+		end
+	end
+end
+
+function MISC:ItemLevel_ReplaceGuildNews(_, _, playerName)
+	self.playerName = playerName
+
 	local newText = gsub(self.text:GetText(), "(|Hitem:%d+:.-|h%[(.-)%]|h)", MISC.ItemLevel_ReplaceItemLink)
 	if newText then
 		self.text:SetText(newText)
 	end
+
+	if not self.hooked then
+		self.text:SetFontObject(Game13Font)
+		self:HookScript("OnClick", MISC.GuildNewsButtonOnClick) -- copy name by key shift
+		self.hooked = true
+	end
+end
+
+function MISC:ItemLevel_UpdateLoot()
+	for i = 1, self.ScrollTarget:GetNumChildren() do
+		local button = select(i, self.ScrollTarget:GetChildren())
+		if button and button.Item and button.GetElementData then
+			if not button.iLvl then
+				button.iLvl = M.CreateFS(button.Item, I.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
+			end
+			local slotIndex = button:GetSlotIndex()
+			local quality = select(5, GetLootSlotInfo(slotIndex))
+			if quality and quality > 1 then
+				local level = M.GetItemLevel(GetLootSlotLink(slotIndex))
+				local color = I.QualityColors[quality]
+				button.iLvl:SetText(level)
+				button.iLvl:SetTextColor(color.r, color.g, color.b)
+			else
+				button.iLvl:SetText("")
+			end
+		end
+	end
+end
+
+function MISC:ItemLevel_UpdateBag()
+	local button = self.__owner
+	if not button.iLvl then
+		button.iLvl = M.CreateFS(button, I.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
+	end
+
+	local bagID = button.GetBankTabID and button:GetBankTabID() or button:GetBagID()
+	local slotID = button.GetContainerSlotID and button:GetContainerSlotID() or button:GetID()
+	local info = C_Container.GetContainerItemInfo(bagID, slotID)
+	local link = info and info.hyperlink
+	local quality = info and info.quality
+	if quality and quality > 1 then
+		local level = M.GetItemLevel(link, bagID, slotID)
+		local color = I.QualityColors[quality]
+		button.iLvl:SetText(level)
+		button.iLvl:SetTextColor(color.r, color.g, color.b)
+	else
+		button.iLvl:SetText("")
+	end
+end
+
+function MISC:ItemLevel_HandleSlots()
+	for button in self.itemButtonPool:EnumerateActive() do
+		if not button.hooked then
+			button.IconBorder.__owner = button
+			hooksecurefunc(button.IconBorder, "SetShown", MISC.ItemLevel_UpdateBag)
+			button.hooked = true
+		end
+	end
+end
+
+function MISC:ItemLevel_Containers()
+	--if R.db["Bags"]["Enable"] then return end
+
+	for i = 1, 13 do
+		local frame = _G["ContainerFrame"..i]
+		if frame then
+			hooksecurefunc(frame, "UpdateItemSlots", MISC.ItemLevel_HandleSlots)
+		end
+	end
+	hooksecurefunc(ContainerFrameCombinedBags, "UpdateItemSlots", MISC.ItemLevel_HandleSlots)
+	hooksecurefunc(AccountBankPanel, "GenerateItemSlotsForSelectedTab", MISC.ItemLevel_HandleSlots)
 end
 
 function MISC:ShowItemLevel()
@@ -384,5 +502,11 @@ function MISC:ShowItemLevel()
 
 	-- iLvl on GuildNews
 	hooksecurefunc("GuildNewsButton_SetText", MISC.ItemLevel_ReplaceGuildNews)
+
+	-- iLvl on LootFrame
+	hooksecurefunc(LootFrame.ScrollBox, "Update", MISC.ItemLevel_UpdateLoot)
+
+	-- iLvl on default Container
+	MISC:ItemLevel_Containers()
 end
 MISC:RegisterMisc("GearInfo", MISC.ShowItemLevel)

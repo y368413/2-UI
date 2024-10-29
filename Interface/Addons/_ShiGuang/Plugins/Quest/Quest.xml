@@ -1,49 +1,21 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="MTG.lua"/>
+	<!--Script file="MTG.lua"/-->
 	<Script file="Mingy.lua"/>
-	<Script file="bfaPetQuest.lua"/>
-	<Script file="DarkmoonFaire.lua"/>
-	<Script file="AngrierWorldQuests.lua"/>
-	<Script file="WorldMapQuestRewardIcon.lua"/>
-	<Frame name="BountyCounterTemplate" virtual="true" hidden="false">
-		<Size x="10" y="10"/>
-		<Layers>		
-			<Layer level="ARTWORK">
-				<Texture parentKey="icon" file="Interface\COMMON\ReputationStar" setAllPoints="true">
-					<TexCoords left="0" right="0.5" top="0.5" bottom="1"/>
-				</Texture>
-			</Layer>
-		</Layers>
-	</Frame>
-	<Frame name="WRWorldQuestFrame" mixin="WorldMapQuestBountyCount" parent="QuestMapFrame">
+	<Script file="QuestLogCounter.lua" />
+	<Frame mixin='ShowQuestCountMixin' hidden='false'>
 		<Scripts>
-			<OnLoad>
-				self:OnLoad();
-			</OnLoad>
+			<OnEvent method='OnEvent' />
+			<OnShow method='OnShow' />
+			<OnLoad method='OnLoad' />
 		</Scripts>
-	</Frame>	
+	</Frame>
+	<Script file="WorldMapQuestRewardIcon.lua"/>
+	<!--Script file="bfaPetQuest.lua"/>
+	<Script file="Quest_Counter.lua"/>
+	<Script file="DarkmoonFaire.lua"/>
 	<Script file='Helpers\Barrels.lua'/>
 	<Script file='Helpers\Loh.lua'/>
 	<Script file='Helpers\Training.lua'/>
 	<Script file='Helpers\Chores.lua'/>
-	<Script file='Helpers\Boggarts.lua'/>
-	   <Button name="QuestBindingsButtonTemplate" virtual="true">
-        <Size x="16" y="16"/>
-        <Layers>
-            <Layer level="ARTWORK">
-                <FontString parentKey="key" inherits="qb_NumberFont">
-                    <Anchors>
-                        <Anchor point="CENTER" x="0.5" y="-0.5"/>
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
-        <Scripts>
-            <OnClick>
-                self:GetParent():Click()
-            </OnClick>
-        </Scripts>
-    </Button>
-  <Script file="QuestBindings.lua"/>
-  <Include file="ClassicQuestLog\ClassicQuestLog.xml"/>
+	<Script file='Helpers\Boggarts.lua'/-->
 </Ui>

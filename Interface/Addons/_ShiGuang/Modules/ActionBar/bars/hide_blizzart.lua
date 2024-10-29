@@ -11,13 +11,12 @@ local scripts = {
 }
 
 local framesToHide = {
-	MainMenuBar, OverrideActionBar,
+	MainMenuBar, MultiBarBottomLeft, MultiBarBottomRight, MultiBarLeft, MultiBarRight, MultiBar5, MultiBar6, MultiBar7, OverrideActionBar, PossessActionBar, PetActionBar,
 }
 
 local framesToDisable = {
-	MainMenuBar,
-	MicroButtonAndBagsBar, MainMenuBarArtFrame, StatusTrackingBarManager,
-	ActionBarDownButton, ActionBarUpButton, MainMenuBarVehicleLeaveButton,
+	MainMenuBar, MultiBarBottomLeft, MultiBarBottomRight, MultiBarLeft, MultiBarRight, MultiBar5, MultiBar6, MultiBar7, PossessActionBar, PetActionBar,
+	MicroButtonAndBagsBar, StatusTrackingBarManager, MainMenuBarVehicleLeaveButton,
 	OverrideActionBar,
 	OverrideActionBarExpBar, OverrideActionBarHealthBar, OverrideActionBarPowerBar, OverrideActionBarPitchFrame,
 }
@@ -30,45 +29,38 @@ local function DisableAllScripts(frame)
 	end
 end
 
-local function buttonShowGrid(name, showgrid)
-	for i = 1, 12 do
-		local button = _G[name..i]
-		if button then
-			button:SetAttribute("showgrid", showgrid)
-			button:ShowGrid(ACTION_BUTTON_SHOW_GRID_REASON_CVAR)
+local function buttonEventsRegisterFrame(self, added)
+	local frames = self.frames
+	for index = #frames, 1, -1 do
+		local frame = frames[index]
+		local wasAdded = frame == added
+		if not added or wasAdded then
+			if not strmatch(frame:GetName(), "ExtraActionButton%d") then
+				self.frames[index] = nil
+			end
+
+			if wasAdded then
+				break
+			end
 		end
 	end
 end
 
-local updateAfterCombat
-local function toggleButtonGrid()
-	if InCombatLockdown() then
-		updateAfterCombat = true
-		M:RegisterEvent("PLAYER_REGEN_ENABLED", toggleButtonGrid)
-	else
-		local showgrid = tonumber(GetCVar("alwaysShowActionBars"))
-		buttonShowGrid("ActionButton", showgrid)
-		buttonShowGrid("MultiBarBottomRightButton", showgrid)
-		buttonShowGrid("UI_ActionBarXButton", showgrid)
-		if updateAfterCombat then
-			M:UnregisterEvent("PLAYER_REGEN_ENABLED", toggleButtonGrid)
-			updateAfterCombat = false
-		end
-	end
-end
-
-local function updateTokenVisibility()
-	TokenFrame_LoadUI()
-	TokenFrame_Update()
-	BackpackTokenFrame_Update()
+local function DisableDefaultBarEvents() -- credit: Simpy
+	-- shut down some events for things we dont use
+	_G.ActionBarController:UnregisterAllEvents()
+	_G.ActionBarController:RegisterEvent("SETTINGS_LOADED") -- this is needed for page controller to spawn properly
+	_G.ActionBarController:RegisterEvent("UPDATE_EXTRA_ACTIONBAR") -- this is needed to let the ExtraActionBar show
+	_G.ActionBarActionEventsFrame:UnregisterAllEvents()
+	-- used for ExtraActionButton and TotemBar (on wrath)
+	_G.ActionBarButtonEventsFrame:UnregisterAllEvents()
+	_G.ActionBarButtonEventsFrame:RegisterEvent("ACTIONBAR_SLOT_CHANGED") -- needed to let the ExtraActionButton show and Totems to swap
+	_G.ActionBarButtonEventsFrame:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN") -- needed for cooldowns of them both
+	hooksecurefunc(_G.ActionBarButtonEventsFrame, "RegisterFrame", buttonEventsRegisterFrame)
+	buttonEventsRegisterFrame(_G.ActionBarButtonEventsFrame)
 end
 
 function Bar:HideBlizz()
-	MainMenuBar:SetMovable(true)
-	MainMenuBar:SetUserPlaced(true)
-	MainMenuBar.ignoreFramePositionManager = true
-	MainMenuBar:SetAttribute("ignoreFramePositionManager", true)
-
 	for _, frame in next, framesToHide do
 		frame:SetParent(M.HiddenFrame)
 	end
@@ -78,15 +70,12 @@ function Bar:HideBlizz()
 		DisableAllScripts(frame)
 	end
 
-	-- Hide blizz options
-	SetCVar("multiBarRightVerticalLayout", 0)
-	InterfaceOptionsActionBarsPanelStackRightBars:EnableMouse(false)
-	InterfaceOptionsActionBarsPanelStackRightBars:SetAlpha(0)
+	DisableDefaultBarEvents()
 	-- Fix maw block anchor
 	MainMenuBarVehicleLeaveButton:RegisterEvent("PLAYER_ENTERING_WORLD")
-	-- Update button grid
-	toggleButtonGrid()
-	hooksecurefunc("MultiActionBar_UpdateGridVisibility", toggleButtonGrid)
-	-- Update token panel
-	M:RegisterEvent("CURRENCY_DISPLAY_UPDATE", updateTokenVisibility)
+	-- Update token panel, some alts may hide token as default
+	SetCVar("showTokenFrame", 1)
+	-- Hide blizzard expbar
+	StatusTrackingBarManager:UnregisterAllEvents()
+	StatusTrackingBarManager:Hide()
 end

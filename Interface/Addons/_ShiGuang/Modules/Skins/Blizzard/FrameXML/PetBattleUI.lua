@@ -66,7 +66,7 @@ tinsert(R.defaultThemes, function()
 			unit.ActualHealthBar:SetPoint("BOTTOMLEFT", unit.Icon, "BOTTOMRIGHT", 0, 0)
 			unit.healthBg:SetPoint("TOPLEFT", unit.ActualHealthBar, -mult, mult)
 			unit.healthBg:SetPoint("BOTTOMLEFT", unit.ActualHealthBar, -mult, -mult)
-			unit.ActualHealthBar:SetGradient("VERTICAL", .26, 1, .22, .13, .5, .11)
+			unit.ActualHealthBar:SetGradient("VERTICAL", CreateColor(.26, 1, .22, 1), CreateColor(.13, .5, .11, 1))
 			unit.petIcon:SetPoint("BOTTOMLEFT", unit.ActualHealthBar, "TOPLEFT", 0, 4)
 			unit.Name:SetPoint("LEFT", unit.petIcon, "RIGHT", 5, 0)
 			unit.Level:SetPoint("BOTTOMLEFT", unit.Icon, 2, 2)
@@ -78,7 +78,7 @@ tinsert(R.defaultThemes, function()
 			unit.ActualHealthBar:SetPoint("BOTTOMRIGHT", unit.Icon, "BOTTOMLEFT", 0, 0)
 			unit.healthBg:SetPoint("TOPRIGHT", unit.ActualHealthBar, mult, mult)
 			unit.healthBg:SetPoint("BOTTOMRIGHT", unit.ActualHealthBar, mult, -mult)
-			unit.ActualHealthBar:SetGradient("VERTICAL", 1, .12, .24, .5, .06, .12)
+			unit.ActualHealthBar:SetGradient("VERTICAL", CreateColor(1, .12, .24, 1), CreateColor(.5, .06, .12, 1))
 			unit.petIcon:SetPoint("BOTTOMRIGHT", unit.ActualHealthBar, "TOPRIGHT", 0, 4)
 			unit.Name:SetPoint("RIGHT", unit.petIcon, "LEFT", -5, 0)
 			unit.Level:SetPoint("BOTTOMRIGHT", unit.Icon, 2, 2)
@@ -116,9 +116,9 @@ tinsert(R.defaultThemes, function()
 		unit.healthBg:SetFrameLevel(unit:GetFrameLevel())
 
 		if index < 3 then
-			unit.ActualHealthBar:SetGradient("VERTICAL", .26, 1, .22, .13, .5, .11)
+			unit.ActualHealthBar:SetGradient("VERTICAL", CreateColor(.26, 1, .22, 1), CreateColor(.13, .5, .11, 1))
 		else
-			unit.ActualHealthBar:SetGradient("VERTICAL", 1, .12, .24, .5, .06, .12)
+			unit.ActualHealthBar:SetGradient("VERTICAL", CreateColor(1, .12, .24, 1), CreateColor(.5, .06, .12, 1))
 		end
 	end
 	frame.Ally2:SetPoint("BOTTOMRIGHT", frame.ActiveAlly, "BOTTOMLEFT", -10, 20)
@@ -147,7 +147,7 @@ tinsert(R.defaultThemes, function()
 		end
 		if self.glow then self.glow:Hide() end
 		if self.Iconbg then
-			local quality = C_PetBattles.GetBreedQuality(self.petOwner, self.petIndex) - 1 or 1
+			local quality = C_PetBattles.GetBreedQuality(self.petOwner, self.petIndex) or 1
 			local color = I.QualityColors[quality]
 			self.Iconbg:SetBackdropBorderColor(color.r, color.g, color.b)
 		end
@@ -217,15 +217,15 @@ tinsert(R.defaultThemes, function()
 				bu:SetPoint("LEFT", buttonList[i-1], "RIGHT", 3, 0)
 			end
 
-			bu:SetNormalTexture("")
-			bu:GetPushedTexture():SetTexture(I.textures.pushed)
+			bu:SetNormalTexture(0)
+			bu:GetPushedTexture():SetTexture(I.pushedTex)
 			bu:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
 			if not bu.bg then
 				bu.bg = M.ReskinIcon(bu.Icon, true)
 				bu.Icon:SetInside()
 			end
 
-			bu.Cooldown:SetFont(I.Font[1], 26, I.Font[3])
+			M.SetFontSize(bu.Cooldown, 26)
 			bu.SelectedHighlight:ClearAllPoints()
 			bu.SelectedHighlight:SetPoint("TOPLEFT", bu, -12, 12)
 			bu.SelectedHighlight:SetPoint("BOTTOMRIGHT", bu, 12, -12)
@@ -240,7 +240,7 @@ tinsert(R.defaultThemes, function()
 	M.PixelIcon(skipButton, "Interface\\Icons\\Ability_Foundryraid_Dormant", true)
 	M.CreateSD(skipButton)
 	skipButton.HL:SetAllPoints(skipButton)
-	skipButton:SetPushedTexture(I.textures.pushed)
+	skipButton:SetPushedTexture(I.pushedTex)
 
 	local xpbar = PetBattleFrameXPBar
 	M.StripTextures(xpbar)

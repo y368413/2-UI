@@ -12,7 +12,7 @@ INFO.leftModules, INFO.rightModules = {}, {}
 
 function INFO:GetMoneyString(money, full)
 	if money >= 1e6 and not full then
-		return format(" %.0f%s", money / 1e4, GOLD_AMOUNT_SYMBOL)
+		return BreakUpLargeNumbers(format("%d", money / 1e4))..GOLD_AMOUNT_SYMBOL
 	else
 		if money > 0 then
 			local moneyString = ""
@@ -179,7 +179,7 @@ function INFO:GetTooltipAnchor(info)
 end
 
 function INFO:OnLogin()
-	if MaoRUIDB["DisableInfobars"] then return end
+	if MaoRUISetDB["DisableInfobars"] then return end
 
 	for _, info in pairs(INFO.modules) do
 		INFO:LoadInfobar(info)

@@ -162,5 +162,5 @@ function M:IsBase64(text)
 	return true
 end
 
-local sv = tonumber(M:Decode("Nw=="))
+local sv = tonumber(M:Decode("OA=="))
 function M:CV(ver) return ver > sv end

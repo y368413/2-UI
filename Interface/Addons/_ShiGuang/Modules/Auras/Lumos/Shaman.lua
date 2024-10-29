@@ -3,6 +3,7 @@ local M, R, U, I = unpack(ns)
 local A = M:GetModule("Auras")
 
 if I.MyClass ~= "SHAMAN" then return end
+local GetSpellTexture = C_Spell.GetSpellTexture
 
 local function GetUnitAura(unit, spell, filter)
 	return A:GetUnitAura(unit, spell, filter)
@@ -37,7 +38,7 @@ function A:ChantLumos(self)
 			elseif IsPlayerSpell(117014) then
 				UpdateCooldown(button, 117014, true)
 			else
-				if IsUsableSpell(8042) then
+				if C_Spell.IsSpellUsable(8042) then
 					button.Icon:SetDesaturated(false)
 					M.ShowOverlayGlow(button.glowFrame)
 				else

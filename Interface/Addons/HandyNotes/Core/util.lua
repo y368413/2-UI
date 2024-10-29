@@ -4,18 +4,7 @@ local _, Core = ...
 ------------------------------ DATAMINE TOOLTIP -------------------------------
 -------------------------------------------------------------------------------
 
-local function CreateDatamineTooltip(name)
-    local f = CreateFrame('GameTooltip', name, UIParent, 'GameTooltipTemplate')
-    f:SetOwner(UIParent, 'ANCHOR_NONE')
-    return f
-end
-
-local NameResolver = {
-    cache = {},
-    prepared = {},
-    preparer = CreateDatamineTooltip("HandyNotes_Core" .. '_NamePreparer'),
-    resolver = CreateDatamineTooltip("HandyNotes_Core" .. '_NameResolver')
-}
+local NameResolver = {cache = {}, prepared = {}}
 
 function NameResolver:IsLink(link)
     if link == nil then return link end
@@ -27,7 +16,7 @@ function NameResolver:Prepare(link)
         -- use a separate tooltip to spam load NPC names, doing this with the
         -- main tooltip can sometimes cause it to become unresponsive and never
         -- update its text until a reload
-        self.preparer:SetHyperlink(link)
+        C_TooltipInfo.GetHyperlink(link)
         self.prepared[link] = true
     end
 end
@@ -43,16 +32,47 @@ function NameResolver:Resolve(link)
 
     local name = self.cache[link]
     if name == nil then
-        self.resolver:SetHyperlink(link)
-        name = _G[self.resolver:GetName() .. 'TextLeft1']:GetText() or UNKNOWN
+        name = UNKNOWN
+        local tooltipData = C_TooltipInfo.GetHyperlink(link)
+        if tooltipData then
+            local line = tooltipData.lines and tooltipData.lines[1]
+            if line then name = line.leftText or UNKNOWN end
+        end
         if name == UNKNOWN then
-            Core.Debug('NameResolver returned UNKNOWN, recreating tooltip ...')
-            self.resolver = CreateDatamineTooltip("HandyNotes_Core" .. '_NameResolver')
+            Core.Debug('NameResolver returned UNKNOWN')
         else
             self.cache[link] = name
         end
     end
     return name
+end
+
+-------------------------------------------------------------------------------
+------------------------------- CALENDAR EVENTS -------------------------------
+-------------------------------------------------------------------------------
+
+local activeCalenderEvents = {}
+local function UpdateActiveCalendarEvents()
+    -- set Calendar to current month
+    local current = C_DateAndTime.GetCurrentCalendarTime()
+    C_Calendar.SetAbsMonth(current.month, current.year)
+
+    wipe(activeCalenderEvents)
+    local day = current.monthDay
+    for i = 1, C_Calendar.GetNumDayEvents(0, day) do
+        local event = C_Calendar.GetDayEvent(0, day, i)
+        activeCalenderEvents[event.eventID] = true
+    end
+
+    -- hours until midnight + minutes unit midnight + 5 extra seconds
+    local nextDay = (((23 - current.hour) * 60) + (60 - current.minute)) * 60 +
+                        5
+    -- this will call UpdateActiveCalendarEvents after midnight
+    C_Timer.After(nextDay, UpdateActiveCalendarEvents)
+end
+
+local function IsCalendarEventActive(eventID)
+    return activeCalenderEvents[eventID] and true or false
 end
 
 -------------------------------------------------------------------------------
@@ -76,12 +96,11 @@ local function PrepareLinks(str)
 end
 
 local function RenderLinks(str, nameOnly)
-    -- render numberic ids
+    -- render numeric ids
     local links, _ = str:gsub('{(%l+):(%d+)(%l*)}', function(type, id, suffix)
         id = tonumber(id)
         if type == 'npc' then
-            local name = NameResolver:Resolve(
-                ('unit:Creature-0-0-0-0-%d'):format(id))
+            local name = NameResolver:Resolve('unit:Creature-0-0-0-0-' .. id)
             name = name .. (suffix or '')
             if nameOnly then return name end
             return Core.color.NPC(name)
@@ -101,55 +120,94 @@ local function RenderLinks(str, nameOnly)
                 if nameOnly then return info.name end
                 local link = C_CurrencyInfo.GetCurrencyLink(id, 0)
                 if link then
-                    return '|T' .. info.iconFileID .. ':0:0:1:-1|t ' .. link
+                    return '|T' .. info.iconFileID .. ':0|t ' .. link
                 end
             end
         elseif type == 'faction' then
-            local name = GetFactionInfoByID(id)
+            local name = Core.api.GetFactionInfoByID(id)
             if nameOnly then return name end
             return Core.color.NPC(name) -- TODO: colorize based on standing?
         elseif type == 'item' then
-            local name, link, _, _, _, _, _, _, _, icon = GetItemInfo(id)
+            local name, link, _, _, _, _, _, _, _, icon = C_Item.GetItemInfo(id)
             if link and icon then
-                if nameOnly then return name .. (suffix or '') end
-                return '|T' .. icon .. ':0:0:1:-1|t ' .. link
+                return nameOnly and (name .. (suffix or '')) or
+                           ('|T' .. icon .. ':0|t ' .. link)
             end
         elseif type == 'daily' or type == 'quest' then
             local name = C_QuestLog.GetTitleForQuestID(id)
             if name then
                 if nameOnly then return name end
-                local icon = (type == 'daily') and 'quest_ab' or 'quest_ay'
+                local icon = type == 'daily' and 'quest_ab' or 'quest_ay'
                 return Core.GetIconLink(icon, 12) ..
                            Core.color.Yellow('[' .. name .. ']')
             end
         elseif type == 'spell' then
-            local name, _, icon = GetSpellInfo(id)
+            local name, _, icon = Core.api.GetSpellInfo(id)
             if name and icon then
                 if nameOnly then return name end
-                local spell = Core.color.Spell(
-                    '|Hspell:' .. id .. '|h[' .. name .. ']|h')
-                return '|T' .. icon .. ':0:0:1:-1|t ' .. spell
+                return Core.color.Spell('|T' .. icon .. ':0|t [' .. name .. ']')
             end
+        elseif type == 'map' then
+            local name = C_Map.GetMapInfo(id).name
+            if nameOnly then return name end
+            return Core.color.Yellow(name)
+        elseif type == 'area' then
+            local name = C_Map.GetAreaInfo(id)
+            if nameOnly then return name end
+            return Core.color.Yellow(name)
         end
         return type .. '+' .. id
     end)
-    -- render non-numeric ids
-    links, _ = links:gsub('{(%l+):([^}]+)}', function(type, id)
-        if type == 'wq' then
-            local icon = Core.GetIconLink('world_quest', 16, 0, -1)
-            return icon .. Core.color.Yellow('[' .. id .. ']')
+    -- render commonly colored text
+    local function renderNonNumeric(str)
+        local result = str:gsub('{(%l+):([^{}]+)}', function(type, text)
+            if type == 'bug' then return Core.color.Red(text) end
+            if type == 'emote' then return Core.color.Orange(text) end
+            if type == 'location' or type == 'map' or type == 'area' then
+                return Core.color.Yellow(text)
+            end
+            if type == 'note' then return Core.color.Orange(text) end
+            if type == 'object' then return Core.color.Yellow(text) end
+            if type == 'title' then return Core.color.Yellow(text) end
+            if type == 'npc' then return Core.color.NPC(text) end
+            if type == 'yell' then return Core.color.Red(text) end
+            if type == 'faction' then return Core.color.NPC(text) end
+            if type == 'wq' then
+                local icon = Core.GetIconLink('world_quest', 16, 0, -1)
+                return icon .. Core.color.Yellow('[' .. text .. ']')
+            end
+            if type == 'dot' then
+                local r, g, b = Core.getARGB(text, 255)
+                local texStr = '|T%s:0::::16:16::16::16:%d:%d:%d|t'
+                return texStr:format(Core.GetGlowPath('peg_bl'), r, g, b)
+            end
+            return type .. '+' .. text
+        end)
+        if result == str then
+            return result
+        else
+            return renderNonNumeric(result)
         end
-        return type .. '+' .. id
-    end)
+    end
+    links = renderNonNumeric(links)
     return links
 end
 
 -------------------------------------------------------------------------------
--------------------------------- BAG FUNCTIONS --------------------------------
+-------------------------------- PLAYER FUNCTIONS -----------------------------
 -------------------------------------------------------------------------------
 
 local function PlayerHasItem(item, count)
-    return GetItemCount(item, true) >= (count and count > 1 and count or 1)
+    return C_Item.GetItemCount(item, true) >=
+               (count and count > 1 and count or 1)
+end
+
+local function PlayerHasProfession(skillID)
+    for _, prof in pairs({GetProfessions()}) do
+        local id = select(7, GetProfessionInfo(prof))
+        if skillID == id then return true end
+    end
+    return false
 end
 
 -------------------------------------------------------------------------------
@@ -179,7 +237,7 @@ same keys in the exact same order even before actual translations are done.
 
 --]]
 
---[[local AceLocale = LibStub("AceLocale-3.0")
+local AceLocale = LibStub('AceLocale-3.0')
 local LOCALES = {}
 
 local function NewLocale(locale)
@@ -195,7 +253,7 @@ local function NewLocale(locale)
         end
     })
     return wrapper
-end]]
+end
 
 -------------------------------------------------------------------------------
 ------------------------------ TABLE CONVERTERS -------------------------------
@@ -221,12 +279,30 @@ local function AsIDTable(value)
 end
 
 -------------------------------------------------------------------------------
+---------------------------- REPUTATION FORMATTER -----------------------------
+-------------------------------------------------------------------------------
+
+local REP_LEVELS = {3000, 6000, 12000, 21000}
+
+local function FormatReputation(amount)
+    for i, v in ipairs(REP_LEVELS) do
+        if amount < v then return amount .. '/' .. v end
+        amount = amount - v
+    end
+    return tostring(amount) -- shouldn't get here
+end
+
+-------------------------------------------------------------------------------
 
 Core.AsIDTable = AsIDTable
 Core.AsTable = AsTable
 Core.GetDatabaseTable = GetDatabaseTable
+Core.IsCalendarEventActive = IsCalendarEventActive
 Core.NameResolver = NameResolver
---Core.NewLocale = NewLocale
+Core.NewLocale = NewLocale
 Core.PlayerHasItem = PlayerHasItem
+Core.PlayerHasProfession = PlayerHasProfession
 Core.PrepareLinks = PrepareLinks
 Core.RenderLinks = RenderLinks
+Core.UpdateActiveCalendarEvents = UpdateActiveCalendarEvents
+Core.FormatReputation = FormatReputation

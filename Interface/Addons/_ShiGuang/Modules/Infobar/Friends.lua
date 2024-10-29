@@ -10,7 +10,7 @@ local C_Timer_After = C_Timer.After
 local C_FriendList_GetNumFriends = C_FriendList.GetNumFriends
 local C_FriendList_GetNumOnlineFriends = C_FriendList.GetNumOnlineFriends
 local C_FriendList_GetFriendInfoByIndex = C_FriendList.GetFriendInfoByIndex
-local BNet_GetClientEmbeddedTexture, BNet_GetValidatedCharacterName, BNet_GetClientTexture = BNet_GetClientEmbeddedTexture, BNet_GetValidatedCharacterName, BNet_GetClientTexture
+local BNet_GetClientEmbeddedAtlas, BNet_GetBattlenetClientAtlas, FriendsFrame_GetFormattedCharacterName = BNet_GetClientEmbeddedAtlas, BNet_GetBattlenetClientAtlas, FriendsFrame_GetFormattedCharacterName
 local BNGetNumFriends, GetRealZoneText, GetQuestDifficultyColor = BNGetNumFriends, GetRealZoneText, GetQuestDifficultyColor
 local HybridScrollFrame_GetOffset, HybridScrollFrame_Update = HybridScrollFrame_GetOffset, HybridScrollFrame_Update
 local C_BattleNet_GetFriendAccountInfo = C_BattleNet.GetFriendAccountInfo
@@ -21,10 +21,10 @@ local InviteToGroup = C_PartyInfo.InviteUnit
 local BNET_CLIENT_WOW, UNKNOWN, GUILD_ONLINE_LABEL = BNET_CLIENT_WOW, UNKNOWN, GUILD_ONLINE_LABEL
 local FRIENDS_TEXTURE_ONLINE, FRIENDS_TEXTURE_AFK, FRIENDS_TEXTURE_DND = FRIENDS_TEXTURE_ONLINE, FRIENDS_TEXTURE_AFK, FRIENDS_TEXTURE_DND
 local RAF_RECRUIT_FRIEND, RAF_RECRUITER_FRIEND = RAF_RECRUIT_FRIEND, RAF_RECRUITER_FRIEND
-local EXPANSION_NAME0, EXPANSION_NAME2 = EXPANSION_NAME0, EXPANSION_NAME2
+local EXPANSION_NAME0, EXPANSION_NAME3 = EXPANSION_NAME0, EXPANSION_NAME3
 local WOW_PROJECT_ID = WOW_PROJECT_ID or 1
 local WOW_PROJECT_60 = WOW_PROJECT_CLASSIC or 2
-local WOW_PROJECT_WRATH = 11
+local WOW_PROJECT_CATA = WOW_PROJECT_CATACLYSM_CLASSIC or 14
 local CLIENT_WOW_DIFF = "WoV" -- for sorting
 
 local r, g, b = I.r, I.g, I.b
@@ -59,7 +59,7 @@ local function buildFriendTable(num)
 				status = FRIENDS_TEXTURE_DND
 			end
 			local class = I.ClassList[info.className]
-			tinsert(friendTable, {info.name, info.level, class, info.area, status})
+			tinsert(friendTable, {info.name, info.level, class, info.area, status, info.notes})
 		end
 	end
 
@@ -96,7 +96,7 @@ local function buildBNetTable(num)
 	wipe(bnetTable)
 
 	for i = 1, num do
-		local accountInfo = C_BattleNet.GetFriendAccountInfo(i)
+		local accountInfo = C_BattleNet_GetFriendAccountInfo(i)
 		if accountInfo then
 			local accountName = accountInfo.accountName
 			local battleTag = accountInfo.battleTag
@@ -115,7 +115,7 @@ local function buildBNetTable(num)
 				local charName = gameAccountInfo.characterName
 				local client = gameAccountInfo.clientProgram
 				local class = gameAccountInfo.className or UNKNOWN
-				local zoneName = gameAccountInfo.areaName or UNKNOWN
+				local zoneName = gameAccountInfo.areaName
 				local level = gameAccountInfo.characterLevel
 				local gameText = gameAccountInfo.richPresence or ""
 				local isGameAFK = gameAccountInfo.isGameAFK
@@ -123,8 +123,9 @@ local function buildBNetTable(num)
 				local wowProjectID = gameAccountInfo.wowProjectID
 				local isMobile = gameAccountInfo.isWowMobile
 				local factionName = gameAccountInfo.factionName or UNKNOWN
+				local timerunningSeasonID = gameAccountInfo.timerunningSeasonID
 
-				charName = BNet_GetValidatedCharacterName(charName, battleTag, client)
+				charName = FriendsFrame_GetFormattedCharacterName(charName, battleTag, client, timerunningSeasonID)
 				class = I.ClassList[class]
 
 				local status = FRIENDS_TEXTURE_ONLINE
@@ -136,13 +137,13 @@ local function buildBNetTable(num)
 
 				if wowProjectID == WOW_PROJECT_60 then
 					gameText = EXPANSION_NAME0
-				elseif wowProjectID == WOW_PROJECT_WRATH then
-					gameText = EXPANSION_NAME2
+				elseif wowProjectID == WOW_PROJECT_CATA then
+					gameText = EXPANSION_NAME3
 				end
 
 				local infoText = GetOnlineInfoText(client, isMobile, rafLinkType, gameText)
 				if client == BNET_CLIENT_WOW and wowProjectID == WOW_PROJECT_ID then
-					infoText = GetOnlineInfoText(client, isMobile, rafLinkType, zoneName)
+					infoText = GetOnlineInfoText(client, isMobile, rafLinkType, zoneName or gameText)
 				end
 
 				if client == BNET_CLIENT_WOW and wowProjectID ~= WOW_PROJECT_ID then client = CLIENT_WOW_DIFF end
@@ -297,6 +298,21 @@ local function buttonOnClick(self, btn)
 			else
 				InviteToGroup(self.data[1])
 			end
+		elseif IsShiftKeyDown() then
+			local name = self.isBNet and self.data[3] or self.data[1]
+			if name then
+				if MailFrame:IsShown() then
+					MailFrameTab_OnClick(nil, 2)
+					SendMailNameEditBox:SetText(name)
+					SendMailNameEditBox:HighlightText()
+				else
+					local editBox = ChatEdit_ChooseBoxForSend()
+					local hasText = (editBox:GetText() ~= "")
+					ChatEdit_ActivateChat(editBox)
+					editBox:Insert(name)
+					if not hasText then editBox:HighlightText() end
+				end
+			end
 		end
 	else
 		if self.isBNet then
@@ -328,13 +344,17 @@ local function buttonOnEnter(self)
 			local level = gameAccountInfo.characterLevel
 			local gameText = gameAccountInfo.richPresence or ""
 			local wowProjectID = gameAccountInfo.wowProjectID
-			local clientString = BNet_GetClientEmbeddedTexture(client, 16)
+			local clientString = BNet_GetClientEmbeddedAtlas(client, 16)
+			local timerunningSeasonID = gameAccountInfo.timerunningSeasonID
 			if client == BNET_CLIENT_WOW then
 				if charName ~= "" then -- fix for weird account
+					if timerunningSeasonID then
+						charName = TimerunningUtil.AddSmallIcon(charName) -- add timerunning tag on name
+					end
 					realmName = (I.MyRealm == realmName or realmName == "") and "" or "-"..realmName
 
 					-- Get TBC realm name from richPresence
-					if wowProjectID == WOW_PROJECT_WRATH then
+					if wowProjectID == WOW_PROJECT_CATA then
 						local realm, count = gsub(gameText, "^.-%-%s", "")
 						if count > 0 then
 							realmName = "-"..realm
@@ -373,10 +393,14 @@ local function buttonOnEnter(self)
 	else
 		GameTooltip:AddLine(U["WoW"], 1,.8,0)
 		GameTooltip:AddLine(" ")
-		local name, level, class, area = unpack(self.data)
+		local name, level, class, area, _, note = unpack(self.data)
 		local classColor = M.HexRGB(M.ClassColor(class))
 		GameTooltip:AddLine(format("%s %s%s", level, classColor, name))
 		GameTooltip:AddLine(format("%s%s", inactiveZone, area))
+
+		if note and note ~= "" then
+			GameTooltip:AddLine(format(noteString, note), 1,.8,0)
+		end
 	end
 	GameTooltip:Show()
 end
@@ -428,11 +452,8 @@ function info:FriendsPanel_UpdateButton(button)
 		local classColor = I.ClassColors[class] or levelColor
 		button.name:SetText(format("%s%s|r %s%s", levelColor, level, M.HexRGB(classColor), name))
 		button.zone:SetText(format("%s%s", zoneColor, area))
-		if I.isNewPatch then
-			button.gameIcon:SetAtlas(BNet_GetBattlenetClientAtlas(BNET_CLIENT_WOW))
-		else
-			button.gameIcon:SetTexture(BNet_GetClientTexture(BNET_CLIENT_WOW))
-		end
+		C_Texture.SetTitleIconTexture(button.gameIcon, BNET_CLIENT_WOW, Enum.TitleIconVersion.Medium)
+		--button.gameIcon:SetAtlas(BNet_GetBattlenetClientAtlas(BNET_CLIENT_WOW))
 
 		button.isBNet = nil
 		button.data = friendTable[index]
@@ -451,19 +472,13 @@ function info:FriendsPanel_UpdateButton(button)
 		button.name:SetText(format("%s%s|r (%s|r)", I.InfoColor, accountName, name))
 		button.zone:SetText(format("%s%s", zoneColor, infoText))
 		if client == CLIENT_WOW_DIFF then
-			if I.isNewPatch then
-				button.gameIcon:SetAtlas(BNet_GetBattlenetClientAtlas(BNET_CLIENT_WOW))
-			else
-				button.gameIcon:SetTexture(BNet_GetClientTexture(BNET_CLIENT_WOW))
-			end
+			C_Texture.SetTitleIconTexture(button.gameIcon, BNET_CLIENT_WOW, Enum.TitleIconVersion.Medium)
+			--button.gameIcon:SetAtlas(BNet_GetBattlenetClientAtlas(BNET_CLIENT_WOW))
 		elseif client == BNET_CLIENT_WOW then
 			button.gameIcon:SetTexture("Interface\\FriendsFrame\\PlusManz-"..factionName)
 		else
-			if I.isNewPatch then
-				button.gameIcon:SetAtlas(BNet_GetBattlenetClientAtlas(client))
-			else
-				button.gameIcon:SetTexture(BNet_GetClientTexture(client))
-			end
+			C_Texture.SetTitleIconTexture(button.gameIcon, client, Enum.TitleIconVersion.Medium)
+			--button.gameIcon:SetAtlas(BNet_GetBattlenetClientAtlas(client))
 		end
 
 		button.isBNet = true

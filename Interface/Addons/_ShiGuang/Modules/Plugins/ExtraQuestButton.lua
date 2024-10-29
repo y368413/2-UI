@@ -4,8 +4,8 @@ local M, R, U, I = unpack(ns)
 local _G = _G
 local next, type, sqrt, GetTime, format = next, type, sqrt, GetTime, format
 local RegisterStateDriver, InCombatLockdown = RegisterStateDriver, InCombatLockdown
-local IsItemInRange, ItemHasRange, HasExtraActionBar = IsItemInRange, ItemHasRange, HasExtraActionBar
-local GetItemCooldown, GetItemCount, GetItemIcon, GetItemInfoFromHyperlink = GetItemCooldown, GetItemCount, GetItemIcon, GetItemInfoFromHyperlink
+local HasExtraActionBar = HasExtraActionBar
+local GetItemInfoFromHyperlink = GetItemInfoFromHyperlink
 local GetBindingKey, GetBindingText, GetQuestLogSpecialItemInfo, QuestHasPOIInfo = GetBindingKey, GetBindingText, GetQuestLogSpecialItemInfo, QuestHasPOIInfo
 local C_Map_GetBestMapForUnit = C_Map.GetBestMapForUnit
 local C_QuestLog_GetInfo = C_QuestLog.GetInfo
@@ -19,7 +19,7 @@ local C_QuestLog_GetLogIndexForQuestID = C_QuestLog.GetLogIndexForQuestID
 local C_QuestLog_GetNumWorldQuestWatches = C_QuestLog.GetNumWorldQuestWatches
 local C_QuestLog_GetQuestIDForQuestWatchIndex = C_QuestLog.GetQuestIDForQuestWatchIndex
 local C_QuestLog_GetQuestIDForWorldQuestWatchIndex = C_QuestLog.GetQuestIDForWorldQuestWatchIndex
-local MAX_DISTANCE_YARDS = 1e4 -- needs review
+local MAX_DISTANCE_YARDS = 1e3 -- needs review
 local onlyCurrentZone = true
 
 -- Warlords of Draenor intro quest items which inspired this addon
@@ -53,18 +53,18 @@ local inaccurateQuestAreas = {
 	[49846] = true, -- anywhere
 	[49860] = true, -- anywhere
 	[49864] = true, -- anywhere
-	[25798] = 64, -- Thousand Needles (TODO: test if we need to associate the item with the zone instead)
-	[25799] = 64, -- Thousand Needles (TODO: test if we need to associate the item with the zone instead)
+	[25798] = 64, -- Thousand Needles
+	[25799] = 64, -- Thousand Needles
 	[34461] = 590, -- Horde Garrison
 	[59809] = true,
 	[60004] = 118, -- 前夕任务：英勇之举
 	[63971] = 1543, -- 法夜突袭，蜗牛践踏
+	[79960] = 2255,
 }
 
 -- items that should be used for a quest but aren't (questID = itemID)
 -- these have low priority during collision
 local questItems = {
-	-- (TODO: test if we need to associate any of these items with a zone directly instead)
 	[10129] = 28038, -- Hellfire Peninsula
 	[10146] = 28038, -- Hellfire Peninsula
 	[10162] = 28132, -- Hellfire Peninsula
@@ -107,6 +107,20 @@ local questItems = {
 	[60188] = 178464, -- Night Fae Covenant
 	[60649] = 180170, -- Ardenweald
 	[60609] = 180008, -- Ardenweald
+	[61708] = 174043, -- Maldraxxus, untested
+	[63892] = 185963, -- Korthia
+	[12022] = 169219, -- Brewfest
+	[12191] = 169219, -- Brewfest
+	[66439] = 192545, -- The Waking Shores
+	[77891] = 209017, -- Emerald Dream
+	[77483] = 202247, -- Technoscrying
+	[77484] = 202247, -- Technoscrying
+	[77434] = 202247, -- Technoscrying
+	[78931] = 202247, -- Technoscrying
+	[78820] = 202247, -- Technoscrying
+	[78616] = 202247, -- Technoscrying
+	[78755] = 211483, -- Khaz Algar
+	[79960] = 216664, -- Azj
 }
 
 -- items that need to be shown, but not. (itemID = bool/mapID)
@@ -125,11 +139,14 @@ local completeHiddenItems = {
 	[186199] = true, -- Lady Moonberry's Wand
 	[187012] = true, -- Unbalanced Riftstone
 	[187516] = true, -- 菲历姆的锻炉阀门
+	[112681] = true, -- 古怪的水晶碎片，questID 34938
+	[193915] = true, -- 黑龙军团的旗帜，questID 66633
 }
 
 local ExtraQuestButton = CreateFrame("Button", "ExtraQuestButton", UIParent, "SecureActionButtonTemplate, SecureHandlerStateTemplate, SecureHandlerAttributeTemplate")
 ExtraQuestButton:SetMovable(true)
 ExtraQuestButton:RegisterEvent("PLAYER_LOGIN")
+ExtraQuestButton:RegisterForClicks("AnyUp", "AnyDown")
 ExtraQuestButton:Hide()
 ExtraQuestButton:SetScript("OnEvent", function(self, event, ...)
 	if self[event] then
@@ -173,7 +190,7 @@ local onAttributeChanged = [[
 
 function ExtraQuestButton:BAG_UPDATE_COOLDOWN()
 	if self:IsShown() and self.itemID then
-		local start, duration = GetItemCooldown(self.itemID)
+		local start, duration = C_Item.GetItemCooldown(self.itemID)
 		if duration > 0 then
 			self.Cooldown:SetCooldown(start, duration)
 			self.Cooldown:Show()
@@ -184,8 +201,8 @@ function ExtraQuestButton:BAG_UPDATE_COOLDOWN()
 end
 
 function ExtraQuestButton:UpdateCount()
-	if self:IsShown() then
-		local count = GetItemCount(self.itemLink)
+	if self:IsShown() and self.itemLink then
+		local count = C_Item.GetItemCount(self.itemLink)
 		self.Count:SetText(count and count > 1 and count or "")
 	end
 end
@@ -227,7 +244,6 @@ function ExtraQuestButton:UPDATE_BINDINGS()
 end
 
 function ExtraQuestButton:PLAYER_LOGIN()
-	if I.isNewPatch then return end
 	RegisterStateDriver(self, "visible", visibilityState)
 	self:SetAttribute("_onattributechanged", onAttributeChanged)
 	self:SetAttribute("type", "item")
@@ -249,7 +265,7 @@ function ExtraQuestButton:PLAYER_LOGIN()
 	self.updateTimer = 0
 	self.rangeTimer = 0
 
-	self:SetPushedTexture(I.textures.pushed)
+	self:SetPushedTexture(I.pushedTex)
 	local push = self:GetPushedTexture()
 	push:SetBlendMode("ADD")
 	push:SetInside()
@@ -301,12 +317,12 @@ end)
 
 ExtraQuestButton:SetScript("OnUpdate", function(self, elapsed)
 	if self.updateRange then
-		if (self.rangeTimer or 0) > TOOLTIP_UPDATE_TIME then
+		if not InCombatLockdown() and ((self.rangeTimer or 0) > TOOLTIP_UPDATE_TIME) then
 			local HotKey = self.HotKey
 			local Icon = self.Icon
 
-			-- BUG: IsItemInRange() is broken versus friendly npcs (and possibly others)
-			local inRange = IsItemInRange(self.itemLink, "target")
+			-- BUG: C_Item.IsItemInRange() is broken versus friendly npcs (and possibly others)
+			local inRange = C_Item.IsItemInRange(self.itemLink, "target")
 			if HotKey:GetText() == RANGE_INDICATOR then
 				if inRange == false then
 					HotKey:SetTextColor(1, .1, .1)
@@ -365,7 +381,7 @@ function ExtraQuestButton:SetItem(itemLink)
 	if HasExtraActionBar() then return end
 
 	if itemLink then
-		self.Icon:SetTexture(GetItemIcon(itemLink))
+		self.Icon:SetTexture(C_Item.GetItemIconByID(itemLink))
 		local itemID = GetItemInfoFromHyperlink(itemLink)
 		self.itemID = itemID
 		self.itemLink = itemLink
@@ -376,7 +392,7 @@ function ExtraQuestButton:SetItem(itemLink)
 	if self.itemID then
 		local HotKey = self.HotKey
 		local key = GetBindingKey("EXTRAACTIONBUTTON1")
-		local hasRange = ItemHasRange(itemLink)
+		local hasRange = C_Item.ItemHasRange(self.itemID)
 		if key then
 			HotKey:SetText(GetBindingText(key, 1))
 			HotKey:Show()
@@ -386,7 +402,7 @@ function ExtraQuestButton:SetItem(itemLink)
 		else
 			HotKey:Hide()
 		end
-		M:GetModule("Actionbar").UpdateHotKey(self)
+		M:GetModule("Actionbar").UpdateHotKey(HotKey)
 
 		self:UpdateAttributes()
 		self:UpdateCount()
@@ -416,7 +432,7 @@ local function GetQuestDistanceWithItem(questID)
 		end
 	end
 	if not itemLink then return end
-	if GetItemCount(itemLink) == 0 then return end
+	if C_Item.GetItemCount(itemLink) == 0 then return end
 
 	local itemID = GetItemInfoFromHyperlink(itemLink)
 	if blacklist[itemID] then return end
@@ -491,6 +507,18 @@ local function GetClosestQuestItem()
 					closestDistance = distance
 					closestQuestItemLink = itemLink
 				end
+			end
+		end
+	end
+
+	local tasksTable = GetTasksTable() -- bonus tracker, needs review
+	for i = 1, #tasksTable do
+		local questID = tasksTable[i]
+		if questID and not C_QuestLog_IsWorldQuest(questID) and not QuestUtils_IsQuestWatched(questID) and GetTaskInfo(questID) then
+			local distance, itemLink = GetQuestDistanceWithItem(questID)
+			if distance and distance <= closestDistance then
+				closestDistance = distance
+				closestQuestItemLink = itemLink
 			end
 		end
 	end

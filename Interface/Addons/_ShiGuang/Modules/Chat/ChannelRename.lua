@@ -42,13 +42,15 @@ function module:UpdateChannelNames(text, ...)
 	end
 
 	-- Timestamp
-	if MaoRUIDB["TimestampFormat"] > 1 then
+	if MaoRUISetDB["TimestampFormat"] > 1 then
 		local locTime, realmTime = GetCurrentTime()
-		local oldTimeStamp = CHAT_TIMESTAMP_FORMAT and gsub(BetterDate(CHAT_TIMESTAMP_FORMAT, locTime), "%[([^]]*)%]", "%%[%1%%]")
+		local defaultTimestamp = GetCVar("showTimestamps")
+		if defaultTimestamp == "none" then defaultTimestamp = nil end
+		local oldTimeStamp = defaultTimestamp and gsub(BetterDate(defaultTimestamp, locTime), "%[([^]]*)%]", "%%[%1%%]")
 		if oldTimeStamp then
 			text = gsub(text, oldTimeStamp, "")
 		end
-		local timeStamp = BetterDate(I.GreyColor..timestampFormat[MaoRUIDB["TimestampFormat"]].."|r", realmTime or locTime)
+		local timeStamp = BetterDate(I.GreyColor..timestampFormat[MaoRUISetDB["TimestampFormat"]].."|r", realmTime or locTime)
 		text = timeStamp..text
 	end
 	

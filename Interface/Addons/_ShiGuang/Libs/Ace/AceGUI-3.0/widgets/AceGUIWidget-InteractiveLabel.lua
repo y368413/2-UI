@@ -1,4 +1,6 @@
-
+--[[-----------------------------------------------------------------------------
+InteractiveLabel Widget
+-------------------------------------------------------------------------------]]
 local Type, Version = "InteractiveLabel", 21
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
@@ -6,6 +8,9 @@ if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 -- Lua APIs
 local select, pairs = select, pairs
 
+--[[-----------------------------------------------------------------------------
+Scripts
+-------------------------------------------------------------------------------]]
 local function Control_OnEnter(frame)
 	frame.obj:Fire("OnEnter")
 end
@@ -19,6 +24,9 @@ local function Label_OnClick(frame, button)
 	AceGUI:ClearFocus()
 end
 
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 local methods = {
 	["OnAcquire"] = function(self)
 		self:LabelOnAcquire()
@@ -54,6 +62,9 @@ local methods = {
 	end
 }
 
+--[[-----------------------------------------------------------------------------
+Constructor
+-------------------------------------------------------------------------------]]
 local function Constructor()
 	-- create a Label type that we will hijack
 	local label = AceGUI:Create("Label")

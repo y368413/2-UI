@@ -1135,8 +1135,8 @@ local Container = createFeature("Container")
 
 function Container:UpdateData()
     for i = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
-        for j = 1, GetContainerNumSlots(i) do
-            local itemId = GetContainerItemID(i, j)
+        for j = 1, C_Container.GetContainerNumSlots(i) do
+            local itemId = C_Container.GetContainerItemID(i, j)
             if itemId then
                 local name = GetItemInfo(itemId)
                 if name and not self[name] then
@@ -1147,8 +1147,8 @@ function Container:UpdateData()
     end
 
     if BankFrame:IsVisible() then
-        for i = 1, GetContainerNumSlots(BANK_CONTAINER) do
-            local itemId = GetContainerItemID(BANK_CONTAINER, i)
+        for i = 1, C_Container.GetContainerNumSlots(BANK_CONTAINER) do
+            local itemId = C_Container.GetContainerItemID(BANK_CONTAINER, i)
             if itemId then
                 local name = GetItemInfo(itemId)
                 if name and not self[name] then
@@ -1158,8 +1158,8 @@ function Container:UpdateData()
         end
 
         for i = NUM_BAG_SLOTS + 1, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS do
-            for j = 1, GetContainerNumSlots(i) do
-                local itemId = GetContainerItemID(i, j)
+            for j = 1, C_Container.GetContainerNumSlots(i) do
+                local itemId = C_Container.GetContainerItemID(i, j)
                 if itemId then
                     local name = GetItemInfo(itemId)
                     if name and not self[name] then
@@ -1240,19 +1240,6 @@ local addons = {
             return frame
         end
     end,]]
-    NDui                                    = function()
-        local oldFunc =  NDui.cargBags.plugins["SearchBar"]
-        NDui.cargBags.plugins["SearchBar"] = function(...)
-            local searchBox = oldFunc(...)
-            if searchBox == UI_BackpackBag.Search then
-                PinyinSearch.AttachEditBox(searchBox, PinyinSearch["Container"], true)
-                searchBox:HookScript("OnShow", function()
-                    PinyinSearch["Container"]:Update()
-                end)
-            end
-            return searchBox
-        end
-    end
 }
 
 function PinyinSearch:CompactAddons(name)
@@ -1263,7 +1250,7 @@ function PinyinSearch:CompactAddons(name)
         end
     else
         for addonName, func in pairs(addons) do
-            if IsAddOnLoaded(addonName) then
+            if C_AddOns.IsAddOnLoaded(addonName) then
                 func()
             end
         end

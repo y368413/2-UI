@@ -38,8 +38,7 @@ local function CreateDropDown(bossIndex, bossID, bossName, checkedSpecName)
     end
     local checkValues = { "", unpack(spec_name_arr) }
     
-    newFrame = CreateFrame("Button", "EncounterJournalBossButton" .. bossIndex .. "DropDown", baseFrame,
-                           "UIDropDownMenuTemplate")
+    newFrame = CreateFrame("Button", "EncounterJournalBossButton" .. bossIndex .. "DropDown", baseFrame, "UIDropDownMenuTemplate")
     tinsert(dropdownFrames, newFrame)
     newFrame:SetPoint("BOTTOMRIGHT", baseFrame, "BOTTOMRIGHT", 15, 0)--右下角
     

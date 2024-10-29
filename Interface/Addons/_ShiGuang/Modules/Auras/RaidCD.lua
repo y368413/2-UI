@@ -6,7 +6,7 @@ function CDS:OnLogin()
 	self:RaidCD()
 	self:PulseCD()
 	self:EnemyCD()
-	self:SorasThreat()
+	--self:SorasThreat()
 end
 ------------------------------------------------------------ --	Raid cooldowns --  alRaidCD by Allez, msylgj0@NGACN
 local show = {
@@ -70,7 +70,10 @@ local StopTimer = function(bar)
 end
 
 local UpdateCharges = function(bar)
-	local curCharges, maxCharges, start, duration = GetSpellCharges(20484)
+	local chargeInfo = C_Spell.GetSpellCharges(20484)
+	if not chargeInfo then return end
+
+	local curCharges, maxCharges, start, duration = chargeInfo.currentCharges, chargeInfo.maxCharges, chargeInfo.cooldownStartTime, chargeInfo.cooldownDuration
 	if curCharges == maxCharges then
 		bar.startTime = 0
 		bar.endTime = GetTime()
@@ -123,7 +126,7 @@ end
 
 local OnMouseDown = function(self, button)
 	if button == "LeftButton" then
-			SendChatMessage(sformat("%s - %s: %s", self.name, GetSpellLink(self.spellId), self.right:GetText()), "YELL")
+			SendChatMessage(sformat("%s - %s: %s", self.name, C_Spell.GetSpellLink(self.spellId), self.right:GetText()), "YELL")
 	elseif button == "RightButton" then
 		StopTimer(self)
 	end
@@ -168,7 +171,7 @@ local CreateBar = function()
 end
 
 local StartTimer = function(name, spellId)
-	local spell, _, icon = GetSpellInfo(spellId)
+	local spell, _, icon = C_Spell.GetSpellInfo(spellId)
 	for _, v in pairs(bars) do
 		if v.name == name and v.spell == spell then
 			StopTimer(v)
@@ -209,7 +212,7 @@ end
 
 local OnEvent = function(self, event)
 	if event == "PLAYER_ENTERING_WORLD" or event == "ZONE_CHANGED_NEW_AREA" then
-		if select(2, IsInInstance()) == "raid" and IsInGroup() then
+		if (select(2, IsInInstance()) == "raid" or select(2, IsInInstance()) == "party") and IsInGroup() then
 			self:RegisterEvent("SPELL_UPDATE_CHARGES")
 		else
 			self:UnregisterEvent("SPELL_UPDATE_CHARGES")
@@ -243,7 +246,7 @@ local OnEvent = function(self, event)
 end
 
 for spell in pairs(R.RaidSpells) do
-	if not GetSpellInfo(spell) then print("|cffff0000XXX → ["..tostring(spell).."]|r") end
+	if not C_Spell.GetSpellInfo(spell) then print("|cffff0000XXX → ["..tostring(spell).."]|r") end
 end
 
 local RaidCD = CreateFrame("Frame")

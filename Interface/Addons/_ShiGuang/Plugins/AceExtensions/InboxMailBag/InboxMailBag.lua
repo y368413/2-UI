@@ -2,16 +2,24 @@
 --  ... finer detail for how long items may stay in the inbox
 --  ... PUSH_ITEM event based queue operation
 
-NUM_BAGITEMS_PER_ROW = 6;
-NUM_BAGITEMS_ROWS = 7;
+-- TWW compatibility
+local GetItemClassInfo = C_Item and C_Item.GetItemClassInfo or GetItemClassInfo
+local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
+local GetCoinTextureString = C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString or GetCoinTextureString
+local GetCoinIcon = C_CurrencyInfo and C_CurrencyInfo.GetCoinIcon or GetCoinIcon
 
-BAGITEMS_ICON_ROW_HEIGHT = 36;
-BAGITEMS_ICON_DISPLAYED = NUM_BAGITEMS_PER_ROW * NUM_BAGITEMS_ROWS;
+NUM_BAGITEMS_PER_ROW = 6
+NUM_BAGITEMS_ROWS = 7
+
+BAGITEMS_ICON_ROW_HEIGHT = 36
+BAGITEMS_ICON_DISPLAYED = NUM_BAGITEMS_PER_ROW * NUM_BAGITEMS_ROWS
 
 -- Import globals
-local insert = table.insert;
-local remove = table.remove;
+local insert = table.insert
+local remove = table.remove
 
+
+local IsRetail = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE
 
 -- Export localization into namespace for XML localization
 MB_BAGNAME = InboxMailBag_BAGNAME;
@@ -23,157 +31,172 @@ local WEAPON = GetItemClassInfo (LE_ITEM_CLASS_WEAPON)
 local ARMOR = GetItemClassInfo (LE_ITEM_CLASS_ARMOR)
 local GLYPH = GetItemClassInfo (LE_ITEM_CLASS_GLYPH)
 
-local MB_Items = {};
-local MB_Queue = {};
-local MB_Ready = true;
-local MB_SearchField = _G["BagItemSearchBox"];
-local MB_Tab; -- The tab for our frame.
-local MB_BattlePetTooltipLines;
+local MB_Items = {}
+local MB_Queue = {}
+local MB_Ready = true
+local MB_SearchField
+local MB_Tab -- The tab for our frame.
+local MB_BattlePetTooltipLines
 
 function InboxMailbagSearch_OnEditFocusGained(self, ...)
-	MB_SearchField = self;
+	MB_SearchField = self
 end
 
 function InboxMailbag_OnLoad(self)
 	-- We have things to do after everything is loaded
-	self:RegisterEvent("PLAYER_LOGIN");
-	self:RegisterEvent("MAIL_SHOW");
+	self:RegisterEvent("PLAYER_LOGIN")
+	self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
 
 	-- Hook our tab to play nicely with MailFrame tabs
-	hooksecurefunc("MailFrameTab_OnClick", InboxMailbag_Hide); -- Adopted from Sent Mail as a more general solution, and plays well with Sent Mail
+	hooksecurefunc("MailFrameTab_OnClick", InboxMailbag_Hide) -- Adopted from Sent Mail as a more general solution, and plays well with Sent Mail
 
 	-- Hook our search field so we know what search field to use.
 	-- Hack, because we can't use UI to give us current search string/search filter
-	BagItemSearchBox:HookScript("OnEditFocusGained", InboxMailbagSearch_OnEditFocusGained);
-	InboxMailbagFrameItemSearchBox:HookScript("OnEditFocusGained", InboxMailbagSearch_OnEditFocusGained);
-	insert(ITEM_SEARCHBAR_LIST, "InboxMailbagFrameItemSearchBox");
-		
+	if BagItemSearchBox then
+		BagItemSearchBox:HookScript("OnEditFocusGained", InboxMailbagSearch_OnEditFocusGained)
+	end
+	InboxMailbagFrameItemSearchBox:HookScript("OnEditFocusGained", InboxMailbagSearch_OnEditFocusGained)
+	insert(ITEM_SEARCHBAR_LIST, "InboxMailbagFrameItemSearchBox")
+
 	--Create Mailbag item buttons, button background textures
-	assert(InboxMailbagFrameItem1);
-	local frameParent = InboxMailbagFrameItem1:GetParent();
+	assert(InboxMailbagFrameItem1)
+	local frameParent = InboxMailbagFrameItem1:GetParent()
 
 	for i = 2, BAGITEMS_ICON_DISPLAYED do
-		local button = CreateFrame("ItemButton", "InboxMailbagFrameItem"..i, frameParent, "MailbagItemButtonGenericTemplate");
-		button:SetID(i);
+		local button = CreateFrame(ItemButtonMixin and "ItemButton" or "Button", "InboxMailbagFrameItem"..i, frameParent, "MailbagItemButtonGenericTemplate")
+		button:SetID(i)
 		if ((i%NUM_BAGITEMS_PER_ROW) == 1) then
-			button:SetPoint("TOPLEFT", _G["InboxMailbagFrameItem"..(i-NUM_BAGITEMS_PER_ROW)], "BOTTOMLEFT", 0, -7);
+			button:SetPoint("TOPLEFT", _G["InboxMailbagFrameItem"..(i-NUM_BAGITEMS_PER_ROW)], "BOTTOMLEFT", 0, -7)
 		else
-			button:SetPoint("TOPLEFT", _G["InboxMailbagFrameItem"..(i-1)], "TOPRIGHT", 9, 0);
+			button:SetPoint("TOPLEFT", _G["InboxMailbagFrameItem"..(i-1)], "TOPRIGHT", 9, 0)
 		end
 	end
 	for i = 1, BAGITEMS_ICON_DISPLAYED do
-		local texture = self:CreateTexture(nil, "BORDER", "Mailbag-Slot-BG");
-		texture:SetPoint("TOPLEFT", _G["InboxMailbagFrameItem"..i], "TOPLEFT", -2, 2);
-		texture:SetPoint("BOTTOMRIGHT", _G["InboxMailbagFrameItem"..i], "BOTTOMRIGHT", 2, -2);
-		texture:SetAlpha(0.66);
+		local button = _G["InboxMailbagFrameItem"..i]
+		local texture = self:CreateTexture(nil, "BORDER", "Mailbag-Slot-BG")
+		texture:SetPoint("TOPLEFT", button, "TOPLEFT", -2, 2)
+		texture:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 2, -2)
+		texture:SetAlpha(0.66)
+
+		if IsRetail and not button.ProfessionQualityOverlay then
+			button.ProfessionQualityOverlay = button:CreateTexture(nil, "OVERLAY")
+			button.ProfessionQualityOverlay:SetPoint("TOPLEFT", -3, 2)
+		end
 	end
 
-	-- From sample code at http://us.battle.net/wow/en/forum/topic/7415465636
-	-- thank you Ro @ Underhill
-	--local BattlePetTooltip = BattlePetTooltip; -- not really needed
-	MB_BattlePetTooltipLines = BattlePetTooltip:CreateFontString(nil, "ARTWORK", "GameFontNormal");
-	MB_BattlePetTooltipLines:SetPoint("TOPLEFT", BattlePetTooltip.Owned, "BOTTOMLEFT", -3, 0);
-	MB_BattlePetTooltipLines:SetJustifyH("LEFT");
-	BattlePetTooltip:HookScript("OnHide", InboxMailbag_BattlePetToolTip_OnHide);
+	if IsRetail then
+		-- From sample code at http://us.battle.net/wow/en/forum/topic/7415465636
+		-- thank you Ro @ Underhill
+		--local BattlePetTooltip = BattlePetTooltip -- not really needed
+		MB_BattlePetTooltipLines = BattlePetTooltip:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+		MB_BattlePetTooltipLines:SetPoint("TOPLEFT", BattlePetTooltip.Owned, "BOTTOMLEFT", -3, 0)
+		MB_BattlePetTooltipLines:SetJustifyH("LEFT")
+		BattlePetTooltip:HookScript("OnHide", InboxMailbag_BattlePetToolTip_OnHide)
 
-	-- properly align Blizzard's default BattlePetTooltip
-	BattlePetTooltip.Name:ClearAllPoints();
-	BattlePetTooltip.Name:SetPoint("TOPLEFT", 10, -10);
+		-- properly align Blizzard's default BattlePetTooltip
+		BattlePetTooltip.Name:ClearAllPoints()
+		BattlePetTooltip.Name:SetPoint("TOPLEFT", 10, -10)
+	end
 end
 
 function InboxMailbag_OnPlayerLogin(self, event, ...)
-	InboxMailbagTab_Create();
-	
+	InboxMailbagTab_Create()
+
 	-- Check for and adapt to the presence of the addon: Sent Mail
 	if (SentMailTab) then
-		MB_Tab:SetPoint("LEFT", SentMailTab, "RIGHT", -8, 0);
-		MB_Tab:HookScript("OnClick", SentMail_UpdateTabs);
-		SentMailTab:HookScript("OnClick", InboxMailbagTab_DeselectTab);
+		MB_Tab:SetPoint("LEFT", SentMailTab, "RIGHT", -8, 0)
+		MB_Tab:HookScript("OnClick", SentMail_UpdateTabs)
+		SentMailTab:HookScript("OnClick", InboxMailbagTab_DeselectTab)
 	end
 
 	-- Check for and adapt to the presence of the addon: BeanCounter (part of Auctioneer's suite)
 	if (BeanCounter) then
-		BeanCounterMail:HookScript("OnShow", InboxMailbag_BeanCounter_OnShow);
-		BeanCounterMail:HookScript("OnHide", InboxMailbag_BeanCounter_OnHide);
+		BeanCounterMail:HookScript("OnShow", InboxMailbag_BeanCounter_OnShow)
+		BeanCounterMail:HookScript("OnHide", InboxMailbag_BeanCounter_OnHide)
 	end
 
 	-- Last tweaks for advanced mode
-	InboxMailbagFrameTotalMessages:Show();
+	InboxMailbag_ToggleAdvanced()
 end
 
 function InboxMailbag_OnShow(self)
-	self:RegisterEvent("MAIL_INBOX_UPDATE");
-	self:RegisterEvent("ITEM_PUSH");
-	self:RegisterEvent("PLAYER_MONEY");
-	self:RegisterEvent("UI_ERROR_MESSAGE");
-	self:RegisterEvent("INVENTORY_SEARCH_UPDATE");
+	self:RegisterEvent("MAIL_INBOX_UPDATE")
+	self:RegisterEvent("ITEM_PUSH")
+	self:RegisterEvent("PLAYER_MONEY")
+	self:RegisterEvent("UI_ERROR_MESSAGE")
+	self:RegisterEvent("INVENTORY_SEARCH_UPDATE")
 
-	InboxMailbag_Consolidate();
+	InboxMailbag_Consolidate()
 end
 
 function InboxMailbag_OnHide(self)
-	self:UnregisterEvent("MAIL_INBOX_UPDATE");
-	self:UnregisterEvent("ITEM_PUSH");
-	self:UnregisterEvent("PLAYER_MONEY");
-	self:UnregisterEvent("UI_ERROR_MESSAGE");
-	self:UnregisterEvent("INVENTORY_SEARCH_UPDATE");
-	
-	InboxMailbag_ResetQueue();
+	self:UnregisterEvent("MAIL_INBOX_UPDATE")
+	self:UnregisterEvent("ITEM_PUSH")
+	self:UnregisterEvent("PLAYER_MONEY")
+	self:UnregisterEvent("UI_ERROR_MESSAGE")
+	self:UnregisterEvent("INVENTORY_SEARCH_UPDATE")
+
+	InboxMailbag_ResetQueue()
 end
 
 function InboxMailbag_OnEvent(self, event, ...)
 	if ( event == "MAIL_INBOX_UPDATE" ) then
-		InboxMailbag_Consolidate();
+		InboxMailbag_Consolidate()
 	elseif( event == "ITEM_PUSH" or event == "PLAYER_MONEY" ) then
 		if not MB_Ready then
-			MB_Ready = true;
-			InboxMailbag_Consolidate();
-			InboxMailbag_FetchNext();
+			MB_Ready = true
+			InboxMailbag_Consolidate()
+			InboxMailbag_FetchNext()
 		end
 	elseif( event == "INVENTORY_SEARCH_UPDATE" ) then
-		InboxMailbag_UpdateSearchResults();
+		InboxMailbag_UpdateSearchResults()
 	elseif( event == "UI_ERROR_MESSAGE" ) then
 		-- Assume it's our fault, stop the queue
-		InboxMailbag_ResetQueue();
+		InboxMailbag_ResetQueue()
 	elseif( event == "MAIL_SHOW" ) then
 			InboxMailbagTab_OnClick(MB_Tab);
+	elseif( event == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW" ) then
+		local type = ...
+		if type == Enum.PlayerInteractionType.MailInfo then
+			InboxMailbagTab_OnClick(MB_Tab)
+		end
 	elseif( event == "PLAYER_LOGIN" ) then
-		InboxMailbag_OnPlayerLogin(self, event, ...);
+		InboxMailbag_OnPlayerLogin(self, event, ...)
 	end
 end
 
 -- Attempt to be clever and re-use pre-existing table entries where possible.
 function MB_Items:SetCash( index, money, daysLeft, link )
 	if ( self[index] ) then
-		local item = self[index];
-		item.money = money;
-		item.hasItem = false;
-		item.daysLeft = daysLeft;
-		wipe(item.links);
-		insert( item.links, link );
-		item.count = nil;
-		item.itemTexture = nil;
+		local item = self[index]
+		item.money = money
+		item.hasItem = false
+		item.daysLeft = daysLeft
+		wipe(item.links)
+		insert( item.links, link )
+		item.count = nil
+		item.itemTexture = nil
 	else
 		local item = {
 			["money"]    = money,
 			["hasItem"]  = false,
 			["daysLeft"] = daysLeft,
 			["links"]    = { link }
-		};
-		self[index] = item;
+		}
+		self[index] = item
 	end
 end
 
 function MB_Items:SetItem( index, count, itemTexture, daysLeft, link )
 	if ( self[index] ) then
-		local item = self[index];
+		local item = self[index]
 		item.count = count
-		item.hasItem = true;
-		item.daysLeft = daysLeft;
-		item.itemTexture = itemTexture;
-		wipe(item.links);
-		insert( item.links, link );
-		item.money = nil;
+		item.hasItem = true
+		item.daysLeft = daysLeft
+		item.itemTexture = itemTexture
+		wipe(item.links)
+		insert( item.links, link )
+		item.money = nil
 	else
 		local item = {
 			["count"]       = count,
@@ -181,8 +204,8 @@ function MB_Items:SetItem( index, count, itemTexture, daysLeft, link )
 			["daysLeft"]    = daysLeft,
 			["itemTexture"] = itemTexture,
 			["links"]       = { link }
-		};
-		self[index] = item;
+		}
+		self[index] = item
 	end
 end
 
@@ -218,21 +241,21 @@ function InboxMailbag_Consolidate()
 		
 		if (itemCount and CODAmount == 0) then
 			for n=1,ATTACHMENTS_MAX_RECEIVE do
-				local name, _, itemTexture, count, quality, canUse = GetInboxItem(i, n);
+				local name, itemID, itemTexture, count, quality, canUse = GetInboxItem(i, n)
 
-				if (name) then
-					local link = { ["mailID"] = i, ["attachment"] = n };
-					if ( bGroupStacks and indexes[name] ) then
-						local item = MB_Items[ indexes[name] ];
-						item.count = item.count + count;
-						insert(item.links, link);
+				if (itemID) then
+					local link = { ["mailID"] = i, ["attachment"] = n }
+					if ( bGroupStacks and indexes[itemID] ) then
+						local item = MB_Items[ indexes[itemID] ]
+						item.count = item.count + count
+						insert(item.links, link)
 						if ( daysLeft < item.daysLeft ) then
 							item.daysLeft = daysLeft
 						end
 					else
-						counter = counter + 1;
-						MB_Items:SetItem( counter, count, itemTexture, daysLeft, link );
-						indexes[name] = counter;
+						counter = counter + 1
+						MB_Items:SetItem( counter, count, itemTexture, daysLeft, link )
+						indexes[itemID] = counter
 					end
 				end
 			end
@@ -252,17 +275,19 @@ end
 
 -- If the itemLink is a [Pet Cage] then return a searchable pet name.
 function InboxMailbag_GetInboxItemID( mailID, attachment, name)
-	local itemLink = GetInboxItemLink( mailID, attachment );
+	local itemLink = GetInboxItemLink( mailID, attachment )
 	if ( itemLink and string.find(itemLink, "item:82800") ) then
-		--local cageName = GetItemInfo( itemLink );
-		if ( name ) then
-			itemLink = name  --.." "..cageName;
-		else
-			local itemName, _, itemTexture, count, quality, canUse = GetInboxItem( mailID, attachment );
-			itemLink = itemName --.." "..cageName;
+		local cageName = GetItemInfo( itemLink )
+		if cageName then
+			if ( name ) then
+				itemLink = name.." "..cageName
+			else
+				local itemName, _, itemTexture, count, quality, canUse = GetInboxItem( mailID, attachment )
+				itemLink = itemName.." "..cageName
+			end
 		end
 	end
-	return itemLink;
+	return itemLink
 end
 
 -- Adapt letters to match upper/lowercase. Escape anything else.
@@ -286,15 +311,15 @@ end
 -- itemID is CASH for a stack of money
 -- itemID is simply the item name, typically for BattlePets
 function InboxMailbag_isFiltered(itemID)
-	local searchString = MB_SearchField:GetText();
-	if (searchString ~= SEARCH and strlen(searchString) > 0) then
-		if (not itemID or itemID == "CASH") then  return true;  end
-		
-		local name, link, _, _, _, itemType, subType, _, equipSlot, _, vendorPrice = GetItemInfo(itemID);
-		name = name or itemID;
+	local searchString = MB_SearchField and MB_SearchField:GetText()
+	if searchString and searchString ~= SEARCH and strlen(searchString) > 0 then
+		if (not itemID or itemID == "CASH") then  return true  end
 
-		local subMatch = false;
-		searchString = MakeSearchPattern(searchString);
+		local name, link, _, _, _, itemType, subType, _, equipSlot, _, vendorPrice = GetItemInfo(itemID)
+		name = name or itemID
+
+		local subMatch = false
+		searchString = MakeSearchPattern(searchString)
 		if (itemType == ARMOR or itemType == WEAPON) then
 			-- Armor/weapons search on name, type (axe/leather), and where you equip it (head)
 			local secondary = _G[equipSlot] or ""
@@ -333,11 +358,11 @@ function InboxMailbag_Update()
 	end
 	
 	local bQualityColors = true;
-	local itemName, itemTexture, count, quality, canUse, _, itemLink;
 	for i=1, BAGITEMS_ICON_DISPLAYED do
 		local currentIndex = i + offset;
 		local item = MB_Items[currentIndex];
 		local itemButton = _G["InboxMailbagFrameItem"..i];
+		local itemName, itemTexture, count, quality, canUse, _, itemLink
 		if (item) then
 			assert(currentIndex <= #MB_Items);
 			if ( item.hasItem ) then
@@ -366,9 +391,9 @@ function InboxMailbag_Update()
 			
 			if ( item.daysLeft < 7 ) then
 				if ( item.daysLeft < 1 ) then
-					itemButton.deleteOverlay:SetColorTexture(1, 0.125, 0.125);
+					itemButton.deleteOverlay:SetTexture(1, 0.125, 0.125);
 				else
-					itemButton.deleteOverlay:SetColorTexture(1, 0.5, 0);
+					itemButton.deleteOverlay:SetTexture(1, 0.5, 0);
 				end
 				itemButton.deleteOverlay:Show();
 			else
@@ -396,7 +421,12 @@ function InboxMailbag_Update()
 			itemButton.item = nil;
 		end
 
-		if ( itemButton:IsMouseOver() ) then  InboxMailbagItem_OnEnter(itemButton);  end
+		if ( itemButton:IsMouseOver() ) then  InboxMailbagItem_OnEnter(itemButton)  end
+
+		if itemButton.ProfessionQualityOverlay then
+			itemButton.ProfessionQualityOverlay:SetAtlas(nil)
+			SetItemCraftingQualityOverlay(itemButton, itemLink)
+		end
 	end
 
 	-- Scrollbar stuff
@@ -435,8 +465,7 @@ function InboxMailbag_FetchNext()
 	end
 end
 
-
-local battletip = {};
+local battletip = {}
 
 function battletip:ClearLines()
 	for i=1, #battletip do
@@ -470,21 +499,24 @@ function InboxMailbagItem_OnEnter(self, index)
 		local tip = GameTooltip;
 
 		if ( item.hasItem ) then
-			local hasCooldown, speciesID, level, breedQuality, maxHealth, power, speed, name = GameTooltip:SetInboxItem( links[1].mailID, links[1].attachment );
+			GameTooltip:SetInboxItem( links[1].mailID, links[1].attachment )
 
-			if ( speciesID and speciesID > 0 ) then
-				BattlePetToolTip_Show(speciesID, level, breedQuality, maxHealth, power, speed, name);
-				tip = battletip;
-				tip:ClearLines();
-			else
-				BattlePetTooltip:Hide();
+			if BattlePetTooltip then
+				local data = C_TooltipInfo.GetInboxItem(links[1].mailID, links[1].attachment)
+				if ( data and data.battlePetSpeciesID and data.battlePetSpeciesID > 0 ) then
+					BattlePetToolTip_Show(data.battlePetSpeciesID, data.battlePetLevel, data.battlePetBreedQuality, data.battlePetMaxHealth, data.battlePetPower, data.battlePetSpeed, data.battlePetName)
+					tip = battletip
+					tip:ClearLines()
+				else
+					BattlePetTooltip:Hide()
+				end
 			end
 		elseif GroupStacks then
 			GameTooltip:AddLine( ENCLOSED_MONEY );
 			GameTooltip:AddLine( GetCoinTextureString(item.money), 1, 1, 1 );
 		else
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo( links[1].mailID );
-			playerName = playerName or AUCTION_HOUSE_MAIL_MULTIPLE_BUYERS
+			playerName = playerName or AUCTION_HOUSE_MAIL_MULTIPLE_BUYERS or ""
 
 			if ( invoiceType == "seller" ) then
 				GameTooltip:AddLine( format( "%s  |cffFFFFFF%s|r", ITEM_SOLD_COLON, itemName ) );
@@ -540,7 +572,7 @@ function InboxMailbagItem_OnEnter(self, index)
 		tip:Show();
 	else
 		GameTooltip:Hide();
-		BattlePetTooltip:Hide();
+		if BattlePetTooltip then BattlePetTooltip:Hide() end
 	end
 end
 
@@ -586,14 +618,14 @@ local function CompareFrameSize(frame1, frame2)
 end
 local MailTabtable = {}; 
 function InboxMailbagTab_TabBoundsCheck()
-	local tabCount = MailFrame.numTabs;
-	local diff = _G["MailFrameTab"..tabCount]:GetRight() - MailFrame:GetRight();
+	local tabCount = MailFrame.numTabs
+	local diff = (_G["MailFrameTab"..tabCount]:GetRight() or 0) - (MailFrame:GetRight() or 0)
 
 	-- First, try left justifying the tabs	
 	if ( diff > 0 ) then
-		local point, relativeTo, relativePoint, xOffset, yOffset = MailFrameTab1:GetPoint(1);
-		MailFrameTab1:SetPoint("BOTTOMLEFT", relativeTo, relativePoint, 0, yOffset );
-		diff = _G["MailFrameTab"..tabCount]:GetRight() - MailFrame:GetRight();
+		local point, relativeTo, relativePoint, xOffset, yOffset = MailFrameTab1:GetPoint(1)
+		MailFrameTab1:SetPoint("BOTTOMLEFT", relativeTo, relativePoint, 0, yOffset )
+		diff = (_G["MailFrameTab"..tabCount]:GetRight() or 0) - (MailFrame:GetRight() or 0)
 	end
 	
 	-- Second, try squishing tab spacing together
@@ -605,7 +637,7 @@ function InboxMailbagTab_TabBoundsCheck()
 			SentMailTab:SetPoint("LEFT", MailFrameTab2, "RIGHT", -15, 0);
 			MB_Tab:SetPoint("LEFT", SentMailTab, "RIGHT", -15, 0);
 		end
-		diff = _G["MailFrameTab"..tabCount]:GetRight() - MailFrame:GetRight();
+		diff = (_G["MailFrameTab"..tabCount]:GetRight() or 0) - (MailFrame:GetRight() or 0)
 	end
 
 	-- If that still wasn't enough, start squishing the padding on tabs

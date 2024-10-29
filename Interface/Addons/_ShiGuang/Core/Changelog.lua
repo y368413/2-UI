@@ -15,10 +15,10 @@ local UIQuestsandHelp = {
 	 "为何没有Buff或者Debuff ID显示啊.|cff3399FF         按着你的Shift再看",
 	 "点击聊天框角色名称可实现:|cff3399FF     Shift-密语 Ctrl-邀请工会 Alt-组队邀请",
    "|cFF00DDFF如需改进和反馈，可以回帖或者在讨论组(n9PnFl0o)告诉我，谢谢。",
-   "-------------------------------"..GetAddOnMetadata("_ShiGuang", "X-StatsVersion").."----[正式]",
+   "-------------------------------"..C_AddOns.GetAddOnMetadata("_ShiGuang", "X-StatsVersion").."----[正式]",
    "|cFFFF0000[注意]控制台设置后的 红色齿轮 可以点击后设置更多|r",
    "|cFFFF0000[注意]使用多功能团框的话，记得控制台别勾选“简易模式框体”|r",
-   "[插件]版本号升级为v "..GetAddOnMetadata("_ShiGuang", "Version"),
+   "[插件]版本号升级为v "..C_AddOns.GetAddOnMetadata("_ShiGuang", "Version"),
    "--------------------------over",
 }
 local story = {
@@ -99,11 +99,11 @@ end
 local function compareToShow(event)
 	if UI_Tutorial then return end
 
-	local old1, old2 = strsplit(".", MaoRUIDB["Changelog"].Version or "")
+	local old1, old2 = strsplit(".", MaoRUISetDB["Changelog"].Version or "")
 	local cur1, cur2 = strsplit(".", I.Version)
 	if old1 ~= cur1 or old2 ~= cur2 then
 		Helplist()
-		MaoRUIDB["Changelog"].Version = I.Version
+		MaoRUISetDB["Changelog"].Version = I.Version
 	end
 
 	M:UnregisterEvent(event, compareToShow)

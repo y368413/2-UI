@@ -1694,7 +1694,7 @@ function DraenorTreasures:LoadCheck()
 		isDBMloaded = true
 	end
 
-	if (IsAddOnLoaded("HandyNotes_LegionRaresTreasures")) then 
+	if (IsAddOnLoaded("HandyNotes")) then 
 		isHN_LRTloaded = true
 	end
 

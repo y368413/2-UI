@@ -1,5 +1,5 @@
---[[ $Id: CallbackHandler-1.0.lua 1186 2018-07-21 14:19:18Z nevcairiel $ ]]
-local MAJOR, MINOR = "CallbackHandler-1.0", 7
+--[[ $Id: CallbackHandler-1.0.lua 1298 2022-12-12 15:10:10Z nevcairiel $ ]]
+local MAJOR, MINOR = "CallbackHandler-1.0", 8
 local CallbackHandler = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not CallbackHandler then return end -- No upgrade needed
@@ -7,29 +7,29 @@ if not CallbackHandler then return end -- No upgrade needed
 local meta = {__index = function(tbl, key) tbl[key] = {} return tbl[key] end}
 
 -- Lua APIs
-local tconcat = table.concat
-local assert, error, loadstring = assert, error, loadstring
-local setmetatable, rawset, rawget = setmetatable, rawset, rawget
+local securecallfunction, error = securecallfunction, error
+local setmetatable, rawget = setmetatable, rawget
 local next, select, pairs, type, tostring = next, select, pairs, type, tostring
 
-local xpcall = xpcall
-
-local function errorhandler(err)
-	return geterrorhandler()(err)
-end
 
 local function Dispatch(handlers, ...)
 	local index, method = next(handlers)
 	if not method then return end
 	repeat
-		xpcall(method, errorhandler, ...)
+		securecallfunction(method, ...)
 		index, method = next(handlers, index)
 	until not method
 end
 
+--------------------------------------------------------------------------
+-- CallbackHandler:New
+--
+--   target            - target object to embed public APIs in
+--   RegisterName      - name of the callback registration API, default "RegisterCallback"
+--   UnregisterName    - name of the callback unregistration API, default "UnregisterCallback"
+--   UnregisterAllName - name of the API to unregister all callbacks, default "UnregisterAllCallbacks". false == don't publish this API.
 
-
-function CallbackHandler:New(target, RegisterName, UnregisterName, UnregisterAllName)
+function CallbackHandler.New(_self, target, RegisterName, UnregisterName, UnregisterAllName)
 
 	RegisterName = RegisterName or "RegisterCallback"
 	UnregisterName = UnregisterName or "UnregisterCallback"
@@ -37,6 +37,11 @@ function CallbackHandler:New(target, RegisterName, UnregisterName, UnregisterAll
 		UnregisterAllName = "UnregisterAllCallbacks"
 	end
 
+	-- we declare all objects and exported APIs inside this closure to quickly gain access
+	-- to e.g. function names, the "target" parameter, etc
+
+
+	-- Create the registry object
 	local events = setmetatable({}, meta)
 	local registry = { recurse=0, events=events }
 
@@ -52,13 +57,13 @@ function CallbackHandler:New(target, RegisterName, UnregisterName, UnregisterAll
 
 		if registry.insertQueue and oldrecurse==0 then
 			-- Something in one of our callbacks wanted to register more callbacks; they got queued
-			for eventname,callbacks in pairs(registry.insertQueue) do
-				local first = not rawget(events, eventname) or not next(events[eventname])	-- test for empty before. not test for one member after. that one member may have been overwritten.
-				for self,func in pairs(callbacks) do
-					events[eventname][self] = func
+			for event,callbacks in pairs(registry.insertQueue) do
+				local first = not rawget(events, event) or not next(events[event])	-- test for empty before. not test for one member after. that one member may have been overwritten.
+				for object,func in pairs(callbacks) do
+					events[event][object] = func
 					-- fire OnUsed callback?
 					if first and registry.OnUsed then
-						registry.OnUsed(registry, target, eventname)
+						registry.OnUsed(registry, target, event)
 						first = nil
 					end
 				end
@@ -67,6 +72,11 @@ function CallbackHandler:New(target, RegisterName, UnregisterName, UnregisterAll
 		end
 	end
 
+	-- Registration of a callback, handles:
+	--   self["method"], leads to self["method"](self, ...)
+	--   self with function ref, leads to functionref(...)
+	--   "addonId" (instead of self) with function ref, leads to functionref(...)
+	-- all with an optional arg, which, if present, gets passed as first argument (after self if present)
 	target[RegisterName] = function(self, eventname, method, ... --[[actually just a single arg]])
 		if type(eventname) ~= "string" then
 			error("Usage: "..RegisterName.."(eventname, method[, arg]): 'eventname' - string expected.", 2)
@@ -114,14 +124,16 @@ function CallbackHandler:New(target, RegisterName, UnregisterName, UnregisterAll
 
 
 		if events[eventname][self] or registry.recurse<1 then
-
+		-- if registry.recurse<1 then
+			-- we're overwriting an existing entry, or not currently recursing. just set it.
 			events[eventname][self] = regfunc
 			-- fire OnUsed callback?
 			if registry.OnUsed and first then
 				registry.OnUsed(registry, target, eventname)
 			end
 		else
-
+			-- we're currently processing a callback in this registry, so delay the registration of this new entry!
+			-- yes, we're a bit wasteful on garbage, but this is a fringe case, so we're picking low implementation overhead over garbage efficiency
 			registry.insertQueue = registry.insertQueue or setmetatable({},meta)
 			registry.insertQueue[eventname][self] = regfunc
 		end
@@ -182,3 +194,9 @@ function CallbackHandler:New(target, RegisterName, UnregisterName, UnregisterAll
 
 	return registry
 end
+
+
+-- CallbackHandler purposefully does NOT do explicit embedding. Nor does it
+-- try to upgrade old implicit embeds since the system is selfcontained and
+-- relies on closures to work.
+

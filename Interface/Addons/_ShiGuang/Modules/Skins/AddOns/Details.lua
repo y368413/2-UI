@@ -10,7 +10,7 @@ local function SetupInstance(instance)
 		instance.wasHidden = true
 	end
 	-- reset texture if using Details default texture
-	local needReset = instance.row_info.texture == "BantoBar"
+	local needReset = instance.row_info.texture == "Details Hyanda" -- details change it from 'BantoBar'
 	instance:ChangeSkin("Minimalistic")
 	instance:InstanceWallpaper(false)
 	instance:DesaturateMenu(true)
@@ -18,15 +18,15 @@ local function SetupInstance(instance)
 	instance:SetBackdropTexture("None") -- if block window from resizing, then back to "Details Ground", needs review
 	instance:MenuAnchor(16, 3)
 	instance:ToolbarMenuButtonsSize(1)
-	instance:AttributeMenu(true, 0, 3, I.Font[1], 13, {1, 1, 1}, 1, true)
+	instance:AttributeMenu(true, 0, 3, needReset and I.Font[1], needReset and 13, {1, 1, 1}, 1, true)
 	instance:SetBarSettings(needReset and 18, needReset and "normTex")
-	instance:SetBarTextSettings(needReset and 14, I.Font[1], nil, nil, nil, true, true)
+	instance:SetBarTextSettings(needReset and 14, needReset and I.Font[1], nil, nil, nil, true, true)
 
 	local bg = M.SetBD(instance.baseframe)
 	bg:SetPoint("TOPLEFT", -1, 18)
 	instance.baseframe.bg = bg
 
-	if instance:GetId() <= 2 then
+	if instance:GetId() < 4 then -- only the top 3 windows
 		local open, close = S:CreateToggle(instance.baseframe)
 		open:HookScript("OnClick", function()
 			instance:ShowWindow()
@@ -114,7 +114,7 @@ local function ReskinDetails()
 	end
 
 	-- Numberize
-	local current = MaoRUIDB["NumberFormat"]
+	local current = MaoRUISetDB["NumberFormat"]
 	if current < 3 then
 		Details.numerical_system = current
 		Details:SelectNumericalSystem()

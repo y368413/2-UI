@@ -553,7 +553,7 @@ function UICreateVirtualScrollList(name, parent, maxButtons, selectable, buttonT
 	slider.thumb = thumb
 	thumb:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
 	thumb:SetWidth(slider:GetWidth())
-	thumb:SetGradientAlpha("HORIZONTAL", 0.5, 0.5, 0.5, 0.75, 0.15, 0.15, 0.15, 1)
+	thumb:SetGradient("HORIZONTAL", CreateColor(0.5, 0.5, 0.5, 0.75), CreateColor(0.15, 0.15, 0.15, 1))
 	slider:SetThumbTexture(thumb)
 
 	slider:SetScript("OnValueChanged", Slider_OnValueChanged)

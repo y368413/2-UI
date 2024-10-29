@@ -78,7 +78,7 @@ HAutoSelectPet.OnUpdate=function(self)
 
 		-------------换上宠物
 		if petID ~= C_PetJournal.GetPetLoadOutInfo(self.step) then	---
-			C_PetJournal.SetPetLoadOutInfo(self.step,petID,true)
+			C_PetJournal.SetPetLoadOutInfo(self.step,petID)
 		end
 			---------判断血量
 		if health<maxHealth*0.8 then
@@ -99,7 +99,7 @@ HAutoSelectPet.OnUpdate=function(self)
 			if abilityID and abilityID~=ab[i] then
 				self.C=self.C+1
 				HSetprint("N"..self.C,"操作,设定"..C_PetJournal.GetBattlePetLink(petID).."的",GetBattlePetAbilityHyperlink(abilityID).."技能")
-				C_PetJournal.SetAbility(self.step, i, abilityID, true)
+				C_PetJournal.SetAbility(self.step, i, abilityID)
 			end
 		end
 			-----------检验技能
@@ -176,7 +176,7 @@ local function SelectpetIDbyspeciesID(id,notid1,notid2)
 end
 
 function SelectpetIDbylevel(tlevel,notid1,notid2)
-	for i=1,select(2,C_PetJournal.GetNumPets(true)) do
+	for i=1,select(2,C_PetJournal.GetNumPets()) do
 		local petID, speciesID, isOwned, _,level= C_PetJournal.GetPetInfoByIndex(i);
 		if petID and petID~=notid1 and petID~=notid2 then
 			local health, maxHealth, _, _, ra= C_PetJournal.GetPetStats(petID);

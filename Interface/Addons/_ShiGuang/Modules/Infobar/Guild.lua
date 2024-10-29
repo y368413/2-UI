@@ -73,7 +73,7 @@ end
 
 function info:GuildPanel_UpdateButton(button)
 	local index = button.index
-	local level, class, name, zone, status = unpack(info.guildTable[index])
+	local level, class, name, zone, status, guid = unpack(info.guildTable[index])
 
 	local levelcolor = M.HexRGB(GetQuestDifficultyColor(level))
 	button.level:SetText(levelcolor..level)
@@ -81,7 +81,9 @@ function info:GuildPanel_UpdateButton(button)
 	M.ClassIconTexCoord(button.class, class)
 
 	local namecolor = M.HexRGB(M.ClassColor(class))
-	button.name:SetText(namecolor..name..status)
+	local isTimerunning = guid and C_ChatInfo.IsTimerunningPlayer(guid)
+	local playerName = isTimerunning and TimerunningUtil.AddSmallIcon(name) or name
+	button.name:SetText(namecolor..playerName..status)
 
 	local zonecolor = I.GreyColor
 	if UnitInRaid(name) or UnitInParty(name) then
@@ -129,10 +131,10 @@ end
 
 local function sortRosters(a, b)
 	if a and b then
-		if MaoRUIDB["GuildSortOrder"] then
-			return a[MaoRUIDB["GuildSortBy"]] < b[MaoRUIDB["GuildSortBy"]]
+		if MaoRUISetDB["GuildSortOrder"] then
+			return a[MaoRUISetDB["GuildSortBy"]] < b[MaoRUISetDB["GuildSortBy"]]
 		else
-			return a[MaoRUIDB["GuildSortBy"]] > b[MaoRUIDB["GuildSortBy"]]
+			return a[MaoRUISetDB["GuildSortBy"]] > b[MaoRUISetDB["GuildSortBy"]]
 		end
 	end
 end
@@ -143,8 +145,8 @@ function info:GuildPanel_SortUpdate()
 end
 
 local function sortHeaderOnClick(self)
-	MaoRUIDB["GuildSortBy"] = self.index
-	MaoRUIDB["GuildSortOrder"] = not MaoRUIDB["GuildSortOrder"]
+	MaoRUISetDB["GuildSortBy"] = self.index
+	MaoRUISetDB["GuildSortOrder"] = not MaoRUISetDB["GuildSortOrder"]
 	info:GuildPanel_SortUpdate()
 end
 
@@ -261,15 +263,15 @@ function info:GuildPanel_Refresh()
 
 	wipe(info.guildTable)
 	local count = 0
-	local total, _, online = GetNumGuildMembers()
+	local total, numOnline, allOnline = GetNumGuildMembers()
 	local guildName, guildRank = GetGuildInfo("player")
 
 	gName:SetText("|cff0099ff<"..(guildName or "")..">")
-	gOnline:SetText(format(I.InfoColor.."%s:".." %d/%d", GUILD_ONLINE_LABEL, online, total))
+	gOnline:SetText(format(I.InfoColor.."%s:".." %d/%d", GUILD_ONLINE_LABEL, (allOnline or numOnline), total))
 	gRank:SetText(I.InfoColor..RANK..": "..(guildRank or ""))
 
 	for i = 1, total do
-		local name, _, _, level, _, zone, _, _, connected, status, class, _, _, mobile = GetGuildRosterInfo(i)
+		local name, _, _, level, _, zone, _, _, connected, status, class, _, _, mobile, _, _, guid = GetGuildRosterInfo(i)
 		if connected or mobile then
 			if mobile and not connected then
 				zone = REMOTE_CHAT
@@ -299,6 +301,7 @@ function info:GuildPanel_Refresh()
 			info.guildTable[count][3] = Ambiguate(name, "none")
 			info.guildTable[count][4] = zone
 			info.guildTable[count][5] = status
+			info.guildTable[count][6] = guid
 		end
 	end
 
@@ -323,8 +326,8 @@ info.onEvent = function(self, event, arg1)
 		end
 	end
 
-	local online = select(3, GetNumGuildMembers())
-	self.text:SetText(I.MyColor..online)
+	local _, numOnline, allOnline = GetNumGuildMembers()
+	self.text:SetText(I.MyColor..(allOnline or numOnline))
 
 	if infoFrame and infoFrame:IsShown() then
 		info:GuildPanel_Refresh()
@@ -358,6 +361,6 @@ info.onMouseUp = function()
 
 	if not IsInGuild() then return end
 	infoFrame:Hide()
-	if not GuildFrame then LoadAddOn("Blizzard_GuildUI") end
-	ToggleFrame(GuildFrame)
+	if not CommunitiesFrame then C_AddOns.LoadAddOn("Blizzard_Communities") end
+	if CommunitiesFrame then ToggleFrame(CommunitiesFrame) end
 end

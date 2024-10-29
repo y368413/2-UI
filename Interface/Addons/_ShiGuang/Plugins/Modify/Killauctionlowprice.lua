@@ -1,15 +1,16 @@
---## Version: 1.0   ## Notes:秒杀低于物品实际拍卖价的物品，专治拍卖行脚本。   ## Author: BG
+--## Version: 1.1   ## Notes:秒杀低于物品实际拍卖价的物品，专治拍卖行脚本。   ## Author: BG
 do
     local e = CreateFrame("Frame")
 
     function e:Init()
         self.limit_rate = 0.1 * 0.01
         self.buy_button = self.buy_button or self:CreateBuyButton()
+        self.buy_5_button = self.buy_5_button or self:CreateBuy5Button() -- 新增按钮
         self.can_buy_lowest = self.can_buy_lowest or false
     end
     
-    --COMMODITY_SEARCH_RESULTS_UPDATED, COMMODITY_PRICE_UPDATED
-    function e:ON_EVENT(event,...)
+    -- COMMODITY_SEARCH_RESULTS_UPDATED, COMMODITY_PRICE_UPDATED
+    function e:ON_EVENT(event, ...)
         if event == "COMMODITY_SEARCH_RESULTS_UPDATED" then
             local itemID = ...
             self.itemID = itemID
@@ -17,10 +18,11 @@ do
             local lowest_item = C_AuctionHouse.GetCommoditySearchResultInfo(itemID, 1)
             if lowest_item then self.lowest_item = lowest_item else self.lowest_item = nil end
             self:BuyButtonShow()
+            self:Buy5ButtonShow() -- 显示秒5个按钮
             local start = self:GetIgnoreStart(itemID)
             if not start or (start == 1) then return nil end
             local start_result = C_AuctionHouse.GetCommoditySearchResultInfo(itemID, start)
-            AuctionHouseFrame.CommoditiesSellFrame:GetCommoditiesSellList():SetSelectedEntry(start_result);
+            AuctionHouseFrame.CommoditiesSellFrame:GetCommoditiesSellList():SetSelectedEntry(start_result)
         elseif event == "COMMODITY_PRICE_UPDATED" then
             local updatedUnitPrice, updatedTotalPrice = ...
             if not self:IsSelling() then return nil end
@@ -42,7 +44,7 @@ do
     e:SetScript("OnEvent", e.ON_EVENT)
     
     function e:IsSelling()
-        local sell_tab = AuctionHouseFrameSellTabMiddleDisabled
+        local sell_tab = AuctionHouseFrame.SellTab.MiddleActive
         if sell_tab and sell_tab:IsShown() then return true else return false end
     end
     
@@ -63,41 +65,66 @@ do
         end
     end
     
-    function e:ConfirmBuy(itemID)
+    function e:ConfirmBuy(itemID, quantity)
+        quantity = quantity or 1
         if self.can_buy_lowest then
-            C_AuctionHouse.ConfirmCommoditiesPurchase(itemID,1)
-            self:PrintBuyResult(true)
+            C_AuctionHouse.ConfirmCommoditiesPurchase(itemID, quantity)
+            self:PrintBuyResult(true, quantity)
         else
             self:PrintBuyResult(false)
         end
     end
     
-    function e:PrintBuyResult(succeed)
+    function e:PrintBuyResult(succeed, quantity)
         if not self.lowest_item then return nil end
         local itemName = GetItemInfo(self.lowest_item.itemID)
         local price_string = GetCoinTextureString(self.lowest_item.unitPrice)
         if not (itemName and price_string) then return nil end
         if succeed then
-            print(itemName.."购买成功1件：" .. price_string)
+            print(itemName .. "购买成功" .. quantity .. "件：" .. price_string)
         else
-            print(itemName.."购买失败，价格变化")
+            print(itemName .. "购买失败，价格变化")
         end
     end
     
     function e:BuyOneItem(itemID)
         if not itemID then return nil end
-        C_AuctionHouse.StartCommoditiesPurchase(itemID,1)
+        C_AuctionHouse.StartCommoditiesPurchase(itemID, 1)
         self.buy_itemID = itemID
-        --C_Timer.After(.5, function() e:ConfirmBuy(itemID) end)
+        -- C_Timer.After(.5, function() e:ConfirmBuy(itemID) end)
+    end
+    
+    function e:BuyFiveItems(itemID)
+        if not itemID then return nil end
+        for i = 1, 5 do
+            C_AuctionHouse.StartCommoditiesPurchase(itemID, 1)
+            self.buy_itemID = itemID
+            -- C_Timer.After(.5, function() e:ConfirmBuy(itemID) end) -- 可选，延迟确认购买
+        end
     end
     
     function e:CreateBuyButton()
         local buy_button = CreateFrame("Button", "WA_AuctionLowPrice_BuyOne_Button", UIParent, "UIPanelButtonTemplate")
-        buy_button:SetSize(150, 32)
+        buy_button:SetSize(120, 32)
         buy_button:SetText("最低价秒一个")
         buy_button:SetScript("OnClick", function() if e.lowest_item then e:BuyOneItem(e.lowest_item.itemID) end end)
         buy_button:SetFrameStrata("TOOLTIP")
         return buy_button
+    end
+    
+    function e:CreateBuy5Button()
+        local buy_5_button = CreateFrame("Button", "WA_AuctionLowPrice_BuyFive_Button", UIParent, "UIPanelButtonTemplate")
+        buy_5_button:SetSize(120, 32)
+        buy_5_button:SetText("最低价秒五个")
+        buy_5_button:SetScript("OnClick", function() 
+            if e.lowest_item and e.lowest_item.quantity >= 5 then 
+                e:BuyFiveItems(e.lowest_item.itemID) 
+            else
+                print("数量不足，无法购买五个")
+            end
+        end)
+        buy_5_button:SetFrameStrata("TOOLTIP")
+        return buy_5_button
     end
     
     function e:BuyButtonShow()
@@ -106,6 +133,14 @@ do
         self.buy_button:SetPoint("RIGHT", refresh, "LEFT")
         self.buy_button:SetParent(refresh)
         self.buy_button:Show()
+    end
+
+    function e:Buy5ButtonShow()
+        local refresh = AuctionHouseFrame.CommoditiesSellList.RefreshFrame
+        if not refresh then return nil end
+        self.buy_5_button:SetPoint("RIGHT", self.buy_button, "LEFT", -10, 0)
+        self.buy_5_button:SetParent(refresh)
+        self.buy_5_button:Show()
     end
     
     e:Init()

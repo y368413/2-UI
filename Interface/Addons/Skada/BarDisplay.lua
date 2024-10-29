@@ -325,7 +325,7 @@ function mod:Update(win)
 						bar.link = nil
 						if data.spellid then
 							local spell = data.spellid
-							bar.link = GetSpellLink(spell)
+							bar.link = C_Spell.GetSpellLink(spell)
 						elseif data.hyperlink then
 							bar.link = data.hyperlink
 						end
@@ -856,7 +856,7 @@ function mod:AddDisplayOptions(win, options)
 			specicons = {
 				type="toggle",
 				name=L["Always show spec icon"],
-				desc=L["Keeps the player shown last even if there is not enough space."],
+				desc=L["Always show spec icon"],  --L["Keeps the player shown last even if there is not enough space."],
 				order=35,
 				get=function() return db.specicons end,
 				set=function() 

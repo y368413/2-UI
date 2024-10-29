@@ -155,8 +155,15 @@ Skada:AddLoadableModule("Power", nil, function(Skada, L)
 
 			for spellid, amount in pairs(player.power[self.power].spells) do
 
-				local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange = GetSpellInfo(spellid)
-
+				local SpellInfo = C_Spell.GetSpellInfo(spellid)
+				local name = SpellInfo.name
+				local icon = SpellInfo.iconID
+				local castTime = SpellInfo.castTime
+				local minRange = SpellInfo.minRange
+				local maxRange = SpellInfo.maxRange
+				local SpellPower = C_Spell.GetSpellPowerCost(spellid)
+				local powerType = SpellPower.type
+					  
 				local d = win.dataset[nr] or {}
 				win.dataset[nr] = d
 

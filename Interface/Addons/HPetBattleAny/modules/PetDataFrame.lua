@@ -217,7 +217,11 @@ setmetatable(HPetBattleAny.GetBreedNames,{__index=function(self,key)return key a
 if BPBID_Arrays then	
 	addon.PetData = {}
 	addon.PetBaseData = {}
-	BPBID_Arrays.InitializeArrays()
+	if HPetBattleAny.BPBIDInit then
+		HPetBattleAny.BPBIDInit()
+	else
+		BPBID_Arrays.InitializeArrays()
+	end
 	HPetBattleAny.GetBaseState = function(id) return fixBaseData(id) or BPBID_Arrays.BasePetStats[id] end
 	HPetBattleAny.GetPetAState = function(id)
 		if fixData(id) then
@@ -240,7 +244,7 @@ else
 	HPetBattleAny.GetPetAState = function(id) return (addon.PetData[id] or addon.fixPetBaseData[id]) and GetAState(id) end
 end
 
-HPetBattleAny.GetPetIDByItemID = function(id) return addon.PetIDByItemID[id] end
+HPetBattleAny.GetPetIDByItemID = function(id) return addon.PetIDByItemID[tostring(id)] end
 
 local HEALTH,POWER,SPEED = 1,2,3
 local PetData = addon.PetData
@@ -577,7 +581,7 @@ function HPetAllInfoFrame:Update(speciesID,breedID,rarityvalue,levelvalue)
 	HPetAllInfoFrame.levelTable.UpdateInfo(speciesID,breedID,levelvalue,rarityvalue)
 
 	HPetAllInfoFrame:UpdateSize(height);
-	updateElapsed = 0
+	-- updateElapsed = 0
 	HPetAllInfoFrame.speciesID = speciesID
 	HPetAllInfoFrame.breedID = breedID
 end
@@ -618,7 +622,7 @@ function HPetAllInfoFrame:Init()
 	self:RegisterForDrag("LeftButton")
 	self:SetScript("OnDragStart",function(self) self:StartMoving() end)
 	self:SetScript("OnDragStop",function(self) self:StopMovingOrSizing() end)
-	frames={
+	local frames={
 		-- name
 		{name="petName",width="350",height="30",
 		point="TOPLEFT",
@@ -694,7 +698,7 @@ function HPetAllInfoFrame:Init()
 	lock:SetPoint("RIGHT")
 	lock:SetScript("OnClick",function(self)
 		rarityslider:Show()
-		isChecked = self:GetChecked()
+		local isChecked = self:GetChecked()
 		if isChecked then
 			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 		else

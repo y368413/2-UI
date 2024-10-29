@@ -4,6 +4,7 @@ local Config = Addon:NewModule('Config')
 local configVersion = 1
 local configDefaults = {
 	progressTooltip = true,
+	progressTooltipMDT = false,
 	progressFormat = 3,
 	autoGossip = false,
 	cosRumors = true,
@@ -17,13 +18,9 @@ local configDefaults = {
 	hideTalkingHead = false,
 	resetPopup = false,
 	announceKeystones = false,
+	schedule = true,
 }
 local callbacks = {}
-
-local LibDD
-function Config:InitializeDropdown()
-	LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
-end
 
 local progressFormatValues = { 1, 2, 3, 4, 5, 6 }
 local splitsFormatValues = { 0, 1, 2 }
@@ -184,13 +181,13 @@ local function DropDown_OnClick(self, dropdown)
 		panelOriginalConfig[key] = Config[key]
 	end
 	Config:Set(key, self.value)
-	LibDD:UIDropDownMenu_SetSelectedValue( dropdown, self.value )
+	UIDropDownMenu_SetSelectedValue( dropdown, self.value )
 end
 
 local function DropDown_Initialize(self)
 	local key = self.configKey
-	local selectedValue = LibDD:UIDropDownMenu_GetSelectedValue(self)
-	local info = LibDD:UIDropDownMenu_CreateInfo()
+	local selectedValue = UIDropDownMenu_GetSelectedValue(self)
+	local info = UIDropDownMenu_CreateInfo()
 	info.func = DropDown_OnClick
 	info.arg1 = self
 
@@ -203,7 +200,7 @@ local function DropDown_Initialize(self)
 			else
 				info.checked = nil
 			end
-			LibDD:UIDropDownMenu_AddButton(info)
+			UIDropDownMenu_AddButton(info)
 		end
 	elseif key == 'splitsFormat' then
 		for i, value in ipairs(splitsFormatValues) do
@@ -214,7 +211,7 @@ local function DropDown_Initialize(self)
 			else
 				info.checked = nil
 			end
-			LibDD:UIDropDownMenu_AddButton(info)
+			UIDropDownMenu_AddButton(info)
 		end
 	end
 end
@@ -222,7 +219,7 @@ end
 local DropDown_Index = 0
 local function DropDown_Create(self)
 	DropDown_Index = DropDown_Index + 1
-	local dropdown = LibDD:Create_UIDropDownMenu(ADDON.."ConfigDropDown"..DropDown_Index, self)
+	local dropdown = CreateFrame("Frame", ADDON.."ConfigDropDown"..DropDown_Index, self, "UIDropDownMenuTemplate")
 	_G[ADDON.."ConfigDropDown"..DropDown_Index.."Middle"]:SetWidth(200)
 	
 	local label = dropdown:CreateFontString(ADDON.."ConfigDropLabel"..DropDown_Index, "BACKGROUND", "GameFontNormal")
@@ -255,7 +252,7 @@ Panel_OnRefresh = function(self)
 		checkboxes = {}
 		dropdowns = {}
 
-		local checkboxes_order = { "silverGoldTimer", "autoGossip", "progressTooltip", "completionMessage", "hideTalkingHead", "resetPopup", "announceKeystones" }
+		local checkboxes_order = { "silverGoldTimer", "autoGossip", "progressTooltip", "progressTooltipMDT", "completionMessage", "hideTalkingHead", "resetPopup", "announceKeystones", "schedule" }
 		if Addon.Locale:HasRumors() then table.insert(checkboxes_order, 5, "cosRumors") end
 
 		for i,key in ipairs(checkboxes_order) do
@@ -293,21 +290,22 @@ Panel_OnRefresh = function(self)
 	end
 
 	for _, dropdown in ipairs(dropdowns) do
-		LibDD:UIDropDownMenu_Initialize(dropdown, DropDown_Initialize)
-		LibDD:UIDropDownMenu_SetSelectedValue(dropdown, Config:Get(dropdown.configKey))
+		UIDropDownMenu_Initialize(dropdown, DropDown_Initialize)
+		UIDropDownMenu_SetSelectedValue(dropdown, Config:Get(dropdown.configKey))
 	end
 
 end
 
 function Config:CreatePanel()
-	self:InitializeDropdown()
 	local panel = CreateFrame("FRAME")
 	panel.name = Addon.Name
 	panel.okay = Panel_OnSave
 	panel.cancel = Panel_OnCancel
-	panel.default  = Panel_OnDefaults
-	panel.refresh  = Panel_OnRefresh
-	InterfaceOptions_AddCategory(panel)
+	panel.OnDefault  = Panel_OnDefaults
+	panel.OnRefresh  = Panel_OnRefresh
+	local category, layout = Settings.RegisterCanvasLayoutCategory(panel, panel.name);
+	Settings.RegisterAddOnCategory(category);
+	panel.settingsCategory = category
 
 	return panel
 end
@@ -333,7 +331,6 @@ SLASH_AngryKeystones1 = "/akeys"
 SLASH_AngryKeystones2 = "/angrykeystones"
 function SlashCmdList.AngryKeystones(msg, editbox)
 	if optionPanel then
-		InterfaceOptionsFrame_OpenToCategory(optionPanel)
-		InterfaceOptionsFrame_OpenToCategory(optionPanel)
+		Settings.OpenToCategory(optionPanel.settingsCategory.ID)
 	end
 end

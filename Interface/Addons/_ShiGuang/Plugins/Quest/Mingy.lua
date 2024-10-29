@@ -24,12 +24,9 @@ function Mingy:Initialize()
 end
 
 function Mingy:Load()
-	
 	Mingy.Frame	= CreateFrame("Frame");
 	Mingy.Frame:SetScript("OnEvent", Mingy.EventHandler);
-	
 	Mingy.Frame:RegisterEvent("ADDON_LOADED");
-	
 end
 
 function Mingy:ChooseReward()

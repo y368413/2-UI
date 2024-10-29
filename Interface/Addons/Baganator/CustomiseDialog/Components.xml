@@ -1,0 +1,181 @@
+<Ui>
+  <Frame name="BaganatorCheckBoxTemplate" virtual="true" mixin="BaganatorCheckBoxMixin">
+    <Size y="40"/>
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+      <OnEnter method="OnEnter"/>
+      <OnLeave method="OnLeave"/>
+      <OnMouseUp method="OnMouseUp"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="BaganatorSliderTemplate" virtual="true" mixin="BaganatorSliderMixin">
+    <Size y="40"/>
+    <Frames>
+      <Slider parentKey="Slider" inherits="UISliderTemplate">
+        <Size y="20"/>
+        <Anchors>
+          <Anchor point="RIGHT" x="-45"/>
+          <Anchor point="LEFT" relativePoint="CENTER" x="-32"/>
+        </Anchors>
+      </Slider>
+    </Frames>
+    <Layers>
+      <Layer level="OVERLAY">
+        <FontString parentKey="Label" inherits="GameFontHighlight" justifyH="RIGHT" text="XX">
+          <Anchors>
+            <Anchor point="LEFT" x="20"/>
+            <Anchor point="RIGHT" relativePoint="CENTER" x="-50"/>
+          </Anchors>
+        </FontString>
+        <FontString parentKey="ValueText" inherits="GameFontHighlight" justifyH="LEFT" text="XX">
+          <Anchors>
+            <Anchor point="LEFT" relativePoint="RIGHT" x="-35"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Anchors>
+      <Anchor point="RIGHT" x="-30"/>
+      <Anchor point="LEFT" x="30"/>
+    </Anchors>
+    <Scripts>
+      <OnMouseWheel method="OnMouseWheel"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="BaganatorDropDownTemplate" virtual="true" mixin="BaganatorDropDownMixin">
+    <Size y="40"/>
+    <Layers>
+      <Layer level="OVERLAY">
+        <FontString parentKey="Label" inherits="GameFontHighlight" justifyH="RIGHT" text="XX">
+          <Anchors>
+            <Anchor point="LEFT" x="20"/>
+            <Anchor point="RIGHT" relativePoint="CENTER" x="-50"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <EventButton parentKey="DropDown" inherits="SelectionPopoutButtonTemplate">
+        <Size x="250" y="38"/>
+        <Anchors>
+          <Anchor point="LEFT" relativePoint="CENTER" x="-45"/>
+        </Anchors>
+        <KeyValues>
+          <KeyValue key="selectionEntryTemplates" value="SettingsSelectionPopoutEntryTemplate" type="string"/>
+        </KeyValues>
+        <Frames>
+          <Frame parentKey="SelectionDetails" setAllPoints="true" mixin="SettingsSelectionPopoutDetailsMixin">
+            <Size x="250" y="20"/>
+            <Layers>
+              <Layer level="OVERLAY" textureSubLevel="1">
+                <FontString parentKey="SelectionName" font="GameFontNormal" justifyH="CENTER" maxLines="1" hidden="true"/>
+              </Layer>
+            </Layers>
+          </Frame>
+        </Frames>
+      </EventButton>
+    </Frames>
+    <Anchors>
+      <Anchor point="RIGHT" x="-30"/>
+      <Anchor point="LEFT" x="30"/>
+    </Anchors>
+  </Frame>
+
+  <Frame name="BaganatorHeaderTemplate" virtual="true" inherits="SettingsCategoryListHeaderTemplate" mixin="BaganatorHeaderMixin">
+    <Size y="40"/>
+    <Layers>
+      <Layer level="OVERLAY">
+        <FontString parentKey="Label" inherits="GameFontHighlightLarge" justifyH="CENTER">
+          <Anchors>
+            <Anchor point="LEFT" x="20" y="-1"/>
+            <Anchor point="RIGHT" x="-20" y="-1"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Anchors>
+      <Anchor point="RIGHT" x="-30"/>
+      <Anchor point="LEFT" x="30"/>
+    </Anchors>
+  </Frame>
+
+  <Button name="BaganatorRetailTabTopTemplate" virtual="true" inherits="PanelTopTabButtonTemplate">
+    <Scripts>
+      <OnShow>
+        PanelTemplates_TabResize(self, 15, nil, 10)
+        PanelTemplates_DeselectTab(self)
+      </OnShow>
+    </Scripts>
+  </Button>
+
+  <Button name="BaganatorClassicTabTopTemplate" virtual="true" inherits="TabButtonTemplate">
+    <Scripts>
+      <OnShow>
+        PanelTemplates_TabResize(self, 0, nil, 0)
+        PanelTemplates_DeselectTab(self)
+      </OnShow>
+    </Scripts>
+  </Button>
+
+  <EventButton name="BaganatorCustomiseGetSelectionPopoutButtonTemplate" mixin="BaganatorCustomiseGetSelectionPopoutButtonMixin" virtual="true">
+    <Size x="150" y="38"/>
+    <NormalTexture parentKey="NormalTexture" atlas="charactercreate-customize-dropdownbox"/>
+    <HighlightTexture parentKey="HighlightTexture" atlas="charactercreate-customize-dropdownbox-open" alphaMode="ADD" alpha="0"/>
+    <PushedTextOffset x="2" y="-2"/>
+    <Frames>
+      <Frame parentKey="Popout" inherits="SelectionPopoutTemplate" hidden="true">
+        <Scripts>
+          <OnShow inherit="prepend">
+            self:SetFrameStrata("DIALOG")
+          </OnShow>
+        </Scripts>
+        <Anchors>
+          <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" x="3" y="11"/>
+        </Anchors>
+      </Frame>
+    </Frames>
+    <Scripts>
+      <OnClick method="OnClick"/>
+      <OnLoad method="OnLoad"/>
+      <OnHide method="OnHide"/>
+      <OnEnter method="OnEnter"/>
+      <OnLeave method="OnLeave"/>
+    </Scripts>
+  </EventButton>
+
+  <Frame name="BaganatorCustomSliderTemplate" virtual="true" mixin="BaganatorCustomSliderMixin">
+    <Size y="40"/>
+    <Layers>
+      <Layer level="OVERLAY">
+        <FontString parentKey="Label" inherits="GameFontHighlight" justifyH="LEFT" text="XX">
+          <Anchors>
+            <Anchor point="LEFT" x="15"/>
+          </Anchors>
+        </FontString>
+        <FontString parentKey="ValueText" inherits="GameFontHighlight" justifyH="LEFT" text="XX">
+          <Anchors>
+            <Anchor point="LEFT" relativePoint="RIGHT" x="-55"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Slider parentKey="Slider" inherits="UISliderTemplate">
+        <Size y="20"/>
+        <Anchors>
+          <Anchor point="RIGHT" x="-70"/>
+          <Anchor point="LEFT" x="10" relativeKey="$parent.Label" relativePoint="RIGHT"/>
+        </Anchors>
+      </Slider>
+    </Frames>
+    <Anchors>
+      <Anchor point="RIGHT" x="-30"/>
+      <Anchor point="LEFT" x="30"/>
+    </Anchors>
+    <Scripts>
+      <OnMouseWheel method="OnMouseWheel"/>
+    </Scripts>
+  </Frame>
+</Ui>

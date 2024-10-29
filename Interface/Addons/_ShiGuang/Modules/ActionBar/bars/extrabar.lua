@@ -4,12 +4,11 @@ local Bar = M:GetModule("Actionbar")
 
 local _G = _G
 local tinsert = tinsert
-local cfg = R.Bars.extrabar
 local padding = R.Bars.padding
 
 function Bar:CreateExtrabar()
 	local buttonList = {}
-	local size = cfg.size
+	local size = 52
 
 	-- ExtraActionButton
 	local frame = CreateFrame("Frame", "UI_ActionBarExtra", UIParent, "SecureHandlerStateTemplate")
@@ -18,10 +17,15 @@ function Bar:CreateExtrabar()
 	frame.mover = M.Mover(frame, U["Extrabar"], "Extrabar", {"BOTTOM", UIParent, "BOTTOM", 0, 210})
 
 	ExtraActionBarFrame:EnableMouse(false)
-	ExtraAbilityContainer:SetParent(frame)
-	ExtraAbilityContainer:ClearAllPoints()
-	ExtraAbilityContainer:SetPoint("CENTER", frame, 0, 2*padding)
-	ExtraAbilityContainer.ignoreFramePositionManager = true
+	ExtraActionBarFrame:ClearAllPoints()
+	ExtraActionBarFrame:SetPoint("CENTER", frame)
+	ExtraActionBarFrame.ignoreFramePositionManager = true
+
+	hooksecurefunc(ExtraActionBarFrame, "SetParent", function(self, parent)
+		if parent == ExtraAbilityContainer then
+			self:SetParent(frame)
+		end
+	end)
 
 	local button = ExtraActionButton1
 	tinsert(buttonList, button)
@@ -30,10 +34,6 @@ function Bar:CreateExtrabar()
 
 	frame.frameVisibility = "[extrabar] show; hide"
 	RegisterStateDriver(frame, "visibility", frame.frameVisibility)
-
-	if cfg.fader then
-		Bar.CreateButtonFrameFader(frame, buttonList, cfg.fader)
-	end
 
 	-- ZoneAbility
 	local zoneFrame = CreateFrame("Frame", "UI_ActionBarZone", UIParent)
@@ -51,7 +51,7 @@ function Bar:CreateExtrabar()
 		for spellButton in self.SpellButtonContainer:EnumerateActive() do
 			if spellButton and not spellButton.styled then
 				spellButton.NormalTexture:SetAlpha(0)
-				spellButton:SetPushedTexture(I.textures.pushed) --force it to gain a texture
+				spellButton:SetPushedTexture(I.pushedTex) --force it to gain a texture
 				spellButton:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
 				spellButton:GetHighlightTexture():SetInside()
 				spellButton.Icon:SetInside()
@@ -65,6 +65,23 @@ function Bar:CreateExtrabar()
 	hooksecurefunc(ZoneAbilityFrame, "SetParent", function(self, parent)
 		if parent == ExtraAbilityContainer then
 			self:SetParent(zoneFrame)
+		end
+	end)
+
+	-- Extra button range, needs review
+	hooksecurefunc("ActionButton_UpdateRangeIndicator", function(self, checksRange, inRange)
+		if not self.action then return end
+		if checksRange and not inRange then
+			self.icon:SetVertexColor(.8, .1, .1)
+		else
+			local isUsable, notEnoughMana = IsUsableAction(self.action)
+			if isUsable then
+				self.icon:SetVertexColor(1, 1, 1)
+			elseif notEnoughMana then
+				self.icon:SetVertexColor(.5, .5, 1)
+			else
+				self.icon:SetVertexColor(.4, .4, .4)
+			end
 		end
 	end)
 end

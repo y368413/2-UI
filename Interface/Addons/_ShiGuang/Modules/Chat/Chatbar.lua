@@ -1,6 +1,8 @@
 ﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
 local module = M:GetModule("Chat")
+local tinsert, pairs = tinsert, pairs
+local C_GuildInfo_IsGuildOfficer = C_GuildInfo.IsGuildOfficer
 local gsub, gmatch, ipairs, select= string.gsub, string.gmatch, ipairs, select
 
 ------------------------------------------------------------------------------------- 属性通报 ----------------------------------------
@@ -284,18 +286,36 @@ local chatEvents = {
     if (button == "LeftButton") then self:GetParent():Hide() end
   end
  --------------------------------------- 聊天表情-- Author:M  end -------------------------------------
- 
+local chatSwitchInfo = {
+	text = U["ChatSwitchHelp"],
+	buttonStyle = HelpTip.ButtonStyle.GotIt,
+	targetPoint = HelpTip.Point.TopEdgeCenter,
+	offsetY = 50,
+	onAcknowledgeCallback = M.HelpInfoAcknowledge,
+	callbackArg = "ChatSwitch",
+}
+
+local function chatSwitchTip()
+	if not MaoRUISetDB["Help"]["ChatSwitch"] then
+		HelpTip:Show(ChatFrame1, chatSwitchInfo)
+	end
+end
+
+local function ResetChatAlertJustify(frame)
+	frame:SetJustification("LEFT")
+end
+
 function module:Chatbar()
 	if not R.db["Chat"]["Chatbar"] then return end
 
-	for _, v in pairs(chatEvents) do
-		ChatFrame_AddMessageEventFilter(v, Chatemotefilter)
+	for _, event in pairs(chatEvents) do
+		ChatFrame_AddMessageEventFilter(event, Chatemotefilter)
 	end
 	local chatFrame = SELECTED_DOCK_FRAME
 	local width, height, padding, buttonList = 16, 18, 6, {}
 	local tinsert, pairs = table.insert, pairs
 	
-	local Chatbar = CreateFrame("Frame", "ChatBar", UIParent)
+	local Chatbar = CreateFrame("Frame", "UI_ChatBar", UIParent)
 	Chatbar:SetSize(width, height)
 	Chatbar:SetPoint("TOPLEFT", _G.ChatFrame1, "BOTTOMLEFT", 0, 0)
 
@@ -318,13 +338,7 @@ function module:Chatbar()
 	_G.ChatFrameToggleVoiceMuteButton:ClearAllPoints()
 	_G.ChatFrameToggleVoiceMuteButton:SetPoint("LEFT", _G.ChatFrameToggleVoiceDeafenButton, "RIGHT", 0, 0)
 	_G.ChatFrameToggleVoiceMuteButton:SetParent(VoiceFrame)
-	--_G.QuickJoinToastButton.Show = M.Dummy
-	--_G.QuickJoinToastButton:Hide()
-	--_G.QuickJoinToastButton:SetParent(VoiceFrame)
-	_G.QuickJoinToastButton:SetAlpha(0)
-	_G.ChatAlertFrame:ClearAllPoints()
-	_G.ChatAlertFrame:SetPoint("BOTTOMLEFT", _G.ChatFrame1Tab, "TOPLEFT", 6, 21)
-
+	
 	local Voice = CreateFrame("Button", nil, Chatbar)
 	Voice:SetSize(18, 18)
 	Voice:SetPoint("LEFT", Chatbar, "LEFT", 0, -2)
@@ -338,7 +352,13 @@ function module:Chatbar()
 	_G.ChatFrameMenuButton:SetSize(21, 21)
 	--_G.ChatFrameMenuButton:SetScale(0.6)
 	_G.ChatFrameMenuButton:SetPoint("LEFT", Voice, "RIGHT", 0, -1)	
-	--_G.ChatFrameMenuButton:SetParent(VoiceFrame)
+	_G.ChatFrameMenuButton:SetParent(Chatbar)
+	_G.QuickJoinToastButton:SetParent(Chatbar)
+	_G.QuickJoinToastButton:SetAlpha(0)
+	_G.ChatAlertFrame:ClearAllPoints()
+	_G.ChatAlertFrame:SetPoint("BOTTOMLEFT", _G.ChatFrame1Tab, "TOPLEFT", 6, 21)
+	ResetChatAlertJustify(_G.ChatAlertFrame)
+	hooksecurefunc(_G.ChatAlertFrame, "SetChatButtonSide", ResetChatAlertJustify)
 	
 	Emote_CallButton=CreateFrame("Button","Emote_CallButton",Chatbar)
  	Emote_CallButton:SetSize(16, 16)
@@ -384,6 +404,7 @@ function module:Chatbar()
     Emote_IconPanel:SetAlpha(0.8)
     Emote_IconPanel:Hide()
     --让输入框支持当输入 { 时自动弹出聊天表情选择框
+	hooksecurefunc("ChatEdit_OnHide", function() C_Timer.After(.5, function() Emote_IconPanel:Hide() end) end)
     hooksecurefunc("ChatEdit_OnTextChanged", function(self, userInput)
         local text = self:GetText()
         if (userInput and strsub(text, -1) == "{") then
@@ -398,7 +419,10 @@ function module:Chatbar()
 		bu:SetHitRectInsets(0, 0, -8, -8)
 		bu:RegisterForClicks("AnyUp")
 		--if text then M.AddTooltip(bu, "ANCHOR_TOP", M.HexRGB(r, g, b)..text) end
-		if func then bu:SetScript("OnClick", func) end
+		if func then
+			bu:SetScript("OnClick", func)
+			bu:HookScript("OnClick", chatSwitchTip)
+		end
 		tinsert(buttonList, bu)
 		return bu
 	end
@@ -422,11 +446,13 @@ function module:Chatbar()
 	local roll = AddButton(.8, 1, .6, Chatbar_rollText)  --LOOT_ROLL
 	roll:SetAttribute("type", "macro")
 	roll:SetAttribute("macrotext", "/roll")
+	roll:RegisterForClicks("AnyUp", "AnyDown")
 
 	-- COMBATLOG
 	--local combat = AddButton(1, 1, 0, BINDING_NAME_TOGGLECOMBATLOG)
 	--combat:SetAttribute("type", "macro")
 	--combat:SetAttribute("macrotext", "/combatlog")
+	--combat:RegisterForClicks("AnyUp", "AnyDown")
 	
 	-- WORLD CHANNEL
 	if GetCVar("portal") == "CN" then

@@ -5,11 +5,11 @@ local UF = M:GetModule("UnitFrames")
 local unpack, min, format, strupper = unpack, min, format, strupper
 local GetTime, IsPlayerSpell, UnitName = GetTime, IsPlayerSpell, UnitName
 local UnitInVehicle, UnitIsUnit, UnitExists = UnitInVehicle, UnitIsUnit, UnitExists
+local UIFrameFadeIn = UIFrameFadeIn
 
 local CastbarCompleteColor = {.1, .8, 0}
 local CastbarFailColor = {1, .1, 0}
 
-local ticks = {}
 local channelingTicks = {
 	[740] = 4,		-- 宁静
 	[755] = 5,		-- 生命通道
@@ -47,13 +47,15 @@ if I.MyClass == "PRIEST" then
 end
 
 function UF:OnCastbarUpdate(elapsed)
-	if self.casting or self.channeling then
+	if self.casting or self.channeling or self.empowering then
+		local isCasting = self.casting or self.empowering
 		local decimal = self.decimal
 
-		local duration = self.casting and (self.duration + elapsed) or (self.duration - elapsed)
-		if (self.casting and duration >= self.max and not self.isChargeSpell) or (self.channeling and duration <= 0) then
+		local duration = isCasting and (self.duration + elapsed) or (self.duration - elapsed)
+		if (isCasting and duration >= self.max) or (self.channeling and duration <= 0) then
 			self.casting = nil
 			self.channeling = nil
+			self.empowering = nil
 			return
 		end
 
@@ -74,12 +76,22 @@ function UF:OnCastbarUpdate(elapsed)
 		self:SetValue(duration)
 		self.Spark:SetPoint("CENTER", self, "LEFT", (duration / self.max) * self:GetWidth(), 0)
 
-		if self.stageString and self.isChargeSpell then
+		if self.stageString then
 			self.stageString:SetText("")
+			if self.empowering then
+				for i = self.numStages, 1, -1 do
+					local pip = self.Pips[i]
+					if pip and duration > pip.duration then
+						self.stageString:SetText(i)
 
-			for i = 1, self.numStages, 1 do
-				if duration > ticks[i].duration then
-					self.stageString:SetText(i)
+						if self.curStage ~= i then
+							self.curStage = i
+							local nextStage = self.numStages == i and 1 or i+1
+							local nextPip = self.Pips[nextStage]
+							UIFrameFadeIn(nextPip.tex, .25, .3, 1)
+						end
+						break
+					end
 				end
 			end
 		end
@@ -165,15 +177,11 @@ function UF:PostCastStart(unit)
 			self.__sendTime = nil
 		end
 
-		if self.isChargeSpell then
-			UF:CreateAndUpdateStagePip(self, ticks, self.numStages)
-		else
-			local numTicks = 0
-			if self.channeling then
-				numTicks = channelingTicks[self.spellID] or 0
-			end
-			M:CreateAndUpdateBarTicks(self, ticks, numTicks)
+		local numTicks = 0
+		if self.channeling then
+			numTicks = channelingTicks[self.spellID] or 0
 		end
+		M:CreateAndUpdateBarTicks(self, self.castTicks, numTicks)
 	end
 
 	UpdateCastBarColor(self, unit)
@@ -214,4 +222,50 @@ function UF:PostCastFailed()
 	self.fadeOut = true
 	self:Show()
 	ResetSpellTarget(self)
+end
+
+UF.PipColors = {
+	[1] = {.08, 1, 0, .3},
+	[2] = {1, .1, .1, .3},
+	[3] = {1, .5, 0, .3},
+	[4] = {.1, .7, .7, .3},
+	[5] = {0, 1, 1, .3},
+}
+function UF:CreatePip(stage)
+	local _, height = self:GetSize()
+
+	local pip = CreateFrame("Frame", nil, self, "CastingBarFrameStagePipTemplate")
+	pip.BasePip:SetTexture(I.bdTex)
+	pip.BasePip:SetVertexColor(0, 0, 0)
+	pip.BasePip:SetWidth(R.mult)
+	pip.BasePip:SetHeight(height)
+	pip.tex = pip:CreateTexture(nil, "ARTWORK", nil, 2)
+	pip.tex:SetTexture(I.normTex)
+	pip.tex:SetVertexColor(unpack(UF.PipColors[stage]))
+
+	return pip
+end
+
+function UF:PostUpdatePips(numStages)
+	local pips = self.Pips
+	local numStages = self.numStages
+
+	for stage = 1, numStages do
+		local pip = pips[stage]
+		pip.tex:SetAlpha(.3) -- reset pip alpha
+		pip.duration = self.stagePoints[stage]
+
+		if stage == numStages then
+			local firstPip = pips[1]
+			local anchor = pips[numStages]
+			firstPip.tex:SetPoint("BOTTOMRIGHT", self)
+			firstPip.tex:SetPoint("TOPLEFT", anchor.BasePip, "TOPRIGHT")
+		end
+
+		if stage ~= 1 then
+			local anchor = pips[stage-1]
+			pip.tex:SetPoint("BOTTOMRIGHT", pip.BasePip, "BOTTOMLEFT")
+			pip.tex:SetPoint("TOPLEFT", anchor.BasePip, "TOPRIGHT")
+		end
+	end
 end

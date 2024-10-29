@@ -19,14 +19,18 @@ Base class for all node requirements.
 --]]
 
 local Requirement = Class('Requirement', nil, {text = UNKNOWN})
-function Requirement:GetText() return self.text end
+function Requirement:GetText()
+    local text = self.text
+    if self.type then text = text .. ' (' .. self.type .. ')' end
+    return text
+end
 function Requirement:IsMet() return false end
 
 -------------------------------------------------------------------------------
 --------------------------------- ACHIEVEMENT ---------------------------------
 -------------------------------------------------------------------------------
 
-local Achievement = Class('Achievement', Requirement)
+local Achievement = Class('Achievement', Requirement, {type = L['achievement']})
 
 function Achievement:Initialize(id)
     self.id = id
@@ -43,7 +47,7 @@ end
 ---------------------------------- CURRENCY -----------------------------------
 -------------------------------------------------------------------------------
 
-local Currency = Class('Currency', Requirement)
+local Currency = Class('Currency', Requirement, {type = L['currency']})
 
 function Currency:Initialize(id, count)
     self.id, self.count = id, count
@@ -95,11 +99,21 @@ end
 ------------------------------------ ITEM -------------------------------------
 -------------------------------------------------------------------------------
 
-local Item = Class('Item', Requirement)
+local Item = Class('Item', Requirement, {type = L['item']})
 
-function Item:Initialize(id, count)
-    self.id, self.count = id, count
+-- Quality (optional - added in Dragnflight):
+-- 1 = Bronze 1 diamond
+-- 2 = Silver 2 diamonds
+-- 3 = Gold 3 diamonds
+-- 4 = Diamond 4 diamonds
+-- 5 = Orange 1 large diamond
+function Item:Initialize(id, count, quality)
+    self.id, self.count, self.quality = id, count, quality
     self.text = string.format('{item:%d}', self.id)
+    if self.quality ~= nil then
+        self.text = self.text ..
+                        C_Texture.GetCraftingReagentQualityChatIcon(self.quality)
+    end
     if self.count and self.count > 1 then
         self.text = self.text .. ' x' .. self.count
     end
@@ -108,14 +122,38 @@ end
 function Item:IsMet() return Core.PlayerHasItem(self.id, self.count) end
 
 -------------------------------------------------------------------------------
+--------------------------------- PROFESSION ----------------------------------
+-------------------------------------------------------------------------------
+
+local Profession = Class('Profession', Requirement)
+
+function Profession:Initialize(skillID, variantID, level)
+    self.skillID = skillID
+    self.variantID = variantID
+    self.level = level
+    self.text = C_TradeSkillUI.GetTradeSkillDisplayName(variantID or skillID)
+
+    if level then self.text = self.text .. ' (' .. level .. ')' end
+end
+
+function Profession:IsMet() return Core.PlayerHasProfession(self.skillID) end
+
+-------------------------------------------------------------------------------
 ------------------------------------ QUEST ------------------------------------
 -------------------------------------------------------------------------------
 
-local Quest = Class('Quest', Requirement)
+local Quest = Class('Quest', Requirement, {type = L['quest']})
 
-function Quest:Initialize(id) self.id = id end
+function Quest:Initialize(id, text, repeatable)
+    self.id = id
+    self.text = text
+    self.type = repeatable and L['quest_repeatable'] or self.type
+end
 
-function Quest:GetText() return C_QuestLog.GetTitleForQuestID(self.id) end
+function Quest:GetText()
+    local text = C_QuestLog.GetTitleForQuestID(self.id) or self.text or UNKNOWN
+    return ('%s (%s)'):format(text, self.type)
+end
 
 function Quest:IsMet() return C_QuestLog.IsQuestFlaggedCompleted(self.id) end
 
@@ -126,39 +164,72 @@ function Quest:IsMet() return C_QuestLog.IsQuestFlaggedCompleted(self.id) end
 local Reputation = Class('Reputation', Requirement)
 
 -- @todo will cause problems when requiring lower / negative reputations. Maybe add comparison as optional parameter with default value '>='.
-function Reputation:Initialize(id, level) self.id, self.level = id, level end
+function Reputation:Initialize(id, level, isRenown, isAmount)
+    self.id = id
+    self.level = level
+    self.isRenown = isRenown
+    self.isAmount = isAmount
+end
 
 function Reputation:GetText()
-    local name = GetFactionInfoByID(self.id)
-    local level = GetText('FACTION_STANDING_LABEL' .. self.level)
-    return string.format(name .. ' (' .. level .. ')')
+    local level = self.level
+    if self.isAmount then
+        level = Core.FormatReputation(self.level)
+    elseif self.isRenown then
+        level = _G['COVENANT_SANCTUM_LEVEL']:format(level)
+    else
+        level = GetText('FACTION_STANDING_LABEL' .. level)
+    end
+    return ('%s (%s)'):format(Core.api.GetFactionInfoByID(self.id), level)
 end
 
 function Reputation:IsMet()
-    local _, _, standingID = GetFactionInfoByID(self.id)
-
-    return standingID >= self.level
+    if self.isAmount then
+        return select(6, Core.api.GetFactionInfoByID(self.id)) >= self.level
+    elseif self.isRenown then
+        return C_MajorFactions.GetCurrentRenownLevel(self.id) >= self.level
+    else
+        return select(3, Core.api.GetFactionInfoByID(self.id)) >= self.level
+    end
 end
 
 -------------------------------------------------------------------------------
 ------------------------------------ SPELL ------------------------------------
 -------------------------------------------------------------------------------
 
-local Spell = Class('Spell', Requirement)
+local Spell = Class('Spell', Requirement, {type = L['spell']})
 
 function Spell:Initialize(id)
     self.id = id
     self.text = string.format('{spell:%d}', self.id)
 end
 
-function Spell:IsMet()
-    for i = 1, 255 do
-        local buff = select(10, UnitAura('player', i, 'HELPFUL'))
-        local debuff = select(10, UnitAura('player', i, 'HARMFUL'))
-        if buff == self.id or debuff == self.id then return true end
-    end
-    return false
+function Spell:IsMet() return C_UnitAuras.GetPlayerAuraBySpellID(self.id) ~= nil end
+
+-------------------------------------------------------------------------------
+------------------------------- Specialization --------------------------------
+-------------------------------------------------------------------------------
+
+local Specialization = Class('Specialization', Requirement,
+    {type = _G['SPECIALIZATION']})
+
+function Specialization:Initialize(id)
+    self.id = id
+    self.text = select(2, GetSpecializationInfoByID(self.id))
 end
+
+function Specialization:IsMet()
+    local specID = GetSpecializationInfo(GetSpecialization())
+    return specID == self.id
+end
+
+-------------------------------------------------------------------------------
+------------------------------------- TOY -------------------------------------
+-------------------------------------------------------------------------------
+
+local Toy = Class('Toy', Item, {type = L['toy']})
+
+function Toy:IsMet() return PlayerHasToy(self.id) end
 
 -------------------------------------------------------------------------------
 ----------------------------------- WAR MODE ----------------------------------
@@ -179,9 +250,12 @@ Core.requirement = {
     GarrisonTalent = GarrisonTalent,
     GarrisonTalentRank = GarrisonTalentRank,
     Item = Item,
+    Profession = Profession,
     Quest = Quest,
     Reputation = Reputation,
     Requirement = Requirement,
+    Specialization = Specialization,
     Spell = Spell,
+    Toy = Toy,
     WarMode = WarMode
 }

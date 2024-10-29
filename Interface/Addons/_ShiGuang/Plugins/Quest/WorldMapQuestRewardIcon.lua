@@ -1,22 +1,49 @@
 ﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
 local RewardIcons_DisableBountyColors = false
-local RewardIcons_Size = 36
 
-local GetCurrentMapID, tonumber, C_TaskQuest, tinsert, abs, time, HaveQuestData, QuestUtils_IsQuestWorldQuest, bit, format, floor, pairs = 
-      function() return WorldMapFrame:GetMapID() or 0 end, tonumber, C_TaskQuest, tinsert, abs, time, HaveQuestData, QuestUtils_IsQuestWorldQuest, bit, format, floor, pairs
+local GetCurrentMapID, tonumber, format, floor, pairs = 
+      function() return WorldMapFrame:GetMapID() or 0 end, tonumber, format, floor, pairs
 local IsQuestComplete, IsQuestCriteriaForBounty = C_QuestLog.IsComplete, C_QuestLog.IsQuestCriteriaForBounty
-
 local function GetCurrencyInfo(id)
 	local data = C_CurrencyInfo.GetCurrencyInfo(id)
 	return data.name, nil, data.iconFileID
 end
-
 local function GetQuestTagInfo(id)
 	local data = C_QuestLog.GetQuestTagInfo(id)
 	return data.tagID, data.tagName, data.worldQuestType, data.quality, data.isElite, data.tradeskillLineID, data.displayExpiration
 end
+local function WorldQuestList_IsAzeriteItemAtMaxLevel()
+	return C_AzeriteItem.IsAzeriteItemAtMaxLevel()
+end
 
+local GetNumQuestLogRewardCurrencies, GetQuestLogRewardCurrencyInfo = GetNumQuestLogRewardCurrencies, GetQuestLogRewardCurrencyInfo
+if not GetNumQuestLogRewardCurrencies then
+	local reward_cache = {}
+	local function GetData(questID)
+		local data = reward_cache[questID]
+		local t = GetTime()
+		if not data or t > data.expTime then
+			data = C_QuestLog.GetQuestRewardCurrencies(questID)
+			data.expTime = t + 5
+		end
+		return data
+	end
+	function GetNumQuestLogRewardCurrencies(questID)
+		local data = GetData(questID)
+		return #data
+	end
+	function GetQuestLogRewardCurrencyInfo(i, questID)
+		local data = GetData(questID)[i]
+		if not data then
+			return
+		end
+		return data.name, data.texture, data.baseRewardAmount, data.currencyID
+		--data.totalRewardAmount
+	end
+end
+
+local WorldQuestList_QuestIDtoMapID = {}
 local CacheQuestItemReward = {}
 local CacheIsAnimaItem = {}
 	local list = {
@@ -60,6 +87,27 @@ local CacheIsAnimaItem = {}
 		[1851] = 2456,
 		[1852] = 2451,
 		[1853] = 2447,
+
+		[1907] = 2470,
+
+		[1982] = 2478,
+
+		[2106] = 2510,
+		[2031] = 2507,
+		[2108] = 2503,
+		[2109] = 2511,
+
+		[2420] = 2568,
+
+		[2819] = 2615,
+		[2652] = 2574,
+ 
+		[2903] = 2600,
+		[3004] = 2607,
+		[3003] = 2605,
+		[3002] = 2601,
+		[2897] = 2590,
+		[2899] = 2570,
 	}
 do
 	local prevTime = 0
@@ -101,7 +149,7 @@ local SlotToIcon = {
 	["INVTYPE_WEAPONMAINHAND"]="transmog-nav-slot-mainhand", 
 	["INVTYPE_SHIELD"]="transmog-nav-slot-secondaryhand",
 	["INVTYPE_WEAPONOFFHAND"]="transmog-nav-slot-secondaryhand",
-	[select(3,GetItemInfoInstant(141265))] = "Warlock-ReadyShard",
+	[select(3,C_Item.GetItemInfoInstant(141265))] = "Warlock-ReadyShard",
 	}
 local GENERAL_MAPS = {	--1: continent A, 2: azeroth, 3: argus, 4: continent B
 	[947] = 2,
@@ -117,6 +165,8 @@ local GENERAL_MAPS = {	--1: continent A, 2: azeroth, 3: argus, 4: continent B
 	[13] = 4,
 	[101] = 4,
 	[1550] = 1,
+	[1978] = 1,
+	[2274] = 1,
 }
 local LE = {
 	LE_QUEST_TAG_TYPE_INVASION = Enum.QuestTagType.Invasion,
@@ -141,19 +191,32 @@ local LE = {
 
 	function WorldQuestList_IsShadowlandsZone(mapID)
 		mapID = mapID or GetCurrentMapID()
-		if mapID >= 1525 then
+		if mapID >= 1525 and mapID < 2022 and mapID ~= 1978 then
+			return true
+		else
+			return false
+		end
+	end
+
+	function WorldQuestList_IsDragonflightZone(mapID)
+		mapID = mapID or GetCurrentMapID()
+		if mapID >= 2022 or mapID == 1978 then
 			return true
 		else
 			return false
 		end
 	end
 	
-local inspectScantip = CreateFrame("GameTooltip", "WorldmapRewardIconWorldQuestListInspectScanningTooltip", nil, "GameTooltipTemplate")
-      inspectScantip:SetOwner(UIParent, "ANCHOR_NONE")
+
+function WorldQuestList_IsAzeriteItemAtMaxLevel()
+	return C_AzeriteItem.IsAzeriteItemAtMaxLevel()
+end
   
 function WorldQuestList_IsFactionCurrency(currencyID)
 	if list[currencyID or 0] then
 		return true
+		elseif C_CurrencyInfo.GetFactionGrantedByCurrency(currencyID) then
+			return true
 	else
 		return false
 	end
@@ -182,7 +245,7 @@ end
 				local pins = mapFrame.pinPools[pinName]
 				if pins then
 					local scaleFactor,startScale,endScale
-					for obj,_ in pairs(pins.activeObjects) do
+					for obj in mapFrame:EnumeratePinsByTemplate("WorldMap_WorldQuestPinTemplate") do
 						scaleFactor = obj.scaleFactor
 						startScale = obj.startScale
 						endScale = obj.endScale
@@ -235,7 +298,7 @@ end
 			table[num] = t
 		end
 		  t.obj = obj:GetParent()
-			t.t:SetFont(STANDARD_TEXT_FONT,23,"OUTLINE")
+			t.t:SetFont(STANDARD_TEXT_FONT,12,"OUTLINE")
 			t.t:SetTextColor(1,1,1,1)
 		t:SetPoint("CENTER",obj,0,0)
 		t.t:SetText(text)
@@ -245,8 +308,8 @@ end
 		return num
 	end
 
-
 function WorldQuestList_WQIcons_AddIcons(frame,pinName)
+	local RewardIcons_Size = R.db["Misc"]["WorldQusetRewardIconsSize"]
 		frame = frame or WorldMapFrame
 		local pins = frame.pinPools[pinName or "WorldMap_WorldQuestPinTemplate"]
 		if pins then
@@ -264,7 +327,7 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 				elseif t < 2880 then
 					bountyData.middleTime = true
 				end
-				if IsQuestComplete(bountyData.questID) then
+				if IsQuestComplete(bountyData.questID) or t == 0 then
 					bountyData.completed = true
 				end
 			end
@@ -283,7 +346,7 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 						elseif t < 2880 then
 							callingData.middleTime = true
 						end
-						if IsQuestComplete(questID) then
+						if IsQuestComplete(questID) or t == 0 then
 							callingData.completed = true
 						end
 
@@ -301,9 +364,9 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 			end
 			local warMode = C_PvP.IsWarModeDesired()
 			local warModeBonus = C_PvP.GetWarModeRewardBonus() / 100 + 1
-			for obj,_ in pairs(pins.activeObjects) do
+			for obj in frame:EnumeratePinsByTemplate("WorldMap_WorldQuestPinTemplate") do
 				local icon = obj.WQL_rewardIcon
-				obj.BountyRing:Hide()
+				--obj.BountyRing:Hide()
 				if obj.questID then
 					if not icon then
 						icon = obj:CreateTexture(nil,"ARTWORK")
@@ -311,44 +374,46 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 						icon:SetPoint("CENTER",0,0)
 						icon:SetSize(RewardIcons_Size,RewardIcons_Size)
 						local Border = obj:CreateTexture(nil, 'OVERLAY', nil, 1)
-						Border:SetPoint('CENTER', 0, -3)
+						Border:SetPoint('CENTER', 0, 0)
 						Border:SetAtlas('worldquest-emissary-ring')
-						Border:SetSize(RewardIcons_Size+32, RewardIcons_Size+32)
+						Border:SetSize(RewardIcons_Size, RewardIcons_Size)
 						obj.Border = Border
-						local Bounty = obj:CreateTexture(nil, 'OVERLAY', nil, 2)
+						--[[local Bounty = obj:CreateTexture(nil, 'OVERLAY', nil, 2)
 						Bounty:SetSize(RewardIcons_Size, RewardIcons_Size)
 						Bounty:SetAtlas('QuestNormal')
 						Bounty:SetPoint('CENTER', 23, 0)
-						obj.BountyRing = Bounty
+						obj.BountyRing = Bounty]]
 						local iconWMask = obj:CreateTexture(nil,"ARTWORK")
+						obj.WQL_rewardIconWMask = iconWMask
 						iconWMask:SetPoint("CENTER",0,0)
 						iconWMask:SetSize(RewardIcons_Size,RewardIcons_Size)
 						iconWMask:SetMask("Interface\\CharacterFrame\\TempPortraitAlphaMask")
-						obj.WQL_rewardIconWMask = iconWMask
 						
 						local ribbon = obj:CreateTexture(nil,"BACKGROUND")
 						obj.WQL_rewardRibbon = ribbon
-						ribbon:SetPoint("TOP",obj,"BOTTOM",3,21)
-						ribbon:SetSize(RewardIcons_Size+21,RewardIcons_Size)
+						ribbon:SetPoint("TOP",obj,"BOTTOM",0,18)
+						ribbon:SetSize(RewardIcons_Size*2,RewardIcons_Size)
 						--ribbon:SetAtlas("UI-Frame-Neutral-Ribbon")
 						
 						if not isWorldMapFrame then
 							local ribbonText = obj:CreateFontString(nil,"BORDER","GameFontWhite")
 							obj.WQL_rewardRibbonText = ribbonText
-							ribbonText:SetFont(ribbonText:GetFont(),23)
-							ribbonText:SetPoint("CENTER",ribbon,0,-1)
+							local a1,a2 = ribbonText:GetFont()
+							ribbonText:SetFont(a1,12)
+							ribbonText:SetPoint("CENTER",ribbon,0,0)
 							ribbonText:SetTextColor(0,0,0,1)
 						end
 						
-						local Indicator = CreateFrame('Frame', nil, obj):CreateTexture(nil, 'OVERLAY', nil, 2)
-						Indicator:SetPoint('CENTER', obj, -19, 19)
-						Indicator:SetSize(RewardIcons_Size,RewardIcons_Size)
-						obj.WQL_iconTopRight = Indicator
+						local iconTopRight = obj:CreateTexture(nil,"OVERLAY")
+						obj.WQL_iconTopRight = iconTopRight
+						iconTopRight:SetPoint("CENTER",obj,"TOPRIGHT",0,0)
+						iconTopRight:SetSize(RewardIcons_Size*0.7,RewardIcons_Size*0.7)
+						iconTopRight.SIZE_MOD = 0.7
 						
 						obj:HookScript("OnEnter",HookOnEnter)
 						obj:HookScript("OnLeave",HookOnLeave)
 
-						--obj.WQL_BountyRing_defSize = obj.BountyRing:GetSize()
+						obj.WQL_BountyRing_defSize = obj.BountyRing and obj.BountyRing:GetSize()
 					end
 					local tagID, tagName, worldQuestType, rarity, isElite, tradeskillLineIndex, displayTimeLeft = GetQuestTagInfo(obj.questID)
 					
@@ -364,7 +429,9 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 					-- currency
 					for i = 1, GetNumQuestLogRewardCurrencies(obj.questID) do
 						local name, texture, numItems, currencyID = GetQuestLogRewardCurrencyInfo(i, obj.questID)
-						if currencyID == 1508 or currencyID == 1533 or currencyID == 1721 then	--Veiled Argunite, Wakening Essence, Prismatic Manapearl
+						if not numItems or numItems <= 0 then
+
+						elseif currencyID == 1508 or currencyID == 1533 or currencyID == 1721 then	--Veiled Argunite, Wakening Essence, Prismatic Manapearl
 							iconTexture = texture
 							ajustMask = true
 							ajustSize = 8
@@ -378,15 +445,27 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 							amount = floor(numItems * (warMode and C_QuestLog.QuestCanHaveWarModeBonus(obj.questID) and C_CurrencyInfo.DoesWarModeBonusApply(currencyID) and warModeBonus or 1))
 							ajustSize = 5
 							iconTexture, ajustMask = nil
-							--if WorldQuestList_IsAzeriteItemAtMaxLevel() then
-								--iconGray = true
-							--end
+							if WorldQuestList_IsAzeriteItemAtMaxLevel() then
+								iconGray = true
+							end
 							break
 						elseif currencyID == 1220 or currencyID == 1560 then	--OR
 							iconAtlas = "legionmission-icon-currency"
 							ajustSize = 5
 							amount = floor(numItems * (warMode and C_QuestLog.QuestCanHaveWarModeBonus(obj.questID) and C_CurrencyInfo.DoesWarModeBonusApply(currencyID) and warModeBonus or 1))
 							iconTexture, ajustMask = nil
+							break
+						elseif currencyID == 2003 then
+							iconTexture = texture
+							ajustMask = true
+							ajustSize = 5
+							amount = floor(numItems * (warMode and C_QuestLog.QuestCanHaveWarModeBonus(obj.questID) and C_CurrencyInfo.DoesWarModeBonusApply(currencyID) and warModeBonus or 1))
+							break
+						elseif currencyID == 2408 or currencyID == 2245 or currencyID == 2706 or currencyID == 2815 or currencyID == 3008 then
+							iconTexture = texture
+							ajustMask = true
+							ajustSize = 8
+							amount = floor(numItems * (warMode and C_QuestLog.QuestCanHaveWarModeBonus(obj.questID) and C_CurrencyInfo.DoesWarModeBonusApply(currencyID) and warModeBonus or 1))
 							break
 						elseif WorldQuestList_IsFactionCurrency(currencyID or 0) then
 							iconAtlas = "poi-workorders"
@@ -400,7 +479,7 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 					if GetNumQuestLogRewards(obj.questID) > 0 then
 						local name,icon,numItems,quality,_,itemID = GetQuestLogRewardInfo(1,obj.questID)
 						if itemID then
-							local itemLevel = select(4,GetItemInfo(itemID)) or 0
+							local itemLevel = select(4,C_Item.GetItemInfo(itemID)) or 0
 							if itemLevel > 60 or (itemLevel > 40 and not WorldQuestList_IsShadowlandsZone(bountyMapID)) then
 								iconAtlas = "Banker"
 								amount = 0
@@ -408,14 +487,15 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 								
 								local itemLink = CacheQuestItemReward[obj.questID]
 								if not itemLink then
-									inspectScantip:SetQuestLogItem("reward", 1, obj.questID)
-									itemLink = select(2,inspectScantip:GetItem())
-									inspectScantip:ClearLines()
-									
+									local tooltipData = C_TooltipInfo.GetQuestLogItem("reward", 1, obj.questID)
+									if tooltipData then
+										itemLink = tooltipData.hyperlink
+									end
+
 									CacheQuestItemReward[obj.questID] = itemLink
 								end
 								if itemLink then
-									itemLevel = select(4,GetItemInfo(itemLink))
+									itemLevel = select(4,C_Item.GetItemInfo(itemLink))
 									if itemLevel then
 										amount = itemLevel
 										if quality and quality > 1 then
@@ -424,13 +504,13 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 										end
 									end
 								end
-								local itemSubType,inventorySlot = select(3,GetItemInfoInstant(itemID))
+								local itemSubType,inventorySlot = select(3,C_Item.GetItemInfoInstant(itemID))
 								if inventorySlot and SlotToIcon[inventorySlot] then
 									iconAtlas = SlotToIcon[inventorySlot]
 									ajustSize = iconAtlas == "Warlock-ReadyShard" and 0 or 10
 								elseif itemSubType and SlotToIcon[itemSubType] then
 									iconAtlas = SlotToIcon[itemSubType]
-									ajustSize = iconAtlas == "Warlock-ReadyShard" and 0 or 10								
+									ajustSize = iconAtlas == "Warlock-ReadyShard" and 0 or 10
 								end
 							end
 							if itemID == 124124 or itemID == 151568 then
@@ -442,7 +522,7 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 								end
 							elseif itemID == 152960 or itemID == 152957 then
 								iconAtlas = "poi-workorders"
-							elseif itemID == 163857 or itemID == 143559 or itemID == 141920 or itemID == 152668 then
+							elseif itemID == 163857 or itemID == 143559 or itemID == 141920 or itemID == 152668 or itemID == 209839 or itemID == 209837 then
 								iconTexture = icon
 								ajustMask = true
 								ajustSize = 4
@@ -476,6 +556,24 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 							elseif itemID == 169485 then
 								iconAtlas = SlotToIcon.INVTYPE_HAND
 								ajustSize = 10
+							elseif itemID == 229899 then
+								iconTexture = icon
+								ajustMask = true
+								ajustSize = 4
+							elseif itemID == 226264 then
+								iconTexture = icon
+								ajustMask = true
+								ajustSize = 4
+							elseif itemID == 198048 or itemID == 198056 or itemID == 198058 or itemID == 198059 or itemID == 204673 then
+								iconTexture = icon
+								ajustMask = true
+								ajustSize = 4
+								amount = itemID == 198048 and "I" or itemID == 198056 and "II" or itemID == 198058 and "III" or itemID == 204673 and "V" or "IV"
+							elseif itemID == 228339 or itemID == 228338 then
+								iconTexture = icon
+								ajustMask = true
+								ajustSize = 4
+								amount = itemID == 228338 and "I" or itemID == 228339 and "II" or "III" 
 							end
 							
 							if CacheIsAnimaItem[itemID] then
@@ -492,39 +590,40 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 									--end
 									amount = amount + bonus
 								end
-							elseif select(2,GetItemInfoInstant(itemID)) == MISCELLANEOUS then
-								inspectScantip:SetQuestLogItem("reward", 1, obj.questID)
-								local isAnima
-								for j=2, inspectScantip:NumLines() do
-									local tooltipLine = _G["WorldmapRewardIconWorldQuestListInspectScanningTooltipTextLeft"..j]								                       	
-									local text = tooltipLine:GetText()
-									if text and text:find(WORLD_QUEST_REWARD_FILTERS_ANIMA.."|r$") then
-										isAnima = 1
-									elseif text and isAnima and text:find("^"..LE.ITEM_SPELL_TRIGGER_ONUSE) then
-										local num = text:gsub("(%d+)[ %.,]+(%d+)","%1%2"):match("%d+")
-										isAnima = tonumber(num or "") or 1
-										break
-									end 
-								end
-								if isAnima then
-									if isAnima ~= 1 then
-										CacheIsAnimaItem[itemID] = isAnima
+							elseif select(2,C_Item.GetItemInfoInstant(itemID)) == MISCELLANEOUS then
+								local tooltipData = C_TooltipInfo.GetQuestLogItem("reward", 1, obj.questID)
+								if tooltipData then
+									local isAnima
+									for j=2, #tooltipData.lines do
+										local tooltipLine = tooltipData.lines[j]
+										local text = tooltipLine.leftText
+										if text and text:find(WORLD_QUEST_REWARD_FILTERS_ANIMA.."|r$") then
+											isAnima = 1
+										elseif text and isAnima and text:find("^"..LE.ITEM_SPELL_TRIGGER_ONUSE) then
+											local num = text:gsub("(%d+)[ %.,]+(%d+)","%1%2"):match("%d+")
+											isAnima = tonumber(num or "") or 1
+											break
+										end 
 									end
-									iconTexture = 613397
-									ajustMask = true
-									ajustSize = 10
-									amount = numItems * isAnima
-									if warMode and C_QuestLog.QuestCanHaveWarModeBonus(obj.questID) then
-										local bonus = floor(amount * (warModeBonus - 1) + .5)
-										--if isAnima <= 35 then
-											bonus = bonus - bonus % 3
-										--else
-										--	bonus = bonus - bonus % 5
-										--end
-										amount = amount + bonus
+									if isAnima then
+										if isAnima ~= 1 then
+											CacheIsAnimaItem[itemID] = isAnima
+										end
+										iconTexture = 613397
+										ajustMask = true
+										ajustSize = 10
+										amount = numItems * isAnima
+										if warMode and C_QuestLog.QuestCanHaveWarModeBonus(obj.questID) then
+											local bonus = floor(amount * (warModeBonus - 1) + .5)
+											--if isAnima <= 35 then
+												bonus = bonus - bonus % 3
+											--else
+											--	bonus = bonus - bonus % 5
+											--end
+											amount = amount + bonus
+										end
 									end
 								end
-								inspectScantip:ClearLines()
 							end
 
 							if worldQuestType == LE.LE_QUEST_TAG_TYPE_PET_BATTLE then
@@ -585,8 +684,9 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 										
 					if iconTexture or iconAtlas or iconVirtual then
 						if not iconVirtual then
-							icon:SetSize(RewardIcons_Size+ajustSize,RewardIcons_Size+ajustSize)
-							obj.WQL_rewardIconWMask:SetSize(RewardIcons_Size+ajustSize,RewardIcons_Size+ajustSize)
+							local res_size = (RewardIcons_Size+ajustSize) * 0.5
+							icon:SetSize(res_size,res_size)
+							obj.WQL_rewardIconWMask:SetSize(res_size,res_size)
 							if iconTexture then
 								if ajustMask then
 									if obj.WQL_rewardIconWMask.curr ~= iconTexture then
@@ -627,25 +727,45 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 									end
 								end
 							end
-							obj.Texture:SetTexture()
+							if obj.Display then
+								obj.Display.Icon:SetTexture()
+								obj.WQL_rewardIcon:SetParent(obj.Display.Icon:GetParent())
+								obj.WQL_rewardIcon:SetDrawLayer("OVERLAY",5)
+								obj.WQL_rewardIconWMask:SetParent(obj.Display.Icon:GetParent())
+								obj.WQL_rewardIconWMask:SetDrawLayer("OVERLAY",5)
+							end
+						else
+							if obj.WQL_rewardIconWMask.curr then
+								obj.WQL_rewardIconWMask:SetTexture()
+								obj.WQL_rewardIconWMask.curr = nil
+							end
+							if icon.curr then
+								icon:SetTexture()
+								icon.curr = nil
+							end
 						end
-						if amount > 0 and not isRibbonDisabled then
+						if ((type(amount)=="number" and amount > 0) or type(amount) == "string") and not isRibbonDisabled then
 							if not obj.WQL_rewardRibbon:IsShown() then obj.WQL_rewardRibbon:Show() end
 								if not isWorldMapFrame then
-									obj.WQL_rewardRibbonText:SetFont(STANDARD_TEXT_FONT,23,"OUTLINE")
+									obj.WQL_rewardRibbonText:SetFont(STANDARD_TEXT_FONT,12,"OUTLINE")
 									obj.WQL_rewardRibbonText:SetTextColor(1,1,1,1)
 								end
 								obj.WQL_rewardRibbon:SetAlpha(1)
 							if not isWorldMapFrame then
 								obj.WQL_rewardRibbonText:SetText((amountIcon and "|T"..amountIcon..":0|t" or "")..(amountColor or "")..amount)
 							end
-							obj.WQL_rewardRibbon:SetWidth( (#tostring(amount) + (amountIcon and 1.5 or 0)) * 21 + RewardIcons_Size )
-							obj.TimeLowFrame:SetPoint("CENTER",-21,-8)
+							obj.WQL_rewardRibbon:SetWidth( ((#tostring(amount) + (amountIcon and 1.5 or 0)) * RewardIcons_Size * 2) * 0.6 )
+
+							obj.TimeLowFrame:SetPoint("CENTER",-8,-8)
 							if isWorldMapFrame then
 								tCount = AddText(WorldMapFrame_TextTable,obj.WQL_rewardRibbon,tCount,(amountIcon and "|T"..amountIcon..":0|t" or "")..(amountColor or "")..amount)							
 							end
-						elseif obj.WQL_rewardRibbon:IsShown() then obj.WQL_rewardRibbon:Hide()
-							obj.TimeLowFrame:SetPoint("CENTER",-16,-16)				
+						elseif obj.WQL_rewardRibbon:IsShown() then
+							obj.WQL_rewardRibbon:Hide()
+							if not isWorldMapFrame then
+								obj.WQL_rewardRibbonText:SetText("")
+							end
+							obj.TimeLowFrame:SetPoint("CENTER",8,-8)				
 						end				
 					else
 						if obj.WQL_rewardIconWMask.curr then
@@ -661,22 +781,23 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 							if not isWorldMapFrame then
 								obj.WQL_rewardRibbonText:SetText("")
 							end
-							obj.TimeLowFrame:SetPoint("CENTER",-16,-16)
+							obj.TimeLowFrame:SetPoint("CENTER",8,-8)
 						end
 					end
 					obj.WQL_questID = obj.questID
 
+					if obj.BountyRing then
 					obj.BountyRing:SetVertexColor(1,1,1)
-					obj.BountyRing:SetAtlas('QuestNormal')
-					obj.BountyRing:SetSize(RewardIcons_Size, RewardIcons_Size)
-					obj.BountyRing:SetPoint('CENTER', 22, 0)
-					--obj.BountyRing:SetSize(obj.WQL_BountyRing_defSize,obj.WQL_BountyRing_defSize)
+					--obj.BountyRing:SetAtlas('QuestNormal')
+					--obj.BountyRing:SetSize(RewardIcons_Size, RewardIcons_Size)
+					--obj.BountyRing:SetPoint('CENTER', 22, 0)
+					obj.BountyRing:SetSize(obj.WQL_BountyRing_defSize,obj.WQL_BountyRing_defSize)
 					obj.BountyRing.WQL_color = 4
 					if not RewardIcons_DisableBountyColors then
 						obj.BountyRing:Hide()
 						for _,bountyData in pairs(bounties) do
 							if IsQuestCriteriaForBounty(obj.questID, bountyData.questID) and not bountyData.completed then
-								obj.BountyRing:SetSize(RewardIcons_Size+8,RewardIcons_Size+8)
+								obj.BountyRing:SetSize(RewardIcons_Size*2.5,RewardIcons_Size*2.5)
 								obj.BountyRing:Show()
 								if bountyData.lowTime and obj.BountyRing.WQL_color > 1 then
 									obj.BountyRing:SetVertexColor(1,0,0)
@@ -687,18 +808,32 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 								elseif not bountyData.lowTime and not bountyData.middleTime and obj.BountyRing.WQL_color > 3 then
 									obj.BountyRing:SetVertexColor(.3,1,.3)
 									obj.BountyRing.WQL_color = 3
+									end
+								end
+							end
+							local mapID = WorldQuestList_QuestIDtoMapID[obj.questID or 0]
+							if mapID then
+								for i=1,#mapsToHighlightCallings do
+									local callingData = mapsToHighlightCallings[i]
+									if callingData and callingData.mapID == mapID and (callingData.worldQuests or (callingData.worldQuestsElite and isElite)) and not callingData.completed then
+										obj.BountyRing:SetSize(RewardIcons_Size*2.5,RewardIcons_Size*2.5)
+										obj.BountyRing:Show()
+										if callingData.lowTime and obj.BountyRing.WQL_color > 1 then
+											obj.BountyRing:SetVertexColor(1,0,0)
+											obj.BountyRing.WQL_color = 1
+										elseif callingData.middleTime and obj.BountyRing.WQL_color > 2 then
+											obj.BountyRing:SetVertexColor(1,.5,0)
+											obj.BountyRing.WQL_color = 2
+										elseif not callingData.lowTime and not callingData.middleTime and obj.BountyRing.WQL_color > 3 then
+											obj.BountyRing:SetVertexColor(.3,1,.3)
+											obj.BountyRing.WQL_color = 3
+										end
 								end
 							end
 						end
 					end
-				end
 			end
-			if isWorldMapFrame then
-				for i=tCount+1,#WorldMapFrame_TextTable do
-					WorldMapFrame_TextTable[i]:Hide()
-				end
-			end
-			for _,obj in pairs(pins.inactiveObjects) do
+				else
 				if obj.WQL_rewardIcon then
 					if obj.WQL_rewardIconWMask.curr then
 						obj.WQL_rewardIconWMask:SetTexture()
@@ -716,38 +851,110 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
 					if not isWorldMapFrame then
 						obj.WQL_rewardRibbonText:SetText("")
 					end
-					obj.TimeLowFrame:SetPoint("CENTER",-16,-16)
-					--obj.BountyRing:SetSize(obj.WQL_BountyRing_defSize,obj.WQL_BountyRing_defSize)
+					obj.TimeLowFrame:SetPoint("CENTER",8,-8)
+						if obj.BountyRing then
+					obj.BountyRing:SetSize(obj.WQL_BountyRing_defSize,obj.WQL_BountyRing_defSize)
 					obj.BountyRing:SetVertexColor(1,1,1)
-					obj.BountyRing:SetAtlas('QuestNormal')
-					obj.BountyRing:SetSize(RewardIcons_Size, RewardIcons_Size)
-					obj.BountyRing:SetPoint('CENTER', 23, 0)
+					end
+					--obj.BountyRing:SetAtlas('QuestNormal')
+					--obj.BountyRing:SetSize(RewardIcons_Size, RewardIcons_Size)
+					--obj.BountyRing:SetPoint('CENTER', 23, 0)
 				end
 				obj.WQL_questID = nil
+				end
 			end
+			if isWorldMapFrame then
+				for i=tCount+1,#WorldMapFrame_TextTable do
+					WorldMapFrame_TextTable[i]:Hide()
+				end
+			end
+
 		elseif frame == WorldMapFrame then
 			for i=1,#WorldMapFrame_TextTable do
 				WorldMapFrame_TextTable[i]:Hide()
 			end
 		end
+
+		WorldQuestList_WQUpdateWMIcons(frame)
 	end
+
+function WorldQuestList_WQUpdateWMIcons(frame)
+		frame = frame or WorldMapFrame
+		local isEnabled = false
+		if frame.EnumeratePinsByTemplate then
+			local currNum, questsNum = 0
+			if isEnabled then
+				for i = 1, C_QuestLog.GetNumQuestLogEntries() do
+					local info = C_QuestLog.GetInfo(i)
+					if info.questID and not C_QuestLog.IsComplete(info.questID) and not info.isHeader then
+						if not questsNum then
+							questsNum = {}
+						end
+						currNum = currNum + 1
+						questsNum[info.questID] = currNum
+					end
+				end
+			end
+			for obj in frame:EnumeratePinsByTemplate("QuestPinTemplate") do
+				if not obj.Display then
+
+				elseif questsNum and questsNum[obj.questID] then
+					--obj.Display.Icon:SetTexture()
+					obj.Display.Icon:SetAlpha(0)
+					if not obj.Display.WQL_Text then
+						obj.Display.WQL_Text = obj:CreateFontString(nil,"OVERLAY","GameFontNormal")
+						local a1,a2 = obj.Display.WQL_Text:GetFont()
+						obj.Display.WQL_Text:SetFont(a1,12,"OUTLINE")
+						obj.Display.WQL_Text:SetPoint("CENTER",0,0)
+					end
+					obj.Display.WQL_Text:SetText(questsNum[obj.questID])
+					obj.Display.WQL_Text:Show()
+				elseif obj.Display.WQL_Text then
+					obj.Display.Icon:SetAlpha(1)
+					obj.Display.WQL_Text:Hide()
+				end
+			end
+			for obj in QuestScrollFrame.Contents.buttonPool:EnumerateActive() do
+				if not obj.Display then
+
+				elseif obj.questID and questsNum and questsNum[obj.questID] then
+					--obj.Display.Icon:SetTexture()
+					obj.Display.Icon:SetAlpha(0)
+					if not obj.Display.WQL_Text then
+						obj.Display.WQL_Text = obj:CreateFontString(nil,"OVERLAY","GameFontNormal")
+						local a1,a2 = obj.Display.WQL_Text:GetFont()
+						obj.Display.WQL_Text:SetFont(a1,12,"OUTLINE")
+						obj.Display.WQL_Text:SetPoint("CENTER",0,0)
+					end
+					obj.Display.WQL_Text:SetText(questsNum[obj.questID])
+					obj.Display.WQL_Text:Show()
+				elseif obj.Display and obj.Display.WQL_Text then
+					obj.Display.Icon:SetAlpha(1)
+					obj.Display.WQL_Text:Hide()
+				end
+			end
+		end
+end
+
 
 WorldMapFrame:RegisterCallback("WorldQuestsUpdate", function()
 	WorldQuestList_WQIcons_AddIcons()
-end, WorldMapFrame)
+end)
+
 local WQIcons_FlightMapLoad = CreateFrame("Frame")
 WQIcons_FlightMapLoad:RegisterEvent("ADDON_LOADED")
 WQIcons_FlightMapLoad:SetScript("OnEvent",function (self, event, arg)
 	if arg == "Blizzard_FlightMap" then
 		self:UnregisterAllEvents()
-		FlightMapFrame:RegisterCallback("WorldQuestsUpdate", function() WorldQuestList_WQIcons_AddIcons(FlightMapFrame,"FlightMap_WorldQuestPinTemplate") end, self)
+		FlightMapFrame:RegisterCallback("WorldQuestsUpdate", function()
+			WorldQuestList_WQIcons_AddIcons(FlightMapFrame,"FlightMap_WorldQuestPinTemplate")
+		end, self)
 	end
 end)
 
 
---- Icons size on map
-
-local defScaleFactor, defStartScale, defEndScale = 1, 0.425, 0.425
+--[[ Icons size on map
+local defScaleFactor, defStartScale, defEndScale = 1, 1, 1
 if WorldMap_WorldQuestPinMixin then
 	local f = CreateFrame("Frame")
 	f.SetScalingLimits = function(_,scaleFactor, startScale, endScale) 
@@ -758,7 +965,7 @@ if WorldMap_WorldQuestPinMixin then
 	pcall(function() WorldMap_WorldQuestPinMixin.OnLoad(f) end)
 end
 
---[[function WorldQuestList_WQIcons_UpdateScale()
+function WorldQuestList_WQIcons_UpdateScale()
 	local pins = WorldMapFrame.pinPools["WorldMap_WorldQuestPinTemplate"]
 	if pins then
 		local startScale, endScale = defStartScale, defEndScale
@@ -767,18 +974,21 @@ end
 		if not generalMap then
 			startScale, endScale = defStartScale, defEndScale
 		elseif generalMap == 2 then
-			startScale, endScale = 0.15, 0.2
+			--startScale, endScale = 0.15, 0.2
+			startScale, endScale = .8, .8
 			scaleFactor = scaleFactor * (WorldMapFrame:IsMaximized() and 1.25 or 1)
 		elseif generalMap == 4 then
-			startScale, endScale = 0.3, 0.425
+			startScale, endScale = .8, .8
+			--startScale, endScale = 0.3, 0.425
 			scaleFactor = scaleFactor * (WorldMapFrame:IsMaximized() and 1.25 or 1)
 		else
-			startScale, endScale = 0.35, 0.425
+			--startScale, endScale = 0.35, 0.425
+			startScale, endScale = 1, 1
 			scaleFactor = scaleFactor * (WorldMapFrame:IsMaximized() and 1.25 or 1)
 		end
 		startScale, endScale = startScale * scaleFactor, endScale * scaleFactor
 	
-		for obj,_ in pairs(pins.activeObjects) do
+		for obj in WorldMapFrame:EnumeratePinsByTemplate("WorldMap_WorldQuestPinTemplate") do
 			--scaleFactor, startScale, endScale
 			if obj.startScale ~= startScale or obj.endScale ~= endScale then
 				obj:SetScalingLimits(1, startScale, endScale)
@@ -792,89 +1002,4 @@ end
 
 WorldMapFrame:RegisterCallback("WorldQuestsUpdate", function()
 	WorldQuestList_WQIcons_UpdateScale()
-end, WorldMapFrame)]]
----------------------------------------------------------------------------------------------------------	WorldMapQuestBountyCount Thanks WorldQuestTab
-WorldMapQuestBountyCount = {}
-function WorldMapQuestBountyCount:OnLoad()
-    self.bountyCounterPool = CreateFramePool("FRAME", self, "BountyCounterTemplate");
-    
-	-- Auto emisarry when clicking on one of the buttons
-	local bountyBoard = WorldMapFrame.overlayFrames[4];
-	self.bountyBoard = bountyBoard;
-	
-	hooksecurefunc(bountyBoard, "OnTabClick", function(self, tab) 
-		if (not R.db["Misc"]["WorldQusetRewardIcons"] or tab.isEmpty) then return; end
-		WRWorldQuestFrame.autoEmisarryId = bountyBoard.bounties[tab.bountyIndex];
-	end, self)
-	
-	hooksecurefunc(bountyBoard, "RefreshSelectedBounty", function() 
-		if (R.db["Misc"]["WorldQusetRewardIcons"]) then
-			self:UpdateBountyCounters();
-		end
-	end)
-		
-	-- Slight offset the tabs to make room for the counters
-	hooksecurefunc(bountyBoard, "AnchorBountyTab", function(self, tab) 
-		if (not R.db["Misc"]["WorldQusetRewardIcons"]) then return end
-		local point, relativeTo, relativePoint, x, y = tab:GetPoint(1);
-		tab:SetPoint(point, relativeTo, relativePoint, x, y + 2);
-	end)
-end
-		
-function WorldMapQuestBountyCount:UpdateBountyCounters()
-	self.bountyCounterPool:ReleaseAll();
-	if (not R.db["Misc"]["WorldQusetRewardIcons"]) then return end
-	if (not self.bountyInfo) then
-		self.bountyInfo = {};
-	end
-	for tab, v in pairs(self.bountyBoard.bountyTabPool.activeObjects) do
-		self:AddBountyCountersToTab(tab);
-	end
-end
-
-function WorldMapQuestBountyCount:RepositionBountyTabs()
-	for tab, v in pairs(self.bountyBoard.bountyTabPool.activeObjects) do
-		self.bountyBoard:AnchorBountyTab(tab);
-	end
-end
-
-function WorldMapQuestBountyCount:AddBountyCountersToTab(tab)
-	local bountyData = self.bountyBoard.bounties[tab.bountyIndex];
-	
-	if (bountyData) then
-		local progress, goal = self.bountyBoard:CalculateBountySubObjectives(bountyData);
-		if (progress == goal) then return end;
-		
-		-- Counters
-		local offsetAngle = 32;
-		local startAngle = 270;
-		
-		-- position of first counter
-		startAngle = startAngle - offsetAngle * (goal -1) /2
-		
-		for i=1, goal do
-			local counter = self.bountyCounterPool:Acquire();
-
-			local x = cos(startAngle) * 16;
-			local y = sin(startAngle) * 16;
-			counter:SetPoint("CENTER", tab.Icon, "CENTER", x, y);
-			counter:SetParent(tab);
-			counter:Show();
-			
-			-- Light nr of completed
-			if i <= progress then
-				counter.icon:SetTexCoord(0, 0.5, 0, 0.5);
-				counter.icon:SetVertexColor(1, 1, 1, 1);
-				counter.icon:SetDesaturated(false);
-			else
-				counter.icon:SetTexCoord(0, 0.5, 0, 0.5);
-				counter.icon:SetVertexColor(0.75, 0.75, 0.75, 1);
-				counter.icon:SetDesaturated(true);
-			end
-
-			-- Offset next counter
-			startAngle = startAngle + offsetAngle;
-		end
-	end
-end
---QuestMapFrame:HookScript("OnLoad", function() WorldMapQuestBountyCount:OnLoad() end)
+end)]]

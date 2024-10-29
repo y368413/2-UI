@@ -78,10 +78,10 @@ local function OnUpdate(_, update)
 				local getCooldownDetails
 				if v[2] == "spell" then
 					getCooldownDetails = memoize(function()
-                        local start, duration, enabled = GetSpellCooldown(v[3])
+                        local start, duration, enabled = C_Spell.GetSpellCooldown(v[3])
                         return {
-                            name = GetSpellInfo(v[3]),
-                            texture = GetSpellTexture(v[3]),
+                            name = C_Spell.GetSpellInfo(v[3]),
+                            texture = C_Spell.GetSpellTexture(v[3]),
                             start = start,
                             duration = duration,
                             enabled = enabled
@@ -89,9 +89,9 @@ local function OnUpdate(_, update)
                     end)
 				elseif v[2] == "item" then
 					getCooldownDetails = memoize(function()
-                        local start, duration, enabled = GetItemCooldown(i)
+                        local start, duration, enabled = C_Item.GetItemCooldown(i)
                         return {
-                            name = GetItemInfo(i),
+                            name = C_Item.GetItemInfo(i),
                             texture = v[3],
                             start = start,
                             duration = duration,
@@ -130,7 +130,7 @@ local function OnUpdate(_, update)
 		for i, getCooldownDetails in pairs(cooldowns) do
             local cooldown = getCooldownDetails()
             local remaining = cooldown.duration - (GetTime() - cooldown.start)
-            if remaining <= 0 then
+            if remaining <= 0.2 then
                 tinsert(animating, {cooldown.texture, cooldown.isPet, cooldown.name})
                 cooldowns[i] = nil
             end
@@ -190,6 +190,10 @@ frame:RegisterEvent("SPELL_UPDATE_COOLDOWN")
 
 function frame:UNIT_SPELLCAST_SUCCEEDED(unit, _, spellID)
 	if unit == "player" then
+		local texture = C_Spell.GetSpellTexture(spellID)
+		local t1 = GetInventoryItemTexture("player", 13)
+		local t2 = GetInventoryItemTexture("player", 14)
+		if texture == t1 or texture == t2 then return end -- Fix wrong buff cd for trinket
 		watching[spellID] = {GetTime(), "spell", spellID}
 		self:SetScript("OnUpdate", OnUpdate)
 	end
@@ -200,7 +204,7 @@ function frame:COMBAT_LOG_EVENT_UNFILTERED()
 	local _, eventType, _, _, _, sourceFlags, _, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
 	if eventType == "SPELL_CAST_SUCCESS" then
 		if (bit.band(sourceFlags, COMBATLOG_OBJECT_TYPE_PET) == COMBATLOG_OBJECT_TYPE_PET and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE) then
-			local name = GetSpellInfo(spellID)
+			local name = C_Spell.GetSpellInfo(spellID)
 			local index = GetPetActionIndexByName(name)
 			if index and not select(7, GetPetActionInfo(index)) then
 				watching[spellID] = {GetTime(), "pet", index}
@@ -241,16 +245,8 @@ hooksecurefunc("UseInventoryItem", function(slot)
 	end
 end)
 
-hooksecurefunc("UseContainerItem", function(bag, slot)
-	local itemID = GetContainerItemID(bag, slot)
-	if itemID then
-		local texture = select(10, GetItemInfo(itemID))
-		watching[itemID] = {GetTime(), "item", texture}
-	end
-end)
-
 SlashCmdList.PulseCD = function()
-	tinsert(animating, {GetSpellTexture(87214)})
+	tinsert(animating, {C_Spell.GetSpellTexture(87214)})
 	--PlaySoundFile([[Interface\AddOns\ShestakUI\Media\Sounds\Proc.ogg]], "Master")
 	frame:SetScript("OnUpdate", OnUpdate)
 end

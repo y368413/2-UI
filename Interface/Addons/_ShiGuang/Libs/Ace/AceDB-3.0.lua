@@ -1,4 +1,47 @@
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 27
+--- **AceDB-3.0** manages the SavedVariables of your addon.
+-- It offers profile management, smart defaults and namespaces for modules.\\
+-- Data can be saved in different data-types, depending on its intended usage.
+-- The most common data-type is the `profile` type, which allows the user to choose
+-- the active profile, and manage the profiles of all of his characters.\\
+-- The following data types are available:
+-- * **char** Character-specific data. Every character has its own database.
+-- * **realm** Realm-specific data. All of the players characters on the same realm share this database.
+-- * **class** Class-specific data. All of the players characters of the same class share this database.
+-- * **race** Race-specific data. All of the players characters of the same race share this database.
+-- * **faction** Faction-specific data. All of the players characters of the same faction share this database.
+-- * **factionrealm** Faction and realm specific data. All of the players characters on the same realm and of the same faction share this database.
+-- * **locale** Locale specific data, based on the locale of the players game client.
+-- * **global** Global Data. All characters on the same account share this database.
+-- * **profile** Profile-specific data. All characters using the same profile share this database. The user can control which profile should be used.
+--
+-- Creating a new Database using the `:New` function will return a new DBObject. A database will inherit all functions
+-- of the DBObjectLib listed here. \\
+-- If you create a new namespaced child-database (`:RegisterNamespace`), you'll get a DBObject as well, but note
+-- that the child-databases cannot individually change their profile, and are linked to their parents profile - and because of that,
+-- the profile related APIs are not available. Only `:RegisterDefaults` and `:ResetProfile` are available on child-databases.
+--
+-- For more details on how to use AceDB-3.0, see the [[AceDB-3.0 Tutorial]].
+--
+-- You may also be interested in [[libdualspec-1-0|LibDualSpec-1.0]] to do profile switching automatically when switching specs.
+--
+-- @usage
+-- MyAddon = LibStub("AceAddon-3.0"):NewAddon("DBExample")
+--
+-- -- declare defaults to be used in the DB
+-- local defaults = {
+--   profile = {
+--     setting = true,
+--   }
+-- }
+--
+-- function MyAddon:OnInitialize()
+--   -- Assuming the .toc says ## SavedVariables: MyAddonDB
+--   self.db = LibStub("AceDB-3.0"):New("MyAddonDB", defaults, true)
+-- end
+-- @class file
+-- @name AceDB-3.0.lua
+-- @release $Id: AceDB-3.0.lua 1328 2024-03-20 22:36:27Z nevcairiel $
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 29
 local AceDB = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -37,18 +80,25 @@ local function copyTable(src, dest)
 	return dest
 end
 
+-- Called to add defaults to a section of the database
+--
+-- When a ["*"] default section is indexed with a new key, a table is returned
+-- and set in the host table.  These tables must be cleaned up by removeDefaults
+-- in order to ensure we don't write empty default tables.
 local function copyDefaults(dest, src)
+	-- this happens if some value in the SV overwrites our default value with a non-table
+	--if type(dest) ~= "table" then return end
 	for k, v in pairs(src) do
 		if k == "*" or k == "**" then
 			if type(v) == "table" then
 				-- This is a metatable used for table defaults
 				local mt = {
 					-- This handles the lookup and creation of new subtables
-					__index = function(t,k)
-							if k == nil then return nil end
+					__index = function(t,k2)
+							if k2 == nil then return nil end
 							local tbl = {}
 							copyDefaults(tbl, v)
-							rawset(t, k, tbl)
+							rawset(t, k2, tbl)
 							return tbl
 						end,
 				}
@@ -61,7 +111,7 @@ local function copyDefaults(dest, src)
 				end
 			else
 				-- Values are not tables, so this is just a simple return
-				local mt = {__index = function(t,k) return k~=nil and v or nil end}
+				local mt = {__index = function(t,k2) return k2~=nil and v or nil end}
 				setmetatable(dest, mt)
 			end
 		elseif type(v) == "table" then
@@ -210,7 +260,7 @@ local factionrealmKey = factionKey .. " - " .. realmKey
 local localeKey = GetLocale():lower()
 
 local regionTable = { "US", "KR", "EU", "TW", "CN" }
-local regionKey = regionTable[GetCurrentRegion()]
+local regionKey = regionTable[GetCurrentRegion()] or GetCurrentRegionName() or "TR"
 local factionrealmregionKey = factionrealmKey .. " - " .. regionKey
 
 -- Actual database initialization function
@@ -299,6 +349,9 @@ local function initdb(sv, defaults, defaultProfile, olddb, parent)
 	return db
 end
 
+-- handle PLAYER_LOGOUT
+-- strip all defaults from all databases
+-- and cleans up empty sections
 local function logoutHandler(frame, event)
 	if event == "PLAYER_LOGOUT" then
 		for db in pairs(AceDB.db_registry) do
@@ -330,6 +383,14 @@ end
 AceDB.frame:RegisterEvent("PLAYER_LOGOUT")
 AceDB.frame:SetScript("OnEvent", logoutHandler)
 
+
+--[[-------------------------------------------------------------------------
+	AceDB Object Method Definitions
+---------------------------------------------------------------------------]]
+
+--- Sets the defaults table for the given database object by clearing any
+-- that are currently set, and then setting the new defaults.
+-- @param defaults A table of defaults for this database
 function DBObjectLib:RegisterDefaults(defaults)
 	if defaults and type(defaults) ~= "table" then
 		error(("Usage: AceDBObject:RegisterDefaults(defaults): 'defaults' - table or nil expected, got %q."):format(type(defaults)), 2)
@@ -359,6 +420,9 @@ function DBObjectLib:RegisterDefaults(defaults)
 	end
 end
 
+--- Changes the profile of the database and all of it's namespaces to the
+-- supplied named profile
+-- @param name The name of the profile to set as the current profile
 function DBObjectLib:SetProfile(name)
 	if type(name) ~= "string" then
 		error(("Usage: AceDBObject:SetProfile(name): 'name' - string expected, got %q."):format(type(name)), 2)
@@ -398,6 +462,9 @@ function DBObjectLib:SetProfile(name)
 	self.callbacks:Fire("OnProfileChanged", self, name)
 end
 
+--- Returns a table with the names of the existing profiles in the database.
+-- You can optionally supply a table to re-use for this purpose.
+-- @param tbl A table to store the profile names in (optional)
 function DBObjectLib:GetProfiles(tbl)
 	if tbl and type(tbl) ~= "table" then
 		error(("Usage: AceDBObject:GetProfiles(tbl): 'tbl' - table or nil expected, got %q."):format(type(tbl)), 2)
@@ -433,6 +500,9 @@ function DBObjectLib:GetCurrentProfile()
 	return self.keys.profile
 end
 
+--- Deletes a named profile.  This profile must not be the active profile.
+-- @param name The name of the profile to be deleted
+-- @param silent If true, do not raise an error when the profile does not exist
 function DBObjectLib:DeleteProfile(name, silent)
 	if type(name) ~= "string" then
 		error(("Usage: AceDBObject:DeleteProfile(name): 'name' - string expected, got %q."):format(type(name)), 2)
@@ -468,6 +538,10 @@ function DBObjectLib:DeleteProfile(name, silent)
 	self.callbacks:Fire("OnProfileDeleted", self, name)
 end
 
+--- Copies a named profile into the current profile, overwriting any conflicting
+-- settings.
+-- @param name The name of the profile to be copied into the current profile
+-- @param silent If true, do not raise an error when the profile does not exist
 function DBObjectLib:CopyProfile(name, silent)
 	if type(name) ~= "string" then
 		error(("Usage: AceDBObject:CopyProfile(name): 'name' - string expected, got %q."):format(type(name)), 2)
@@ -500,6 +574,9 @@ function DBObjectLib:CopyProfile(name, silent)
 	self.callbacks:Fire("OnProfileCopied", self, name)
 end
 
+--- Resets the current profile to the default values (if specified).
+-- @param noChildren if set to true, the reset will not be populated to the child namespaces of this DB object
+-- @param noCallbacks if set to true, won't fire the OnProfileReset callback
 function DBObjectLib:ResetProfile(noChildren, noCallbacks)
 	local profile = self.profile
 
@@ -525,9 +602,12 @@ function DBObjectLib:ResetProfile(noChildren, noCallbacks)
 	end
 end
 
+--- Resets the entire database, using the string defaultProfile as the new default
+-- profile.
+-- @param defaultProfile The profile name to use as the default
 function DBObjectLib:ResetDB(defaultProfile)
-	if defaultProfile and type(defaultProfile) ~= "string" then
-		error(("Usage: AceDBObject:ResetDB(defaultProfile): 'defaultProfile' - string or nil expected, got %q."):format(type(defaultProfile)), 2)
+	if defaultProfile and type(defaultProfile) ~= "string" and defaultProfile ~= true then
+		error(("Usage: AceDBObject:ResetDB(defaultProfile): 'defaultProfile' - string or true expected, got %q."):format(type(defaultProfile)), 2)
 	end
 
 	local sv = self.sv
@@ -554,6 +634,11 @@ function DBObjectLib:ResetDB(defaultProfile)
 	return self
 end
 
+--- Creates a new database namespace, directly tied to the database.  This
+-- is a full scale database in it's own rights other than the fact that
+-- it cannot control its profile individually
+-- @param name The name of the new namespace
+-- @param defaults A table of values to use as defaults
 function DBObjectLib:RegisterNamespace(name, defaults)
 	if type(name) ~= "string" then
 		error(("Usage: AceDBObject:RegisterNamespace(name, defaults): 'name' - string expected, got %q."):format(type(name)), 2)
@@ -578,6 +663,12 @@ function DBObjectLib:RegisterNamespace(name, defaults)
 	return newDB
 end
 
+--- Returns an already existing namespace from the database object.
+-- @param name The name of the new namespace
+-- @param silent if true, the addon is optional, silently return nil if its not found
+-- @usage
+-- local namespace = self.db:GetNamespace('namespace')
+-- @return the namespace object if found
 function DBObjectLib:GetNamespace(name, silent)
 	if type(name) ~= "string" then
 		error(("Usage: AceDBObject:GetNamespace(name): 'name' - string expected, got %q."):format(type(name)), 2)
@@ -589,6 +680,28 @@ function DBObjectLib:GetNamespace(name, silent)
 	return self.children[name]
 end
 
+--[[-------------------------------------------------------------------------
+	AceDB Exposed Methods
+---------------------------------------------------------------------------]]
+
+--- Creates a new database object that can be used to handle database settings and profiles.
+-- By default, an empty DB is created, using a character specific profile.
+--
+-- You can override the default profile used by passing any profile name as the third argument,
+-- or by passing //true// as the third argument to use a globally shared profile called "Default".
+--
+-- Note that there is no token replacement in the default profile name, passing a defaultProfile as "char"
+-- will use a profile named "char", and not a character-specific profile.
+-- @param tbl The name of variable, or table to use for the database
+-- @param defaults A table of database defaults
+-- @param defaultProfile The name of the default profile. If not set, a character specific profile will be used as the default.
+-- You can also pass //true// to use a shared global profile called "Default".
+-- @usage
+-- -- Create an empty DB using a character-specific default profile.
+-- self.db = LibStub("AceDB-3.0"):New("MyAddonDB")
+-- @usage
+-- -- Create a DB using defaults and using a shared default profile
+-- self.db = LibStub("AceDB-3.0"):New("MyAddonDB", defaults, true)
 function AceDB:New(tbl, defaults, defaultProfile)
 	if type(tbl) == "string" then
 		local name = tbl

@@ -2,15 +2,16 @@
 local M, R, U, I = unpack(ns)
 local module = M:RegisterModule("Settings")
 local pairs, wipe = pairs, table.wipe
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 
 -- Addon Info
-print("<<<--|cFFFFFF00 2|r|cFFFF0000 UI|r v"..GetAddOnMetadata("_ShiGuang", "Version").."["..GetAddOnMetadata("_ShiGuang", "X-StatsVersion").."]" .." For "..GetAddOnMetadata("_ShiGuang", "X-Support").." --")
+print("<<<--|cFFFFFF00 2|r|cFFFF0000 UI|r v"..C_AddOns.GetAddOnMetadata("_ShiGuang", "Version").."["..C_AddOns.GetAddOnMetadata("_ShiGuang", "X-StatsVersion").."]" .." For "..C_AddOns.GetAddOnMetadata("_ShiGuang", "X-Support").." --")
 print("  ---|cffC495DD 特别感谢|r|cff3399ffSiweia|r|cffC495DD,向他学到了好多.|r---  ")
 print("----------------- 有你们的魔兽,才是世界 -->>>")
 
 -- Tuitorial
 local function DefaultSettings()
-	SetCVar("scriptErrors", 0)     --0是屏蔽错误1是不屏蔽错误
+	SetCVar("scriptErrors", 1)     --0是屏蔽错误1是不屏蔽错误
 	SetCVar("autoQuestWatch", 1)  
 	SetCVar("synchronizeSettings", 1)
 	SetCVar("synchronizeMacros", 1)
@@ -20,6 +21,7 @@ local function DefaultSettings()
 	SetCVar("showQuestTrackingTooltips", 1)
 	--SetCVar("fstack_preferParentKeys", 0)
 	SetCVar("missingTransmogSourceInItemTooltips", 1)
+	SetCVar("autoSelfCast", 0) -- disable auto self casting
 	--setglobal("MAX_EQUIPMENT_SETS_PER_PLAYER",100)
 	PlayerFrame:SetScale(R.db["UFs"]["PlayerFrameScale"]) 
 	TargetFrame:SetScale(R.db["UFs"]["PlayerFrameScale"])
@@ -27,16 +29,16 @@ end
 
 local function ForceDefaultSettings()
   --/console cvar_defaul
-  local PlayerFrame = _G["PlayerFrame"]
-  if (PlayerFrame and not PlayerFrame_IsAnimatedOut(PlayerFrame)) then
-  PlayerFrame:ClearAllPoints() PlayerFrame:SetPoint("RIGHT",UIParent,"CENTER", -150, -250) PlayerFrame:SetUserPlaced(true)  --PlayerFrame:SetScale(0.8) 
+  --[[local PlayerFrame = _G["PlayerFrame"]
+  if (PlayerFrame) then --and not PlayerFrame_IsAnimatedOut(PlayerFrame)
+  PlayerFrame:ClearAllPoints() PlayerFrame:SetPoint("RIGHT",UIParent,"CENTER", -110, -260) PlayerFrame:SetUserPlaced(true)  --PlayerFrame:SetScale(0.8) 
   end
   local TargetFrame = _G["TargetFrame"]
   if (TargetFrame) then
-  TargetFrame:ClearAllPoints() TargetFrame:SetPoint("LEFT",UIParent,"CENTER", 150, -250) TargetFrame:SetUserPlaced(true)  --TargetFrame:SetScale(0.8) 
+  TargetFrame:ClearAllPoints() TargetFrame:SetPoint("LEFT",UIParent,"CENTER", 110, -260) TargetFrame:SetUserPlaced(true)  --TargetFrame:SetScale(0.8) 
   end
   TargetFrameToT:ClearAllPoints() TargetFrameToT:SetPoint("LEFT",TargetFrame,"BOTTOMRIGHT", -43, 21)
-  TargetFrameToTTextureFrameName:ClearAllPoints() TargetFrameToTTextureFrameName:SetPoint("LEFT",TargetFrameToT,"Top", -8, -43)
+  --TargetFrameToTTextureFrameName:ClearAllPoints() TargetFrameToTTextureFrameName:SetPoint("LEFT",TargetFrameToT,"Top", -8, -43)
   PetFrameHealthBarText:SetPoint("BOTTOMRIGHT", PetFrame, "LEFT", 3,-6)  
   PetFrameManaBarText:SetPoint("TOPRIGHT", PetFrame, "LEFT", 3, -6)
   PetFrameManaBarText:SetTextColor(0, 1, 1)
@@ -45,7 +47,7 @@ local function ForceDefaultSettings()
   FocusFrame:SetScript("OnMouseDown", function(self, elapsed) if IsShiftKeyDown() and (not InCombatLockdown()) then FocusFrame:StartMoving(); end end)
   FocusFrame:SetScript("OnMouseUp", function(self, elapsed) FocusFrame:StopMovingOrSizing(); end)
   --FocusFrame:SetClampedToScreen(1)
-  end
+  end]]
   SetCVar("nameplateSelectedScale", 1.25)
   SetCVar("nameplateLargerScale", 1.25)
 	SetCVar("autoLootDefault", 1)
@@ -65,7 +67,7 @@ local function ForceDefaultSettings()
   SHOW_MULTI_ACTIONBAR_2="1" --右下方动作条 
   SHOW_MULTI_ACTIONBAR_3 = "0" --右动作条1
   SHOW_MULTI_ACTIONBAR_4 = "0" --右动作条2
-  InterfaceOptions_UpdateMultiActionBars() --刷新动作条
+  --InterfaceOptions_UpdateMultiActionBars() --刷新动作条
 	SetCVar("enableFloatingCombatText", 0)
 	SetCVar("floatingCombatTextCombatState", 0)
 	SetCVar("showTargetOfTarget",1) --目标的目标
@@ -73,6 +75,7 @@ local function ForceDefaultSettings()
 	--SetCVar("floatingCombatTextCombatDamage", 0)
 	--SetCVar("floatingCombatTextCombatHealing", 0)
 	SetCVar("floatingCombatTextCombatDamageDirectionalScale", 1)
+	SetCVar("floatingCombatTextCombatDamageDirectionalOffset", 10)
 	SetCVar("floatingCombatTextFloatMode", 3) 
   --SetCVar("floatingCombatTextPetMeleeDamage", 0)   	 --寵物對目標傷害
   --SetCVar("floatingCombatTextPetSpellDamage", 0)   	 --寵物對目標傷害
@@ -111,7 +114,7 @@ end
 local function ForceRaidFrame()
 	if InCombatLockdown() then return end
 	if not CompactUnitFrameProfiles then return end
-	CompactRaidFrameContainer:SetScale(0.85)
+	--CompactRaidFrameContainer:SetScale(0.85)
 	--SetRaidProfileOption(GetActiveRaidProfile(), "healthText", "none")
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "useClassColors", true) --显示职业颜色
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayPowerBar", false) --显示能量条 
@@ -195,7 +198,7 @@ local function ForceDBMOptions()
 	DBM_AllSavedOptions["Default"]["HideObjectivesFrame"] = false
 	DBM_AllSavedOptions["Default"]["WarningFontSize"] = 20
 	DBM_AllSavedOptions["Default"]["SpecialWarningFontSize2"] = 36
-	MaoRUIDB["DBMRequest"] = false
+	MaoRUISetDB["DBMRequest"] = false
 end
 
 -- Skada
@@ -256,7 +259,7 @@ local function ForceSkadaOptions()
 			},
 		},
 	}
-	MaoRUIDB["SkadaRequest"] = false
+	MaoRUISetDB["SkadaRequest"] = false
 end
 
 -- BigWigs
@@ -339,24 +342,23 @@ local function ForceBigwigs()
 			},
 		},
 	}
-	MaoRUIDB["BWRequest"] = false
+	MaoRUISetDB["BWRequest"] = false
 end
 
 local function ForceAddonSkins()
-	if MaoRUIDB["DBMRequest"] then ForceDBMOptions() end
-	if MaoRUIDB["SkadaRequest"] then ForceSkadaOptions() end
-	if MaoRUIDB["BWRequest"] then ForceBigwigs() end
+	if MaoRUISetDB["DBMRequest"] then ForceDBMOptions() end
+	if MaoRUISetDB["SkadaRequest"] then ForceSkadaOptions() end
+	if MaoRUISetDB["BWRequest"] then ForceBigwigs() end
 end
 
 -- Tutorial
 local function YesTutor()
 	ForceRaidFrame()
-	MaoRUIDB["DBMRequest"] = true
-	MaoRUIDB["SkadaRequest"] = true
-	MaoRUIDB["BWRequest"] = true
+	MaoRUISetDB["DBMRequest"] = true
+	MaoRUISetDB["SkadaRequest"] = true
+	MaoRUISetDB["BWRequest"] = true
 	ForceAddonSkins()
-	MaoRUIDB["ResetDetails"] = true
-	MaoRUIDB["YesTutor"] = false
+	MaoRUISetDB["YesTutor"] = false
 end
 
 local welcome
@@ -391,8 +393,8 @@ local function HelloWorld()
 	local MadeBy = M:CreatStyleButton(nil, welcome, 210, 21, "BOTTOMRIGHT", BottomBlack, "BOTTOMRIGHT", -8, 31, 10, 1) 
 	MadeBy:SetScript("OnClick", function(self,Button) welcome:Hide() end)
 	--MadeByText = M:CreatStyleText(MadeBy, "Interface\\addons\\_ShiGuang\\Media\\Fonts\\Pixel.TTF", 12, "OUTLINE", "- www.maorui.net -", "CENTER", MadeBy, 0, 0, 0.66,0.66,0.66) --■ ■
-	MadeByText1 = M:CreatStyleText(MadeBy, "Interface\\addons\\_ShiGuang\\Media\\Fonts\\Edo.TTF", 52, "OUTLINE", "ALLIANCE OR HORDE ?", "TOP",Welcome,"TOP",0,-21, 1, 1, 1)
-	MadeByText2 = M:CreatStyleText(MadeBy, "Interface\\addons\\_ShiGuang\\Media\\Fonts\\Edo.TTF", 43, "OUTLINE", "MAKE DECISION !", "TOP",Welcome,"TOP",0,-99, 1, 1, 1)
+	--MadeByText1 = M:CreatStyleText(MadeBy, "Interface\\addons\\_ShiGuang\\Media\\Fonts\\Edo.TTF", 52, "OUTLINE", "Breathe deep and accept that you have caused your end.", "TOP",Welcome,"TOP",0,-21, 1, 1, 1)
+	MadeByText2 = M:CreatStyleText(MadeBy, "Interface\\addons\\_ShiGuang\\Media\\Fonts\\Edo.TTF", 43, "OUTLINE", "Your world is dying!", "TOP",Welcome,"TOP",0,-55, 1, 1, 1)
 
 	local LeftPic = M:CreatStyleButton(nil, welcome, 512, 210, "BOTTOMRIGHT", welcome, "BOTTOM", 1, 43, 2, 1)
 	LeftPic:SetNormalTexture("Interface\\AddOns\\_ShiGuang\\Media\\Modules\\BlinkHealthText\\LeftPic")
@@ -431,19 +433,29 @@ local function HelloWorld()
 		ForceDefaultSettings()
 		ReloadUI()
   end)
-	SmallText1 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ SL " ..GetAddOnMetadata("_ShiGuang", "X-Support").. " v"..GetAddOnMetadata("_ShiGuang", "Version").." ]", "LEFT",RightPic,"RIGHT",-26,60, I.r, I.g, I.b)
+	SmallText1 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ SL " ..C_AddOns.GetAddOnMetadata("_ShiGuang", "X-Support").. " v"..C_AddOns.GetAddOnMetadata("_ShiGuang", "Version").." ]", "LEFT",RightPic,"RIGHT",-26,60, I.r, I.g, I.b)
 	SmallText2 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ https://www.maorui.net ]", "LEFT",RightPic,"RIGHT",-26,20, I.r, I.g, I.b)
 	SmallText3 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 鼠标右键点击小地图便捷插件设置 ]", "LEFT",RightPic,"RIGHT",-26,-20, I.r, I.g, I.b)
 	SmallText4 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 系统自带功能，插件有针对性增强或者删减 ]", "LEFT",RightPic,"RIGHT",-26,-60, I.r, I.g, I.b)
 
-	local LeftBlue = CreateFrame("Frame", nil, welcome, "BackdropTemplate") 
+	local ModulesBack = CreateFrame("Frame", nil, welcome, "BackdropTemplate") 
+	ModulesBack:SetPoint("TOPLEFT",welcome,"TOPLEFT",0,0)
+	ModulesBack:SetPoint("BOTTOMRIGHT",welcome,"TOPRIGHT",0,0)
+	ModulesBack:SetBackdrop({ 
+   bgFile = BackDropFile, 
+   edgeFile = BackDropFile, 
+	})
+	ModulesBack:SetBackdropColor(0, 0, 0, 0.3) 
+	ModulesBack:SetBackdropBorderColor(0,0,0,0)
+	
+	--[[local LeftBlue = CreateFrame("Frame", nil, welcome, "BackdropTemplate") 
 	LeftBlue:SetPoint("TOPLEFT",welcome,"TOPLEFT",0,0)
 	LeftBlue:SetPoint("BOTTOMRIGHT",LeftPic,"TOPRIGHT",0,0)
 	LeftBlue:SetBackdrop({ 
    bgFile = BackDropFile, 
    edgeFile = BackDropFile, 
 	})
-	LeftBlue:SetBackdropColor(0, 0, 1, 0.3) 
+	LeftBlue:SetBackdropColor(0, 0, 0, 0.3) 
 	LeftBlue:SetBackdropBorderColor(0,0,0,0)
 
 	local RightRed = CreateFrame("Frame", nil, welcome, "BackdropTemplate") 
@@ -453,28 +465,28 @@ local function HelloWorld()
    bgFile = BackDropFile, 
    edgeFile = BackDropFile, 
 	})
-	RightRed:SetBackdropColor(1, 0, 0, 0.3) 
-	RightRed:SetBackdropBorderColor(0,0,0,0)
+	RightRed:SetBackdropColor(0, 0, 0, 0.3) 
+	RightRed:SetBackdropBorderColor(0,0,0,0)]]
 
-	local NPCModeRight = CreateFrame("PlayerModel", "NPCModeRight", RightRed)
+	local NPCModeRight = CreateFrame("PlayerModel", "NPCModeRight", ModulesBack)
 	NPCModeRight:SetSize(UIParent:GetWidth()*0.6, UIParent:GetHeight())
 	NPCModeRight:SetPoint("BOTTOM",RightPic,"TOPRIGHT",0,0) --"CENTER",0,210
-	NPCModeRight:SetDisplayInfo(28213)  --ShiGuangDB.DisplayInfo
-	NPCModeRight:SetParent(RightRed) 
-	NPCModeRight:SetCamDistanceScale(0.5)
-	NPCModeRight:SetPosition(0,-0.08,0.12)
-	NPCModeRight:SetRotation(-0.2)
-	NPCModeRight.rotation = 0.21
+	NPCModeRight:SetDisplayInfo(118072)  --ShiGuangDB.DisplayInfo 28213
+	NPCModeRight:SetParent(ModulesBack) 
+	--NPCModeRight:SetCamDistanceScale(1)
+	NPCModeRight:SetPosition(1,0.05,-0.32)
+	NPCModeRight:SetRotation(-0.4)
+	--NPCModeRight.rotation = 0.21
 
-	local NPCModeLeft = CreateFrame("PlayerModel", "NPCModeLeft", LeftBlue)
+	local NPCModeLeft = CreateFrame("PlayerModel", "NPCModeLeft", ModulesBack)
 	NPCModeLeft:SetSize(UIParent:GetWidth()*0.6, UIParent:GetHeight())
 	NPCModeLeft:SetPoint("BOTTOM",LeftPic,"TOPLEFT",0,0) --"CENTER",0,210
-	NPCModeLeft:SetDisplayInfo(82047)  --54860  --74504   --71057 	--68323   --35908   --65636 
-	NPCModeLeft:SetParent(LeftBlue) 
-	NPCModeLeft:SetCamDistanceScale(0.8)
-	NPCModeLeft:SetPosition(0,0.06,-0.12)
-	NPCModeLeft:SetRotation(0.2)
-	NPCModeLeft.rotation = 0.21
+	NPCModeLeft:SetDisplayInfo(121956)  --54860  --74504   --71057 	--68323   --35908   --65636   --82047
+	NPCModeLeft:SetParent(ModulesBack) 
+	--NPCModeLeft:SetCamDistanceScale(1)
+	NPCModeLeft:SetPosition(1,-0.18,-0.2)
+	NPCModeLeft:SetRotation(0.3)
+	--NPCModeLeft.rotation = 0.21
 
 	local PlayerModel = CreateFrame("PlayerModel", "PlayerModel", welcome)
 	PlayerModel:SetSize(256, 256)
@@ -491,10 +503,6 @@ SLASH_SHIGUANG1 = "/loadmr"
 
 -----------------------------------------
 function module:OnLogin()
-	-- Hide options
-	M.HideOption(Display_UseUIScale)
-	M.HideOption(Display_UIScaleSlider)
-
 	-- Tutorial and settings
 	DefaultSettings()
 	ForceAddonSkins()

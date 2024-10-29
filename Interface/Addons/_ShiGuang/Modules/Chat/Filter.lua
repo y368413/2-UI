@@ -7,10 +7,10 @@ local pairs, ipairs, tonumber = pairs, ipairs, tonumber
 local min, max, tremove = math.min, math.max, table.remove
 local IsGuildMember, C_FriendList_IsFriend, IsGUIDInGroup, C_Timer_After = IsGuildMember, C_FriendList.IsFriend, IsGUIDInGroup, C_Timer.After
 local Ambiguate, UnitIsUnit, GetTime, SetCVar = Ambiguate, UnitIsUnit, GetTime, SetCVar
-local GetItemInfo, GetItemStats = GetItemInfo, GetItemStats
+local GetItemInfo = C_Item.GetItemInfo or GetItemInfo
+local GetItemStats = C_Item.GetItemStats or GetItemStats
 local C_BattleNet_GetGameAccountInfoByGUID = C_BattleNet.GetGameAccountInfoByGUID
 
-local LE_ITEM_CLASS_WEAPON, LE_ITEM_CLASS_ARMOR = LE_ITEM_CLASS_WEAPON, LE_ITEM_CLASS_ARMOR
 local BN_TOAST_TYPE_CLUB_INVITATION = BN_TOAST_TYPE_CLUB_INVITATION or 6
 
 -- Filter Chat symbols
@@ -18,12 +18,12 @@ local msgSymbols = {"`", "～", "＠", "＃", "^", "＊", "！", "？", "。", "
 
 local FilterList = {}
 function module:UpdateFilterList()
-	M.SplitList(FilterList, MaoRUIDB["ChatFilterList"], true)
+	M.SplitList(FilterList, MaoRUISetDB["ChatFilterList"], true)
 end
 
 local WhiteFilterList = {}
 function module:UpdateFilterWhiteList()
-	M.SplitList(WhiteFilterList, MaoRUIDB["ChatFilterWhiteList"], true)
+	M.SplitList(WhiteFilterList, MaoRUISetDB["ChatFilterWhiteList"], true)
 end
 
 -- ECF strings compare
@@ -138,7 +138,7 @@ end
 -- Block addon msg
 local addonBlockList = {
 	"任务进度提示", "%[接受任务%]", "%(任务完成%)", "<大脚", "【爱不易】", "EUI[:_]", "打断:.+|Hspell", "PS 死亡: .+>", "%*%*.+%*%*", "<iLvl>", strrep("%-", 20),
-	"<小队物品等级:.+>", "<LFG>", "进度:", "属性通报", "汐寒", "wow.+兑换码", "wow.+验证码", "【有爱插件】", "：.+>", "|Hspell.+=>"
+	"<小队物品等级:.+>", "<LFG>", "进度:", "属性通报", "汐寒", "wow.+兑换码", "wow.+验证码", "<有爱提示>", "：.+>", "|Hspell.+=>"
 }
 
 local cvar
@@ -189,7 +189,7 @@ end
 -- Show itemlevel on chat hyperlinks
 local function isItemHasLevel(link)
 	local name, _, rarity, level, _, _, _, _, _, _, _, classID = GetItemInfo(link)
-	if name and level and rarity > 1 and (classID == LE_ITEM_CLASS_WEAPON or classID == LE_ITEM_CLASS_ARMOR) then
+	if name and level and rarity > 1 and (classID == Enum.ItemClass.Weapon or classID == Enum.ItemClass.Armor) then
 		local itemLevel = M.GetItemLevel(link)
 		return name, itemLevel
 	end
@@ -207,6 +207,7 @@ local socketWatchList = {
 	["PUNCHCARDRED"] = true,
 	["PUNCHCARDYELLOW"] = true,
 	["DOMINATION"] = true,
+	["PRIMORDIAL"] = true,
 }
 
 local function GetSocketTexture(socket, count)
@@ -220,6 +221,7 @@ function module.IsItemHasGem(link)
 		for stat, count in pairs(stats) do
 			local socket = strmatch(stat, "EMPTY_SOCKET_(%S+)")
 			if socket and socketWatchList[socket] then
+				if socket == "PRIMORDIAL" then socket = "META" end -- primordial texture is missing, use meta instead, needs review
 				text = text..GetSocketTexture(socket, count)
 			end
 		end
@@ -265,7 +267,7 @@ local function SetChatLinkIcon(link)
     local schema, id = string.match(link, "|H(%w+):(%d+):")
     local texture
     if (schema == "item") then texture = select(10, GetItemInfo(tonumber(id)))
-    elseif (schema == "spell") then texture = select(3, GetSpellInfo(tonumber(id)))
+    elseif (schema == "spell") then texture = select(3, C_Spell.GetSpellInfo(tonumber(id)))
     elseif (schema == "achievement") then texture = select(10, GetAchievementInfo(tonumber(id)))
     end
     return GetHyperlink(link, texture)
@@ -297,8 +299,9 @@ end
 
 function module:ChatFilter()
 	if R.db["Chat"]["ChatItemLevel"] then
-		GetDungeonScoreInColor = M:GetModule("Tooltip").GetDungeonScore
-	
+		local TT = M:GetModule("Tooltip")
+		GetDungeonScoreInColor = TT and TT.GetDungeonScore
+
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", self.UpdateChatItemLevel)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateChatItemLevel)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", self.UpdateChatItemLevel)
@@ -318,7 +321,7 @@ function module:ChatFilter()
 
 	hooksecurefunc(BNToastFrame, "ShowToast", self.BlockTrashClub)
 
-	if IsAddOnLoaded("EnhancedChatFilter") then return end
+	if C_AddOns.IsAddOnLoaded("EnhancedChatFilter") then return end
 
 	if R.db["Chat"]["EnableFilter"] then
 		self:UpdateFilterList()

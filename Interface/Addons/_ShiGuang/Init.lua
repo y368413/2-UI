@@ -4,9 +4,8 @@ ns[2] = {}			-- R, Config
 ns[3] = {}			-- U, Locales
 ns[4] = {}			-- I, Database
 
-MaoRUIPerDB, MaoRUIDB, MaoRUISetDB = {}, {}, {}
-ShiGuangDB = ShiGuangDB or {}
-ShiGuangPerDB = ShiGuangPerDB or {}
+MaoRUIDB, MaoRUISetDB, MaoRUIPerDB = {}, {}, {}
+ShiGuangDB, ShiGuangPerDB = {}, {}  --ShiGuangDB or {}, ShiGuangPerDB or {}
 
 local M, R, U, I = unpack(ns)
 local pairs, next, tinsert = pairs, next, table.insert
@@ -84,8 +83,8 @@ local function GetBestScale()
 end
 
 function M:SetupUIScale(init)
-	if MaoRUIDB["LockUIScale"] then MaoRUIDB["UIScale"] = GetBestScale() end
-	local scale = MaoRUIDB["UIScale"]
+	if MaoRUISetDB["LockUIScale"] then MaoRUISetDB["UIScale"] = GetBestScale() end
+	local scale = MaoRUISetDB["UIScale"]
 	if init then
 		local pixel = 1
 		local ratio = 768 / I.ScreenHeight
@@ -121,10 +120,17 @@ end
 
 M:RegisterEvent("PLAYER_LOGIN", function()
 	-- Initial
+	SetCVar("ActionButtonUseKeyDown", 1)
 	M:SetupUIScale()
 	M:RegisterEvent("UI_SCALE_CHANGED", UpdatePixelScale)
-	M:SetSmoothingAmount(MaoRUIDB["SmoothAmount"])
+	M:SetSmoothingAmount(MaoRUISetDB["SmoothAmount"])
 	R.margin = 3
+
+	local LCG = LibStub("LibCustomGlow-1.0-UI")
+	if LCG then
+		M.ShowOverlayGlow = LCG.ShowOverlayGlow
+		M.HideOverlayGlow = LCG.HideOverlayGlow
+	end
 
 	for _, module in next, initQueue do
 		if module.OnLogin then
@@ -135,6 +141,8 @@ M:RegisterEvent("PLAYER_LOGIN", function()
 	end
 
 	M.Modules = modules
+
+	if M.InitCallback then M:InitCallback() end
 end)
 
 _G[addonName] = ns

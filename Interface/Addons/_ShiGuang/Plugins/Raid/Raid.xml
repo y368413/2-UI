@@ -1,8 +1,9 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="PremadeSort.lua"/>
+	<!--Script file="BossTips.lua"/>
+	<Script file="PremadeSort.lua"/-->
 	<Script file="BossesKilled.lua"/>
 	<Script file="ElitismHelper.lua"/>
-	<!--Script file="KeystoneHelper.lua"/-->
 	<Script file="LFR_of_the_past.lua"/>
+	<Script file="AdventureGuideLockouts.lua"/>
 	<Include file="DamageEx\DamageEx.xml"/>
 </Ui>

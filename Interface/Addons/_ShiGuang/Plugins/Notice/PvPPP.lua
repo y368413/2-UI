@@ -1,8 +1,8 @@
 ﻿--------------------------------	Announce enemy drinking in arena(by Duffed)----------------------------------
 local drinkSpell = {
-	[GetSpellInfo(118358)] = true,	-- Drink
-	[GetSpellInfo(167152)] = true,	-- Refreshment
-	[GetSpellInfo(167268)] = true,	-- Ba'ruun's Bountiful Bloom
+	[C_Spell.GetSpellInfo(118358)] = true,	-- Drink
+	[C_Spell.GetSpellInfo(167152)] = true,	-- Refreshment
+	[C_Spell.GetSpellInfo(167268)] = true,	-- Ba'ruun's Bountiful Bloom
 }
 
 local frame = CreateFrame("Frame")
@@ -11,7 +11,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 	if not (event == "UNIT_SPELLCAST_SUCCEEDED" and GetZonePVPInfo() == "arena") then return end
 
 	local unit, _, spellID = ...
-	if UnitIsEnemy("player", unit) and drinkSpell[GetSpellInfo(spellID)] then
+	if UnitIsEnemy("player", unit) and drinkSpell[C_Spell.GetSpellInfo(spellID)] then
 		SendChatMessage(UnitClass(unit).." "..UnitName(unit)..TUTORIAL_TITLE11, CheckChat(true))
 	end
 end)

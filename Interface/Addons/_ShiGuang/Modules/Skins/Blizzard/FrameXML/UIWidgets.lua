@@ -5,26 +5,11 @@ local Type_StatusBar = _G.Enum.UIWidgetVisualizationType.StatusBar
 local Type_CaptureBar = _G.Enum.UIWidgetVisualizationType.CaptureBar
 local Type_SpellDisplay = _G.Enum.UIWidgetVisualizationType.SpellDisplay
 local Type_DoubleStatusBar = _G.Enum.UIWidgetVisualizationType.DoubleStatusBar
+local Type_ItemDisplay = _G.Enum.UIWidgetVisualizationType.ItemDisplay
 
-local atlasColors = {
-	["UI-Frame-Bar-Fill-Blue"] = {.2, .6, 1},
-	["UI-Frame-Bar-Fill-Red"] = {.9, .2, .2},
-	["UI-Frame-Bar-Fill-Yellow"] = {1, .6, 0},
-	["objectivewidget-bar-fill-left"] = {.2, .6, 1},
-	["objectivewidget-bar-fill-right"] = {.9, .2, .2},
-	["EmberCourtScenario-Tracker-barfill"] = {.9, .2, .2},
-}
-
-function M:ReplaceWidgetBarTexture(atlas)
-	if atlasColors[atlas] then
-		self:SetStatusBarTexture(I.normTex)
-		self:SetStatusBarColor(unpack(atlasColors[atlas]))
-	end
-end
-
-local function ResetLabelColor(text, _, _, _, force)
+local function ResetLabelColor(text, _, _, _, _, force)
 	if not force then
-		text:SetTextColor(1, 1, 1, true)
+		text:SetTextColor(1, 1, 1, 1, true)
 	end
 end
 
@@ -47,8 +32,6 @@ local function ReskinWidgetStatusBar(bar)
 			hooksecurefunc(bar.Label, "SetTextColor", ResetLabelColor)
 		end
 		M.SetBD(bar)
-		M.ReplaceWidgetBarTexture(bar, bar:GetStatusBarAtlas())
-		hooksecurefunc(bar, "SetStatusBarAtlas", M.ReplaceWidgetBarTexture)
 
 		bar.styled = true
 	end
@@ -96,6 +79,8 @@ local function ReskinSpellDisplayWidget(spell)
 end
 
 local function ReskinPowerBarWidget(self)
+	if not self.widgetFrames then return end
+
 	for _, widgetFrame in pairs(self.widgetFrames) do
 		if widgetFrame.widgetType == Type_StatusBar then
 			if not widgetFrame:IsForbidden() then
@@ -105,7 +90,17 @@ local function ReskinPowerBarWidget(self)
 	end
 end
 
+local function ReskinWidgetItemDisplay(item)
+	if not item.bg then
+		item.bg = M.ReskinIcon(item.Icon)
+		M.ReskinIconBorder(item.IconBorder, true)
+	end
+	item.IconMask:Hide()
+end
+
 local function ReskinWidgetGroups(self)
+	if not self.widgetFrames then return end
+
 	for _, widgetFrame in pairs(self.widgetFrames) do
 		if not widgetFrame:IsForbidden() then
 			local widgetType = widgetFrame.widgetType
@@ -115,6 +110,8 @@ local function ReskinWidgetGroups(self)
 				ReskinSpellDisplayWidget(widgetFrame.Spell)
 			elseif widgetType == Type_StatusBar then
 				ReskinWidgetStatusBar(widgetFrame.Bar)
+			elseif widgetType == Type_ItemDisplay then
+				ReskinWidgetItemDisplay(widgetFrame.Item)
 			end
 		end
 	end
@@ -127,6 +124,8 @@ tinsert(R.defaultThemes, function()
 	ReskinWidgetGroups(_G.UIWidgetTopCenterContainerFrame)
 
 	hooksecurefunc(_G.UIWidgetBelowMinimapContainerFrame, "UpdateWidgetLayout", function(self)
+		if not self.widgetFrames then return end
+	
 		for _, widgetFrame in pairs(self.widgetFrames) do
 			if widgetFrame.widgetType == Type_CaptureBar then
 				if not widgetFrame:IsForbidden() then
@@ -139,17 +138,8 @@ tinsert(R.defaultThemes, function()
 	hooksecurefunc(_G.UIWidgetPowerBarContainerFrame, "UpdateWidgetLayout", ReskinPowerBarWidget)
 	ReskinPowerBarWidget(_G.UIWidgetPowerBarContainerFrame)
 
-	hooksecurefunc(_G.TopScenarioWidgetContainerBlock.WidgetContainer, "UpdateWidgetLayout", ReskinPowerBarWidget)
-
-	hooksecurefunc(_G.BottomScenarioWidgetContainerBlock.WidgetContainer, "UpdateWidgetLayout", function(self)
-		for _, widgetFrame in pairs(self.widgetFrames) do
-			if widgetFrame.widgetType == Type_SpellDisplay then
-				if not widgetFrame:IsForbidden() then
-					ReskinSpellDisplayWidget(widgetFrame.Spell)
-				end
-			end
-		end
-	end)
+	hooksecurefunc(_G.ObjectiveTrackerUIWidgetContainer, "UpdateWidgetLayout", ReskinPowerBarWidget)
+	ReskinPowerBarWidget(_G.ObjectiveTrackerUIWidgetContainer)
 
 	-- if font outline enabled in tooltip, fix text shows in two lines on Torghast info
 	hooksecurefunc(_G.UIWidgetTemplateTextWithStateMixin, "Setup", function(self)
@@ -160,5 +150,10 @@ tinsert(R.defaultThemes, function()
 	hooksecurefunc(_G.UIWidgetTemplateStatusBarMixin, "Setup", function(self)
 		if self:IsForbidden() then return end
 		ReskinWidgetStatusBar(self.Bar)
+		if self.Label then
+			self.Label:SetTextColor(1, .8, 0)
+		end
 	end)
+
+	--M.Reskin(_G.UIWidgetCenterDisplayFrame.CloseButton)
 end)

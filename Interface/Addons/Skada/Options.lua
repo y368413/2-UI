@@ -9,7 +9,7 @@ Skada.windowdefaults = {
 
   point= "BOTTOMRIGHT",
   x= 0,
-  y= 21,
+  y= 0,  --21
   
 	barspacing=0,  --11
 	bartexture="HalfStyle",
@@ -23,21 +23,21 @@ Skada.windowdefaults = {
 	barbgcolor = {r = 0.21, g = 0.21, b = 0.21, a = 0.12},
 	barslocked=true,
 	clickthrough=false,
-    spellschoolcolors=true,
+	spellschoolcolors = true,
 	classcolorbars = true,
 	classcolortext = false,
-	classicons = true,
+	classicons = false,
 	roleicons = false,
 	specicons = true,
-  showself = true,
+	showself = true,
 
 	buttons = {menu = true, reset = true, report = true, mode = true, segment = true},
 
 	title = {textcolor = {r = 0.9, g = 0.9, b = 0.9, a = 1}, height = 15, font="ChatFontNormal", fontsize=11, texture="None", bordercolor = {r=0,g=0,b=0,a=1}, bordertexture="None", borderthickness=2, color = {r=0.1,g=0.1,b=0.3,a=0.8}, fontflags = ""},
 	background = {height=165, texture="None", bordercolor = {r=0,g=0,b=0,a=1}, bordertexture="None", borderthickness=0, color = {r=0,g=0,b=0.5,a=0.2}, tile = false, tilesize = 0,},
 
-    strata = "LOW",
-    scale = 1,
+	strata = "LOW",
+	scale = 1,
 
 	reversegrowth=true,
 	modeincombat="",

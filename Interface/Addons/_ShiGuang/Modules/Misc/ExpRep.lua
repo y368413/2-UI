@@ -16,18 +16,20 @@ local ARTIFACT_POWER, ARTIFACT_RETIRED = ARTIFACT_POWER, ARTIFACT_RETIRED
 
 local UnitLevel, UnitXP, UnitXPMax, GetXPExhaustion, IsXPUserDisabled = UnitLevel, UnitXP, UnitXPMax, GetXPExhaustion, IsXPUserDisabled
 local BreakUpLargeNumbers, GetNumFactions, GetFactionInfo = BreakUpLargeNumbers, GetNumFactions, GetFactionInfo
-local GetWatchedFactionInfo, GetFriendshipReputation, GetFriendshipReputationRanks = GetWatchedFactionInfo, GetFriendshipReputation, GetFriendshipReputationRanks
 local HasArtifactEquipped, ArtifactBarGetNumArtifactTraitsPurchasableFromXP = HasArtifactEquipped, ArtifactBarGetNumArtifactTraitsPurchasableFromXP
 local IsWatchingHonorAsXP, UnitHonor, UnitHonorMax, UnitHonorLevel = IsWatchingHonorAsXP, UnitHonor, UnitHonorMax, UnitHonorLevel
 local IsPlayerAtEffectiveMaxLevel = IsPlayerAtEffectiveMaxLevel
 local C_Reputation_IsFactionParagon = C_Reputation.IsFactionParagon
 local C_Reputation_GetFactionParagonInfo = C_Reputation.GetFactionParagonInfo
+local C_Reputation_IsMajorFaction = C_Reputation.IsMajorFaction
 local C_AzeriteItem_IsAzeriteItemAtMaxLevel = C_AzeriteItem.IsAzeriteItemAtMaxLevel
 local C_AzeriteItem_FindActiveAzeriteItem = C_AzeriteItem.FindActiveAzeriteItem
 local C_AzeriteItem_GetAzeriteItemXPInfo = C_AzeriteItem.GetAzeriteItemXPInfo
 local C_AzeriteItem_GetPowerLevel = C_AzeriteItem.GetPowerLevel
 local C_ArtifactUI_IsEquippedArtifactDisabled = C_ArtifactUI.IsEquippedArtifactDisabled
 local C_ArtifactUI_GetEquippedArtifactInfo = C_ArtifactUI.GetEquippedArtifactInfo
+local C_GossipInfo_GetFriendshipReputation = C_GossipInfo.GetFriendshipReputation
+local C_GossipInfo_GetFriendshipReputationRanks = C_GossipInfo.GetFriendshipReputationRanks
 
 local function IsAzeriteAvailable()
 	local itemLocation = C_AzeriteItem_FindActiveAzeriteItem()
@@ -37,6 +39,8 @@ end
 function MISC:ExpBar_Update()
 	local rest = self.restBar
 	if rest then rest:Hide() end
+
+	local factionData = C_Reputation.GetWatchedFactionData()
 
 	if not IsPlayerAtEffectiveMaxLevel() then
 		local xp, mxp, rxp = UnitXP("player"), UnitXPMax("player"), GetXPExhaustion()
@@ -50,27 +54,41 @@ function MISC:ExpBar_Update()
 			rest:Show()
 		end
 		if IsXPUserDisabled() then self:SetStatusBarColor(.7, 0, 0) end
-		local function showIfResting() if (IsResting("player") or FALSE) then return "+" end return "" end
-    local function showRestAmount() if (GetXPExhaustion("player") or FALSE) then return math.ceil(100*(GetXPExhaustion("player")/UnitXPMax("player"))) end return "0" end		
-		self.ArtifactText:SetText(UnitLevel("player").."  "..math.floor(100*(UnitXP("player")/UnitXPMax("player"))) .. "%".."  |c00FF68CC"..showRestAmount().."%"..showIfResting().."|r")
-	elseif GetWatchedFactionInfo() then
-		local _, standing, barMin, barMax, value, factionID = GetWatchedFactionInfo()
-		local friendID, friendRep, _, _, _, _, _, friendThreshold, nextFriendThreshold = GetFriendshipReputation(factionID)
-		if C_Reputation_IsFactionParagon(factionID) then
-			local currentValue, threshold = C_Reputation_GetFactionParagonInfo(factionID)
-			currentValue = mod(currentValue, threshold)
-			barMin, barMax, value = 0, threshold, currentValue
-		elseif friendID then
-			if nextFriendThreshold then
-				barMin, barMax, value = friendThreshold, nextFriendThreshold, friendRep
-			else
+	elseif factionData then
+		local standing = factionData.reaction
+		local barMin = factionData.currentReactionThreshold
+		local barMax = factionData.nextReactionThreshold
+		local value = factionData.currentStanding
+		local factionID = factionData.factionID
+		if factionID and C_Reputation_IsMajorFaction(factionID) then
+			local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID)
+			local isMaxRenown = C_MajorFactions.HasMaximumRenown(factionID)
+			if isMaxRenown then
 				barMin, barMax, value = 0, 1, 1
+			else
+				value = majorFactionData.renownReputationEarned or 0
+				barMin, barMax = 0, majorFactionData.renownLevelThreshold
 			end
-			standing = 5
 		else
-			if standing == MAX_REPUTATION_REACTION then barMin, barMax, value = 0, 1, 1 end
+			local repInfo = C_GossipInfo_GetFriendshipReputation(factionID)
+			local friendID, friendRep, friendThreshold, nextFriendThreshold = repInfo.friendshipFactionID, repInfo.standing, repInfo.reactionThreshold, repInfo.nextThreshold
+			if C_Reputation_IsFactionParagon(factionID) then
+				local currentValue, threshold = C_Reputation_GetFactionParagonInfo(factionID)
+				currentValue = mod(currentValue, threshold)
+				barMin, barMax, value = 0, threshold, currentValue
+			elseif friendID and friendID ~= 0 then
+				if nextFriendThreshold then
+					barMin, barMax, value = friendThreshold, nextFriendThreshold, friendRep
+				else
+					barMin, barMax, value = 0, 1, 1
+				end
+				standing = 5
+			else
+				if standing == MAX_REPUTATION_REACTION then barMin, barMax, value = 0, 1, 1 end
+			end
 		end
-		self:SetStatusBarColor(FACTION_BAR_COLORS[standing].r, FACTION_BAR_COLORS[standing].g, FACTION_BAR_COLORS[standing].b, .85)
+		local color = FACTION_BAR_COLORS[standing] or FACTION_BAR_COLORS[5]
+		self:SetStatusBarColor(color.r, color.g, color.b, .85)
 		self:SetMinMaxValues(barMin, barMax)
 		self:SetValue(value)
 		self:Show()
@@ -120,26 +138,50 @@ function MISC:ExpBar_UpdateTooltip()
 		if IsXPUserDisabled() then GameTooltip:AddLine("|cffff0000"..XP..LOCKED) end
 	end
 
-	if GetWatchedFactionInfo() then
-		local name, standing, barMin, barMax, value, factionID = GetWatchedFactionInfo()
-		local friendID, _, _, _, _, _, friendTextLevel, _, nextFriendThreshold = GetFriendshipReputation(factionID)
-		local currentRank, maxRank = GetFriendshipReputationRanks(friendID)
+	local factionData = C_Reputation.GetWatchedFactionData()
+	if factionData then
+		local name = factionData.name
+		local standing = factionData.reaction
+		local barMin = factionData.currentReactionThreshold
+		local barMax = factionData.nextReactionThreshold
+		local value = factionData.currentStanding
+		local factionID = factionData.factionID
 		local standingtext
-		if friendID then
-			if maxRank > 0 then
-				name = name.." ("..currentRank.." / "..maxRank..")"
+		if factionID and C_Reputation_IsMajorFaction(factionID) then
+			local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID)
+			name = majorFactionData.name
+			standingtext = RENOWN_LEVEL_LABEL..majorFactionData.renownLevel
+
+			local isMaxRenown = C_MajorFactions.HasMaximumRenown(factionID)
+			if isMaxRenown then
+				barMin, barMax, value = 0, 1, 1
+			else
+				value = majorFactionData.renownReputationEarned or 0
+				barMin, barMax = 0, majorFactionData.renownLevelThreshold
 			end
-			if not nextFriendThreshold then
-				barMax = barMin + 1e3
-				value = barMax - 1
-			end
-			standingtext = friendTextLevel
 		else
-			if standing == MAX_REPUTATION_REACTION then
-				barMax = barMin + 1e3
-				value = barMax - 1
+			local repInfo = C_GossipInfo_GetFriendshipReputation(factionID)
+			local friendID, friendRep, friendThreshold, nextFriendThreshold = repInfo.friendshipFactionID, repInfo.standing, repInfo.reactionThreshold, repInfo.nextThreshold
+			local repRankInfo = C_GossipInfo_GetFriendshipReputationRanks(factionID)
+			local currentRank, maxRank = repRankInfo.currentLevel, repRankInfo.maxLevel
+			if friendID and friendID ~= 0 then
+				if maxRank > 0 then
+					name = name.." ("..currentRank.." / "..maxRank..")"
+				end
+				if nextFriendThreshold then
+					barMin, barMax, value = friendThreshold, nextFriendThreshold, friendRep
+				else
+					barMax = barMin + 1e3
+					value = barMax - 1
+				end
+				standingtext = repInfo.reaction
+			else
+				if standing == MAX_REPUTATION_REACTION then
+					barMax = barMin + 1e3
+					value = barMax - 1
+				end
+				standingtext = _G["FACTION_STANDING_LABEL"..standing] or UNKNOWN
 			end
-			standingtext = _G["FACTION_STANDING_LABEL"..standing] or UNKNOWN
 		end
 		--GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(name, 0,.6,1)
@@ -153,7 +195,8 @@ function MISC:ExpBar_UpdateTooltip()
 		end
 
 		if factionID == 2465 then -- 荒猎团
-			local _, rep, _, name, _, _, reaction, threshold, nextThreshold = GetFriendshipReputation(2463) -- 玛拉斯缪斯
+			local repInfo = C_GossipInfo_GetFriendshipReputation(2463) -- 玛拉斯缪斯
+			local rep, name, reaction, threshold, nextThreshold = repInfo.standing, repInfo.name, repInfo.reaction, repInfo.reactionThreshold, repInfo.nextThreshold
 			if nextThreshold and rep > 0 then
 				local current = rep - threshold
 				local currentMax = nextThreshold - threshold
@@ -247,14 +290,14 @@ function MISC:SetupScript(bar)
 end
 
 function MISC:Expbar()
+	if R.db["Map"]["DisableMinimap"] then return end
 	if not R.db["Misc"]["ExpRep"] then return end
 
-	local bar = CreateFrame("StatusBar", nil, MinimapCluster)
+	local bar = CreateFrame("StatusBar", "UIExpRepBar", MinimapCluster)
 	bar:SetPoint("TOPLEFT", Minimap, "BOTTOMLEFT", 0, 0)
 	bar:SetPoint("TOPRIGHT", Minimap, "BOTTOMRIGHT", 0, 0)
 	bar:SetHeight(3)
 	bar:SetHitRectInsets(0, 0, 0, -10)
-	bar:SetFrameLevel(bar:GetFrameLevel() + 8)
 	M.CreateSB(bar)
 	
     bar.ArtifactText=bar:CreateFontString("ShowArtifactText", "OVERLAY")
@@ -269,45 +312,33 @@ function MISC:Expbar()
 	bar.restBar = rest
 
 	MISC:SetupScript(bar)
-
-	if I.isNewPatch then
-		StatusTrackingBarManager:UnregisterAllEvents()
-	end
 end
 MISC:RegisterMisc("ExpRep", MISC.Expbar)
 
 -- Paragon reputation info
-function MISC:HookParagonRep()
-	local numFactions = GetNumFactions()
-	local factionOffset = FauxScrollFrame_GetOffset(ReputationListScrollFrame)
-	for i = 1, NUM_FACTIONS_DISPLAYED, 1 do
-		local factionIndex = factionOffset + i
-		local factionRow = _G["ReputationBar"..i]
-		local factionBar = _G["ReputationBar"..i.."ReputationBar"]
-		local factionStanding = _G["ReputationBar"..i.."ReputationBarFactionStanding"]
+function MISC:ParagonReputationSetup()
+	if I.isWW then return end -- FIXME
+	if not R.db["Misc"]["ParagonRep"] then return end
 
-		if factionIndex <= numFactions then
-			local factionID = select(14, GetFactionInfo(factionIndex))
-			if factionID and C_Reputation_IsFactionParagon(factionID) then
-				local currentValue, threshold = C_Reputation_GetFactionParagonInfo(factionID)
-				if currentValue then
-					local barValue = mod(currentValue, threshold)
-					local factionStandingtext = "★"..floor(currentValue/threshold)
+	hooksecurefunc("ReputationFrame_InitReputationRow", function(factionRow, elementData)
+		local factionID = factionRow.factionID
+		local factionContainer = factionRow.Container
+		local factionBar = factionContainer.ReputationBar
+		local factionStanding = factionBar.FactionStanding
 
-					factionBar:SetMinMaxValues(0, threshold)
-					factionBar:SetValue(barValue)
-					factionStanding:SetText(factionStandingtext)
-					factionRow.standingText = factionStandingtext
-					factionRow.rolloverText = format(REPUTATION_PROGRESS_FORMAT, BreakUpLargeNumbers(barValue), BreakUpLargeNumbers(threshold))
-				end
+		if factionContainer.Paragon:IsShown() then
+			local currentValue, threshold = C_Reputation_GetFactionParagonInfo(factionID)
+			if currentValue then
+				local barValue = mod(currentValue, threshold)
+				local factionStandingtext = U["Paragon"]..floor(currentValue/threshold)
+
+				factionBar:SetMinMaxValues(0, threshold)
+				factionBar:SetValue(barValue)
+				factionStanding:SetText(factionStandingtext)
+				factionRow.standingText = factionStandingtext
+				factionRow.rolloverText = format(REPUTATION_PROGRESS_FORMAT, BreakUpLargeNumbers(barValue), BreakUpLargeNumbers(threshold))
 			end
 		end
-	end
-end
-
-function MISC:ParagonReputationSetup()
-	if I.isNewPatch then return end -- todo
-	if not R.db["Misc"]["ParagonRep"] then return end
-	hooksecurefunc("ReputationFrame_Update", MISC.HookParagonRep)
+	end)
 end
 MISC:RegisterMisc("ParagonRep", MISC.ParagonReputationSetup)

@@ -4,11 +4,13 @@
 local _, Core = ...
 local L = Core.locale
 
+--local LibDD = LibStub:GetLibrary('LibUIDropDownMenu-4.0')
+
 -------------------------------------------------------------------------------
 --------------------------- UIDROPDOWNMENU_ADDSLIDER --------------------------
 -------------------------------------------------------------------------------
 
-local function UIDropDownMenu_AddSlider(info, level)
+local function Custom_UIDropDownMenu_AddSlider(info, level)
     local function format(v)
         if info.percentage then return FormatPercentage(v, true) end
         return string.format('%.2f', v)
@@ -37,10 +39,11 @@ local WorldMapOptionsButtonMixin = {}
 _G["HandyNotes_Core" .. 'WorldMapOptionsButtonMixin'] = WorldMapOptionsButtonMixin
 
 function WorldMapOptionsButtonMixin:OnLoad()
-    UIDropDownMenu_SetInitializeFunction(self.DropDown,
-        function(dropdown, level)
-            dropdown:GetParent():InitializeDropDown(level)
-        end)
+    local drop_down_name = "HandyNotes_Core" .. 'WorldMapDropDownMenu'
+    self.DropDown = CreateFrame("Frame", drop_down_name, self, "UIDropDownMenuTemplate") --Create_UIDropDownMenu(drop_down_name, self)
+
+    UIDropDownMenu_SetInitializeFunction(self.DropDown, function(dropdown,
+        level) dropdown:GetParent():InitializeDropDown(level) end)
     UIDropDownMenu_SetDisplayMode(self.DropDown, 'MENU')
 
     self.GroupDesc = CreateFrame('Frame', "HandyNotes_Core" .. 'GroupMenuSliderOption',
@@ -82,47 +85,107 @@ function WorldMapOptionsButtonMixin:Refresh()
     end
 end
 
+function WorldMapOptionsButtonMixin:AddGroupButton(group, level)
+    local map = Core.maps[self:GetParent():GetMapID()]
+    local icon, iconLink = group.icon
+    local status = ''
+    if group.achievement then
+        local _, _, _, completed, _, _, _, _, _, _, _, _, earnedByMe =
+            GetAchievementInfo(group.achievement)
+        status = ' ' .. (earnedByMe and Core.GetIconLink('check_gn') or
+                     (completed and Core.GetIconLink('check_bl') or ''))
+    end
+
+    if group.name == 'misc' then
+        -- find an icon from the misc nodes in the map
+        for coord, node in pairs(map.nodes) do
+            if node.group[1] == group then
+                icon = node.icon
+                break
+            end
+        end
+    end
+
+    if type(icon) == 'number' then
+        iconLink = Core.GetIconLink(icon, 12, 1, 0) .. ' '
+    else
+        iconLink = Core.GetIconLink(icon, 16)
+    end
+
+    UIDropDownMenu_AddButton({
+        text = iconLink .. ' ' .. Core.RenderLinks(group.label, true) .. status,
+        isNotRadio = true,
+        keepShownOnClick = true,
+        hasArrow = true,
+        value = group,
+        checked = group:GetDisplay(map.id),
+        arg1 = group,
+        func = function(button, group)
+            group:SetDisplay(button.checked, map.id)
+        end
+    }, level)
+end
+
+function WorldMapOptionsButtonMixin:AddGroupOptions(group, level)
+    local map = Core.maps[self:GetParent():GetMapID()]
+
+    self.GroupDesc.Text:SetText(Core.RenderLinks(group.desc))
+    UIDropDownMenu_AddButton({customFrame = self.GroupDesc}, level)
+    UIDropDownMenu_AddButton({notClickable = true, notCheckable = true},
+        level)
+
+    Custom_UIDropDownMenu_AddSlider({
+        text = L['options_opacity'],
+        min = 0,
+        max = 1,
+        step = 0.01,
+        value = group:GetAlpha(map.id),
+        frame = self.AlphaOption,
+        percentage = true,
+        func = function(v) group:SetAlpha(v, map.id) end
+    }, level)
+
+    Custom_UIDropDownMenu_AddSlider({
+        text = L['options_scale'],
+        min = 0.3,
+        max = 3,
+        step = 0.05,
+        value = group:GetScale(map.id),
+        frame = self.ScaleOption,
+        func = function(v) group:SetScale(v, map.id) end
+    }, level)
+end
+
 function WorldMapOptionsButtonMixin:InitializeDropDown(level)
-    local map, icon, iconLink = Core.maps[self:GetParent():GetMapID()]
+    local map = Core.maps[self:GetParent():GetMapID()]
 
     if level == 1 then
-        UIDropDownMenu_AddButton({
-            isTitle = true,
-            notCheckable = true,
-            text = WORLD_MAP_FILTER_TITLE
-        })
-
+        local current_group_type = nil
+        local achievements_menu_added = false
         for i, group in ipairs(map.groups) do
+
+            -- Add a separator each time the group type changes
+            if current_group_type ~= nil and current_group_type ~= group.type then
+                UIDropDownMenu_AddSeparator()
+            end
+            current_group_type = group.type
+
             if group:IsEnabled() and group:HasEnabledNodes(map) then
-                icon = group.icon
-                if group.name == 'misc' then
-                    -- find an icon from the misc nodes in the map
-                    for coord, node in pairs(map.nodes) do
-                        if node.group == group then
-                            icon = node.icon
-                            break
-                        end
-                    end
+                if group.type == Core.group_types.ACHIEVEMENT and
+                    not achievements_menu_added then
+                    UIDropDownMenu_AddButton({
+                        text = Core.GetIconLink(236671, 12, 1, 0) .. '  ' ..
+                            ACHIEVEMENTS,
+                        isNotRadio = true,
+                        notCheckable = true,
+                        keepShownOnClick = true,
+                        hasArrow = true,
+                        value = 'achievements'
+                    })
+                    achievements_menu_added = true
+                elseif group.type ~= Core.group_types.ACHIEVEMENT then
+                    self:AddGroupButton(group, 1)
                 end
-
-                if type(icon) == 'number' then
-                    iconLink = Core.GetIconLink(icon, 12, 1, 0) .. ' '
-                else
-                    iconLink = Core.GetIconLink(icon, 16)
-                end
-
-                UIDropDownMenu_AddButton({
-                    text = iconLink .. ' ' .. Core.RenderLinks(group.label, true),
-                    isNotRadio = true,
-                    keepShownOnClick = true,
-                    hasArrow = true,
-                    value = group,
-                    checked = group:GetDisplay(map.id),
-                    arg1 = group,
-                    func = function(button, group)
-                        group:SetDisplay(button.checked, map.id)
-                    end
-                })
             end
         end
 
@@ -154,6 +217,15 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
             end
         })
         UIDropDownMenu_AddButton({
+            text = L['options_toggle_hide_done_treasure'],
+            isNotRadio = true,
+            keepShownOnClick = true,
+            checked = Core:GetOpt('hide_done_treasures'),
+            func = function(button, option)
+                Core:SetOpt('hide_done_treasures', button.checked)
+            end
+        })
+        UIDropDownMenu_AddButton({
             text = L['options_toggle_use_char_achieves'],
             isNotRadio = true,
             keepShownOnClick = true,
@@ -162,7 +234,25 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
                 Core:SetOpt('use_char_achieves', button.checked)
             end
         })
-
+        UIDropDownMenu_AddSeparator()
+        UIDropDownMenu_AddButton({
+            text = L['ignore_class_restrictions'],
+            isNotRadio = true,
+            keepShownOnClick = true,
+            checked = Core:GetOpt('ignore_class_restrictions'),
+            func = function(button, option)
+                Core:SetOpt('ignore_class_restrictions', button.checked)
+            end
+        })
+        UIDropDownMenu_AddButton({
+            text = L['ignore_faction_restrictions'],
+            isNotRadio = true,
+            keepShownOnClick = true,
+            checked = Core:GetOpt('ignore_faction_restrictions'),
+            func = function(button, option)
+                Core:SetOpt('ignore_faction_restrictions', button.checked)
+            end
+        })
         UIDropDownMenu_AddSeparator()
         UIDropDownMenu_AddButton({
             text = L['options_open_settings_panel'],
@@ -170,16 +260,23 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
             notCheckable = true,
             disabled = not map.settings,
             func = function(button, option)
-                InterfaceOptionsFrame_Show()
-                InterfaceOptionsFrame_OpenToCategory('HandyNotes')
+                HideUIPanel(WorldMapFrame)
+                Settings.OpenToCategory('HandyNotes')
                 LibStub('AceConfigDialog-3.0'):SelectGroup('HandyNotes',
-                    'plugins', "HandyNotes", 'ZonesTab', 'Zone_' .. map.id)
+                    'plugins', "HandyNotes-Core", 'ZonesTab', 'Zone_' .. map.id)
             end
         })
     elseif level == 2 then
-        if UIDROPDOWNMENU_MENU_VALUE == 'rewards' then
+        if UIDROPDOWNMENU_MENU_VALUE == 'achievements' then
+            for i, group in ipairs(map.groups) do
+                if group.type == Core.group_types.ACHIEVEMENT and
+                    group:IsEnabled() and group:HasEnabledNodes(map) then
+                    self:AddGroupButton(group, 2)
+                end
+            end
+        elseif UIDROPDOWNMENU_MENU_VALUE == 'rewards' then
             for i, type in ipairs({
-                'mount', 'pet', 'toy', 'transmog', 'all_transmog'
+                'rep', 'mount', 'pet', 'recipe', 'toy', 'transmog'
             }) do
                 UIDropDownMenu_AddButton({
                     text = L['options_' .. type .. '_rewards'],
@@ -191,35 +288,47 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
                     end
                 }, 2)
             end
+
+            -- Only show manuscripts for the dragonflight plugin. A bit hacky, maybe
+            -- we can find a better way to do this in the future.
+            if ADDON_NAME == 'HandyNotes' then
+                UIDropDownMenu_AddButton({
+                    text = L['options_manuscript_rewards'],
+                    isNotRadio = true,
+                    keepShownOnClick = true,
+                    checked = Core:GetOpt('show_manuscript_rewards'),
+                    func = function(button, option)
+                        Core:SetOpt('show_manuscript_rewards', button.checked)
+                    end
+                }, 2)
+            end
+
+            -- Additional options tweaking the behavior of the above filters
+            UIDropDownMenu_AddSeparator(2)
+            UIDropDownMenu_AddButton({
+                text = L['options_all_transmog_rewards'],
+                isNotRadio = true,
+                keepShownOnClick = true,
+                checked = Core:GetOpt('show_all_transmog_rewards'),
+                func = function(button, option)
+                    Core:SetOpt('show_all_transmog_rewards', button.checked)
+                end
+            }, 2)
+            UIDropDownMenu_AddButton({
+                text = L['options_claimed_rep_rewards'],
+                isNotRadio = true,
+                keepShownOnClick = true,
+                checked = Core:GetOpt('show_claimed_rep_rewards'),
+                func = function(button, option)
+                    Core:SetOpt('show_claimed_rep_rewards', button.checked)
+                end
+            }, 2)
         else
-            -- Get correct map ID to query/set options for
-            local group = UIDROPDOWNMENU_MENU_VALUE
-
-            self.GroupDesc.Text:SetText(Core.RenderLinks(group.desc))
-            UIDropDownMenu_AddButton({customFrame = self.GroupDesc}, 2)
-            UIDropDownMenu_AddButton({notClickable = true, notCheckable = true},
-                2)
-
-            UIDropDownMenu_AddSlider({
-                text = L['options_opacity'],
-                min = 0,
-                max = 1,
-                step = 0.01,
-                value = group:GetAlpha(map.id),
-                frame = self.AlphaOption,
-                percentage = true,
-                func = function(v) group:SetAlpha(v, map.id) end
-            }, 2)
-
-            UIDropDownMenu_AddSlider({
-                text = L['options_scale'],
-                min = 0.3,
-                max = 3,
-                step = 0.05,
-                value = group:GetScale(map.id),
-                frame = self.ScaleOption,
-                func = function(v) group:SetScale(v, map.id) end
-            }, 2)
+            -- add opacity/scale menu for non-achievements
+            self:AddGroupOptions(UIDROPDOWNMENU_MENU_VALUE, 2)
         end
+    elseif level == 3 then
+        -- add opacity/scale menu for achievements
+        self:AddGroupOptions(UIDROPDOWNMENU_MENU_VALUE, 3)
     end
 end

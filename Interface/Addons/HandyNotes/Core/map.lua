@@ -43,7 +43,7 @@ function Map:Initialize(attrs)
     })
 
     -- auto-register this map
-    if Core.maps[self.id] then error('Map already registered: ' .. self.id) end
+    --if Core.maps[self.id] then error('Map already registered: ' .. self.id) end
     Core.maps[self.id] = self
 end
 
@@ -61,15 +61,17 @@ function Map:AddNode(coord, node)
         fgroup[#fgroup + 1] = coord
     end
 
-    if node.group ~= Core.groups.QUEST then
-        -- Initialize group defaults and UI controls for this map if the group does
-        -- not inherit its settings and defaults from a parent map
-        if self.settings then Core.CreateGroupOptions(self, node.group) end
+    for _, group in pairs(node.group) do
+        if group ~= Core.groups.QUEST then
+            -- Initialize group defaults and UI controls for this map if the group does
+            -- not inherit its settings and defaults from a parent map
+            if self.settings then Core.CreateGroupOptions(self, group) end
 
-        -- Keep track of all groups associated with this map
-        if not self.groups[node.group.name] then
-            self.groups[#self.groups + 1] = node.group
-            self.groups[node.group.name] = true
+            -- Keep track of all groups associated with this map
+            if not self.groups[group.name] then
+                self.groups[#self.groups + 1] = group
+                self.groups[group.name] = true
+            end
         end
     end
 
@@ -93,7 +95,9 @@ function Map:AddNode(coord, node)
             end
             local map = Core.maps[parent.id] or Map({id = parent.id})
             map.nodes[HandyNotes:getCoord(px, py)] = Core.Clone(node, {
-                pois = (parent.pois or false)
+                pois = parent.pois or nil,
+                note = parent.note or nil,
+                location = parent.location or nil
             })
         end
     end
@@ -144,14 +148,14 @@ function Map:IsNodeEnabled(node, coord, minimap)
     -- Check if the node is disabled in the current context
     if not self:CanDisplay(node, coord, minimap) then return false end
 
-    -- Check if node's group is disabled
-    if not node.group:IsEnabled() then return false end
+    for _, group in pairs(node.group) do
+        -- Check if group is enable and checked/unchecked and then check for prerequisites and quest (or custom) completion
+        if group:IsEnabled() and group:GetDisplay(self.id) then
+            return node:IsEnabled()
+        end
+    end
 
-    -- Check if node's group is checked/unchecked
-    if not node.group:GetDisplay(self.id) then return false end
-
-    -- Check for prerequisites and quest (or custom) completion
-    return node:IsEnabled()
+    return false
 end
 
 function Map:Prepare()
@@ -162,6 +166,15 @@ function Map:Prepare()
             node._prepared = true
         end
     end
+
+    -- Sort groups by type, order and name
+    table.sort(self.groups, function(a, b)
+        if a.type ~= b.type then return a.type < b.type end
+        if a.order ~= b.order then return a.order < b.order end
+        local alabel = Core.RenderLinks(a.label, true)
+        local blabel = Core.RenderLinks(b.label, true)
+        return alabel < blabel
+    end)
 end
 
 function Map:SetFocus(node, coord, state, hover)
@@ -282,6 +295,10 @@ end
 function MinimapPinMixin:OnAcquired(poi, ...)
     local mapID = HBD:GetPlayerZone()
     local x, y = poi:Draw(self, ...)
+
+    self.label = poi.label
+    self.note = poi.note
+
     if GetCVar('rotateMinimap') == '1' then self:UpdateRotation() end
     HBDPins:AddMinimapIconMap(MinimapPinsKey, self, mapID, x, y, true)
 end
@@ -299,6 +316,12 @@ function MinimapPinMixin:UpdateRotation()
     if self.rotation == nil or self.provider.facing == nil then return end
     self.texture:SetRotation(self.rotation + math.pi * 2 - self.provider.facing)
 end
+
+function MinimapPinMixin:OnMouseEnter()
+    if self.label then Core.tooltip.RenderPinTooltip(self) end
+end
+
+function MinimapPinMixin:OnMouseLeave() GameTooltip:Hide() end
 
 MinimapDataProvider:SetScript('OnUpdate', function()
     if GetCVar('rotateMinimap') == '1' then MinimapDataProvider:OnUpdate() end
@@ -318,6 +341,8 @@ end)
 local WorldMapDataProvider = CreateFromMixins(MapCanvasDataProviderMixin)
 local WorldMapPinTemplate = "HandyNotes_Core" .. 'WorldMapPinTemplate'
 local WorldMapPinMixin = CreateFromMixins(MapCanvasPinMixin)
+
+function WorldMapPinMixin:SetPassThroughButtons() end
 
 _G["HandyNotes_Core" .. 'WorldMapPinMixin'] = WorldMapPinMixin
 
@@ -382,6 +407,10 @@ function WorldMapPinMixin:OnAcquired(poi, ...)
     local _, _, w, h = self:GetParent():GetRect()
     self.parentWidth = w
     self.parentHeight = h
+
+    self.label = poi.label
+    self.note = poi.note
+
     if (w and h) then
         local x, y = poi:Draw(self, ...)
         self:ApplyCurrentScale()
@@ -402,6 +431,12 @@ function WorldMapPinMixin:ApplyFrameLevel()
     MapCanvasPinMixin.ApplyFrameLevel(self)
     self:SetFrameLevel(self:GetFrameLevel() + self.frameOffset)
 end
+
+function WorldMapPinMixin:OnMouseEnter()
+    if self.label then Core.tooltip.RenderPinTooltip(self) end
+end
+
+function WorldMapPinMixin:OnMouseLeave() GameTooltip:Hide() end
 
 -------------------------------------------------------------------------------
 ------------------------------ HANDYNOTES HOOKS -------------------------------

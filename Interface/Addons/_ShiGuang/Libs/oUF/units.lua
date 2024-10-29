@@ -204,7 +204,7 @@ local function createOnUpdate(timer)
 			self.elapsed = (self.elapsed or 0) + elapsed
 			if(self.elapsed > timer) then
 				for _, object in next, objects do
-					if(object.unit and unitExists(object.unit)) then
+					if(object:IsVisible() and object.unit and unitExists(object.unit)) then
 						object:UpdateAllElements('OnUpdate')
 					end
 				end
@@ -226,14 +226,12 @@ function oUF:HandleEventlessUnit(object)
 	-- time from the layout code after oUF:Spawn(unit) returns the frame.
 	local timer = object.onUpdateFrequency or 0.5
 
-	-- Remove it, in case it's registered with another timer previously
-	for t, objects in next, eventlessObjects do
-		if(t ~= timer) then
-			for i, obj in next, objects do
-				if(obj == object) then
-					table.remove(objects, i)
-					break
-				end
+	-- Remove it, in case it's already registered with any timer
+	for _, objects in next, eventlessObjects do
+		for i, obj in next, objects do
+			if(obj == object) then
+				table.remove(objects, i)
+				break
 			end
 		end
 	end

@@ -32,132 +32,128 @@ end
 	
 --Skull Marks Raid Marker 8 NO World Marker
   WMSkull = CreatMarkerButton("RaidMarker8Skull", MAF, "Interface\\TargetingFrame\\UI-RaidTargetingIcon_8.png", 21, 21, "TOP", MAF, "BOTTOM", 0, 0, 0.5)
-	WMSkull:RegisterForClicks("AnyUp")
+	WMSkull:RegisterForClicks("AnyDown")
 	WMSkull:SetAttribute("type","macro")
-	WMSkull:SetAttribute("macrotext",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",8) end\n/wm [btn:2] 8')
+	WMSkull:SetAttribute("macrotext1",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",8) end')
+	WMSkull:SetAttribute("macrotext2",'/wm [btn:2] 8')
 	
 --Cross Marks Raid Marker 7 World Marker 4
 	WMCross = CreatMarkerButton("RaidMarker7Cross", MAF, "Interface\\TargetingFrame\\UI-RaidTargetingIcon_7.png", 21, 21, "TOP", WMSkull, "BOTTOM", 0, -5, 0.5)
-	WMCross:RegisterForClicks("AnyUp")
+	WMCross:RegisterForClicks("AnyDown")
 	WMCross:SetAttribute("type","macro")
-	WMCross:SetAttribute("macrotext",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",7) end\n/wm [btn:2] 4')
+	WMCross:SetAttribute("macrotext1",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",7) end')
+	WMCross:SetAttribute("macrotext2",'/wm [btn:2] 4')
 	
 --Square Marks Raid Marker 6 World Marker 1
   WMSquare = CreatMarkerButton("RaidMarker6Square", MAF, "Interface\\TargetingFrame\\UI-RaidTargetingIcon_6.png", 21, 21, "TOP", WMCross, "BOTTOM", 0, -5, 0.5)
-	WMSquare:RegisterForClicks("AnyUp")
+	WMSquare:RegisterForClicks("AnyDown")
 	WMSquare:SetAttribute("type","macro")
-	WMSquare:SetAttribute("macrotext",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",6) end\n/wm [btn:2] 1')
+	WMSquare:SetAttribute("macrotext1",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",6) end')
+	WMSquare:SetAttribute("macrotext2",'/wm [btn:2] 1')
 	
 --Moon Marks Raid Marker 5 World Marker 7
   WMMoon = CreatMarkerButton("RaidMarker5Moon", MAF, "Interface\\TargetingFrame\\UI-RaidTargetingIcon_5.png", 21, 21, "TOP", WMSquare, "BOTTOM", 0, -5, 0.5)
-	WMMoon:RegisterForClicks("AnyUp")
+	WMMoon:RegisterForClicks("AnyDown")
 	WMMoon:SetAttribute("type","macro")
-	WMMoon:SetAttribute("macrotext",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",5) end\n/wm [btn:2] 7')
+	WMMoon:SetAttribute("macrotext1",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",5) end')
+	WMMoon:SetAttribute("macrotext2",'/wm [btn:2] 7')
 	
 --Triangle Marks Raid Marker 4 World Marker 2
   WMTriangle = CreatMarkerButton("RaidMarker4Triangle", MAF, "Interface\\TargetingFrame\\UI-RaidTargetingIcon_4.png", 21, 21, "TOP", WMMoon, "BOTTOM", 0, -5, 0.5)
-	WMTriangle:RegisterForClicks("AnyUp")
+	WMTriangle:RegisterForClicks("AnyDown")
 	WMTriangle:SetAttribute("type","macro")
-	WMTriangle:SetAttribute("macrotext",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",4) end\n/wm [btn:2] 2')
+	WMTriangle:SetAttribute("macrotext1",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",4) end')
+	WMTriangle:SetAttribute("macrotext2",'/wm [btn:2] 2')
 	
 --Diamond Marks Raid Marker 3 World Marker 3
   WMDiamond = CreatMarkerButton("RaidMarker3Diamond", MAF, "Interface\\TargetingFrame\\UI-RaidTargetingIcon_3.png", 21, 21, "TOP", WMTriangle, "BOTTOM", 0, -5, 0.5)
-	WMDiamond:RegisterForClicks("AnyUp")
+	WMDiamond:RegisterForClicks("AnyDown")
 	WMDiamond:SetAttribute("type","macro")
-	WMDiamond:SetAttribute("macrotext",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",3) end\n/wm [btn:2] 3')
+	WMDiamond:SetAttribute("macrotext1",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",3) end')
+	WMDiamond:SetAttribute("macrotext2",'/wm [btn:2] 3')
 	
 --Circle Marks Raid Marker 2 World Marker 6
   WMCircle = CreatMarkerButton("RaidMarker2Circle", MAF, "Interface\\TargetingFrame\\UI-RaidTargetingIcon_2.png", 21, 21, "TOP", WMDiamond, "BOTTOM", 0, -5, 0.5)
-	WMCircle:RegisterForClicks("AnyUp")
+	WMCircle:RegisterForClicks("AnyDown")
 	WMCircle:SetAttribute("type","macro")
-	WMCircle:SetAttribute("macrotext",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",2) end\n/wm [btn:2] 6')
+	WMCircle:SetAttribute("macrotext1",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",2) end')
+	WMCircle:SetAttribute("macrotext2",'/wm [btn:2] 6')
 
 --Star Marks Raid Marker 1 World Marker 5
     WMStar = CreatMarkerButton("RaidMarker1Star", MAF, "Interface\\TargetingFrame\\UI-RaidTargetingIcon_1.png", 21, 21, "TOP", WMCircle, "BOTTOM", 0, -5, 0.5)
-	WMStar:RegisterForClicks("AnyUp")
+	WMStar:RegisterForClicks("AnyDown")
 	WMStar:SetAttribute("type","macro")
-	WMStar:SetAttribute("macrotext",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",1) end\n/wm [btn:2] 5')
+	WMStar:SetAttribute("macrotext1",'/run if SecureCmdOptionParse("[btn:1]") then SetRaidTargetIcon("target",1) end')
+	WMStar:SetAttribute("macrotext2",'/wm [btn:2] 5')
 	
 --Clear Marks Raid Marker 0 World Marker 6
 	WMClear = CreatMarkerButton("WorldMarker6Clear", MAF, "Interface\\BUTTONS\\UI-GroupLoot-Pass-Up", 21, 21, "TOP", WMStar, "BOTTOM", 0, -5, 0.5)
-	WMClear:RegisterForClicks("AnyUp")
+	WMClear:RegisterForClicks("AnyDown")
 	WMClear:SetAttribute("type","macro")
-	WMClear:SetAttribute("macrotext","/tm [btn:1] 0\n/cwm [btn:2] 0")
+	WMClear:SetAttribute("macrotext1","/tm [btn:1] 0")  --/run ClearRaidMarker()
+	WMClear:SetAttribute("macrotext2","/cwm [btn:2] 0")
 	
 ---------------------------------------------------- READY CHECK
 	RC = CreatMarkerButton("READYCHECK", MAF, "Interface\\Addons\\_ShiGuang\\Media\\Emotes\\okay", 21, 21, "TOP", WMClear, "BOTTOM", 0, -11, 0.43)
-	RC:RegisterForClicks("LeftButtonUp")
-	RC:SetAttribute("type","macro")
-	RC:SetAttribute("macrotext",'/script DoReadyCheck()')
-	RC:SetScript("OnEnter", function(self)
-	GameTooltip:SetOwner(RC, "ANCHOR_TOP")
-	GameTooltip:AddLine("就位确认", 1,2,0)
-	GameTooltip:Show()
+    RC:SetScript("OnEnter", function(self) GameTooltip:SetOwner(RC, "ANCHOR_TOP") GameTooltip:AddLine("就位确认", 1,2,0) GameTooltip:Show() end)
+	RC:HookScript("OnMouseDown", function(_, btn)
+			if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
+			if IsInGroup() and (UnitIsGroupLeader("player") or (UnitIsGroupAssistant("player") and IsInRaid())) then
+				DoReadyCheck()
+			else
+				UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_LEADER)
+			end
 	end)
-    RC:SetScript("OnLeave", function(self) GameTooltip:Hide() end)
 	
 ---------------------------------------------------- ROLE POLL
     RP = CreatMarkerButton("ROLEPOLL", MAF, "Interface\\Addons\\_ShiGuang\\Media\\Modules\\Role\\DAMAGER", 21, 21, "TOP", RC, "BOTTOM", 0, -3, 0.43)
-	RP:RegisterForClicks("LeftButtonUp")
-	RP:SetAttribute("type","macro")
-	RP:SetAttribute("macrotext",'/script InitiateRolePoll()')
-	RP:SetScript("OnEnter", function(self)
-	GameTooltip:SetOwner(RP, "ANCHOR_TOP")
-	GameTooltip:AddLine("职责确认", 1,2,0)
-	GameTooltip:Show()
+    RP:SetScript("OnEnter", function(self) GameTooltip:SetOwner(RP, "ANCHOR_TOP") GameTooltip:AddLine("职责确认", 1,2,0) GameTooltip:Show() end)
+	RP:HookScript("OnMouseDown", function(_, btn)
+			if IsInGroup() and not HasLFGRestrictions() and (UnitIsGroupLeader("player") or (UnitIsGroupAssistant("player") and IsInRaid())) then
+				InitiateRolePoll()
+			else
+				UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_LEADER)
+			end
 	end)
-    RP:SetScript("OnLeave", function(self) GameTooltip:Hide() end)
 	
 ---------------------------------------------------- FlaskFood  --RP:SetText("※")
-	local BuffName, numPlayer = {"合剂", "食物", SPELL_STAT4_NAME, RAID_BUFF_2, RAID_BUFF_3, RUNES}
-	local NoBuff, numGroups = {}, 6
+	local BuffName = {U["Flask"], U["Food"], SPELL_STAT4_NAME, RAID_BUFF_2, RAID_BUFF_3, RUNES}
+	local NoBuff, numGroups, numPlayer = {}, 6, 0
 	for i = 1, numGroups do NoBuff[i] = {} end
-    local FFCBuffList = {
-	[1] = {
-		307166,	-- 大锅
-		307185,	-- 通用合剂
-		307187,	-- 耐力合剂
-	},		-- 合剂
-	[2] = {	104273,	},     -- 进食充分  -- 250敏捷，BUFF名一致
-	[3] = {	1459,	264760,	},     -- 10%智力
-	[4] = { 21562, 264764, },     -- 10%耐力
-	[5] = { 6673, 264761, },     -- 10%攻强
-	[6] = { 270058, },     -- 符文
-}
 	-- Role counts
-	local function getRaidMaxGroup()
-		local _, instType, difficulty = GetInstanceInfo()
-		if (instType == "party" or instType == "scenario") and not IsInRaid() then
-			return 1
-		elseif instType ~= "raid" then
-			return 8
-		elseif difficulty == 8 or difficulty == 1 or difficulty == 2 or difficulty == 24 then
-			return 1
-		elseif difficulty == 14 or difficulty == 15 then
-			return 6
-		elseif difficulty == 16 then
-			return 4
-		elseif difficulty == 3 or difficulty == 5 then
-			return 2
-		elseif difficulty == 9 then
-			return 8
-		else
-			return 5
-		end
+local function getRaidMaxGroup()
+	local _, instType, difficulty = GetInstanceInfo()
+	if (instType == "party" or instType == "scenario") and not IsInRaid() then
+		return 1
+	elseif instType ~= "raid" then
+		return 8
+	elseif difficulty == 8 or difficulty == 1 or difficulty == 2 then
+		return 1
+	elseif difficulty == 14 or difficulty == 15 or (difficulty == 24 and instType == "raid") then
+		return 6
+	elseif difficulty == 16 then
+		return 4
+	elseif difficulty == 3 or difficulty == 5 then
+		return 2
+	elseif difficulty == 9 then
+		return 8
+	else
+		return 5
 	end
+end
 	local function sendMsg(text)
-			SendChatMessage(text, IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY")
+			SendChatMessage(text, IsPartyLFG() or C_PartyInfo.IsPartyWalkIn() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY")
 	end
 
 	local function sendResult(i)
 		local count = #NoBuff[i]
 		if count > 0 then
 			if count >= numPlayer then
-				sendMsg("缺少"..BuffName[i]..": "..ALL..PLAYER)
+				sendMsg(U["Lack"]..BuffName[i]..": "..ALL..PLAYER)
 			elseif count >= 5 and i > 2 then
-				sendMsg("缺少"..BuffName[i]..": "..format(U["Player Count"], count))
+				sendMsg(U["Lack"]..BuffName[i]..": "..format(U["Player Count"], count))
 			else
-				local str = "缺少"..BuffName[i]..": "
+				local str = U["Lack"]..BuffName[i]..": "
 				for j = 1, count do
 					str = str..NoBuff[i][j]..(j < #NoBuff[i] and ", " or "")
 					if #str > 230 then
@@ -181,15 +177,12 @@ end
 				numPlayer = numPlayer + 1
 				for j = 1, numGroups do
 					local HasBuff
-					local buffTable = FFCBuffList[j]
+					local buffTable = I.BuffList[j]
 					for k = 1, #buffTable do
-						local buffName = GetSpellInfo(buffTable[k])
-						for index = 1, 32 do
-							local currentBuff = UnitAura(name, index)
-							if currentBuff and currentBuff == buffName then
-								HasBuff = true
-								break
-							end
+						local buffName = C_Spell.GetSpellName(buffTable[k])
+						if buffName and C_UnitAuras.GetAuraDataBySpellName(name, buffName) then
+							HasBuff = true
+							break
 						end
 					end
 					if not HasBuff then
@@ -214,17 +207,39 @@ end
     FF:SetScript("OnEnter", function(self) GameTooltip:SetOwner(FF, "ANCHOR_TOP") GameTooltip:AddLine("检查食物", 1,2,0) GameTooltip:Show() end)
     FF:SetScript("OnLeave", function(self) GameTooltip:Hide() end)
 	FF:SetScript("OnMouseDown", function(self) scanBuff() end)
-  
+	
+ --重置副本宏 /run ResetInstances() 
 ---------------------------------------------------- PullTimer
-	PT = CreatMarkerButton("FLASKFOOD", MAF, "Interface\\Addons\\_ShiGuang\\Media\\Modules\\Role\\bubbleTex", 21, 21, "TOP", FF, "BOTTOM", 0, -3, 0.43)
+	local reset = true
+	M:RegisterEvent("PLAYER_REGEN_ENABLED", function() reset = true end)
+	PT = CreatMarkerButton("DBMCOUNT", MAF, "Interface\\Addons\\_ShiGuang\\Media\\Modules\\Role\\bubbleTex", 21, 21, "TOP", FF, "BOTTOM", 0, -3, 0.43)
     PT:SetScript("OnEnter", function(self) GameTooltip:SetOwner(PT, "ANCHOR_TOP") GameTooltip:AddLine("DBM倒数", 1,2,0) GameTooltip:Show() end)
-    PT:SetScript("OnLeave", function(self) GameTooltip:Hide() end)
-	PT:RegisterForClicks("LeftButtonUp")
-	PT:SetAttribute("type","macro")
-	PT:SetAttribute("macrotext",'/dbm pull 8')
- 
+	PT:HookScript("OnMouseDown", function(_, btn)
+			if IsInGroup() and (UnitIsGroupLeader("player") or (UnitIsGroupAssistant("player") and IsInRaid())) then
+				if C_AddOns.IsAddOnLoaded("DBM-Core") then
+					if reset then
+						SlashCmdList["DEADLYBOSSMODS"]("pull "..R.db["Misc"]["DBMCount"])
+					else
+						SlashCmdList["DEADLYBOSSMODS"]("pull 0")
+					end
+					reset = not reset
+				elseif C_AddOns.IsAddOnLoaded("BigWigs") then
+					if not SlashCmdList["BIGWIGSPULL"] then C_AddOns.LoadAddOn("BigWigs_Plugins") end
+					if reset then
+						SlashCmdList["BIGWIGSPULL"](R.db["Misc"]["DBMCount"])
+					else
+						SlashCmdList["BIGWIGSPULL"]("0")
+					end
+					reset = not reset
+				else
+					UIErrorsFrame:AddMessage(I.InfoColor..U["DBM Required"])
+				end
+			else
+				UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_LEADER)
+			end
+	end)
 --[[-------------------------------------------------- Battle resurrect
-	RES = CreatMarkerButton("FLASKFOOD", MAF, GetSpellTexture(20484), 18, 18, "TOP", PT, "BOTTOM", 0, -3, 0.43)
+	RES = CreatMarkerButton("FLASKFOOD", MAF, C_Spell.GetSpellTexture(20484), 18, 18, "TOP", PT, "BOTTOM", 0, -3, 0.43)
 	RES.Count = RES:CreateFontString(nil, "OVERLAY")
 	RES.Count:SetFont(STANDARD_TEXT_FONT, 16, "OUTLINE")
 	RES.Count:SetText("0")
@@ -277,7 +292,6 @@ if InCombatLockdown() then MAF:RegisterEvent("PLAYER_REGEN_ENABLED") return end
 if CheckRaidStatus() then MAF:Show() else MAF:Hide() end
 if event == "PLAYER_REGEN_ENABLED" then MAF:UnregisterEvent("PLAYER_REGEN_ENABLED") end
 end);
-
 --------------------------------------------------------------------------------------- DejaAutoMark ## Authors: Dejablue
 local TankHealerMarkFrame = CreateFrame("Frame", "TankHealerMarkFrame")
 TankHealerMarkFrame:RegisterEvent("PLAYER_LOGIN")

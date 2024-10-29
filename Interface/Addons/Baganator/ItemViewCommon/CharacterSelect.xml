@@ -1,0 +1,43 @@
+<Ui>
+  <Frame name="BaganatorCharacterSelectTemplate" virtual="true" mixin="BaganatorCharacterSelectMixin" inherits="ButtonFrameTemplate" enableMouse="true" hidden="true" topLevel="true">
+    <Size x="300" y="430"/>
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+      <OnShow method="OnShow"/>
+      <OnDragStart method="OnDragStart"/>
+      <OnDragStop method="OnDragStop"/>
+    </Scripts>
+    <Frames>
+      <EditBox parentKey="SearchBox" inherits="SearchBoxTemplate">
+        <Size y="22"/>
+        <Anchors>
+          <Anchor point="TOPRIGHT" x="-20" y="-25"/>
+          <Anchor point="TOPLEFT" x="20" y="-25"/>
+        </Anchors>
+      </EditBox>
+      <EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar">
+        <Anchors>
+          <Anchor point="TOPRIGHT" y="-55" x="-12"/>
+          <Anchor point="BOTTOMRIGHT" y="37"/>
+        </Anchors>
+      </EventFrame>
+      <Frame parentKey="ScrollBox" inherits="WowScrollBoxList">
+        <Anchors>
+          <Anchor point="TOPLEFT" y="-50"/>
+          <Anchor point="BOTTOMRIGHT" relativeKey="$parent.ScrollBar" y="3" x="-3"/>
+        </Anchors>
+      </Frame>
+
+      <Button parentKey="ManageCharactersButton" inherits="UIPanelDynamicResizeButtonTemplate" text="BAGANATOR_L_MANAGE_CHARACTERS">
+        <Scripts>
+          <OnClick>
+            Settings.OpenToCategory(SYNDICATOR_L_SYNDICATOR)
+          </OnClick>
+        </Scripts>
+        <Anchors>
+          <Anchor point="BOTTOM" y="10"/>
+        </Anchors>
+      </Button>
+    </Frames>
+  </Frame>
+</Ui>

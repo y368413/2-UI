@@ -158,7 +158,7 @@ local function RegisterSpells(list, ...)
 	for i = 1, select("#", ...) do
 		local id = select(i, ...)
 		if type(id) == "number" then
-			local spell = GetSpellInfo(id)
+			local spell = C_Spell.GetSpellInfo(id)
 			if spell then
 				list[spell] = 1
 			end
@@ -617,7 +617,7 @@ end
 
 function DEX_doLog(ani)
 	local thetime = GetTime() - ani.starttime;
-	if thetime < DEX_logTime and thetime > 0 then
+	if thetime < DEX_logTime and thetime >= 0 then
 		ani.FObject:SetAlpha(1);
 	else
 		if thetime < DEX_logTime + 3 then
@@ -738,7 +738,7 @@ function DEX_BuildText(damage,spell,color,colorSe)
 	if DEX_Get("DEX_ShowSpellIcon") == 1 then				--Show Icons instead of Spell Name
 		local icons = ""
 		local iconsize = DEX_TEXTSIZE;
-		if select(3,GetSpellInfo(spell))~=nil then icons ="|T"..select(3,GetSpellInfo(spell))..":"..(iconsize / 2.5).."|t";	end
+		if select(3,C_Spell.GetSpellInfo(spell))~=nil then icons ="|T"..select(3,C_Spell.GetSpellInfo(spell))..":"..(iconsize / 2.5).."|t";	end
 		if DEX_Get("DEX_ColorMode") == 1 then
 			return damage.." "..icons
 		elseif DEX_Get("DEX_ColorMode") == 3 then

@@ -177,8 +177,8 @@ GameTooltip:HookScript('OnTooltipSetItem', DecorateTooltip)
 				-- todo: see if PickupItem(158923) works for this
 				if not C_ChallengeMode.GetSlottedKeystoneInfo() then
 					for bag = 0, NUM_BAG_SLOTS do
-						for slot = 1, GetContainerNumSlots(bag) do
-							if GetContainerItemID == 158923 then
+						for slot = 1, C_Container.GetContainerNumSlots(bag) do
+							if C_Container.GetContainerItemID == 158923 then
 								PickupContainerItem(bag, slot)
 								if CursorHasItem() then
 									C_ChallengeMode.SlotKeystone()

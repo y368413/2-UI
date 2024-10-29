@@ -38,11 +38,7 @@ function MISC:PetTabs_Click(button)
 end
 
 function MISC:PetTabs_Create()
-	if I.isNewPatch then
-		PetJournal.ScrollBox:SetPoint("TOPLEFT", PetJournalLeftInset, 3, -60)
-	else
-		PetJournalListScrollFrame:SetPoint("TOPLEFT", PetJournalLeftInset, 3, -60)
-	end
+	PetJournal.ScrollBox:SetPoint("TOPLEFT", PetJournalLeftInset, 3, -60)
 
 	-- Create the pet type buttons, sorted according weakness
 	-- Humanoid > Dragonkin > Magic > Flying > Aquatic > Elemental > Mechanical > Beast > Critter > Undead
@@ -83,7 +79,7 @@ end
 function MISC:PetTabs_Init()
 	if not R.db["Misc"]["PetFilter"] then return end
 
-	if IsAddOnLoaded("Blizzard_Collections") then
+	if C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
 		MISC:PetTabs_Create()
 	else
 		M:RegisterEvent("ADDON_LOADED", MISC.PetTabs_Load)

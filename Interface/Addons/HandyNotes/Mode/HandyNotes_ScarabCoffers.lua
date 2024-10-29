@@ -4,7 +4,7 @@ local ScarabCoffers = {}
 local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes")
 local HL = LibStub("AceAddon-3.0"):NewAddon("HandyNotes_ScarabCoffers", "AceEvent-3.0")
 -- local L = LibStub("AceLocale-3.0"):GetLocale("HandyNotes_ScarabCoffers", true)
-ScarabCoffers_HL = HL
+ScarabCoffers.HL = HL
 
 local next = next
 local GameTooltip = GameTooltip
@@ -28,14 +28,11 @@ local function poi_texture(poi)
 end
 local function atlas_texture(atlas, scale)
     if not icon_cache[atlas] then
+        atlas = C_Texture.GetAtlasInfo(atlas)
         icon_cache[atlas] = {
-            icon = C_Texture.GetAtlasInfo(atlas).file,
-            tCoordLeft = C_Texture.GetAtlasInfo(atlas).leftTexCoord,
-            tCoordRight = C_Texture.GetAtlasInfo(atlas).rightTexCoord,
-            tCoordTop = C_Texture.GetAtlasInfo(atlas).topTexCoord,
-            tCoordBottom = C_Texture.GetAtlasInfo(atlas).bottomTexCoord,
+            icon = atlas.file,
+            tCoordLeft = atlas.leftTexCoord, tCoordRight = atlas.rightTexCoord, tCoordTop = atlas.topTexCoord, tCoordBottom = atlas.bottomTexCoord,
             scale = scale or 1,
-            r = 1, g = 1, b = 1,
         }
     end
     return icon_cache[atlas]
@@ -60,13 +57,13 @@ local get_point_info = function(point)
     end
 end
 local get_point_info_by_coord = function(uiMapID, coord)
-    return get_point_info(ScarabCoffers_points[uiMapID] and ScarabCoffers_points[uiMapID][coord])
+    return get_point_info(ScarabCoffers.points[uiMapID] and ScarabCoffers.points[uiMapID][coord])
 end
 
 local function handle_tooltip(tooltip, point)
     if point then
         tooltip:AddLine(point.label or DEFAULT_LABEL)
-        if point.quest and not C_QuestLog.IsQuestFlaggedCompleted(point.quest) then
+        if point.quest and not IsQuestFlaggedCompleted(point.quest) then
             tooltip:AddLine(NEED, 1, 0, 0)
         end
         if point.note then
@@ -78,7 +75,7 @@ local function handle_tooltip(tooltip, point)
     tooltip:Show()
 end
 local handle_tooltip_by_coord = function(tooltip, uiMapID, coord)
-    return handle_tooltip(tooltip, ScarabCoffers_points[uiMapID] and ScarabCoffers_points[uiMapID][coord])
+    return handle_tooltip(tooltip, ScarabCoffers.points[uiMapID] and ScarabCoffers.points[uiMapID][coord])
 end
 
 ---------------------------------------------------------
@@ -109,7 +106,7 @@ local function createWaypoint(button, uiMapID, coord)
 end
 
 local function hideNode(button, uiMapID, coord)
-    ScarabCoffers_hidden[uiMapID][coord] = true
+    ScarabCoffers.hidden[uiMapID][coord] = true
     HL:Refresh()
 end
 
@@ -182,10 +179,10 @@ do
         if not t then return nil end
         local state, value = next(t, prestate)
         while state do -- Have we reached the end of this zone?
-            if value and not ScarabCoffers_hidden[currentZone][state] then
+            if value and not ScarabCoffers.hidden[currentZone][state] then
                 local label, icon, scale = get_point_info(value)
-                scale = (scale or 1) * (icon and icon.scale or 1) * ScarabCoffers_db.icon_scale
-                return state, nil, icon, scale, ScarabCoffers_db.icon_alpha
+                scale = (scale or 1) * (icon and icon.scale or 1) * ScarabCoffers.db.icon_scale
+                return state, nil, icon, scale, ScarabCoffers.db.icon_alpha
             end
             state, value = next(t, state) -- Get next data
         end
@@ -193,7 +190,7 @@ do
     end
     function HLHandler:GetNodes2(uiMapID, minimap)
         currentZone = uiMapID
-        return iter, ScarabCoffers_points[uiMapID], nil
+        return iter, ScarabCoffers.points[uiMapID], nil
     end
 end
 
@@ -202,11 +199,11 @@ end
 
 function HL:OnInitialize()
     -- Set up our database
-    self.db = LibStub("AceDB-3.0"):New("HandyNotes_ScarabCoffersDB", ScarabCoffers_defaults)
-    ScarabCoffers_db = self.db.profile
-    ScarabCoffers_hidden = self.db.char.hidden
+    self.db = LibStub("AceDB-3.0"):New("HandyNotes_ScarabCoffersDB", ScarabCoffers.defaults)
+    ScarabCoffers.db = self.db.profile
+    ScarabCoffers.hidden = self.db.char.hidden
     -- Initialize our database with HandyNotes
-    HandyNotes:RegisterPluginDB("HandyNotes_ScarabCoffers", HLHandler, ScarabCoffers_options)
+    HandyNotes:RegisterPluginDB("HandyNotes_ScarabCoffers", HLHandler, ScarabCoffers.options)
 
     -- watch for LOOT_CLOSED
     self:RegisterEvent("LOOT_CLOSED")
@@ -221,7 +218,7 @@ function HL:LOOT_CLOSED()
 end
 
 
-ScarabCoffers_defaults = {
+ScarabCoffers.defaults = {
     profile = {
         -- found = false,
         icon_scale = 1.5,
@@ -235,13 +232,13 @@ ScarabCoffers_defaults = {
     },
 }
 
-ScarabCoffers_options = {
+ScarabCoffers.options = {
     type = "group",
     name = "ScarabCoffers",
-    get = function(info) return ScarabCoffers_db[info[#info]] end,
+    get = function(info) return ScarabCoffers.db[info[#info]] end,
     set = function(info, v)
-        ScarabCoffers_db[info[#info]] = v
-        ScarabCoffers_HL:SendMessage("HandyNotes_NotifyUpdate", "HandyNotes_ScarabCoffers")
+        ScarabCoffers.db[info[#info]] = v
+        ScarabCoffers.HL:SendMessage("HandyNotes_NotifyUpdate", "HandyNotes_ScarabCoffers")
     end,
     args = {
         icon = {
@@ -286,10 +283,10 @@ ScarabCoffers_options = {
                     name = "Reset hidden nodes",
                     desc = "Show all nodes that you manually hid by right-clicking on them and choosing \"hide\".",
                     func = function()
-                        for map,coords in pairs(ScarabCoffers_hidden) do
+                        for map,coords in pairs(ScarabCoffers.hidden) do
                             wipe(coords)
                         end
-                        ScarabCoffers_HL:Refresh()
+                        ScarabCoffers.HL:Refresh()
                     end,
                     order = 50,
                 },
@@ -299,21 +296,21 @@ ScarabCoffers_options = {
 }
 
 local player_faction = UnitFactionGroup("player")
-ScarabCoffers_should_show_point = function(coord, point, currentZone, currentLevel)
+ScarabCoffers.should_show_point = function(coord, point, currentZone, currentLevel)
     if point.level and point.level ~= currentLevel then
         return false
     end
-    if ScarabCoffers_hidden[currentZone] and ScarabCoffers_hidden[currentZone][coord] then
+    if ScarabCoffers.hidden[currentZone] and ScarabCoffers.hidden[currentZone][coord] then
         return false
     end
-    if point.junk and not ScarabCoffers_db.show_junk then
+    if point.junk and not ScarabCoffers.db.show_junk then
         return false
     end
     if point.faction and point.faction ~= player_faction then
         return false
     end
-    if (not ScarabCoffers_db.found) then
-        if point.quest and C_QuestLog.IsQuestFlaggedCompleted(point.quest) then
+    if (not ScarabCoffers.db.found) then
+        if point.quest and IsQuestFlaggedCompleted(point.quest) then
             return false
         end
         if point.achievement then
@@ -337,16 +334,16 @@ ScarabCoffers_should_show_point = function(coord, point, currentZone, currentLev
             return false
         end
     end
-    if (not ScarabCoffers_db.repeatable) and point.repeatable then
+    if (not ScarabCoffers.db.repeatable) and point.repeatable then
         return false
     end
-    if point.npc and not point.follower and not ScarabCoffers_db.show_npcs then
+    if point.npc and not point.follower and not ScarabCoffers.db.show_npcs then
         return false
     end
     return true
 end
 
-ScarabCoffers_points = {
+ScarabCoffers.points = {
     --[[ structure:
     [mapFile] = { -- "_terrain1" etc will be stripped from attempts to fetch this
         [coord] = {

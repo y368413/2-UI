@@ -1,0 +1,118 @@
+<Ui>
+  <Frame name="BaganatorBagSearchLayoutMonitorTemplate" virtual="true" mixin="BaganatorBagSearchLayoutMonitorMixin">
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="BaganatorGuildSearchLayoutMonitorTemplate" virtual="true" mixin="BaganatorGuildSearchLayoutMonitorMixin">
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="BaganatorCachedBagLayoutTemplate" virtual="true" mixin="BaganatorCachedBagLayoutMixin" parentArray="Layouts">
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+      <OnShow method="OnShow"/>
+      <OnHide method="OnHide"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="BaganatorCachedGuildLayoutTemplate" virtual="true" mixin="BaganatorGeneralGuildLayoutMixin" parentArray="Layouts">
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+      <OnShow method="OnShow"/>
+      <OnHide method="OnHide"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="BaganatorCachedUnifiedGuildLayoutTemplate" virtual="true" mixin="BaganatorUnifiedGuildLayoutMixin" parentArray="Layouts">
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+      <OnShow method="OnShow"/>
+      <OnHide method="OnHide"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="BaganatorLiveBagLayoutTemplate" virtual="true" mixin="BaganatorLiveBagLayoutMixin" parentArray="Layouts">
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+      <OnShow method="OnShow"/>
+      <OnHide method="OnHide"/>
+      <OnEvent method="OnEvent"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="BaganatorLiveCategoryLayoutTemplate" virtual="true" mixin="BaganatorLiveCategoryLayoutMixin" parentArray="Layouts">
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+      <OnShow method="OnShow"/>
+      <OnHide method="OnHide"/>
+      <OnEvent method="OnEvent"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="BaganatorCachedCategoryLayoutTemplate" virtual="true" mixin="BaganatorCachedCategoryLayoutMixin" parentArray="Layouts">
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+      <OnShow method="OnShow"/>
+      <OnHide method="OnHide"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="BaganatorLiveGuildLayoutTemplate" virtual="true" mixin="BaganatorLiveGuildLayoutMixin" parentArray="Layouts">
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+      <OnShow method="OnShow"/>
+      <OnHide method="OnHide"/>
+      <OnEvent method="OnEvent"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="BaganatorLiveUnifiedGuildLayoutTemplate" virtual="true" mixin="BaganatorLiveUnifiedGuildLayoutMixin" parentArray="Layouts">
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+      <OnShow method="OnShow"/>
+      <OnHide method="OnHide"/>
+      <OnEvent method="OnEvent"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="BaganatorLiveWarbandLayoutTemplate" virtual="true" mixin="BaganatorLiveWarbandLayoutMixin" parentArray="Layouts">
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+      <OnShow method="OnShow"/>
+      <OnHide method="OnHide"/>
+      <OnEvent method="OnEvent"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="BaganatorCachedWarbandLayoutTemplate" virtual="true" mixin="BaganatorCachedWarbandLayoutMixin" parentArray="Layouts">
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+      <OnShow method="OnShow"/>
+      <OnHide method="OnHide"/>
+    </Scripts>
+  </Frame>
+
+  <Frame name="BaganatorBagDividerTemplate" virtual="true" mixin="BaganatorBagDividerMixin">
+    <Anchors>
+      <Anchor point="TOPLEFT"/>
+      <Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT"/>
+    </Anchors>
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+    </Scripts>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <Texture parentKey="Divider">
+          <Anchors>
+            <Anchor point="TOPLEFT"/>
+            <Anchor point="TOPRIGHT"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+  </Frame>
+</Ui>

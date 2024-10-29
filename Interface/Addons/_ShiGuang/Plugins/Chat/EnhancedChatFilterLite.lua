@@ -327,14 +327,14 @@ end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", AchievementFilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", AchievementFilter)
 
--- Loot Filter
+--[[ Loot Filter
 local function lootItemFilter(self,_,msg)
 	local itemID = tonumber(msg:match("|Hitem:(%d+)"))
 	if not itemID then return end -- pet cages don't have 'item'
 	if defaults.lootItemFilterList[itemID] then return true end
 	if C_Item_GetItemQualityByID(itemID) < defaults.lootQualityMin then return true end
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", lootItemFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", lootItemFilter)]]
 
 local function lootCurrecyFilter(self,_,msg)
 	local currencyID = tonumber(msg:match("|Hcurrency:(%d+)"))

@@ -1,4 +1,4 @@
-FACTION_BAR_COLORS = {
+--[[FACTION_BAR_COLORS = {
 	[1] = { r= .54, g= 0,   b= 0   }, -- hated      {r = 0.63, g = 0, b = 0},
 	[2] = { r= 1,   g= .1,  b= .1  }, -- hostile    {r = 0.63, g = 0, b = 0},
 	[3] = { r= 1,   g= .55, b= 0   }, -- unfriendly {r = 0.63, g = 0, b = 0},
@@ -8,7 +8,7 @@ FACTION_BAR_COLORS = {
 	[7] = { r= .25, g= .41, b= .88 }, -- revered    {r = 0.32, g = 0.67, b = 0},
 	[8] = { r= .6,  g= .2,  b= .8  }, -- exalted    {r = 0, g = 0.75, b = 0.44},
 	[9] = { r= .4,  g= 0,   b= .6  }, -- past exalted
-};
+};]]
 
 GOLD_AMOUNT = "|c00ffd700%d●|r";--GOLD_AMOUNT = "%d\124TInterface\\MoneyFrame\\UI-GoldIcon:0:0:2:0\124t"
 SILVER_AMOUNT = "|c00c7c7cf%d●|r";--SILVER_AMOUNT = "%d\124TInterface\\MoneyFrame\\UI-SilverIcon:0:0:2:0\124t"

@@ -13,7 +13,7 @@ local list = {
 		{AuraID = 198813, UnitID = "target", Caster = "player"},	-- 复仇回避
 		{AuraID = 179057, UnitID = "target", Caster = "player"},	-- 混乱新星
 		{AuraID = 207690, UnitID = "target", Caster = "player"},	-- 血滴子
-		{AuraID = 206491, UnitID = "target", Caster = "player"},	-- 涅墨西斯
+		--{AuraID = 206491, UnitID = "target", Caster = "player"},	-- 涅墨西斯
 		{AuraID = 213405, UnitID = "target", Caster = "player"},	-- 战刃大师
 		{AuraID = 185245, UnitID = "target", Caster = "player"},	-- 折磨
 		{AuraID = 204490, UnitID = "target", Caster = "player"},	-- 沉默咒符
@@ -28,7 +28,7 @@ local list = {
 		{AuraID = 211881, UnitID = "target", Caster = "player"},	-- 邪能爆发
 		{AuraID = 247456, UnitID = "target", Caster = "player"},	-- 脆弱
 		{AuraID = 258860, UnitID = "target", Caster = "player"},	-- 黑暗鞭笞
-		{AuraID = 268178, UnitID = "target", Caster = "player"},	-- 虚空掠夺者
+		--{AuraID = 268178, UnitID = "target", Caster = "player"},	-- 虚空掠夺者
 		{AuraID = 323802, UnitID = "target", Caster = "player"},	-- 恶魔追击
 		{AuraID = 317009, UnitID = "target", Caster = "player"},	-- 罪孽烙印
 	},

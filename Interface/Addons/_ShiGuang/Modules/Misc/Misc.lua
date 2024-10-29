@@ -12,11 +12,9 @@ local GetArchaeologyRaceInfo = GetArchaeologyRaceInfo
 local EquipmentManager_UnequipItemInSlot = EquipmentManager_UnequipItemInSlot
 local EquipmentManager_RunAction = EquipmentManager_RunAction
 local GetInventoryItemTexture = GetInventoryItemTexture
-local GetItemInfo = GetItemInfo
 local BuyMerchantItem = BuyMerchantItem
 local GetMerchantItemLink = GetMerchantItemLink
 local GetMerchantItemMaxStack = GetMerchantItemMaxStack
-local GetItemQualityColor = GetItemQualityColor
 local Screenshot = Screenshot
 local GetTime, GetCVarBool, SetCVar = GetTime, GetCVarBool, SetCVar
 local GetNumLootItems, LootSlot = GetNumLootItems, LootSlot
@@ -27,7 +25,6 @@ local SetSavedInstanceExtend = SetSavedInstanceExtend
 local RequestRaidInfo, RaidInfoFrame_Update = RequestRaidInfo, RaidInfoFrame_Update
 local IsGuildMember, C_BattleNet_GetGameAccountInfoByGUID, C_FriendList_IsFriend = IsGuildMember, C_BattleNet.GetGameAccountInfoByGUID, C_FriendList.IsFriend
 local C_Map_GetMapInfo, C_Map_GetBestMapForUnit = C_Map.GetMapInfo, C_Map.GetBestMapForUnit
-local UnitIsPlayer, GuildInvite, C_FriendList_AddFriend = UnitIsPlayer, GuildInvite, C_FriendList.AddFriend
 
 --[[
 	Miscellaneous 各种有用没用的小玩意儿
@@ -52,13 +49,11 @@ function MISC:OnLogin()
 	MISC:ExtendInstance()
 	MISC:VehicleSeatMover()
 	MISC:UIWidgetFrameMover()
-	MISC:MoveMawBuffsFrame()
 	MISC:MoveDurabilityFrame()
 	MISC:MoveTicketStatusFrame()
 	MISC:UpdateScreenShot()
 	MISC:UpdateFasterLoot()
 	MISC:TradeTargetInfo()
-	MISC:MoveQuestTracker()
 	MISC:BlockStrangerInvite()
 	MISC:ToggleBossBanner()
 	MISC:ToggleBossEmote()
@@ -70,11 +65,13 @@ function MISC:OnLogin()
 	MISC:BaudErrorFrameHelpTip()
 	MISC:EnhancedPicker()
 	MISC:UpdateMaxZoomLevel()
-	
+	MISC:MoveBlizzFrames()
+	MISC:HandleUITitle()
+
 	--MISC:CreateRM()
 	--MISC:FreeMountCD()
-	MISC:xMerchant()
-	MISC:BlinkRogueHelper()
+	--MISC:xMerchant()
+	--MISC:BlinkRogueHelper()
 	
 	----------------QuickQueue.lua----------------------
 	if R.db["Misc"]["QuickQueue"] then
@@ -92,8 +89,17 @@ function MISC:OnLogin()
 		end)
 	end
 
+	-- Always show altpower value
+	hooksecurefunc("UnitPowerBarAlt_SetUp", function(self)
+		local statusFrame = self.statusFrame
+		if statusFrame.enabled then
+			statusFrame:Show()
+			statusFrame.Hide = statusFrame.Show
+		end
+	end)
+
 	-- Auto chatBubbles
-	if MaoRUIDB["AutoBubbles"] then
+	if MaoRUISetDB["AutoBubbles"] then
 		local function updateBubble()
 			local name, instType = GetInstanceInfo()
 			if name and instType == "raid" then
@@ -118,14 +124,6 @@ function MISC:OnLogin()
 				self.editBox:SetText(DELETE_ITEM_CONFIRM_STRING)
 			end
 		end)
-	end
-
-	-- Fix blizz bug in addon list
-	local _AddonTooltip_Update = AddonTooltip_Update
-	function AddonTooltip_Update(owner)
-		if not owner then return end
-		if owner:GetID() < 1 then return end
-		_AddonTooltip_Update(owner)
 	end
 end
 
@@ -180,7 +178,7 @@ function MISC:ExtendInstance()
 	local bu = CreateFrame("Button", nil, RaidInfoFrame)
 	bu:SetPoint("TOPRIGHT", -35, -5)
 	bu:SetSize(25, 25)
-	M.PixelIcon(bu, GetSpellTexture(80353), true)
+	M.PixelIcon(bu, C_Spell.GetSpellTexture(80353), true)
 	bu.title = U["Extend Instance"]
 	local tipStr = format(U["Extend Instance Tip"], I.LeftButton, I.RightButton)
 	M.AddTooltip(bu, "ANCHOR_RIGHT", tipStr, "system")
@@ -212,7 +210,7 @@ function MISC:VehicleSeatMover()
 	M.Mover(frame, U["VehicleSeat"], "VehicleSeat", {"BOTTOMRIGHT", UIParent, -285, 21})
 
 	hooksecurefunc(VehicleSeatIndicator, "SetPoint", function(self, _, parent)
-		if parent == "MinimapCluster" or parent == MinimapCluster then
+		if parent ~= frame then
 			self:ClearAllPoints()
 			self:SetPoint("TOPLEFT", frame)
 		end
@@ -226,7 +224,7 @@ function MISC:UIWidgetFrameMover()
 	M.Mover(frame1, U["UIWidgetFrame"], "UIWidgetFrame", {"TOPRIGHT", Minimap, "BOTTOMRIGHT", 0, -43})
 
 	hooksecurefunc(UIWidgetBelowMinimapContainerFrame, "SetPoint", function(self, _, parent)
-		if parent == "MinimapCluster" or parent == MinimapCluster then
+		if parent ~= frame1 then
 			self:ClearAllPoints()
 			self:SetPoint("TOPRIGHT", frame1)
 		end
@@ -237,24 +235,9 @@ function MISC:UIWidgetFrameMover()
 	M.Mover(frame2, U["UIWidgetPowerBar"], "UIWidgetPowerBar", {"BOTTOM", UIParent, "BOTTOM", 0, 150})
 
 	hooksecurefunc(UIWidgetPowerBarContainerFrame, "SetPoint", function(self, _, parent)
-		if parent == "UIParent" or parent == UIParent then
+		if parent ~= frame2 then
 			self:ClearAllPoints()
 			self:SetPoint("CENTER", frame2)
-		end
-	end)
-end
-
--- Reanchor MawBuffsBelowMinimapFrame
-function MISC:MoveMawBuffsFrame()
-	local frame = CreateFrame("Frame", "UIMawBuffsMover", UIParent)
-	frame:SetSize(235, 28)
-	local mover = M.Mover(frame, MAW_POWER_DESCRIPTION, "MawBuffs", {"TOPRIGHT", UIParent, -80, -225})
-	frame:SetPoint("TOPLEFT", mover, 4, 12)
-
-	hooksecurefunc(MawBuffsBelowMinimapFrame, "SetPoint", function(self, _, parent)
-		if parent == "MinimapCluster" or parent == MinimapCluster then
-			self:ClearAllPoints()
-			self:SetPoint("TOPRIGHT", frame)
 		end
 	end)
 end
@@ -279,31 +262,9 @@ function MISC:MoveTicketStatusFrame()
 	end)
 end
 
--- Reanchor ObjectiveTracker
-function MISC:MoveQuestTracker()
-	local frame = CreateFrame("Frame", "UIQuestMover", UIParent)
-	frame:SetSize(240, 43)
-	M.Mover(frame, U["QuestTracker"], "QuestTracker", {"TOPLEFT","UIParent","TOPLEFT",26,-21})
-
-	local tracker = ObjectiveTrackerFrame
-	tracker:ClearAllPoints()
-	tracker:SetPoint("TOPRIGHT", frame)
-	tracker:SetHeight(GetScreenHeight()*.75)
-	tracker:SetClampedToScreen(false)
-	tracker:SetMovable(true)
-	if tracker:IsMovable() then tracker:SetUserPlaced(true) end
-
-	if not I.isNewPatch then return end
-	hooksecurefunc(tracker, "SetPoint", function(self, _, parent)
-		if parent ~= frame then
-			self:ClearAllPoints()
-			self:SetPoint("TOPRIGHT", frame)
-		end
-	end)
-end
-
 -- Achievement screenshot
-function MISC:ScreenShotOnEvent()
+function MISC:ScreenShotOnEvent(_, alreadyEarnedOnAccount)
+	if alreadyEarnedOnAccount then return end
 	MISC.ScreenShotFrame.delay = 1
 	MISC.ScreenShotFrame:Show()
 end
@@ -383,6 +344,18 @@ function MISC:BlockStrangerInvite()
 			StaticPopup_Hide("PARTY_INVITE")
 		end
 	end)
+
+	M:RegisterEvent("GROUP_INVITE_CONFIRMATION", function()
+		if not R.db["Misc"]["BlockRequest"] then return end
+
+		local guid = GetNextPendingInviteConfirmation()
+		if not guid then return end
+
+		if not (C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGuildMember(guid)) then
+			RespondToInviteConfirmation(guid, false)
+			StaticPopup_Hide("GROUP_INVITE_CONFIRMATION")
+		end
+	end)
 end
 
 -- Archaeology counts
@@ -423,10 +396,10 @@ do
 	local function setupMisc(event, addon)
 		if addon == "Blizzard_ArchaeologyUI" then
 			AddCalculateIcon()
-			-- Repoint Bar
-			ArcheologyDigsiteProgressBar.ignoreFramePositionManager = true
-			ArcheologyDigsiteProgressBar:SetPoint("BOTTOM", 0, 150)
-			M.CreateMF(ArcheologyDigsiteProgressBar)
+			-- Repoint Bar, todo: add mover for this, UIParentBottomManagedFrameContainer
+		--	ArcheologyDigsiteProgressBar.ignoreFramePositionManager = true
+		--	ArcheologyDigsiteProgressBar:SetPoint("BOTTOM", 0, 150)
+		--	M.CreateMF(ArcheologyDigsiteProgressBar)
 
 			M:UnregisterEvent(event, setupMisc)
 		end
@@ -448,15 +421,17 @@ end
 -- Drag AltPowerbar
 do
 	local mover = CreateFrame("Frame", "UIAltBarMover", PlayerPowerBarAlt)
-	mover:SetPoint("CENTER", UIParent, 0, -260)
+	mover:SetPoint("CENTER", UIParent, 0, -200)
 	mover:SetSize(20, 20)
 	M.CreateMF(PlayerPowerBarAlt, mover)
+
 	hooksecurefunc(PlayerPowerBarAlt, "SetPoint", function(_, _, parent)
 		if parent ~= mover then
 			PlayerPowerBarAlt:ClearAllPoints()
 			PlayerPowerBarAlt:SetPoint("CENTER", mover)
 		end
 	end)
+
 	hooksecurefunc("UnitPowerBarAlt_SetUp", function(self)
 		local statusFrame = self.statusFrame
 		if statusFrame.enabled then
@@ -473,7 +448,7 @@ do
 		callbackArg = "AltPower",
 	}
 	PlayerPowerBarAlt:HookScript("OnEnter", function(self)
-		if not MaoRUIDB["Help"]["AltPower"] then
+		if not MaoRUISetDB["Help"]["AltPower"] then
 			HelpTip:Show(self, altPowerInfo)
 		end
 	end)
@@ -504,10 +479,10 @@ do
 			id = self:GetID()
 			itemLink = GetMerchantItemLink(id)
 			if not itemLink then return end
-			local name, _, quality, _, _, _, _, maxStack, _, texture = GetItemInfo(itemLink)
+			local name, _, quality, _, _, _, _, maxStack, _, texture = C_Item.GetItemInfo(itemLink)
 			if maxStack and maxStack > 1 then
 				if not cache[itemLink] then
-					local r, g, b = GetItemQualityColor(quality or 1)
+					local r, g, b = C_Item.GetItemQualityColor(quality or 1)
 					StaticPopup_Show("BUY_STACK", " ", " ", {["texture"] = texture, ["name"] = name, ["color"] = {r, g, b, 1}, ["link"] = itemLink, ["index"] = id, ["count"] = maxStack})
 				else
 					BuyMerchantItem(id, GetMerchantItemMaxStack(id))
@@ -516,86 +491,6 @@ do
 		end
 		_MerchantItemButton_OnModifiedClick(self, ...)
 	end
-end
-
--- Fix Drag Collections taint
-do
-	local done
-	local function setupMisc(event, addon)
-		if event == "ADDON_LOADED" and addon == "Blizzard_Collections" then
-			-- Fix undragable issue
-			local checkBox = WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox
-			checkBox.Label:ClearAllPoints()
-			checkBox.Label:SetPoint("LEFT", checkBox, "RIGHT", 2, 1)
-			checkBox.Label:SetWidth(152)
-
-			CollectionsJournal:HookScript("OnShow", function()
-				if not done then
-					if InCombatLockdown() then
-						M:RegisterEvent("PLAYER_REGEN_ENABLED", setupMisc)
-					else
-						M.CreateMF(CollectionsJournal)
-					end
-					done = true
-				end
-			end)
-			M:UnregisterEvent(event, setupMisc)
-		elseif event == "PLAYER_REGEN_ENABLED" then
-			M.CreateMF(CollectionsJournal)
-			M:UnregisterEvent(event, setupMisc)
-		end
-	end
-
-	M:RegisterEvent("ADDON_LOADED", setupMisc)
-end
-
--- Select target when click on raid units
-do
-	local function fixRaidGroupButton()
-		for i = 1, 40 do
-			local bu = _G["RaidGroupButton"..i]
-			if bu and bu.unit and not bu.clickFixed then
-				bu:SetAttribute("type", "target")
-				bu:SetAttribute("unit", bu.unit)
-
-				bu.clickFixed = true
-			end
-		end
-	end
-
-	local function setupMisc(event, addon)
-		if event == "ADDON_LOADED" and addon == "Blizzard_RaidUI" then
-			if not InCombatLockdown() then
-				fixRaidGroupButton()
-			else
-				M:RegisterEvent("PLAYER_REGEN_ENABLED", setupMisc)
-			end
-			M:UnregisterEvent(event, setupMisc)
-		elseif event == "PLAYER_REGEN_ENABLED" then
-			if RaidGroupButton1 and RaidGroupButton1:GetAttribute("type") ~= "target" then
-				fixRaidGroupButton()
-				M:UnregisterEvent(event, setupMisc)
-			end
-		end
-	end
-
-	M:RegisterEvent("ADDON_LOADED", setupMisc)
-end
-
--- Fix blizz guild news hyperlink error
-do
-	local function fixGuildNews(event, addon)
-		if addon ~= "Blizzard_GuildUI" then return end
-
-		local _GuildNewsButton_OnEnter = GuildNewsButton_OnEnter
-		function GuildNewsButton_OnEnter(self)
-			if not (self.newsInfo and self.newsInfo.whatText) then return end
-			_GuildNewsButton_OnEnter(self)
-		end
-
-		M:UnregisterEvent(event, fixGuildNews)
-	end
-	M:RegisterEvent("ADDON_LOADED", fixGuildNews)
 end
 
 local function skipOnKeyDown(self, key)
@@ -646,7 +541,7 @@ function MISC:EnhanceDressup()
 
 	M.AddTooltip(button, "ANCHOR_TOP", format(U["UndressButtonTip"], I.LeftButton, I.RightButton))
 
-	DressUpFrame.LinkButton:SetWidth(106)
+	DressUpFrame.LinkButton:SetWidth(80)
 	DressUpFrame.LinkButton:SetText(SOCIAL_SHARE_TEXT)
 end
 
@@ -682,7 +577,7 @@ function MISC:FuckTrainSound()
 end
 
 function MISC:JerryWay()
-	if IsAddOnLoaded("TomTom") then return end
+	if hash_SlashCmdList["/WAY"] then return end -- disable this when other addons use Tomtom command
 
 	local pointString = I.InfoColor.."|Hworldmap:%d+:%d+:%d+|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a%s (%s, %s)%s]|h|r"
 
@@ -711,6 +606,8 @@ function MISC:JerryWay()
 					y = GetCorrectCoord(y)
 					if x and y then
 						print(format(pointString, mapID, x*100, y*100, mapName, x, y, z or ""))
+						C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(mapID, x/100, y/100))
+						C_SuperTrack.SetSuperTrackedUserWaypoint(true)
 					end
 				end
 			end
@@ -720,7 +617,7 @@ function MISC:JerryWay()
 end
 
 function MISC:BaudErrorFrameHelpTip()
-	if not IsAddOnLoaded("!BaudErrorFrame") then return end
+	if not C_AddOns.IsAddOnLoaded("!BaudErrorFrame") then return end
 	local button, count = _G.BaudErrorFrameMinimapButton, _G.BaudErrorFrameMinimapCount
 	if not button then return end
 
@@ -734,7 +631,7 @@ function MISC:BaudErrorFrameHelpTip()
 		callbackArg = "BaudError",
 	}
 	hooksecurefunc(count, "SetText", function(_, text)
-		if not MaoRUIDB["Help"]["BaudError"] then
+		if not MaoRUISetDB["Help"]["BaudError"] then
 			text = tonumber(text)
 			if text and text > 0 then
 				HelpTip:Show(button, errorInfo)
@@ -744,69 +641,90 @@ function MISC:BaudErrorFrameHelpTip()
 end
 
 -- Buttons to enhance popup menu
-function MISC:MenuButton_AddFriend()
-	C_FriendList_AddFriend(MISC.MenuButtonName)
+function MISC:CustomMenu_AddFriend(rootDescription, data, name)
+	rootDescription:CreateButton(I.InfoColor..ADD_CHARACTER_FRIEND, function()
+		local fullName = data.server and data.name.."-"..data.server or data.name
+		C_FriendList.AddFriend(name or fullName)
+	end)
 end
 
-function MISC:MenuButton_CopyName()
-	local editBox = ChatEdit_ChooseBoxForSend()
-	local hasText = (editBox:GetText() ~= "")
-	ChatEdit_ActivateChat(editBox)
-	editBox:Insert(MISC.MenuButtonName)
-	if not hasText then editBox:HighlightText() end
+local guildInviteString = gsub(CHAT_GUILD_INVITE_SEND, HEADER_COLON, "")
+function MISC:CustomMenu_GuildInvite(rootDescription, data, name)
+	rootDescription:CreateButton(I.InfoColor..guildInviteString, function()
+		local fullName = data.server and data.name.."-"..data.server or data.name
+		C_GuildInfo.Invite(name or fullName)
+	end)
 end
 
-function MISC:MenuButton_GuildInvite()
-	GuildInvite(MISC.MenuButtonName)
+function MISC:CustomMenu_CopyName(rootDescription, data, name)
+	rootDescription:CreateButton(I.InfoColor..COPY_NAME, function()
+		local editBox = ChatEdit_ChooseBoxForSend()
+		local hasText = (editBox:GetText() ~= "")
+		ChatEdit_ActivateChat(editBox)
+		editBox:Insert(name or data.name)
+		if not hasText then editBox:HighlightText() end
+	end)
+end
+
+function MISC:CustomMenu_Whisper(rootDescription, data)
+	rootDescription:CreateButton(I.InfoColor..WHISPER, function()
+		ChatFrame_SendTell(data.name)
+	end)
 end
 
 function MISC:QuickMenuButton()
 	if not R.db["Misc"]["MenuButton"] then return end
 
-	local menuList = {
-		{text = ADD_FRIEND, func = MISC.MenuButton_AddFriend, color = {0, .6, 1}},
-		{text = gsub(CHAT_GUILD_INVITE_SEND, HEADER_COLON, ""), func = MISC.MenuButton_GuildInvite, color = {0, .8, 0}},
-		{text = COPY_NAME, func = MISC.MenuButton_CopyName, color = {1, 0, 0}},
-	}
+	--hooksecurefunc(UnitPopupManager, "OpenMenu", function(_, which)
+	--	print("MENU_UNIT_"..which)
+	--end)
 
-	local frame = CreateFrame("Frame", "UIMenuButtonFrame", DropDownList1)
-	frame:SetSize(10, 10)
-	frame:SetPoint("TOPLEFT")
-	frame:Hide()
-	for i = 1, 3 do
-		local button = CreateFrame("Button", nil, frame)
-		button:SetSize(25, 10)
-		button:SetPoint("TOPLEFT", frame, (i-1)*28 + 2, -2)
-		M.PixelIcon(button, nil, true)
-		button.Icon:SetColorTexture(unpack(menuList[i].color))
-		button:SetScript("OnClick", menuList[i].func)
-		M.AddTooltip(button, "ANCHOR_TOP", menuList[i].text)
-	end
+	Menu.ModifyMenu("MENU_UNIT_SELF", function(_, rootDescription, data)
+		MISC:CustomMenu_CopyName(rootDescription, data)
+		MISC:CustomMenu_Whisper(rootDescription, data)
+	end)
 
-	hooksecurefunc("ToggleDropDownMenu", function(level, _, dropdownMenu)
-		if level and level > 1 then return end
+	Menu.ModifyMenu("MENU_UNIT_TARGET", function(_, rootDescription, data)
+		MISC:CustomMenu_CopyName(rootDescription, data)
+	end)
 
-		local name = dropdownMenu.name
-		local unit = dropdownMenu.unit
-		local isPlayer = unit and UnitIsPlayer(unit)
-		local isFriendMenu = dropdownMenu == FriendsDropDown -- menus on FriendsFrame
-		if not name or (not isPlayer and not dropdownMenu.chatType and not isFriendMenu) then
-			frame:Hide()
-			return
-		end
+	Menu.ModifyMenu("MENU_UNIT_PLAYER", function(_, rootDescription, data)
+		MISC:CustomMenu_GuildInvite(rootDescription, data)
+	end)
 
-		local gameAccountInfo = dropdownMenu.accountInfo and dropdownMenu.accountInfo.gameAccountInfo
-		if gameAccountInfo and gameAccountInfo.characterName and gameAccountInfo.realmName then
-			MISC.MenuButtonName = gameAccountInfo.characterName.."-"..gameAccountInfo.realmName
-			frame:Show()
-		else
-			local server = dropdownMenu.server
-			if not server or server == "" then
-				server = I.MyRealm
+	Menu.ModifyMenu("MENU_UNIT_FRIEND", function(_, rootDescription, data)
+		MISC:CustomMenu_AddFriend(rootDescription, data)
+		MISC:CustomMenu_GuildInvite(rootDescription, data)
+	end)
+
+	Menu.ModifyMenu("MENU_UNIT_BN_FRIEND", function(_, rootDescription, data)
+		local fullName
+		local gameAccountInfo = data.accountInfo and data.accountInfo.gameAccountInfo
+		if gameAccountInfo then
+			local characterName = gameAccountInfo.characterName
+			local realmName = gameAccountInfo.realmName
+			if characterName and realmName then
+				fullName = characterName.."-"..realmName
 			end
-			MISC.MenuButtonName = name.."-"..server
-			frame:Show()
 		end
+		MISC:CustomMenu_AddFriend(rootDescription, data, fullName)
+		MISC:CustomMenu_GuildInvite(rootDescription, data, fullName)
+		MISC:CustomMenu_CopyName(rootDescription, data, fullName)
+	end)
+
+	Menu.ModifyMenu("MENU_UNIT_PARTY", function(_, rootDescription, data)
+		MISC:CustomMenu_GuildInvite(rootDescription, data)
+	end)
+
+	Menu.ModifyMenu("MENU_UNIT_RAID", function(_, rootDescription, data)
+		MISC:CustomMenu_AddFriend(rootDescription, data)
+		MISC:CustomMenu_GuildInvite(rootDescription, data)
+		MISC:CustomMenu_CopyName(rootDescription, data)
+		MISC:CustomMenu_Whisper(rootDescription, data)
+	end)
+
+	Menu.ModifyMenu("MENU_UNIT_RAID_PLAYER", function(_, rootDescription, data)
+		MISC:CustomMenu_GuildInvite(rootDescription, data)
 	end)
 end
 
@@ -821,7 +739,7 @@ function MISC:EnhancedPicker_UpdateColor()
 	r = translateColor(r)
 	g = translateColor(g)
 	b = translateColor(b)
-	_G.ColorPickerFrame:SetColorRGB(r, g, b)
+	_G.ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 end
 
 local function GetBoxColor(box)
@@ -845,10 +763,13 @@ local function updateColorStr(self)
 end
 
 local function createCodeBox(width, index, text)
+	local parent = ColorPickerFrame.Content.ColorSwatchCurrent
+	local offset = -3
+
 	local box = M.CreateEditBox(_G.ColorPickerFrame, width, 22)
 	box:SetMaxLetters(index == 4 and 6 or 3)
 	box:SetTextInsets(0, 0, 0, 0)
-	box:SetPoint("TOPLEFT", _G.ColorSwatch, "BOTTOMLEFT", 0, -index*24 + 2)
+	box:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, -index*24 + offset)
 	M.CreateFS(box, 14, text, "system", "LEFT", -15, 0)
 	if index == 4 then
 		box:HookScript("OnEnterPressed", updateColorStr)
@@ -862,14 +783,13 @@ function MISC:EnhancedPicker()
 	local pickerFrame = _G.ColorPickerFrame
 	pickerFrame:SetHeight(250)
 	M.CreateMF(pickerFrame.Header, pickerFrame) -- movable by header
-	_G.OpacitySliderFrame:SetPoint("TOPLEFT", _G.ColorSwatch, "TOPRIGHT", 50, 0)
 
 	local colorBar = CreateFrame("Frame", nil, pickerFrame)
 	colorBar:SetSize(1, 22)
 	colorBar:SetPoint("BOTTOM", 0, 38)
 
 	local count = 0
-	for name, class in pairs(I.ClassList) do
+	for class, name in pairs(LOCALIZED_CLASS_NAMES_MALE) do
 		local value = I.ClassColors[class]
 		if value then
 			local bu = M.CreateButton(colorBar, 22, 22, true)
@@ -887,18 +807,24 @@ function MISC:EnhancedPicker()
 	pickerFrame.__boxR = createCodeBox(45, 1, "|cffff0000R")
 	pickerFrame.__boxG = createCodeBox(45, 2, "|cff00ff00G")
 	pickerFrame.__boxB = createCodeBox(45, 3, "|cff0000ffB")
-	pickerFrame.__boxH = createCodeBox(70, 4, "#")
 
-	pickerFrame:HookScript("OnColorSelect", function(self)
-		local r, g, b = self:GetColorRGB()
+	local hexBox = pickerFrame.Content and pickerFrame.Content.HexBox
+	if hexBox then
+		M.ReskinEditBox(hexBox)
+		hexBox:ClearAllPoints()
+		hexBox:SetPoint("BOTTOMRIGHT", -25, 67)
+	end
+
+	pickerFrame.Content.ColorPicker.__owner = pickerFrame
+	pickerFrame.Content.ColorPicker:HookScript("OnColorSelect", function(self)
+		local r, g, b = self.__owner:GetColorRGB()
 		r = M:Round(r*255)
 		g = M:Round(g*255)
 		b = M:Round(b*255)
 
-		self.__boxR:SetText(r)
-		self.__boxG:SetText(g)
-		self.__boxB:SetText(b)
-		self.__boxH:SetText(format("%02x%02x%02x", r, g, b))
+		self.__owner.__boxR:SetText(r)
+		self.__owner.__boxG:SetText(g)
+		self.__owner.__boxB:SetText(b)
 	end)
 end
 
@@ -906,25 +832,7 @@ function MISC:UpdateMaxZoomLevel()
 	SetCVar("cameraDistanceMaxZoomFactor", R.db["Misc"]["MaxZoom"])
 end
 
---[[hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self,textString,value,_,maxValue)  ---	Custom status text format.
-	if self.RightText and value and maxValue>0 and not self.showPercentage and GetCVar("statusTextDisplay")=="BOTH" then
-		self.RightText:SetText(M.Numb(value))
-		if value == 0 then self.RightText:SetText(" "); end
-	end
-	if maxValue>0 and GetCVar("statusTextDisplay")=="NUMERIC" then 
-     if maxValue == value then textString:SetText(M.Numb(maxValue))
-     else textString:SetText(M.Numb(value) .." / "..M.Numb(maxValue))
-       --textString:SetText(tostring(math.ceil((value / maxValue) * 100)).."% "..maxValue.." ")
-     end 
-   end
-end)]]
-
-local hall = CreateFrame("Frame")
-hall:RegisterEvent("ADDON_LOADED")
-hall:SetScript("OnEvent", function(self, event, addon)
-	if event == "ADDON_LOADED" and addon == "Blizzard_OrderHallUI" then
-		M.HideObject(OrderHallCommandBar)
-		--GarrisonLandingPageTutorialBox:SetClampedToScreen(true)
-		self:UnregisterEvent("ADDON_LOADED")
-	end
-end)
+-- Move and save blizz frames
+function MISC:MoveBlizzFrames()
+	--M:BlizzFrameMover(CharacterFrame)
+end

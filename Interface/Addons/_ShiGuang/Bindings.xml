@@ -1,8 +1,8 @@
 ﻿<Bindings>
-	<Binding name="RELOADUI" description="Reloads the UI." header="ACE3" category="BINDING_HEADER_ACE3"> ReloadUI() </Binding>
-	<Binding name="CLASSIC_QUEST_LOG_TOGGLE" category="BINDING_HEADER_ACE3"> ClassicQuestLog:ToggleWindow() </Binding>
+	<Binding name="RELOADUI" description="Reloads the UI." category="BINDING_HEADER_ACE3"> ReloadUI() </Binding>
+	<!--Binding name="CLASSIC_QUEST_LOG_TOGGLE" category="BINDING_HEADER_ACE3"> ClassicQuestLog:ToggleWindow() </Binding-->
 	<Binding name="TOMEOFTELEPORTATIONSHOW" category="BINDING_HEADER_ACE3"> TeleporterFunction() </Binding>
-	<Binding name="TARGETCLASSBUTTON_INSPECT" header="TARGETCLASSBUTTON" category="BINDING_HEADER_ACE3"> InspectUnit("target") </Binding>
+	<Binding name="TARGETCLASSBUTTON_INSPECT" category="BINDING_HEADER_ACE3"> InspectUnit("target") </Binding>
 	<Binding name="TARGETCLASSBUTTON_TRADE" category="BINDING_HEADER_ACE3"> InitiateTrade("target") </Binding>
 	<Binding name="TARGETCLASSBUTTON_FOLLOW" category="BINDING_HEADER_ACE3"> FollowUnit("target") </Binding>
 	<Binding name="TARGETCLASSBUTTON_COMPARE_ACHIEVEMENTS" category="BINDING_HEADER_ACE3"> InspectAchievements("target") </Binding>

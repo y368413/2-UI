@@ -10,18 +10,17 @@ info.eventList = {
 }
 
 info.onEvent = function(self)
-  local free, total, used = 0, 0, 0
+  local free = 0
 		for i = 0, NUM_BAG_SLOTS do
-			free, total = free + GetContainerNumFreeSlots(i), total + GetContainerNumSlots(i)
+			free = free + C_Container.GetContainerNumFreeSlots(i)
 		end
-		used = total - free
 	self.text:SetText("|cff00cccc"..free)
 end
 
 info.onEnter = function(self)
   local free, total, used = 0, 0, 0
 		for i = 0, NUM_BAG_SLOTS do
-			free, total = free + GetContainerNumFreeSlots(i), total + GetContainerNumSlots(i)
+			free, total = free + C_Container.GetContainerNumFreeSlots(i), total + C_Container.GetContainerNumSlots(i)
 		end
 		used = total - free
 	GameTooltip:SetOwner(self, "ANCHOR_TOP", 0, 6);

@@ -7409,7 +7409,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 		container:AddChild(classTitle)
 
 		-- Center Power
-		local cname = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(n.sourceData.center.azeritePowerID).spellID)
+		local cname = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(n.sourceData.center.azeritePowerID).spellID)
 		e[c] = AceGUI:Create("EditBox")
 		e[c]:SetLabel(format("  |T%d:18|t %s", n.sourceData.center.icon, cname or n.sourceData.center.name))
 		e[c]:SetText(powerWeights[n.sourceData.center.azeritePowerID] or "")
@@ -7425,7 +7425,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 
 		-- Class Powers
 		for i, powerData in ipairs(n.sourceData.class[classID][specID]) do
-			local name = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
+			local name = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
 			e[c] = AceGUI:Create("EditBox")
 			e[c]:SetLabel(format("  |T%d:18|t %s", powerData.icon, name or powerData.name))
 			e[c]:SetText(powerWeights[powerData.azeritePowerID] or "")
@@ -7448,7 +7448,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 
 			-- Defensive Powers
 			for i, powerData in ipairs(n.sourceData.defensive[classID]) do
-				local name = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
+				local name = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
 				e[c] = AceGUI:Create("EditBox")
 				e[c]:SetLabel(format("  |T%d:18|t %s", powerData.icon, name or powerData.name))
 				e[c]:SetText(powerWeights[powerData.azeritePowerID] or "")
@@ -7463,7 +7463,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 				c = c + 1
 			end
 			for i, powerData in ipairs(n.sourceData.defensive.common) do
-				local name = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
+				local name = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
 				e[c] = AceGUI:Create("EditBox")
 				e[c]:SetLabel(format("  |T%d:18|t %s", powerData.icon, name or powerData.name))
 				e[c]:SetText(powerWeights[powerData.azeritePowerID] or "")
@@ -7487,7 +7487,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 
 			-- Role Powers
 			for i, powerData in ipairs(n.sourceData.role.common) do
-				local name = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
+				local name = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
 				e[c] = AceGUI:Create("EditBox")
 				local roleIcon = "|TInterface\\LFGFrame\\LFGRole:0:3:::64:16:16:64:0:16|t" -- Tank, DPS & Healer
 				e[c]:SetLabel(format("  %s |T%d:18|t %s", roleIcon, powerData.icon, name or powerData.name))
@@ -7506,7 +7506,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 			-- Non-Healer Powers
 			if bit.band(roleBits, bit.bor(BIT_DAMAGER, BIT_TANK)) ~= 0 then
 				for i, powerData in ipairs(n.sourceData.role.nonhealer) do
-					local name = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
+					local name = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
 					e[c] = AceGUI:Create("EditBox")
 					local roleIcon = "|TInterface\\LFGFrame\\LFGRole:0:2:::64:16:16:48:0:16|t" -- Tank & DPS
 					e[c]:SetLabel(format("  %s |T%d:18|t %s", roleIcon, powerData.icon, name or powerData.name))
@@ -7525,7 +7525,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 			-- Tank Powers
 			if bit.band(roleBits, BIT_TANK) ~= 0 then
 				for i, powerData in ipairs(n.sourceData.role.tank) do
-					local name = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
+					local name = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
 					e[c] = AceGUI:Create("EditBox")
 					local roleIcon = "|TInterface\\LFGFrame\\LFGRole:0::::64:16:32:48:0:16|t" -- Tank
 					e[c]:SetLabel(format("  %s |T%d:18|t %s", roleIcon, powerData.icon, name or powerData.name))
@@ -7544,7 +7544,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 			-- Healer Powers
 			if bit.band(roleBits, BIT_HEALER) ~= 0 then
 				for i, powerData in ipairs(n.sourceData.role.healer) do
-					local name = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
+					local name = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
 					e[c] = AceGUI:Create("EditBox")
 					local roleIcon = "|TInterface\\LFGFrame\\LFGRole:0::::64:16:48:64:0:16|t" -- Healer
 					e[c]:SetLabel(format("  %s |T%d:18|t %s", roleIcon, powerData.icon, name or powerData.name))
@@ -7570,7 +7570,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 
 			-- Raid Powers
 			for i, powerData in ipairs(n.sourceData.raid) do
-				local name = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
+				local name = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
 				e[c] = AceGUI:Create("EditBox")
 				e[c]:SetLabel(format("  |T%d:18|t*%s*", powerData.icon, name or powerData.name))
 				e[c]:SetText(powerWeights[powerData.azeritePowerID] or "")
@@ -7590,7 +7590,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 			local endPoint = 15
 			for i = startPoint, endPoint do
 				local powerData = n.sourceData.zone[i]
-				local name = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
+				local name = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
 				e[c] = AceGUI:Create("EditBox")
 				e[c]:SetLabel(format("  |T%d:18|t %s", powerData.icon, name or powerData.name))
 				e[c]:SetText(powerWeights[powerData.azeritePowerID] or "")
@@ -7609,7 +7609,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 			local tidesEnd = isHorde and 19 or 17
 			for i = tidesStart, tidesEnd do
 				local powerData = n.sourceData.zone[i]
-				local name = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
+				local name = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
 				e[c] = AceGUI:Create("EditBox")
 				e[c]:SetLabel(format("  |T%d:18|t %s", powerData.icon, name or powerData.name))
 				e[c]:SetText(powerWeights[powerData.azeritePowerID] or "")
@@ -7626,7 +7626,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 			-- 8.2 ->
 			for i = 20, #n.sourceData.zone do
 				local powerData = n.sourceData.zone[i]
-				local name = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
+				local name = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
 				e[c] = AceGUI:Create("EditBox")
 				e[c]:SetLabel(format("  |T%d:18|t %s", powerData.icon, name or powerData.name))
 				e[c]:SetText(powerWeights[powerData.azeritePowerID] or "")
@@ -7650,7 +7650,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 
 			-- Profession Powers
 			for i, powerData in ipairs(n.sourceData.profession) do
-				local name = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
+				local name = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
 				e[c] = AceGUI:Create("EditBox")
 				e[c]:SetLabel(format("  |T%d:18|t %s", powerData.icon, name or powerData.name))
 				e[c]:SetText(powerWeights[powerData.azeritePowerID] or "")
@@ -7678,7 +7678,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 			local endPoint = isHorde and 6 or 12
 			for i = startPoint, endPoint do
 				local powerData = n.sourceData.pvp[i]
-				local name = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
+				local name = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
 				e[c] = AceGUI:Create("EditBox")
 				e[c]:SetLabel(format("  |T%d:18|t %s", powerData.icon, name or powerData.name))
 				e[c]:SetText(powerWeights[powerData.azeritePowerID] or "")
@@ -7696,7 +7696,7 @@ function n:CreateWeightEditorGroup(isCustomScale, container, dataSet, scaleKey, 
 			-- 8.1:
 			for i = 13, #n.sourceData.pvp do
 				local powerData = n.sourceData.pvp[i]
-				local name = GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
+				local name = C_Spell.GetSpellInfo(C_AzeriteEmpoweredItem.GetPowerInfo(powerData.azeritePowerID).spellID)
 				e[c] = AceGUI:Create("EditBox")
 				e[c]:SetLabel(format("  |T%d:18|t %s", powerData.icon, name or powerData.name))
 				e[c]:SetText(powerWeights[powerData.azeritePowerID] or "")
@@ -9486,7 +9486,7 @@ SlashCmdList["AZERITEPOWERWEIGHTS"] = function(text)
 		end
 		if not n.guiContainer then
 			if not _G.AzeriteEmpoweredItemUI then
-				local loaded, reason = LoadAddOn("Blizzard_AzeriteUI")
+				local loaded, reason = C_AddOns.LoadAddOn("Blizzard_AzeriteUI")
 				if loaded then
 					_toggleEditorUI()
 				else

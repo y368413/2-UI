@@ -7,4 +7,39 @@
 	<Include file="Notice\Notice.xml"/>
 	<Include file="Modify\Modify.xml"/>
 	<Include file="AceExtensions\AceExtensions.xml"/>
+	<!--Button name="GameMenuButtonReloadButton" inherits="GameMenuButtonTemplate" text="RELOADUI" parent="GameMenuFrame">
+		<Scripts>
+			<OnLoad>
+				if GameMenuFrame_UpdateVisibleButtons then
+					hooksecurefunc("GameMenuFrame_UpdateVisibleButtons", function()
+						GameMenuFrame:SetHeight(GameMenuFrame:GetHeight() + 25)
+						local point, relativeTo, relativePoint, x, y = GameMenuButtonLogout:GetPoint(1)
+						if (relativeTo and relativeTo ~= self) then
+							self:SetPoint(point, relativeTo, relativePoint, x, y)
+						end
+						GameMenuButtonLogout:ClearAllPoints()
+						GameMenuButtonLogout:SetPoint("TOP", self, "BOTTOM", 0, - 1)
+					end)
+				end
+			</OnLoad>
+			<OnClick>
+				PlaySound(SOUNDKIT.IG_MAINMENU_LOGOUT);
+				ReloadUI();
+				HideUIPanel(GameMenuFrame);
+			</OnClick>
+		</Scripts>
+	</Button-->
+	<Button name="SettingsPanelReloadUI" inherits="UIPanelButtonTemplate" text="RELOADUI" parent="SettingsPanel">
+		<Size x="96" y="22"/>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" x="16" y="16"/>
+		</Anchors>
+		<Scripts>
+			<OnClick>
+				PlaySound(SOUNDKIT.IG_MAINMENU_LOGOUT);
+				ReloadUI();
+				HideUIPanel(InterfaceOptionsFrame);
+			</OnClick>
+		</Scripts>
+	</Button>
 </Ui>

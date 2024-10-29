@@ -8,36 +8,37 @@ local info = module:RegisterInfobar("Gold", R.Infobar.GoldPos)
 local format, pairs, wipe, unpack = string.format, pairs, table.wipe, unpack
 local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
 local GetMoney, GetNumWatchedTokens, Ambiguate = GetMoney, GetNumWatchedTokens, Ambiguate
-local GetContainerNumSlots, GetContainerItemInfo, UseContainerItem = GetContainerNumSlots, GetContainerItemInfo, UseContainerItem
-local GetContainerItemEquipmentSetInfo = GetContainerItemEquipmentSetInfo
 local C_Timer_After, IsControlKeyDown, IsShiftKeyDown = C_Timer.After, IsControlKeyDown, IsShiftKeyDown
 local C_CurrencyInfo_GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
 local C_CurrencyInfo_GetBackpackCurrencyInfo = C_CurrencyInfo.GetBackpackCurrencyInfo
 local CalculateTotalNumberOfFreeBagSlots = CalculateTotalNumberOfFreeBagSlots
+local C_TransmogCollection_GetItemInfo = C_TransmogCollection.GetItemInfo
+local C_Container_UseContainerItem = C_Container.UseContainerItem
+local C_Container_GetContainerNumSlots = C_Container.GetContainerNumSlots
+local C_Container_GetContainerItemInfo = C_Container.GetContainerItemInfo
+
 local slotString = U["Bags"]..": %s%d"
 
 local profit, spent, oldMoney = 0, 0, 0
 local myName, myRealm = I.MyName, I.MyRealm
-
-local crossRealms = GetAutoCompleteRealms()
-if not crossRealms or #crossRealms == 0 then
-	crossRealms = {[1]=myRealm}
-end
+myRealm = gsub(myRealm, "%s", "") -- fix for multi words realm name
 
 StaticPopupDialogs["RESETGOLD"] = {
 	text = U["Are you sure to reset the gold count?"],
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function()
-		for _, realm in pairs(crossRealms) do
-			if MaoRUIDB["totalGold"][realm] then
-				wipe(MaoRUIDB["totalGold"][realm])
-			end
-		end
-		MaoRUIDB["totalGold"][myRealm][myName] = {GetMoney(), I.MyClass}
+		wipe(MaoRUISetDB["totalGold"])
+		if not MaoRUISetDB["totalGold"][myRealm] then MaoRUISetDB["totalGold"][myRealm] = {} end
+		MaoRUISetDB["totalGold"][myRealm][myName] = {GetMoney(), I.MyClass}
 	end,
 	whileDead = 1,
 }
+
+local menuList = {
+	{text = M.HexRGB(1, .8, 0)..REMOVE_WORLD_MARKERS.."!!!", notCheckable = true, func = function() StaticPopup_Show("RESETGOLD") end},
+}
+
 local function getClassIcon(class)
 	local c1, c2, c3, c4 = unpack(CLASS_ICON_TCOORDS[class])
 	c1, c2, c3, c4 = (c1+.03)*50, (c2-.03)*50, (c3+.03)*50, (c4-.03)*50
@@ -68,7 +69,7 @@ info.onEvent = function(self, event, arg1)
 		oldMoney = GetMoney()
 		self:UnregisterEvent(event)
 
-		if MaoRUIDB["ShowSlots"] then
+		if MaoRUISetDB["ShowSlots"] then
 			self:RegisterEvent("BAG_UPDATE")
 		end
 	elseif event == "BAG_UPDATE" then
@@ -82,28 +83,60 @@ info.onEvent = function(self, event, arg1)
 	else								-- Gained Moeny
 		profit = profit + change
 	end
-	--if MaoRUIDB["ShowSlots"] then
+	--if MaoRUISetDB["ShowSlots"] then
 		--self.text:SetText(getSlotString())
 	--else
 		self.text:SetText(module:GetMoneyString(newMoney))
 	--end
 
-	if not MaoRUIDB["totalGold"][myRealm] then MaoRUIDB["totalGold"][myRealm] = {} end
-	if not MaoRUIDB["totalGold"][myRealm][myName] then MaoRUIDB["totalGold"][myRealm][myName] = {} end
-	MaoRUIDB["totalGold"][myRealm][myName][1] = GetMoney()
-	MaoRUIDB["totalGold"][myRealm][myName][2] = I.MyClass
+	if not MaoRUISetDB["totalGold"][myRealm] then MaoRUISetDB["totalGold"][myRealm] = {} end
+	if not MaoRUISetDB["totalGold"][myRealm][myName] then MaoRUISetDB["totalGold"][myRealm][myName] = {} end
+	MaoRUISetDB["totalGold"][myRealm][myName][1] = GetMoney()
+	MaoRUISetDB["totalGold"][myRealm][myName][2] = I.MyClass
 
 	oldMoney = newMoney
 end
 
+local RebuildCharList
+
+local function clearCharGold(_, realm, name)
+	MaoRUISetDB["totalGold"][realm][name] = nil
+	DropDownList1:Hide()
+	RebuildCharList()
+end
+
+function RebuildCharList()
+	for i = 2, #menuList do
+		if menuList[i] then wipe(menuList[i]) end
+	end
+
+	local index = 1
+	for realm, data in pairs(MaoRUISetDB["totalGold"]) do
+		for name, value in pairs(data) do
+			if not (realm == myRealm and name == myName) then
+				index = index + 1
+				if not menuList[index] then menuList[index] = {} end
+				menuList[index].text = M.HexRGB(M.ClassColor(value[2]))..Ambiguate(name.."-"..realm, "none")
+				menuList[index].notCheckable = true
+				menuList[index].arg1 = realm
+				menuList[index].arg2 = name
+				menuList[index].func = clearCharGold
+			end
+		end
+	end
+end
 
 info.onMouseUp = function(self, btn)
 	if btn == "RightButton" then
 		--if IsControlKeyDown() then
-			StaticPopup_Show("RESETGOLD")
+			if not menuList[1].created then
+				RebuildCharList()
+				menuList[1].created = true
+			end
+			EasyMenu(menuList, M.EasyMenu, self, -80, 100, "MENU", 1)
 		--else
-			--MaoRUIDB["ShowSlots"] = not MaoRUIDB["ShowSlots"]
-			--if MaoRUIDB["ShowSlots"] then
+			--MaoRUISetDB["ShowSlots"] = not MaoRUISetDB["ShowSlots"]
+			--if MaoRUISetDB["ShowSlots"] then
 				--self:RegisterEvent("BAG_UPDATE")
 			--else
 				--self:UnregisterEvent("BAG_UPDATE")
@@ -111,13 +144,15 @@ info.onMouseUp = function(self, btn)
 			--self:onEvent()
 		--end
 	elseif btn == "MiddleButton" then
-		MaoRUIDB["AutoSell"] = not MaoRUIDB["AutoSell"]
+		MaoRUISetDB["AutoSell"] = not MaoRUISetDB["AutoSell"]
 		self:onEnter()
 	else
 		--if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
 		ToggleCharacter("TokenFrame")
 	end
 end
+
+local title
 
 info.onEnter = function(self)
 	local _, anchor, offset = module:GetTooltipAnchor(info)
@@ -138,30 +173,61 @@ info.onEnter = function(self)
 
 	local totalGold = 0
 	GameTooltip:AddLine(U["RealmCharacter"], .6,.8,1)
-	for _, realm in pairs(crossRealms) do
-		local thisRealmList = MaoRUIDB["totalGold"][realm]
-		if thisRealmList then
-			for k, v in pairs(thisRealmList) do
-				local name = Ambiguate(k.."-"..realm, "none")
+
+	if MaoRUISetDB["totalGold"][myRealm] then
+		for k, v in pairs(MaoRUISetDB["totalGold"][myRealm]) do
+			local name = Ambiguate(k.."-"..myRealm, "none")
+			local gold, class = unpack(v)
+			local r, g, b = M.ClassColor(class)
+			GameTooltip:AddDoubleLine(getClassIcon(class)..name, module:GetMoneyString(gold), r,g,b, 1,1,1)
+			totalGold = totalGold + gold
+		end
+	end
+
+	local isShiftKeyDown = IsShiftKeyDown()
+	for realm, data in pairs(MaoRUISetDB["totalGold"]) do
+		if realm ~= myRealm then
+			for k, v in pairs(data) do
 				local gold, class = unpack(v)
-				local r, g, b = M.ClassColor(class)
-				GameTooltip:AddDoubleLine(getClassIcon(class)..name, module:GetMoneyString(gold), r,g,b, 1,1,1)
+				if isShiftKeyDown then -- show other realms while holding shift
+					local name = Ambiguate(k.."-"..realm, "none")
+					local r, g, b = M.ClassColor(class)
+					GameTooltip:AddDoubleLine(getClassIcon(class)..name, module:GetMoneyString(gold), r,g,b, 1,1,1)
+				end
 				totalGold = totalGold + gold
 			end
 		end
 	end
-	GameTooltip:AddLine(" ")
-	GameTooltip:AddDoubleLine(TOTAL..":", module:GetMoneyString(totalGold), .6,.8,1, 1,1,1)
+	if not isShiftKeyDown then
+		GameTooltip:AddLine(U["Hold Shift"], .6,.8,1)
+	end
 
-	for i = 1, GetNumWatchedTokens() do
+	local accountmoney = C_Bank.FetchDepositedMoney(Enum.BankType.Account)
+	GameTooltip:AddDoubleLine(CHARACTER..":", module:GetMoneyString(totalGold), .6,.8,1, 1,1,1)
+	GameTooltip:AddDoubleLine(ACCOUNT_BANK_PANEL_TITLE..":", module:GetMoneyString(accountmoney), .6,.8,1, 1,1,1)
+	GameTooltip:AddDoubleLine(TOTAL..":", module:GetMoneyString(totalGold + accountmoney), .6,.8,1, 1,1,1)
+
+	title = false
+	local chargeInfo = C_CurrencyInfo_GetCurrencyInfo(2813) -- Tier charges
+	if chargeInfo then
+		if not title then
+			GameTooltip:AddLine(CURRENCY..":", .6,.8,1)
+			title = true
+		end
+		local iconTexture = " |T"..chargeInfo.iconFileID..":13:15:0:0:50:50:4:46:4:46|t"
+		GameTooltip:AddDoubleLine(chargeInfo.name, chargeInfo.quantity.."/"..chargeInfo.maxQuantity..iconTexture, 1,1,1, 1,1,1)
+	end
+
+	for i = 1, 10 do -- seems unlimit, but use 10 for now, needs review
 		local currencyInfo = C_CurrencyInfo_GetBackpackCurrencyInfo(i)
 		if not currencyInfo then break end
 		local name, count, icon, currencyID = currencyInfo.name, currencyInfo.quantity, currencyInfo.iconFileID, currencyInfo.currencyTypesID
-		if name and i == 1 then
-			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine(CURRENCY..":", .6,.8,1)
-		end
 		if name and count then
+			if not title then
+				GameTooltip:AddLine(" ")
+				GameTooltip:AddLine(CURRENCY..":", .6,.8,1)
+				title = true
+			end
 			local total = C_CurrencyInfo_GetCurrencyInfo(currencyID).maxQuantity
 			local iconTexture = " |T"..icon..":13:15:0:0:50:50:4:46:4:46|t"
 			if total > 0 then
@@ -172,7 +238,8 @@ info.onEnter = function(self)
 		end
 	end
   GameTooltip:AddDoubleLine(" ","--------------",1,1,1,0.5,0.5,0.5)
-	GameTooltip:AddDoubleLine(" ",U["AutoSell Junk"]..": "..(MaoRUIDB["AutoSell"] and "|cff55ff55"..VIDEO_OPTIONS_ENABLED or "|cffff5555"..VIDEO_OPTIONS_DISABLED),1,1,1,.6,.8,1)
+	GameTooltip:AddDoubleLine(" ", I.ScrollButton..U["AutoSell Junk"]..": "..(MaoRUISetDB["AutoSell"] and "|cff55ff55"..VIDEO_OPTIONS_ENABLED or "|cffff5555"..VIDEO_OPTIONS_DISABLED).." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", I.RightButton..U["Reset Gold"].." ", 1,1,1, .6,.8,1)
 	GameTooltip:Show()
 end
 
@@ -184,23 +251,26 @@ local errorText = _G.ERR_VENDOR_DOESNT_BUY
 
 local function startSelling()
 	if stop then return end
-	for bag = 0, 4 do
-		for slot = 1, GetContainerNumSlots(bag) do
+	for bag = 0, 5 do
+		for slot = 1, C_Container_GetContainerNumSlots(bag) do
 			if stop then return end
-			local _, _, _, quality, _, _, link, _, noValue, itemID = GetContainerItemInfo(bag, slot)
-			local isInSet = GetContainerItemEquipmentSetInfo(bag, slot)
-			if link and not noValue and not isInSet and (quality == 0 or MaoRUIDB["CustomJunkList"][itemID]) and not cache["b"..bag.."s"..slot] then
-				cache["b"..bag.."s"..slot] = true
-				UseContainerItem(bag, slot)
-				C_Timer_After(.1, startSelling)
-				return
+			local info = C_Container_GetContainerItemInfo(bag, slot)
+			if info then
+				if not cache["b"..bag.."s"..slot] and info.hyperlink and not info.hasNoValue
+				and (info.quality == 0 or MaoRUISetDB["CustomJunkList"][info.itemID])
+				and (not C_TransmogCollection_GetItemInfo(info.hyperlink) or not M.IsUnknownTransmog(bag, slot)) then
+					cache["b"..bag.."s"..slot] = true
+					C_Container_UseContainerItem(bag, slot)
+					C_Timer_After(.1, startSelling)
+					return
+				end
 			end
 		end
 	end
 end
 
 local function updateSelling(event, ...)
-	if not MaoRUIDB["AutoSell"] then return end
+	if not MaoRUISetDB["AutoSell"] then return end
 
 	local _, arg = ...
 	if event == "MERCHANT_SHOW" then

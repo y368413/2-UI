@@ -36,7 +36,7 @@ end
 
 local BattlePetAbilityTooltips = CreateFrame("Frame")
 BattlePetAbilityTooltips:SetScript("OnEvent",function(self,event,addon)
-	if IsAddOnLoaded("Blizzard_PetBattleUI") then
+	if C_AddOns.IsAddOnLoaded("Blizzard_PetBattleUI") then
 		init()
 		hooksecurefunc("PetBattleUnitTooltip_UpdateForUnit",list)
 		self:UnregisterEvent("ADDON_LOADED")
@@ -54,7 +54,7 @@ frame.texCoords = {Power={0,.5,0,.5}, Speed={0,.5,.5,1}, Health={.5,1,.5,1}}
 -- PetBattleUI appears to load very early, but not guaranteed: check if loaded
 -- at PLAYER_LOGIN to setup, and then watch for ADDON_LOADED until setup turns it off
 frame:SetScript("OnEvent",function(self,event,...)
-  if self.notSetUp and IsAddOnLoaded("Blizzard_PetBattleUI") then
+  if self.notSetUp and C_AddOns.IsAddOnLoaded("Blizzard_PetBattleUI") then
     self:SetUpWidgets() -- runs once when PetBattleUI known to be loaded
 	elseif event=="PET_BATTLE_CLOSE" then
 		PetBattleFrame.TopVersusText:SetPoint("TOP",PetBattleFrame,"TOP",0,-26)
@@ -137,11 +137,11 @@ function frame:UpdateWidgets()
   end
 end
 
---[[ Cloudy Pet Collected ## Author: Cloudyfa ## Version: 1.8 ]]
+--[[ Cloudy Pet Collected ## Author: Cloudyfa ## Version: 1.9 
 --- Pet String Calculation ---
 local function GetPetString(name)
 	if (not name) or (name == '') then return end
-	--if (not CollectionsJournal) then CollectionsJournal_LoadUI() end
+	if (not CollectionsJournal) then CollectionsJournal_LoadUI() end
 
 	local petString, petID, speciesID
 	speciesID, petID = C_PetJournal.FindPetIDByName(name)
@@ -262,7 +262,7 @@ GameTooltip:HookScript('OnUpdate', function(self)
 		line:SetText(text)
 		self:Show()
 	end
-end)
+end)]]
 
 
 --[[Pet Battle Announcer]]

@@ -1,9 +1,9 @@
 ﻿--## SavedVariables: IncentiveProgramDB
----------Incentive Program------Created by: Jacob Beu----Xubera @ US-Alleria------r18 | 2/4/2021------------
+---------Incentive Program------Created by: Jacob Beu----Xubera @ US-Alleria------r22 | 7/28/2024------------
 local IncentiveProgram = {}
 
 --Core
-IncentiveProgram.ADDON_DISPLAY_NAME = NOTICE_INCENTIVEPROGRAM_TITLE.." (|cFF69CCF0 r18 |r)"
+IncentiveProgram.ADDON_DISPLAY_NAME = NOTICE_INCENTIVEPROGRAM_TITLE.." (|cFF69CCF0 r22 |r)"
 
 IncentiveProgram.Flair = {
 	[849] = "HM1 - ",
@@ -66,29 +66,31 @@ IncentiveProgram.Icons = {
   
 --Settings
 IncentiveProgram.Settings = {
-	QA_TANK = "queueAsTank",
-	QA_HEALER = "queueAsHealer",
-	QA_DAMAGE = "queueAsDamage",
-	IGNORE = "ignore",
-	DUNGEON_NAME = "dungeonName",
-	DUNGEON_TYPE = "dungeonType",
-	HIDE_IN_PARTY = "hideInParty",
-	HIDE_ALWAYS = "hideAlways", --still shows in databroker
+    QA_TANK = "queueAsTank",
+    QA_HEALER = "queueAsHealer",
+    QA_DAMAGE = "queueAsDamage",
+    IGNORE = "ignore",
+    DUNGEON_NAME = "dungeonName",
+    DUNGEON_TYPE = "dungeonType",
+    HIDE_IN_PARTY = "hideInParty",
+    HIDE_ALWAYS = "hideAlways", --still shows in databroker
 	HIDE_EMPTY = "hideEmpty",
-	ALERT = "alert",
-	ALERT_TOAST = "toastAlert",
-	COUNT_EVEN_IF_NOT_SELECTED = "countEvenIfNotSelected",
-	COUNT_EVEN_IF_NOT_ROLE_ELIGIBLE = "countEvenIfNotRoleEligible",
+    HIDE_MINIMAP = "hideMinimap",
+    ALERT = "alert",
+    ALERT_TOAST = "toastAlert",
+    COUNT_EVEN_IF_NOT_SELECTED = "countEvenIfNotSelected",
+    COUNT_EVEN_IF_NOT_ROLE_ELIGIBLE = "countEvenIfNotRoleEligible",
 	IGNORE_COMPLETED_LFR = "ignoreCompletedLFR",
     
-	ROLE_TANK = "roleTank",
-	ROLE_HEALER = "roleHealer",
-	ROLE_DAMAGE = "roleDamage",
+    ROLE_TANK = "roleTank",
+    ROLE_HEALER = "roleHealer",
+    ROLE_DAMAGE = "roleDamage",
     
-	FRAME_TOP = "frameTop",
-	FRAME_LEFT = "frameLeft",
-	TOAST_TOP = "toastTop",
-	TOAST_LEFT = "toastLeft",
+    FRAME_TOP = "frameTop",
+    FRAME_LEFT = "frameLeft",
+    TOAST_TOP = "toastTop",
+    TOAST_LEFT = "toastLeft",
+    MINIMAP = "minimap",
 	
 	ALERT_PING = "alertPing",
 	ALERT_SOUND = "alertSound",
@@ -124,18 +126,18 @@ IncentiveProgram.TOAST_DAMAGE = "\124TInterface\\LFGFRAME\\UI-LFG-ICON-PORTRAITR
 
 --Context Menu
 IncentiveProgram.ContextMenu = {
-	TANK = 2,
-	HEALER = 3,
-	DAMAGE = 4,
+    TANK = 2,
+    HEALER = 3,
+    DAMAGE = 4,
+    
+    ROLES = "roles",
+    IGNORE = "ignore",
+    SETTINGS = "settings",
+    
+    QUEUE = "queue",
+    JOIN = "join",
 	
-	ROLES = "roles" ,
-	IGNORE = "ignore",
-	SETTINGS = "settings",
-	
-	QUEUE = "queue",
-	JOIN = "join",
-	
-	INTERFACE_PANEL = "interfacePanel",
+	INTERFACE_PANEL = "interfacePanel"
 }
 
 IncentiveProgram.ContextLabels = {
@@ -181,506 +183,7 @@ IncentiveProgram.ContextLabels = {
 }
 
 
-
-
-
-
-
-
-local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
-
------------------------------------------ menu---------------------------------------
---Local copy of the class
-local menu
-
--- Right Click Menu Table
-local tank, healer, damage = C_LFGList.GetAvailableRoles()
-if ( tank ) then tank = "" else tank = "\124CFFC41F3B" end
-if ( healer ) then healer = "" else healer = "\124CFFC41F3B" end
-if ( damage ) then damage = "" else damage = "\124CFFC41F3B" end
-local menuData = {
-    [1] = {
-        ["text"] = IncentiveProgram.ContextLabels["ROLES"],
-        ["notCheckable"] = true,
-        ["hasArrow"] = true,
-        ["value"] = { --submenu
-            [1] = {
-                ["text"] = tank..IncentiveProgram.ContextLabels["TANK"],
-                ["isNotRadio"] = true,
-                ["arg1"] = IncentiveProgram.ContextMenu["ROLES"],
-                ["arg2"] = IncentiveProgram.Settings["ROLE_TANK"],
-                ["keepShownOnClick"] = true
-            },
-            [2] = {
-                ["text"] = healer..IncentiveProgram.ContextLabels["HEALER"],
-                ["isNotRadio"] = true,
-                ["arg1"] = IncentiveProgram.ContextMenu["ROLES"],
-                ["arg2"] = IncentiveProgram.Settings["ROLE_HEALER"],
-                ["keepShownOnClick"] = true
-            },
-            [3] = {
-                ["text"] = damage..IncentiveProgram.ContextLabels["DAMAGE"],
-                ["isNotRadio"] = true,
-                ["arg1"] = IncentiveProgram.ContextMenu["ROLES"],
-                ["arg2"] = IncentiveProgram.Settings["ROLE_DAMAGE"],
-                ["keepShownOnClick"] = true
-            }
-        }
-    },
-    
-    [2] = {
-        ["notCheckable"] = true,
-        ["text"] = IncentiveProgram.ContextLabels["IGNORED"],
-        ["hasArrow"] = true,
-        ["value"] = IncentiveProgram.ContextMenu["IGNORE"]
-    },
-    
-    [3] = {
-        ["iconOnly"] = true,
-        ["notCheckable"] = true,
-        ["keepShownOnClick"] = true,
-        ["disabled"] = true,
-        ["icon"] = IncentiveProgram.Icons["CONTEXT_MENU_DIVIDER"],
-        ["iconInfo"] = {
-            ["tCoordLeft"] = 0,
-            ["tCoordRight"] = 1,
-            ["tFitDropDownSizeX"] = true,
-            ["tCoordTop"] = 0,
-            ["tCoordBottom"] = 1,
-            ["tSizeX"] = 0,
-            ["tSizeY"] = 8
-        }
-    },
-    
-    [4] = {
-        ["text"] = IncentiveProgram.ContextLabels["SETTINGS"],
-        ["notCheckable"] = true,
-        ["hasArrow"] = true,
-        ["value"] = {
-            [1] = {
-                ["text"] = IncentiveProgram.ContextLabels["HIDE_IN_PARTY"],
-                ["isNotRadio"] = true,
-                ["arg1"] = IncentiveProgram.ContextMenu["SETTINGS"],
-                ["arg2"] = IncentiveProgram.Settings["HIDE_IN_PARTY"],
-                ["keepShownOnClick"] = true
-            },
-            [2] = {
-                ["text"] = IncentiveProgram.ContextLabels["HIDE_ALWAYS"],
-                ["isNotRadio"] = true,
-                ["arg1"] = IncentiveProgram.ContextMenu["SETTINGS"],
-                ["arg2"] = IncentiveProgram.Settings["HIDE_ALWAYS"],
-                ["keepShownOnClick"] = true,
-				["tooltipTitle"] = IncentiveProgram.ADDON_DISPLAY_NAME,
-				["tooltipText"] = IncentiveProgram.ContextLabels["TOOLTIP_HIDE_ALWAYS"],
-				["tooltipOnButton"] = 1
-            },
-            [3] = {
-                ["text"] = IncentiveProgram.ContextLabels["ALERT"],
-                ["isNotRadio"] = true,
-                ["arg1"] = IncentiveProgram.ContextMenu["SETTINGS"],
-                ["arg2"] = IncentiveProgram.Settings["ALERT"],
-                ["keepShownOnClick"] = true
-            },
-            [4] = {
-                ["text"] = IncentiveProgram.ContextLabels["ALERT_TOAST"],
-                ["isNotRadio"] = true,
-                ["arg1"] = IncentiveProgram.ContextMenu["SETTINGS"],
-                ["arg2"] = IncentiveProgram.Settings["ALERT_TOAST"],
-                ["keepShownOnClick"] = true
-            },
-            [5] = {
-                ["text"] = IncentiveProgram.ContextLabels["IGNORE_COMPLETED_LFR"],
-                ["isNotRadio"] = true,
-                ["arg1"] = IncentiveProgram.ContextMenu["SETTINGS"],
-                ["arg2"] = IncentiveProgram.Settings["IGNORE_COMPLETED_LFR"],
-                ["keepShownOnClick"] = true,
-				["tooltipTitle"] = IncentiveProgram.ADDON_DISPLAY_NAME,
-				["tooltipText"] = IncentiveProgram.ContextLabels["TOOLTIP_IGNORE_LFR"],
-				["tooltipOnButton"] = 1
-            },
-			[6] = {
-				text = IncentiveProgram.ContextLabels["INTERFACE_PANEL"],
-				arg1 = IncentiveProgram.ContextMenu["INTERFACE_PANEL"],
-				notCheckable = true,
-				leftPadding = 16
-			}
-        }
-    }
-}
-
- 
-local function createTitleInfo(level)
-    local info = LibDD:UIDropDownMenu_CreateInfo()
-    
-    --Add title
-    info.text = IncentiveProgram.ADDON_DISPLAY_NAME
-    info.isTitle = true
-    info.notCheckable = true
-    
-    LibDD:UIDropDownMenu_AddButton(info, level)
-end
-
-local function createSettingsMenu(level, level2Table)
-    if ( level == 1 ) then
-        for i=1, #menuData do
-            local info = LibDD:UIDropDownMenu_CreateInfo();
-            for key,value in pairs(menuData[i]) do
-                info[key] = value
-            end
-            info.func = menu.MenuOnClick
-            LibDD:UIDropDownMenu_AddButton(info, level)
-        end
-    elseif ( level == 2 ) then
-        for i=1, #level2Table do
-            local info = LibDD:UIDropDownMenu_CreateInfo();
-            for key,value in pairs(level2Table[i]) do
-                info[key] = value
-            end
-            if level2Table[i]["arg1"] == IncentiveProgram.ContextMenu["ROLES"] then
-                info.checked = IncentiveProgram:GetSettings():GetUserSetting(level2Table[i]["arg2"])
-            elseif level2Table[i]["arg1"] == IncentiveProgram.ContextMenu["SETTINGS"] then
-                info.checked = IncentiveProgram:GetSettings():GetSetting(level2Table[i]["arg2"])
-            end
-            
-            info.func = menu.MenuOnClick
-            LibDD:UIDropDownMenu_AddButton(info, level)
-        end
-    end
-end
-
-local function createSettingsIgnoreList(level)
-    local count = 0
-    for key, value in pairs (IncentiveProgram:GetSettings().db.dungeonSettings) do
-        if ( IncentiveProgram:GetSettings():GetDungeonSetting(key, IncentiveProgram.Settings["IGNORE"]) ) then
-            local info = LibDD:UIDropDownMenu_CreateInfo()
-            info.text = value[IncentiveProgram.Settings["DUNGEON_NAME"]]
-            info.notCheckable = true
-            info.func = menu.MenuOnClick
-            info.arg1 = IncentiveProgram.ContextMenu["IGNORE"]
-            info.arg2 = key
-            
-            info.icon = IncentiveProgram.Icons["CONTEXT_MENU_RED_X"]
-            info.padding = 8
-            
-            LibDD:UIDropDownMenu_AddButton(info, level)
-            count = count + 1
-            if ( count >= 10 ) then break end
-        end
-    end
-    
-    if ( count == 0 ) then
-        local info = LibDD:UIDropDownMenu_CreateInfo()
-        info.text = IncentiveProgram.ContextLabels["NO_IGNORED"]
-        info.notCheckable = true
-        info.disabled = true
-        
-        LibDD:UIDropDownMenu_AddButton(info, level)
-    end
-end
-
-local function createDungeonEntry(dungeonID, name, level, isShortage, showAll)
-    local info = LibDD:UIDropDownMenu_CreateInfo()
-    local isAvailble, isAvaibleToPlayer = IsLFGDungeonJoinable(dungeonID)
-
-    if not ( isAvailble and isAvaibleToPlayer ) then
-        info.disabled = true
-    else
-        info.hasArrow = true
-    end
-
-	local encounterDone, encounterTotal = GetLFGDungeonNumEncounters(dungeonID)
-	local lfrCompleted = ( encounterDone == encounterTotal )
-	if lfrCompleted and encounterDone > 0 then
-		info.colorCode = "|cFF33FF44"
-	end
-    
-    --Color red if ignored but showing all anyways
-	local ignored = IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, IncentiveProgram.Settings["IGNORE"])
-    if ( ignored and showAll ) then
-        info.colorCode = "|cFFC41F3B"
-    end
-    
-    --Queue Check
-    if ( IncentiveProgram:GetDungeon():IsQueued(dungeonID) ) then
-        info.colorCode = "|cFF69CCF0"
-    end
-
-    local flair = IncentiveProgram.Flair[dungeonID] or ""
-    info.text = flair..name
-    info.value = dungeonID
-    info.notCheckable = true
-    
-    
-    --Color gray if not in the shortage list but still showing all.
-    if ( not isShortage and showAll ) then
-        info.colorCode = "|cFF666666"
-        LibDD:UIDropDownMenu_AddButton(info, level)
-	elseif ( ignored and showAll ) then
-        LibDD:UIDropDownMenu_AddButton(info, level)
-    elseif ( isShortage and not ignored ) then
-        LibDD:UIDropDownMenu_AddButton(info, level)
-    end  
-end
-  
-local function createIgnoreButton(dungeonID, level)
-    local info = LibDD:UIDropDownMenu_CreateInfo()
-    
-    if ( IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, IncentiveProgram.Settings["IGNORE"]) ) then
-        info.text = IncentiveProgram.ContextLabels["UNIGNORE"]
-    else
-        info.text = IncentiveProgram.ContextLabels["IGNORE"]
-    end
-    
-    info.arg1 = IncentiveProgram.ContextMenu["QUEUE"]
-    info.arg2 = IncentiveProgram.Settings["IGNORE"]
-    info.value = dungeonID
-    info.func = menu.MenuOnClick
-    info.notCheckable = true
-    LibDD:UIDropDownMenu_AddButton(info, level)
-end
-
-local function createRoleButtons(dungeonID, level, showAll)
-    local tank, healer, damage = C_LFGList.GetAvailableRoles()
-    local shortageTank, shortageHealer, shortageDamage = IncentiveProgram:GetDungeon():GetShortageRoles(dungeonID)
-    
-    --Tank
-    if ( tank and ( shortageTank or showAll ) ) then
-        local info = LibDD:UIDropDownMenu_CreateInfo()
-        info.text = IncentiveProgram.ContextLabels["TANK"]
-        info.arg1 = IncentiveProgram.ContextMenu["QUEUE"]
-        info.arg2 = IncentiveProgram.Settings["QA_TANK"]
-        info.value = dungeonID
-        info.checked = IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, IncentiveProgram.Settings["QA_TANK"])
-        info.isNotRadio = true
-        info.func = menu.MenuOnClick
-        info.keepShownOnClick = true
-        
-        if ( not shortageTank ) then
-            info.colorCode = "|CFF666666"
-        end
-        
-        LibDD:UIDropDownMenu_AddButton(info, level)
-    end
-    
-    --Healer
-    if ( healer and ( shortageHealer or showAll ) ) then
-        local info = LibDD:UIDropDownMenu_CreateInfo()
-        info.text = IncentiveProgram.ContextLabels["HEALER"]
-        info.arg1 = IncentiveProgram.ContextMenu["QUEUE"]
-        info.arg2 = IncentiveProgram.Settings["QA_HEALER"]
-        info.value = dungeonID
-        info.checked = IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, IncentiveProgram.Settings["QA_HEALER"])
-        info.isNotRadio = true
-        info.func = menu.MenuOnClick
-        info.keepShownOnClick = true
-        
-        if ( not shortageHealer ) then
-            info.colorCode = "|CFF666666"
-        end
-        
-        LibDD:UIDropDownMenu_AddButton(info, level)
-    end
-    
-    --Damage
-    if ( damage and ( shortageDamage or showAll ) ) then
-        local info = LibDD:UIDropDownMenu_CreateInfo()
-        info.text = IncentiveProgram.ContextLabels["DAMAGE"]
-        info.arg1 = IncentiveProgram.ContextMenu["QUEUE"]
-        info.arg2 = IncentiveProgram.Settings["QA_DAMAGE"]
-        info.value = dungeonID
-        info.checked = IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, IncentiveProgram.Settings["QA_DAMAGE"])
-        info.isNotRadio = true
-        info.func = menu.MenuOnClick
-        info.keepShownOnClick = true
-        
-        if ( not shortageDamage ) then
-            info.colorCode = "|CFF666666"
-        end
-        
-        LibDD:UIDropDownMenu_AddButton(info, level)
-    end
-        
-end
-
----------------------------------------
--- createJoinButton is a helper function that adds Join Queue button to the dungeon context menu
----------------------------------------   
-local function createJoinButton(dungeonID, level)
-    local info = LibDD:UIDropDownMenu_CreateInfo()
-    info.text = IncentiveProgram.ContextLabels["JOIN_QUEUE"]
-    info.arg1 = IncentiveProgram.ContextMenu["QUEUE"]
-    info.arg2 = IncentiveProgram.ContextMenu["JOIN"]
-    info.value = dungeonID
-    info.func = menu.MenuOnClick
-    info.notCheckable = true
-    
-    --If Queued, disabled
-    if ( IncentiveProgram:GetDungeon():IsQueued(dungeonID) ) then
-        info.disabled = true
-    end
-   
-    if ( not IncentiveProgram:GetDungeon():CanQueueForDungeon(dungeonID) ) then
-        info.disabled = true
-    end
-    
-    LibDD:UIDropDownMenu_AddButton(info, level)
-end
-
-local IncentiveProgramMenu = {
-    new = function(self, parent)
-        local obj = {}
-        setmetatable(obj, self)
-        self.__index = self
-
-        local frame = LibDD:Create_UIDropDownMenu("IncentiveProgramFrameMenu", parent_frame)
-        obj.frame = frame
-        return obj
-    end,
-  
-    MenuOnLoad = function(menuFrame, level)
-        if ( menu == menuFrame) then return end --Blizzard's Menu UI calls this function, shouldn't self call this.
-        if ( menuFrame.button == "LeftButton" ) then
-            if ( level == 1 ) then
-                createTitleInfo(level)
-                local showAll = IsShiftKeyDown()
-
-                local dungeonIDs, dungeonNames, dungeonTypes = IncentiveProgram:GetDungeon():GetDungeonList()
-                local shortage = IncentiveProgram:GetDungeon():GetShortage()
-                
-                for key, dungeonID in pairs(dungeonIDs) do
-                    local name = dungeonNames[key]
-                    if ( shortage[dungeonID] ) then
-                        createDungeonEntry(dungeonID, name, level, true, showAll)
-                    else
-                        createDungeonEntry(dungeonID, name, level, false, showAll)
-                    end
-                end
-            elseif ( level == 2 ) then
-                local dungeonID = L_UIDROPDOWNMENU_MENU_VALUE
-                local showAll = IsShiftKeyDown()
-                
-                createIgnoreButton(dungeonID, level)
-                createRoleButtons(dungeonID, level, showAll)
-                createJoinButton(dungeonID, level)
-            end
-        elseif (menuFrame.button == "RightButton" ) then
-            if ( level == 1 ) then
-                createTitleInfo(level)
-                createSettingsMenu(level)
-            elseif ( level == 2 ) then
-                local level2Table = L_UIDROPDOWNMENU_MENU_VALUE
-                if ( level2Table == IncentiveProgram.ContextMenu["IGNORE"] ) then
-                    createSettingsIgnoreList(level)
-                else
-                    createSettingsMenu(level, level2Table)
-                end
-            end
-        end
-    end,
-       
-    MenuOnClick = function(menuButton, arg1, arg2)
-        if ( arg1 == IncentiveProgram.ContextMenu["ROLES"] ) then
-            if ( arg2 == IncentiveProgram.Settings["ROLE_TANK"] ) then
-                IncentiveProgram:GetSettings():SetUserSetting(IncentiveProgram.Settings["ROLE_TANK"], menuButton.checked)
-            elseif ( arg2 == IncentiveProgram.Settings["ROLE_HEALER"] ) then
-                IncentiveProgram:GetSettings():SetUserSetting(IncentiveProgram.Settings["ROLE_HEALER"], menuButton.checked)
-            elseif ( arg2 == IncentiveProgram.Settings["ROLE_DAMAGE"] ) then
-                IncentiveProgram:GetSettings():SetUserSetting(IncentiveProgram.Settings["ROLE_DAMAGE"], menuButton.checked)
-            end
-            
-            IncentiveProgram:SetCount(IncentiveProgram:GetDungeon():GetShortageCount()) --Refresh Count
-        elseif ( arg1 == IncentiveProgram.ContextMenu["IGNORE"] ) then
-            IncentiveProgram:GetSettings():SetDungeonSetting(arg2, IncentiveProgram.Settings["IGNORE"], false)
-            IncentiveProgram:SetCount(IncentiveProgram:GetDungeon():GetShortageCount()) --Refresh Count
-            
-        elseif ( arg1 == IncentiveProgram.ContextMenu["SETTINGS"] ) then
-            IncentiveProgram:GetSettings():SetSetting(arg2, menuButton.checked)
-            IncentiveProgram:GetFrame():UpdatedSettings() --In case new settings now hide frame
-            
-        elseif ( arg1 == IncentiveProgram.ContextMenu["QUEUE"] ) then
-            local dungeonID = L_UIDROPDOWNMENU_MENU_VALUE
-            if ( arg2 == IncentiveProgram.Settings["IGNORE"] ) then
-                local ignoreSetting = IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, arg2)
-                IncentiveProgram:GetSettings():SetDungeonSetting(dungeonID, arg2, not ignoreSetting)
-            elseif ( ( arg2 == IncentiveProgram.Settings["QA_TANK"] ) or
-                     ( arg2 == IncentiveProgram.Settings["QA_HEALER"] ) or 
-                     ( arg2 == IncentiveProgram.Settings["QA_DAMAGE"] ) ) then
-                IncentiveProgram:GetSettings():SetDungeonSetting(dungeonID, arg2, menuButton.checked)
-            elseif ( arg2 == IncentiveProgram.ContextMenu["JOIN"] ) then
-                menu:JoinDungeon(dungeonID, true)
-            end
-            
-            IncentiveProgram:SetCount(IncentiveProgram:GetDungeon():GetShortageCount()) --Refresh Count
-        elseif ( arg1 == IncentiveProgram.ContextMenu["INTERFACE_PANEL"] ) then
-			InterfaceOptionsFrame_OpenToCategory(IncentiveProgramInterfacePanel) 
-		end
-    end,
-  
-    JoinDungeon = function(self, dungeonID, fromDropDownMenu)
-        local dungeonType = IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, IncentiveProgram.Settings["DUNGEON_TYPE"])
-        local canQueue, tank, healer, damage = IncentiveProgram:GetDungeon():CanQueueForDungeon(dungeonID)
-        local lfgLeader, lfgTank, lfgHealer, lfgDamage = GetLFGRoles()
-        
-        if ( ( dungeonType == LE_LFG_CATEGORY_RF ) and canQueue ) then
-            SetLFGRoles(lfgLeader, tank, healer, damage)
-            RaidFinderQueueFrame.raid = dungeonID
-            RaidFinderQueueFrame_Join() --Blizzard function in RaidFinder.lua
-            
-            IncentiveProgram.SavedLFGRoles.isUpdated = true
-            IncentiveProgram.SavedLFGRoles.Leader = lfgLeader
-            IncentiveProgram.SavedLFGRoles.Tank = lfgTank
-            IncentiveProgram.SavedLFGRoles.Healer = lfgHealer
-            IncentiveProgram.SavedLFGRoles.Damage = lfgDamage
-        elseif ( dungeonType == LE_LFG_CATEGORY_LFD ) and canQueue then
-            SetLFGRoles(lfgLeader, tank, healer, damage)
-            
-            LFDQueueFrame.type = dungeonID
-            LFDQueueFrame_Join() --Blizzard Function in LFGFrame.lua
-            
-            IncentiveProgram.SavedLFGRoles.isUpdated = true
-            IncentiveProgram.SavedLFGRoles.Leader = lfgLeader
-            IncentiveProgram.SavedLFGRoles.Tank = lfgTank
-            IncentiveProgram.SavedLFGRoles.Healer = lfgHealer
-            IncentiveProgram.SavedLFGRoles.Damage = lfgDamage
-        end
-        
-        if ( fromDropDownMenu ) then
-             --Close context menu and lock until LFGRoles reset
-            LibDD:ToggleDropDownMenu(1, nil, IncentiveProgram:GetFrame():GetUIMenuFrame(), IncentiveProgram:GetFrame():GetAnchorFrame() or IncentiveProgram:GetFrame():GetUIFrame(), 0, 0)
-        end
-    end
-}
-
-function IncentiveProgram:CreateMenu(parent)
-    if ( not parent ) then return end
-    if ( not menu ) then
-        menu = IncentiveProgramMenu:new(parent)
-    else
-        menu.frame:SetParent(parent)
-    end
-    
-    return menu
-end
-
-function IncentiveProgram:GetMenu()
-    if ( not menu ) then return end
-    
-    return menu
-end
-
-
-
-
-
-
-
-
-
-
-
 ----------------------------------- IncentiveProgramSettings -----------------------------------
-
-
 --Local copy of the class
 local settings
 
@@ -690,8 +193,9 @@ local defaultSettings = {}
     defaultSettings[IncentiveProgram.Settings["QA_DAMAGE"]] = true
     defaultSettings[IncentiveProgram.Settings["IGNORE"]] = false
     defaultSettings[IncentiveProgram.Settings["HIDE_IN_PARTY"]] = true
-    defaultSettings[IncentiveProgram.Settings["HIDE_ALWAYS"]] = false
-	  defaultSettings[IncentiveProgram.Settings["HIDE_EMPTY"]] = true
+    defaultSettings[IncentiveProgram.Settings["HIDE_ALWAYS"]] = true
+	defaultSettings[IncentiveProgram.Settings["HIDE_EMPTY"]] = true
+	defaultSettings[IncentiveProgram.Settings["HIDE_MINIMAP"]] = false
     defaultSettings[IncentiveProgram.Settings["ALERT"]] = true
     defaultSettings[IncentiveProgram.Settings["ALERT_TOAST"]] = true
     defaultSettings[IncentiveProgram.Settings["COUNT_EVEN_IF_NOT_SELECTED"]] = false
@@ -707,7 +211,7 @@ local defaultSettings = {}
     defaultSettings[IncentiveProgram.Settings["FRAME_TOP"]] = -1
     defaultSettings[IncentiveProgram.Settings["TOAST_TOP"]] = -1
 
-	defaultSettings[IncentiveProgram.Settings["IGNORE_COMPLETED_LFR"]] = true
+    defaultSettings[IncentiveProgram.Settings["MINIMAP"]] = {}
 	defaultSettings[IncentiveProgram.Settings["ALERT_PING"]] = false
 	defaultSettings[IncentiveProgram.Settings["ALERT_SOUND"]] = 47615
 	defaultSettings[IncentiveProgram.Settings["ALERT_REPEATS"]] = 2
@@ -826,6 +330,8 @@ end
 
 
 ----------------------------------- frame -----------------------------------
+--local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
+local minimap = LibStub("LibDBIcon-1.0")
 --Local copy of the class
 local frame
 
@@ -875,15 +381,15 @@ local IncentiveProgramFrame = {
         ipFrame.leftGradiant:SetWidth(16)
         ipFrame.leftGradiant:SetHeight(14)
         ipFrame.leftGradiant:SetPoint("LEFT", 0, -5)
-        ipFrame.leftGradiant:SetColorTexture(1,0,0,1)
-        ipFrame.leftGradiant:SetGradientAlpha("Horizontal", 0, 0, 0, 0.2, 0, 0, 0, 1)
+        ipFrame.leftGradiant:SetTexture(1,0,0,1)
+        ipFrame.leftGradiant:SetGradient("Horizontal", CreateColor(0, 0, 0, 0.2), CreateColor(0, 0, 0, 1))
         
         ipFrame.rightGradiant = ipFrame:CreateTexture(nil, "BORDER")
         ipFrame.rightGradiant:SetWidth(16)
         ipFrame.rightGradiant:SetHeight(14)
         ipFrame.rightGradiant:SetPoint("RIGHT", 0, -5)
-        ipFrame.rightGradiant:SetColorTexture(1,0,0,1)
-        ipFrame.rightGradiant:SetGradientAlpha("Horizontal", 0, 0, 0, 1, 0, 0, 0, 0.2)
+        ipFrame.rightGradiant:SetTexture(1,0,0,1)
+        ipFrame.rightGradiant:SetGradient("Horizontal", CreateColor(0, 0, 0, 1), CreateColor(0, 0, 0, 0.2))
         
         ipFrame.text = ipFrame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
         ipFrame.text:SetJustifyH("CENTER")
@@ -894,7 +400,7 @@ local IncentiveProgramFrame = {
         ipFrame.text:SetNonSpaceWrap(false)
         
         ipFrame.menu = IncentiveProgram:CreateMenu(ipFrame)
-        LibDD:UIDropDownMenu_Initialize(ipFrame.menu.frame, ipFrame.menu.MenuOnLoad, "MENU")
+        UIDropDownMenu_Initialize(ipFrame.menu.frame, ipFrame.menu.MenuOnLoad, "MENU")
         
         self.ipFrame = ipFrame
     end,
@@ -908,12 +414,12 @@ local IncentiveProgramFrame = {
             self:GetUIMenuFrame().point = "BOTTOMLEFT"
             self:GetUIMenuFrame().relativeTo = anchorFrame
             self:GetUIMenuFrame().relativePoint = "TOPRIGHT"
-            LibDD:ToggleDropDownMenu(1, nil, self:GetUIMenuFrame(), anchorFrame, 0, 0)
+            ToggleDropDownMenu(1, nil, self:GetUIMenuFrame(), anchorFrame, 0, 0)
         elseif ( button == "RightButton" ) then
             self:GetUIMenuFrame().point = "BOTTOMLEFT"
             self:GetUIMenuFrame().relativeTo = anchorFrame
             self:GetUIMenuFrame().relativePoint = "TOPRIGHT"
-            LibDD:ToggleDropDownMenu(1, nil, self:GetUIMenuFrame(), anchorFrame, 0, 0)
+            ToggleDropDownMenu(1, nil, self:GetUIMenuFrame(), anchorFrame, 0, 0)
         end
     end,
 
@@ -962,6 +468,13 @@ local IncentiveProgramFrame = {
 			self:ShowFrame()
 		end
 		
+        local hideMinimap = IncentiveProgram:GetSettings():GetSetting(IncentiveProgram.Settings["HIDE_MINIMAP"])
+        if ( hideMinimap ) then
+            minimap:Hide("IncentiveProgram")
+        else
+            minimap:Show("IncentiveProgram")
+        end
+
     end,
     
 
@@ -1366,12 +879,10 @@ local function sendAlert(dungeonID, tempKey)
 	local ignoreCompletedLFRs = IncentiveProgram:GetSettings():GetSetting(IncentiveProgram.Settings["IGNORE_COMPLETED_LFR"])
 	local ignoreDungeon = IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, IncentiveProgram.Settings["IGNORE"])
 	
-	if ( ignoreCompletedLFRs ) then
-		local encounterDone, encounterTotal = GetLFGDungeonNumEncounters(dungeonID)
-
-		if ( encounterDone == 0 ) then --Not an LFR, so alert.
-			IncentiveProgram:SetAlert(line1, line2, texture, dungeonID)
-		elseif ( encounterDone ~= encounterTotal ) then --all of the LFRs have not been completed.
+	local encounterDone, encounterTotal = GetLFGDungeonNumEncounters(dungeonID)
+	
+	if ( encounterTotal > 0 ) then
+		if ( encounterDone ~= encounterTotal or not ignoreCompletedLFRs ) then --all of the LFRs have not been completed.
 			IncentiveProgram:SetAlert(line1, line2, texture, dungeonID)
 		end
 	elseif (not ignoreDungeon ) then
@@ -1554,6 +1065,8 @@ local IncentiveProgramDataBroker = {
                 IncentiveProgram:GetFrame():OnClick(button, down, clickedframe)
             end
         })
+
+        minimap:Register("IncentiveProgram", obj.dataBroker, IncentiveProgram:GetSettings():GetSetting(IncentiveProgram.Settings["MINIMAP"]))
         
         return obj
     end,
@@ -1591,7 +1104,7 @@ local function setSetting(element, value)
 	
 	IncentiveProgram:GetFrame():UpdatedSettings()
 	IncentiveProgram:SetCount(IncentiveProgram:GetDungeon():GetShortageCount()) --Refresh Count
-	InterfaceOptionsOptionsFrame_RefreshAddOns()
+	-- InterfaceOptionsOptionsFrame_RefreshAddOns() -- Comment out for Dragonflight Changes - Thanks to kaygil on CurseForge
 end
 
 local function getSetting(element)
@@ -1634,20 +1147,26 @@ local function loadSettings(panel)
 	panel.generalHideInParty:SetChecked(getSetting(panel.generalHideInParty))
 	panel.generalHideAlways:SetChecked(getSetting(panel.generalHideAlways))
 	panel.generalHideEmpty:SetChecked(getSetting(panel.generalHideEmpty))
+	--panel.generalHideMinimap:SetChecked(getSetting(panel.generalHideMinimap))
 	panel.generalAlert:SetChecked(getSetting(panel.generalAlert))
 	panel.generalAlertToast:SetChecked(getSetting(panel.generalAlertToast))
 	panel.generalIgnoreCompletedLFR:SetChecked(getSetting(panel.generalIgnoreCompletedLFR))
 	
 	--Sounds
 	panel.soundsAlertPing:SetChecked(getSetting(panel.soundsAlertPing))
-	panel.soundsAlertSound:SetText(getSetting(panel.soundsAlertSound))
-	panel.soundsAlertRepeats:SetText(getSetting(panel.soundsAlertRepeats))
+	panel.soundsAlertSound:SetText("")
+	panel.soundsAlertSound:Insert(getSetting(panel.soundsAlertSound))
+	panel.soundsAlertRepeats:SetText("")
+	panel.soundsAlertRepeats:Insert(getSetting(panel.soundsAlertRepeats))
 	panel.soundsToastPing:SetChecked(getSetting(panel.soundsToastPing))
-	panel.soundsToastSound:SetText(getSetting(panel.soundsToastSound))
-	panel.soundsToastRepeats:SetText(getSetting(panel.soundsToastRepeats))
+	panel.soundsToastSound:SetText("")
+	panel.soundsToastSound:Insert(getSetting(panel.soundsToastSound))
+	panel.soundsToastRepeats:SetText("")
+	panel.soundsToastRepeats:Insert(getSetting(panel.soundsToastRepeats))
 	
 	--Cycles
-	panel.cyclesCount:SetText(getSetting(panel.cyclesCount))
+	panel.cyclesCount:SetText("")
+	panel.cyclesCount:Insert(getSetting(panel.cyclesCount))
 	panel.cyclesContinuous:SetChecked(getSetting(panel.cyclesContinuous))
 	
 	local channel = getSetting(panel.soundsChannelDefault)
@@ -1781,8 +1300,15 @@ local function createInterfacePanel()
 	panel.refresh = function(self, ...)
 		loadSettings(self)
 	end
+
+	panel:SetScript("OnShow", function(self, ...)
+		panel.refresh(self, ...)
+	end)
 	
-	InterfaceOptions_AddCategory(panel)
+	--InterfaceOptions_AddCategory(panel)
+	local category = Settings.RegisterCanvasLayoutCategory(panel, NOTICE_INCENTIVEPROGRAM_PANEL_TITLE)
+	Settings.RegisterAddOnCategory(category)
+	IncentiveProgram.InterfacePanelCategory = category
 	
 	--Header
 	panel.title = panel:CreateFontString(panel:GetName().."Title", "ARTWORK", "Game18Font")
@@ -1818,7 +1344,7 @@ local function createInterfacePanel()
 		panel.generalHeader, "LEFT", "RIGHT", 15, 0, IncentiveProgram.Settings["HIDE_IN_PARTY"], nil, nil, nil)
 	
 	panel.generalHideAlways = createCheckButton(panel, "GeneralHideAlways", IncentiveProgram.ContextLabels["HIDE_ALWAYS"],
-		panel.generalHideInParty, "LEFT", "RIGHT", 150, 0, IncentiveProgram.Settings["HIDE_ALWAYS"], nil, nil, nil)
+		panel.generalHideInParty, "LEFT", "RIGHT", 100, 0, IncentiveProgram.Settings["HIDE_ALWAYS"], nil, nil, nil)
 	
 	panel.generalHideEmpty = createCheckButton(panel, "GenerlaHideEmpty", IncentiveProgram.ContextLabels["HIDE_EMPTY"],
 		panel.generalHideAlways, "LEFT", "RIGHT", 100, 0, IncentiveProgram.Settings["HIDE_EMPTY"], nil, nil, nil)
@@ -1827,7 +1353,10 @@ local function createInterfacePanel()
 		panel.generalHideInParty, "TOPLEFT", "BOTTOMLEFT", 0, 0, IncentiveProgram.Settings["ALERT"], nil, nil, nil)
 	
 	panel.generalAlertToast = createCheckButton(panel, "GeneralAlertToast", IncentiveProgram.ContextLabels["ALERT_TOAST"],
-		panel.generalAlert, "LEFT", "RIGHT", 200, 0, IncentiveProgram.Settings["ALERT_TOAST"], nil, nil, nil)
+		panel.generalAlert, "LEFT", "RIGHT", 100, 0, IncentiveProgram.Settings["ALERT_TOAST"], nil, nil, nil)
+		
+	--panel.generalHideMinimap = createCheckButton(panel, "GeneralHideMinimap", IncentiveProgram.ContextLabels["HIDE_MINIMAP"],
+		--panel.generalAlertToast, "LEFT", "RIGHT", 100, 0, IncentiveProgram.Settings["HIDE_MINIMAP"], nil, nil, nil)
 	
 	panel.generalIgnoreCompletedLFR = createCheckButton(panel, "GeneralIgnoreCompletedLFR", IncentiveProgram.ContextLabels["IGNORE_COMPLETED_LFR"],
 		panel.generalAlert, "TOPLEFT", "BOTTOMLEFT", 0, 0, IncentiveProgram.Settings["IGNORE_COMPLETED_LFR"], nil, nil, nil, IncentiveProgram.ContextLabels["TOOLTIP_IGNORE_LFR"])
@@ -1892,7 +1421,7 @@ local function createInterfacePanel()
 	panel.soundsToastRepeatsLabel:SetPoint("LEFT", panel.soundsToastTest, "RIGHT", 15, 0)
 	
 	panel.soundsToastRepeats = createEditBox(panel, "SoundsToastRepeats", IncentiveProgram.ContextLabels["REPEATS"],
-	panel.soundsToastRepeatsLabel, "LEFT", "RIGHT", 15, 1, IncentiveProgram.Settings["TOAST_REPEATS"], nil, nil, nil, IncentiveProgram.ContextLabels["TOOLTIP_SOUND_REPEATS"])
+		panel.soundsToastRepeatsLabel, "LEFT", "RIGHT", 15, 1, IncentiveProgram.Settings["TOAST_REPEATS"], nil, nil, nil, IncentiveProgram.ContextLabels["TOOLTIP_SOUND_REPEATS"])
 	
 	--Sounds
 	----Channel Radio
@@ -1933,13 +1462,603 @@ local function createInterfacePanel()
 	end)
 	
 	--Tell Bliz's interface frame to update and show the interface panel
-    InterfaceAddOnsList_Update();
+    -- InterfaceAddOnsList_Update(); -- Comment out for Dragonflight Changes - Thanks to kaygil on CurseForge
 	
 	--test
 	--InterfaceOptionsFrame_OpenToCategory(IncentiveProgramInterfacePanel) 
+
+	loadSettings(panel)
 end
 
 IncentiveProgram.CreateInterfacePanel = createInterfacePanel
+
+
+----------------------------------------- menu---------------------------------------
+--Local copy of the class
+local menu
+
+-- Right Click Menu Table
+local tank, healer, damage = C_LFGList.GetAvailableRoles()
+if ( tank ) then tank = "" else tank = "\124CFFC41F3B" end
+if ( healer ) then healer = "" else healer = "\124CFFC41F3B" end
+if ( damage ) then damage = "" else damage = "\124CFFC41F3B" end
+local menuData = {
+    [1] = {
+        ["text"] = IncentiveProgram.ContextLabels["ROLES"],
+        ["notCheckable"] = true,
+        ["hasArrow"] = true,
+        ["value"] = { --submenu
+            [1] = {
+                ["text"] = tank..IncentiveProgram.ContextLabels["TANK"],
+                ["isNotRadio"] = true,
+                ["arg1"] = IncentiveProgram.ContextMenu["ROLES"],
+                ["arg2"] = IncentiveProgram.Settings["ROLE_TANK"],
+                ["keepShownOnClick"] = true
+            },
+            [2] = {
+                ["text"] = healer..IncentiveProgram.ContextLabels["HEALER"],
+                ["isNotRadio"] = true,
+                ["arg1"] = IncentiveProgram.ContextMenu["ROLES"],
+                ["arg2"] = IncentiveProgram.Settings["ROLE_HEALER"],
+                ["keepShownOnClick"] = true
+            },
+            [3] = {
+                ["text"] = damage..IncentiveProgram.ContextLabels["DAMAGE"],
+                ["isNotRadio"] = true,
+                ["arg1"] = IncentiveProgram.ContextMenu["ROLES"],
+                ["arg2"] = IncentiveProgram.Settings["ROLE_DAMAGE"],
+                ["keepShownOnClick"] = true
+            }
+        }
+    },
+    
+    [2] = {
+        ["notCheckable"] = true,
+        ["text"] = IncentiveProgram.ContextLabels["IGNORED"],
+        ["hasArrow"] = true,
+        ["value"] = IncentiveProgram.ContextMenu["IGNORE"]
+    },
+    
+    [3] = {
+        ["iconOnly"] = true,
+        ["notCheckable"] = true,
+        ["keepShownOnClick"] = true,
+        ["disabled"] = true,
+        ["icon"] = IncentiveProgram.Icons["CONTEXT_MENU_DIVIDER"],
+        ["iconInfo"] = {
+            ["tCoordLeft"] = 0,
+            ["tCoordRight"] = 1,
+            ["tFitDropDownSizeX"] = true,
+            ["tCoordTop"] = 0,
+            ["tCoordBottom"] = 1,
+            ["tSizeX"] = 0,
+            ["tSizeY"] = 8
+        }
+    },
+    
+    [4] = {
+        ["text"] = IncentiveProgram.ContextLabels["SETTINGS"],
+        ["notCheckable"] = true,
+        ["hasArrow"] = true,
+        ["value"] = {
+            [1] = {
+                ["text"] = IncentiveProgram.ContextLabels["HIDE_IN_PARTY"],
+                ["isNotRadio"] = true,
+                ["arg1"] = IncentiveProgram.ContextMenu["SETTINGS"],
+                ["arg2"] = IncentiveProgram.Settings["HIDE_IN_PARTY"],
+                ["keepShownOnClick"] = true
+            },
+            [2] = {
+                ["text"] = IncentiveProgram.ContextLabels["HIDE_ALWAYS"],
+                ["isNotRadio"] = true,
+                ["arg1"] = IncentiveProgram.ContextMenu["SETTINGS"],
+                ["arg2"] = IncentiveProgram.Settings["HIDE_ALWAYS"],
+                ["keepShownOnClick"] = true,
+				["tooltipTitle"] = IncentiveProgram.ADDON_DISPLAY_NAME,
+				["tooltipText"] = IncentiveProgram.ContextLabels["TOOLTIP_HIDE_ALWAYS"],
+				["tooltipOnButton"] = 1
+            },
+            [3] = {
+                ["text"] = IncentiveProgram.ContextLabels["ALERT"],
+                ["isNotRadio"] = true,
+                ["arg1"] = IncentiveProgram.ContextMenu["SETTINGS"],
+                ["arg2"] = IncentiveProgram.Settings["ALERT"],
+                ["keepShownOnClick"] = true
+            },
+            [4] = {
+                ["text"] = IncentiveProgram.ContextLabels["ALERT_TOAST"],
+                ["isNotRadio"] = true,
+                ["arg1"] = IncentiveProgram.ContextMenu["SETTINGS"],
+                ["arg2"] = IncentiveProgram.Settings["ALERT_TOAST"],
+                ["keepShownOnClick"] = true
+            },
+            [5] = {
+                ["text"] = IncentiveProgram.ContextLabels["IGNORE_COMPLETED_LFR"],
+                ["isNotRadio"] = true,
+                ["arg1"] = IncentiveProgram.ContextMenu["SETTINGS"],
+                ["arg2"] = IncentiveProgram.Settings["IGNORE_COMPLETED_LFR"],
+                ["keepShownOnClick"] = true,
+				["tooltipTitle"] = IncentiveProgram.ADDON_DISPLAY_NAME,
+				["tooltipText"] = IncentiveProgram.ContextLabels["TOOLTIP_IGNORE_LFR"],
+				["tooltipOnButton"] = 1
+            },
+			[6] = {
+				text = IncentiveProgram.ContextLabels["INTERFACE_PANEL"],
+				arg1 = IncentiveProgram.ContextMenu["INTERFACE_PANEL"],
+				notCheckable = true,
+				leftPadding = 16
+			}
+        }
+    }
+}
+
+ 
+local function createTitleInfo(level)
+    local info = UIDropDownMenu_CreateInfo()
+    
+    --Add title
+    info.text = IncentiveProgram.ADDON_DISPLAY_NAME
+    info.isTitle = true
+    info.notCheckable = true
+    
+    UIDropDownMenu_AddButton(info, level)
+end
+
+local function createSettingsMenu(level, level2Table)
+    if ( level == 1 ) then
+        for i=1, #menuData do
+            local info = UIDropDownMenu_CreateInfo();
+            for key,value in pairs(menuData[i]) do
+                info[key] = value
+            end
+            info.func = menu.MenuOnClick
+            UIDropDownMenu_AddButton(info, level)
+        end
+    elseif ( level == 2 ) then
+        for i=1, #level2Table do
+            local info = UIDropDownMenu_CreateInfo();
+            for key,value in pairs(level2Table[i]) do
+                info[key] = value
+            end
+            if level2Table[i]["arg1"] == IncentiveProgram.ContextMenu["ROLES"] then
+                info.checked = IncentiveProgram:GetSettings():GetUserSetting(level2Table[i]["arg2"])
+            elseif level2Table[i]["arg1"] == IncentiveProgram.ContextMenu["SETTINGS"] then
+                info.checked = IncentiveProgram:GetSettings():GetSetting(level2Table[i]["arg2"])
+            end
+            
+            info.func = menu.MenuOnClick
+            UIDropDownMenu_AddButton(info, level)
+        end
+    end
+end
+
+local function createSettingsIgnoreList(level)
+    local count = 0
+    for key, value in pairs (IncentiveProgram:GetSettings().db.dungeonSettings) do
+        if ( IncentiveProgram:GetSettings():GetDungeonSetting(key, IncentiveProgram.Settings["IGNORE"]) ) then
+            local info = UIDropDownMenu_CreateInfo()
+            info.text = value[IncentiveProgram.Settings["DUNGEON_NAME"]]
+            info.notCheckable = true
+            info.func = menu.MenuOnClick
+            info.arg1 = IncentiveProgram.ContextMenu["IGNORE"]
+            info.arg2 = key
+            
+            info.icon = IncentiveProgram.Icons["CONTEXT_MENU_RED_X"]
+            info.padding = 8
+            
+            UIDropDownMenu_AddButton(info, level)
+            count = count + 1
+            if ( count >= 10 ) then break end
+        end
+    end
+    
+    if ( count == 0 ) then
+        local info = UIDropDownMenu_CreateInfo()
+        info.text = IncentiveProgram.ContextLabels["NO_IGNORED"]
+        info.notCheckable = true
+        info.disabled = true
+        
+        UIDropDownMenu_AddButton(info, level)
+    end
+end
+
+local function createDungeonEntry(dungeonID, name, level, isShortage, showAll)
+    local info = UIDropDownMenu_CreateInfo()
+    local isAvailble, isAvaibleToPlayer = IsLFGDungeonJoinable(dungeonID)
+
+    if not ( isAvailble and isAvaibleToPlayer ) then
+        info.disabled = true
+    else
+        info.hasArrow = true
+    end
+
+	local encounterDone, encounterTotal = GetLFGDungeonNumEncounters(dungeonID)
+	local lfrCompleted = ( encounterDone == encounterTotal )
+	if lfrCompleted and encounterDone > 0 then
+		info.colorCode = "|cFF33FF44"
+	end
+    
+    --Color red if ignored but showing all anyways
+	local ignored = IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, IncentiveProgram.Settings["IGNORE"])
+    if ( ignored and showAll ) then
+        info.colorCode = "|cFFC41F3B"
+    end
+    
+    --Queue Check
+    if ( IncentiveProgram:GetDungeon():IsQueued(dungeonID) ) then
+        info.colorCode = "|cFF69CCF0"
+    end
+
+    local flair = IncentiveProgram.Flair[dungeonID] or ""
+    info.text = flair..name
+    info.value = dungeonID
+    info.notCheckable = true
+    
+    
+    --Color gray if not in the shortage list but still showing all.
+    if ( not isShortage and showAll ) then
+        info.colorCode = "|cFF666666"
+        UIDropDownMenu_AddButton(info, level)
+	elseif ( ignored and showAll ) then
+        UIDropDownMenu_AddButton(info, level)
+    elseif ( isShortage and not ignored ) then
+        UIDropDownMenu_AddButton(info, level)
+    end  
+end
+  
+local function createIgnoreButton(dungeonID, level)
+    local info = UIDropDownMenu_CreateInfo()
+    
+    if ( IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, IncentiveProgram.Settings["IGNORE"]) ) then
+        info.text = IncentiveProgram.ContextLabels["UNIGNORE"]
+    else
+        info.text = IncentiveProgram.ContextLabels["IGNORE"]
+    end
+    
+    info.arg1 = IncentiveProgram.ContextMenu["QUEUE"]
+    info.arg2 = IncentiveProgram.Settings["IGNORE"]
+    info.value = dungeonID
+    info.func = menu.MenuOnClick
+    info.notCheckable = true
+    UIDropDownMenu_AddButton(info, level)
+end
+
+local function createRoleButtons(dungeonID, level, showAll)
+    local tank, healer, damage = C_LFGList.GetAvailableRoles()
+    local shortageTank, shortageHealer, shortageDamage = IncentiveProgram:GetDungeon():GetShortageRoles(dungeonID)
+    
+    --Tank
+    if ( tank and ( shortageTank or showAll ) ) then
+        local info = UIDropDownMenu_CreateInfo()
+        info.text = IncentiveProgram.ContextLabels["TANK"]
+        info.arg1 = IncentiveProgram.ContextMenu["QUEUE"]
+        info.arg2 = IncentiveProgram.Settings["QA_TANK"]
+        info.value = dungeonID
+        info.checked = IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, IncentiveProgram.Settings["QA_TANK"])
+        info.isNotRadio = true
+        info.func = menu.MenuOnClick
+        info.keepShownOnClick = true
+        
+        if ( not shortageTank ) then
+            info.colorCode = "|CFF666666"
+        end
+        
+        UIDropDownMenu_AddButton(info, level)
+    end
+    
+    --Healer
+    if ( healer and ( shortageHealer or showAll ) ) then
+        local info = UIDropDownMenu_CreateInfo()
+        info.text = IncentiveProgram.ContextLabels["HEALER"]
+        info.arg1 = IncentiveProgram.ContextMenu["QUEUE"]
+        info.arg2 = IncentiveProgram.Settings["QA_HEALER"]
+        info.value = dungeonID
+        info.checked = IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, IncentiveProgram.Settings["QA_HEALER"])
+        info.isNotRadio = true
+        info.func = menu.MenuOnClick
+        info.keepShownOnClick = true
+        
+        if ( not shortageHealer ) then
+            info.colorCode = "|CFF666666"
+        end
+        
+        UIDropDownMenu_AddButton(info, level)
+    end
+    
+    --Damage
+    if ( damage and ( shortageDamage or showAll ) ) then
+        local info = UIDropDownMenu_CreateInfo()
+        info.text = IncentiveProgram.ContextLabels["DAMAGE"]
+        info.arg1 = IncentiveProgram.ContextMenu["QUEUE"]
+        info.arg2 = IncentiveProgram.Settings["QA_DAMAGE"]
+        info.value = dungeonID
+        info.checked = IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, IncentiveProgram.Settings["QA_DAMAGE"])
+        info.isNotRadio = true
+        info.func = menu.MenuOnClick
+        info.keepShownOnClick = true
+        
+        if ( not shortageDamage ) then
+            info.colorCode = "|CFF666666"
+        end
+        
+        UIDropDownMenu_AddButton(info, level)
+    end
+        
+end
+
+---------------------------------------
+-- createJoinButton is a helper function that adds Join Queue button to the dungeon context menu
+---------------------------------------   
+local function createJoinButton(dungeonID, level)
+    local info = UIDropDownMenu_CreateInfo()
+    info.text = IncentiveProgram.ContextLabels["JOIN_QUEUE"]
+    info.arg1 = IncentiveProgram.ContextMenu["QUEUE"]
+    info.arg2 = IncentiveProgram.ContextMenu["JOIN"]
+    info.value = dungeonID
+    info.func = menu.MenuOnClick
+    info.notCheckable = true
+    
+    --If Queued, disabled
+    if ( IncentiveProgram:GetDungeon():IsQueued(dungeonID) ) then
+        info.disabled = true
+    end
+   
+    if ( not IncentiveProgram:GetDungeon():CanQueueForDungeon(dungeonID) ) then
+        info.disabled = true
+    end
+    
+    UIDropDownMenu_AddButton(info, level)
+end
+
+local function create_DropDownMenu(name, parent)
+	local f
+	if type(name) == "table" then
+		f = name
+		name = f:GetName()
+	else
+		f = CreateFrame("Frame", name, parent or nil)
+	end
+	
+	--if not name then name = "" end
+	
+	f:SetSize(40, 32)
+	
+	f.Left = f:CreateTexture( name and (name.."Left") or nil, "ARTWORK")
+	f.Left:SetTexture("Interface\\Glues\\CharacterCreate\\CharacterCreate-LabelFrame")
+	f.Left:SetSize(25, 64)
+	f.Left:SetPoint("TOPLEFT", f, 0, 17)
+	f.Left:SetTexCoord(0, 0.1953125, 0, 1)
+	
+	f.Middle = f:CreateTexture( name and (name.."Middle") or nil, "ARTWORK")
+	f.Middle:SetTexture("Interface\\Glues\\CharacterCreate\\CharacterCreate-LabelFrame")
+	f.Middle:SetSize(115, 64)
+	f.Middle:SetPoint("LEFT", f.Left, "RIGHT")
+	f.Middle:SetTexCoord(0.1953125, 0.8046875, 0, 1)
+	
+	f.Right = f:CreateTexture( name and (name.."Right") or nil, "ARTWORK")
+	f.Right:SetTexture("Interface\\Glues\\CharacterCreate\\CharacterCreate-LabelFrame")
+	f.Right:SetSize(25, 64)
+	f.Right:SetPoint("LEFT", f.Middle, "RIGHT")
+	f.Right:SetTexCoord(0.8046875, 1, 0, 1)
+	
+	f.Text = f:CreateFontString( name and (name.."Text") or nil, "ARTWORK", "GameFontHighlightSmall")
+	f.Text:SetWordWrap(false)
+	f.Text:SetJustifyH("RIGHT")
+	f.Text:SetSize(0, 10)
+	f.Text:SetPoint("RIGHT", f.Right, -43, 2)
+	
+	f.Icon = f:CreateTexture( name and (name.."Icon") or nil, "OVERLAY")
+	f.Icon:Hide()
+	f.Icon:SetSize(16, 16)
+	f.Icon:SetPoint("LEFT", 30, 2)
+	
+	-- // UIDropDownMenuButtonScriptTemplate
+	f.Button = CreateFrame("Button", name and (name.."Button") or nil, f)
+	f.Button:SetMotionScriptsWhileDisabled(true)
+	f.Button:SetSize(24, 24)
+	f.Button:SetPoint("TOPRIGHT", f.Right, -16, -18)
+	
+	f.Button.NormalTexture = f.Button:CreateTexture( name and (name.."NormalTexture") or nil)
+	f.Button.NormalTexture:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up")
+	f.Button.NormalTexture:SetSize(24, 24)
+	f.Button.NormalTexture:SetPoint("RIGHT", f.Button, 0, 0)
+	f.Button:SetNormalTexture(f.Button.NormalTexture)
+	
+	f.Button.PushedTexture = f.Button:CreateTexture( name and (name.."PushedTexture") or nil)
+	f.Button.PushedTexture:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Down")
+	f.Button.PushedTexture:SetSize(24, 24)
+	f.Button.PushedTexture:SetPoint("RIGHT", f.Button, 0, 0)
+	f.Button:SetPushedTexture(f.Button.PushedTexture)
+	
+	f.Button.DisabledTexture = f.Button:CreateTexture( name and (name.."DisabledTexture") or nil)
+	f.Button.DisabledTexture:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Disabled")
+	f.Button.DisabledTexture:SetSize(24, 24)
+	f.Button.DisabledTexture:SetPoint("RIGHT", f.Button, 0, 0)
+	f.Button:SetDisabledTexture(f.Button.DisabledTexture)
+	
+	f.Button.HighlightTexture = f.Button:CreateTexture( name and (name.."HighlightTexture") or nil)
+	f.Button.HighlightTexture:SetTexture("Interface\\Buttons\\UI-Common-MouseHilight")
+	f.Button.HighlightTexture:SetSize(24, 24)
+	f.Button.HighlightTexture:SetPoint("RIGHT", f.Button, 0, 0)
+	f.Button.HighlightTexture:SetBlendMode("ADD")
+	f.Button:SetHighlightTexture(f.Button.HighlightTexture)
+	
+	-- Button Script
+	f.Button:SetScript("OnEnter", function(self, motion)
+		local parent = self:GetParent()
+		local myscript = parent:GetScript("OnEnter")
+		if(myscript ~= nil) then
+			myscript(parent)
+		end
+	end)
+	f.Button:SetScript("OnLeave", function(self, motion)
+		local parent = self:GetParent()
+		local myscript = parent:GetScript("OnLeave")
+		if(myscript ~= nil) then
+			myscript(parent)
+		end
+	end)
+	f.Button:SetScript("OnMouseDown", function(self, button)
+		if self:IsEnabled() then
+			local parent = self:GetParent()
+			lib:ToggleDropDownMenu(nil, nil, parent)
+			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+		end
+	end)
+	
+	-- UIDropDownMenu Script
+	f:SetScript("OnHide", function(self)
+		lib:CloseDropDownMenus()
+	end)
+	
+	return f
+end
+
+local IncentiveProgramMenu = {
+    new = function(self, parent)
+        local obj = {}
+        setmetatable(obj, self)
+        self.__index = self
+
+        local frame = CreateFrame("Frame", "IncentiveProgramFrameMenu", parent_frame, "UIDropDownMenuTemplate")
+        obj.frame = frame
+        return obj
+    end,
+  
+    MenuOnLoad = function(menuFrame, level)
+        if ( menu == menuFrame) then return end --Blizzard's Menu UI calls this function, shouldn't self call this.
+        if ( menuFrame.button == "LeftButton" ) then
+            if ( level == 1 ) then
+                createTitleInfo(level)
+                local showAll = IsShiftKeyDown()
+
+                local dungeonIDs, dungeonNames, dungeonTypes = IncentiveProgram:GetDungeon():GetDungeonList()
+                local shortage = IncentiveProgram:GetDungeon():GetShortage()
+                
+                for key, dungeonID in pairs(dungeonIDs) do
+                    local name = dungeonNames[key]
+                    if ( shortage[dungeonID] ) then
+                        createDungeonEntry(dungeonID, name, level, true, showAll)
+                    else
+                        createDungeonEntry(dungeonID, name, level, false, showAll)
+                    end
+                end
+            elseif ( level == 2 ) then
+                local dungeonID = UIDROPDOWNMENU_MENU_VALUE
+                local showAll = IsShiftKeyDown()
+                
+                createIgnoreButton(dungeonID, level)
+                createRoleButtons(dungeonID, level, showAll)
+                createJoinButton(dungeonID, level)
+            end
+        elseif (menuFrame.button == "RightButton" ) then
+            if ( level == 1 ) then
+                createTitleInfo(level)
+                createSettingsMenu(level)
+            elseif ( level == 2 ) then
+                local level2Table = UIDROPDOWNMENU_MENU_VALUE
+                if ( level2Table == IncentiveProgram.ContextMenu["IGNORE"] ) then
+                    createSettingsIgnoreList(level)
+                else
+                    createSettingsMenu(level, level2Table)
+                end
+            end
+        end
+    end,
+       
+    MenuOnClick = function(menuButton, arg1, arg2)
+        if ( arg1 == IncentiveProgram.ContextMenu["ROLES"] ) then
+            if ( arg2 == IncentiveProgram.Settings["ROLE_TANK"] ) then
+                IncentiveProgram:GetSettings():SetUserSetting(IncentiveProgram.Settings["ROLE_TANK"], menuButton.checked)
+            elseif ( arg2 == IncentiveProgram.Settings["ROLE_HEALER"] ) then
+                IncentiveProgram:GetSettings():SetUserSetting(IncentiveProgram.Settings["ROLE_HEALER"], menuButton.checked)
+            elseif ( arg2 == IncentiveProgram.Settings["ROLE_DAMAGE"] ) then
+                IncentiveProgram:GetSettings():SetUserSetting(IncentiveProgram.Settings["ROLE_DAMAGE"], menuButton.checked)
+            end
+            
+            IncentiveProgram:SetCount(IncentiveProgram:GetDungeon():GetShortageCount()) --Refresh Count
+        elseif ( arg1 == IncentiveProgram.ContextMenu["IGNORE"] ) then
+            IncentiveProgram:GetSettings():SetDungeonSetting(arg2, IncentiveProgram.Settings["IGNORE"], false)
+            IncentiveProgram:SetCount(IncentiveProgram:GetDungeon():GetShortageCount()) --Refresh Count
+            
+        elseif ( arg1 == IncentiveProgram.ContextMenu["SETTINGS"] ) then
+            IncentiveProgram:GetSettings():SetSetting(arg2, menuButton.checked)
+            IncentiveProgram:GetFrame():UpdatedSettings() --In case new settings now hide frame
+            
+        elseif ( arg1 == IncentiveProgram.ContextMenu["QUEUE"] ) then
+            local dungeonID = UIDROPDOWNMENU_MENU_VALUE
+            if ( arg2 == IncentiveProgram.Settings["IGNORE"] ) then
+                local ignoreSetting = IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, arg2)
+                IncentiveProgram:GetSettings():SetDungeonSetting(dungeonID, arg2, not ignoreSetting)
+            elseif ( ( arg2 == IncentiveProgram.Settings["QA_TANK"] ) or
+                     ( arg2 == IncentiveProgram.Settings["QA_HEALER"] ) or 
+                     ( arg2 == IncentiveProgram.Settings["QA_DAMAGE"] ) ) then
+                IncentiveProgram:GetSettings():SetDungeonSetting(dungeonID, arg2, menuButton.checked)
+            elseif ( arg2 == IncentiveProgram.ContextMenu["JOIN"] ) then
+                menu:JoinDungeon(dungeonID, true)
+            end
+            
+            IncentiveProgram:SetCount(IncentiveProgram:GetDungeon():GetShortageCount()) --Refresh Count
+        elseif ( arg1 == IncentiveProgram.ContextMenu["INTERFACE_PANEL"] ) then
+			--InterfaceOptionsFrame_OpenToCategory(IncentiveProgramInterfacePanel)
+            Settings.OpenToCategory(IncentiveProgram.InterfacePanelCategory.ID, "")
+		end
+    end,
+  
+    JoinDungeon = function(self, dungeonID, fromDropDownMenu)
+        local dungeonType = IncentiveProgram:GetSettings():GetDungeonSetting(dungeonID, IncentiveProgram.Settings["DUNGEON_TYPE"])
+        local canQueue, tank, healer, damage = IncentiveProgram:GetDungeon():CanQueueForDungeon(dungeonID)
+        local lfgLeader, lfgTank, lfgHealer, lfgDamage = GetLFGRoles()
+        
+        if ( ( dungeonType == LE_LFG_CATEGORY_RF ) and canQueue ) then
+            SetLFGRoles(lfgLeader, tank, healer, damage)
+            RaidFinderQueueFrame.raid = dungeonID
+            RaidFinderQueueFrame_Join() --Blizzard function in RaidFinder.lua
+            
+            IncentiveProgram.SavedLFGRoles.isUpdated = true
+            IncentiveProgram.SavedLFGRoles.Leader = lfgLeader
+            IncentiveProgram.SavedLFGRoles.Tank = lfgTank
+            IncentiveProgram.SavedLFGRoles.Healer = lfgHealer
+            IncentiveProgram.SavedLFGRoles.Damage = lfgDamage
+        elseif ( dungeonType == LE_LFG_CATEGORY_LFD ) and canQueue then
+            SetLFGRoles(lfgLeader, tank, healer, damage)
+            
+            LFDQueueFrame.type = dungeonID
+            LFDQueueFrame_Join() --Blizzard Function in LFGFrame.lua
+            
+            IncentiveProgram.SavedLFGRoles.isUpdated = true
+            IncentiveProgram.SavedLFGRoles.Leader = lfgLeader
+            IncentiveProgram.SavedLFGRoles.Tank = lfgTank
+            IncentiveProgram.SavedLFGRoles.Healer = lfgHealer
+            IncentiveProgram.SavedLFGRoles.Damage = lfgDamage
+        end
+        
+        if ( fromDropDownMenu ) then
+             --Close context menu and lock until LFGRoles reset
+            ToggleDropDownMenu(1, nil, IncentiveProgram:GetFrame():GetUIMenuFrame(), IncentiveProgram:GetFrame():GetAnchorFrame() or IncentiveProgram:GetFrame():GetUIFrame(), 0, 0)
+        end
+    end
+}
+
+function IncentiveProgram:CreateMenu(parent)
+    if ( not parent ) then return end
+    if ( not menu ) then
+        menu = IncentiveProgramMenu:new(parent)
+    else
+        menu.frame:SetParent(parent)
+    end
+    
+    return menu
+end
+
+function IncentiveProgram:GetMenu()
+    if ( not menu ) then return end
+    
+    return menu
+end
+
+
+
 local eventFrame = CreateFrame("Frame", "IncentiveProgramEventFrame", UIParent)
 eventFrame:RegisterEvent("VARIABLES_LOADED")
 eventFrame:SetScript("OnEvent", function(self, ...) self:OnEvent(...) end)
@@ -1959,7 +2078,8 @@ function SlashCmdList.INCENTIVEPROGRAM(msg, editbox)
     --IncentiveProgram:GetSettings():SetSetting(IncentiveProgram.Settings["HIDE_IN_PARTY"], false)
     --IncentiveProgram:GetSettings():SetSetting(IncentiveProgram.Settings["HIDE_ALWAYS"], false)
     --IncentiveProgram:GetFrame():ShowFrame()
-	InterfaceOptionsFrame_OpenToCategory(IncentiveProgramInterfacePanel) 
+	--InterfaceOptionsFrame_OpenToCategory(IncentiveProgramInterfacePanel) 
+    Settings.OpenToCategory(IncentiveProgram.InterfacePanelCategory.ID, "")
 end
 function eventFrame:OnEvent(event, ...)
     if ( event == "VARIABLES_LOADED" ) then
@@ -1969,7 +2089,7 @@ function eventFrame:OnEvent(event, ...)
         self:RegisterEvent("GROUP_ROSTER_UPDATE")
         self:RegisterEvent("LFG_UPDATE_RANDOM_INFO")
         self:RegisterEvent("LFG_ROLE_UPDATE")
-    elseif ( event == "GROUP_ROSTER_UPDATE" or event == "LFG_ROLE_UPDATE" ) then --Party Update
+    elseif ( event == "GROUP_ROSTER_UPDATE" or event == "LFG_UPDATE" ) then --Party Update
         if IsInGroup() then
             if ( IncentiveProgram:GetSettings():GetSetting(IncentiveProgram.Settings["HIDE_IN_PARTY"]) ) then
                 IncentiveProgram:GetFrame():HideFrame()

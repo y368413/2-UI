@@ -1,8 +1,11 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd"> 
+  <Script file="api.lua"/>
   <Script file="colors.lua"/>
-  <Script file="util.lua"/>
   <Script file="class.lua"/>
-  <Script file="Core.lua"/>
+  <Script file="tooltip.lua"/>
+  <Script file="util.lua"/>
+  <Script file="professions.lua"/>
+  <Script file="core.lua"/>
   <Script file="icons.lua"/>
   <Script file="options.lua"/>
   <Script file="dev.lua"/>
@@ -12,6 +15,6 @@
   <Script file="nodes.lua"/>
   <Script file="rewards.lua"/>
   <Script file="templates.lua"/>
+  <Script file="tomtom.lua"/>
   <Script file="pois.lua"/>
-  <Include file="templates.xml"/>
 </Ui>

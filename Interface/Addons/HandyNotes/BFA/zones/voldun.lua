@@ -9,11 +9,11 @@ local Map = BattleForAzeroth.Map
 local Collectible = BattleForAzeroth.node.Collectible
 local PetBattle = BattleForAzeroth.node.PetBattle
 local Rare = BattleForAzeroth.node.Rare
+local Safari = BattleForAzeroth.node.Safari
 local Supply = BattleForAzeroth.node.Supply
 local Treasure = BattleForAzeroth.node.Treasure
 
 local Achievement = BattleForAzeroth.reward.Achievement
-local Item = BattleForAzeroth.reward.Item
 local Mount = BattleForAzeroth.reward.Mount
 local Transmog = BattleForAzeroth.reward.Transmog
 
@@ -294,13 +294,8 @@ map.nodes[43905405] = Rare({
     id = 129411,
     quest = 48319,
     note = L['in_cave'] .. ' ' .. L['zunashi_note'],
-    rewards = {
-        Achievement({id = 12943, criteria = 41633}),
-        Item({item = 161119, note = L['trinket']}) -- Ravasaur Skull Bijou
-    },
-    pois = {
-        POI({43975252}) -- Entrance
-    }
+    rewards = {Achievement({id = 12943, criteria = 41633})},
+    pois = {POI({43975252})}
 }) -- Zunashi the Exile
 
 -------------------------------------------------------------------------------
@@ -740,16 +735,35 @@ map.nodes[43006900] = Collectible({
 ------------------- TO ALL THE SQUIRRELS I SET SAIL TO SEE --------------------
 -------------------------------------------------------------------------------
 
-local ToAlltheSquirrels = Class('ToAlltheSquirrels', Collectible, {
-    icon = 237182,
-    group = BattleForAzeroth.groups.SQUIRRELS
-})
-
-map.nodes[52758373] = ToAlltheSquirrels({
+map.nodes[52758373] = BattleForAzeroth.node.Squirrel({
     id = 134700,
-    note = L['squirrels_note'],
     rewards = {Achievement({id = 14730, criteria = 50247})},
-    pois = {
-        POI({52108640, 50008680})
-    }
+    pois = {POI({52108640, 50008680})}
 }) -- Vale Flutterby
+
+-------------------------------------------------------------------------------
+-------------------------------- BATTLE SAFARI --------------------------------
+-------------------------------------------------------------------------------
+
+map.nodes[36408900] = Safari.HermitCrab({
+    pois = {
+        POI({
+            24006660, 24406480, 25004940, 25206380, 25405240, 25405260,
+            25405480, 25406040, 25604860, 25804840, 26006720, 26404660,
+            26604740, 27405800, 27605620, 28404500, 28404780, 28405780,
+            29605620, 30007880, 30405660, 30604640, 30605620, 30605700,
+            30807840, 31205220, 31405400, 31405460, 31405800, 31605580,
+            31805480, 31807900, 32204440, 33004360, 33008160, 33404300,
+            33604240, 33604260, 33608240, 34404040, 35004020, 35408100,
+            35803740, 36203800, 36403940, 36408900, 36603160, 36603940,
+            36604020, 36608340, 36608980, 37403060, 37608240, 37609000,
+            38008800, 38202900, 38203020, 38208300, 38802780, 40402520,
+            40602640, 41202520, 41802460, 42002380, 45602100, 45801960,
+            46001920, 46601820, 51801180, 52401100, 53801020, 54200800,
+            54200900, 60402020, 60402100, 60602040, 60801040, 61202380,
+            61401900, 61601040, 61601880, 61801160, 62401800, 62601800,
+            63201360, 63201500, 65402040, 65402060, 66002140, 66802300,
+            68602360, 69202660, 69202820
+        })
+    }
+}) -- Hermit Crab

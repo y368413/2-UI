@@ -12,197 +12,7 @@ local lastQuantity
 
 local PRIDEFUL_AFFIX_ID = 121
 
-local progressPresets = {
-	-- Í¨ÁéÕ½³±
-	[166264] = 1, -- ±¸ÓÃ²¿¼þ
-	[165138] = 1, -- µòÁãÖ®´ü
-	[171500] = 1, -- õçõÇµÄËÀÊ¬
-	[162729] = 4, -- ÅÁÆæÎ¬¿ËÊ¿±ø
-	[165597] = 4, -- ÅÁÆæÎ¬¿ËÊ¿±ø
-	[163128] = 4, -- ×ô¶ûÀ­Ä·Ë¹Î×Ê¦
-	[163619] = 4, -- ×ô¶ûÀ­Ä·Ë¹¿Ì¹ÇÕß
-	[165222] = 4, -- ×ô¶ûÀ­Ä·Ë¹Óú¹ÇÕß
-	[166302] = 4, -- Ê¬ÌåÊÕ¸îÕß
-	[173016] = 4, -- Ê¬Ìå²É¼¯Õß
-	[165872] = 4, -- ÑªÈâ¹¤½³
-	[165911] = 4, -- ÖÒ³ÏµÄÔìÎï
-	[173044] = 4, -- ·ìºÏÖúÀí
-	[167731] = 4, -- ·ÖÀëÖúÀí
-	[163121] = 5, -- ·ìºÏÏÈ·æ
-	[172981] = 5, -- ¸ñÀï¶÷·ìºÏÔ÷¶ñ
-	[165137] = 6, -- ×ô¶ûÀ­Ä·Ë¹ÊØÃÅÈË
-	[165919] = 6, -- ÷¼÷Ã½ÙÂÓÕß
-	[163620] = 6, -- ÀÃÍÂ
-	[163621] = 6, -- ËéÓÙ
-	[163618] = 8, -- ×ô¶ûÀ­Ä·Ë¹Í¨ÁéÊ¦
-	[165197] = 12, -- º¡¹Ç¾Þ¹Ö
-	[165824] = 15, -- ÄÉ×æ´ï
-	-- ½úÉý¸ßËþ
-	[166411] = 1, -- ÆúÊÄ´ÛÎ»Õß
-	[163503] = 2, -- ÒÔÌ«¸©³åÕß
-	[163457] = 4, -- ÆúÊÄÏÈ·æ
-	[163459] = 4, -- ÆúÊÄÖÎÓúÕß
-	[163458] = 4, -- ÆúÊÄÇ´·£Õß
-	[163506] = 4, -- ÆúÊÄÇ±×¦Ê¨
-	[163501] = 4, -- ÆúÊÄÉ¢±ø
-	[168420] = 4, -- ÆúÊÄÓÂÊ¿
-	[168418] = 4, -- ÆúÊÄÉóÅÐ¹Ù
-	[168718] = 4, -- ÆúÊÄ¿´ÊØÈË
-	[168717] = 4, -- ÆúÊÄ²Ã¾öÕß
-	[163524] = 5, -- ¸ñÀï¶÷ºÚ°µ²Ã¶¨Õß
-	[163520] = 6, -- ÆúÊÄÐ¡¶Ó³¤
-	[168681] = 6, -- ÆúÊÄ¶ñ¶¾Õß
-	[168318] = 8, -- ÆúÊÄ¸çÀûÑÇ
-	[168425] = 8, -- ÆúÊÄ¼ßÃðÕß
-	[168658] = 8, -- ÆúÊÄ»ÙÃðÕß
-	[168843] = 12, -- ¿ËÂÞÍÐË¹
-	[168844] = 12, -- À­¿ÆÎ÷Ë¹
-	[168845] = 12, -- °¢Ë¹ÍÐÅµË¹
-	-- ÉËÊÅ¾ç³¡
-	[163089] = 1, -- ¶ñÐÄµÄ²ÐÇû
-	[169875] = 2, -- èäèôÖ®»ê
-	[170838] = 4, -- ²»ÇüµÄ²ÎÈüÕß
-	[174197] = 4, -- Õ½³¡¼ÀÊ¦
-	[164510] = 4, -- õçõÇµÄåóÊÖ
-	[167994] = 4, -- ¹Ç»¯µÄÔ®±ø
-	[170690] = 4, -- È¾²¡¿ÖÄ§
-	[174210] = 4, -- µòÁãÓÙÄàÅçÉäÕß
-	[160495] = 4, -- ¿ñÈÈµÄ¸¿»êÕß
-	[170882] = 4, -- °×¹ÇÄ§µ¼Ê¦
-	[164506] = 5, -- ÉÏ¹Å¶Ó³¤
-	[169927] = 5, -- ÐÈ³ôÍÀ·ò
-	[169893] = 6, -- ±°ÁÓµÄ°µÓïÕß
-	[170850] = 7, -- ¿ñÅ­µÄÑª½Ç
-	[163086] = 8, -- ¸¯³ôµÄÆøÄÒ¹Ö
-	[167998] = 8, -- ´«ËÍÃÅÊØÎÀ
-	[162763] = 8, -- »êÖý°×¹Ç±àÖ¯Õß
-	[167538] = 20, -- ²Ð±©Õß¶à»ù¸ñ
-	[167536] = 20, -- ÊÈÑªµÄ¹þÂ³¼ªÑÇ
-	[162744] = 20, -- ÁÑÉËÕßÄÍ¿ËÈøÀ­
-	[167532] = 20, -- ·ÛËéÕßºÕÎÄ
-	[167533] = 20, -- °¢µÂÎÄÌØ¡¤×·ã¯
-	[167534] = 20, -- ÀÏÁ·µÄÀï¿Ë
-	-- ±Ë½ç
-	[170488] = 1, -- ¹þ¿¨Ö®×Ó
-	[171341] = 1, -- ÈÐà¹³ûº×
-	[170486] = 2, -- °¢ËþÀ³ò¯ÐÅÕß
-	[171342] = 2, -- Ó×Äê·ûÎÄÄµÂ¹
-	[164857] = 2, -- ÁÖ¹íÕÛÓúÕß
-	[164861] = 2, -- ÁÖ¹í¸¿Æ¤Õß
-	[168986] = 3, -- ÷¼÷ÃÑ¸ÃÍÁú
-	[164862] = 3, -- ÏÉÒ°Ë¸¹â¶ê
-	[168949] = 4, -- ¸´ÉúµÄ÷¼÷ÃÕ½Ê¿
-	[168992] = 4, -- ¸´ÉúµÄ¼ÀÊ¦
-	[171181] = 4, -- ÁìµØÈÐà¹º×
-	[164873] = 4, -- ´ó½Ç·ûÎÄÄµÂ¹
-	[170490] = 5, -- °¢ËþÀ³¸ß½×¼ÀË¾
-	[170480] = 5, -- °¢ËþÀ³ËÀÍöÐÐÕß
-	[167963] = 5, -- ÎÞÍ·µÄÖÕ¶Ë»ú
-	[167965] = 5, -- Èó»¬Æ÷
-	[171343] = 5, -- ÈÐà¹º×Ä¸
-	[169905] = 6, -- ¸´ÉúµÄ¶½¾ü
-	[168942] = 6, -- ÍöÓïÕß
-	[170572] = 6, -- °¢ËþÀ³ÔÖ¶òÑýÊõÊ¦
-	[167967] = 6, -- ÓÐÖª¾õµÄÓÍ
-	[168934] = 8, -- ¼¤Å­Ö®Áé
-	[167962] = 8, -- Ê§ÁéµÄÑÀ×ê
-	[167964] = 8, -- 4.RF-4.RF
-	[171184] = 12, -- ÃÜË¹À×Ê²£¬²Ôñ·Ö®×¦
-	-- Êê×ï´óÌü
-	[167610] = 1, -- Ê¯Ä§ÊÉõ×Õß
-	[165415] = 2, -- ÀÍ¿àµÄ¹ÜÀíÔ±
-	[165515] = 4, -- ¶éÂäµÄºÚ°µ½£Ê¿
-	[164563] = 4, -- Ð°¶ñµÄ¼Ó¶û¹±
-	[164562] = 4, -- ¶éÂäµÄÑ±È®Õß
-	[165414] = 4, -- ¶éÂäµÄ¼ßÃðÕß
-	[174175] = 4, -- ÖÒ³ÏµÄÊ¯ÒáÄ§
-	[165529] = 4, -- ¶éÂäµÄËÑ¼¯Õß
-	[167611] = 4, -- Ê¯ÒáÌÞ¹ÇÕß
-	[167612] = 6, -- Ê¯ÒáÂÓ¶áÕß
-	[167607] = 7, -- Ê¯ÒáÇÐ¸îÕß
-	[164557] = 10, -- ¹þ¶û¼ªÑÇË¹µÄËéÆ¬
-	[167876] = 20, -- ÉóÅÐ¹ÙÎ÷¼Ó¶û
-	-- ³àºìÉîÔ¨
-	[162158] = 1, -- ¼¢¶öµÄÇô·¸
-	[168058] = 1, -- ×¢ÄÜµÄÓðôá
-	[168457] = 1, -- Ê¯Ç½¼Ó¶û¹±
-	[171455] = 1, -- Ê¯Ç½¼Ó¶û¹±
-	[162056] = 1, -- ¸¿Ê¯ÑÒ¾«
-	[167955] = 1, -- ³àºìÑ§Ô±
-	[162046] = 1, -- ¼¢¶öµÄÊ­×Ó
-	[169753] = 1, -- ¼¢¶öµÄÊ­×Ó
-	[167956] = 1, -- ºÚ°µÖú¼À
-	[162051] = 2, -- ·è¿ñµÄÊ³Ê¬¹í
-	[162041] = 2, -- °¹ÔàµÄ½ÀÍÁÕß
-	[171448] = 4, -- ¿Ö²ÀµÄá÷ÁÔ´óÊ¦
-	[172265] = 4, -- ·ßÅ­²ÐÓà
-	[162049] = 4, -- ÒÉÂÇ²Ð¼£
-	[171384] = 4, -- ÑÐ¾¿ÃúÎÄÊ¦
-	[171805] = 4, -- ÑÐ¾¿ÃúÎÄÊ¦
-	[165076] = 4, -- Ì°Ê³µÄÊ­×Ó
-	[166396] = 4, -- ¹ó×åÉ¢±ø
-	[162039] = 4, -- Ð°¶ñµÄÕòÑ¹Õß
-	[168591] = 4, -- Ì°À·µÄ¿Ö¾åòð
-	[162057] = 7, -- ´óÌüÉÚ±ø
-	[162040] = 7, -- ´ó¼à¶½Õß
-	[171799] = 7, -- ÉîÔ¨Óü×ä
-	[162038] = 7, -- »Ê¼ÒÎèÎíÕß
-	[164852] = 7, -- »Ê¼ÒÎèÎíÕß
-	[162047] = 7, -- Ì°Ê³µÄÂù±ø
-	[171376] = 10, -- Ê×Ï¯¹ÜÀíÕß¼Ó¸¥ÁÖ
-	-- µò»êÖ®éä
-	[168969] = 1, -- Åç±¡ÈíÄà
-	[163857] = 4, -- µò¸¿¿ñÈÈÕß
-	[163892] = 6, -- ¸¯ÀÃµÄð¤ÒºÖ®×¦
-	[164705] = 6, -- ´«È¾ÈíÄà
-	[163891] = 6, -- ¸¯ËèÈíÄà
-	[164707] = 6, -- Äý½áÈíÄà
-	[169696] = 8, -- ÔóµØÊ¿±ø
-	[168580] = 8, -- ×êµòÕß
-	[168361] = 8, -- ¼îÕÓ´ó»Æ·ä
-	[168578] = 8, -- ¾ú¹½ÊõÊ¿
-	[168572] = 8, -- Õæ¾úÃÍ¹¥Õß
-	[168574] = 8, -- ÖÂÃüµÄÊÕ¸îÕß
-	[168891] = 8, -- ±»²Ù×ÝµÄ×êµòÕß
-	[168627] = 8, -- Ä§Ò©Êø¸¿Õß
-	[167493] = 8, -- Åç¶¾¾Ñ»÷ÊÖ
-	[174802] = 8, -- Åç¶¾¾Ñ»÷ÊÖ
-	[163862] = 8, -- ÍòÑÛ·ÀÓùÕß
-	[163915] = 10, -- Ó×·äÖ®³²
-	[168022] = 10, -- ÈíÄà´¥Ðë
-	[168310] = 12, -- µòÁã´óÅô
-	[168153] = 12, -- µòÁã´óÅô
-	[168393] = 12, -- Ä§Ò©ÅçÍÂÕß
-	[168396] = 12, -- Ä§Ò©ÅçÍÂÕß
-	[173360] = 12, -- Ä§Ò©ÅçÍÂÕß
-	[163894] = 12, -- µòÁãËé¼¹Õß
-	[164737] = 12, -- ³²Èº·ü»÷Õß
-	[163882] = 14, -- ¸¯ÀÃµÄÑªÈâ¾ÞÈË
-	[168886] = 25, -- Î¬Â³À­¿ËË¹Ä§Ò©±àÖ¯Õß
-	[169861] = 25, -- °¬¿Â¶û¡¤µ¨Èâ
-	-- Èû×ÈÏÉÁÖµÄÃÔÎí
-	[167117] = 1, -- ×¶ºíÓ×³æ
-	[165111] = 2, -- µÂÂ³Ë¹ÌØ¶ñ×¦Õß
-	[164920] = 4, -- µÂÂ³Ë¹ÌØÕ¶»êÕß
-	[172991] = 4, -- µÂÂ³Ë¹ÌØÕ¶»êÕß
-	[164921] = 4, -- µÂÂ³Ë¹ÌØÊÕ¸îÕß
-	[163058] = 4, -- É´Îí·ÀÓùÕß
-	[171772] = 4, -- É´Îí·ÀÓùÕß
-	[166299] = 4, -- É´ÎíÕÕ¿´Õß
-	[166301] = 4, -- É´Îí×·ÁÔÕß
-	[166275] = 4, -- É´ÎíËÜÐÎÕß
-	[166304] = 4, -- É´Îí¶¤´Ì¶ê
-	[166276] = 4, -- É´ÎíÊØ»¤Õß
-	[167113] = 4, -- ×¶ºíËáÑÊÕß
-	[172312] = 4, -- ×¶ºí÷Ò÷ÑÕß
-	[167116] = 4, -- ×¶ºíÂÓ¶áÕß
-	[167111] = 5, -- ×¶ºíÂ¹½Ç¾Þ³æ
-	[164926] = 6, -- µÂÂ³Ë¹ÌØËéÖ¦Õß
-	[164929] = 7, -- ÏÉÄ¾ÁÖ¾ÓÃñ(ÑªÁ¿½ö¼ÆËã80%)
-	[173720] = 16, -- É´ÎíÊÉºíÕß
-	[173714] = 16, -- É´ÎíÒ¹»¨
-	[173655] = 16, -- É´ÎíÁúÄ¸
-}
+local progressPresets = {}
 
 local function ProcessLasts()
 	if lastDied and lastDiedTime and lastAmount and lastAmountTime then
@@ -224,7 +34,7 @@ function Mod:COMBAT_LOG_EVENT_UNFILTERED()
 		if bit.band(destFlags, COMBATLOG_OBJECT_TYPE_NPC) > 0
 				and bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_NPC) > 0
 				and (bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 or bit.band(destFlags, COMBATLOG_OBJECT_REACTION_NEUTRAL) > 0) then
-			local type, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-", destGUID)
+			local npc_id = select(6, strsplit("-", destGUID))
 			lastDied = tonumber(npc_id)
 			lastDiedTime = GetTime()
 			lastDiedName = destName
@@ -248,15 +58,18 @@ function Mod:SCENARIO_CRITERIA_UPDATE()
 	if scenarioType == LE_SCENARIO_TYPE_CHALLENGE_MODE then
 		local numCriteria = select(3, C_Scenario.GetStepInfo())
 		for criteriaIndex = 1, numCriteria do
-			local criteriaString, criteriaType, _, quantity, totalQuantity, _, _, quantityString, _, _, _, _, isWeightedProgress = C_Scenario.GetCriteriaInfo(criteriaIndex)
-			if isWeightedProgress then
-				local currentQuantity = quantityString and tonumber( strsub(quantityString, 1, -2) )
-				if lastQuantity and currentQuantity < totalQuantity and currentQuantity > lastQuantity then
+			-- local criteriaString, criteriaType, _, quantity, totalQuantity, _, _, quantityString, _, _, _, _, isWeightedProgress = C_Scenario.GetCriteriaInfo(criteriaIndex)
+			local criteriaInfo = C_ScenarioInfo.GetCriteriaInfo(criteriaIndex)
+			if criteriaInfo and criteriaInfo.isWeightedProgress then
+				local quantityString = criteriaInfo.quantityString
+				local currentQuantity = quantityString and tonumber( quantityString:match("%d+") )
+				if lastQuantity and currentQuantity < criteriaInfo.totalQuantity and currentQuantity > lastQuantity then
 					lastAmount = currentQuantity - lastQuantity
 					lastAmountTime = GetTime()
 					ProcessLasts()
 				end
 				lastQuantity = currentQuantity
+				break
 			end
 		end
 	end
@@ -266,10 +79,12 @@ local function StartTime()
 	Mod:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	local numCriteria = select(3, C_Scenario.GetStepInfo())
 	for criteriaIndex = 1, numCriteria do
-		local criteriaString, criteriaType, _, quantity, totalQuantity, _, _, quantityString, _, _, _, _, isWeightedProgress = C_Scenario.GetCriteriaInfo(criteriaIndex)
-		if isWeightedProgress then
-			local quantityString = select(8, C_Scenario.GetCriteriaInfo(criteriaIndex))
-			lastQuantity = quantityString and tonumber( strsub(quantityString, 1, -2) )
+		-- local criteriaString, criteriaType, _, quantity, totalQuantity, _, _, quantityString, _, _, _, _, isWeightedProgress = C_Scenario.GetCriteriaInfo(criteriaIndex)
+		local criteriaInfo = C_ScenarioInfo.GetCriteriaInfo(criteriaIndex)
+		if criteriaInfo and criteriaInfo.isWeightedProgress then
+			local quantityString = criteriaInfo.quantityString
+			lastQuantity = quantityString and tonumber( quantityString:match("%d+") )
+			break
 		end
 	end
 end
@@ -299,24 +114,17 @@ local function OnTooltipSetUnit(tooltip)
 		local name, unit = tooltip:GetUnit()
 		local guid = unit and UnitGUID(unit)
 		if guid then
-			local type, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-", guid)
+			local npc_id = select(6, strsplit("-", guid))
 			npc_id = tonumber(npc_id)
-			local info = AngryKeystones_Data.progress[npc_id]
-			local preset = progressPresets[npc_id]
-			if info or preset then
-				local numCriteria = select(3, C_Scenario.GetStepInfo())
-				local total
-				local progressName
-				for criteriaIndex = 1, numCriteria do
-					local criteriaString, _, _, quantity, totalQuantity, _, _, quantityString, _, _, _, _, isWeightedProgress = C_Scenario.GetCriteriaInfo(criteriaIndex)
-					if isWeightedProgress then
-						progressName = criteriaString
-						total = totalQuantity
-					end
-				end
+			local value
 
-				local value, valueCount
+			if Addon.Config.progressTooltipMDT and MDT then
+				value = MDT:GetEnemyForces(npc_id)
+			else
+				local info = AngryKeystones_Data.progress[npc_id]
+
 				if info then
+					local valueCount
 					for amount, count in pairs(info) do
 						if not valueCount or count > valueCount or (count == valueCount and amount < value) then
 							value = amount
@@ -324,10 +132,22 @@ local function OnTooltipSetUnit(tooltip)
 						end
 					end
 				end
-				if preset and (not value or valueCount == 1) then
-					value = preset
+			end
+
+			if value then
+				local numCriteria = select(3, C_Scenario.GetStepInfo())
+				local total
+				local progressName
+				for criteriaIndex = 1, numCriteria do
+					local criteriaInfo = C_ScenarioInfo.GetCriteriaInfo(criteriaIndex)
+					if criteriaInfo and criteriaInfo.isWeightedProgress then
+						progressName = criteriaInfo.description
+						total = criteriaInfo.totalQuantity
+						break
+					end
 				end
-				if value and total then
+
+				if total then
 					local forcesFormat = format(" - %s: %%s", progressName)
 					local text
 					if Addon.Config.progressFormat == 1 or Addon.Config.progressFormat == 4 then
@@ -379,86 +199,72 @@ function Mod:CHALLENGE_MODE_START(...) CheckTime(GetWorldElapsedTimers()) end
 function Mod:CHALLENGE_MODE_RESET(...) wipe(Mod.playerDeaths) end
 
 local function ProgressBar_SetValue(self, percent)
-	if self.criteriaIndex then
-		local _, _, _, _, totalQuantity, _, _, quantityString, _, _, _, _, _ = C_Scenario.GetCriteriaInfo(self.criteriaIndex)
-		local currentQuantity = quantityString and tonumber( strsub(quantityString, 1, -2) )
-		if currentQuantity and totalQuantity then
-			if Addon.Config.progressFormat == 1 then
-				self.Bar.Label:SetFormattedText("%.2f%%", currentQuantity/totalQuantity*100)
-			elseif Addon.Config.progressFormat == 2 then
-				self.Bar.Label:SetFormattedText("%d/%d", currentQuantity, totalQuantity)
-			elseif Addon.Config.progressFormat == 3 then
-				self.Bar.Label:SetFormattedText("%.2f%% - %d/%d", currentQuantity/totalQuantity*100, currentQuantity, totalQuantity)
-			elseif Addon.Config.progressFormat == 4 then
-				self.Bar.Label:SetFormattedText("%.2f%% (%.2f%%)", currentQuantity/totalQuantity*100, (totalQuantity-currentQuantity)/totalQuantity*100)
-			elseif Addon.Config.progressFormat == 5 then
-				self.Bar.Label:SetFormattedText("%d/%d (%d)", currentQuantity, totalQuantity, totalQuantity - currentQuantity)
-			elseif Addon.Config.progressFormat == 6 then
-				self.Bar.Label:SetFormattedText("%.2f%% (%.2f%%) - %d/%d (%d)", currentQuantity/totalQuantity*100, (totalQuantity-currentQuantity)/totalQuantity*100, currentQuantity, totalQuantity, totalQuantity - currentQuantity)
-			end
+	-- local _, _, _, _, totalQuantity, _, _, quantityString, _, _, _, _, _ = C_Scenario.GetCriteriaInfo(self.criteriaIndex)
+
+	local scenarioType = select(10, C_Scenario.GetInfo())
+
+	if scenarioType ~= LE_SCENARIO_TYPE_CHALLENGE_MODE then return end
+
+	local numCriteria = select(3, C_Scenario.GetStepInfo())
+	local criteriaInfo
+	local cInfo
+
+	for criteriaIndex = 1, numCriteria do
+		cInfo = C_ScenarioInfo.GetCriteriaInfo(criteriaIndex)
+		if cInfo and cInfo.isWeightedProgress then
+			criteriaInfo = cInfo
+			break
 		end
+	end
 
-		local isPridefulActive = false
-		local _, affixes = C_ChallengeMode.GetActiveKeystoneInfo()
-		if affixes then
-			for i = 1, #affixes do
-				if affixes[i] == PRIDEFUL_AFFIX_ID then
-					isPridefulActive = true
-				end
-			end
-		end
+	if not criteriaInfo then return end
 
-		if isPridefulActive and currentQuantity < totalQuantity then
-			if not self.ReapingFrame then
-				local reapingFrame = CreateFrame("Frame", nil, self)
-				reapingFrame:SetSize(56, 16)
-				reapingFrame:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 0, 0)
-		
-				reapingFrame.Icon = CreateFrame("Frame", nil, reapingFrame, "ScenarioChallengeModeAffixTemplate")
-				reapingFrame.Icon:SetPoint("LEFT", reapingFrame, "LEFT", 0, 0)
-				reapingFrame.Icon:SetSize(16, 16)
-				reapingFrame.Icon.Portrait:SetSize(16, 16)
-				reapingFrame.Icon:SetUp(PRIDEFUL_AFFIX_ID)
+	local totalQuantity = criteriaInfo.totalQuantity
+	local quantityString = criteriaInfo.quantityString
+	local currentQuantity = quantityString and tonumber( quantityString:match("%d+") )
 
-				reapingFrame.Text = reapingFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-				reapingFrame.Text:SetPoint("LEFT", reapingFrame.Icon, "RIGHT", 4, 0)
-
-				self.ReapingFrame = reapingFrame
-
-				self:HookScript("OnShow", function(self) self.ReapingFrame:Show(); self.ReapingFrame.Icon:Show() end )
-				self:HookScript("OnHide", function(self) self.ReapingFrame:Hide(); self.ReapingFrame.Icon:Hide() end )
-			end
-			local threshold = totalQuantity / 5
-			local current = currentQuantity
-			local value = threshold - current % threshold
-			local total = totalQuantity
-			if Addon.Config.progressFormat == 1 or Addon.Config.progressFormat == 4 then
-				self.ReapingFrame.Text:SetFormattedText("%.2f%%", value/total*100)
-			elseif Addon.Config.progressFormat == 2 or Addon.Config.progressFormat == 5 then
-				self.ReapingFrame.Text:SetFormattedText("%d", ceil(value))
-			elseif Addon.Config.progressFormat == 3 or Addon.Config.progressFormat == 6 then
-				self.ReapingFrame.Text:SetFormattedText("%.2f%% - %d", value/total*100, ceil(value))
-			else
-				self.ReapingFrame.Text:SetFormattedText("%d%%", value/total*100)
-			end
-			self.ReapingFrame:Show()
-			self.ReapingFrame.Icon:Show()
-		elseif self.ReapingFrame then
-			self.ReapingFrame:Hide()
-			self.ReapingFrame.Icon:Hide()
-		end
-	else
-		if self.ReapingFrame then
-			self.ReapingFrame:Hide()
-			self.ReapingFrame.Icon:Hide()
+	if currentQuantity and totalQuantity then
+		if Addon.Config.progressFormat == 1 then
+			self.Bar.Label:SetFormattedText("%.2f%%", currentQuantity/totalQuantity*100)
+		elseif Addon.Config.progressFormat == 2 then
+			self.Bar.Label:SetFormattedText("%d/%d", currentQuantity, totalQuantity)
+		elseif Addon.Config.progressFormat == 3 then
+			self.Bar.Label:SetFormattedText("%.2f%% - %d/%d", currentQuantity/totalQuantity*100, currentQuantity, totalQuantity)
+		elseif Addon.Config.progressFormat == 4 then
+			self.Bar.Label:SetFormattedText("%.2f%% (%.2f%%)", currentQuantity/totalQuantity*100, (totalQuantity-currentQuantity)/totalQuantity*100)
+		elseif Addon.Config.progressFormat == 5 then
+			self.Bar.Label:SetFormattedText("%d/%d (%d)", currentQuantity, totalQuantity, totalQuantity - currentQuantity)
+		elseif Addon.Config.progressFormat == 6 then
+			self.Bar.Label:SetFormattedText("%.2f%% (%.2f%%) - %d/%d (%d)", currentQuantity/totalQuantity*100, (totalQuantity-currentQuantity)/totalQuantity*100, currentQuantity, totalQuantity, totalQuantity - currentQuantity)
 		end
 	end
 end
 
+local progressBarFound = false
+
+local function findProgressBar()
+
+	if progressBarFound then return end
+
+	local usedBars = ScenarioObjectiveTracker.usedProgressBars or {}
+
+	for _, bar in pairs(usedBars) do
+		if bar.used then
+			hooksecurefunc(bar, "SetValue", ProgressBar_SetValue)
+			progressBarFound = true
+			break
+		end
+	end
+end
+
+hooksecurefunc(ScenarioObjectiveTracker.ObjectivesBlock, "AddProgressBar", findProgressBar )
+
 local function DeathCount_OnEnter(self)
+	local parent = self:GetParent()
+
 	GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-	GameTooltip:SetText(CHALLENGE_MODE_DEATH_COUNT_TITLE:format(self.count), 1, 1, 1)
-	GameTooltip:AddLine(CHALLENGE_MODE_DEATH_COUNT_DESCRIPTION:format(SecondsToClock(self.timeLost, false)))
+	GameTooltip:SetText(CHALLENGE_MODE_DEATH_COUNT_TITLE:format(parent.deathCount), 1, 1, 1)
+	GameTooltip:AddLine(CHALLENGE_MODE_DEATH_COUNT_DESCRIPTION:format(SecondsToClock(parent.timeLost, false)))
 
 	GameTooltip:AddLine(" ")
 	local list = {}
@@ -484,7 +290,7 @@ local function DeathCount_OnEnter(self)
 end
 
 function Mod:Blizzard_ObjectiveTracker()
-	ScenarioChallengeModeBlock.DeathCount:SetScript("OnEnter", DeathCount_OnEnter)
+	ScenarioObjectiveTracker.ChallengeModeBlock.DeathCount:SetScript("OnEnter", DeathCount_OnEnter)
 end
 
 function Mod:Startup()
@@ -511,14 +317,17 @@ function Mod:Startup()
 	self:RegisterEvent("CHALLENGE_MODE_RESET")
 	self:RegisterAddOnLoaded("Blizzard_ObjectiveTracker")
 	CheckTime(GetWorldElapsedTimers())
-	GameTooltip:HookScript("OnTooltipSetUnit", OnTooltipSetUnit)
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit)
 
 	Addon.Config:RegisterCallback('progressFormat', function()
-		local usedBars = SCENARIO_TRACKER_MODULE.usedProgressBars[ScenarioObjectiveBlock] or {}
+		local usedBars = ScenarioObjectiveTracker.usedProgressBars or {}
 		for _, bar in pairs(usedBars) do
-			ProgressBar_SetValue(bar)
+			if bar.used then
+				ProgressBar_SetValue(bar)
+				break
+			end
 		end
 	end)
 end
 
-hooksecurefunc("ScenarioTrackerProgressBar_SetValue", ProgressBar_SetValue)
+-- hooksecurefunc("ScenarioTrackerProgressBar_SetValue", ProgressBar_SetValue)

@@ -1,17 +1,19 @@
-## Interface: 90207
+## Interface: 110002
+## IconTexture: 464160
 ## Title:|cFFBF00FF[H]|r Something About Pet Battle
 ## Notes:Displays the BreedID of pets in your journal, in battle, in chat links, and in AH tooltips,Type /hpq to config 
 ## Title-zhCN: |cFFBF00FF[宠物]|r对战增强
 ## Notes-zhCN: 提醒野生宠物品质、ID等,输入/hpq设置
 ## Title-zhTW: |cFFBF00FF[寵物]|r對戰增強
 ## Notes-zhTW: 提醒野生寵物品質、ID等,輸入/hpq設置
-## Author: Qshine,Simca@Malfurion and Hugh@Burning Blade
-## Author-zhCN: 上官晓雾,Simca@Malfurion and Hugh@Burning Blade
-## Author-zhTW: 上官曉霧,Simca@Malfurion and Hugh@Burning Blade
-## X-Date: 2020-11-06,2022-02-26T14:37:33Z
-## Version: 2.2.17 + v1.20.1
+## Author: Qshine,Simca@Malfurion
+## Author-zhCN: 上官晓雾,Simca@Malfurion
+## Author-zhTW: 上官曉霧,Simca@Malfurion
+## X-Date: 2024-08-16,2024-09-25T23:11:48Z
+## Version: 2.3.4 + v1.30.4
 ## SavedVariables: HPetSaves,BID_Options
-## DefaultState: disabled
+## IconTexture: Interface\AddOns\HandyNotes\Icons\Krag.blp
+## Dependencies: _ShiGuang
 
 ## X-Repple: 2 UI
 
@@ -19,7 +21,7 @@ Localization.lua
 
 HPetBattleAny.lua
 BattlePetBreedID.lua
-## modules\PetData.lua
+modules\PetData.lua
 modules\PetDataFrame.lua
 modules\Config.lua
 modules\Hook.lua

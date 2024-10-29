@@ -1,4 +1,7 @@
-
+--[[-----------------------------------------------------------------------------
+Label Widget
+Displays text and optionally an icon.
+-------------------------------------------------------------------------------]]
 local Type, Version = "Label", 28
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
@@ -9,7 +12,9 @@ local max, select, pairs = math.max, select, pairs
 -- WoW APIs
 local CreateFrame, UIParent = CreateFrame, UIParent
 
-
+--[[-----------------------------------------------------------------------------
+Support functions
+-------------------------------------------------------------------------------]]
 
 local function UpdateImageAnchor(self)
 	if self.resizing then return end
@@ -48,18 +53,21 @@ local function UpdateImageAnchor(self)
 		label:SetWidth(width)
 		height = label:GetStringHeight()
 	end
-	
+
 	-- avoid zero-height labels, since they can used as spacers
 	if not height or height == 0 then
 		height = 1
 	end
-	
+
 	self.resizing = true
 	frame:SetHeight(height)
 	frame.height = height
 	self.resizing = nil
 end
 
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 local methods = {
 	["OnAcquire"] = function(self)
 		-- set the flag to stop constant size updates
@@ -101,7 +109,7 @@ local methods = {
 	["SetImage"] = function(self, path, ...)
 		local image = self.image
 		image:SetTexture(path)
-		
+
 		if image:GetTexture() then
 			self.imageshown = true
 			local n = select("#", ...)
@@ -144,7 +152,9 @@ local methods = {
 	end,
 }
 
-
+--[[-----------------------------------------------------------------------------
+Constructor
+-------------------------------------------------------------------------------]]
 local function Constructor()
 	local frame = CreateFrame("Frame", nil, UIParent)
 	frame:Hide()

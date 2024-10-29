@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 local module = M:RegisterModule("AurasTable")
 
 local pairs, next, format, wipe, unpack = pairs, next, format, wipe, unpack
-local GetSpellInfo = GetSpellInfo
+local GetSpellName = C_Spell.GetSpellName
 local EJ_GetInstanceInfo = EJ_GetInstanceInfo
 
 -- AuraWatch
@@ -41,7 +41,7 @@ function module:AddNewAuraWatch(class, list)
 		for _, v in pairs(k) do
 			local spellID = v.AuraID or v.SpellID
 			if spellID then
-				local name = GetSpellInfo(spellID)
+				local name = GetSpellName(spellID)
 				if not name and not v.Disabled then
 					wipe(v)
 					if I.isDeveloper then print(format("|cffFF0000XXX:|r '%s' %s", class, spellID)) end
@@ -84,17 +84,9 @@ function module:AddDeprecatedGroup()
 	wipe(R.DeprecatedAuras)
 end
 
--- RaidFrame spells
-local RaidBuffs = {}
-function module:AddClassSpells(list)
-	for class, value in pairs(list) do
-		RaidBuffs[class] = value
-	end
-end
-
 -- RaidFrame debuffs
 local RaidDebuffs = {}
-function module:RegisterDebuff(_, instID, _, spellID, level)
+function module:RegisterDebuff(tierID, instID, _, spellID, level)
 	local instName = EJ_GetInstanceInfo(instID)
 	if not instName then
 		if I.isDeveloper then print("Invalid instance ID: "..instID) end
@@ -108,77 +100,59 @@ function module:RegisterDebuff(_, instID, _, spellID, level)
 	RaidDebuffs[instName][spellID] = level
 end
 
--- Party watcher spells
-function module:CheckPartySpells()
-	for spellID, duration in pairs(R.PartySpells) do
-		local name = GetSpellInfo(spellID)
-		if name then
-			local modDuration = MaoRUIDB["PartySpells"][spellID]
-			if modDuration and modDuration == duration then
-				MaoRUIDB["PartySpells"][spellID] = nil
-			end
-		else
-			if I.isDeveloper then print("Invalid partyspell ID: "..spellID) end
-		end
-	end
-end
-
 function module:CheckCornerSpells()
-	if not MaoRUIDB["CornerSpells"][I.MyClass] then MaoRUIDB["CornerSpells"][I.MyClass] = {} end
+	if not MaoRUISetDB["CornerSpells"][I.MyClass] then MaoRUISetDB["CornerSpells"][I.MyClass] = {} end
 	local data = R.CornerBuffs[I.MyClass]
 	if not data then return end
 
 	for spellID in pairs(data) do
-		local name = GetSpellInfo(spellID)
+		local name = GetSpellName(spellID)
 		if not name then
 			if I.isDeveloper then print("Invalid cornerspell ID: "..spellID) end
 		end
 	end
 
-	for spellID, value in pairs(MaoRUIDB["CornerSpells"][I.MyClass]) do
+	for spellID, value in pairs(MaoRUISetDB["CornerSpells"][I.MyClass]) do
 		if not next(value) and R.CornerBuffs[I.MyClass][spellID] == nil then
-			MaoRUIDB["CornerSpells"][I.MyClass][spellID] = nil
+			MaoRUISetDB["CornerSpells"][I.MyClass][spellID] = nil
 		end
 	end
 end
 
 function module:CheckMajorSpells()
 	for spellID in pairs(R.MajorSpells) do
-		local name = GetSpellInfo(spellID)
+		local name = GetSpellName(spellID)
 		if name then
-			if MaoRUIDB["MajorSpells"][spellID] then
-				MaoRUIDB["MajorSpells"][spellID] = nil
+			if MaoRUISetDB["MajorSpells"][spellID] then
+				MaoRUISetDB["MajorSpells"][spellID] = nil
 			end
 		else
 			if I.isDeveloper then print("Invalid majorspells ID: "..spellID) end
 		end
 	end
 
-	for spellID, value in pairs(MaoRUIDB["MajorSpells"]) do
+	for spellID, value in pairs(MaoRUISetDB["MajorSpells"]) do
 		if value == false and R.MajorSpells[spellID] == nil then
-			MaoRUIDB["MajorSpells"][spellID] = nil
+			MaoRUISetDB["MajorSpells"][spellID] = nil
 		end
 	end
 end
 
-local function checkNameplateFilter(index)
-	local VALUE = (index == 1 and R.WhiteList) or (index == 2 and R.BlackList)
-	if VALUE then
-		for spellID in pairs(VALUE) do
-			local name = GetSpellInfo(spellID)
-			if name then
-				if MaoRUIDB["NameplateFilter"][index][spellID] then
-					MaoRUIDB["NameplateFilter"][index][spellID] = nil
-				end
-			else
-				if I.isDeveloper then print("Invalid nameplate filter ID: "..spellID) end
+local function CheckNameplateFilter(list, key)
+	for spellID in pairs(list) do
+		local name = GetSpellName(spellID)
+		if name then
+			if MaoRUISetDB[key][spellID] then
+				MaoRUISetDB[key][spellID] = nil
 			end
+		else
+			if I.isDeveloper then print("Invalid nameplate filter ID: "..spellID) end
 		end
+	end
 
-		for spellID, value in pairs(MaoRUIDB["NameplateFilter"][index]) do
-			if value == false and VALUE[spellID] == nil then
-				MaoRUIDB["NameplateFilter"][index][spellID] = nil
-			end
+	for spellID, value in pairs(MaoRUISetDB[key]) do
+		if value == false and list[spellID] == nil then
+			MaoRUISetDB[key][spellID] = nil
 		end
 	end
 end
@@ -197,8 +171,8 @@ local function cleanupNameplateUnits(VALUE)
 end
 
 function module:CheckNameplateFilters()
-	checkNameplateFilter(1)
-	checkNameplateFilter(2)
+	CheckNameplateFilter(R.WhiteList, "NameplateWhite")
+	CheckNameplateFilter(R.BlackList, "NameplateBlack")
 	cleanupNameplateUnits("CustomUnits")
 	cleanupNameplateUnits("PowerUnits")
 end
@@ -206,24 +180,22 @@ end
 function module:OnLogin()
 	for instName, value in pairs(RaidDebuffs) do
 		for spell, priority in pairs(value) do
-			if MaoRUIDB["RaidDebuffs"][instName] and MaoRUIDB["RaidDebuffs"][instName][spell] and MaoRUIDB["RaidDebuffs"][instName][spell] == priority then
-				MaoRUIDB["RaidDebuffs"][instName][spell] = nil
+			if MaoRUISetDB["RaidDebuffs"][instName] and MaoRUISetDB["RaidDebuffs"][instName][spell] and MaoRUISetDB["RaidDebuffs"][instName][spell] == priority then
+				MaoRUISetDB["RaidDebuffs"][instName][spell] = nil
 			end
 		end
 	end
-	for instName, value in pairs(MaoRUIDB["RaidDebuffs"]) do
+	for instName, value in pairs(MaoRUISetDB["RaidDebuffs"]) do
 		if not next(value) then
-			MaoRUIDB["RaidDebuffs"][instName] = nil
+			MaoRUISetDB["RaidDebuffs"][instName] = nil
 		end
 	end
 
 	RaidDebuffs[0] = {} -- OTHER spells
 	module:AddDeprecatedGroup()
 	R.AuraWatchList = AuraWatchList
-	R.RaidBuffs = RaidBuffs
 	R.RaidDebuffs = RaidDebuffs
 
-	module:CheckPartySpells()
 	module:CheckCornerSpells()
 	module:CheckMajorSpells()
 	module:CheckNameplateFilters()

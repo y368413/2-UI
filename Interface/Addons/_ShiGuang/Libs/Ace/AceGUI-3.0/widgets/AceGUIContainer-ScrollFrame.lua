@@ -77,7 +77,7 @@ local methods = {
 	["MoveScroll"] = function(self, value)
 		local status = self.status or self.localstatus
 		local height, viewheight = self.scrollframe:GetHeight(), self.content:GetHeight()
-		
+
 		if self.scrollBarShown then
 			local diff = height - viewheight
 			local delta = 1
@@ -133,7 +133,11 @@ local methods = {
 
 	["LayoutFinished"] = function(self, width, height)
 		self.content:SetHeight(height or 0 + 20)
+
+		-- update the scrollframe
 		self:FixScroll()
+
+		-- schedule another update when everything has "settled"
 		self.scrollframe:SetScript("OnUpdate", FixScrollOnUpdate)
 	end,
 

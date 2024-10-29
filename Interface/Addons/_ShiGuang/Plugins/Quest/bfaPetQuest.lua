@@ -27,7 +27,7 @@ bfaPetQuestDB = { -- questid, pet, item, TomTom coords--
 local menuFrame = CreateFrame("Frame", "ExampleMenuFrame", UIParent, "UIDropDownMenuTemplate")
 
 local function bfePetQuestCoords(index)
-    if IsAddOnLoaded("TomTom") then
+    if C_AddOns.IsAddOnLoaded("TomTom") then
         TomTom:AddWaypoint(bfaPetQuestDB[index][7], bfaPetQuestDB[index][5]/100, bfaPetQuestDB[index][6]/100, {
             title = string.format(bfaPetQuestDB[index][3]),
             minimap = true,

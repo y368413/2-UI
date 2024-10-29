@@ -1,5 +1,7 @@
-
-local Type, Version = "EditBox", 28
+--[[-----------------------------------------------------------------------------
+EditBox Widget
+-------------------------------------------------------------------------------]]
+local Type, Version = "EditBox", 29
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -8,10 +10,13 @@ local tostring, pairs = tostring, pairs
 
 -- WoW APIs
 local PlaySound = PlaySound
-local GetCursorInfo, ClearCursor, GetSpellInfo = GetCursorInfo, ClearCursor, GetSpellInfo
+local GetCursorInfo, ClearCursor = GetCursorInfo, ClearCursor
 local CreateFrame, UIParent = CreateFrame, UIParent
 local _G = _G
 
+--[[-----------------------------------------------------------------------------
+Support functions
+-------------------------------------------------------------------------------]]
 if not AceGUIEditBoxInsertLink then
 	-- upgradeable hook
 	hooksecurefunc("ChatEdit_InsertLink", function(...) return _G.AceGUIEditBoxInsertLink(...) end)
@@ -39,6 +44,9 @@ local function HideButton(self)
 	self.editbox:SetTextInsets(0, 0, 3, 3)
 end
 
+--[[-----------------------------------------------------------------------------
+Scripts
+-------------------------------------------------------------------------------]]
 local function Control_OnEnter(frame)
 	frame.obj:Fire("OnEnter")
 end
@@ -68,12 +76,16 @@ end
 
 local function EditBox_OnReceiveDrag(frame)
 	local self = frame.obj
-	local type, id, info = GetCursorInfo()
+	local type, id, info, extra = GetCursorInfo()
 	local name
 	if type == "item" then
 		name = info
 	elseif type == "spell" then
-		name = GetSpellInfo(id, info)
+		if C_Spell and C_Spell.GetSpellName then
+			name = C_Spell.GetSpellName(extra)
+		else
+			name = C_Spell.GetSpellInfo(id, info)
+		end
 	elseif type == "macro" then
 		name = GetMacroInfo(id)
 	end
@@ -106,6 +118,9 @@ local function Button_OnClick(frame)
 	EditBox_OnEnterPressed(editbox)
 end
 
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 local methods = {
 	["OnAcquire"] = function(self)
 		-- height is controlled by SetLabel
@@ -190,6 +205,9 @@ local methods = {
 	end
 }
 
+--[[-----------------------------------------------------------------------------
+Constructor
+-------------------------------------------------------------------------------]]
 local function Constructor()
 	local num  = AceGUI:GetNextWidgetNum(Type)
 	local frame = CreateFrame("Frame", nil, UIParent)

@@ -5,12 +5,13 @@ local MISC = M:GetModule("Misc")
 local format, gsub, strsplit, strfind = string.format, string.gsub, string.split, string.find
 local pairs, wipe, select = pairs, wipe, select
 local GetInstanceInfo, PlaySound, print = GetInstanceInfo, PlaySound, print
-local IsPartyLFG, IsInRaid, IsInGroup, IsInInstance, IsInGuild = IsPartyLFG, IsInRaid, IsInGroup, IsInInstance, IsInGuild
+local IsInRaid, IsInGroup, IsInInstance, IsInGuild = IsInRaid, IsInGroup, IsInInstance, IsInGuild
 local UnitInRaid, UnitInParty, SendChatMessage = UnitInRaid, UnitInParty, SendChatMessage
 local UnitName, Ambiguate, GetTime = UnitName, Ambiguate, GetTime
-local GetSpellLink, GetSpellInfo, GetSpellCooldown = GetSpellLink, GetSpellInfo, GetSpellCooldown
+local GetSpellLink = C_Spell.GetSpellLink
+local GetSpellName = C_Spell.GetSpellName
 local GetActionInfo, GetMacroSpell, GetMacroItem = GetActionInfo, GetMacroSpell, GetMacroItem
-local GetItemInfo, GetItemInfoFromHyperlink = GetItemInfo, GetItemInfoFromHyperlink
+local GetItemInfoFromHyperlink = GetItemInfoFromHyperlink
 local C_Timer_After = C_Timer.After
 local C_Map_GetBestMapForUnit = C_Map.GetBestMapForUnit
 local C_VignetteInfo_GetVignetteInfo = C_VignetteInfo.GetVignetteInfo
@@ -20,6 +21,9 @@ local C_ChatInfo_SendAddonMessage = C_ChatInfo.SendAddonMessage
 local C_ChatInfo_RegisterAddonMessagePrefix = C_ChatInfo.RegisterAddonMessagePrefix
 local C_ChallengeMode_GetActiveKeystoneInfo = C_ChallengeMode.GetActiveKeystoneInfo
 
+local function IsRandomGroup()
+	return IsPartyLFG() or C_PartyInfo.IsPartyWalkIn()
+end
 --[[
 	SoloInfo是一个告知你当前副本难度的小工具，防止我有时候单刷时进错难度了。
 	instList左侧是副本ID，你可以使用"/getid"命令来获取当前副本的ID；右侧的是副本难度，常用的一般是：2为5H，4为25普通，6为25H。
@@ -88,6 +92,11 @@ local isIgnoredZone = {
 	[1943] = true,	-- 联盟激流堡
 	[2111] = true,	-- 黑海岸前线
 }
+local defaultList = {
+	[5485] = true, -- 海象人工具盒
+	[6149] = true, -- 奥妮克希亚龙蛋
+}
+local isIgnoredIDs = {}
 
 local function isUsefulAtlas(info)
 	local atlas = info.atlasName
@@ -96,10 +105,18 @@ local function isUsefulAtlas(info)
 	end
 end
 
+function MISC:RareAlert_UpdateIgnored()
+	M.SplitList(isIgnoredIDs, MaoRUISetDB["IgnoredRares"], true)
+
+	for id in pairs(defaultList) do
+		isIgnoredIDs[id] = true
+	end
+end
+
 function MISC:RareAlert_Update(id)
 	if id and not cache[id] then
 		local info = C_VignetteInfo_GetVignetteInfo(id)
-		if not info or not isUsefulAtlas(info) then return end
+		if not info or not isUsefulAtlas(info) or isIgnoredIDs[info.vignetteID] then return end
 
 		local atlasInfo = C_Texture_GetAtlasInfo(info.atlasName)
 		if not atlasInfo then return end
@@ -109,13 +126,13 @@ function MISC:RareAlert_Update(id)
 		--UIErrorsFrame:AddMessage(I.InfoColor..U["Rare Found"]..tex..(info.name or ""))
 		RaidNotice_AddMessage(RaidWarningFrame, "----------   "..tex..(info.name or "").."   ----------", ChatTypeInfo["RAID_WARNING"])
 		if R.db["Misc"]["RarePrint"] then
-			local currrentTime = MaoRUIDB["TimestampFormat"] == 1 and "|cff00ff00["..date("%H:%M:%S").."]|r" or ""
+			local currrentTime = MaoRUISetDB["TimestampFormat"] == 1 and "|cff00ff00["..date("%H:%M:%S").."]|r" or ""
 			local nameString
 			local mapID = C_Map_GetBestMapForUnit("player")
 			local position = mapID and C_VignetteInfo_GetVignettePosition(info.vignetteGUID, mapID)
 			if position then
 				local x, y = position:GetXY()
-				nameString = format(MISC.RareString, mapID, x*10000, y*10000, info.name, x*100, y*100, "")
+				nameString = format(MISC.RareString, mapID, x*10000, y*10000, info.name, x*100, y*100, "") --"ID:"..info.vignetteID
 			end
 			print(currrentTime.." -> "..I.InfoColor..tex..(nameString or info.name or ""))  --.." → "
 		end
@@ -143,6 +160,7 @@ function MISC:RareAlert()
 	MISC.RareString = "|Hworldmap:%d+:%d+:%d+|h[%s] <%.1f, %.1f>%s|h|r"
 
 	if R.db["Misc"]["RareAlerter"] then
+		MISC:RareAlert_UpdateIgnored()
 		MISC:RareAlert_CheckInstance()
 		M:RegisterEvent("UPDATE_INSTANCE_INFO", MISC.RareAlert_CheckInstance)
 	else
@@ -157,22 +175,7 @@ end
 	打断、偷取及驱散法术时的警报
 ]]
 function MISC:GetMsgChannel()
-	return IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
-end
-
-local function msgChannel()
-	if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
-		return "INSTANCE_CHAT"
-	--elseif IsInRaid(LE_PARTY_CATEGORY_HOME) then
-		--if warning and (UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") or IsEveryoneAssistant()) then
-			--return "RAID_WARNING"
-		--else
-			--return "RAID"
-		--end
-	elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
-		return "PARTY"
-	end
-	return "SAY"
+	return IsRandomGroup() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
 end
 
 local infoType = {}
@@ -214,8 +217,12 @@ local blackList = {
 	[207685] = true,	-- 悲苦咒符
 	[226943] = true,	-- 心灵炸弹
 	[228600] = true,	-- 冰川尖刺
+	[285515] = true,	-- 能量湍流
 	[331866] = true,	-- 混沌代理人
 	[354051] = true,	-- 轻盈步
+	[355689] = true,	-- 山崩
+	[386770] = true,	-- 极寒
+	[378760] = true,	-- 冰霜撕咬
 }
 
 function MISC:IsAllyPet(sourceFlags)
@@ -225,6 +232,8 @@ function MISC:IsAllyPet(sourceFlags)
 end
 
 function MISC:InterruptAlert_Update(...)
+	if R.db["Misc"]["LeaderOnly"] and not (UnitIsGroupAssistant("player") or UnitIsGroupLeader("player")) then return end -- only alert for leader, needs review
+
 	local _, eventType, _, sourceGUID, sourceName, sourceFlags, _, _, destName, _, _, spellID, _, _, extraskillID, _, _, auraType = ...
 	if not sourceGUID or sourceName == destName then return end
 
@@ -235,21 +244,16 @@ function MISC:InterruptAlert_Update(...)
 			if infoText == U["BrokenSpell"] then
 				if auraType and auraType == AURA_TYPE_BUFF or blackList[spellID] then return end
 				sourceSpellID, destSpellID = extraskillID, spellID
-				if sourceSpellID and destSpellID then
-					SendChatMessage(format(infoText, sourceName..GetSpellLink(sourceSpellID), destName..GetSpellLink(destSpellID)), msgChannel())
-				end
 			elseif infoText == U["Interrupt"] then
 				if R.db["Misc"]["OwnInterrupt"] and sourceName ~= I.MyName and not I:IsMyPet(sourceFlags) then return end
 				sourceSpellID, destSpellID = spellID, extraskillID
-				if sourceSpellID and destSpellID then
-					SendChatMessage(format(infoText, GetSpellLink(destSpellID)), msgChannel())
-				end
 			else
 				if R.db["Misc"]["OwnDispell"] and sourceName ~= I.MyName and not I:IsMyPet(sourceFlags) then return end
 				sourceSpellID, destSpellID = spellID, extraskillID
-				if sourceSpellID and destSpellID then
-					SendChatMessage(format(infoText, GetSpellLink(destSpellID)), msgChannel())
-				end
+			end
+
+			if sourceSpellID and destSpellID then
+				SendChatMessage(format(infoText, sourceName..GetSpellLink(sourceSpellID), destName..GetSpellLink(destSpellID)), MISC:GetMsgChannel())
 			end
 				if R.db["Misc"]["InterruptSound"] then
 				    PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\ShutupFool.ogg", "Master")
@@ -259,7 +263,7 @@ function MISC:InterruptAlert_Update(...)
 end
 
 function MISC:InterruptAlert_CheckGroup()
-	if IsInGroup() and (not R.db["Misc"]["InstAlertOnly"] or (IsInInstance() and not IsPartyLFG())) then
+	if IsInGroup() and (not R.db["Misc"]["InstAlertOnly"] or (IsInInstance() and not IsRandomGroup())) then
 		M:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.InterruptAlert_Update)
 	else
 		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.InterruptAlert_Update)
@@ -282,67 +286,6 @@ function MISC:InterruptAlert()
 	end
 end
 
---[[
-	大米完成时，通报打球统计
-]]
-local eventList = {
-	["SWING_DAMAGE"] = 13,
-	["RANGE_DAMAGE"] = 16,
-	["SPELL_DAMAGE"] = 16,
-	["SPELL_PERIODIC_DAMAGE"] = 16,
-	["SPELL_BUILDING_DAMAGE"] = 16,
-}
-
-function MISC:Explosive_Update(...)
-	local _, eventType, _, _, sourceName, _, _, destGUID = ...
-	local index = eventList[eventType]
-	if index and M.GetNPCID(destGUID) == 120651 then
-		local overkill = select(index, ...)
-		if overkill and overkill > 0 then
-			local name = strsplit("-", sourceName or UNKNOWN)
-			local cache = R.db["Misc"]["ExplosiveCache"]
-			if not cache[name] then cache[name] = 0 end
-			cache[name] = cache[name] + 1
-		end
-	end
-end
-
-function MISC:Explosive_SendResult()
-	local text
-	for name, count in pairs(R.db["Misc"]["ExplosiveCache"]) do
-		text = (text or U["ExplosiveCount"])..name.."("..count..") "
-	end
-	--if text then SendChatMessage(text, "PARTY") end
-	if text then print(text) end
-	M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.Explosive_Update)
-end
-
-function MISC.Explosive_CheckAffixes(event)
-	local _, affixes = C_ChallengeMode_GetActiveKeystoneInfo()
-	if affixes[3] and affixes[3] == 13 then
-		if event == "CHALLENGE_MODE_START" then
-			wipe(R.db["Misc"]["ExplosiveCache"])
-		end
-		M:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.Explosive_Update)
-		M:RegisterEvent("CHALLENGE_MODE_COMPLETED", MISC.Explosive_SendResult)
-	else
-		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.Explosive_Update)
-		M:UnregisterEvent("CHALLENGE_MODE_COMPLETED", MISC.Explosive_SendResult)
-	end
-end
-
-function MISC:ExplosiveAlert()
-	if R.db["Misc"]["ExplosiveCount"] then
-		MISC:Explosive_CheckAffixes()
-		M:RegisterEvent("ZONE_CHANGED_NEW_AREA", MISC.Explosive_CheckAffixes)
-		M:RegisterEvent("CHALLENGE_MODE_START", MISC.Explosive_CheckAffixes)
-	else
-		M:UnregisterEvent("ZONE_CHANGED_NEW_AREA", MISC.Explosive_CheckAffixes)
-		M:UnregisterEvent("CHALLENGE_MODE_START", MISC.Explosive_CheckAffixes)
-		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.Explosive_Update)
-		M:UnregisterEvent("CHALLENGE_MODE_COMPLETED", MISC.Explosive_SendResult)
-	end
-end
 
 --[[
 	放大餐时叫一叫
@@ -359,11 +302,15 @@ for i = 1, 40 do
 end
 
 local spellList = {
+	[698] = true,		-- 拉人
+	[29893] = true,		-- 糖
+	[190336] = true,	-- 面包
 	[54710] = true,		-- 随身邮箱
 	[67826] = true,		-- 基维斯
 	[226241] = true,	-- 宁神圣典
 	[256230] = true,	-- 静心圣典
 	[185709] = true,	-- 焦糖鱼宴
+	[199109] = true,	-- 自动铁锤
 	[259409] = true,	-- 海帆盛宴
 	[259410] = true,	-- 船长盛宴
 	[276972] = true,	-- 秘法药锅
@@ -374,23 +321,41 @@ local spellList = {
 	[345130] = true,	-- 9.0工程战复
 	[307157] = true,	-- 永恒药锅
 	[359336] = true,	-- 石头汤锅
-	[324029] = true,	-- 宁心圣典
+	[261602] = true,	-- 凯蒂的印哨
+	[376664] = true,	-- 欧胡纳栖枝
 
 	[2825]   = true,	-- 嗜血
 	[32182]  = true,	-- 英勇
 	[80353]  = true,	-- 时间扭曲
+	[90355] = true,		-- 远古狂乱，宠物
 	[264667] = true,	-- 原始暴怒，宠物
 	[272678] = true,	-- 原始暴怒，宠物掌控
 	[178207] = true,	-- 狂怒战鼓
 	[230935] = true,	-- 高山战鼓
 	[256740] = true,	-- 漩涡战鼓
 	[292686] = true,	-- 雷皮之槌
+	[390386] = true,	-- 守护巨龙之怒
 	[309658] = true,	-- 死亡凶蛮战鼓
+	[444257] = true,	-- 掣雷之鼓
+
+	[384893] = true,	-- 足以乱真的救急电缆11.0工程战复
+	[453949] = true,	-- 不可抗拒的红色按钮11.0工程战复工具
+	[453942] = true,	-- 阿加修理机器人11O   
+	[432877] = true,	-- 阿加合剂大锅
+	[433292] = true,	-- 阿加药水大锅
+	[455960] = true,	-- 全味炖煮
+	[457285] = true,	-- 午夜舞会盛宴
+	[457302] = true,	-- 特色寿司
+	[457487] = true,	-- 丰盛的全味炖煮(战团)
+	[462211] = true,	-- 丰盛的特色寿司(战团)
+	[462213] = true,	-- 丰盛的午夜舞会盛宴(战团)
 }
 
 function MISC:ItemAlert_Update(unit, castID, spellID)
+	if R.db["Misc"]["LeaderOnly"] and not (UnitIsGroupAssistant("player") or UnitIsGroupLeader("player")) then return end -- only alert for leader, needs review
+
 	if groupUnits[unit] and spellList[spellID] and (spellList[spellID] ~= castID) then
-		SendChatMessage(format(U["SpellItemAlertStr"], UnitName(unit), GetSpellLink(spellID) or GetSpellInfo(spellID)), MISC:GetMsgChannel())
+		SendChatMessage(format(U["SpellItemAlertStr"], UnitName(unit), GetSpellLink(spellID) or GetSpellName(spellID)), MISC:GetMsgChannel())
 		spellList[spellID] = castID
 	end
 end
@@ -404,6 +369,8 @@ local bloodLustDebuffs = {
 }
 
 function MISC:CheckBloodlustStatus(...)
+	if R.db["Misc"]["LeaderOnly"] and not (UnitIsGroupAssistant("player") or UnitIsGroupLeader("player")) then return end -- only alert for leader, needs review
+
 	local _, eventType, _, sourceGUID, _, _, _, _, _, _, _, spellID = ...
 	if eventType == "SPELL_AURA_REMOVED" and bloodLustDebuffs[spellID] and sourceGUID == myGUID then
 		SendChatMessage(format(U["BloodlustStr"], GetSpellLink(spellID), MISC.factionSpell), MISC:GetMsgChannel())
@@ -549,7 +516,6 @@ local IncompatibleAddOns = {
 	["AuroraClassic"] = true, -- my own addon
 	["DomiRank"] = true, -- my own addon
 	["MDGuildBest"] = true, -- my own addon
-	["SexyMap"] = true,
 }
 local AddonDependency = {
 	["BigFoot"] = "!!!Libs",
@@ -557,7 +523,7 @@ local AddonDependency = {
 function MISC:CheckIncompatible()
 	local IncompatibleList = {}
 	for addon in pairs(IncompatibleAddOns) do
-		if IsAddOnLoaded(addon) then
+		if C_AddOns.IsAddOnLoaded(addon) then
 			tinsert(IncompatibleList, addon)
 		end
 	end
@@ -587,9 +553,9 @@ function MISC:CheckIncompatible()
 		disable.text:SetTextColor(1, .8, 0)
 		disable:SetScript("OnClick", function()
 			for _, addon in pairs(IncompatibleList) do
-				DisableAddOn(addon, true)
+				C_AddOns.DisableAddOn(addon)
 				if AddonDependency[addon] then
-					DisableAddOn(AddonDependency[addon], true)
+					C_AddOns.DisableAddOn(AddonDependency[addon])
 				end
 			end
 			ReloadUI()
@@ -608,28 +574,46 @@ end
 
 local lastCDSend = 0
 function MISC:SendCurrentSpell(thisTime, spellID)
-	local start, duration = GetSpellCooldown(spellID)
 	local spellLink = GetSpellLink(spellID)
-	if start and duration > 0 then
-		local remain = start + duration - thisTime
-		SendChatMessage(format(U["CooldownRemaining"], spellLink, GetRemainTime(remain)), MISC:GetMsgChannel())
+	local chargeInfo = C_Spell.GetSpellCharges(spellID)
+	local charges = chargeInfo and chargeInfo.currentCharges
+	local maxCharges = chargeInfo and chargeInfo.maxCharges
+	local chargeStart = chargeInfo and chargeInfo.cooldownStartTime
+	local chargeDuration = chargeInfo and chargeInfo.cooldownDuration
+
+	if charges and maxCharges then
+		if charges ~= maxCharges then
+			local remain = chargeStart + chargeDuration - thisTime
+			SendChatMessage(format(U["ChargesRemaining"], spellLink, charges, maxCharges, GetRemainTime(remain)), MISC:GetMsgChannel())
+		else
+			SendChatMessage(format(U["ChargesCompleted"], spellLink, charges, maxCharges), MISC:GetMsgChannel())
+		end
 	else
-		SendChatMessage(format(U["CooldownCompleted"], spellLink), MISC:GetMsgChannel())
+		local cooldownInfo = C_Spell.GetSpellCooldown(spellID)
+		local start = cooldownInfo and cooldownInfo.startTime
+		local duration = cooldownInfo and cooldownInfo.duration
+
+		if start and duration > 0 then
+			local remain = start + duration - thisTime
+			SendChatMessage(format(U["CooldownRemaining"], spellLink, GetRemainTime(remain)), MISC:GetMsgChannel())
+		else
+			SendChatMessage(format(U["CooldownCompleted"], spellLink), MISC:GetMsgChannel())
+		end
 	end
 end
 
-function MISC:SendCurrentItem(thisTime, itemID, itemLink)
-	local start, duration = GetItemCooldown(itemID)
+function MISC:SendCurrentItem(thisTime, itemID, itemLink, itemCount)
+	local start, duration = C_Item.GetItemCooldown(itemID)
 	if start and duration > 0 then
 		local remain = start + duration - thisTime
-		SendChatMessage(format(U["CooldownRemaining"], itemLink, GetRemainTime(remain)), MISC:GetMsgChannel())
+		SendChatMessage(format(U["CooldownRemaining"], itemLink.." x"..itemCount, GetRemainTime(remain)), MISC:GetMsgChannel())
 	else
-		SendChatMessage(format(U["CooldownCompleted"], itemLink), MISC:GetMsgChannel())
+		SendChatMessage(format(U["CooldownCompleted"], itemLink.." x"..itemCount), MISC:GetMsgChannel())
 	end
 end
 
 function MISC:AnalyzeButtonCooldown()
-	if not self.action then return end -- no action for pet actionbar
+	if not self._state_action then return end -- no action for pet actionbar
 	if not R.db["Misc"]["SendActionCD"] then return end
 	if not IsInGroup() then return end
 
@@ -637,20 +621,21 @@ function MISC:AnalyzeButtonCooldown()
 	if thisTime - lastCDSend < 1.5 then return end
 	lastCDSend = thisTime
 
-	local spellType, id = GetActionInfo(self.action)
+	local spellType, id, subType = GetActionInfo(self._state_action)
+	local itemCount = GetActionCount(self._state_action)
 	if spellType == "spell" then
 		MISC:SendCurrentSpell(thisTime, id)
 	elseif spellType == "item" then
-		local itemName, itemLink = GetItemInfo(id)
-		MISC:SendCurrentItem(thisTime, id, itemLink or itemName)
+		local itemName, itemLink = C_Item.GetItemInfo(id)
+		MISC:SendCurrentItem(thisTime, id, itemLink or itemName, itemCount)
 	elseif spellType == "macro" then
-		local spellID = GetMacroSpell(id)
+		local spellID = subType == "spell" and id or GetMacroSpell(id)
 		local _, itemLink = GetMacroItem(id)
 		local itemID = itemLink and GetItemInfoFromHyperlink(itemLink)
 		if spellID then
 			MISC:SendCurrentSpell(thisTime, spellID)
 		elseif itemID then
-			MISC:SendCurrentItem(thisTime, itemID, itemLink)
+			MISC:SendCurrentItem(thisTime, itemID, itemLink, itemCount)
 		end
 	end
 end
@@ -659,6 +644,7 @@ function MISC:SendCDStatus()
 	if not R.db["Actionbar"]["Enable"] then return end
 
 	local Bar = M:GetModule("Actionbar")
+	if not Bar then return end
 	for _, button in pairs(Bar.buttons) do
 		button:HookScript("OnMouseWheel", MISC.AnalyzeButtonCooldown)
 	end
@@ -669,7 +655,6 @@ function MISC:AddAlerts()
 	MISC:SoloInfo()
 	MISC:RareAlert()
 	MISC:InterruptAlert()
-	MISC:ExplosiveAlert()
 	MISC:SpellItemAlert()
 	MISC:NVision_Init()
 	MISC:CheckIncompatible()

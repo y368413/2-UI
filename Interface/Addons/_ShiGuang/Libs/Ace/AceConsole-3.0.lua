@@ -1,3 +1,15 @@
+--- **AceConsole-3.0** provides registration facilities for slash commands.
+-- You can register slash commands to your custom functions and use the `GetArgs` function to parse them
+-- to your addons individual needs.
+--
+-- **AceConsole-3.0** can be embeded into your addon, either explicitly by calling AceConsole:Embed(MyAddon) or by
+-- specifying it as an embeded library in your AceAddon. All functions will be available on your addon object
+-- and can be accessed directly, without having to explicitly call AceConsole itself.\\
+-- It is recommended to embed AceConsole, otherwise you'll have to specify a custom `self` on all calls you
+-- make into AceConsole.
+-- @class file
+-- @name AceConsole-3.0
+-- @release $Id: AceConsole-3.0.lua 1284 2022-09-25 09:15:30Z nevcairiel $
 local MAJOR,MINOR = "AceConsole-3.0", 7
 
 local AceConsole, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
@@ -31,6 +43,10 @@ local function Print(self,frame,...)
 	frame:AddMessage( tconcat(tmp," ",1,n) )
 end
 
+--- Print to DEFAULT_CHAT_FRAME or given ChatFrame (anything with an .AddMessage function)
+-- @paramsig [chatframe ,] ...
+-- @param chatframe Custom ChatFrame to print to (or any frame with an .AddMessage function)
+-- @param ... List of any values to be printed
 function AceConsole:Print(...)
 	local frame = ...
 	if type(frame) == "table" and frame.AddMessage then	-- Is first argument something with an .AddMessage member?
@@ -40,6 +56,12 @@ function AceConsole:Print(...)
 	end
 end
 
+
+--- Formatted (using format()) print to DEFAULT_CHAT_FRAME or given ChatFrame (anything with an .AddMessage function)
+-- @paramsig [chatframe ,] "format"[, ...]
+-- @param chatframe Custom ChatFrame to print to (or any frame with an .AddMessage function)
+-- @param format Format string - same syntax as standard Lua format()
+-- @param ... Arguments to the format string
 function AceConsole:Printf(...)
 	local frame = ...
 	if type(frame) == "table" and frame.AddMessage then	-- Is first argument something with an .AddMessage member?
@@ -49,13 +71,20 @@ function AceConsole:Printf(...)
 	end
 end
 
+
+
+
+--- Register a simple chat command
+-- @param command Chat command to be registered WITHOUT leading "/"
+-- @param func Function to call when the slash command is being used (funcref or methodname)
+-- @param persist if false, the command will be soft disabled/enabled when aceconsole is used as a mixin (default: true)
 function AceConsole:RegisterChatCommand( command, func, persist )
 	if type(command)~="string" then error([[Usage: AceConsole:RegisterChatCommand( "command", func[, persist ]): 'command' - expected a string]], 2) end
-	
+
 	if persist==nil then persist=true end	-- I'd rather have my addon's "/addon enable" around if the author screws up. Having some extra slash regged when it shouldnt be isn't as destructive. True is a better default. /Mikk
-	
+
 	local name = "ACECONSOLE_"..command:upper()
-	
+
 	if type( func ) == "string" then
 		SlashCmdList[name] = function(input, editBox)
 			self[func](self, input, editBox)
@@ -100,10 +129,18 @@ local function nils(n, ...)
 	end
 end
 
+
+--- Retreive one or more space-separated arguments from a string.
+-- Treats quoted strings and itemlinks as non-spaced.
+-- @param str The raw argument string
+-- @param numargs How many arguments to get (default 1)
+-- @param startpos Where in the string to start scanning (default  1)
+-- @return Returns arg1, arg2, ..., nextposition\\
+-- Missing arguments will be returned as nils. 'nextposition' is returned as 1e9 at the end of the string.
 function AceConsole:GetArgs(str, numargs, startpos)
 	numargs = numargs or 1
 	startpos = max(startpos or 1, 1)
-	
+
 	local pos=startpos
 
 	-- find start of new arg
@@ -128,24 +165,24 @@ function AceConsole:GetArgs(str, numargs, startpos)
 	else
 		delim_or_pipe="([| ])"
 	end
-	
+
 	startpos = pos
-	
+
 	while true do
 		-- find delimiter or hyperlink
-		local ch,_
+		local _
 		pos,_,ch = strfind(str, delim_or_pipe, pos)
-		
+
 		if not pos then break end
-		
+
 		if ch=="|" then
 			-- some kind of escape
-			
+
 			if strsub(str,pos,pos+1)=="|H" then
 				-- It's a |H....|hhyper link!|h
 				pos=strfind(str, "|h", pos+2)	-- first |h
 				if not pos then break end
-				
+
 				pos=strfind(str, "|h", pos+2)	-- second |h
 				if not pos then break end
 			elseif strsub(str,pos, pos+1) == "|T" then
@@ -153,16 +190,16 @@ function AceConsole:GetArgs(str, numargs, startpos)
 				pos=strfind(str, "|t", pos+2)
 				if not pos then break end
 			end
-			
+
 			pos=pos+2 -- skip past this escape (last |h if it was a hyperlink)
-		
+
 		else
 			-- found delimiter, done with this arg
 			return strsub(str, startpos, pos-1), AceConsole:GetArgs(str, numargs-1, pos+1)
 		end
-		
+
 	end
-	
+
 	-- search aborted, we hit end of string. return it all as one argument. (yes, even if it's an unterminated quote or hyperlink)
 	return strsub(str, startpos), nils(numargs-1, 1e9)
 end
@@ -176,9 +213,10 @@ local mixins = {
 	"RegisterChatCommand",
 	"UnregisterChatCommand",
 	"GetArgs",
-} 
+}
 
-
+-- Embeds AceConsole into the target object making the functions from the mixins list available on target:..
+-- @param target target object to embed AceBucket in
 function AceConsole:Embed( target )
 	for k, v in pairs( mixins ) do
 		target[v] = self[v]

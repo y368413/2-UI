@@ -11,7 +11,6 @@
 	<Script file="AceLocale-3.0.lua"/>
 	<Script file="AceConsole-3.0.lua"/>
 	<Include file="AceGUI-3.0\AceGUI-3.0.xml"/>
-	<Include file="AceGUI-3.0-SharedMediaWidgets\widget.xml"/>
 	<Include file="AceConfig-3.0\AceConfig-3.0.xml"/>
 	<Include file="AceComm-3.0\AceComm-3.0.xml"/>
 	<Script file="AceTab-3.0.lua"/>

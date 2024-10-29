@@ -5,60 +5,52 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
 local oUF = ns.oUF
+local GetSpellName = C_Spell.GetSpellName
 
 local classList = {
 	["DEATHKNIGHT"] = {
-		combat = GetSpellInfo(61999),	-- Raise Ally
+		combat = GetSpellName(61999),	-- Raise Ally
 	},
 	["DRUID"] = {
-		combat = GetSpellInfo(20484),	-- Rebirth
-		ooc = GetSpellInfo(50769),		-- Revive
+		combat = GetSpellName(20484),	-- Rebirth
+		ooc = GetSpellName(50769),		-- Revive
 	},
 	["MONK"] = {
-		ooc = GetSpellInfo(115178),		-- Resuscitate
+		ooc = GetSpellName(115178),		-- Resuscitate
 	},
 	["PALADIN"] = {
-		ooc = GetSpellInfo(7328),		-- Redemption
+		ooc = GetSpellName(7328),		-- Redemption
+		combat = GetSpellName(391054),	-- 代祷Intercession
 	},
 	["PRIEST"] = {
-		ooc = GetSpellInfo(2006),		-- Resurrection
+		ooc = GetSpellName(2006),		-- Resurrection
 	},
 	["SHAMAN"] = {
-		ooc = GetSpellInfo(2008),		-- Ancestral Spirit
+		ooc = GetSpellName(2008),		-- Ancestral Spirit
 	},
 	["WARLOCK"] = {
-		combat = GetSpellInfo(20707),	-- Soulstone
+		combat = GetSpellName(20707),	-- Soulstone
 	},
-	--["HUNTER"] = {},	-- blz has removed hunter res
-}
-
-local hunterRes = {
-	[1] = GetSpellInfo(126393),			-- Eternal Guardian
-	[2] = GetSpellInfo(159931),			-- Gift of Chiji
-	[3] = GetSpellInfo(159956),			-- Dust of Life
+	["EVOKER"] = {
+		ooc = GetSpellName(361227),		-- 生还Return
+	},
 }
 
 local body = ""
 local function macroBody(class)
 	body = "/stopmacro [@mouseover,nodead]\n"
 
-	if class == "HUNTER" then
-		for i = 1, #hunterRes do
-			body = body.."/cast [@mouseover,help,dead]"..hunterRes[i].."\n"
+	local combatSpell = classList[class].combat
+	local oocSpell = classList[class].ooc
+	if combatSpell then
+		if oocSpell then
+			body = body.."/cast [combat,@mouseover,help,dead] "..combatSpell.."; "
+			body = body.."[@mouseover,help,dead] "..oocSpell
+		else
+			body = body.."/cast [@mouseover,help,dead] "..combatSpell
 		end
-	else
-		local combatSpell = classList[class].combat
-		local oocSpell = classList[class].ooc
-		if combatSpell then
-			if oocSpell then
-				body = body.."/cast [combat,@mouseover,help,dead] "..combatSpell.."; "
-				body = body.."[@mouseover,help,dead] "..oocSpell
-			else
-				body = body.."/cast [@mouseover,help,dead] "..combatSpell
-			end
-		elseif oocSpell then
-			body = body.."/cast [@mouseover,help,dead] "..oocSpell
-		end
+	elseif oocSpell then
+		body = body.."/cast [@mouseover,help,dead] "..oocSpell
 	end
 
 	return body
@@ -67,14 +59,14 @@ end
 local function setupAttribute(self)
 	if InCombatLockdown() then return end
 
-	if classList[I.MyClass] and not IsAddOnLoaded("Clique") then
+	if classList[I.MyClass] and not C_AddOns.IsAddOnLoaded("Clique") then
 		self:SetAttribute("*type3", "macro")
 		self:SetAttribute("macrotext3", macroBody(I.MyClass))
 		self:UnregisterEvent("PLAYER_REGEN_ENABLED", setupAttribute)
 	end
 end
 
-local Enable = function(self)
+local function Enable(self)
 	if not R.db["UFs"]["AutoRes"] then return end
 
 	if InCombatLockdown() then
@@ -84,7 +76,7 @@ local Enable = function(self)
 	end
 end
 
-local Disable = function(self)
+local function Disable(self)
 	if R.db["UFs"]["AutoRes"] then return end
 
 	self:SetAttribute("*type3", nil)

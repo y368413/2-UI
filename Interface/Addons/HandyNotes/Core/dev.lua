@@ -57,6 +57,13 @@ local function BootstrapDevelopmentEnvironment()
         desc = L['options_toggle_force_nodes_desc'],
         order = 103
     }
+    Core.options.args.GeneralTab.args.show_debug_currency = {
+        type = 'toggle',
+        arg = 'show_debug_currency',
+        name = L['options_toggle_show_debug_currency'],
+        desc = L['options_toggle_show_debug_currency_desc'],
+        order = 104
+    }
 
     -- Print debug messages for each quest ID that is flipped
     local QTFrame = CreateFrame('Frame', "HandyNotes_Core" .. 'QT')
@@ -66,44 +73,90 @@ local function BootstrapDevelopmentEnvironment()
     local changed = {}
     local max_quest_id = 100000
 
-    local function DebugQuest(...)
-        if Core:GetOpt('show_debug_quest') then Core.Debug(...) end
+    local CurrencyFrame = CreateFrame('Frame', "HandyNotes_Core" .. 'C')
+    local c_lastCheck = GetTime()
+    local c_history = Core.GetDatabaseTable('currency_id_history')
+    local currency = {}
+    local c_changed = {}
+
+    if Core:GetOpt('show_debug_quest') then
+        C_Timer.After(2, function()
+            -- Give some time for quest info to load in before we start
+            for id = 65000, max_quest_id do
+                quests[id] = C_QuestLog.IsQuestFlaggedCompleted(id)
+            end
+            QTFrame:SetScript('OnUpdate', function()
+                if GetTime() - lastCheck > 5 and Core:GetOpt('show_debug_quest') then
+                    for id = 65000, max_quest_id do
+                        local s = C_QuestLog.IsQuestFlaggedCompleted(id)
+                        if s ~= quests[id] then
+                            changed[#changed + 1] = {time(), id, quests[id], s}
+                            quests[id] = s
+                        end
+                    end
+                    if #changed <= 10 then
+                        -- changing zones will sometimes cause thousands of quest
+                        -- ids to flip state, we do not want to report on those
+                        for i, args in ipairs(changed) do
+                            table.insert(history, 1, args)
+                            print('Quest', args[2], 'changed:', args[3], '=>',
+                                args[4])
+                        end
+                    end
+                    if #history > 100 then
+                        for i = #history, 101, -1 do
+                            history[i] = nil
+                        end
+                    end
+                    lastCheck = GetTime()
+                    wipe(changed)
+                end
+            end)
+            print('Quest IDs are now being tracked')
+        end)
     end
 
-    C_Timer.After(2, function()
-        -- Give some time for quest info to load in before we start
-        for id = 0, max_quest_id do
-            quests[id] = C_QuestLog.IsQuestFlaggedCompleted(id)
-        end
-        QTFrame:SetScript('OnUpdate', function()
-            if GetTime() - lastCheck > 1 and Core:GetOpt('show_debug_quest') then
-                for id = 0, max_quest_id do
-                    local s = C_QuestLog.IsQuestFlaggedCompleted(id)
-                    if s ~= quests[id] then
-                        changed[#changed + 1] = {time(), id, quests[id], s}
-                        quests[id] = s
+    if Core:GetOpt('show_debug_currency') then
+        C_Timer.After(2, function()
+            -- Give some time for currency info to load in before we start
+            for id = 1, 3000 do
+                local c = C_CurrencyInfo.GetCurrencyInfo(id) or false
+                if c then currency[id] = c.quantity end
+            end
+            CurrencyFrame:SetScript('OnUpdate', function()
+                if GetTime() - c_lastCheck > 5 and
+                    Core:GetOpt('show_debug_currency') then
+                    for id = 1, 3000 do
+                        local c = C_CurrencyInfo.GetCurrencyInfo(id) or false
+                        if c then
+                            local s = c.quantity
+                            if s ~= currency[id] then
+                                c_changed[#c_changed + 1] = {
+                                    time(), id, currency[id], s
+                                }
+                                currency[id] = s
+                            end
+                        end
                     end
-                end
-                if #changed <= 10 then
-                    -- changing zones will sometimes cause thousands of quest
-                    -- ids to flip state, we do not want to report on those
-                    for i, args in ipairs(changed) do
-                        table.insert(history, 1, args)
-                        DebugQuest('Quest', args[2], 'changed:', args[3], '=>',
+
+                    for i, args in ipairs(c_changed) do
+                        table.insert(c_history, 1, args)
+                        print('Currency', args[2], 'changed:', args[3], '=>',
                             args[4])
                     end
-                end
-                if #history > 100 then
-                    for i = #history, 101, -1 do
-                        history[i] = nil
+
+                    if #c_history > 100 then
+                        for i = #c_history, 101, -1 do
+                            c_history[i] = nil
+                        end
                     end
+                    c_lastCheck = GetTime()
+                    wipe(c_changed)
                 end
-                lastCheck = GetTime()
-                wipe(changed)
-            end
+            end)
+            print('Currency changes are now being tracked')
         end)
-        DebugQuest('Quest IDs are now being tracked')
-    end)
+    end
 
     -- Listen for LCTRL + LALT when the map is open to force display nodes
     local IQFrame = CreateFrame('Frame', "HandyNotes_Core" .. 'IQ', WorldMapFrame)
@@ -177,6 +230,23 @@ _G["HandyNotes_Core" .. 'QuestHistory'] = function(count)
             time = 'MISSING'
         else
             time, id, old, new = unpack(history[i])
+            time = date('%H:%M:%S', time)
+        end
+        print(time, '::', id, '::', old, '=>', new)
+    end
+end
+
+_G["HandyNotes_Core" .. 'CurrencyHistory'] = function(count)
+    local c_history = Core.GetDatabaseTable('currency_id_history')
+    if #c_history == 0 then return print('Currency history is empty') end
+    for i = 1, (count or 10) do
+        if i > #c_history then break end
+        local time, id, old, new, _
+        if c_history[i][1] == 'Currency' then
+            _, id, _, old, _, new = unpack(c_history[i])
+            time = 'MISSING'
+        else
+            time, id, old, new = unpack(c_history[i])
             time = date('%H:%M:%S', time)
         end
         print(time, '::', id, '::', old, '=>', new)

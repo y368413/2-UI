@@ -100,7 +100,7 @@ function HPetBattleAny:Search(command,rest)
 		end
 	end
 
-	for i=1,C_PetJournal.GetNumPets(false) do
+	for i=1,C_PetJournal.GetNumPets() do
 		local petID,speciesID,isOwned, _, _, _, _, name, _, _, _, sourceText=C_PetJournal.GetPetInfoByIndex(i)
 		if command=="s" then
 			if serachtemp and string.find(sourceText,serachtemp[1]) then
@@ -183,24 +183,22 @@ local npcs = {
 		["QuestID"]=31955
 	},
 
-	["派恩少校"]={
-		["QuestID"]=31935
-	},
+	-- ["派恩少校"]={
+	-- 	["QuestID"]=31935
+	-- },
 
-	["“冷血”崔克斯"]={
-		["QuestID"]=31909
-	},
-	["奥巴里斯"]={
-		["QuestID"]=31971
-	},
-	["莉迪亚·埃考斯特"]={
-		["QuestID"]=31916
-	},
-	["血骑士安塔里"]={
-		["QuestID"]=31926
-	},
-
-
+	-- ["“冷血”崔克斯"]={
+	-- 	["QuestID"]=31909
+	-- },
+	-- ["奥巴里斯"]={
+	-- 	["QuestID"]=31971
+	-- },
+	-- ["莉迪亚·埃考斯特"]={
+	-- 	["QuestID"]=31916
+	-- },
+	-- ["血骑士安塔里"]={
+	-- 	["QuestID"]=31926
+	-- },
 
 	['“冷血”崔克斯'] = {['qID'] = 31909},
 	['艾琳娜·振翼'] = {['qID'] = 31908},

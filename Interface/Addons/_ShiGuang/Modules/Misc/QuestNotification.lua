@@ -4,7 +4,7 @@ local MISC = M:GetModule("Misc")
 
 local strmatch, strfind, gsub, format, floor = strmatch, strfind, gsub, format, floor
 local wipe, mod, tonumber, pairs, print = wipe, mod, tonumber, pairs, print
-local IsPartyLFG, IsInRaid, IsInGroup, PlaySound, SendChatMessage = IsPartyLFG, IsInRaid, IsInGroup, PlaySound, SendChatMessage
+local SendChatMessage = SendChatMessage
 local GetQuestLink = GetQuestLink
 local C_QuestLog_GetInfo = C_QuestLog.GetInfo
 local C_QuestLog_IsComplete = C_QuestLog.IsComplete
@@ -15,7 +15,7 @@ local C_QuestLog_GetQuestIDForLogIndex = C_QuestLog.GetQuestIDForLogIndex
 local C_QuestLog_GetNumQuestLogEntries = C_QuestLog.GetNumQuestLogEntries
 local C_QuestLog_GetLogIndexForQuestID = C_QuestLog.GetLogIndexForQuestID
 local soundKitID = SOUNDKIT.ALARM_CLOCK_WARNING_3
-local DAILY, QUEST_COMPLETE = DAILY, QUEST_COMPLETE
+local DAILY, QUEST_COMPLETE, COLLECTED = DAILY, QUEST_COMPLETE, COLLECTED
 local LE_QUEST_TAG_TYPE_PROFESSION = Enum.QuestTagType.Profession
 local LE_QUEST_FREQUENCY_DAILY = Enum.QuestFrequency.Daily
 
@@ -42,7 +42,7 @@ end
 local function sendQuestMsg(msg)
 	if R.db["Misc"]["OnlyCompleteRing"] then return end
 
-	if IsPartyLFG() then
+	if (IsPartyLFG() or C_PartyInfo.IsPartyWalkIn()) then
 		SendChatMessage(msg, "INSTANCE_CHAT")
 	--elseif IsInRaid() then
 		--SendChatMessage(msg, "RAID")
@@ -129,18 +129,34 @@ function MISC:FindWorldQuestComplete(questID)
 	end
 end
 
+-- Dragon glyph notification
+local glyphAchievements = {
+	[16575] = true, -- 觉醒海岸
+	[16576] = true, -- 欧恩哈拉平原
+	[16577] = true, -- 碧蓝林海
+	[16578] = true, -- 索德拉苏斯
+}
+
+function MISC:FindDragonGlyph(achievementID, criteriaString)
+	if glyphAchievements[achievementID] then
+		sendQuestMsg(criteriaString.." "..COLLECTED)
+	end
+end
+
 function MISC:QuestNotification()
 	if R.db["Misc"]["QuestNotification"] then
 		M:RegisterEvent("QUEST_ACCEPTED", MISC.FindQuestAccept)
 		M:RegisterEvent("QUEST_LOG_UPDATE", MISC.FindQuestComplete)
 		M:RegisterEvent("QUEST_TURNED_IN", MISC.FindWorldQuestComplete)
 		M:RegisterEvent("UI_INFO_MESSAGE", MISC.FindQuestProgress)
+		M:RegisterEvent("CRITERIA_EARNED", MISC.FindDragonGlyph)
 	else
 		wipe(completedQuest)
 		M:UnregisterEvent("QUEST_ACCEPTED", MISC.FindQuestAccept)
 		M:UnregisterEvent("QUEST_LOG_UPDATE", MISC.FindQuestComplete)
 		M:UnregisterEvent("QUEST_TURNED_IN", MISC.FindWorldQuestComplete)
 		M:UnregisterEvent("UI_INFO_MESSAGE", MISC.FindQuestProgress)
+		M:UnregisterEvent("CRITERIA_EARNED", MISC.FindDragonGlyph)
 	end
 end
 MISC:RegisterMisc("QuestNotification", MISC.QuestNotification)

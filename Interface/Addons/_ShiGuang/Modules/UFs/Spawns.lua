@@ -18,10 +18,22 @@ end
 
 local function CreatePlayerStyle(self)
 	self.mystyle = "player"
+	UF:CreateCastBar(self)
+	UF:CreateQuestSync(self)
+	UF:CreateClassPower(self)
+	UF:StaggerBar(self)
+	UF:CreateSwing(self)
+
+	if R.db["UFs"]["Castbars"] then
+		UF:ReskinMirrorBars()
+		UF:ReskinTimerTrakcer(self)
+	end
+	--if R.db["Map"]["DisableMinimap"] or not R.db["Misc"]["ExpRep"] then UF:CreateExpRepBar(self) end
 end
 
 local function CreateTargetStyle(self)
 	self.mystyle = "target"
+	UF:CreateCastBar(self)
 end
 
 local function CreateFocusStyle(self)
@@ -33,12 +45,13 @@ local function CreateFocusStyle(self)
 	UF:CreateHealthText(self)
 	UF:CreatePowerBar(self)
 	UF:CreatePowerText(self)
+	UF:CreatePortrait(self)
 	UF:CreateCastBar(self)
 	UF:CreateRaidMark(self)
 	UF:CreateIcons(self)
 	UF:CreatePrediction(self)
 	UF:CreateAuras(self)
-	UF:DemonicGatewayIcon(self)
+	--UF:DemonicGatewayIcon(self)
 end
 
 local function CreateFocusTargetStyle(self)
@@ -100,13 +113,10 @@ local function CreateRaidStyle(self)
 	UF:CreateRaidIcons(self)
 	UF:CreatePrediction(self)
 	UF:CreateClickSets(self)
-	UF:CreateRaidDebuffs(self)
 	UF:CreateThreatBorder(self)
-	UF:CreateAuras(self)
-	UF:CreateBuffs(self)
-	UF:CreateDebuffs(self)
-	UF:RefreshAurasByCombat(self)
-	UF:CreateBuffIndicator(self)
+	if self.raidType ~= "simple" then
+		UF:CreateRaidAuras(self)
+	end
 end
 
 local function CreateSimpleRaidStyle(self)
@@ -117,7 +127,6 @@ end
 local function CreatePartyStyle(self)
 	self.raidType = "party"
 	CreateRaidStyle(self)
-	UF:InterruptIndicator(self)
 	UF:CreatePartyAltPower(self)
 end
 
@@ -160,7 +169,7 @@ local function GetRaidVisibility()
 		end
 	else
 		if R.db["UFs"]["ShowSolo"] then
-			visibility = "[group,nogroup]show;hide"
+			visibility = "show"
 		else
 			visibility = "[group] show;hide"
 		end
@@ -251,7 +260,6 @@ function UF:OnLogin()
 		UF:BlockAddons()
 		UF:CreateUnitTable()
 		UF:CreatePowerUnitTable()
-		UF:CheckExplosives()
 		UF:UpdateGroupRoles()
 		UF:QuestIconCheck()
 		UF:RefreshPlateByEvents()
@@ -296,6 +304,7 @@ function UF:OnLogin()
 		oUF:SetActiveStyle("Focus")
 		local focus = oUF:Spawn("focus", "oUF_Focus")
 		M.Mover(focus, U["FocusUF"], "FocusUF", R.UFs.FocusPos)
+		UF.ToggleCastBar(focus, "Focus")
 
 		oUF:SetActiveStyle("FocusTarget")
 		local focustarget = oUF:Spawn("focustarget", "oUF_FocusTarget")
@@ -328,18 +337,29 @@ function UF:OnLogin()
 			end
 		end
 
+		--UF:ToggleAddPower()
 		UF:ToggleSwingBars()
 		UF:ToggleUFClassPower()
 		UF:UpdateTextScale()
 		UF:ToggleAllAuras()
 		--UF:UpdateScrollingFont()
+		--UF:TogglePortraits()
+		UF:CheckPowerBars()
+		UF:UpdateRaidInfo() -- RaidAuras
+	--end
+
 	if R.db["UFs"]["RaidFrame"] then
-		SetCVar("predictedHealth", 1)
+		M:LockCVar("predictedHealth", "1")
 		UF:AddClickSetsListener()
 		UF:UpdateCornerSpells()
+		UF:UpdateRaidBuffsWhite()
+		UF:UpdateRaidDebuffsBlack()
 		UF.headers = {}
 
 		-- Hide Default RaidFrame
+		if CompactPartyFrame then
+			CompactPartyFrame:UnregisterAllEvents()
+		end
 		if CompactRaidFrameManager_SetSetting then
 			CompactRaidFrameManager_SetSetting("IsShown", "0")
 			UIParent:UnregisterEvent("GROUP_ROSTER_UPDATE")
@@ -350,9 +370,6 @@ function UF:OnLogin()
 		-- Group Styles
 		local partyMover
 		if R.db["UFs"]["PartyFrame"] then
-			UF:SyncWithZenTracker()
-			UF:UpdatePartyWatcherSpells()
-
 			local party
 			oUF:RegisterStyle("Party", CreatePartyStyle)
 			oUF:SetActiveStyle("Party")
@@ -613,7 +630,7 @@ function UF:OnLogin()
 						group.index = i
 						group.groupType = "raid"
 						tinsert(UF.headers, group)
-						RegisterStateDriver(group, "visibility", "[group,nogroup]show;hide")
+						RegisterStateDriver(group, "visibility", "show")
 						RegisterStateDriver(group, "visibility", GetRaidVisibility())
 						CreateTeamIndex(group)
 
@@ -670,8 +687,6 @@ function UF:OnLogin()
 			UF:UpdateRaidTeamIndex()
 		end
 
-		UF:UpdateRaidHealthMethod()
-
 		if R.db["UFs"]["SpecRaidPos"] then
 			local function UpdateSpecPos(event, ...)
 				local unit, _, spellID = ...
@@ -700,18 +715,22 @@ function UF:OnLogin()
 			M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", UpdateSpecPos)
 
 			if raidMover then
-				hooksecurefunc(raidMover, "SetPoint", function()
+				local function updateRaidMover()
 					local specIndex = GetSpecialization()
 					if not specIndex then return end
 					R.db["Mover"]["RaidPos"..specIndex] = R.db["Mover"]["RaidFrame"]
-				end)
+				end
+				raidMover:HookScript("OnDragStop", updateRaidMover)
+				raidMover:HookScript("OnHide", updateRaidMover)
 			end
 			if partyMover then
-				hooksecurefunc(partyMover, "SetPoint", function()
+				local function updatePartyMover()
 					local specIndex = GetSpecialization()
 					if not specIndex then return end
 					R.db["Mover"]["PartyPos"..specIndex] = R.db["Mover"]["PartyFrame"]
-				end)
+				end
+				partyMover:HookScript("OnDragStop", updatePartyMover)
+				partyMover:HookScript("OnHide", updatePartyMover)
 			end
 		end
 	end

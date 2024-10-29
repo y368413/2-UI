@@ -1,4 +1,4 @@
-﻿local _, addon = ...
+local _, addon = ...
 
 local Skada = LibStub("AceAddon-3.0"):NewAddon(addon, "Skada", "AceTimer-3.0")  --, "LibNotify-1.0"
 _G.Skada = Skada
@@ -1916,7 +1916,7 @@ local function cleuHandler(timestamp, eventtype, hideCaster, srcGUID, srcName, s
 	-- Pet scheme: save the GUID in a table along with the GUID of the owner.
 	-- Note to self: this needs 1) to be made self-cleaning so it can't grow too much, and 2) saved persistently.
 	-- Now also done on raid roster/party changes.
-	if eventtype == 'SPELL_SUMMON' and ( (band(srcFlags, RAID_FLAGS) ~= 0) or ( (band(srcFlags, PET_FLAGS)) ~= 0 ) or ((band(dstFlags, PET_FLAGS) ~= 0) and pets[dstGUID])) then
+	if eventtype == 'SPELL_SUMMON' and srcName and srcName ~= "" and (band(srcFlags, RAID_FLAGS) ~= 0 or band(srcFlags, PET_FLAGS) ~= 0 or (band(dstFlags, PET_FLAGS) ~= 0 and pets[dstGUID])) then
 		-- assign pet normally
 		pets[dstGUID] = {id = srcGUID, name = srcName}
 		if pets[srcGUID] then
@@ -2370,43 +2370,8 @@ function Skada:PlayerActiveTime(set, player)
 end
 
 do
-	local tooltip = CreateFrame("GameTooltip", "SkadaTooltip", nil, "GameTooltipTemplate")
-	tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
-
-	local function GetRussianOwnerID(owner)
-		if not _G.LOCALE_ruRU or not Skada.current then return end
-		for _, p in Skada.current.players do
-			local sex = UnitSex(p.name)
-			for set = 1, GetNumDeclensionSets(p.name, sex) do
-				local name = DeclineName(p.name, sex, set) -- first return is genitive
-				if owner == name then
-					return p.id
-				end
-			end
-		end
-	end
-
-	local ownerPatterns = {}
-	for i = 1, 44 do
-		local title = _G["UNITNAME_SUMMON_TITLE"..i]
-		if title and title ~= "%s" and title:find("%s", nil, true) then
-			local pattern = title:gsub("%%s", "(.-)")
-			tinsert(ownerPatterns, pattern)
-		end
-	end
 	local function GetPetOwner(guid)
-		tooltip:SetHyperlink("unit:" .. guid)
-		for i = 2, tooltip:NumLines() do
-			local text = _G["SkadaTooltipTextLeft"..i]:GetText()
-			if text then
-				for _, pattern in next, ownerPatterns do
-					local owner = text:match(pattern)
-					if owner then
-						return owner
-					end
-				end
-			end
-		end
+		local data = C_TooltipInfo.GetHyperlink("unit:" .. guid)
 	end
 
 	-- Modify objects if they are pets.
@@ -2424,11 +2389,12 @@ do
 				owner = { id = UnitGUID("player"), name = UnitName("player") }
 				pets[action.playerid] = owner
 			else
-				local ownerName = GetPetOwner(action.playerid)
-				if ownerName then
-					local id = UnitGUID(ownerName) or GetRussianOwnerID(ownerName)
-					if players[id] then
-						owner = { id = id, name = ownerName }
+				local id = GetPetOwner(action.playerid)
+				if players[id] then
+					local name, server = select(6, GetPlayerInfoByGUID(id))
+					if name then
+						if server and server ~= "" then name = name.."-"..server end
+						owner = { id = id, name = name }
 						pets[action.playerid] = owner
 					end
 				end
@@ -2456,6 +2422,16 @@ do
 	end
 end
 
+-- Takes a source GUID and name and returns the owner GUID and name if found.
+function Skada:FixMyPets(guid, name)
+	local owner = pets[guid]
+	if owner then
+		return owner.id, owner.name
+	end
+	-- No pet match, return the original source.
+	return guid, name
+end
+
 function Skada:SetTooltipPosition(tooltip, frame)
 	local p = self.db.profile.tooltippos
 	if p == "default" then
@@ -2477,16 +2453,6 @@ function Skada:SetTooltipPosition(tooltip, frame)
 			tooltip:SetPoint("TOPRIGHT", frame, "TOPLEFT", -10, 0)
 		end
 	end
-end
-
--- Same thing, only takes two arguments and returns two arguments.
-function Skada:FixMyPets(playerGUID, playerName)
-	local pet = pets[playerGUID]
-	if pet then
-		return pet.id, pet.name
-	end
-	-- No pet match - return the player.
-	return playerGUID, playerName
 end
 
 -- Format value text in a standardized way. Up to 3 value and boolean (show/don't show) combinations are accepted.
@@ -2877,83 +2843,88 @@ function Skada:OnInitialize()
 		--media:Register("statusbar", "TukTex",			[[Interface\Addons\Skada\statusbar\normTex]])
 
 
-		-- Some sounds (copied from Omen).
-		media:Register("sound", "Rubber Ducky", 566121)
-		media:Register("sound", "Cartoon FX", 566543)
-		media:Register("sound", "Explosion", 566982)
-		media:Register("sound", "Shing!", 566240)
-		media:Register("sound", "Wham!", 566946)
-		media:Register("sound", "Simon Chime", 566076)
-		media:Register("sound", "War Drums", 567275)
-		media:Register("sound", "Cheer", 567283)
-		media:Register("sound", "Humm", 569518)
-		media:Register("sound", "Short Circuit", 568975)
-		media:Register("sound", "Fel Portal", 569215)
-		media:Register("sound", "Fel Nova", 568582)
-		media:Register("sound", "You Will Die!", 546633)
+	-- Some sounds (copied from Omen).
+	media:Register("sound", "Rubber Ducky",         566121) --[[Sound\Doodad\Goblin_Lottery_Open01.ogg]]
+	media:Register("sound", "Cartoon FX",           566543) --[[Sound\Doodad\Goblin_Lottery_Open03.ogg]]
+	media:Register("sound", "Explosion",            566982) --[[Sound\Doodad\Hellfire_Raid_FX_Explosion05.ogg]]
+	media:Register("sound", "Shing!",               566240) --[[Sound\Doodad\PortcullisActive_Closed.ogg]]
+	media:Register("sound", "Wham!",                566946) --[[Sound\Doodad\PVP_Lordaeron_Door_Open.ogg]]
+	media:Register("sound", "Simon Chime",          566076) --[[Sound\Doodad\SimonGame_LargeBlueTree.ogg]]
+	media:Register("sound", "War Drums",            567275) --[[Sound\Event Sounds\Event_wardrum_ogre.ogg]]
+	media:Register("sound", "Cheer",                567283) --[[Sound\Event Sounds\OgreEventCheerUnique.ogg]]
+	media:Register("sound", "Humm",                 569518) --[[Sound\Spells\SimonGame_Visual_GameStart.ogg]]
+	media:Register("sound", "Short Circuit",        568975) --[[Sound\Spells\SimonGame_Visual_BadPress.ogg]]
+	media:Register("sound", "Fel Portal",           569215) --[[Sound\Spells\Sunwell_Fel_PortalStand.ogg]]
+	media:Register("sound", "Fel Nova",             568582) --[[Sound\Spells\SeepingGaseous_Fel_Nova.ogg]]
+	media:Register("sound", "You Will Die!",        546633) --[[Sound\Creature\CThun\CThunYouWillDie.ogg]]
 
-		-- DB
-		self.db = LibStub("AceDB-3.0"):New("SkadaDB", self.defaults, "Default")
-		if type(SkadaPerCharDB) ~= "table" then SkadaPerCharDB = {} end
-		self.char = SkadaPerCharDB
-		self.char.sets = self.char.sets or {}
-		self.char.cached_specs = self.char.cached_specs or {}
-		LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Skada", self.options, true)
+	-- DB
+	self.db = LibStub("AceDB-3.0"):New("SkadaDB", self.defaults, "Default")
+	if type(SkadaPerCharDB) ~= "table" then SkadaPerCharDB = {} end
+	self.char = SkadaPerCharDB
+	self.char.sets = self.char.sets or {}
+	self.char.cached_specs = self.char.cached_specs or {}
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Skada", self.options, true)
 
-		-- Profiles
-		LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Skada-Profiles", LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db), true)
-        local profiles = LibStub('AceDBOptions-3.0'):GetOptionsTable(self.db)
-        profiles.order = 600
-        profiles.disabled = false
-        Skada.options.args.profiles = profiles
+	-- Profiles
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Skada-Profiles", LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db), true)
+	local profiles = LibStub('AceDBOptions-3.0'):GetOptionsTable(self.db)
+	profiles.order = 600
+	profiles.disabled = false
+	Skada.options.args.profiles = profiles
 
-		-- Dual spec profiles
-		if lds then
-			lds:EnhanceDatabase(self.db, "SkadaDB")
-			lds:EnhanceOptions(LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db), self.db)
-		end
+	-- Dual spec profiles
+	if lds then
+		lds:EnhanceDatabase(self.db, "SkadaDB")
+		lds:EnhanceOptions(LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db), self.db)
+	end
 
-        --[[ Blizzard options frame
-        local panel = CreateFrame("Frame", "SkadaBlizzOptions")
-        panel.name = L["SkadaTitle"]
-        InterfaceOptions_AddCategory(panel)
+	-- Blizzard options frame
+	local panel = CreateFrame("Frame", "SkadaBlizzOptions")
+	panel.name = "Skada"
+    panel.GetCategory = function() return nil end --from Baz4k
+    panel.GetParentCategory = function() return nil end
 
-        local fs = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-        fs:SetPoint("TOPLEFT", 10, -15)
-        fs:SetPoint("BOTTOMRIGHT", panel, "TOPRIGHT", 10, -45)
-        fs:SetJustifyH("LEFT")
-        fs:SetJustifyV("TOP")
-        fs:SetText(L["SkadaTitle"].."Skada")
+    local skadaCategory = Settings.RegisterCanvasLayoutCategory(panel, L["SkadaTitle"])
 
-        local button = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
-        button:SetText(L['Configure'])
-        button:SetWidth(128)
-        button:SetPoint("TOPLEFT", 10, -48)
-        button:SetScript('OnClick', function()
-            while CloseWindows() do end
-            return Skada:OpenOptions()
-        end)]]
+    Settings.RegisterAddOnCategory(skadaCategory)
+	
+	local fs = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	fs:SetPoint("TOPLEFT", 10, -15)
+	fs:SetPoint("BOTTOMRIGHT", panel, "TOPRIGHT", 10, -45)
+	fs:SetJustifyH("LEFT")
+	fs:SetJustifyV("TOP")
+	fs:SetText(L["SkadaTitle"])
 
-		-- Slash Handler
-		SLASH_SKADA1 = "/skada"
-		SlashCmdList.SKADA = slashHandler
+	local button = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+	button:SetText(L["Configure"])
+	button:SetWidth(128)
+	button:SetPoint("TOPLEFT", 10, -48)
+	button:SetScript('OnClick', function()
+		while CloseWindows() do end
+		return Skada:OpenOptions()
+	end)
 
-		self.db.RegisterCallback(self, "OnProfileChanged", "ReloadSettings")
-		self.db.RegisterCallback(self, "OnProfileCopied", "ReloadSettings")
-		self.db.RegisterCallback(self, "OnProfileReset", "ReloadSettings")
-		self.db.RegisterCallback(self, "OnDatabaseShutdown", "ClearAllIndexes")
+	-- Slash Handler
+	SLASH_SKADA1 = "/skada"
+	SlashCmdList.SKADA = slashHandler
 
-		-- Migrate old settings.
-		if self.db.profile.barmax then
-			self:Print("Migrating old settings somewhat gracefully. This should only happen once.")
-			self.db.profile.barmax = nil
-			self.db.profile.background.height = 200
-		end
-		if self.db.profile.total then
-			self.db.profile.current = nil
-			self.db.profile.total = nil
-			self.db.profile.sets = nil
-		end
+	self.db.RegisterCallback(self, "OnProfileChanged", "ReloadSettings")
+	self.db.RegisterCallback(self, "OnProfileCopied", "ReloadSettings")
+	self.db.RegisterCallback(self, "OnProfileReset", "ReloadSettings")
+	self.db.RegisterCallback(self, "OnDatabaseShutdown", "ClearAllIndexes")
+
+	-- Migrate old settings.
+	if self.db.profile.barmax then
+		self:Print("Migrating old settings somewhat gracefully. This should only happen once.")
+		self.db.profile.barmax = nil
+		self.db.profile.background.height = 200
+	end
+	if self.db.profile.total then
+		self.db.profile.current = nil
+		self.db.profile.total = nil
+		self.db.profile.sets = nil
+	end
 end
 
 function Skada:OpenOptions(window)

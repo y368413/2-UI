@@ -795,7 +795,7 @@ end
 
 
 --[[function MTG:MERCHANT_CLOSED(event,...)
-    if IsAddOnLoaded("WeakAuras") then
+    if C_AddOns.IsAddOnLoaded("WeakAuras") then
         if WeakAuras.loaded["Mrrl's trade game"] then 
             MTG:UnregisterEvent("MERCHANT_SHOW")
             MTG:UnregisterEvent("MERCHANT_CLOSED")

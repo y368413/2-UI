@@ -9,6 +9,8 @@ local HandyNotes = LibStub('AceAddon-3.0'):GetAddon('HandyNotes', true)
 local L = LibStub('AceLocale-3.0'):GetLocale("HandyNotes")
 if not HandyNotes then return end
 
+--local LibDD = LibStub:GetLibrary('LibUIDropDownMenu-4.0')
+
 Core.addon = Addon
 Core.locale = L
 Core.maps = {}
@@ -19,7 +21,7 @@ _G["HandyNotes_Core"] = Addon
 ----------------------------------- HELPERS -----------------------------------
 -------------------------------------------------------------------------------
 
-local DropdownMenu = CreateFrame('Frame', "HandyNotes_Core" .. 'DropdownMenu')
+local DropdownMenu = CreateFrame("Frame", "HandyNotes_Core" .. 'DropdownMenu', nil, "UIDropDownMenuTemplate") -- = Create_UIDropDownMenu("HandyNotes_Core" .. 'DropdownMenu')
 DropdownMenu.displayMode = 'MENU'
 local function InitializeDropdownMenu(level, mapID, coord)
     if not level then return end
@@ -47,20 +49,44 @@ local function InitializeDropdownMenu(level, mapID, coord)
             end
         }, level)
 
-        if select(2, IsAddOnLoaded('TomTom')) then
+        if select(2, C_AddOns.IsAddOnLoaded('TomTom')) then
+            -- Add spacer before TomTom section
+            UIDropDownMenu_AddButton(spacer, level)
+            -- Add waypoint to TomoTom for single node
             UIDropDownMenu_AddButton({
                 text = L['context_menu_add_tomtom'],
                 notCheckable = 1,
                 func = function(button)
-                    local x, y = HandyNotes:getXY(coord)
-                    TomTom:AddWaypoint(mapID, x, y, {
-                        title = Core.RenderLinks(node.label, true),
-                        persistent = nil,
-                        minimap = true,
-                        world = true
-                    })
+                    Core.tomtom.AddSingleWaypoint(node, mapID, coord)
+                    TomTom:SetClosestWaypoint(false)
                 end
             }, level)
+            -- Add waypoints to TomTom for entire group
+            for i, group in pairs(node.group) do
+                if group ~= Core.groups.MISC then
+                    UIDropDownMenu_AddButton({
+                        text = L['context_menu_add_group_tomtom'],
+                        notCheckable = 1,
+                        func = function(button)
+                            Core.tomtom.AddGroupWaypoints(node, mapID, coord)
+                            TomTom:SetClosestWaypoint(false)
+                        end
+                    }, level)
+                end
+            end
+            -- Add waypoints to TomTom for node fgroup (focus group)
+            if node.fgroup then
+                UIDropDownMenu_AddButton({
+                    text = L['context_menu_add_focus_group_tomtom'],
+                    notCheckable = 1,
+                    func = function(button)
+                        Core.tomtom.AddFocusGroupWaypoints(node, mapID)
+                        TomTom:SetClosestWaypoint(false)
+                    end
+                }, level)
+            end
+            -- Add spacer after TomTom section
+            UIDropDownMenu_AddButton(spacer, level)
         end
 
         UIDropDownMenu_AddButton({
@@ -141,6 +167,8 @@ function Addon:OnClick(button, down, mapID, coord)
         if map:CanFocus(node) then
             map:SetFocus(node, coord, not map:IsFocused(coord))
             Addon:RefreshImmediate()
+        elseif node.OnClick then
+            node.OnClick()
         end
     end
 end
@@ -153,21 +181,26 @@ function Addon:OnInitialize()
     self:RegisterEvent('PLAYER_ENTERING_WORLD', function()
         self:UnregisterEvent('PLAYER_ENTERING_WORLD')
         self:ScheduleTimer('RegisterWithHandyNotes', 1)
+
+        -- Query localized expansion title
+        if not Core.expansion then
+            error('Expansion not set: ' .. "HandyNotes_Core")
+        end
+        local expansion_name = _G['EXPANSION_NAME' .. (Core.expansion - 1)]
+        Core.plugin_name = 'HandyNotes: ' .. expansion_name
+        Core.options.name = ('%02d - '):format(Core.expansion) .. expansion_name
     end)
 
     -- Add global groups to settings panel
     Core.CreateGlobalGroupOptions()
 
+    -- Update calendar events
+    Core.UpdateActiveCalendarEvents()
+
     -- Add quick-toggle menu button to top-right corner of world map
     local template = "HandyNotes_Core" .. 'WorldMapOptionsButtonTemplate'
-    Core.world_map_button = LibStub('Krowi_WorldMapButtons-1.3'):Add(template,
+    Core.world_map_button = LibStub('Krowi_WorldMapButtons-1.4'):Add(template,
         'DROPDOWNTOGGLEBUTTON')
-
-    -- Query localized expansion title
-    if not Core.expansion then error('Expansion not set: ' .. "HandyNotes_Core") end
-    local expansion_name = EJ_GetTierInfo(Core.expansion)
-    Core.plugin_name = 'HandyNotes: ' .. expansion_name
-    Core.options.name = ('%02d - '):format(Core.expansion) .. expansion_name
 end
 
 -------------------------------------------------------------------------------

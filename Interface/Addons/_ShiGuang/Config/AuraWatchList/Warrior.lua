@@ -68,7 +68,7 @@ local list = {
 		{AuraID = 209484, UnitID = "player"},	-- 战术优势
 		{AuraID = 248625, UnitID = "player"},	-- 粉碎防御
 		{AuraID = 248622, UnitID = "player"},	-- 杀心骤起
-		--{AuraID = 190456, UnitID = "player", Value = true},	-- 无视痛苦
+		{AuraID = 190456, UnitID = "player", Value = true},	-- 无视痛苦
 		{AuraID = 260708, UnitID = "player"},	-- 横扫攻击
 		{AuraID = 262228, UnitID = "player"},	-- 致命平静
 	},

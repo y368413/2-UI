@@ -1,7 +1,6 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-
 local _, BattleForAzeroth = ...
 local L = BattleForAzeroth.locale
 local Class = BattleForAzeroth.Class
@@ -22,7 +21,7 @@ local nodes = map.nodes
 ---------------------------------- BUFF BOTS ----------------------------------
 -------------------------------------------------------------------------------
 
-local Buff = Class('Buff', NPC, {group=BattleForAzeroth.groups.MECH_BUFF, scale=0.75})
+local Buff = Class('Buff', NPC, {group = BattleForAzeroth.groups.MECH_BUFF, scale = 0.75})
 local GREASE = Buff({id = 155911, icon = 252178, note = L['grease_bot_note']})
 local SHOCK = Buff({id = 155909, icon = 136099, note = L['shock_bot_note']})
 local WELDING = Buff({id = 155910, icon = 134952, note = L['welding_bot_note']})

@@ -51,10 +51,14 @@ function Node:Initialize(attrs)
     self.questDeps = Core.AsTable(self.questDeps)
     self.parent = Core.AsIDTable(self.parent)
     self.requires = Core.AsTable(self.requires, Requirement)
+    self.group = Core.AsTable(self.group, Group)
+    self.vignette = Core.AsTable(self.vignette)
 
-    -- ensure proper group is assigned
-    if not IsInstance(self.group, Group) then
-        error('group attribute must be a Group class instance: ' .. self.group)
+    -- ensure proper group(s) is/are assigned
+    for _, group in pairs(self.group) do
+        if not IsInstance(group, Group) then
+            error('group attribute must be a Group class instance: ' .. group)
+        end
     end
 end
 
@@ -65,8 +69,8 @@ for this node.
 
 function Node:GetDisplayInfo(mapID, minimap)
     local icon = Core.GetIconPath(self.icon)
-    local scale = self.scale * self.group:GetScale(mapID)
-    local alpha = self.alpha * self.group:GetAlpha(mapID)
+    local scale = self.scale * self.group[1]:GetScale(mapID) -- Get scale/alpha form first (main) group
+    local alpha = self.alpha * self.group[1]:GetAlpha(mapID)
 
     if not minimap and WorldMapFrame.isMaximized and
         Core:GetOpt('maximized_enlarged') then
@@ -88,6 +92,8 @@ function Node:GetGlow(mapID, minimap, focused)
         self.glow.scale = scale
         if focused then
             self.glow.r, self.glow.g, self.glow.b = 0, 1, 0
+        elseif self.OnClick then
+            self.glow.r, self.glow.g, self.glow.b = 0, 0, 1
         else
             self.glow.r, self.glow.g, self.glow.b = 1, 1, 0
         end
@@ -100,10 +106,13 @@ Return the "collected" status of this node. A node is collected if all
 associated rewards have been obtained (achievements, toys, pets, mounts).
 --]]
 
-function Node:IsCollected()
+function Node:IsCollected(type)
     for reward in self:IterateRewards() do
-        if reward:IsEnabled() and reward:IsObtainable() and
-            not reward:IsObtained() then return false end
+        if (not type or Core.IsInstance(reward, type)) and reward:IsEnabled() then
+            if reward:IsObtainable() and not reward:IsObtained() then
+                return false
+            end
+        end
     end
     return true
 end
@@ -152,6 +161,18 @@ function Node:IsEnabled()
         if self:IsCompleted() then return false end
     end
 
+    -- Check faction
+    if self.faction then
+        if Core:GetOpt('ignore_faction_restrictions') then return true end
+        if self.faction ~= Core.faction then return false end
+    end
+
+    -- Check class
+    if self.class then
+        if Core:GetOpt('ignore_class_restrictions') then return true end
+        if self.class ~= Core.class then return false end
+    end
+
     return true
 end
 
@@ -160,14 +181,14 @@ Iterate over rewards that are enabled for this character.
 --]]
 
 function Node:IterateRewards()
-    local index, reward = 0
+    local index, reward = 0, nil
     return function()
         if not (self.rewards and #self.rewards) then return end
         repeat
             index = index + 1
             if index > #self.rewards then return end
             reward = self.rewards[index]
-        until reward:IsEnabled()
+        until reward and reward:IsEnabled()
         return reward
     end
 end
@@ -210,7 +231,9 @@ function Node:Prepare()
 
     Core.PrepareLinks(self.label)
     Core.PrepareLinks(self.sublabel)
+    Core.PrepareLinks(self.location)
     Core.PrepareLinks(self.note)
+    Core.PrepareLinks(self.rlabel)
 
     if self.requires then
         for i, req in ipairs(self.requires) do
@@ -264,12 +287,27 @@ function Node:Render(tooltip, focusable)
         rlabel = (#rlabel > 0) and focus .. ' ' .. rlabel or focus
     end
 
+    if self.OnClick then
+        local click = Core.GetIconLink('left_mouse', 12)
+        rlabel = click .. ' ' .. Core.status.Gray(self.clabel) or click
+    end
+
     -- render top-right label text
     if #rlabel > 0 then
         local rtext = _G[tooltip:GetName() .. 'TextRight1']
         rtext:SetTextColor(1, 1, 1)
-        rtext:SetText(rlabel)
+        rtext:SetText(Core.RenderLinks(rlabel, true))
         rtext:Show()
+    end
+
+    -- optional text directly under sublabel/label for development notes
+    if self.devnote and Core:GetOpt('development') then
+        tooltip:AddLine(Core.RenderLinks(self.devnote), 1, 0, 1)
+    end
+    -- optional text directly under sublabel/label for development notes
+    if self.areaPOI and Core:GetOpt('development') then
+        tooltip:AddLine(Core.RenderLinks('Poi ID: ' .. self.areaPOI), 0.58, 0.43,
+            0.84)
     end
 
     -- optional text directly under label
@@ -282,18 +320,35 @@ function Node:Render(tooltip, focusable)
         for i, req in ipairs(self.requires) do
             if IsInstance(req, Requirement) then
                 color = req:IsMet() and Core.color.White or Core.color.Red
-                text = color(L['Requires'] .. ' ' .. req:GetText())
+                text = color(L['requires'] .. ' ' .. req:GetText())
             else
-                text = Core.color.Red(L['Requires'] .. ' ' .. req)
+                text = Core.color.Red(L['requires'] .. ' ' .. req)
             end
             tooltip:AddLine(Core.RenderLinks(text, true))
         end
     end
 
+    -- additional text for the node to describe where the object or
+    -- rare can be found
+    if self.location and Core:GetOpt('show_notes') then
+        if self.requires or self.sublabel then
+            GameTooltip_AddBlankLineToTooltip(tooltip)
+        end
+        tooltip:AddLine(Core.RenderLinks(self.location), 1, 1, 1, true)
+    end
+
+    -- adds text if the node spawns in a specific rotation
+    if self.interval then
+        if self.requires or self.sublabel or self.location then
+            GameTooltip_AddBlankLineToTooltip(tooltip)
+        end
+        tooltip:AddLine(Core.RenderLinks(self.interval:GetText()), 1, 1, 1, true)
+    end
+
     -- additional text for the node to describe how to interact with the
     -- object or summon the rare
     if self.note and Core:GetOpt('show_notes') then
-        if self.requires or self.sublabel then
+        if self.requires or self.sublabel or self.location or self.interval then
             GameTooltip_AddBlankLineToTooltip(tooltip)
         end
         tooltip:AddLine(Core.RenderLinks(self.note), 1, 1, 1, true)
@@ -302,22 +357,7 @@ function Node:Render(tooltip, focusable)
     -- all rewards (achievements, pets, mounts, toys, quests) that can be
     -- collected or completed from this node
     if self.rewards and Core:GetOpt('show_loot') then
-        local firstAchieve, firstOther = true, true
-        for reward in self:IterateRewards() do
-
-            -- Add a blank line between achievements and other rewards
-            local isAchieve = IsInstance(reward, Core.reward.Achievement)
-            local isSpacer = IsInstance(reward, Core.reward.Spacer)
-            if isAchieve and firstAchieve then
-                GameTooltip_AddBlankLineToTooltip(tooltip)
-                firstAchieve = false
-            elseif not (isAchieve or isSpacer) and firstOther then
-                GameTooltip_AddBlankLineToTooltip(tooltip)
-                firstOther = false
-            end
-
-            reward:Render(tooltip)
-        end
+        self:RenderRewards(tooltip)
     end
 
     if self.spellID then
@@ -329,6 +369,24 @@ function Node:Render(tooltip, focusable)
                     self.spellID, spell:GetSpellTexture())
                 self.cancelSpellDataCallback = nil
             end);
+    end
+end
+
+function Node:RenderRewards(tooltip)
+    local firstAchieve, firstOther = true, true
+    for reward in self:IterateRewards() do
+        -- Add a blank line between achievements and other rewards
+        local isAchieve = Core.IsInstance(reward, Core.reward.Achievement)
+        local isSpacer = Core.IsInstance(reward, Core.reward.Spacer)
+        if isAchieve and firstAchieve then
+            --tooltip:AddLine(' ')
+            firstAchieve = false
+        elseif not (isAchieve or isSpacer) and firstOther then
+            --tooltip:AddLine(' ')
+            firstOther = false
+        end
+
+        reward:Render(tooltip)
     end
 end
 
@@ -468,8 +526,23 @@ end
 
 local Rare = Class('Rare', NPC, {scale = 1.2, group = Core.groups.RARE})
 
-function Rare.getters:icon() return
-    self:IsCollected() and 'skull_w' or 'skull_b' end
+function Rare.getters:icon()
+    if self:IsCollected() then
+        return 'skull_w'
+    elseif not self:IsCollected(Core.reward.Reputation) then
+        return 'skull_p'
+    else
+        return 'skull_b'
+    end
+end
+
+function Rare.getters:label()
+    local label = NPC.getters.label(self)
+    if Core:GetOpt('show_npc_id') then
+        label = label .. ' (' .. Core.color.White(self.id) .. ')'
+    end
+    return label
+end
 
 function Rare:IsEnabled()
     if Core:GetOpt('hide_done_rares') and self:IsCollected() then return false end
@@ -496,16 +569,91 @@ function Treasure.getters:label()
     return UNKNOWN
 end
 
+function Treasure:IsEnabled()
+    if Core:GetOpt('hide_done_treasures') and self:IsCollected() then
+        return false
+    end
+    return Node.IsEnabled(self)
+end
+
+-------------------------------------------------------------------------------
+----------------------------------- VENDOR ------------------------------------
+-------------------------------------------------------------------------------
+
+local Vendor = Class('Vendor', Collectible,
+    {icon = 'bag', scale = 1.35, group = Core.groups.VENDOR})
+
+-------------------------------------------------------------------------------
+------------------------------- Interval Class --------------------------------
+-------------------------------------------------------------------------------
+
+local Interval = Class('Interval')
+
+function Interval:Initialize(attrs)
+    if attrs then for k, v in pairs(attrs) do self[k] = v end end
+
+    local region_initial = {
+        [1] = self.initial.us,
+        [2] = self.initial.kr or self.initial.tw,
+        [3] = self.initial.eu,
+        [4] = self.initial.cn
+    } -- https://warcraft.wiki.gg/wiki/API_GetCurrentRegion
+
+    if self.id then
+        self.SpawnTime = self.id * self.offset +
+                             (region_initial[GetCurrentRegion()] or
+                                 self.initial.us)
+    end
+end
+
+function Interval:Next()
+    if not (self.id and self.initial and self.interval) then return false end
+    local CurrentTime = GetServerTime()
+    local SpawnTime = self.SpawnTime
+
+    local NextSpawn = SpawnTime +
+                          math.ceil((CurrentTime - SpawnTime) / self.interval) *
+                          self.interval
+    local TimeLeft = NextSpawn - CurrentTime
+
+    return NextSpawn, TimeLeft
+end
+
+function Interval:GetText()
+    local TimeFormat = Core:GetOpt('use_standard_time') and self.format_12hrs or
+                           self.format_24hrs
+
+    local NextSpawn, TimeLeft = self:Next()
+
+    local SpawnsIn = TimeLeft <= 60 and L['now'] or
+                         SecondsToTime(TimeLeft, true, true)
+
+    if self.yellow and self.green then
+        local color = Core.color.Orange
+        if TimeLeft < self.yellow then color = Core.color.Yellow end
+        if TimeLeft < self.green then color = Core.color.Green end
+        SpawnsIn = color(SpawnsIn)
+    end
+
+    local text = format('%s (%s)', SpawnsIn, date(TimeFormat, NextSpawn))
+    if self.text then text = format(self.text, text) end
+    Core.PrepareLinks(text)
+    return text
+end
+
 -------------------------------------------------------------------------------
 
 Core.node = {
-    Node = Node,
     Collectible = Collectible,
     Intro = Intro,
     Item = Item,
+    Node = Node,
     NPC = NPC,
     PetBattle = PetBattle,
     Quest = Quest,
     Rare = Rare,
-    Treasure = Treasure
+    Treasure = Treasure,
+    Vendor = Vendor
 }
+
+Core.Interval = Interval

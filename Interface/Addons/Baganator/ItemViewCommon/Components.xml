@@ -1,0 +1,315 @@
+<Ui>
+  <Button name="BaganatorRetailTabButtonTemplate" virtual="true" inherits="PanelTabButtonTemplate">
+    <Scripts>
+      <OnShow>
+        PanelTemplates_TabResize(self, 30, nil, 20)
+        PanelTemplates_DeselectTab(self)
+      </OnShow>
+    </Scripts>
+  </Button>
+
+  <Button name="BaganatorClassicTabButtonTemplate" virtual="true" inherits="CharacterFrameTabButtonTemplate">
+    <Scripts>
+      <OnShow>
+        PanelTemplates_TabResize(self, 30, nil, 20)
+        PanelTemplates_DeselectTab(self)
+      </OnShow>
+    </Scripts>
+  </Button>
+
+  <Button name="BaganatorRightSideTabButtonTemplate" virtual="true" scale="0.8">
+    <Size>
+      <AbsDimension x="32" y="32"/>
+    </Size>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <Texture parentKey="Background" file="Interface\SpellBook\SpellBook-SkillLineTab">
+          <Size>
+            <AbsDimension x="64" y="64"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOPLEFT">
+              <Offset>
+                <AbsDimension x="-3" y="11"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </Texture>
+      </Layer>
+      <Layer level="ARTWORK">
+        <Texture parentKey="SelectedTexture" file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/>
+        <Texture parentKey="Icon" alphaMode="ADD" setAllPoints="true"/>
+      </Layer>
+    </Layers>
+    <NormalTexture/>
+    <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+    <Scripts>
+      <OnEnter>
+        GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+        GameTooltip:SetText(self.tabName)
+        GameTooltip:Show()
+      </OnEnter>
+      <OnLeave>
+        GameTooltip:Hide()
+      </OnLeave>
+    </Scripts>
+  </Button>
+
+  <Button name="BaganatorSecureRightSideTabButtonTemplate" virtual="true" inherits="BaganatorRightSideTabButtonTemplate,InsecureActionButtonTemplate">
+  </Button>
+
+  <Button name="BaganatorTooltipIconButtonTemplate" virtual="true" inherits="UIPanelButtonTemplate">
+    <Size x="32" y="22"/>
+    <Scripts>
+      <OnEnter>
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText(self.tooltipHeader)
+        if self.tooltipText then
+          GameTooltip:AddLine(self.tooltipText, 1, 1, 1, true)
+        end
+        GameTooltip:Show()
+      </OnEnter>
+      <OnLeave>
+        GameTooltip:Hide()
+      </OnLeave>
+    </Scripts>
+  </Button>
+
+  <Button name="BaganatorCustomiseButtonTemplate" virtual="true" inherits="BaganatorTooltipIconButtonTemplate">
+    <KeyValues>
+      <KeyValue key="tooltipHeader" value="BAGANATOR_L_CUSTOMISE_BAGANATOR" type="global"/>
+    </KeyValues>
+    <Scripts>
+      <OnLoad>
+        Baganator.Skins.AddFrame("IconButton", self, {"customise"})
+      </OnLoad>
+    </Scripts>
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture parentKey="Icon" file="Interface\AddOns\Baganator\Assets\Cog.png">
+          <Size x="17" y="17"/>
+          <Anchors>
+            <Anchor point="CENTER"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnClick>
+        Baganator.CallbackRegistry:TriggerEvent("ShowCustomise")
+      </OnClick>
+    </Scripts>
+  </Button>
+
+  <Button name="BaganatorToggleBagSlotsButtonTemplate" virtual="true" inherits="BaganatorTooltipIconButtonTemplate">
+    <KeyValues>
+      <KeyValue key="tooltipHeader" value="BAGANATOR_L_BAG_SLOTS" type="global"/>
+    </KeyValues>
+    <Scripts>
+      <OnLoad>
+        Baganator.Skins.AddFrame("IconButton", self, {"bagSlots"})
+      </OnLoad>
+    </Scripts>
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture parentKey="Icon" file="Interface\AddOns\Baganator\Assets\Bags.png">
+          <Size x="16" y="16"/>
+          <Anchors>
+            <Anchor point="CENTER"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+  </Button>
+
+  <Button name="BaganatorSortButtonTemplate" virtual="true" inherits="BaganatorTooltipIconButtonTemplate">
+    <KeyValues>
+      <KeyValue key="tooltipHeader" value="BAGANATOR_L_SORT" type="global"/>
+    </KeyValues>
+    <Scripts>
+      <OnLoad>
+        -- Disable sort button during combat as sorting is partially blocked by Blizzard
+        self:RegisterEvent("PLAYER_REGEN_ENABLED")
+        self:RegisterEvent("PLAYER_REGEN_DISABLED")
+        self:SetEnabled(not InCombatLockdown())
+        Baganator.Skins.AddFrame("IconButton", self, {"sort"})
+      </OnLoad>
+      <OnEvent>
+        self:SetEnabled(event ~= "PLAYER_REGEN_DISABLED")
+      </OnEvent>
+    </Scripts>
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture parentKey="Icon" file="Interface\AddOns\Baganator\Assets\Sorting.png">
+          <Size x="17" y="17"/>
+          <Anchors>
+            <Anchor point="CENTER"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+  </Button>
+
+  <Button name="BaganatorTransferButtonTemplate" virtual="true" inherits="BaganatorTooltipIconButtonTemplate">
+    <KeyValues>
+      <KeyValue key="tooltipHeader" value="BAGANATOR_L_TRANSFER" type="global"/>
+    </KeyValues>
+    <Scripts>
+      <OnLoad>
+        -- Disable transfer button during combat as sorting is partially blocked by Blizzard
+        self:RegisterEvent("PLAYER_REGEN_ENABLED")
+        self:RegisterEvent("PLAYER_REGEN_DISABLED")
+        self:SetEnabled(not InCombatLockdown())
+        Baganator.Skins.AddFrame("IconButton", self, {"transfer"})
+      </OnLoad>
+      <OnEvent>
+        self:SetEnabled(event ~= "PLAYER_REGEN_DISABLED")
+      </OnEvent>
+    </Scripts>
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture parentKey="Icon" file="Interface\AddOns\Baganator\Assets\Transfer.png">
+          <Size x="16" y="16"/>
+          <Anchors>
+            <Anchor point="CENTER"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+  </Button>
+
+  <Button name="BaganatorAllCharactersButtonTemplate" inherits="BaganatorTooltipIconButtonTemplate" virtual="true">
+    <KeyValues>
+      <KeyValue key="tooltipHeader" value="BAGANATOR_L_ALL_CHARACTERS" type="global"/>
+    </KeyValues>
+    <Scripts>
+      <OnLoad>
+        Baganator.Skins.AddFrame("IconButton", self, {"allCharacters"})
+      </OnLoad>
+    </Scripts>
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture parentKey="Icon" file="Interface\AddOns\Baganator\Assets\All_Characters.png">
+          <Size x="16" y="16"/>
+          <Anchors>
+            <Anchor point="CENTER"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnClick>
+        Baganator.CallbackRegistry:TriggerEvent("CharacterSelectToggle")
+      </OnClick>
+    </Scripts>
+  </Button>
+
+  <Button name="BaganatorBankButtonTemplate" inherits="BaganatorTooltipIconButtonTemplate" virtual="true">
+    <KeyValues>
+      <KeyValue key="tooltipHeader" value="BAGANATOR_L_BANK" type="global"/>
+    </KeyValues>
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture parentKey="Icon" file="Interface\AddOns\Baganator\Assets\Chest.png">
+          <Size x="16" y="16"/>
+          <Anchors>
+            <Anchor point="CENTER"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnLoad>
+        Baganator.Skins.AddFrame("IconButton", self, {"bank"})
+      </OnLoad>
+    </Scripts>
+  </Button>
+
+  <Button name="BaganatorGuildBankButtonTemplate" inherits="BaganatorTooltipIconButtonTemplate" virtual="true" motionScriptsWhileDisabled="true">
+    <KeyValues>
+      <KeyValue key="tooltipHeader" value="BAGANATOR_L_GUILD_BANK" type="global"/>
+    </KeyValues>
+    <Scripts>
+      <OnLoad>
+        Baganator.Skins.AddFrame("IconButton", self, {"guildBank"})
+      </OnLoad>
+    </Scripts>
+    <Layers>
+      <Layer>
+        <Texture parentKey="Icon" file="Interface\AddOns\Baganator\Assets\Guild.png">
+          <Size x="15" y="14"/>
+          <Anchors>
+            <Anchor point="CENTER" y="-1"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+  </Button>
+
+  <Button name="BaganatorMegaSearchButtonTemplate" inherits="BaganatorTooltipIconButtonTemplate" virtual="true" motionScriptsWhileDisabled="true">
+    <KeyValues>
+      <KeyValue key="tooltipHeader" value="BAGANATOR_L_SEARCH_EVERYWHERE" type="global"/>
+      <KeyValue key="tooltipText" value="BAGANATOR_L_SEARCH_EVERYWHERE_TOOLTIP_TEXT_2" type="global"/>
+    </KeyValues>
+    <Scripts>
+      <OnLoad>
+        Baganator.Skins.AddFrame("IconButton", self, {"searchEverywhere"})
+      </OnLoad>
+    </Scripts>
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture parentKey="Icon" file="Interface\AddOns\Baganator\Assets\Search.png">
+          <Size x="14" y="14"/>
+          <Anchors>
+            <Anchor point="CENTER"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+  </Button>
+
+  <Button name="BaganatorHelpButtonTemplate" inherits="BaganatorTooltipIconButtonTemplate" virtual="true" motionScriptsWhileDisabled="true">
+    <KeyValues>
+      <KeyValue key="tooltipHeader" value="BAGANATOR_L_HELP" type="global"/>
+    </KeyValues>
+    <Scripts>
+      <OnLoad>
+        Baganator.Skins.AddFrame("IconButton", self, {"help"})
+      </OnLoad>
+    </Scripts>
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture parentKey="Icon" atlas="QuestTurnin">
+          <Size x="14" y="14"/>
+          <Anchors>
+            <Anchor point="CENTER"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+  </Button>
+
+  <Button name="BaganatorCurrencyButtonTemplate" inherits="BaganatorTooltipIconButtonTemplate" virtual="true" motionScriptsWhileDisabled="true">
+    <KeyValues>
+      <KeyValue key="tooltipHeader" value="BAGANATOR_L_CURRENCIES" type="global"/>
+    </KeyValues>
+    <Scripts>
+      <OnLoad>
+        Baganator.Skins.AddFrame("IconButton", self, {"currency"})
+      </OnLoad>
+      <OnClick>
+        Baganator.CallbackRegistry:TriggerEvent("CurrencyPanelToggle")
+      </OnClick>
+    </Scripts>
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture parentKey="Icon" file="Interface\AddOns\Baganator\Assets\Currency.png">
+          <Size x="14" y="14"/>
+          <Anchors>
+            <Anchor point="CENTER"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+  </Button>
+</Ui>

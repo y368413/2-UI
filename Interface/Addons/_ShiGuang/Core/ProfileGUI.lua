@@ -14,9 +14,9 @@ StaticPopupDialogs["RESET_UI"] = {
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function()
-		MaoRUIPerDB = {}
 		MaoRUIDB = {}
 		MaoRUISetDB = {}
+		MaoRUIPerDB = {}
 		ReloadUI()
 	end,
 	whileDead = 1,
@@ -27,7 +27,7 @@ StaticPopupDialogs["RESET_UI_HELPINFO"] = {
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function()
-		wipe(MaoRUIDB["Help"])
+		wipe(MaoRUISetDB["Help"])
 	end,
 	whileDead = 1,
 }
@@ -48,7 +48,7 @@ StaticPopupDialogs["UI_APPLY_PROFILE"] = {
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function()
-		MaoRUIDB["ProfileIndex"][myFullName] = G.currentProfile
+		MaoRUISetDB["ProfileIndex"][myFullName] = G.currentProfile
 		ReloadUI()
 	end,
 	whileDead = 1,
@@ -59,13 +59,13 @@ StaticPopupDialogs["UI_DOWNLOAD_PROFILE"] = {
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function()
-		local profileIndex = MaoRUIDB["ProfileIndex"][myFullName]
+		local profileIndex = MaoRUISetDB["ProfileIndex"][myFullName]
 		if G.currentProfile == 1 then
-			MaoRUISetDB[profileIndex-1] = MaoRUIPerDB
+			MaoRUIPerDB[profileIndex-1] = MaoRUIDB
 		elseif profileIndex == 1 then
-			MaoRUIPerDB = MaoRUISetDB[G.currentProfile-1]
+			MaoRUIDB = MaoRUIPerDB[G.currentProfile-1]
 		else
-			MaoRUISetDB[profileIndex-1] = MaoRUISetDB[G.currentProfile-1]
+			MaoRUIPerDB[profileIndex-1] = MaoRUIPerDB[G.currentProfile-1]
 		end
 		ReloadUI()
 	end,
@@ -78,9 +78,9 @@ StaticPopupDialogs["UI_UPLOAD_PROFILE"] = {
 	button2 = NO,
 	OnAccept = function()
 		if G.currentProfile == 1 then
-			MaoRUIPerDB = R.db
+			MaoRUIDB = R.db
 		else
-			MaoRUISetDB[G.currentProfile-1] = R.db
+			MaoRUIPerDB[G.currentProfile-1] = R.db
 		end
 	end,
 	whileDead = 1,
@@ -92,10 +92,10 @@ StaticPopupDialogs["UI_DELETE_UNIT_PROFILE"] = {
 	button2 = NO,
 	OnAccept = function(self)
 		local name, realm = strsplit("-", self.text.text_arg1)
-		if MaoRUIDB["totalGold"][realm] and MaoRUIDB["totalGold"][realm][name] then
-			MaoRUIDB["totalGold"][realm][name] = nil
+		if MaoRUISetDB["totalGold"][realm] and MaoRUISetDB["totalGold"][realm][name] then
+			MaoRUISetDB["totalGold"][realm][name] = nil
 		end
-		MaoRUIDB["ProfileIndex"][self.text.text_arg1] = nil
+		MaoRUISetDB["ProfileIndex"][self.text.text_arg1] = nil
 	end,
 	OnShow = function(self)
 		local r, g, b
@@ -142,15 +142,15 @@ end
 
 function G:GetClassFromGoldInfo(name, realm)
 	local class = "NONE"
-	if MaoRUIDB["totalGold"][realm] and MaoRUIDB["totalGold"][realm][name] then
-		class = MaoRUIDB["totalGold"][realm][name][2]
+	if MaoRUISetDB["totalGold"][realm] and MaoRUISetDB["totalGold"][realm][name] then
+		class = MaoRUISetDB["totalGold"][realm][name][2]
 	end
 	return class
 end
 
 function G:FindProfleUser(icon)
 	icon.list = {}
-	for fullName, index in pairs(MaoRUIDB["ProfileIndex"]) do
+	for fullName, index in pairs(MaoRUISetDB["ProfileIndex"]) do
 		if index == icon.index then
 			local name, realm = strsplit("-", fullName)
 			if not icon.list[realm] then icon.list[realm] = {} end
@@ -181,16 +181,16 @@ function G:Icon_OnEnter()
 end
 
 function G:Note_OnEscape()
-	self:SetText(MaoRUIDB["ProfileNames"][self.index])
+	self:SetText(MaoRUISetDB["ProfileNames"][self.index])
 end
 
 function G:Note_OnEnter()
 	local text = self:GetText()
 	if text == "" then
-		MaoRUIDB["ProfileNames"][self.index] = self.__defaultText
+		MaoRUISetDB["ProfileNames"][self.index] = self.__defaultText
 		self:SetText(self.__defaultText)
 	else
-		MaoRUIDB["ProfileNames"][self.index] = text
+		MaoRUISetDB["ProfileNames"][self.index] = text
 	end
 end
 
@@ -224,10 +224,10 @@ function G:CreateProfileBar(parent, index)
 	else
 		note.__defaultText = U["DefaultSharedProfile"]..(index - 1)
 	end
-	if not MaoRUIDB["ProfileNames"][index] then
-		MaoRUIDB["ProfileNames"][index] = note.__defaultText
+	if not MaoRUISetDB["ProfileNames"][index] then
+		MaoRUISetDB["ProfileNames"][index] = note.__defaultText
 	end
-	note:SetText(MaoRUIDB["ProfileNames"][index])
+	note:SetText(MaoRUISetDB["ProfileNames"][index])
 	note.index = index
 	note:HookScript("OnEnterPressed", G.Note_OnEnter)
 	note:HookScript("OnEscapePressed", G.Note_OnEscape)
@@ -290,7 +290,7 @@ function G:Delete_OnEnter()
 		self:SetText(text)
 	end
 
-	if MaoRUIDB["ProfileIndex"][text] or (MaoRUIDB["totalGold"][realm] and MaoRUIDB["totalGold"][realm][name]) then
+	if MaoRUISetDB["ProfileIndex"][text] or (MaoRUISetDB["totalGold"][realm] and MaoRUISetDB["totalGold"][realm][name]) then
 		StaticPopup_Show("UI_DELETE_UNIT_PROFILE", text, G:GetClassFromGoldInfo(name, realm))
 	else
 		UIErrorsFrame:AddMessage(I.InfoColor..U["Incorrect unit name"])
@@ -347,7 +347,7 @@ function G:CreateProfileGUI(parent)
 	delete.title = U["DeleteUnitProfile"]
 	M.AddTooltip(delete, "ANCHOR_TOP", U["DeleteUnitProfileTip"], "info")
 
-	G.currentProfile = MaoRUIDB["ProfileIndex"][I.MyFullName]
+	G.currentProfile = MaoRUISetDB["ProfileIndex"][I.MyFullName]
 
 	local numBars = 6
 	local panel = M.CreateBDFrame(parent, 0)
@@ -381,6 +381,13 @@ local accountStrValues = {
 	["IgnoredButtons"] = true,
 }
 
+local spellBooleanValues = {
+	["RaidBuffsWhite"] = true,
+	["RaidDebuffsBlack"] = true,
+	["NameplateWhite"] = true,
+	["NameplateBlack"] = true,
+}
+
 local booleanTable = {
 	["CustomUnits"] = true,
 	["PowerUnits"] = true,
@@ -398,8 +405,6 @@ function G:ExportGUIData()
 						for k, v in pairs(value) do
 							text = text..":"..k..":"..v
 						end
-					elseif key == "ExplosiveCache" then
-						text = text..";"..KEY..":"..key..":EMPTYTABLE"
 					elseif KEY == "AuraWatchList" then
 						if key == "Switcher" then
 							for k, v in pairs(value) do
@@ -444,23 +449,16 @@ function G:ExportGUIData()
 		end
 	end
 
-	for KEY, VALUE in pairs(MaoRUIDB) do
-		if KEY == "RaidAuraWatch" then
+	for KEY, VALUE in pairs(MaoRUISetDB) do
+		if spellBooleanValues[KEY] then
 			text = text..";ACCOUNT:"..KEY
-			for spellID in pairs(VALUE) do
-				text = text..":"..spellID
+			for spellID, value in pairs(VALUE) do
+				text = text..":"..spellID..":"..tostring(value)
 			end
 		elseif KEY == "RaidDebuffs" then
 			for instName, value in pairs(VALUE) do
 				for spellID, prio in pairs(value) do
 					text = text..";ACCOUNT:"..KEY..":"..instName..":"..spellID..":"..prio
-				end
-			end
-		elseif KEY == "NameplateFilter" then
-			for index, value in pairs(VALUE) do
-				text = text..";ACCOUNT:"..KEY..":"..index
-				for spellID in pairs(value) do
-					text = text..":"..spellID
 				end
 			end
 		elseif KEY == "CornerSpells" then
@@ -476,14 +474,6 @@ function G:ExportGUIData()
 							text = text..":"..spellID..":"..anchor..":"..color[1]..":"..color[2]..":"..color[3]..":"..tostring(filter or false)
 						end
 					end
-				end
-			end
-		elseif KEY == "PartySpells" then
-			text = text..";ACCOUNT:"..KEY
-			for spellID, duration in pairs(VALUE) do
-				local name = GetSpellInfo(spellID)
-				if name then
-					text = text..":"..spellID..":"..duration
 				end
 			end
 		elseif KEY == "ContactList" then
@@ -502,10 +492,11 @@ function G:ExportGUIData()
 			end
 		elseif KEY == "ClickSets" then
 			text = text..";ACCOUNT:"..KEY
-			if MaoRUIDB[KEY][I.MyClass] then
+			if MaoRUISetDB[KEY][I.MyClass] then
 				text = text..":"..I.MyClass
-				for fullkey, value in pairs(MaoRUIDB[KEY][I.MyClass]) do
+				for fullkey, value in pairs(MaoRUISetDB[KEY][I.MyClass]) do
 					value = gsub(value, "%:", "`")
+					value = gsub(value, ";", "}")
 					text = text..":"..fullkey..":"..value
 				end
 			end
@@ -537,7 +528,7 @@ local function reloadDefaultSettings()
 			R.db[i] = j
 		end
 	end
-	R.db["SL"] = true -- don't empty data on next loading
+	R.db["TWW"] = true -- don't empty data on next loading
 end
 
 local function IsOldProfileVersion(version)
@@ -553,7 +544,7 @@ function G:ImportGUIData()
 	if M:IsBase64(profile) then profile = M:Decode(profile) end
 	local options = {strsplit(";", profile)}
 	local title, version, _, class = strsplit(":", options[1])
-	if title ~= "UISettings" or IsOldProfileVersion(version) then
+	if title ~= "UISettings"then -- or IsOldProfileVersion(version) 
 		UIErrorsFrame:AddMessage(I.InfoColor..U["Import data error"])
 		return
 	end
@@ -566,12 +557,12 @@ function G:ImportGUIData()
 		local key, value, arg1 = strsplit(":", option)
 		if arg1 == "true" or arg1 == "false" then
 			if key == "ACCOUNT" then
-				MaoRUIDB[value] = toBoolean(arg1)
+				MaoRUISetDB[value] = toBoolean(arg1)
 			else
 				R.db[key][value] = toBoolean(arg1)
 			end
-		elseif arg1 == "EMPTYTABLE" then
-			R.db[key][value] = {}
+		--elseif arg1 == "EMPTYTABLE" then
+			--R.db[key][value] = {}
 		elseif strfind(value, "Color") and (arg1 == "r" or arg1 == "g" or arg1 == "b") then
 			local colors = {select(3, strsplit(":", option))}
 			if R.db[key][value] then
@@ -606,11 +597,11 @@ function G:ImportGUIData()
 			for i = 1, #results, 2 do
 				R.db[key][value][tonumber(results[i]) or results[i]] = toBoolean(results[i+1])
 			end
-		elseif value == "CustomItems" or value == "CustomNames" then
-			local results = {select(3, strsplit(":", option))}
-			for i = 1, #results, 2 do
-				R.db[key][value][tonumber(results[i])] = tonumber(results[i+1]) or results[i+1]
-			end
+		--elseif value == "CustomItems" or value == "CustomNames" then
+			--local results = {select(3, strsplit(":", option))}
+			--for i = 1, #results, 2 do
+				--R.db[key][value][tonumber(results[i])] = tonumber(results[i+1]) or results[i+1]
+			--end
 		elseif key == "Mover" or key == "AuraWatchMover" then
 			local relFrom, parent, relTo, x, y = select(3, strsplit(":", option))
 			value = tonumber(value) or value
@@ -625,25 +616,20 @@ function G:ImportGUIData()
 			R.db[key][spellID] = {spellID, duration, indicator, unit, itemID}
 		elseif value == "InfoStrLeft" or value == "InfoStrRight" or accountStrValues[value] then
 			if key == "ACCOUNT" then
-				MaoRUIDB[value] = arg1
+				MaoRUISetDB[value] = arg1
 			else
 				R.db[key][value] = arg1
 			end
 		elseif key == "ACCOUNT" then
-			if value == "RaidAuraWatch" then
-				local spells = {select(3, strsplit(":", option))}
-				for _, spellID in next, spells do
-					MaoRUIDB[value][tonumber(spellID)] = true
+			if spellBooleanValues[value] then
+				local results = {select(3, strsplit(":", option))}
+				for i = 1, #results, 2 do
+					MaoRUISetDB[value][tonumber(results[i])] = toBoolean(results[i+1])
 				end
 			elseif value == "RaidDebuffs" then
 				local instName, spellID, priority = select(3, strsplit(":", option))
-				if not MaoRUIDB[value][instName] then MaoRUIDB[value][instName] = {} end
-				MaoRUIDB[value][instName][tonumber(spellID)] = tonumber(priority)
-			elseif value == "NameplateFilter" then
-				local spells = {select(4, strsplit(":", option))}
-				for _, spellID in next, spells do
-					MaoRUIDB[value][tonumber(arg1)][tonumber(spellID)] = true
-				end
+				if not MaoRUISetDB[value][instName] then MaoRUISetDB[value][instName] = {} end
+				MaoRUISetDB[value][instName][tonumber(spellID)] = tonumber(priority)
 			elseif value == "CornerSpells" then
 				local results = {select(3, strsplit(":", option))}
 				local class = results[1]
@@ -655,53 +641,44 @@ function G:ImportGUIData()
 						g = tonumber(g)
 						b = tonumber(b)
 						filter = toBoolean(filter)
-						if not MaoRUIDB[value][class] then MaoRUIDB[value][class] = {} end
+						if not MaoRUISetDB[value][class] then MaoRUISetDB[value][class] = {} end
 						if anchor == "" then
-							MaoRUIDB[value][class][spellID] = {}
+							MaoRUISetDB[value][class][spellID] = {}
 						else
-							MaoRUIDB[value][class][spellID] = {anchor, {r, g, b}, filter}
+							MaoRUISetDB[value][class][spellID] = {anchor, {r, g, b}, filter}
 						end
 					end
-				end
-			elseif value == "PartySpells" then
-				local options = {strsplit(":", option)}
-				local index = 3
-				local spellID = options[index]
-				while spellID do
-					local duration = options[index+1]
-					MaoRUIDB[value][tonumber(spellID)] = tonumber(duration) or 0
-					index = index + 2
-					spellID = options[index]
 				end
 			elseif value == "ContactList" then
 				local names = {select(3, strsplit(":", option))}
 				for i = 1, #names, 4 do
-					MaoRUIDB[value][names[i]] = names[i+1]..":"..names[i+2]..":"..names[i+3]
+					MaoRUISetDB[value][names[i]] = names[i+1]..":"..names[i+2]..":"..names[i+3]
 				end
 			elseif value == "ProfileIndex" then
 				local results = {select(3, strsplit(":", option))}
 				for i = 1, #results, 2 do
-					MaoRUIDB[value][results[i]] = tonumber(results[i+1])
+					MaoRUISetDB[value][results[i]] = tonumber(results[i+1])
 				end
 			elseif value == "ProfileNames" then
 				local results = {select(3, strsplit(":", option))}
 				for i = 1, #results, 2 do
-					MaoRUIDB[value][tonumber(results[i])] = results[i+1]
+					MaoRUISetDB[value][tonumber(results[i])] = results[i+1]
 				end
 			elseif value == "ClickSets" then
 				if arg1 == I.MyClass then
-					MaoRUIDB[value][arg1] = MaoRUIDB[value][arg1] or {}
+					MaoRUISetDB[value][arg1] = MaoRUISetDB[value][arg1] or {}
 					local results = {select(4, strsplit(":", option))}
 					for i = 1, #results, 2 do
 						results[i+1] = gsub(results[i+1], "`", ":")
-						MaoRUIDB[value][arg1][results[i]] = tonumber(results[i+1]) or results[i+1]
+						results[i+1] = gsub(results[i+1], "}", ";")
+						MaoRUISetDB[value][arg1][results[i]] = tonumber(results[i+1]) or results[i+1]
 					end
 				end
 			end
 		elseif tonumber(arg1) then
 			if value == "DBMCount" then
 				R.db[key][value] = arg1
-			else
+			elseif R.db[key] then
 				R.db[key][value] = tonumber(arg1)
 			end
 		end

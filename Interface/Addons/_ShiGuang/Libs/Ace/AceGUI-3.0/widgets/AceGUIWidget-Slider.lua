@@ -1,3 +1,7 @@
+--[[-----------------------------------------------------------------------------
+Slider Widget
+Graphical Slider, like, for Range values.
+-------------------------------------------------------------------------------]]
 local Type, Version = "Slider", 23
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
@@ -10,6 +14,9 @@ local tonumber, pairs = tonumber, pairs
 local PlaySound = PlaySound
 local CreateFrame, UIParent = CreateFrame, UIParent
 
+--[[-----------------------------------------------------------------------------
+Support functions
+-------------------------------------------------------------------------------]]
 local function UpdateText(self)
 	local value = self.value or 0
 	if self.ispercent then
@@ -20,17 +27,19 @@ local function UpdateText(self)
 end
 
 local function UpdateLabels(self)
-	local min, max = (self.min or 0), (self.max or 100)
+	local min_value, max_value = (self.min or 0), (self.max or 100)
 	if self.ispercent then
-		self.lowtext:SetFormattedText("%s%%", (min * 100))
-		self.hightext:SetFormattedText("%s%%", (max * 100))
+		self.lowtext:SetFormattedText("%s%%", (min_value * 100))
+		self.hightext:SetFormattedText("%s%%", (max_value * 100))
 	else
-		self.lowtext:SetText(min)
-		self.hightext:SetText(max)
+		self.lowtext:SetText(min_value)
+		self.hightext:SetText(max_value)
 	end
 end
 
-
+--[[-----------------------------------------------------------------------------
+Scripts
+-------------------------------------------------------------------------------]]
 local function Control_OnEnter(frame)
 	frame.obj:Fire("OnEnter")
 end
@@ -92,7 +101,7 @@ local function EditBox_OnEnterPressed(frame)
 	else
 		value = tonumber(value)
 	end
-	
+
 	if value then
 		PlaySound(856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
 		self.slider:SetValue(value)
@@ -108,7 +117,9 @@ local function EditBox_OnLeave(frame)
 	frame:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
 end
 
-
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 local methods = {
 	["OnAcquire"] = function(self)
 		self:SetWidth(200)
@@ -160,13 +171,13 @@ local methods = {
 		self.label:SetText(text)
 	end,
 
-	["SetSliderValues"] = function(self, min, max, step)
+	["SetSliderValues"] = function(self, min_value, max_value, step)
 		local frame = self.slider
 		frame.setup = true
-		self.min = min
-		self.max = max
+		self.min = min_value
+		self.max = max_value
 		self.step = step
-		frame:SetMinMaxValues(min or 0,max or 100)
+		frame:SetMinMaxValues(min_value or 0,max_value or 100)
 		UpdateLabels(self)
 		frame:SetValueStep(step or 1)
 		if self.value then
@@ -182,7 +193,9 @@ local methods = {
 	end
 }
 
-
+--[[-----------------------------------------------------------------------------
+Constructor
+-------------------------------------------------------------------------------]]
 local SliderBackdrop  = {
 	bgFile = "Interface\\Buttons\\UI-SliderBar-Background",
 	edgeFile = "Interface\\Buttons\\UI-SliderBar-Border",

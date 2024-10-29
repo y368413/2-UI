@@ -5,7 +5,7 @@ local MISC = M:GetModule("Misc")
 local wipe, select, pairs, tonumber = wipe, select, pairs, tonumber
 local strsplit, strfind, tinsert = strsplit, strfind, tinsert
 local InboxItemCanDelete, DeleteInboxItem, TakeInboxMoney, TakeInboxItem = InboxItemCanDelete, DeleteInboxItem, TakeInboxMoney, TakeInboxItem
-local GetInboxNumItems, GetInboxHeaderInfo, GetInboxItem, GetItemInfo = GetInboxNumItems, GetInboxHeaderInfo, GetInboxItem, GetItemInfo
+local GetInboxNumItems, GetInboxHeaderInfo, GetInboxItem = GetInboxNumItems, GetInboxHeaderInfo, GetInboxItem
 local GetSendMailPrice, GetMoney = GetSendMailPrice, GetMoney
 local C_Timer_After = C_Timer.After
 local C_Mail_HasInboxMoney = C_Mail.HasInboxMoney
@@ -52,9 +52,9 @@ function MISC:InboxItem_OnEnter()
 		if itemAttached > 1 then
 			GameTooltip:AddLine(U["Attach List"])
 			for itemID, count in pairs(inboxItems) do
-				local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture = GetItemInfo(itemID)
+				local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture = C_Item.GetItemInfo(itemID)
 				if itemName then
-					local r, g, b = GetItemQualityColor(itemQuality)
+					local r, g, b = C_Item.GetItemQualityColor(itemQuality)
 					GameTooltip:AddDoubleLine(" |T"..itemTexture..":12:12:0:0:50:50:4:46:4:46|t "..itemName, count, r, g, b)
 				end
 			end
@@ -73,7 +73,7 @@ function MISC:ContactButton_OnClick()
 end
 
 function MISC:ContactButton_Delete()
-	MaoRUIDB["ContactList"][self.__owner.name:GetText()] = nil
+	MaoRUISetDB["ContactList"][self.__owner.name:GetText()] = nil
 	MISC:ContactList_Refresh()
 end
 
@@ -113,10 +113,12 @@ function MISC:ContactList_Refresh()
 	wipe(contactList)
 	wipe(contactListByRealm)
 
-	for fullname, color in pairs(MaoRUIDB["ContactList"]) do
+	for fullname, color in pairs(MaoRUISetDB["ContactList"]) do
 		local name, realm = strsplit("-", fullname)
-		if not contactListByRealm[realm] then contactListByRealm[realm] = {} end
-		contactListByRealm[realm][name] = color
+		if realm then
+			if not contactListByRealm[realm] then contactListByRealm[realm] = {} end
+			contactListByRealm[realm][name] = color
+		end
 	end
 
 	GenerateDataByRealm(I.MyRealm)
@@ -175,7 +177,7 @@ end
 
 function MISC:MailBox_ContactList()
 	local bu = M.CreateGear(SendMailFrame)
-	bu:SetPoint("LEFT", SendMailNameEditBox, "RIGHT", 3, 0)
+	bu:SetPoint("LEFT", SendMailNameEditBox, "RIGHT", 21, 0)
 
 	local list = CreateFrame("Frame", nil, bu)
 	list:SetSize(200, 424)
@@ -199,10 +201,10 @@ function MISC:MailBox_ContactList()
 		local text = editbox:GetText()
 		if text == "" or tonumber(text) then return end -- incorrect input
 		if not strfind(text, "-") then text = text.."-"..I.MyRealm end -- complete player realm name
-		if MaoRUIDB["ContactList"][text] then return end -- unit exists
+		if MaoRUISetDB["ContactList"][text] then return end -- unit exists
 
 		local r, g, b = swatch.tex:GetColor()
-		MaoRUIDB["ContactList"][text] = r..":"..g..":"..b
+		MaoRUISetDB["ContactList"][text] = r..":"..g..":"..b
 		MISC:ContactList_Refresh()
 		editbox:SetText("")
 	end)
@@ -410,7 +412,7 @@ end
 
 function MISC:MailBox()
 	if not R.db["Misc"]["Mail"] then return end
-	if IsAddOnLoaded("Postal") then return end
+	if C_AddOns.IsAddOnLoaded("Postal") then return end
 
 	-- Delete buttons
 	for i = 1, 7 do

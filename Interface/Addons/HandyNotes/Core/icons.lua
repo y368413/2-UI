@@ -18,6 +18,8 @@ local DEFAULT_GLOW = Glow('square_icon')
 
 Core.icons = { -- name => path
 
+    bag = {Icon('bag'), Glow('bag')},
+
     -- Red, Blue, Yellow, Purple, Green, Pink, Lime, Navy, Teal
     chest_bk = {Icon('chest_black'), Glow('chest')},
     chest_bl = {Icon('chest_blue'), Glow('chest')},
@@ -64,12 +66,16 @@ Core.icons = { -- name => path
     quest_ay = {Icon('quest_available_yellow'), Glow('quest_available')},
 
     skull_b = {Icon('skull_blue'), Glow('skull')},
+    skull_p = {Icon('skull_purple'), Glow('skull')},
     skull_w = {Icon('skull_white'), Glow('skull')},
 
     star_chest_b = {Icon('star_chest_blue'), Glow('star_chest')},
     star_chest_g = {Icon('star_chest_gray'), Glow('star_chest')},
     star_chest_p = {Icon('star_chest_pink'), Glow('star_chest')},
     star_chest_y = {Icon('star_chest_yellow'), Glow('star_chest')},
+
+    star_skull_b = {Icon('star_skull_blue'), Glow('star_skull')},
+    star_skull_w = {Icon('star_skull_white'), Glow('star_skull')},
 
     war_mode_flags = {Icon('war_mode_flags'), nil},
     war_mode_swords = {Icon('war_mode_swords'), nil},
@@ -82,10 +88,15 @@ Core.icons = { -- name => path
     achievement = {Icon('achievement'), nil},
     door_down = {Icon('door_down'), Glow('door_down')},
     envelope = {Icon('envelope'), Glow('envelope')},
+    ferry = {Icon('ferry'), Glow('ferry')},
     left_mouse = {Icon('left_mouse'), nil},
     scroll = {Icon('scroll'), Glow('scroll')},
-    world_quest = {Icon('world_quest'), Glow('world_quest')}
+    world_quest = {Icon('world_quest'), Glow('world_quest')},
 
+    check_bl = {Icon('check_blue'), nil},
+    check_gn = {Icon('check_green'), nil},
+    check_gy = {Icon('check_gray'), nil},
+    check_yw = {Icon('check_yellow'), nil}
 }
 
 -------------------------------------------------------------------------------
@@ -99,7 +110,8 @@ local function GetIconPath(name)
 end
 
 local function GetIconLink(name, size, offsetX, offsetY)
-    local link = '|T' .. GetIconPath(name) .. ':' .. size .. ':' .. size
+    local link = '|T' .. GetIconPath(name) .. ':' .. (size or 0) .. ':' ..
+                     (size or 0) -- if size is nil icon will be textHeight
     if offsetX and offsetY then
         link = link .. ':' .. offsetX .. ':' .. offsetY
     end

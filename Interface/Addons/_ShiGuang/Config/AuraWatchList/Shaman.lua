@@ -57,7 +57,7 @@ local list = {
 		{AuraID = 173183, UnitID = "player"},	-- 元素冲击 急速
 		{AuraID = 173184, UnitID = "player"},	-- 元素冲击 精通
 		{AuraID = 210714, UnitID = "player"},	-- 冰怒
-		--{AuraID = 157504, UnitID = "player", Value = true},	-- 暴雨图腾
+		{AuraID = 157504, UnitID = "player", Value = true},	-- 暴雨图腾
 		{AuraID = 280615, UnitID = "player"},	-- 迅捷洪流
 		{AuraID = 273323, UnitID = "player"},	-- 闪电护盾超载
 		{AuraID = 272737, UnitID = "player"},	-- 无穷力量

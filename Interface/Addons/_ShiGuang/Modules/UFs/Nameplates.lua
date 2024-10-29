@@ -14,13 +14,14 @@ local SetCVar, UIFrameFadeIn, UIFrameFadeOut = SetCVar, UIFrameFadeIn, UIFrameFa
 local IsInRaid, IsInGroup, UnitName, UnitHealth, UnitHealthMax = IsInRaid, IsInGroup, UnitName, UnitHealth, UnitHealthMax
 local GetNumGroupMembers, GetNumSubgroupMembers, UnitGroupRolesAssigned = GetNumGroupMembers, GetNumSubgroupMembers, UnitGroupRolesAssigned
 local C_NamePlate_GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit
-local GetSpellCooldown, GetTime = GetSpellCooldown, GetTime
+local GetTime = GetTime
 local UnitNameplateShowsWidgetsOnly = UnitNameplateShowsWidgetsOnly
 local INTERRUPTED, THREAT_TOOLTIP = INTERRUPTED, THREAT_TOOLTIP
 local C_NamePlate_SetNamePlateEnemySize = C_NamePlate.SetNamePlateEnemySize
 local C_NamePlate_SetNamePlateFriendlySize = C_NamePlate.SetNamePlateFriendlySize
 local C_NamePlate_SetNamePlateEnemyClickThrough = C_NamePlate.SetNamePlateEnemyClickThrough
 local C_NamePlate_SetNamePlateFriendlyClickThrough = C_NamePlate.SetNamePlateFriendlyClickThrough
+local GetSpellName = C_Spell.GetSpellName
 
 -- Init
 function UF:UpdatePlateCVars()
@@ -39,12 +40,13 @@ function UF:UpdatePlateCVars()
 	SetCVar("nameplateOverlapV", R.db["Nameplate"]["VerticalSpacing"])
 	SetCVar("nameplateShowOnlyNames", R.db["Nameplate"]["CVarOnlyNames"] and 1 or 0)
 	SetCVar("nameplateShowFriendlyNPCs", R.db["Nameplate"]["CVarShowNPCs"] and 1 or 0)
+	SetCVar("nameplateMaxDistance", R.db["Nameplate"]["PlateRange"])
 end
 
 function UF:UpdateClickableSize()
 	if InCombatLockdown() then return end
 
-	local uiScale = MaoRUIDB["UIScale"]
+	local uiScale = MaoRUISetDB["UIScale"]
 	local harmWidth, harmHeight = R.db["Nameplate"]["HarmWidth"], R.db["Nameplate"]["HarmHeight"]
 	local helpWidth, helpHeight = R.db["Nameplate"]["HelpWidth"], R.db["Nameplate"]["HelpHeight"]
 
@@ -68,23 +70,27 @@ function UF:SetupCVars()
 	--SetCVar("nameplateSelectedScale", 1)
 	--SetCVar("nameplateLargerScale", 1)
 	SetCVar("nameplateGlobalScale", 1)
+	SetCVar("NamePlateHorizontalScale", 1)
+	SetCVar("NamePlateVerticalScale", 1)
+	SetCVar("NamePlateClassificationScale", 1)
 
 	SetCVar("nameplateShowSelf", 0)
 	SetCVar("nameplateResourceOnTarget", 0)
-	M.HideOption(InterfaceOptionsNamesPanelUnitNameplatesPersonalResource)
-	M.HideOption(InterfaceOptionsNamesPanelUnitNameplatesPersonalResourceOnEnemy)
-
 	UF:UpdateClickableSize()
 	hooksecurefunc(NamePlateDriverFrame, "UpdateNamePlateOptions", UF.UpdateClickableSize)
 	UF:UpdatePlateClickThru()
+	-- fix blizz friendly plate visibility
+	SetCVar("nameplatePlayerMaxDistance", 60)
 end
 
 function UF:BlockAddons()
 	if not R.db["Nameplate"]["BlockDBM"] then return end
 	if not DBM or not DBM.Nameplate then return end
 
-	function DBM.Nameplate:SupportedNPMod()
-		return true
+	if DBM.Options then
+		DBM.Options.DontShowNameplateIcons = true
+		DBM.Options.DontShowNameplateIconsCD = true
+		DBM.Options.DontShowNameplateIconsCast = true
 	end
 
 	local function showAurasForDBM(_, _, _, spellID)
@@ -272,6 +278,7 @@ end
 
 function UF:CreateThreatColor(self)
 	local threatIndicator = M.CreateSD(self.backdrop, nil, true)
+	threatIndicator:SetFrameLevel(2)
 	threatIndicator:Hide()
 	self.backdrop.__shadow = nil
 
@@ -288,8 +295,9 @@ end
 -- Target indicator
 function UF:UpdateTargetChange()
 	local element = self.TargetIndicator
-	local unit = self.unit
+	if not element then return end
 
+	local unit = self.unit
 	if R.db["Nameplate"]["TargetIndicator"] ~= 1 then
 		if UnitIsUnit(unit, "target") and not UnitIsUnit(unit, "player") then
 			element:Show()
@@ -303,8 +311,10 @@ function UF:UpdateTargetChange()
 end
 
 function UF:UpdateTargetIndicator()
-	local style = R.db["Nameplate"]["TargetIndicator"]
 	local element = self.TargetIndicator
+	if not element then return end
+
+	local style = R.db["Nameplate"]["TargetIndicator"]
 	local isNameOnly = self.plateType == "NameOnly"
 	if style == 1 then
 		element:Hide()
@@ -386,7 +396,7 @@ function UF:AddTargetIndicator(self)
 	frame.RightArrow:SetRotation(rad(-90))
 
 	frame.Glow = M.CreateSD(frame, 6, true)
-	frame.Glow:SetOutside(self.Health.backdrop, 5, 5)
+	frame.Glow:SetOutside(self.backdrop, 5, 5)
 	frame.Glow:SetBackdropBorderColor(1, 1, 1)
 	frame.Glow:SetFrameLevel(0)
 
@@ -429,34 +439,29 @@ function UF:UpdateQuestUnit(_, unit)
 	end
 
 	unit = unit or self.unit
-
 	local startLooking, isLootQuest, questProgress -- FIXME: isLootQuest in old expansion
-	M.ScanTip:SetOwner(UIParent, "ANCHOR_NONE")
-	M.ScanTip:SetUnit(unit)
+	local prevDiff = 0
 
-	for i = 2, M.ScanTip:NumLines() do
-		local textLine = _G["UI_ScanTooltipTextLeft"..i]
-		local text = textLine and textLine:GetText()
-		if not text then break end
-
-		if text ~= " " then
-			if isInGroup and text == I.MyName or (not isInGroup and isQuestTitle(textLine)) then
-				startLooking = true
-			elseif startLooking then
-				local current, goal = strmatch(text, "(%d+)/(%d+)")
-				local progress = strmatch(text, "(%d+)%%")
-				if current and goal then
-					local diff = floor(goal - current)
-					if diff > 0 then
-						questProgress = diff
-						break
+	local data = C_TooltipInfo.GetUnit(unit)
+	if data then
+		for i = 1, #data.lines do
+			local lineData = data.lines[i]
+			if lineData.type == 8 then
+				local text = lineData.leftText -- progress string
+				if text then
+					local current, goal = strmatch(text, "(%d+)/(%d+)")
+					local progress = strmatch(text, "(%d+)%%")
+					if current and goal then
+						local diff = floor(goal - current)
+						if diff > prevDiff then
+							questProgress = diff
+							prevDiff = diff
+						end
+					elseif progress and prevDiff == 0 then
+						if floor(100 - progress) > 0 then
+							questProgress = progress.."%" -- lower priority on progress, keep looking
+						end
 					end
-				elseif progress and not strmatch(text, THREAT_TOOLTIP) then
-					if floor(100 - progress) > 0 then
-						questProgress = 100 - progress  --.."%" -- lower priority on progress, keep looking
-					end
-				else
-					break
 				end
 			end
 		end
@@ -512,37 +517,28 @@ end
 
 local cache = {}
 function UF:UpdateDungeonProgress(unit)
-	if not self.progressText or not AngryKeystones_Data then return end
+	if not self.progressText or not MDT then return end
 	if unit ~= self.unit then return end
 	self.progressText:SetText("")
 
 	local name, _, _, _, _, _, _, _, _, scenarioType = C_Scenario_GetInfo()
 	if scenarioType == LE_SCENARIO_TYPE_CHALLENGE_MODE then
-		local npcID = self.npcID
-		local info = AngryKeystones_Data.progress[npcID]
-		if info then
-			local numCriteria = select(3, C_Scenario_GetStepInfo())
+		local value = MDT:GetEnemyForces(self.npcID)
+		if value and value > 0 then
 			local total = cache[name]
 			if not total then
+				local numCriteria = select(3, C_Scenario_GetStepInfo())
 				for criteriaIndex = 1, numCriteria do
-					local _, _, _, _, totalQuantity, _, _, _, _, _, _, _, isWeightedProgress = C_Scenario.GetCriteriaInfo(criteriaIndex)
-					if isWeightedProgress then
-						cache[name] = totalQuantity
+					local criteriaInfo = C_ScenarioInfo.GetCriteriaInfo(criteriaIndex)
+					if criteriaInfo and criteriaInfo.isWeightedProgress then
+						cache[name] = criteriaInfo.totalQuantity
 						total = cache[name]
 						break
 					end
 				end
 			end
 
-			local value, valueCount
-			for amount, count in pairs(info) do
-				if not valueCount or count > valueCount or (count == valueCount and amount < value) then
-					value = amount
-					valueCount = count
-				end
-			end
-
-			if value and total then
+			if total then
 				self.progressText:SetText(format("+%.2f", value/total*100))
 			end
 		end
@@ -558,7 +554,7 @@ local NPClassifies = {
 }
 
 function UF:AddCreatureIcon(self)
-	local icon = self:CreateTexture(nil, "ARTWORK")
+	local icon = self.Health:CreateTexture(nil, "ARTWORK")
 	--icon:SetAtlas("auctionhouse-icon-favorite")
 	icon:SetPoint("RIGHT", self.nameText, "LEFT", 0, 0)
 	icon:SetSize(21, 21)
@@ -568,58 +564,21 @@ function UF:AddCreatureIcon(self)
 end
 
 function UF:UpdateUnitClassify(unit)
-	if self.ClassifyIndicator then
+	if not self.ClassifyIndicator then return end
+	if not unit then unit = self.unit end
+
+	self.ClassifyIndicator:Hide()
+
+	if self.__tagIndex > 3 then
 		local class = UnitClassification(unit)
-	  local level = UnitLevel(unit)
-		if (not self.isNameOnly) and class and NPClassifies[class] then
-			local tex, r, g, b, desature = unpack(NPClassifies[class])
+		local classify = class and NPClassifies[class]
+		if classify then
+			local r, g, b, desature = unpack(classify)
 			--self.ClassifyIndicator:SetVertexColor(r, g, b)
-			--self.ClassifyIndicator:SetDesaturated(desature)
-			
-			if level and level < UnitLevel("player") then  -- or level == -1
-			    if class == elite then
-			        self.ClassifyIndicator:Hide()
-			    end
-			else    
-			    self.ClassifyIndicator:SetTexture(tex)
-		      self.ClassifyIndicator:SetTexCoord(r, g, b, desature)
-		      self.ClassifyIndicator:Show()
-			end
-		else
-			self.ClassifyIndicator:Hide()
+			self.ClassifyIndicator:SetDesaturated(desature)
+			self.ClassifyIndicator:Show()
 		end
 	end
-end
-
--- Scale plates for explosives
-local hasExplosives
-local EXPLOSIVE_ID = 120651
-function UF:UpdateExplosives(event, unit)
-	if not hasExplosives or unit ~= self.unit then return end
-
-	local npcID = self.npcID
-	if event == "NAME_PLATE_UNIT_ADDED" and npcID == EXPLOSIVE_ID then
-		self:SetScale(MaoRUIDB["UIScale"]*1.25)
-	elseif event == "NAME_PLATE_UNIT_REMOVED" then
-		self:SetScale(MaoRUIDB["UIScale"])
-	end
-end
-
-local function checkAffixes(event)
-	local _, affixes = C_ChallengeMode_GetActiveKeystoneInfo()
-	if affixes[3] and affixes[3] == 13 then
-		hasExplosives = true
-	else
-		hasExplosives = false
-	end
-end
-
-function UF:CheckExplosives()
-	if not R.db["Nameplate"]["ExplosivesScale"] then return end
-
-	checkAffixes()
-	M:RegisterEvent("ZONE_CHANGED_NEW_AREA", checkAffixes)
-	M:RegisterEvent("CHALLENGE_MODE_START", checkAffixes)
 end
 
 -- Mouseover indicator
@@ -661,9 +620,14 @@ function UF:MouseoverIndicator(self)
 	local highlight = CreateFrame("Frame", nil, self.Health)
 	highlight:SetAllPoints(self)
 	highlight:Hide()
+
 	local texture = highlight:CreateTexture(nil, "ARTWORK")
 	texture:SetAllPoints()
-	texture:SetColorTexture(1, 1, 1, .25)
+	texture:SetColorTexture(1, 1, 1, .35)
+	local glow = M.CreateSD(highlight, 8, true)
+	glow:SetOutside(self.backdrop, 8, 8)
+	glow:SetBackdropBorderColor(0, .6, 1)
+	glow:SetFrameLevel(1)
 
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", UF.UpdateMouseoverShown, true)
 
@@ -716,20 +680,17 @@ function UF:CreatePlates()
 	self.mystyle = "nameplate"
 	self:SetSize(R.db["Nameplate"]["PlateWidth"], R.db["Nameplate"]["PlateHeight"])
 	self:SetPoint("CENTER")
-	self:SetScale(MaoRUIDB["UIScale"])
+	self:SetScale(MaoRUISetDB["UIScale"])
 
 	local health = CreateFrame("StatusBar", nil, self)
 	health:SetAllPoints()
 	health:SetStatusBarTexture(I.normTex)
-  --M.CreateTex(health)
-  --M.CreateSD(health, 3)
 	self.backdrop = M.SetBD(health)
 	self.backdrop.__shadow = nil
 	M:SmoothBar(health)
 
 	self.Health = health
 	self.Health.UpdateColor = UF.UpdateColor
-
 
 	local tarName = M.CreateFS(self, R.db["Nameplate"]["NameTextSize"]+4)
 	tarName:ClearAllPoints()
@@ -755,7 +716,7 @@ function UF:CreatePlates()
 
 	local title = M.CreateFS(self, R.db["Nameplate"]["NameOnlyTitleSize"])
 	title:ClearAllPoints()
-	title:SetPoint("TOP", self, "BOTTOM", 0, -10)
+	title:SetPoint("TOP", self.nameText, "BOTTOM", 0, -2)
 	title:Hide()
 	self:Tag(title, "[npctitle]")
 	self.npcTitle = title
@@ -798,12 +759,12 @@ function UF:UpdateNameplateAuras()
 	end
 	element.numTotal = R.db["Nameplate"]["maxAuras"]
 	element.size = R.db["Nameplate"]["AuraSize"]
+	element.fontSize = R.db["Nameplate"]["FontSize"]
 	element.showDebuffType = R.db["Nameplate"]["DebuffColor"]
 	element.showStealableBuffs = R.db["Nameplate"]["DispellMode"] == 1
 	element.alwaysShowStealable = R.db["Nameplate"]["DispellMode"] == 2
 	element.desaturateDebuff = R.db["Nameplate"]["Desaturate"]
-	element:SetWidth(self:GetWidth())
-	element:SetHeight((element.size + element.spacing) * 2)
+	UF:UpdateAuraContainer(self, element, element.numTotal)
 	element:ForceUpdate()
 end
 
@@ -818,47 +779,51 @@ function UF:UpdateNameplateSize()
 	local plateWidth, plateHeight = R.db["Nameplate"]["PlateWidth"], R.db["Nameplate"]["PlateHeight"]
 	local plateCBHeight, plateCBOffset = R.db["Nameplate"]["PlateCBHeight"], R.db["Nameplate"]["PlateCBOffset"]
 	local nameTextSize, CBTextSize = R.db["Nameplate"]["NameTextSize"], R.db["Nameplate"]["CBTextSize"]
+	local nameTextOffset = R.db["Nameplate"]["NameTextOffset"]
 	local healthTextSize = R.db["Nameplate"]["HealthTextSize"]
 	local healthTextOffset = R.db["Nameplate"]["HealthTextOffset"]
 	if R.db["Nameplate"]["FriendPlate"] and self.isFriendly and not R.db["Nameplate"]["NameOnlyMode"] then -- cannot use plateType here
 		plateWidth, plateHeight = R.db["Nameplate"]["FriendPlateWidth"], R.db["Nameplate"]["FriendPlateHeight"]
 		plateCBHeight, plateCBOffset = R.db["Nameplate"]["FriendPlateCBHeight"], R.db["Nameplate"]["FriendPlateCBOffset"]
 		nameTextSize, CBTextSize = R.db["Nameplate"]["FriendNameSize"], R.db["Nameplate"]["FriendCBTextSize"]
+		nameTextOffset = R.db["Nameplate"]["FriendNameOffset"]
 		healthTextSize = R.db["Nameplate"]["FriendHealthSize"]
 		healthTextOffset = R.db["Nameplate"]["FriendHealthOffset"]
 	end
-	local font, fontFlag = I.Font[1], I.Font[3]
 	local iconSize = plateHeight + plateCBHeight + 5
 	local nameType = R.db["Nameplate"]["NameType"]
 	local nameOnlyTextSize, nameOnlyTitleSize = R.db["Nameplate"]["NameOnlyTextSize"], R.db["Nameplate"]["NameOnlyTitleSize"]
 
 	if self.plateType == "NameOnly" then
-		self.nameText:SetFont(font, nameOnlyTextSize, fontFlag)
+		M.SetFontSize(self.nameText, nameOnlyTextSize)
 		self:Tag(self.nameText, "[nprare][nplevel][color][name]")
 		self.__tagIndex = 6
-		self.npcTitle:SetFont(font, nameOnlyTitleSize, fontFlag)
+		M.SetFontSize(self.npcTitle, nameOnlyTitleSize)
 		self.npcTitle:UpdateTag()
 	else
-		self.nameText:SetFont(font, nameTextSize, fontFlag)
+		M.SetFontSize(self.nameText, nameTextSize)
+		self.nameText:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, nameTextOffset)
+		self.nameText:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 0, nameTextOffset)
 		self:Tag(self.nameText, UF.PlateNameTags[nameType])
 		self.__tagIndex = nameType
 
 		self:SetSize(plateWidth, plateHeight)
-		self.tarName:SetFont(font, nameTextSize+4, fontFlag)
+		M.SetFontSize(self.tarName, nameTextSize+4)
 		self.Castbar.Icon:SetSize(iconSize, iconSize)
 		self.Castbar.glowFrame:SetSize(iconSize+8, iconSize+8)
 		self.Castbar:SetHeight(plateCBHeight)
-		self.Castbar.Time:SetFont(font, CBTextSize, fontFlag)
+		M.SetFontSize(self.Castbar.Time, CBTextSize)
 		self.Castbar.Time:SetPoint("TOPRIGHT", self.Castbar, "RIGHT", 0, plateCBOffset)
-		self.Castbar.Text:SetFont(font, CBTextSize, fontFlag)
+		M.SetFontSize(self.Castbar.Text, CBTextSize)
 		self.Castbar.Text:SetPoint("TOPLEFT", self.Castbar, "LEFT", 0, plateCBOffset)
 		self.Castbar.Shield:SetPoint("TOP", self.Castbar, "CENTER", 0, plateCBOffset)
 		self.Castbar.Shield:SetSize(CBTextSize + 4, CBTextSize + 4)
-		self.Castbar.spellTarget:SetFont(font, CBTextSize+3, fontFlag)
-		self.healthValue:SetFont(font, healthTextSize, fontFlag)
+		M.SetFontSize(self.Castbar.spellTarget, CBTextSize+3)
+		M.SetFontSize(self.healthValue, healthTextSize)
 		self.healthValue:SetPoint("RIGHT", self, 0, healthTextOffset)
 		self:Tag(self.healthValue, "[VariousHP("..UF.VariousTagIndex[R.db["Nameplate"]["HealthType"]]..")]")
 		self.healthValue:UpdateTag()
+		self.RaidTargetIndicator:SetPoint("BOTTOMRIGHT", self, "TOPLEFT", R.db["Nameplate"]["RaidTargetX"], R.db["Nameplate"]["RaidTargetY"])
 	end
 	self.nameText:UpdateTag()
 end
@@ -881,8 +846,13 @@ function UF:RefreshAllPlates()
 end
 
 local DisabledElements = {
-	"Health", "Castbar", "HealPredictionAndAbsorb", "PvPClassificationIndicator", "ThreatIndicator"
+	"Health", "Castbar", "HealthPrediction", "PvPClassificationIndicator", "ThreatIndicator"
 }
+
+local SoftTargetBlockElements = {
+	"Auras", "RaidTargetIndicator",
+}
+
 function UF:UpdatePlateByType()
 	local name = self.nameText
 	local hpval = self.healthValue
@@ -890,9 +860,28 @@ function UF:UpdatePlateByType()
 	local raidtarget = self.RaidTargetIndicator
 	local questIcon = self.questIcon
 
-	name:SetShown(not self.widgetsOnly)
-	name:ClearAllPoints()
+	if self.widgetsOnly then
+		name:Hide()
+	else
+		name:Show()
+		name:UpdateTag()
+		name:ClearAllPoints()
+	end
 	raidtarget:ClearAllPoints()
+
+	if self.isSoftTarget then
+		for _, element in pairs(SoftTargetBlockElements) do
+			if self:IsElementEnabled(element) then
+				self:DisableElement(element)
+			end
+		end
+	else
+		for _, element in pairs(SoftTargetBlockElements) do
+			if not self:IsElementEnabled(element) then
+				self:EnableElement(element)
+			end
+		end
+	end
 
 	if self.plateType == "NameOnly" then
 		for _, element in pairs(DisabledElements) do
@@ -921,8 +910,6 @@ function UF:UpdatePlateByType()
 		end
 
 		name:SetJustifyH("LEFT")
-		name:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 5)
-		name:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 0, 5)
 		hpval:Show()
 		title:Hide()
 
@@ -943,7 +930,8 @@ end
 function UF:RefreshPlateType(unit)
 	self.reaction = UnitReaction(unit, "player")
 	self.isFriendly = self.reaction and self.reaction >= 4 and not UnitCanAttack("player", unit)
-	if R.db["Nameplate"]["NameOnlyMode"] and self.isFriendly or self.widgetsOnly then
+	self.isSoftTarget = UnitIsUnit(unit, "softinteract")
+	if R.db["Nameplate"]["NameOnlyMode"] and self.isFriendly or self.widgetsOnly or self.isSoftTarget then
 		self.plateType = "NameOnly"
 	elseif R.db["Nameplate"]["FriendPlate"] and self.isFriendly then
 		self.plateType = "FriendPlate"
@@ -962,6 +950,20 @@ function UF:OnUnitFactionChanged(unit)
 	local unitFrame = nameplate and nameplate.unitFrame
 	if unitFrame and unitFrame.unitName then
 		UF.RefreshPlateType(unitFrame, unit)
+	end
+end
+
+function UF:OnUnitSoftTargetChanged(previousTarget, currentTarget)
+	if not GetCVarBool("SoftTargetIconGameObject") then return end
+
+	for _, nameplate in pairs(C_NamePlate.GetNamePlates()) do
+		local unitFrame = nameplate and nameplate.unitFrame
+		local guid = unitFrame and unitFrame.unitGUID
+		if guid and (guid == previousTarget or guid == currentTarget) then
+			unitFrame.previousType = nil
+			UF.RefreshPlateType(unitFrame, unitFrame.unit)
+			UF.UpdateTargetChange(unitFrame)
+		end
 	end
 end
 
@@ -1003,6 +1005,7 @@ end
 
 function UF:RefreshPlateByEvents()
 	M:RegisterEvent("UNIT_FACTION", UF.OnUnitFactionChanged)
+	M:RegisterEvent("PLAYER_SOFT_INTERACT_CHANGED", UF.OnUnitSoftTargetChanged)
 
 	if R.db["Nameplate"]["UnitTargeted"] then
 		UF:OnUnitTargetChanged()
@@ -1029,10 +1032,18 @@ function UF:PostUpdatePlates(event, unit)
 		self.widgetsOnly = UnitNameplateShowsWidgetsOnly(unit)
 
 		local blizzPlate = self:GetParent().UnitFrame
-		self.widgetContainer = blizzPlate and blizzPlate.WidgetContainer
-		if self.widgetContainer then
-			self.widgetContainer:SetParent(self)
-			self.widgetContainer:SetScale(1/MaoRUIDB["UIScale"])
+		if blizzPlate then
+			self.widgetContainer = blizzPlate.WidgetContainer
+			if self.widgetContainer then
+				--self.widgetContainer:SetParent(self)
+				self.widgetContainer:SetScale(1/MaoRUISetDB["UIScale"])
+			end
+
+			self.softTargetFrame = blizzPlate.SoftTargetFrame
+			if self.softTargetFrame then
+				--self.softTargetFrame:SetParent(self)
+				self.softTargetFrame:SetScale(1/MaoRUISetDB["UIScale"])
+			end
 		end
 
 		UF.RefreshPlateType(self, unit)
@@ -1052,7 +1063,6 @@ function UF:PostUpdatePlates(event, unit)
 
 		self.tarName:SetShown(R.ShowTargetNPCs[self.npcID])
 	end
-	UF.UpdateExplosives(self, event, unit)
 end
 
 -- Player Nameplate
@@ -1130,7 +1140,10 @@ function UF:CreatePlayerPlate()
 	UF:CreateClassPower(self)
 	UF:StaggerBar(self)
 	if R.db["Auras"]["ClassAuras"] then
-		M:GetModule("Auras"):CreateLumos(self)
+		local AURA = M:GetModule("Auras")
+		if AURA then
+			AURA:CreateLumos(self)
+		end
 	end
 
 	local textFrame = CreateFrame("Frame", nil, self.Power)
@@ -1282,7 +1295,10 @@ function UF:ResizeTargetPower()
 end
 
 function UF:UpdateGCDTicker()
-	local start, duration = GetSpellCooldown(61304)
+	local cooldownInfo = C_Spell.GetSpellCooldown(61304)
+	local start = cooldownInfo and cooldownInfo.startTime
+	local duration = cooldownInfo and cooldownInfo.duration
+
 	if start > 0 and duration > 0 then
 		if self.duration ~= duration then
 			self:SetMinMaxValues(0, duration)
@@ -1328,47 +1344,45 @@ function UF:RefreshMajorSpells()
 	wipe(UF.MajorSpells)
 
 	for spellID in pairs(R.MajorSpells) do
-		local name = GetSpellInfo(spellID)
+		local name = GetSpellName(spellID)
 		if name then
-			local modValue = MaoRUIDB["MajorSpells"][spellID]
+			local modValue = MaoRUISetDB["MajorSpells"][spellID]
 			if modValue == nil then
 				UF.MajorSpells[spellID] = true
 			end
 		end
 	end
 
-	for spellID, value in pairs(MaoRUIDB["MajorSpells"]) do
+	for spellID, value in pairs(MaoRUISetDB["MajorSpells"]) do
 		if value then
 			UF.MajorSpells[spellID] = true
 		end
 	end
 end
 
-UF.NameplateFilter = {[1]={}, [2]={}}
+UF.NameplateWhite = {}
+UF.NameplateBlack = {}
 
-local function refreshNameplateFilter(index)
-	wipe(UF.NameplateFilter[index])
+local function RefreshNameplateFilter(list, key)
+	wipe(UF[key])
 
-	local VALUE = (index == 1 and R.WhiteList) or (index == 2 and R.BlackList)
-	if VALUE then
-		for spellID in pairs(VALUE) do
-			local name = GetSpellInfo(spellID)
-			if name then
-				if MaoRUIDB["NameplateFilter"][index][spellID] == nil then
-					UF.NameplateFilter[index][spellID] = true
-				end
+	for spellID in pairs(list) do
+		local name = GetSpellName(spellID)
+		if name then
+			if MaoRUISetDB[key][spellID] == nil then
+				UF[key][spellID] = true
 			end
 		end
 	end
 
-	for spellID, value in pairs(MaoRUIDB["NameplateFilter"][index]) do
+	for spellID, value in pairs(MaoRUISetDB[key]) do
 		if value then
-			UF.NameplateFilter[index][spellID] = true
+			UF[key][spellID] = true
 		end
 	end
 end
 
 function UF:RefreshNameplateFilters()
-	refreshNameplateFilter(1)
-	refreshNameplateFilter(2)
+	RefreshNameplateFilter(R.WhiteList, "NameplateWhite")
+	RefreshNameplateFilter(R.BlackList, "NameplateBlack")
 end

@@ -65,7 +65,7 @@ Skada:AddLoadableModule("Friendly Fire", "Shows damage done on players by friend
 				dmg.playerid = srcGUID
 				dmg.playername = srcName
 				dmg.spellid = 6603
-				dmg.spellname = GetSpellInfo(6603)
+				dmg.spellname = C_Spell.GetSpellInfo(6603)
 				dmg.amount = (amount or 0) + (overkill or 0) + (absorb or 0)
 				dmg.targetid = dstGUID
 				dmg.targetname = dstName
@@ -125,7 +125,7 @@ Skada:AddLoadableModule("Friendly Fire", "Shows damage done on players by friend
 
 								d.label = spellname
 								d.value = spell.damage
-								d.icon = select(3, GetSpellInfo(spell.id))
+								d.icon = select(3, C_Spell.GetSpellInfo(spell.id))
 								d.id = spellname
 								d.spellid = spell.id
 								d.valuetext = Skada:FormatNumber(spell.damage)..(" (%02.1f%%)"):format(spell.damage / player.ffdamagedone * 100)

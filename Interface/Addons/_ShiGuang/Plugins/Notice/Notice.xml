@@ -1,12 +1,18 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="PvPPP.lua"/>
+	<!--Script file="PvPPP.lua"/-->
 	<Script file="Paragon.lua"/>
+	<Script file="ParagonReputation.lua"/>
+	<Script file="NPCTime.lua"/>
 	<Script file="Reminder.lua"/>
-	<Script file="DaisyCosp.lua"/>
-	<Script file="PhotoRobot.lua"/>
+	<!--Script file="DaisyCosp.lua"/>
+	<Script file="PhotoRobot.lua"/-->
+	<Script file="MountSource.lua"/>
 	<Script file="TransmogHeadsUp.lua"/>
-	<Script file="FeastsAndPortals.lua"/>
+	<Script file="FeastsAndPortals.lua"/>	
 	<Script file="IncentiveProgram.lua"/>
-	<!--Script file="Defs-Rare-Safari.lua"/-->
-	<Script file="TomeOfIllusionsCheck.lua"/>
+	<Script file="DoomCooldownPulse.lua"/>
+	<!--Script file="SpellActivationText.lua"/-->
+	<Script file="SimpleBattlefieldAlert.lua"/>
+	<!--Script file="Defs-Rare-Safari.lua"/>
+	<Script file="TomeOfIllusionsCheck.lua"/-->
 </Ui>

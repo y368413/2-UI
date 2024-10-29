@@ -62,7 +62,9 @@ R.ClickCastList = {
 	["WARLOCK"] = {
 		["MWU"] = 89808,		-- 灼烧驱魔
 	},
+	["EVOKER"] = {
+		["MWU"] = 365585,		-- 净除
+	},
 	["DEMONHUNTER"] = {},
 	["DEATHKNIGHT"] = {},
-	["EVOKER"] = {},
 }

@@ -4,6 +4,7 @@
 local _, Core = ...
 local Class = Core.Class
 local HBD = LibStub('HereBeDragons-2.0')
+local L = Core.locale
 
 local ARROW = "Interface\\AddOns\\HandyNotes\\Icons\\Artwork\\arrow"
 local CIRCLE = "Interface\\AddOns\\HandyNotes\\Icons\\Artwork\\circle"
@@ -36,6 +37,14 @@ function POI:Initialize(attrs)
     -- normalize table values
     self.quest = Core.AsTable(self.quest)
     self.questDeps = Core.AsTable(self.questDeps)
+
+    -- normalize points = {} back into the POI itself for legacy reasons
+    if self.points then
+        self.points = Core.AsTable(self.points)
+        for k, v in ipairs(self.points) do self[k] = v end
+    end
+
+    if self.color then self.r, self.g, self.b = Core.getARGB(self.color) end
 end
 
 function POI:IsCompleted()
@@ -72,17 +81,27 @@ function POI:IsEnabled()
 end
 
 function POI:Render(map, template)
-    -- draw a circle at every coord
+    -- draw POI at every coord
     for i = 1, #self, 1 do map:AcquirePin(template, self, self[i]) end
 end
 
 function POI:Draw(pin, xy)
     local t = ResetPin(pin)
+
     local size = (pin.minimap and 10 or (pin.parentHeight * 0.012))
-    size = size * Core:GetOpt('poi_scale')
-    t:SetVertexColor(unpack({Core:GetColorOpt('poi_color')}))
-    t:SetTexture(CIRCLE)
+    size = size * Core:GetOpt('poi_scale') * (self.size or 1)
+
+    local r, g, b, a = Core:GetColorOpt('poi_color')
+    if self.icon then
+        r, g, b, a = 1, 1, 1, 1
+    elseif self.color then
+        r, g, b = Core.getARGB(self.color)
+    end
+
+    t:SetTexture(self.icon and Core.GetIconPath(self.icon) or CIRCLE)
+    t:SetVertexColor(r, g, b, a)
     pin:SetSize(size, size)
+
     return HandyNotes:getXY(xy)
 end
 
@@ -137,7 +156,9 @@ end
 
 function Path:Draw(pin, type, xy1, xy2)
     local t = ResetPin(pin)
-    t:SetVertexColor(unpack({Core:GetColorOpt('path_color')}))
+    local color = {Core:GetColorOpt('path_color')}
+    if self.color then color = {self.r, self.g, self.b} end
+    t:SetVertexColor(unpack(color))
     t:SetTexture(type)
 
     -- constant size for minimaps, variable size for world maps
@@ -177,6 +198,45 @@ function Path:Draw(pin, type, xy1, xy2)
 
         return (x1 + x2) / 2, (y1 + y2) / 2
     end
+end
+
+-------------------------------------------------------------------------------
+-------------------------------- SHAPE: CIRCLE --------------------------------
+-------------------------------------------------------------------------------
+
+local function Circle(attrs)
+    local coords = {}
+    local origin = attrs.origin
+    local oX, oY = HandyNotes:getXY(origin)
+    local radius = attrs.radius
+    local segments = attrs.segments or 32
+    for d = 0, segments, 1 do
+        local angle = math.rad(d * (360 / segments))
+        local x = oX + ((radius / 100) * math.sin(angle)) * 1.0
+        local y = oY + ((radius / 100) * math.cos(angle)) * 1.5
+        table.insert(coords, HandyNotes:getCoord(x, y))
+    end
+
+    return unpack(coords)
+end
+
+-------------------------------------------------------------------------------
+-------------------------------- SHAPE: SQUARE --------------------------------
+-------------------------------------------------------------------------------
+
+local function Square(attrs)
+    local coords = {}
+    local origin = attrs.origin
+    local oX, oY = HandyNotes:getXY(origin)
+    local width = attrs.width
+    local calculate = {{-1, -1}, {1, -1}, {1, 1}, {-1, 1}, {-1, -1}}
+    for i = 1, #calculate, 1 do
+        local x = oX + ((width / 100) * calculate[i][1] * 1.0)
+        local y = oY + ((width / 100) * calculate[i][2] * 1.5)
+        table.insert(coords, HandyNotes:getCoord(x, y))
+    end
+
+    return unpack(coords)
 end
 
 -------------------------------------------------------------------------------
@@ -263,5 +323,26 @@ function Arrow:Draw(pin, type, xy1, xy2)
 end
 
 -------------------------------------------------------------------------------
+----------------------------------- ENTRANCE ----------------------------------
+-------------------------------------------------------------------------------
 
-Core.poi = {POI = POI, Glow = Glow, Path = Path, Line = Line, Arrow = Arrow}
+local Entrance = Class('Line', POI)
+
+function Entrance:Initialize(attrs)
+    POI.Initialize(self, attrs)
+
+    self.label = L['poi_entrance_label']
+end
+
+-------------------------------------------------------------------------------
+
+Core.poi = {
+    POI = POI,
+    Glow = Glow,
+    Path = Path,
+    Circle = Circle,
+    Square = Square,
+    Line = Line,
+    Arrow = Arrow,
+    Entrance = Entrance
+}

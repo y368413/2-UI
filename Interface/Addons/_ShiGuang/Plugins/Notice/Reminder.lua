@@ -20,7 +20,7 @@ Saythanks:SetScript("OnEvent", function()
 	for key, value in pairs(thanksspells) do
 		if spell == key and value == true and player == UnitName("player") and buffer ~= UnitName("player") and subEvent == "SPELL_CAST_SUCCESS" then
 			--SendChatMessage("Thanks:"....GetSpellLink(spell)..", "..buffer:gsub("%-[^|]+", ""), "WHISPER", nil, buffer)
-			DEFAULT_CHAT_FRAME:AddMessage(GetSpellLink(spell)..SHIGUANG_Gets..buffer)
+			DEFAULT_CHAT_FRAME:AddMessage(C_Spell.GetSpellLink(spell)..SHIGUANG_Gets..buffer)
 		end
 	end
 end)
@@ -56,20 +56,20 @@ GarrisonLandingPageMinimapButton:HookScript("OnEnter", function(self)
 	GameTooltip:Show()
 end)]]
 
-----RepSwitch by Ne0nguy(## Version: 7.3.5.9 ## X-Website: Ne0nguy.com)
+--[[--RepSwitch by Ne0nguy(## Version: 7.3.5.9 ## X-Website: Ne0nguy.com)
 RepSwitch = {};
 RepSwitch.frame = CreateFrame("Frame", nil, UIParent);
 RepSwitch.frame:RegisterEvent("COMBAT_TEXT_UPDATE");
 RepSwitch.frame:SetScript("OnEvent", function(_, event, arg1, arg2)
 	if(event == "COMBAT_TEXT_UPDATE" and arg1 == "FACTION" and arg2 ~= "Guild") then
-		for i=1,GetNumFactions() do
-			if arg2 == GetFactionInfo(i) then
+		for i=1,C_Reputation.GetNumFactions() do
+			if arg2 == C_CreatureInfo.GetFactionInfo(i) then
 				SetWatchedFactionIndex(i);
 			end
 		end
 	end
-end);
-----SonicReputation by 小刺猬(updata for 7.2 by 灰原哀709@NGA)
+end);]]
+--[[SonicReputation by 小刺猬(updata for 7.2 by 灰原哀709@NGA)
 local rep = {};
 local extraRep = {};  --额外声望
 local C_Reputation_IsFactionParagon = C_Reputation.IsFactionParagon
@@ -101,9 +101,9 @@ end
 local SonicReputation = CreateFrame("Frame");
 SonicReputation:RegisterEvent("UPDATE_FACTION");
 SonicReputation:SetScript("OnEvent", function()
-	local numFactions = GetNumFactions(self);
+	local numFactions = C_Reputation.GetNumFactions(self);
 	for i = 1, numFactions, 1 do
-		local name, _, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID = GetFactionInfo(i);
+		local name, _, standingID, barMin, barMax, barValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild, factionID = C_CreatureInfo.GetFactionInfo(i);
 		local value = 0;
 		if barValue >= 42000 then
       if C_Reputation_IsFactionParagon(factionID) then
@@ -138,7 +138,7 @@ SonicReputation:SetScript("OnEvent", function()
     end
 	end
 end)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_COMBAT_FACTION_CHANGE", function() return true; end);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_COMBAT_FACTION_CHANGE", function() return true; end);]]
 
 --[[---------------------------------ExaltedPlus------------------------------------------
 local faction,ExaltedPlusFactions,buln,rpt,f={},{},BreakUpLargeNumbers,EmbeddedItemTooltip,CreateFrame("frame")
@@ -201,7 +201,7 @@ hooksecurefunc("ReputationFrame_Update",function(_,n,id,x,bar,row) f.update()
 		else f[i]=nil end
 	end
 end)]]
------------- SpellOverlayTimer v1.15.2 by DarkStarX, modified by nj55top @ 2012-11-17     ---------
+--[[----------  v1.15.2 by DarkStarX, modified by nj55top @ 2012-11-17     ---------
 local SAO = {}
 local nextUpdate = 0.2
 local activeNum = 0
@@ -255,7 +255,7 @@ end
 
 function SAO_ShowTimer(...)
 	local self, spellID, texturePath, position = ...
-	--local icon = GetSpellTexture(spellID)
+	--local icon = C_Spell.GetSpellTexture(spellID)
 	local overlay = SpellActivationOverlay_GetOverlay(self, spellID, position)
 	if OverlayRemap[spellID] then spellID = OverlayRemap[spellID] end
 	local checkwho = "player"
@@ -307,7 +307,7 @@ function SAO_HideTimer(...)
 	SAO[spellID].timer:SetScript("OnUpdate", nil)
 end
 hooksecurefunc("SpellActivationOverlay_ShowOverlay", SAO_ShowTimer)
-hooksecurefunc("SpellActivationOverlay_HideOverlays", SAO_HideTimer)
+hooksecurefunc("SpellActivationOverlay_HideOverlays", SAO_HideTimer)]]
 
 -- adjust LossOfControlFrame by nj55top
 hooksecurefunc("LossOfControlFrame_SetUpDisplay", function(self)
@@ -344,7 +344,7 @@ BattleResAlert:SetScript("OnEvent",function(a,b,c,event, d,e,sourceName, f,g,h,d
 	end
 end)
 
-------------------------------------------------------     HideFishingBobberTooltip     -----------------------------------------------------
+--------------------------     HideFishingBobberTooltip     -----------------------------------
 local HideFishingBobberTooltip = CreateFrame("Frame")
 HideFishingBobberTooltip:RegisterEvent("PLAYER_LOGIN")
 HideFishingBobberTooltip:SetScript("OnEvent", function()
@@ -386,13 +386,13 @@ end)
 ---------------------[[ Bag Space Checker Created by BrknSoul on 17th January 2014 --]]
 --Frame creation and event registration
 local frameBSC=CreateFrame("FRAME")
-frameBSC:RegisterEvent("BAG_UPDATE_DELAYED")
+--frameBSC:RegisterEvent("BAG_UPDATE_DELAYED")
 frameBSC:RegisterEvent("BAG_UPDATE")
 frameBSC:SetScript("OnEvent",function(event,arg1)  --Event Handlers
-  if event == "BAG_UPDATE_DELAYED" then
+  if event == "BAG_UPDATE" then
     local BSCSpace = 0
     for i=0,NUM_BAG_SLOTS do 
-      BSCSpace = BSCSpace + GetContainerNumFreeSlots(i)
+      BSCSpace = BSCSpace + C_Container.GetContainerNumFreeSlots(i)
     end
     if BSCSpace <= 8 then
       UIErrorsFrame:AddMessage(REMINDER_BAGS_SPACE..BSCSpace,1,0,0,5)
@@ -401,12 +401,12 @@ frameBSC:SetScript("OnEvent",function(event,arg1)  --Event Handlers
   end
 end)
 
---[[----------------------------------------------------------------------------AltTabLfgNotification
+------------------------------------------------------------------------------AltTabLfgNotification
 local AltTabLfgNotification, Flashevents = CreateFrame("Frame", "AltTabLfgNotification"), {};
 ------------------------------------------------------- start of events
 -- party invite
 function Flashevents:PARTY_INVITE_REQUEST(...) SendChatMessage("-- 你有组队邀请 --", "WHISPER", nil, UnitName("player")); end
-function Flashevents:PARTY_INVITE_XREALM(...) SendChatMessage("-- 你有组队邀请 --", "WHISPER", nil, UnitName("player")); end
+--function Flashevents:PARTY_INVITE_XREALM(...) SendChatMessage("-- 你有组队邀请 --", "WHISPER", nil, UnitName("player")); end
 -- going to queue into lfg
 function Flashevents:LFG_ROLE_CHECK_SHOW(...) SendChatMessage("-- 职责确认 --", "WHISPER", nil, UnitName("player")); end
 -- lfg queue ready
@@ -427,23 +427,23 @@ for i = 1, 10 do
 end
 end
 -- tb/wg queue ready
-function Flashevents:BATTLEFIELD_MGR_ENTRY_INVITE(...) SendChatMessage("BATTLEFIELD_MGR_ENTRY_INVITE", "WHISPER", nil, UnitName("player")); end
+--function Flashevents:BATTLEFIELD_MGR_ENTRY_INVITE(...) SendChatMessage("BATTLEFIELD_MGR_ENTRY_INVITE", "WHISPER", nil, UnitName("player")); end
 -- worldpvp--Add by y368413
-function Flashevents:BFMGR_INVITED_TO_ENTER(...) SendChatMessage("*BFMGR_INVITED_TO_ENTER*", "WHISPER", nil, UnitName("player")); end
+--function Flashevents:BFMGR_INVITED_TO_ENTER(...) SendChatMessage("*BFMGR_INVITED_TO_ENTER*", "WHISPER", nil, UnitName("player")); end
 -- duel_request--Add by y368413
 function Flashevents:DUEL_REQUESTED(...) SendChatMessage("-- 决斗 --", "WHISPER", nil, UnitName("player")); end
 function Flashevents:PET_BATTLE_PVP_DUEL_REQUESTED(...) SendChatMessage("-- 宠物对决 --", "WHISPER", nil, UnitName("player")); end
 -- summon--Add by y368413
-function Flashevents:CONFIRM_SUMMON_STARTING_AREA(...) SendChatMessage("*CONFIRM_SUMMON_STARTING_AREA*", "WHISPER", nil, UnitName("player")); end
+--function Flashevents:CONFIRM_SUMMON_STARTING_AREA(...) SendChatMessage("*CONFIRM_SUMMON_STARTING_AREA*", "WHISPER", nil, UnitName("player")); end
 -- tarde--Add by y368413
-function Flashevents:TRADE_WITH_QUESTION(...) SendChatMessage("*TRADE_WITH_QUESTION*", "WHISPER", nil, UnitName("player")); end
+--function Flashevents:TRADE_WITH_QUESTION(...) SendChatMessage("*TRADE_WITH_QUESTION*", "WHISPER", nil, UnitName("player")); end
 function Flashevents:TRADE_SHOW(...) SendChatMessage("-- 交易 --", "WHISPER", nil, UnitName("player")); end
 --------------------------------------------------------------------------- end of events
 AltTabLfgNotification:SetScript("OnEvent", function(self, event, ...)
  if not R.db["Misc"]["AltTabLfgNotification"] then return end
  Flashevents[event](self, ...);
 end);
-for k, v in pairs(Flashevents) do AltTabLfgNotification:RegisterEvent(k);  end]]
+for k, v in pairs(Flashevents) do AltTabLfgNotification:RegisterEvent(k);  end
 
 --  CtrlIndicator    Author: 图图   --检测Ctrl是否卡住,Ctrl按下4.5秒之后就会提示
 local ctrlCnt, AltCnt, ShiftCnt = 0, 0, 0;
@@ -452,19 +452,19 @@ C_Timer.NewTicker(0.1, function()
     if IsControlKeyDown() then ctrlCnt=ctrlCnt+1 else ctrlCnt = 0 end
     if ctrlCnt==45 then
         PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Legendary.ogg", "Master")
-        UIErrorsFrame:AddMessage("你的Ctrl可能卡啦!",1,0,0,5)
+        UIErrorsFrame:AddMessage("|cFFFF0000".."你的Ctrl可能卡啦!")
         --RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000你的Ctrl可能卡啦!|r", ChatTypeInfo["RAID_WARNING"])
     end
     if IsAltKeyDown() then AltCnt=AltCnt+1 else AltCnt = 0 end
     if AltCnt==45 then
         PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Legendary.ogg", "Master")
-        UIErrorsFrame:AddMessage("你的Alt可能卡啦!",1,0,0,5)
+        UIErrorsFrame:AddMessage("|cFFFF0000".."你的Alt可能卡啦!")
         --RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000你的Alt可能卡啦!|r", ChatTypeInfo["RAID_WARNING"])
     end
     if IsShiftKeyDown() then ShiftCnt=ShiftCnt+1 else ShiftCnt = 0 end
     if ShiftCnt==45 then
         PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Legendary.ogg", "Master")
-        UIErrorsFrame:AddMessage("你的Shift可能卡啦!",1,0,0,5)
+        UIErrorsFrame:AddMessage("|cFFFF0000".."你的Shift可能卡啦!")
         --RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000你的Shift可能卡啦!|r", ChatTypeInfo["RAID_WARNING"])
     end
 end)
@@ -528,11 +528,11 @@ end)
 CombatNotificationAlertFrame:SetScript("OnUpdate", function(self, elapsed)
     CombatNotificationAlertFrame.timer = CombatNotificationAlertFrame.timer + elapsed
     if (CombatNotificationAlertFrame.timer > CombatNotificationAlertFrame.totalTime) then CombatNotificationAlertFrame:Hide() end
-    if (CombatNotificationAlertFrame.timer <= 0.6) then
-        CombatNotificationAlertFrame:SetAlpha(CombatNotificationAlertFrame.timer * 2)
-    elseif (CombatNotificationAlertFrame.timer > 0.8) then
-        CombatNotificationAlertFrame:SetAlpha(1 - CombatNotificationAlertFrame.timer / CombatNotificationAlertFrame.totalTime)
-    end
+    --if (CombatNotificationAlertFrame.timer <= 0.6) then
+        --CombatNotificationAlertFrame:SetAlpha(CombatNotificationAlertFrame.timer * 2)
+    --elseif (CombatNotificationAlertFrame.timer > 0.8) then
+        --CombatNotificationAlertFrame:SetAlpha(1 - CombatNotificationAlertFrame.timer / CombatNotificationAlertFrame.totalTime)
+    --end
 end)
 CombatNotificationAlertFrame:SetScript("OnEvent", function(self, event)
     CombatNotificationAlertFrame:Hide()
@@ -543,3 +543,110 @@ CombatNotificationAlertFrame:SetScript("OnEvent", function(self, event)
     end
     CombatNotificationAlertFrame:Show()
 end)
+
+--## Author: V4M0N0S
+local AutoThanks = CreateFrame("Frame")
+AutoThanks:RegisterEvent("RESURRECT_REQUEST")
+AutoThanks:SetScript("OnEvent", function(self, event, reviver)
+    if IsInRaid() then
+        SendChatMessage("Thanks for rezzing me!", "RAID")
+    elseif IsInGroup() then
+        SendChatMessage("Thanks for rezzing me!", "PARTY")
+    else
+        SendChatMessage("Thanks for rezzing me!", "SAY")
+    end
+end)
+
+--[[PetHealthAlarm------------------## Version: 1.2 ## Author: Dephotian
+local PetHealthAlarmFrame=CreateFrame("ScrollingMessageFrame","PetHealthAlarm",UIParent)	
+PetHealthAlarmFrame:RegisterEvent("PLAYER_LOGIN")
+PetHealthAlarmFrame:RegisterEvent("UNIT_HEALTH")
+PetHealthAlarmFrame.Threshold=35
+PetHealthAlarmFrame.Warned=false
+PetHealthAlarmFrame:SetScript("OnEvent",function(Event,Arg1,...)
+	if(Event=="UNIT_HEALTH" and Arg1=="pet")then
+			if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)<=PetHealthAlarmFrame.Threshold and PetHealthAlarmFrame.Warned==false)then
+			if(not UnitName("pet")) then
+			    PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Beep.ogg")	
+				PetHealthAlarmFrame:AddMessage("- CRITICAL PET HEALTH -", 1, 0, 0, nil, 3)
+		else
+			    PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Beep.ogg")	
+				PetHealthAlarmFrame:AddMessage(UnitName("pet") .. "- CRITICAL PET HEALTH -", 1, 0, 0, nil, 3)
+		end
+				PetHealthAlarmFrame.Warned=true
+				return
+			end
+			if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)>PetHealthAlarmFrame.Threshold) then
+				PetHealthAlarmFrame.Warned=false
+				return
+			end	
+		return
+	end
+	if(Event=="PLAYER_LOGIN")then
+			PetHealthAlarmFrame:SetWidth(450)
+			PetHealthAlarmFrame:SetHeight(200)
+			PetHealthAlarmFrame:SetPoint("CENTER",UIParent,"CENTER",0,360)	
+			PetHealthAlarmFrame:SetFont("Interface\\AddOns\\_ShiGuang\\Media\\Fonts\\RedCircl.TTF",36,"THICKOUTLINE")
+			PetHealthAlarmFrame:SetShadowColor(0.00,0.00,0.00,0.75)
+			PetHealthAlarmFrame:SetShadowOffset(3.00,-3.00)
+			PetHealthAlarmFrame:SetJustifyH("CENTER")		
+			PetHealthAlarmFrame:SetMaxLines(2)
+			PetHealthAlarmFrame:SetTimeVisible(2)
+			PetHealthAlarmFrame:SetFadeDuration(1)		
+		return
+	end	
+end)]]
+
+local PetHealthAlert = {}
+local PetHealthAlarmFrame=CreateFrame("ScrollingMessageFrame","PetHealthAlarm",UIParent)
+PetHealthAlarmFrame.Threshold=35
+PetHealthAlarmFrame.Warned=false
+-- Initialize
+function PetHealthAlert:Initialize()
+	PetHealthAlarmFrame:SetWidth(450)
+	PetHealthAlarmFrame:SetHeight(200)
+	PetHealthAlarmFrame:SetPoint("CENTER",UIParent,"CENTER",0,50)
+	--PetHealthAlarmFrame:SetPoint("CENTER",UIParent,"CENTER",0,360)
+	--PetHealthAlarmFrame:SetFont("Interface\\AddOns\\PetHealthAlarm\\ComicSansMS3.ttf",25,"THICKOUTLINE")
+	PetHealthAlarmFrame:SetFont("Interface\\AddOns\\_ShiGuang\\Media\\Fonts\\RedCircl.TTF",36,"THICKOUTLINE")
+	PetHealthAlarmFrame:SetShadowColor(0.00,0.00,0.00,0.75)
+	PetHealthAlarmFrame:SetShadowOffset(3.00,-3.00)
+	PetHealthAlarmFrame:SetJustifyH("CENTER")
+	PetHealthAlarmFrame:SetMaxLines(2)
+	PetHealthAlarmFrame:SetTimeVisible(2)
+	PetHealthAlarmFrame:SetFadeDuration(1)
+end
+-- Update health warning
+function PetHealthAlert:Update()
+	if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)<=PetHealthAlarmFrame.Threshold and PetHealthAlarmFrame.Warned==false)then
+		--if(not UnitName("pet")) then
+			--PetHealthAlarmFrame:AddMessage(" - Your pet needs healing!", 1, 0, 0, nil, 6)
+			PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Beep.ogg")	
+			PetHealthAlarmFrame:AddMessage("- CRITICAL PET HEALTH -", 1, 0, 0, nil, 3)
+		--else
+			--PetHealthAlarmFrame:AddMessage(" - " .. UnitName("pet") .. " needs healing!", 1, 0, 0, nil, 6)
+			--PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Beep.ogg")	
+			--PetHealthAlarmFrame:AddMessage(UnitName("pet") .. "- CRITICAL PET HEALTH -", 1, 0, 0, nil, 3)
+		--end
+		PetHealthAlarmFrame.Warned=true
+		return
+	end
+	if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)>PetHealthAlarmFrame.Threshold)then
+		PetHealthAlarmFrame.Warned=false
+		return
+	end
+end
+-- Handle events
+function PetHealthAlert:OnEvent(Event,Arg1,...)
+	if(Event=="UNIT_HEALTH" and Arg1=="pet")then
+		PetHealthAlert:Update()
+		return
+	end
+	if(Event=="PLAYER_LOGIN")then
+		PetHealthAlert:Initialize()
+		return
+	end
+end
+PetHealthAlarmFrame:SetScript("OnEvent",PetHealthAlert.OnEvent)
+PetHealthAlarmFrame:RegisterEvent("PLAYER_LOGIN")
+PetHealthAlarmFrame:RegisterEvent("UNIT_HEALTH")

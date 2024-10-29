@@ -1,4 +1,4 @@
-﻿--## Version: Chalcedony 2  ## Author: Leo Bolin
+﻿--## Version: Diamond 1  ## Author: Leo Bolin
 local T = {}
 
 -- Player variables
@@ -22,43 +22,111 @@ T.standingColor = {
 
 T.friendStandingColor = {
 	["default"] = {
-		[1] = "|cffffff00", -- Stranger
-        [2] = "|cff00ff00", -- Acquaintance/Pal
-        [3] = "|cff00ff88", -- Buddy
-        [4] = "|cff00ff88", -- Friend
-        [5] = "|cff00ffcc", -- Good Friend
-        [6] = "|cff4cc2ff", -- Best Friend
-        [9] = "|cff4cc2ff", -- Paragon
+		[1] = T.standingColor[4], -- Stranger
+        [2] = T.standingColor[5], -- Acquaintance/Pal
+        [3] = T.standingColor[6], -- Buddy
+        [4] = T.standingColor[6], -- Friend
+        [5] = T.standingColor[7], -- Good Friend
+        [6] = T.standingColor[8], -- Best Friend
+        [9] = T.standingColor[9], -- Paragon
 	},
 	["chromie"] = {
-		[1] = "|cffffff00", -- Whelpling
-		[2] = "|cff00ff00", -- Temporal Trainee
-		[3] = "|cff00ff88", -- Timehopper
-		[4] = "|cff00ff88", -- Chrono-Friend
-		[5] = "|cff00ffcc", -- Bronze Ally
-		[6] = "|cff00ffcc", -- Epoch-Mender
-		[7] = "|cff4cc2ff", -- Timelord
+		[1] = T.standingColor[4], -- Whelpling
+		[2] = T.standingColor[4], -- Temporal Trainee
+		[3] = T.standingColor[5], -- Timehopper
+		[4] = T.standingColor[5], -- Chrono-Friend
+		[5] = T.standingColor[6], -- Bronze Ally
+		[6] = T.standingColor[7], -- Epoch-Mender
+		[7] = T.standingColor[8], -- Timelord
 	},
 	["vivianne"] = {
-		[1] = "|cff00ff00", -- Bodyguard
-		[2] = "|cff00ffcc", -- Trusted Bodyguard
-		[3] = "|cff4cc2ff", -- Personal Wingman
+		[1] = T.standingColor[5], -- Bodyguard
+		[2] = T.standingColor[6], -- Trusted Bodyguard
+		[3] = T.standingColor[8], -- Personal Wingman
 	},
-	["court of night"] = {
-		[1] = "|cffffff00", -- Neutral
-		[2] = "|cff00ff00", -- Friendly
-		[3] = "|cff00ff88", -- Honored
-		[4] = "|cff00ffcc", -- Revered
-		[5] = "|cff4cc2ff", -- Exalted
+	["court of night"] = { -- also Marasmius, Stitchmasters
+		[1] = T.standingColor[4], -- Neutral
+		[2] = T.standingColor[5], -- Friendly
+		[3] = T.standingColor[6], -- Honored
+		[4] = T.standingColor[7], -- Revered
+		[5] = T.standingColor[8], -- Exalted
+	},
+	["nomi"] = {
+		[1] = T.standingColor[4], -- Apprentice
+		[2] = T.standingColor[4], -- Apprentice
+		[3] = T.standingColor[5], -- Journeyman
+		[4] = T.standingColor[6], -- Journeyman
+		[5] = T.standingColor[7], -- Journeyman
+		[6] = T.standingColor[8], -- Expert
+	},
+	["sabellian"] = { -- also Wrathion
+		[1] = T.standingColor[4], -- Acquaintance
+		[2] = T.standingColor[5], -- Cohort
+		[3] = T.standingColor[6], -- Ally
+		[4] = T.standingColor[6], -- Fang
+		[5] = T.standingColor[7], -- Friend
+		[6] = T.standingColor[8], -- True Friend
+		[9] = T.standingColor[9], -- Paragon
+	},
+	["artisan's consortium - dragon isles branch"] = {
+		[1] = T.standingColor[4], -- Neutral
+        [2] = T.standingColor[5], -- Preferred
+        [3] = T.standingColor[6], -- Respected
+        [4] = T.standingColor[7], -- Valued
+        [5] = T.standingColor[8], -- Esteemed
+	},
+	["cobalt assembly"] = {
+		[1] = T.standingColor[4], -- Empty
+        [2] = T.standingColor[5], -- Low
+        [3] = T.standingColor[6], -- Medium
+        [4] = T.standingColor[7], -- High
+        [5] = T.standingColor[8], -- Maximum
+	},
+	["glimmerogg racer"] = {
+		[1] = T.standingColor[4], -- Aspirational
+        [2] = T.standingColor[5], -- Amateur
+        [3] = T.standingColor[6], -- Competent
+        [4] = T.standingColor[7], -- Skilled
+        [5] = T.standingColor[8], -- Professional
+	},
+	["soridormi"] = {
+		[1] = T.standingColor[4], -- Anomaly
+        [2] = T.standingColor[5], -- Future Friend
+        [3] = T.standingColor[6], -- Rift-Mender
+        [4] = T.standingColor[7], -- Timewalker
+        [5] = T.standingColor[8], -- Legend
+	},
+	["azerothian archives"] = {
+		[1] = T.standingColor[4], -- Junior
+        [2] = T.standingColor[5], -- Capable
+        [3] = T.standingColor[6], -- Learned
+        [4] = T.standingColor[7], -- Resident
+        [5] = T.standingColor[8], -- Tenured
+	},
+	["the general"] = {
+		[1] = T.standingColor[4], -- Stranger
+        [2] = T.standingColor[5], -- Acquaintance
+        [3] = T.standingColor[5], -- Crony
+        [4] = T.standingColor[6], -- Accomplice
+        [5] = T.standingColor[6], -- Collaborator
+        [6] = T.standingColor[6], -- Accessory
+        [7] = T.standingColor[7], -- Abettor
+        [8] = T.standingColor[7], -- Conspirator
+        [9] = T.standingColor[8], -- Mastermind
 	},
 }
--- Reuse Bodyguard colors
+-- Reuse colors
 T.friendStandingColor["aeda brightdawn"] = T.friendStandingColor["vivianne"]
 T.friendStandingColor["defender illona"] = T.friendStandingColor["vivianne"]
 T.friendStandingColor["delvar ironfist"] = T.friendStandingColor["vivianne"]
 T.friendStandingColor["leorajh"] = T.friendStandingColor["vivianne"]
 T.friendStandingColor["talonpriest ishaal"] = T.friendStandingColor["vivianne"]
 T.friendStandingColor["tormmok"] = T.friendStandingColor["vivianne"]
+T.friendStandingColor["marasmius"] = T.friendStandingColor["court of night"]
+T.friendStandingColor["stitchmasters"] = T.friendStandingColor["court of night"]
+T.friendStandingColor["wrathion"] = T.friendStandingColor["sabellian"]
+T.friendStandingColor["the vizier"] = T.friendStandingColor["the general"]
+T.friendStandingColor["the weaver"] = T.friendStandingColor["the general"]
 
 -- Localized standing
 T.standing = {
@@ -123,17 +191,15 @@ T.friendStanding = {
 		[2] = "faction_standing_trusted_bodyguard",
 		[3] = "faction_standing_personal_wingman",
 	},
-	["nomi"] = { -- Nomi is weird
+	["nomi"] = {
 		[1] = "faction_standing_apprentice",
 		[2] = "faction_standing_apprentice",
-		[3] = "faction_standing_apprentice",
-		[4] = "faction_standing_apprentice",
+		[3] = "faction_standing_journeyman",
+		[4] = "faction_standing_journeyman",
 		[5] = "faction_standing_journeyman",
-		[6] = "faction_standing_journeyman",
-		[7] = "faction_standing_journeyman",
-		[8] = "faction_standing_expert",
+		[6] = "faction_standing_expert",
 	},
-	["court of night"] = {
+	["court of night"] = { -- also Marasmius, Stitchmasters
 		[1] = "faction_standing_neutral",
 		[2] = "faction_standing_friendly",
 		[3] = "faction_standing_honored",
@@ -149,25 +215,155 @@ T.friendStanding = {
 		[6] = "faction_standing_tier_6",
 		[9] = "faction_standing_paragon",
 	},
+	["artisan's consortium - dragon isles branch"] = {
+		[1] = "faction_standing_neutral",
+		[2] = "faction_standing_preferred",
+		[3] = "faction_standing_respected",
+		[4] = "faction_standing_valued",
+		[5] = "faction_standing_esteemed",
+	},
+	["cobalt assembly"] = {
+		[1] = "faction_standing_empty",
+		[2] = "faction_standing_low",
+		[3] = "faction_standing_medium",
+		[4] = "faction_standing_high",
+		[5] = "faction_standing_maximum",
+	},
+	["sabellian"] = { -- also Wrathion
+		[1] = "faction_standing_acquaintance",
+		[2] = "faction_standing_cohort",
+		[3] = "faction_standing_ally",
+		[4] = "faction_standing_fang",
+		[5] = "faction_standing_friend",
+		[6] = "faction_standing_true_friend",
+		[7] = "faction_standing_paragon",
+	},
+	["glimmerogg racer"] = {
+		[1] = "faction_standing_aspirational",
+		[2] = "faction_standing_amateur",
+		[3] = "faction_standing_competent",
+		[4] = "faction_standing_skilled",
+		[5] = "faction_standing_professional",
+	},
+	["soridormi"] = {
+		[1] = "faction_standing_anomaly",
+		[2] = "faction_standing_future_friend",
+		[3] = "faction_standing_rift-mender",
+		[4] = "faction_standing_timewalker",
+		[5] = "faction_standing_legend",
+	},
+	["azerothian archives"] = {
+		[1] = "faction_standing_junior",
+		[2] = "faction_standing_capable",
+		[3] = "faction_standing_learned",
+		[4] = "faction_standing_resident",
+		[5] = "faction_standing_tenured",
+	},
+	["the general"] = {
+		[1] = "faction_standing_stranger",
+		[2] = "faction_standing_acquaintance",
+		[3] = "faction_standing_crony",
+		[4] = "faction_standing_accomplice",
+		[5] = "faction_standing_collaborator",
+		[6] = "faction_standing_accessory",
+		[7] = "faction_standing_abettor",
+		[8] = "faction_standing_conspirator",
+		[9] = "faction_standing_mastermind",
+	},
 }
--- Reuse Nat Pagle's labels for Margoss and Fisherfriends since they are the same
+
 T.friendStanding["conjurer margoss"] = T.friendStanding["nat pagle"]
 T.friendStanding["akule riverhorn"] = T.friendStanding["nat pagle"]
 T.friendStanding["ilyssia of the waters"] = T.friendStanding["nat pagle"]
 T.friendStanding["impus"] = T.friendStanding["nat pagle"]
 T.friendStanding["keeper raynae"] = T.friendStanding["nat pagle"]
 T.friendStanding["sha'leth"] = T.friendStanding["nat pagle"]
--- Reuse Bodyguard labels
 T.friendStanding["aeda brightdawn"] = T.friendStanding["vivianne"]
 T.friendStanding["defender illona"] = T.friendStanding["vivianne"]
 T.friendStanding["delvar ironfist"] = T.friendStanding["vivianne"]
 T.friendStanding["leorajh"] = T.friendStanding["vivianne"]
 T.friendStanding["talonpriest ishaal"] = T.friendStanding["vivianne"]
 T.friendStanding["tormmok"] = T.friendStanding["vivianne"]
+T.friendStanding["marasmius"] = T.friendStanding["court of night"]
+T.friendStanding["stitchmasters"] = T.friendStanding["court of night"]
+T.friendStanding["wrathion"] = T.friendStanding["sabellian"]
+T.friendStanding["the vizier"] = T.friendStanding["the general"]
+T.friendStanding["the weaver"] = T.friendStanding["the general"]
 
 
 -- Reputation item IDs - BoA and BoE
 T.reputationItemBoA = {
+	-- The War Within
+	[222599] = "council of dornogal", -- Contract: Council of Dornogal (Quality 3)
+	[222598] = "council of dornogal", -- Contract: Council of Dornogal (Quality 2)
+	[222597] = "council of dornogal", -- Contract: Council of Dornogal (Quality 1)
+	[222600] = "the assembly of the deeps", -- Contract: Assembly of the Deeps (Quality 1)
+	[222601] = "the assembly of the deeps", -- Contract: Assembly of the Deeps (Quality 2)
+	[222602] = "the assembly of the deeps", -- Contract: Assembly of the Deeps (Quality 3)
+	[222605] = "hallowfall arathi", -- Contract: Hallowfall Arathi (Quality 3)
+	[222604] = "hallowfall arathi", -- Contract: Hallowfall Arathi (Quality 2)
+	[222603] = "hallowfall arathi", -- Contract: Hallowfall Arathi (Quality 1)
+	[222608] = "the severed threads", -- Contract: The Severed Threads (Quality 3)
+	[222607] = "the severed threads", -- Contract: The Severed Threads (Quality 2)
+	[222606] = "the severed threads", -- Contract: The Severed Threads (Quality 1)
+
+	-- Dragonflight
+	[213536] = "azerothian archives", -- Priceless Artifact (1000)
+	[210423] = "dream wardens", -- Dream Wardens Insignia (2500)
+	[210423] = "dream wardens", -- Dream Wardens Insignia (2500)
+	[211416] = "dream wardens", -- Dream Wardens Insignia (1000)
+	[210421] = "dream wardens", -- Dream Wardens Insignia (500)
+	[210420] = "dream wardens", -- Dream Wardens Insignia (250)
+	[210419] = "dream wardens", -- Dream Wardens Insignia (50)
+	[210246] = "dream wardens", -- Contract: Dream Wardens (Quality 3)
+	[210245] = "dream wardens", -- Contract: Dream Wardens (Quality 2)
+	[210244] = "dream wardens", -- Contract: Dream Wardens (Quality 1)
+	[208952] = "soridormi", -- Soridormi's Letter of Commendation (1000)
+	[210422] = "loamm niffen", -- Loamm Niffen Insignia (2500)
+	[205985] = "loamm niffen", -- Loamm Niffen Insignia (500)
+	[205342] = "loamm niffen", -- Loamm Niffen Insignia (250)
+	[205365] = "loamm niffen", -- Loamm Niffen Insignia (50)
+	[204993] = "loamm niffen", -- Contract: Loamm Niffen (Quality 1)
+	[204991] = "loamm niffen", -- Contract: Loamm Niffen (Quality 2)
+	[204992] = "loamm niffen", -- Contract: Loamm Niffen (Quality 3)
+	[198503] = "artisan's consortium - dragon isles branch", -- Contract: Artisan's Consortium (Quality 1)
+	[198504] = "artisan's consortium - dragon isles branch", -- Contract: Artisan's Consortium (Quality 2)
+	[198505] = "artisan's consortium - dragon isles branch", -- Contract: Artisan's Consortium (Quality 3)
+	[200443] = "dragonscale expedition", -- Dragon Isles Artifact (15)
+	[200285] = "dragonscale expedition", -- Dragonscale Expedition Insignia (50)
+	[200452] = "dragonscale expedition", -- Dragonscale Expedition Insignia (250)
+	[201921] = "dragonscale expedition", -- Dragonscale Expedition Insignia (500)
+	[202091] = "dragonscale expedition", -- Dragonscale Expedition Insignia (2500)
+	[198506] = "dragonscale expedition", -- Contract: Dragonscale Expedition (Quality 1)
+	[198507] = "dragonscale expedition", -- Contract: Dragonscale Expedition (Quality 2)
+	[198508] = "dragonscale expedition", -- Contract: Dragonscale Expedition (Quality 3)
+	[200449] = "iskaara tuskarr", -- Sacred Tuskarr Totem (15)
+	[200287] = "iskaara tuskarr", -- Iskaara Tuskarr Insignia (50)
+	[200453] = "iskaara tuskarr", -- Iskaara Tuskarr Insignia (250)
+	[201922] = "iskaara tuskarr", -- Iskaara Tuskarr Insignia (500)
+	[202092] = "iskaara tuskarr", -- Iskaara Tuskarr Insignia (2500)
+	[198494] = "iskaara tuskarr", -- Contract: Iskaara Tuskarr (Quality 1)
+	[198495] = "iskaara tuskarr", -- Contract: Iskaara Tuskarr (Quality 2)
+	[198496] = "iskaara tuskarr", -- Contract: Iskaara Tuskarr (Quality 3)
+	[200447] = "maruuk centaur", -- Centaur Hunting Trophy (25)
+	[200288] = "maruuk centaur", -- Maruuk Centaur Insignia (50)
+	[200454] = "maruuk centaur", -- Maruuk Centaur Insignia (250)
+	[201923] = "maruuk centaur", -- Maruuk Centaur Insignia (500)
+	[202094] = "maruuk centaur", -- Maruuk Centaur Insignia (2500)
+	[198500] = "maruuk centaur", -- Contract: Maruuk Centaur (Quality 1)
+	[198501] = "maruuk centaur", -- Contract: Maruuk Centaur (Quality 2)
+	[198502] = "maruuk centaur", -- Contract: Maruuk Centaur (Quality 3)
+	[200450] = "valdrakken accord", -- Titan Relic (15)
+	[200289] = "valdrakken accord", -- Valdrakken Accord Insignia (50)
+	[200455] = "valdrakken accord", -- Valdrakken Accord Insignia (250)
+	[201924] = "valdrakken accord", -- Valdrakken Accord Insignia (500)
+	[202093] = "valdrakken accord", -- Valdrakken Accord Insignia (2500)
+	[198497] = "valdrakken accord", -- Contract: Valdrakken Accord (Quality 1)
+	[198498] = "valdrakken accord", -- Contract: Valdrakken Accord (Quality 2)
+	[198499] = "valdrakken accord", -- Contract: Valdrakken Accord (Quality 3)
+	[200224] = "sabellian", -- Mark of Sargha (50)
+	[201991] = "wrathion", -- Sargha's Signet (50)
+
 	-- Shadowlands
 	[173062] = "court of harvesters", -- Contract: Court of Harvesters
 	[186522] = "death's advance", -- Contract: Death's Advance
@@ -176,6 +372,7 @@ T.reputationItemBoA = {
 	[191022] = "the enlightened", -- Eternal Curio
 	[175924] = "the undying army", -- Contract: The Undying Army
 	[173053] = "the wild hunt", -- Contract: The Wild Hunt
+	[191299] = "the enlightened", -- Tribute to the Enlightened
 
 	-- Battle for Azeroth
 	[165016] = "7th legion", -- Contract: 7th Legion
@@ -327,10 +524,13 @@ T.reputationItemBoA = {
 	[129946] = "the sha'tar", -- Commendation of The Sha'tar
 
 	-- Classic
-	[20404] = "cenarion circle", -- Encrypted Twilight Text (500 per 10)
-	[17010] = "thorium brotherhood", -- Fiery Core (500)
-	[17011] = "thorium brotherhood", -- Lava Core (500)
-	[18945] = "thorium brotherhood", -- Dark Iron Residue (625 per 100 or 15 per 4)
+	[20404]  = "cenarion circle", -- Encrypted Twilight Text (500 per 10)
+	[17010]  = "thorium brotherhood", -- Fiery Core (500)
+	[17011]  = "thorium brotherhood", -- Lava Core (500)
+	[18945]  = "thorium brotherhood", -- Dark Iron Residue (625 per 100 or 15 per 4)
+	[206374] = "argent dawn", -- Invader's Scourgestone
+	[206375] = "argent dawn", -- Corruptor's Scourgestone
+	[12844]  = "argent dawn", -- Argent Dawn Valor Token (100)
 
 	-- Guild
 	[69209] = "guild", -- Illustrious Guild Tabard (50% increase)
@@ -339,6 +539,57 @@ T.reputationItemBoA = {
 
 -- Reputation item IDs - Soulbound
 T.reputationItemBoP = {
+	-- Dragonflight
+	[210920] = "dream wardens", -- Gift of Amirdrassil (2500)
+	[210916] = "dream wardens", -- Ember of Fyrakk (2500)
+	[210847] = "dream wardens", -- Tears of the Eye (2500)
+	[210757] = "dream wardens", -- Scales of Remorse (2500)
+	[210730] = "dream wardens", -- Mark of the Dream Wardens (2500)
+	[211417] = "dream wardens", -- Dream Wardens Insignia (1000)
+	[210950] = "dream wardens", -- Insight of Q'onzu (~767)
+	[210959] = "dream wardens", -- Pact of the Netherwing (750)
+	[211370] = "dream wardens", -- Branch of Gracus (750)
+	[210954] = "dream wardens", -- Sprout of Rebirth (750)
+	[211366] = "dream wardens", -- Drops of Moon Water (750)
+	[211369] = "dream wardens", -- Charred Staff of the Overseer (750)
+	[210921] = "dream wardens", -- Bounty of the Fallen Defector (500)
+	[210952] = "dream wardens", -- Spare Heated Hearthstone (500)
+	[210958] = "dream wardens", -- Crown of the Dryad Daughter (500)
+	[211353] = "dream wardens", -- Roasted Ram Special (250)
+	[210957] = "dream wardens", -- Rune of the Fire Druids (250)
+	[210951] = "dream wardens", -- Treacherous Research Notes (250)
+	[210997] = "dream wardens", -- Spare Party Hat (250)
+	[211371] = "dream wardens", -- Dryad-Keeper Credentials (250)
+	[211379] = "dream wardens", -- Tangled Yarn of Secrets (~118)
+	[211374] = "dream wardens", -- Tangled Yarn of Secrets (~96)
+	[211378] = "dream wardens", -- Tangled Yarn of Secrets (~19)
+	[211377] = "dream wardens", -- Tangled Yarn of Secrets (~19)
+	[211380] = "dream wardens", -- Tangled Yarn of Secrets (~9)
+	[211372] = "dream wardens", -- Q'onzu's Consolation Prize (1)
+	[206006] = "loamm niffen", -- Earth-Warder's Thanks (2500)
+	[205998] = "loamm niffen", -- Sign of Respect (2500)
+	[205992] = "loamm niffen", -- Regurgitated Half-Digested Fish (2500)
+	[205251] = "loamm niffen", -- Champion's Rock Bar (1000)
+	[205253] = "loamm niffen", -- Farmhand's Abundant Harvest (1000)
+	[205989] = "loamm niffen", -- Symbol of Friendship (2500)
+	[205991] = "loamm niffen", -- Shiny Token of Gratitude (2500)
+	[205250] = "loamm niffen", -- Gift of the High Redolence (1000)
+	[205249] = "loamm niffen", -- Pungent Niffen Incense (1000)
+	[202018] = "winterpelt furbolg", -- Intact Scribe Stick
+	[202017] = "winterpelt furbolg", -- Liberated Furbolg Artifacts
+	[201783] = "iskaara tuskarr", -- Tutaqan's Commendation (2500)
+	[201779] = "valdrakken accord", -- Merithra's Blessing (2500)
+	[201781] = "valdrakken accord", -- Memory of Tyr (2500)
+	[191264] = "sabellian|wrathion|valdrakken accord", -- Restored Obsidian Key (250 Sabellian/Wratghion, 50 Valdrakken)
+	[205254] = "dragonscale expedition", -- Honorary Explorer's Compass (1000)
+	[201782] = "dragonscale expedition", -- Tyr's Blessing (2500)
+	[201411] = "dragonscale expedition", -- Ancient Vault Artifact (30)
+	[192055] = "dragonscale expedition", -- Dragon Isles Artifact (15)
+	[200071] = "iskaara tuskarr", -- Sacred Tuskarr Totem (15)
+	[200093] = "maruuk centaur", -- Centaur Hunting Trophy (25)
+	[199906] = "valdrakken accord", -- Titan Relic (15)
+	[198790] = "artisan's consortium - dragon isles branch", -- I.O.U. (75)
+
 	-- Shadowlands
 	[186685] = "the archivists' codex", -- Relic Fragment (0.5)
 	[187322] = "the archivists' codex", -- Crumbling Stone Tablet (4)
@@ -368,6 +619,24 @@ T.reputationItemBoP = {
 	[187333] = "the archivists' codex", -- Core of an Unknown Titan (150)
 	[187350] = "the archivists' codex", -- Displaced Relic (150)
 	[187335] = "the archivists' codex", -- Maldraxxus Larva Shell (150)
+	[190339] = "the enlightened", -- Enlightened Offering (75)
+	[190941] = "the enlightened", -- Teachings of the Elders (75)
+	[176114] = "the countess", -- RSVP: The Countess
+	[178686] = "stonehead", -- RSVP: Stonehead
+	[176125] = "sika", -- RSVP: Sika
+	[176118] = "rendle and cudgelface", -- RSVP: Rendle and Cudgelface
+	[176117] = "polemarch adrestes", -- RSVP: Polemarch Adrestes
+	[176124] = "plague deviser marileth", -- RSVP: Plague Deviser Marileth
+	[176113] = "mikanikos", -- RSVP: Mikanikos
+	[176112] = "lady moonberry", -- RSVP: Lady Moonberry
+	[176123] = "kleia and pelagos", -- RSVP: Kleia and Pelagos
+	[176116] = "hunt-captain korayn", -- RSVP: Hunt-Captain Korayn
+	[176122] = "grandmaster vole", -- RSVP: Grandmaster Vole
+	[176121] = "droman aliothe", -- RSVP: Droman Aliothe
+	[176120] = "cryptkeeper kassir", -- RSVP: Cryptkeeper Kassir
+	[176119] = "choofa", -- RSVP: Choofa
+	[176097] = "baroness vashj", -- RSVP: Baroness Vashj
+	[176115] = "alexandros mograine", -- RSVP: Alexandros Mograine
 
 	-- Battle for Azeroth
 	[170184] = "the unshackled|waveblade ankoan", -- Ancient Reefwalker Bark (350 The Unshackled/Waveblade Ankoan)
@@ -463,6 +732,7 @@ T.reputationItemBoP = {
 	[49702]  = "the sons of hodir", -- Sons of Hodir Commendation Badge (520)
 	[44710]  = "wyrmrest cccord", -- Wyrmrest Commendation Badge (520)
 	[43156]  = "wyrmrest accord", -- Tabard of the Wyrmrest Accord
+	[35188]  = "cenarion expedition", -- Nesingwary Lackey Ear (15 for 150)
 
 	-- The Burning Crusade
 	[24290]  = "sporeggar", -- Mature Spore Sack (750 per 10, up to Friendly)
@@ -518,213 +788,259 @@ T.reputationItemBoP = {
 -- Factions
 T.faction = {
 	-- Guild
-	["guild"] 								= { ["id"] = 1168, 	["icon"] = 135026, 		["paragon"] = false,	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
+	["guild"] 								= { ["id"] = 1168, 	["icon"] = 135026, 		["paragon"] = false,	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+
+	-- The War Within
+	["council of dornogal"] 				= { ["id"] = 2590, 	["icon"] = 5891369, 	["paragon"] = true, 	["friend"] = 25, ["kind"] = "renown", 		 ["factionGroup"] = false,		["warband"] = true, },
+	--["earthen"] 							= { ["id"] = 2645, 	["icon"] = 5359645, 	["paragon"] = false, 	["friend"] = 0,  ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = true, }, -- seems to be scrapped
+	["hallowfall arathi"] 					= { ["id"] = 2570, 	["icon"] = 5891368, 	["paragon"] = true, 	["friend"] = 25, ["kind"] = "renown", 		 ["factionGroup"] = false,		["warband"] = true, },
+	["the assmebly of the deeps"] 			= { ["id"] = 2594, 	["icon"] = 6029027, 	["paragon"] = true, 	["friend"] = 25, ["kind"] = "renown", 		 ["factionGroup"] = false,		["warband"] = true, },
+	["the severed threads"] 				= { ["id"] = 2600, 	["icon"] = 5891370, 	["paragon"] = true, 	["friend"] = 25, ["kind"] = "renown", 		 ["factionGroup"] = false,		["warband"] = true, },
+	["the general"] 						= { ["id"] = 2605, 	["icon"] = 5862762, 	["paragon"] = true, 	["friend"] = 9,  ["kind"] = "friendship",    ["factionGroup"] = false,		["warband"] = true, },
+	["the vizier"] 							= { ["id"] = 2607, 	["icon"] = 5862763, 	["paragon"] = true, 	["friend"] = 9,  ["kind"] = "friendship",    ["factionGroup"] = false,		["warband"] = true, },
+	["the weaver"] 							= { ["id"] = 2601, 	["icon"] = 5862764, 	["paragon"] = true, 	["friend"] = 9,  ["kind"] = "friendship",    ["factionGroup"] = false,		["warband"] = true, },
+	["brann bronzebeard"] 					= { ["id"] = 2640, 	["icon"] = 236444,  	["paragon"] = false, 	["friend"] = 60, ["kind"] = "friendship",    ["factionGroup"] = false,		["warband"] = true, },
+
+	-- Dragonflight
+	["artisan's consortium - dragon isles branch"] = { ["id"] = 2544, ["icon"] = 4557373, ["paragon"] = false, 	["friend"] = 5,  ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = true, },
+	["azerothian archives"] 				= { ["id"] = 2615,  ["icon"] = 4638485,     ["paragon"] = false, 	["friend"] = 5,  ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = true, },
+	["cobalt assembly"] 					= { ["id"] = 2550,  ["icon"] = 1394893, 	["paragon"] = false, 	["friend"] = 5,  ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = true, },
+	["dragonscale expedition"] 				= { ["id"] = 2507, 	["icon"] = 4687628, 	["paragon"] = true, 	["friend"] = 25, ["kind"] = "renown", 		 ["factionGroup"] = false,		["warband"] = true, },
+	["glimmerogg racer"] 					= { ["id"] = 2568,  ["icon"] = 5003559,     ["paragon"] = false,    ["friend"] = 5,  ["kind"] = "friendship",    ["factionGroup"] = false,		["warband"] = false, },
+	["iskaara tuskarr"] 					= { ["id"] = 2511, 	["icon"] = 4687629, 	["paragon"] = true, 	["friend"] = 30, ["kind"] = "renown", 		 ["factionGroup"] = false,		["warband"] = true, },
+	["loamm niffen"] 						= { ["id"] = 2564, 	["icon"] = 5140835, 	["paragon"] = true, 	["friend"] = 20, ["kind"] = "renown", 		 ["factionGroup"] = false,		["warband"] = true, },
+	["dream wardens"] 						= { ["id"] = 2574, 	["icon"] = 5244643, 	["paragon"] = true, 	["friend"] = 20, ["kind"] = "renown", 		 ["factionGroup"] = false,		["warband"] = true, },
+	["maruuk centaur"] 						= { ["id"] = 2503, 	["icon"] = 4687627, 	["paragon"] = true, 	["friend"] = 25, ["kind"] = "renown", 		 ["factionGroup"] = false,		["warband"] = true, },
+	["sabellian"] 							= { ["id"] = 2518,  ["icon"] = 4630449,     ["paragon"] = false,    ["friend"] = 6,  ["kind"] = "friendship",    ["factionGroup"] = false,		["warband"] = true, },
+	["soridormi"]  							= { ["id"] = 2553,  ["icon"] = 922527, 		["paragon"] = false, 	["friend"] = 5,  ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = true, },
+	["valdrakken accord"] 					= { ["id"] = 2510, 	["icon"] = 4687630, 	["paragon"] = true, 	["friend"] = 30, ["kind"] = "renown", 		 ["factionGroup"] = false,		["warband"] = true, },
+	["winterpelt furbolg"] 					= { ["id"] = 2526, 	["icon"] = 4672495, 	["paragon"] = false, 	["friend"] = 0,  ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["wrathion"] 							= { ["id"] = 2517,  ["icon"] = 4630449,     ["paragon"] = false,    ["friend"] = 6,  ["kind"] = "friendship",    ["factionGroup"] = false,		["warband"] = true, },
 
 	-- Shadowlands
-	["court of harvesters"]					= { ["id"] = 2413, 	["icon"] = 3514227, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["court of night"]						= { ["id"] = 2464, 	["icon"] = 3752258, 	["paragon"] = false, 	["friend"] = 5, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["death's advance"]						= { ["id"] = 2470, 	["icon"] = 4064729, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["marasmius"]							= { ["id"] = 2463, 	["icon"] = 464342, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "friendship",	 ["factionGroup"] = false, }, -- hidden from the Reputation Panel
-	["stitchmasters"]						= { ["id"] = 2462, 	["icon"] = 3622121, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the archivists' codex"]				= { ["id"] = 2472, 	["icon"] = 1506458, 	["paragon"] = true, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the ascended"]						= { ["id"] = 2407, 	["icon"] = 3257748, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the avowed"]							= { ["id"] = 2439, 	["icon"] = 3601526, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the enlightened"]						= { ["id"] = 2478, 	["icon"] = 4226232, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the ember court"]						= { ["id"] = 2445, 	["icon"] = 3641397, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the undying army"]					= { ["id"] = 2410, 	["icon"] = 3492310, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the wild hunt"]						= { ["id"] = 2465, 	["icon"] = 3575389, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["ve'nari"]								= { ["id"] = 2432, 	["icon"] = 3527519, 	["paragon"] = true, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, },
+	["court of harvesters"]					= { ["id"] = 2413, 	["icon"] = 3514227, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["court of night"]						= { ["id"] = 2464, 	["icon"] = 3752258, 	["paragon"] = false, 	["friend"] = 5, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["death's advance"]						= { ["id"] = 2470, 	["icon"] = 4064729, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["marasmius"]							= { ["id"] = 2463, 	["icon"] = 464342, 		["paragon"] = false, 	["friend"] = 5, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, }, -- hidden from the Reputation Panel
+	["stitchmasters"]						= { ["id"] = 2462, 	["icon"] = 3622121, 	["paragon"] = false, 	["friend"] = 5, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the archivists' codex"]				= { ["id"] = 2472, 	["icon"] = 1506458, 	["paragon"] = true, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the ascended"]						= { ["id"] = 2407, 	["icon"] = 3257748, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the avowed"]							= { ["id"] = 2439, 	["icon"] = 3601526, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the enlightened"]						= { ["id"] = 2478, 	["icon"] = 4226232, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the ember court"]						= { ["id"] = 2445, 	["icon"] = 3257751, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the undying army"]					= { ["id"] = 2410, 	["icon"] = 3492310, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the wild hunt"]						= { ["id"] = 2465, 	["icon"] = 3575389, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["ve'nari"]								= { ["id"] = 2432, 	["icon"] = 3527519, 	["paragon"] = true, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	-- The Ember Court
+	["alexandros mograine"]					= { ["id"] = 2450, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["baroness vashj"]						= { ["id"] = 2446, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["choofa"]								= { ["id"] = 2454, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["cryptkeeper kassir"]					= { ["id"] = 2455, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["droman aliothe"]						= { ["id"] = 2456, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["grandmaster vole"]					= { ["id"] = 2457, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["hunt-captain korayn"]					= { ["id"] = 2451, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["kleia and pelagos"]					= { ["id"] = 2458, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["lady moonberry"]						= { ["id"] = 2447, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["mikanikos"]							= { ["id"] = 2448, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["plague deviser marileth"]				= { ["id"] = 2461, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["polemarch adrestes"]					= { ["id"] = 2452, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["rendle and cudgelface"]				= { ["id"] = 2453, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["sika"]								= { ["id"] = 2459, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["stonehead"]							= { ["id"] = 2460, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the countess"]						= { ["id"] = 2449, 	["icon"] = 3675493, 	["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
 
 	-- Battle for Azeroth
-	["7th legion"]							= { ["id"] = 2159, 	["icon"] = 2032591, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["champions of azeroth"]				= { ["id"] = 2164, 	["icon"] = 2032592, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["honeyback hive"]						= { ["id"] = 2395,  ["icon"] = 2027853,		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["order of embers"]						= { ["id"] = 2161, 	["icon"] = 2032594, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["proudmoore admiralty"]				= { ["id"] = 2160, 	["icon"] = 2065573, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["rajani"]								= { ["id"] = 2415, 	["icon"] = 3196265, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["rustbolt resistance"]					= { ["id"] = 2391, 	["icon"] = 2909316, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["storm's wake"]						= { ["id"] = 2162, 	["icon"] = 2032596, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["talanji's expedition"]				= { ["id"] = 2156, 	["icon"] = 2032597, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["the honorbound"]						= { ["id"] = 2157, 	["icon"] = 2032593, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["the unshackled"]						= { ["id"] = 2373,  ["icon"] = 2821782,		["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["tortollan seekers"]					= { ["id"] = 2163, 	["icon"] = 2032598, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["uldum accord"]						= { ["id"] = 2417, 	["icon"] = 3196264, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["voldunai"]							= { ["id"] = 2158, 	["icon"] = 2032599, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["waveblade ankoan"]					= { ["id"] = 2400,  ["icon"] = 2909045,		["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["zandalari empire"]					= { ["id"] = 2103, 	["icon"] = 2032601, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
+	["7th legion"]							= { ["id"] = 2159, 	["icon"] = 2032591, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["champions of azeroth"]				= { ["id"] = 2164, 	["icon"] = 2032592, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["honeyback hive"]						= { ["id"] = 2395,  ["icon"] = 2027853,		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["order of embers"]						= { ["id"] = 2161, 	["icon"] = 2032594, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["proudmoore admiralty"]				= { ["id"] = 2160, 	["icon"] = 2065573, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["rajani"]								= { ["id"] = 2415, 	["icon"] = 3196265, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["rustbolt resistance"]					= { ["id"] = 2391, 	["icon"] = 2909316, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["storm's wake"]						= { ["id"] = 2162, 	["icon"] = 2032596, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["talanji's expedition"]				= { ["id"] = 2156, 	["icon"] = 2032597, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["the honorbound"]						= { ["id"] = 2157, 	["icon"] = 2032593, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["the unshackled"]						= { ["id"] = 2373,  ["icon"] = 2821782,		["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["tortollan seekers"]					= { ["id"] = 2163, 	["icon"] = 2032598, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["uldum accord"]						= { ["id"] = 2417, 	["icon"] = 3196264, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["voldunai"]							= { ["id"] = 2158, 	["icon"] = 2032599, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["waveblade ankoan"]					= { ["id"] = 2400,  ["icon"] = 2909045,		["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["zandalari empire"]					= { ["id"] = 2103, 	["icon"] = 2032601, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
 
 	-- Legion
-	["argussian reach"] 					= { ["id"] = 2170, 	["icon"] = 1708496, 	["paragon"] = true,		["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["armies of legionfall"] 				= { ["id"] = 2045, 	["icon"] = 1585421, 	["paragon"] = true,		["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["army of the light"] 					= { ["id"] = 2165, 	["icon"] = 1708497, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["chromie"]								= { ["id"] = 2135, 	["icon"] = 237538, 		["paragon"] = false, 	["friend"] = 7, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["conjurer margoss"]					= { ["id"] = 1975, 	["icon"] = 132852, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["court of farondis"] 					= { ["id"] = 1900, 	["icon"] = 1394952, 	["paragon"] = true,  	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["dreamweavers"] 						= { ["id"] = 1883, 	["icon"] = 1394953, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["highmountain tribe"] 					= { ["id"] = 1828, 	["icon"] = 1394954, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the nightfallen"] 					= { ["id"] = 1859, 	["icon"] = 1394956, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the wardens"] 						= { ["id"] = 1894, 	["icon"] = 1394958, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["valarjar"] 							= { ["id"] = 1948, 	["icon"] = 1394957, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["talon's vengeance"]					= { ["id"] = 2018, 	["icon"] = 537444, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
+	["argussian reach"] 					= { ["id"] = 2170, 	["icon"] = 1708496, 	["paragon"] = true,		["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["armies of legionfall"] 				= { ["id"] = 2045, 	["icon"] = 1585421, 	["paragon"] = true,		["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["army of the light"] 					= { ["id"] = 2165, 	["icon"] = 1708497, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["chromie"]								= { ["id"] = 2135, 	["icon"] = 237538, 		["paragon"] = false, 	["friend"] = 7, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["conjurer margoss"]					= { ["id"] = 1975, 	["icon"] = 132852, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["court of farondis"] 					= { ["id"] = 1900, 	["icon"] = 1394952, 	["paragon"] = true,  	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["dreamweavers"] 						= { ["id"] = 1883, 	["icon"] = 1394953, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["highmountain tribe"] 					= { ["id"] = 1828, 	["icon"] = 1394954, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the nightfallen"] 					= { ["id"] = 1859, 	["icon"] = 1394956, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the wardens"] 						= { ["id"] = 1894, 	["icon"] = 1394958, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["valarjar"] 							= { ["id"] = 1948, 	["icon"] = 1394957, 	["paragon"] = true, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["talon's vengeance"]					= { ["id"] = 2018, 	["icon"] = 537444, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
 	-- Fisherfriends
-	["akule riverhorn"]						= { ["id"] = 2099, 	["icon"] = 236575, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["corbyn"]								= { ["id"] = 2100, 	["icon"] = 236575, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- maybe 132915
-	["ilyssia of the waters"]				= { ["id"] = 2097, 	["icon"] = 236575, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["impus"]								= { ["id"] = 2102, 	["icon"] = 236575, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- maybe 136218
-	["keeper raynae"]						= { ["id"] = 2098, 	["icon"] = 236575, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["sha'leth"]							= { ["id"] = 2101, 	["icon"] = 236575, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, },
+	["akule riverhorn"]						= { ["id"] = 2099, 	["icon"] = 236575, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["corbyn"]								= { ["id"] = 2100, 	["icon"] = 236575, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, }, -- maybe 132915
+	["ilyssia of the waters"]				= { ["id"] = 2097, 	["icon"] = 236575, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["impus"]								= { ["id"] = 2102, 	["icon"] = 236575, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, }, -- maybe 136218
+	["keeper raynae"]						= { ["id"] = 2098, 	["icon"] = 236575, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["sha'leth"]							= { ["id"] = 2101, 	["icon"] = 236575, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
 
 	-- Warlords of Draenor
-	["arakkoa outcasts"]					= { ["id"] = 1515, 	["icon"] = 1042646, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["council of exarchs"]					= { ["id"] = 1731, 	["icon"] = 1048727, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["frostwolf orcs"]						= { ["id"] = 1445, 	["icon"] = 1044164, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["hand of the prophet"]					= { ["id"] = 1847, 	["icon"] = 1048305,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", }, -- temp icon
-	["laughing skull orcs"]					= { ["id"] = 1708, 	["icon"] = 1043559, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["order of the awakened"]				= { ["id"] = 1849, 	["icon"] = 1240656, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["sha'tari defense"]					= { ["id"] = 1710, 	["icon"] = 1042739, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["steamwheedle preservation society"]	= { ["id"] = 1711, 	["icon"] = 1052654, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the saberstalkers"]					= { ["id"] = 1850, 	["icon"] = 1240657, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["vol'jin's headhunters"]				= { ["id"] = 1848, 	["icon"] = 1048305, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", }, -- temp icon
-	["vol'jin's spear"]						= { ["id"] = 1681, 	["icon"] = 1042727, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["wrynn's vanguard"]					= { ["id"] = 1682, 	["icon"] = 1042294, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
+	["arakkoa outcasts"]					= { ["id"] = 1515, 	["icon"] = 1042646, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["council of exarchs"]					= { ["id"] = 1731, 	["icon"] = 1048727, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["frostwolf orcs"]						= { ["id"] = 1445, 	["icon"] = 1044164, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["hand of the prophet"]					= { ["id"] = 1847, 	["icon"] = 1048305,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, }, -- temp icon
+	["laughing skull orcs"]					= { ["id"] = 1708, 	["icon"] = 1043559, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["order of the awakened"]				= { ["id"] = 1849, 	["icon"] = 1240656, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["sha'tari defense"]					= { ["id"] = 1710, 	["icon"] = 1042739, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", ["warband"] = false, },
+	["steamwheedle preservation society"]	= { ["id"] = 1711, 	["icon"] = 1052654, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the saberstalkers"]					= { ["id"] = 1850, 	["icon"] = 1240657, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["vol'jin's headhunters"]				= { ["id"] = 1848, 	["icon"] = 1048305, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, }, -- temp icon
+	["vol'jin's spear"]						= { ["id"] = 1681, 	["icon"] = 1042727, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["wrynn's vanguard"]					= { ["id"] = 1682, 	["icon"] = 1042294, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
 	-- Barracks Bodyguards
-	["aeda brightdawn"]						= { ["id"] = 1740, 	["icon"] = 1037260, 	["paragon"] = false, 	["friend"] = 3, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["defender illona"]						= { ["id"] = 1738, 	["icon"] = 1037260, 	["paragon"] = false, 	["friend"] = 3, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["delvar ironfist"]						= { ["id"] = 1733, 	["icon"] = 1037260, 	["paragon"] = false, 	["friend"] = 3, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["leorajh"]								= { ["id"] = 1741, 	["icon"] = 1037260, 	["paragon"] = false, 	["friend"] = 3, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["talonpriest ishaal"]					= { ["id"] = 1737, 	["icon"] = 1037260, 	["paragon"] = false, 	["friend"] = 3, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["tormmok"]								= { ["id"] = 1736, 	["icon"] = 1037260, 	["paragon"] = false, 	["friend"] = 3, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["vivianne"]							= { ["id"] = 1739, 	["icon"] = 1037260, 	["paragon"] = false, 	["friend"] = 3, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
+	["aeda brightdawn"]						= { ["id"] = 1740, 	["icon"] = 1037260, 	["paragon"] = false, 	["friend"] = 3, ["kind"] = "friendship",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["defender illona"]						= { ["id"] = 1738, 	["icon"] = 1037260, 	["paragon"] = false, 	["friend"] = 3, ["kind"] = "friendship",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["delvar ironfist"]						= { ["id"] = 1733, 	["icon"] = 1037260, 	["paragon"] = false, 	["friend"] = 3, ["kind"] = "friendship",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["leorajh"]								= { ["id"] = 1741, 	["icon"] = 1037260, 	["paragon"] = false, 	["friend"] = 3, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["talonpriest ishaal"]					= { ["id"] = 1737, 	["icon"] = 1037260, 	["paragon"] = false, 	["friend"] = 3, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["tormmok"]								= { ["id"] = 1736, 	["icon"] = 1037260, 	["paragon"] = false, 	["friend"] = 3, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["vivianne"]							= { ["id"] = 1739, 	["icon"] = 1037260, 	["paragon"] = false, 	["friend"] = 3, ["kind"] = "friendship",	 ["factionGroup"] = "Horde",	["warband"] = false, },
 
 	-- Mists of Pandaria
-	["dominance offensive"]					= { ["id"] = 1375, 	["icon"] = 463451, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["emperor shaohao"]						= { ["id"] = 1492, 	["icon"] = 607848, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["forest hozen"]						= { ["id"] = 1228, 	["icon"] = 132159, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", }, -- temp icon
-	["golden lotus"]						= { ["id"] = 1269, 	["icon"] = 643910, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["kirin tor offensive"]					= { ["id"] = 1387, 	["icon"] = 801132, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["operation: shieldwall"]				= { ["id"] = 1376, 	["icon"] = 463450, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["order of the cloud serpent"]			= { ["id"] = 1271, 	["icon"] = 646324, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["pearlfin jinyu"]						= { ["id"] = 1242, 	["icon"] = 463858, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", }, -- temp icon
-	["shado-pan"]							= { ["id"] = 1270, 	["icon"] = 645204, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["shado-pan assault"]					= { ["id"] = 1435, 	["icon"] = 838811, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["sunreaver onslaught"]					= { ["id"] = 1388, 	["icon"] = 838819, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["the august celestials"]				= { ["id"] = 1341, 	["icon"] = 645203, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the black prince"]					= { ["id"] = 1359, 	["icon"] = 656543, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the klaxxi"]							= { ["id"] = 1337, 	["icon"] = 646377, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the lorewalkers"]						= { ["id"] = 1345, 	["icon"] = 617219, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the anglers"]							= { ["id"] = 1302, 	["icon"] = 643874, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["nat pagle"]							= { ["id"] = 1358, 	["icon"] = 133152, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the tillers"]							= { ["id"] = 1272, 	["icon"] = 645198, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
+	["dominance offensive"]					= { ["id"] = 1375, 	["icon"] = 463451, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["emperor shaohao"]						= { ["id"] = 1492, 	["icon"] = 645160, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["forest hozen"]						= { ["id"] = 1228, 	["icon"] = 132159, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, }, -- temp icon
+	["golden lotus"]						= { ["id"] = 1269, 	["icon"] = 643910, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["kirin tor offensive"]					= { ["id"] = 1387, 	["icon"] = 801132, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["operation: shieldwall"]				= { ["id"] = 1376, 	["icon"] = 463450, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["order of the cloud serpent"]			= { ["id"] = 1271, 	["icon"] = 646324, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["pearlfin jinyu"]						= { ["id"] = 1242, 	["icon"] = 463858, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, }, -- temp icon
+	["shado-pan"]							= { ["id"] = 1270, 	["icon"] = 645204, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["shado-pan assault"]					= { ["id"] = 1435, 	["icon"] = 838811, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["sunreaver onslaught"]					= { ["id"] = 1388, 	["icon"] = 838819, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["the august celestials"]				= { ["id"] = 1341, 	["icon"] = 645203, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the black prince"]					= { ["id"] = 1359, 	["icon"] = 656543, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the klaxxi"]							= { ["id"] = 1337, 	["icon"] = 646377, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the lorewalkers"]						= { ["id"] = 1345, 	["icon"] = 645218, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the anglers"]							= { ["id"] = 1302, 	["icon"] = 643874, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["nat pagle"]							= { ["id"] = 1358, 	["icon"] = 133152, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the tillers"]							= { ["id"] = 1272, 	["icon"] = 645198, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
 	-- The Tillers
-	["chee chee"]							= { ["id"] = 1277, 	["icon"] = 132926, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- blue feather
-	["ella"]								= { ["id"] = 1275, 	["icon"] = 454045, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- jade cat
-	["farmer fung"]							= { ["id"] = 1283, 	["icon"] = 134210, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- marsh lily
-	["fish fellreed"]						= { ["id"] = 1282, 	["icon"] = 454045, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- jade cat
-	["gina mudclaw"]						= { ["id"] = 1281, 	["icon"] = 134210, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- marsh lily
-	["haohan mudclaw"]						= { ["id"] = 1279, 	["icon"] = 237204, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- ruby shard
-	["jogu the drunk"]						= { ["id"] = 1273, 	["icon"] = 133975, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- lovely apple
-	["old hillpaw"]							= { ["id"] = 1276, 	["icon"] = 132926, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- blue feather
-	["sho"]									= { ["id"] = 1278, 	["icon"] = 133975, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- lovely apple
-	["tina mudclaw"]						= { ["id"] = 1280, 	["icon"] = 237204, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- ruby shard
+	["chee chee"]							= { ["id"] = 1277, 	["icon"] = 132926, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, }, -- blue feather
+	["ella"]								= { ["id"] = 1275, 	["icon"] = 454045, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, }, -- jade cat
+	["farmer fung"]							= { ["id"] = 1283, 	["icon"] = 134210, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, }, -- marsh lily
+	["fish fellreed"]						= { ["id"] = 1282, 	["icon"] = 454045, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, }, -- jade cat
+	["gina mudclaw"]						= { ["id"] = 1281, 	["icon"] = 134210, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, }, -- marsh lily
+	["haohan mudclaw"]						= { ["id"] = 1279, 	["icon"] = 237204, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, }, -- ruby shard
+	["jogu the drunk"]						= { ["id"] = 1273, 	["icon"] = 133975, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, }, -- lovely apple
+	["old hillpaw"]							= { ["id"] = 1276, 	["icon"] = 132926, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, }, -- blue feather
+	["sho"]									= { ["id"] = 1278, 	["icon"] = 133975, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, }, -- lovely apple
+	["tina mudclaw"]						= { ["id"] = 1280, 	["icon"] = 237204, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, }, -- ruby shard
 	-- Hidden
-	["nomi"]								= { ["id"] = 1357, 	["icon"] = 654236, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "friendship",	 ["factionGroup"] = false, }, -- hidden from the Reputation Panel
+	["nomi"]								= { ["id"] = 1357, 	["icon"] = 654236, 		["paragon"] = false, 	["friend"] = 6, ["kind"] = "friendship",	 ["factionGroup"] = false,		["warband"] = false, }, -- hidden from the Reputation Panel
 
 	-- Cataclysm
-	["avengers of hyjal"]					= { ["id"] = 1204, 	["icon"] = 512609, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["baradin's wardens"]					= { ["id"] = 1177, 	["icon"] = 456564, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["dragonmaw clan"]						= { ["id"] = 1172, 	["icon"] = 456565, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["guardians of hyjal"]					= { ["id"] = 1158, 	["icon"] = 456570, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["hellscream's reach"]					= { ["id"] = 1178, 	["icon"] = 456571, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["ramkahen"]							= { ["id"] = 1173, 	["icon"] = 456574, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the earthen ring"]					= { ["id"] = 1135, 	["icon"] = 456567, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["therazane"]							= { ["id"] = 1171, 	["icon"] = 456572, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["wildhammer clan"]						= { ["id"] = 1174, 	["icon"] = 456575, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
+	["avengers of hyjal"]					= { ["id"] = 1204, 	["icon"] = 512609, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["baradin's wardens"]					= { ["id"] = 1177, 	["icon"] = 456564, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["dragonmaw clan"]						= { ["id"] = 1172, 	["icon"] = 456565, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["guardians of hyjal"]					= { ["id"] = 1158, 	["icon"] = 456570, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["hellscream's reach"]					= { ["id"] = 1178, 	["icon"] = 456571, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["ramkahen"]							= { ["id"] = 1173, 	["icon"] = 456574, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the earthen ring"]					= { ["id"] = 1135, 	["icon"] = 456567, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["therazane"]							= { ["id"] = 1171, 	["icon"] = 456572, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["wildhammer clan"]						= { ["id"] = 1174, 	["icon"] = 456575, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
 
 	-- Wrath of the Lich King
-	["argent crusade"]						= { ["id"] = 1106, 	["icon"] = 236689, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["kirin tor"]							= { ["id"] = 1090, 	["icon"] = 236693, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["knights of the ebon blade"]			= { ["id"] = 1098, 	["icon"] = 236694, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the ashen verdict"]					= { ["id"] = 1156, 	["icon"] = 343640, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- actual icon is same as argent crusade, use 343640 instead
-	["the kalu'ak"]							= { ["id"] = 1073, 	["icon"] = 236697, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the sons of hodir"]					= { ["id"] = 1119, 	["icon"] = 254107, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the wyrmrest accord"]					= { ["id"] = 1091, 	["icon"] = 236699, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["alliance vanguard"]					= { ["id"] = 1037, 	["icon"] = 463450, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", }, -- generic alliance icon
-	["explorer's league"]					= { ["id"] = 1068, 	["icon"] = 463450, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", }, -- generic alliance icon
-	["the frostborn"]						= { ["id"] = 1126, 	["icon"] = 463450, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", }, -- generic alliance icon
-	["the silver covenant"]					= { ["id"] = 1094, 	["icon"] = 463450, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", }, -- generic alliance icon - tabard uses 134472
-	["valiance expedition"]					= { ["id"] = 1050, 	["icon"] = 463450, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", }, -- generic alliance icon
-	["horde expedition"]					= { ["id"] = 1052, 	["icon"] = 463451, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", }, -- generic horde icon
-	["the hand of vengeance"]				= { ["id"] = 1067, 	["icon"] = 463451, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", }, -- generic horde icon
-	["the sunreavers"]						= { ["id"] = 1124, 	["icon"] = 463451, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", }, -- generic horde icon - tabard uses 134473
-	["the taunka"]							= { ["id"] = 1064, 	["icon"] = 463451, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", }, -- generic horde icon
-	["warsong offensive"]					= { ["id"] = 1085, 	["icon"] = 463451, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", }, -- generic horde icon
+	["argent crusade"]						= { ["id"] = 1106, 	["icon"] = 236689, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["kirin tor"]							= { ["id"] = 1090, 	["icon"] = 236693, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["knights of the ebon blade"]			= { ["id"] = 1098, 	["icon"] = 236694, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the ashen verdict"]					= { ["id"] = 1156, 	["icon"] = 343640, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, }, -- actual icon is same as argent crusade, use 343640 instead
+	["the kalu'ak"]							= { ["id"] = 1073, 	["icon"] = 236697, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the sons of hodir"]					= { ["id"] = 1119, 	["icon"] = 254107, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the wyrmrest accord"]					= { ["id"] = 1091, 	["icon"] = 236699, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["alliance vanguard"]					= { ["id"] = 1037, 	["icon"] = 463450, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, }, -- generic alliance icon
+	["explorer's league"]					= { ["id"] = 1068, 	["icon"] = 463450, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, }, -- generic alliance icon
+	["the frostborn"]						= { ["id"] = 1126, 	["icon"] = 463450, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, }, -- generic alliance icon
+	["the silver covenant"]					= { ["id"] = 1094, 	["icon"] = 463450, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, }, -- generic alliance icon - tabard uses 134472
+	["valiance expedition"]					= { ["id"] = 1050, 	["icon"] = 463450, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, }, -- generic alliance icon
+	["horde expedition"]					= { ["id"] = 1052, 	["icon"] = 463451, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, }, -- generic horde icon
+	["the hand of vengeance"]				= { ["id"] = 1067, 	["icon"] = 463451, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, }, -- generic horde icon
+	["the sunreavers"]						= { ["id"] = 1124, 	["icon"] = 463451, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, }, -- generic horde icon - tabard uses 134473
+	["the taunka"]							= { ["id"] = 1064, 	["icon"] = 463451, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, }, -- generic horde icon
+	["warsong offensive"]					= { ["id"] = 1085, 	["icon"] = 463451, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, }, -- generic horde icon
 	-- Sholazar Basin
-	["frenzyheart tribe"]					= { ["id"] = 1104, 	["icon"] = 236698, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the oracles"]							= { ["id"] = 1105, 	["icon"] = 252780, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
+	["frenzyheart tribe"]					= { ["id"] = 1104, 	["icon"] = 236698, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the oracles"]							= { ["id"] = 1105, 	["icon"] = 252780, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
 
 	-- The Burning Crusade
-	["ashtongue deathsworn"]				= { ["id"] = 1012, 	["icon"] = 236691, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["cenarion expedition"]					= { ["id"] = 942, 	["icon"] = 132280, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- guardian of cenarius icon
-	["honor hold"]							= { ["id"] = 946, 	["icon"] = 134502, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["keepers of time"]						= { ["id"] = 989, 	["icon"] = 134156, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- generic bronze dragon icon
-	["kurenai"]								= { ["id"] = 978, 	["icon"] = 458240, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", }, -- generic icon
-	["netherwing"]							= { ["id"] = 1015, 	["icon"] = 132250, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["ogri'la"]								= { ["id"] = 1038, 	["icon"] = 133594, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- alt 236695
-	["sporeggar"]							= { ["id"] = 970, 	["icon"] = 134532, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the consortium"]						= { ["id"] = 933, 	["icon"] = 132881, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- alt 236426
-	["the mag'har"]							= { ["id"] = 941, 	["icon"] = 970886, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["the scale of the sands"]				= { ["id"] = 990, 	["icon"] = 136106, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the violet eye"]						= { ["id"] = 967, 	["icon"] = 236693, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, }, -- kirin tor icon
-	["thrallmar"]							= { ["id"] = 947, 	["icon"] = 134504, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["tranquillien"]						= { ["id"] = 922, 	["icon"] = 236765, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
+	["ashtongue deathsworn"]				= { ["id"] = 1012, 	["icon"] = 236691, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["cenarion expedition"]					= { ["id"] = 942, 	["icon"] = 132280, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["honor hold"]							= { ["id"] = 946, 	["icon"] = 134502, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["keepers of time"]						= { ["id"] = 989, 	["icon"] = 134156, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, }, -- generic bronze dragon icon
+	["kurenai"]								= { ["id"] = 978, 	["icon"] = 458240, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, }, -- generic icon
+	["netherwing"]							= { ["id"] = 1015, 	["icon"] = 132250, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["ogri'la"]								= { ["id"] = 1038, 	["icon"] = 133594, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, }, -- alt 236695
+	["sporeggar"]							= { ["id"] = 970, 	["icon"] = 134532, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the consortium"]						= { ["id"] = 933, 	["icon"] = 132881, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, }, -- alt 236426
+	["the mag'har"]							= { ["id"] = 941, 	["icon"] = 970886, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["the scale of the sands"]				= { ["id"] = 990, 	["icon"] = 136106, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the violet eye"]						= { ["id"] = 967, 	["icon"] = 135933, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["thrallmar"]							= { ["id"] = 947, 	["icon"] = 134504, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["tranquillien"]						= { ["id"] = 922, 	["icon"] = 236765, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
 	-- Shattrath City
-	["lower city"]							= { ["id"] = 1011, 	["icon"] = 135760, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["sha'tari skyguard"]					= { ["id"] = 1031, 	["icon"] = 132191, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["shattered sun offensive"]				= { ["id"] = 1077, 	["icon"] = 134993, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the aldor"]							= { ["id"] = 932, 	["icon"] = 255137, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the scryers"]							= { ["id"] = 934, 	["icon"] = 255136, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["the sha'tar"]							= { ["id"] = 935, 	["icon"] = 1708140, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
+	["lower city"]							= { ["id"] = 1011, 	["icon"] = 135760, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["sha'tari skyguard"]					= { ["id"] = 1031, 	["icon"] = 132191, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["shattered sun offensive"]				= { ["id"] = 1077, 	["icon"] = 134993, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the aldor"]							= { ["id"] = 932, 	["icon"] = 255137, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the scryers"]							= { ["id"] = 934, 	["icon"] = 255136, 		["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["the sha'tar"]							= { ["id"] = 935, 	["icon"] = 1708140, 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
 
 	-- Classic
-	["argent dawn"]							= { ["id"] = 529, 	["icon"] = 133440,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["bloodsail buccaneers"]				= { ["id"] = 87, 	["icon"] = 133168,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["brood of nozdormu"]					= { ["id"] = 910, 	["icon"] = 134156,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["cenarion circle"]						= { ["id"] = 609, 	["icon"] = 132280,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["darkmoon faire"]						= { ["id"] = 909, 	["icon"] = 1100023,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["hydraxian waterlords"]				= { ["id"] = 749, 	["icon"] = 135862,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["ravenholdt"]							= { ["id"] = 349, 	["icon"] = 132299,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["thorium brotherhood"]					= { ["id"] = 59, 	["icon"] = 1786406,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["timbermaw hold"]						= { ["id"] = 576, 	["icon"] = 236696,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["wintersaber trainers"]				= { ["id"] = 589, 	["icon"] = 132252,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
+	["argent dawn"]							= { ["id"] = 529, 	["icon"] = 133440,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["bloodsail buccaneers"]				= { ["id"] = 87, 	["icon"] = 133168,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["brood of nozdormu"]					= { ["id"] = 910, 	["icon"] = 134156,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["cenarion circle"]						= { ["id"] = 609, 	["icon"] = 236692,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["darkmoon faire"]						= { ["id"] = 909, 	["icon"] = 1100023,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["hydraxian waterlords"]				= { ["id"] = 749, 	["icon"] = 135862,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["ravenholdt"]							= { ["id"] = 349, 	["icon"] = 132299,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["thorium brotherhood"]					= { ["id"] = 59, 	["icon"] = 1786406,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["timbermaw hold"]						= { ["id"] = 576, 	["icon"] = 236696,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["wintersaber trainers"]				= { ["id"] = 589, 	["icon"] = 132252,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
 	-- Alliance
-	["darnassus"]							= { ["id"] = 69, 	["icon"] = 255141,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["exodar"]								= { ["id"] = 930, 	["icon"] = 255137,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["gilneas"]								= { ["id"] = 1134, 	["icon"] = 466012,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["gnomeregan"]							= { ["id"] = 54, 	["icon"] = 255139,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["ironforge"]							= { ["id"] = 47, 	["icon"] = 255138,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["stormwind"]							= { ["id"] = 72, 	["icon"] = 255140,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["tushui pandaren"]						= { ["id"] = 1353, 	["icon"] = 626190,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
+	["darnassus"]							= { ["id"] = 69, 	["icon"] = 255141,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["exodar"]								= { ["id"] = 930, 	["icon"] = 255137,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["gilneas"]								= { ["id"] = 1134, 	["icon"] = 466012,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["gnomeregan"]							= { ["id"] = 54, 	["icon"] = 255139,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["ironforge"]							= { ["id"] = 47, 	["icon"] = 255138,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["stormwind"]							= { ["id"] = 72, 	["icon"] = 255140,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["tushui pandaren"]						= { ["id"] = 1353, 	["icon"] = 626190,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["obsidian warders"]					= { ["id"] = 2524, 	["icon"] = 4528812,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
 	-- Alliance Forces
-	["silverwing sentinels"]				= { ["id"] = 890, 	["icon"] = 132279,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["stormpike guard"]						= { ["id"] = 730, 	["icon"] = 133433,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
-	["the league of arathor"]				= { ["id"] = 509, 	["icon"] = 132351,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance", },
+	["silverwing sentinels"]				= { ["id"] = 890, 	["icon"] = 132279,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["stormpike guard"]						= { ["id"] = 730, 	["icon"] = 133433,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
+	["the league of arathor"]				= { ["id"] = 509, 	["icon"] = 132351,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Alliance",	["warband"] = false, },
 	-- Horde
-	["bilgewater cartel"]					= { ["id"] = 1133, 	["icon"] = 463834,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["darkspear trolls"]					= { ["id"] = 530, 	["icon"] = 255145,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["huojin pandaren"]						= { ["id"] = 1352, 	["icon"] = 626190,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["orgrimmar"]							= { ["id"] = 76, 	["icon"] = 255142,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["silvermoon city"]						= { ["id"] = 911, 	["icon"] = 255136,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["thunder bluff"]						= { ["id"] = 81, 	["icon"] = 255144,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["undercity"]							= { ["id"] = 68, 	["icon"] = 255143,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
+	["bilgewater cartel"]					= { ["id"] = 1133, 	["icon"] = 463834,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["darkspear trolls"]					= { ["id"] = 530, 	["icon"] = 255145,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["huojin pandaren"]						= { ["id"] = 1352, 	["icon"] = 626190,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["orgrimmar"]							= { ["id"] = 76, 	["icon"] = 255142,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["silvermoon city"]						= { ["id"] = 911, 	["icon"] = 255136,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["thunder bluff"]						= { ["id"] = 81, 	["icon"] = 255144,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["undercity"]							= { ["id"] = 68, 	["icon"] = 255143,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["dark talons"]							= { ["id"] = 2523, 	["icon"] = 4528811,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
 	-- Horde Forces
-	["frostwolf clan"]						= { ["id"] = 729, 	["icon"] = 133283,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["the defilers"]						= { ["id"] = 510, 	["icon"] = 237568,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
-	["warsong outriders"]					= { ["id"] = 889, 	["icon"] = 132366,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde", },
+	["frostwolf clan"]						= { ["id"] = 729, 	["icon"] = 133283,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["the defilers"]						= { ["id"] = 510, 	["icon"] = 237568,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
+	["warsong outriders"]					= { ["id"] = 889, 	["icon"] = 132366,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = "Horde",	["warband"] = false, },
 	-- Steamwheedle Cartel
-	["booty bay"]							= { ["id"] = 21, 	["icon"] = 236844,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["everlook"]							= { ["id"] = 577, 	["icon"] = 236854,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["gadgetzan"]							= { ["id"] = 369, 	["icon"] = 236846,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
-	["ratchet"]								= { ["id"] = 470, 	["icon"] = 236717,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false, },
+	["booty bay"]							= { ["id"] = 21, 	["icon"] = 236844,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["everlook"]							= { ["id"] = 577, 	["icon"] = 236854,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["gadgetzan"]							= { ["id"] = 369, 	["icon"] = 236846,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
+	["ratchet"]								= { ["id"] = 470, 	["icon"] = 236717,	 	["paragon"] = false, 	["friend"] = 0, ["kind"] = "reputation",	 ["factionGroup"] = false,		["warband"] = false, },
 }
 
 
@@ -752,6 +1068,10 @@ LL["enUS"] = {
 	["faction_standing_revered"] 			= FACTION_STANDING_LABEL7, -- Revered
 	["faction_standing_exalted"] 			= FACTION_STANDING_LABEL8, -- Exalted
 	["faction_standing_paragon"] 			= "Paragon",
+	["faction_standing_renown %d"] 			= "Renown %d",
+	["faction_standing_level %d"] 			= "Level %d",
+	["faction_standing_undiscovered"] 		= "Undiscovered",
+	["faction_standing_unknown"] 			= "Saved data is out of date",
 	-- Defaults (also used by Halfhill factions, etc)
 	["faction_standing_stranger"] 			= "Stranger",
 	["faction_standing_acquaintance"] 		= "Acquaintance",
@@ -795,18 +1115,61 @@ LL["enUS"] = {
 	["faction_standing_tier_4"] 			= "Tier 4",
 	["faction_standing_tier_5"] 			= "Tier 5",
 	["faction_standing_tier_6"] 			= "Tier 6",
+	-- Artisan's Consortium
+	["faction_standing_preferred"] 			= "Preferred",
+	["faction_standing_respected"] 			= "Respected",
+	["faction_standing_valued"] 			= "Valued",
+	["faction_standing_esteemed"] 			= "Esteemed",
+	-- Sabellian/Wrathion
+	["faction_standing_cohort"] 			= "Cohort",
+	["faction_standing_ally"] 				= "Ally",
+	["faction_standing_fang"] 				= "Fang",
+	["faction_standing_true_friend"] 		= "True Friend",
+	-- Cobalt Assembly
+	["faction_standing_empty"] 				= "Empty",
+	["faction_standing_low"] 				= "Low",
+	["faction_standing_medium"] 			= "Medium",
+	["faction_standing_high"] 				= "High",
+	["faction_standing_maximum"] 			= "Maximum",
+	-- Glimmerogg Racer
+	["faction_standing_aspirational"] 		= "Aspirational",
+	["faction_standing_amateur"] 			= "Amateur",
+	["faction_standing_competent"] 			= "Competent",
+	["faction_standing_skilled"] 			= "Skilled",
+	["faction_standing_professional"] 		= "Professional",
+	-- Soridormi
+	["faction_standing_anomaly"] 			= "Anomaly",
+	["faction_standing_future_friend"] 		= "Future Friend",
+	["faction_standing_rift-mender"] 		= "Rift-Mender",
+	["faction_standing_timewalker"] 		= "Timewalker",
+	["faction_standing_legend"] 			= "Legend",
+	-- Azerothian Archives
+	["faction_standing_junior"] 			= "Junior",
+	["faction_standing_capable"] 			= "Capable",
+	["faction_standing_learned"] 			= "Learned",
+	["faction_standing_resident"] 			= "Resident",
+	["faction_standing_tenured"] 			= "Tenured",
+	-- The Severed Threads
+	["faction_standing_crony"] 				= "Crony",
+	["faction_standing_accomplice"] 		= "Accomplice",
+	["faction_standing_collaborator"] 		= "Collaborator",
+	["faction_standing_accessory"] 			= "Accessory",
+	["faction_standing_abettor"] 			= "Abettor",
+	["faction_standing_conspirator"] 		= "Conspirator",
+	["faction_standing_mastermind"] 		= "Mastermind",
 
 
 	-- Global
 	["highest reputation"] 					= "Highest Reputation",
 	["lowest reputation"] 					= "Lowest Reputation",
+	["warband"]								= REPUTATION_SORT_TYPE_ACCOUNT, -- Warband
 
 	-- Tooltips
 	["hold shift for more"] 				= "<Hold Shift for More>",
 	["hold shift for highest reputation"] 	= "<Hold Shift for Highest Reputation>",
 
 	-- Slash Commands
-	["/paragon help"] = "|cFF00FFFFParagon|r Usage:\n|cff00ffff/paragon <faction>|r  List Highest Reputation for the specified faction in chat\n|cff00ffff/paragon delete <name or name-realm>|r  Delete a character's data",  --\n|cff00ffff/paragon config|r  Open the Options Panel
+	["/paragon help"] = "|cFF00FFFFParagon|r Usage:\n|cff00ffff/paragon <faction>|r  List Highest Reputation for the specified faction in chat\n|cff00ffff/paragon delete <name or name-realm>|r  Delete a character's data\n|cff00ffff/paragon config|r  Open the Options Panel",
 
 	["/paragon delete no argument"] 		= "|cFF00FFFFParagon|r: No character name specified.",
 	["delete character not found"]			= "|cFF00FFFFParagon|r: There is nothing to remove for \"%s\". Make sure you include the character's realm if it's not on %s.",
@@ -817,7 +1180,7 @@ LL["enUS"] = {
 	["no results"]							= "Nothing to display for %s.",
 
 	-- Settings Panel
-	["cfgFrameSubtext"] 					= "Paragon keeps track of reputation for all your characters.\n\nType |cff00ffff/par <faction>|r in chat to bring up an overview window for a specific reputation faction.\n\n\nTo delete stored data for a character, type |cff00ffff/par delete <name>|r in chat.",
+	["cfgFrameSubtext"] 					= "Paragon keeps track of reputation for all your characters.\n\nType |cff00ffff/par <faction>|r in chat to bring up an overview window for a specific reputation faction.\n\n\nTo delete stored data for a character, type |cff00ffff/par delete <name or name-realm>|r in chat.",
 	["cfgChatOutputLimitLabel"] 			= "Maximum Chat Lines",
 	["cfgTooltipHeader"] 					= "Item Tooltips",
 	["cfgTooltipSubtext"] 					= "Paragon can add additional information to tooltips for reputation related items.",
@@ -844,6 +1207,33 @@ LL["enUS"] = {
 	-- Guild
 	["f guild"] 							= "Guild",
 
+	-- The War Within
+	["f council of dornogal"] 				= "Council of Dornogal",
+	["f earthen"] 							= "Earthen",
+	["f hallowfall arathi"] 				= "Hallowfall Arathi",
+	["f the assmebly of the deeps"] 		= "The Assembl of the Deeps",
+	["f the severed threads"] 				= "The Severed Threads",
+	["f the general"] 						= "The General",
+	["f the vizier"] 						= "The Vizier",
+	["f the weaver"] 						= "The Weaver",
+	["f brann bronzebeard"] 				= "Brann Bronzebeard",
+
+	-- Dragonflight
+	["f artisan's consortium - dragon isles branch"] = "Artisan's Consortium - Dragon Isles Branch",
+	["f azerothian archives"] 				= "Azerothian Archives",
+	["f cobalt assembly"] 					= "Cobalt Assembly",
+	["f dragonscale expedition"] 			= "Dragonscale Expedition",
+	["f dream wardens"]						= "Dream Wardens",
+	["f glimmerogg racer"]					= "Glimmerogg Racer",
+	["f iskaara tuskarr"] 					= "Iskaara Tuskarr",
+	["f loamm niffen"]						= "Loamm Niffen",
+	["f maruuk centaur"] 					= "Maruuk Centaur",
+	["f sabellian"]							= "Sabellian",
+	["f soridormi"]  						= "Soridormi",
+	["f valdrakken accord"] 				= "Valdrakken Accord",
+	["f winterpelt furbolg"]				= "Winterpelt Furbolg",
+	["f wrathion"]							= "Wrathion",
+
 	-- Shadowlands
 	["f court of harvesters"]				= "Court of Harvesters",
 	["f court of night"]					= "Court of Night",
@@ -858,6 +1248,23 @@ LL["enUS"] = {
 	["f the undying army"]					= "The Undying Army",
 	["f the wild hunt"]						= "The Wild Hunt",
 	["f ve'nari"]							= "Ve'nari",
+	-- The Ember Court
+	["f alexandros mograine"]				= "Alexandros Mograine",
+	["f baroness vashj"]					= "Baroness Vashj",
+	["f choofa"]							= "Choofa",
+	["f cryptkeeper kassir"]				= "Cryptkeeper Kassir",
+	["f droman aliothe"]					= "Droman Aliothe",
+	["f grandmaster vole"]					= "Grandmaster Vole",
+	["f hunt-captain korayn"]				= "Hunt-Captain Korayn",
+	["f kleia and pelagos"]					= "Kleia and Pelagos",
+	["f lady moonberry"]					= "Lady Moonberry",
+	["f mikanikos"]							= "Mikanikos",
+	["f plague deviser marileth"]			= "Plague Deviser Marileth",
+	["f polemarch adrestes"]				= "Polemarch Adrestes",
+	["f rendle and cudgelface"]				= "Rendle and Crudgelface",
+	["f sika"]								= "Sika",
+	["f stonehead"]							= "Stonehead",
+	["f the countess"]						= "The Countess",
 
 	-- Battle for Azeroth
 	["f 7th legion"]						= "7th Legion",
@@ -1026,6 +1433,7 @@ LL["enUS"] = {
 	["f ironforge"]							= "Ironforge",
 	["f stormwind"]							= "Stormwind",
 	["f tushui pandaren"]					= "Tushui Pandaren",
+	["f obsidian warders"]					= "Obsidian Warders",
 	-- Alliance Forces
 	["f silverwing sentinels"]				= "Silverwing Sentinels",
 	["f stormpike guard"]					= "Stormpike Guard",
@@ -1038,6 +1446,7 @@ LL["enUS"] = {
 	["f silvermoon city"]					= "Silvermoon City",
 	["f thunder bluff"]						= "Thunder Bluff",
 	["f undercity"]							= "Undercity",
+	["f dark talons"]						= "Dark Talons",
 	-- Horde Forces
 	["f frostwolf clan"]					= "Frostwolf Clan",
 	["f the defilers"]						= "The Defilers",
@@ -1268,8 +1677,11 @@ end })
 T.standing[9] = T.L["faction_standing_paragon"]
 
 
+local L = T.L
+
 SLASH_PARAGON1 = "/paragon"
 SLASH_PARAGON2 = "/par"
+local WARBAND_ICON = CreateAtlasMarkup("questlog-questtypeicon-account")
 
 -- Default settings
 T.defaults = {
@@ -1452,42 +1864,175 @@ local function updateFactions()
 
 	for faction, data in pairs(T.faction) do
 		local id, icon, paragon, factionGroup, friend, kind = data["id"], data["icon"], data["paragon"], data["factionGroup"], data["friend"], data["kind"]
-		local name, standingId, barMin, barMax, barValue = "", 4, 0, 0, 0
+		local name, standingId, barMin, barMax, barValue, renownLevel = "", 4, 0, 0, 0, 0
 
 		if kind == "friendship" then
-			_, barValue, _, name, _, _, _, barMin, barMax = GetFriendshipReputation(id)
-			if not barMax then
-				barMax = 42000
-			end
+			local friendship = C_GossipInfo.GetFriendshipReputation(id)
+			barValue = friendship.standing or 0
+			barMin = friendship.reactionThreshold
+			barMax = friendship.nextThreshold or 42000
+			name = friendship.name or name
 
-			if id == 1357 then -- Hack for Nomi which is a super weird reputation
-				if barValue >= 42000 then
-					standingId = 8
-				elseif barValue >= 33600 then
-					standingId = 7
-				elseif barValue >= 25200 then
-					standingId = 7
-				elseif barValue >= 16800 then
-					standingId = 6
-				elseif barValue >= 8400 then
-					standingId = 5
-				else
-					standingId = 4
+			if id == 1740 or id == 1738 or id == 1733 or id == 1741 or id == 1737 or id == 1736 or id == 1739 then -- Garrison Bodyguards
+				if barValue >= 20000 then standingId = 3
+				elseif barValue >= 10000 then standingId = 2
+				else standingId = 1
 				end
-			else
-				if barValue >= 42000 then
-					standingId = 8
-				elseif barValue >= 21000 then
-					standingId = 7
-				elseif barValue >= 9000 then
-					standingId = 6
-				elseif barValue >= 3000 then
-					standingId = 5
+			elseif id == 2135 then -- Chromie
+				if barValue >= 15000 then standingId = 7
+				elseif barValue >= 10000 then standingId = 6
+				elseif barValue >= 7000 then standingId = 5
+				elseif barValue >= 4500 then standingId = 4
+				elseif barValue >= 2500 then standingId = 3
+				elseif barValue >= 1000 then standingId = 2
+				else standingId = 1
+				end
+			elseif id == 2464 or id == 2463 or id == 2462 then -- Court of Night, Marasmius, Stitchmasters
+				if barValue >= 42000 then standingId = 5
+				elseif barValue >= 21000 then standingId = 4
+				elseif barValue >= 9000 then standingId = 3
+				elseif barValue >= 3000 then standingId = 2
+				else standingId = 1
+				end
+			elseif id == 2432 then -- Ve'nari
+				if barValue >= 42000 then standingId = 6
+				elseif barValue >= 21000 then standingId = 5
+				elseif barValue >= 14000 then standingId = 4
+				elseif barValue >= 7000 then standingId = 3
+				elseif barValue >= 1000 then standingId = 2
+				else standingId = 1
+				end
+			elseif id == 2472 then -- The Archivists' Codex
+				if barValue >= 41000 then standingId = 6
+				elseif barValue >= 25000 then standingId = 5
+				elseif barValue >= 14000 then standingId = 4
+				elseif barValue >= 7500 then standingId = 3
+				elseif barValue >= 3000 then standingId = 2
+				else standingId = 1
+				end
+			elseif id == 2544 then -- Artisan's Consortium - Dragon Isles Branch
+				if barValue >= 12500 then standingId = 5
+				elseif barValue >= 5500 then standingId = 4
+				elseif barValue >= 2500 then standingId = 3
+				elseif barValue >= 500 then standingId = 2
+				else standingId = 1
+				end
+			elseif id == 2550 then -- Cobalt Assembly
+				if barValue >= 10000 then standingId = 5
+				elseif barValue >= 3600 then standingId = 4
+				elseif barValue >= 1200 then standingId = 3
+				elseif barValue >= 300 then standingId = 2
+				else standingId = 1
+				end
+			elseif id == 2553 then -- Soridormi
+				if barValue >= 42000 then standingId = 5
+				elseif barValue >= 24000 then standingId = 4
+				elseif barValue >= 14000 then standingId = 3
+				elseif barValue >= 7000 then standingId = 2
+				else standingId = 1
+				end
+			elseif id == 2615 then -- Azerothian Archives
+				if barValue >= 42000 then standingId = 5
+				elseif barValue >= 32500 then standingId = 4
+				elseif barValue >= 21000 then standingId = 3
+				elseif barValue >= 10500 then standingId = 2
+				else standingId = 1
+				end
+			elseif id == 2605 or id == 2607 or id == 2601 then -- The General, The Vizier, The Weaver
+				if barValue >= 20000 then standingId = 9
+				elseif barValue >= 17500 then standingId = 8
+				elseif barValue >= 15000 then standingId = 7
+				elseif barValue >= 12500 then standingId = 6
+				elseif barValue >= 10000 then standingId = 5
+				elseif barValue >= 7500 then standingId = 4
+				elseif barValue >= 5000 then standingId = 3
+				elseif barValue >= 2500 then standingId = 2
+				else standingId = 1
+				end
+			elseif id == 2640 then -- Brann Bronzebeard
+				if barValue >= 676997 then standingId = 60
+				elseif barValue >= 664497 then standingId = 59
+				elseif barValue >= 651997 then standingId = 58
+				elseif barValue >= 639497 then standingId = 57
+				elseif barValue >= 626997 then standingId = 56
+				elseif barValue >= 614497 then standingId = 55
+				elseif barValue >= 601997 then standingId = 54
+				elseif barValue >= 589497 then standingId = 53
+				elseif barValue >= 576997 then standingId = 52
+				elseif barValue >= 564497 then standingId = 51
+				elseif barValue >= 551997 then standingId = 50
+				elseif barValue >= 539497 then standingId = 49
+				elseif barValue >= 526997 then standingId = 48
+				elseif barValue >= 514497 then standingId = 47
+				elseif barValue >= 501997 then standingId = 46
+				elseif barValue >= 489497 then standingId = 45
+				elseif barValue >= 476997 then standingId = 44
+				elseif barValue >= 464497 then standingId = 43
+				elseif barValue >= 451997 then standingId = 42
+				elseif barValue >= 439497 then standingId = 41
+				elseif barValue >= 426997 then standingId = 40
+				elseif barValue >= 414497 then standingId = 39
+				elseif barValue >= 401997 then standingId = 38
+				elseif barValue >= 389497 then standingId = 37
+				elseif barValue >= 376997 then standingId = 36
+				elseif barValue >= 364497 then standingId = 35
+				elseif barValue >= 351997 then standingId = 34
+				elseif barValue >= 339497 then standingId = 33
+				elseif barValue >= 326997 then standingId = 32
+				elseif barValue >= 314497 then standingId = 31
+				elseif barValue >= 301997 then standingId = 30
+				elseif barValue >= 289497 then standingId = 29
+				elseif barValue >= 276997 then standingId = 28
+				elseif barValue >= 264497 then standingId = 27
+				elseif barValue >= 251997 then standingId = 26
+				elseif barValue >= 239497 then standingId = 25
+				elseif barValue >= 226997 then standingId = 24
+				elseif barValue >= 214497 then standingId = 23
+				elseif barValue >= 201997 then standingId = 22
+				elseif barValue >= 189497 then standingId = 21
+				elseif barValue >= 176997 then standingId = 20
+				elseif barValue >= 164497 then standingId = 19
+				elseif barValue >= 151997 then standingId = 18
+				elseif barValue >= 139497 then standingId = 17
+				elseif barValue >= 126997 then standingId = 16
+				elseif barValue >= 114497 then standingId = 15
+				elseif barValue >= 101997 then standingId = 14
+				elseif barValue >= 89497 then standingId = 13
+				elseif barValue >= 76997 then standingId = 12
+				elseif barValue >= 64497 then standingId = 11
+				elseif barValue >= 51997 then standingId = 10
+				elseif barValue >= 41248 then standingId = 9
+				elseif barValue >= 32290 then standingId = 8
+				elseif barValue >= 24825 then standingId = 7
+				elseif barValue >= 18604 then standingId = 6
+				elseif barValue >= 13420 then standingId = 5
+				elseif barValue >= 9100 then standingId = 4
+				elseif barValue >= 5500 then standingId = 3
+				elseif barValue >= 2500 then standingId = 2
+				else standingId = 1
+				end
+			else -- Default
+				if barValue >= 42000 then standingId = 6
+				elseif barValue >= 33600 then standingId = 5
+				elseif barValue >= 25200 then standingId = 4
+				elseif barValue >= 16800 then standingId = 3
+				elseif barValue >= 8400 then standingId = 2
+				else standingId = 1
 				end
 			end
+		elseif kind == "renown" then
+			local data = C_MajorFactions.GetMajorFactionData(id)
+			standingId = data.renownLevel or 1
+			barValue = data.renownReputationEarned or 0
+			barMax = data.renownLevelThreshold or 2500
+			name = data.name or name
 		else
-			name, _, standingId, barMin, barMax, barValue = GetFactionInfoByID(id)
+			local factionData = C_Reputation.GetFactionDataByID(id)
+			if factionData then
+				name, standingId, barMin, barMax, barValue = factionData.name, factionData.reaction, factionData.currentReactionThreshold, factionData.nextReactionThreshold, factionData.currentStanding
+			end
 		end
+
 		local currentValue, threshold, _, hasRewardPending = C_Reputation.GetFactionParagonInfo(id)
 
 
@@ -1497,10 +2042,17 @@ local function updateFactions()
 				if hasRewardPending then currentValue = currentValue + threshold end
 
 				ShiGuangDB["ParagonDBcharacter"][T.charStr][faction] = {
-					["standingId"] = 9, -- Paragon
+					["standingId"] = (kind == "renown") and standingId or 9, -- Paragon
 					["current"] = currentValue,
 					["max"] = threshold,
 					["hasRewardPending"] = hasRewardPending,
+				}
+			elseif kind == "renown" then
+				ShiGuangDB["ParagonDBcharacter"][T.charStr][faction] = {
+					["standingId"] = standingId, -- Renown level
+					["current"] = barValue,
+					["max"] = barMax,
+					["hasRewardPending"] = false,
 				}
 			elseif barValue then
 				ShiGuangDB["ParagonDBcharacter"][T.charStr][faction] = {
@@ -1519,7 +2071,7 @@ end
 local function deleteCharacter(characterName, verbose)
 	if not characterName then
 		if verbose then
-			DEFAULT_CHAT_FRAME:AddMessage(T.L["/paragon delete no argument"])
+			DEFAULT_CHAT_FRAME:AddMessage(L["/paragon delete no argument"])
 		end
 		return
 	else
@@ -1529,7 +2081,7 @@ local function deleteCharacter(characterName, verbose)
 	if setContains(ShiGuangDB["ParagonDBcharacter"], characterName) then
 		ShiGuangDB["ParagonDBcharacter"][characterName] = nil
 		if verbose then
-			DEFAULT_CHAT_FRAME:AddMessage(string.format(T.L["delete character successful"], characterName))
+			DEFAULT_CHAT_FRAME:AddMessage(string.format(L["delete character successful"], characterName))
 		end
 		return
 	else
@@ -1539,13 +2091,13 @@ local function deleteCharacter(characterName, verbose)
 	if setContains(ShiGuangDB["ParagonDBcharacter"], characterName) and characterName ~= string.lower("-"..T.realm) then
 		ShiGuangDB["ParagonDBcharacter"][characterName] = nil
 		if verbose then
-			DEFAULT_CHAT_FRAME:AddMessage(string.format(T.L["delete character successful"], characterName))
+			DEFAULT_CHAT_FRAME:AddMessage(string.format(L["delete character successful"], characterName))
 		end
 		return
 	elseif verbose and characterName == string.lower("-"..T.realm) then
-		DEFAULT_CHAT_FRAME:AddMessage(T.L["/paragon delete no argument"])
+		DEFAULT_CHAT_FRAME:AddMessage(L["/paragon delete no argument"])
 	elseif verbose then
-		DEFAULT_CHAT_FRAME:AddMessage(string.format(T.L["delete character not found"], characterName, T.realm))
+		DEFAULT_CHAT_FRAME:AddMessage(string.format(L["delete character not found"], characterName, T.realm))
 	end
 end
 
@@ -1553,14 +2105,34 @@ end
 -- Functions to format standings
 local function standing(standingId, faction)
 	if setContains(T.faction, faction) then
-		if T.faction[faction]["friend"] ~= 0 then
-			if setContains(T.friendStanding, faction) then
-				return T.L[T.friendStanding[faction][standingId]]
+		if T.faction[faction]["kind"] == "renown" then
+			if standingId == T.faction[faction]["friend"] then
+				return T.standing[9] -- Paragon
+			elseif standingId > 0 then
+				return L["faction_standing_renown %d"]:format(standingId)
 			else
-				return T.L[T.friendStanding["default"][standingId]]
+				return L["faction_standing_undiscovered"]
 			end
-		elseif faction == "nomi" then
-			return T.L[T.friendStanding[faction][standingId]]
+		elseif faction == "brann bronzebeard" then
+			if standingId == T.faction[faction]["friend"] then
+				return T.standing[9] -- Paragon
+			elseif standingId > 0 then
+				return L["faction_standing_level %d"]:format(standingId)
+			else
+				return L["faction_standing_undiscovered"]
+			end
+		elseif T.faction[faction]["friend"] ~= 0 then
+			if setContains(T.friendStanding, faction) then
+				if T.friendStanding[faction][standingId] then
+					return L[T.friendStanding[faction][standingId]]
+				else
+					return L["faction_standing_unknown"]
+				end
+			else
+				return L[T.friendStanding["default"][standingId]]
+			end
+		elseif setContains(T.friendStanding, faction) then
+			return L[T.friendStanding[faction][standingId]]
 		else
 			return T.standing[standingId]
 		end
@@ -1571,12 +2143,38 @@ end
 
 local function standingColor(standingId, faction)
 	if setContains(T.faction, faction) then
-		if T.faction[faction]["friend"] ~= 0 then
+		if T.faction[faction]["kind"] == "renown" then
+			if standingId == T.faction[faction]["friend"] then
+				return T.standingColor[9] -- Max renown
+			elseif standingId >= 20 then
+				return T.standingColor[7]
+			elseif standingId >= 10 then
+				return T.standingColor[6]
+			elseif standingId > 0 then
+				return T.standingColor[5]
+			else
+				return T.standingColor[4] -- Undiscovered
+			end
+		elseif faction == "brann bronzebeard" then
+			if standingId == T.faction[faction]["friend"] then
+				return T.standingColor[8] -- Max level
+			elseif standingId >= 50 then
+				return T.standingColor[7]
+			elseif standingId >= 30 then
+				return T.standingColor[6]
+			elseif standingId > 1 then
+				return T.standingColor[5]
+			else
+				return T.standingColor[4] -- Level 1
+			end
+		elseif T.faction[faction]["friend"] ~= 0 then
 			if setContains(T.friendStandingColor, faction) then
-				return T.friendStandingColor[faction][standingId]
+				return T.friendStandingColor[faction][standingId] or T.standingColor[1]
 			else
 				return T.friendStandingColor["default"][standingId]
 			end
+		elseif setContains(T.friendStandingColor, faction) then
+			return T.friendStandingColor[faction][standingId]
 		else
 			return T.standingColor[standingId]
 		end
@@ -1594,7 +2192,7 @@ local function outputFaction(factionName, limit, outputFormat, currentLine)
 
 	-- Check if the faction exists
 	if not setContains(T.faction, faction) then
-		return -- Break
+		return false
 	elseif outputFormat == "test" then
 		return true
 	end
@@ -1607,7 +2205,7 @@ local function outputFaction(factionName, limit, outputFormat, currentLine)
 	for char, tbl in pairs(ShiGuangDB["ParagonDBcharacter"]) do
 		if setContains(tbl, faction) then
 			factionTable[char] = tbl[faction]
-			sortTable[char] = tostring(tbl[faction]["standingId"] .. "." .. string.format("%09.7d", tbl[faction]["current"]))
+			sortTable[char] = tostring(string.format("%04.4d", tbl[faction]["standingId"]) .. "." .. string.format("%09.7d", tbl[faction]["current"]))
 		end
 	end
 
@@ -1624,7 +2222,7 @@ local function outputFaction(factionName, limit, outputFormat, currentLine)
 		local d = ShiGuangDB["ParagonDBcharacter"][char]
 		local standingId = factionTable[char]["standingId"]
 
-		if (not (ShiGuangDB["ParagonDBconfig"]["tooltip_hide_exalted"] and standingId == 8) and not (ShiGuangDB["ParagonDBconfig"]["tooltip_hide_neutral"] and standingId == 4) and not (ShiGuangDB["ParagonDBconfig"]["tooltip_hide_unfriendly"] and standingId <= 3)) or outputFormat == "ui" then
+		if (not T.faction[faction]["warband"] and not (ShiGuangDB["ParagonDBconfig"]["tooltip_hide_exalted"] and standingId == 8) and not (ShiGuangDB["ParagonDBconfig"]["tooltip_hide_neutral"] and standingId == 4) and not (ShiGuangDB["ParagonDBconfig"]["tooltip_hide_unfriendly"] and standingId <= 3)) or outputFormat == "ui" then
 			i = i + 1
 
 			if i == 1 then
@@ -1632,7 +2230,7 @@ local function outputFaction(factionName, limit, outputFormat, currentLine)
 					--content frame
 					resultsContent:Hide()
 
-					resultsFrameFactionLabel:SetText("|T" .. T.faction[faction]["icon"] .. ":24:24|t  " .. T.L["f "..faction])
+					resultsFrameFactionLabel:SetText("|T" .. T.faction[faction]["icon"] .. ":24:24|t  " .. L["f "..faction])
 
 					resultsContent = CreateFrame("Frame", nil, resultsScrollFrame)
 					resultsScrollFrame.content = resultsContent
@@ -1640,19 +2238,25 @@ local function outputFaction(factionName, limit, outputFormat, currentLine)
 
 					resultsFrame:Show()
 				else
-					out = "|cFF00FFFFParagon|r\n|T" .. T.faction[faction]["icon"] .. ":0|t " .. T.L["f "..faction] .. " - " .. T.L["highest reputation"]
+					out = "|cFF00FFFFParagon|r\n|T" .. T.faction[faction]["icon"] .. ":0|t " .. L["f "..faction] .. " - " .. L["highest reputation"]
 				end
 			end
 
-			if i <= limit or outputFormat == "ui" then
-				local displayAmount = "  " .. FormatLargeNumber(factionTable[char]["current"]) .. " / " .. FormatLargeNumber(factionTable[char]["max"])
-				if standingId == 8 or (T.faction[faction]["friend"] ~= 0 and standingId >= T.faction[faction]["friend"] and standingId ~= 9) then -- Exalted/Best Friend
+			if ((i <= limit or outputFormat == "ui") and not T.faction[faction]["warband"]) or (T.faction[faction]["warband"] and char == T.charStr) then
+				local displayAmount = FormatLargeNumber(factionTable[char]["current"]) .. " / " .. FormatLargeNumber(factionTable[char]["max"])
+				if T.faction[faction]["kind"] == "renown" then
+					if standingId == 0 or (standingId == T.faction[faction]["friend"] and not T.faction[faction]["paragon"]) then
+						displayAmount = "" -- Max renown level (no paragon) or undiscovered
+					end
+				elseif standingId == 8 or (T.faction[faction]["friend"] ~= 0 and standingId >= T.faction[faction]["friend"] and standingId ~= 9) then -- Exalted/Best Friend
 					displayAmount = "" -- Exalted reputations do not have amounts
 				end
 
 				local line = "|c" .. RAID_CLASS_COLORS[d["class"]].colorStr .. ellipsis(d["name"] .. format_realm(d["realm"]), 30) .. "|r  " .. standingColor(standingId, faction) .. standing(standingId, faction) .. displayAmount .. "|r"
 
 				if outputFormat == "ui" then
+					if T.faction[faction]["warband"] and char == T.charStr then i = 1 end
+
 					local offset = (i - 1) * -24
 
 					local rowBg = CreateFrame("Frame", nil, resultsContent, BackdropTemplateMixin and "BackdropTemplate")
@@ -1673,7 +2277,11 @@ local function outputFaction(factionName, limit, outputFormat, currentLine)
 					-- Character Name
 					local label = rowBg:CreateFontString("OVERLAY", nil, "GameFontNormalSmall")
 					label:SetPoint("TOPLEFT", 10, 0)
-					label:SetText("|c" .. RAID_CLASS_COLORS[d["class"]].colorStr .. ellipsis(d["name"] .. format_realm(d["realm"]), 23) .. "|r")
+					if T.faction[faction]["warband"] then
+						label:SetText(WARBAND_ICON .. " |cff00ccff" .. L["warband"] .. "|r")
+					else
+						label:SetText("|c" .. RAID_CLASS_COLORS[d["class"]].colorStr .. ellipsis(d["name"] .. format_realm(d["realm"]), 23) .. "|r")
+					end
 					label:SetHeight(24)
 					label:SetJustifyV("MIDDLE")
 
@@ -1685,7 +2293,7 @@ local function outputFaction(factionName, limit, outputFormat, currentLine)
 					label:SetJustifyV("MIDDLE")
 
 					-- Amount
-					if standingId ~= 8 then
+					if displayAmount ~= "" then
 						local label = rowBg:CreateFontString("OVERLAY", nil, "GameFontNormalSmall")
 						label:SetPoint("TOPLEFT", 270, 0)
 						label:SetText(standingColor(standingId, faction) .. displayAmount .. "|r")
@@ -1694,6 +2302,8 @@ local function outputFaction(factionName, limit, outputFormat, currentLine)
 						label:SetJustifyH("LEFT")
 						label:SetJustifyV("MIDDLE")
 					end
+
+					if T.faction[faction]["warband"] and char == T.charStr then break end
 				elseif outputFormat == "tooltip" and i == currentLine then
 					return "|cff808080" .. i .. ".|r " .. line
 				else
@@ -1708,7 +2318,7 @@ local function outputFaction(factionName, limit, outputFormat, currentLine)
 			--content frame
 			resultsContent:Hide()
 
-			resultsFrameFactionLabel:SetText("|T" .. T.faction[faction]["icon"] .. ":24:24|t  " .. T.L["f "..faction])
+			resultsFrameFactionLabel:SetText("|T" .. T.faction[faction]["icon"] .. ":24:24|t  " .. L["f "..faction])
 
 			resultsContent = CreateFrame("Frame", nil, resultsScrollFrame)
 			resultsScrollFrame.content = resultsContent
@@ -1718,13 +2328,13 @@ local function outputFaction(factionName, limit, outputFormat, currentLine)
 
 			local label = resultsContent:CreateFontString("OVERLAY", nil, "GameFontNormalLarge")
 			label:SetPoint("TOPLEFT", 10, -10)
-			label:SetText(string.format(T.L["reputation not discovered"], T.L["f "..faction]))
+			label:SetText(string.format(L["reputation not discovered"], L["f "..faction]))
 			label:SetJustifyV("MIDDLE")
 			label:SetJustifyH("CENTER")
 			label:SetWidth(360)
 			label:SetHeight(460)
 		else
-			out = "|cFF00FFFFParagon|r: " .. string.format(T.L["no results"], "\"" .. T.L["f "..faction] .. "\"")
+			out = "|cFF00FFFFParagon|r: " .. string.format(L["no results"], "\"" .. L["f "..faction] .. "\"")
 		end
 	end
 
@@ -1752,33 +2362,16 @@ end
 
 
 -- Function to add information to item tooltips
-local function GameTooltip_OnTooltipSetItem(tooltip)
+local function OnTooltipSetItem(tooltip, data)
+	if not data then return end -- If there is no data we do nothing
 	local tooltip = tooltip
 	local match = string.match
-	local _, link = tooltip:GetItem()
-	if not link then return; end -- Break if the link is invalid
-	
-	-- String matching to get item ID
-	local itemString = match(link, "item[%-?%d:]+")
-	local _, itemId = strsplit(":", itemString or "")
 
-	-- TradeSkillFrame workaround
-	if itemId == "0" and TradeSkillFrame ~= nil and TradeSkillFrame:IsVisible() then
-		if (GetMouseFocus():GetName()) == "TradeSkillSkillIcon" then
-			itemId = GetTradeSkillItemLink(TradeSkillFrame.selectedSkill):match("item:(%d+):") or nil
-		else
-			for i = 1, 8 do
-				if (GetMouseFocus():GetName()) == "TradeSkillReagent"..i then
-					itemId = GetTradeSkillReagentItemLink(TradeSkillFrame.selectedSkill, i):match("item:(%d+):") or nil
-					break
-				end
-			end
-		end
-	end
+	local link = data.guid and C_Item.GetItemLinkByGUID(data.guid)
+	local itemId = data.id or false
+	if not link or not itemId then return end
 
-	itemId = tonumber(itemId) -- Make sure itemId is an integer
-
-	if itemId and (setContains(T.reputationItemBoA, itemId) or setContains(T.reputationItemBoP, itemId)) then
+	if setContains(T.reputationItemBoA, itemId) or setContains(T.reputationItemBoP, itemId) then
 		updateFactions() -- Make sure player data is up to date
 
 		local bound, faction = nil, nil
@@ -1800,14 +2393,22 @@ local function GameTooltip_OnTooltipSetItem(tooltip)
 				totalFactions = totalFactions + 1
 
 				tooltip:AddLine(" ")
-				tooltip:AddLine("|cffffffff" .. T.L["f "..faction] .. "|r")
+				tooltip:AddLine("|cffffffff" .. (T.faction[faction]["warband"] and (WARBAND_ICON .. " ") or "") .. L["f "..faction] .. "|r")
 
-				local displayAmount = "  " .. FormatLargeNumber(d[faction]["current"]) .. " / " .. FormatLargeNumber(d[faction]["max"])
-				if d[faction]["standingId"] == 8 or (T.faction[faction]["friend"] ~= 0 and d[faction]["standingId"] >= T.faction[faction]["friend"]) then -- Exalted/Best Friend
-					displayAmount = ""
+				local displayAmount = FormatLargeNumber(d[faction]["current"]) .. " / " .. FormatLargeNumber(d[faction]["max"])
+				if T.faction[faction]["kind"] == "renown" then
+					if standingId == 0 or (standingId == T.faction[faction]["friend"] and not T.faction[faction]["paragon"]) then
+						displayAmount = "" -- Max renown level (no paragon) or undiscovered
+					end
+				elseif d[faction]["standingId"] == 8 or (T.faction[faction]["friend"] ~= 0 and d[faction]["standingId"] >= T.faction[faction]["friend"]) then
+					displayAmount = "" -- Exalted/Best Friend
 				end
 
-				tooltip:AddLine(standingColor(d[faction]["standingId"], faction) .. standing(d[faction]["standingId"], faction) .. displayAmount .. "|r")
+				if displayAmount ~= "" then
+					tooltip:AddDoubleLine(standingColor(d[faction]["standingId"], faction) .. standing(d[faction]["standingId"], faction) .. "|r", standingColor(d[faction]["standingId"], faction) .. displayAmount .. "|r")
+				else
+					tooltip:AddLine(standingColor(d[faction]["standingId"], faction) .. standing(d[faction]["standingId"], faction) .. "|r")
+				end
 			end
 		end
 
@@ -1836,17 +2437,17 @@ local function GameTooltip_OnTooltipSetItem(tooltip)
 						end
 					end
 				elseif ShiGuangDB["ParagonDBconfig"]["tooltip_alts_enabled_shift"] and limit_shift > limit and outputFaction(faction, (limit + 1), "tooltip", (limit + 1)) then
-					tooltip:AddLine("|cff00ff00"..T.L["hold shift for more"].."|r")
+					tooltip:AddLine("|cff00ff00"..L["hold shift for more"].."|r")
 				end
-				tooltip:AddLine(" ")
+				--tooltip:AddLine(" ")
 			end
 		elseif ShiGuangDB["ParagonDBconfig"]["tooltip_alts_enabled_shift"] and limit_shift >= 1 and totalFactions == 1 then
 			if IsShiftKeyDown() then
 				tooltip:AddLine(" ")
 				if ShiGuangDB["ParagonDBconfig"]["tooltip_alts_enabled_alt"] and IsAltKeyDown() then
-					tooltip:AddLine(T.L["lowest reputation"])
+					tooltip:AddLine(L["lowest reputation"])
 				else
-					tooltip:AddLine(T.L["highest reputation"])
+					tooltip:AddLine(L["highest reputation"])
 				end
 				tooltip:AddLine(outputFaction(faction, 1, "tooltip", 1))
 
@@ -1860,11 +2461,13 @@ local function GameTooltip_OnTooltipSetItem(tooltip)
 				tooltip:AddLine(" ")
 			--else
 				--tooltip:AddLine(" ")
-				--tooltip:AddLine("|cff00ff00"..T.L["hold shift for highest reputation"].."|r")
+				--tooltip:AddLine("|cff00ff00"..L["hold shift for highest reputation"].."|r")
 			end
 		end
 	end
 end
+
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetItem)
 
 
 -- Slash Commands
@@ -1877,24 +2480,48 @@ function SlashCmdList.PARAGON(msg, editbox)
 		args = string.lower(args)
 	end
 
-	--if cmd == "config" or cmd == "cfg" or cmd == "settings" or cmd == "options" then
-		--InterfaceOptionsFrame_OpenToCategory("Paragon")
-	--else
-	if cmd == "delete" then
+	if cmd == "config" or cmd == "cfg" or cmd == "settings" or cmd == "options" then
+		Settings.OpenToCategory("Paragon")
+	elseif cmd == "delete" or cmd == "del" then
 		deleteCharacter(args, true)
 	else
 		local guildname = GetGuildInfo("player")
 
-		if T.L["shorthands"] and T.L["shorthands"][string.lower(msg)] then
-			msg = T.L["shorthands"][string.lower(msg)]
+		if L["shorthands"] and L["shorthands"][string.lower(msg)] then
+			msg = L["shorthands"][string.lower(msg)]
 		elseif guildname and msg and string.lower(msg) == string.lower(guildname) then
 			msg = "guild"
+		-- Since shorthands and guild have failed, try partial match now
+		-- Make sure no valid full faction string is given either
+		else --if not outputFaction(msg, 1, "test") then
+			msg = string.lower(msg)
+			-- Partial string match against the localized faction name strings
+			local found = false
+			for f, _ in pairs(T.faction) do
+				if L["f "..f] then
+					if L["f "..f]:lower():find(msg, nil, true) then
+						--print(format('Paragon Debug: Found "%s" as partial string in faction "%s".', msg, L["f "..f])) -- Debug
+						msg, found = L["f "..f], true
+						break
+					end
+				end
+			end
+			-- As last resort, partial string match against the shorthand strings
+			if not found and L["shorthands"] then
+				for s, f in pairs(L["shorthands"]) do
+					if s:find(msg, nil, true) then
+						--print(format('Paragon Debug: Found "%s" as partial string in shorthand "%s".', msg, s)) -- Debug
+						msg = f
+						break
+					end
+				end
+			end
 		end
 
 		if outputFaction(msg, 1, "test") then
-			outputFaction(msg, tonumber(ShiGuangDB["ParagonDBconfig"]["chat_output_limit"]), "ui")
+			outputFaction(msg, 0, "ui")
 		else
-			DEFAULT_CHAT_FRAME:AddMessage(T.L["/paragon help"])
+			DEFAULT_CHAT_FRAME:AddMessage(L["/paragon help"])
 		end
 	end
 end
@@ -1918,4 +2545,6 @@ end
 
 frame:SetScript("OnEvent", eventHandler)
 
-GameTooltip:HookScript("OnTooltipSetItem", GameTooltip_OnTooltipSetItem)
+--local category, layout = Settings.RegisterCanvasLayoutCategory(cfgFrame, cfgFrame.name)
+--Settings.RegisterAddOnCategory(category)
+--T.SettingsID = category:GetID()

@@ -119,7 +119,7 @@ function Handler:Control(spellSet)
 	table.wipe(actionMessages)
 	table.wipe(actionResetSpells)
 	for spellID, actionIndex in next, spellSet do
-		actionMessages[(GetSpellInfo(spellID))] = actionIndex
+		actionMessages[(C_Spell.GetSpellInfo(spellID))] = actionIndex
 		actionResetSpells[spellID] = true
 	end
 

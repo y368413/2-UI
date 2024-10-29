@@ -5,7 +5,6 @@ local Bar = M:GetModule("Actionbar")
 local _G = _G
 local tinsert = tinsert
 local UnitOnTaxi, TaxiRequestEarlyLanding, VehicleExit = UnitOnTaxi, TaxiRequestEarlyLanding, VehicleExit
-local cfg = R.Bars.leave_vehicle
 local padding = R.Bars.padding
 
 function Bar:UpdateVehicleButton()
@@ -23,7 +22,7 @@ function Bar:CreateLeaveVehicle()
 	local buttonList = {}
 
 	local frame = CreateFrame("Frame", "UI_ActionBarExit", UIParent, "SecureHandlerStateTemplate")
-	frame.mover = M.Mover(frame, U["LeaveVehicle"], "LeaveVehicle", {"BOTTOM", UIParent, "BOTTOM", 320, 100})
+	frame.mover = M.Mover(frame, U["LeaveVehicle"], "LeaveVehicle", {"BOTTOM", UIParent, "BOTTOM", 310, 100})
 
 	local button = CreateFrame("CheckButton", "UI_LeaveVehicleButton", frame, "ActionButtonTemplate, SecureHandlerClickTemplate")
 	tinsert(buttonList, button)
@@ -34,7 +33,7 @@ function Bar:CreateLeaveVehicle()
 	button.icon:SetDrawLayer("ARTWORK")
 	button.icon.__lockdown = true
 
-	button:SetScript("OnEnter", MainMenuBarVehicleLeaveButton_OnEnter)
+	button:SetScript("OnEnter", MainMenuBarVehicleLeaveButton.OnEnter)
 	button:SetScript("OnLeave", M.HideTooltip)
 	button:SetScript("OnClick", function(self)
 		if UnitOnTaxi("player") then TaxiRequestEarlyLanding() else VehicleExit() end
@@ -51,8 +50,4 @@ function Bar:CreateLeaveVehicle()
 
 	frame:SetAttribute("_onstate-exit", [[ if CanExitVehicle() then self:Show() else self:Hide() end ]])
 	if not CanExitVehicle() then frame:Hide() end
-
-	if cfg.fader then
-		Bar.CreateButtonFrameFader(frame, buttonList, cfg.fader)
-	end
 end

@@ -43,6 +43,10 @@ local function ReskinWAIcon(icon)
 	hooksecurefunc(icon, "SetVertexColor", UpdateIconBgAlpha)
 end
 
+local function ResetBGLevel(frame)
+	frame.bg:SetFrameLevel(0)
+end
+
 local function Skin_WeakAuras(f, fType)
 	if fType == "icon" then
 		if not f.styled then
@@ -54,6 +58,7 @@ local function Skin_WeakAuras(f, fType)
 			f.bg = M.SetBD(f.bar, 0)
 			f.bg:SetFrameLevel(0)
 			ReskinWAIcon(f.icon)
+			hooksecurefunc(f, "SetFrameStrata", ResetBGLevel)
 			f.styled = true
 		end
 
@@ -64,36 +69,19 @@ end
 local function ReskinWA()
 	if not R.db["Skins"]["WeakAuras"] then return end
 
-	local regionTypes = WeakAuras.regionTypes
-	local Create_Icon, Modify_Icon = regionTypes.icon.create, regionTypes.icon.modify
-	local Create_AuraBar, Modify_AuraBar = regionTypes.aurabar.create, regionTypes.aurabar.modify
-
-	regionTypes.icon.create = function(parent, data)
-		local region = Create_Icon(parent, data)
-		Skin_WeakAuras(region, "icon")
-		return region
+	if not WeakAuras or not WeakAuras.Private then
+		return
 	end
 
-	regionTypes.aurabar.create = function(parent)
-		local region = Create_AuraBar(parent)
-		Skin_WeakAuras(region, "aurabar")
-		return region
-	end
-
-	regionTypes.icon.modify = function(parent, region, data)
-		Modify_Icon(parent, region, data)
-		Skin_WeakAuras(region, "icon")
-	end
-
-	regionTypes.aurabar.modify = function(parent, region, data)
-		Modify_AuraBar(parent, region, data)
-		Skin_WeakAuras(region, "aurabar")
-	end
-
-	for _, regions in pairs(WeakAuras.regions) do
-		if regions.regionType == "icon" or regions.regionType == "aurabar" then
-			Skin_WeakAuras(regions.region, regions.regionType)
+	if WeakAuras.Private.regionPrototype then
+		local function OnPrototypeCreate(region)
+			Skin_WeakAuras(region, region.regionType)
 		end
+		local function OnPrototypeModifyFinish(_, region)
+			Skin_WeakAuras(region, region.regionType)
+		end
+		hooksecurefunc(WeakAuras.Private.regionPrototype, "create", OnPrototypeCreate)
+		hooksecurefunc(WeakAuras.Private.regionPrototype, "modifyFinish", OnPrototypeModifyFinish)
 	end
 end
 

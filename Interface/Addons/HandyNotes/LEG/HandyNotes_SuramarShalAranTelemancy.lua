@@ -89,7 +89,7 @@ local IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
 local LH = LibStub("AceLocale-3.0"):GetLocale("HandyNotes", false)
 local AceDB = LibStub("AceDB-3.0")
 -- UIDropDownMenu
-local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
+--local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
 
 local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes")
 local addon = LibStub("AceAddon-3.0"):NewAddon(SuramarShalAranTelemancy.addon_name, "AceEvent-3.0")
@@ -206,7 +206,7 @@ local function hideNode(button, uMapID, coord)
 end
 
 local function closeAllDropdowns()
-	LibDD:CloseDropDownMenus(1)
+	CloseDropDownMenus(1)
 end
 
 local function addTomTomWaypoint(button, uMapID, coord)
@@ -228,42 +228,42 @@ do
 		if (not level) then return end
 		if (level == 1) then
 			-- Create the title of the menu
-			info = LibDD:UIDropDownMenu_CreateInfo()
+			info = UIDropDownMenu_CreateInfo()
 			info.isTitle 		= true
 			info.text 		= "HandyNotes - " ..addon.pluginName
 			info.notCheckable 	= true
-			LibDD:UIDropDownMenu_AddButton(info, level)
+			UIDropDownMenu_AddButton(info, level)
 
 			if TomTom then
 				-- Waypoint menu item
-				info = LibDD:UIDropDownMenu_CreateInfo()
+				info = UIDropDownMenu_CreateInfo()
 				info.text = LH["Add this location to TomTom waypoints"]
 				info.notCheckable = true
 				info.func = addTomTomWaypoint
 				info.arg1 = currentMapID
 				info.arg2 = currentCoord
-				LibDD:UIDropDownMenu_AddButton(info, level)
+				UIDropDownMenu_AddButton(info, level)
 			end
 
 			-- Hide menu item
-			info = LibDD:UIDropDownMenu_CreateInfo()
+			info = UIDropDownMenu_CreateInfo()
 			info.text		= HIDE 
 			info.notCheckable 	= true
 			info.func		= hideNode
 			info.arg1		= currentMapID
 			info.arg2		= currentCoord
-			LibDD:UIDropDownMenu_AddButton(info, level)
+			UIDropDownMenu_AddButton(info, level)
 
 			-- Close menu item
-			info = LibDD:UIDropDownMenu_CreateInfo()
+			info = UIDropDownMenu_CreateInfo()
 			info.text		= CLOSE
 			info.func		= closeAllDropdowns
 			info.notCheckable 	= true
-			LibDD:UIDropDownMenu_AddButton(info, level)
+			UIDropDownMenu_AddButton(info, level)
 		end
 	end
 	--local HL_Dropdown = CreateFrame("Frame", SuramarShalAranTelemancy.addon_name.."DropdownMenu")
-	local HL_Dropdown = LibDD:Create_UIDropDownMenu(SuramarShalAranTelemancy.addon_name.."DropdownMenu")
+	local HL_Dropdown = Create_UIDropDownMenu(SuramarShalAranTelemancy.addon_name.."DropdownMenu")
 	HL_Dropdown.displayMode = "MENU"
 	HL_Dropdown.initialize = generateMenu
 
@@ -271,7 +271,7 @@ do
 		if (button == "RightButton" and not down) then
 			currentMapID = uMapID
 			currentCoord = coord
-			LibDD:ToggleDropDownMenu(1, nil, HL_Dropdown, self, 0, 0)
+			ToggleDropDownMenu(1, nil, HL_Dropdown, self, 0, 0)
 		end
 	end
 end

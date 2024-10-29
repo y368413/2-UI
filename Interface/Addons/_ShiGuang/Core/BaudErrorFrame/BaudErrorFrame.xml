@@ -7,12 +7,12 @@
 		<Anchors>
 			<Anchor point="LEFT">
 				<Offset>
-					<AbsDimension x="13" y="0"/>
+					<AbsDimension x="13"/>
 				</Offset>
 			</Anchor>
 			<Anchor point="RIGHT">
 				<Offset>
-					<AbsDimension x="-13" y="0"/>
+					<AbsDimension x="-13"/>
 				</Offset>
 			</Anchor>
 		</Anchors>
@@ -27,7 +27,7 @@
 			</OnClick>
 		</Scripts>
 	</Button>
-	<Button name="BaudErrorFrameMinimapButton" frameStrata="DIALOG" parent="UIParent" movable="true" hidden="true" inherits="MiniMapButtonTemplate">
+	<Button name="BaudErrorFrameMinimapButton" frameStrata="DIALOG" parent="UIParent" movable="true" hidden="true">
 		<Size>
 			<AbsDimension x="21" y="21"/>
 		</Size>
@@ -55,7 +55,7 @@
 					<Anchors>
 						<Anchor point="CENTER" relativeTo="$parentIcon">
 							<Offset>
-								<AbsDimension x="0" y="1"/>
+								<AbsDimension y="1"/>
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -100,7 +100,7 @@
 					<Anchors>
 						<Anchor point="TOP">
 							<Offset>
-								<AbsDimension x="0" y="5"/>
+								<AbsDimension y="5"/>
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -109,7 +109,7 @@
 					<Anchors>
 						<Anchor point="TOP" relativeTo="$parentHeader">
 							<Offset>
-								<AbsDimension x="0" y="-14"/>
+								<AbsDimension y="-14"/>
 							</Offset>
 						</Anchor>
 					</Anchors>

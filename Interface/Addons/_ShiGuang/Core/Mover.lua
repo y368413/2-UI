@@ -31,6 +31,27 @@ function M:RestoreMF()
 	end
 end
 
+function M:UpdateBlizzFrame()
+	if InCombatLockdown() then return end
+	if self.isRestoring then return end
+	self.isRestoring = true
+	M.RestoreMF(self)
+	self.isRestoring = nil
+end
+
+function M:RestoreBlizzFrame()
+	if IsControlKeyDown() then
+		R.db["TempAnchor"][self:GetName()] = nil
+		UpdateUIPanelPositions(self)
+	end
+end
+
+function M:BlizzFrameMover(frame)
+	M.CreateMF(frame, nil, true)
+	hooksecurefunc(frame, "SetPoint", M.UpdateBlizzFrame)
+	frame:HookScript("OnMouseUp", M.RestoreBlizzFrame)
+end
+
 -- Frame Mover
 local MoverList, f = {}
 local updater
@@ -362,4 +383,58 @@ function MISC:OnLogin()
 	updater:SetScript("OnUpdate", function()
 		MISC.UpdateTrimFrame(updater.__owner)
 	end)
+
+	MISC:DisableBlizzardMover()
+end
+
+-- Disable blizzard edit mode
+local function isUnitFrameEnable()
+	return R.db["UFs"]["Enable"]
+end
+
+local function isBuffEnable()
+	return R.db["Auras"]["BuffFrame"] or R.db["Auras"]["HideBlizBuff"]
+end
+
+local function isActionbarEnable()
+	return R.db["Actionbar"]["Enable"]
+end
+
+local function isCastbarEnable()
+	return R.db["UFs"]["Enable"] and R.db["UFs"]["Castbars"]
+end
+
+local function isPartyEnable()
+	return R.db["UFs"]["RaidFrame"] and R.db["UFs"]["PartyFrame"]
+end
+
+local function isRaidEnable()
+	return R.db["UFs"]["RaidFrame"]
+end
+
+local function isArenaEnable()
+	return R.db["UFs"]["Enable"] and R.db["UFs"]["Arena"]
+end
+
+function MISC:DisableBlizzardMover()
+	local editMode = _G.EditModeManagerFrame
+
+	-- account settings will be tainted
+	local mixin = editMode.AccountSettings
+	if isCastbarEnable() then mixin.RefreshCastBar = M.Dummy end
+	if isBuffEnable() then mixin.RefreshBuffsAndDebuffs = M.Dummy end
+	if isRaidEnable() then mixin.RefreshRaidFrames = M.Dummy end
+	if isArenaEnable() then mixin.RefreshArenaFrames = M.Dummy end
+	if isPartyEnable() then mixin.RefreshPartyFrames = M.Dummy end
+	if isUnitFrameEnable() then
+		mixin.RefreshTargetAndFocus = M.Dummy
+		mixin.RefreshBossFrames = M.Dummy
+	end
+	if isActionbarEnable() then
+		mixin.RefreshPetFrame = M.Dummy
+		mixin.RefreshEncounterBar = M.Dummy
+		mixin.RefreshActionBarShown = M.Dummy
+		mixin.RefreshVehicleLeaveButton = M.Dummy
+		mixin.ResetActionBarShown = M.Dummy
+	end
 end

@@ -5,7 +5,7 @@ local cr, cg, cb = I.r, I.g, I.b
 
 local _G = _G
 local pairs, ipairs, strsub, strlower = pairs, ipairs, string.sub, string.lower
-local IsInGroup, IsInRaid, IsPartyLFG, IsInGuild, IsShiftKeyDown, IsControlKeyDown = IsInGroup, IsInRaid, IsPartyLFG, IsInGuild, IsShiftKeyDown, IsControlKeyDown
+local IsInGroup, IsInRaid, IsInGuild, IsShiftKeyDown, IsControlKeyDown = IsInGroup, IsInRaid, IsInGuild, IsShiftKeyDown, IsControlKeyDown
 local ChatEdit_UpdateHeader, GetCVar, SetCVar, Ambiguate, GetTime = ChatEdit_UpdateHeader, GetCVar, SetCVar, Ambiguate, GetTime
 local GetNumGuildMembers, GetGuildRosterInfo, IsGuildMember, UnitIsGroupLeader, UnitIsGroupAssistant = GetNumGuildMembers, GetGuildRosterInfo, IsGuildMember, UnitIsGroupLeader, UnitIsGroupAssistant
 local CanCooperateWithGameAccount, BNInviteFriend, PlaySound = CanCooperateWithGameAccount, BNInviteFriend, PlaySound
@@ -22,6 +22,16 @@ module.MuteCache = {}
 function module:TabSetAlpha(alpha)
 	if self.glow:IsShown() and alpha ~= 1 then
 		self:SetAlpha(1)
+	end
+end
+
+local function updateChatAnchor(self, _, _, _, x, y)
+	if not R.db["Chat"]["Lock"] then return end
+	if not (x == 0 and y == 21) then
+		self:ClearAllPoints()
+		self:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 21)
+		self:SetWidth(R.db["Chat"]["ChatWidth"])
+		self:SetHeight(R.db["Chat"]["ChatHeight"])
 	end
 end
 
@@ -80,8 +90,14 @@ local function UpdateEditBoxAnchor(eb)
 	end
 end
 
+local function UpdateEditboxFont(editbox)
+	editbox:SetFont(I.Font[1], R.db["Chat"]["EditFont"], "")
+	editbox.header:SetFont(I.Font[1], R.db["Chat"]["EditFont"], "")
+end
+
 function module:ToggleEditBoxAnchor()
 	for _, eb in pairs(chatEditboxes) do
+		UpdateEditboxFont(eb)
 		UpdateEditBoxAnchor(eb)
 	end
 end
@@ -92,13 +108,11 @@ function module:SkinChat()
 	local name = self:GetName()
 	local fontStyle, fontSize, _= self:GetFont()
 	--self:SetClampRectInsets(0, 0, 0, 0)
-	self:SetMaxResize(I.ScreenWidth, I.ScreenHeight)
-	self:SetMinResize(120, 60)
 	if R.db["Chat"]["Outline"] then
 	  self:SetFont(fontFile or fontStyle, fontSize, "OUTLINE")
 	  self:SetShadowColor(0, 0, 0, 0)
 	else
-	  self:SetFont(fontFile or fontStyle, fontSize)
+	  self:SetFont(fontFile or fontStyle, fontSize, "")
 	  --self:SetShadowOffset(1, -1)
 	end
 	self:SetClampRectInsets(0, 0, 0, 0)
@@ -117,6 +131,7 @@ function module:SkinChat()
 	UpdateEditBoxAnchor(eb)
 	M.StripTextures(eb, 2)
 	M.SetBD(eb)
+	UpdateEditboxFont(eb)
 	tinsert(chatEditboxes, eb)
 
 	local lang = _G[name.."EditBoxLanguage"]
@@ -133,11 +148,18 @@ function module:SkinChat()
 	hooksecurefunc(tab, "SetAlpha", module.TabSetAlpha)
 
 	M.HideObject(self.buttonFrame)
-	M.HideObject(self.ScrollBar)
-	M.HideObject(self.ScrollToBottomButton)
 	module:ToggleChatFrameTextures(self)
 
 	self.oldAlpha = self.oldAlpha or 0 -- fix blizz error
+
+	self:HookScript("OnMouseWheel", module.QuickMouseScroll)
+
+	if self == GeneralDockManager.primary then
+		local messageFrame = CommunitiesFrame and CommunitiesFrame.Chat and CommunitiesFrame.Chat.MessageFrame
+		if messageFrame then
+			messageFrame:SetFont(fontFile or font, fontSize, fontOutline)
+		end
+	end
 
 	self.styled = true
 end
@@ -170,7 +192,7 @@ local cycles = {
 	{ chatType = "SAY", IsActive = function() return true end },
 	{ chatType = "PARTY", IsActive = function() return IsInGroup() end },
 	{ chatType = "RAID", IsActive = function() return IsInRaid() end },
-	{ chatType = "INSTANCE_CHAT", IsActive = function() return IsPartyLFG() end },
+	{ chatType = "INSTANCE_CHAT", IsActive = function() return IsPartyLFG() or C_PartyInfo.IsPartyWalkIn() end },
 	{ chatType = "GUILD", IsActive = function() return IsInGuild() end },
 	{ chatType = "OFFICER", IsActive = function() return C_GuildInfo_IsGuildOfficer() end },
 	{ chatType = "CHANNEL", IsActive = function(_, editbox)
@@ -227,7 +249,7 @@ local chatScrollInfo = {
 }
 
 function module:QuickMouseScroll(dir)
-	if not MaoRUIDB["Help"]["ChatScroll"] then
+	if not MaoRUISetDB["Help"]["ChatScroll"] then
 		HelpTip:Show(ChatFrame1, chatScrollInfo)
 	end
 
@@ -247,7 +269,6 @@ function module:QuickMouseScroll(dir)
 		end
 	end
 end
-hooksecurefunc("FloatingChatFrame_OnMouseScroll", module.QuickMouseScroll)
 
 -- Autoinvite by whisper
 local whisperList = {}
@@ -425,17 +446,11 @@ function module:OnLogin()
 	hooksecurefunc("FloatingChatFrame_OnEvent", module.UpdateTabEventColors)
 	hooksecurefunc("ChatFrame_MessageEventHandler", module.PlayWhisperSound)
 
-	-- Font size
-	for i = 1, 15 do
-		CHAT_FONT_HEIGHTS[i] = i + 9
-	end
-
 	-- Default
 	if CHAT_OPTIONS then CHAT_OPTIONS.HIDE_FRAME_ALERTS = true end -- only flash whisper
 	SetCVar("chatStyle", "classic")
 	SetCVar("chatMouseScroll", 1) -- enable mousescroll
 	--SetCVar("whisperMode", "inline") -- blizz reset this on NPE
-	M.HideOption(InterfaceOptionsSocialPanelChatStyle)
 	CombatLogQuickButtonFrame_CustomTexture:SetTexture(nil)
 
 	-- Add Elements
@@ -452,11 +467,27 @@ function module:OnLogin()
 	if R.db["Chat"]["Lock"] then
 		module:UpdateChatSize()
 		M:RegisterEvent("UI_SCALE_CHANGED", module.UpdateChatSize)
-		if I.isNewPatch then
-			hooksecurefunc(ChatFrame1, "SetPoint", updateChatAnchor)
-		else
-			hooksecurefunc("FCF_SavePositionAndDimensions", module.UpdateChatSize)
-			FCF_SavePositionAndDimensions(ChatFrame1)
+		hooksecurefunc(ChatFrame1, "SetPoint", updateChatAnchor)
+		FCF_SavePositionAndDimensions(ChatFrame1)
+	end
+
+	-- Extra elements in chat tab menu
+	do
+		-- Font size
+		local function IsSelected(height)
+			local _, fontHeight = FCF_GetCurrentChatFrame():GetFont()
+			return height == floor(fontHeight + .5)
 		end
+
+		local function SetSelected(height)
+			FCF_SetChatWindowFontSize(nil, FCF_GetChatFrameByID(CURRENT_CHAT_FRAME_ID), height)
+		end
+
+		Menu.ModifyMenu("MENU_FCF_TAB", function(self, rootDescription, data)
+			local fontSizeSubmenu = rootDescription:CreateButton(I.InfoColor..U["MoreFontSize"])
+			for i = 10, 30 do
+				fontSizeSubmenu:CreateRadio((format(FONT_SIZE_TEMPLATE, i)), IsSelected, SetSelected, i)
+			end
+		end)
 	end
 end

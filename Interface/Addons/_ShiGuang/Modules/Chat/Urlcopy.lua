@@ -6,10 +6,9 @@ local strfind, strmatch, strsub, gsub = string.find, string.match, string.sub, s
 local strsplit, strlen = string.split, string.len
 
 local IsModifierKeyDown, IsAltKeyDown, IsControlKeyDown, IsModifiedClick = IsModifierKeyDown, IsAltKeyDown, IsControlKeyDown, IsModifiedClick
-local GuildInvite, BNInviteFriend = GuildInvite, BNInviteFriend
+local BNInviteFriend = BNInviteFriend
 local CanCooperateWithGameAccount = CanCooperateWithGameAccount
 local C_BattleNet_GetAccountInfoByID = C_BattleNet.GetAccountInfoByID
-local InviteToGroup = C_PartyInfo.InviteUnit
 
 local foundurl = false
 
@@ -64,10 +63,10 @@ function module:HyperlinkShowHook(link, _, button)
 		if type == "player" then
 			local unit = strmatch(value, "([^:]+)")
 			if IsAltKeyDown() then
-				InviteToGroup(unit)
+				C_PartyInfo.InviteUnit(unit)
 				hide = true
 			elseif IsControlKeyDown() then
-				GuildInvite(unit)
+				C_GuildInfo.Invite(unit)
 				hide = true
 			end
 		elseif type == "BNplayer" then
@@ -84,8 +83,17 @@ function module:HyperlinkShowHook(link, _, button)
 				elseif IsControlKeyDown() then
 					local charName = gameAccountInfo.characterName
 					local realmName = gameAccountInfo.realmName
-					GuildInvite(charName.."-"..realmName)
+					C_GuildInfo.Invite(charName.."-"..realmName)
 					hide = true
+				end
+			end
+		elseif type == "worldmap" then
+			local waypoint = C_Map.GetUserWaypointHyperlink()
+			if waypoint then
+				if ChatEdit_GetActiveWindow() then
+					ChatEdit_InsertLink(waypoint)
+				else
+					ChatFrame_OpenChat(waypoint)
 				end
 			end
 		end
@@ -123,12 +131,8 @@ function module.SetItemRefHook(link, _, button)
 					MailFrameTab_OnClick(nil, 2)
 					SendMailNameEditBox:SetText(name)
 					SendMailNameEditBox:HighlightText()
-				else
-					local editBox = ChatEdit_ChooseBoxForSend()
-					local hasText = (editBox:GetText() ~= "")
-					ChatEdit_ActivateChat(editBox)
-					editBox:Insert(name)
-					if not hasText then editBox:HighlightText() end
+				elseif ChatEdit_GetActiveWindow() then
+					ChatEdit_InsertLink(name)
 				end
 			end
 		end

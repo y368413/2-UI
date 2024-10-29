@@ -42,6 +42,10 @@ local Private = oUF.Private
 
 local unitExists = Private.unitExists
 
+local READY_CHECK_READY_TEXTURE = "UI-LFG-ReadyMark"
+local READY_CHECK_NOT_READY_TEXTURE = "UI-LFG-DeclineMark"
+local READY_CHECK_WAITING_TEXTURE = "UI-LFG-PendingMark"
+
 local function OnFinished(self)
 	local element = self:GetParent()
 	element:Hide()
@@ -72,11 +76,11 @@ local function Update(self, event)
 	local status = GetReadyCheckStatus(unit)
 	if(unitExists(unit) and status) then
 		if(status == 'ready') then
-			element:SetTexture(element.readyTexture)
+			element:SetAtlas(element.readyTexture)
 		elseif(status == 'notready') then
-			element:SetTexture(element.notReadyTexture)
+			element:SetAtlas(element.notReadyTexture)
 		else
-			element:SetTexture(element.waitingTexture)
+			element:SetAtlas(element.waitingTexture)
 		end
 
 		element.status = status
@@ -127,9 +131,9 @@ local function Enable(self, unit)
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
 
-		element.readyTexture = element.readyTexture or _G.READY_CHECK_READY_TEXTURE
-		element.notReadyTexture = element.notReadyTexture or _G.READY_CHECK_NOT_READY_TEXTURE
-		element.waitingTexture = element.waitingTexture or _G.READY_CHECK_WAITING_TEXTURE
+		element.readyTexture = element.readyTexture or READY_CHECK_READY_TEXTURE
+		element.notReadyTexture = element.notReadyTexture or READY_CHECK_NOT_READY_TEXTURE
+		element.waitingTexture = element.waitingTexture or READY_CHECK_WAITING_TEXTURE
 
 		local AnimationGroup = element:CreateAnimationGroup()
 		AnimationGroup:HookScript('OnFinished', OnFinished)

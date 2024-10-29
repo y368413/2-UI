@@ -5,21 +5,33 @@ local bit_band, bit_bor = bit.band, bit.bor
 local COMBATLOG_OBJECT_AFFILIATION_MINE = COMBATLOG_OBJECT_AFFILIATION_MINE or 0x00000001
 local GetSpecialization, GetSpecializationInfo = GetSpecialization, GetSpecializationInfo
 
-I.Version = GetAddOnMetadata("_ShiGuang", "Version")
-I.Support = GetAddOnMetadata("_ShiGuang", "X-Support")
+I.Version = C_AddOns.GetAddOnMetadata("_ShiGuang", "Version")
+I.Support = C_AddOns.GetAddOnMetadata("_ShiGuang", "X-Support")
 I.Client = GetLocale()
 I.ScreenWidth, I.ScreenHeight = GetPhysicalScreenSize()
-I.isNewPatch = select(4, GetBuildInfo()) >= 100000 -- 10.0
+I.isNewPatch = select(4, GetBuildInfo()) >= 110005 -- 11.0.5
+I.isWW = select(4, GetBuildInfo()) >= 110000 -- 11.0.0
 
 -- Deprecated
-LE_ITEM_QUALITY_POOR = Enum.ItemQuality.Poor
-LE_ITEM_QUALITY_COMMON = Enum.ItemQuality.Common
-LE_ITEM_QUALITY_UNCOMMON = Enum.ItemQuality.Uncommon
-LE_ITEM_QUALITY_RARE = Enum.ItemQuality.Rare
-LE_ITEM_QUALITY_EPIC = Enum.ItemQuality.Epic
-LE_ITEM_QUALITY_LEGENDARY = Enum.ItemQuality.Legendary
-LE_ITEM_QUALITY_ARTIFACT = Enum.ItemQuality.Artifact
-LE_ITEM_QUALITY_HEIRLOOM = Enum.ItemQuality.Heirloom
+if I.isWW then -- FIXME
+	local function EasyMenu_Initialize( frame, level, menuList )
+		for index = 1, #menuList do
+			local value = menuList[index]
+			if (value.text) then
+				value.index = index
+				UIDropDownMenu_AddButton( value, level )
+			end
+		end
+	end
+	
+	function EasyMenu(menuList, menuFrame, anchor, x, y, displayMode, autoHideDelay )
+		if ( displayMode == "MENU" ) then
+			menuFrame.displayMode = displayMode
+		end
+		UIDropDownMenu_Initialize(menuFrame, EasyMenu_Initialize, displayMode, nil, menuList)
+		ToggleDropDownMenu(1, nil, menuFrame, anchor, x, y, menuList, nil, autoHideDelay)
+	end
+end
 
 -- Colors
 I.MyName = UnitName("player")
@@ -53,8 +65,8 @@ for index, value in pairs(qualityColors) do
 	I.QualityColors[index] = {r = value.r, g = value.g, b = value.b}
 end
 I.QualityColors[-1] = {r = 0, g = 0, b = 0}
-I.QualityColors[LE_ITEM_QUALITY_POOR] = {r = .61, g = .61, b = .61}
-I.QualityColors[LE_ITEM_QUALITY_COMMON] = {r = 0, g = 0, b = 0}
+I.QualityColors[Enum.ItemQuality.Poor] = {r = COMMON_GRAY_COLOR.r, g = COMMON_GRAY_COLOR.g, b = COMMON_GRAY_COLOR.b}
+I.QualityColors[Enum.ItemQuality.Common] = {r = 0, g = 0, b = 0}
 I.QualityColors[99] = {r = 1, g = 0, b = 0}
 
 -- Fonts
@@ -65,25 +77,25 @@ I.UIString = "|cff0080ff*|r"
 -- Textures
 local Media = "Interface\\Addons\\_ShiGuang\\Media\\"
 I.bdTex = "Interface\\ChatFrame\\ChatFrameBackground"
-I.blankTex = Media.."blankTex"
 I.glowTex = Media.."glowTex"
 I.normTex = Media.."normTex"
 I.gradTex = Media.."gradTex"
 I.flatTex = Media.."flatTex"
 I.bgTex = Media.."bgTex"
+I.pushedTex = Media.."pushed"
 I.arrowTex = Media.."Modules\\Raid\\Arrow"  --"Interface\\BUTTONS\\UI-MicroStream-Red.blp"
 I.starTex = Media.."Hutu\\star"
+I.flagTex = Media.."Hutu\\flag"
 I.MicroTex = Media.."Hutu\\"
-I.rolesTex = Media.."Hutu\\RoleIcons"  --UI-LFG-ICON-ROLES
-I.tankTex = Media.."Hutu\\Tank"
-I.healTex = Media.."Hutu\\Healer"
-I.dpsTex = Media.."Hutu\\DPS"
 I.chatLogo = Media.."2UI.blp"
 I.logoTex = Media.."2UI.blp"
 I.closeTex = Media.."Hutu\\close"
 I.ArrowUp = Media.."Modules\\Raid\\ArrowLarge"
 I.afdianTex = Media.."Hutu\\Afdian"
 I.patreonTex = Media.."Hutu\\Patreon"
+I.sponsorTex = Media.."Hutu\\Sponsor"
+I.curseforgeTex = Media.."Hutu\\CURSEFORGE"
+I.boxTex = Media.."Hutu\\Box"
 I.mailTex = "Interface\\Minimap\\Tracking\\Mailbox"
 I.gearTex = "Interface\\WorldMap\\Gear_64"
 I.eyeTex = "Interface\\Minimap\\Raid_Icon"		-- blue: \\Dungeon_Icon
@@ -96,11 +108,6 @@ I.creditTex = "Interface\\HelpFrame\\HelpIcon-KnowledgeBase"
 I.newItemFlash = "Interface\\Cooldown\\star4"
 I.sparkTex = "Interface\\CastingBar\\UI-CastingBar-Spark"
 I.TexCoord = {.08, .92, .08, .92}
-I.textures = {
-	normal		= Media.."ActionBar\\gloss",
-	flash		= Media.."ActionBar\\flash",
-	pushed		= Media.."ActionBar\\pushed",
-}
 I.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
 I.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:410|t "
 I.ScrollButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:127:204|t "
@@ -137,12 +144,15 @@ M:RegisterEvent("PLAYER_TALENT_UPDATE", CheckRole)
 -- Raidbuff Checklist
 I.BuffList = {
 	[1] = {		-- 合剂
-		307166,	-- 大锅
-		307185,	-- 通用合剂
-		307187,	-- 耐力合剂
+		431971,	-- 淬火侵攻合剂
+		431972,	-- 淬火矫健合剂
+		431973,	-- 淬火全能合剂
+		431974,	-- 淬火精通合剂
+		432021,	-- 炼金混沌合剂
 	},
-	[2] = {     -- 进食充分
-		104273, -- 250敏捷，BUFF名一致
+	[2] = {     -- 食物
+		104273, -- 进食充分
+		462210, -- 丰盛进食充分
 	},
 	[3] = {     -- 10%智力
 		1459,
@@ -157,13 +167,30 @@ I.BuffList = {
 		264761,
 	},
 	[6] = {     -- 符文
-		270058,
+		453250, -- 晶化强化符文
 	},
 }
 
 -- Reminder Buffs Checklist
 I.ReminderBuffs = {
 	ITEMS = {
+		{	itemID = 190384, -- 9.0永久属性符文
+			spells = {
+				[393438] = true, -- 巨龙强化符文 itemID 201325
+				[367405] = true, -- 永久符文buff
+			},
+			instance = true,
+			disable = true, -- 禁用直到出了新符文
+		},
+		{	itemID = 194307, -- 巢穴守护者的诺言
+			spells = {
+				[394457] = true,
+			},
+			equip = true,
+			instance = true,
+			inGroup = true,
+		},
+		--[=[
 		{	itemID = 178742, -- 瓶装毒素饰品
 			spells = {
 				[345545] = true,
@@ -171,13 +198,6 @@ I.ReminderBuffs = {
 			equip = true,
 			instance = true,
 			combat = true,
-		},
-		{	itemID = 190384, -- 9.0永久属性符文
-			spells = {
-				[347901] = true, -- 普通符文buff
-				[367405] = true, -- 永久符文buff
-			},
-			instance = true,
 		},
 		{	itemID = 190958, -- 究极秘术
 			spells = {
@@ -187,6 +207,7 @@ I.ReminderBuffs = {
 			instance = true,
 			inGroup = true,
 		},
+		]=]
 	},
 	MAGE = {
 		{	spells = {	-- 奥术魔宠
@@ -225,6 +246,7 @@ I.ReminderBuffs = {
 		{	spells = {
 				[192106] = true,	-- 闪电之盾
 				[974] = true,		-- 大地之盾
+				[383648] = true,	-- 大地之盾
 				[52127] = true,		-- 水之护盾
 			},
 			depend = 192106,
@@ -252,12 +274,19 @@ I.ReminderBuffs = {
 			weaponIndex = 2,
 			spec = 2,
 		},
+		{	spells = {	-- 天怒
+				[462854] = true,
+			},
+			depend = 462854,
+			instance = true,
+		},
 	},
 	ROGUE = {
 		{	spells = {	-- 伤害类毒药
 				[2823] = true,		-- 致命药膏
 				[8679] = true,		-- 致伤药膏
 				[315584] = true,	-- 速效药膏
+				[381664] = true,	-- 增效药膏
 			},
 			texture = 132273,
 			depend = 315584,
@@ -268,9 +297,26 @@ I.ReminderBuffs = {
 		{	spells = {	-- 效果类毒药
 				[3408] = true,		-- 减速药膏
 				[5761] = true,		-- 迟钝药膏
+				[381637] = true,	-- 萎缩药膏
 			},
 			depend = 3408,
 			pvp = true,
+		},
+	},
+	EVOKER = {
+		{	spells = {	-- 青铜龙的祝福
+				[381748] = true,
+			},
+			depend = 364342,
+			instance = true,
+		},
+	},
+	DRUID = {
+		{	spells = {	-- 野性印记
+				[1126] = true,
+			},
+			depend = 1126,
+			instance = true,
 		},
 	},
 }

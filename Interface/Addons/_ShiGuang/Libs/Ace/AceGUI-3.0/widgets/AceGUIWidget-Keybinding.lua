@@ -1,4 +1,7 @@
-
+--[[-----------------------------------------------------------------------------
+Keybinding Widget
+Set Keybindings in the Config UI.
+-------------------------------------------------------------------------------]]
 local Type, Version = "Keybinding", 26
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
@@ -10,6 +13,9 @@ local pairs = pairs
 local IsShiftKeyDown, IsControlKeyDown, IsAltKeyDown = IsShiftKeyDown, IsControlKeyDown, IsAltKeyDown
 local CreateFrame, UIParent = CreateFrame, UIParent
 
+--[[-----------------------------------------------------------------------------
+Scripts
+-------------------------------------------------------------------------------]]
 
 local function Control_OnEnter(frame)
 	frame.obj:Fire("OnEnter")
@@ -100,6 +106,9 @@ local function Keybinding_OnMouseWheel(frame, direction)
 	Keybinding_OnKeyDown(frame, button)
 end
 
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 local methods = {
 	["OnAcquire"] = function(self)
 		self:SetWidth(200)
@@ -155,6 +164,9 @@ local methods = {
 	end,
 }
 
+--[[-----------------------------------------------------------------------------
+Constructor
+-------------------------------------------------------------------------------]]
 
 local ControlBackdrop  = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -198,7 +210,7 @@ local function Constructor()
 	label:SetJustifyH("CENTER")
 	label:SetHeight(18)
 
-	local msgframe = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate" or nil)
+	local msgframe = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
 	msgframe:SetHeight(30)
 	msgframe:SetBackdrop(ControlBackdrop)
 	msgframe:SetBackdropColor(0,0,0)
@@ -207,7 +219,7 @@ local function Constructor()
 	msgframe:SetToplevel(true)
 
 	local msg = msgframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	msg:SetText("Press a key to bind, ESC to clear the binding or click the button again to cancel.")
+	msg:SetText("按任意键进行按键绑定，按ESC键清除绑定或再次点击按钮取消绑定。")
 	msgframe.msg = msg
 	msg:SetPoint("TOPLEFT", 5, -5)
 	msgframe:SetScript("OnUpdate", keybindingMsgFixWidth)

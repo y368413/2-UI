@@ -574,7 +574,7 @@ function PhotoRobot.CreateConfig()
 	PhotoRobot.testFont2:SetText("4.9")
 	PhotoRobot.testFont2:SetTextColor(PhotoRobot.db.PhotoRobotr, PhotoRobot.db.PhotoRobotg, PhotoRobot.db.PhotoRobotb, PhotoRobot.db.a)
 	
-	PhotoRobot.colorButton = CreateFrame("Button", nil, p1, "OptionsCheckButtonTemplate")
+	PhotoRobot.colorButton = CreateFrame("Button", nil, p1, "OptionsBaseCheckButtonTemplate")
 	local frame = PhotoRobot.colorButton
 	frame:SetPoint("TOPLEFT", PhotoRobot.dropdown1, "BOTTOMLEFT", 20, -10)
 	frame:SetHighlightTexture("Interface\\Buttons\\CheckButtonHilight")
@@ -1081,7 +1081,7 @@ function PhotoRobot.CheckAuras(unit)
 	local auCheck = PhotoRobot.ListAuras(unit)
 
 	for idx, spellID in ipairs(PhotoRobot.spellDB) do
-		local spell = GetSpellInfo(spellID)
+		local spell = C_Spell.GetSpellInfo(spellID)
 		if (spell ~= nil) then
 			--print("checking aura " .. spellID .. " on " .. unit)
 			for i = 1, #auCheck do						
@@ -1178,7 +1178,7 @@ function PhotoRobot.CompareSpells(t1, t2)
 	--print("Comparing "..t1.spell.." and "..t2.spell)
 	for i, sp in ipairs(PhotoRobot.spellDB)
 	do
-		local spell = GetSpellInfo(sp)
+		local spell = C_Spell.GetSpellInfo(sp)
 		if (spell == t1.spell) then
 			--print(sp.." won!")
 			return false

@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 local S = M:RegisterModule("Skins")
 
 local pairs, wipe = pairs, wipe
-local IsAddOnLoaded = IsAddOnLoaded
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 
 R.defaultThemes = {}
 R.themes = {}
@@ -68,8 +68,9 @@ function S:OnLogin()
 	self:LoadAddOnSkins()
 	-- Add Skins
 	self:DBMSkin()
-	--self:PGFSkin()
+	self:PGFSkin()
 	--self:ReskinRematch()
+	self:OtherSkins()
 	self:LootEx()		-- 拾取增强
 	-- Register skin
 	local media = LibStub and LibStub("LibSharedMedia-3.0", true)

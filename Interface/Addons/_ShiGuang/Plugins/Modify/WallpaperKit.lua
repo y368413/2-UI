@@ -14,17 +14,6 @@ WallpaperKitcfg.color = {class = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[sele
 WallpaperKitcfg.playermodel = {animation = 4, rotation = -21, camdistance = 1.5, pos = { Y = 1, Z = -0.1, },}  -- PLAYER MODEL SETTING  动画 、旋转、缩放 、位置
 WallpaperKitcfg.petmodel = {rotation = 45, camdistance = 1.8, pos = { Y = -3.8, Z = -1.2, },}  -- PET MODEL SETTINGS
 WallpaperKitcfg.battlepetmodel = {rotation = 20, camdistance = 3, pos = { Y = 0, Z = -1.25, },}  -- BATTLEPET MODEL SETTINGS
--- TOP / BOTTOM TEXTURE
-WallpaperKitcfg.background = {
-	top = { size = 0.1, gradient = true,
-		gradientcolor = { 0.2,0.2,0.2,0, 0,0,0,0.9}, -- THE FIRST FOUR DIGITS IS THE BOTTOM COLOR, THE SECOND FOUR IS THE TOP COLOR
-		staticcolor = { 0.15,0.15,0.15,0.6 },
-	},
-	bottom = { size = 0.3, gradient = true,
-		gradientcolor = { 0,0,0,0.9, 0.2,0.2,0.2,0 }, -- THE FIRST FOUR DIGITS IS THE TOP COLOR, THE SECOND FOUR IS THE BOTTOM COLOR
-		staticcolor = { 0.15,0.15,0.15,0.6 },
-	},
-}
 -- TEXT
 WallpaperKitcfg.text ={
 	name = { size = 43, flag = "OUTLINE", pos = { point = "TOP", X = -0.21, Y = -0.08, },},
@@ -50,58 +39,37 @@ WallpaperKit.w,WallpaperKit.h = WallpaperKit:GetSize()
 if WallpaperKitcfg.show.background then
 WallpaperKit.bg = WallpaperKit:CreateTexture(nil,"BACKGROUND",nil,-8)
 WallpaperKit.bg:SetTexture("Interface\\TargetingFrame\\UI-StatusBar")
-	if UnitFactionGroup("player") == "Horde" then WallpaperKit.bg:SetColorTexture(0.8, 0.31, 0.26, 0.85)
-	elseif UnitFactionGroup("player") == "Alliance" then WallpaperKit.bg:SetColorTexture(0.2, 0.8, 0.8, 0.85)
+  if UnitFactionGroup("player") == "Horde" then WallpaperKit.bg:SetColorTexture(0.8, 0.31, 0.26, 0.85)
+  elseif UnitFactionGroup("player") == "Alliance" then WallpaperKit.bg:SetColorTexture(0.2, 0.8, 0.8, 0.85)
   else WallpaperKit.bg:SetColorTexture(0.52, 0.21, 0.6, 0.85) end  --255, 222, 123, 0.85
 WallpaperKit.bg:SetVertexColor(WallpaperKitcfg.color.class.r, WallpaperKitcfg.color.class.g, WallpaperKitcfg.color.class.b, 1)
 WallpaperKit.bg:SetPoint("CENTER")
 WallpaperKit.bg:SetSize(WallpaperKit.w,WallpaperKit.h)
-else
 end
 -- AURA TEXTURE
 if WallpaperKitcfg.show.auratexture then
 WallpaperKit.bg2 = WallpaperKit:CreateTexture(nil,"BACKGROUND",nil,-7)
 WallpaperKit.bg2:SetTexture("") --WallpaperKitcfg.aura.texture
-if WallpaperKitcfg.aura.classcolor then WallpaperKit.bg2:SetVertexColor(WallpaperKitcfg.color.class.r, WallpaperKitcfg.color.class.g, WallpaperKitcfg.color.class.b, 1)
-else WallpaperKit.bg2:SetVertexColor(unpack(WallpaperKitcfg.aura.color)) end
+  if WallpaperKitcfg.aura.classcolor then
+	WallpaperKit.bg2:SetVertexColor(WallpaperKitcfg.color.class.r, WallpaperKitcfg.color.class.g, WallpaperKitcfg.color.class.b, 1)
+  else WallpaperKit.bg2:SetVertexColor(unpack(WallpaperKitcfg.aura.color)) end
 WallpaperKit.bg2:SetPoint(WallpaperKitcfg.aura.pos.point, WallpaperKitcfg.aura.pos.X, WallpaperKitcfg.aura.pos.Y)
 WallpaperKit.bg2:SetSize(WallpaperKit.w*WallpaperKitcfg.aura.size,WallpaperKit.h*WallpaperKitcfg.aura.size)
-else return end
-
--- TOP SHADE
-if WallpaperKitcfg.show.toptexture then
-WallpaperKit.topbg = WallpaperKit:CreateTexture(nil,"BACKGROUND",nil,-5)
-WallpaperKit.topbg:SetColorTexture(1,1,1,1)
-WallpaperKit.topbg:SetPoint("TOPLEFT")
-WallpaperKit.topbg:SetPoint("TOPRIGHT")
-WallpaperKit.topbg:SetHeight(WallpaperKit.h*WallpaperKitcfg.background.top.size)
-if WallpaperKitcfg.background.top.gradient then WallpaperKit.topbg:SetGradientAlpha("VERTICAL", unpack(WallpaperKitcfg.background.top.gradientcolor))
-else WallpaperKit.topbg:SetVertexColor(unpack(WallpaperKitcfg.background.top.staticcolor)) end
 end
--- BOTTOM SHADE
-if WallpaperKitcfg.show.bottomtexture then
-WallpaperKit.bottombg = WallpaperKit:CreateTexture(nil,"BACKGROUND",nil,-5)
-WallpaperKit.bottombg:SetColorTexture(1,1,1,1)
-WallpaperKit.bottombg:SetPoint("BOTTOMLEFT")
-WallpaperKit.bottombg:SetPoint("BOTTOMRIGHT")
-WallpaperKit.bottombg:SetHeight(WallpaperKit.h*WallpaperKitcfg.background.bottom.size)
-if WallpaperKitcfg.background.bottom.gradient then WallpaperKit.bottombg:SetGradientAlpha("VERTICAL", unpack(WallpaperKitcfg.background.bottom.gradientcolor))
-else WallpaperKit.bottombg:SetVertexColor(unpack(WallpaperKitcfg.background.bottom.staticcolor)) end
-else return end
 -- CLASS ICON
 if WallpaperKitcfg.show.classicon then
-	WallpaperKit.classicon = WallpaperKit:CreateFontString(nil, "OVERLAY")
-	WallpaperKit.classicon:SetPoint(WallpaperKitcfg.classicon.pos.point, WallpaperKitcfg.classicon.pos.X, WallpaperKitcfg.classicon.pos.Y)
-	WallpaperKit.classicon:SetFont(WallpaperKitcfg.classicon.font, WallpaperKitcfg.classicon.size, "OUTLINE")
-	WallpaperKit.classicon:SetText(WallpaperKitcfg.classicon.text)
-else return end
+  WallpaperKit.classicon = WallpaperKit:CreateFontString(nil, "OVERLAY")
+  WallpaperKit.classicon:SetPoint(WallpaperKitcfg.classicon.pos.point, WallpaperKitcfg.classicon.pos.X, WallpaperKitcfg.classicon.pos.Y)
+  WallpaperKit.classicon:SetFont(WallpaperKitcfg.classicon.font, WallpaperKitcfg.classicon.size, "OUTLINE")
+  WallpaperKit.classicon:SetText(WallpaperKitcfg.classicon.text)
+end
 -- FACTION ICON
 if WallpaperKitcfg.show.factionicon then
 WallpaperKit.factionicon = WallpaperKit:CreateTexture(nil,"BACKGROUND",nil,-4)
 WallpaperKit.factionicon:SetPoint(WallpaperKitcfg.factionicon.pos.point, WallpaperKitcfg.factionicon.pos.X, WallpaperKitcfg.factionicon.pos.Y)
 WallpaperKit.factionicon:SetSize(WallpaperKit.h*WallpaperKitcfg.factionicon.size, WallpaperKit.h*WallpaperKitcfg.factionicon.size)
 if UnitFactionGroup("player") ~= "Neutral" then WallpaperKit.factionicon:SetTexture("Interface\\Timer\\"..UnitFactionGroup("player").."-Logo") end
-else return end
+end
 ------------------------------- MODELS----------------------------- 
 -- PLAYER MODEL
 WallpaperKit.playermodel = CreateFrame("PlayerModel",nil,WallpaperKit)
@@ -138,30 +106,30 @@ end
 	if UnitRace("player") == "侏儒" then WallpaperKit.playermodel:SetPosition(0,0.6,0)
 	elseif UnitRace("player") == "矮人" then WallpaperKit.playermodel:SetPosition(0,0.9,0)
 	else WallpaperKit.playermodel:SetPosition(0,WallpaperKitcfg.playermodel.pos.Y,WallpaperKitcfg.playermodel.pos.Z) end
-  else return end
+    end
 	-- PET
 	if WallpaperKitcfg.show.petmodel then
 		WallpaperKit.petmodel:SetUnit("pet")
 		WallpaperKit.petmodel:SetRotation(math.rad(WallpaperKitcfg.petmodel.rotation))
 		WallpaperKit.petmodel:SetCamDistanceScale(WallpaperKitcfg.petmodel.camdistance)
 		WallpaperKit.petmodel:SetPosition(0,WallpaperKitcfg.petmodel.pos.Y,WallpaperKitcfg.petmodel.pos.Z)
-  else return end
+    end
 	--TEXT
 	if WallpaperKitcfg.show.name then
 	WallpaperKit.textname:SetText(UnitPVPName("player"))
-  else return end
+    end
 	if WallpaperKitcfg.show.guild then
 	local faction = UnitFactionGroup("player")
 	if(IsInGuild()) then
 		local guildName, guildRankName = GetGuildInfo("player");
 		if faction == "Horde" then WallpaperKit.textguild:SetText("|cffffd200"..guildRankName.."|cff9d9d9d  <|cffffd200 "..guildName.." |cff9d9d9d>  |cffE60D12"..GetRealmName())
 		elseif faction == "Alliance" then WallpaperKit.textguild:SetText("|cffffd200"..guildRankName.."|cff9d9d9d  <|cffffd200 "..guildName.." |cff9d9d9d>  |cff4A54E8"..GetRealmName())
-  else return end
+    end
 	else
 		if faction == "Horde" then WallpaperKit.textguild:SetText("|cff9d9d9d |cffE60D12"..GetRealmName())
 		elseif faction == "Alliance" then WallpaperKit.textguild:SetText("|cff9d9d9d |cff4A54E8"..GetRealmName())
 		else WallpaperKit.textguild:SetText("|cff9d9d9d |cff20ff20"..GetRealmName()) end
-	end else return end
+	end end
 end
 -- TIME
 WallpaperKit.texttime = WallpaperKit:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")

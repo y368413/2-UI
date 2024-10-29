@@ -1,6 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="ClassSpells.lua"/>
 
+	<Script file="Cata\Party-Cata.lua"/>
 	<Script file="WoD\Party-WoD.lua"/>
 
 	<Script file="Legion\PartyDungeons.lua"/>
@@ -22,4 +23,12 @@
 	<Script file="Shadowlands\SanctumofDonimation.lua"/>
 	<Script file="Shadowlands\Sepulcher.lua"/>
 	<Script file="Shadowlands\Party-Shadowlands.lua"/>
+
+	<Script file="Dragonflight\Party-DF.lua"/>
+	<Script file="Dragonflight\VaultoftheIncarnates.lua"/>
+	<Script file="Dragonflight\Aberrus.lua"/>
+	<Script file="Dragonflight\Amirdrassil.lua"/>
+
+	<Script file="TWW\Party-TWW.lua"/>
+	<Script file="TWW\NerubarPalace.lua"/>
 </Ui>

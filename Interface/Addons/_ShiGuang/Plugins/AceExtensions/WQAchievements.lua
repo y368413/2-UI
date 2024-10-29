@@ -1,4 +1,5 @@
---## Author: Urtgard  ## Version: v9.2.5-1
+--## Author: Urtgard  ## Version: v11.0.5-2
+
 WQAchievements = LibStub("AceAddon-3.0"):NewAddon("WQAchievements", "AceConsole-3.0", "AceTimer-3.0")
 local WQA = WQAchievements
 WQA.data = {}
@@ -8,7 +9,2650 @@ WQA.questList = {}
 WQA.missionList = {}
 WQA.itemList = {}
 WQA.links = {}
+WQA.Criterias = {}
+WQA.Rewards = {}
 
+
+--	Legion
+local data = {
+    name = "Legion"
+}
+WQA.data[7] = data
+
+-- Achievements
+local trainer = {
+    42159,
+    40299,
+    40277,
+    42442,
+    40298,
+    40280,
+    40282,
+    41687,
+    40278,
+    41944,
+    41895,
+    40337,
+    41990,
+    40279,
+    41860
+}
+local argusTrainer = {
+    49041,
+    49042,
+    49043,
+    49044,
+    49045,
+    49046,
+    49047,
+    49048,
+    49049,
+    49050,
+    49051,
+    49052,
+    49053,
+    49054,
+    49055,
+    49056,
+    49057,
+    49058
+}
+
+data.achievements = {
+    {
+        name = "Free For All, More For Me",
+        id = 11474,
+        criteriaType = "ACHIEVEMENT",
+        criteria = {
+            {id = 11475, notAccountwide = true},
+            {id = 11476, notAccountwide = true},
+            {id = 11477, notAccountwide = true},
+            {id = 11478, notAccountwide = true}
+        }
+    },
+    {
+        name = "Family Familiar",
+        id = 9696,
+        criteriaType = "ACHIEVEMENT",
+        criteria = {
+            {id = 9686, criteriaType = "QUESTS", criteria = trainer},
+            {id = 9687, criteriaType = "QUESTS", criteria = trainer},
+            {id = 9688, criteriaType = "QUESTS", criteria = trainer},
+            {id = 9689, criteriaType = "QUESTS", criteria = trainer},
+            {id = 9690, criteriaType = "QUESTS", criteria = trainer},
+            {id = 9691, criteriaType = "QUESTS", criteria = trainer},
+            {id = 9692, criteriaType = "QUESTS", criteria = trainer},
+            {id = 9693, criteriaType = "QUESTS", criteria = trainer},
+            {id = 9694, criteriaType = "QUESTS", criteria = trainer},
+            {id = 9695, criteriaType = "QUESTS", criteria = trainer}
+        }
+    },
+    {
+        name = "Family Fighter",
+        id = 12100,
+        criteriaType = "ACHIEVEMENT",
+        criteria = {
+            {id = 12089, criteriaType = "QUESTS", criteria = argusTrainer},
+            {id = 12091, criteriaType = "QUESTS", criteria = argusTrainer},
+            {id = 12092, criteriaType = "QUESTS", criteria = argusTrainer},
+            {id = 12093, criteriaType = "QUESTS", criteria = argusTrainer},
+            {id = 12094, criteriaType = "QUESTS", criteria = argusTrainer},
+            {id = 12095, criteriaType = "QUESTS", criteria = argusTrainer},
+            {id = 12096, criteriaType = "QUESTS", criteria = argusTrainer},
+            {id = 12097, criteriaType = "QUESTS", criteria = argusTrainer},
+            {id = 12098, criteriaType = "QUESTS", criteria = argusTrainer},
+            {id = 12099, criteriaType = "QUESTS", criteria = argusTrainer}
+        }
+    },
+    {name = "Battle on the Broken Isles", id = 10876},
+    {
+        name = "Fishing 'Round the Isles",
+        id = 10598,
+        criteriaType = "QUESTS",
+        criteria = {
+            {41612, 41613, 41270},
+            41267,
+            {41604, 41605, 41279},
+            {41598, 41599, 41264},
+            41268,
+            41252,
+            {41611, 41265, 41610},
+            {41617, 41280, 41616},
+            {41597, 41244, 41596},
+            {41602, 41274, 41603},
+            {41609, 41243},
+            41273,
+            41266,
+            {41615, 41275, 41614},
+            41278,
+            41271,
+            41277,
+            41240,
+            {41269, 41600, 41601},
+            41253,
+            41276,
+            41272,
+            41282,
+            41283
+        }
+    },
+    {name = "Crate Expectations", id = 11681, criteriaType = "QUEST_SINGLE", criteria = 45542},
+    {name = "They See Me Rolling", id = 11607, criteriaType = "QUEST_SINGLE", criteria = 46175},
+    {name = "Variety is the Spice of Life", id = 11189, criteriaType = "SPECIAL"}
+}
+
+-- Mounts
+data.mounts = {
+    {
+        name = "Maddened Chaosrunner",
+        itemID = 152814,
+        spellID = 253058,
+        quest = {{trackingID = 48695, wqID = 48696}}
+    },
+    {
+        name = "Crimson Slavermaw",
+        itemID = 152905,
+        spellID = 253661,
+        quest = {{trackingID = 49183, wqID = 47561}}
+    },
+    {name = "Acid Belcher", itemID = 152904, spellID = 253662, quest = {{trackingID = 48721, wqID = 48740}}},
+    {name = "Vile Fiend", itemID = 152790, spellID = 243652, quest = {{trackingID = 48821, wqID = 48835}}},
+    {name = "Lambent Mana Ray", itemID = 152844, spellID = 253107, quest = {{trackingID = 48705, wqID = 48725}}},
+    {
+        name = "Biletooth Gnasher",
+        itemID = 152903,
+        spellID = 253660,
+        quest = {{trackingID = 48810, wqID = 48465}, {trackingID = 48809, wqID = 48467}}
+    },
+    -- Egg
+    {
+        name = "Vibrant Mana Ray",
+        itemID = 152842,
+        spellID = 253106,
+        quest = {
+            {trackingID = 48667, wqID = 48502},
+            {trackingID = 48712, wqID = 48732},
+            {trackingID = 48812, wqID = 48827}
+        }
+    },
+    {
+        name = "Felglow Mana Ray",
+        itemID = 152841,
+        spellID = 253108,
+        quest = {
+            {trackingID = 48667, wqID = 48502},
+            {trackingID = 48712, wqID = 48732},
+            {trackingID = 48812, wqID = 48827}
+        }
+    },
+    {
+        name = "Scintillating Mana Ray",
+        itemID = 152840,
+        spellID = 253109,
+        quest = {
+            {trackingID = 48667, wqID = 48502},
+            {trackingID = 48712, wqID = 48732},
+            {trackingID = 48812, wqID = 48827}
+        }
+    },
+    {
+        name = "Darkspore Mana Ray",
+        itemID = 152843,
+        spellID = 235764,
+        quest = {
+            {trackingID = 48667, wqID = 48502},
+            {trackingID = 48712, wqID = 48732},
+            {trackingID = 48812, wqID = 48827}
+        }
+    }
+}
+
+-- Pets
+data.pets = {
+    {
+        name = "Grasping Manifestation",
+        itemID = 153056,
+        creatureID = 128159,
+        quest = {{trackingID = 0, wqID = 48729}}
+    },
+    -- Egg
+    {
+        name = "Fel-Afflicted Skyfin",
+        itemID = 153055,
+        creatureID = 128158,
+        quest = {
+            {trackingID = 48667, wqID = 48502},
+            {trackingID = 48712, wqID = 48732},
+            {trackingID = 48812, wqID = 48827}
+        }
+    },
+    {
+        name = "Docile Skyfin",
+        itemID = 153054,
+        creatureID = 128157,
+        quest = {
+            {trackingID = 48667, wqID = 48502},
+            {trackingID = 48712, wqID = 48732},
+            {trackingID = 48812, wqID = 48827}
+        }
+    },
+    -- Emissary
+    {name = "Thistleleaf Adventurer", itemID = 130167, creatureID = 99389, questID = 42170, emissary = true},
+    {name = "Wondrous Wisdomball", itemID = 141348, creatureID = 113827, questID = 43179, emissary = true},
+    -- Treasure Master Iks'reeged
+    {name = "Scraps", itemID = 146953, creatureID = 120397, questID = 45379}
+}
+
+-- Toys
+data.toys = {
+    {
+        name = "Barrier Generator",
+        itemID = 153183,
+        quest = {{trackingID = 48704, wqID = 48724}, {trackingID = 48703, wqID = 48723}}
+    },
+    {name = "Micro-Artillery Controller", itemID = 153126, quest = {{trackingID = 0, wqID = 48829}}},
+    {name = "Spire of Spite", itemID = 153124, quest = {{trackingID = 0, wqID = 48512}}},
+    {name = "Yellow Conservatory Scroll", itemID = 153180, quest = {{trackingID = 48718, wqID = 48737}}},
+    {name = "Red Conservatory Scroll", itemID = 153181, quest = {{trackingID = 48718, wqID = 48737}}},
+    {name = "Blue Conservatory Scroll", itemID = 153179, quest = {{trackingID = 48718, wqID = 48737}}},
+    {name = "Baarut the Brisk", itemID = 153193, quest = {{trackingID = 0, wqID = 48701}}},
+    -- Treasure Master Iks'reeged
+    {name = "Pilfered Sweeper", itemID = 147867, questID = 45379}
+}
+
+-- Terrors of the Shore
+-- Commander of Argus
+
+
+
+-- Battle for Azeroth
+local data = {
+    name = "Battle for Azeroth"
+}
+WQA.data[8] = data
+
+-- Achievements
+local trainer = {
+    52009,
+    52165,
+    52218,
+    52278,
+    52297,
+    52316,
+    52325,
+    52430,
+    52471,
+    52751,
+    52754,
+    52799,
+    52803,
+    52850,
+    52856,
+    52878,
+    52892,
+    52923,
+    52938
+}
+
+data.achievements = {
+    {name = "Adept Sandfisher", id = 13009, criteriaType = "QUEST_SINGLE", criteria = 51173, faction = "Horde"},
+    {name = "Scourge of Zem'lan", id = 13011, criteriaType = "QUESTS", criteria = {{51763, 51783}}},
+    {name = "Vorrik's Champion", id = 13014, criteriaType = "QUESTS", criteria = {51957, 51983}, faction = "Horde"},
+    {
+        name = "Revenge is Best Served Speedily",
+        id = 13022,
+        criteriaType = "QUEST_SINGLE",
+        criteria = 50786,
+        faction = "Horde"
+    },
+    {name = "It's Really Getting Out of Hand", id = 13023, criteriaType = "QUESTS", criteria = {{50559, 51127}}},
+    {name = "Zandalari Spycatcher", id = 13025, criteriaType = "QUEST_SINGLE", criteria = 50717, faction = "Horde"},
+    {
+        name = "7th Legion Spycatcher",
+        id = 13026,
+        criteriaType = "QUEST_SINGLE",
+        criteria = 50899,
+        faction = "Alliance"
+    },
+    {name = "By de Power of de Loa!", id = 13035, criteriaType = "QUESTS", criteria = {{51178, 51232}}},
+    {name = "Bless the Rains Down in Freehold", id = 13050, criteriaType = "QUESTS", criteria = {{53196, 52159}}},
+    {
+        name = "Kul Runnings",
+        id = 13060,
+        criteriaType = "QUESTS",
+        criteria = {49994, 53188, 53189},
+        faction = "Alliance"
+    },
+    {
+        name = "Battle on Zandalar and Kul Tiras",
+        id = 12936,
+        criteriaType = "QUESTS",
+        criteria = {
+            52009,
+            52126,
+            52165,
+            52218,
+            52278,
+            52297,
+            52316,
+            52325,
+            52430,
+            52455,
+            52471,
+            52751,
+            52754,
+            52779,
+            52799,
+            52803,
+            52850,
+            52856,
+            52864,
+            52878,
+            52892,
+            52923,
+            52937,
+            52938
+        }
+    },
+    {
+        name = "A Most Efficient Apocalypse",
+        id = 13021,
+        criteriaType = "QUEST_SINGLE",
+        criteria = 50665,
+        faction = "Horde"
+    },
+    -- Thanks NatalieWright
+    {
+        name = "Adventurer of Zuldazar",
+        id = 12944,
+        criteriaType = "QUESTS",
+        criteria = {
+            50864,
+            50877,
+            {51085, 51087},
+            51081,
+            {50287, 51374, 50866},
+            50885,
+            50863,
+            50862,
+            50861,
+            50859,
+            50845,
+            50857,
+            nil,
+            50875,
+            50874,
+            nil,
+            50872,
+            50876,
+            50871,
+            50870,
+            50869,
+            50868,
+            50867
+        }
+    },
+    {
+        name = "Adventurer of Vol'dun",
+        id = 12943,
+        criteriaType = "QUESTS",
+        criteria = {
+            51105,
+            51095,
+            51096,
+            51117,
+            nil,
+            51118,
+            51120,
+            51098,
+            51121,
+            51099,
+            51108,
+            51100,
+            51125,
+            51102,
+            51429,
+            51103,
+            51124,
+            51107,
+            51122,
+            51123,
+            51104,
+            51116,
+            51106,
+            51119,
+            51112,
+            51113,
+            51114,
+            51115
+        }
+    },
+    {
+        name = "Adventurer of Nazmir",
+        id = 12942,
+        criteriaType = "QUESTS",
+        criteria = {
+            50488,
+            50570,
+            50564,
+            nil,
+            50490,
+            50506,
+            50568,
+            50491,
+            50492,
+            50499,
+            50496,
+            50498,
+            50501,
+            nil,
+            50502,
+            50503,
+            50505,
+            50507,
+            50566,
+            50511,
+            50512,
+            nil,
+            50513,
+            50514,
+            nil,
+            50515,
+            50516,
+            50489,
+            50519,
+            50518,
+            50509,
+            50517
+        }
+    },
+    {
+        name = "Adventurer of Drustvar",
+        id = 12941,
+        criteriaType = "QUESTS",
+        criteria = {
+            51469,
+            51505,
+            51506,
+            51508,
+            51468,
+            51972,
+            nil,
+            nil,
+            nil,
+            51897,
+            51457,
+            nil,
+            51909,
+            51507,
+            51917,
+            nil,
+            51919,
+            51908,
+            51491,
+            51512,
+            51527,
+            51461,
+            51467,
+            51528,
+            51466,
+            51541,
+            51542,
+            51884,
+            51874,
+            51906,
+            51887,
+            51989,
+            51988
+        }
+    },
+    {
+        name = "Adventurer of Tiragarde Sound",
+        id = 12939,
+        criteriaType = "QUESTS",
+        criteria = {
+            51653,
+            51652,
+            51666,
+            51669,
+            51841,
+            51665,
+            51848,
+            51842,
+            51654,
+            51662,
+            51844,
+            51664,
+            51670,
+            51895,
+            nil,
+            51659,
+            51843,
+            51660,
+            51661,
+            51890,
+            51656,
+            51893,
+            51892,
+            51651,
+            51839,
+            51891,
+            51849,
+            51894,
+            51655,
+            51847,
+            nil,
+            51657
+        }
+    },
+    {
+        name = "Adventurer of Stormsong Valley",
+        id = 12940,
+        criteriaType = "QUESTS",
+        criteria = {
+            52452,
+            52315,
+            51759,
+            {51976, 51977, 51978},
+            52476,
+            51774,
+            51921,
+            nil,
+            51776,
+            52459,
+            52321,
+            51781,
+            nil,
+            51886,
+            51779,
+            51778,
+            52306,
+            52310,
+            51901,
+            51777,
+            52301,
+            nil,
+            52463,
+            nil,
+            52328,
+            51782, -- Captain Razorspine
+            52299, -- Whiplash
+            nil,
+            52300,
+            nil,
+            52464,
+            52309,
+            52322,
+            nil
+        }
+    },
+    {name = "Sabertron Assemble", id = 13054, criteriaType = "QUESTS", criteria = {nil, 51977, 51978, 51976, 51974}},
+    {name = "Drag Race", id = 13059, criteriaType = "QUEST_SINGLE", criteria = 53346, faction = "Alliance"},
+    {
+        name = "Unbound Monstrosities",
+        id = 12587,
+        criteriaType = "QUESTS",
+        criteria = {52166, 52157, 52181, 52169, 52196, 136385}
+    },
+    {name = "Wide World of Quests", id = 13144, criteriaType = "SPECIAL"},
+    {
+        name = "Family Battler",
+        id = 13279,
+        criteriaType = "ACHIEVEMENT",
+        criteria = {
+            {id = 13280, criteriaType = "QUESTS", criteria = trainer},
+            {id = 13270, criteriaType = "QUESTS", criteria = trainer},
+            {id = 13271, criteriaType = "QUESTS", criteria = trainer},
+            {id = 13272, criteriaType = "QUESTS", criteria = trainer},
+            {id = 13273, criteriaType = "QUESTS", criteria = trainer},
+            {id = 13274, criteriaType = "QUESTS", criteria = trainer},
+            {id = 13281, criteriaType = "QUESTS", criteria = trainer},
+            {id = 13275, criteriaType = "QUESTS", criteria = trainer},
+            {id = 13277, criteriaType = "QUESTS", criteria = trainer},
+            {id = 13278, criteriaType = "QUESTS", criteria = trainer}
+        }
+    },
+    -- 8.1
+    {name = "Upright Citizens", id = 13285, criteriaType = "QUEST_SINGLE", criteria = 53704, faction = "Alliance"},
+    {
+        name = "Scavenge like a Vulpera",
+        id = 13437,
+        criteriaType = "QUEST_SINGLE",
+        criteria = 54415,
+        faction = "Horde"
+    },
+    {name = "Pushing the Payload", id = 13441, criteriaType = "QUEST_SINGLE", criteria = 54505, faction = "Horde"},
+    {
+        name = "Pushing the Payload",
+        id = 13440,
+        criteriaType = "QUEST_SINGLE",
+        criteria = 54498,
+        faction = "Alliance"
+    },
+    {name = "Doomsoul Surprise", id = 13435, criteriaType = "QUEST_SINGLE", criteria = 54689, faction = "Horde"},
+    {name = "Come On and Slam", id = 13426, criteriaType = "QUEST_SINGLE", criteria = 54512, faction = "Alliance"},
+    {name = "Boxing Match", id = 13439, criteriaType = "QUESTS", criteria = {{54524, 54516}}, faction = "Alliance"},
+    {name = "Boxing Match", id = 13438, criteriaType = "QUESTS", criteria = {{54524, 54516}}, faction = "Horde"},
+    -- 8.1.5
+    -- Circle, Square, Triangle
+    {
+        name = "Master Calligrapher",
+        id = 13512,
+        criteriaType = "QUESTS",
+        criteria = {{55340, 55342}, {55264, 55343}, {55341, 55344}}
+    },
+    -- Mission Table
+    -- Alliance
+    {name = "Azeroth at War: The Barrens", id = 12896, criteriaType = "MISSION_TABLE", faction = "Alliance"},
+    {name = "Azeroth at War: Kalimdor on Fire", id = 12899, criteriaType = "MISSION_TABLE", faction = "Alliance"},
+    {name = "Azeroth at War: After Lordaeron", id = 12898, criteriaType = "MISSION_TABLE", faction = "Alliance"},
+    -- Horde
+    {name = "Azeroth at War: The Barrens", id = 12867, criteriaType = "MISSION_TABLE", faction = "Horde"},
+    {name = "Azeroth at War: Kalimdor on Fire", id = 12870, criteriaType = "MISSION_TABLE", faction = "Horde"},
+    {name = "Azeroth at War: After Lordaeron", id = 12869, criteriaType = "MISSION_TABLE", faction = "Horde"},
+    -- 8.2
+    {
+        name = "Outside Influences",
+        id = 13556,
+        criteriaType = "QUEST_PIN",
+        mapID = "1462",
+        criteriaInfo = {
+            [4] = {55658, 55672},
+            [5] = {55658, 55688},
+            [6] = {55658, 55717},
+            [7] = {55658, 55718},
+            [8] = {55658, 56049},
+            [10] = {55658, 55469},
+            [25] = {56552, 56558}
+        }
+    },
+    {name = "Nazjatarget Eliminated", id = 13690},
+    {name = "Puzzle Performer", id = 13764},
+    -- criteriaType = "QUESTS", criteria= {56025, 56024, 56023, 56022, 56021, 56020, 56019, 56018, nil, 56008, 56007, 56009, 56006, 56003, 56010, 56011, 56014, 56016, 56015, 56013,  56012}},
+    {name = "Periodic Destruction", id = 13699, criteriaType = "QUEST_FLAG", criteria = 55121}
+}
+
+-- Pets
+data.pets = {
+    {name = "Vengeful Chicken", itemID = 160940, creatureID = 139372, quest = {{trackingID = 0, wqID = 51212}}},
+    {
+        name = "Rebuilt Gorilla Bot",
+        itemID = 166715,
+        creatureID = 149348,
+        quest = {{trackingID = 0, wqID = 54272}},
+        faction = "Alliance"
+    },
+    {
+        name = "Rebuilt Mechanical Spider",
+        itemID = 166723,
+        creatureID = 149361,
+        quest = {{trackingID = 0, wqID = 54273}},
+        faction = "Horde"
+    }
+}
+
+-- Toys
+data.toys = {
+    {
+        name = "Echoes of Rezan",
+        itemID = 160509,
+        quest = {{trackingID = 0, wqID = 50855}, {trackingID = 0, wqID = 50957}}
+    },
+    {name = "Toy Siege Tower", itemID = 163828, quest = {{trackingID = 0, wqID = 52847}}, faction = "Alliance"},
+    {name = "Toy War Machine", itemID = 163829, quest = {{trackingID = 0, wqID = 52848}}, faction = "Horde"}
+}
+
+-- Mounts
+data.mounts = {
+    {name = "Mollie", itemID = 174842, spellID = 298367, quest = {{wqID = 52196}}}
+}
+
+
+
+-- Shadowlands
+local data = {
+    name = "Shadowlands"
+}
+WQA.data[9] = data
+
+-- Achievements
+local trainer = {
+    61883,
+    61885,
+    61886,
+    61867,
+    61868,
+    61866,
+    61787,
+    61791,
+    61784,
+    61946,
+    61948
+}
+
+data.achievements = {
+    {name = "Tea Tales", id = 14233, criteriaType = "QUESTS", criteria = {59848, 59850, 59852, 59853}},
+    {name = "Something's Not Quite Right....", id = 14671, criteriaType = "QUEST_SINGLE", criteria = 60739},
+    {name = "A Bit of This, A Bit of That", id = 14672, criteriaType = "QUEST_SINGLE", criteria = 60475},
+    {name = "Flight School Graduate", id = 14735, criteriaType = "QUESTS", criteria = {60844, 60858, 60911}},
+    {
+        name = "What Bastion Remembered",
+        id = 14737,
+        criteriaType = "QUEST_SINGLE",
+        criteria = {
+            59717,
+            59705
+        }
+    },
+    {name = "Aerial Ace", id = 14741, criteriaType = "QUEST_SINGLE", criteria = 60911},
+    {name = "Breaking the Stratus Fear", id = 14762, criteriaType = "QUEST_SINGLE", criteria = 60858},
+    {name = "Ramparts Racer", id = 14765, criteriaType = "QUEST_SINGLE", criteria = 59643},
+    {name = "Parasoling", id = 14766, criteriaType = "QUEST_SINGLE", criteria = 59718},
+    {name = "Caught in a Bat Romance", id = 14772, criteriaType = "QUEST_SINGLE", criteria = 60602},
+    {name = "Friend of Ooz", id = 15055, criteriaType = "QUEST_SINGLE", criteria = 64016},
+    {name = "Friend of Bloop", id = 15056, criteriaType = "QUEST_SINGLE", criteria = 64017},
+    {name = "Friend of Plaguey", id = 15057, criteriaType = "QUEST_SINGLE", criteria = 63989},
+    {
+        name = "Battle in the Shadowlands",
+        id = 14625,
+        criteriaType = "QUESTS",
+        criteria = {
+            61949,
+            61948,
+            61947,
+            61946,
+            61886,
+            61885,
+            61883, -- Sylla
+            61879,
+            61870,
+            61868,
+            61867, -- Rotgut
+            61866,
+            61791,
+            61787, -- Zolla
+            61784,
+            61783
+        }
+    },
+    {
+        name = "Adventures: Into the Breach",
+        id = 14844,
+        criteriaType = "MISSION_TABLE",
+        criteria = {{2296, 2250}, {2251, 2297}, {2252, 2298}, {2299, 2253}, 2254, 2255, 2256, 2258, 2259, 2260}
+    },
+    {
+        name = "Impressing Zo'Sorg",
+        id = 14516,
+        criteriaType = "QUESTS",
+        criteria = {
+            {59658},
+            {59803},
+            {59825},
+            {60231}
+        }
+    },
+    {
+        name = "The World Beyond",
+        id = 14758,
+        criteriaType = "SPECIAL"
+    },
+    {
+        name = "Family Exorcist",
+        id = 14879,
+        criteriaType = "ACHIEVEMENT",
+        criteria = {
+            {id = 14868, criteriaType = "QUESTS", criteria = trainer},
+            {id = 14869, criteriaType = "QUESTS", criteria = trainer},
+            {id = 14870, criteriaType = "QUESTS", criteria = trainer},
+            {id = 14871, criteriaType = "QUESTS", criteria = trainer},
+            {id = 14872, criteriaType = "QUESTS", criteria = trainer},
+            {id = 14873, criteriaType = "QUESTS", criteria = trainer},
+            {id = 14874, criteriaType = "QUESTS", criteria = trainer},
+            {id = 14875, criteriaType = "QUESTS", criteria = trainer},
+            {id = 14876, criteriaType = "QUESTS", criteria = trainer},
+            {id = 14877, criteriaType = "QUESTS", criteria = trainer}
+        }
+    }
+}
+
+-- Pets
+data.pets = {
+    {name = "Dal", itemID = 183859, creatureID = 171136, quest = {{trackingID = 0, wqID = 60655}}},
+    {name = "Carpal", itemID = 183114, creatureID = 173847, source = {type = "ITEM", itemID = 183111}},
+    {name = "Primordial Bogling", itemID = 180588, creatureID = 171121, quest = {{trackingID = 0, wqID = 59808}}}
+}
+
+-- Toys
+data.toys = {
+    {name = "Tithe Collector's Vessel", itemID = 180947, source = {type = "ITEM", itemID = 180947}},
+    {name = "Gormling in a Bag", itemID = 184487, source = {type = "ITEM", itemID = 184487}}
+}
+
+
+
+-- Dragonflight
+local data = {
+    name = "Dragonflight"
+}
+WQA.data[10] = data
+
+-- Achievements
+data.achievements = {
+    {
+        name = "Malicia's Challenge",
+        id = 16589,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 67005 },
+            { 70209 },
+            { 70439 },
+            { 69949 }
+        }
+    },
+    {
+        name = "A Champion's Tour: Dragon Isles",
+        id = 16590,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 67005 },
+            { 70209 },
+            { 70439 },
+            { 69949 }
+        }
+    },
+    {
+        name = "A Champion's Pursuit",
+        id = 16599,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 72008 },
+            { 72058 },
+            { 72019 },
+            { 71225 }
+        }
+    },
+    {
+        name = "Wildlife Photographer",
+        id = 16560,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 70075, 70632 },
+            { 70079, 70659 },
+            { 70100 },
+            { 70110, 70699 }
+        }
+    },
+    {
+        name = "A Legendary Album",
+        id = 16570,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 70075 },
+            { 70632 },
+            { 70100 },
+            { 70659 },
+            { 70110 },
+            { 70079 },
+            { 70699 }
+        }
+    },
+    {
+        name = "Great Shots Galore!",
+        id = 16568,
+        criteriaType = "QUESTS",
+        criteria = {
+            {
+                70075,
+                70632,
+                70079,
+                70659,
+                70100,
+                70110,
+                70699
+            }
+        }
+    },
+    -- Grand Hunt
+    {
+        name = "Hunt Master",
+        id = 16540,
+        criteriaType = "AREA_POI",
+        criteria = {
+            { AreaPoiId = 7342, MapId = 1978 },
+            { AreaPoiId = 7342, MapId = 1978 },
+            { AreaPoiId = 7342, MapId = 1978 },
+            { AreaPoiId = 7343, MapId = 1978 },
+            { AreaPoiId = 7343, MapId = 1978 },
+            { AreaPoiId = 7343, MapId = 1978 },
+            { AreaPoiId = 7345, MapId = 1978 },
+            { AreaPoiId = 7345, MapId = 1978 },
+            { AreaPoiId = 7345, MapId = 1978 },
+            { AreaPoiId = 7344, MapId = 1978 },
+            { AreaPoiId = 7344, MapId = 1978 }
+        }
+    },
+    {
+        name = "The Disgruntled Hunter",
+        id = 16542,
+        criteriaType = "AREA_POI",
+        criteria = {
+            { AreaPoiId = 7342, MapId = 1978 },
+            { AreaPoiId = 7342, MapId = 1978 },
+            { AreaPoiId = 7342, MapId = 1978 },
+            { AreaPoiId = 7343, MapId = 1978 },
+            { AreaPoiId = 7343, MapId = 1978 },
+            { AreaPoiId = 7343, MapId = 1978 },
+            { AreaPoiId = 7345, MapId = 1978 },
+            { AreaPoiId = 7345, MapId = 1978 },
+            { AreaPoiId = 7345, MapId = 1978 },
+            { AreaPoiId = 7344, MapId = 1978 },
+            { AreaPoiId = 7344, MapId = 1978 }
+        }
+    },
+    --
+    -- Primal Storms
+    {
+        name = "Chasing Storms in The Waking Shores",
+        id = 16468,
+        criteriaType = "ACHIEVEMENT",
+        criteria = {
+            {
+                name = "Thunderstorms in The Waking Shores",
+                id = 16463,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7249, MapId = 2022 },
+                        { AreaPoiId = 7253, MapId = 2022 },
+                        { AreaPoiId = 7257, MapId = 2022 }
+                    }
+                },
+                notAccountwide = true
+            },
+            {
+                name = "Sandstorms in The Waking Shores",
+                id = 16465,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7250, MapId = 2022 },
+                        { AreaPoiId = 7254, MapId = 2022 },
+                        { AreaPoiId = 7258, MapId = 2022 }
+                    }
+                },
+                notAccountwide = true
+            },
+            {
+                name = "Firestorms in The Waking Shores",
+                id = 16466,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7251, MapId = 2022 },
+                        { AreaPoiId = 7255, MapId = 2022 },
+                        { AreaPoiId = 7259, MapId = 2022 }
+                    }
+                },
+                notAccountwide = true
+            },
+            {
+                name = "Snowstorms in The Waking Shores",
+                id = 16467,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7252, MapId = 2022 },
+                        { AreaPoiId = 7256, MapId = 2022 },
+                        { AreaPoiId = 7260, MapId = 2022 }
+                    }
+                },
+                notAccountwide = true
+            }
+        }
+    },
+    {
+        name = "Chasing Storms in the Ohn'ahran Plains",
+        id = 16476,
+        criteriaType = "ACHIEVEMENT",
+        criteria = {
+            {
+                name = "Thunderstorms in the Ohn'ahran Plains",
+                id = 16475,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7221, MapId = 2023 },
+                        { AreaPoiId = 7225, MapId = 2023 }
+                    }
+                },
+                notAccountwide = true
+            },
+            {
+                name = "Sandstorms in the Ohn'ahran Plains",
+                id = 16477,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7222, MapId = 2023 },
+                        { AreaPoiId = 7226, MapId = 2023 }
+                    }
+                },
+                notAccountwide = true
+            },
+            {
+                name = "Firestorms in the Ohn'ahran Plains",
+                id = 16478,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7223, MapId = 2023 },
+                        { AreaPoiId = 7227, MapId = 2023 }
+                    }
+                },
+                notAccountwide = true
+            },
+            {
+                name = "Snowstorms in the Ohn'ahran Plains",
+                id = 16479,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7224, MapId = 2023 },
+                        { AreaPoiId = 7228, MapId = 2023 }
+                    }
+                },
+                notAccountwide = true
+            }
+        }
+    },
+    {
+        name = "Chasing Storms in The Azure Span",
+        id = 16484,
+        criteriaType = "ACHIEVEMENT",
+        criteria = {
+            {
+                name = "Thunderstorms in The Azure Span",
+                id = 16480,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7237, MapId = 2024 },
+                        { AreaPoiId = 7233, MapId = 2024 },
+                        { AreaPoiId = 7229, MapId = 2024 }
+                    }
+                },
+                notAccountwide = true
+            },
+            {
+                name = "Sandstorms in The Azure Span",
+                id = 16481,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7238, MapId = 2024 },
+                        { AreaPoiId = 7234, MapId = 2024 },
+                        { AreaPoiId = 7230, MapId = 2024 }
+                    }
+                },
+                notAccountwide = true
+            },
+            {
+                name = "Firestorms in The Azure Span",
+                id = 16482,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7239, MapId = 2024 },
+                        { AreaPoiId = 7235, MapId = 2024 },
+                        { AreaPoiId = 7231, MapId = 2024 }
+                    }
+                },
+                notAccountwide = true
+            },
+            {
+                name = "Snowstorms in The Azure Span",
+                id = 16483,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7240, MapId = 2024 },
+                        { AreaPoiId = 7236, MapId = 2024 },
+                        { AreaPoiId = 7232, MapId = 2024 }
+                    }
+                },
+                notAccountwide = true
+            }
+        }
+    },
+    {
+        name = "Chasing Storms in Thaldraszus",
+        id = 16489,
+        criteriaType = "ACHIEVEMENT",
+        criteria = {
+            {
+                name = "Thunderstorms in Thaldraszus",
+                id = 16485,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7298, MapId = 2025 },
+                        { AreaPoiId = 7245, MapId = 2025 }
+                    }
+                },
+                notAccountwide = true
+            },
+            {
+                name = "Sandstorms in Thaldraszus",
+                id = 16486,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7299, MapId = 2025 },
+                        { AreaPoiId = 7246, MapId = 2025 }
+                    }
+                },
+                notAccountwide = true
+            },
+            {
+                name = "Firestorms in Thaldraszus",
+                id = 16487,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7300, MapId = 2025 },
+                        { AreaPoiId = 7247, MapId = 2025 }
+                    }
+                },
+                notAccountwide = true
+            },
+            {
+                name = "Snowstorms in Thaldraszus",
+                id = 16488,
+                criteriaType = "AREA_POI",
+                criteria = {
+                    {
+                        { AreaPoiId = 7301, MapId = 2025 },
+                        { AreaPoiId = 7248, MapId = 2025 }
+                    }
+                },
+                notAccountwide = true
+            }
+        }
+    },
+    --
+    {
+        name = "Battle on the Dragon Isles",
+        id = 16464,
+        criteriaType = "QUESTS",
+        criteria = {
+            71206,
+            71202,
+            66588,
+            71145,
+            71166,
+            66551,
+            71140,
+            71180
+        }
+    },
+    {
+        name = "Battle on the Dragon Isles II",
+        id = 17406,
+        criteriaType = "QUESTS",
+        criteria = {
+            74841,
+            74838,
+            74835,
+            74794,
+            74840,
+            74837,
+            74836,
+            74792
+        }
+    },
+    {
+        name = "Global Swarming",
+        id = 17541,
+        criteriaType = "QUESTS",
+        criteria = {
+            73146,
+            73147,
+            73148,
+            73149
+        }
+    },
+    {
+        name = "Battle in Zaralek Cavern",
+        id = 17880,
+        criteriaType = "QUESTS",
+        criteria = {
+            75680,
+            75750,
+            75834,
+            75835
+        }
+    },
+    {
+        name = "Friends In Feather",
+        id = 19293,
+        criteriaType = "QUEST_SINGLE",
+        criteria = 78370
+    },
+    {
+        name = "Goggle Wobble",
+        id = 19791,
+        criteriaType = "QUESTS",
+        criteria = {
+            78820,
+            78931,
+            78616
+        }
+    },
+    {
+        name = "When a Rock is Just a Rock",
+        id = 19786,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 78645, 78661, 78663 }
+        }
+    },
+    {
+        name = "Clued In",
+        id = 19787,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 77424, 76587, 76734, 76739, 77362 }
+        }
+    },
+    {
+        name = "Just One More Thing",
+        id = 19792,
+        criteriaType = "QUESTS",
+        criteria = {
+
+            77424, -- Lost Atheneum
+            76587, -- The Riverbed
+            76734, -- Igira's Watch
+            76739, -- Gaze of Neltharion
+            76911, -- Concord Observatory
+            77362  -- Winglord's Perch
+        }
+    },
+    {
+        name = "Taking From Nature",
+        id = 16553,
+        criteriaType = "AREA_POI",
+        criteria = {
+            { AreaPoiId = 7086, MapId = 2022 },
+            { AreaPoiId = 7266, MapId = 2024 },
+            { AreaPoiId = 7270, MapId = 2023 },
+            { AreaPoiId = 7271, MapId = 2025 },
+            { AreaPoiId = 7272, MapId = 2024 }
+        }
+    },
+}
+
+-- Pets
+data.pets = {
+    {
+        name = "Wildfire",
+        itemID = 202412,
+        creatureID = 200771,
+        quest = { { trackingID = 0, wqID = 73148 } }
+    },
+    {
+        name = "Vortex",
+        itemID = 202413,
+        creatureID = 200769,
+        quest = { { trackingID = 0, wqID = 73146 } }
+    },
+    {
+        name = "Tremblor",
+        itemID = 202411,
+        creatureID = 200770,
+        quest = { { trackingID = 0, wqID = 73147 } }
+    },
+    {
+        name = "Flow",
+        itemID = 202407,
+        creatureID = 200772,
+        quest = { { trackingID = 0, wqID = 73149 } }
+    },
+    {
+        name = "Time-Lost Vorquin Foal",
+        itemID = 193855,
+        creatureID = 191298,
+        quest = { { trackingID = 0, wqID = 74378 } }
+    }
+}
+
+-- Toys
+data.toys = {
+    {
+        name = "Glutinous Glitterscale Glob",
+        itemID = 205688,
+        quest = { { trackingID = 0, wqID = 75343 } }
+    },
+    {
+        name = "Chasing Storm",
+        itemID = 202020,
+        quest = { { trackingID = 0, wqID = 74378 } }
+    }
+}
+
+-- Mounts
+data.mounts = {
+    {
+        name = "Skyskin Hornstrider",
+        itemID = 192800,
+        spellID = 352926,
+        quest = { { trackingID = 0, wqID = 74378 } }
+    }
+}
+
+
+
+-- War Within
+local data = {
+    name = "War Within"
+}
+WQA.data[11] = data
+
+-- Achievements
+local trainer = {
+    82293,
+    82292,
+    82294,
+    82295
+
+}
+
+data.achievements = {
+    {
+        name = "Worm Theory",
+        id = 40869,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 82324 },
+            { 79959 },
+            { 79958 }
+        }
+    },
+    {
+        name = "I Only Need One Trip",
+        id = 40623,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 82580 }
+        }
+    },
+    {
+        name = "For the Collective",
+        id = 40630,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 82580 }
+        }
+    },
+    {
+        name = "Hanging Tight",
+        id = 40507,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 83101 }
+        }
+    },
+    {
+        name = "Children's Entertainer",
+        id = 40150,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 82288 }
+        }
+    },
+    {
+        name = "Mine Poppin'",
+        id = 40843,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 82468 }
+        }
+    },
+    {
+        name = "Never Enough",
+        id = 40082,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 82120 }
+        }
+    },
+    {
+        name = "A Champion's Tour: The War Within",
+        id = 40088,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 80395 },
+            { 80394 },
+            { 80208 },
+            { 80323 },
+            { 80412 },
+            { 81622 },
+            { 80409 },
+            { 80457 }
+        }
+    },
+    {
+        name = "Unbound Battle",
+        id = 40087,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 80395 },
+            { 80394 },
+            { 80208 },
+            { 80323 },
+            { 80412 },
+            { 81622 },
+            { 80409 },
+            { 80457 }
+        }
+    },
+    {
+        name = "Battle on Khaz Algar",
+        id = 40153,
+        criteriaType = "QUESTS",
+        criteria = {
+            { 82291 }, -- Awakened Custodian
+            { 82300 }, -- Haywire Servobot
+            { 82298 }, -- Guttergunk
+            { 82292 }, -- Collector Dyna
+            { 82297 }, -- Zadeu
+            { 82293 }, -- Friendhaver Grem
+            { 82294 }, -- Kyrie
+            { 82295 }  -- Ziriak
+        }
+    }
+}
+
+-- Miscellaneous
+data.miscellaneous = {
+    {
+        name = "Special Assignment",
+        criteriaType = "AREA_POI",
+        criteria = {
+            { AreaPoiID = 7823, MapId = 2248 }, -- Special Assignment: Cinderbee Surge
+            { AreaPoiID = 7824, MapId = 2248 }, -- Special Assignment: Titanic Resurgence
+            { AreaPoiID = 7825, MapId = 2214 }, -- Special Assignment: Shadows Below
+            { AreaPoiID = 7826, MapId = 2214 }, -- Special Assignment: When the Deeps Stir
+            { AreaPoiID = 7827, MapId = 2215 }, -- Special Assignment: Lynx Rescue
+            { AreaPoiID = 7828, MapId = 2215 }, -- Special Assignment: Rise of the Colossals
+            { AreaPoiID = 7829, MapId = 2255 }, -- Special Assignment: Bombs from Behind
+            { AreaPoiID = 7830, MapId = 2255 }, -- Special Assignment: A Pound of Cure
+            { AreaPoiID = 7886, MapId = 2248 }, -- Special Assignment: Titanic Resurgence
+            { AreaPoiID = 7887, MapId = 2248 }  -- Special Assignment: Titanic Resurgence
+        }
+    },
+}
+
+
+
+WQA.ExpansionList = {
+    [6] = "|cFFFF0000 WOD >>>|r",  --Warlords of Draenor
+    [7] = "|cFFFF0000 LEG >>>|r",  --Legion
+    [8] = "|cFFFF0000 BFA >>>|r",  --Battle For Azeroth
+    [9] = "|cFFFF0000 SLS >>>|r",  --Shadowlands
+    [10] = "|cFFFF0000 DF >>>|r",  --Dragonflight
+    [11] = "|cFFFF0000 TWW >>>|r",  --War Within
+}
+
+
+WQA.ZoneIDList = {
+    [7] = {
+        619, -- Broken Isles
+        627, -- Dalaran
+        630, -- Azsuna
+        641, -- Val'sharah
+        650, -- Highmountain
+        -- 625, -- Dalaran
+        680, -- Suramar
+        634, -- Stormheim
+        646, -- Broken Shore
+        790, -- Eye of Azshara
+        885,
+        830,
+        882
+    },
+    [8] = {
+        14, -- Arathi Highlands
+        62, -- Darkshore
+        875,
+        876,
+        862,
+        863,
+        864,
+        895,  -- Tiragarde Sound
+        942,
+        896,  -- Drustvar
+        1161, -- Boralus
+        1165, -- Dazar'alor
+        1355, -- Nazjatar
+        1462, -- Mechagon
+        1527, -- Uldum
+        1530  -- Vale of Eternal Blossoms
+    },
+    [9] = {
+        1525, -- Revendreth
+        1533, -- Bastion
+        1536, -- Maldraxxus
+        1565, -- Ardenweald
+        1543, -- The Maw
+        1961, -- Korthia
+        1970  -- Zereth Mortis
+    },
+    [10] = {
+        2022, -- The Waking Shores
+        2023, -- Ohn'ahran Plains
+        2024, -- The Azure Span	Zone
+        2025, -- Thaldraszus Zone
+        1978, -- Dragon Isles
+        2085, -- Primalist Tomorrow
+        2112, -- Valdrakken
+        2151, -- The Forbidden Reach
+        2133, -- Zaralek Cavern
+        2200  -- Emerald Dream
+    },
+    [11] = {
+        2213, -- City of Threads
+        2214, -- Ringing Deeps
+        2215, -- Hallowfall
+        2216, -- City of Threads - Lower
+        2248, -- Isle of Dorn
+        2255, -- Azj-Kahet
+        2256, -- Azj-Kahet - Lower
+        2339  -- Dornogal
+    }
+}
+
+
+local WQA = WQAchievements
+
+---@enum CriteriaType
+local CriteriaType = {
+    AreaPoi = "AREA_POI"
+}
+
+WQA.Criterias = {
+    CriteriaType = CriteriaType
+}
+
+
+---@alias AreaPoiCriteria
+---| { AreaPoiId: integer, MapId: integer}
+
+local criteria = {}
+criteria.list = {}
+criteria.watched = {}
+
+function criteria:AddReward(poi, rewardType, reward, emissary)
+    local poiId = poi.AreaPoiId
+    local mapId = poi.MapId
+
+    if not self.list[poiId] then
+        self.list[poiId] = {}
+    end
+    if not self.list[poiId][mapId] then
+        self.list[poiId][mapId] = {}
+    end
+
+    local l = self.list[poiId][mapId]
+
+    WQA:AddReward(l, rewardType, reward, emissary)
+end
+
+function criteria:Check()
+    local active = {}
+    local new = {}
+    local retry = false
+
+    for poiId, mapIds in pairs(self.list) do
+        for mapId in pairs(mapIds) do
+            local poiInfo = C_AreaPoiInfo.GetAreaPOIInfo(mapId, poiId)
+
+            if poiInfo then
+                local link
+                for k, v in pairs(self.list[poiId][mapId].reward) do
+                    if k == "custom" or k == "professionSkillup" or k == "gold" then
+                        link = true
+                    else
+                        link = WQA:GetRewardLinkByID(poiId, k, v, 1)
+                    end
+
+                    if not link then
+                        WQA:Debug(poiId, k, v, 1)
+                        retry = true
+                    else
+                        WQA:SetRewardLinkByID(poiId, k, v, 1, link)
+                    end
+
+                    if k == "achievement" or k == "chance" or k == "azeriteTraits" then
+                        for i = 2, #v do
+                            link = WQA:GetRewardLinkByID(poiId, k, v, i)
+                            if not link then
+                                WQA:Debug(poiId, k, v, i)
+                                retry = true
+                            else
+                                WQA:SetRewardLinkByID(poiId, k, v, i, link)
+                            end
+                        end
+                    end
+                end
+                if (not link) then
+                    WQA:Debug(poiId, poiInfo.name, link)
+                    retry = true
+                else
+                    if not active[poiId] then
+                        active[poiId] = {}
+                    end
+                    active[poiId][mapId] = true
+
+                    if not self.watched[poiId] or not self.watched[poiId][mapId] then
+                        if not new[poiId] then
+                            new[poiId] = {}
+                        end
+                        new[poiId][mapId] = true
+                    end
+                end
+            end
+        end
+    end
+
+    return {
+        active = active,
+        new = new,
+        retry = retry
+    }
+end
+
+WQA.Criterias.AreaPoi = criteria
+
+
+---@class WQAchievements
+local RewardType = {
+    Achievement = "ACHIEVEMENT",
+    AzeriteTrait = "AZERITE_TRAIT",
+    Chance = "CHANCE",
+    Currency = "CURRENCY",
+    Custom = "CUSTOM",
+    CustomItem = "CUSTOM_ITEM",
+    Gold = "GOLD",
+    Item = "ITEM",
+    Miscellaneous = "MISCELLANEOUS",
+    ProfessionSkillup = "PROFESSION_SKILLUP",
+    Recipe = "RECIPE",
+    Reputation = "REPUTATION"
+}
+
+WQA.Rewards = {
+    RewardType = RewardType
+}
+
+
+---@class WQAchievements
+local WQA = WQAchievements
+local RewardType = WQA.Rewards.RewardType
+
+
+---@param rewardType RewardType
+function WQA:AddReward(list, rewardType, reward, emissary)
+    local l = list
+    if emissary == true then
+        l.isEmissary = true
+    end
+    if not l.reward then
+        l.reward = {}
+    end
+
+
+    ---@type table <RewardType, any>
+    l = l.reward
+    if rewardType == RewardType.Achievement then
+        if not l.achievement then
+            l.achievement = {}
+        end
+
+        for _, achievement in ipairs(l.achievement) do
+            if achievement.id == reward then
+                return
+            end
+        end
+
+        l.achievement[#l.achievement + 1] = { id = reward }
+    elseif rewardType == RewardType.Chance then
+        if not l.chance then
+            l.chance = {}
+        end
+
+        for _, v in pairs(l.chance) do
+            if v.id == reward then
+                return
+            end
+        end
+
+        l.chance[#l.chance + 1] = { id = reward }
+    elseif rewardType == RewardType.Custom then
+        if not l.custom then
+            l.custom = true
+        end
+    elseif rewardType == RewardType.Item then
+        if not l.item then
+            l.item = {}
+        end
+        for k, v in pairs(reward) do
+            l.item[k] = v
+        end
+    elseif rewardType == RewardType.Reputation then
+        if not l.reputation then
+            l.reputation = {}
+        end
+        for k, v in pairs(reward) do
+            l.reputation[k] = v
+        end
+    elseif rewardType == RewardType.Recipe then
+        l.recipe = reward
+    elseif rewardType == RewardType.CustomItem then
+        l.customItem = reward
+    elseif rewardType == RewardType.Currency then
+        if not l.currency then
+            l.currency = {}
+        end
+        for k, v in pairs(reward) do
+            l.currency[k] = v
+        end
+    elseif rewardType == RewardType.ProfessionSkillup then
+        l.professionSkillup = reward
+    elseif rewardType == RewardType.Gold then
+        l.gold = reward
+    elseif rewardType == RewardType.AzeriteTrait then
+        if not l.azeriteTraits then
+            l.azeriteTraits = {}
+        end
+        for k, v in pairs(l.azeriteTraits) do
+            if v.spellID == reward then
+                return
+            end
+        end
+        l.azeriteTraits[#l.azeriteTraits + 1] = { spellID = reward }
+    elseif rewardType == RewardType.Miscellaneous then
+        if not l[RewardType.Miscellaneous] then
+            ---@type { [string]: boolean }
+            l[RewardType.Miscellaneous] = {}
+        end
+
+        table.insert(l[RewardType.Miscellaneous], reward)
+    end
+end
+
+
+local CriteriaType = WQA.Criterias.CriteriaType
+
+---@param items { name: string, criteriaType: CriteriaType, criteria: AreaPoiCriteria[] }[]
+function WQA:AddMiscellaneous(items)
+    for _, item in pairs(items) do
+        if item.criteriaType == CriteriaType.AreaPoi then
+            for _, criteria in pairs(item.criteria) do
+                WQA.Criterias.AreaPoi:AddReward(
+                    criteria --[[@as AreaPoiCriteria]],
+                    RewardType.Miscellaneous,
+                    item.name)
+            end
+        end
+    end
+end
+
+
+
+WQA.Achievements = {}
+
+function WQA.Achievements:Register(achievement, forced, forcedByMe)
+    if achievement.criteriaType == "SPECIAL" then
+        return
+    end
+
+    local id = achievement.id
+    forced = forced or false
+    forcedByMe = false
+
+    if WQA.db.profile.achievements[id] == "disabled" then
+        return
+    end
+    if WQA.db.profile.achievements[id] == "exclusive" and WQA.db.profile.achievements.exclusive[id] ~= WQA.playerName then
+        return
+    end
+    if WQA.db.profile.achievements[id] == "always" then
+        forced = true
+    end
+    if WQA.db.profile.achievements[id] == "wasEarnedByMe" then
+        forcedByMe = true
+    end
+
+    local _, _, _, completed, _, _, _, _, _, _, _, _, wasEarnedByMe = GetAchievementInfo(id)
+    if (achievement.notAccountwide and not wasEarnedByMe) or not completed or forced or forcedByMe then
+        if achievement.criteriaType == "ACHIEVEMENT" then
+            self:Register_ACHIEVEMENT(achievement, forced, forcedByMe)
+        elseif achievement.criteriaType == "QUEST_SINGLE" then
+            self:Register_QUEST_SINGLE(achievement)
+        elseif achievement.criteriaType == "QUEST_PIN" then
+            self:Register_QUEST_PIN(achievement, forced)
+        elseif achievement.criteriaType == "QUEST_FLAG" then
+            self:Register_QUEST_FLAG(achievement)
+        else
+            local achievementNumCriteria = GetAchievementNumCriteria(id)
+
+            if achievementNumCriteria > 0 then
+                for i = 1, achievementNumCriteria do
+                    local _, _, criteriaCompleted, _, _, _, _, questID = GetAchievementCriteriaInfo(id, i)
+
+                    if not criteriaCompleted or forced then
+                        if achievement.criteriaType == "QUESTS" then
+                            self:Register_QUESTS(achievement, i)
+                        elseif achievement.criteriaType == "MISSION_TABLE" then
+                            self:Register_MISSION_TABLE(achievement, i, questID)
+                        elseif achievement.criteriaType == "AREA_POI" then
+                            self:Register_AREA_POI(achievement, i)
+                        else
+                            WQA:AddRewardToQuest(questID, "ACHIEVEMENT", id)
+                        end
+                    end
+                end
+            else
+                if achievement.criteriaType == "QUESTS" then
+                    self:Register_QUESTS(achievement, 1)
+                end
+            end
+        end
+    end
+end
+
+function WQA.Achievements:Register_ACHIEVEMENT(achievement, forced, forcedByMe)
+    for _, criteriaAchievement in pairs(achievement.criteria) do
+        self:Register(criteriaAchievement, forced, forcedByMe)
+    end
+end
+
+function WQA.Achievements:Register_QUEST_SINGLE(achievement)
+    local id = achievement.id
+
+    if type(achievement.criteria) == "table" then
+        for _, questID in pairs(achievement.criteria) do
+            WQA:AddRewardToQuest(questID, "ACHIEVEMENT", id)
+        end
+    else
+        WQA:AddRewardToQuest(achievement.criteria, "ACHIEVEMENT", id)
+    end
+end
+
+function WQA.Achievements:Register_QUEST_PIN(achievement, forced)
+    local id = achievement.id
+
+    C_QuestLine.RequestQuestLinesForMap(achievement.mapID)
+    for i = 1, GetAchievementNumCriteria(id) do
+        local _, _, completed, _, _, _, _, questID = GetAchievementCriteriaInfo(id, i)
+
+        if not questID then
+            return
+        end
+
+        if not completed or forced then
+            if achievement.criteriaInfo[i] then
+                for _, questID in pairs(achievement.criteriaInfo[i]) do
+                    WQA:AddRewardToQuest(questID, "ACHIEVEMENT", id)
+                    WQA.questPinMapList[achievement.mapID] = true
+                    WQA.questPinList[questID] = true
+                end
+            else
+                WQA:AddRewardToQuest(questID, "ACHIEVEMENT", id)
+                WQA.questPinMapList[achievement.mapID] = true
+                WQA.questPinList[questID] = true
+            end
+        end
+    end
+end
+
+function WQA.Achievements:Register_QUEST_FLAG(achievement)
+    WQA:AddRewardToQuest(achievement.criteria, "ACHIEVEMENT", achievement.id)
+    WQA.questFlagList[achievement.criteria] = true
+end
+
+function WQA.Achievements:Register_QUESTS(achievement, index)
+    local id = achievement.id
+
+    if type(achievement.criteria[index]) == "table" then
+        for _, questID in pairs(achievement.criteria[index]) do
+            WQA:AddRewardToQuest(questID, "ACHIEVEMENT", id)
+        end
+    else
+        local questID = achievement.criteria[index]
+        if questID then
+            WQA:AddRewardToQuest(questID, "ACHIEVEMENT", id)
+        end
+    end
+end
+
+function WQA.Achievements:Register_MISSION_TABLE(achievement, index, criteriaQuestId)
+    local id = achievement.id
+
+    if achievement.criteria and achievement.criteria[index] then
+        if type(achievement.criteria[index]) == "table" then
+            for _, questID in pairs(achievement.criteria[index]) do
+                WQA:AddRewardToMission(questID, "ACHIEVEMENT", id)
+            end
+        else
+            local questID = achievement.criteria[index]
+            if questID then
+                WQA:AddRewardToMission(questID, "ACHIEVEMENT", id)
+            end
+        end
+    else
+        WQA:AddRewardToMission(criteriaQuestId, "ACHIEVEMENT", id)
+    end
+end
+
+function WQA.Achievements:Register_AREA_POI(achievement, index)
+    local id = achievement.id
+
+    if not achievement.criteria[index].AreaPoiId then
+        for _, areaPoi in pairs(achievement.criteria[index]) do
+            WQA.Criterias.AreaPoi:AddReward(areaPoi, "ACHIEVEMENT", id)
+        end
+    else
+        local areaPoi = achievement.criteria[index]
+        if areaPoi then
+            WQA.Criterias.AreaPoi:AddReward(areaPoi, "ACHIEVEMENT", id)
+        end
+    end
+end
+
+---@class WQAchievements
+local GetTitleForQuestID = C_QuestLog.GetTitleForQuestID
+
+
+function WQA:GetExpansionByMissionID(missionID)
+    return WQA.missionList[missionID].expansion
+end
+
+local questZoneIDList = {
+    -- Outside Influences
+    [55463] = 1462,
+    [55658] = 1462,
+    [55688] = 1462,
+    [55718] = 1462,
+    [55765] = 1462,
+    [55885] = 1462,
+    [56053] = 1462,
+    [55813] = 1462,
+    [56301] = 1462,
+    [56142] = 1462,
+    [55528] = 1462,
+    [56365] = 1462,
+    [56572] = 1462,
+    [56501] = 1462,
+    [56493] = 1462,
+    [56552] = 1462,
+    [56558] = 1462,
+    [55575] = 1462,
+    [55672] = 1462,
+    [55717] = 1462,
+    [56049] = 1462,
+    [56469] = 1462,
+    [55816] = 1462,
+    [55905] = 1462,
+    [56184] = 1462,
+    [56306] = 1462,
+    [54090] = 1462,
+    [56355] = 1462,
+    [56523] = 1462,
+    [56410] = 1462,
+    [56508] = 1462,
+    [56471] = 1462,
+    [56405] = 1462,
+    -- Periodic Destruction
+    [55121] = 1355
+}
+
+function WQA:GetQuestZoneID(questID)
+    if WQA.questList[questID] and WQA.questList[questID].isEmissary then
+        return "Emissary"
+    end
+    --if not WQA.questList[questID].info then	WQA.questList[questID].info = {} end
+    --if WQA.questList[questID].info.zoneID then
+    --	return WQA.questList[questID].info.zoneID
+    --else
+    --	WQA.questList[questID].info.zoneID = questZoneIDList[questID] or C_TaskQuest.GetQuestZoneID(questID)
+    --	return WQA.questList[questID].info.zoneID
+    --end
+    return questZoneIDList[questID] or C_TaskQuest.GetQuestZoneID(questID)
+end
+
+function WQA:GetMissionZoneID(missionID)
+    if WQA.missionList[missionID].shipyard == true then
+        return -self:GetExpansionByMissionID(missionID) - .5
+    else
+        return -self:GetExpansionByMissionID(missionID)
+    end
+end
+
+function WQA:GetTaskZoneID(task)
+    if task.type == "MISSION" then
+        return self:GetMissionZoneID(task.id)
+    elseif task.type == "WORLD_QUEST" then
+        return self:GetQuestZoneID(task.id)
+    elseif task.type == "AREA_POI" then
+        return task.mapId
+    end
+end
+
+function WQA:GetMapInfo(mapID)
+    if mapID then
+        return C_Map.GetMapInfo(mapID)
+    else
+        return { name = "Unknown" }
+    end
+end
+
+function WQA:GetQuestZoneName(questID)
+    if WQA.questList[questID].isEmissary then
+        return "Emissary"
+    end
+    if not WQA.questList[questID].info then
+        WQA.questList[questID].info = {}
+    end
+    WQA.questList[questID].info.zoneName = WQA.questList[questID].info.zoneName or
+        self:GetMapInfo(self:GetQuestZoneID(questID)).name
+    return WQA.questList[questID].info.zoneName
+end
+
+function WQA:GetMissionZoneName(missionID)
+    if WQA.missionList[missionID].shipyard == true then
+        return "Shipyard"
+    else
+        return "Mission Table"
+    end
+end
+
+function WQA:GetTaskZoneName(task)
+    if task.type == "MISSION" then
+        return self:GetMissionZoneName(task.id)
+    end
+
+    if task.type == "AREA_POI" then
+        return self:GetMapInfo(task.mapId).name
+    end
+
+    return self:GetQuestZoneName(task.id)
+end
+
+ExpansionByZoneID = {
+    -- BfA
+    [1169] = 8 -- Tol Dagor
+}
+
+function WQA:GetExpansionByMapId(mapId)
+    if ExpansionByZoneID[mapId] then
+        return ExpansionByZoneID[mapId]
+    end
+
+    for expansion, zones in pairs(WQA.ZoneIDList) do
+        for _, v in pairs(zones) do
+            if mapId == v then
+                return expansion
+            end
+        end
+    end
+
+    return -1
+end
+
+function WQA:GetExpansionByQuestID(questID)
+    --if not WQA.questList[questID].info then	WQA.questList[questID].info = {} end
+    --if WQA.questList[questID].info.expansion then
+    --	return WQA.questList[questID].info.expansion
+    --else
+    local zoneID = self:GetQuestZoneID(questID)
+
+    local expansionId = self:GetExpansionByMapId(zoneID)
+
+    if (expansionId > 0) then
+        return expansionId
+    end
+
+    for expansion, v in pairs(WQA.EmissaryQuestIDList) do
+        for _, id in pairs(v) do
+            if type(id) == "table" then
+                id = id.id
+            end
+            if id == questID then
+                return expansion
+            end
+        end
+    end
+    return -1
+end
+
+function WQA:GetExpansion(task)
+    if task.type == "MISSION" then
+        return self:GetExpansionByMissionID(task.id)
+    end
+
+    if task.type == "AREA_POI" then
+        return self:GetExpansionByMapId(task.mapId)
+    end
+
+    return self:GetExpansionByQuestID(task.id)
+end
+
+function WQA:GetExpansionName(id)
+    return WQA.ExpansionList[id] or "Unknown"
+end
+
+function WQA:GetMissionTimeLeftMinutes(id)
+    if not WQA.missionList[id].offerEndTime then
+        return 0
+    else
+        return (WQA.missionList[id].offerEndTime - GetTime()) / 60
+    end
+end
+
+function WQA:GetTaskTime(task)
+    if task.type == "WORLD_QUEST" then
+        return C_TaskQuest.GetQuestTimeLeftMinutes(task.id)
+    elseif task.type == "MISSION" then
+        return self:GetMissionTimeLeftMinutes(task.id)
+    elseif task.type == "AREA_POI" then
+        local seconds = C_AreaPoiInfo.GetAreaPOISecondsLeft(task.id)
+        if seconds then
+            return seconds / 60
+        end
+    end
+end
+
+function WQA:GetTaskLink(task)
+    if task.type == "WORLD_QUEST" then
+        --	else
+        --		return GetQuestLink(task.id)
+        --	end
+        --	if WQA.questPinList[task.id] or WQA.questFlagList[task.id] then
+        return GetQuestLink(task.id) or GetTitleForQuestID(task.id)
+    elseif task.type == "MISSION" then
+        return C_Garrison.GetMissionLink(task.id)
+    elseif task.type == "AREA_POI" then
+        return C_AreaPoiInfo.GetAreaPOIInfo(task.mapId, task.id).name
+    end
+end
+
+
+
+local L = WQA.L
+local LibQTip = LibStub("LibQTip-1.0")
+
+
+function WQA:CreateQTip()
+    if not LibQTip:IsAcquired("WQAchievements") and not self.tooltip then
+        local tooltip = LibQTip:Acquire("WQAchievements", 2, "LEFT", "LEFT")
+        self.tooltip = tooltip
+
+        tooltip:SetScript("OnHide", function()
+            if WQA.PopUp then
+                WQA.PopUp:Hide()
+            end
+        end)
+
+        if self.db.profile.options.popupShowExpansion or self.db.profile.options.popupShowZone then
+            tooltip:AddColumn()
+        end
+        if self.db.profile.options.popupShowTime then
+            tooltip:AddColumn()
+        end
+
+        tooltip:AddHeader("World Quest")
+        tooltip:SetCell(1, tooltip:GetColumnCount(), "Reward")
+        tooltip:SetFrameStrata("MEDIUM")
+        tooltip:SetFrameLevel(100)
+        tooltip:AddSeparator()
+    end
+end
+
+---@param questID number
+local function GetIconTexture(questID)
+    local texture = select(2, GetQuestLogRewardInfo(1, questID))
+    if texture then
+        return texture
+    end
+
+    local currencyInfo = C_QuestLog.GetQuestRewardCurrencyInfo(questID, 1, false)
+    if currencyInfo then
+        return currencyInfo.texture
+    end
+
+    return [[Interface\GossipFrame\auctioneerGossipIcon]]
+end
+
+function WQA:UpdateQTip(tasks)
+    local tooltip = self.tooltip
+    if next(tasks) == nil then
+        tooltip:AddLine(L["NO_QUESTS"])
+    else
+        tooltip.quests = tooltip.quests or {}
+        tooltip.missions = tooltip.missions or {}
+        tooltip.pois = tooltip.pois or {}
+
+        local i = tooltip:GetLineCount()
+        local expansion, zoneID
+        for _, task in ipairs(tasks) do
+            local id = task.id
+            if
+                (task.type == "WORLD_QUEST" and not tooltip.quests[id]) or (task.type == "MISSION" and not tooltip.missions[id]) or
+                (task.type == "AREA_POI" and not tooltip.pois[id])
+            then
+                local j = 1
+
+                if self.db.profile.options.popupShowExpansion then
+                    j = 2
+                    if self:GetExpansion(task) ~= expansion then
+                        expansion = self:GetExpansion(task)
+                        tooltip:AddLine(string.format("|cff33ff33%s|r", self:GetExpansionName(expansion)))
+                        i = i + 1
+                        zoneID = nil
+                    end
+                end
+
+                tooltip:AddLine()
+                i = i + 1
+
+                if self.db.profile.options.popupShowZone then
+                    j = 2
+                    if self:GetTaskZoneID(task) ~= zoneID then
+                        zoneID = self:GetTaskZoneID(task)
+                        tooltip:SetCell(i, 1, "     " .. self:GetTaskZoneName(task))
+                    end
+                end
+
+                if self.db.profile.options.popupShowTime then
+                    tooltip:SetCell(i, j, self:formatTime(self:GetTaskTime(task)))
+                    j = j + 1
+                end
+
+                if task.type == "WORLD_QUEST" then
+                    tooltip.quests[id] = true
+                elseif task.type == "MISSION" then
+                    tooltip.missions[id] = true
+                end
+
+                local link = self:GetTaskLink(task)
+                tooltip:SetCell(i, j, link)
+
+                tooltip:SetCellScript(
+                    i,
+                    j,
+                    "OnEnter",
+                    function(self)
+                        GameTooltip_SetDefaultAnchor(GameTooltip, self)
+                        GameTooltip:ClearLines()
+                        GameTooltip:ClearAllPoints()
+                        GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 0)
+                        if task.type == "WORLD_QUEST" then
+                            if string.find(link, "|Hquest:") then
+                                GameTooltip:SetHyperlink(link)
+                            end
+                        elseif task.type == "MISSION" then
+                            GameTooltip:SetText(C_Garrison.GetMissionName(id))
+                            GameTooltip:AddLine(
+                                string.format(GARRISON_MISSION_TOOLTIP_NUM_REQUIRED_FOLLOWERS,
+                                    C_Garrison.GetMissionMaxFollowers(id)),
+                                1,
+                                1,
+                                1
+                            )
+                            GarrisonMissionButton_AddThreatsToTooltip(
+                                id,
+                                WQA.missionList[task.id].followerType,
+                                false,
+                                C_Garrison.GetFollowerAbilityCountersForMechanicTypes(WQA.missionList[task.id]
+                                    .followerType)
+                            )
+                            GameTooltip:AddLine(GARRISON_MISSION_AVAILABILITY)
+                            GameTooltip:AddLine(WQA.missionList[task.id].offerTimeRemaining, 1, 1, 1)
+                            if not C_Garrison.IsPlayerInGarrison(WQA.missionList[task.id].followerType) then
+                                GameTooltip:AddLine(" ")
+                                GameTooltip:AddLine(
+                                    GarrisonFollowerOptions[WQA.missionList[task.id].followerType].strings
+                                    .RETURN_TO_START,
+                                    nil,
+                                    nil,
+                                    nil,
+                                    1
+                                )
+                            end
+                        elseif task.type == "AREA_POI" then
+                            local poiInfo = C_AreaPoiInfo.GetAreaPOIInfo(task.mapId, task.id)
+
+                            GameTooltip_SetTitle(GameTooltip, poiInfo.name, HIGHLIGHT_FONT_COLOR)
+
+                            if poiInfo.description then
+                                GameTooltip_AddNormalLine(GameTooltip, poiInfo.description)
+                            end
+
+                            if C_AreaPoiInfo.IsAreaPOITimed(poiInfo.areaPoiID) then
+                                local secondsLeft = C_AreaPoiInfo.GetAreaPOISecondsLeft(poiInfo.areaPoiID)
+                                if secondsLeft and secondsLeft > 0 then
+                                    local timeString = SecondsToTime(secondsLeft)
+                                    GameTooltip_AddNormalLine(GameTooltip, BONUS_OBJECTIVE_TIME_LEFT:format(timeString))
+                                end
+                            end
+
+                            if poiInfo.textureKit == "OribosGreatVault" then
+                                GameTooltip_AddBlankLineToTooltip(GameTooltip)
+                                GameTooltip_AddInstructionLine(GameTooltip, ORIBOS_GREAT_VAULT_POI_TOOLTIP_INSTRUCTIONS)
+                            end
+
+                            if poiInfo.widgetSetID then
+                                GameTooltip_AddWidgetSet(GameTooltip, poiInfo.widgetSetID, 10)
+                            end
+
+                            if poiInfo.textureKit then
+                                local backdropStyle = GAME_TOOLTIP_TEXTUREKIT_BACKDROP_STYLES[poiInfo.textureKit]
+                                if (backdropStyle) then
+                                    SharedTooltip_SetBackdropStyle(GameTooltip, backdropStyle)
+                                end
+                            end
+                        end
+                        GameTooltip:Show()
+                    end
+                )
+                tooltip:SetCellScript(
+                    i,
+                    j,
+                    "OnLeave",
+                    function()
+                        GameTooltip:Hide()
+                    end
+                )
+                tooltip:SetCellScript(
+                    i,
+                    j,
+                    "OnMouseDown",
+                    function()
+                        if ChatEdit_TryInsertChatLink(link) ~= true then
+                            if
+                                task.type == "WORLD_QUEST" and not WQA.questList[id].isEmissary and
+                                not (self.questPinList[id] or self.questFlagList[id])
+                            then
+                                if WorldQuestTrackerAddon and self.db.profile.options.WorldQuestTracker then
+                                    if WorldQuestTrackerAddon.IsQuestBeingTracked(id) then
+                                        WorldQuestTrackerAddon.RemoveQuestFromTracker(id)
+                                        WQA:ScheduleTimer(
+                                            function()
+                                                WorldQuestTrackerAddon:FullTrackerUpdate()
+                                            end,
+                                            .5
+                                        )
+                                    else
+                                        local _, _, numObjectives = GetTaskInfo(id)
+                                        local widget = {
+                                            questID = id,
+                                            mapID = self:GetQuestZoneID(id),
+                                            numObjectives = numObjectives
+                                        }
+                                        zoneID = self:GetQuestZoneID(id)
+                                        local x, y = C_TaskQuest.GetQuestLocation(id, zoneID)
+                                        widget.questX, widget.questY = x or 0, y or 0
+                                        widget.IconTexture = GetIconTexture(id)
+                                        local function f(widget)
+                                            if not widget.IconTexture then
+                                                WQA:ScheduleTimer(
+                                                    function()
+                                                        widget.IconTexture = GetIconTexture(id)
+                                                        f(widget)
+                                                    end,
+                                                    1.5
+                                                )
+                                            else
+                                                WorldQuestTrackerAddon.AddQuestToTracker(widget)
+                                                WQA:ScheduleTimer(
+                                                    function()
+                                                        WorldQuestTrackerAddon:FullTrackerUpdate()
+                                                    end,
+                                                    .5
+                                                )
+                                            end
+                                        end
+                                        f(widget)
+                                    end
+                                else
+                                    if not C_QuestLog.AddWorldQuestWatch(id, 1) then
+                                        C_QuestLog.RemoveWorldQuestWatch(id)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                )
+
+                local list
+                if task.type == "WORLD_QUEST" then
+                    list = WQA.questList[id].reward
+                elseif task.type == "MISSION" then
+                    list = WQA.missionList[id].reward
+                elseif task.type == "AREA_POI" then
+                    list = WQA.Criterias.AreaPoi.list[task.id][task.mapId].reward
+                end
+
+                local more = false
+                for k, v in pairs(list) do
+                    for n = 1, 3 do
+                        if n == 1 or (n > 1 and (k == "achievement" or k == "chance" or k == "azeriteTraits")) then
+                            local text = self:GetRewardTextByID(id, k, v, n, task.type)
+                            if text then
+                                j = j + 1
+
+                                if j > tooltip:GetColumnCount() then
+                                    tooltip:AddColumn()
+                                end
+                                tooltip:SetCell(i, j, text)
+
+                                tooltip:SetCellScript(
+                                    i,
+                                    j,
+                                    "OnEnter",
+                                    function(self)
+                                        GameTooltip:SetOwner(self, "ANCHOR_NONE")
+                                        GameTooltip:ClearLines()
+                                        ContainerFrameItemButton_CalculateItemTooltipAnchors(self, GameTooltip)
+
+                                        if WQA:GetRewardLinkByID(id, k, v, n) then
+                                            GameTooltip:SetHyperlink(WQA:GetRewardLinkByID(id, k, v, n))
+                                        else
+                                            GameTooltip:SetText(WQA:GetRewardTextByID(id, k, v, n, task.type))
+                                        end
+                                        GameTooltip:Show()
+                                        if (IsModifiedClick("COMPAREITEMS") or GetCVarBool("alwaysCompareItems")) and k == "item" then
+                                            GameTooltip_ShowCompareItem()
+                                        else
+                                            GameTooltip_HideShoppingTooltips(GameTooltip)
+                                        end
+                                    end
+                                )
+                                tooltip:SetCellScript(
+                                    i,
+                                    j,
+                                    "OnLeave",
+                                    function()
+                                        GameTooltip_HideResetCursor()
+                                    end
+                                )
+                                tooltip:SetCellScript(
+                                    i,
+                                    j,
+                                    "OnMouseDown",
+                                    function()
+                                        HandleModifiedItemClick(WQA:GetRewardLinkByID(id, k, v, n))
+                                    end
+                                )
+                                if n == 3 then
+                                    local m = 4
+                                    if self:GetRewardTextByID(id, k, v, m, task.type) then
+                                        j = j + 1
+                                        if j > tooltip:GetColumnCount() then
+                                            tooltip:AddColumn()
+                                        end
+                                        tooltip:SetCell(i, j, "...")
+                                        local moreTooltipText = ""
+                                        while self:GetRewardTextByID(id, k, v, m, task.type) do
+                                            if m == 4 then
+                                                moreTooltipText = moreTooltipText ..
+                                                    self:GetRewardTextByID(id, k, v, m, task.type)
+                                            else
+                                                moreTooltipText = moreTooltipText ..
+                                                    "\n" .. self:GetRewardTextByID(id, k, v, m, task.type)
+                                            end
+                                            m = m + 1
+                                        end
+
+                                        tooltip:SetCellScript(
+                                            i,
+                                            j,
+                                            "OnEnter",
+                                            function(self)
+                                                GameTooltip_SetDefaultAnchor(GameTooltip, self)
+                                                GameTooltip:ClearLines()
+                                                GameTooltip:ClearAllPoints()
+                                                GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 0)
+                                                GameTooltip:SetText(moreTooltipText)
+                                                GameTooltip:Show()
+                                            end
+                                        )
+                                        tooltip:SetCellScript(
+                                            i,
+                                            j,
+                                            "OnLeave",
+                                            function()
+                                                GameTooltip:Hide()
+                                            end
+                                        )
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    tooltip:Show()
+end
+
+function WQA:AnnouncePopUp(quests, silent)
+    if not self.PopUp then
+        local PopUp = CreateFrame("Frame", "WQAchievementsPopUp", UIParent, "UIPanelDialogTemplate")
+        if self.db.profile.options.esc then
+            tinsert(UISpecialFrames, "WQAchievementsPopUp")
+        end
+        self.PopUp = PopUp
+        PopUp:SetMovable(true)
+        PopUp:EnableMouse(true)
+        PopUp:RegisterForDrag("LeftButton")
+        PopUp:SetScript(
+            "OnDragStart",
+            function(self)
+                self.moving = true
+                self:StartMoving()
+            end
+        )
+        PopUp:SetScript(
+            "OnDragStop",
+            function(self)
+                self.moving = nil
+                self:StopMovingOrSizing()
+                if WQA.db.profile.options.popupRememberPosition then
+                    WQA.db.profile.options.popupX = self:GetLeft()
+                    WQA.db.profile.options.popupY = self:GetTop()
+                end
+            end
+        )
+		PopUp:SetWidth(430)
+		PopUp:SetHeight(80)
+		PopUp:SetPoint("BOTTOM", 0, 120)
+        PopUp:Hide()
+
+        PopUp:SetScript(
+            "OnHide",
+            function()
+                if WQA.tooltip ~= nil then
+                    LibQTip:Release(WQA.tooltip)
+                    WQA.tooltip.quests = nil
+                    WQA.tooltip.missions = nil
+                    WQA.tooltip = nil
+                end
+
+                PopUp.shown = false
+            end
+        )
+    end
+    if next(quests) == nil and silent == true then
+        return
+    end
+    local PopUp = self.PopUp
+    PopUp:Show()
+    PopUp.shown = true
+    self:CreateQTip()
+    self.tooltip:SetAutoHideDelay()
+    self.tooltip:ClearAllPoints()
+    self.tooltip:SetPoint("TOP", PopUp, "TOP", 2, -27)
+    self:UpdateQTip(quests)
+    PopUp:SetWidth(self.tooltip:GetWidth() + 8.5)
+    PopUp:SetHeight(self.tooltip:GetHeight() + 32)
+    PopUp:SetScale(self.tooltip:GetScale())
+    if (PopUp:GetEffectiveScale() ~= self.tooltip:GetEffectiveScale()) then
+        PopUp:SetScale(PopUp:GetScale() * self.tooltip:GetEffectiveScale() / PopUp:GetEffectiveScale())
+    end
+    PopUp:SetFrameLevel(self.tooltip:GetFrameLevel())
+
+    if self.db.profile.options.popupRememberPosition then
+        PopUp:ClearAllPoints()
+        PopUp:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.options.popupX, self.db.profile.options.popupY)
+    end
+end
+
+function WQA:SortByZoneName(a, b)
+    if a.type == "MISSION" and b.type ~= "MISSION" then
+        return false
+    elseif b.type == "MISSION" and a.type ~= "MISSION" then
+        return true
+    elseif a.type == "MISSION" and b.type == "MISSION" then
+        return self:GetTaskZoneName(a) < self:GetTaskZoneName(b)
+    end
+
+    if a.type == "WORLD_QUEST" and WQA.questList[a.id].isEmissary ~= nil then
+        if b.type == "WORLD_QUEST" and WQA.questList[b.id].isEmissary ~= nil then
+            return false
+        else
+            return true
+        end
+    elseif b.type == "WORLD_QUEST" and WQA.questList[b.id].isEmissary ~= nil then
+        return false
+    end
+
+    return self:GetTaskZoneName(a) < self:GetTaskZoneName(b)
+end
+
+function WQA:SortByExpansion(a, b)
+    a = self:GetExpansion(a)
+
+    b = self:GetExpansion(b)
+    --returnself:GetExpansion(a) >self:GetExpansion(b)
+    return a > b
+end
+
+local LibQTip = LibStub("LibQTip-1.0")
 -- Blizzard
 local IsActive = C_TaskQuest.IsActive
 local GetQuestTagInfo = C_QuestLog.GetQuestTagInfo
@@ -16,189 +2660,6 @@ local GetBountiesForMapID = C_QuestLog.GetBountiesForMapID
 local GetTitleForQuestID = C_QuestLog.GetTitleForQuestID
 local GetCurrencyLink = C_CurrencyInfo.GetCurrencyLink
 local IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
-
-local function GetExpansionByMissionID(missionID)
-	return WQA.missionList[missionID].expansion
-end
-
-local questZoneIDList = {
-	-- Outside Influences
-	[55463] = 1462,
-	[55658] = 1462,
-	[55688] = 1462,
-	[55718] = 1462,
-	[55765] = 1462,
-	[55885] = 1462,
-	[56053] = 1462,
-	[55813] = 1462,
-	[56301] = 1462,
-	[56142] = 1462,
-	[55528] = 1462,
-	[56365] = 1462,
-	[56572] = 1462,
-	[56501] = 1462,
-	[56493] = 1462,
-	[56552] = 1462,
-	[56558] = 1462,
-	[55575] = 1462,
-	[55672] = 1462,
-	[55717] = 1462,
-	[56049] = 1462,
-	[56469] = 1462,
-	[55816] = 1462,
-	[55905] = 1462,
-	[56184] = 1462,
-	[56306] = 1462,
-	[54090] = 1462,
-	[56355] = 1462,
-	[56523] = 1462,
-	[56410] = 1462,
-	[56508] = 1462,
-	[56471] = 1462,
-	[56405] = 1462,
-	-- Periodic Destruction
-	[55121] = 1355
-}
-
-local function GetQuestZoneID(questID)
-	if WQA.questList[questID] and WQA.questList[questID].isEmissary then return BOUNTY_BOARD_LOCKED_TITLE end  --"Emissary"
-	--if not WQA.questList[questID].info then	WQA.questList[questID].info = {} end
-	--if WQA.questList[questID].info.zoneID then
-	--	return WQA.questList[questID].info.zoneID
-	--else
-	--	WQA.questList[questID].info.zoneID = questZoneIDList[questID] or C_TaskQuest.GetQuestZoneID(questID)
-	--	return WQA.questList[questID].info.zoneID
-	--end
-	return questZoneIDList[questID] or C_TaskQuest.GetQuestZoneID(questID)
-end
-
-local function GetMissionZoneID(missionID)
-	if WQA.missionList[missionID].shipyard == true then
-		return -GetExpansionByMissionID(missionID) - .5
-	else
-		return -GetExpansionByMissionID(missionID)
-	end
-end
-
-local function GetTaskZoneID(task)
-	if task.type == "MISSION" then
-		return GetMissionZoneID(task.id)
-	else
-		return GetQuestZoneID(task.id)
-	end
-end
-
-local function GetMapInfo(mapID)
-	if mapID then
-		return C_Map.GetMapInfo(mapID)
-	else
-		return {name = "Unknown"}
-	end
-end
-
-local function GetQuestZoneName(questID)
-	if WQA.questList[questID].isEmissary then return BOUNTY_BOARD_LOCKED_TITLE end    --"Emissary"
-	if not WQA.questList[questID].info then	WQA.questList[questID].info = {} end
-	WQA.questList[questID].info.zoneName = WQA.questList[questID].info.zoneName or GetMapInfo(GetQuestZoneID(questID)).name
-	return WQA.questList[questID].info.zoneName
-end
-
-local function GetMissionZoneName(missionID)
-	if WQA.missionList[missionID].shipyard == true then
-		return GARRISON_SHIPYARD_MISSION_REPORT   --"Shipyard"
-	else
-		return BFA_MISSION_REPORT   --"Mission Table"
-	end
-end
-
-local function GetTaskZoneName(task)
-	if task.type == "MISSION" then
-		return GetMissionZoneName(task.id)
-	else
-		return GetQuestZoneName(task.id)
-	end
-end
-
-ExpansionByZoneID = {
-	-- BfA
-	[1169] = 8 -- Tol Dagor
-}
-
-local function GetExpansionByQuestID(questID)
-	--if not WQA.questList[questID].info then	WQA.questList[questID].info = {} end
-	--if WQA.questList[questID].info.expansion then
-	--	return WQA.questList[questID].info.expansion
-	--else
-	local zoneID = GetQuestZoneID(questID)
-
-	if ExpansionByZoneID[zoneID] then
-		--	WQA.questList[questID].info.expansion = ExpansionByZoneID[zoneID]
-		return ExpansionByZoneID[zoneID]
-	end
-
-	for expansion, zones in pairs(WQA.ZoneIDList) do
-		for _, v in pairs(zones) do
-			if zoneID == v then
-				--			WQA.questList[questID].info.expansion = expansion
-				return expansion
-			end
-		end
-	end
-
-	for expansion, v in pairs(WQA.EmissaryQuestIDList) do
-		for _, id in pairs(v) do
-			if type(id) == "table" then
-				id = id.id
-			end
-			if id == questID then
-				--					WQA.questList[questID].info.expansion = expansion
-				return expansion
-			end
-		end
-	end
-	--end
-	return -1
-end
-
-local function GetExpansion(task)
-	if task.type == "MISSION" then
-		return GetExpansionByMissionID(task.id)
-	else
-		return GetExpansionByQuestID(task.id)
-	end
-end
-
-local function GetExpansionName(id)
-	return WQA.ExpansionList[id] or " |cFFFF0000"..INSTANCE.. " >>>|r"  --"^-^"
-end
-
-local function GetMissionTimeLeftMinutes(id)
-	if not WQA.missionList[id].offerEndTime then
-		return 0
-	else
-		return (WQA.missionList[id].offerEndTime - GetTime()) / 60
-	end
-end
-
-local function GetTaskTime(task)
-	if task.type == "WORLD_QUEST" then
-		return C_TaskQuest.GetQuestTimeLeftMinutes(task.id)
-	else
-		return GetMissionTimeLeftMinutes(task.id)
-	end
-end
-
-local function GetTaskLink(task)
-	if task.type == "WORLD_QUEST" then
-		--	else
-		--		return GetQuestLink(task.id)
-		--	end
-		--	if WQA.questPinList[task.id] or WQA.questFlagList[task.id] then
-		return GetQuestLink(task.id) or GetTitleForQuestID(task.id)
-	else
-		return C_Garrison.GetMissionLink(task.id)
-	end
-end
 
 local newOrder
 do
@@ -209,20 +2670,20 @@ do
 	end
 end
 
-WQA.data.custom = {wqID = "", rewardID = "", rewardType = "none", questType = "WORLD_QUEST"}
-WQA.data.custom.mission = {missionID = "", rewardID = "", rewardType = "none"}
+WQA.data.custom = { wqID = "", rewardID = "", rewardType = "none", questType = "WORLD_QUEST" }
+WQA.data.custom.mission = { missionID = "", rewardID = "", rewardType = "none" }
 --WQA.data.customReward = 0
 
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1")
 local dataobj =
 	ldb:NewDataObject(
-	"WQAchievements",
-	{
-		type = "data source",
-		text = "WQA",
-		icon = "Interface\\Icons\\INV_Misc_Map06"
-	}
-)
+		"WQAchievements",
+		{
+			type = "data source",
+			text = "WQA",
+			icon = "Interface\\Icons\\INV_Misc_Map06"
+		}
+	)
 
 local icon = LibStub("LibDBIcon-1.0")
 
@@ -268,7 +2729,8 @@ function WQA:OnInitialize()
 						itemLevelUpgradeMin = 1,
 						PercentUpgradeMin = 1,
 						unknownSource = true,
-						azeriteTraits = ""
+						azeriteTraits = "",
+						conduit = false
 					},
 					general = {
 						gold = false,
@@ -300,21 +2762,21 @@ function WQA:OnInitialize()
 					}
 				},
 				delay = 1,
-				LibDBIcon = {hide = false}
+				LibDBIcon = { hide = false }
 			},
-			["achievements"] = {exclusive = {}, ["*"] = "default"},
-			["mounts"] = {exclusive = {}, ["*"] = "default"},
-			["pets"] = {exclusive = {}, ["*"] = "default"},
-			["toys"] = {exclusive = {}, ["*"] = "default"},
+			["achievements"] = { exclusive = {}, ["*"] = "default" },
+			["mounts"] = { exclusive = {}, ["*"] = "default" },
+			["pets"] = { exclusive = {}, ["*"] = "default" },
+			["toys"] = { exclusive = {}, ["*"] = "default" },
 			custom = {
-				["*"] = {["*"] = true}
+				["*"] = { ["*"] = true }
 			},
-			["*"] = {["*"] = true}
+			["*"] = { ["*"] = true }
 		},
 		global = {
-			completed = {["*"] = false},
+			completed = { ["*"] = false },
 			custom = {
-				["*"] = {["*"] = false}
+				["*"] = { ["*"] = false }
 			}
 		}
 	}
@@ -355,28 +2817,35 @@ function WQA:OnEnable()
 	self.event = CreateFrame("Frame")
 	self.event:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self.event:RegisterEvent("GARRISON_MISSION_LIST_UPDATE")
-	self.event:SetScript(		"OnEvent",		function(...)
+	self.event:SetScript(
+		"OnEvent",
+		function(...)
 			local _, name, id = ...
 			if name == "PLAYER_ENTERING_WORLD" then
-				for i = 1, #self.ZoneIDList do
-					for _, mapID in pairs(self.ZoneIDList[i]) do
-						if self.db.profile.options.zone[mapID] == true then
-							local quests = C_TaskQuest.GetQuestsForPlayerByMapID(mapID)
-							if quests then
-								for i = 1, #quests do
-									local questID = quests[i].questId
-									local numQuestRewards = GetNumQuestLogRewards(questID)
-									if numQuestRewards > 0 then
-										local itemName, itemTexture, quantity, quality, isUsable, itemID = GetQuestLogRewardInfo(1, questID)
+				self:ScheduleTimer(
+					function()
+						for i = 1, #self.ZoneIDList do
+							for _, mapID in pairs(self.ZoneIDList[i]) do
+								if self.db.profile.options.zone[mapID] == true then
+									local quests = C_TaskQuest.GetQuestsOnMap(mapID)
+									if quests then
+										for j = 1, #quests do
+											local questID = quests[j].questId
+											local numQuestRewards = GetNumQuestLogRewards(questID)
+											if numQuestRewards > 0 then
+												GetQuestLogRewardInfo(1, questID)
+											end
+										end
 									end
 								end
 							end
 						end
-					end
-				end
+					end,
+					self.db.profile.options.delay
+				)
 
 				self.event:UnregisterEvent("PLAYER_ENTERING_WORLD")
-				self:ScheduleTimer("Show", self.db.profile.options.delay, nil, true)
+				self:ScheduleTimer("Show", self.db.profile.options.delay + 1, nil, true)
 				self:ScheduleTimer(
 					function()
 						self:Show("new", true)
@@ -404,751 +2873,9 @@ function WQA:OnEnable()
 		end
 	)
 
-	LoadAddOn("Blizzard_GarrisonUI")
+	C_AddOns.LoadAddOn("Blizzard_GarrisonUI")
 end
 
-WQA:RegisterChatCommand("wqa", "slash")
-
-function WQA:slash(input)
-	local arg1 = string.lower(input)
-	if arg1 == "" then
-		self:Show()
-	elseif arg1 == "new" then
-		self:Show("new")
-	elseif arg1 == "popup" then
-		self:Show("popup")
-	end
-end
-
-------------------
--- 	Data
-------------------
---	Legion
-do
-	local legion = {}
-	local trainer = {
-		42159,
-		40299,
-		40277,
-		42442,
-		40298,
-		40280,
-		40282,
-		41687,
-		40278,
-		41944,
-		41895,
-		40337,
-		41990,
-		40279,
-		41860
-	}
-	local argusTrainer = {
-		49041,
-		49042,
-		49043,
-		49044,
-		49045,
-		49046,
-		49047,
-		49048,
-		49049,
-		49050,
-		49051,
-		49052,
-		49053,
-		49054,
-		49055,
-		49056,
-		49057,
-		49058
-	}
-	legion = {
-		name = "Legion",
-		achievements = {
-			{
-				name = "Free For All, More For Me",
-				id = 11474,
-				criteriaType = "ACHIEVEMENT",
-				criteria = {
-					{id = 11475, notAccountwide = true},
-					{id = 11476, notAccountwide = true},
-					{id = 11477, notAccountwide = true},
-					{id = 11478, notAccountwide = true}
-				}
-			},
-			{
-				name = "Family Familiar",
-				id = 9696,
-				criteriaType = "ACHIEVEMENT",
-				criteria = {
-					{id = 9686, criteriaType = "QUESTS", criteria = trainer},
-					{id = 9687, criteriaType = "QUESTS", criteria = trainer},
-					{id = 9688, criteriaType = "QUESTS", criteria = trainer},
-					{id = 9689, criteriaType = "QUESTS", criteria = trainer},
-					{id = 9690, criteriaType = "QUESTS", criteria = trainer},
-					{id = 9691, criteriaType = "QUESTS", criteria = trainer},
-					{id = 9692, criteriaType = "QUESTS", criteria = trainer},
-					{id = 9693, criteriaType = "QUESTS", criteria = trainer},
-					{id = 9694, criteriaType = "QUESTS", criteria = trainer},
-					{id = 9695, criteriaType = "QUESTS", criteria = trainer}
-				}
-			},
-			{
-				name = "Family Fighter",
-				id = 12100,
-				criteriaType = "ACHIEVEMENT",
-				criteria = {
-					{id = 12089, criteriaType = "QUESTS", criteria = argusTrainer},
-					{id = 12091, criteriaType = "QUESTS", criteria = argusTrainer},
-					{id = 12092, criteriaType = "QUESTS", criteria = argusTrainer},
-					{id = 12093, criteriaType = "QUESTS", criteria = argusTrainer},
-					{id = 12094, criteriaType = "QUESTS", criteria = argusTrainer},
-					{id = 12095, criteriaType = "QUESTS", criteria = argusTrainer},
-					{id = 12096, criteriaType = "QUESTS", criteria = argusTrainer},
-					{id = 12097, criteriaType = "QUESTS", criteria = argusTrainer},
-					{id = 12098, criteriaType = "QUESTS", criteria = argusTrainer},
-					{id = 12099, criteriaType = "QUESTS", criteria = argusTrainer}
-				}
-			},
-			{name = "Battle on the Broken Isles", id = 10876},
-			{
-				name = "Fishing 'Round the Isles",
-				id = 10598,
-				criteriaType = "QUESTS",
-				criteria = {
-					{41612, 41613, 41270},
-					41267,
-					{41604, 41605, 41279},
-					{41598, 41599, 41264},
-					41268,
-					41252,
-					{41611, 41265, 41610},
-					{41617, 41280, 41616},
-					{41597, 41244, 41596},
-					{41602, 41274, 41603},
-					{41609, 41243},
-					41273,
-					41266,
-					{41615, 41275, 41614},
-					41278,
-					41271,
-					41277,
-					41240,
-					{41269, 41600, 41601},
-					41253,
-					41276,
-					41272,
-					41282,
-					41283
-				}
-			},
-			{name = "Crate Expectations", id = 11681, criteriaType = "QUEST_SINGLE", criteria = 45542},
-			{name = "They See Me Rolling", id = 11607, criteriaType = "QUEST_SINGLE", criteria = 46175},
-			{name = "Variety is the Spice of Life", id = 11189, criteriaType = "SPECIAL"}
-		},
-		mounts = {
-			{name = "Maddened Chaosrunner", itemID = 152814, spellID = 253058, quest = {{trackingID = 48695, wqID = 48696}}},
-			{name = "Crimson Slavermaw", itemID = 152905, spellID = 253661, quest = {{trackingID = 49183, wqID = 47561}}},
-			{name = "Acid Belcher", itemID = 152904, spellID = 253662, quest = {{trackingID = 48721, wqID = 48740}}},
-			{name = "Vile Fiend", itemID = 152790, spellID = 243652, quest = {{trackingID = 48821, wqID = 48835}}},
-			{name = "Lambent Mana Ray", itemID = 152844, spellID = 253107, quest = {{trackingID = 48705, wqID = 48725}}},
-			{
-				name = "Biletooth Gnasher",
-				itemID = 152903,
-				spellID = 253660,
-				quest = {{trackingID = 48810, wqID = 48465}, {trackingID = 48809, wqID = 48467}}
-			},
-			-- Egg
-			{
-				name = "Vibrant Mana Ray",
-				itemID = 152842,
-				spellID = 253106,
-				quest = {{trackingID = 48667, wqID = 48502}, {trackingID = 48712, wqID = 48732}, {trackingID = 48812, wqID = 48827}}
-			},
-			{
-				name = "Felglow Mana Ray",
-				itemID = 152841,
-				spellID = 253108,
-				quest = {{trackingID = 48667, wqID = 48502}, {trackingID = 48712, wqID = 48732}, {trackingID = 48812, wqID = 48827}}
-			},
-			{
-				name = "Scintillating Mana Ray",
-				itemID = 152840,
-				spellID = 253109,
-				quest = {{trackingID = 48667, wqID = 48502}, {trackingID = 48712, wqID = 48732}, {trackingID = 48812, wqID = 48827}}
-			},
-			{
-				name = "Darkspore Mana Ray",
-				itemID = 152843,
-				spellID = 235764,
-				quest = {{trackingID = 48667, wqID = 48502}, {trackingID = 48712, wqID = 48732}, {trackingID = 48812, wqID = 48827}}
-			}
-		},
-		pets = {
-			{name = "Grasping Manifestation", itemID = 153056, creatureID = 128159, quest = {{trackingID = 0, wqID = 48729}}},
-			-- Egg
-			{
-				name = "Fel-Afflicted Skyfin",
-				itemID = 153055,
-				creatureID = 128158,
-				quest = {{trackingID = 48667, wqID = 48502}, {trackingID = 48712, wqID = 48732}, {trackingID = 48812, wqID = 48827}}
-			},
-			{
-				name = "Docile Skyfin",
-				itemID = 153054,
-				creatureID = 128157,
-				quest = {{trackingID = 48667, wqID = 48502}, {trackingID = 48712, wqID = 48732}, {trackingID = 48812, wqID = 48827}}
-			},
-			-- Emissary
-			{name = "Thistleleaf Adventurer", itemID = 130167, creatureID = 99389, questID = 42170, emissary = true},
-			{name = "Wondrous Wisdomball", itemID = 141348, creatureID = 113827, questID = 43179, emissary = true},
-			-- Treasure Master Iks'reeged
-			{name = "Scraps", itemID = 146953, creatureID = 120397, questID = 45379}
-		},
-		toys = {
-			{
-				name = "Barrier Generator",
-				itemID = 153183,
-				quest = {{trackingID = 48704, wqID = 48724}, {trackingID = 48703, wqID = 48723}}
-			},
-			{name = "Micro-Artillery Controller", itemID = 153126, quest = {{trackingID = 0, wqID = 48829}}},
-			{name = "Spire of Spite", itemID = 153124, quest = {{trackingID = 0, wqID = 48512}}},
-			{name = "Yellow Conservatory Scroll", itemID = 153180, quest = {{trackingID = 48718, wqID = 48737}}},
-			{name = "Red Conservatory Scroll", itemID = 153181, quest = {{trackingID = 48718, wqID = 48737}}},
-			{name = "Blue Conservatory Scroll", itemID = 153179, quest = {{trackingID = 48718, wqID = 48737}}},
-			{name = "Baarut the Brisk", itemID = 153193, quest = {{trackingID = 0, wqID = 48701}}},
-			-- Treasure Master Iks'reeged
-			{name = "Pilfered Sweeper", itemID = 147867, questID = 45379}
-		}
-	}
-	WQA.data[7] = legion
-end
--- Battle for Azeroth
-do
-	local bfa = {}
-	local trainer = {
-		52009,
-		52165,
-		52218,
-		52278,
-		52297,
-		52316,
-		52325,
-		52430,
-		52471,
-		52751,
-		52754,
-		52799,
-		52803,
-		52850,
-		52856,
-		52878,
-		52892,
-		52923,
-		52938
-	}
-	bfa = {
-		name = "Battle for Azeroth",
-		achievements = {
-			{name = "Adept Sandfisher", id = 13009, criteriaType = "QUEST_SINGLE", criteria = 51173, faction = "Horde"},
-			{name = "Scourge of Zem'lan", id = 13011, criteriaType = "QUESTS", criteria = {{51763, 51783}}},
-			{name = "Vorrik's Champion", id = 13014, criteriaType = "QUESTS", criteria = {51957, 51983}, faction = "Horde"},
-			{
-				name = "Revenge is Best Served Speedily",
-				id = 13022,
-				criteriaType = "QUEST_SINGLE",
-				criteria = 50786,
-				faction = "Horde"
-			},
-			{name = "It's Really Getting Out of Hand", id = 13023, criteriaType = "QUESTS", criteria = {{50559, 51127}}},
-			{name = "Zandalari Spycatcher", id = 13025, criteriaType = "QUEST_SINGLE", criteria = 50717, faction = "Horde"},
-			{name = "7th Legion Spycatcher", id = 13026, criteriaType = "QUEST_SINGLE", criteria = 50899, faction = "Alliance"},
-			{name = "By de Power of de Loa!", id = 13035, criteriaType = "QUESTS", criteria = {{51178, 51232}}},
-			{name = "Bless the Rains Down in Freehold", id = 13050, criteriaType = "QUESTS", criteria = {{53196, 52159}}},
-			{name = "Kul Runnings", id = 13060, criteriaType = "QUESTS", criteria = {49994, 53188, 53189}, faction = "Alliance"},
-			{
-				name = "Battle on Zandalar and Kul Tiras",
-				id = 12936,
-				criteriaType = "QUESTS",
-				criteria = {
-					52009,
-					52126,
-					52165,
-					52218,
-					52278,
-					52297,
-					52316,
-					52325,
-					52430,
-					52455,
-					52471,
-					52751,
-					52754,
-					52779,
-					52799,
-					52803,
-					52850,
-					52856,
-					52864,
-					52878,
-					52892,
-					52923,
-					52937,
-					52938
-				}
-			},
-			{
-				name = "A Most Efficient Apocalypse",
-				id = 13021,
-				criteriaType = "QUEST_SINGLE",
-				criteria = 50665,
-				faction = "Horde"
-			},
-			-- Thanks NatalieWright
-			{
-				name = "Adventurer of Zuldazar",
-				id = 12944,
-				criteriaType = "QUESTS",
-				criteria = {
-					50864,
-					50877,
-					{51085, 51087},
-					51081,
-					{50287, 51374, 50866},
-					50885,
-					50863,
-					50862,
-					50861,
-					50859,
-					50845,
-					50857,
-					nil,
-					50875,
-					50874,
-					nil,
-					50872,
-					50876,
-					50871,
-					50870,
-					50869,
-					50868,
-					50867
-				}
-			},
-			{
-				name = "Adventurer of Vol'dun",
-				id = 12943,
-				criteriaType = "QUESTS",
-				criteria = {
-					51105,
-					51095,
-					51096,
-					51117,
-					nil,
-					51118,
-					51120,
-					51098,
-					51121,
-					51099,
-					51108,
-					51100,
-					51125,
-					51102,
-					51429,
-					51103,
-					51124,
-					51107,
-					51122,
-					51123,
-					51104,
-					51116,
-					51106,
-					51119,
-					51112,
-					51113,
-					51114,
-					51115
-				}
-			},
-			{
-				name = "Adventurer of Nazmir",
-				id = 12942,
-				criteriaType = "QUESTS",
-				criteria = {
-					50488,
-					50570,
-					50564,
-					nil,
-					50490,
-					50506,
-					50568,
-					50491,
-					50492,
-					50499,
-					50496,
-					50498,
-					50501,
-					nil,
-					50502,
-					50503,
-					50505,
-					50507,
-					50566,
-					50511,
-					50512,
-					nil,
-					50513,
-					50514,
-					nil,
-					50515,
-					50516,
-					50489,
-					50519,
-					50518,
-					50509,
-					50517
-				}
-			},
-			{
-				name = "Adventurer of Drustvar",
-				id = 12941,
-				criteriaType = "QUESTS",
-				criteria = {
-					51469,
-					51505,
-					51506,
-					51508,
-					51468,
-					51972,
-					nil,
-					nil,
-					nil,
-					51897,
-					51457,
-					nil,
-					51909,
-					51507,
-					51917,
-					nil,
-					51919,
-					51908,
-					51491,
-					51512,
-					51527,
-					51461,
-					51467,
-					51528,
-					51466,
-					51541,
-					51542,
-					51884,
-					51874,
-					51906,
-					51887,
-					51989,
-					51988
-				}
-			},
-			{
-				name = "Adventurer of Tiragarde Sound",
-				id = 12939,
-				criteriaType = "QUESTS",
-				criteria = {
-					51653,
-					51652,
-					51666,
-					51669,
-					51841,
-					51665,
-					51848,
-					51842,
-					51654,
-					51662,
-					51844,
-					51664,
-					51670,
-					51895,
-					nil,
-					51659,
-					51843,
-					51660,
-					51661,
-					51890,
-					51656,
-					51893,
-					51892,
-					51651,
-					51839,
-					51891,
-					51849,
-					51894,
-					51655,
-					51847,
-					nil,
-					51657
-				}
-			},
-			{
-				name = "Adventurer of Stormsong Valley",
-				id = 12940,
-				criteriaType = "QUESTS",
-				criteria = {
-					52452,
-					52315,
-					51759,
-					{51976, 51977, 51978},
-					52476,
-					51774,
-					51921,
-					nil,
-					51776,
-					52459,
-					52321,
-					51781,
-					nil,
-					51886,
-					51779,
-					51778,
-					52306,
-					52310,
-					51901,
-					51777,
-					52301,
-					nil,
-					52463,
-					nil,
-					52328,
-					51782, -- Captain Razorspine
-					52299, -- Whiplash
-					nil,
-					52300,
-					nil,
-					52464,
-					52309,
-					52322,
-					nil
-				}
-			},
-			{name = "Sabertron Assemble", id = 13054, criteriaType = "QUESTS", criteria = {nil, 51977, 51978, 51976, 51974}},
-			{name = "Drag Race", id = 13059, criteriaType = "QUEST_SINGLE", criteria = 53346, faction = "Alliance"},
-			{
-				name = "Unbound Monstrosities",
-				id = 12587,
-				criteriaType = "QUESTS",
-				criteria = {52166, 52157, 52181, 52169, 52196, 136385}
-			},
-			{name = "Wide World of Quests", id = 13144, criteriaType = "SPECIAL"},
-			{
-				name = "Family Battler",
-				id = 13279,
-				criteriaType = "ACHIEVEMENT",
-				criteria = {
-					{id = 13280, criteriaType = "QUESTS", criteria = trainer},
-					{id = 13270, criteriaType = "QUESTS", criteria = trainer},
-					{id = 13271, criteriaType = "QUESTS", criteria = trainer},
-					{id = 13272, criteriaType = "QUESTS", criteria = trainer},
-					{id = 13273, criteriaType = "QUESTS", criteria = trainer},
-					{id = 13274, criteriaType = "QUESTS", criteria = trainer},
-					{id = 13281, criteriaType = "QUESTS", criteria = trainer},
-					{id = 13275, criteriaType = "QUESTS", criteria = trainer},
-					{id = 13277, criteriaType = "QUESTS", criteria = trainer},
-					{id = 13278, criteriaType = "QUESTS", criteria = trainer}
-				}
-			},
-			-- 8.1
-			{name = "Upright Citizens", id = 13285, criteriaType = "QUEST_SINGLE", criteria = 53704, faction = "Alliance"},
-			{name = "Scavenge like a Vulpera", id = 13437, criteriaType = "QUEST_SINGLE", criteria = 54415, faction = "Horde"},
-			{name = "Pushing the Payload", id = 13441, criteriaType = "QUEST_SINGLE", criteria = 54505, faction = "Horde"},
-			{name = "Pushing the Payload", id = 13440, criteriaType = "QUEST_SINGLE", criteria = 54498, faction = "Alliance"},
-			{name = "Doomsoul Surprise", id = 13435, criteriaType = "QUEST_SINGLE", criteria = 54689, faction = "Horde"},
-			{name = "Come On and Slam", id = 13426, criteriaType = "QUEST_SINGLE", criteria = 54512, faction = "Alliance"},
-			{name = "Boxing Match", id = 13439, criteriaType = "QUESTS", criteria = {{54524, 54516}}, faction = "Alliance"},
-			{name = "Boxing Match", id = 13438, criteriaType = "QUESTS", criteria = {{54524, 54516}}, faction = "Horde"},
-			-- 8.1.5
-			-- Circle, Square, Triangle
-			{
-				name = "Master Calligrapher",
-				id = 13512,
-				criteriaType = "QUESTS",
-				criteria = {{55340, 55342}, {55264, 55343}, {55341, 55344}}
-			},
-			-- Mission Table
-			-- Alliance
-			{name = "Azeroth at War: The Barrens", id = 12896, criteriaType = "MISSION_TABLE", faction = "Alliance"},
-			{name = "Azeroth at War: Kalimdor on Fire", id = 12899, criteriaType = "MISSION_TABLE", faction = "Alliance"},
-			{name = "Azeroth at War: After Lordaeron", id = 12898, criteriaType = "MISSION_TABLE", faction = "Alliance"},
-			-- Horde
-			{name = "Azeroth at War: The Barrens", id = 12867, criteriaType = "MISSION_TABLE", faction = "Horde"},
-			{name = "Azeroth at War: Kalimdor on Fire", id = 12870, criteriaType = "MISSION_TABLE", faction = "Horde"},
-			{name = "Azeroth at War: After Lordaeron", id = 12869, criteriaType = "MISSION_TABLE", faction = "Horde"},
-			-- 8.2
-			{
-				name = "Outside Influences",
-				id = 13556,
-				criteriaType = "QUEST_PIN",
-				mapID = "1462",
-				criteriaInfo = {
-					[4] = {55658, 55672},
-					[5] = {55658, 55688},
-					[6] = {55658, 55717},
-					[7] = {55658, 55718},
-					[8] = {55658, 56049},
-					[10] = {55658, 55469},
-					[25] = {56552, 56558}
-				}
-			},
-			{name = "Nazjatarget Eliminated", id = 13690},
-			{name = "Puzzle Performer", id = 13764},
-			-- criteriaType = "QUESTS", criteria= {56025, 56024, 56023, 56022, 56021, 56020, 56019, 56018, nil, 56008, 56007, 56009, 56006, 56003, 56010, 56011, 56014, 56016, 56015, 56013,  56012}},
-			{name = "Periodic Destruction", id = 13699, criteriaType = "QUEST_FLAG", criteria = 55121}
-		},
-		pets = {
-			{name = "Vengeful Chicken", itemID = 160940, creatureID = 139372, quest = {{trackingID = 0, wqID = 51212}}},
-			{
-				name = "Rebuilt Gorilla Bot",
-				itemID = 166715,
-				creatureID = 149348,
-				quest = {{trackingID = 0, wqID = 54272}},
-				faction = "Alliance"
-			},
-			{
-				name = "Rebuilt Mechanical Spider",
-				itemID = 166723,
-				creatureID = 149361,
-				quest = {{trackingID = 0, wqID = 54273}},
-				faction = "Horde"
-			}
-		},
-		toys = {
-			{name = "Echoes of Rezan", itemID = 160509, quest = {{trackingID = 0, wqID = 50855}, {trackingID = 0, wqID = 50957}}},
-			{name = "Toy Siege Tower", itemID = 163828, quest = {{trackingID = 0, wqID = 52847}}, faction = "Alliance"},
-			{name = "Toy War Machine", itemID = 163829, quest = {{trackingID = 0, wqID = 52848}}, faction = "Horde"}
-		},
-		mounts = {
-			{name = "Mollie", itemID = 174842, spellID = 298367, quest = {{wqID = 52196}}}
-		}
-	}
-	WQA.data[8] = bfa
-end
--- Shadowlands
-do
-	local shadowlands = {}
-	local trainer = {
-		61883,
-		61885,
-		61886,
-		61867,
-		61868,
-		61866,
-		61787,
-		61791,
-		61784,
-		61946,
-		61948
-	}
-	shadowlands = {
-		name = "Shadowlands",
-		achievements = {
-			{name = "Tea Tales", id = 14233, criteriaType = "QUESTS", criteria = {59848, 59850, 59852, 59853}},
-			{name = "Something's Not Quite Right....", id = 14671, criteriaType = "QUEST_SINGLE", criteria = 60739},
-			{name = "A Bit of This, A Bit of That", id = 14672, criteriaType = "QUEST_SINGLE", criteria = 60475},
-			{name = "Flight School Graduate", id = 14735, criteriaType = "QUESTS", criteria = {60844, 60858, 60911}},
-			{
-				name = "What Bastion Remembered",
-				id = 14737,
-				criteriaType = "QUEST_SINGLE",
-				criteria = {
-					59717,
-					59705
-				}
-			},
-			{name = "Aerial Ace", id = 14741, criteriaType = "QUEST_SINGLE", criteria = 60911},
-			{name = "Breaking the Stratus Fear", id = 14762, criteriaType = "QUEST_SINGLE", criteria = 60858},
-			{name = "Ramparts Racer", id = 14765, criteriaType = "QUEST_SINGLE", criteria = 59643},
-			{name = "Parasoling", id = 14766, criteriaType = "QUEST_SINGLE", criteria = 59718},
-			{name = "Caught in a Bat Romance", id = 14772, criteriaType = "QUEST_SINGLE", criteria = 60602},
-			{name = "Friend of Ooz", id = 15055, criteriaType = "QUEST_SINGLE", criteria = 64016},
-			{name = "Friend of Bloop", id = 15056, criteriaType = "QUEST_SINGLE", criteria = 64017},
-			{name = "Friend of Plaguey", id = 15057, criteriaType = "QUEST_SINGLE", criteria = 63989},
-			{
-				name = "Battle in the Shadowlands",
-				id = 14625,
-				criteriaType = "QUESTS",
-				criteria = {
-					61949,
-					61948,
-					61947,
-					61946,
-					61886,
-					61885,
-					61883, -- Sylla
-					61879,
-					61870,
-					61868,
-					61867, -- Rotgut
-					61866,
-					61791,
-					61787, -- Zolla
-					61784,
-					61783
-				}
-			},
-			{
-				name = "Adventures: Into the Breach",
-				id = 14844,
-				criteriaType = "MISSION_TABLE",
-				criteria = {{2296, 2250}, {2251, 2297}, {2252, 2298}, {2299, 2253}, 2254, 2255, 2256, 2258, 2259, 2260}
-			},
-			{
-				name = "Impressing Zo'Sorg",
-				id = 14516,
-				criteriaType = "QUESTS",
-				criteria = {
-					{59658},
-					{59803},
-					{59825},
-					{60231}
-				}
-			},
-			{
-				name = "The World Beyond",
-				id = 14758,
-				criteriaType = "SPECIAL"
-			},
-			{
-				name = "Family Exorcist",
-				id = 14879,
-				criteriaType = "ACHIEVEMENT",
-				criteria = {
-					{id = 14868, criteriaType = "QUESTS", criteria = trainer},
-					{id = 14869, criteriaType = "QUESTS", criteria = trainer},
-					{id = 14870, criteriaType = "QUESTS", criteria = trainer},
-					{id = 14871, criteriaType = "QUESTS", criteria = trainer},
-					{id = 14872, criteriaType = "QUESTS", criteria = trainer},
-					{id = 14873, criteriaType = "QUESTS", criteria = trainer},
-					{id = 14874, criteriaType = "QUESTS", criteria = trainer},
-					{id = 14875, criteriaType = "QUESTS", criteria = trainer},
-					{id = 14876, criteriaType = "QUESTS", criteria = trainer},
-					{id = 14877, criteriaType = "QUESTS", criteria = trainer}
-				}
-			}
-		},
-		pets = {
-			{name = "Dal", itemID = 183859, creatureID = 171136, quest = {{trackingID = 0, wqID = 60655}}},
-			{name = "Carpal", itemID = 183114, creatureID = 173847, source = {type = "ITEM", itemID = 183111}},
-			{name = "Primordial Bogling", itemID = 180588, creatureID = 171121, quest = {{trackingID = 0, wqID = 59808}}}
-		},
-		toys = {
-			{name = "Tithe Collector's Vessel", itemID = 180947, source = {type = "ITEM", itemID = 180947}},
-			{name = "Gormling in a Bag", itemID = 184487, source = {type = "ITEM", itemID = 184487}}
-		}
-	}
-	WQA.data[9] = shadowlands
-end
-
--- Terrors of the Shore
--- Commander of Argus
 
 function WQA:CreateQuestList()
 	self.questList = {}
@@ -1156,137 +2883,39 @@ function WQA:CreateQuestList()
 	self.questPinMapList = {}
 	self.missionList = {}
 	self.questFlagList = {}
+	self.Criterias.AreaPoi.list = {}
 
-	-- Legion
-	for _, v in pairs(self.data[7].achievements) do
-		self:AddAchievements(v)
-	end
-	self:AddMounts(self.data[7].mounts)
-	self:AddPets(self.data[7].pets)
-	self:AddToys(self.data[7].toys)
+	for expansionID = 7, 11 do
+		local data = self.data[expansionID]
 
-	-- Battle for Azeroth
-	for _, v in pairs(self.data[8].achievements) do
-		self:AddAchievements(v)
-	end
-	self:AddMounts(self.data[8].mounts)
-	self:AddPets(self.data[8].pets)
-	self:AddToys(self.data[8].toys)
+		if (data.achievements) then
+			for _, v in pairs(data.achievements) do
+				self.Achievements:Register(v)
+			end
+		end
 
-	-- Shadowlands
-	for _, v in pairs(self.data[9].achievements) do
-		self:AddAchievements(v)
+		if (data.mounts) then
+			self:AddMounts(data.mounts)
+		end
+
+		if (data.pets) then
+			self:AddPets(data.pets)
+		end
+
+		if (data.toys) then
+			self:AddToys(data.toys)
+		end
+
+		if (data.miscellaneous) then
+			--  self:AddMiscellaneous(data.miscellaneous)
+		end
 	end
-	self:AddPets(self.data[9].pets)
-	self:AddToys(self.data[9].toys)
+
 
 	self:AddCustom()
 	self:Special()
 	self:Reward()
 	self:EmissaryReward()
-end
-
-function WQA:AddAchievements(achievement, forced, forcedByMe)
-	local id = achievement.id
-	local forced = forced or false
-	local forcedByMe = false
-
-	if self.db.profile.achievements[id] == "disabled" then return end
-	if self.db.profile.achievements[id] == "exclusive" and self.db.profile.achievements.exclusive[id] ~= self.playerName then return end
-	if self.db.profile.achievements[id] == "always" then forced = true end
-	if self.db.profile.achievements[id] == "wasEarnedByMe" then forcedByMe = true end
-
-	local _, _, _, completed, _, _, _, _, _, _, _, _, wasEarnedByMe = GetAchievementInfo(id)
-	if (achievement.notAccountwide and not wasEarnedByMe) or not completed or forced or forcedByMe then
-		if achievement.criteriaType == "ACHIEVEMENT" then
-			for _, v in pairs(achievement.criteria) do
-				self:AddAchievements(v, forced, forcedByMe)
-			end
-		elseif achievement.criteriaType == "QUEST_SINGLE" then
-			if type(achievement.criteria) == "table" then
-				for _, questID in pairs(achievement.criteria) do
-					self:AddRewardToQuest(questID, "ACHIEVEMENT", id)
-				end
-			else
-				self:AddRewardToQuest(achievement.criteria, "ACHIEVEMENT", id)
-			end
-		elseif achievement.criteriaType == "QUEST_PIN" then
-			C_QuestLine.RequestQuestLinesForMap(achievement.mapID)
-			for i = 1, GetAchievementNumCriteria(id) do
-				local _, t, completed, _, _, _, _, questID = GetAchievementCriteriaInfo(id, i)
-				if not completed or forced then
-					if achievement.criteriaInfo[i] then
-						for _, questID in pairs(achievement.criteriaInfo[i]) do
-							self:AddRewardToQuest(questID, "ACHIEVEMENT", id)
-							self.questPinMapList[achievement.mapID] = true
-							self.questPinList[questID] = true
-						end
-					else
-						self:AddRewardToQuest(questID, "ACHIEVEMENT", id)
-						self.questPinMapList[achievement.mapID] = true
-						self.questPinList[questID] = true
-					end
-				end
-			end
-		elseif achievement.criteriaType == "QUEST_FLAG" then
-			self:AddRewardToQuest(achievement.criteria, "ACHIEVEMENT", id)
-			self.questFlagList[achievement.criteria] = true
-		elseif achievement.criteriaType ~= "SPECIAL" then
-			if GetAchievementNumCriteria(id) > 0 then
-				for i = 1, GetAchievementNumCriteria(id) do
-					local _, t, completed, _, _, _, _, questID = GetAchievementCriteriaInfo(id, i)
-					if not completed or forced then
-						if achievement.criteriaType == "QUESTS" then
-							if type(achievement.criteria[i]) == "table" then
-								for _, questID in pairs(achievement.criteria[i]) do
-									self:AddRewardToQuest(questID, "ACHIEVEMENT", id)
-								end
-							else
-								questID = achievement.criteria[i]
-								if questID then
-									self:AddRewardToQuest(questID, "ACHIEVEMENT", id)
-								end
-							end
-						elseif achievement.criteriaType == 1 and t == 0 then
-							for _, questID in pairs(achievement.criteria[i]) do
-								self:AddRewardToQuest(questID, "ACHIEVEMENT", id)
-							end
-						elseif achievement.criteriaType == "MISSION_TABLE" then
-							if achievement.criteria and achievement.criteria[i] then
-								if type(achievement.criteria[i]) == "table" then
-									for _, questID in pairs(achievement.criteria[i]) do
-										self:AddRewardToMission(questID, "ACHIEVEMENT", id)
-									end
-								else
-									local questID = achievement.criteria[i]
-									if questID then
-										self:AddRewardToMission(questID, "ACHIEVEMENT", id)
-									end
-								end
-							else
-								self:AddRewardToMission(questID, "ACHIEVEMENT", id)
-							end
-						else
-							self:AddRewardToQuest(questID, "ACHIEVEMENT", id)
-						end
-					end
-				end
-			else
-				if achievement.criteriaType == "QUESTS" then
-					if type(achievement.criteria[1]) == "table" then
-						for _, questID in pairs(achievement.criteria[1]) do
-							self:AddRewardToQuest(questID, "ACHIEVEMENT", id)
-						end
-					else
-						local questID = achievement.criteria[1]
-						if questID then
-							self:AddRewardToQuest(questID, "ACHIEVEMENT", id)
-						end
-					end
-				end
-			end
-		end
-	end
 end
 
 function WQA:AddMounts(mounts)
@@ -1297,7 +2926,7 @@ function WQA:AddMounts(mounts)
 		if
 			not (self.db.profile.mounts[spellID] == "disabled" or
 				(self.db.profile.mounts[spellID] == "exclusive" and self.db.profile.mounts.exclusive[spellID] ~= self.playerName))
-		 then
+		then
 			if self.db.profile.mounts[spellID] == "always" then
 				forced = true
 			end
@@ -1326,7 +2955,7 @@ function WQA:AddPets(pets)
 		if
 			not (self.db.profile.pets[companionID] == "disabled" or
 				(self.db.profile.pets[companionID] == "exclusive" and self.db.profile.pets.exclusive[companionID] ~= self.playerName))
-		 then
+		then
 			if self.db.profile.pets[companionID] == "always" then
 				forced = true
 			end
@@ -1370,7 +2999,7 @@ function WQA:AddToys(toys)
 		if
 			not (self.db.profile.toys[itemID] == "disabled" or
 				(self.db.profile.toys[itemID] == "exclusive" and self.db.profile.toys.exclusive[itemID] ~= self.playerName))
-		 then
+		then
 			if self.db.profile.toys[itemID] == "always" then
 				forced = true
 			end
@@ -1422,71 +3051,21 @@ function WQA:AddCustom()
 end
 
 function WQA:AddRewardToMission(missionID, rewardType, reward)
-	if not self.missionList[missionID] then self.missionList[missionID] = {} end
+	if not self.missionList[missionID] then
+		self.missionList[missionID] = {}
+	end
 	local l = self.missionList[missionID]
 
 	self:AddReward(l, rewardType, reward)
 end
 
 function WQA:AddRewardToQuest(questID, rewardType, reward, emissary)
-	if not self.questList[questID] then self.questList[questID] = {} end
+	if not self.questList[questID] then
+		self.questList[questID] = {}
+	end
 	local l = self.questList[questID]
 
 	self:AddReward(l, rewardType, reward, emissary)
-end
-
-function WQA:AddReward(list, rewardType, reward, emissary)
-	local l = list
-	if emissary == true then
-		l.isEmissary = true
-	end
-	if not l.reward then l.reward = {} end
-	l = l.reward
-	if rewardType == "ACHIEVEMENT" then
-		if not l.achievement then l.achievement = {} end
-		for _, achievement in ipairs(l.achievement) do
-			if achievement.id == reward then
-				return
-			end
-		end
-		l.achievement[#l.achievement + 1] = {id = reward}
-	elseif rewardType == "CHANCE" then
-		if not l.chance then l.chance = {} end
-		l.chance[#l.chance + 1] = {id = reward}
-	elseif rewardType == "CUSTOM" then
-		if not l.custom then l.custom = true end
-	elseif rewardType == "ITEM" then
- 		if not l.item then l.item = {} end
- 		for k,v in pairs(reward) do
- 			l.item[k] = v
- 		end
-	elseif rewardType == "REPUTATION" then
-		if not l.reputation then l.reputation = {} end
- 		for k,v in pairs(reward) do
- 			l.reputation[k] = v
- 		end
-	elseif rewardType == "RECIPE" then
-		l.recipe = reward
-	elseif rewardType == "CUSTOM_ITEM" then
-		l.customItem = reward
-	elseif rewardType == "CURRENCY" then
-		if not l.currency then l.currency = {} end
- 		for k,v in pairs(reward) do
- 			l.currency[k] = v
-		end
-	elseif rewardType == "PROFESSION_SKILLUP" then
-		l.professionSkillup = reward
-	elseif rewardType == "GOLD" then
-		l.gold = reward
-	elseif rewardType == "AZERITE_TRAIT" then
-		if not l.azeriteTraits then l.azeriteTraits = {} end
-		for k, v in pairs(l.azeriteTraits) do
-			if v.spellID == reward then
-				return
-			end
-		end
-		l.azeriteTraits[#l.azeriteTraits + 1] = {spellID = reward}
-	end
 end
 
 function WQA:AddEmissaryReward(questID, rewardType, reward)
@@ -1509,15 +3088,16 @@ function WQA:CheckWQ(mode)
 		self:ScheduleTimer("CheckWQ", .4, mode)
 		return
 	end
+
 	local activeQuests = {}
 	local newQuests = {}
 	local retry = false
 	for questID, _ in pairs(self.questList) do
 		if
 			IsActive(questID) or self:EmissaryIsActive(questID) or self:isQuestPinActive(questID) or
-				self:IsQuestFlaggedCompleted(questID)
-		 then
-			local questLink = GetTaskLink({id = questID, type = "WORLD_QUEST"})
+			self:IsQuestFlaggedCompleted(questID)
+		then
+			local questLink = self:GetTaskLink({ id = questID, type = "WORLD_QUEST" })
 			local link
 			for k, v in pairs(self.questList[questID].reward) do
 				if k == "custom" or k == "professionSkillup" or k == "gold" then
@@ -1581,7 +3161,13 @@ function WQA:CheckWQ(mode)
 	else
 		retry = true
 	end
-	
+
+	local pois = self.Criterias.AreaPoi:Check()
+
+	if pois.retry then
+		retry = true
+	end
+
 	if retry == true then
 		self:ScheduleTimer("CheckWQ", 1, mode)
 		return
@@ -1589,10 +3175,15 @@ function WQA:CheckWQ(mode)
 
 	self.activeTasks = {}
 	for id in pairs(activeQuests) do
-		table.insert(self.activeTasks, {id = id, type = "WORLD_QUEST"})
+		table.insert(self.activeTasks, { id = id, type = "WORLD_QUEST" })
 	end
 	for id in pairs(activeMissions) do
-		table.insert(self.activeTasks, {id = id, type = "MISSION"})
+		table.insert(self.activeTasks, { id = id, type = "MISSION" })
+	end
+	for poiId, mapIds in pairs(pois.active) do
+		for mapId in pairs(mapIds) do
+			table.insert(self.activeTasks, { id = poiId, mapId = mapId, type = "AREA_POI" })
+		end
 	end
 
 	self.activeTasks = self:SortQuestList(self.activeTasks)
@@ -1600,11 +3191,21 @@ function WQA:CheckWQ(mode)
 	self.newTasks = {}
 	for id in pairs(newQuests) do
 		self.watched[id] = true
-		table.insert(self.newTasks, {id = id, type = "WORLD_QUEST"})
+		table.insert(self.newTasks, { id = id, type = "WORLD_QUEST" })
 	end
 	for id in pairs(newMissions) do
 		self.watchedMissions[id] = true
-		table.insert(self.newTasks, {id = id, type = "MISSION"})
+		table.insert(self.newTasks, { id = id, type = "MISSION" })
+	end
+	for poiId, mapIds in pairs(pois.new) do
+		for mapId in pairs(mapIds) do
+			if not self.Criterias.AreaPoi.watched[poiId] then
+				self.Criterias.AreaPoi.watched[poiId] = {}
+			end
+			self.Criterias.AreaPoi.watched[poiId][mapId] = true
+
+			table.insert(self.newTasks, { id = poiId, mapId = mapId, type = "AREA_POI" })
+		end
 	end
 
 	if mode == "new" then
@@ -1713,28 +3314,32 @@ function WQA:AnnounceChat(tasks, silent)
 		local text, i = "", 0
 
 		if self.db.profile.options.chatShowExpansion == true then
-			if GetExpansion(task) ~= expansion then
-				expansion = GetExpansion(task)
-				print(GetExpansionName(expansion))
+			if self:GetExpansion(task) ~= expansion then
+				expansion = self:GetExpansion(task)
+				print(self:GetExpansionName(expansion))
 			end
 		end
 
 		if self.db.profile.options.chatShowZone == true then
-			if GetTaskZoneID(task) ~= zoneID then
-				zoneID = GetTaskZoneID(task)
-				print(GetTaskZoneName(task))
+			if self:GetTaskZoneID(task) ~= zoneID then
+				zoneID = self:GetTaskZoneID(task)
+				print(self:GetTaskZoneName(task))
 			end
 		end
 
 		local l
 		if task.type == "WORLD_QUEST" then
-			l = self.questList
-		else
-			l = self.missionList
+			l = self.questList[task.id]
+		elseif task.type == "MISSION" then
+			l = self.missionList[task.id]
+		elseif task.type == "AREA_POI" then
+			l = self.Criterias.AreaPoi.list[task.id][task.mapId]
 		end
 
+		local rewards = l.reward
+
 		local more
-		for k, v in pairs(l[task.id].reward) do
+		for k, v in pairs(rewards) do
 			local rewardText = self:GetRewardTextByID(task.id, k, v, 1, task.type)
 			if k == "achievement" or k == "chance" or k == "azeriteTraits" then
 				for j = 2, 3 do
@@ -1747,7 +3352,7 @@ function WQA:AnnounceChat(tasks, silent)
 					more = true
 				end
 			end
-				
+
 			i = i + 1
 			if i > 1 then
 				text = text .. " & " .. rewardText
@@ -1760,10 +3365,13 @@ function WQA:AnnounceChat(tasks, silent)
 		end
 
 		if self.db.profile.options.chatShowTime then
-			print("   "..string.format("%s (%s) → %s", GetTaskLink(task), self:formatTime(GetTaskTime(task)), text))
+			output = "   " ..
+				string.format("%s (%s) → %s", self:GetTaskLink(task), self:formatTime(self:GetTaskTime(task)), text)
 		else
-			print("   "..string.format("%s → %s", GetTaskLink(task), text))
+			output = "   " .. string.format("%s → %s", self:GetTaskLink(task), text)
 		end
+
+		print(output)
 	end
 end
 
@@ -1800,15 +3408,6 @@ local EquipLocToSlot2 = {
 	INVTYPE_TRINKET = 14,
 	INVTYPE_WEAPON = 17
 }
-
-ItemTooltipScan = CreateFrame("GameTooltip", "WQTItemTooltipScan", UIParent, "InternalEmbeddedItemTooltipTemplate")
-ItemTooltipScan.texts = {
-	_G["WQTItemTooltipScanTooltipTextLeft1"],
-	_G["WQTItemTooltipScanTooltipTextLeft2"],
-	_G["WQTItemTooltipScanTooltipTextLeft3"],
-	_G["WQTItemTooltipScanTooltipTextLeft4"]
-}
-ItemTooltipScan.patern = ITEM_LEVEL:gsub("%%d", "(%%d+)") --from LibItemUpgradeInfo-1.0
 
 local ReputationItemList = {
 	-- Army of the Light Insignia
@@ -1884,7 +3483,27 @@ local ReputationCurrencyList = {
 	[1600] = 2157, -- The Honorbound
 	[1742] = 2391, -- Rustbolt Resistance
 	[1739] = 2400, -- Waveblade Ankoan
-	[1738] = 2373 -- The Unshackled
+	[1757] = 2417, -- Uldum Accord
+	[1758] = 2415, -- Rajani
+	[1738] = 2373, -- The Unshackled
+	[1807] = 2413, -- Court of Harvesters
+	[1907] = 2470, -- Death's Advance
+	[1804] = 2407, -- The Ascended
+	[1982] = 2478, -- The Enlightened
+	[1805] = 2410, -- The Undying Army
+	[1806] = 2465, -- The Wild Hunt
+	[1880] = 2432, -- Ve'nari
+	[2819] = 2615, -- Azerothian Archives
+	[2031] = 2507, -- Dragonscale Expedition
+	[2652] = 2574, -- Dream Wardens
+	[2109] = 2511, -- Iskaara Tuskarr
+	[2420] = 2564, -- Loamm Niffen
+	[2108] = 2503, -- Maruuk Centaur
+	[2106] = 2510, -- Valdrakken Accord
+	[2902] = 2594, -- The Assembly of the Deeps
+	[2899] = 2570, -- Hallowfall Arathi
+	[2903] = 2600, -- The Severed Threads
+	[2897] = 2590 -- Council of Dornogal
 }
 
 function WQA:Reward()
@@ -1904,10 +3523,10 @@ function WQA:Reward()
 	for i in pairs(self.ZoneIDList) do
 		for _, mapID in pairs(self.ZoneIDList[i]) do
 			if self.db.profile.options.zone[mapID] == true then
-				local quests = C_TaskQuest.GetQuestsForPlayerByMapID(mapID)
+				local quests = C_TaskQuest.GetQuestsOnMap(mapID)
 				if quests then
 					for i = 1, #quests do
-						local questID = quests[i].questId
+						local questID = quests[i].questID
 						local questTagInfo = GetQuestTagInfo(questID)
 						local worldQuestType = 0
 						if questTagInfo then
@@ -1920,8 +3539,8 @@ function WQA:Reward()
 
 						if
 							self.db.profile.options.zone[C_TaskQuest.GetQuestZoneID(questID)] == true and
-								self.db.profile.options.reward.general.worldQuestType[worldQuestType]
-						 then
+							self.db.profile.options.reward.general.worldQuestType[worldQuestType]
+						then
 							-- 100 different World Quests achievements
 							if QuestUtils_IsQuestWorldQuest(questID) and not self.db.global.completed[questID] then
 								local zoneID = C_TaskQuest.GetQuestZoneID(questID)
@@ -1936,18 +3555,18 @@ function WQA:Reward()
 
 								if
 									self.db.profile.achievements[11189] ~= "disabled" and not select(4, GetAchievementInfo(11189)) and exp == 7 and
-										mapID ~= 830 and
-										mapID ~= 885 and
-										mapID ~= 882
-								 then
+									mapID ~= 830 and
+									mapID ~= 885 and
+									mapID ~= 882
+								then
 									self:AddRewardToQuest(questID, "ACHIEVEMENT", 11189)
 								elseif
 									self.db.profile.achievements[13144] ~= "disabled" and not select(4, GetAchievementInfo(13144)) and exp == 8
-								 then
+								then
 									self:AddRewardToQuest(questID, "ACHIEVEMENT", 13144)
 								elseif
 									self.db.profile.achievements[14758] ~= "disabled" and not select(4, GetAchievementInfo(14758)) and exp == 9
-								 then
+								then
 									self:AddRewardToQuest(questID, "ACHIEVEMENT", 14758)
 								end
 							end
@@ -1979,8 +3598,8 @@ function WQA:Reward()
 
 								if
 									not self.db.char[exp].profession[tradeskillLineID].isMaxLevel and
-										self.db.profile.options.reward[exp].profession[tradeskillLineID].skillup
-								 then
+									self.db.profile.options.reward[exp].profession[tradeskillLineID].skillup
+								then
 									self:AddRewardToQuest(questID, "PROFESSION_SKILLUP", professionName)
 								end
 							end
@@ -1995,11 +3614,11 @@ function WQA:Reward()
 		self.start = GetTime()
 		self.timer =
 			self:ScheduleTimer(
-			function()
-				self:Reward()
-			end,
-			2
-		)
+				function()
+					self:Reward()
+				end,
+				2
+			)
 		self.event:RegisterEvent("QUEST_LOG_UPDATE")
 		self.event:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	else
@@ -2057,206 +3676,263 @@ function WQA:IsTransmogable(itemLink)
 end
 
 function WQA:CheckItems(questID, isEmissary)
-	local retry = false
 	local numQuestRewards = GetNumQuestLogRewards(questID)
-	if numQuestRewards > 0 then
-		local itemName, itemTexture, quantity, quality, isUsable, itemID = GetQuestLogRewardInfo(1, questID)
-		if itemID then
-			inspectScantip:SetQuestLogItem("reward", 1, questID)
-			local itemLink = select(2, inspectScantip:GetItem())
-			if not itemLink then
-				return true
-			elseif string.find(itemLink, "%[]") then
-				return true
-			end
 
-			local itemName,
-				_,
-				itemRarity,
-				itemLevel,
-				itemMinLevel,
-				itemType,
-				itemSubType,
-				itemStackCount,
-				itemEquipLoc,
-				itemTexture,
-				itemSellPrice,
-				itemClassID,
-				itemSubClassID = GetItemInfo(itemLink)
-			local expacID = GetExpansionByQuestID(questID)
-			
-			-- Ask Pawn if this is an Upgrade
-			if PawnIsItemAnUpgrade and self.db.profile.options.reward.gear.PawnUpgrade then
-				local Item = PawnGetItemData(itemLink)
-				if Item then
-					local UpgradeInfo, BestItemFor, SecondBestItemFor, NeedsEnhancements = PawnIsItemAnUpgrade(Item)
-					if
-						UpgradeInfo and UpgradeInfo[1].PercentUpgrade * 100 >= self.db.profile.options.reward.gear.PercentUpgradeMin and
-							UpgradeInfo[1].PercentUpgrade < 10
-					 then
-						local item = {itemLink = itemLink, itemPercentUpgrade = math.floor(UpgradeInfo[1].PercentUpgrade * 100 + .5)}
-						self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
-					end
+	if numQuestRewards == 0 then
+		return false
+	end
+
+	local retryArray = {}
+
+	for rewardIndex = 1, numQuestRewards do
+		retryArray[rewardIndex] = self:CheckReward(questID, isEmissary, rewardIndex)
+	end
+
+	for _, retry in pairs(retryArray) do
+		if retry then return true end
+	end
+
+	return false
+end
+
+function WQA:CheckReward(questID, isEmissary, rewardIndex)
+	local retry = false
+
+	local itemName, itemTexture, quantity, quality, isUsable, itemID = GetQuestLogRewardInfo(rewardIndex,
+		questID)
+	if itemID then
+		inspectScantip:SetQuestLogItem("reward", rewardIndex, questID)
+		local itemLink = select(2, inspectScantip:GetItem())
+		if not itemLink then
+			return true
+		elseif string.find(itemLink, "%[]") then
+			return true
+		end
+
+		local itemName,
+		_,
+		itemRarity,
+		itemLevel,
+		itemMinLevel,
+		itemType,
+		itemSubType,
+		itemStackCount,
+		itemEquipLoc,
+		itemTexture,
+		itemSellPrice,
+		itemClassID,
+		itemSubClassID = GetItemInfo(itemLink)
+		local expacID = self:GetExpansionByQuestID(questID)
+
+		-- Ask Pawn if this is an Upgrade
+		if PawnIsItemAnUpgrade and self.db.profile.options.reward.gear.PawnUpgrade then
+			local Item = PawnGetItemData(itemLink)
+			if Item then
+				local UpgradeInfo, BestItemFor, SecondBestItemFor, NeedsEnhancements = PawnIsItemAnUpgrade(Item)
+				if
+					UpgradeInfo and UpgradeInfo[1].PercentUpgrade * 100 >= self.db.profile.options.reward.gear.PercentUpgradeMin and
+					UpgradeInfo[1].PercentUpgrade < 10
+				then
+					local item = {
+						itemLink = itemLink,
+						itemPercentUpgrade = math.floor(UpgradeInfo[1].PercentUpgrade * 100 + .5)
+					}
+					self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
 				end
 			end
+		end
 
-			-- StatWeightScore
-			local StatWeightScore = LibStub("AceAddon-3.0"):GetAddon("StatWeightScore", true)
-			if StatWeightScore and self.db.profile.options.reward.gear.StatWeightScore then
-				local slotID = EquipLocToSlot1[itemEquipLoc]
-				if slotID then
-					local itemPercentUpgrade = 0
-					local ScoreModule = StatWeightScore:GetModule("StatWeightScoreScore")
-					local SpecModule = StatWeightScore:GetModule("StatWeightScoreSpec")
-					local ScanningTooltipModule = StatWeightScore:GetModule("StatWeightScoreScanningTooltip")
-					local specs = SpecModule:GetSpecs()
-					for _, spec in pairs(specs) do
-						if spec.Enabled then
-							local score =
-								ScoreModule:CalculateItemScore(
+		-- StatWeightScore
+		local StatWeightScore = LibStub("AceAddon-3.0"):GetAddon("StatWeightScore", true)
+		if StatWeightScore and self.db.profile.options.reward.gear.StatWeightScore then
+			local slotID = EquipLocToSlot1[itemEquipLoc]
+			if slotID then
+				local itemPercentUpgrade = 0
+				local ScoreModule = StatWeightScore:GetModule("StatWeightScoreScore")
+				local SpecModule = StatWeightScore:GetModule("StatWeightScoreSpec")
+				local ScanningTooltipModule = StatWeightScore:GetModule("StatWeightScoreScanningTooltip")
+				local specs = SpecModule:GetSpecs()
+				for _, spec in pairs(specs) do
+					if spec.Enabled then
+						local score =
+							ScoreModule:CalculateItemScore(
 								itemLink,
 								slotID,
 								ScanningTooltipModule:ScanTooltip(itemLink),
 								spec,
 								equippedItemHasUniqueGem
 							).Score
-							local equippedScore
-							local equippedLink = GetInventoryItemLink("player", slotID)
-							if equippedLink then
-								equippedScore =
-									ScoreModule:CalculateItemScore(
+						local equippedScore
+						local equippedLink = GetInventoryItemLink("player", slotID)
+						if equippedLink then
+							equippedScore =
+								ScoreModule:CalculateItemScore(
 									equippedLink,
 									slotID,
 									ScanningTooltipModule:ScanTooltip(equippedLink),
 									spec,
 									equippedItemHasUniqueGem
 								).Score
-							else
-								retry = true
-							end
+						else
+							retry = true
+						end
 
-							local slotID2 = EquipLocToSlot2[itemEquipLoc]
-							if slotID2 then
-								equippedLink = GetInventoryItemLink("player", slotID2)
-								if equippedLink then
-									local equippedScore2 =
-										ScoreModule:CalculateItemScore(
+						local slotID2 = EquipLocToSlot2[itemEquipLoc]
+						if slotID2 then
+							equippedLink = GetInventoryItemLink("player", slotID2)
+							if equippedLink then
+								local equippedScore2 =
+									ScoreModule:CalculateItemScore(
 										equippedLink,
 										slotID2,
 										ScanningTooltipModule:ScanTooltip(equippedLink),
 										spec,
 										equippedItemHasUniqueGem
 									).Score
-									if equippedScore or 0 > equippedScore2 then
-										equippedScore = equippedScore2
-									end
-								else
-									retry = true
-								end
-							end
-
-							if equippedScore then
-								if (score - equippedScore) / equippedScore * 100 > itemPercentUpgrade then
-									itemPercentUpgrade = (score - equippedScore) / equippedScore * 100
-								end
-							end
-						end
-					end
-					if itemPercentUpgrade >= self.db.profile.options.reward.gear.PercentUpgradeMin then
-						local item = {itemLink = itemLink, itemPercentUpgrade = math.floor(itemPercentUpgrade + .5)}
-						self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
-					end
-				end
-			end
-
-			-- Upgrade by itemLevel
-			if self.db.profile.options.reward.gear.itemLevelUpgrade then
-				local itemLevel1, itemLevel2
-				local slotID = EquipLocToSlot1[itemEquipLoc]
-				if slotID then
-					if GetInventoryItemID("player", slotID) then
-						local itemLink1 = GetInventoryItemLink("player", slotID)
-						if itemLink1 then
-							itemLevel1 = GetDetailedItemLevelInfo(itemLink1)
-							if not itemLevel1 then
-								retry = true
-							end
-						else
-							retry = true
-						end
-					end
-				end
-				if EquipLocToSlot2[itemEquipLoc] then
-					slotID = EquipLocToSlot2[itemEquipLoc]
-					if GetInventoryItemID("player", slotID) then
-						local itemLink2 = GetInventoryItemLink("player", slotID)
-						if itemLink2 then
-							itemLevel2 = GetDetailedItemLevelInfo(itemLink2)
-							if not itemLevel2 then
-								retry = true
-							end
-						else
-							retry = true
-						end
-					end
-				end
-				itemLevel = GetDetailedItemLevelInfo(itemLink)
-				local itemLevelEquipped = math.min(itemLevel1 or 1000, itemLevel2 or 1000)
-				if itemLevel - itemLevelEquipped >= self.db.profile.options.reward.gear.itemLevelUpgradeMin then
-					local item = {itemLink = itemLink, itemLevelUpgrade = itemLevel - itemLevelEquipped}
-					self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
-				end
-			end
-
-			-- Azerite Armor Cache
-			if itemID == 163857 and self.db.profile.options.reward.gear.AzeriteArmorCache then
-				itemLevel = GetDetailedItemLevelInfo(itemLink)
-				local AzeriteArmorCacheIsUpgrade = false
-				local AzeriteArmorCache = {}
-				for i = 1, 5, 2 do
-					if GetInventoryItemID("player", i) then
-						local itemLink1 = GetInventoryItemLink("player", i)
-						if itemLink1 then
-							local itemLevel1 = GetDetailedItemLevelInfo(itemLink1)
-							if itemLevel1 then
-								AzeriteArmorCache[i] = itemLevel - itemLevel1
-								if itemLevel > itemLevel1 and itemLevel - itemLevel1 >= self.db.profile.options.reward.gear.itemLevelUpgradeMin then
-									AzeriteArmorCacheIsUpgrade = true
+								if equippedScore or 0 > equippedScore2 then
+									equippedScore = equippedScore2
 								end
 							else
 								retry = true
+							end
+						end
+
+						if equippedScore then
+							if (score - equippedScore) / equippedScore * 100 > itemPercentUpgrade then
+								itemPercentUpgrade = (score - equippedScore) / equippedScore * 100
+							end
+						end
+					end
+				end
+				if itemPercentUpgrade >= self.db.profile.options.reward.gear.PercentUpgradeMin then
+					local item = { itemLink = itemLink, itemPercentUpgrade = math.floor(itemPercentUpgrade + .5) }
+					self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
+				end
+			end
+		end
+
+		-- Upgrade by itemLevel
+		if self.db.profile.options.reward.gear.itemLevelUpgrade then
+			local itemLevel1, itemLevel2
+			local slotID = EquipLocToSlot1[itemEquipLoc]
+			if slotID then
+				if GetInventoryItemID("player", slotID) then
+					local itemLink1 = GetInventoryItemLink("player", slotID)
+					if itemLink1 then
+						itemLevel1 = GetDetailedItemLevelInfo(itemLink1)
+						if not itemLevel1 then
+							retry = true
+						end
+					else
+						retry = true
+					end
+				end
+			end
+			if EquipLocToSlot2[itemEquipLoc] then
+				slotID = EquipLocToSlot2[itemEquipLoc]
+				if GetInventoryItemID("player", slotID) then
+					local itemLink2 = GetInventoryItemLink("player", slotID)
+					if itemLink2 then
+						itemLevel2 = GetDetailedItemLevelInfo(itemLink2)
+						if not itemLevel2 then
+							retry = true
+						end
+					else
+						retry = true
+					end
+				end
+			end
+			itemLevel = GetDetailedItemLevelInfo(itemLink)
+			if not itemLevel then
+				retry = true
+			else
+				local itemLevelEquipped = math.min(itemLevel1 or 1000, itemLevel2 or 1000)
+				if itemLevel - itemLevelEquipped >= self.db.profile.options.reward.gear.itemLevelUpgradeMin then
+					local item = { itemLink = itemLink, itemLevelUpgrade = itemLevel - itemLevelEquipped }
+					self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
+				end
+			end
+		end
+
+		-- Azerite Armor Cache
+		if itemID == 163857 and self.db.profile.options.reward.gear.AzeriteArmorCache then
+			itemLevel = GetDetailedItemLevelInfo(itemLink)
+			local AzeriteArmorCacheIsUpgrade = false
+			local AzeriteArmorCache = {}
+			for i = 1, 5, 2 do
+				if GetInventoryItemID("player", i) then
+					local itemLink1 = GetInventoryItemLink("player", i)
+					if itemLink1 then
+						local itemLevel1 = GetDetailedItemLevelInfo(itemLink1)
+						if itemLevel1 then
+							AzeriteArmorCache[i] = itemLevel - itemLevel1
+							if itemLevel > itemLevel1 and itemLevel - itemLevel1 >= self.db.profile.options.reward.gear.itemLevelUpgradeMin then
+								AzeriteArmorCacheIsUpgrade = true
 							end
 						else
 							retry = true
 						end
 					else
-						AzeriteArmorCache[i] = itemLevel
-						if itemLevel and itemLevel >= self.db.profile.options.reward.gear.itemLevelUpgradeMin then
-							AzeriteArmorCacheIsUpgrade = true
+						retry = true
+					end
+				else
+					AzeriteArmorCache[i] = itemLevel
+					if itemLevel and itemLevel >= self.db.profile.options.reward.gear.itemLevelUpgradeMin then
+						AzeriteArmorCacheIsUpgrade = true
+					end
+				end
+			end
+			if AzeriteArmorCacheIsUpgrade == true then
+				local item = { itemLink = itemLink, AzeriteArmorCache = AzeriteArmorCache }
+				self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
+			end
+		end
+
+		-- Equipment Cache
+		if
+			(weaponCache[itemID] and self.db.profile.options.reward.gear.weaponCache) or
+			(armorCache[itemID] and self.db.profile.options.reward.gear.armorCache) or
+			(jewelryCache[itemID] and self.db.profile.options.reward.gear.jewelryCache)
+		then
+			itemLevel = GetDetailedItemLevelInfo(itemLink)
+			local n = 0
+			local upgrade
+			local upgradeMax = 0
+			local upgradeSum = 0
+			local upgradeNum = 0
+
+			if weaponCache[itemID] then
+				for i = 16, 17 do
+					if GetInventoryItemID("player", i) then
+						local itemLink1 = GetInventoryItemLink("player", i)
+						if itemLink1 then
+							local itemLevel1 = GetDetailedItemLevelInfo(itemLink1)
+							if itemLevel1 then
+								n = n + 1
+								upgrade = itemLevel - itemLevel1
+								if upgrade >= self.db.profile.options.reward.gear.itemLevelUpgradeMin then
+									upgradeNum = upgradeNum + 1
+									if upgrade > upgradeMax then
+										upgradeMax = upgrade
+									end
+								end
+								upgradeSum = upgradeSum + upgrade
+							else
+								retry = true
+							end
+						else
+							retry = true
 						end
 					end
 				end
-				if AzeriteArmorCacheIsUpgrade == true then
-					local item = {itemLink = itemLink, AzeriteArmorCache = AzeriteArmorCache}
-					self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
-				end
 			end
 
-			-- Equipment Cache
-			if
-				(weaponCache[itemID] and self.db.profile.options.reward.gear.weaponCache) or
-					(armorCache[itemID] and self.db.profile.options.reward.gear.armorCache) or
-					(jewelryCache[itemID] and self.db.profile.options.reward.gear.jewelryCache)
-			 then
-				itemLevel = GetDetailedItemLevelInfo(itemLink)
-				local n = 0
-				local upgrade
-				local upgradeMax = 0
-				local upgradeSum = 0
-				local upgradeNum = 0
-
-				if weaponCache[itemID] then
-					for i = 16, 17 do
+			if armorCache[itemID] then
+				for i = 1, 10 do
+					if i == 4 then
+						i = 15
+					end
+					if i ~= 2 then
 						if GetInventoryItemID("player", i) then
 							local itemLink1 = GetInventoryItemLink("player", i)
 							if itemLink1 then
@@ -2280,116 +3956,94 @@ function WQA:CheckItems(questID, isEmissary)
 						end
 					end
 				end
+			end
 
-				if armorCache[itemID] then
-					for i = 1, 10 do
-						if i == 4 then
-							i = 15
-						end
-						if i ~= 2 then
-							if GetInventoryItemID("player", i) then
-								local itemLink1 = GetInventoryItemLink("player", i)
-								if itemLink1 then
-									local itemLevel1 = GetDetailedItemLevelInfo(itemLink1)
-									if itemLevel1 then
-										n = n + 1
-										upgrade = itemLevel - itemLevel1
-										if upgrade >= self.db.profile.options.reward.gear.itemLevelUpgradeMin then
-											upgradeNum = upgradeNum + 1
-											if upgrade > upgradeMax then
-												upgradeMax = upgrade
-											end
-										end
-										upgradeSum = upgradeSum + upgrade
-									else
-										retry = true
+			if jewelryCache[itemID] then
+				for i = 11, 14 do
+					if GetInventoryItemID("player", i) then
+						local itemLink1 = GetInventoryItemLink("player", i)
+						if itemLink1 then
+							local itemLevel1 = GetDetailedItemLevelInfo(itemLink1)
+							if itemLevel1 then
+								n = n + 1
+								upgrade = itemLevel - itemLevel1
+								if upgrade >= self.db.profile.options.reward.gear.itemLevelUpgradeMin then
+									upgradeNum = upgradeNum + 1
+									if upgrade > upgradeMax then
+										upgradeMax = upgrade
 									end
-								else
-									retry = true
 								end
-							end
-						end
-					end
-				end
-
-				if jewelryCache[itemID] then
-					for i = 11, 14 do
-						if GetInventoryItemID("player", i) then
-							local itemLink1 = GetInventoryItemLink("player", i)
-							if itemLink1 then
-								local itemLevel1 = GetDetailedItemLevelInfo(itemLink1)
-								if itemLevel1 then
-									n = n + 1
-									upgrade = itemLevel - itemLevel1
-									if upgrade >= self.db.profile.options.reward.gear.itemLevelUpgradeMin then
-										upgradeNum = upgradeNum + 1
-										if upgrade > upgradeMax then
-											upgradeMax = upgrade
-										end
-									end
-									upgradeSum = upgradeSum + upgrade
-								else
-									retry = true
-								end
+								upgradeSum = upgradeSum + upgrade
 							else
 								retry = true
 							end
+						else
+							retry = true
 						end
 					end
 				end
-
-				if upgradeNum > 0 then
-					local item = {itemLink = itemLink, cache = {upgradeNum = upgradeNum, n = n, upgradeMax = upgradeMax}}
-					self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
-				end
 			end
 
-			-- Transmog
-			if self.db.profile.options.reward.gear.unknownAppearance and self:IsTransmogable(itemLink) then
-				if itemClassID == 2 or itemClassID == 4 then
-					local transmog
-					if AllTheThings then
-						local state = AllTheThings.SearchForLink(itemLink)[1].collected
+			if upgradeNum > 0 then
+				local item = {
+					itemLink = itemLink,
+					cache = { upgradeNum = upgradeNum, n = n, upgradeMax = upgradeMax }
+				}
+				self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
+			end
+		end
+
+		-- Transmog
+		if self.db.profile.options.reward.gear.unknownAppearance and self:IsTransmogable(itemLink) then
+			if itemClassID == 2 or itemClassID == 4 then
+				local transmog
+				if AllTheThings then
+					local searchForLinkResult = AllTheThings.SearchForLink(itemLink)
+					if (searchForLinkResult and searchForLinkResult[1]) then
+						local state = searchForLinkResult[1].collected
 						if not state then
 							transmog = "|TInterface\\Addons\\AllTheThings\\assets\\unknown:0|t"
 						elseif state == 2 and self.db.profile.options.reward.gear.unknownSource then
 							transmog = "|TInterface\\Addons\\AllTheThings\\assets\\known_circle:0|t"
 						end
-					elseif CanIMogIt then
-						if CanIMogIt:IsEquippable(itemLink) and CanIMogIt:CharacterCanLearnTransmog(itemLink) then
-							if not CanIMogIt:PlayerKnowsTransmog(itemLink) then
-								transmog = "|TInterface\\AddOns\\TransMogMaster\\Icons\\UNKNOWN:0|t"  --" X "
-							elseif not CanIMogIt:PlayerKnowsTransmogFromItem(itemLink) and self.db.profile.options.reward.gear.unknownSource then
-								transmog = "|TInterface\\AddOns\\TransMogMaster\\Icons\\KNOWN_circle:0|t"  --" √ "
-							end
+					end
+				end
+
+				if CanIMogIt and not transmog then
+					if CanIMogIt:IsEquippable(itemLink) and CanIMogIt:CharacterCanLearnTransmog(itemLink) then
+						if not CanIMogIt:PlayerKnowsTransmog(itemLink) then
+							transmog = "|TInterface\\AddOns\\CanIMogIt\\Icons\\UNKNOWN:0|t"
+						elseif not CanIMogIt:PlayerKnowsTransmogFromItem(itemLink) and self.db.profile.options.reward.gear.unknownSource then
+							transmog = "|TInterface\\AddOns\\CanIMogIt\\Icons\\KNOWN_circle:0|t"
 						end
 					end
-					if transmog then
-						local item = {itemLink = itemLink, transmog = transmog}
-						self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
-					end
+				end
+				if transmog then
+					local item = { itemLink = itemLink, transmog = transmog }
+					self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
 				end
 			end
+		end
 
-			-- Reputation Token
-			local factionID = ReputationItemList[itemID] or nil
-			if factionID then
-				if self.db.profile.options.reward.reputation[factionID] == true then
-					local reputation = {itemLink = itemLink, factionID = factionID}
-					self:AddRewardToQuest(questID, "REPUTATION", reputation, isEmissary)
-				end
+		-- Reputation Token
+		local factionID = ReputationItemList[itemID] or nil
+		if factionID then
+			if self.db.profile.options.reward.reputation[factionID] == true then
+				local reputation = { itemLink = itemLink, factionID = factionID }
+				self:AddRewardToQuest(questID, "REPUTATION", reputation, isEmissary)
 			end
+		end
 
-			-- print(expacID, GetExpansionByQuestID(questID), itemLink, questID)
-			-- Recipe
-			if itemClassID == 9 then
-				if self.db.profile.options.reward.recipe[expacID] == true then
-					self:AddRewardToQuest(questID, "RECIPE", itemLink, isEmissary)
-				end
+		-- print(expacID,self:GetExpansionByQuestID(questID), itemLink, questID)
+		-- Recipe
+		if itemClassID == 9 then
+			if self.db.profile.options.reward.recipe[expacID] == true then
+				self:AddRewardToQuest(questID, "RECIPE", itemLink, isEmissary)
 			end
+		end
 
-			-- Crafting Reagent
-			--[[
+		-- Crafting Reagent
+		--[[
 			if self.db.profile.options.reward.craftingreagent[itemID] == true then
 				if not self.questList[questID] then self.questList[questID] = {} end
 				local l = self.questList[questID]
@@ -2397,53 +4051,55 @@ function WQA:CheckItems(questID, isEmissary)
 				if not l.reward.item then l.reward.item = {} end
 				l.reward.item.itemLink = itemLink
 			end--]]
-			-- Custom itemID
-			if self.db.global.custom.worldQuestReward[itemID] == true then
-				if self.db.profile.custom.worldQuestReward[itemID] == true then
-					self:AddRewardToQuest(questID, "CUSTOM_ITEM", itemLink, isEmissary)
-				end
+		-- Custom itemID
+		if self.db.global.custom.worldQuestReward[itemID] == true then
+			if self.db.profile.custom.worldQuestReward[itemID] == true then
+				self:AddRewardToQuest(questID, "CUSTOM_ITEM", itemLink, isEmissary)
 			end
+		end
 
-			-- Items
-			if self.itemList[itemID] == true then
-				local item = {itemLink = itemLink}
-				self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
-			end
+		-- Items
+		if self.itemList[itemID] == true then
+			local item = { itemLink = itemLink }
+			self:AddRewardToQuest(questID, "ITEM", item, isEmissary)
+		end
 
-			-- Azerite Traits
-			if
-				self.db.profile.options.reward.gear.azeriteTraits ~= "" and
-					C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(itemLink)
-			 then
-				for _, ring in pairs(C_AzeriteEmpoweredItem.GetAllTierInfoByItemID(itemLink)) do
-					for _, azeritePowerID in pairs(ring.azeritePowerIDs) do
-						local spellID = C_AzeriteEmpoweredItem.GetPowerInfo(azeritePowerID).spellID
-						if self.azeriteTraitsList[spellID] then
-							self:AddRewardToQuest(questID, "AZERITE_TRAIT", spellID, isEmissary)
-							self:AddRewardToQuest(questID, "ITEM", {itemLink = itemLink}, isEmissary)
-						end
+		-- Azerite Traits
+		if
+			self.db.profile.options.reward.gear.azeriteTraits ~= "" and
+			C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(itemLink)
+		then
+			for _, ring in pairs(C_AzeriteEmpoweredItem.GetAllTierInfoByItemID(itemLink)) do
+				for _, azeritePowerID in pairs(ring.azeritePowerIDs) do
+					local spellID = C_AzeriteEmpoweredItem.GetPowerInfo(azeritePowerID).spellID
+					if self.azeriteTraitsList[spellID] then
+						self:AddRewardToQuest(questID, "AZERITE_TRAIT", spellID, isEmissary)
+						self:AddRewardToQuest(questID, "ITEM", { itemLink = itemLink }, isEmissary)
 					end
 				end
 			end
-
-			-- Conduit
-			if self.db.profile.options.reward.gear.conduit and C_Soulbinds.IsItemConduitByItemInfo(itemLink) then
-				self:AddRewardToQuest(questID, "ITEM", {itemLink = itemLink}, isEmissary)
-			end
-		else
-			retry = true
 		end
+
+		-- Conduit
+		if self.db.profile.options.reward.gear.conduit and C_Soulbinds.IsItemConduitByItemInfo(itemLink) then
+			self:AddRewardToQuest(questID, "ITEM", { itemLink = itemLink }, isEmissary)
+		end
+	else
+		retry = true
 	end
 
 	return retry
 end
 
 function WQA:CheckCurrencies(questID, isEmissary)
-	local numQuestCurrencies = GetNumQuestLogRewardCurrencies(questID)
-	for i = 1, numQuestCurrencies do
-		local name, texture, numItems, currencyID = GetQuestLogRewardCurrencyInfo(i, questID)
+	local questRewardCurrencies = C_QuestLog.GetQuestRewardCurrencies(questID)
+
+	for _, currencyInfo in ipairs(questRewardCurrencies) do
+		local currencyID = currencyInfo.currencyID
+		local amount = currencyInfo.totalRewardAmount
+
 		if self.db.profile.options.reward.currency[currencyID] then
-			local currency = {currencyID = currencyID, amount = numItems}
+			local currency = { currencyID = currencyID, amount = amount }
 			self:AddRewardToQuest(questID, "CURRENCY", currency, isEmissary)
 		end
 
@@ -2451,7 +4107,12 @@ function WQA:CheckCurrencies(questID, isEmissary)
 		local factionID = ReputationCurrencyList[currencyID] or nil
 		if factionID then
 			if self.db.profile.options.reward.reputation[factionID] == true then
-				local reputation = {name = name, currencyID = currencyID, amount = numItems, factionID = factionID}
+				local reputation = {
+					name = currencyInfo.name,
+					currencyID = currencyID,
+					amount = amount,
+					factionID = factionID
+				}
 				self:AddRewardToQuest(questID, "REPUTATION", reputation, isEmissary)
 			end
 		end
@@ -2466,362 +4127,6 @@ function WQA:CheckCurrencies(questID, isEmissary)
 end
 
 
-local LibQTip = LibStub("LibQTip-1.0")
-
-function WQA:CreateQTip()
-	if not LibQTip:IsAcquired("WQAchievements") and not self.tooltip then
-		local tooltip = LibQTip:Acquire("WQAchievements", 2, "LEFT", "LEFT")
-		self.tooltip = tooltip
-
-		if self.db.profile.options.popupShowExpansion or self.db.profile.options.popupShowZone then
-			tooltip:AddColumn()
-		end
-		if self.db.profile.options.popupShowTime then
-			tooltip:AddColumn()
-		end
-
-		tooltip:AddHeader(WORLD_QUEST_BANNER)  -- "World Quest"
-		tooltip:SetCell(1, tooltip:GetColumnCount(), BONUS_LOOT_LABEL)  -- "Reward"
-		tooltip:SetFrameStrata("MEDIUM")
-		tooltip:SetFrameLevel(100)
-		tooltip:AddSeparator()
-	end
-end
-
-function WQA:UpdateQTip(tasks)
-	local tooltip = self.tooltip
-	if next(tasks) == nil then
-		tooltip:AddLine(" XXX ")
-	else
-		tooltip.quests = tooltip.quests or {}
-		tooltip.missions = tooltip.missions or {}
-		local i = tooltip:GetLineCount()
-		local expansion, zoneID
-		for _, task in ipairs(tasks) do
-			local id = task.id
-			if (task.type == "WORLD_QUEST" and not tooltip.quests[id]) or (task.type == "MISSION" and not tooltip.missions[id]) then
-				local j = 1
-
-				if self.db.profile.options.popupShowExpansion then
-					j = 2
-					if GetExpansion(task) ~= expansion then
-						expansion = GetExpansion(task)
-						tooltip:AddLine(string.format("|cff33ff33%s|r", GetExpansionName(expansion)))
-						i = i + 1
-						zoneID = nil
-					end
-				end
-
-				tooltip:AddLine()
-				i = i + 1
-				
-				if self.db.profile.options.popupShowZone then
-					j = 2
-					if GetTaskZoneID(task) ~= zoneID then
-						zoneID = GetTaskZoneID(task)
-						tooltip:SetCell(i, 1, "     " .. GetTaskZoneName(task))
-					end
-				end
-
-				if self.db.profile.options.popupShowTime then
-					tooltip:SetCell(i, j, self:formatTime(GetTaskTime(task)))
-					j = j + 1
-				end
-
-				if task.type == "WORLD_QUEST" then
-					tooltip.quests[id] = true
-				elseif task.type == "MISSION" then
-					tooltip.missions[id] = true
-				end
-
-				local link = GetTaskLink(task)
-				tooltip:SetCell(i, j, link)
-
-				tooltip:SetCellScript(
-					i,
-					j,
-					"OnEnter",
-					function(self)
-						GameTooltip_SetDefaultAnchor(GameTooltip, self)
-						GameTooltip:ClearLines()
-						GameTooltip:ClearAllPoints()
-						GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 0)
-						if task.type == "WORLD_QUEST" then
-							if string.find(link, "|Hquest:") then
-								GameTooltip:SetHyperlink(link)
-							end
-						else
-							GameTooltip:SetText(C_Garrison.GetMissionName(id))
-							GameTooltip:AddLine(
-								string.format(GARRISON_MISSION_TOOLTIP_NUM_REQUIRED_FOLLOWERS, C_Garrison.GetMissionMaxFollowers(id)),
-								1,
-								1,
-								1
-							)
-							GarrisonMissionButton_AddThreatsToTooltip(
-								id,
-								WQA.missionList[task.id].followerType,
-								false,
-								C_Garrison.GetFollowerAbilityCountersForMechanicTypes(WQA.missionList[task.id].followerType)
-							)
-							GameTooltip:AddLine(GARRISON_MISSION_AVAILABILITY)
-							GameTooltip:AddLine(WQA.missionList[task.id].offerTimeRemaining, 1, 1, 1)
-							if not C_Garrison.IsPlayerInGarrison(WQA.missionList[task.id].followerType) then
-								GameTooltip:AddLine(" ")
-								GameTooltip:AddLine(
-									GarrisonFollowerOptions[WQA.missionList[task.id].followerType].strings.RETURN_TO_START,
-									nil,
-									nil,
-									nil,
-									1
-								)
-							end
-						end
-						GameTooltip:Show()
-					end
-				)
-				tooltip:SetCellScript(
-					i,
-					j,
-					"OnLeave",
-					function()
-						GameTooltip:Hide()
-					end
-				)
-				tooltip:SetCellScript(
-					i,
-					j,
-					"OnMouseDown",
-					function()
-						if ChatEdit_TryInsertChatLink(link) ~= true then
-							if
-								task.type == "WORLD_QUEST" and not WQA.questList[id].isEmissary and
-									not (self.questPinList[id] or self.questFlagList[id])
-							 then
-								if WorldQuestTrackerAddon and self.db.profile.options.WorldQuestTracker then
-									if WorldQuestTrackerAddon.IsQuestBeingTracked(id) then
-										WorldQuestTrackerAddon.RemoveQuestFromTracker(id)
-										WQA:ScheduleTimer(
-											function()
-												WorldQuestTrackerAddon:FullTrackerUpdate()
-											end,
-											.5
-										)
-									else
-										local _, _, numObjectives = GetTaskInfo(id)
-										local widget = {questID = id, mapID = GetQuestZoneID(id), numObjectives = numObjectives}
-										zoneID = GetQuestZoneID(id)
-										local x, y = C_TaskQuest.GetQuestLocation(id, zoneID)
-										widget.questX, widget.questY = x or 0, y or 0
-										widget.IconTexture =
-											select(2, GetQuestLogRewardInfo(1, id)) or select(2, GetQuestLogRewardCurrencyInfo(1, id)) or
-											[[Interface\GossipFrame\auctioneerGossipIcon]]
-										local function f(widget)
-											if not widget.IconTexture then
-												WQA:ScheduleTimer(
-													function()
-														widget.IconTexture =
-															select(2, GetQuestLogRewardInfo(1, id)) or select(2, GetQuestLogRewardCurrencyInfo(1, id))
-														f(widget)
-													end,
-													1.5
-												)
-											else
-												WorldQuestTrackerAddon.AddQuestToTracker(widget)
-												WQA:ScheduleTimer(
-													function()
-														WorldQuestTrackerAddon:FullTrackerUpdate()
-													end,
-													.5
-												)
-											end
-										end
-										f(widget)
-									end
-								else
-									if not C_QuestLog.AddWorldQuestWatch(id, 1) then
-										C_QuestLog.RemoveWorldQuestWatch(id)
-									end
-								end
-							end
-						end
-					end
-				)
-
-				local list
-				if task.type == "WORLD_QUEST" then
-					list = WQA.questList[id].reward
-				elseif task.type == "MISSION" then
-					list = WQA.missionList[id].reward
-				end
-
-				local more = false
-				for k, v in pairs(list) do
-					for n = 1, 3 do
-						if n == 1 or (n > 1 and (k == "achievement" or k == "chance" or k == "azeriteTraits")) then
-							local text = self:GetRewardTextByID(id, k, v, n, task.type)
-							if text then
-								j = j + 1
-
-								if j > tooltip:GetColumnCount() then
-									tooltip:AddColumn()
-								end
-								tooltip:SetCell(i, j, text)
-
-								tooltip:SetCellScript(
-									i,
-									j,
-									"OnEnter",
-									function(self)
-										GameTooltip:SetOwner(self, "ANCHOR_NONE")
-										GameTooltip:ClearLines()
-										ContainerFrameItemButton_CalculateItemTooltipAnchors(self, GameTooltip)
-
-										if WQA:GetRewardLinkByID(id, k, v, n) then
-											GameTooltip:SetHyperlink(WQA:GetRewardLinkByID(id, k, v, n))
-										else
-											GameTooltip:SetText(WQA:GetRewardTextByID(id, k, v, n, task.type))
-										end
-										GameTooltip:Show()
-										if (IsModifiedClick("COMPAREITEMS") or GetCVarBool("alwaysCompareItems")) and k == "item" then
-											GameTooltip_ShowCompareItem()
-										else
-											GameTooltip_HideShoppingTooltips(GameTooltip)
-										end
-									end
-								)
-								tooltip:SetCellScript(
-									i,
-									j,
-									"OnLeave",
-									function()
-										GameTooltip_HideResetCursor()
-									end
-								)
-								tooltip:SetCellScript(
-									i,
-									j,
-									"OnMouseDown",
-									function()
-										HandleModifiedItemClick(WQA:GetRewardLinkByID(id, k, v, n))
-									end
-								)
-								if n == 3 then
-									local m = 4
-									if self:GetRewardTextByID(id, k, v, m, task.type) then
-										j = j + 1
-										if j > tooltip:GetColumnCount() then
-											tooltip:AddColumn()
-										end
-										tooltip:SetCell(i, j, "...")
-										local moreTooltipText = ""
-										while self:GetRewardTextByID(id, k, v, m, task.type) do
-											if m == 4 then
-												moreTooltipText = moreTooltipText .. self:GetRewardTextByID(id, k, v, m, task.type)
-											else
-												moreTooltipText = moreTooltipText .. "\n" .. self:GetRewardTextByID(id, k, v, m, task.type)
-											end
-											m = m + 1
-										end
-
-										tooltip:SetCellScript(
-											i,
-											j,
-											"OnEnter",
-											function(self)
-												GameTooltip_SetDefaultAnchor(GameTooltip, self)
-												GameTooltip:ClearLines()
-												GameTooltip:ClearAllPoints()
-												GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 0)
-												GameTooltip:SetText(moreTooltipText)
-												GameTooltip:Show()
-											end
-										)
-										tooltip:SetCellScript(
-											i,
-											j,
-											"OnLeave",
-											function()
-												GameTooltip:Hide()
-											end
-										)
-									end
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-	tooltip:Show()
-end
-
-function WQA:AnnouncePopUp(quests, silent)
-	if not self.PopUp then
-		local PopUp = CreateFrame("Frame", "WQAchievementsPopUp", UIParent, "UIPanelDialogTemplate")
-		if self.db.profile.options.esc then
-			tinsert(UISpecialFrames, "WQAchievementsPopUp")
-		end
-		self.PopUp = PopUp
-		PopUp:SetMovable(true)
-		PopUp:EnableMouse(true)
-		PopUp:RegisterForDrag("LeftButton")
-		PopUp:SetScript(
-			"OnDragStart",
-			function(self)
-				self.moving = true
-				self:StartMoving()
-			end
-		)
-		PopUp:SetScript(
-			"OnDragStop",
-			function(self)
-				self.moving = nil
-				self:StopMovingOrSizing()
-				if WQA.db.profile.options.popupRememberPosition then
-					WQA.db.profile.options.popupX = self:GetLeft()
-					WQA.db.profile.options.popupY = self:GetTop()
-				end
-			end
-		)
-		PopUp:SetWidth(430)
-		PopUp:SetHeight(80)
-		PopUp:SetPoint("BOTTOM", 0, 120)
-		PopUp:Hide()
-
-		PopUp:SetScript(
-			"OnHide",
-			function()
-				LibQTip:Release(WQA.tooltip)
-				WQA.tooltip.quests = nil
-				WQA.tooltip.missions = nil
-				WQA.tooltip = nil
-				PopUp.shown = false
-			end
-		)
-	end
-	if next(quests) == nil and silent == true then
-		return
-	end
-	local PopUp = self.PopUp
-	PopUp:Show()
-	PopUp.shown = true
-	self:CreateQTip()
-	self.tooltip:SetAutoHideDelay()
-	self.tooltip:ClearAllPoints()
-	self.tooltip:SetPoint("TOP", PopUp, "TOP", 2, -27)
-	self:UpdateQTip(quests)
-	PopUp:SetWidth(self.tooltip:GetWidth() + 8.5)
-	PopUp:SetHeight(self.tooltip:GetHeight() + 32)
-	PopUp:SetScale(self.tooltip:GetScale())
-	PopUp:SetFrameLevel(self.tooltip:GetFrameLevel())
-
-	if self.db.profile.options.popupRememberPosition then
-		PopUp:ClearAllPoints()
-		PopUp:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.options.popupX, self.db.profile.options.popupY)
-	end
-end
 
 function WQA:GetRewardTextByID(questID, key, value, i, type)
 	local k, v = key, value
@@ -2852,7 +4157,7 @@ function WQA:GetRewardLinkByMissionID(missionID, key, value, i)
 	return self:GetRewardLinkByID(missionID, key, value, i)
 end
 
-function WQA:GetRewardLinkByID(questId, key, value, i)
+function WQA:GetRewardLinkByID(questID, key, value, i)
 	local k, v = key, value
 	local link = nil
 	if k == "achievement" then
@@ -2890,6 +4195,8 @@ function WQA:GetRewardLinkByID(questId, key, value, i)
 			return nil
 		end
 		link = GetSpellLink(v[i].spellID)
+	elseif k == WQA.Rewards.RewardType.Miscellaneous then
+		link = table.concat(v, ", ")
 	end
 	return link
 end
@@ -2911,37 +4218,6 @@ function WQA:SetRewardLinkByID(questID, key, value, i, link)
 	elseif k == "currency" then
 		v.currencyLink = link
 	end
-end
-
-local function SortByZoneName(a, b)
-	if a.type == "MISSION" and b.type ~= "MISSION" then
-		return false
-	elseif b.type == "MISSION" and a.type ~= "MISSION" then
-		return true
-	elseif a.type == "MISSION" and b.type == "MISSION" then
-		return GetTaskZoneName(a) < GetTaskZoneName(b)
-	else
-		a = a.id
-		b = b.id
-	end
-	if WQA.questList[a].isEmissary then
-		if WQA.questList[b].isEmissary then
-			return false
-		else
-			return true
-		end
-	elseif WQA.questList[b].isEmissary then
-		return false
-	end
-	return GetQuestZoneName(a) < GetQuestZoneName(b)
-end
-
-local function SortByExpansion(a, b)
-	a = GetExpansion(a)
-
-	b = GetExpansion(b)
-	--return GetExpansion(a) > GetExpansion(b)
-	return a > b
 end
 
 local function GetQuestName(questID)
@@ -2985,14 +4261,14 @@ end
 
 function WQA:SortQuestList(list)
 	if self.db.profile.options.sortByName == true then
-		list = WQA:InsertionSort(list, SortByName)
+		list = self:InsertionSort(list, SortByName)
 	end
 
 	if self.db.profile.options.sortByZoneName == true then
-		list = WQA:InsertionSort(list, SortByZoneName)
+		list = self:InsertionSort(list, function(a, b) return self:SortByZoneName(a, b) end)
 	end
 
-	list = WQA:InsertionSort(list, SortByExpansion)
+	list = self:InsertionSort(list, function(a, b) return self:SortByExpansion(a, b) end)
 	return list
 end
 
@@ -3001,7 +4277,7 @@ function WQA:EmissaryReward()
 	self.emissaryRewards = false
 	local retry = false
 
-	for _, mapID in pairs({627, 875}) do
+	for _, mapID in pairs({ 627, 875 }) do
 		local bounties = GetBountiesForMapID(mapID)
 		if bounties then
 			for _, emissary in ipairs(GetBountiesForMapID(mapID)) do
@@ -3064,9 +4340,9 @@ end
 function WQA:Special()
 	if
 		(self.db.profile.achievements[11189] ~= "disabled" and not select(4, GetAchievementInfo(11189)) == true) or
-			(self.db.profile.achievements[13144] ~= "disabled" and not select(4, GetAchievementInfo(13144)) == true) or
-			(self.db.profile.achievements[14758] ~= "disabled" and not select(4, GetAchievementInfo(14758)))
-	 then
+		(self.db.profile.achievements[13144] ~= "disabled" and not select(4, GetAchievementInfo(13144)) == true) or
+		(self.db.profile.achievements[14758] ~= "disabled" and not select(4, GetAchievementInfo(14758)))
+	then
 		self.event:RegisterEvent("QUEST_TURNED_IN")
 	end
 end
@@ -3091,8 +4367,7 @@ function dataobj:OnClick(button)
 	if button == "LeftButton" then
 		WQA:Show("popup")
 	elseif button == "RightButton" then
-		InterfaceOptionsFrame_Show()
-		InterfaceOptionsFrame_OpenToCategory("WQAchievements")
+		Settings.OpenToCategory("WQAchievements")
 	end
 end
 
@@ -3150,7 +4425,7 @@ function WQA:formatTime(t)
 	else
 		timeString = string.format("%dm", m)
 	end
-	
+
 	if t > 0 then
 		if t <= 180 then
 			if t <= 30 then
@@ -3165,10 +4440,10 @@ function WQA:formatTime(t)
 end
 
 local LE_GARRISON_TYPE = {
-	[6] = Enum.GarrisonType.Type_6_0,
-	[7] = Enum.GarrisonType.Type_7_0,
-	[8] = Enum.GarrisonType.Type_8_0,
-	[9] = Enum.GarrisonType.Type_9_0
+	[6] = Enum.GarrisonType.Type_6_0_Garrison,
+	[7] = Enum.GarrisonType.Type_7_0_Garrison,
+	[8] = Enum.GarrisonType.Type_8_0_Garrison,
+	[9] = Enum.GarrisonType.Type_9_0_Garrison
 }
 
 function WQA:CheckMissions()
@@ -3177,12 +4452,12 @@ function WQA:CheckMissions()
 	for i in pairs(WQA.ExpansionList) do
 		local type = LE_GARRISON_TYPE[i]
 		local followerType = GetPrimaryGarrisonFollowerType(type)
-		if C_Garrison.HasGarrison(type) then
+		if type and C_Garrison.HasGarrison(type) then
 			local missions = C_Garrison.GetAvailableMissions(followerType)
 			-- Add Shipyard Missions
 			if i == 6 and C_Garrison.HasShipyard() then
-				for missionID, mission in ipairs(C_Garrison.GetAvailableMissions(Enum.GarrisonFollowerType.FollowerType_6_2)) do
-					mission.followerType = Enum.GarrisonFollowerType.FollowerType_6_2
+				for missionID, mission in ipairs(C_Garrison.GetAvailableMissions(Enum.GarrisonFollowerType.FollowerType_6_0_Boat)) do
+					mission.followerType = Enum.GarrisonFollowerType.FollowerType_6_0_Boat
 					missions[#missions + 1] = mission
 				end
 			end
@@ -3200,14 +4475,18 @@ function WQA:CheckMissions()
 								local currencyID = reward.currencyID
 								local amount = reward.quantity
 								if self.db.profile.options.missionTable.reward.currency[currencyID] then
-									local currency = {currencyID = currencyID, amount = amount}
+									local currency = { currencyID = currencyID, amount = amount }
 									self:AddRewardToMission(missionID, "CURRENCY", currency)
 									addMission = true
 								else
 									local factionID = ReputationCurrencyList[currencyID] or nil
 									if factionID then
 										if self.db.profile.options.missionTable.reward.reputation[factionID] == true then
-											local reputation = {currencyID = currencyID, amount = amount, factionID = factionID}
+											local reputation = {
+												currencyID = currencyID,
+												amount = amount,
+												factionID = factionID
+											}
 											self:AddRewardToMission(missionID, "REPUTATION", reputation)
 										end
 									end
@@ -3216,8 +4495,8 @@ function WQA:CheckMissions()
 								local gold = math.floor(reward.quantity / 10000)
 								if
 									self.db.profile.options.missionTable.reward.gold and
-										gold >= self.db.profile.options.missionTable.reward.goldMin
-								 then
+									gold >= self.db.profile.options.missionTable.reward.goldMin
+								then
 									self:AddRewardToMission(missionID, "GOLD", gold)
 									addMission = true
 								end
@@ -3227,25 +4506,25 @@ function WQA:CheckMissions()
 						if reward.itemID then
 							local itemID = reward.itemID
 							local itemName,
-								itemLink,
-								itemRarity,
-								itemLevel,
-								itemMinLevel,
-								itemType,
-								itemSubType,
-								itemStackCount,
-								itemEquipLoc,
-								itemTexture,
-								itemSellPrice,
-								itemClassID,
-								itemSubClassID = GetItemInfo(itemID)
+							itemLink,
+							itemRarity,
+							itemLevel,
+							itemMinLevel,
+							itemType,
+							itemSubType,
+							itemStackCount,
+							itemEquipLoc,
+							itemTexture,
+							itemSellPrice,
+							itemClassID,
+							itemSubClassID = GetItemInfo(itemID)
 
 							if not itemLink then
 								retry = true
 							else
 								-- Custom Mission Reward
 								if self.db.global.custom.missionReward[itemID] and self.db.profile.custom.missionReward[itemID] then
-									local item = {itemLink = itemLink}
+									local item = { itemLink = itemLink }
 									self:AddRewardToMission(missionID, "ITEM", item)
 									addMission = true
 								end
@@ -3254,7 +4533,7 @@ function WQA:CheckMissions()
 								local factionID = ReputationItemList[itemID] or nil
 								if factionID then
 									if self.db.profile.options.missionTable.reward.reputation[factionID] == true then
-										local reputation = {itemLink = itemLink, factionID = factionID}
+										local reputation = { itemLink = itemLink, factionID = factionID }
 										self:AddRewardToMission(missionID, "REPUTATION", reputation)
 										addMission = true
 									end
@@ -3266,7 +4545,7 @@ function WQA:CheckMissions()
 										local transmog
 										if AllTheThings then
 											local searchForLinkResult = AllTheThings.SearchForLink(itemLink)
-											if not searchForLinkResult then
+											if not searchForLinkResult or not searchForLinkResult[1] then
 												retry = true
 											else
 												local state = searchForLinkResult[1].collected
@@ -3279,16 +4558,16 @@ function WQA:CheckMissions()
 										elseif CanIMogIt then
 											if CanIMogIt:IsEquippable(itemLink) and CanIMogIt:CharacterCanLearnTransmog(itemLink) then
 												if not CanIMogIt:PlayerKnowsTransmog(itemLink) then
-													transmog = "|TInterface\\AddOns\\TransMogMaster\\Icons\\UNKNOWN:0|t"
+													transmog = "|TInterface\\AddOns\\CanIMogIt\\Icons\\UNKNOWN:0|t"
 												elseif
 													not CanIMogIt:PlayerKnowsTransmogFromItem(itemLink) and self.db.profile.options.reward.gear.unknownSource
-												 then
-													transmog = "|TInterface\\AddOns\\TransMogMaster\\Icons\\KNOWN_circle:0|t"
+												then
+													transmog = "|TInterface\\AddOns\\CanIMogIt\\Icons\\KNOWN_circle:0|t"
 												end
 											end
 										end
 										if transmog then
-											local item = {itemLink = itemLink, transmog = transmog}
+											local item = { itemLink = itemLink, transmog = transmog }
 											self:AddRewardToMission(missionID, "ITEM", item)
 											addMission = true
 										end
@@ -3297,7 +4576,7 @@ function WQA:CheckMissions()
 
 								-- Conduit
 								if self.db.profile.options.reward.gear.conduit and C_Soulbinds.IsItemConduitByItemInfo(itemLink) then
-									self:AddRewardToMission(missionID, "ITEM", {itemLink = itemLink})
+									self:AddRewardToMission(missionID, "ITEM", { itemLink = itemLink })
 									addMission = true
 								end
 							end
@@ -3354,22 +4633,9 @@ local GetTitleForQuestID = C_QuestLog.GetTitleForQuestID
 
 local optionsTimer
 
-WQA.ExpansionList = {
-	[6] = "|cFFFF0000 WOD >>>|r",  --Warlords of Draenor
-	[7] = "|cFFFF0000 LEG >>>|r",  --Legion
-	[8] = "|cFFFF0000 BFA >>>|r",  --Battle For Azeroth
-	[9] = "|cFFFF0000 SLS >>>|r",  --"Shadowlands"
-}
-
-local IDToExpansionID = {
-	[1] = 6,
-	[2] = 7,
-	[3] = 8,
-	[4] = 9
-}
-
 local CurrencyIDList = {
 	[6] = {
+		823, -- Apexis Crystal
 		824 -- Garrison Resources
 	},
 	[7] = {
@@ -3380,16 +4646,27 @@ local CurrencyIDList = {
 		1533 -- Wakening Essence
 	},
 	[8] = {
-		1553, -- Azerite
-		1560, -- War Ressource
-		{id = 1716, faction = "Horde"}, -- Honorbound Service Medal
-		{id = 1717, faction = "Alliance"}, -- 7th Legion Service Medal
-		1721, -- Prismatic Manapearl
-		1602, -- Conquest
-		1166 -- Timewarped Badge
+		1553,                          -- Azerite
+		1560,                          -- War Ressource
+		{ id = 1716, faction = "Horde" }, -- Honorbound Service Medal
+		{ id = 1717, faction = "Alliance" }, -- 7th Legion Service Medal
+		1721,                          -- Prismatic Manapearl
+		1602,                          -- Conquest
+		1166                           -- Timewarped Badge
 	},
 	[9] = {
 		1889 -- Adventure Campaign Progress
+	},
+	[10] = {
+		2003, -- Dragon Isles Supplies
+		2123, -- Bloody Tokens
+		2657, -- Mysterious Fragment
+		2245, -- Flightstones
+	},
+	[11] = {
+		3008, -- Valorstones
+		3056, -- Kej
+		2815, -- Resonance Crystals
 	}
 }
 
@@ -3442,51 +4719,6 @@ local worldQuestType = {
 	["Dungeon"] = Enum.QuestTagType.Dungeon
 }
 
-WQA.ZoneIDList = {
-	[7] = {
-		619, -- Broken Isles
-		627, -- Dalaran
-		630, -- Azsuna
-		641, -- Val'sharah
-		650, -- Highmountain
-		-- 625, -- Dalaran
-		680, -- Suramar
-		634, -- Stormheim
-		646, -- Broken Shore
-		790, -- Eye of Azshara
-		885,
-		830,
-		882
-	},
-	[8] = {
-		14, -- Arathi Highlands
-		62, -- Darkshore
-		875,
-		876,
-		862,
-		863,
-		864,
-		895, -- Tiragarde Sound
-		942,
-		896, -- Drustvar
-		1161, -- Boralus
-		1165, -- Dazar'alor
-		1355, -- Nazjatar
-		1462, -- Mechagon
-		1527, -- Uldum
-		1530 -- Vale of Eternal Blossoms
-	},
-	[9] = {
-		1525, -- Revendreth
-		1533, -- Bastion
-		1536, -- Maldraxxus
-		1565, -- Ardenweald
-		1543, -- The Maw
-		1961, -- Korthia
-		1970 --	Zereth Mortis
-	}
-}
-
 WQA.EmissaryQuestIDList = {
 	[7] = {
 		42233, -- Highmountain Tribes
@@ -3501,20 +4733,20 @@ WQA.EmissaryQuestIDList = {
 		43179 -- Kirin Tor
 	},
 	[8] = {
-		50604, -- Tortollan Seekers
-		50562, -- Champions of Azeroth
-		{id = 50599, faction = "Alliance"}, -- Proudmoore Admiralty
-		{id = 50600, faction = "Alliance"}, -- Order of Embers
-		{id = 50601, faction = "Alliance"}, -- Storm's Wake
-		{id = 50605, faction = "Alliance"}, -- 7th Legion
-		{id = 50598, faction = "Horde"}, -- Zandalari Empire
-		{id = 50603, faction = "Horde"}, -- Voldunai
-		{id = 50602, faction = "Horde"}, -- Talanji's Expedition
-		{id = 50606, faction = "Horde"}, -- The Honorbound
+		50604,                          -- Tortollan Seekers
+		50562,                          -- Champions of Azeroth
+		{ id = 50599, faction = "Alliance" }, -- Proudmoore Admiralty
+		{ id = 50600, faction = "Alliance" }, -- Order of Embers
+		{ id = 50601, faction = "Alliance" }, -- Storm's Wake
+		{ id = 50605, faction = "Alliance" }, -- 7th Legion
+		{ id = 50598, faction = "Horde" }, -- Zandalari Empire
+		{ id = 50603, faction = "Horde" }, -- Voldunai
+		{ id = 50602, faction = "Horde" }, -- Talanji's Expedition
+		{ id = 50606, faction = "Horde" }, -- The Honorbound
 		-- 8.2
 		-- 2391, -- Rustbolt Resistance
-		{id = 56119, faction = "Alliance"}, -- Waveblade Ankoan
-		{id = 56120, faction = "Horde"} -- The Unshackled
+		{ id = 56119, faction = "Alliance" }, -- Waveblade Ankoan
+		{ id = 56120, faction = "Horde" } -- The Unshackled
 	}
 }
 
@@ -3535,7 +4767,9 @@ local FactionIDList = {
 		Neutral = {
 			2164, -- Champions of Azeroth
 			2163, -- Tortollan Seekers
-			2391 -- Rustbolt Resistance
+			2391, -- Rustbolt Resistance
+			2417, -- Uldum Accord
+			2415 -- Rajani
 		},
 		Alliance = {
 			2160, -- Proudmoore Admiralty
@@ -3551,6 +4785,37 @@ local FactionIDList = {
 			2157, -- The Honorbound
 			2373 -- The Unshackled
 		}
+	},
+	[9] = {
+		Neutral = {
+			2413, -- Court of Harvesters
+			2470, -- Death's Advance
+			2407, -- The Ascended
+			2478, -- The Enlightened
+			2410, -- The Undying Army
+			2465, -- The Wild Hunt
+			2432 -- Ve'nari
+		}
+	},
+	[10] = {
+		Neutral = {
+			2615, -- Azerothian Archives
+			2507, -- Dragonscale Expedition
+			2574, -- Dream Wardens
+			2511, -- Iskaara Tuskarr
+			2564, -- Loamm Niffen
+			2503, -- Maruuk Centaur
+			2510 -- Valdrakken Accord
+		}
+	},
+	[11] = {
+		Neutral = {
+			2594, -- The Assembly of the Deeps
+			2570, -- Hallowfall Arathi
+			2600, -- The Severed Threads
+			2590 -- Council of Dornogal
+		}
+
 	}
 }
 
@@ -3885,8 +5150,8 @@ function WQA:UpdateOptions()
 								end,
 								disabled = function()
 									local mapId = self.data.custom.mapID
-									local questId = self.data.custom.wqID
-									return (questId == nil or questId == "") or
+									local questID = self.data.custom.wqID
+									return (questID == nil or questID == "") or
 										(self.data.custom.questType == "QUEST_PIN" and (mapId == nil or mapId == ""))
 								end
 							},
@@ -4318,7 +5583,7 @@ function WQA:UpdateOptions()
 		end
 	end
 
-	for _, i in ipairs(IDToExpansionID) do
+	for i = 6, 11 do
 		self.options.args.reward.args[self.ExpansionList[i]] = {
 			order = newOrder(),
 			name = self.ExpansionList[i],
@@ -4399,16 +5664,18 @@ function WQA:UpdateOptions()
 				}
 				for _, factionGroup in pairs {"Neutral", UnitFactionGroup("player")} do
 					if FactionIDList[i][factionGroup] then
-						for k, v in pairs(FactionIDList[i][factionGroup]) do
-							args.reputation.args[GetFactionInfoByID(v)] = {
+						for _, factionID in pairs(FactionIDList[i][factionGroup]) do
+							local factionName = C_Reputation.GetFactionDataByID(factionID).name
+
+							args.reputation.args[factionName] = {
 								type = "toggle",
-								name = GetFactionInfoByID(v),
+								name = factionName,
 								set = function(info, val)
-									WQA.db.profile.options.reward.reputation[v] = val
+									WQA.db.profile.options.reward.reputation[factionID] = val
 								end,
 								descStyle = "inline",
 								get = function()
-									return WQA.db.profile.options.reward.reputation[v]
+									return WQA.db.profile.options.reward.reputation[factionID]
 								end,
 								order = newOrder()
 							}
@@ -4469,10 +5736,10 @@ function WQA:UpdateOptions()
 
 				-- Skillup
 				-- if not self.db.char[exp+5].profession[tradeskillLineID].isMaxLevel and self.db.profile.options.reward[exp+5].profession[tradeskillLineID].skillup thenthen
-				for _, tradeskillLineIndex in pairs({GetProfessions()}) do
+				for _, tradeskillLineIndex in pairs({ GetProfessions() }) do
 					local professionName, _, _, _, _, _, tradeskillLineID = GetProfessionInfo(tradeskillLineIndex)
 					args.profession.args[tradeskillLineID.."Header"] = { type = "header", name = professionName, order = newOrder()}
-					args.profession.args[tradeskillLineID.."Skillup"] = {
+					args.profession.args[tradeskillLineID .. "Skillup"] = {
 						type = "toggle",
 						name = "提升技能",
 						desc = "追踪每个世界任务，直到技能等级达到上限",
@@ -4497,27 +5764,27 @@ function WQA:UpdateOptions()
 						order = newOrder()
 					}
 				end
-			-- Crafting Reagents
-			--
-			-- for k,v in pairs(CraftingReagentIDList[i] or {}) do
-			--	local name = GetItemInfo(v)
-			--	if name then
-			--		self.options.args.reward.args[ExpansionList[i]].args.profession.args[GetItemInfo(v)] = {
-			--			type = "toggle",
-			--			name = GetItemInfo(v),
-			--			set = function(info, val)
-			--				WQA.db.profile.options.reward.craftingreagent[v] = val
-			--			end,
-			--			descStyle = "inline",
-			--		 get = function()
-			--		 	return WQA.db.profile.options.reward.craftingreagent[v]
-			--	 	end,
-			--		 order = newOrder()
-			--		}
-			--	else
-			--		--LibStub("AceConfigRegistry-3.0"):NotifyChange("WQAchievements")
-			--	end
-			-- end
+				-- Crafting Reagents
+				--
+				-- for k,v in pairs(CraftingReagentIDList[i] or {}) do
+				--	local name = GetItemInfo(v)
+				--	if name then
+				--		self.options.args.reward.args[ExpansionList[i]].args.profession.args[GetItemInfo(v)] = {
+				--			type = "toggle",
+				--			name = GetItemInfo(v),
+				--			set = function(info, val)
+				--				WQA.db.profile.options.reward.craftingreagent[v] = val
+				--			end,
+				--			descStyle = "inline",
+				--		 get = function()
+				--		 	return WQA.db.profile.options.reward.craftingreagent[v]
+				--	 	end,
+				--		 order = newOrder()
+				--		}
+				--	else
+				--		--LibStub("AceConfigRegistry-3.0"):NotifyChange("WQAchievements")
+				--	end
+				-- end
 			end
 		end
 
@@ -4560,7 +5827,7 @@ function WQA:UpdateOptions()
 							WQA.db.profile.options.missionTable.reward.goldMin = tonumber(val)
 						end,
 						get = function() return tostring(WQA.db.profile.options.missionTable.reward.goldMin)  end
-					},
+					}
 				}
 			end
 
@@ -4591,18 +5858,20 @@ function WQA:UpdateOptions()
 				type = "group",
 				args = {}
 			}
-			for _, factionGroup in pairs {"Neutral", UnitFactionGroup("player")} do
+			for _, factionGroup in pairs { "Neutral", UnitFactionGroup("player") } do
 				if FactionIDList[i][factionGroup] then
-					for k, v in pairs(FactionIDList[i][factionGroup]) do
-						args.reputation.args[GetFactionInfoByID(v)] = {
+					for _, factionID in pairs(FactionIDList[i][factionGroup]) do
+						local factionName = C_Reputation.GetFactionDataByID(factionID).name
+
+						args.reputation.args[factionName] = {
 							type = "toggle",
-							name = GetFactionInfoByID(v),
+							name = factionName,
 							set = function(info, val)
-								WQA.db.profile.options.missionTable.reward.reputation[v] = val
+								WQA.db.profile.options.missionTable.reward.reputation[factionID] = val
 							end,
 							descStyle = "inline",
 							get = function()
-								return WQA.db.profile.options.missionTable.reward.reputation[v]
+								return WQA.db.profile.options.missionTable.reward.reputation[factionID]
 							end,
 							order = newOrder()
 						}
@@ -4674,27 +5943,27 @@ function WQA:CreateGroup(options, data, groupName)
 				type = "select",
 				values = {disabled = "不要追踪", default = "默认", always = "始终追踪", wasEarnedByMe = "追踪活跃角色未获得", exclusive = "仅追踪当前角色"},
 				width = 1.4,
-				--type = "toggle",
-				name = "",--idString,
+				-- type = "toggle",
+				name = "", -- idString,
 				handler = WQA,
 				set = "ToggleSet",
-				--descStyle = "inline",
-			 get = function(info)
-			 	local value = WQA.db.profile[groupName][id]
-			 	if value == "exclusive" then
-			 		local name, server = UnitFullName("player")
-			 		name = name.."-"..server
-			 		if WQA.db.profile[info[#info-1]].exclusive[id] ~= name then
+				-- descStyle = "inline",
+				get = function(info)
+					local value = WQA.db.profile[groupName][id]
+					if value == "exclusive" then
+						local name, server = UnitFullName("player")
+						name = name .. "-" .. server
+						if WQA.db.profile[info[#info - 1]].exclusive[id] ~= name then
 			 			info.option.values.other = "仅追踪于"..WQA.db.profile[info[#info-1]].exclusive[id]
 			 			return "其他"
-			 		end
-			 	end
+						end
+					end
 					return value
-		 	end,
-				order = newOrder(),
+				end,
+				order = newOrder()
 			}
 			if object.itemID then
-				if not select(2,GetItemInfo(object.itemID)) then
+				if not select(2, GetItemInfo(object.itemID)) then
 					self:CancelTimer(optionsTimer)
 					optionsTimer = self:ScheduleTimer(function() LibStub("AceConfigRegistry-3.0"):NotifyChange("WQAchievements") end, 2)
 				end
@@ -4710,8 +5979,8 @@ function WQA:CreateCustomQuest()
 	 if not self.db.global.custom then self.db.global.custom = {} end
 	 if not self.db.global.custom.worldQuest then self.db.global.custom.worldQuest = {} end
  	self.db.global.custom.worldQuest[tonumber(self.data.custom.wqID)] = {questType = self.data.custom.questType, mapID = self.data.custom.mapID}--{rewardID = tonumber(self.data.custom.rewardID), rewardType = self.data.custom.rewardType}
- 	self:UpdateCustomQuests()
- end
+	self:UpdateCustomQuests()
+end
 
 function WQA:UpdateCustomQuests()
 	local data = self.db.global.custom.worldQuest
@@ -4735,9 +6004,9 @@ function WQA:UpdateCustomQuests()
 		args[id .. "questType"] = {
 			name = "任务类型",
 			order = newOrder(),
-			desc = "IsActive:\nUse this as a last resort. Works for some daily quests.\n\nIsQuestFlaggedCompleted:\nUse this for quests, that are always active.\n\nQuest Pin:\nUse this, if the daily is marked with a quest pin on the world map.\n\nWorld Quest:\nUse this, if you want to track a world quest.",
+			desc = "活跃任务：\n作为最后的手段使用。适用于一些日常任务。\n\n重复任务：\n用于始终处于激活状态的任务。\n\n任务标记：\n使用这个将日常任务在世界地图上标记一个任务标记。\n\n世界任务：\n如果你想追踪一个世界任务，请使用这个。",
 			type = "select",
-			values = {WORLD_QUEST = "World Quest", QUEST_PIN = "Quest Pin", QUEST_FLAG = "IsQuestFlaggedCompleted", IsActive = "IsActive"},
+			values = {WORLD_QUEST = "世界任务", QUEST_PIN = "任务标记", QUEST_FLAG = "重复任务", IsActive = "活跃任务"},
 			width = .8,
 			set = function(info, val)
 				self.db.global.custom.worldQuest[id].questType = val
@@ -4746,7 +6015,7 @@ function WQA:UpdateCustomQuests()
 		}
 		args[id .. "mapID"] = {
 			name = "地图ID",
-			desc = "Quest pin tracking needs a mapID.\nSee https://wow.gamepedia.com/UiMapID for help.",
+			desc = "任务标记需要一个地图ID。\n查看 https://wow.gamepedia.com/UiMapID 获取帮助信息。",
 			type = "input",
 			width = .4,
 			order = newOrder(),
@@ -4809,16 +6078,16 @@ end
 function WQA:CreateCustomReward()
 	 if not self.db.global.custom then self.db.global.custom = {} end
 	 if not self.db.global.custom.worldQuestReward then self.db.global.custom.worldQuestReward = {} end
- 	self.db.global.custom.worldQuestReward[tonumber(self.data.custom.worldQuestReward)] = true
- 	self:UpdateCustomRewards()
+	self.db.global.custom.worldQuestReward[tonumber(self.data.custom.worldQuestReward)] = true
+	self:UpdateCustomRewards()
 end
 
 function WQA:UpdateCustomRewards()
- 	local data = self.db.global.custom.worldQuestReward
+	local data = self.db.global.custom.worldQuestReward
  	if type(data) ~= "table" then return false end
- 	local args = self.options.args.custom.args.reward.args
- 	for id,_ in pairs(data) do
- 		local _, itemLink = GetItemInfo(id)
+	local args = self.options.args.custom.args.reward.args
+	for id, _ in pairs(data) do
+		local _, itemLink = GetItemInfo(id)
 		args[tostring(id)] = {
 			type = "toggle",
 			name = itemLink or tostring(id),
@@ -4860,7 +6129,7 @@ function WQA:CreateCustomMission()
 	if not self.db.global.custom then self.db.global.custom = {} end
 	if not self.db.global.custom.mission then self.db.global.custom.mission = {} end
 	self.db.global.custom.mission[tonumber(self.data.custom.mission.missionID)] = {rewardID = tonumber(self.data.custom.mission.rewardID), rewardType = self.data.custom.mission.rewardType}
- 	self:UpdateCustomMissions()
+	self:UpdateCustomMissions()
 end
 
 function WQA:UpdateCustomMissions()
@@ -4882,8 +6151,8 @@ function WQA:UpdateCustomMissions()
 			width = 1.2
 		}
 		args[id .. "Reward"] = {
-			name = "Reward (optional)",
-			desc = "Enter an achievementID or itemID",
+			name = "奖励（可选）",
+			desc = "输入一个成就ID 或者 物品ID",
 			type = "input",
 			width = .6,
 			order = newOrder(),
@@ -4895,10 +6164,10 @@ function WQA:UpdateCustomMissions()
 			end
 		}
 		args[id .. "RewardType"] = {
-			name = "Reward type",
+			name = "奖励类型",
 			order = newOrder(),
 			type = "select",
-			values = {item = "Item", achievement = "Achievement", none = "none"},
+			values = { item = "物品", achievement = "成就", none = "无" },
 			width = .6,
 			set = function(info, val)
 				self.db.global.custom.mission[id].rewardType = val

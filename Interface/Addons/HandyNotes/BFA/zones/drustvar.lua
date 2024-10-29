@@ -10,6 +10,7 @@ local Map = BattleForAzeroth.Map
 local Collectible = BattleForAzeroth.node.Collectible
 local PetBattle = BattleForAzeroth.node.PetBattle
 local Rare = BattleForAzeroth.node.Rare
+local Safari = BattleForAzeroth.node.Safari
 local Supply = BattleForAzeroth.node.Supply
 local Treasure = BattleForAzeroth.node.Treasure
 
@@ -163,10 +164,7 @@ map.nodes[18716138] = Rare({
     id = 134706,
     quest = 50669,
     note = L['in_small_cave'],
-    rewards = {
-        Achievement({id = 12941, criteria = 42342}),
-        Item({item = 158555, note = L['trinket']}) -- Doom Shroom
-    }
+    rewards = {Achievement({id = 12941, criteria = 42342})}
 }) -- Deathcap
 
 map.nodes[63404009] = Rare({
@@ -304,10 +302,7 @@ map.nodes[67986688] = Rare({
     quest = 49341,
     label = GetAchievementCriteriaInfoByID(12941, 41719),
     note = L['seething_cache_note'],
-    rewards = {
-        Achievement({id = 12941, criteria = 41719}),
-        Item({item = 158598, note = L['ring']}) -- Band of Seething Manifest
-    }
+    rewards = {Achievement({id = 12941, criteria = 41719})}
 }) -- Seething Cache
 
 map.nodes[32985711] = Rare({
@@ -331,10 +326,7 @@ map.nodes[31934061] = Rare({
 map.nodes[25101624] = Rare({
     id = 139358,
     quest = 51949,
-    note = L['the_caterer_note'],
-    rewards = {
-        Item({item = 155560, note = L['ring']}) -- Lazy-Baker's Ring
-    }
+    note = L['the_caterer_note']
 }) -- The Caterer
 
 map.nodes[72856047] = Rare({
@@ -424,7 +416,7 @@ map.nodes[25751995] = Treasure({
     note = L['merchants_chest_note'],
     rewards = {
         Achievement({id = 12995, criteria = 41698}),
-        Item({item = 163036, note = 'x5'})
+        Item({item = 163036, note = '5x'})
     }
 }) -- Merchant's Chest
 
@@ -457,7 +449,7 @@ map.nodes[24264830] = Treasure({
     note = L['in_small_cave'],
     rewards = {
         Achievement({id = 12995, criteria = 41752}),
-        Item({item = 163036, note = 'x5'})
+        Item({item = 163036, note = '5x'})
     }
 }) -- Stolen Thornspeaker Cache
 
@@ -815,25 +807,105 @@ map.nodes[21474360] = Collectible({
 ------------------- TO ALL THE SQUIRRELS I SET SAIL TO SEE --------------------
 -------------------------------------------------------------------------------
 
-local ToAlltheSquirrels = Class('ToAlltheSquirrels', Collectible, {
-    icon = 237182,
-    group = BattleForAzeroth.groups.SQUIRRELS
-})
-
-map.nodes[53202880] = ToAlltheSquirrels({
+map.nodes[53202880] = BattleForAzeroth.node.Squirrel({
     id = 129791,
-    note = L['squirrels_note'],
     rewards = {Achievement({id = 14730, criteria = 50239})},
-    pois = {
-        POI({51802640, 53803340})
-    }
+    pois = {POI({51802640, 53803340})}
 }) -- Drustbat
 
-map.nodes[60802340] = ToAlltheSquirrels({
+map.nodes[60802340] = BattleForAzeroth.node.Squirrel({
     id = 128798,
-    note = L['squirrels_note'],
-    rewards = {Achievement({id=14730, criteria = 50241})},
-    pois={
-        POI({60801600, 62602380, 59202340})
-    }
+    rewards = {Achievement({id = 14730, criteria = 50241})},
+    pois = {POI({60801600, 62602380, 59202340})}
 }) -- Bramble Hare
+
+-------------------------------------------------------------------------------
+-------------------------------- BATTLE SAFARI --------------------------------
+-------------------------------------------------------------------------------
+
+map.nodes[27407220] = Safari.CoastalScuttler({
+    pois = {POI({26407340, 27207280, 27407100, 27407220, 27607100, 28007320})}
+}) -- Coastal Scuttler
+
+map.nodes[35004020] = Safari.RiverOtter({
+    pois = {
+        POI({
+            28804480, 30404460, 30604460, 31004560, 31804260, 32004400,
+            32404200, 32804060, 32804340, 33003920, 33404040, 33604060,
+            34203980, 35004020, 35004620
+        })
+    }
+}) -- River Otter
+
+map.nodes[21602880] = Safari.ShackCrab({
+    pois = {
+        POI({
+            20403020, 20603000, 20802840, 20802880, 21202700, 21402620,
+            21602620, 21602880, 22402260, 22402500, 22602300, 22602420,
+            22602480, 58601440
+        })
+    }
+}) -- ShackCrab
+
+-------------------------------------------------------------------------------
+--------------------------- CURSED GAME HUNTER --------------------------------
+-------------------------------------------------------------------------------
+
+local Cursed = Class('Cursed', Collectible, {
+    icon = 1027879,
+    group = BattleForAzeroth.groups.CURSED_HUNTER,
+    label = L['cursed_hunter_label'],
+    note = L['cursed_hunter_note']
+})
+
+map.nodes[53872072] = Cursed({
+    rewards = {Achievement({id = 13094, criteria = 1})}
+}) -- Cursed Game Hunter: Goats
+
+map.nodes[56804148] = Cursed({
+    rewards = {Achievement({id = 13094, criteria = 2})}
+}) -- Cursed Game Hunter: Deer
+
+map.nodes[58623461] = Cursed({
+    rewards = {Achievement({id = 13094, criteria = 3})}
+}) -- Cursed Game Hunter: Pigs
+
+map.nodes[32216170] = Cursed({
+    rewards = {Achievement({id = 13094, criteria = 4})}
+}) -- Cursed Game Hunter: Thornclaws
+
+map.nodes[58952992] = Cursed({
+    rewards = {Achievement({id = 13094, criteria = 5})}
+}) -- Cursed Game Hunter: Wolves
+
+map.nodes[53173602] = Cursed({
+    rewards = {Achievement({id = 13094, criteria = 6})}
+}) -- Cursed Game Hunter: Ravens
+
+map.nodes[53334270] = Cursed({
+    rewards = {Achievement({id = 13094, criteria = 7})}
+}) -- Cursed Game Hunter: Rabbits
+
+map.nodes[31292511] = Cursed({
+    rewards = {Achievement({id = 13094, criteria = 8})}
+}) -- Cursed Game Hunter: Falcons
+
+map.nodes[24004902] = Cursed({
+    rewards = {Achievement({id = 13094, criteria = 9})}
+}) -- Cursed Game Hunter: Bramblebacks
+
+map.nodes[21902260] = Cursed({
+    rewards = {Achievement({id = 13094, criteria = 10})}
+}) -- Cursed Game Hunter: Sea Lions
+
+map.nodes[30282528] = Cursed({
+    rewards = {Achievement({id = 13094, criteria = 11})}
+}) -- Cursed Game Hunter: Horses
+
+map.nodes[22366947] = Cursed({
+    rewards = {Achievement({id = 13094, criteria = 12})}
+}) -- Cursed Game Hunter: Sharks
+
+map.nodes[74346589] = Cursed({
+    rewards = {Achievement({id = 13094, criteria = 13})}
+}) -- Cursed Game Hunter: Crabs

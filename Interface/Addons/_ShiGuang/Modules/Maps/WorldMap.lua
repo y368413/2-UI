@@ -57,8 +57,10 @@ function module:UpdateCoords(elapsed)
 		local cursorX, cursorY = module:GetCursorCoords()
 		if cursorX and cursorY then
 			cursorCoords:SetFormattedText(CoordsFormat(MOUSE_LABEL), 100 * cursorX, 100 * cursorY)
+			cursorCoords:Show()
 		else
-			cursorCoords:SetText(CoordsFormat(MOUSE_LABEL, true))
+			cursorCoords:Hide()
+			--cursorCoords:SetText(CoordsFormat(MOUSE_LABEL, true))
 		end
 
 		if not currentMapID then
@@ -85,8 +87,16 @@ function module:UpdateMapID()
 end
 
 function module:SetupCoords()
-	playerCoords = M.CreateFS(WorldMapFrame.BorderFrame, 12, "", false, "BOTTOMLEFT", 110, 3)
-	cursorCoords = M.CreateFS(WorldMapFrame.BorderFrame, 12, "", false, "BOTTOMLEFT", 220, 3)
+	local textParent = CreateFrame("Frame", nil, WorldMapFrame)
+	textParent:SetPoint("BOTTOMLEFT", WorldMapFrame.ScrollContainer)
+	textParent:SetSize(1, 18)
+	textParent:SetFrameLevel(5)
+	M.SetGradient(textParent, "H", 0,0,0, .5, 0, 450, 18):SetPoint("LEFT")
+
+	playerCoords = M.CreateFS(textParent, 13, "", false, "LEFT", 5, 0)
+	playerCoords:SetJustifyH("LEFT")
+	cursorCoords = M.CreateFS(textParent, 13, "", false, "LEFT", 180, 0)
+	cursorCoords:SetJustifyH("LEFT")
 	WorldMapFrame.BorderFrame.Tutorial:SetPoint("TOPLEFT", WorldMapFrame, "TOPLEFT", -12, -12)
 
 	hooksecurefunc(WorldMapFrame, "OnFrameSizeChanged", module.UpdateMapID)
@@ -105,25 +115,19 @@ function module:UpdateMapScale()
 end
 
 function module:UpdateMapAnchor()
-	if not InCombatLockdown() then
+	--if not InCombatLockdown() then
 		module.UpdateMapScale(self)
 		M.RestoreMF(self)
-	end
+	--end
 end
 
 function module:WorldMapScale()
-	-- Fix worldmap cursor when scaling
-	WorldMapFrame.ScrollContainer.GetCursorPosition = function(f)
-		local x, y = MapCanvasScrollControllerMixin.GetCursorPosition(f)
-		local scale = WorldMapFrame:GetScale()
-		return x / scale, y / scale
-	end
-
 	M.CreateMF(WorldMapFrame, nil, true)
+	WorldMapFrame:HookScript("OnShow", self.UpdateMapAnchor)
 	hooksecurefunc(WorldMapFrame, "SynchronizeDisplayState", self.UpdateMapAnchor)
 end
 
-local shownMapCache, exploredCache, fileDataIDs = {}, {}, {}
+local shownMapCache, exploredCache, fileDataIDs, storedTex = {}, {}, {}, {}
 
 local function GetStringFromInfo(info)
 	return format("W%dH%dX%dY%d", info.textureWidth, info.textureHeight, info.offsetX, info.offsetY)
@@ -145,6 +149,10 @@ end
 function module:MapData_RefreshOverlays(fullUpdate)
 	wipe(shownMapCache)
 	wipe(exploredCache)
+	for _, tex in pairs(storedTex) do
+		tex:SetVertexColor(1, 1, 1)
+	end
+	wipe(storedTex)
 
 	local mapID = WorldMapFrame.mapID
 	if not mapID then return end
@@ -195,6 +203,7 @@ function module:MapData_RefreshOverlays(fullUpdate)
 				end
 				for k = 1, numTexturesWide do
 					local texture = self.overlayTexturePool:Acquire()
+					tinsert(storedTex, texture)
 					if k < numTexturesWide then
 						texturePixelWidth = TILE_SIZE_WIDTH
 						textureFileWidth = TILE_SIZE_WIDTH
@@ -240,9 +249,9 @@ function module:MapData_ResetTexturePool(texture)
 end
 
 function module:RemoveMapFog()
-	local bu = CreateFrame("CheckButton", nil, WorldMapFrame.BorderFrame, "OptionsCheckButtonTemplate")
+	local bu = CreateFrame("CheckButton", nil, WorldMapFrame.BorderFrame.TitleContainer, "OptionsBaseCheckButtonTemplate")
 	bu:SetHitRectInsets(-5, -5, -5, -5)
-	bu:SetPoint("TOPRIGHT", -270, 0)
+	bu:SetPoint("BOTTOMLEFT", WorldMapFrameHomeButton, "TOPLEFT", -4, 0)
 	bu:SetSize(26, 26)
 	--M.ReskinCheck(bu)
 	bu:SetChecked(R.db["Map"]["MapReveal"])
@@ -264,7 +273,7 @@ end
 
 function module:SetupWorldMap()
 	if R.db["Map"]["DisableMap"] then return end
-	if IsAddOnLoaded("Mapster") then return end
+	if C_AddOns.IsAddOnLoaded("Mapster") then return end
 
 	-- Remove from frame manager
 	WorldMapFrame:ClearAllPoints()
@@ -289,11 +298,11 @@ function module:OnLogin()
 	self:SetupMinimap()
 end
 
---## Author: Coop ## Version: 01.00
+--[[## Author: Coop ## Version: 01.00
 local CollapseQuestLog = CreateFrame("Button", "CollapseButton", WorldMapFrame.BorderFrame, 'UIPanelButtonTemplate')
 CollapseQuestLog:ClearAllPoints();
 CollapseQuestLog:SetPoint("TOPRIGHT",-48,0)
 CollapseQuestLog:SetSize(24,24)
 CollapseQuestLog:SetText("-")
 CollapseQuestLog:RegisterForClicks("AnyUp")
-CollapseQuestLog:SetScript("OnClick", function() CollapseQuestHeader(0) end)
+CollapseQuestLog:SetScript("OnClick", function() CollapseQuestHeader(0) end)]]

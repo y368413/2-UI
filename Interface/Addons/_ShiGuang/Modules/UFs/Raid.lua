@@ -5,9 +5,9 @@ local UF = M:GetModule("UnitFrames")
 
 local strmatch, format, wipe = strmatch, format, wipe
 local pairs, ipairs, next, tonumber, unpack, gsub = pairs, ipairs, next, tonumber, unpack, gsub
-local UnitAura, GetSpellInfo = UnitAura, GetSpellInfo
+local GetSpellName = C_Spell.GetSpellName
 local InCombatLockdown = InCombatLockdown
-local GetTime, GetSpellCooldown, IsInRaid, IsInGroup = GetTime, GetSpellCooldown, IsInRaid, IsInGroup
+local GetTime, IsInRaid, IsInGroup = GetTime, IsInRaid, IsInGroup
 local C_ChatInfo_SendAddonMessage = C_ChatInfo.SendAddonMessage
 local LE_PARTY_CATEGORY_HOME = LE_PARTY_CATEGORY_HOME
 local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
@@ -81,73 +81,6 @@ function UF:CreateThreatBorder(self)
 	self.ThreatIndicator.Override = UF.UpdateThreatBorder
 end
 
-local debuffList = {}
-function UF:UpdateRaidDebuffs()
-	wipe(debuffList)
-	for instName, value in pairs(R.RaidDebuffs) do
-		for spell, priority in pairs(value) do
-			if not (MaoRUIDB["RaidDebuffs"][instName] and MaoRUIDB["RaidDebuffs"][instName][spell]) then
-				if not debuffList[instName] then debuffList[instName] = {} end
-				debuffList[instName][spell] = priority
-			end
-		end
-	end
-	for instName, value in pairs(MaoRUIDB["RaidDebuffs"]) do
-		for spell, priority in pairs(value) do
-			if priority > 0 then
-				if not debuffList[instName] then debuffList[instName] = {} end
-				debuffList[instName][spell] = priority
-			end
-		end
-	end
-end
-
-local function buttonOnEnter(self)
-	if not self.index then return end
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
-	GameTooltip:ClearLines()
-	GameTooltip:SetUnitAura(self.__owner.unit, self.index, self.filter)
-	GameTooltip:Show()
-end
-
-function UF:CreateRaidDebuffs(self)
-	local scale = R.db["UFs"]["RaidDebuffScale"]
-	local size = 18
-
-	local bu = CreateFrame("Frame", nil, self)
-	bu:SetSize(size, size)
-	bu:SetPoint("RIGHT", -15, 0)
-	bu:SetFrameLevel(self:GetFrameLevel() + 3)
-	M.CreateSD(bu, 3, true)
-	bu.__shadow:SetFrameLevel(self:GetFrameLevel() + 2)
-	bu:SetScale(scale)
-	bu:Hide()
-
-	bu.icon = bu:CreateTexture(nil, "ARTWORK")
-	bu.icon:SetAllPoints()
-	bu.icon:SetTexCoord(unpack(I.TexCoord))
-
-	local parentFrame = CreateFrame("Frame", nil, bu)
-	parentFrame:SetAllPoints()
-	parentFrame:SetFrameLevel(bu:GetFrameLevel() + 6)
-	bu.count = M.CreateFS(parentFrame, 12, "", false, "BOTTOMRIGHT", 6, -3)
-	bu.timer = M.CreateFS(bu, 12, "", false, "CENTER", 1, 0)
-	bu.glowFrame = M.CreateGlowFrame(bu, size)
-
-	if not R.db["UFs"]["AurasClickThrough"] then
-		bu:SetScript("OnEnter", buttonOnEnter)
-		bu:SetScript("OnLeave", M.HideTooltip)
-	end
-
-	bu.ShowDispellableDebuff = true
-	bu.ShowDebuffBorder = true
-	if R.db["UFs"]["InstanceAuras"] then
-		if not next(debuffList) then UF:UpdateRaidDebuffs() end
-		bu.Debuffs = debuffList
-	end
-	self.RaidDebuffs = bu
-end
-
 local keyList = {}
 local mouseButtonList = {"LMB","RMB","MMB","MB4","MB5"}
 local modKeyList = {"","ALT-","CTRL-","SHIFT-","ALT-CTRL-","ALT-SHIFT-","CTRL-SHIFT-","ALT-CTRL-SHIFT-"}
@@ -174,10 +107,10 @@ for keyIndex, keyString in pairs(wheelGroupIndex) do
 end
 
 function UF:DefaultClickSets()
-	if not MaoRUIDB["ClickSets"][I.MyClass] then MaoRUIDB["ClickSets"][I.MyClass] = {} end
-	if not next(MaoRUIDB["ClickSets"][I.MyClass]) then
+	if not MaoRUISetDB["ClickSets"][I.MyClass] then MaoRUISetDB["ClickSets"][I.MyClass] = {} end
+	if not next(MaoRUISetDB["ClickSets"][I.MyClass]) then
 		for fullkey, spellID in pairs(R.ClickCastList[I.MyClass]) do
-			MaoRUIDB["ClickSets"][I.MyClass][fullkey] = spellID
+			MaoRUISetDB["ClickSets"][I.MyClass][fullkey] = spellID
 		end
 	end
 end
@@ -191,7 +124,7 @@ local onMouseString = "if not self:IsUnderMouse(false) then self:ClearBindings()
 
 local function setupMouseWheelCast(self)
 	local found
-	for fullkey in pairs(MaoRUIDB["ClickSets"][I.MyClass]) do
+	for fullkey in pairs(MaoRUISetDB["ClickSets"][I.MyClass]) do
 		if strmatch(fullkey, "MW%w") then
 			found = true
 			break
@@ -207,17 +140,27 @@ local function setupMouseWheelCast(self)
 	end
 end
 
+local fixedSpells = {
+	[360823] = 365585, -- incorrect spellID for Evoker
+}
+
 local function setupClickSets(self)
 	if self.clickCastRegistered then return end
 
-	for fullkey, value in pairs(MaoRUIDB["ClickSets"][I.MyClass]) do
+	for fullkey, value in pairs(MaoRUISetDB["ClickSets"][I.MyClass]) do
 		if fullkey == "SHIFT-LMB" then self.focuser = true end
 
 		local keyIndex = keyList[fullkey]
 		if keyIndex then
 			if tonumber(value) then
-				self:SetAttribute(format(keyIndex, "type"), "spell")
-				self:SetAttribute(format(keyIndex, "spell"), value)
+				value = fixedSpells[value] or value
+				--self:SetAttribute(format(keyIndex, "type"), "spell")
+				--self:SetAttribute(format(keyIndex, "spell"), value)
+				local spellName = GetSpellName(value)
+				if spellName then
+					self:SetAttribute(format(keyIndex, "type"), "macro")
+					self:SetAttribute(format(keyIndex, "macrotext"), "/cast [@mouseover]"..spellName)
+				end
 			elseif value == "target" then
 				self:SetAttribute(format(keyIndex, "type"), "target")
 			elseif value == "focus" then
@@ -264,336 +207,6 @@ function UF:AddClickSetsListener()
 	M:RegisterEvent("PLAYER_REGEN_ENABLED", UF.DelayClickSets)
 end
 
-local counterOffsets = {
-	["TOPLEFT"] = {{6, 1}, {"LEFT", "RIGHT", -2, 0}},
-	["TOPRIGHT"] = {{-6, 1}, {"RIGHT", "LEFT", 2, 0}},
-	["BOTTOMLEFT"] = {{6, 1},{"LEFT", "RIGHT", -2, 0}},
-	["BOTTOMRIGHT"] = {{-6, 1}, {"RIGHT", "LEFT", 2, 0}},
-	["LEFT"] = {{6, 1}, {"LEFT", "RIGHT", -2, 0}},
-	["RIGHT"] = {{-6, 1}, {"RIGHT", "LEFT", 2, 0}},
-	["TOP"] = {{0, 0}, {"RIGHT", "LEFT", 2, 0}},
-	["BOTTOM"] = {{0, 0}, {"RIGHT", "LEFT", 2, 0}},
-}
-
-function UF:BuffIndicatorOnUpdate(elapsed)
-	M.CooldownOnUpdate(self, elapsed, true)
-end
-
-UF.CornerSpells = {}
-function UF:UpdateCornerSpells()
-	wipe(UF.CornerSpells)
-
-	for spellID, value in pairs(R.CornerBuffs[I.MyClass]) do
-		local modData = MaoRUIDB["CornerSpells"][I.MyClass]
-		if not (modData and modData[spellID]) then
-			local r, g, b = unpack(value[2])
-			UF.CornerSpells[spellID] = {value[1], {r, g, b}, value[3]}
-		end
-	end
-
-	for spellID, value in pairs(MaoRUIDB["CornerSpells"][I.MyClass]) do
-		if next(value) then
-			local r, g, b = unpack(value[2])
-			UF.CornerSpells[spellID] = {value[1], {r, g, b}, value[3]}
-		end
-	end
-end
-
-local found = {}
-local auraFilter = {"HELPFUL", "HARMFUL"}
-
-function UF:UpdateBuffIndicator(event, unit)
-	if event == "UNIT_AURA" and self.unit ~= unit then return end
-
-	local spellList = UF.CornerSpells
-	local buttons = self.BuffIndicator
-	unit = self.unit
-
-	wipe(found)
-	for _, filter in next, auraFilter do
-		for i = 1, 32 do
-			local name, texture, count, _, duration, expiration, caster, _, _, spellID = UnitAura(unit, i, filter)
-			if not name then break end
-			local value = spellList[spellID]
-			if value and (value[3] or caster == "player" or caster == "pet") then
-				local bu = buttons[value[1]]
-				if bu then
-					if R.db["UFs"]["BuffIndicatorType"] == 3 then
-						if duration and duration > 0 then
-							bu.expiration = expiration
-							bu:SetScript("OnUpdate", UF.BuffIndicatorOnUpdate)
-						else
-							bu:SetScript("OnUpdate", nil)
-						end
-						bu.timer:SetTextColor(unpack(value[2]))
-					else
-						if duration and duration > 0 then
-							bu.cd:SetCooldown(expiration - duration, duration)
-							bu.cd:Show()
-						else
-							bu.cd:Hide()
-						end
-						if R.db["UFs"]["BuffIndicatorType"] == 1 then
-							bu.icon:SetVertexColor(unpack(value[2]))
-						else
-							bu.icon:SetTexture(texture)
-						end
-					end
-
-					bu.count:SetText(count > 1 and count)
-					bu:Show()
-					found[bu.anchor] = true
-				end
-			end
-		end
-	end
-
-	for _, bu in pairs(buttons) do
-		if not found[bu.anchor] then
-			bu:Hide()
-		end
-	end
-end
-
-function UF:RefreshBuffIndicator(bu)
-	if R.db["UFs"]["BuffIndicatorType"] == 3 then
-		local point, anchorPoint, x, y = unpack(counterOffsets[bu.anchor][2])
-		bu.timer:Show()
-		bu.count:ClearAllPoints()
-		bu.count:SetPoint(point, bu.timer, anchorPoint, x, y)
-		bu.icon:Hide()
-		bu.cd:Hide()
-		bu.bg:Hide()
-	else
-		bu:SetScript("OnUpdate", nil)
-		bu.timer:Hide()
-		bu.count:ClearAllPoints()
-		bu.count:SetPoint("CENTER", unpack(counterOffsets[bu.anchor][1]))
-		if R.db["UFs"]["BuffIndicatorType"] == 1 then
-			bu.icon:SetTexture(I.bdTex)
-		else
-			bu.icon:SetVertexColor(1, 1, 1)
-		end
-		bu.icon:Show()
-		bu.cd:Show()
-		bu.bg:Show()
-	end
-end
-
-function UF:CreateBuffIndicator(self)
-	if not R.db["UFs"]["RaidBuffIndicator"] then return end
-	if self.raidType == "simple" then return end
-
-	local anchors = {"TOPLEFT", "TOP", "TOPRIGHT", "LEFT", "RIGHT", "BOTTOMLEFT", "BOTTOM", "BOTTOMRIGHT"}
-	local buttons = {}
-	for _, anchor in pairs(anchors) do
-		local bu = CreateFrame("Frame", nil, self.Health)
-		bu:SetFrameLevel(self:GetFrameLevel()+10)
-		bu:SetSize(10, 10)
-		bu:SetScale(R.db["UFs"]["BuffIndicatorScale"])
-		bu:SetPoint(anchor)
-		bu:Hide()
-
-		bu.bg = M.CreateBDFrame(bu)
-		bu.icon = bu:CreateTexture(nil, "BORDER")
-		bu.icon:SetInside(bu.bg)
-		bu.icon:SetTexCoord(unpack(I.TexCoord))
-		bu.cd = CreateFrame("Cooldown", nil, bu, "CooldownFrameTemplate")
-		bu.cd:SetAllPoints(bu.bg)
-		bu.cd:SetReverse(true)
-		bu.cd:SetHideCountdownNumbers(true)
-		bu.timer = M.CreateFS(bu, 12, "", false, "CENTER", -counterOffsets[anchor][2][3], 0)
-		bu.count = M.CreateFS(bu, 12, "")
-
-		bu.anchor = anchor
-		buttons[anchor] = bu
-
-		UF:RefreshBuffIndicator(bu)
-	end
-
-	self.BuffIndicator = buttons
-	self:RegisterEvent("UNIT_AURA", UF.UpdateBuffIndicator)
-	self:RegisterEvent("GROUP_ROSTER_UPDATE", UF.UpdateBuffIndicator, true)
-end
-
-function UF:RefreshRaidFrameIcons()
-	for _, frame in pairs(oUF.objects) do
-		if frame.mystyle == "raid" then
-			if frame.RaidDebuffs then
-				frame.RaidDebuffs:SetScale(R.db["UFs"]["RaidDebuffScale"])
-			end
-			if frame.BuffIndicator then
-				for _, bu in pairs(frame.BuffIndicator) do
-					bu:SetScale(R.db["UFs"]["BuffIndicatorScale"])
-					UF:RefreshBuffIndicator(bu)
-				end
-			end
-		end
-	end
-end
-
--- Partywatcher
-UF.PartyWatcherSpells = {}
-function UF:UpdatePartyWatcherSpells()
-	wipe(UF.PartyWatcherSpells)
-
-	for spellID, duration in pairs(R.PartySpells) do
-		local name = GetSpellInfo(spellID)
-		if name then
-			local modDuration = MaoRUIDB["PartySpells"][spellID]
-			if not modDuration or modDuration > 0 then
-				UF.PartyWatcherSpells[spellID] = duration
-			end
-		end
-	end
-
-	for spellID, duration in pairs(MaoRUIDB["PartySpells"]) do
-		if duration > 0 then
-			UF.PartyWatcherSpells[spellID] = duration
-		end
-	end
-end
-
-local watchingList = {}
-function UF:PartyWatcherPostUpdate(button, unit, spellID)
-	local guid = UnitGUID(unit)
-	if not watchingList[guid] then watchingList[guid] = {} end
-	watchingList[guid][spellID] = button
-end
-
-function UF:HandleCDMessage(...)
-	local prefix, msg = ...
-	if prefix ~= "ZenTracker" then return end
-
-	local _, msgType, guid, spellID, duration, remaining = strsplit(":", msg)
-	if msgType == "U" then
-		spellID = tonumber(spellID)
-		duration = tonumber(duration)
-		remaining = tonumber(remaining)
-		local button = watchingList[guid] and watchingList[guid][spellID]
-		if button then
-			local start = GetTime() + remaining - duration
-			if start > 0 and duration > 1.5 then
-				button.CD:SetCooldown(start, duration)
-			end
-		end
-	end
-end
-
-local function SendPartySyncMsg(text)
-	if IsInRaid() or not IsInGroup() then return end
-	if not IsInGroup(LE_PARTY_CATEGORY_HOME) and IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
-		C_ChatInfo_SendAddonMessage("ZenTracker", text, "INSTANCE_CHAT")
-	else
-		C_ChatInfo_SendAddonMessage("ZenTracker", text, "PARTY")
-	end
-end
-
-local lastUpdate = 0
-function UF:SendCDMessage()
-	local thisTime = GetTime()
-	if thisTime - lastUpdate >= 5 then
-		local value = watchingList[UF.myGUID]
-		if value then
-			for spellID in pairs(value) do
-				local start, duration, enabled = GetSpellCooldown(spellID)
-				if enabled ~= 0 and start ~= 0 then
-					local remaining = start + duration - thisTime
-					if remaining < 0 then remaining = 0 end
-					SendPartySyncMsg(format("3:U:%s:%d:%.2f:%.2f:%s", UF.myGUID, spellID, duration, remaining, "-")) -- sync to others
-				end
-			end
-		end
-		lastUpdate = thisTime
-	end
-end
-
-local lastSyncTime = 0
-function UF:UpdateSyncStatus()
-	if IsInGroup() and not IsInRaid() and R.db["UFs"]["PartyFrame"] then
-		local thisTime = GetTime()
-		if thisTime - lastSyncTime > 5 then
-			SendPartySyncMsg(format("3:H:%s:0::0:1", UF.myGUID)) -- handshake to ZenTracker
-			lastSyncTime = thisTime
-		end
-		M:RegisterEvent("SPELL_UPDATE_COOLDOWN", UF.SendCDMessage)
-	else
-		M:UnregisterEvent("SPELL_UPDATE_COOLDOWN", UF.SendCDMessage)
-	end
-end
-
-function UF:SyncWithZenTracker()
-	if not R.db["UFs"]["PartyWatcherSync"] then return end
-
-	UF.myGUID = UnitGUID("player")
-	C_ChatInfo.RegisterAddonMessagePrefix("ZenTracker")
-	M:RegisterEvent("CHAT_MSG_ADDON", UF.HandleCDMessage)
-
-	UF:UpdateSyncStatus()
-	M:RegisterEvent("GROUP_ROSTER_UPDATE", UF.UpdateSyncStatus)
-end
-
-local function UpdateWatcherAnchor(element)
-	local self = element.__owner
-	local horizon = R.db["UFs"]["PartyDirec"] > 2
-	local otherSide = R.db["UFs"]["PWOnRight"]
-	local relF = horizon and "BOTTOMLEFT" or "TOPRIGHT"
-	local relT = "TOPLEFT"
-	local xOffset = horizon and 0 or -5
-	local yOffset = horizon and 5 or 0
-	local margin = horizon and 2 or -2
-	if otherSide then
-		relF = "TOPLEFT"
-		relT = horizon and "BOTTOMLEFT" or "TOPRIGHT"
-		xOffset = horizon and 0 or 5
-		yOffset = horizon and -5 or 0
-		margin = 2
-	end
-	local rel1 = not horizon and not otherSide and "RIGHT" or "LEFT"
-	local rel2 = not horizon and not otherSide and "LEFT" or "RIGHT"
-	local iconSize = horizon and (self:GetWidth()-2*abs(margin))/3 or self:GetHeight()
-	if iconSize > 36 then iconSize = 36 end
-
-	for i = 1, element.__max do
-		local bu = element[i]
-		bu:SetSize(iconSize, iconSize)
-		bu:ClearAllPoints()
-		if i == 1 then
-			bu:SetPoint(relF, self, relT, xOffset, yOffset)
-		elseif i == 4 and horizon then
-			bu:SetPoint(relF, element[i-3], relT, 0, margin)
-		else
-			bu:SetPoint(rel1, element[i-1], rel2, margin, 0)
-		end
-	end
-end
-
-function UF:InterruptIndicator(self)
-	if not R.db["UFs"]["PartyWatcher"] then return end
-
-	local buttons = {}
-	local maxIcons = 6
-	for i = 1, maxIcons do
-		local bu = CreateFrame("Frame", nil, self)
-		M.AuraIcon(bu)
-		bu.CD:SetReverse(false)
-		bu:Hide()
-
-		buttons[i] = bu
-	end
-
-	buttons.__owner = self
-	buttons.__max = maxIcons
-	UpdateWatcherAnchor(buttons)
-	buttons.UpdateAnchor = UpdateWatcherAnchor
-	buttons.PartySpells = UF.PartyWatcherSpells
-	buttons.TalentCDFix = R.TalentCDFix
-	self.PartyWatcher = buttons
-	if R.db["UFs"]["PartyWatcherSync"] then
-		self.PartyWatcher.PostUpdate = UF.PartyWatcherPostUpdate
-	end
-end
-
 local function UpdateAltPowerAnchor(element)
 	if R.db["UFs"]["PartyAltPower"] then
 		local self = element.__owner
@@ -636,9 +249,6 @@ function UF:UpdatePartyElements()
 		if frame.raidType == "party" then
 			if frame.altPower then
 				frame.altPower:UpdateAnchor()
-			end
-			if frame.PartyWatcher then
-				frame.PartyWatcher:UpdateAnchor()
 			end
 		end
 	end

@@ -1,7 +1,26 @@
+--- **AceComm-3.0** allows you to send messages of unlimited length over the addon comm channels.
+-- It'll automatically split the messages into multiple parts and rebuild them on the receiving end.\\
+-- **ChatThrottleLib** is of course being used to avoid being disconnected by the server.
+--
+-- **AceComm-3.0** can be embeded into your addon, either explicitly by calling AceComm:Embed(MyAddon) or by
+-- specifying it as an embeded library in your AceAddon. All functions will be available on your addon object
+-- and can be accessed directly, without having to explicitly call AceComm itself.\\
+-- It is recommended to embed AceComm, otherwise you'll have to specify a custom `self` on all calls you
+-- make into AceComm.
+-- @class file
+-- @name AceComm-3.0
+-- @release $Id: AceComm-3.0.lua 1333 2024-05-05 16:24:39Z nevcairiel $
+
+--[[ AceComm-3.0
+
+TODO: Time out old data rotting around from dead senders? Not a HUGE deal since the number of possible sender names is somewhat limited.
+
+]]
+
 local CallbackHandler = LibStub("CallbackHandler-1.0")
 local CTL = assert(ChatThrottleLib, "AceComm-3.0 requires ChatThrottleLib")
 
-local MAJOR, MINOR = "AceComm-3.0", 12
+local MAJOR, MINOR = "AceComm-3.0", 14
 local AceComm,oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceComm then return end
@@ -63,12 +82,12 @@ function AceComm:SendCommMessage(prefix, text, distribution, target, prio, callb
 
 	local textlen = #text
 	local maxtextlen = 255  -- Yes, the max is 255 even if the dev post said 256. I tested. Char 256+ get silently truncated. /Mikk, 20110327
-	local queueName = prefix..distribution..(target or "")
+	local queueName = prefix
 
 	local ctlCallback = nil
 	if callbackFn then
-		ctlCallback = function(sent)
-			return callbackFn(callbackArg, sent, textlen)
+		ctlCallback = function(sent, sendResult)
+			return callbackFn(callbackArg, sent, textlen, sendResult)
 		end
 	end
 
@@ -120,10 +139,10 @@ do
 			end
 			return t
 		end
-		
+
 		return {}
 	end
-	
+
 	local function lostdatawarning(prefix,sender,where)
 		DEFAULT_CHAT_FRAME:AddMessage(MAJOR..": Warning: lost network data regarding '"..tostring(prefix).."' from '"..tostring(sender).."' (in "..where..")")
 	end
@@ -139,7 +158,7 @@ do
 		local key = prefix.."\t"..distribution.."\t"..sender	-- a unique stream is defined by the prefix + distribution + sender
 		local spool = AceComm.multipart_spool
 		local olddata = spool[key]
-		
+
 		if not olddata then
 			--lostdatawarning(prefix,sender,"Next")
 			return
@@ -160,14 +179,14 @@ do
 		local key = prefix.."\t"..distribution.."\t"..sender	-- a unique stream is defined by the prefix + distribution + sender
 		local spool = AceComm.multipart_spool
 		local olddata = spool[key]
-		
+
 		if not olddata then
 			--lostdatawarning(prefix,sender,"End")
 			return
 		end
 
 		spool[key] = nil
-		
+
 		if type(olddata) == "table" then
 			-- if we've received a "next", the spooled data will be a table for rapid & garbage-free tconcat
 			tinsert(olddata, message)

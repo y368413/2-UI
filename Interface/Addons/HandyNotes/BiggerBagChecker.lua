@@ -1,5 +1,7 @@
-﻿--## Version: v1.4.4-release ## Author: KyrosKrane Sylvanblade
+﻿--## Version: v1.4.21-release ## Author: KyrosKrane Sylvanblade
 local L = {}
+local IsClassic = select(4, GetBuildInfo()) < 50000
+if IsClassic then return end
 
 local criteria =
 {

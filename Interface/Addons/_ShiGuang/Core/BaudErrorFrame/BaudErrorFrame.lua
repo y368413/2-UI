@@ -2,7 +2,7 @@
 local ErrorList = {}
 local SoundTime = 0
 local EnableTaint = true
-ShiGuangDB.BaudErrorFrameConfig = ShiGuangDB.BaudErrorFrameConfig or {}
+BaudErrorFrameConfig = BaudErrorFrameConfig or {}
 
 local function RegisterTaintEvents(self)
 	self:RegisterEvent("ADDON_ACTION_BLOCKED")
@@ -43,7 +43,7 @@ function BaudErrorFrame_OnLoad(self)
 	icon:SetTexture([[Interface\COMMON\VOICECHAT-SPEAKER]])
 
 	local function updateColor()
-		if ShiGuangDB.BaudErrorFrameConfig.enableSound then
+		if BaudErrorFrameConfig.enableSound then
 			icon:SetVertexColor(1, 1, 0)
 		else
 			icon:SetVertexColor(1, 0, 0)
@@ -51,7 +51,7 @@ function BaudErrorFrame_OnLoad(self)
 	end
 
 	soundButton:SetScript("OnMouseUp", function(self)
-		ShiGuangDB.BaudErrorFrameConfig.enableSound = not ShiGuangDB.BaudErrorFrameConfig.enableSound
+		BaudErrorFrameConfig.enableSound = not BaudErrorFrameConfig.enableSound
 		updateColor()
 		PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Sonar.ogg", "Master")
 		self:GetScript("OnEnter")(self)
@@ -59,7 +59,7 @@ function BaudErrorFrame_OnLoad(self)
 	soundButton:SetScript("OnShow", updateColor)
 	soundButton:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT")
-		GameTooltip:AddLine(SOUND..": "..(ShiGuangDB.BaudErrorFrameConfig.enableSound and "|cff00ff00"..ENABLE or "|cffff0000"..DISABLE))
+		GameTooltip:AddLine(SOUND..": "..(BaudErrorFrameConfig.enableSound and "|cff00ff00"..ENABLE or "|cffff0000"..DISABLE))
 		GameTooltip:Show()
 	end)
 	soundButton:SetScript("OnLeave", BaudErrorFrameMinimapButton_OnLeave)
@@ -68,8 +68,8 @@ end
 function BaudErrorFrame_OnEvent(self, event, ...)
 	local arg1, arg2 = ...
 	if event == "VARIABLES_LOADED" then
-		if type(ShiGuangDB.BaudErrorFrameConfig) ~= "table" then
-			ShiGuangDB.BaudErrorFrameConfig = {}
+		if type(BaudErrorFrameConfig) ~= "table" then
+			BaudErrorFrameConfig = {}
 		end
 	elseif event == "ADDON_ACTION_BLOCKED" then
 		BaudErrorFrameAdd(arg1.." blocked from using "..arg2, 4)
@@ -103,10 +103,9 @@ function BaudErrorFrameHandler(Error)
 end
 
 function BaudErrorFrameShowError(Error)
-	if not ShiGuangDB.BaudErrorFrameConfig.enableSound then return end
+	if not BaudErrorFrameConfig.enableSound then return end
 
 	if GetTime() > SoundTime then
-		--PlaySound(48942, "Master")
 		PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Sonar.ogg", "Master")
 		SoundTime = GetTime() + 1
 	end

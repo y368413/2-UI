@@ -6,7 +6,7 @@ local module = M:GetModule("Infobar")
 local info = module:RegisterInfobar("Time", R.Infobar.TimePos)
 info.text:SetFont(unpack(R.Infobar.TimeFonts))
 local time, date = time, date
-local strfind, format, floor = strfind, format, floor
+local strfind, format, floor, strmatch = strfind, format, floor, strmatch
 local mod, tonumber, pairs, ipairs = mod, tonumber, pairs, ipairs
 local IsShiftKeyDown = IsShiftKeyDown
 local C_Map_GetMapInfo = C_Map.GetMapInfo
@@ -16,21 +16,20 @@ local C_Calendar_SetAbsMonth = C_Calendar.SetAbsMonth
 local C_Calendar_OpenCalendar = C_Calendar.OpenCalendar
 local C_Calendar_GetNumDayEvents = C_Calendar.GetNumDayEvents
 local C_Calendar_GetNumPendingInvites = C_Calendar.GetNumPendingInvites
-local C_AreaPoiInfo_GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
 local C_AreaPoiInfo_GetAreaPOISecondsLeft = C_AreaPoiInfo.GetAreaPOISecondsLeft
-local C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo = C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo
 local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
 local FULLDATE, CALENDAR_WEEKDAY_NAMES, CALENDAR_FULLDATE_MONTH_NAMES = FULLDATE, CALENDAR_WEEKDAY_NAMES, CALENDAR_FULLDATE_MONTH_NAMES
 local PLAYER_DIFFICULTY_TIMEWALKER, RAID_INFO_WORLD_BOSS, DUNGEON_DIFFICULTY3 = PLAYER_DIFFICULTY_TIMEWALKER, RAID_INFO_WORLD_BOSS, DUNGEON_DIFFICULTY3
 local DUNGEONS, RAID_INFO, QUESTS_LABEL, QUEST_COMPLETE = DUNGEONS, RAID_INFO, QUESTS_LABEL, QUEST_COMPLETE
-local QUEUE_TIME_UNAVAILABLE, RATED_PVP_WEEKLY_VAULT, AVAILABLE = QUEUE_TIME_UNAVAILABLE, RATED_PVP_WEEKLY_VAULT, AVAILABLE
-local HORRIFIC_VISION = SPLASH_BATTLEFORAZEROTH_8_3_0_FEATURE1_TITLE
+local QUEUE_TIME_UNAVAILABLE, RATED_PVP_WEEKLY_VAULT = QUEUE_TIME_UNAVAILABLE, RATED_PVP_WEEKLY_VAULT
 local RequestRaidInfo, GetNumSavedWorldBosses, GetSavedWorldBossInfo = RequestRaidInfo, GetNumSavedWorldBosses, GetSavedWorldBossInfo
 local GetCVarBool, GetGameTime, GameTime_GetLocalTime, GameTime_GetGameTime, SecondsToTime = GetCVarBool, GetGameTime, GameTime_GetLocalTime, GameTime_GetGameTime, SecondsToTime
 local GetNumSavedInstances, GetSavedInstanceInfo = GetNumSavedInstances, GetSavedInstanceInfo
 local IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
-local C_TaskQuest_GetThreatQuests = C_TaskQuest.GetThreatQuests
-local C_TaskQuest_GetQuestInfoByQuestID = C_TaskQuest.GetQuestInfoByQuestID
+local C_AreaPoiInfo_GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
+-- Localized
+local COMMUNITY_FEAST = C_Spell.GetSpellName(388961)
+local PROGRESS_FORMAT = " |cff%s(%s/%s)|r"
 
 local function updateTimerFormat(color, hour, minute)
 	if GetCVarBool("timeMgrUseMilitaryTime") then
@@ -92,25 +91,22 @@ end
 local questlist = {
 	{name = U["Mean One"], id = 6983},
 	{name = U["Blingtron"], id = 34774},
-	{name = U["Tormentors of Torghast"], id = 63854},
+	{name = U["Timewarped"], id = 83285, texture = 6006158},	-- Vanilla
 	{name = U["Timewarped"], id = 40168, texture = 1129674},	-- TBC
 	{name = U["Timewarped"], id = 40173, texture = 1129686},	-- WotLK
 	{name = U["Timewarped"], id = 40786, texture = 1304688},	-- Cata
 	{name = U["Timewarped"], id = 45563, texture = 1530590},	-- MoP
 	{name = U["Timewarped"], id = 55499, texture = 1129683},	-- WoD
 	{name = U["Timewarped"], id = 64710, texture = 1467047},	-- Legion
-}
-
-local lesserVisions = {58151, 58155, 58156, 58167, 58168}
-local horrificVisions = {
-	[1] = {id = 57848, desc = "470 (5+5)"},
-	[2] = {id = 57844, desc = "465 (5+4)"},
-	[3] = {id = 57847, desc = "460 (5+3)"},
-	[4] = {id = 57843, desc = "455 (5+2)"},
-	[5] = {id = 57846, desc = "450 (5+1)"},
-	[6] = {id = 57842, desc = "445 (5+0)"},
-	[7] = {id = 57845, desc = "430 (3+0)"},
-	[8] = {id = 57841, desc = "420 (1+0)"},
+	{name = C_Spell.GetSpellName(388945), id = 70866},	-- SoDK
+	{name = "", id = 70906, itemID = 200468},	-- Grand hunt
+	{name = "", id = 70893, questName = true},	-- Community feast
+	{name = "", id = 79226, questName = true},	-- The big dig
+	{name = "", id = 78319, questName = true},	-- The superbloom
+	{name = "", id = 76586, questName = true},	-- 散步圣光
+	{name = "", id = 82946, questName = true},	-- 蜡团
+	{name = "", id = 83240, questName = true},	-- 剧场
+	{name = C_Map.GetAreaInfo(15141), id = 83333},	-- 觉醒主机
 }
 
 -- Check Invasion Status
@@ -178,28 +174,64 @@ local function GetNextLocation(nextTime, index)
 	return C_Map_GetMapInfo(inv.maps[inv.timeTable[round]]).name
 end
 
-local cache, nzothAssaults = {}
-local function GetNzothThreatName(questID)
-	local name = cache[questID]
-	if not name then
-		name = C_TaskQuest_GetQuestInfoByQuestID(questID)
-		cache[questID] = name
-	end
-	return name
-end
-
--- Torghast
-local TorghastWidgets, TorghastInfo = {
-	{nameID = 2925, levelID = 2930}, -- Fracture Chambers
-	{nameID = 2926, levelID = 2932}, -- Skoldus Hall
-	{nameID = 2924, levelID = 2934}, -- Soulforges
-	{nameID = 2927, levelID = 2936}, -- Coldheart Interstitia
-	{nameID = 2928, levelID = 2938}, -- Mort'regar
-	{nameID = 2929, levelID = 2940}, -- The Upper Reaches
+-- Grant hunts
+local huntAreaToMapID = { -- 狩猎区域ID转换为地图ID
+	[7342] = 2023, -- 欧恩哈拉平原
+	[7343] = 2022, -- 觉醒海岸
+	[7344] = 2025, -- 索德拉苏斯
+	[7345] = 2024, -- 碧蓝林海
 }
 
-local function CleanupLevelName(text)
-	return gsub(text, "|n", "")
+-- Elemental invasion
+local stormPoiIDs = {
+	[2022] = {
+		{7249, 7250, 7251, 7252},
+		{7253, 7254, 7255, 7256},
+		{7257, 7258, 7259, 7260},
+	},
+	[2023] = {
+		{7221, 7222, 7223, 7224},
+		{7225, 7226, 7227, 7228},
+	},
+	[2024] = {
+		{7229, 7230, 7231, 7232},
+		{7233, 7234, 7235, 7236},
+		{7237, 7238, 7239, 7240},
+	},
+	[2025] = {
+		{7245, 7246, 7247, 7248},
+		{7298, 7299, 7300, 7301},
+	},
+	--[2085] = {
+	--	{7241, 7242, 7243, 7244},
+	--},
+}
+
+local atlasCache = {}
+local function GetElementalType(element) -- 获取入侵类型图标
+	local str = atlasCache[element]
+	if not str then
+		local info = C_Texture.GetAtlasInfo("ElementalStorm-Lesser-"..element)
+		if info then
+			str = M:GetTextureStrByAtlas(info, 16, 16)
+			atlasCache[element] = str
+		end
+	end
+	return str
+end
+
+local function GetFormattedTimeLeft(timeLeft)
+	return format("%.2d:%.2d", timeLeft/60, timeLeft%60)
+end
+
+local itemCache = {}
+local function GetItemLink(itemID)
+	local link = itemCache[itemID]
+	if not link then
+		link = select(2, C_Item.GetItemInfo(itemID))
+		itemCache[itemID] = link
+	end
+	return link
 end
 
 local title
@@ -216,6 +248,29 @@ info.onShiftDown = function()
 		info:onEnter()
 	end
 end
+
+local communityFeastTime = {
+	["CN"] = 1679747400, -- 20:30
+	["TW"] = 1679747400, -- 20:30
+	["KR"] = 1679747400, -- 20:30
+	["EU"] = 1679749200, -- 21:00
+	["US"] = 1679751000, -- 21:30
+}
+
+local delveList = {
+	{uiMapID = 2248, delveID = 7787}, -- Earthcrawl Mines
+	{uiMapID = 2248, delveID = 7781}, -- Kriegval's Rest
+	{uiMapID = 2248, delveID = 7779}, -- Fungal Folly
+	{uiMapID = 2215, delveID = 7789}, -- Skittering Breach
+	{uiMapID = 2215, delveID = 7785}, -- Nightfall Sanctum
+	{uiMapID = 2215, delveID = 7783}, -- The Sinkhole
+	{uiMapID = 2215, delveID = 7780}, -- Mycomancer Cavern
+	{uiMapID = 2214, delveID = 7782}, -- The Waterworks
+	{uiMapID = 2214, delveID = 7788}, -- The Dread Pit
+	{uiMapID = 2255, delveID = 7790}, -- The Spiral Weave
+	{uiMapID = 2255, delveID = 7784}, -- Tak-Rethan Abyss
+	{uiMapID = 2255, delveID = 7786}, -- TThe Underkeep
+}
 
 info.onEnter = function(self)
 	self.entered = true
@@ -257,73 +312,87 @@ info.onEnter = function(self)
 	-- Raids
 	title = false
 	for i = 1, GetNumSavedInstances() do
-		local name, _, reset, _, locked, extended, _, isRaid, _, diffName = GetSavedInstanceInfo(i)
+		local name, _, reset, _, locked, extended, _, isRaid, _, diffName, numBosses, progress = GetSavedInstanceInfo(i)
 		if isRaid and (locked or extended) then
 			addTitle(RAID_INFO)
 			if extended then r,g,b = .3,1,.3 else r,g,b = 1,1,1 end
-			GameTooltip:AddDoubleLine(name.." - "..diffName, SecondsToTime(reset, true, nil, 3), 1,1,1, r,g,b)
-		end
-	end
-
-	-- Torghast
-	if not TorghastInfo then
-		TorghastInfo = C_AreaPoiInfo_GetAreaPOIInfo(1543, 6640)
-	end
-	if TorghastInfo and IsQuestFlaggedCompleted(60136) then
-		title = false
-		for _, value in pairs(TorghastWidgets) do
-			local nameInfo = C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo(value.nameID)
-			if nameInfo and nameInfo.shownState == 1 then
-				addTitle(TorghastInfo.name)
-				local nameText = CleanupLevelName(nameInfo.text)
-				local levelInfo = C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo(value.levelID)
-				local levelText = AVAILABLE
-				if levelInfo and levelInfo.shownState == 1 then
-					levelText = CleanupLevelName(levelInfo.text)
-				end
-				GameTooltip:AddDoubleLine(nameText, levelText)
-			end
+			local progressColor = (numBosses == progress) and "ff0000" or "00ff00"
+			local progressStr = format(PROGRESS_FORMAT, progressColor, progress, numBosses)
+			GameTooltip:AddDoubleLine(name.." - "..diffName..progressStr, SecondsToTime(reset, true, nil, 3), 1,1,1, r,g,b)
 		end
 	end
 
 	-- Quests
 	title = false
-
 	for _, v in pairs(questlist) do
 		if v.name and IsQuestFlaggedCompleted(v.id) then
 			if v.name == U["Timewarped"] and isTimeWalker and checkTexture(v.texture) or v.name ~= U["Timewarped"] then
 				addTitle(QUESTS_LABEL)
-				GameTooltip:AddDoubleLine(v.name, QUEST_COMPLETE, 1,1,1, 1,0,0)
+				GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, QUEST_COMPLETE, 1,1,1, 1,0,0)
 			end
 		end
 	end
 
+	-- Delves
+	title = false
+	for _, v in pairs(delveList) do
+		local delveInfo = C_AreaPoiInfo_GetAreaPOIInfo(v.uiMapID, v.delveID)
+		if delveInfo then
+			addTitle(delveInfo.description)
+			local mapInfo = C_Map_GetMapInfo(v.uiMapID)
+			GameTooltip:AddDoubleLine(mapInfo.name.." - "..delveInfo.name, SecondsToTime(GetQuestResetTime(), true, nil, 3), 1,1,1, 1,1,1)
+		end
+	end
+
 	--if IsShiftKeyDown() then
-		-- Nzoth relavants
-		for _, v in ipairs(horrificVisions) do
-			if IsQuestFlaggedCompleted(v.id) then
-				addTitle(QUESTS_LABEL)
-				GameTooltip:AddDoubleLine(HORRIFIC_VISION, v.desc, 1,1,1, 0,1,0)
+		-- Elemental threats
+		title = false
+		for mapID, stormGroup in next, stormPoiIDs do
+			for _, areaPoiIDs in next, stormGroup do
+				for _, areaPoiID in next, areaPoiIDs do
+					local poiInfo = C_AreaPoiInfo_GetAreaPOIInfo(mapID, areaPoiID)
+					local elementType = poiInfo and poiInfo.atlasName and strmatch(poiInfo.atlasName, "ElementalStorm%-Lesser%-(.+)")
+					if elementType then
+						addTitle(poiInfo.name)
+						local mapInfo = C_Map_GetMapInfo(mapID)
+						local timeLeft = C_AreaPoiInfo_GetAreaPOISecondsLeft(areaPoiID) or 0
+						timeLeft = timeLeft/60
+						if timeLeft < 60 then r,g,b = 1,0,0 else r,g,b = 0,1,0 end
+						GameTooltip:AddDoubleLine(mapInfo.name..GetElementalType(elementType), GetFormattedTimeLeft(timeLeft), 1,1,1, r,g,b)
+						break
+					end
+				end
+			end
+		end
+	
+		-- Grand hunts
+		title = false
+		for areaPoiID, mapID in pairs(huntAreaToMapID) do
+			local poiInfo = C_AreaPoiInfo_GetAreaPOIInfo(1978, areaPoiID) -- Dragon isles
+			if poiInfo then
+				addTitle(poiInfo.name)
+				local mapInfo = C_Map_GetMapInfo(mapID)
+				local timeLeft = C_AreaPoiInfo_GetAreaPOISecondsLeft(areaPoiID) or 0
+				timeLeft = timeLeft/60
+				if timeLeft < 60 then r,g,b = 1,0,0 else r,g,b = 0,1,0 end
+				GameTooltip:AddDoubleLine(mapInfo.name, GetFormattedTimeLeft(timeLeft), 1,1,1, r,g,b)
 				break
 			end
 		end
-
-		for _, id in pairs(lesserVisions) do
-			if IsQuestFlaggedCompleted(id) then
-				addTitle(QUESTS_LABEL)
-				GameTooltip:AddDoubleLine(U["LesserVision"], QUEST_COMPLETE, 1,1,1, 1,0,0)
-				break
-			end
-		end
-
-		if not nzothAssaults then
-			nzothAssaults = C_TaskQuest_GetThreatQuests() or {}
-		end
-		for _, v in pairs(nzothAssaults) do
-			if IsQuestFlaggedCompleted(v) then
-				addTitle(QUESTS_LABEL)
-				GameTooltip:AddDoubleLine(GetNzothThreatName(v), QUEST_COMPLETE, 1,1,1, 1,0,0)
-			end
+	
+		-- Community feast
+		title = false
+		local feastTime = communityFeastTime[region]
+		if feastTime then
+			local currentTime = time()
+			local duration = 5400 -- 1.5hrs
+			local elapsed = mod(currentTime - feastTime, duration)
+			local nextTime = duration - elapsed + currentTime
+	
+			addTitle(COMMUNITY_FEAST)
+			if currentTime - (nextTime-duration) < 900 then r,g,b = 0,1,0 else r,g,b = .6,.6,.6 end -- green text if progressing
+			GameTooltip:AddDoubleLine(date("%m/%d %H:%MISC", nextTime-duration*2), date("%m/%d %H:%MISC", nextTime-duration), .6,.6,.6, r,g,b)
+			GameTooltip:AddDoubleLine(date("%m/%d %H:%MISC", nextTime), date("%m/%d %H:%MISC", nextTime+duration), 1,1,1, 1,1,1)
 		end
 
 		-- Invasions
@@ -335,7 +404,7 @@ info.onEnter = function(self)
 			if timeLeft then
 				timeLeft = timeLeft/60
 				if timeLeft < 60 then r,g,b = 1,0,0 else r,g,b = 0,1,0 end
-				GameTooltip:AddDoubleLine(U["Current Invasion"]..zoneName, format("%.2d:%.2d", timeLeft/60, timeLeft%60), 1,1,1, r,g,b)
+				GameTooltip:AddDoubleLine(U["Current Invasion"]..zoneName, GetFormattedTimeLeft(timeLeft), 1,1,1, r,g,b)
 			end
 			local nextLocation = GetNextLocation(nextTime, index)
 			GameTooltip:AddDoubleLine(U["Next Invasion"]..nextLocation, date("%m/%d %H:%MISC", nextTime), 1,1,1, 1,1,1)
@@ -363,11 +432,15 @@ info.onMouseUp = function(_, btn)
 	if btn == "RightButton" then
 		ToggleTimeManager()
 	elseif btn == "MiddleButton" then
-		if not WeeklyRewardsFrame then LoadAddOn("Blizzard_WeeklyRewards") end
+		if not WeeklyRewardsFrame then C_AddOns.LoadAddOn("Blizzard_WeeklyRewards") end
 		if InCombatLockdown() then
 			M:TogglePanel(WeeklyRewardsFrame)
 		else
 			ToggleFrame(WeeklyRewardsFrame)
+		end
+		local dialog = WeeklyRewardExpirationWarningDialog
+		if dialog and dialog:IsShown() then
+			dialog:Hide()
 		end
 	else
 		--if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel

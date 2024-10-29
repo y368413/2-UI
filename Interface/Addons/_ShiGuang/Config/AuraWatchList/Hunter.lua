@@ -27,8 +27,11 @@ local list = {
 		{AuraID = 160007, UnitID = "player"},	-- 上升气流（双头龙）
 		{AuraID = 260249, UnitID = "player"},	-- 掠食者
 		{AuraID = 231390, UnitID = "player", Combat = true},	-- 开拓者
-		{AuraID = 164273, UnitID = "player", Combat = true},	-- 独来独往
-		{AuraID = 209997, UnitID = "pet", Flash = true},		-- 装死
+		{AuraID = 164273, UnitID = "player", Combat = true, Value = true},	-- 独来独往
+		{AuraID = 260242, UnitID = "player"},	-- 弹无虚发
+		{AuraID = 342076, UnitID = "player"},	-- 行云流水
+		{AuraID = 389020, UnitID = "player"},	-- 子弹风暴
+		{AuraID = 424571, UnitID = "player"},	-- 风行者的指引
 	},
 	["Target Aura"] = {		-- 目标光环组
 		{AuraID = 3355, UnitID = "target", Caster = "player"},		-- 冰冻陷阱
@@ -62,6 +65,11 @@ local list = {
 		{AuraID = 324149, UnitID = "target", Caster = "player"},	-- 劫掠射击
 		{AuraID = 308498, UnitID = "target", Caster = "player"},	-- 共鸣箭
 		{AuraID = 333526, UnitID = "target", Caster = "player"},	-- 尖刺果实
+		{AuraID = 375893, UnitID = "target", Caster = "player"},	-- 死亡飞轮
+		{AuraID = 424567, UnitID = "target", Caster = "player", Flash = true},	-- 狂野本能
+		{AuraID = 430703, UnitID = "target", Caster = "player"},	-- 黑蚀箭
+
+		{AuraID = 410167, UnitID = "target", Caster = "player"},	-- 破甲，生存4T
 	},
 	["Special Aura"] = {	-- 玩家重要光环组
 		{AuraID = 19574, UnitID = "player"},	-- 狂野怒火
@@ -71,10 +79,11 @@ local list = {
 		{AuraID = 190515, UnitID = "player"},	-- 适者生存
 		{AuraID = 193534, UnitID = "player"},	-- 稳固集中
 		{AuraID = 194594, UnitID = "player", Flash = true},	-- 荷枪实弹
-		{AuraID = 118455, UnitID = "pet"},		-- 野兽瞬劈斩
+		{AuraID = 118455, UnitID = "pet", Flash = true, Text = "AoE"}, -- 野兽瞬劈斩
 		{AuraID = 207094, UnitID = "pet"},		-- 泰坦之雷
 		{AuraID = 217200, UnitID = "pet"},		-- 凶猛狂暴
 		{AuraID = 272790, UnitID = "pet"},		-- 狂暴
+		{AuraID = 209997, UnitID = "pet", Flash = true}, -- 装死
 		{AuraID = 193530, UnitID = "player"},	-- 野性守护
 		{AuraID = 185791, UnitID = "player"},	-- 荒野呼唤
 		{AuraID = 259388, UnitID = "player"},	-- 猫鼬之怒
@@ -91,11 +100,10 @@ local list = {
 		{AuraID = 235712, UnitID = "player", Combat = true},	-- 回转稳定，橙手
 		{AuraID = 264735, UnitID = "player"},	-- 优胜劣汰
 		{AuraID = 281195, UnitID = "player"},	-- 优胜劣汰
-		{AuraID = 260242, UnitID = "player"},	-- 弹无虚发
 		{AuraID = 260395, UnitID = "player"},	-- 致命射击
 		{AuraID = 269502, UnitID = "player"},	-- 致命射击
 		{AuraID = 281036, UnitID = "player"},	-- 凶暴野兽
-		{AuraID = 260402, UnitID = "player"},	-- 二连发
+		{AuraID = 400456, UnitID = "player", Flash = true},	-- 齐射
 		{AuraID = 266779, UnitID = "player"},	-- 协调进攻
 		{AuraID = 260286, UnitID = "player"},	-- 利刃之矛
 		{AuraID = 265898, UnitID = "player"},	-- 接战协定
@@ -104,11 +112,22 @@ local list = {
 		{AuraID = 288613, UnitID = "player"},	-- 百发百中
 		{AuraID = 274447, UnitID = "player"},	-- 千里之目
 		{AuraID = 260243, UnitID = "player"},	-- 乱射
-		{AuraID = 342076, UnitID = "player"},	-- 行云流水
 		{AuraID = 336892, UnitID = "player", Flash = true},	-- 无懈警戒之秘
+		{AuraID = 388035, UnitID = "player"},	-- 巨熊之韧
+		{AuraID = 392956, UnitID = "player"},	-- 巨熊之韧
+		{AuraID = 407405, UnitID = "player"},	-- 弦之韵律
+		{AuraID = 359844, UnitID = "player"},	-- 荒野的召唤
+		{AuraID = 388045, UnitID = "player", Flash = true},	-- 警戒
+		{AuraID = 378770, UnitID = "player", Flash = true},	-- 夺命打击
+		{AuraID = 378747, UnitID = "player", Flash = true},	-- 凶暴兽群
+		{AuraID = 459759, UnitID = "player", Flash = true, Stack = 4},	-- 黑鸦
+		{AuraID = 459689, UnitID = "player", Flash = true, Stack = 5},	-- 毒蛇钉刺
 
-		{AuraID = 363760, UnitID = "player", Flash = true},	-- 杀戮狂乱，兽王4T
-		{AuraID = 363805, UnitID = "player", Flash = true},	-- 疯狂掷弹兵，生存2T
+		{AuraID = 394366, UnitID = "player"},	-- 密迹寻踪，射击2T
+		{AuraID = 394384, UnitID = "player", Flash = true},	-- 集中瞄准，射击4T
+		{AuraID = 394388, UnitID = "player", Flash = true},	-- 狂野弹幕，生存4T
+
+		{AuraID = 410147, UnitID = "player", Flash = true},	-- 暴露伤口，生存2T
 	},
 	["Focus Aura"] = {		-- 焦点光环组
 		{AuraID = 3355, UnitID = "focus", Caster = "player"},	-- 冰冻陷阱
@@ -123,6 +142,7 @@ local list = {
 		{SlotID = 14},		-- 饰品2
 		{SpellID = 186265},	-- 灵龟守护
 		{SpellID = 147362},	-- 反制射击
+		{SpellID = 288613},	-- 百发百中
 	},
 }
 

@@ -68,6 +68,30 @@ function MISC:GuildBest_Create()
 	if not hasAngryKeystones then
 		ChallengesFrame.WeeklyInfo.Child.Description:SetPoint("CENTER", 0, 20)
 	end
+
+	if SlashCmdList.KEYSTONE then -- Details key window
+		local button = CreateFrame("Button", nil, frame)
+		button:SetSize(20, 20)
+		button:SetPoint("TOPRIGHT", -12, -5)
+		button:SetScript("OnClick", function()
+			if DetailsKeystoneInfoFrame and DetailsKeystoneInfoFrame:IsShown() then
+				DetailsKeystoneInfoFrame:Hide()
+			else
+				SlashCmdList.KEYSTONE()
+			end
+		end)
+		local tex = button:CreateTexture()
+		tex:SetAllPoints()
+		tex:SetTexture(I.copyTex)
+		tex:SetVertexColor(0, 1, 0)
+		local hl = button:CreateTexture(nil, "HIGHLIGHT")
+		hl:SetAllPoints()
+		hl:SetTexture(I.copyTex)
+	end
+
+	if RaiderIO_GuildWeeklyFrame then
+		M.HideObject(RaiderIO_GuildWeeklyFrame)
+	end
 end
 
 function MISC:GuildBest_SetUp(leaderInfo)
@@ -99,11 +123,11 @@ function MISC:GuildBest_Update()
 
 	if not resize and hasAngryKeystones then
 		hooksecurefunc(self.WeeklyInfo.Child.WeeklyChest, "SetPoint", function(frame, _, x, y)
-			if x == 100 and y == -30 then
-				frame:SetPoint("LEFT", 105, -5)
+			if x == 100 and y == 0 then
+				frame:SetPoint("LEFT", 110, -5)
 			end
 		end)
-		self.WeeklyInfo.Child.ThisWeekLabel:SetPoint("TOP", -135, -25)
+		self.WeeklyInfo.Child.ThisWeekLabel:SetPoint("TOP", -125, -25)
 
 		local schedule = AngryKeystones.Modules.Schedule
 		frame:SetWidth(246)
@@ -111,14 +135,10 @@ function MISC:GuildBest_Update()
 		frame:SetPoint("BOTTOMLEFT", schedule.AffixFrame, "TOPLEFT", 0, 10)
 
 		local keystoneText = schedule.KeystoneText
-		keystoneText:SetFontObject(Game13Font)
-		keystoneText:ClearAllPoints()
-		keystoneText:SetPoint("TOP", self.WeeklyInfo.Child.DungeonScoreInfo.Score, "BOTTOM", 0, -3)
-
-		local affix = self.WeeklyInfo.Child.Affixes[1]
-		if affix then
-			affix:ClearAllPoints()
-			affix:SetPoint("TOPLEFT", 20, -55)
+		if keystoneText then
+			keystoneText:SetFontObject(Game13Font)
+			keystoneText:ClearAllPoints()
+			keystoneText:SetPoint("TOP", self.WeeklyInfo.Child.DungeonScoreInfo.Score, "BOTTOM", 0, -3)
 		end
 
 		resize = true
@@ -127,7 +147,7 @@ end
 
 function MISC.GuildBest_OnLoad(event, addon)
 	if addon == "Blizzard_ChallengesUI" then
-		hooksecurefunc("ChallengesFrame_Update", MISC.GuildBest_Update)
+		hooksecurefunc(ChallengesFrame, "Update", MISC.GuildBest_Update)
 		MISC:KeystoneInfo_Create()
 		ChallengesFrame.WeeklyInfo.Child.WeeklyChest:HookScript("OnEnter", MISC.KeystoneInfo_WeeklyRuns)
 
@@ -170,18 +190,18 @@ function MISC:KeystoneInfo_WeeklyRuns()
 end
 
 function MISC:KeystoneInfo_Create()
-	local texture = select(10, GetItemInfo(158923)) or 525134
-	local iconColor = I.QualityColors[LE_ITEM_QUALITY_EPIC or 4]
+	local texture = C_Item.GetItemIconByID(158923) or 525134
+	local iconColor = I.QualityColors[Enum.ItemQuality.Epic or 4]
 	local button = CreateFrame("Frame", nil, ChallengesFrame.WeeklyInfo, "BackdropTemplate")
 	button:SetPoint("BOTTOMLEFT", 2, 67)
-	button:SetSize(31, 31)
+	button:SetSize(32, 32)
 	M.PixelIcon(button, texture, true)
 	button.bg:SetBackdropBorderColor(iconColor.r, iconColor.g, iconColor.b)
 	button:SetScript("OnEnter", function(self)
 		GameTooltip:ClearLines()
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		GameTooltip:AddLine(U["Account Keystones"])
-		for fullName, info in pairs(MaoRUIDB["KeystoneInfo"]) do
+		for fullName, info in pairs(MaoRUISetDB["KeystoneInfo"]) do
 			local name = Ambiguate(fullName, "none")
 			local mapID, level, class, faction = strsplit(":", info)
 			local color = M.HexRGB(M.ClassColor(class))
@@ -196,7 +216,7 @@ function MISC:KeystoneInfo_Create()
 	button:SetScript("OnLeave", M.HideTooltip)
 	button:SetScript("OnMouseUp", function(_, btn)
 		if btn == "MiddleButton" then
-			wipe(MaoRUIDB["KeystoneInfo"])
+			wipe(MaoRUISetDB["KeystoneInfo"])
 			MISC:KeystoneInfo_Update() -- update own keystone info after reset
 		end
 	end)
@@ -212,16 +232,16 @@ end
 function MISC:KeystoneInfo_Update()
 	local mapID, keystoneLevel = MISC:KeystoneInfo_UpdateBag()
 	if mapID then
-		MaoRUIDB["KeystoneInfo"][I.MyFullName] = mapID..":"..keystoneLevel..":"..I.MyClass..":"..I.MyFaction
+		MaoRUISetDB["KeystoneInfo"][I.MyFullName] = mapID..":"..keystoneLevel..":"..I.MyClass..":"..I.MyFaction
 	else
-		MaoRUIDB["KeystoneInfo"][I.MyFullName] = nil
+		MaoRUISetDB["KeystoneInfo"][I.MyFullName] = nil
 	end
 end
 
 function MISC:GuildBest()
 	if not R.db["Misc"]["MDGuildBest"] then return end
 
-	hasAngryKeystones = IsAddOnLoaded("AngryKeystones")
+	hasAngryKeystones = C_AddOns.IsAddOnLoaded("AngryKeystones")
 	M:RegisterEvent("ADDON_LOADED", MISC.GuildBest_OnLoad)
 
 	MISC:KeystoneInfo_Update()

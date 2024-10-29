@@ -9,6 +9,7 @@ local L = Core.locale
 local Green = Core.status.Green
 local Orange = Core.status.Orange
 local Red = Core.status.Red
+local White = Core.color.White
 
 -------------------------------------------------------------------------------
 
@@ -29,11 +30,22 @@ function Reward:Initialize(attrs)
 end
 
 function Reward:IsEnabled()
-    if self.class and self.class ~= Core.class then return false end
-    if self.faction and self.faction ~= Core.faction then return false end
     if self.display_option and not Core:GetOpt(self.display_option) then
         return false
     end
+
+    -- Check faction
+    if self.faction then
+        if Core:GetOpt('ignore_faction_restrictions') then return true end
+        if self.faction ~= Core.faction then return false end
+    end
+
+    -- Check class
+    if self.class then
+        if Core:GetOpt('ignore_class_restrictions') then return true end
+        if self.class ~= Core.class then return false end
+    end
+
     return true
 end
 
@@ -145,7 +157,11 @@ end
 
 function Achievement:GetText()
     local _, name, _, _, _, _, _, _, _, icon = GetAchievementInfo(self.id)
-    return Icon(icon) .. ACHIEVEMENT_COLOR_CODE .. '[' .. name .. ']|r'
+    local text = Icon(icon) .. ACHIEVEMENT_COLOR_CODE .. '[' .. name .. ']|r'
+    if self.note then
+        text = text .. Core.color.White('\n(' .. self.note .. ')')
+    end
+    return text
 end
 
 function Achievement:GetStatus()
@@ -194,15 +210,67 @@ end
 ----------------------------------- CURRENCY ----------------------------------
 -------------------------------------------------------------------------------
 
-local Currency = Class('Currency', Reward)
+local Currency = Class('Currency', Reward, {type = L['currency']})
 
 function Currency:GetText()
     local info = C_CurrencyInfo.GetCurrencyInfo(self.id)
     local text = C_CurrencyInfo.GetCurrencyLink(self.id, 0)
+    text = text .. ' (' .. self.type .. ')'
     if self.note then -- additional info
         text = text .. ' (' .. self.note .. ')'
     end
     return Icon(info.iconFileID) .. text
+end
+
+-------------------------------------------------------------------------------
+---------------------------------- FOLLOWER -----------------------------------
+-------------------------------------------------------------------------------
+
+local Follower = Class('Follower', Reward)
+
+function Follower:GetType(category)
+    local types = {
+        [6] = {
+            ['enum'] = Enum.GarrisonFollowerType.FollowerType_6_0,
+            ['locale'] = L['follower_type_follower']
+        },
+        [7] = {
+            ['enum'] = Enum.GarrisonFollowerType.FollowerType_7_0,
+            ['locale'] = L['follower_type_champion']
+        },
+        [8] = {
+            ['enum'] = Enum.GarrisonFollowerType.FollowerType_8_0,
+            ['locale'] = L['follower_type_follower']
+        },
+        [9] = {
+            ['enum'] = Enum.GarrisonFollowerType.FollowerType_9_0,
+            ['locale'] = L['follower_type_companion']
+        }
+    }
+    return types[Core.expansion][category]
+end
+
+function Follower:GetText()
+    local text = C_Garrison.GetFollowerInfo(self.id).name
+    if self.icon then text = Icon(self.icon) .. text end
+    text = text .. ' (' .. self:GetType('locale') .. ')'
+    if self.note then
+        text = text .. ' (' .. Core.RenderLinks(self.note, true) .. ')'
+    end
+    return text
+end
+
+function Follower:IsObtained()
+    local followers = C_Garrison.GetFollowers(self:GetType('enum'))
+    for i = 1, followers and #followers or 0 do
+        local followerID = followers[i].followerID
+        if (self.id == followerID) then return false end
+    end
+    return true
+end
+
+function Follower:GetStatus()
+    return self:IsObtained() and Green(L['known']) or Red(L['missing'])
 end
 
 -------------------------------------------------------------------------------
@@ -238,8 +306,14 @@ end
 
 function Item:GetText()
     local text = self.itemLink
-    if self.type then -- mount, pet, toy, etc
+    if self.isCosmetic then
+        local type = self.type and ', ' .. self.type or ''
+        text = text .. ' (' .. L['cosmetic'] .. type .. ')'
+    elseif self.type then -- mount, pet, toy, etc
         text = text .. ' (' .. self.type .. ')'
+    end
+    if self.count then
+        text = text .. string.format(' (%sx)', BreakUpLargeNumbers(self.count))
     end
     if self.note then -- additional info
         text = text .. ' (' .. Core.RenderLinks(self.note, true) .. ')'
@@ -261,6 +335,26 @@ function Item:GetStatus()
         return completed and Green(L['weekly']) or Red(L['weekly'])
     end
 end
+
+-------------------------------------------------------------------------------
+----------------------------------- HEIRLOOM ----------------------------------
+-------------------------------------------------------------------------------
+
+local Heirloom = Class('Heirloom', Item, {type = L['heirloom']})
+
+function Heirloom:IsObtained() return C_Heirloom.PlayerHasHeirloom(self.item) end
+
+function Heirloom:GetStatus()
+    local collected = C_Heirloom.PlayerHasHeirloom(self.item)
+    return collected and Green(L['known']) or Red(L['missing'])
+end
+
+-------------------------------------------------------------------------------
+---------------------------------- MANUSCRIPT ---------------------------------
+-------------------------------------------------------------------------------
+
+local Manuscript = Class('Manuscript', Item,
+    {display_option = 'show_manuscript_rewards'})
 
 -------------------------------------------------------------------------------
 ------------------------------------ MOUNT ------------------------------------
@@ -292,7 +386,7 @@ function Pet:Initialize(attrs)
         Reward.Initialize(self, attrs)
         local name, icon = C_PetJournal.GetPetInfoBySpeciesID(self.id)
         self.itemIcon = icon
-        self.itemLink = '|cff1eff00[' .. name .. ']|r'
+        self.itemLink = Core.color.Green(name)
     end
 end
 
@@ -344,6 +438,47 @@ function Quest:GetStatus()
 end
 
 -------------------------------------------------------------------------------
+------------------------------------ RECIPE -----------------------------------
+-------------------------------------------------------------------------------
+
+local Recipe = Class('Recipe', Item, {
+    display_option = 'show_recipe_rewards',
+    type = L['recipe']
+})
+
+function Recipe:Initialize(attrs)
+    Item.Initialize(self, attrs)
+
+    if not self.profession then
+        error('Recipe() reward requires a profession id to be set')
+    end
+end
+
+-- Tooltip Documentation:
+-- https://warcraft.wiki.gg/wiki/Patch_10.0.2/API_changes
+-- https://warcraft.wiki.gg/wiki/Patch_10.1.0/API_changes
+function Recipe:IsObtained()
+    local info = C_TooltipInfo.GetItemByID(self.item)
+    if info then
+        for _, line in ipairs(info.lines) do
+            if line.leftText and line.leftText == _G.ITEM_SPELL_KNOWN then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function Recipe:GetStatus()
+    return self:IsObtained() and Green(L['known']) or Red(L['missing'])
+end
+
+function Recipe:IsEnabled()
+    if not Item.IsEnabled(self) then return false end
+    return Core.PlayerHasProfession(self.profession)
+end
+
+-------------------------------------------------------------------------------
 ------------------------------------ SPELL ------------------------------------
 -------------------------------------------------------------------------------
 
@@ -354,6 +489,33 @@ function Spell:IsObtained() return IsSpellKnown(self.spell) end
 function Spell:GetStatus()
     local collected = IsSpellKnown(self.spell)
     return collected and Green(L['known']) or Red(L['missing'])
+end
+
+-------------------------------------------------------------------------------
+------------------------------------ TITLE ------------------------------------
+-------------------------------------------------------------------------------
+
+local Title = Class('Title', Reward, {type = L['title']})
+
+function Title:GetText()
+    local text = self.pattern
+    local titleName, _ = GetTitleName(self.id)
+    local title = strtrim(titleName)
+    text = string.gsub(text, '{title}', title)
+    local player = UnitName('player')
+    text = string.gsub(text, '{player}', player)
+    text = White(text)
+    if self.type then text = text .. ' (' .. self.type .. ')' end
+    if self.note then
+        text = text .. ' (' .. Core.RenderLinks(self.note, true) .. ')'
+    end
+    return text
+end
+
+function Title:IsObtained() return IsTitleKnown(self.id) end
+
+function Title:GetStatus()
+    return self:IsObtained() and Green(L['known']) or Red(L['missing'])
 end
 
 -------------------------------------------------------------------------------
@@ -368,6 +530,31 @@ function Toy:IsObtained() return PlayerHasToy(self.item) end
 function Toy:GetStatus()
     local collected = PlayerHasToy(self.item)
     return collected and Green(L['known']) or Red(L['missing'])
+end
+
+-------------------------------------------------------------------------------
+---------------------------------- APPEARANCE ---------------------------------
+-------------------------------------------------------------------------------
+
+-- Ensemble, Arsenal, Illusion
+
+local Appearance = Class('Appearance', Item, {
+    display_option = 'show_transmog_rewards',
+    type = _G.APPEARANCE_LABEL
+})
+
+function Appearance:IsObtained()
+    local KnownLineType = Enum.TooltipDataLineType.RestrictedSpellKnown
+    local info = C_TooltipInfo.GetItemByID(self.item)
+    if info then
+        for _, line in ipairs(info.lines) do
+            if line.type == KnownLineType then return true end
+        end
+    end
+    return false
+end
+function Appearance:GetStatus()
+    return self:IsObtained() and Green(L['known']) or Red(L['missing'])
 end
 
 -------------------------------------------------------------------------------
@@ -390,8 +577,9 @@ function Transmog:Prepare()
     Item.Prepare(self)
     local sourceID = select(2, CTC.GetItemInfo(self.item))
     if sourceID then CTC.PlayerCanCollectSource(sourceID) end
-    GetItemSpecInfo(self.item)
+    C_Item.GetItemSpecInfo(self.item)
     CTC.PlayerHasTransmog(self.item)
+    self.isCosmetic = C_Item.IsCosmeticItem(self.item)
 end
 
 function Transmog:IsEnabled()
@@ -430,11 +618,10 @@ function Transmog:IsObtainable()
     if not Item.IsObtainable(self) then return false end
     -- Cosmetic cloaks do not behave well with the GetItemSpecInfo() function.
     -- They return an empty table even though you can get the item to drop.
-    local _, _, _, ilvl, _, _, _, _, equipLoc = GetItemInfo(self.item)
-    if not (ilvl == 1 and equipLoc == 'INVTYPE_CLOAK' and self.slot ==
-        L['cosmetic']) then
+    local _, _, _, ilvl, _, _, _, _, equipLoc = C_Item.GetItemInfo(self.item)
+    if not (ilvl == 1 and equipLoc == 'INVTYPE_CLOAK' and self.isCosmetic) then
         -- Verify the item drops for any of the players specs
-        local specs = GetItemSpecInfo(self.item)
+        local specs = C_Item.GetItemSpecInfo(self.item)
         if type(specs) == 'table' and #specs == 0 then return false end
     end
     return true
@@ -464,6 +651,52 @@ function Transmog:GetStatus()
 end
 
 -------------------------------------------------------------------------------
+--------------------------------- REPUTATION ----------------------------------
+-------------------------------------------------------------------------------
+
+local Reputation = Class('Reputation', Reward,
+    {display_option = 'show_rep_rewards', type = L['rep']})
+
+function Reputation:GetText()
+    local text = Core.api.GetFactionInfoByID(self.id)
+    if self.gain then text = ('+%d %s'):format(self.gain, text) end
+    text = Core.color.LightBlue(text) .. ' (' .. self.type .. ')'
+    if self.note then
+        text = text .. ' (' .. Core.RenderLinks(self.note, true) .. ')'
+    end
+    return text
+end
+
+function Reputation:IsEnabled()
+    if not Reward.IsEnabled(self) then return false end
+    if self:IsObtained() and not Core:GetOpt('show_claimed_rep_rewards') then
+        return false
+    end
+
+    return true
+end
+function Reputation:Prepare() Core.PrepareLinks(self.note) end
+
+function Reputation:GetStatus()
+    if not self.quest then return end
+    return self:IsObtainable() and Red(L['unclaimed']) or Green(L['claimed'])
+end
+
+function Reputation:IsObtainable()
+    if not self.quest then return true end
+    if C_Reputation.IsAccountWideReputation(self.id) then
+        return not C_QuestLog.IsQuestFlaggedCompletedOnAccount(self.quest)
+    else
+        return not C_QuestLog.IsQuestFlaggedCompleted(self.quest)
+    end
+end
+
+function Reputation:IsObtained()
+    if self.quest and self:IsObtainable() then return false end
+    return true
+end
+
+-------------------------------------------------------------------------------
 
 Core.reward = {
     Reward = Reward,
@@ -471,11 +704,18 @@ Core.reward = {
     Spacer = Spacer,
     Achievement = Achievement,
     Currency = Currency,
+    Follower = Follower,
     Item = Item,
+    Heirloom = Heirloom,
+    Manuscript = Manuscript,
     Mount = Mount,
     Pet = Pet,
     Quest = Quest,
+    Recipe = Recipe,
     Spell = Spell,
+    Title = Title,
     Toy = Toy,
-    Transmog = Transmog
+    Appearance = Appearance,
+    Transmog = Transmog,
+    Reputation = Reputation
 }

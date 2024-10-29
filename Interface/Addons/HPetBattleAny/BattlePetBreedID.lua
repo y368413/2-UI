@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 Written by: Hugh@Burning Blade-US and Simca@Malfurion-US
 
 Special thanks to Nullberri, Ro, and Warla for helping at various points throughout the addon's development.
@@ -8,7 +8,13 @@ Special thanks to Nullberri, Ro, and Warla for helping at various points through
 
 -- Get folder path and set addon namespace
 local internal = {}
-
+if GetLocale() == "zhCN" then
+  BattlePetBreedIDOptionsName = "|cFFBF00FF[宠物]|r三围数据";
+elseif GetLocale() == "zhTW" then
+  BattlePetBreedIDOptionsName = "|cFFBF00FF[宠物]|r三围数据r";
+else
+  BattlePetBreedIDOptionsName = "|cFFBF00FF[BB]|rBattlePet BreedID";
+end
 -- Give access to the internal namespace through a specified global variable
 _G["BPBID_Internal"] = internal;
 
@@ -42,7 +48,7 @@ internal.MAX_BREEDS = 10
 local PJHooked = false
 
 -- Check if on future build or PTR to enable additional developer functions
-local is_ptr = select(4, _G.GetBuildInfo()) ~= GetAddOnMetadata("HPetBattleAny", "Interface")
+local is_ptr = select(4, _G.GetBuildInfo()) ~= C_AddOns.GetAddOnMetadata("HPetBattleAny", "Interface")
 
 -- Takes in lots of information, returns Breed ID as a number (or an error), and the rarity as a number
 function internal.CalculateBreedID(nSpeciesID, nQuality, nLevel, nMaxHP, nPower, nSpeed, wild, flying)
@@ -85,10 +91,15 @@ function internal.CalculateBreedID(nSpeciesID, nQuality, nLevel, nMaxHP, nPower,
     local ispeed = BPBID_Arrays.BasePetStats[nSpeciesID][3] * 10
     
     -- Account for wild pet HP / Power reductions
+    nLevel = tonumber(nLevel)
     local wildHPFactor, wildPowerFactor = 1, 1
     if wild then
         wildHPFactor = 1.2
-        wildPowerFactor = 1.25
+        if nLevel < 6 then
+            wildPowerFactor = 1.4
+        else
+            wildPowerFactor = 1.25
+        end
     end
     
     -- Upconvert to avoid floating point errors
@@ -105,7 +116,6 @@ function internal.CalculateBreedID(nSpeciesID, nQuality, nLevel, nMaxHP, nPower,
         nQL = BPBID_Arrays.RealRarityValues[i] * 20 * nLevel
         
         -- Higher level pets can never have duplicate breeds, so calculations can be less accurate and faster (they remain the same since version 0.7)
-        nLevel = tonumber(nLevel)
         if (nLevel > 2) then
         
             -- Calculate diffs
@@ -144,7 +154,7 @@ function internal.CalculateBreedID(nSpeciesID, nQuality, nLevel, nMaxHP, nPower,
                 trueresults[1] = breedID
             end
         
-        -- Lowbie pets go here, the bane of my existance. calculations must be intense and logic loops numerous
+        -- Lowbie pets go here, the bane of my existence. Calculations must be intense and logic loops numerous.
         else
             -- Calculate diffs much more intensely. Round calculations with 10^-2 and math.floor. Also, properly devalue HP by dividing its absolute value by 5
             local diff3 = (abs((floor(((ihp + 5) * nQL * 5 + 10000) / wildHPFactor * 0.01 + 0.5) / 0.01) - thp) / 5) + abs((floor( ((ipower + 5) * nQL) / wildPowerFactor * 0.01 + 0.5) / 0.01) - tpower) + abs((floor( ((ispeed + 5) * nQL) * 0.01 + 0.5) / 0.01) - tspeed)
@@ -313,7 +323,7 @@ function GetBreedID_Journal(nPetID)
     end
 end
 
--- Retrieve pre-determined Breed ID from cache for pet being moused over
+-- Retrieve pre-determined Breed ID from cache for pet being moused over (requires Blizzard Pet tooltip to be passed)
 function GetBreedID_Battle(self)
     if (self) then
         -- Determine index of internal.breedCache array. accepted values are 1-6 with 1-3 being your pets and 4-6 being enemy pets
@@ -337,7 +347,9 @@ function internal.CacheAllPets()
             local nMaxHP = CPB.GetMaxHealth(iOwner, iIndex)
             local nPower = CPB.GetPower(iOwner, iIndex)
             local nSpeed = CPB.GetSpeed(iOwner, iIndex)
-            local nQuality = CPB.GetBreedQuality(iOwner, iIndex)
+			-- In Patch 11.0.0, Blizzard decreased the natural quality values passed from this function by 1.
+			-- This is inconsistent with all other quality APIs.
+            local nQuality = CPB.GetBreedQuality(iOwner, iIndex) + 1
             local wild = false
             local flying = false
             
@@ -372,7 +384,7 @@ function internal.CacheAllPets()
                     local wildnum, flyingnum = 1, 1
                     if wild then wildnum = 1.2 end
                     if flying then flyingnum = 1.5 end
-                    print(string.format("NEW Species found; Owner #%i, Pet #%i, Wild status %s, SpeciesID %u, Base Stats %4.2f / %4.2f / %4.2f", iOwner, iIndex, wild and "true" or "false", nSpeciesID, ((nMaxHP * wildnum - 100) / 5) / (nLevel * (1 + (0.1 * (nQuality - 1)))), nPower / (nLevel * (1 + (0.1 * (nQuality - 1)))), (nSpeed / flyingnum) / (nLevel * (1 + (0.1 * (nQuality - 1))))))
+                    print(string.format("NEW Species found; Owner #%i, Pet #%i, Wild status %s, SpeciesID %u, Base+Breed Stats %4.4f / %4.4f / %4.4f", iOwner, iIndex, wild and "true" or "false", nSpeciesID, ((nMaxHP * wildnum - 100) / 5) / (nLevel * (1 + (0.1 * (nQuality - 1)))), nPower / (nLevel * (1 + (0.1 * (nQuality - 1)))), (nSpeed / flyingnum) / (nLevel * (1 + (0.1 * (nQuality - 1))))))
                     if (breed ~= "NEW") then SELECTED_CHAT_FRAME:AddMessage("NEW Breed found: " .. breed) end
                 elseif (breed ~= "???") and (sub(tostring(breed), 1, 3) ~= "ERR") then
                     local exists = false
@@ -385,7 +397,7 @@ function internal.CacheAllPets()
                         local wildnum, flyingnum = 1, 1
                         if wild then wildnum = 1.2 end
                         if flying then flyingnum = 1.5 end
-                        print(string.format("NEW Breed found for existing species; Owner #%i, Pet #%i, Wild status %s, SpeciesID %u, Base Stats %4.2f / %4.2f / %4.2f, Breed %s", iOwner, iIndex, wild and "true" or "false", nSpeciesID, ((nMaxHP * wildnum - 100) / 5) / (nLevel * (1 + (0.1 * (nQuality - 1)))), nPower / (nLevel * (1 + (0.1 * (nQuality - 1)))), (nSpeed / flyingnum) / (nLevel * (1 + (0.1 * (nQuality - 1)))), breed))
+                        print(string.format("NEW Breed found for existing species; Owner #%i, Pet #%i, Wild status %s, SpeciesID %u, Base+Breed Stats %4.4f / %4.4f / %4.4f, Breed %s", iOwner, iIndex, wild and "true" or "false", nSpeciesID, ((nMaxHP * wildnum - 100) / 5) / (nLevel * (1 + (0.1 * (nQuality - 1)))), nPower / (nLevel * (1 + (0.1 * (nQuality - 1)))), (nSpeed / flyingnum) / (nLevel * (1 + (0.1 * (nQuality - 1)))), breed))
                     end
                 end
                 
@@ -398,52 +410,45 @@ function internal.CacheAllPets()
     end
 end
 
--- Display breed on PetJournal's ScrollFrame
-local function BPBID_Hook_HSFUpdate(scrollFrame)
-    -- Safety check AND make sure the user wants us here
-    if (not ((scrollFrame == PetJournalListScrollFrame) or (scrollFrame == PetJournalEnhancedListScrollFrame))) or (not PetJournal:IsShown()) or (not BPBID_Options.Names.HSFUpdate) then return end
+-- Display breed on PetJournal's ScrollBox frames
+local function BPBID_Hook_PetJournal_InitPetButton(petScrollListFrame, elementData)
+    -- Shouldn't apply if using Rematch or PJE    
+    -- Make sure the option is enabled
+    if not BPBID_Options.Names.HSFUpdate or not petScrollListFrame or not elementData or not elementData.index then return end
+
+    -- Ensure petID and name are not bogus
+    local petID, _, _, customName, _, _, _, name = CPJ.GetPetInfoByIndex(elementData.index)
+    if not petID or not name then return end
+        
+    -- Get pet hex color from rarity
+    local _, _, _, _, rarity = CPJ.GetPetStats(petID)
+    if not rarity then return end
+    local hex = ITEM_QUALITY_COLORS[rarity - 1].hex
+    if not hex then return end
     
-    -- Loop for all shown buttons
-    for i = 1, #scrollFrame.buttons do
-        
-        -- Set specifics for this button
-        local thisPet = scrollFrame.buttons[i]
-        local petID = thisPet.petID
-        
-        -- Assure petID is not bogus
-        if (petID ~= nil) then
-            
-            -- Get pet name to assure petID is not bogus
-            local _, customName, _, _, _, _, _, name = CPJ.GetPetInfoByPetID(petID)
-            if (name) then
-                
-                -- Get pet hex color
-                local _, _, _, _, rarity = CPJ.GetPetStats(petID)
-                local hex = ITEM_QUALITY_COLORS[rarity - 1].hex
-                
-                -- FONT DOWNSIZING ROUTINE HERE COULD USE SOME WORK
-                
-                -- If user doesn't want rarity coloring then use default
-                if (not BPBID_Options.Names.HSFUpdateRarity) then hex = "|cffffd100" end
-                    
-                -- Display breed as part of the nickname if the pet has one, otherwise use the real name
-                if (customName) then
-                    thisPet.name:SetText(hex..customName.." ["..GetBreedID_Journal(petID).."]".."|r")
-                    thisPet.subName:Show()
-                    thisPet.subName:SetText(name)
-                else
-                    thisPet.name:SetText(hex..name.." ["..GetBreedID_Journal(petID).."]".."|r")
-                    thisPet.subName:Hide()
-                end
-                
-                -- Downside font if the name/breed gets chopped off
-                if (thisPet.name:IsTruncated()) then
-                    thisPet.name:SetFontObject("GameFontNormalSmall")
-                else
-                    thisPet.name:SetFontObject("GameFontNormal")
-                end
-            end
-        end
+    -- FONT DOWNSIZING ROUTINE HERE COULD USE SOME WORK
+    
+    -- If user doesn't want rarity coloring then use default
+    if not BPBID_Options.Names.HSFUpdateRarity then hex = "|cffffd100" end
+    
+    local breedID = GetBreedID_Journal(petID)
+    if not breedID then return end
+    
+    -- Display breed as part of the nickname if the pet has one, otherwise use the real name
+    if customName then
+        petScrollListFrame.name:SetText(hex..customName.." ("..GetBreedID_Journal(petID)..")".."|r")
+        petScrollListFrame.subName:Show()
+        petScrollListFrame.subName:SetText(name)
+    else
+        petScrollListFrame.name:SetText(hex..name.." ("..GetBreedID_Journal(petID)..")".."|r")
+        petScrollListFrame.subName:Hide()
+    end
+    
+    -- Downside font if the name/breed gets chopped off
+    if petScrollListFrame.name:IsTruncated() then
+        petScrollListFrame.name:SetFontObject("GameFontNormalSmall")
+    else
+        petScrollListFrame.name:SetFontObject("GameFontNormal")
     end
 end
 
@@ -472,7 +477,7 @@ local function BPBID_Events_OnEvent(self, event, name, ...)
         if (BPBID_Options.format == 4) or (BPBID_Options.format == 5) or (BPBID_Options.format == 6) then BPBID_Options.format = 3 end
         
         -- Set the rest of the defaults
-        if not (BPBID_Options.Names) then
+        if (not BPBID_Options.Names) then
             BPBID_Options.Names = {}
             BPBID_Options.Names.PrimaryBattle = true -- In Battle (on primary pets for both owners)
             BPBID_Options.Names.BattleTooltip = true -- In PrimaryBattlePetUnitTooltip's header (in-battle tooltips)
@@ -502,6 +507,7 @@ local function BPBID_Events_OnEvent(self, event, name, ...)
             BPBID_Options.Breedtip.CurrentStats25Rare = true -- Always assume pet will be Rare at level 25
             BPBID_Options.Breedtip.AllStats25 = true -- All breeds' stats at level 25
             BPBID_Options.Breedtip.AllStats25Rare = true -- Always assume pet will be Rare at level 25
+            BPBID_Options.Breedtip.Collected = true -- Collected breeds for current pet
             
             BPBID_Options.BattleFontFix = false -- Test old Pet Battle rarity coloring
         end
@@ -512,7 +518,7 @@ local function BPBID_Events_OnEvent(self, event, name, ...)
         end
         
         -- Disable option unless user has manually changed it
-        if (not BPBID_Options.ManualChange) or (BPBID_Options.ManualChange ~= GetAddOnMetadata("HPetBattleAny", "Version")) then
+        if (not BPBID_Options.ManualChange) or (BPBID_Options.ManualChange ~= "v1.31.0") then
             BPBID_Options.BattleFontFix = false
         end
         
@@ -522,6 +528,9 @@ local function BPBID_Events_OnEvent(self, event, name, ...)
             -- Hook into the OnEnter script for the frame that calls GameTooltip in the Pet Journal
             PetJournalPetCardPetInfo:HookScript("OnEnter", internal.Hook_PJTEnter)
             PetJournalPetCardPetInfo:HookScript("OnLeave", internal.Hook_PJTLeave)
+			
+			-- Hook into the Pet Journal's list button initialization
+			hooksecurefunc("PetJournal_InitPetButton", BPBID_Hook_PetJournal_InitPetButton)
             
             -- Set boolean
             PJHooked = true
@@ -540,6 +549,9 @@ local function BPBID_Events_OnEvent(self, event, name, ...)
             -- Hook into the OnEnter script for the frame that calls GameTooltip in the Pet Journal
             PetJournalPetCardPetInfo:HookScript("OnEnter", internal.Hook_PJTEnter)
             PetJournalPetCardPetInfo:HookScript("OnLeave", internal.Hook_PJTLeave)
+			
+			-- Hook into the Pet Journal's list button initialization
+			hooksecurefunc("PetJournal_InitPetButton", BPBID_Hook_PetJournal_InitPetButton)
             
             -- Set boolean
             PJHooked = true
@@ -558,6 +570,9 @@ local function BPBID_Events_OnEvent(self, event, name, ...)
             -- Hook into the OnEnter script for the frame that calls GameTooltip in the Pet Journal
             PetJournalPetCardPetInfo:HookScript("OnEnter", internal.Hook_PJTEnter)
             PetJournalPetCardPetInfo:HookScript("OnLeave", internal.Hook_PJTLeave)
+			
+			-- Hook into the Pet Journal's list button initialization
+			hooksecurefunc("PetJournal_InitPetButton", BPBID_Hook_PetJournal_InitPetButton)
             
             -- Set boolean
             PJHooked = true
@@ -598,32 +613,37 @@ end
 -- Set our event handler function
 BPBID_Events:SetScript("OnEvent", BPBID_Events_OnEvent)
 
--- Hook non-tooltip functions (almost all other hooks are in BreedTooltips.lua)
-hooksecurefunc("HybridScrollFrame_Update", BPBID_Hook_HSFUpdate)
-
 -- Create slash commands
 SLASH_BATTLEPETBREEDID1 = "/battlepetbreedID"
 SLASH_BATTLEPETBREEDID2 = "/BPBID"
 SLASH_BATTLEPETBREEDID3 = "/breedID"
 SlashCmdList["BATTLEPETBREEDID"] = function(msg)
-    InterfaceOptionsFrame:Show()
-    InterfaceOptionsFrameTab2:Click()
-    
-    local i = 1
-    local currAddon = "InterfaceOptionsFrameAddOnsButton" .. i
-    while _G[currAddon] do
-        if (_G[currAddon]:GetText() == BattlePetBreedIDOptionsName) then _G[currAddon]:Click() break end
-        i = i + 1
-        currAddon = "InterfaceOptionsFrameAddOnsButton" .. i
-    end
+    Settings.OpenToCategory(BattlePetBreedIDOptionsName)
 end
 
+local mouseButtonNote = "\nDisplay the BreedID of pets in your journal, in battle, in chat links, and in AH tooltips.";
+AddonCompartmentFrame:RegisterAddon({
+	text = BattlePetBreedIDOptionsName,  --addonname,
+	icon = "Interface/Icons/petjournalportrait.blp",
+	notCheckable = true,
+	func = function(button, menuInputData, menu)
+		Settings.OpenToCategory(BattlePetBreedIDOptionsName)
+	end,
+	funcOnEnter = function(button)
+		MenuUtil.ShowTooltip(button, function(tooltip)
+			tooltip:SetText(BattlePetBreedIDOptionsName .. mouseButtonNote)
+		end)
+	end,
+	funcOnLeave = function(button)
+		MenuUtil.HideTooltip(button)
+	end,
+})
 --[[
 BattlePetBreedID: Pet Data Module
-Last Update: Patch 9.2.0 Live; 2022-03-29T10:02:14Z
+Last Update: Patch 11.0.2 Live; 2024-09-25T23:11:48Z
 
 If you would like a copy of this data in a different format for your own purposes or to be informed of future updates:
-Contact MMOSimca / Simca@Malfurion - either through MMO-Champion, through CurseForge, or in-game
+Contact MMOSimca / Simca@Malfurion-US - either through MMO-Champion, through CurseForge, or in-game
 
 You may use this compiled data in any form for any purpose without my permission (though it'd be cool if you gave a shoutout somewhere). Ultimately, it's all property of Blizzard Entertainment anyway.
 ]]--
@@ -3144,7 +3164,7 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BasePetStats[2477] = {8, 8, 8}
     BPBID_Arrays.BasePetStats[2478] = {8.375, 8, 7.625}
     BPBID_Arrays.BasePetStats[2479] = {8.375, 8, 7.625}
-    BPBID_Arrays.BasePetStats[2480] = false
+    BPBID_Arrays.BasePetStats[2480] = {10.5, 8, 8}
     BPBID_Arrays.BasePetStats[2481] = false
     BPBID_Arrays.BasePetStats[2482] = {8, 8, 8}
     BPBID_Arrays.BasePetStats[2483] = {8, 8, 8}
@@ -3286,7 +3306,7 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BasePetStats[2619] = false
     BPBID_Arrays.BasePetStats[2620] = false
     BPBID_Arrays.BasePetStats[2621] = {8.25, 8.5, 7.25}
-    BPBID_Arrays.BasePetStats[2622] = false
+    BPBID_Arrays.BasePetStats[2622] = {7.5, 7.875, 8.625}
     BPBID_Arrays.BasePetStats[2623] = {7.75, 8.125, 8.125}
     BPBID_Arrays.BasePetStats[2624] = false
     BPBID_Arrays.BasePetStats[2625] = false
@@ -3444,7 +3464,7 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BasePetStats[2777] = {7.625, 8.375, 8}
     BPBID_Arrays.BasePetStats[2778] = {8.375, 8, 7.625}
     BPBID_Arrays.BasePetStats[2779] = {7.25, 9.25, 7.5}
-    BPBID_Arrays.BasePetStats[2780] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[2780] = {8.7, 8.3, 7}
     BPBID_Arrays.BasePetStats[2781] = false
     BPBID_Arrays.BasePetStats[2782] = false
     BPBID_Arrays.BasePetStats[2783] = false
@@ -3552,9 +3572,9 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BasePetStats[2885] = {7.5, 9, 7.5}
     BPBID_Arrays.BasePetStats[2886] = {9, 7.5, 7.5}
     BPBID_Arrays.BasePetStats[2887] = {7.5, 7.5, 9}
-    BPBID_Arrays.BasePetStats[2888] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[2888] = {7.65, 8.175, 8.175}
     BPBID_Arrays.BasePetStats[2889] = {8.5, 8.25, 7.25}
-    BPBID_Arrays.BasePetStats[2890] = false
+    BPBID_Arrays.BasePetStats[2890] = {8, 8.275, 7.725}
     BPBID_Arrays.BasePetStats[2891] = {7.5, 8.175, 8.325}
     BPBID_Arrays.BasePetStats[2892] = {8, 9, 7}
     BPBID_Arrays.BasePetStats[2893] = {7.5, 8.75, 7.75}
@@ -3717,7 +3737,7 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BasePetStats[3050] = {7.5, 8.175, 8.325}
     BPBID_Arrays.BasePetStats[3051] = {8.5, 8, 7.5}
     BPBID_Arrays.BasePetStats[3052] = {8, 8, 8}
-    BPBID_Arrays.BasePetStats[3053] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3053] = {7.4, 8.6, 8}
     BPBID_Arrays.BasePetStats[3054] = {7.25, 7.5, 9.25}
     BPBID_Arrays.BasePetStats[3055] = false
     BPBID_Arrays.BasePetStats[3056] = false
@@ -3771,7 +3791,7 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BasePetStats[3104] = {8.75, 7.625, 7.625}
     BPBID_Arrays.BasePetStats[3105] = {8.75, 8, 7.625}
     BPBID_Arrays.BasePetStats[3106] = {6.335, 9.11, 8.555}
-    BPBID_Arrays.BasePetStats[3107] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3107] = {7.775, 7.775, 8.45}
     BPBID_Arrays.BasePetStats[3108] = {7.625, 8, 8.375}
     BPBID_Arrays.BasePetStats[3109] = {7.625, 8, 8.375}
     BPBID_Arrays.BasePetStats[3110] = {7.625, 8, 8.375}
@@ -3817,7 +3837,7 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BasePetStats[3150] = false
     BPBID_Arrays.BasePetStats[3151] = false
     BPBID_Arrays.BasePetStats[3152] = false
-    BPBID_Arrays.BasePetStats[3153] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3153] = {7.25, 8, 8.75}
     BPBID_Arrays.BasePetStats[3154] = false
     BPBID_Arrays.BasePetStats[3155] = {8.25, 8, 8}
     BPBID_Arrays.BasePetStats[3156] = {8.5, 8.5, 8.25}
@@ -3839,9 +3859,9 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BasePetStats[3172] = {8, 8.5, 7.5}
     BPBID_Arrays.BasePetStats[3173] = {9, 7.5, 7.5}
     BPBID_Arrays.BasePetStats[3174] = {7.825, 8.05, 8.125}
-    BPBID_Arrays.BasePetStats[3175] = false
+    BPBID_Arrays.BasePetStats[3175] = {8.25, 8.25, 7.5}
     BPBID_Arrays.BasePetStats[3176] = {7.825, 8.05, 8.125}
-    BPBID_Arrays.BasePetStats[3177] = false
+    BPBID_Arrays.BasePetStats[3177] = {8.325, 8.675, 7}
     BPBID_Arrays.BasePetStats[3178] = {7.825, 8.05, 8.125}
     BPBID_Arrays.BasePetStats[3179] = {9.5, 8, 6.5}
     BPBID_Arrays.BasePetStats[3180] = {9, 7.5, 7.5}
@@ -3900,18 +3920,1387 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BasePetStats[3233] = {9.5, 8.5, 6}
     BPBID_Arrays.BasePetStats[3234] = {7.5, 8, 8.5}
     BPBID_Arrays.BasePetStats[3235] = {9.5, 8.5, 6}
-    BPBID_Arrays.BasePetStats[3236] = false
+    BPBID_Arrays.BasePetStats[3236] = {7.5, 8.5, 8}
     BPBID_Arrays.BasePetStats[3237] = {7.95, 7.8, 8.25}
     BPBID_Arrays.BasePetStats[3238] = false
     BPBID_Arrays.BasePetStats[3239] = false
     BPBID_Arrays.BasePetStats[3240] = false
     BPBID_Arrays.BasePetStats[3241] = false
-    BPBID_Arrays.BasePetStats[3242] = false
-    BPBID_Arrays.BasePetStats[3243] = false
-    BPBID_Arrays.BasePetStats[3244] = false
+    BPBID_Arrays.BasePetStats[3242] = {8.5, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[3243] = {8, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[3244] = {8.5, 8.5, 7}
     BPBID_Arrays.BasePetStats[3245] = false
-    BPBID_Arrays.BasePetStats[3246] = {28, 8, -12}
+    BPBID_Arrays.BasePetStats[3246] = {8, 8.5, 11}
     BPBID_Arrays.BasePetStats[3247] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3248] = {8.625, 8.125, 7.25}
+    BPBID_Arrays.BasePetStats[3249] = {8, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[3250] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3251] = {7, 9, 8}
+    BPBID_Arrays.BasePetStats[3252] = {8, 8.75, 7.25}
+    BPBID_Arrays.BasePetStats[3253] = {9, 8, 7}
+    BPBID_Arrays.BasePetStats[3254] = {7.75, 8.5, 7.75}
+    BPBID_Arrays.BasePetStats[3255] = {7.25, 8, 8.75}
+    BPBID_Arrays.BasePetStats[3256] = {8.5, 7.5, 8}
+    BPBID_Arrays.BasePetStats[3257] = {7.25, 8.5, 8.25}
+    BPBID_Arrays.BasePetStats[3258] = false
+    BPBID_Arrays.BasePetStats[3259] = {8, 7, 9}
+    BPBID_Arrays.BasePetStats[3260] = {8, 7.5, 8.5}
+    BPBID_Arrays.BasePetStats[3261] = {8, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[3262] = {8.5, 8, 7.5}
+    BPBID_Arrays.BasePetStats[3263] = {8.5, 7.5, 8}
+    BPBID_Arrays.BasePetStats[3264] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3265] = {8.375, 8, 7.625}
+    BPBID_Arrays.BasePetStats[3266] = {7.5, 8, 8.5}
+    BPBID_Arrays.BasePetStats[3267] = {7.5, 8.125, 8.375}
+    BPBID_Arrays.BasePetStats[3268] = {24.25, 10.5, 8}
+    BPBID_Arrays.BasePetStats[3269] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3270] = {7.5, 8.375, 8.125}
+    BPBID_Arrays.BasePetStats[3271] = false
+    BPBID_Arrays.BasePetStats[3272] = {8, 7, 9}
+    BPBID_Arrays.BasePetStats[3273] = {8.5, 8, 7.5}
+    BPBID_Arrays.BasePetStats[3274] = {8.75, 8.5, 6.75}
+    BPBID_Arrays.BasePetStats[3275] = {8, 7.5, 8.5}
+    BPBID_Arrays.BasePetStats[3276] = {8, 7.5, 8.5}
+    BPBID_Arrays.BasePetStats[3277] = {8, 7.5, 8.5}
+    BPBID_Arrays.BasePetStats[3278] = {8, 7.5, 8.5}
+    BPBID_Arrays.BasePetStats[3279] = {8.375, 7.875, 7.75}
+    BPBID_Arrays.BasePetStats[3280] = {8.5, 7.5, 8}
+    BPBID_Arrays.BasePetStats[3281] = {8.75, 8, 7.25}
+    BPBID_Arrays.BasePetStats[3282] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3283] = {7, 9, 8}
+    BPBID_Arrays.BasePetStats[3284] = {8.75, 8, 7.25}
+    BPBID_Arrays.BasePetStats[3285] = {8.75, 8, 7.25}
+    BPBID_Arrays.BasePetStats[3286] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3287] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3288] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3289] = {8.25, 7.5, 8.25}
+    BPBID_Arrays.BasePetStats[3290] = {8, 9, 7}
+    BPBID_Arrays.BasePetStats[3291] = {9, 8, 7}
+    BPBID_Arrays.BasePetStats[3292] = {7.65, 7.85, 8.5}
+    BPBID_Arrays.BasePetStats[3293] = {8.5, 7.75, 7.75}
+    BPBID_Arrays.BasePetStats[3294] = {7.625, 9.25, 7.625}
+    BPBID_Arrays.BasePetStats[3295] = {8.375, 7.625, 8}
+    BPBID_Arrays.BasePetStats[3296] = {8.375, 7.625, 8}
+    BPBID_Arrays.BasePetStats[3297] = {8.375, 7.625, 8}
+    BPBID_Arrays.BasePetStats[3298] = {8.375, 7.625, 8}
+    BPBID_Arrays.BasePetStats[3299] = {8.25, 7.5, 8.25}
+    BPBID_Arrays.BasePetStats[3300] = {8.375, 8, 7.625}
+    BPBID_Arrays.BasePetStats[3301] = {7.625, 8.125, 8.25}
+    BPBID_Arrays.BasePetStats[3302] = {7.625, 8.125, 8.25}
+    BPBID_Arrays.BasePetStats[3303] = {7.625, 8.125, 8.25}
+    BPBID_Arrays.BasePetStats[3304] = false
+    BPBID_Arrays.BasePetStats[3305] = false
+    BPBID_Arrays.BasePetStats[3306] = {7.625, 8.375, 8}
+    BPBID_Arrays.BasePetStats[3307] = {7.625, 8.125, 8.25}
+    BPBID_Arrays.BasePetStats[3308] = {7.625, 8.125, 8.25}
+    BPBID_Arrays.BasePetStats[3309] = {8.375, 8, 7.625}
+    BPBID_Arrays.BasePetStats[3310] = {8.25, 7.5, 8.25}
+    BPBID_Arrays.BasePetStats[3311] = {7.625, 8, 8.375}
+    BPBID_Arrays.BasePetStats[3312] = {8.375, 8, 7.625}
+    BPBID_Arrays.BasePetStats[3313] = {8.375, 7.875, 7.75}
+    BPBID_Arrays.BasePetStats[3314] = {8.375, 7.875, 7.75}
+    BPBID_Arrays.BasePetStats[3315] = false
+    BPBID_Arrays.BasePetStats[3316] = {8.375, 7.875, 7.75}
+    BPBID_Arrays.BasePetStats[3317] = {8.375, 7.875, 7.75}
+    BPBID_Arrays.BasePetStats[3318] = {8.375, 7.875, 7.75}
+    BPBID_Arrays.BasePetStats[3319] = {7.5, 8.125, 8.375}
+    BPBID_Arrays.BasePetStats[3320] = {7.5, 8.125, 8.375}
+    BPBID_Arrays.BasePetStats[3321] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3322] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3323] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3324] = false
+    BPBID_Arrays.BasePetStats[3325] = {7.5, 8.25, 8.25}
+    BPBID_Arrays.BasePetStats[3326] = {8.375, 7.625, 8}
+    BPBID_Arrays.BasePetStats[3327] = {8.375, 7.625, 8}
+    BPBID_Arrays.BasePetStats[3328] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3329] = {8.375, 7.625, 8}
+    BPBID_Arrays.BasePetStats[3330] = {8.375, 7.625, 8}
+    BPBID_Arrays.BasePetStats[3331] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3332] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3333] = {7.5, 8.125, 8.375}
+    BPBID_Arrays.BasePetStats[3334] = {7.5, 8.125, 8.375}
+    BPBID_Arrays.BasePetStats[3335] = {7.5, 8.125, 8.375}
+    BPBID_Arrays.BasePetStats[3336] = {7.5, 8.125, 8.375}
+    BPBID_Arrays.BasePetStats[3337] = false
+    BPBID_Arrays.BasePetStats[3338] = {7.75, 7.75, 8.5}
+    BPBID_Arrays.BasePetStats[3339] = false
+    BPBID_Arrays.BasePetStats[3340] = false
+    BPBID_Arrays.BasePetStats[3341] = false
+    BPBID_Arrays.BasePetStats[3342] = {8.25, 8.25, 7.5}
+    BPBID_Arrays.BasePetStats[3343] = false
+    BPBID_Arrays.BasePetStats[3344] = {7.5, 8, 8.5}
+    BPBID_Arrays.BasePetStats[3345] = {8, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[3346] = {8, 7.5, 8.5}
+    BPBID_Arrays.BasePetStats[3347] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3348] = {7.5, 8, 8.5}
+    BPBID_Arrays.BasePetStats[3349] = false
+    BPBID_Arrays.BasePetStats[3350] = {7.75, 7.75, 8.5}
+    BPBID_Arrays.BasePetStats[3351] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3352] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3353] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3354] = {8.75, 8, 7.25}
+    BPBID_Arrays.BasePetStats[3355] = {8.25, 7.5, 8.25}
+    BPBID_Arrays.BasePetStats[3356] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3357] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3358] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3359] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3360] = {8.375, 8.375, 7.25}
+    BPBID_Arrays.BasePetStats[3361] = {8.5, 8, 7.5}
+    BPBID_Arrays.BasePetStats[3362] = {8.5, 8, 7.5}
+    BPBID_Arrays.BasePetStats[3363] = {8.5, 8, 7.5}
+    BPBID_Arrays.BasePetStats[3364] = {7.5, 8.25, 8.25}
+    BPBID_Arrays.BasePetStats[3365] = {8.5, 7.5, 8}
+    BPBID_Arrays.BasePetStats[3366] = {8, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[3367] = {8.5, 8, 7.5}
+    BPBID_Arrays.BasePetStats[3368] = {7, 8.5, 8.5}
+    BPBID_Arrays.BasePetStats[3369] = false
+    BPBID_Arrays.BasePetStats[3370] = false
+    BPBID_Arrays.BasePetStats[3371] = false
+    BPBID_Arrays.BasePetStats[3372] = false
+    BPBID_Arrays.BasePetStats[3373] = false
+    BPBID_Arrays.BasePetStats[3374] = false
+    BPBID_Arrays.BasePetStats[3375] = false
+    BPBID_Arrays.BasePetStats[3376] = {8, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[3377] = {5.5, 5, 5}
+    BPBID_Arrays.BasePetStats[3378] = {8.375, 7.875, 7.75}
+    BPBID_Arrays.BasePetStats[3379] = {8.375, 7.875, 7.75}
+    BPBID_Arrays.BasePetStats[3380] = {7.875, 8.5, 7.625}
+    BPBID_Arrays.BasePetStats[3381] = {8.15, 7.575, 8.275}
+    BPBID_Arrays.BasePetStats[3382] = {8, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[3383] = false
+    BPBID_Arrays.BasePetStats[3384] = {7.625, 8, 8.375}
+    BPBID_Arrays.BasePetStats[3385] = {8.375, 7.875, 7.75}
+    BPBID_Arrays.BasePetStats[3386] = {9.25, 9.25, 5.5}
+    BPBID_Arrays.BasePetStats[3387] = {7, 9, 8}
+    BPBID_Arrays.BasePetStats[3388] = {11, 9, 10.5}
+    BPBID_Arrays.BasePetStats[3389] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3390] = {7, 9, 8}
+    BPBID_Arrays.BasePetStats[3391] = {11, 8, 8}
+    BPBID_Arrays.BasePetStats[3392] = {8, 8, 6}
+    BPBID_Arrays.BasePetStats[3393] = {6.75, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[3394] = {7.5, 8.5, 5.5}
+    BPBID_Arrays.BasePetStats[3395] = {5.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3396] = {10.5, 10.5, 8}
+    BPBID_Arrays.BasePetStats[3397] = {8.55, 7, 8.5}
+    BPBID_Arrays.BasePetStats[3398] = {8, 8.75, 8.75}
+    BPBID_Arrays.BasePetStats[3399] = false
+    BPBID_Arrays.BasePetStats[3400] = {9, 9, 8}
+    BPBID_Arrays.BasePetStats[3401] = {13, 9, 6.5}
+    BPBID_Arrays.BasePetStats[3402] = {10.5, 9, 8.5}
+    BPBID_Arrays.BasePetStats[3403] = {8.75, 7.25, 8}
+    BPBID_Arrays.BasePetStats[3404] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3405] = {8.5, 7.75, 7.75}
+    BPBID_Arrays.BasePetStats[3406] = {8, 7.5, 8.5}
+    BPBID_Arrays.BasePetStats[3407] = {7.5, 8.25, 8.25}
+    BPBID_Arrays.BasePetStats[3408] = {7.25, 8.5, 8.25}
+    BPBID_Arrays.BasePetStats[3409] = {7, 8, 9}
+    BPBID_Arrays.BasePetStats[3410] = {7.75, 8.5, 7.75}
+    BPBID_Arrays.BasePetStats[3411] = {8.75, 7.625, 7.625}
+    BPBID_Arrays.BasePetStats[3412] = {7.25, 8.25, 8.5}
+    BPBID_Arrays.BasePetStats[3413] = false
+    BPBID_Arrays.BasePetStats[3414] = {8, 8.75, 7.25}
+    BPBID_Arrays.BasePetStats[3415] = {8, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[3416] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3417] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3418] = false
+    BPBID_Arrays.BasePetStats[3419] = false
+    BPBID_Arrays.BasePetStats[3420] = false
+    BPBID_Arrays.BasePetStats[3421] = false
+    BPBID_Arrays.BasePetStats[3422] = {25.5, 10.5, 8}
+    BPBID_Arrays.BasePetStats[3423] = {25.5, 10.5, 8}
+    BPBID_Arrays.BasePetStats[3424] = {25.5, 10.5, 8}
+    BPBID_Arrays.BasePetStats[3425] = {25.5, 10.5, 8}
+    BPBID_Arrays.BasePetStats[3426] = false
+    BPBID_Arrays.BasePetStats[3427] = {8.5, 8.25, 7.25}
+    BPBID_Arrays.BasePetStats[3428] = false
+    BPBID_Arrays.BasePetStats[3429] = {18, 10.5, 10.5}
+    BPBID_Arrays.BasePetStats[3430] = {23, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[3431] = {18, 10.5, 10.5}
+    BPBID_Arrays.BasePetStats[3432] = {21.75, 9.25, 8}
+    BPBID_Arrays.BasePetStats[3433] = {13, 9.25, 9.25}
+    BPBID_Arrays.BasePetStats[3434] = {18.75, 8.25, 7}
+    BPBID_Arrays.BasePetStats[3435] = {14.5, 9.75, 9.75}
+    BPBID_Arrays.BasePetStats[3436] = {17.625, 8.625, 7.75}
+    BPBID_Arrays.BasePetStats[3437] = {11, 9, 9}
+    BPBID_Arrays.BasePetStats[3438] = {14.5, 8, 6.5}
+    BPBID_Arrays.BasePetStats[3439] = {10.5, 9.25, 9.25}
+    BPBID_Arrays.BasePetStats[3440] = {13.125, 8.375, 7.5}
+    BPBID_Arrays.BasePetStats[3441] = {11.5, 9.5, 9.5}
+    BPBID_Arrays.BasePetStats[3442] = {14, 9.5, 7}
+    BPBID_Arrays.BasePetStats[3443] = {13, 8, 9.5}
+    BPBID_Arrays.BasePetStats[3444] = {14.5, 8, 8}
+    BPBID_Arrays.BasePetStats[3445] = false
+    BPBID_Arrays.BasePetStats[3446] = {6, 9, 9}
+    BPBID_Arrays.BasePetStats[3447] = {9.25, 8.25, 6.5}
+    BPBID_Arrays.BasePetStats[3448] = {7, 8.5, 8.5}
+    BPBID_Arrays.BasePetStats[3449] = {8.5, 8.25, 7.25}
+    BPBID_Arrays.BasePetStats[3450] = {9.5, 10, 9}
+    BPBID_Arrays.BasePetStats[3451] = {9, 10, 8}
+    BPBID_Arrays.BasePetStats[3452] = {10.5, 9, 8.75}
+    BPBID_Arrays.BasePetStats[3453] = {8, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3454] = {12, 9, 8.875}
+    BPBID_Arrays.BasePetStats[3455] = {8, 10, 9}
+    BPBID_Arrays.BasePetStats[3456] = {9, 8.5, 9}
+    BPBID_Arrays.BasePetStats[3457] = {7.5, 9.5, 9}
+    BPBID_Arrays.BasePetStats[3458] = {9, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3459] = {9, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3460] = {9, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3461] = false
+    BPBID_Arrays.BasePetStats[3462] = false
+    BPBID_Arrays.BasePetStats[3463] = false
+    BPBID_Arrays.BasePetStats[3464] = false
+    BPBID_Arrays.BasePetStats[3465] = {12, 9, 8.875}
+    BPBID_Arrays.BasePetStats[3466] = {17, 9.5, 8}
+    BPBID_Arrays.BasePetStats[3467] = false
+    BPBID_Arrays.BasePetStats[3468] = false
+    BPBID_Arrays.BasePetStats[3469] = false
+    BPBID_Arrays.BasePetStats[3470] = false
+    BPBID_Arrays.BasePetStats[3471] = false
+    BPBID_Arrays.BasePetStats[3472] = {7, 8, 7}
+    BPBID_Arrays.BasePetStats[3473] = {8, 9.5, 9}
+    BPBID_Arrays.BasePetStats[3474] = {9, 9.5, 7}
+    BPBID_Arrays.BasePetStats[3475] = {7.625, 8.375, 8}
+    BPBID_Arrays.BasePetStats[3476] = {7.75, 7.75, 8.5}
+    BPBID_Arrays.BasePetStats[3477] = {7.5, 8.75, 7.75}
+    BPBID_Arrays.BasePetStats[3478] = {7.625, 8.75, 7.625}
+    BPBID_Arrays.BasePetStats[3479] = {7.75, 8.75, 7.5}
+    BPBID_Arrays.BasePetStats[3480] = {9, 8, 7}
+    BPBID_Arrays.BasePetStats[3481] = {7, 9, 8}
+    BPBID_Arrays.BasePetStats[3482] = {9, 9, 6}
+    BPBID_Arrays.BasePetStats[3483] = {7.5, 8, 8.5}
+    BPBID_Arrays.BasePetStats[3484] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[3485] = {7.375, 9.125, 7.5}
+    BPBID_Arrays.BasePetStats[3486] = {8.75, 7.25, 8}
+    BPBID_Arrays.BasePetStats[3487] = {9, 8.5, 6.5}
+    BPBID_Arrays.BasePetStats[3488] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[3489] = {7.5, 8, 8.5}
+    BPBID_Arrays.BasePetStats[3490] = {8.5, 8.5, 7}
+    BPBID_Arrays.BasePetStats[3491] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[3492] = false
+    BPBID_Arrays.BasePetStats[3493] = {8, 7.5, 8.5}
+    BPBID_Arrays.BasePetStats[3494] = false
+    BPBID_Arrays.BasePetStats[3495] = false
+    BPBID_Arrays.BasePetStats[3496] = false
+    BPBID_Arrays.BasePetStats[3497] = false
+    BPBID_Arrays.BasePetStats[3498] = false
+    BPBID_Arrays.BasePetStats[3499] = false
+    BPBID_Arrays.BasePetStats[3500] = false
+    BPBID_Arrays.BasePetStats[3501] = false
+    BPBID_Arrays.BasePetStats[3502] = false
+    BPBID_Arrays.BasePetStats[3503] = false
+    BPBID_Arrays.BasePetStats[3504] = false
+    BPBID_Arrays.BasePetStats[3505] = false
+    BPBID_Arrays.BasePetStats[3506] = false
+    BPBID_Arrays.BasePetStats[3507] = false
+    BPBID_Arrays.BasePetStats[3508] = false
+    BPBID_Arrays.BasePetStats[3509] = false
+    BPBID_Arrays.BasePetStats[3510] = false
+    BPBID_Arrays.BasePetStats[3511] = {8.75, 7.625, 7.625}
+    BPBID_Arrays.BasePetStats[3512] = {8.75, 7.625, 7.625}
+    BPBID_Arrays.BasePetStats[3513] = {7.5, 8.75, 7.75}
+    BPBID_Arrays.BasePetStats[3514] = {7.5, 8.75, 7.75}
+    BPBID_Arrays.BasePetStats[3515] = {7.5, 8.75, 7.75}
+    BPBID_Arrays.BasePetStats[3516] = {7.5, 8.75, 7.75}
+    BPBID_Arrays.BasePetStats[3517] = {7.5, 8.75, 7.75}
+    BPBID_Arrays.BasePetStats[3518] = {7.625, 8.75, 7.625}
+    BPBID_Arrays.BasePetStats[3519] = {8.5, 9, 6.5}
+    BPBID_Arrays.BasePetStats[3520] = {7.75, 8.75, 7.5}
+    BPBID_Arrays.BasePetStats[3521] = {8.625, 8.375, 7}
+    BPBID_Arrays.BasePetStats[3522] = {8.625, 8.375, 7}
+    BPBID_Arrays.BasePetStats[3523] = {8.625, 8.375, 7}
+    BPBID_Arrays.BasePetStats[3524] = {8.625, 8.375, 7}
+    BPBID_Arrays.BasePetStats[3525] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3526] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3527] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3528] = {9, 8, 7}
+    BPBID_Arrays.BasePetStats[3529] = {9, 8, 7}
+    BPBID_Arrays.BasePetStats[3530] = {8.5, 9, 6.5}
+    BPBID_Arrays.BasePetStats[3531] = {8.5, 9, 6.5}
+    BPBID_Arrays.BasePetStats[3532] = {8.5, 9, 6.5}
+    BPBID_Arrays.BasePetStats[3533] = {8.5, 9, 6.5}
+    BPBID_Arrays.BasePetStats[3534] = {8.5, 9, 6.5}
+    BPBID_Arrays.BasePetStats[3535] = {8.5, 8.5, 7}
+    BPBID_Arrays.BasePetStats[3536] = {8.5, 9, 6.5}
+    BPBID_Arrays.BasePetStats[3537] = {9, 8.5, 6.5}
+    BPBID_Arrays.BasePetStats[3538] = {9.5, 8, 6.5}
+    BPBID_Arrays.BasePetStats[3539] = {9, 8.5, 6.5}
+    BPBID_Arrays.BasePetStats[3540] = {9, 8.5, 6.5}
+    BPBID_Arrays.BasePetStats[3541] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[3542] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[3543] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[3544] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[3545] = {7.5, 8, 8.5}
+    BPBID_Arrays.BasePetStats[3546] = {7.5, 8, 8.5}
+    BPBID_Arrays.BasePetStats[3547] = {7.5, 8, 8.5}
+    BPBID_Arrays.BasePetStats[3548] = {8.5, 9, 6.5}
+    BPBID_Arrays.BasePetStats[3549] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[3550] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[3551] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[3552] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[3553] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[3554] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[3555] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[3556] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[3557] = {8.25, 9.25, 6.5}
+    BPBID_Arrays.BasePetStats[3558] = {9, 9, 10}
+    BPBID_Arrays.BasePetStats[3559] = {8, 11, 8}
+    BPBID_Arrays.BasePetStats[3560] = {8, 10, 9}
+    BPBID_Arrays.BasePetStats[3561] = false
+    BPBID_Arrays.BasePetStats[3562] = false
+    BPBID_Arrays.BasePetStats[3563] = false
+    BPBID_Arrays.BasePetStats[3564] = false
+    BPBID_Arrays.BasePetStats[3565] = {9.5, 11, 9}
+    BPBID_Arrays.BasePetStats[3566] = {11, 9.5, 8}
+    BPBID_Arrays.BasePetStats[3567] = {9, 9.5, 9}
+    BPBID_Arrays.BasePetStats[3568] = {8.5, 9.5, 9.5}
+    BPBID_Arrays.BasePetStats[3569] = {8, 11, 8}
+    BPBID_Arrays.BasePetStats[3570] = {8, 11, 8}
+    BPBID_Arrays.BasePetStats[3571] = {8, 10, 8}
+    BPBID_Arrays.BasePetStats[3572] = {10.5, 9, 8}
+    BPBID_Arrays.BasePetStats[3573] = {10.5, 9, 8}
+    BPBID_Arrays.BasePetStats[3574] = false
+    BPBID_Arrays.BasePetStats[3575] = false
+    BPBID_Arrays.BasePetStats[3576] = false
+    BPBID_Arrays.BasePetStats[3577] = false
+    BPBID_Arrays.BasePetStats[3578] = {8, 9.5, 6.5}
+    BPBID_Arrays.BasePetStats[3579] = false
+    BPBID_Arrays.BasePetStats[3580] = {8.5, 8.5, 7}
+    BPBID_Arrays.BasePetStats[3581] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3582] = {8.25, 7.5, 8.25}
+    BPBID_Arrays.BasePetStats[3583] = false
+    BPBID_Arrays.BasePetStats[3584] = false
+    BPBID_Arrays.BasePetStats[3585] = false
+    BPBID_Arrays.BasePetStats[3586] = false
+    BPBID_Arrays.BasePetStats[3587] = {8.25, 7.5, 9.5}
+    BPBID_Arrays.BasePetStats[3588] = {9.5, 7.5, 7}
+    BPBID_Arrays.BasePetStats[3589] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3590] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3591] = false
+    BPBID_Arrays.BasePetStats[3592] = false
+    BPBID_Arrays.BasePetStats[3593] = false
+    BPBID_Arrays.BasePetStats[3594] = false
+    BPBID_Arrays.BasePetStats[3595] = false
+    BPBID_Arrays.BasePetStats[3596] = {8.75, 7.625, 7.625}
+    BPBID_Arrays.BasePetStats[3597] = {9.5, 7.5, 7}
+    BPBID_Arrays.BasePetStats[3598] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3599] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3600] = {7.5, 8.75, 7.75}
+    BPBID_Arrays.BasePetStats[3601] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[3602] = {8, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[3603] = false
+    BPBID_Arrays.BasePetStats[3604] = false
+    BPBID_Arrays.BasePetStats[3605] = false
+    BPBID_Arrays.BasePetStats[3606] = false
+    BPBID_Arrays.BasePetStats[3607] = false
+    BPBID_Arrays.BasePetStats[3608] = {9.5, 7.5, 8}
+    BPBID_Arrays.BasePetStats[3609] = {9, 8.5, 9}
+    BPBID_Arrays.BasePetStats[3610] = false
+    BPBID_Arrays.BasePetStats[3611] = false
+    BPBID_Arrays.BasePetStats[3612] = false
+    BPBID_Arrays.BasePetStats[3613] = false
+    BPBID_Arrays.BasePetStats[3614] = false
+    BPBID_Arrays.BasePetStats[3615] = false
+    BPBID_Arrays.BasePetStats[3616] = false
+    BPBID_Arrays.BasePetStats[3617] = false
+    BPBID_Arrays.BasePetStats[3618] = false
+    BPBID_Arrays.BasePetStats[3619] = false
+    BPBID_Arrays.BasePetStats[3620] = false
+    BPBID_Arrays.BasePetStats[3621] = false
+    BPBID_Arrays.BasePetStats[3622] = false
+    BPBID_Arrays.BasePetStats[3623] = false
+    BPBID_Arrays.BasePetStats[3624] = false
+    BPBID_Arrays.BasePetStats[3625] = false
+    BPBID_Arrays.BasePetStats[3626] = false
+    BPBID_Arrays.BasePetStats[3627] = false
+    BPBID_Arrays.BasePetStats[3628] = false
+    BPBID_Arrays.BasePetStats[3629] = false
+    BPBID_Arrays.BasePetStats[3630] = false
+    BPBID_Arrays.BasePetStats[3631] = false
+    BPBID_Arrays.BasePetStats[3632] = false
+    BPBID_Arrays.BasePetStats[3633] = false
+    BPBID_Arrays.BasePetStats[3634] = false
+    BPBID_Arrays.BasePetStats[3635] = false
+    BPBID_Arrays.BasePetStats[3636] = false
+    BPBID_Arrays.BasePetStats[3637] = false
+    BPBID_Arrays.BasePetStats[3638] = false
+    BPBID_Arrays.BasePetStats[3639] = false
+    BPBID_Arrays.BasePetStats[3640] = false
+    BPBID_Arrays.BasePetStats[3641] = false
+    BPBID_Arrays.BasePetStats[3642] = false
+    BPBID_Arrays.BasePetStats[3643] = false
+    BPBID_Arrays.BasePetStats[3644] = false
+    BPBID_Arrays.BasePetStats[3645] = false
+    BPBID_Arrays.BasePetStats[3646] = false
+    BPBID_Arrays.BasePetStats[3647] = false
+    BPBID_Arrays.BasePetStats[3648] = false
+    BPBID_Arrays.BasePetStats[3649] = false
+    BPBID_Arrays.BasePetStats[3650] = false
+    BPBID_Arrays.BasePetStats[3651] = false
+    BPBID_Arrays.BasePetStats[3652] = false
+    BPBID_Arrays.BasePetStats[3653] = false
+    BPBID_Arrays.BasePetStats[3654] = false
+    BPBID_Arrays.BasePetStats[3655] = false
+    BPBID_Arrays.BasePetStats[3656] = false
+    BPBID_Arrays.BasePetStats[3657] = false
+    BPBID_Arrays.BasePetStats[3658] = false
+    BPBID_Arrays.BasePetStats[3659] = false
+    BPBID_Arrays.BasePetStats[3660] = false
+    BPBID_Arrays.BasePetStats[3661] = false
+    BPBID_Arrays.BasePetStats[3662] = false
+    BPBID_Arrays.BasePetStats[3663] = false
+    BPBID_Arrays.BasePetStats[3664] = false
+    BPBID_Arrays.BasePetStats[3665] = false
+    BPBID_Arrays.BasePetStats[3666] = false
+    BPBID_Arrays.BasePetStats[3667] = false
+    BPBID_Arrays.BasePetStats[3668] = false
+    BPBID_Arrays.BasePetStats[3669] = false
+    BPBID_Arrays.BasePetStats[3670] = false
+    BPBID_Arrays.BasePetStats[3671] = false
+    BPBID_Arrays.BasePetStats[3672] = false
+    BPBID_Arrays.BasePetStats[3673] = false
+    BPBID_Arrays.BasePetStats[3674] = false
+    BPBID_Arrays.BasePetStats[3675] = false
+    BPBID_Arrays.BasePetStats[3676] = false
+    BPBID_Arrays.BasePetStats[3677] = false
+    BPBID_Arrays.BasePetStats[3678] = false
+    BPBID_Arrays.BasePetStats[3679] = false
+    BPBID_Arrays.BasePetStats[3680] = false
+    BPBID_Arrays.BasePetStats[3681] = false
+    BPBID_Arrays.BasePetStats[3682] = false
+    BPBID_Arrays.BasePetStats[3683] = false
+    BPBID_Arrays.BasePetStats[3684] = false
+    BPBID_Arrays.BasePetStats[3685] = false
+    BPBID_Arrays.BasePetStats[3686] = false
+    BPBID_Arrays.BasePetStats[3687] = false
+    BPBID_Arrays.BasePetStats[3688] = false
+    BPBID_Arrays.BasePetStats[3689] = false
+    BPBID_Arrays.BasePetStats[3690] = false
+    BPBID_Arrays.BasePetStats[3691] = false
+    BPBID_Arrays.BasePetStats[3692] = false
+    BPBID_Arrays.BasePetStats[3693] = false
+    BPBID_Arrays.BasePetStats[3694] = false
+    BPBID_Arrays.BasePetStats[3695] = false
+    BPBID_Arrays.BasePetStats[3696] = false
+    BPBID_Arrays.BasePetStats[3697] = false
+    BPBID_Arrays.BasePetStats[3698] = false
+    BPBID_Arrays.BasePetStats[3699] = false
+    BPBID_Arrays.BasePetStats[3700] = false
+    BPBID_Arrays.BasePetStats[3701] = false
+    BPBID_Arrays.BasePetStats[3702] = false
+    BPBID_Arrays.BasePetStats[3703] = false
+    BPBID_Arrays.BasePetStats[3704] = false
+    BPBID_Arrays.BasePetStats[3705] = false
+    BPBID_Arrays.BasePetStats[3706] = false
+    BPBID_Arrays.BasePetStats[3707] = false
+    BPBID_Arrays.BasePetStats[3708] = false
+    BPBID_Arrays.BasePetStats[3709] = false
+    BPBID_Arrays.BasePetStats[3710] = false
+    BPBID_Arrays.BasePetStats[3711] = false
+    BPBID_Arrays.BasePetStats[3712] = false
+    BPBID_Arrays.BasePetStats[3713] = false
+    BPBID_Arrays.BasePetStats[3714] = false
+    BPBID_Arrays.BasePetStats[3715] = false
+    BPBID_Arrays.BasePetStats[3716] = false
+    BPBID_Arrays.BasePetStats[3717] = false
+    BPBID_Arrays.BasePetStats[3718] = false
+    BPBID_Arrays.BasePetStats[3719] = false
+    BPBID_Arrays.BasePetStats[3720] = false
+    BPBID_Arrays.BasePetStats[3721] = false
+    BPBID_Arrays.BasePetStats[3722] = false
+    BPBID_Arrays.BasePetStats[3723] = false
+    BPBID_Arrays.BasePetStats[3724] = false
+    BPBID_Arrays.BasePetStats[3725] = false
+    BPBID_Arrays.BasePetStats[3726] = false
+    BPBID_Arrays.BasePetStats[3727] = false
+    BPBID_Arrays.BasePetStats[3728] = false
+    BPBID_Arrays.BasePetStats[3729] = false
+    BPBID_Arrays.BasePetStats[3730] = false
+    BPBID_Arrays.BasePetStats[3731] = false
+    BPBID_Arrays.BasePetStats[3732] = false
+    BPBID_Arrays.BasePetStats[3733] = false
+    BPBID_Arrays.BasePetStats[3734] = false
+    BPBID_Arrays.BasePetStats[3735] = false
+    BPBID_Arrays.BasePetStats[3736] = false
+    BPBID_Arrays.BasePetStats[3737] = false
+    BPBID_Arrays.BasePetStats[3738] = false
+    BPBID_Arrays.BasePetStats[3739] = false
+    BPBID_Arrays.BasePetStats[3740] = false
+    BPBID_Arrays.BasePetStats[3741] = false
+    BPBID_Arrays.BasePetStats[3742] = false
+    BPBID_Arrays.BasePetStats[3743] = false
+    BPBID_Arrays.BasePetStats[3744] = false
+    BPBID_Arrays.BasePetStats[3745] = false
+    BPBID_Arrays.BasePetStats[3746] = false
+    BPBID_Arrays.BasePetStats[3747] = false
+    BPBID_Arrays.BasePetStats[3748] = false
+    BPBID_Arrays.BasePetStats[3749] = false
+    BPBID_Arrays.BasePetStats[3750] = false
+    BPBID_Arrays.BasePetStats[3751] = false
+    BPBID_Arrays.BasePetStats[3752] = false
+    BPBID_Arrays.BasePetStats[3753] = false
+    BPBID_Arrays.BasePetStats[3754] = false
+    BPBID_Arrays.BasePetStats[3755] = false
+    BPBID_Arrays.BasePetStats[3756] = false
+    BPBID_Arrays.BasePetStats[3757] = false
+    BPBID_Arrays.BasePetStats[3758] = false
+    BPBID_Arrays.BasePetStats[3759] = false
+    BPBID_Arrays.BasePetStats[3760] = false
+    BPBID_Arrays.BasePetStats[3761] = false
+    BPBID_Arrays.BasePetStats[3762] = false
+    BPBID_Arrays.BasePetStats[3763] = false
+    BPBID_Arrays.BasePetStats[3764] = false
+    BPBID_Arrays.BasePetStats[3765] = false
+    BPBID_Arrays.BasePetStats[3766] = false
+    BPBID_Arrays.BasePetStats[3767] = false
+    BPBID_Arrays.BasePetStats[3768] = false
+    BPBID_Arrays.BasePetStats[3769] = false
+    BPBID_Arrays.BasePetStats[3770] = false
+    BPBID_Arrays.BasePetStats[3771] = false
+    BPBID_Arrays.BasePetStats[3772] = false
+    BPBID_Arrays.BasePetStats[3773] = false
+    BPBID_Arrays.BasePetStats[3774] = false
+    BPBID_Arrays.BasePetStats[3775] = false
+    BPBID_Arrays.BasePetStats[3776] = false
+    BPBID_Arrays.BasePetStats[3777] = false
+    BPBID_Arrays.BasePetStats[3778] = false
+    BPBID_Arrays.BasePetStats[3779] = false
+    BPBID_Arrays.BasePetStats[3780] = false
+    BPBID_Arrays.BasePetStats[3781] = false
+    BPBID_Arrays.BasePetStats[3782] = false
+    BPBID_Arrays.BasePetStats[3783] = false
+    BPBID_Arrays.BasePetStats[3784] = false
+    BPBID_Arrays.BasePetStats[3785] = false
+    BPBID_Arrays.BasePetStats[3786] = false
+    BPBID_Arrays.BasePetStats[3787] = false
+    BPBID_Arrays.BasePetStats[3788] = false
+    BPBID_Arrays.BasePetStats[3789] = false
+    BPBID_Arrays.BasePetStats[3790] = false
+    BPBID_Arrays.BasePetStats[3791] = false
+    BPBID_Arrays.BasePetStats[3792] = false
+    BPBID_Arrays.BasePetStats[3793] = false
+    BPBID_Arrays.BasePetStats[3794] = false
+    BPBID_Arrays.BasePetStats[3795] = false
+    BPBID_Arrays.BasePetStats[3796] = false
+    BPBID_Arrays.BasePetStats[3797] = false
+    BPBID_Arrays.BasePetStats[3798] = false
+    BPBID_Arrays.BasePetStats[3799] = false
+    BPBID_Arrays.BasePetStats[3800] = false
+    BPBID_Arrays.BasePetStats[3801] = false
+    BPBID_Arrays.BasePetStats[3802] = false
+    BPBID_Arrays.BasePetStats[3803] = false
+    BPBID_Arrays.BasePetStats[3804] = false
+    BPBID_Arrays.BasePetStats[3805] = false
+    BPBID_Arrays.BasePetStats[3806] = false
+    BPBID_Arrays.BasePetStats[3807] = false
+    BPBID_Arrays.BasePetStats[3808] = false
+    BPBID_Arrays.BasePetStats[3809] = false
+    BPBID_Arrays.BasePetStats[3810] = false
+    BPBID_Arrays.BasePetStats[3811] = false
+    BPBID_Arrays.BasePetStats[3812] = false
+    BPBID_Arrays.BasePetStats[3813] = false
+    BPBID_Arrays.BasePetStats[3814] = false
+    BPBID_Arrays.BasePetStats[3815] = false
+    BPBID_Arrays.BasePetStats[3816] = false
+    BPBID_Arrays.BasePetStats[3817] = false
+    BPBID_Arrays.BasePetStats[3818] = false
+    BPBID_Arrays.BasePetStats[3819] = false
+    BPBID_Arrays.BasePetStats[3820] = false
+    BPBID_Arrays.BasePetStats[3821] = false
+    BPBID_Arrays.BasePetStats[3822] = false
+    BPBID_Arrays.BasePetStats[3823] = false
+    BPBID_Arrays.BasePetStats[3824] = false
+    BPBID_Arrays.BasePetStats[3825] = false
+    BPBID_Arrays.BasePetStats[3826] = false
+    BPBID_Arrays.BasePetStats[3827] = false
+    BPBID_Arrays.BasePetStats[3828] = false
+    BPBID_Arrays.BasePetStats[3829] = false
+    BPBID_Arrays.BasePetStats[3830] = false
+    BPBID_Arrays.BasePetStats[3831] = false
+    BPBID_Arrays.BasePetStats[3832] = false
+    BPBID_Arrays.BasePetStats[3833] = false
+    BPBID_Arrays.BasePetStats[3834] = false
+    BPBID_Arrays.BasePetStats[3835] = false
+    BPBID_Arrays.BasePetStats[3836] = false
+    BPBID_Arrays.BasePetStats[3837] = false
+    BPBID_Arrays.BasePetStats[3838] = false
+    BPBID_Arrays.BasePetStats[3839] = false
+    BPBID_Arrays.BasePetStats[3840] = false
+    BPBID_Arrays.BasePetStats[3841] = false
+    BPBID_Arrays.BasePetStats[3842] = false
+    BPBID_Arrays.BasePetStats[3843] = false
+    BPBID_Arrays.BasePetStats[3844] = false
+    BPBID_Arrays.BasePetStats[3845] = false
+    BPBID_Arrays.BasePetStats[3846] = false
+    BPBID_Arrays.BasePetStats[3847] = false
+    BPBID_Arrays.BasePetStats[3848] = false
+    BPBID_Arrays.BasePetStats[3849] = false
+    BPBID_Arrays.BasePetStats[3850] = false
+    BPBID_Arrays.BasePetStats[3851] = false
+    BPBID_Arrays.BasePetStats[3852] = false
+    BPBID_Arrays.BasePetStats[3853] = false
+    BPBID_Arrays.BasePetStats[3854] = false
+    BPBID_Arrays.BasePetStats[3855] = false
+    BPBID_Arrays.BasePetStats[3856] = false
+    BPBID_Arrays.BasePetStats[3857] = false
+    BPBID_Arrays.BasePetStats[3858] = false
+    BPBID_Arrays.BasePetStats[3859] = false
+    BPBID_Arrays.BasePetStats[3860] = false
+    BPBID_Arrays.BasePetStats[3861] = false
+    BPBID_Arrays.BasePetStats[3862] = false
+    BPBID_Arrays.BasePetStats[3863] = false
+    BPBID_Arrays.BasePetStats[3864] = false
+    BPBID_Arrays.BasePetStats[3865] = false
+    BPBID_Arrays.BasePetStats[3866] = false
+    BPBID_Arrays.BasePetStats[3867] = false
+    BPBID_Arrays.BasePetStats[3868] = false
+    BPBID_Arrays.BasePetStats[3869] = false
+    BPBID_Arrays.BasePetStats[3870] = false
+    BPBID_Arrays.BasePetStats[3871] = false
+    BPBID_Arrays.BasePetStats[3872] = false
+    BPBID_Arrays.BasePetStats[3873] = false
+    BPBID_Arrays.BasePetStats[3874] = false
+    BPBID_Arrays.BasePetStats[3875] = false
+    BPBID_Arrays.BasePetStats[3876] = false
+    BPBID_Arrays.BasePetStats[3877] = false
+    BPBID_Arrays.BasePetStats[3878] = false
+    BPBID_Arrays.BasePetStats[3879] = false
+    BPBID_Arrays.BasePetStats[3880] = false
+    BPBID_Arrays.BasePetStats[3881] = false
+    BPBID_Arrays.BasePetStats[3882] = false
+    BPBID_Arrays.BasePetStats[3883] = false
+    BPBID_Arrays.BasePetStats[3884] = false
+    BPBID_Arrays.BasePetStats[3885] = false
+    BPBID_Arrays.BasePetStats[3886] = false
+    BPBID_Arrays.BasePetStats[3887] = false
+    BPBID_Arrays.BasePetStats[3888] = false
+    BPBID_Arrays.BasePetStats[3889] = false
+    BPBID_Arrays.BasePetStats[3890] = false
+    BPBID_Arrays.BasePetStats[3891] = false
+    BPBID_Arrays.BasePetStats[3892] = false
+    BPBID_Arrays.BasePetStats[3893] = false
+    BPBID_Arrays.BasePetStats[3894] = false
+    BPBID_Arrays.BasePetStats[3895] = false
+    BPBID_Arrays.BasePetStats[3896] = false
+    BPBID_Arrays.BasePetStats[3897] = false
+    BPBID_Arrays.BasePetStats[3898] = false
+    BPBID_Arrays.BasePetStats[3899] = false
+    BPBID_Arrays.BasePetStats[3900] = false
+    BPBID_Arrays.BasePetStats[3901] = false
+    BPBID_Arrays.BasePetStats[3902] = false
+    BPBID_Arrays.BasePetStats[3903] = false
+    BPBID_Arrays.BasePetStats[3904] = false
+    BPBID_Arrays.BasePetStats[3905] = false
+    BPBID_Arrays.BasePetStats[3906] = false
+    BPBID_Arrays.BasePetStats[3907] = false
+    BPBID_Arrays.BasePetStats[3908] = false
+    BPBID_Arrays.BasePetStats[3909] = false
+    BPBID_Arrays.BasePetStats[3910] = false
+    BPBID_Arrays.BasePetStats[3911] = false
+    BPBID_Arrays.BasePetStats[3912] = false
+    BPBID_Arrays.BasePetStats[3913] = false
+    BPBID_Arrays.BasePetStats[3914] = false
+    BPBID_Arrays.BasePetStats[3915] = false
+    BPBID_Arrays.BasePetStats[3916] = false
+    BPBID_Arrays.BasePetStats[3917] = false
+    BPBID_Arrays.BasePetStats[3918] = false
+    BPBID_Arrays.BasePetStats[3919] = false
+    BPBID_Arrays.BasePetStats[3920] = false
+    BPBID_Arrays.BasePetStats[3921] = false
+    BPBID_Arrays.BasePetStats[3922] = false
+    BPBID_Arrays.BasePetStats[3923] = false
+    BPBID_Arrays.BasePetStats[3924] = false
+    BPBID_Arrays.BasePetStats[3925] = false
+    BPBID_Arrays.BasePetStats[3926] = false
+    BPBID_Arrays.BasePetStats[3927] = false
+    BPBID_Arrays.BasePetStats[3928] = false
+    BPBID_Arrays.BasePetStats[3929] = false
+    BPBID_Arrays.BasePetStats[3930] = false
+    BPBID_Arrays.BasePetStats[3931] = false
+    BPBID_Arrays.BasePetStats[3932] = false
+    BPBID_Arrays.BasePetStats[3933] = false
+    BPBID_Arrays.BasePetStats[3934] = false
+    BPBID_Arrays.BasePetStats[3935] = false
+    BPBID_Arrays.BasePetStats[3936] = false
+    BPBID_Arrays.BasePetStats[3937] = false
+    BPBID_Arrays.BasePetStats[3938] = false
+    BPBID_Arrays.BasePetStats[3939] = false
+    BPBID_Arrays.BasePetStats[3940] = false
+    BPBID_Arrays.BasePetStats[3941] = false
+    BPBID_Arrays.BasePetStats[3942] = false
+    BPBID_Arrays.BasePetStats[3943] = false
+    BPBID_Arrays.BasePetStats[3944] = false
+    BPBID_Arrays.BasePetStats[3945] = false
+    BPBID_Arrays.BasePetStats[3946] = false
+    BPBID_Arrays.BasePetStats[3947] = false
+    BPBID_Arrays.BasePetStats[3948] = false
+    BPBID_Arrays.BasePetStats[3949] = false
+    BPBID_Arrays.BasePetStats[3950] = false
+    BPBID_Arrays.BasePetStats[3951] = false
+    BPBID_Arrays.BasePetStats[3952] = false
+    BPBID_Arrays.BasePetStats[3953] = false
+    BPBID_Arrays.BasePetStats[3954] = false
+    BPBID_Arrays.BasePetStats[3955] = false
+    BPBID_Arrays.BasePetStats[3956] = false
+    BPBID_Arrays.BasePetStats[3957] = false
+    BPBID_Arrays.BasePetStats[3958] = false
+    BPBID_Arrays.BasePetStats[3959] = false
+    BPBID_Arrays.BasePetStats[3960] = false
+    BPBID_Arrays.BasePetStats[3961] = false
+    BPBID_Arrays.BasePetStats[3962] = false
+    BPBID_Arrays.BasePetStats[3963] = false
+    BPBID_Arrays.BasePetStats[3964] = false
+    BPBID_Arrays.BasePetStats[3965] = false
+    BPBID_Arrays.BasePetStats[3966] = false
+    BPBID_Arrays.BasePetStats[3967] = false
+    BPBID_Arrays.BasePetStats[3968] = false
+    BPBID_Arrays.BasePetStats[3969] = false
+    BPBID_Arrays.BasePetStats[3970] = false
+    BPBID_Arrays.BasePetStats[3971] = false
+    BPBID_Arrays.BasePetStats[3972] = false
+    BPBID_Arrays.BasePetStats[3973] = false
+    BPBID_Arrays.BasePetStats[3974] = false
+    BPBID_Arrays.BasePetStats[3975] = {8, 5.5, 3.5}
+    BPBID_Arrays.BasePetStats[3976] = false
+    BPBID_Arrays.BasePetStats[3977] = false
+    BPBID_Arrays.BasePetStats[3978] = false
+    BPBID_Arrays.BasePetStats[3979] = false
+    BPBID_Arrays.BasePetStats[3980] = false
+    BPBID_Arrays.BasePetStats[3981] = false
+    BPBID_Arrays.BasePetStats[3982] = false
+    BPBID_Arrays.BasePetStats[3983] = false
+    BPBID_Arrays.BasePetStats[3984] = false
+    BPBID_Arrays.BasePetStats[3985] = false
+    BPBID_Arrays.BasePetStats[3986] = false
+    BPBID_Arrays.BasePetStats[3987] = false
+    BPBID_Arrays.BasePetStats[3988] = false
+    BPBID_Arrays.BasePetStats[3989] = false
+    BPBID_Arrays.BasePetStats[3990] = false
+    BPBID_Arrays.BasePetStats[3991] = false
+    BPBID_Arrays.BasePetStats[3992] = false
+    BPBID_Arrays.BasePetStats[3993] = false
+    BPBID_Arrays.BasePetStats[3994] = false
+    BPBID_Arrays.BasePetStats[3995] = false
+    BPBID_Arrays.BasePetStats[3996] = false
+    BPBID_Arrays.BasePetStats[3997] = false
+    BPBID_Arrays.BasePetStats[3998] = false
+    BPBID_Arrays.BasePetStats[3999] = false
+    BPBID_Arrays.BasePetStats[4000] = false
+    BPBID_Arrays.BasePetStats[4001] = false
+    BPBID_Arrays.BasePetStats[4002] = false
+    BPBID_Arrays.BasePetStats[4003] = false
+    BPBID_Arrays.BasePetStats[4004] = false
+    BPBID_Arrays.BasePetStats[4005] = false
+    BPBID_Arrays.BasePetStats[4006] = false
+    BPBID_Arrays.BasePetStats[4007] = false
+    BPBID_Arrays.BasePetStats[4008] = false
+    BPBID_Arrays.BasePetStats[4009] = false
+    BPBID_Arrays.BasePetStats[4010] = false
+    BPBID_Arrays.BasePetStats[4011] = false
+    BPBID_Arrays.BasePetStats[4012] = false
+    BPBID_Arrays.BasePetStats[4013] = false
+    BPBID_Arrays.BasePetStats[4014] = false
+    BPBID_Arrays.BasePetStats[4015] = false
+    BPBID_Arrays.BasePetStats[4016] = false
+    BPBID_Arrays.BasePetStats[4017] = false
+    BPBID_Arrays.BasePetStats[4018] = false
+    BPBID_Arrays.BasePetStats[4019] = false
+    BPBID_Arrays.BasePetStats[4020] = false
+    BPBID_Arrays.BasePetStats[4021] = false
+    BPBID_Arrays.BasePetStats[4022] = false
+    BPBID_Arrays.BasePetStats[4023] = false
+    BPBID_Arrays.BasePetStats[4024] = false
+    BPBID_Arrays.BasePetStats[4025] = false
+    BPBID_Arrays.BasePetStats[4026] = false
+    BPBID_Arrays.BasePetStats[4027] = false
+    BPBID_Arrays.BasePetStats[4028] = false
+    BPBID_Arrays.BasePetStats[4029] = false
+    BPBID_Arrays.BasePetStats[4030] = false
+    BPBID_Arrays.BasePetStats[4031] = false
+    BPBID_Arrays.BasePetStats[4032] = false
+    BPBID_Arrays.BasePetStats[4033] = false
+    BPBID_Arrays.BasePetStats[4034] = false
+    BPBID_Arrays.BasePetStats[4035] = false
+    BPBID_Arrays.BasePetStats[4036] = false
+    BPBID_Arrays.BasePetStats[4037] = false
+    BPBID_Arrays.BasePetStats[4038] = false
+    BPBID_Arrays.BasePetStats[4039] = false
+    BPBID_Arrays.BasePetStats[4040] = false
+    BPBID_Arrays.BasePetStats[4041] = false
+    BPBID_Arrays.BasePetStats[4042] = false
+    BPBID_Arrays.BasePetStats[4043] = false
+    BPBID_Arrays.BasePetStats[4044] = false
+    BPBID_Arrays.BasePetStats[4045] = false
+    BPBID_Arrays.BasePetStats[4046] = false
+    BPBID_Arrays.BasePetStats[4047] = false
+    BPBID_Arrays.BasePetStats[4048] = false
+    BPBID_Arrays.BasePetStats[4049] = false
+    BPBID_Arrays.BasePetStats[4050] = false
+    BPBID_Arrays.BasePetStats[4051] = false
+    BPBID_Arrays.BasePetStats[4052] = false
+    BPBID_Arrays.BasePetStats[4053] = false
+    BPBID_Arrays.BasePetStats[4054] = false
+    BPBID_Arrays.BasePetStats[4055] = false
+    BPBID_Arrays.BasePetStats[4056] = false
+    BPBID_Arrays.BasePetStats[4057] = false
+    BPBID_Arrays.BasePetStats[4058] = false
+    BPBID_Arrays.BasePetStats[4059] = false
+    BPBID_Arrays.BasePetStats[4060] = false
+    BPBID_Arrays.BasePetStats[4061] = false
+    BPBID_Arrays.BasePetStats[4062] = false
+    BPBID_Arrays.BasePetStats[4063] = false
+    BPBID_Arrays.BasePetStats[4064] = false
+    BPBID_Arrays.BasePetStats[4065] = false
+    BPBID_Arrays.BasePetStats[4066] = false
+    BPBID_Arrays.BasePetStats[4067] = false
+    BPBID_Arrays.BasePetStats[4068] = false
+    BPBID_Arrays.BasePetStats[4069] = false
+    BPBID_Arrays.BasePetStats[4070] = false
+    BPBID_Arrays.BasePetStats[4071] = false
+    BPBID_Arrays.BasePetStats[4072] = false
+    BPBID_Arrays.BasePetStats[4073] = false
+    BPBID_Arrays.BasePetStats[4074] = false
+    BPBID_Arrays.BasePetStats[4075] = false
+    BPBID_Arrays.BasePetStats[4076] = false
+    BPBID_Arrays.BasePetStats[4077] = false
+    BPBID_Arrays.BasePetStats[4078] = false
+    BPBID_Arrays.BasePetStats[4079] = false
+    BPBID_Arrays.BasePetStats[4080] = false
+    BPBID_Arrays.BasePetStats[4081] = false
+    BPBID_Arrays.BasePetStats[4082] = false
+    BPBID_Arrays.BasePetStats[4083] = false
+    BPBID_Arrays.BasePetStats[4084] = false
+    BPBID_Arrays.BasePetStats[4085] = false
+    BPBID_Arrays.BasePetStats[4086] = false
+    BPBID_Arrays.BasePetStats[4087] = false
+    BPBID_Arrays.BasePetStats[4088] = false
+    BPBID_Arrays.BasePetStats[4089] = false
+    BPBID_Arrays.BasePetStats[4090] = false
+    BPBID_Arrays.BasePetStats[4091] = false
+    BPBID_Arrays.BasePetStats[4092] = false
+    BPBID_Arrays.BasePetStats[4093] = false
+    BPBID_Arrays.BasePetStats[4094] = false
+    BPBID_Arrays.BasePetStats[4095] = false
+    BPBID_Arrays.BasePetStats[4096] = false
+    BPBID_Arrays.BasePetStats[4097] = false
+    BPBID_Arrays.BasePetStats[4098] = false
+    BPBID_Arrays.BasePetStats[4099] = false
+    BPBID_Arrays.BasePetStats[4100] = false
+    BPBID_Arrays.BasePetStats[4101] = false
+    BPBID_Arrays.BasePetStats[4102] = false
+    BPBID_Arrays.BasePetStats[4103] = false
+    BPBID_Arrays.BasePetStats[4104] = false
+    BPBID_Arrays.BasePetStats[4105] = false
+    BPBID_Arrays.BasePetStats[4106] = false
+    BPBID_Arrays.BasePetStats[4107] = false
+    BPBID_Arrays.BasePetStats[4108] = false
+    BPBID_Arrays.BasePetStats[4109] = false
+    BPBID_Arrays.BasePetStats[4110] = false
+    BPBID_Arrays.BasePetStats[4111] = false
+    BPBID_Arrays.BasePetStats[4112] = false
+    BPBID_Arrays.BasePetStats[4113] = false
+    BPBID_Arrays.BasePetStats[4114] = false
+    BPBID_Arrays.BasePetStats[4115] = false
+    BPBID_Arrays.BasePetStats[4116] = false
+    BPBID_Arrays.BasePetStats[4117] = false
+    BPBID_Arrays.BasePetStats[4118] = false
+    BPBID_Arrays.BasePetStats[4119] = false
+    BPBID_Arrays.BasePetStats[4120] = false
+    BPBID_Arrays.BasePetStats[4121] = false
+    BPBID_Arrays.BasePetStats[4122] = false
+    BPBID_Arrays.BasePetStats[4123] = false
+    BPBID_Arrays.BasePetStats[4124] = false
+    BPBID_Arrays.BasePetStats[4125] = false
+    BPBID_Arrays.BasePetStats[4126] = false
+    BPBID_Arrays.BasePetStats[4127] = false
+    BPBID_Arrays.BasePetStats[4128] = false
+    BPBID_Arrays.BasePetStats[4129] = false
+    BPBID_Arrays.BasePetStats[4130] = false
+    BPBID_Arrays.BasePetStats[4131] = false
+    BPBID_Arrays.BasePetStats[4132] = false
+    BPBID_Arrays.BasePetStats[4133] = false
+    BPBID_Arrays.BasePetStats[4134] = false
+    BPBID_Arrays.BasePetStats[4135] = false
+    BPBID_Arrays.BasePetStats[4136] = false
+    BPBID_Arrays.BasePetStats[4137] = false
+    BPBID_Arrays.BasePetStats[4138] = false
+    BPBID_Arrays.BasePetStats[4139] = false
+    BPBID_Arrays.BasePetStats[4140] = false
+    BPBID_Arrays.BasePetStats[4141] = false
+    BPBID_Arrays.BasePetStats[4142] = false
+    BPBID_Arrays.BasePetStats[4143] = false
+    BPBID_Arrays.BasePetStats[4144] = false
+    BPBID_Arrays.BasePetStats[4145] = false
+    BPBID_Arrays.BasePetStats[4146] = false
+    BPBID_Arrays.BasePetStats[4147] = false
+    BPBID_Arrays.BasePetStats[4148] = false
+    BPBID_Arrays.BasePetStats[4149] = false
+    BPBID_Arrays.BasePetStats[4150] = false
+    BPBID_Arrays.BasePetStats[4151] = false
+    BPBID_Arrays.BasePetStats[4152] = false
+    BPBID_Arrays.BasePetStats[4153] = false
+    BPBID_Arrays.BasePetStats[4154] = false
+    BPBID_Arrays.BasePetStats[4155] = false
+    BPBID_Arrays.BasePetStats[4156] = false
+    BPBID_Arrays.BasePetStats[4157] = false
+    BPBID_Arrays.BasePetStats[4158] = false
+    BPBID_Arrays.BasePetStats[4159] = false
+    BPBID_Arrays.BasePetStats[4160] = false
+    BPBID_Arrays.BasePetStats[4161] = false
+    BPBID_Arrays.BasePetStats[4162] = false
+    BPBID_Arrays.BasePetStats[4163] = false
+    BPBID_Arrays.BasePetStats[4164] = false
+    BPBID_Arrays.BasePetStats[4165] = false
+    BPBID_Arrays.BasePetStats[4166] = false
+    BPBID_Arrays.BasePetStats[4167] = false
+    BPBID_Arrays.BasePetStats[4168] = false
+    BPBID_Arrays.BasePetStats[4169] = false
+    BPBID_Arrays.BasePetStats[4170] = false
+    BPBID_Arrays.BasePetStats[4171] = false
+    BPBID_Arrays.BasePetStats[4172] = false
+    BPBID_Arrays.BasePetStats[4173] = false
+    BPBID_Arrays.BasePetStats[4174] = false
+    BPBID_Arrays.BasePetStats[4175] = false
+    BPBID_Arrays.BasePetStats[4176] = false
+    BPBID_Arrays.BasePetStats[4177] = false
+    BPBID_Arrays.BasePetStats[4178] = false
+    BPBID_Arrays.BasePetStats[4179] = false
+    BPBID_Arrays.BasePetStats[4180] = false
+    BPBID_Arrays.BasePetStats[4181] = false
+    BPBID_Arrays.BasePetStats[4182] = false
+    BPBID_Arrays.BasePetStats[4183] = false
+    BPBID_Arrays.BasePetStats[4184] = false
+    BPBID_Arrays.BasePetStats[4185] = false
+    BPBID_Arrays.BasePetStats[4186] = false
+    BPBID_Arrays.BasePetStats[4187] = false
+    BPBID_Arrays.BasePetStats[4188] = false
+    BPBID_Arrays.BasePetStats[4189] = false
+    BPBID_Arrays.BasePetStats[4190] = false
+    BPBID_Arrays.BasePetStats[4191] = false
+    BPBID_Arrays.BasePetStats[4192] = false
+    BPBID_Arrays.BasePetStats[4193] = false
+    BPBID_Arrays.BasePetStats[4194] = false
+    BPBID_Arrays.BasePetStats[4195] = false
+    BPBID_Arrays.BasePetStats[4196] = false
+    BPBID_Arrays.BasePetStats[4197] = false
+    BPBID_Arrays.BasePetStats[4198] = false
+    BPBID_Arrays.BasePetStats[4199] = false
+    BPBID_Arrays.BasePetStats[4200] = false
+    BPBID_Arrays.BasePetStats[4201] = false
+    BPBID_Arrays.BasePetStats[4202] = false
+    BPBID_Arrays.BasePetStats[4203] = false
+    BPBID_Arrays.BasePetStats[4204] = false
+    BPBID_Arrays.BasePetStats[4205] = false
+    BPBID_Arrays.BasePetStats[4206] = false
+    BPBID_Arrays.BasePetStats[4207] = false
+    BPBID_Arrays.BasePetStats[4208] = false
+    BPBID_Arrays.BasePetStats[4209] = false
+    BPBID_Arrays.BasePetStats[4210] = false
+    BPBID_Arrays.BasePetStats[4211] = false
+    BPBID_Arrays.BasePetStats[4212] = false
+    BPBID_Arrays.BasePetStats[4213] = false
+    BPBID_Arrays.BasePetStats[4214] = false
+    BPBID_Arrays.BasePetStats[4215] = false
+    BPBID_Arrays.BasePetStats[4216] = false
+    BPBID_Arrays.BasePetStats[4217] = false
+    BPBID_Arrays.BasePetStats[4218] = false
+    BPBID_Arrays.BasePetStats[4219] = false
+    BPBID_Arrays.BasePetStats[4220] = false
+    BPBID_Arrays.BasePetStats[4221] = false
+    BPBID_Arrays.BasePetStats[4222] = false
+    BPBID_Arrays.BasePetStats[4223] = false
+    BPBID_Arrays.BasePetStats[4224] = false
+    BPBID_Arrays.BasePetStats[4225] = false
+    BPBID_Arrays.BasePetStats[4226] = false
+    BPBID_Arrays.BasePetStats[4227] = false
+    BPBID_Arrays.BasePetStats[4228] = false
+    BPBID_Arrays.BasePetStats[4229] = false
+    BPBID_Arrays.BasePetStats[4230] = false
+    BPBID_Arrays.BasePetStats[4231] = false
+    BPBID_Arrays.BasePetStats[4232] = false
+    BPBID_Arrays.BasePetStats[4233] = false
+    BPBID_Arrays.BasePetStats[4234] = false
+    BPBID_Arrays.BasePetStats[4235] = false
+    BPBID_Arrays.BasePetStats[4236] = false
+    BPBID_Arrays.BasePetStats[4237] = {11, 7.25, 7.25}
+    BPBID_Arrays.BasePetStats[4238] = false
+    BPBID_Arrays.BasePetStats[4239] = false
+    BPBID_Arrays.BasePetStats[4240] = false
+    BPBID_Arrays.BasePetStats[4241] = false
+    BPBID_Arrays.BasePetStats[4242] = false
+    BPBID_Arrays.BasePetStats[4243] = false
+    BPBID_Arrays.BasePetStats[4244] = false
+    BPBID_Arrays.BasePetStats[4245] = false
+    BPBID_Arrays.BasePetStats[4246] = false
+    BPBID_Arrays.BasePetStats[4247] = false
+    BPBID_Arrays.BasePetStats[4248] = false
+    BPBID_Arrays.BasePetStats[4249] = false
+    BPBID_Arrays.BasePetStats[4250] = false
+    BPBID_Arrays.BasePetStats[4251] = false
+    BPBID_Arrays.BasePetStats[4252] = false
+    BPBID_Arrays.BasePetStats[4253] = {7.5, 8.25, 8.25}
+    BPBID_Arrays.BasePetStats[4254] = false
+    BPBID_Arrays.BasePetStats[4255] = {8.5, 8, 7.5}
+    BPBID_Arrays.BasePetStats[4256] = false
+    BPBID_Arrays.BasePetStats[4257] = {7.75, 9.25, 7}
+    BPBID_Arrays.BasePetStats[4258] = {7.75, 9.25, 7}
+    BPBID_Arrays.BasePetStats[4259] = {7.75, 9.25, 7}
+    BPBID_Arrays.BasePetStats[4260] = {7.5, 9, 7.5}
+    BPBID_Arrays.BasePetStats[4261] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4262] = {7.75, 9.25, 7}
+    BPBID_Arrays.BasePetStats[4263] = {7.5, 8.25, 8.25}
+    BPBID_Arrays.BasePetStats[4264] = {7.5, 8.75, 7.75}
+    BPBID_Arrays.BasePetStats[4265] = {8, 8.75, 7.25}
+    BPBID_Arrays.BasePetStats[4266] = {8, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[4267] = {8, 9, 7}
+    BPBID_Arrays.BasePetStats[4268] = false
+    BPBID_Arrays.BasePetStats[4269] = false
+    BPBID_Arrays.BasePetStats[4270] = false
+    BPBID_Arrays.BasePetStats[4271] = false
+    BPBID_Arrays.BasePetStats[4272] = false
+    BPBID_Arrays.BasePetStats[4273] = false
+    BPBID_Arrays.BasePetStats[4274] = false
+    BPBID_Arrays.BasePetStats[4275] = {7.5, 8.75, 7.75}
+    BPBID_Arrays.BasePetStats[4276] = {7.5, 7.75, 8.75}
+    BPBID_Arrays.BasePetStats[4277] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4278] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[4279] = {7.5, 9, 7.5}
+    BPBID_Arrays.BasePetStats[4280] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4281] = false
+    BPBID_Arrays.BasePetStats[4282] = false
+    BPBID_Arrays.BasePetStats[4283] = false
+    BPBID_Arrays.BasePetStats[4284] = false
+    BPBID_Arrays.BasePetStats[4285] = {8.5, 8.5, 7}
+    BPBID_Arrays.BasePetStats[4286] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[4287] = {7, 9, 8}
+    BPBID_Arrays.BasePetStats[4288] = {8, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[4289] = {7, 8, 9}
+    BPBID_Arrays.BasePetStats[4290] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[4291] = {8.25, 8.5, 7.25}
+    BPBID_Arrays.BasePetStats[4292] = {7.25, 7.25, 9.5}
+    BPBID_Arrays.BasePetStats[4293] = false
+    BPBID_Arrays.BasePetStats[4294] = false
+    BPBID_Arrays.BasePetStats[4295] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4296] = {8, 9, 7}
+    BPBID_Arrays.BasePetStats[4297] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4298] = {7.625, 9, 7.625}
+    BPBID_Arrays.BasePetStats[4299] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4300] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[4301] = false
+    BPBID_Arrays.BasePetStats[4302] = {7.75, 8.25, 8}
+    BPBID_Arrays.BasePetStats[4303] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4304] = {7.5, 8.5, 8}
+    BPBID_Arrays.BasePetStats[4305] = {7.5, 8, 8.5}
+    BPBID_Arrays.BasePetStats[4306] = {8.5, 8, 7.5}
+    BPBID_Arrays.BasePetStats[4307] = {8.75, 8, 7.25}
+    BPBID_Arrays.BasePetStats[4308] = {7, 9, 8}
+    BPBID_Arrays.BasePetStats[4309] = {9, 8.5, 6.5}
+    BPBID_Arrays.BasePetStats[4310] = {7.5, 9, 7.5}
+    BPBID_Arrays.BasePetStats[4311] = {7.5, 8.75, 7.75}
+    BPBID_Arrays.BasePetStats[4312] = false
+    BPBID_Arrays.BasePetStats[4313] = false
+    BPBID_Arrays.BasePetStats[4314] = false
+    BPBID_Arrays.BasePetStats[4315] = false
+    BPBID_Arrays.BasePetStats[4316] = false
+    BPBID_Arrays.BasePetStats[4317] = false
+    BPBID_Arrays.BasePetStats[4318] = false
+    BPBID_Arrays.BasePetStats[4319] = false
+    BPBID_Arrays.BasePetStats[4320] = false
+    BPBID_Arrays.BasePetStats[4321] = false
+    BPBID_Arrays.BasePetStats[4322] = false
+    BPBID_Arrays.BasePetStats[4323] = false
+    BPBID_Arrays.BasePetStats[4324] = false
+    BPBID_Arrays.BasePetStats[4325] = false
+    BPBID_Arrays.BasePetStats[4326] = false
+    BPBID_Arrays.BasePetStats[4327] = false
+    BPBID_Arrays.BasePetStats[4328] = false
+    BPBID_Arrays.BasePetStats[4329] = false
+    BPBID_Arrays.BasePetStats[4330] = false
+    BPBID_Arrays.BasePetStats[4331] = false
+    BPBID_Arrays.BasePetStats[4332] = false
+    BPBID_Arrays.BasePetStats[4333] = false
+    BPBID_Arrays.BasePetStats[4334] = false
+    BPBID_Arrays.BasePetStats[4335] = false
+    BPBID_Arrays.BasePetStats[4336] = false
+    BPBID_Arrays.BasePetStats[4337] = false
+    BPBID_Arrays.BasePetStats[4338] = false
+    BPBID_Arrays.BasePetStats[4339] = false
+    BPBID_Arrays.BasePetStats[4340] = false
+    BPBID_Arrays.BasePetStats[4341] = false
+    BPBID_Arrays.BasePetStats[4342] = false
+    BPBID_Arrays.BasePetStats[4343] = false
+    BPBID_Arrays.BasePetStats[4344] = false
+    BPBID_Arrays.BasePetStats[4345] = false
+    BPBID_Arrays.BasePetStats[4346] = false
+    BPBID_Arrays.BasePetStats[4347] = false
+    BPBID_Arrays.BasePetStats[4348] = false
+    BPBID_Arrays.BasePetStats[4349] = false
+    BPBID_Arrays.BasePetStats[4350] = false
+    BPBID_Arrays.BasePetStats[4351] = false
+    BPBID_Arrays.BasePetStats[4352] = false
+    BPBID_Arrays.BasePetStats[4353] = false
+    BPBID_Arrays.BasePetStats[4354] = false
+    BPBID_Arrays.BasePetStats[4355] = false
+    BPBID_Arrays.BasePetStats[4356] = false
+    BPBID_Arrays.BasePetStats[4357] = false
+    BPBID_Arrays.BasePetStats[4358] = false
+    BPBID_Arrays.BasePetStats[4359] = false
+    BPBID_Arrays.BasePetStats[4360] = false
+    BPBID_Arrays.BasePetStats[4361] = false
+    BPBID_Arrays.BasePetStats[4362] = false
+    BPBID_Arrays.BasePetStats[4363] = false
+    BPBID_Arrays.BasePetStats[4364] = false
+    BPBID_Arrays.BasePetStats[4365] = false
+    BPBID_Arrays.BasePetStats[4366] = false
+    BPBID_Arrays.BasePetStats[4367] = false
+    BPBID_Arrays.BasePetStats[4368] = false
+    BPBID_Arrays.BasePetStats[4369] = false
+    BPBID_Arrays.BasePetStats[4370] = false
+    BPBID_Arrays.BasePetStats[4371] = false
+    BPBID_Arrays.BasePetStats[4372] = false
+    BPBID_Arrays.BasePetStats[4373] = false
+    BPBID_Arrays.BasePetStats[4374] = false
+    BPBID_Arrays.BasePetStats[4375] = false
+    BPBID_Arrays.BasePetStats[4376] = false
+    BPBID_Arrays.BasePetStats[4377] = false
+    BPBID_Arrays.BasePetStats[4378] = false
+    BPBID_Arrays.BasePetStats[4379] = false
+    BPBID_Arrays.BasePetStats[4380] = false
+    BPBID_Arrays.BasePetStats[4381] = false
+    BPBID_Arrays.BasePetStats[4382] = false
+    BPBID_Arrays.BasePetStats[4383] = false
+    BPBID_Arrays.BasePetStats[4384] = false
+    BPBID_Arrays.BasePetStats[4385] = false
+    BPBID_Arrays.BasePetStats[4386] = false
+    BPBID_Arrays.BasePetStats[4387] = false
+    BPBID_Arrays.BasePetStats[4388] = false
+    BPBID_Arrays.BasePetStats[4389] = false
+    BPBID_Arrays.BasePetStats[4390] = false
+    BPBID_Arrays.BasePetStats[4391] = false
+    BPBID_Arrays.BasePetStats[4392] = false
+    BPBID_Arrays.BasePetStats[4393] = false
+    BPBID_Arrays.BasePetStats[4394] = false
+    BPBID_Arrays.BasePetStats[4395] = false
+    BPBID_Arrays.BasePetStats[4396] = false
+    BPBID_Arrays.BasePetStats[4397] = false
+    BPBID_Arrays.BasePetStats[4398] = false
+    BPBID_Arrays.BasePetStats[4399] = false
+    BPBID_Arrays.BasePetStats[4400] = false
+    BPBID_Arrays.BasePetStats[4401] = false
+    BPBID_Arrays.BasePetStats[4402] = {7.25, 8.5, 8.25}
+    BPBID_Arrays.BasePetStats[4403] = false
+    BPBID_Arrays.BasePetStats[4404] = false
+    BPBID_Arrays.BasePetStats[4405] = false
+    BPBID_Arrays.BasePetStats[4406] = {7, 8.5, 8.5}
+    BPBID_Arrays.BasePetStats[4407] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[4408] = {8.5, 8.5, 7}
+    BPBID_Arrays.BasePetStats[4409] = {7.5, 8, 8.5}
+    BPBID_Arrays.BasePetStats[4410] = {7.5, 8.5, 8.5}
+    BPBID_Arrays.BasePetStats[4411] = {7.75, 7.5, 8.75}
+    BPBID_Arrays.BasePetStats[4412] = {8.75, 7.75, 7.5}
+    BPBID_Arrays.BasePetStats[4413] = false
+    BPBID_Arrays.BasePetStats[4414] = false
+    BPBID_Arrays.BasePetStats[4415] = false
+    BPBID_Arrays.BasePetStats[4416] = false
+    BPBID_Arrays.BasePetStats[4417] = false
+    BPBID_Arrays.BasePetStats[4418] = false
+    BPBID_Arrays.BasePetStats[4419] = false
+    BPBID_Arrays.BasePetStats[4420] = false
+    BPBID_Arrays.BasePetStats[4421] = {7.5, 7.5, 9}
+    BPBID_Arrays.BasePetStats[4422] = false
+    BPBID_Arrays.BasePetStats[4423] = false
+    BPBID_Arrays.BasePetStats[4424] = false
+    BPBID_Arrays.BasePetStats[4425] = {9.25, 7.5, 7.25}
+    BPBID_Arrays.BasePetStats[4426] = {8.75, 8, 7.25}
+    BPBID_Arrays.BasePetStats[4427] = false
+    BPBID_Arrays.BasePetStats[4428] = false
+    BPBID_Arrays.BasePetStats[4429] = false
+    BPBID_Arrays.BasePetStats[4430] = false
+    BPBID_Arrays.BasePetStats[4431] = false
+    BPBID_Arrays.BasePetStats[4432] = false
+    BPBID_Arrays.BasePetStats[4433] = false
+    BPBID_Arrays.BasePetStats[4434] = false
+    BPBID_Arrays.BasePetStats[4435] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4436] = {7.5, 9, 7.5}
+    BPBID_Arrays.BasePetStats[4437] = {8.75, 8.25, 7}
+    BPBID_Arrays.BasePetStats[4438] = false
+    BPBID_Arrays.BasePetStats[4439] = false
+    BPBID_Arrays.BasePetStats[4440] = false
+    BPBID_Arrays.BasePetStats[4441] = false
+    BPBID_Arrays.BasePetStats[4442] = false
+    BPBID_Arrays.BasePetStats[4443] = false
+    BPBID_Arrays.BasePetStats[4444] = false
+    BPBID_Arrays.BasePetStats[4445] = false
+    BPBID_Arrays.BasePetStats[4446] = false
+    BPBID_Arrays.BasePetStats[4447] = false
+    BPBID_Arrays.BasePetStats[4448] = false
+    BPBID_Arrays.BasePetStats[4449] = false
+    BPBID_Arrays.BasePetStats[4450] = {8, 8.75, 7.25}
+    BPBID_Arrays.BasePetStats[4451] = {8.5, 8, 7.5}
+    BPBID_Arrays.BasePetStats[4452] = {9, 9, 6}
+    BPBID_Arrays.BasePetStats[4453] = false
+    BPBID_Arrays.BasePetStats[4454] = false
+    BPBID_Arrays.BasePetStats[4455] = {6.5, 8.5, 9}
+    BPBID_Arrays.BasePetStats[4456] = {6.5, 8.5, 9}
+    BPBID_Arrays.BasePetStats[4457] = {6.5, 8.5, 9}
+    BPBID_Arrays.BasePetStats[4458] = {6.5, 9, 8.5}
+    BPBID_Arrays.BasePetStats[4459] = {8.375, 7.875, 7.75}
+    BPBID_Arrays.BasePetStats[4460] = {7.5, 8.25, 8.25}
+    BPBID_Arrays.BasePetStats[4461] = {7, 8.5, 8.5}
+    BPBID_Arrays.BasePetStats[4462] = {8.25, 8.5, 7.25}
+    BPBID_Arrays.BasePetStats[4463] = {7.75, 8.5, 8.25}
+    BPBID_Arrays.BasePetStats[4464] = {7.75, 9, 7.25}
+    BPBID_Arrays.BasePetStats[4465] = {8.25, 8, 7.75}
+    BPBID_Arrays.BasePetStats[4466] = {6.75, 8.5, 8.75}
+    BPBID_Arrays.BasePetStats[4467] = {8.5, 8, 9}
+    BPBID_Arrays.BasePetStats[4468] = false
+    BPBID_Arrays.BasePetStats[4469] = {7, 8.5, 8.5}
+    BPBID_Arrays.BasePetStats[4470] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4471] = {7.75, 7.75, 8.5}
+    BPBID_Arrays.BasePetStats[4472] = {7.25, 8.25, 8.5}
+    BPBID_Arrays.BasePetStats[4473] = {5.5, 8.5, 10}
+    BPBID_Arrays.BasePetStats[4474] = {5.5, 10, 8.5}
+    BPBID_Arrays.BasePetStats[4475] = {6.5, 10, 7.5}
+    BPBID_Arrays.BasePetStats[4476] = {7.5, 9, 7.5}
+    BPBID_Arrays.BasePetStats[4477] = {8.5, 7.75, 7.75}
+    BPBID_Arrays.BasePetStats[4478] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4479] = false
+    BPBID_Arrays.BasePetStats[4480] = {8.5, 7.5, 8}
+    BPBID_Arrays.BasePetStats[4481] = {7.5, 8, 8.5}
+    BPBID_Arrays.BasePetStats[4482] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4483] = {8.75, 8, 7.25}
+    BPBID_Arrays.BasePetStats[4484] = {9, 8, 7}
+    BPBID_Arrays.BasePetStats[4485] = {9, 8.5, 6.5}
+    BPBID_Arrays.BasePetStats[4486] = false
+    BPBID_Arrays.BasePetStats[4487] = false
+    BPBID_Arrays.BasePetStats[4488] = {11.5, 10.5, 6.5}
+    BPBID_Arrays.BasePetStats[4489] = {8.5, 7, 8.5}
+    BPBID_Arrays.BasePetStats[4490] = {7.5, 7.5, 9}
+    BPBID_Arrays.BasePetStats[4491] = {7.5, 9, 7.5}
+    BPBID_Arrays.BasePetStats[4492] = {8, 8.25, 7.75}
+    BPBID_Arrays.BasePetStats[4493] = {8.875, 7.875, 7.25}
+    BPBID_Arrays.BasePetStats[4494] = false
+    BPBID_Arrays.BasePetStats[4495] = {8.375, 8.375, 7.25}
+    BPBID_Arrays.BasePetStats[4496] = {8.375, 9.125, 6.5}
+    BPBID_Arrays.BasePetStats[4497] = {8, 9.25, 6.75}
+    BPBID_Arrays.BasePetStats[4498] = {8.5, 7.75, 7.75}
+    BPBID_Arrays.BasePetStats[4499] = {7.75, 7.75, 8.5}
+    BPBID_Arrays.BasePetStats[4500] = {7.75, 8.5, 7.75}
+    BPBID_Arrays.BasePetStats[4501] = false
+    BPBID_Arrays.BasePetStats[4502] = {8.25, 8.25, 7.5}
+    BPBID_Arrays.BasePetStats[4503] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4504] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4505] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4506] = {7, 8, 9}
+    BPBID_Arrays.BasePetStats[4507] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4508] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4509] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4510] = {6.5, 8.5, 9}
+    BPBID_Arrays.BasePetStats[4511] = {7, 8.5, 8.5}
+    BPBID_Arrays.BasePetStats[4512] = {6.5, 9, 8.5}
+    BPBID_Arrays.BasePetStats[4513] = {6.5, 8.75, 8.75}
+    BPBID_Arrays.BasePetStats[4514] = {8.5, 8, 9}
+    BPBID_Arrays.BasePetStats[4515] = {8.5, 8, 9}
+    BPBID_Arrays.BasePetStats[4516] = {8.5, 8, 9}
+    BPBID_Arrays.BasePetStats[4517] = {8, 9, 7}
+    BPBID_Arrays.BasePetStats[4518] = {9, 8, 7}
+    BPBID_Arrays.BasePetStats[4519] = {9, 8, 7}
+    BPBID_Arrays.BasePetStats[4520] = {9.5, 8, 6.5}
+    BPBID_Arrays.BasePetStats[4521] = {7.5, 8, 8.5}
+    BPBID_Arrays.BasePetStats[4522] = {8, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[4523] = false
+    BPBID_Arrays.BasePetStats[4524] = {7.25, 8.25, 8.5}
+    BPBID_Arrays.BasePetStats[4525] = {9, 7, 8}
+    BPBID_Arrays.BasePetStats[4526] = {9.5, 6, 8.5}
+    BPBID_Arrays.BasePetStats[4527] = {9.5, 6.5, 8}
+    BPBID_Arrays.BasePetStats[4528] = {9.5, 8.75, 5.75}
+    BPBID_Arrays.BasePetStats[4529] = {9.5, 8, 6.5}
+    BPBID_Arrays.BasePetStats[4530] = {9.5, 6.5, 8}
+    BPBID_Arrays.BasePetStats[4531] = false
+    BPBID_Arrays.BasePetStats[4532] = false
+    BPBID_Arrays.BasePetStats[4533] = {8.5, 8.5, 7}
+    BPBID_Arrays.BasePetStats[4534] = {8.25, 8.25, 7.5}
+    BPBID_Arrays.BasePetStats[4535] = {8.75, 8.25, 7}
+    BPBID_Arrays.BasePetStats[4536] = {8.5, 8.5, 7}
+    BPBID_Arrays.BasePetStats[4537] = {8.25, 8, 7.75}
+    BPBID_Arrays.BasePetStats[4538] = {6.5, 9, 8.5}
+    BPBID_Arrays.BasePetStats[4539] = {7, 8, 9}
+    BPBID_Arrays.BasePetStats[4540] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4541] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4542] = {7, 9, 8}
+    BPBID_Arrays.BasePetStats[4543] = {6, 8.5, 9.5}
+    BPBID_Arrays.BasePetStats[4544] = {6, 9, 9}
+    BPBID_Arrays.BasePetStats[4545] = {9, 8.5, 6.5}
+    BPBID_Arrays.BasePetStats[4546] = {9, 9, 6}
+    BPBID_Arrays.BasePetStats[4547] = false
+    BPBID_Arrays.BasePetStats[4548] = {8.5, 8.5, 7}
+    BPBID_Arrays.BasePetStats[4549] = {8, 11, 8}
+    BPBID_Arrays.BasePetStats[4550] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4551] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4552] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4553] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4554] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4555] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4556] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4557] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4558] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4559] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4560] = {12, 10.5, 8.5}
+    BPBID_Arrays.BasePetStats[4561] = {13, 10, 9}
+    BPBID_Arrays.BasePetStats[4562] = {13.5, 9.5, 8.5}
+    BPBID_Arrays.BasePetStats[4563] = false
+    BPBID_Arrays.BasePetStats[4564] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4565] = {7, 8.25, 8.75}
+    BPBID_Arrays.BasePetStats[4566] = {8.25, 7, 8.75}
+    BPBID_Arrays.BasePetStats[4567] = false
+    BPBID_Arrays.BasePetStats[4568] = {7.5, 7.5, 9}
+    BPBID_Arrays.BasePetStats[4569] = {9, 8, 7}
+    BPBID_Arrays.BasePetStats[4570] = {8, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[4571] = {8.25, 8, 7.75}
+    BPBID_Arrays.BasePetStats[4572] = false
+    BPBID_Arrays.BasePetStats[4573] = {9, 8, 7}
+    BPBID_Arrays.BasePetStats[4574] = {8.5, 8, 7.5}
+    BPBID_Arrays.BasePetStats[4575] = {9.25, 8, 6.75}
+    BPBID_Arrays.BasePetStats[4576] = {9, 7.5, 7.5}
+    BPBID_Arrays.BasePetStats[4577] = {8, 8.5, 7.5}
+    BPBID_Arrays.BasePetStats[4578] = false
+    BPBID_Arrays.BasePetStats[4579] = {8.25, 8.75, 7}
+    BPBID_Arrays.BasePetStats[4580] = {8, 9, 7}
+    BPBID_Arrays.BasePetStats[4581] = {8.5, 8, 7.5}
+    BPBID_Arrays.BasePetStats[4582] = {8.5, 8, 7.5}
+    BPBID_Arrays.BasePetStats[4583] = {8.5, 8, 7.5}
+    BPBID_Arrays.BasePetStats[4584] = {8.5, 8, 7.5}
+    BPBID_Arrays.BasePetStats[4585] = false
+    BPBID_Arrays.BasePetStats[4586] = {6.5, 8, 9.5}
+    BPBID_Arrays.BasePetStats[4587] = false
+    BPBID_Arrays.BasePetStats[4588] = false
+    BPBID_Arrays.BasePetStats[4589] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4590] = {7.5, 9, 7.5}
+    BPBID_Arrays.BasePetStats[4591] = {8, 7.5, 8.5}
+    BPBID_Arrays.BasePetStats[4592] = false
+    BPBID_Arrays.BasePetStats[4593] = false
+    BPBID_Arrays.BasePetStats[4594] = {7.5, 8.25, 8.25}
+    BPBID_Arrays.BasePetStats[4595] = {8.375, 8.625, 7}
+    BPBID_Arrays.BasePetStats[4596] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4597] = {7.5, 8, 8.25}
+    BPBID_Arrays.BasePetStats[4598] = {8, 8, 8}
+    BPBID_Arrays.BasePetStats[4599] = {7.5, 8, 8.5}
+    BPBID_Arrays.BasePetStats[4600] = false
+    BPBID_Arrays.BasePetStats[4601] = false
+    BPBID_Arrays.BasePetStats[4602] = {8.5, 8.5, 7}
+    BPBID_Arrays.BasePetStats[4603] = false
+    BPBID_Arrays.BasePetStats[4604] = false
+    BPBID_Arrays.BasePetStats[4605] = false
+    BPBID_Arrays.BasePetStats[4606] = false
+    BPBID_Arrays.BasePetStats[4607] = false
+    BPBID_Arrays.BasePetStats[4608] = false
+    BPBID_Arrays.BasePetStats[4609] = false
+    BPBID_Arrays.BasePetStats[4610] = false
+    BPBID_Arrays.BasePetStats[4611] = false
+    BPBID_Arrays.BasePetStats[4612] = false
+    BPBID_Arrays.BasePetStats[4613] = false
+    BPBID_Arrays.BasePetStats[4614] = false
+    BPBID_Arrays.BasePetStats[4615] = {8.5, 8.5, 7}
+    BPBID_Arrays.BasePetStats[4616] = {6.335, 8.555, 9.11}
 
 
     -- AVAILABLE BREEDS
@@ -6536,7 +7925,7 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BreedsPerSpecies[2619] = false
     BPBID_Arrays.BreedsPerSpecies[2620] = false
     BPBID_Arrays.BreedsPerSpecies[2621] = {7}
-    BPBID_Arrays.BreedsPerSpecies[2622] = false
+    BPBID_Arrays.BreedsPerSpecies[2622] = {5}
     BPBID_Arrays.BreedsPerSpecies[2623] = {10}
     BPBID_Arrays.BreedsPerSpecies[2624] = false
     BPBID_Arrays.BreedsPerSpecies[2625] = false
@@ -6804,7 +8193,7 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BreedsPerSpecies[2887] = false
     BPBID_Arrays.BreedsPerSpecies[2888] = {11}
     BPBID_Arrays.BreedsPerSpecies[2889] = {4, 6, 7, 9}
-    BPBID_Arrays.BreedsPerSpecies[2890] = false
+    BPBID_Arrays.BreedsPerSpecies[2890] = {7}
     BPBID_Arrays.BreedsPerSpecies[2891] = {11}
     BPBID_Arrays.BreedsPerSpecies[2892] = {4, 8}
     BPBID_Arrays.BreedsPerSpecies[2893] = {5}
@@ -7014,7 +8403,7 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BreedsPerSpecies[3097] = {6}
     BPBID_Arrays.BreedsPerSpecies[3098] = {7}
     BPBID_Arrays.BreedsPerSpecies[3099] = {4}
-    BPBID_Arrays.BreedsPerSpecies[3100] = false
+    BPBID_Arrays.BreedsPerSpecies[3100] = {4}
     BPBID_Arrays.BreedsPerSpecies[3101] = {8}
     BPBID_Arrays.BreedsPerSpecies[3102] = {3, 5, 9, 11}
     BPBID_Arrays.BreedsPerSpecies[3103] = {5, 8}
@@ -7089,9 +8478,9 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BreedsPerSpecies[3172] = {4}
     BPBID_Arrays.BreedsPerSpecies[3173] = {3, 6, 7, 12}
     BPBID_Arrays.BreedsPerSpecies[3174] = {3}
-    BPBID_Arrays.BreedsPerSpecies[3175] = false
+    BPBID_Arrays.BreedsPerSpecies[3175] = {8}
     BPBID_Arrays.BreedsPerSpecies[3176] = {3}
-    BPBID_Arrays.BreedsPerSpecies[3177] = false
+    BPBID_Arrays.BreedsPerSpecies[3177] = {7}
     BPBID_Arrays.BreedsPerSpecies[3178] = {3}
     BPBID_Arrays.BreedsPerSpecies[3179] = {3}
     BPBID_Arrays.BreedsPerSpecies[3180] = {4}
@@ -7139,7 +8528,7 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BreedsPerSpecies[3222] = {3}
     BPBID_Arrays.BreedsPerSpecies[3223] = {3}
     BPBID_Arrays.BreedsPerSpecies[3224] = {3}
-    BPBID_Arrays.BreedsPerSpecies[3225] = false
+    BPBID_Arrays.BreedsPerSpecies[3225] = {5}
     BPBID_Arrays.BreedsPerSpecies[3226] = {5}
     BPBID_Arrays.BreedsPerSpecies[3227] = {3}
     BPBID_Arrays.BreedsPerSpecies[3228] = false
@@ -7150,23 +8539,1394 @@ function BPBID_Arrays.InitializeArrays()
     BPBID_Arrays.BreedsPerSpecies[3233] = {3}
     BPBID_Arrays.BreedsPerSpecies[3234] = {3}
     BPBID_Arrays.BreedsPerSpecies[3235] = {3}
-    BPBID_Arrays.BreedsPerSpecies[3236] = false
+    BPBID_Arrays.BreedsPerSpecies[3236] = {10}
     BPBID_Arrays.BreedsPerSpecies[3237] = {3}
     BPBID_Arrays.BreedsPerSpecies[3238] = false
     BPBID_Arrays.BreedsPerSpecies[3239] = false
     BPBID_Arrays.BreedsPerSpecies[3240] = false
     BPBID_Arrays.BreedsPerSpecies[3241] = false
     BPBID_Arrays.BreedsPerSpecies[3242] = false
-    BPBID_Arrays.BreedsPerSpecies[3243] = false
-    BPBID_Arrays.BreedsPerSpecies[3244] = false
+    BPBID_Arrays.BreedsPerSpecies[3243] = {4}
+    BPBID_Arrays.BreedsPerSpecies[3244] = {7}
     BPBID_Arrays.BreedsPerSpecies[3245] = false
     BPBID_Arrays.BreedsPerSpecies[3246] = false
     BPBID_Arrays.BreedsPerSpecies[3247] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3248] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3249] = {4}
+    BPBID_Arrays.BreedsPerSpecies[3250] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3251] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3252] = {10}
+    BPBID_Arrays.BreedsPerSpecies[3253] = {12}
+    BPBID_Arrays.BreedsPerSpecies[3254] = {4}
+    BPBID_Arrays.BreedsPerSpecies[3255] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3256] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3257] = false
+    BPBID_Arrays.BreedsPerSpecies[3258] = false
+    BPBID_Arrays.BreedsPerSpecies[3259] = false
+    BPBID_Arrays.BreedsPerSpecies[3260] = {3, 5, 9}
+    BPBID_Arrays.BreedsPerSpecies[3261] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3262] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3263] = {12}
+    BPBID_Arrays.BreedsPerSpecies[3264] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3265] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3266] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3267] = false
+    BPBID_Arrays.BreedsPerSpecies[3268] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3269] = {12}
+    BPBID_Arrays.BreedsPerSpecies[3270] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3271] = false
+    BPBID_Arrays.BreedsPerSpecies[3272] = {3, 5, 7, 9, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[3273] = {3, 5, 7, 9, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[3274] = {7}
+    BPBID_Arrays.BreedsPerSpecies[3275] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3276] = {3, 5, 8, 9}
+    BPBID_Arrays.BreedsPerSpecies[3277] = false
+    BPBID_Arrays.BreedsPerSpecies[3278] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3279] = {12}
+    BPBID_Arrays.BreedsPerSpecies[3280] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3281] = {3, 12}
+    BPBID_Arrays.BreedsPerSpecies[3282] = {3, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[3283] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3284] = {7}
+    BPBID_Arrays.BreedsPerSpecies[3285] = {7}
+    BPBID_Arrays.BreedsPerSpecies[3286] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3287] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3288] = {6, 7, 9, 12}
+    BPBID_Arrays.BreedsPerSpecies[3289] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3290] = {4}
+    BPBID_Arrays.BreedsPerSpecies[3291] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3292] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3293] = {12}
+    BPBID_Arrays.BreedsPerSpecies[3294] = {4}
+    BPBID_Arrays.BreedsPerSpecies[3295] = {6, 7, 9, 12}
+    BPBID_Arrays.BreedsPerSpecies[3296] = {6, 7, 9, 12}
+    BPBID_Arrays.BreedsPerSpecies[3297] = {9}
+    BPBID_Arrays.BreedsPerSpecies[3298] = false
+    BPBID_Arrays.BreedsPerSpecies[3299] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3300] = {5, 8, 9, 11}
+    BPBID_Arrays.BreedsPerSpecies[3301] = {3, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[3302] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3303] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3304] = false
+    BPBID_Arrays.BreedsPerSpecies[3305] = false
+    BPBID_Arrays.BreedsPerSpecies[3306] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3307] = {3, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[3308] = false
+    BPBID_Arrays.BreedsPerSpecies[3309] = {9}
+    BPBID_Arrays.BreedsPerSpecies[3310] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3311] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3312] = false
+    BPBID_Arrays.BreedsPerSpecies[3313] = {4, 5, 8, 11}
+    BPBID_Arrays.BreedsPerSpecies[3314] = false
+    BPBID_Arrays.BreedsPerSpecies[3315] = false
+    BPBID_Arrays.BreedsPerSpecies[3316] = {12}
+    BPBID_Arrays.BreedsPerSpecies[3317] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3318] = {4, 5, 8, 11}
+    BPBID_Arrays.BreedsPerSpecies[3319] = {7}
+    BPBID_Arrays.BreedsPerSpecies[3320] = {3, 7, 10, 12}
+    BPBID_Arrays.BreedsPerSpecies[3321] = {7}
+    BPBID_Arrays.BreedsPerSpecies[3322] = {3, 7, 10}
+    BPBID_Arrays.BreedsPerSpecies[3323] = {7}
+    BPBID_Arrays.BreedsPerSpecies[3324] = false
+    BPBID_Arrays.BreedsPerSpecies[3325] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3326] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3327] = {3, 7, 9}
+    BPBID_Arrays.BreedsPerSpecies[3328] = {3, 7, 9}
+    BPBID_Arrays.BreedsPerSpecies[3329] = {3, 7, 9}
+    BPBID_Arrays.BreedsPerSpecies[3330] = {3, 7, 9}
+    BPBID_Arrays.BreedsPerSpecies[3331] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3332] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3333] = {9}
+    BPBID_Arrays.BreedsPerSpecies[3334] = {9}
+    BPBID_Arrays.BreedsPerSpecies[3335] = {9}
+    BPBID_Arrays.BreedsPerSpecies[3336] = {9}
+    BPBID_Arrays.BreedsPerSpecies[3337] = false
+    BPBID_Arrays.BreedsPerSpecies[3338] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3339] = false
+    BPBID_Arrays.BreedsPerSpecies[3340] = false
+    BPBID_Arrays.BreedsPerSpecies[3341] = false
+    BPBID_Arrays.BreedsPerSpecies[3342] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3343] = false
+    BPBID_Arrays.BreedsPerSpecies[3344] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3345] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3346] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3347] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3348] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3349] = false
+    BPBID_Arrays.BreedsPerSpecies[3350] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3351] = {3, 4, 7}
+    BPBID_Arrays.BreedsPerSpecies[3352] = {3, 4, 7}
+    BPBID_Arrays.BreedsPerSpecies[3353] = {3, 9}
+    BPBID_Arrays.BreedsPerSpecies[3354] = {3, 9}
+    BPBID_Arrays.BreedsPerSpecies[3355] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3356] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3357] = {9}
+    BPBID_Arrays.BreedsPerSpecies[3358] = {9}
+    BPBID_Arrays.BreedsPerSpecies[3359] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3360] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3361] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3362] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3363] = false
+    BPBID_Arrays.BreedsPerSpecies[3364] = false
+    BPBID_Arrays.BreedsPerSpecies[3365] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3366] = {3, 4, 8, 10}
+    BPBID_Arrays.BreedsPerSpecies[3367] = {3, 6, 7}
+    BPBID_Arrays.BreedsPerSpecies[3368] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3369] = false
+    BPBID_Arrays.BreedsPerSpecies[3370] = false
+    BPBID_Arrays.BreedsPerSpecies[3371] = false
+    BPBID_Arrays.BreedsPerSpecies[3372] = false
+    BPBID_Arrays.BreedsPerSpecies[3373] = false
+    BPBID_Arrays.BreedsPerSpecies[3374] = false
+    BPBID_Arrays.BreedsPerSpecies[3375] = false
+    BPBID_Arrays.BreedsPerSpecies[3376] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3377] = false
+    BPBID_Arrays.BreedsPerSpecies[3378] = {12}
+    BPBID_Arrays.BreedsPerSpecies[3379] = {12}
+    BPBID_Arrays.BreedsPerSpecies[3380] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3381] = {11}
+    BPBID_Arrays.BreedsPerSpecies[3382] = {7}
+    BPBID_Arrays.BreedsPerSpecies[3383] = false
+    BPBID_Arrays.BreedsPerSpecies[3384] = {5, 8, 9, 11}
+    BPBID_Arrays.BreedsPerSpecies[3385] = {4, 5, 8, 11}
+    BPBID_Arrays.BreedsPerSpecies[3386] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3387] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3388] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3389] = {5, 8, 9, 11}
+    BPBID_Arrays.BreedsPerSpecies[3390] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3391] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3392] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3393] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3394] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3395] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3396] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3397] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3398] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3399] = false
+    BPBID_Arrays.BreedsPerSpecies[3400] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3401] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3402] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3403] = {5, 6, 9}
+    BPBID_Arrays.BreedsPerSpecies[3404] = {3, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[3405] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3406] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3407] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3408] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3409] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3410] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3411] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3412] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3413] = false
+    BPBID_Arrays.BreedsPerSpecies[3414] = {12}
+    BPBID_Arrays.BreedsPerSpecies[3415] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3416] = {5}
+    BPBID_Arrays.BreedsPerSpecies[3417] = {4}
+    BPBID_Arrays.BreedsPerSpecies[3418] = false
+    BPBID_Arrays.BreedsPerSpecies[3419] = false
+    BPBID_Arrays.BreedsPerSpecies[3420] = false
+    BPBID_Arrays.BreedsPerSpecies[3421] = false
+    BPBID_Arrays.BreedsPerSpecies[3422] = false
+    BPBID_Arrays.BreedsPerSpecies[3423] = false
+    BPBID_Arrays.BreedsPerSpecies[3424] = false
+    BPBID_Arrays.BreedsPerSpecies[3425] = false
+    BPBID_Arrays.BreedsPerSpecies[3426] = false
+    BPBID_Arrays.BreedsPerSpecies[3427] = {12}
+    BPBID_Arrays.BreedsPerSpecies[3428] = false
+    BPBID_Arrays.BreedsPerSpecies[3429] = false
+    BPBID_Arrays.BreedsPerSpecies[3430] = false
+    BPBID_Arrays.BreedsPerSpecies[3431] = false
+    BPBID_Arrays.BreedsPerSpecies[3432] = false
+    BPBID_Arrays.BreedsPerSpecies[3433] = false
+    BPBID_Arrays.BreedsPerSpecies[3434] = false
+    BPBID_Arrays.BreedsPerSpecies[3435] = false
+    BPBID_Arrays.BreedsPerSpecies[3436] = false
+    BPBID_Arrays.BreedsPerSpecies[3437] = false
+    BPBID_Arrays.BreedsPerSpecies[3438] = false
+    BPBID_Arrays.BreedsPerSpecies[3439] = false
+    BPBID_Arrays.BreedsPerSpecies[3440] = false
+    BPBID_Arrays.BreedsPerSpecies[3441] = false
+    BPBID_Arrays.BreedsPerSpecies[3442] = false
+    BPBID_Arrays.BreedsPerSpecies[3443] = false
+    BPBID_Arrays.BreedsPerSpecies[3444] = false
+    BPBID_Arrays.BreedsPerSpecies[3445] = false
+    BPBID_Arrays.BreedsPerSpecies[3446] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3447] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3448] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3449] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3450] = false
+    BPBID_Arrays.BreedsPerSpecies[3451] = false
+    BPBID_Arrays.BreedsPerSpecies[3452] = false
+    BPBID_Arrays.BreedsPerSpecies[3453] = false
+    BPBID_Arrays.BreedsPerSpecies[3454] = false
+    BPBID_Arrays.BreedsPerSpecies[3455] = false
+    BPBID_Arrays.BreedsPerSpecies[3456] = false
+    BPBID_Arrays.BreedsPerSpecies[3457] = false
+    BPBID_Arrays.BreedsPerSpecies[3458] = false
+    BPBID_Arrays.BreedsPerSpecies[3459] = false
+    BPBID_Arrays.BreedsPerSpecies[3460] = false
+    BPBID_Arrays.BreedsPerSpecies[3461] = false
+    BPBID_Arrays.BreedsPerSpecies[3462] = false
+    BPBID_Arrays.BreedsPerSpecies[3463] = false
+    BPBID_Arrays.BreedsPerSpecies[3464] = false
+    BPBID_Arrays.BreedsPerSpecies[3465] = false
+    BPBID_Arrays.BreedsPerSpecies[3466] = false
+    BPBID_Arrays.BreedsPerSpecies[3467] = false
+    BPBID_Arrays.BreedsPerSpecies[3468] = false
+    BPBID_Arrays.BreedsPerSpecies[3469] = false
+    BPBID_Arrays.BreedsPerSpecies[3470] = false
+    BPBID_Arrays.BreedsPerSpecies[3471] = false
+    BPBID_Arrays.BreedsPerSpecies[3472] = false
+    BPBID_Arrays.BreedsPerSpecies[3473] = false
+    BPBID_Arrays.BreedsPerSpecies[3474] = false
+    BPBID_Arrays.BreedsPerSpecies[3475] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3476] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3477] = {3, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[3478] = {5, 6, 9}
+    BPBID_Arrays.BreedsPerSpecies[3479] = {3, 4, 7, 8, 10}
+    BPBID_Arrays.BreedsPerSpecies[3480] = {3, 4, 5, 9}
+    BPBID_Arrays.BreedsPerSpecies[3481] = {3, 4, 6, 10}
+    BPBID_Arrays.BreedsPerSpecies[3482] = {3, 6, 7, 12}
+    BPBID_Arrays.BreedsPerSpecies[3483] = {3, 5}
+    BPBID_Arrays.BreedsPerSpecies[3484] = {3, 6, 9}
+    BPBID_Arrays.BreedsPerSpecies[3485] = {4, 5, 8}
+    BPBID_Arrays.BreedsPerSpecies[3486] = {5, 6, 9}
+    BPBID_Arrays.BreedsPerSpecies[3487] = {3, 12}
+    BPBID_Arrays.BreedsPerSpecies[3488] = {3, 6, 7}
+    BPBID_Arrays.BreedsPerSpecies[3489] = {3, 5, 8}
+    BPBID_Arrays.BreedsPerSpecies[3490] = {4, 6, 12}
+    BPBID_Arrays.BreedsPerSpecies[3491] = {4}
+    BPBID_Arrays.BreedsPerSpecies[3492] = false
+    BPBID_Arrays.BreedsPerSpecies[3493] = {9}
+    BPBID_Arrays.BreedsPerSpecies[3494] = false
+    BPBID_Arrays.BreedsPerSpecies[3495] = false
+    BPBID_Arrays.BreedsPerSpecies[3496] = false
+    BPBID_Arrays.BreedsPerSpecies[3497] = false
+    BPBID_Arrays.BreedsPerSpecies[3498] = false
+    BPBID_Arrays.BreedsPerSpecies[3499] = false
+    BPBID_Arrays.BreedsPerSpecies[3500] = false
+    BPBID_Arrays.BreedsPerSpecies[3501] = false
+    BPBID_Arrays.BreedsPerSpecies[3502] = false
+    BPBID_Arrays.BreedsPerSpecies[3503] = false
+    BPBID_Arrays.BreedsPerSpecies[3504] = false
+    BPBID_Arrays.BreedsPerSpecies[3505] = false
+    BPBID_Arrays.BreedsPerSpecies[3506] = false
+    BPBID_Arrays.BreedsPerSpecies[3507] = false
+    BPBID_Arrays.BreedsPerSpecies[3508] = false
+    BPBID_Arrays.BreedsPerSpecies[3509] = false
+    BPBID_Arrays.BreedsPerSpecies[3510] = false
+    BPBID_Arrays.BreedsPerSpecies[3511] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3512] = {8}
+    BPBID_Arrays.BreedsPerSpecies[3513] = false
+    BPBID_Arrays.BreedsPerSpecies[3514] = false
+    BPBID_Arrays.BreedsPerSpecies[3515] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3516] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3517] = false
+    BPBID_Arrays.BreedsPerSpecies[3518] = false
+    BPBID_Arrays.BreedsPerSpecies[3519] = false
+    BPBID_Arrays.BreedsPerSpecies[3520] = false
+    BPBID_Arrays.BreedsPerSpecies[3521] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3522] = false
+    BPBID_Arrays.BreedsPerSpecies[3523] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3524] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3525] = false
+    BPBID_Arrays.BreedsPerSpecies[3526] = false
+    BPBID_Arrays.BreedsPerSpecies[3527] = false
+    BPBID_Arrays.BreedsPerSpecies[3528] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3529] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3530] = {4}
+    BPBID_Arrays.BreedsPerSpecies[3531] = false
+    BPBID_Arrays.BreedsPerSpecies[3532] = false
+    BPBID_Arrays.BreedsPerSpecies[3533] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3534] = false
+    BPBID_Arrays.BreedsPerSpecies[3535] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3536] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3537] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3538] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3539] = false
+    BPBID_Arrays.BreedsPerSpecies[3540] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3541] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3542] = false
+    BPBID_Arrays.BreedsPerSpecies[3543] = false
+    BPBID_Arrays.BreedsPerSpecies[3544] = false
+    BPBID_Arrays.BreedsPerSpecies[3545] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3546] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3547] = false
+    BPBID_Arrays.BreedsPerSpecies[3548] = {7}
+    BPBID_Arrays.BreedsPerSpecies[3549] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3550] = false
+    BPBID_Arrays.BreedsPerSpecies[3551] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3552] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3553] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3554] = false
+    BPBID_Arrays.BreedsPerSpecies[3555] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3556] = false
+    BPBID_Arrays.BreedsPerSpecies[3557] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3558] = false
+    BPBID_Arrays.BreedsPerSpecies[3559] = false
+    BPBID_Arrays.BreedsPerSpecies[3560] = false
+    BPBID_Arrays.BreedsPerSpecies[3561] = false
+    BPBID_Arrays.BreedsPerSpecies[3562] = false
+    BPBID_Arrays.BreedsPerSpecies[3563] = false
+    BPBID_Arrays.BreedsPerSpecies[3564] = false
+    BPBID_Arrays.BreedsPerSpecies[3565] = false
+    BPBID_Arrays.BreedsPerSpecies[3566] = false
+    BPBID_Arrays.BreedsPerSpecies[3567] = false
+    BPBID_Arrays.BreedsPerSpecies[3568] = false
+    BPBID_Arrays.BreedsPerSpecies[3569] = false
+    BPBID_Arrays.BreedsPerSpecies[3570] = false
+    BPBID_Arrays.BreedsPerSpecies[3571] = false
+    BPBID_Arrays.BreedsPerSpecies[3572] = false
+    BPBID_Arrays.BreedsPerSpecies[3573] = false
+    BPBID_Arrays.BreedsPerSpecies[3574] = false
+    BPBID_Arrays.BreedsPerSpecies[3575] = false
+    BPBID_Arrays.BreedsPerSpecies[3576] = false
+    BPBID_Arrays.BreedsPerSpecies[3577] = false
+    BPBID_Arrays.BreedsPerSpecies[3578] = {4}
+    BPBID_Arrays.BreedsPerSpecies[3579] = false
+    BPBID_Arrays.BreedsPerSpecies[3580] = {7}
+    BPBID_Arrays.BreedsPerSpecies[3581] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3582] = {9}
+    BPBID_Arrays.BreedsPerSpecies[3583] = false
+    BPBID_Arrays.BreedsPerSpecies[3584] = false
+    BPBID_Arrays.BreedsPerSpecies[3585] = false
+    BPBID_Arrays.BreedsPerSpecies[3586] = false
+    BPBID_Arrays.BreedsPerSpecies[3587] = false
+    BPBID_Arrays.BreedsPerSpecies[3588] = {6}
+    BPBID_Arrays.BreedsPerSpecies[3589] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3590] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3591] = false
+    BPBID_Arrays.BreedsPerSpecies[3592] = false
+    BPBID_Arrays.BreedsPerSpecies[3593] = false
+    BPBID_Arrays.BreedsPerSpecies[3594] = false
+    BPBID_Arrays.BreedsPerSpecies[3595] = false
+    BPBID_Arrays.BreedsPerSpecies[3596] = {4}
+    BPBID_Arrays.BreedsPerSpecies[3597] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3598] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3599] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3600] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3601] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3602] = {3}
+    BPBID_Arrays.BreedsPerSpecies[3603] = false
+    BPBID_Arrays.BreedsPerSpecies[3604] = false
+    BPBID_Arrays.BreedsPerSpecies[3605] = false
+    BPBID_Arrays.BreedsPerSpecies[3606] = false
+    BPBID_Arrays.BreedsPerSpecies[3607] = false
+    BPBID_Arrays.BreedsPerSpecies[3608] = false
+    BPBID_Arrays.BreedsPerSpecies[3609] = false
+    BPBID_Arrays.BreedsPerSpecies[3610] = false
+    BPBID_Arrays.BreedsPerSpecies[3611] = false
+    BPBID_Arrays.BreedsPerSpecies[3612] = false
+    BPBID_Arrays.BreedsPerSpecies[3613] = false
+    BPBID_Arrays.BreedsPerSpecies[3614] = false
+    BPBID_Arrays.BreedsPerSpecies[3615] = false
+    BPBID_Arrays.BreedsPerSpecies[3616] = false
+    BPBID_Arrays.BreedsPerSpecies[3617] = false
+    BPBID_Arrays.BreedsPerSpecies[3618] = false
+    BPBID_Arrays.BreedsPerSpecies[3619] = false
+    BPBID_Arrays.BreedsPerSpecies[3620] = false
+    BPBID_Arrays.BreedsPerSpecies[3621] = false
+    BPBID_Arrays.BreedsPerSpecies[3622] = false
+    BPBID_Arrays.BreedsPerSpecies[3623] = false
+    BPBID_Arrays.BreedsPerSpecies[3624] = false
+    BPBID_Arrays.BreedsPerSpecies[3625] = false
+    BPBID_Arrays.BreedsPerSpecies[3626] = false
+    BPBID_Arrays.BreedsPerSpecies[3627] = false
+    BPBID_Arrays.BreedsPerSpecies[3628] = false
+    BPBID_Arrays.BreedsPerSpecies[3629] = false
+    BPBID_Arrays.BreedsPerSpecies[3630] = false
+    BPBID_Arrays.BreedsPerSpecies[3631] = false
+    BPBID_Arrays.BreedsPerSpecies[3632] = false
+    BPBID_Arrays.BreedsPerSpecies[3633] = false
+    BPBID_Arrays.BreedsPerSpecies[3634] = false
+    BPBID_Arrays.BreedsPerSpecies[3635] = false
+    BPBID_Arrays.BreedsPerSpecies[3636] = false
+    BPBID_Arrays.BreedsPerSpecies[3637] = false
+    BPBID_Arrays.BreedsPerSpecies[3638] = false
+    BPBID_Arrays.BreedsPerSpecies[3639] = false
+    BPBID_Arrays.BreedsPerSpecies[3640] = false
+    BPBID_Arrays.BreedsPerSpecies[3641] = false
+    BPBID_Arrays.BreedsPerSpecies[3642] = false
+    BPBID_Arrays.BreedsPerSpecies[3643] = false
+    BPBID_Arrays.BreedsPerSpecies[3644] = false
+    BPBID_Arrays.BreedsPerSpecies[3645] = false
+    BPBID_Arrays.BreedsPerSpecies[3646] = false
+    BPBID_Arrays.BreedsPerSpecies[3647] = false
+    BPBID_Arrays.BreedsPerSpecies[3648] = false
+    BPBID_Arrays.BreedsPerSpecies[3649] = false
+    BPBID_Arrays.BreedsPerSpecies[3650] = false
+    BPBID_Arrays.BreedsPerSpecies[3651] = false
+    BPBID_Arrays.BreedsPerSpecies[3652] = false
+    BPBID_Arrays.BreedsPerSpecies[3653] = false
+    BPBID_Arrays.BreedsPerSpecies[3654] = false
+    BPBID_Arrays.BreedsPerSpecies[3655] = false
+    BPBID_Arrays.BreedsPerSpecies[3656] = false
+    BPBID_Arrays.BreedsPerSpecies[3657] = false
+    BPBID_Arrays.BreedsPerSpecies[3658] = false
+    BPBID_Arrays.BreedsPerSpecies[3659] = false
+    BPBID_Arrays.BreedsPerSpecies[3660] = false
+    BPBID_Arrays.BreedsPerSpecies[3661] = false
+    BPBID_Arrays.BreedsPerSpecies[3662] = false
+    BPBID_Arrays.BreedsPerSpecies[3663] = false
+    BPBID_Arrays.BreedsPerSpecies[3664] = false
+    BPBID_Arrays.BreedsPerSpecies[3665] = false
+    BPBID_Arrays.BreedsPerSpecies[3666] = false
+    BPBID_Arrays.BreedsPerSpecies[3667] = false
+    BPBID_Arrays.BreedsPerSpecies[3668] = false
+    BPBID_Arrays.BreedsPerSpecies[3669] = false
+    BPBID_Arrays.BreedsPerSpecies[3670] = false
+    BPBID_Arrays.BreedsPerSpecies[3671] = false
+    BPBID_Arrays.BreedsPerSpecies[3672] = false
+    BPBID_Arrays.BreedsPerSpecies[3673] = false
+    BPBID_Arrays.BreedsPerSpecies[3674] = false
+    BPBID_Arrays.BreedsPerSpecies[3675] = false
+    BPBID_Arrays.BreedsPerSpecies[3676] = false
+    BPBID_Arrays.BreedsPerSpecies[3677] = false
+    BPBID_Arrays.BreedsPerSpecies[3678] = false
+    BPBID_Arrays.BreedsPerSpecies[3679] = false
+    BPBID_Arrays.BreedsPerSpecies[3680] = false
+    BPBID_Arrays.BreedsPerSpecies[3681] = false
+    BPBID_Arrays.BreedsPerSpecies[3682] = false
+    BPBID_Arrays.BreedsPerSpecies[3683] = false
+    BPBID_Arrays.BreedsPerSpecies[3684] = false
+    BPBID_Arrays.BreedsPerSpecies[3685] = false
+    BPBID_Arrays.BreedsPerSpecies[3686] = false
+    BPBID_Arrays.BreedsPerSpecies[3687] = false
+    BPBID_Arrays.BreedsPerSpecies[3688] = false
+    BPBID_Arrays.BreedsPerSpecies[3689] = false
+    BPBID_Arrays.BreedsPerSpecies[3690] = false
+    BPBID_Arrays.BreedsPerSpecies[3691] = false
+    BPBID_Arrays.BreedsPerSpecies[3692] = false
+    BPBID_Arrays.BreedsPerSpecies[3693] = false
+    BPBID_Arrays.BreedsPerSpecies[3694] = false
+    BPBID_Arrays.BreedsPerSpecies[3695] = false
+    BPBID_Arrays.BreedsPerSpecies[3696] = false
+    BPBID_Arrays.BreedsPerSpecies[3697] = false
+    BPBID_Arrays.BreedsPerSpecies[3698] = false
+    BPBID_Arrays.BreedsPerSpecies[3699] = false
+    BPBID_Arrays.BreedsPerSpecies[3700] = false
+    BPBID_Arrays.BreedsPerSpecies[3701] = false
+    BPBID_Arrays.BreedsPerSpecies[3702] = false
+    BPBID_Arrays.BreedsPerSpecies[3703] = false
+    BPBID_Arrays.BreedsPerSpecies[3704] = false
+    BPBID_Arrays.BreedsPerSpecies[3705] = false
+    BPBID_Arrays.BreedsPerSpecies[3706] = false
+    BPBID_Arrays.BreedsPerSpecies[3707] = false
+    BPBID_Arrays.BreedsPerSpecies[3708] = false
+    BPBID_Arrays.BreedsPerSpecies[3709] = false
+    BPBID_Arrays.BreedsPerSpecies[3710] = false
+    BPBID_Arrays.BreedsPerSpecies[3711] = false
+    BPBID_Arrays.BreedsPerSpecies[3712] = false
+    BPBID_Arrays.BreedsPerSpecies[3713] = false
+    BPBID_Arrays.BreedsPerSpecies[3714] = false
+    BPBID_Arrays.BreedsPerSpecies[3715] = false
+    BPBID_Arrays.BreedsPerSpecies[3716] = false
+    BPBID_Arrays.BreedsPerSpecies[3717] = false
+    BPBID_Arrays.BreedsPerSpecies[3718] = false
+    BPBID_Arrays.BreedsPerSpecies[3719] = false
+    BPBID_Arrays.BreedsPerSpecies[3720] = false
+    BPBID_Arrays.BreedsPerSpecies[3721] = false
+    BPBID_Arrays.BreedsPerSpecies[3722] = false
+    BPBID_Arrays.BreedsPerSpecies[3723] = false
+    BPBID_Arrays.BreedsPerSpecies[3724] = false
+    BPBID_Arrays.BreedsPerSpecies[3725] = false
+    BPBID_Arrays.BreedsPerSpecies[3726] = false
+    BPBID_Arrays.BreedsPerSpecies[3727] = false
+    BPBID_Arrays.BreedsPerSpecies[3728] = false
+    BPBID_Arrays.BreedsPerSpecies[3729] = false
+    BPBID_Arrays.BreedsPerSpecies[3730] = false
+    BPBID_Arrays.BreedsPerSpecies[3731] = false
+    BPBID_Arrays.BreedsPerSpecies[3732] = false
+    BPBID_Arrays.BreedsPerSpecies[3733] = false
+    BPBID_Arrays.BreedsPerSpecies[3734] = false
+    BPBID_Arrays.BreedsPerSpecies[3735] = false
+    BPBID_Arrays.BreedsPerSpecies[3736] = false
+    BPBID_Arrays.BreedsPerSpecies[3737] = false
+    BPBID_Arrays.BreedsPerSpecies[3738] = false
+    BPBID_Arrays.BreedsPerSpecies[3739] = false
+    BPBID_Arrays.BreedsPerSpecies[3740] = false
+    BPBID_Arrays.BreedsPerSpecies[3741] = false
+    BPBID_Arrays.BreedsPerSpecies[3742] = false
+    BPBID_Arrays.BreedsPerSpecies[3743] = false
+    BPBID_Arrays.BreedsPerSpecies[3744] = false
+    BPBID_Arrays.BreedsPerSpecies[3745] = false
+    BPBID_Arrays.BreedsPerSpecies[3746] = false
+    BPBID_Arrays.BreedsPerSpecies[3747] = false
+    BPBID_Arrays.BreedsPerSpecies[3748] = false
+    BPBID_Arrays.BreedsPerSpecies[3749] = false
+    BPBID_Arrays.BreedsPerSpecies[3750] = false
+    BPBID_Arrays.BreedsPerSpecies[3751] = false
+    BPBID_Arrays.BreedsPerSpecies[3752] = false
+    BPBID_Arrays.BreedsPerSpecies[3753] = false
+    BPBID_Arrays.BreedsPerSpecies[3754] = false
+    BPBID_Arrays.BreedsPerSpecies[3755] = false
+    BPBID_Arrays.BreedsPerSpecies[3756] = false
+    BPBID_Arrays.BreedsPerSpecies[3757] = false
+    BPBID_Arrays.BreedsPerSpecies[3758] = false
+    BPBID_Arrays.BreedsPerSpecies[3759] = false
+    BPBID_Arrays.BreedsPerSpecies[3760] = false
+    BPBID_Arrays.BreedsPerSpecies[3761] = false
+    BPBID_Arrays.BreedsPerSpecies[3762] = false
+    BPBID_Arrays.BreedsPerSpecies[3763] = false
+    BPBID_Arrays.BreedsPerSpecies[3764] = false
+    BPBID_Arrays.BreedsPerSpecies[3765] = false
+    BPBID_Arrays.BreedsPerSpecies[3766] = false
+    BPBID_Arrays.BreedsPerSpecies[3767] = false
+    BPBID_Arrays.BreedsPerSpecies[3768] = false
+    BPBID_Arrays.BreedsPerSpecies[3769] = false
+    BPBID_Arrays.BreedsPerSpecies[3770] = false
+    BPBID_Arrays.BreedsPerSpecies[3771] = false
+    BPBID_Arrays.BreedsPerSpecies[3772] = false
+    BPBID_Arrays.BreedsPerSpecies[3773] = false
+    BPBID_Arrays.BreedsPerSpecies[3774] = false
+    BPBID_Arrays.BreedsPerSpecies[3775] = false
+    BPBID_Arrays.BreedsPerSpecies[3776] = false
+    BPBID_Arrays.BreedsPerSpecies[3777] = false
+    BPBID_Arrays.BreedsPerSpecies[3778] = false
+    BPBID_Arrays.BreedsPerSpecies[3779] = false
+    BPBID_Arrays.BreedsPerSpecies[3780] = false
+    BPBID_Arrays.BreedsPerSpecies[3781] = false
+    BPBID_Arrays.BreedsPerSpecies[3782] = false
+    BPBID_Arrays.BreedsPerSpecies[3783] = false
+    BPBID_Arrays.BreedsPerSpecies[3784] = false
+    BPBID_Arrays.BreedsPerSpecies[3785] = false
+    BPBID_Arrays.BreedsPerSpecies[3786] = false
+    BPBID_Arrays.BreedsPerSpecies[3787] = false
+    BPBID_Arrays.BreedsPerSpecies[3788] = false
+    BPBID_Arrays.BreedsPerSpecies[3789] = false
+    BPBID_Arrays.BreedsPerSpecies[3790] = false
+    BPBID_Arrays.BreedsPerSpecies[3791] = false
+    BPBID_Arrays.BreedsPerSpecies[3792] = false
+    BPBID_Arrays.BreedsPerSpecies[3793] = false
+    BPBID_Arrays.BreedsPerSpecies[3794] = false
+    BPBID_Arrays.BreedsPerSpecies[3795] = false
+    BPBID_Arrays.BreedsPerSpecies[3796] = false
+    BPBID_Arrays.BreedsPerSpecies[3797] = false
+    BPBID_Arrays.BreedsPerSpecies[3798] = false
+    BPBID_Arrays.BreedsPerSpecies[3799] = false
+    BPBID_Arrays.BreedsPerSpecies[3800] = false
+    BPBID_Arrays.BreedsPerSpecies[3801] = false
+    BPBID_Arrays.BreedsPerSpecies[3802] = false
+    BPBID_Arrays.BreedsPerSpecies[3803] = false
+    BPBID_Arrays.BreedsPerSpecies[3804] = false
+    BPBID_Arrays.BreedsPerSpecies[3805] = false
+    BPBID_Arrays.BreedsPerSpecies[3806] = false
+    BPBID_Arrays.BreedsPerSpecies[3807] = false
+    BPBID_Arrays.BreedsPerSpecies[3808] = false
+    BPBID_Arrays.BreedsPerSpecies[3809] = false
+    BPBID_Arrays.BreedsPerSpecies[3810] = false
+    BPBID_Arrays.BreedsPerSpecies[3811] = false
+    BPBID_Arrays.BreedsPerSpecies[3812] = false
+    BPBID_Arrays.BreedsPerSpecies[3813] = false
+    BPBID_Arrays.BreedsPerSpecies[3814] = false
+    BPBID_Arrays.BreedsPerSpecies[3815] = false
+    BPBID_Arrays.BreedsPerSpecies[3816] = false
+    BPBID_Arrays.BreedsPerSpecies[3817] = false
+    BPBID_Arrays.BreedsPerSpecies[3818] = false
+    BPBID_Arrays.BreedsPerSpecies[3819] = false
+    BPBID_Arrays.BreedsPerSpecies[3820] = false
+    BPBID_Arrays.BreedsPerSpecies[3821] = false
+    BPBID_Arrays.BreedsPerSpecies[3822] = false
+    BPBID_Arrays.BreedsPerSpecies[3823] = false
+    BPBID_Arrays.BreedsPerSpecies[3824] = false
+    BPBID_Arrays.BreedsPerSpecies[3825] = false
+    BPBID_Arrays.BreedsPerSpecies[3826] = false
+    BPBID_Arrays.BreedsPerSpecies[3827] = false
+    BPBID_Arrays.BreedsPerSpecies[3828] = false
+    BPBID_Arrays.BreedsPerSpecies[3829] = false
+    BPBID_Arrays.BreedsPerSpecies[3830] = false
+    BPBID_Arrays.BreedsPerSpecies[3831] = false
+    BPBID_Arrays.BreedsPerSpecies[3832] = false
+    BPBID_Arrays.BreedsPerSpecies[3833] = false
+    BPBID_Arrays.BreedsPerSpecies[3834] = false
+    BPBID_Arrays.BreedsPerSpecies[3835] = false
+    BPBID_Arrays.BreedsPerSpecies[3836] = false
+    BPBID_Arrays.BreedsPerSpecies[3837] = false
+    BPBID_Arrays.BreedsPerSpecies[3838] = false
+    BPBID_Arrays.BreedsPerSpecies[3839] = false
+    BPBID_Arrays.BreedsPerSpecies[3840] = false
+    BPBID_Arrays.BreedsPerSpecies[3841] = false
+    BPBID_Arrays.BreedsPerSpecies[3842] = false
+    BPBID_Arrays.BreedsPerSpecies[3843] = false
+    BPBID_Arrays.BreedsPerSpecies[3844] = false
+    BPBID_Arrays.BreedsPerSpecies[3845] = false
+    BPBID_Arrays.BreedsPerSpecies[3846] = false
+    BPBID_Arrays.BreedsPerSpecies[3847] = false
+    BPBID_Arrays.BreedsPerSpecies[3848] = false
+    BPBID_Arrays.BreedsPerSpecies[3849] = false
+    BPBID_Arrays.BreedsPerSpecies[3850] = false
+    BPBID_Arrays.BreedsPerSpecies[3851] = false
+    BPBID_Arrays.BreedsPerSpecies[3852] = false
+    BPBID_Arrays.BreedsPerSpecies[3853] = false
+    BPBID_Arrays.BreedsPerSpecies[3854] = false
+    BPBID_Arrays.BreedsPerSpecies[3855] = false
+    BPBID_Arrays.BreedsPerSpecies[3856] = false
+    BPBID_Arrays.BreedsPerSpecies[3857] = false
+    BPBID_Arrays.BreedsPerSpecies[3858] = false
+    BPBID_Arrays.BreedsPerSpecies[3859] = false
+    BPBID_Arrays.BreedsPerSpecies[3860] = false
+    BPBID_Arrays.BreedsPerSpecies[3861] = false
+    BPBID_Arrays.BreedsPerSpecies[3862] = false
+    BPBID_Arrays.BreedsPerSpecies[3863] = false
+    BPBID_Arrays.BreedsPerSpecies[3864] = false
+    BPBID_Arrays.BreedsPerSpecies[3865] = false
+    BPBID_Arrays.BreedsPerSpecies[3866] = false
+    BPBID_Arrays.BreedsPerSpecies[3867] = false
+    BPBID_Arrays.BreedsPerSpecies[3868] = false
+    BPBID_Arrays.BreedsPerSpecies[3869] = false
+    BPBID_Arrays.BreedsPerSpecies[3870] = false
+    BPBID_Arrays.BreedsPerSpecies[3871] = false
+    BPBID_Arrays.BreedsPerSpecies[3872] = false
+    BPBID_Arrays.BreedsPerSpecies[3873] = false
+    BPBID_Arrays.BreedsPerSpecies[3874] = false
+    BPBID_Arrays.BreedsPerSpecies[3875] = false
+    BPBID_Arrays.BreedsPerSpecies[3876] = false
+    BPBID_Arrays.BreedsPerSpecies[3877] = false
+    BPBID_Arrays.BreedsPerSpecies[3878] = false
+    BPBID_Arrays.BreedsPerSpecies[3879] = false
+    BPBID_Arrays.BreedsPerSpecies[3880] = false
+    BPBID_Arrays.BreedsPerSpecies[3881] = false
+    BPBID_Arrays.BreedsPerSpecies[3882] = false
+    BPBID_Arrays.BreedsPerSpecies[3883] = false
+    BPBID_Arrays.BreedsPerSpecies[3884] = false
+    BPBID_Arrays.BreedsPerSpecies[3885] = false
+    BPBID_Arrays.BreedsPerSpecies[3886] = false
+    BPBID_Arrays.BreedsPerSpecies[3887] = false
+    BPBID_Arrays.BreedsPerSpecies[3888] = false
+    BPBID_Arrays.BreedsPerSpecies[3889] = false
+    BPBID_Arrays.BreedsPerSpecies[3890] = false
+    BPBID_Arrays.BreedsPerSpecies[3891] = false
+    BPBID_Arrays.BreedsPerSpecies[3892] = false
+    BPBID_Arrays.BreedsPerSpecies[3893] = false
+    BPBID_Arrays.BreedsPerSpecies[3894] = false
+    BPBID_Arrays.BreedsPerSpecies[3895] = false
+    BPBID_Arrays.BreedsPerSpecies[3896] = false
+    BPBID_Arrays.BreedsPerSpecies[3897] = false
+    BPBID_Arrays.BreedsPerSpecies[3898] = false
+    BPBID_Arrays.BreedsPerSpecies[3899] = false
+    BPBID_Arrays.BreedsPerSpecies[3900] = false
+    BPBID_Arrays.BreedsPerSpecies[3901] = false
+    BPBID_Arrays.BreedsPerSpecies[3902] = false
+    BPBID_Arrays.BreedsPerSpecies[3903] = false
+    BPBID_Arrays.BreedsPerSpecies[3904] = false
+    BPBID_Arrays.BreedsPerSpecies[3905] = false
+    BPBID_Arrays.BreedsPerSpecies[3906] = false
+    BPBID_Arrays.BreedsPerSpecies[3907] = false
+    BPBID_Arrays.BreedsPerSpecies[3908] = false
+    BPBID_Arrays.BreedsPerSpecies[3909] = false
+    BPBID_Arrays.BreedsPerSpecies[3910] = false
+    BPBID_Arrays.BreedsPerSpecies[3911] = false
+    BPBID_Arrays.BreedsPerSpecies[3912] = false
+    BPBID_Arrays.BreedsPerSpecies[3913] = false
+    BPBID_Arrays.BreedsPerSpecies[3914] = false
+    BPBID_Arrays.BreedsPerSpecies[3915] = false
+    BPBID_Arrays.BreedsPerSpecies[3916] = false
+    BPBID_Arrays.BreedsPerSpecies[3917] = false
+    BPBID_Arrays.BreedsPerSpecies[3918] = false
+    BPBID_Arrays.BreedsPerSpecies[3919] = false
+    BPBID_Arrays.BreedsPerSpecies[3920] = false
+    BPBID_Arrays.BreedsPerSpecies[3921] = false
+    BPBID_Arrays.BreedsPerSpecies[3922] = false
+    BPBID_Arrays.BreedsPerSpecies[3923] = false
+    BPBID_Arrays.BreedsPerSpecies[3924] = false
+    BPBID_Arrays.BreedsPerSpecies[3925] = false
+    BPBID_Arrays.BreedsPerSpecies[3926] = false
+    BPBID_Arrays.BreedsPerSpecies[3927] = false
+    BPBID_Arrays.BreedsPerSpecies[3928] = false
+    BPBID_Arrays.BreedsPerSpecies[3929] = false
+    BPBID_Arrays.BreedsPerSpecies[3930] = false
+    BPBID_Arrays.BreedsPerSpecies[3931] = false
+    BPBID_Arrays.BreedsPerSpecies[3932] = false
+    BPBID_Arrays.BreedsPerSpecies[3933] = false
+    BPBID_Arrays.BreedsPerSpecies[3934] = false
+    BPBID_Arrays.BreedsPerSpecies[3935] = false
+    BPBID_Arrays.BreedsPerSpecies[3936] = false
+    BPBID_Arrays.BreedsPerSpecies[3937] = false
+    BPBID_Arrays.BreedsPerSpecies[3938] = false
+    BPBID_Arrays.BreedsPerSpecies[3939] = false
+    BPBID_Arrays.BreedsPerSpecies[3940] = false
+    BPBID_Arrays.BreedsPerSpecies[3941] = false
+    BPBID_Arrays.BreedsPerSpecies[3942] = false
+    BPBID_Arrays.BreedsPerSpecies[3943] = false
+    BPBID_Arrays.BreedsPerSpecies[3944] = false
+    BPBID_Arrays.BreedsPerSpecies[3945] = false
+    BPBID_Arrays.BreedsPerSpecies[3946] = false
+    BPBID_Arrays.BreedsPerSpecies[3947] = false
+    BPBID_Arrays.BreedsPerSpecies[3948] = false
+    BPBID_Arrays.BreedsPerSpecies[3949] = false
+    BPBID_Arrays.BreedsPerSpecies[3950] = false
+    BPBID_Arrays.BreedsPerSpecies[3951] = false
+    BPBID_Arrays.BreedsPerSpecies[3952] = false
+    BPBID_Arrays.BreedsPerSpecies[3953] = false
+    BPBID_Arrays.BreedsPerSpecies[3954] = false
+    BPBID_Arrays.BreedsPerSpecies[3955] = false
+    BPBID_Arrays.BreedsPerSpecies[3956] = false
+    BPBID_Arrays.BreedsPerSpecies[3957] = false
+    BPBID_Arrays.BreedsPerSpecies[3958] = false
+    BPBID_Arrays.BreedsPerSpecies[3959] = false
+    BPBID_Arrays.BreedsPerSpecies[3960] = false
+    BPBID_Arrays.BreedsPerSpecies[3961] = false
+    BPBID_Arrays.BreedsPerSpecies[3962] = false
+    BPBID_Arrays.BreedsPerSpecies[3963] = false
+    BPBID_Arrays.BreedsPerSpecies[3964] = false
+    BPBID_Arrays.BreedsPerSpecies[3965] = false
+    BPBID_Arrays.BreedsPerSpecies[3966] = false
+    BPBID_Arrays.BreedsPerSpecies[3967] = false
+    BPBID_Arrays.BreedsPerSpecies[3968] = false
+    BPBID_Arrays.BreedsPerSpecies[3969] = false
+    BPBID_Arrays.BreedsPerSpecies[3970] = false
+    BPBID_Arrays.BreedsPerSpecies[3971] = false
+    BPBID_Arrays.BreedsPerSpecies[3972] = false
+    BPBID_Arrays.BreedsPerSpecies[3973] = false
+    BPBID_Arrays.BreedsPerSpecies[3974] = false
+    BPBID_Arrays.BreedsPerSpecies[3975] = false
+    BPBID_Arrays.BreedsPerSpecies[3976] = false
+    BPBID_Arrays.BreedsPerSpecies[3977] = false
+    BPBID_Arrays.BreedsPerSpecies[3978] = false
+    BPBID_Arrays.BreedsPerSpecies[3979] = false
+    BPBID_Arrays.BreedsPerSpecies[3980] = false
+    BPBID_Arrays.BreedsPerSpecies[3981] = false
+    BPBID_Arrays.BreedsPerSpecies[3982] = false
+    BPBID_Arrays.BreedsPerSpecies[3983] = false
+    BPBID_Arrays.BreedsPerSpecies[3984] = false
+    BPBID_Arrays.BreedsPerSpecies[3985] = false
+    BPBID_Arrays.BreedsPerSpecies[3986] = false
+    BPBID_Arrays.BreedsPerSpecies[3987] = false
+    BPBID_Arrays.BreedsPerSpecies[3988] = false
+    BPBID_Arrays.BreedsPerSpecies[3989] = false
+    BPBID_Arrays.BreedsPerSpecies[3990] = false
+    BPBID_Arrays.BreedsPerSpecies[3991] = false
+    BPBID_Arrays.BreedsPerSpecies[3992] = false
+    BPBID_Arrays.BreedsPerSpecies[3993] = false
+    BPBID_Arrays.BreedsPerSpecies[3994] = false
+    BPBID_Arrays.BreedsPerSpecies[3995] = false
+    BPBID_Arrays.BreedsPerSpecies[3996] = false
+    BPBID_Arrays.BreedsPerSpecies[3997] = false
+    BPBID_Arrays.BreedsPerSpecies[3998] = false
+    BPBID_Arrays.BreedsPerSpecies[3999] = false
+    BPBID_Arrays.BreedsPerSpecies[4000] = false
+    BPBID_Arrays.BreedsPerSpecies[4001] = false
+    BPBID_Arrays.BreedsPerSpecies[4002] = false
+    BPBID_Arrays.BreedsPerSpecies[4003] = false
+    BPBID_Arrays.BreedsPerSpecies[4004] = false
+    BPBID_Arrays.BreedsPerSpecies[4005] = false
+    BPBID_Arrays.BreedsPerSpecies[4006] = false
+    BPBID_Arrays.BreedsPerSpecies[4007] = false
+    BPBID_Arrays.BreedsPerSpecies[4008] = false
+    BPBID_Arrays.BreedsPerSpecies[4009] = false
+    BPBID_Arrays.BreedsPerSpecies[4010] = false
+    BPBID_Arrays.BreedsPerSpecies[4011] = false
+    BPBID_Arrays.BreedsPerSpecies[4012] = false
+    BPBID_Arrays.BreedsPerSpecies[4013] = false
+    BPBID_Arrays.BreedsPerSpecies[4014] = false
+    BPBID_Arrays.BreedsPerSpecies[4015] = false
+    BPBID_Arrays.BreedsPerSpecies[4016] = false
+    BPBID_Arrays.BreedsPerSpecies[4017] = false
+    BPBID_Arrays.BreedsPerSpecies[4018] = false
+    BPBID_Arrays.BreedsPerSpecies[4019] = false
+    BPBID_Arrays.BreedsPerSpecies[4020] = false
+    BPBID_Arrays.BreedsPerSpecies[4021] = false
+    BPBID_Arrays.BreedsPerSpecies[4022] = false
+    BPBID_Arrays.BreedsPerSpecies[4023] = false
+    BPBID_Arrays.BreedsPerSpecies[4024] = false
+    BPBID_Arrays.BreedsPerSpecies[4025] = false
+    BPBID_Arrays.BreedsPerSpecies[4026] = false
+    BPBID_Arrays.BreedsPerSpecies[4027] = false
+    BPBID_Arrays.BreedsPerSpecies[4028] = false
+    BPBID_Arrays.BreedsPerSpecies[4029] = false
+    BPBID_Arrays.BreedsPerSpecies[4030] = false
+    BPBID_Arrays.BreedsPerSpecies[4031] = false
+    BPBID_Arrays.BreedsPerSpecies[4032] = false
+    BPBID_Arrays.BreedsPerSpecies[4033] = false
+    BPBID_Arrays.BreedsPerSpecies[4034] = false
+    BPBID_Arrays.BreedsPerSpecies[4035] = false
+    BPBID_Arrays.BreedsPerSpecies[4036] = false
+    BPBID_Arrays.BreedsPerSpecies[4037] = false
+    BPBID_Arrays.BreedsPerSpecies[4038] = false
+    BPBID_Arrays.BreedsPerSpecies[4039] = false
+    BPBID_Arrays.BreedsPerSpecies[4040] = false
+    BPBID_Arrays.BreedsPerSpecies[4041] = false
+    BPBID_Arrays.BreedsPerSpecies[4042] = false
+    BPBID_Arrays.BreedsPerSpecies[4043] = false
+    BPBID_Arrays.BreedsPerSpecies[4044] = false
+    BPBID_Arrays.BreedsPerSpecies[4045] = false
+    BPBID_Arrays.BreedsPerSpecies[4046] = false
+    BPBID_Arrays.BreedsPerSpecies[4047] = false
+    BPBID_Arrays.BreedsPerSpecies[4048] = false
+    BPBID_Arrays.BreedsPerSpecies[4049] = false
+    BPBID_Arrays.BreedsPerSpecies[4050] = false
+    BPBID_Arrays.BreedsPerSpecies[4051] = false
+    BPBID_Arrays.BreedsPerSpecies[4052] = false
+    BPBID_Arrays.BreedsPerSpecies[4053] = false
+    BPBID_Arrays.BreedsPerSpecies[4054] = false
+    BPBID_Arrays.BreedsPerSpecies[4055] = false
+    BPBID_Arrays.BreedsPerSpecies[4056] = false
+    BPBID_Arrays.BreedsPerSpecies[4057] = false
+    BPBID_Arrays.BreedsPerSpecies[4058] = false
+    BPBID_Arrays.BreedsPerSpecies[4059] = false
+    BPBID_Arrays.BreedsPerSpecies[4060] = false
+    BPBID_Arrays.BreedsPerSpecies[4061] = false
+    BPBID_Arrays.BreedsPerSpecies[4062] = false
+    BPBID_Arrays.BreedsPerSpecies[4063] = false
+    BPBID_Arrays.BreedsPerSpecies[4064] = false
+    BPBID_Arrays.BreedsPerSpecies[4065] = false
+    BPBID_Arrays.BreedsPerSpecies[4066] = false
+    BPBID_Arrays.BreedsPerSpecies[4067] = false
+    BPBID_Arrays.BreedsPerSpecies[4068] = false
+    BPBID_Arrays.BreedsPerSpecies[4069] = false
+    BPBID_Arrays.BreedsPerSpecies[4070] = false
+    BPBID_Arrays.BreedsPerSpecies[4071] = false
+    BPBID_Arrays.BreedsPerSpecies[4072] = false
+    BPBID_Arrays.BreedsPerSpecies[4073] = false
+    BPBID_Arrays.BreedsPerSpecies[4074] = false
+    BPBID_Arrays.BreedsPerSpecies[4075] = false
+    BPBID_Arrays.BreedsPerSpecies[4076] = false
+    BPBID_Arrays.BreedsPerSpecies[4077] = false
+    BPBID_Arrays.BreedsPerSpecies[4078] = false
+    BPBID_Arrays.BreedsPerSpecies[4079] = false
+    BPBID_Arrays.BreedsPerSpecies[4080] = false
+    BPBID_Arrays.BreedsPerSpecies[4081] = false
+    BPBID_Arrays.BreedsPerSpecies[4082] = false
+    BPBID_Arrays.BreedsPerSpecies[4083] = false
+    BPBID_Arrays.BreedsPerSpecies[4084] = false
+    BPBID_Arrays.BreedsPerSpecies[4085] = false
+    BPBID_Arrays.BreedsPerSpecies[4086] = false
+    BPBID_Arrays.BreedsPerSpecies[4087] = false
+    BPBID_Arrays.BreedsPerSpecies[4088] = false
+    BPBID_Arrays.BreedsPerSpecies[4089] = false
+    BPBID_Arrays.BreedsPerSpecies[4090] = false
+    BPBID_Arrays.BreedsPerSpecies[4091] = false
+    BPBID_Arrays.BreedsPerSpecies[4092] = false
+    BPBID_Arrays.BreedsPerSpecies[4093] = false
+    BPBID_Arrays.BreedsPerSpecies[4094] = false
+    BPBID_Arrays.BreedsPerSpecies[4095] = false
+    BPBID_Arrays.BreedsPerSpecies[4096] = false
+    BPBID_Arrays.BreedsPerSpecies[4097] = false
+    BPBID_Arrays.BreedsPerSpecies[4098] = false
+    BPBID_Arrays.BreedsPerSpecies[4099] = false
+    BPBID_Arrays.BreedsPerSpecies[4100] = false
+    BPBID_Arrays.BreedsPerSpecies[4101] = false
+    BPBID_Arrays.BreedsPerSpecies[4102] = false
+    BPBID_Arrays.BreedsPerSpecies[4103] = false
+    BPBID_Arrays.BreedsPerSpecies[4104] = false
+    BPBID_Arrays.BreedsPerSpecies[4105] = false
+    BPBID_Arrays.BreedsPerSpecies[4106] = false
+    BPBID_Arrays.BreedsPerSpecies[4107] = false
+    BPBID_Arrays.BreedsPerSpecies[4108] = false
+    BPBID_Arrays.BreedsPerSpecies[4109] = false
+    BPBID_Arrays.BreedsPerSpecies[4110] = false
+    BPBID_Arrays.BreedsPerSpecies[4111] = false
+    BPBID_Arrays.BreedsPerSpecies[4112] = false
+    BPBID_Arrays.BreedsPerSpecies[4113] = false
+    BPBID_Arrays.BreedsPerSpecies[4114] = false
+    BPBID_Arrays.BreedsPerSpecies[4115] = false
+    BPBID_Arrays.BreedsPerSpecies[4116] = false
+    BPBID_Arrays.BreedsPerSpecies[4117] = false
+    BPBID_Arrays.BreedsPerSpecies[4118] = false
+    BPBID_Arrays.BreedsPerSpecies[4119] = false
+    BPBID_Arrays.BreedsPerSpecies[4120] = false
+    BPBID_Arrays.BreedsPerSpecies[4121] = false
+    BPBID_Arrays.BreedsPerSpecies[4122] = false
+    BPBID_Arrays.BreedsPerSpecies[4123] = false
+    BPBID_Arrays.BreedsPerSpecies[4124] = false
+    BPBID_Arrays.BreedsPerSpecies[4125] = false
+    BPBID_Arrays.BreedsPerSpecies[4126] = false
+    BPBID_Arrays.BreedsPerSpecies[4127] = false
+    BPBID_Arrays.BreedsPerSpecies[4128] = false
+    BPBID_Arrays.BreedsPerSpecies[4129] = false
+    BPBID_Arrays.BreedsPerSpecies[4130] = false
+    BPBID_Arrays.BreedsPerSpecies[4131] = false
+    BPBID_Arrays.BreedsPerSpecies[4132] = false
+    BPBID_Arrays.BreedsPerSpecies[4133] = false
+    BPBID_Arrays.BreedsPerSpecies[4134] = false
+    BPBID_Arrays.BreedsPerSpecies[4135] = false
+    BPBID_Arrays.BreedsPerSpecies[4136] = false
+    BPBID_Arrays.BreedsPerSpecies[4137] = false
+    BPBID_Arrays.BreedsPerSpecies[4138] = false
+    BPBID_Arrays.BreedsPerSpecies[4139] = false
+    BPBID_Arrays.BreedsPerSpecies[4140] = false
+    BPBID_Arrays.BreedsPerSpecies[4141] = false
+    BPBID_Arrays.BreedsPerSpecies[4142] = false
+    BPBID_Arrays.BreedsPerSpecies[4143] = false
+    BPBID_Arrays.BreedsPerSpecies[4144] = false
+    BPBID_Arrays.BreedsPerSpecies[4145] = false
+    BPBID_Arrays.BreedsPerSpecies[4146] = false
+    BPBID_Arrays.BreedsPerSpecies[4147] = false
+    BPBID_Arrays.BreedsPerSpecies[4148] = false
+    BPBID_Arrays.BreedsPerSpecies[4149] = false
+    BPBID_Arrays.BreedsPerSpecies[4150] = false
+    BPBID_Arrays.BreedsPerSpecies[4151] = false
+    BPBID_Arrays.BreedsPerSpecies[4152] = false
+    BPBID_Arrays.BreedsPerSpecies[4153] = false
+    BPBID_Arrays.BreedsPerSpecies[4154] = false
+    BPBID_Arrays.BreedsPerSpecies[4155] = false
+    BPBID_Arrays.BreedsPerSpecies[4156] = false
+    BPBID_Arrays.BreedsPerSpecies[4157] = false
+    BPBID_Arrays.BreedsPerSpecies[4158] = false
+    BPBID_Arrays.BreedsPerSpecies[4159] = false
+    BPBID_Arrays.BreedsPerSpecies[4160] = false
+    BPBID_Arrays.BreedsPerSpecies[4161] = false
+    BPBID_Arrays.BreedsPerSpecies[4162] = false
+    BPBID_Arrays.BreedsPerSpecies[4163] = false
+    BPBID_Arrays.BreedsPerSpecies[4164] = false
+    BPBID_Arrays.BreedsPerSpecies[4165] = false
+    BPBID_Arrays.BreedsPerSpecies[4166] = false
+    BPBID_Arrays.BreedsPerSpecies[4167] = false
+    BPBID_Arrays.BreedsPerSpecies[4168] = false
+    BPBID_Arrays.BreedsPerSpecies[4169] = false
+    BPBID_Arrays.BreedsPerSpecies[4170] = false
+    BPBID_Arrays.BreedsPerSpecies[4171] = false
+    BPBID_Arrays.BreedsPerSpecies[4172] = false
+    BPBID_Arrays.BreedsPerSpecies[4173] = false
+    BPBID_Arrays.BreedsPerSpecies[4174] = false
+    BPBID_Arrays.BreedsPerSpecies[4175] = false
+    BPBID_Arrays.BreedsPerSpecies[4176] = false
+    BPBID_Arrays.BreedsPerSpecies[4177] = false
+    BPBID_Arrays.BreedsPerSpecies[4178] = false
+    BPBID_Arrays.BreedsPerSpecies[4179] = false
+    BPBID_Arrays.BreedsPerSpecies[4180] = false
+    BPBID_Arrays.BreedsPerSpecies[4181] = false
+    BPBID_Arrays.BreedsPerSpecies[4182] = false
+    BPBID_Arrays.BreedsPerSpecies[4183] = false
+    BPBID_Arrays.BreedsPerSpecies[4184] = false
+    BPBID_Arrays.BreedsPerSpecies[4185] = false
+    BPBID_Arrays.BreedsPerSpecies[4186] = false
+    BPBID_Arrays.BreedsPerSpecies[4187] = false
+    BPBID_Arrays.BreedsPerSpecies[4188] = false
+    BPBID_Arrays.BreedsPerSpecies[4189] = false
+    BPBID_Arrays.BreedsPerSpecies[4190] = false
+    BPBID_Arrays.BreedsPerSpecies[4191] = false
+    BPBID_Arrays.BreedsPerSpecies[4192] = false
+    BPBID_Arrays.BreedsPerSpecies[4193] = false
+    BPBID_Arrays.BreedsPerSpecies[4194] = false
+    BPBID_Arrays.BreedsPerSpecies[4195] = false
+    BPBID_Arrays.BreedsPerSpecies[4196] = false
+    BPBID_Arrays.BreedsPerSpecies[4197] = false
+    BPBID_Arrays.BreedsPerSpecies[4198] = false
+    BPBID_Arrays.BreedsPerSpecies[4199] = false
+    BPBID_Arrays.BreedsPerSpecies[4200] = false
+    BPBID_Arrays.BreedsPerSpecies[4201] = false
+    BPBID_Arrays.BreedsPerSpecies[4202] = false
+    BPBID_Arrays.BreedsPerSpecies[4203] = false
+    BPBID_Arrays.BreedsPerSpecies[4204] = false
+    BPBID_Arrays.BreedsPerSpecies[4205] = false
+    BPBID_Arrays.BreedsPerSpecies[4206] = false
+    BPBID_Arrays.BreedsPerSpecies[4207] = false
+    BPBID_Arrays.BreedsPerSpecies[4208] = false
+    BPBID_Arrays.BreedsPerSpecies[4209] = false
+    BPBID_Arrays.BreedsPerSpecies[4210] = false
+    BPBID_Arrays.BreedsPerSpecies[4211] = false
+    BPBID_Arrays.BreedsPerSpecies[4212] = false
+    BPBID_Arrays.BreedsPerSpecies[4213] = false
+    BPBID_Arrays.BreedsPerSpecies[4214] = false
+    BPBID_Arrays.BreedsPerSpecies[4215] = false
+    BPBID_Arrays.BreedsPerSpecies[4216] = false
+    BPBID_Arrays.BreedsPerSpecies[4217] = false
+    BPBID_Arrays.BreedsPerSpecies[4218] = false
+    BPBID_Arrays.BreedsPerSpecies[4219] = false
+    BPBID_Arrays.BreedsPerSpecies[4220] = false
+    BPBID_Arrays.BreedsPerSpecies[4221] = false
+    BPBID_Arrays.BreedsPerSpecies[4222] = false
+    BPBID_Arrays.BreedsPerSpecies[4223] = false
+    BPBID_Arrays.BreedsPerSpecies[4224] = false
+    BPBID_Arrays.BreedsPerSpecies[4225] = false
+    BPBID_Arrays.BreedsPerSpecies[4226] = false
+    BPBID_Arrays.BreedsPerSpecies[4227] = false
+    BPBID_Arrays.BreedsPerSpecies[4228] = false
+    BPBID_Arrays.BreedsPerSpecies[4229] = false
+    BPBID_Arrays.BreedsPerSpecies[4230] = false
+    BPBID_Arrays.BreedsPerSpecies[4231] = false
+    BPBID_Arrays.BreedsPerSpecies[4232] = false
+    BPBID_Arrays.BreedsPerSpecies[4233] = false
+    BPBID_Arrays.BreedsPerSpecies[4234] = false
+    BPBID_Arrays.BreedsPerSpecies[4235] = false
+    BPBID_Arrays.BreedsPerSpecies[4236] = false
+    BPBID_Arrays.BreedsPerSpecies[4237] = false
+    BPBID_Arrays.BreedsPerSpecies[4238] = false
+    BPBID_Arrays.BreedsPerSpecies[4239] = false
+    BPBID_Arrays.BreedsPerSpecies[4240] = false
+    BPBID_Arrays.BreedsPerSpecies[4241] = false
+    BPBID_Arrays.BreedsPerSpecies[4242] = false
+    BPBID_Arrays.BreedsPerSpecies[4243] = false
+    BPBID_Arrays.BreedsPerSpecies[4244] = false
+    BPBID_Arrays.BreedsPerSpecies[4245] = false
+    BPBID_Arrays.BreedsPerSpecies[4246] = false
+    BPBID_Arrays.BreedsPerSpecies[4247] = false
+    BPBID_Arrays.BreedsPerSpecies[4248] = false
+    BPBID_Arrays.BreedsPerSpecies[4249] = false
+    BPBID_Arrays.BreedsPerSpecies[4250] = false
+    BPBID_Arrays.BreedsPerSpecies[4251] = false
+    BPBID_Arrays.BreedsPerSpecies[4252] = false
+    BPBID_Arrays.BreedsPerSpecies[4253] = {8}
+    BPBID_Arrays.BreedsPerSpecies[4254] = false
+    BPBID_Arrays.BreedsPerSpecies[4255] = {7}
+    BPBID_Arrays.BreedsPerSpecies[4256] = false
+    BPBID_Arrays.BreedsPerSpecies[4257] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4258] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4259] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4260] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4261] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4262] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4263] = {11}
+    BPBID_Arrays.BreedsPerSpecies[4264] = false
+    BPBID_Arrays.BreedsPerSpecies[4265] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4266] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4267] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4268] = false
+    BPBID_Arrays.BreedsPerSpecies[4269] = false
+    BPBID_Arrays.BreedsPerSpecies[4270] = false
+    BPBID_Arrays.BreedsPerSpecies[4271] = false
+    BPBID_Arrays.BreedsPerSpecies[4272] = false
+    BPBID_Arrays.BreedsPerSpecies[4273] = false
+    BPBID_Arrays.BreedsPerSpecies[4274] = false
+    BPBID_Arrays.BreedsPerSpecies[4275] = {3, 4, 7}
+    BPBID_Arrays.BreedsPerSpecies[4276] = {3, 4, 7, 8}
+    BPBID_Arrays.BreedsPerSpecies[4277] = {3, 5, 8, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4278] = {3, 5, 9, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4279] = {3, 4}
+    BPBID_Arrays.BreedsPerSpecies[4280] = {3, 9, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4281] = false
+    BPBID_Arrays.BreedsPerSpecies[4282] = false
+    BPBID_Arrays.BreedsPerSpecies[4283] = false
+    BPBID_Arrays.BreedsPerSpecies[4284] = false
+    BPBID_Arrays.BreedsPerSpecies[4285] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4286] = {11}
+    BPBID_Arrays.BreedsPerSpecies[4287] = {6}
+    BPBID_Arrays.BreedsPerSpecies[4288] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4289] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4290] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4291] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4292] = {5}
+    BPBID_Arrays.BreedsPerSpecies[4293] = false
+    BPBID_Arrays.BreedsPerSpecies[4294] = false
+    BPBID_Arrays.BreedsPerSpecies[4295] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4296] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4297] = {8}
+    BPBID_Arrays.BreedsPerSpecies[4298] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4299] = {9}
+    BPBID_Arrays.BreedsPerSpecies[4300] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4301] = false
+    BPBID_Arrays.BreedsPerSpecies[4302] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4303] = {3, 4, 7}
+    BPBID_Arrays.BreedsPerSpecies[4304] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4305] = {5}
+    BPBID_Arrays.BreedsPerSpecies[4306] = {12}
+    BPBID_Arrays.BreedsPerSpecies[4307] = {6}
+    BPBID_Arrays.BreedsPerSpecies[4308] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4309] = {7}
+    BPBID_Arrays.BreedsPerSpecies[4310] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4311] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4312] = false
+    BPBID_Arrays.BreedsPerSpecies[4313] = false
+    BPBID_Arrays.BreedsPerSpecies[4314] = false
+    BPBID_Arrays.BreedsPerSpecies[4315] = false
+    BPBID_Arrays.BreedsPerSpecies[4316] = false
+    BPBID_Arrays.BreedsPerSpecies[4317] = false
+    BPBID_Arrays.BreedsPerSpecies[4318] = false
+    BPBID_Arrays.BreedsPerSpecies[4319] = false
+    BPBID_Arrays.BreedsPerSpecies[4320] = false
+    BPBID_Arrays.BreedsPerSpecies[4321] = false
+    BPBID_Arrays.BreedsPerSpecies[4322] = false
+    BPBID_Arrays.BreedsPerSpecies[4323] = false
+    BPBID_Arrays.BreedsPerSpecies[4324] = false
+    BPBID_Arrays.BreedsPerSpecies[4325] = false
+    BPBID_Arrays.BreedsPerSpecies[4326] = false
+    BPBID_Arrays.BreedsPerSpecies[4327] = false
+    BPBID_Arrays.BreedsPerSpecies[4328] = false
+    BPBID_Arrays.BreedsPerSpecies[4329] = false
+    BPBID_Arrays.BreedsPerSpecies[4330] = false
+    BPBID_Arrays.BreedsPerSpecies[4331] = false
+    BPBID_Arrays.BreedsPerSpecies[4332] = false
+    BPBID_Arrays.BreedsPerSpecies[4333] = false
+    BPBID_Arrays.BreedsPerSpecies[4334] = false
+    BPBID_Arrays.BreedsPerSpecies[4335] = false
+    BPBID_Arrays.BreedsPerSpecies[4336] = false
+    BPBID_Arrays.BreedsPerSpecies[4337] = false
+    BPBID_Arrays.BreedsPerSpecies[4338] = false
+    BPBID_Arrays.BreedsPerSpecies[4339] = false
+    BPBID_Arrays.BreedsPerSpecies[4340] = false
+    BPBID_Arrays.BreedsPerSpecies[4341] = false
+    BPBID_Arrays.BreedsPerSpecies[4342] = false
+    BPBID_Arrays.BreedsPerSpecies[4343] = false
+    BPBID_Arrays.BreedsPerSpecies[4344] = false
+    BPBID_Arrays.BreedsPerSpecies[4345] = false
+    BPBID_Arrays.BreedsPerSpecies[4346] = false
+    BPBID_Arrays.BreedsPerSpecies[4347] = false
+    BPBID_Arrays.BreedsPerSpecies[4348] = false
+    BPBID_Arrays.BreedsPerSpecies[4349] = false
+    BPBID_Arrays.BreedsPerSpecies[4350] = false
+    BPBID_Arrays.BreedsPerSpecies[4351] = false
+    BPBID_Arrays.BreedsPerSpecies[4352] = false
+    BPBID_Arrays.BreedsPerSpecies[4353] = false
+    BPBID_Arrays.BreedsPerSpecies[4354] = false
+    BPBID_Arrays.BreedsPerSpecies[4355] = false
+    BPBID_Arrays.BreedsPerSpecies[4356] = false
+    BPBID_Arrays.BreedsPerSpecies[4357] = false
+    BPBID_Arrays.BreedsPerSpecies[4358] = false
+    BPBID_Arrays.BreedsPerSpecies[4359] = false
+    BPBID_Arrays.BreedsPerSpecies[4360] = false
+    BPBID_Arrays.BreedsPerSpecies[4361] = false
+    BPBID_Arrays.BreedsPerSpecies[4362] = false
+    BPBID_Arrays.BreedsPerSpecies[4363] = false
+    BPBID_Arrays.BreedsPerSpecies[4364] = false
+    BPBID_Arrays.BreedsPerSpecies[4365] = false
+    BPBID_Arrays.BreedsPerSpecies[4366] = false
+    BPBID_Arrays.BreedsPerSpecies[4367] = false
+    BPBID_Arrays.BreedsPerSpecies[4368] = false
+    BPBID_Arrays.BreedsPerSpecies[4369] = false
+    BPBID_Arrays.BreedsPerSpecies[4370] = false
+    BPBID_Arrays.BreedsPerSpecies[4371] = false
+    BPBID_Arrays.BreedsPerSpecies[4372] = false
+    BPBID_Arrays.BreedsPerSpecies[4373] = false
+    BPBID_Arrays.BreedsPerSpecies[4374] = false
+    BPBID_Arrays.BreedsPerSpecies[4375] = false
+    BPBID_Arrays.BreedsPerSpecies[4376] = false
+    BPBID_Arrays.BreedsPerSpecies[4377] = false
+    BPBID_Arrays.BreedsPerSpecies[4378] = false
+    BPBID_Arrays.BreedsPerSpecies[4379] = false
+    BPBID_Arrays.BreedsPerSpecies[4380] = false
+    BPBID_Arrays.BreedsPerSpecies[4381] = false
+    BPBID_Arrays.BreedsPerSpecies[4382] = false
+    BPBID_Arrays.BreedsPerSpecies[4383] = false
+    BPBID_Arrays.BreedsPerSpecies[4384] = false
+    BPBID_Arrays.BreedsPerSpecies[4385] = false
+    BPBID_Arrays.BreedsPerSpecies[4386] = false
+    BPBID_Arrays.BreedsPerSpecies[4387] = false
+    BPBID_Arrays.BreedsPerSpecies[4388] = false
+    BPBID_Arrays.BreedsPerSpecies[4389] = false
+    BPBID_Arrays.BreedsPerSpecies[4390] = false
+    BPBID_Arrays.BreedsPerSpecies[4391] = false
+    BPBID_Arrays.BreedsPerSpecies[4392] = false
+    BPBID_Arrays.BreedsPerSpecies[4393] = false
+    BPBID_Arrays.BreedsPerSpecies[4394] = false
+    BPBID_Arrays.BreedsPerSpecies[4395] = false
+    BPBID_Arrays.BreedsPerSpecies[4396] = false
+    BPBID_Arrays.BreedsPerSpecies[4397] = false
+    BPBID_Arrays.BreedsPerSpecies[4398] = false
+    BPBID_Arrays.BreedsPerSpecies[4399] = false
+    BPBID_Arrays.BreedsPerSpecies[4400] = false
+    BPBID_Arrays.BreedsPerSpecies[4401] = false
+    BPBID_Arrays.BreedsPerSpecies[4402] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4403] = false
+    BPBID_Arrays.BreedsPerSpecies[4404] = false
+    BPBID_Arrays.BreedsPerSpecies[4405] = false
+    BPBID_Arrays.BreedsPerSpecies[4406] = {8}
+    BPBID_Arrays.BreedsPerSpecies[4407] = {6}
+    BPBID_Arrays.BreedsPerSpecies[4408] = {7}
+    BPBID_Arrays.BreedsPerSpecies[4409] = {5}
+    BPBID_Arrays.BreedsPerSpecies[4410] = false
+    BPBID_Arrays.BreedsPerSpecies[4411] = {5}
+    BPBID_Arrays.BreedsPerSpecies[4412] = {7}
+    BPBID_Arrays.BreedsPerSpecies[4413] = false
+    BPBID_Arrays.BreedsPerSpecies[4414] = false
+    BPBID_Arrays.BreedsPerSpecies[4415] = false
+    BPBID_Arrays.BreedsPerSpecies[4416] = false
+    BPBID_Arrays.BreedsPerSpecies[4417] = false
+    BPBID_Arrays.BreedsPerSpecies[4418] = false
+    BPBID_Arrays.BreedsPerSpecies[4419] = false
+    BPBID_Arrays.BreedsPerSpecies[4420] = false
+    BPBID_Arrays.BreedsPerSpecies[4421] = {5}
+    BPBID_Arrays.BreedsPerSpecies[4422] = false
+    BPBID_Arrays.BreedsPerSpecies[4423] = false
+    BPBID_Arrays.BreedsPerSpecies[4424] = false
+    BPBID_Arrays.BreedsPerSpecies[4425] = {12}
+    BPBID_Arrays.BreedsPerSpecies[4426] = {10}
+    BPBID_Arrays.BreedsPerSpecies[4427] = false
+    BPBID_Arrays.BreedsPerSpecies[4428] = false
+    BPBID_Arrays.BreedsPerSpecies[4429] = false
+    BPBID_Arrays.BreedsPerSpecies[4430] = false
+    BPBID_Arrays.BreedsPerSpecies[4431] = false
+    BPBID_Arrays.BreedsPerSpecies[4432] = false
+    BPBID_Arrays.BreedsPerSpecies[4433] = false
+    BPBID_Arrays.BreedsPerSpecies[4434] = false
+    BPBID_Arrays.BreedsPerSpecies[4435] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4436] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4437] = {10}
+    BPBID_Arrays.BreedsPerSpecies[4438] = false
+    BPBID_Arrays.BreedsPerSpecies[4439] = false
+    BPBID_Arrays.BreedsPerSpecies[4440] = false
+    BPBID_Arrays.BreedsPerSpecies[4441] = false
+    BPBID_Arrays.BreedsPerSpecies[4442] = false
+    BPBID_Arrays.BreedsPerSpecies[4443] = false
+    BPBID_Arrays.BreedsPerSpecies[4444] = false
+    BPBID_Arrays.BreedsPerSpecies[4445] = false
+    BPBID_Arrays.BreedsPerSpecies[4446] = false
+    BPBID_Arrays.BreedsPerSpecies[4447] = false
+    BPBID_Arrays.BreedsPerSpecies[4448] = false
+    BPBID_Arrays.BreedsPerSpecies[4449] = false
+    BPBID_Arrays.BreedsPerSpecies[4450] = {7}
+    BPBID_Arrays.BreedsPerSpecies[4451] = {6}
+    BPBID_Arrays.BreedsPerSpecies[4452] = {10}
+    BPBID_Arrays.BreedsPerSpecies[4453] = false
+    BPBID_Arrays.BreedsPerSpecies[4454] = false
+    BPBID_Arrays.BreedsPerSpecies[4455] = {6}
+    BPBID_Arrays.BreedsPerSpecies[4456] = {3, 4, 5, 6, 8, 10, 11}
+    BPBID_Arrays.BreedsPerSpecies[4457] = {3, 4, 5, 6, 8, 10, 11}
+    BPBID_Arrays.BreedsPerSpecies[4458] = false
+    BPBID_Arrays.BreedsPerSpecies[4459] = false
+    BPBID_Arrays.BreedsPerSpecies[4460] = {3, 4, 5, 6, 7, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4461] = {3, 4, 5, 6, 7, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4462] = {7}
+    BPBID_Arrays.BreedsPerSpecies[4463] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4464] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4465] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4466] = false
+    BPBID_Arrays.BreedsPerSpecies[4467] = {11}
+    BPBID_Arrays.BreedsPerSpecies[4468] = false
+    BPBID_Arrays.BreedsPerSpecies[4469] = {11}
+    BPBID_Arrays.BreedsPerSpecies[4470] = {10}
+    BPBID_Arrays.BreedsPerSpecies[4471] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4472] = {11}
+    BPBID_Arrays.BreedsPerSpecies[4473] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4474] = false
+    BPBID_Arrays.BreedsPerSpecies[4475] = false
+    BPBID_Arrays.BreedsPerSpecies[4476] = {11}
+    BPBID_Arrays.BreedsPerSpecies[4477] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4478] = false
+    BPBID_Arrays.BreedsPerSpecies[4479] = false
+    BPBID_Arrays.BreedsPerSpecies[4480] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4481] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4482] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4483] = {6, 7, 9, 12}
+    BPBID_Arrays.BreedsPerSpecies[4484] = false
+    BPBID_Arrays.BreedsPerSpecies[4485] = {3, 7, 9, 12}
+    BPBID_Arrays.BreedsPerSpecies[4486] = false
+    BPBID_Arrays.BreedsPerSpecies[4487] = false
+    BPBID_Arrays.BreedsPerSpecies[4488] = false
+    BPBID_Arrays.BreedsPerSpecies[4489] = {11}
+    BPBID_Arrays.BreedsPerSpecies[4490] = false
+    BPBID_Arrays.BreedsPerSpecies[4491] = {9}
+    BPBID_Arrays.BreedsPerSpecies[4492] = {6}
+    BPBID_Arrays.BreedsPerSpecies[4493] = false
+    BPBID_Arrays.BreedsPerSpecies[4494] = false
+    BPBID_Arrays.BreedsPerSpecies[4495] = {9}
+    BPBID_Arrays.BreedsPerSpecies[4496] = {9}
+    BPBID_Arrays.BreedsPerSpecies[4497] = false
+    BPBID_Arrays.BreedsPerSpecies[4498] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4499] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4500] = {9}
+    BPBID_Arrays.BreedsPerSpecies[4501] = false
+    BPBID_Arrays.BreedsPerSpecies[4502] = false
+    BPBID_Arrays.BreedsPerSpecies[4503] = false
+    BPBID_Arrays.BreedsPerSpecies[4504] = false
+    BPBID_Arrays.BreedsPerSpecies[4505] = false
+    BPBID_Arrays.BreedsPerSpecies[4506] = {15}
+    BPBID_Arrays.BreedsPerSpecies[4507] = false
+    BPBID_Arrays.BreedsPerSpecies[4508] = false
+    BPBID_Arrays.BreedsPerSpecies[4509] = false
+    BPBID_Arrays.BreedsPerSpecies[4510] = {4, 8, 10, 11}
+    BPBID_Arrays.BreedsPerSpecies[4511] = {5}
+    BPBID_Arrays.BreedsPerSpecies[4512] = false
+    BPBID_Arrays.BreedsPerSpecies[4513] = {11}
+    BPBID_Arrays.BreedsPerSpecies[4514] = {4, 5, 8, 10, 11}
+    BPBID_Arrays.BreedsPerSpecies[4515] = {4, 5, 8, 10, 11}
+    BPBID_Arrays.BreedsPerSpecies[4516] = {4, 5, 8, 10, 11}
+    BPBID_Arrays.BreedsPerSpecies[4517] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4518] = {3, 7, 9, 12}
+    BPBID_Arrays.BreedsPerSpecies[4519] = false
+    BPBID_Arrays.BreedsPerSpecies[4520] = {11}
+    BPBID_Arrays.BreedsPerSpecies[4521] = {11}
+    BPBID_Arrays.BreedsPerSpecies[4522] = {11}
+    BPBID_Arrays.BreedsPerSpecies[4523] = false
+    BPBID_Arrays.BreedsPerSpecies[4524] = {5}
+    BPBID_Arrays.BreedsPerSpecies[4525] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4526] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4527] = {9}
+    BPBID_Arrays.BreedsPerSpecies[4528] = false
+    BPBID_Arrays.BreedsPerSpecies[4529] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4530] = {6}
+    BPBID_Arrays.BreedsPerSpecies[4531] = false
+    BPBID_Arrays.BreedsPerSpecies[4532] = false
+    BPBID_Arrays.BreedsPerSpecies[4533] = {4, 5, 8, 10, 11}
+    BPBID_Arrays.BreedsPerSpecies[4534] = {9}
+    BPBID_Arrays.BreedsPerSpecies[4535] = {4, 5, 8, 10, 11}
+    BPBID_Arrays.BreedsPerSpecies[4536] = {12}
+    BPBID_Arrays.BreedsPerSpecies[4537] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4538] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4539] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4540] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4541] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4542] = false
+    BPBID_Arrays.BreedsPerSpecies[4543] = {8}
+    BPBID_Arrays.BreedsPerSpecies[4544] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    BPBID_Arrays.BreedsPerSpecies[4545] = false
+    BPBID_Arrays.BreedsPerSpecies[4546] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4547] = false
+    BPBID_Arrays.BreedsPerSpecies[4548] = {12}
+    BPBID_Arrays.BreedsPerSpecies[4549] = false
+    BPBID_Arrays.BreedsPerSpecies[4550] = false
+    BPBID_Arrays.BreedsPerSpecies[4551] = false
+    BPBID_Arrays.BreedsPerSpecies[4552] = false
+    BPBID_Arrays.BreedsPerSpecies[4553] = false
+    BPBID_Arrays.BreedsPerSpecies[4554] = false
+    BPBID_Arrays.BreedsPerSpecies[4555] = false
+    BPBID_Arrays.BreedsPerSpecies[4556] = false
+    BPBID_Arrays.BreedsPerSpecies[4557] = false
+    BPBID_Arrays.BreedsPerSpecies[4558] = false
+    BPBID_Arrays.BreedsPerSpecies[4559] = false
+    BPBID_Arrays.BreedsPerSpecies[4560] = false
+    BPBID_Arrays.BreedsPerSpecies[4561] = false
+    BPBID_Arrays.BreedsPerSpecies[4562] = false
+    BPBID_Arrays.BreedsPerSpecies[4563] = false
+    BPBID_Arrays.BreedsPerSpecies[4564] = false
+    BPBID_Arrays.BreedsPerSpecies[4565] = {11}
+    BPBID_Arrays.BreedsPerSpecies[4566] = {11}
+    BPBID_Arrays.BreedsPerSpecies[4567] = false
+    BPBID_Arrays.BreedsPerSpecies[4568] = false
+    BPBID_Arrays.BreedsPerSpecies[4569] = false
+    BPBID_Arrays.BreedsPerSpecies[4570] = {8}
+    BPBID_Arrays.BreedsPerSpecies[4571] = {3, 7, 9, 12}
+    BPBID_Arrays.BreedsPerSpecies[4572] = false
+    BPBID_Arrays.BreedsPerSpecies[4573] = {3, 7, 9, 12}
+    BPBID_Arrays.BreedsPerSpecies[4574] = {3, 7, 9, 12}
+    BPBID_Arrays.BreedsPerSpecies[4575] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4576] = {9}
+    BPBID_Arrays.BreedsPerSpecies[4577] = {8}
+    BPBID_Arrays.BreedsPerSpecies[4578] = false
+    BPBID_Arrays.BreedsPerSpecies[4579] = {6}
+    BPBID_Arrays.BreedsPerSpecies[4580] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4581] = false
+    BPBID_Arrays.BreedsPerSpecies[4582] = {12}
+    BPBID_Arrays.BreedsPerSpecies[4583] = false
+    BPBID_Arrays.BreedsPerSpecies[4584] = false
+    BPBID_Arrays.BreedsPerSpecies[4585] = false
+    BPBID_Arrays.BreedsPerSpecies[4586] = {5}
+    BPBID_Arrays.BreedsPerSpecies[4587] = false
+    BPBID_Arrays.BreedsPerSpecies[4588] = false
+    BPBID_Arrays.BreedsPerSpecies[4589] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4590] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4591] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4592] = false
+    BPBID_Arrays.BreedsPerSpecies[4593] = false
+    BPBID_Arrays.BreedsPerSpecies[4594] = {9}
+    BPBID_Arrays.BreedsPerSpecies[4595] = {4}
+    BPBID_Arrays.BreedsPerSpecies[4596] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4597] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4598] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4599] = {12}
+    BPBID_Arrays.BreedsPerSpecies[4600] = false
+    BPBID_Arrays.BreedsPerSpecies[4601] = false
+    BPBID_Arrays.BreedsPerSpecies[4602] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4603] = false
+    BPBID_Arrays.BreedsPerSpecies[4604] = false
+    BPBID_Arrays.BreedsPerSpecies[4605] = false
+    BPBID_Arrays.BreedsPerSpecies[4606] = false
+    BPBID_Arrays.BreedsPerSpecies[4607] = false
+    BPBID_Arrays.BreedsPerSpecies[4608] = false
+    BPBID_Arrays.BreedsPerSpecies[4609] = false
+    BPBID_Arrays.BreedsPerSpecies[4610] = false
+    BPBID_Arrays.BreedsPerSpecies[4611] = false
+    BPBID_Arrays.BreedsPerSpecies[4612] = false
+    BPBID_Arrays.BreedsPerSpecies[4613] = false
+    BPBID_Arrays.BreedsPerSpecies[4614] = false
+    BPBID_Arrays.BreedsPerSpecies[4615] = {3}
+    BPBID_Arrays.BreedsPerSpecies[4616] = false
 end
 
 
 --[[
-Written by: Hugh@Burning Blade-US and Simca@Malfurion-US
+Written by: Simca@Malfurion-US
+
+Thanks to Hugh@Burning-Blade, a co-author for the first few versions of the AddOn.
 
 Special thanks to Ro for letting me bounce solutions off him regarding tooltip conflicts.
 ]]--
@@ -7228,12 +9988,15 @@ function BPBID_SetBreedTooltip(parent, speciesID, tblBreedID, rareness, tooltipD
 
     -- Workaround for TradeSkillMaster's tooltip
     -- Note that setting parent breaks floating tooltip and setting two corner points breaks borders on TSM tooltip
-    -- Setting parent is also required for BattlePetTooltip because TSMExtraTip constantly reanchors itself on its parent
-    if (_G.IsAddOnLoaded("TradeSkillMaster")) then
+    -- Setting parent is also required for BattlePetTooltip because TSMExtraTooltip constantly reanchors itself on its parent
+    if (C_AddOns.IsAddOnLoaded("TradeSkillMaster")) then
         for i = 1, 10 do
-            local t = _G["TSMExtraTip" .. i]
+            local t = _G["TSMExtraTooltip" .. i]
             if t then
-                local _, relativeFrame = t:GetPoint("TOP")
+				-- It probably never matters which point we check to learn the relative frame
+				-- This is because TSM tooltips should only be relative to one frame each
+				-- If this changes in the future or this assumption is wrong, we'll have to iterate points here
+                local _, relativeFrame = t:GetPoint()
                 if (relativeFrame == BattlePetTooltip) then
                     t:ClearAllPoints()
                     t:SetParent(BPBID_BreedTooltip)
@@ -7262,6 +10025,28 @@ function BPBID_SetBreedTooltip(parent, speciesID, tblBreedID, rareness, tooltipD
             end
         end
         breedtip:AddLine(current, 1, 1, 1, 1)
+    end
+
+	-- Set line for "Collected"
+    if (BPBID_Options.Breedtip.Collected) then
+        C_PetJournal.ClearSearchFilter()
+        numPets, numOwned = C_PetJournal.GetNumPets()
+        local collectedPets = {}
+        for i = 1, numPets do
+            local petID, speciesID2, owned, customName, level, favorite, isRevoked, speciesName, icon, petType, companionID, tooltip, description, isWild, canBattle, isTradeable, isUnique, obtainable = C_PetJournal.GetPetInfoByIndex(i)
+            if petID and speciesID2 == speciesID then 
+                local speciesID, customName, level, xp, maxXp, displayID, isFavorite, name, icon, petType, creatureID, sourceText, description, isWild, canBattle, tradable, unique, obtainable = C_PetJournal.GetPetInfoByPetID(petID)
+                local health, maxHealth, power, speed, rarity = C_PetJournal.GetPetStats(petID)
+
+                local breedNum, quality, resultslist = internal.CalculateBreedID(speciesID, rarity, level, maxHealth, power, speed, false, false)
+
+                local breed = internal.RetrieveBreedName(breedNum)
+                table.insert(collectedPets, ITEM_QUALITY_COLORS[quality-1].hex .. "L" .. level .. " (" .. breed .. ")"  .. "|r")
+            end
+        end
+        if (#collectedPets > 0) then
+            breedtip:AddLine("\124cFFD4A017Collected:\124r " .. table.concat(collectedPets, ", "), 1, 1, 1, 1)
+        end
     end
 
     -- Set line for "Current pet's possible breeds"
@@ -7458,21 +10243,21 @@ local function BPBID_Hook_BattleUpdate(self)
         if (name) and (BPBID_Options.Names.PrimaryBattle) then
             -- Set standard text or use hex coloring based on font fix option
             if (BPBID_Options.BattleFontFix) then
-                local _, _, _, hex = GetItemQualityColor(internal.rarityCache[self.petIndex + offset] - 1)
-                self.Name:SetText("|c"..hex..name.." ["..breed.."]".."|r")
+                local _, _, _, hex = C_Item.GetItemQualityColor(internal.rarityCache[self.petIndex + offset] - 1)
+                self.Name:SetText("|c"..hex..name.." ("..breed..")".."|r")
             else
-                self.Name:SetText(name.." ["..breed.."]")
+                self.Name:SetText(name.." ("..breed..")")
             end
         end
     else
         -- Set the name header if the user wants
         if (name) and (BPBID_Options.Names.BattleTooltip) then
             -- Set standard text or use hex coloring based on font fix option
-            if (not BPBID_Options.BattleFontFix) then
-                local _, _, _, hex = GetItemQualityColor(internal.rarityCache[self.petIndex + offset] - 1)
-                self.Name:SetText("|c"..hex..name.." ["..breed.."]".."|r")
+            if (BPBID_Options.BattleFontFix) then
+                local _, _, _, hex = C_Item.GetItemQualityColor(internal.rarityCache[self.petIndex + offset] - 1)
+                self.Name:SetText("|c"..hex..name.." ("..breed..")".."|r")
             else
-                self.Name:SetText(name.." ["..breed.."]")
+                self.Name:SetText(name.." ("..breed..")")
             end
         end
 
@@ -7528,9 +10313,9 @@ local function BPBID_Hook_BPTShow(speciesID, level, rarity, maxHealth, power, sp
         local currentText = BattlePetTooltip.Name:GetText()
 
         -- Test if we've already written to the tooltip
-        if not strfind(currentText, " [" .. breed .. "]") then
+        if not strfind(currentText, " (" .. breed .. ")") then
             -- Append breed to tooltip
-            BattlePetTooltip.Name:SetText(currentText .. " [" .. breed .. "]")
+            BattlePetTooltip.Name:SetText(currentText .. " (" .. breed .. ")")
 
             -- If this not the same tooltip as before
             if (BPTNameText ~= BattlePetTooltip.Name:GetText()) then
@@ -7733,11 +10518,11 @@ hooksecurefunc("BattlePetToolTip_Show", BPBID_Hook_BPTShow)
 hooksecurefunc("FloatingBattlePet_Show", BPBID_Hook_FBPTShow)
 -- Internal.Hook_PJTEnter is called by the ADDON_LOADED event for Blizzard_Collections in BattlePetBreedID's Core
 -- Internal.Hook_PJTLeave is called by the ADDON_LOADED event for Blizzard_Collections in BattlePetBreedID's Core
--- HSFUpdate is handled in BattlePetBreedID's Core entirely because it is unrelated to tooltips
-
-
+-- Pet Journal's list button initialization hook is handled in BattlePetBreedID's Core entirely because it is unrelated to tooltips
 --[[
-Written by: Hugh@Burning Blade-US and Simca@Malfurion-US
+Written by: Simca@Malfurion-US
+
+Thanks to Hugh@Burning-Blade, a co-author for the first few versions of the AddOn.
 
 Special thanks to Ro for inspiration for the overall structure of this options panel (and the title/version/description code)
 ]]--
@@ -7753,6 +10538,7 @@ BPBID_Options.Names.BattleTooltip: In PrimaryBattlePetUnitTooltip's header (in-b
 BPBID_Options.Names.BPT: In BattlePetTooltip's header (items)
 BPBID_Options.Names.FBPT: In FloatingBattlePetTooltip's header (chat links)
 BPBID_Options.Names.HSFUpdate: In the Pet Journal scrolling frame
+    BPBID_Options.Names.HSFUpdateRarity: Color Pet Journal scrolling frame by rarity
 BPBID_Options.Names.PJT: In the Pet Journal tooltips
     BPBID_Options.Names.PJTRarity: Color Pet Journal tooltip headers by rarity
 
@@ -7775,18 +10561,11 @@ BPBID_Options.Breedtip.AllStats25: All breeds' stats at level 25
     BPBID_Options.Breedtip.AllStats25Rare: Always assume pet will be Rare at level 25
 --]]
 
-if GetLocale() == "zhCN" then
-  BattlePetBreedIDOptionsName = "|cFFBF00FF[宠物]|r三围数据";
-elseif GetLocale() == "zhTW" then
-  BattlePetBreedIDOptionsName = "|cFFBF00FF[宠物]|r三围数据r";
-else
-  BattlePetBreedIDOptionsName = "|cFFBF00FF[BB]|rBattlePet BreedID";
-end
+
 
 -- Create options panel
-local Options = CreateFrame("Frame", nil, InterfaceOptionsFramePanelContainer)
-Options:Hide()
-Options.name = BattlePetBreedIDOptionsName
+local Options = CreateFrame("Frame")
+local properName = BattlePetBreedIDOptionsName
 
 -- Variable for easy positioning
 local lastcheckbox
@@ -7821,20 +10600,23 @@ local function CreateCheckbox(text, height, width, anchorPoint, relativeTo, rela
     return checkbox
 end
 
-local panelWidth = InterfaceOptionsFramePanelContainer:GetWidth() -- ~623
-local wideWidth = panelWidth - 40
+-- Similar function for buttons
+local function CreateButton(text, height, width, anchorPoint, relativeTo, relativePoint, xoff, yoff)
+    local button = CreateFrame("Button", nil, Options, "UIPanelButtonTemplate")
+    button:SetPoint(anchorPoint, relativeTo, relativePoint, xoff, yoff)
+    button:SetSize(height, width)
+    button:SetText(text)
+    return button
+end
 
 -- Create title, version, author, and description fields
-local title = CreateFont("GameFontNormalLarge", "BattlePet BreedID")
+local title = CreateFont("GameFontNormalLarge", properName)
 title:SetPoint("TOPLEFT", 16, -16)
-local ver = CreateFont("GameFontNormalSmall", "v1.20.2")
+local ver = CreateFont("GameFontNormalSmall", "v1.31.0")
 ver:SetPoint("BOTTOMLEFT", title, "BOTTOMRIGHT", 4, 0)
-local auth = CreateFont("GameFontNormalSmall", "by Simca@Malfurion and Hugh@Burning Blade")
+local auth = CreateFont("GameFontNormalSmall", "by Simca@Malfurion")
 auth:SetPoint("BOTTOMLEFT", ver, "BOTTOMRIGHT", 3, 0)
-local desc = CreateFont("GameFontHighlight", nil, nil, nil, "TOPLEFT", title, "BOTTOMLEFT", wideWidth, 40, 0, -8, "Battle Pet BreedID displays the BreedID of pets in your journal, in battle, in chat links, and in item tooltips.")
-
--- Create temp format variable
-local tempformat = 3
+local desc = CreateFont("GameFontHighlight", nil, nil, nil, "TOPLEFT", title, "BOTTOMLEFT", 580, 40, 0, -8, "在宠物对战日志中、战斗中、聊天链接以及物品提示中的显示你的宠物品种ID。")
 
 -- Create dropdownmenu
 if not BPBID_OptionsFormatMenu then
@@ -7848,16 +10630,16 @@ BPBID_OptionsFormatMenu:Show()
 
 -- Create array for dropdownmenu
 local formats = {
-    "Number (3)",
-    "Dual numbers (3/13)",
-    "Letters (B/B)",
+    "数字 (3)",
+    "两个数字 (3/13)",
+    "字母 (B/B)",
 }
 
 -- Create array for text blurb
 local formatTexts = {
-    "The number system was created by Blizzard developers and is used internally (it was discovered via the Web API). As such, it is fairly arbitrary (why does it start at 3?), but it was all we had at first. However, a lot of people have learned the system by numbers, and a few of the first-created resources and addons use it, such as Warla's popular website, PetSear.ch.",
-    "Same as numbers but for people who like a reminder that we cannot figure out the sex of pets. Male pets are the first number (3 - 12) and female pets are the second number (13 - 22). Remember that not all pets can be both sexes. For example, all (?) Elemental type pets are exclusively male.",
-    "The letter system was developed as a way to more quickly tell breeds apart from each other. Each letter represents one half of the stat contribution that makes up a breed. A few examples: S/S (#5) is a pure Speed breed. S/B (#11) is half Speed with the other half Balanced between all three stats. H/P (#7) is half Health and half Power.",
+    "这个数字体系是由暴雪开发者创建并内部使用的（它是通过Web API被发现的）。因此，它相当随意（为什么它从3开始？），但这就是我们原始能够使用的。不管怎样，有些人已经通过数字学会了这个系统，一些较旧的资源和插件也在使用它。",
+    "对那些喜欢提醒我们无法在游戏中确定宠物性别的人来说，这些数字看起来一样。雄性宠物是第一个数字（3 - 12），雌性宠物是第二个数字（13 - 22）。请记住，并非所有宠物都是两种性别。例如，所有（？）元素类型的宠物都是专属雄性。",
+    "字母体系是作为一种更快速区分不同品种的方法而开发的。每个字母代表构成品种的一半信息。一些例子：S/S（#5）是纯速度品种。S/B（#11）是一半速度，另一半在所有三个数据之间平衡。H/P（#7）是一半生命和一半力量。",
 }
 
 -- Create text blurb explaining format choices
@@ -7867,13 +10649,13 @@ FormatTextBlurb:SetTextColor(1, 1, 1, 1)
 -- OnClick function for dropdownmenu
 local function BPBID_OptionsFormatMenu_OnClick(self, arg1, arg2, checked)
     -- Update temp variable
-    tempformat = arg1
+    BPBID_Options.format = arg1
     
     -- Update dropdownmenu text
-    UIDropDownMenu_SetText(BPBID_OptionsFormatMenu, formats[tempformat])
+    UIDropDownMenu_SetText(BPBID_OptionsFormatMenu, formats[BPBID_Options.format])
     
     -- Update text blurb to the new choice
-    FormatTextBlurb:SetText(formatTexts[tempformat])
+    FormatTextBlurb:SetText(formatTexts[BPBID_Options.format])
 end
 
 -- Initialization function for dropdownmenu
@@ -7897,172 +10679,67 @@ UIDropDownMenu_SetText(BPBID_OptionsFormatMenu, formats[tempformat])
 UIDropDownMenu_JustifyText(BPBID_OptionsFormatMenu, "LEFT")
 
 -- Set on top of colored region
-local nameTitle = CreateFont("GameFontNormal", "Show BreedIDs in the Name line...")
+local nameTitle = CreateFont("GameFontNormal", "在姓名行显示品种ID...")
 nameTitle:SetPoint("TOPLEFT", BPBID_OptionsFormatMenu, "BOTTOMLEFT", -8, -16)
 nameTitle:SetTextColor(1, 1, 1, 1)
 
 -- Make Names checkboxes
-local OptNamesPrimaryBattle = CreateCheckbox("In Battle (on primary pets)", 32, 32, "TOPLEFT", nameTitle, "BOTTOMLEFT", 0, 0)
-local OptNamesBattleTooltip = CreateCheckbox("On in-battle tooltips", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
-local OptNamesBPT = CreateCheckbox("In Item tooltips", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
-local OptNamesFBPT = CreateCheckbox("In Chat Link tooltips", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
-local OptNamesHSFUpdate = CreateCheckbox("In the Pet Journal scrolling frame", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
-local OptNamesHSFUpdateRarity = CreateCheckbox("Color Pet Journal scrolling frame by rarity.", 16, 16, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 32, 0, "GameFontNormalSmall")
-local OptNamesPJT = CreateCheckbox("In the Pet Journal description tooltip", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", -32, 0)
-local OptNamesPJTRarity = CreateCheckbox("Color Pet Journal tooltip headers by rarity", 16, 16, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 32, 0, "GameFontNormalSmall")
+local OptNamesPrimaryBattle = CreateCheckbox("在战斗中（主要宠物）", 32, 32, "TOPLEFT", nameTitle, "BOTTOMLEFT", 0, 0)
+local OptNamesBattleTooltip = CreateCheckbox("在战斗提示中", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
+local OptNamesBPT = CreateCheckbox("在物品提示中", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
+local OptNamesFBPT = CreateCheckbox("在聊天链接提示中", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
+local OptNamesHSFUpdate = CreateCheckbox("在宠物对战日志中", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
+local OptNamesHSFUpdateRarity = CreateCheckbox("稀有度着色宠物对战日志", 16, 16, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 32, 0, "GameFontNormalSmall")
+local OptNamesPJT = CreateCheckbox("在宠物对战日志描述提示中", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", -32, 0)
+local OptNamesPJTRarity = CreateCheckbox("稀有度着色宠物对战日志提示标题", 16, 16, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 32, 0, "GameFontNormalSmall")
 
 -- Above the Tooltips region's title (this checkbox disables the rest of them)
-local OptTooltipsEnabled = CreateCheckbox("Enable Battle Pet BreedID Tooltips", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", -32, -16)
+local OptTooltipsEnabled = CreateCheckbox("“启用对战宠物品种ID提示", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", -32, -16)
 
 -- Text above the Tooltips region
-local tooltipsTitle = CreateFont("GameFontNormal", "Show Battle Pet BreedID Tooltips...")
+local tooltipsTitle = CreateFont("GameFontNormal", "显示对战宠物品种ID提示...")
 tooltipsTitle:SetPoint("TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, -2)
 tooltipsTitle:SetTextColor(1, 1, 1, 1)
 
 -- Make Tooltips checkboxes
-local OptTooltipsBattleTooltip = CreateCheckbox("In Battle", 32, 32, "TOPLEFT", tooltipsTitle, "BOTTOMLEFT", 0, 0)
-local OptTooltipsBPT = CreateCheckbox("On Items", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
-local OptTooltipsFBPT = CreateCheckbox("On Chat Links", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
-local OptTooltipsPJT = CreateCheckbox("In the Pet Journal", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
+local OptTooltipsBattleTooltip = CreateCheckbox("在战斗中", 32, 32, "TOPLEFT", tooltipsTitle, "BOTTOMLEFT", 0, 0)
+local OptTooltipsBPT = CreateCheckbox("在物品上", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
+local OptTooltipsFBPT = CreateCheckbox("在聊天链接上", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
+local OptTooltipsPJT = CreateCheckbox("在宠物对战日志中", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
 
 -- Text above the Tooltips region
-local breedtipTitle = CreateFont("GameFontNormal", "In Tooltips, show...")
+local breedtipTitle = CreateFont("GameFontNormal", "在提示中显示...")
 breedtipTitle:SetPoint("TOP", FormatTextBlurb, "BOTTOM", -48, -8)
 breedtipTitle:SetTextColor(1, 1, 1, 1)
 
 -- Make Breedtip checkboxes
-local OptBreedtipCurrent = CreateCheckbox("Current pet's breed", 32, 32, "TOPLEFT", breedtipTitle, "BOTTOMLEFT", 0, 0)
-local OptBreedtipPossible = CreateCheckbox("Current pet's possible breeds", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
-local OptBreedtipSpeciesBase = CreateCheckbox("Pet species' base stats", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
-local OptBreedtipCurrentStats = CreateCheckbox("Current breed's base stats", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
-local OptBreedtipAllStats = CreateCheckbox("All breed's base stats", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
-local OptBreedtipCurrentStats25 = CreateCheckbox("Current breed's stats at level 25", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
-local OptBreedtipCurrentStats25Rare = CreateCheckbox("Always assume pet will be Rare at level 25", 16, 16, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 32, 0, "GameFontNormalSmall")
-local OptBreedtipAllStats25 = CreateCheckbox("All breeds' stats at level 25", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", -32, 0)
-local OptBreedtipAllStats25Rare = CreateCheckbox("Always assume pet will be Rare at level 25", 16, 16, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 32, 0, "GameFontNormalSmall")
+local OptBreedtipCurrent = CreateCheckbox("当前宠物的品种", 32, 32, "TOPLEFT", breedtipTitle, "BOTTOMLEFT", 0, 0)
+local OptBreedtipPossible = CreateCheckbox("当前宠物可能的品种", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
+local OptBreedtipCollected = CreateCheckbox("当前宠物已收集的品种", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
+local OptBreedtipSpeciesBase = CreateCheckbox("宠物种类的基础属性", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
+local OptBreedtipCurrentStats = CreateCheckbox("当前品种的基础属性", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
+local OptBreedtipAllStats = CreateCheckbox("所有品种的基础属性", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
+local OptBreedtipCurrentStats25 = CreateCheckbox("当前品种25级时的属性", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, 0)
+local OptBreedtipCurrentStats25Rare = CreateCheckbox("始终假设宠物在25级时为稀有品质", 16, 16, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 32, 0, "GameFontNormalSmall")
+local OptBreedtipAllStats25 = CreateCheckbox("所有品种25级时的属性", 32, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", -32, 0)
+local OptBreedtipAllStats25Rare = CreateCheckbox("始终假设宠物在25级时为稀有品质", 16, 16, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 32, 0, "GameFontNormalSmall")
 
 -- Text above the BlizzBug region
-local blizzbugTitle = CreateFont("GameFontNormal", "Fix Bugs:") -- Used to say "Fix Blizzard Bugs:"
+local blizzbugTitle = CreateFont("GameFontNormal", "修复错误：") -- Used to say "Fix Blizzard Bugs:"
 blizzbugTitle:SetPoint("TOPLEFT", OptBreedtipAllStats25Rare, "BOTTOMLEFT", -32, -16)
 blizzbugTitle:SetTextColor(1, 1, 1, 1)
 
-local OptBugBattleFontFix = CreateCheckbox("Test old Pet Battle rarity coloring", 32, 32, "TOPLEFT", blizzbugTitle, "BOTTOMLEFT", 0, 0)
+local OptBugBattleFontFix = CreateCheckbox("测试旧的对战宠物稀有度着色", 32, 32, "TOPLEFT", blizzbugTitle, "BOTTOMLEFT", 0, 0)
 
--- To disable rarity checkbox since it is dependent
-local function BPBID_OptNamesHSFUpdate_OnClick(self, button, down)
-    
-    -- If the checkbox is checked
-    if (OptNamesHSFUpdate:GetChecked()) then
-        
-        -- Enable and check rarity checkbox
-        OptNamesHSFUpdateRarity:Enable()
-        OptNamesHSFUpdateRarity:SetChecked(true)
-        
-    elseif (not OptNamesHSFUpdate:GetChecked()) then
-        
-        -- Disable and uncheck rarity checkbox
-        OptNamesHSFUpdateRarity:Disable()
-        OptNamesHSFUpdateRarity:SetChecked(nil)
-    end
-end
+local OptDefaultButton = CreateButton("默认设置", 80, 32, "TOPLEFT", lastcheckbox, "BOTTOMLEFT", 0, -32)
 
--- Variable to store settings until window is closed in case user wants to 
-local tempstorage
-
--- Disable dependent checkboxes if unchecked
-local function BPBID_OptTooltipsEnabled_OnClick(self, button, down)
-    
-    -- If the checkbox is checked AND it was unchecked at one point in time (to create tempstorage!)
-    if (OptTooltipsEnabled:GetChecked()) and (tempstorage) then
-        
-        -- Enable all tooltip-related checkboxes
-        OptTooltipsBattleTooltip:Enable()
-        OptTooltipsBPT:Enable()
-        OptTooltipsFBPT:Enable()
-        OptTooltipsPJT:Enable()
-        OptBreedtipCurrent:Enable()
-        OptBreedtipPossible:Enable()
-        OptBreedtipSpeciesBase:Enable()
-        OptBreedtipCurrentStats:Enable()
-        OptBreedtipAllStats:Enable()
-        OptBreedtipCurrentStats25:Enable()
-        OptBreedtipCurrentStats25Rare:Enable()
-        OptBreedtipAllStats25:Enable()
-        OptBreedtipAllStats25Rare:Enable()
-        
-        -- Set them to their old values
-        OptTooltipsBattleTooltip:SetChecked(tempstorage[1])
-        OptTooltipsBPT:SetChecked(tempstorage[2])
-        OptTooltipsFBPT:SetChecked(tempstorage[3])
-        OptTooltipsPJT:SetChecked(tempstorage[4])
-        OptBreedtipCurrent:SetChecked(tempstorage[5])
-        OptBreedtipPossible:SetChecked(tempstorage[6])
-        OptBreedtipSpeciesBase:SetChecked(tempstorage[7])
-        OptBreedtipCurrentStats:SetChecked(tempstorage[8])
-        OptBreedtipAllStats:SetChecked(tempstorage[9])
-        OptBreedtipCurrentStats25:SetChecked(tempstorage[10])
-        OptBreedtipCurrentStats25Rare:SetChecked(tempstorage[11])
-        OptBreedtipAllStats25:SetChecked(tempstorage[12])
-        OptBreedtipAllStats25Rare:SetChecked(tempstorage[13])
-        
-    elseif (not OptTooltipsEnabled:GetChecked()) then
-        
-        -- Update tempstorage with the current values from the checkboxes (before they get wiped)
-        tempstorage = {
-            OptTooltipsBattleTooltip:GetChecked(),
-            OptTooltipsBPT:GetChecked(),
-            OptTooltipsFBPT:GetChecked(),
-            OptTooltipsPJT:GetChecked(),
-            OptBreedtipCurrent:GetChecked(),
-            OptBreedtipPossible:GetChecked(),
-            OptBreedtipSpeciesBase:GetChecked(),
-            OptBreedtipCurrentStats:GetChecked(),
-            OptBreedtipAllStats:GetChecked(),
-            OptBreedtipCurrentStats25:GetChecked(),
-            OptBreedtipCurrentStats25Rare:GetChecked(),
-            OptBreedtipAllStats25:GetChecked(),
-            OptBreedtipAllStats25Rare:GetChecked(),
-        }
-        
-        -- Disable any tooltip-related checkboxes
-        OptTooltipsBattleTooltip:Disable()
-        OptTooltipsBPT:Disable()
-        OptTooltipsFBPT:Disable()
-        OptTooltipsPJT:Disable()
-        OptBreedtipCurrent:Disable()
-        OptBreedtipPossible:Disable()
-        OptBreedtipSpeciesBase:Disable()
-        OptBreedtipCurrentStats:Disable()
-        OptBreedtipAllStats:Disable()
-        OptBreedtipCurrentStats25:Disable()
-        OptBreedtipCurrentStats25Rare:Disable()
-        OptBreedtipAllStats25:Disable()
-        OptBreedtipAllStats25Rare:Disable()
-        
-        -- Uncheck all tooltip-related checkboxes
-        OptTooltipsBattleTooltip:SetChecked(nil)
-        OptTooltipsBPT:SetChecked(nil)
-        OptTooltipsFBPT:SetChecked(nil)
-        OptTooltipsPJT:SetChecked(nil)
-        OptBreedtipCurrent:SetChecked(nil)
-        OptBreedtipPossible:SetChecked(nil)
-        OptBreedtipSpeciesBase:SetChecked(nil)
-        OptBreedtipCurrentStats:SetChecked(nil)
-        OptBreedtipAllStats:SetChecked(nil)
-        OptBreedtipCurrentStats25:SetChecked(nil)
-        OptBreedtipCurrentStats25Rare:SetChecked(nil)
-        OptBreedtipAllStats25:SetChecked(nil)
-        OptBreedtipAllStats25Rare:SetChecked(nil)
-    end
-end
-
+-- Refresh all settings from storage
 local function BPBID_Options_Refresh()
     -- Reset the dropdownmenu to the old value
-    tempformat = BPBID_Options.format
-    UIDropDownMenu_SetText(BPBID_OptionsFormatMenu, formats[tempformat])
+    UIDropDownMenu_SetText(BPBID_OptionsFormatMenu, formats[BPBID_Options.format])
     
     -- Reset the text blurb to the old value
-    FormatTextBlurb:SetText(formatTexts[tempformat])
+    FormatTextBlurb:SetText(formatTexts[BPBID_Options.format])
     
     -- Reset all the checkboxes to the old value
     OptNamesPrimaryBattle:SetChecked(BPBID_Options.Names.PrimaryBattle)
@@ -8088,18 +10765,234 @@ local function BPBID_Options_Refresh()
     OptBreedtipAllStats25:SetChecked(BPBID_Options.Breedtip.AllStats25)
     OptBreedtipAllStats25Rare:SetChecked(BPBID_Options.Breedtip.AllStats25Rare)
     OptBugBattleFontFix:SetChecked(BPBID_Options.BattleFontFix)
-    
-    -- Call this to fix the checkboxes to their correct enabled state
-    BPBID_OptTooltipsEnabled_OnClick()
+    OptBreedtipCollected:SetChecked(BPBID_Options.Breedtip.Collected)
+
+    -- Enable/disable dependent checkboxes
+    if (OptNamesHSFUpdate:GetChecked()) then
+        OptNamesHSFUpdateRarity:Enable()
+    elseif (not OptNamesHSFUpdate:GetChecked()) then
+        OptNamesHSFUpdateRarity:Disable()
+    end
+    if (OptNamesPJT:GetChecked()) then
+        OptNamesPJTRarity:Enable()
+    elseif (not OptNamesPJT:GetChecked()) then
+        OptNamesPJTRarity:Disable()
+    end
+    if (OptTooltipsEnabled:GetChecked()) then
+        OptTooltipsBattleTooltip:Enable()
+        OptTooltipsBPT:Enable()
+        OptTooltipsFBPT:Enable()
+        OptTooltipsPJT:Enable()
+        OptBreedtipCurrent:Enable()
+        OptBreedtipPossible:Enable()
+        OptBreedtipSpeciesBase:Enable()
+        OptBreedtipCurrentStats:Enable()
+        OptBreedtipAllStats:Enable()
+        OptBreedtipCurrentStats25:Enable()
+        OptBreedtipCurrentStats25Rare:Enable()
+        OptBreedtipAllStats25:Enable()
+        OptBreedtipAllStats25Rare:Enable()
+        OptBreedtipCollected:Enable()
+    elseif (not OptTooltipsEnabled:GetChecked()) then
+        OptTooltipsBattleTooltip:Disable()
+        OptTooltipsBPT:Disable()
+        OptTooltipsFBPT:Disable()
+        OptTooltipsPJT:Disable()
+        OptBreedtipCurrent:Disable()
+        OptBreedtipPossible:Disable()
+        OptBreedtipSpeciesBase:Disable()
+        OptBreedtipCurrentStats:Disable()
+        OptBreedtipAllStats:Disable()
+        OptBreedtipCurrentStats25:Disable()
+        OptBreedtipCurrentStats25Rare:Disable()
+        OptBreedtipAllStats25:Disable()
+        OptBreedtipAllStats25Rare:Disable()
+        OptBreedtipCollected:Disable()
+    end
+
+    if (OptBreedtipCurrentStats25:GetChecked()) then
+        OptBreedtipCurrentStats25Rare:Enable()
+    elseif (not OptBreedtipCurrentStats25:GetChecked()) then
+        OptBreedtipCurrentStats25Rare:Disable()
+    end
+
+    if (OptBreedtipAllStats25:GetChecked()) then
+        OptBreedtipAllStats25Rare:Enable()
+    elseif (not OptBreedtipAllStats25:GetChecked()) then
+        OptBreedtipAllStats25Rare:Disable()
+    end
 end
 
-function Options.refresh()
+-- Enable/disable dependent checkboxes
+local function BPBID_OptNamesHSFUpdate_OnClick(self, button, down)
+    
+    -- Change value of dependent checkbox accordingly (default sub-checkbox to true)
+    if (OptNamesHSFUpdate:GetChecked()) then
+        BPBID_Options.Names.HSFUpdate = true
+        BPBID_Options.Names.HSFUpdateRarity = true
+    elseif (not OptNamesHSFUpdate:GetChecked()) then
+        BPBID_Options.Names.HSFUpdate = false
+        BPBID_Options.Names.HSFUpdateRarity = false
+    end
+    
+    -- A manual change has occurred (added in v1.0.8 to help update values added in new versions)
+    BPBID_Options.ManualChange = "v1.31.0"
+    
+    -- Refresh the options page to display the new values
+    BPBID_Options_Refresh()
+end
+local function BPBID_OptNamesPJT_OnClick(self, button, down)
+    
+    -- Change value of dependent checkbox accordingly (default sub-checkbox to false)
+    if (OptNamesPJT:GetChecked()) then
+        BPBID_Options.Names.PJT = true
+        BPBID_Options.Names.PJTRarity = false
+    elseif (not OptNamesPJT:GetChecked()) then
+        BPBID_Options.Names.PJT = false
+        BPBID_Options.Names.PJTRarity = false
+    end
+    
+    -- A manual change has occurred (added in v1.0.8 to help update values added in new versions)
+    BPBID_Options.ManualChange = "v1.31.0"
+    
+    -- Refresh the options page to display the new values
+    BPBID_Options_Refresh()
+end
+local function BPBID_OptBreedtipCurrentStats25_OnClick(self, button, down)
+    
+    -- Change value of dependent checkbox accordingly (default sub-checkbox to true)
+    if (OptBreedtipCurrentStats25:GetChecked()) then
+        BPBID_Options.Breedtip.CurrentStats25 = true
+        BPBID_Options.Breedtip.CurrentStats25Rare = true
+    elseif (not OptBreedtipCurrentStats25:GetChecked()) then
+        BPBID_Options.Breedtip.CurrentStats25 = false
+        BPBID_Options.Breedtip.CurrentStats25Rare = false
+    end
+    
+    -- A manual change has occurred (added in v1.0.8 to help update values added in new versions)
+    BPBID_Options.ManualChange = "v1.31.0"
+    
+    -- Refresh the options page to display the new values
+    BPBID_Options_Refresh()
+end
+local function BPBID_OptBreedtipAllStats25_OnClick(self, button, down)
+    
+    -- Change value of dependent checkbox accordingly (default sub-checkbox to true)
+    if (OptBreedtipAllStats25:GetChecked()) then
+        BPBID_Options.Breedtip.AllStats25 = true
+        BPBID_Options.Breedtip.AllStats25Rare = true
+    elseif (not OptBreedtipAllStats25:GetChecked()) then
+        BPBID_Options.Breedtip.AllStats25 = false
+        BPBID_Options.Breedtip.AllStats25Rare = false
+    end
+    
+    -- A manual change has occurred (added in v1.0.8 to help update values added in new versions)
+    BPBID_Options.ManualChange = "v1.31.0"
+    
+    -- Refresh the options page to display the new values
     BPBID_Options_Refresh()
 end
 
-function Options.default()
+-- Disable dependent checkboxes if unchecked
+local function BPBID_OptTooltipsEnabled_OnClick(self, button, down)
     
-    tempstorage = nil
+    -- If the checkbox is checked
+    if (OptTooltipsEnabled:GetChecked()) then
+        
+        -- Enable all tooltip-related checkboxes
+        OptTooltipsBattleTooltip:Enable()
+        OptTooltipsBPT:Enable()
+        OptTooltipsFBPT:Enable()
+        OptTooltipsPJT:Enable()
+        OptBreedtipCurrent:Enable()
+        OptBreedtipPossible:Enable()
+        OptBreedtipSpeciesBase:Enable()
+        OptBreedtipCurrentStats:Enable()
+        OptBreedtipAllStats:Enable()
+        OptBreedtipCurrentStats25:Enable()
+        OptBreedtipCurrentStats25Rare:Enable()
+        OptBreedtipAllStats25:Enable()
+        OptBreedtipAllStats25Rare:Enable()
+        OptBreedtipCollected:Enable()
+        
+        -- Restore defaults for previously disabled checkboxes
+        BPBID_Options.Tooltips.Enabled = true -- Enable Battle Pet BreedID Tooltips
+        BPBID_Options.Tooltips.BattleTooltip = true -- In Battle (PrimaryBattlePetUnitTooltip)
+        BPBID_Options.Tooltips.BPT = true -- On Items (BattlePetTooltip)
+        BPBID_Options.Tooltips.FBPT = true -- On Chat Links (FloatingBattlePetTooltip)
+        BPBID_Options.Tooltips.PJT = true -- In the Pet Journal (GameTooltip)
+        BPBID_Options.Breedtip.Current = true -- Current pet's breed
+        BPBID_Options.Breedtip.Possible = true -- Current pet's possible breeds
+        BPBID_Options.Breedtip.SpeciesBase = false -- Pet species' base stats
+        BPBID_Options.Breedtip.CurrentStats = false -- Current breed's base stats (level 1 Poor)
+        BPBID_Options.Breedtip.AllStats = false -- All breed's base stats (level 1 Poor)
+        BPBID_Options.Breedtip.CurrentStats25 = true -- Current breed's stats at level 25
+        BPBID_Options.Breedtip.CurrentStats25Rare = true -- Always assume pet will be Rare at level 25
+        BPBID_Options.Breedtip.AllStats25 = true -- All breeds' stats at level 25
+        BPBID_Options.Breedtip.AllStats25Rare = true -- Always assume pet will be Rare at level 25
+        
+    elseif (not OptTooltipsEnabled:GetChecked()) then
+        
+        -- Disable any tooltip-related checkboxes
+        OptTooltipsBattleTooltip:Disable()
+        OptTooltipsBPT:Disable()
+        OptTooltipsFBPT:Disable()
+        OptTooltipsPJT:Disable()
+        OptBreedtipCurrent:Disable()
+        OptBreedtipPossible:Disable()
+        OptBreedtipSpeciesBase:Disable()
+        OptBreedtipCurrentStats:Disable()
+        OptBreedtipAllStats:Disable()
+        OptBreedtipCurrentStats25:Disable()
+        OptBreedtipCurrentStats25Rare:Disable()
+        OptBreedtipAllStats25:Disable()
+        OptBreedtipAllStats25Rare:Disable()
+        OptBreedtipCollected:Disable()
+        
+        -- Uncheck all tooltip-related checkboxes
+        BPBID_Options.Tooltips.Enabled = false -- Enable Battle Pet BreedID Tooltips
+        BPBID_Options.Tooltips.BattleTooltip = false -- In Battle (PrimaryBattlePetUnitTooltip)
+        BPBID_Options.Tooltips.BPT = false -- On Items (BattlePetTooltip)
+        BPBID_Options.Tooltips.FBPT = false -- On Chat Links (FloatingBattlePetTooltip)
+        BPBID_Options.Tooltips.PJT = false -- In the Pet Journal (GameTooltip)
+        BPBID_Options.Breedtip.Current = false -- Current pet's breed
+        BPBID_Options.Breedtip.Possible = false -- Current pet's possible breeds
+        BPBID_Options.Breedtip.SpeciesBase = false -- Pet species' base stats
+        BPBID_Options.Breedtip.CurrentStats = false -- Current breed's base stats (level 1 Poor)
+        BPBID_Options.Breedtip.AllStats = false -- All breed's base stats (level 1 Poor)
+        BPBID_Options.Breedtip.CurrentStats25 = false -- Current breed's stats at level 25
+        BPBID_Options.Breedtip.CurrentStats25Rare = false -- Always assume pet will be Rare at level 25
+        BPBID_Options.Breedtip.AllStats25 = false -- All breeds' stats at level 25
+        BPBID_Options.Breedtip.AllStats25Rare = false -- Always assume pet will be Rare at level 25
+    end
+    
+    -- A manual change has occurred (added in v1.0.8 to help update values added in new versions)
+    BPBID_Options.ManualChange = "v1.31.0"
+    
+    -- Refresh the options page to display the new values
+    BPBID_Options_Refresh()
+end
+
+local function BPBID_Options_EnableAll()
+    OptNamesHSFUpdateRarity:Enable()
+    OptNamesPJTRarity:Enable()
+    OptTooltipsBattleTooltip:Enable()
+    OptTooltipsBPT:Enable()
+    OptTooltipsFBPT:Enable()
+    OptTooltipsPJT:Enable()
+    OptBreedtipCurrent:Enable()
+    OptBreedtipPossible:Enable()
+    OptBreedtipSpeciesBase:Enable()
+    OptBreedtipCurrentStats:Enable()
+    OptBreedtipAllStats:Enable()
+    OptBreedtipCurrentStats25:Enable()
+    OptBreedtipCurrentStats25Rare:Enable()
+    OptBreedtipAllStats25:Enable()
+    OptBreedtipAllStats25Rare:Enable()
+    OptBreedtipCollected:Enable()
+end
+
+local function BPBID_Options_Default()
     
     BPBID_Options = {}
 
@@ -8134,20 +11027,17 @@ function Options.default()
     BPBID_Options.Breedtip.AllStats25Rare = true -- Always assume pet will be Rare at level 25
     
     BPBID_Options.BattleFontFix = false -- Use alternate rarity coloring method in-battle
+
+    -- Enable all checkboxes that can be enabled (defaults would enable them)
+    BPBID_Options_EnableAll()
     
     -- Refresh the options page to display the new defaults
     BPBID_Options_Refresh()
 end
 
-function Options.okay()
+local function BPBID_GeneralCheckbox_OnClick(self, button, down)
     -- IF THE LAST TOOLTIP CALLED BEFORE THE OPTIONS ARE CHANGED HAS CHANGED FONT,
-    -- BAD STUFF WILL HAPPEN SO CALL ORIGINAL FONT CHANGING FUNCTIONS IN OKAY BOX
-    
-    -- Clear storage for TooltipsEnabled remembering
-    tempstorage = nil
-    
-    -- Store format setting
-    BPBID_Options.format = tempformat
+    -- BAD STUFF WILL HAPPEN SO CALL ORIGINAL FONT CHANGING FUNCTIONS HERE
     
     -- Retrieve the rest of the settings from the checkboxes
     BPBID_Options.Names.PrimaryBattle = OptNamesPrimaryBattle:GetChecked()
@@ -8172,6 +11062,7 @@ function Options.okay()
     BPBID_Options.Breedtip.CurrentStats25Rare = OptBreedtipCurrentStats25Rare:GetChecked()
     BPBID_Options.Breedtip.AllStats25 = OptBreedtipAllStats25:GetChecked()
     BPBID_Options.Breedtip.AllStats25Rare = OptBreedtipAllStats25Rare:GetChecked()
+    BPBID_Options.Breedtip.Collected = OptBreedtipCollected:GetChecked()
     BPBID_Options.BattleFontFix = OptBugBattleFontFix:GetChecked()
     
     -- Fix fontsize for PrimaryBattlePetUnitTooltip (TODO: PetFrame)
@@ -8195,32 +11086,53 @@ function Options.okay()
         FloatingBattlePetTooltip.JournalClick:SetWidth(238)
     end
     
-    -- Fix font size for HSFUpdate
-    if (not BPBID_Options.Names.HSFUpdate) then
-        for i = 1, #PetJournalListScrollFrame.buttons do
-            PetJournalListScrollFrame.buttons[i].name:SetFontObject("GameFontNormal")
-        end
-    end
-    
     -- A manual change has occurred (added in v1.0.8 to help update values added in new versions)
-    BPBID_Options.ManualChange = "v1.20.2"
+    BPBID_Options.ManualChange = "v1.31.0"
     
-    -- Refresh the options page to display the new values
+    -- Refresh the options page to display the new defaults
     BPBID_Options_Refresh()
 end
 
-function Options.cancel()
-    
-    -- Clear storage for TooltipsEnabled remembering
-    tempstorage = nil
-    
-    -- Refresh the options page to display the old settings
-    BPBID_Options_Refresh()
-end
+-- Refresh on show
+Options:SetScript("OnShow", BPBID_Options_Refresh)
 
--- Set script for needed checkbox
+-- Enable/disable dependent checkboxes
 OptNamesHSFUpdate:SetScript("OnClick", BPBID_OptNamesHSFUpdate_OnClick)
+OptNamesPJT:SetScript("OnClick", BPBID_OptNamesPJT_OnClick)
 OptTooltipsEnabled:SetScript("OnClick", BPBID_OptTooltipsEnabled_OnClick)
+OptBreedtipCurrentStats25:SetScript("OnClick", BPBID_OptBreedtipCurrentStats25_OnClick)
+OptBreedtipAllStats25:SetScript("OnClick", BPBID_OptBreedtipAllStats25_OnClick)
+
+-- Toggle settings
+OptNamesPrimaryBattle:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptNamesBattleTooltip:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptNamesBPT:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptNamesFBPT:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptNamesHSFUpdateRarity:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptNamesPJTRarity:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptTooltipsBattleTooltip:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptTooltipsBPT:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptTooltipsFBPT:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptTooltipsPJT:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptBreedtipCurrent:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptBreedtipPossible:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptBreedtipSpeciesBase:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptBreedtipCurrentStats:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptBreedtipAllStats:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptBreedtipCurrentStats25Rare:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptBreedtipAllStats25Rare:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptBreedtipCollected:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+OptBugBattleFontFix:SetScript("OnClick", BPBID_GeneralCheckbox_OnClick)
+
+-- Reset to Defaults button
+OptDefaultButton:SetScript("OnClick", BPBID_Options_Default)
+
+-- Set up required functions on frame
+Options.OnCommit = BPBID_GeneralCheckbox_OnClick
+Options.OnDefault = BPBID_Options_Default
+Options.OnRefresh = BPBID_Options_Refresh
 
 -- Add the options panel to the Blizzard list
-InterfaceOptions_AddCategory(Options)
+local category = Settings.RegisterCanvasLayoutCategory(Options, properName, properName)
+category.ID = BattlePetBreedIDOptionsName
+Settings.RegisterAddOnCategory(category)

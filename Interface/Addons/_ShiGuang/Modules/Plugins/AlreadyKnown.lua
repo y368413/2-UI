@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 local TT = M:GetModule("Tooltip")
 
 local mod, strmatch, strfind, format = mod, strmatch, strfind, format
-local GetItemInfo, SetItemButtonTextureVertexColor = GetItemInfo, SetItemButtonTextureVertexColor
+local SetItemButtonTextureVertexColor = SetItemButtonTextureVertexColor
 local GetCurrentGuildBankTab, GetGuildBankItemInfo, GetGuildBankItemLink = GetCurrentGuildBankTab, GetGuildBankItemInfo, GetGuildBankItemLink
 local GetMerchantNumItems, GetMerchantItemInfo, GetMerchantItemLink = GetMerchantNumItems, GetMerchantItemInfo, GetMerchantItemLink
 local GetNumBuybackItems, GetBuybackItemInfo, GetBuybackItemLink = GetNumBuybackItems, GetBuybackItemInfo, GetBuybackItemLink
@@ -11,10 +11,10 @@ local C_PetJournal_GetNumCollectedInfo = C_PetJournal.GetNumCollectedInfo
 
 local COLOR = {r = .1, g = 1, b = .1}
 local knowables = {
-	[LE_ITEM_CLASS_CONSUMABLE] = true,
-	[LE_ITEM_CLASS_RECIPE] = true,
-	[LE_ITEM_CLASS_MISCELLANEOUS] = true,
-	[LE_ITEM_CLASS_ITEM_ENHANCEMENT] = true,
+	[Enum.ItemClass.Consumable] = true,
+	[Enum.ItemClass.Recipe] = true,
+	[Enum.ItemClass.Miscellaneous] = true,
+	[Enum.ItemClass.ItemEnhancement] = true,
 }
 local knowns = {}
 
@@ -35,25 +35,29 @@ local function IsAlreadyKnown(link, index)
 	if linkType == "battlepet" then
 		return isPetCollected(linkID)
 	elseif linkType == "item" then
-		local name, _, _, level, _, _, _, _, _, _, _, itemClassID = GetItemInfo(link)
+		local name, _, _, level, _, _, _, _, _, _, _, itemClassID = C_Item.GetItemInfo(link)
 		if not name then return end
 
-		if itemClassID == LE_ITEM_CLASS_BATTLEPET and index then
-			local speciesID = M.ScanTip:SetGuildBankItem(GetCurrentGuildBankTab(), index)
-			return isPetCollected(speciesID)
-		elseif TT.ConduitData[linkID] and TT.ConduitData[linkID] >= level then
-			return true
+		if itemClassID == Enum.ItemClass.Battlepet and index then
+			local data = C_TooltipInfo.GetGuildBankItem(GetCurrentGuildBankTab(), index)
+			if data then
+				return data.battlePetSpeciesID and isPetCollected(data.battlePetSpeciesID)
+			end
 		else
 			if knowns[link] then return true end
-			if not knowables[itemClassID] then return end
+			if not knowables[itemClassID] and not C_Item.IsCosmeticItem(link) then return end
 
-			M.ScanTip:SetOwner(UIParent, "ANCHOR_NONE")
-			M.ScanTip:SetHyperlink(link)
-			for i = 1, M.ScanTip:NumLines() do
-				local text = _G["UI_ScanTooltipTextLeft"..i]:GetText() or ""
-				if strfind(text, COLLECTED) or text == ITEM_SPELL_KNOWN then
-					knowns[link] = true
-					return true
+			local data = C_TooltipInfo.GetHyperlink(link, nil, nil, true)
+			if data then
+				for i = 1, #data.lines do
+					local lineData = data.lines[i]
+					local text = lineData and lineData.leftText
+					if text then
+						if strfind(text, COLLECTED) or text == ITEM_SPELL_KNOWN then
+							knowns[link] = true
+							return true
+						end
+					end
 				end
 			end
 		end
@@ -98,38 +102,34 @@ local function Hook_UpdateBuybackInfo()
 end
 hooksecurefunc("MerchantFrame_UpdateBuybackInfo", Hook_UpdateBuybackInfo)
 
-local function Hook_UpdateAuctionHouse(self)
-	local numResults = self.getNumEntries()
-
-	local buttons = HybridScrollFrame_GetButtons(self.ScrollFrame)
-	local buttonCount = #buttons
-	local offset = self:GetScrollOffset()
-	for i = 1, buttonCount do
-		local visible = i + offset <= numResults
-		local button = buttons[i]
-		if visible then
-			if button.rowData.itemKey.itemID then
+local function Hook_UpdateAuctionItems(self)
+	for i = 1, self.ScrollTarget:GetNumChildren() do
+		local child = select(i, self.ScrollTarget:GetChildren())
+		if child.cells then
+			local button = child.cells[2]
+			local itemKey = button and button.rowData and button.rowData.itemKey
+			if itemKey and itemKey.itemID then
 				local itemLink
-				if button.rowData.itemKey.itemID == 82800 then -- BattlePet
-					itemLink = format("|Hbattlepet:%d::::::|h[Dummy]|h", button.rowData.itemKey.battlePetSpeciesID)
-				else -- Normal item
-					itemLink = format("|Hitem:%d", button.rowData.itemKey.itemID)
+				if itemKey.itemID == 82800 then
+					itemLink = format("|Hbattlepet:%d::::::|h[Dummy]|h", itemKey.battlePetSpeciesID)
+				else
+					itemLink = format("|Hitem:%d", itemKey.itemID)
 				end
 
 				if itemLink and IsAlreadyKnown(itemLink) then
 					-- Highlight
-					button.SelectedHighlight:Show()
-					button.SelectedHighlight:SetVertexColor(COLOR.r, COLOR.g, COLOR.b)
-					button.SelectedHighlight:SetAlpha(.25)
+					child.SelectedHighlight:Show()
+					child.SelectedHighlight:SetVertexColor(COLOR.r, COLOR.g, COLOR.b)
+					child.SelectedHighlight:SetAlpha(.25)
 					-- Icon
-					button.cells[2].Icon:SetVertexColor(COLOR.r, COLOR.g, COLOR.b)
-					button.cells[2].IconBorder:SetVertexColor(COLOR.r, COLOR.g, COLOR.b)
+					button.Icon:SetVertexColor(COLOR.r, COLOR.g, COLOR.b)
+					button.IconBorder:SetVertexColor(COLOR.r, COLOR.g, COLOR.b)
 				else
 					-- Highlight
-					button.SelectedHighlight:SetVertexColor(1, 1, 1)
+					child.SelectedHighlight:SetVertexColor(1, 1, 1)
 					-- Icon
-					button.cells[2].Icon:SetVertexColor(1, 1, 1)
-					button.cells[2].IconBorder:SetVertexColor(1, 1, 1)
+					button.Icon:SetVertexColor(1, 1, 1)
+					button.IconBorder:SetVertexColor(1, 1, 1)
 				end
 			end
 		end
@@ -169,7 +169,7 @@ local f = CreateFrame("Frame")
 f:RegisterEvent("ADDON_LOADED")
 f:SetScript("OnEvent", function(_, event, addon)
 	if addon == "Blizzard_AuctionHouseUI" then
-		hooksecurefunc(AuctionHouseFrame.BrowseResultsFrame.ItemList, "RefreshScrollFrame", Hook_UpdateAuctionHouse)
+		hooksecurefunc(AuctionHouseFrame.BrowseResultsFrame.ItemList.ScrollBox, "Update", Hook_UpdateAuctionItems)
 		hookCount = hookCount + 1
 	elseif addon == "Blizzard_GuildBankUI" then
 		hooksecurefunc(GuildBankFrame, "Update", GuildBankFrame_Update)

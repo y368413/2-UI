@@ -12,6 +12,9 @@ local UnitIsAFK, UnitIsDND, UnitIsDead, UnitIsGhost, UnitName, UnitExists = Unit
 local UnitIsWildBattlePet, UnitIsBattlePetCompanion, UnitBattlePetLevel = UnitIsWildBattlePet, UnitIsBattlePetCompanion, UnitBattlePetLevel
 local GetNumArenaOpponentSpecs, GetCreatureDifficultyColor = GetNumArenaOpponentSpecs, GetCreatureDifficultyColor
 
+-- Add scantip back, due to issue on ColorMixin
+local scanTip = CreateFrame("GameTooltip", "UI_ScanTooltip", nil, "GameTooltipTemplate")
+
 local function ColorPercent(value)
 	local r, g, b
 	if value < 20 then
@@ -65,6 +68,9 @@ oUF.Tags.Methods["VariousHP"] = function(unit, _, arg1)
 	elseif arg1 == "losspercent" then
 		local loss = max - cur
 		return loss ~= 0 and M:Round(loss/max*100, 1)
+	elseif arg1 == "absorb" then
+		local absorb = UnitGetTotalAbsorbs(unit) or 0
+		return (absorb > 0 and I.InfoColor or "")..M.Numb(cur+absorb)
 	end
 end
 oUF.Tags.Events["VariousHP"] = "UNIT_HEALTH UNIT_MAXHEALTH UNIT_CONNECTION PLAYER_FLAGS_CHANGED PARTY_MEMBER_ENABLE PARTY_MEMBER_DISABLE"
@@ -92,8 +98,8 @@ end
 oUF.Tags.Events["VariousMP"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_DISPLAYPOWER"
 
 oUF.Tags.Methods["curAbsorb"] = function(unit)
-	local value = UnitGetTotalAbsorbs(unit)
-	return value > 0 and I.InfoColor..value.."+|r"
+	local value = UnitGetTotalAbsorbs(unit) or 0
+	return value > 0 and I.InfoColor..M.Numb(value).."+|r"
 end
 oUF.Tags.Events["curAbsorb"] = "UNIT_ABSORB_AMOUNT_CHANGED UNIT_HEAL_ABSORB_AMOUNT_CHANGED"
 
@@ -103,7 +109,7 @@ oUF.Tags.Methods["color"] = function(unit)
 
 	if UnitIsTapDenied(unit) then
 		return M.HexRGB(oUF.colors.tapped)
-	elseif UnitIsPlayer(unit) then
+	elseif UnitIsPlayer(unit) or UnitInPartyIsAI(unit) then
 		return M.HexRGB(oUF.colors.class[class])
 	elseif reaction then
 		return M.HexRGB(oUF.colors.reaction[reaction])
@@ -178,12 +184,13 @@ local healthModeType = {
 	[3] = "current",
 	[4] = "loss",
 	[5] = "losspercent",
+	[6] = "absorb",
 }
 oUF.Tags.Methods["raidhp"] = function(unit)
 	local healthType = healthModeType[R.db["UFs"]["RaidHPMode"]]
 	return oUF.Tags.Methods["VariousHP"](unit, _, healthType)
 end
-oUF.Tags.Events["raidhp"] = oUF.Tags.Events["VariousHP"]
+oUF.Tags.Events["raidhp"] = oUF.Tags.Events["VariousHP"].." UNIT_ABSORB_AMOUNT_CHANGED UNIT_HEAL_ABSORB_AMOUNT_CHANGED"
 
 -- Nameplate tags
 oUF.Tags.Methods["nppp"] = function(unit)
@@ -249,13 +256,26 @@ oUF.Tags.Methods["npctitle"] = function(unit)
 			return "<"..guildName..">"
 		end
 	elseif not isPlayer and R.db["Nameplate"]["NameOnlyTitle"] then
-		M.ScanTip:SetOwner(UIParent, "ANCHOR_NONE")
-		M.ScanTip:SetUnit(unit)
+		scanTip:SetOwner(UIParent, "ANCHOR_NONE")
+		scanTip:SetUnit(unit)
 
-		local title = _G[format("UI_ScanTooltipTextLeft%d", GetCVarBool("colorblindmode") and 3 or 2)]:GetText()
+		local textLine = _G[format("UI_ScanTooltipTextLeft%d", GetCVarBool("colorblindmode") and 3 or 2)]
+		local title = textLine and textLine:GetText()
 		if title and not strfind(title, "^"..LEVEL) then
 			return title
 		end
+--[[
+		local data = not I.isWW and C_TooltipInfo.GetUnit(unit) -- FIXME: ColorMixin error
+		if not data then return "" end
+
+		local lineData = data.lines[GetCVarBool("colorblindmode") and 3 or 2]
+		if lineData then
+			local title = lineData.leftText
+			if title and not strfind(title, "^"..LEVEL) then
+				return title
+			end
+		end
+]]
 	end
 end
 oUF.Tags.Events["npctitle"] = "UNIT_NAME_UPDATE"

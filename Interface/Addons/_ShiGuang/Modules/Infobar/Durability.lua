@@ -15,6 +15,7 @@ local HelpTip = HelpTip
 
 local repairCostString = gsub(REPAIR_COST, HEADER_COLON, ":")
 local lowDurabilityCap = .25
+local needToRepair
 
 local localSlots = {
 	[1] = {1, INVTYPE_HEAD, 1000},
@@ -22,9 +23,9 @@ local localSlots = {
 	[3] = {5, INVTYPE_CHEST, 1000},
 	[4] = {6, INVTYPE_WAIST, 1000},
 	[5] = {9, INVTYPE_WRIST, 1000},
-	[6] = {10, U["Hands"], 1000},
+	[6] = {10, INVTYPE_HAND, 1000},
 	[7] = {7, INVTYPE_LEGS, 1000},
-	[8] = {8, U["Feet"], 1000},
+	[8] = {8, INVTYPE_FEET, 1000},
 	[9] = {16, INVTYPE_WEAPONMAINHAND, 1000},
 	[10] = {17, INVTYPE_WEAPONOFFHAND, 1000}
 }
@@ -106,14 +107,16 @@ info.onEvent = function(self, event)
 
 	if isLowDurability() then
 		HelpTip:Show(info, lowDurabilityInfo)
+		needToRepair = true
 	else
 		HelpTip:Hide(info, U["Low Durability"])
+		needToRepair = false
 	end
 end
 
 info.onMouseUp = function(self, btn)
 	if btn == "RightButton" then
-		MaoRUIDB["RepairType"] = mod(MaoRUIDB["RepairType"] + 1, 3)
+		MaoRUISetDB["RepairType"] = mod(MaoRUISetDB["RepairType"] + 1, 3)
 		self:onEnter()
 	else
 		--if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
@@ -143,8 +146,10 @@ info.onEnter = function(self)
 			local slotIcon = localSlots[i][4]
 			GameTooltip:AddDoubleLine(slotIcon..localSlots[i][2], cur.."%", 1,1,1, getDurabilityColor(cur, 100))
 
-			M.ScanTip:SetOwner(UIParent, "ANCHOR_NONE")
-			totalCost = totalCost + select(3, M.ScanTip:SetInventoryItem("player", slot))
+			local data = C_TooltipInfo.GetInventoryItem("player", slot)
+			if data and data.repairCost then
+				totalCost = totalCost + data.repairCost
+			end
 		end
 	end
 
@@ -154,7 +159,7 @@ info.onEnter = function(self)
 	end
 
 	GameTooltip:AddDoubleLine(" ", I.LineString)
-	GameTooltip:AddDoubleLine(" ", U["Auto Repair"]..": "..repairlist[MaoRUIDB["RepairType"]].." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", U["Auto Repair"]..": "..repairlist[MaoRUISetDB["RepairType"]].." ", 1,1,1, .6,.8,1)
 	GameTooltip:Show()
 end
 
@@ -180,7 +185,7 @@ function autoRepair(override)
 	repairAllCost, canRepair = GetRepairAllCost()
 
 	if canRepair and repairAllCost > 0 then
-		if (not override) and MaoRUIDB["RepairType"] == 1 and IsInGuild() and CanGuildBankRepair() and GetGuildBankWithdrawMoney() >= repairAllCost then
+		if (not override) and MaoRUISetDB["RepairType"] == 1 and IsInGuild() and CanGuildBankRepair() and GetGuildBankWithdrawMoney() >= repairAllCost then
 			RepairAllItems(true)
 		else
 			if myMoney > repairAllCost then
@@ -209,10 +214,39 @@ local function merchantClose()
 	M:UnregisterEvent("MERCHANT_CLOSED", merchantClose)
 end
 
+local autoRepairInfo = {
+	text = U["AutoRepairInfo"],
+	buttonStyle = HelpTip.ButtonStyle.GotIt,
+	targetPoint = HelpTip.Point.RightEdgeCenter,
+	onAcknowledgeCallback = M.HelpInfoAcknowledge,
+	callbackArg = "AutoRepair",
+}
+
 local function merchantShow()
-	if IsShiftKeyDown() or MaoRUIDB["RepairType"] == 0 or not CanMerchantRepair() then return end
+	if not MaoRUISetDB["Help"]["AutoRepair"] then
+		HelpTip:Show(MerchantFrame, autoRepairInfo)
+	end
+
+	if IsShiftKeyDown() or MaoRUISetDB["RepairType"] == 0 or not CanMerchantRepair() then return end
 	autoRepair()
 	M:RegisterEvent("UI_ERROR_MESSAGE", checkBankFund)
 	M:RegisterEvent("MERCHANT_CLOSED", merchantClose)
 end
 M:RegisterEvent("MERCHANT_SHOW", merchantShow)
+
+local repairGossipIDs = {
+	[37005] = true, -- 基维斯
+	[44982] = true, -- 里弗斯
+}
+M:RegisterEvent("GOSSIP_SHOW", function()
+	if IsShiftKeyDown() then return end
+	if not needToRepair then return end
+
+	local options = C_GossipInfo.GetOptions()
+	for i = 1, #options do
+		local option = options[i]
+		if repairGossipIDs[option.gossipOptionID] then
+			C_GossipInfo.SelectOption(option.gossipOptionID)
+		end
+	end
+end)

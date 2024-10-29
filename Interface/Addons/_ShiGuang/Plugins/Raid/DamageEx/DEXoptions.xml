@@ -516,7 +516,7 @@
 
 			<Button name="DEXOptionsSave" inherits="UIPanelCloseButton">
 				<Anchors>
-					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relitiveTo="DEXOptions">
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="DEXOptions">
 						<Offset>
 							<AbsDimension x="-5" y="-5" />
 						</Offset>
@@ -532,8 +532,8 @@
 				</Scripts>
 			</Button>
 
-			<Button name="DEXOptionsClose" inherits="OptionsButtonTemplate" text="CLOSE">
-				<Anchors>
+			<Button name="DEXOptionsClose" inherits="UIPanelButtonTemplate" text="CLOSE">
+				<Anchors>					
 					<Anchor point="BOTTOMRIGHT">
 						<Offset>
 							<AbsDimension x="-24" y="24"/>
@@ -546,11 +546,12 @@
 				<Scripts>
 					<OnClick>
 						DEX_CloseOptions()
-					</OnClick>
+					</OnClick>					
 				</Scripts>
-			</Button>
-			<Button name="DEXOptionsReset" inherits="OptionsButtonTemplate" text="RESET">
-				<Anchors>
+			</Button>		
+			
+			<Button name="DEXOptionsReset" inherits="UIPanelButtonTemplate" text="RESET">
+				<Anchors>					
 					<Anchor point="RIGHT" relativeTo="DEXOptionsClose" relativePoint="LEFT">
 						<Offset>
 							<AbsDimension x="0" y="0"/>
@@ -584,7 +585,7 @@
 					<Layer level="OVERLAY">
 						<FontString name="DEX_PreBox_Title" inherits="GameFontNormal" text="DEX_PREVIEW_LABEL">
 							<Anchors>
-								<Anchor point="CENTER" relitiveTo="$parent"/>							
+								<Anchor point="CENTER" relativeTo="$parent"/>							
 							</Anchors>							
 							<FontHeight>
 								<AbsValue val="14"/>

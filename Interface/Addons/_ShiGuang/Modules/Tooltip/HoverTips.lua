@@ -24,6 +24,7 @@ local linkTypes = {
 	azessence = true,
 	mawpower = true,
 	conduit = true,
+	mount = true,
 }
 
 function TT:HyperLink_SetPet(link)
@@ -105,12 +106,18 @@ for i = 1, NUM_CHAT_WINDOWS do
 	frame:SetScript("OnHyperlinkLeave", TT.HyperLink_OnLeave)
 end
 
+local function hookMessageFrame()
+	CommunitiesFrame.Chat.MessageFrame:SetScript("OnHyperlinkEnter", TT.HyperLink_OnEnter)
+	CommunitiesFrame.Chat.MessageFrame:SetScript("OnHyperlinkLeave", TT.HyperLink_OnLeave)
+end
 local function hookCommunitiesFrame(event, addon)
 	if addon == "Blizzard_Communities" then
-		CommunitiesFrame.Chat.MessageFrame:SetScript("OnHyperlinkEnter", TT.HyperLink_OnEnter)
-		CommunitiesFrame.Chat.MessageFrame:SetScript("OnHyperlinkLeave", TT.HyperLink_OnLeave)
-
+		hookMessageFrame()
 		M:UnregisterEvent(event, hookCommunitiesFrame)
 	end
 end
-M:RegisterEvent("ADDON_LOADED", hookCommunitiesFrame)
+if C_AddOns.IsAddOnLoaded("Blizzard_Communities") then
+	hookMessageFrame()
+else
+	M:RegisterEvent("ADDON_LOADED", hookCommunitiesFrame)
+end
