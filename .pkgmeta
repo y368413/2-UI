@@ -1,4 +1,4 @@
-package-as: _ShiGuang
+package-as: HandyNotes
 
 move-folders:
     2ui/Interface/AddOns/_ShiGuang: _ShiGuang
