@@ -5,9 +5,9 @@
 ## Version: 4.3.5
 ## SavedVariables: MaoRUISetDB,MaoRUIPerDB,ShiGuangDB,WQADB,DCP_Saved,ParagonReputationDB,rhDB,BreakablesDB,rpolyOptions,AngrierWorldQuests_Config,AngrierWorldQuestsDB,DialogKeyNumyDB,MCL_DB,MOUNTLIST,MCL_PINNED,MCL_SETTINGS,SoulbindCacheOpenerDB,DelverViewDB
 ## SavedVariablesPerCharacter: MaoRUIDB,ShiGuangPerDB,DEX_SAVE,DCP_SavedPerCharacter
-## X-Support: 11.0.2
+## X-Support: 11.0.5
 ## X-Repple: 2 UI
-## X-StatsVersion: 20241105
+## X-StatsVersion: 20241106
 ## X-LoadOn-Always: Delayed
 ## X-Website: https://github.com/y368413/2-UI
 ## IconTexture: Interface\AddOns\_ShiGuang\Media\2UI.blp
