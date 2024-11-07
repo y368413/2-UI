@@ -2,6 +2,7 @@ package-as: 2ui
 
 ignore:
   - .github/*
+  - Interface/AddOns/2ui
   - Interface/TargetingFrame
   - Interface/Tooltips
   - README.md
