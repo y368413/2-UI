@@ -2,6 +2,7 @@
 	<!--Script file="MTG.lua"/-->
 	<Script file="Mingy.lua"/>
 	<Script file="QuestLogCounter.lua" />
+	<Script file="CollapseQuestLog.lua" />
 	<Frame mixin='ShowQuestCountMixin' hidden='false'>
 		<Scripts>
 			<OnEvent method='OnEvent' />
