@@ -1223,7 +1223,7 @@ local DefaultOptions =
 	["fontHeight"] = 10,
 	["buttonInset"] = 12,
 	["showHelp"] = false,
-	["background"] = "Interface/DialogFrame/UI-DialogBox-Gold-Background",
+	["background"] = "Interface/AchievementFrame/UI-Achievement-Parchment-Horizontal",  --Interface/DialogFrame/UI-DialogBox-Gold-Background
 	["edge"] = "Interface/DialogFrame/UI-DialogBox-Border",
 	["backgroundR"] = 0,
 	["backgroundG"] = 0,
@@ -1349,10 +1349,7 @@ end
 
 function Teleporter_OnEvent(self, event, ...)
 	if event == "ADDON_LOADED" then
-		local loadedAddon = ...
-		if string.upper(loadedAddon) == string.upper("_ShiGuang") then
 			Teleporter_OnAddonLoaded()
-		end
 	elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
 		local player, guid, spell = ...
 		if player == "player" then
@@ -1510,7 +1507,7 @@ local function SortSpells(spell1, spell2, sortType)
 		local optId2 = spell2:GetOptionId()
 		-- New spells always sort last - not ideal, but makes it easier to have a deterministic sort.
 		if so[optId1] and so[optId2] then
-			return so[optId1] < so[optId2]			
+			return so[optId1] < so[optId2]
 		elseif so[optId1] then
 			return true
 		elseif so[optId2] then

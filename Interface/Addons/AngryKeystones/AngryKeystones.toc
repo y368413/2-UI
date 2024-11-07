@@ -5,12 +5,12 @@
 ## Notes: Displays additional information for Mythic Keystone dungeons
 ## Notes-zhCN: 显示大秘境钥石的更多信息。
 ## Notes-zhTW: 顯示大秘境鑰石的更多資訊。
-## Version: 0.31.7
+## Version: 0.31.8
 ## Author: Ermad
 ## SavedVariables: AngryKeystones_Config, AngryKeystones_Data
 ## SavedVariablesPerCharacter: AngryKeystones_CharacterConfig
 ## OptionalDeps: !KalielsTracker
-## X-Packaged-Version: v0.31.7
+## X-Packaged-Version: v0.31.8
 ## IconTexture: Interface\AddOns\HandyNotes\Icons\weaponsmith.blp
 ## RequiredDeps: _ShiGuang
 

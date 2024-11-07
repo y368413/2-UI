@@ -1,13 +1,13 @@
 ## Interface: 110005
 ## Author: Xinhuan
-## Version: v1.6.21
+## Version: v1.6.22
 ## Title: HandyNotes
 ## Title-zhCN:|cff0080ff[地图]|r宝藏稀有
 ## Title-zhTW:|cff0080ff[地图]|r寶藏稀有
 ## Notes: Handynotes with Achievments+Treasures+Toys+Mounts
 ## Notes-zhCN: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已击杀过。并替换自带飞行地图，使之更加方便详细。
 ## Notes-zhTW: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已擊殺過。并替换自带飞行地图，使之更加方便详细。
-## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, HandyNotes_CoreDB, HandyNotes_LostAndFoundDB, HNMoleMachineConfig, HandyNotes_PetDailiesDB, HandyNotes_Universal_ExplorerDB, HandyNotes_TravelGuideDB, HandyNotes_HigherDimensionalLearningDB, HandyNotes_WitheredChestsDB, HandyNotes_OribosDB, HandyNotesArgusDB, HandyNotes_SuramarTelemancyDB, HandyNotes_SuramarLeylinesDB,HandyNotes_WrathOfTheLichKingDB,HandyNotes_WarlordsOfDraenorDB,HandyNotes_UniversalExplorerDB
+## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, HandyNotes_CoreDB, HandyNotes_LostAndFoundDB, HNMoleMachineConfig, HandyNotes_PetDailiesDB, HandyNotes_Universal_ExplorerDB, HandyNotes_TravelGuideDB, HandyNotes_HigherDimensionalLearningDB, HandyNotes_WitheredChestsDB, HandyNotes_OribosDB, HandyNotesArgusDB, HandyNotes_SuramarTelemancyDB, HandyNotes_SuramarLeylinesDB,HandyNotes_WrathOfTheLichKingDB,HandyNotes_WarlordsOfDraenorDB,HandyNotes_UniversalExplorerDB,HandyNotes_WarfrontTreasuresDB
 ## Dependencies: _ShiGuang, Blizzard_FlightMap
 ## IconTexture: Interface\AddOns\HandyNotes\Icons\greatvault.blp
 
@@ -133,7 +133,8 @@ SL\zones\revendreth.lua
 SL\zones\the_maw.lua
 SL\zones\torghast.lua
 SL\zones\zereth_mortis.lua
-#SL\HandyNotes_Oribos.lua
+SL\HandyNotes_Oribos.lua
+#SL\HandyNotes_WarfrontTreasures.lua
 
 #Dragonflight
 DF\common.lua

@@ -1,7 +1,11 @@
---## Version: 1.0.55 ## Author: Jassade
+--## Version: 1.0.56 ## Author: Jassade
 local CanOpenerGlobal = {}
-local playerEnteredWorld = false;
 local shouldUpdateBags = false;
+
+------------------------------------------------
+-- Global Settings
+------------------------------------------------
+CanOpenerGlobal.IsRemixActive = false;
 
 ------------------------------------------------
 -- Debug Methods
@@ -114,10 +118,10 @@ local function initSavedVariables()
 	ShiGuangPerDB = {
 		CanOpenerEnable = true,
 		CanOpenerShowRousing = true,
-		CanOpenerIsRemixActive = false,
 		CanOpenershowRemixGems = true,
 		CanOpenerRemixEpicGems = true,
 		CanOpenerPosition = {"TOPRIGHT", "TOPRIGHT", -80, -260},
+		excludedItems = { },
 	};
 end
 local function resetSavedVariables()
@@ -134,6 +138,7 @@ CanOpenerGlobal.ResetSavedVariables = resetSavedVariables;
 local function addon_Loaded()
 		CanOpenerGlobal.Frame:UnregisterEvent("ADDON_LOADED");
 		CanOpenerGlobal.SavedVars = ShiGuangPerDB or initSavedVariables();
+        --InitSettingsMenu();
 end
 
 local function bag_update(bagID)
@@ -154,11 +159,9 @@ end
 
 local function player_entering_world(isInitialLogin, isReloadingUi)
 	CanOpenerGlobal.Frame:Show();
-	playerEnteredWorld = true;
 end
 
 local function player_leaving_world()
-	playerEnteredWorld = false;
 end
 
 local function player_regen_disabled()
@@ -1080,7 +1083,7 @@ CanOpenerGlobal.openables = {
 	[217728] = { name = "cache-of-awakened-treasures" },
 	[217729] = { name = "cache-of-awakened-treasures" },
 	[217111] = { name = "cache-of-awakened-dreams" },
-	[217242] = { name = "awakening-stone-wing" },
+	--[217242] = { name = "awakening-stone-wing" },
 	[217243] = { name = "awakening-ruby-wing" },
 -- MoP: Remix
 	[211279] = { name = "cache-of-infinite-treasure" },
@@ -2842,8 +2845,25 @@ CanOpenerGlobal.openables = {
 	[227782] = { name = "delvers-bounty-t6" },
 	[227783] = { name = "delvers-bounty-t7" },
 	[227784] = { name = "delvers-bounty-t8" },
-	[226102] = { name = " " },
-	[233014] = { name = " " },
+	-- 11.0.5 Items
+	[229355] = { name = "chromies-premium-goodie-bag" },
+	[233014] = { name = "bronze-celebration-cache-of-treasures" },
+	[232877] = { name = "timely-goodie-bag" },
+	[229359] = { name = "chromies-goodie-bag" },
+	[226101] = { name = "chromies-tour-goodie-bag" },
+	[226102] = { name = "chromies-tour-goodie-bag-max" },
+	[232602] = { name = "forged-gladiators-coin-pouch" },
+	[232598] = { name = "bag-of-timewarped-badges" },
+	[234413] = { name = "satchel-of-exotic-mysteries" },
+	[232473] = { name = "cache-of-dark-iron-treasures-lfr" },
+	[232471] = { name = "cache-of-dark-iron-treasures-normal" },
+	[232472] = { name = "cache-of-dark-iron-treasures-heroic" },
+	[223619] = { name = "bronze-celebration-goodie-bag" },
+	[223620] = { name = "20th-anniversary-cache-lfr" },
+	[223621] = { name = "20th-anniversary-cache-normal" },
+	[223622] = { name = "20th-anniversary-cache-heroic" },
+	[228910] = { name = "cache-of-nerubian-treasures" },
+	[232631] = { name = "wrapped-spear" },
 };
 
 
@@ -2879,11 +2899,11 @@ function CriteriaContext:evaluateAll(cacheDetails, count)
     return true
 end
 
-SkipRousingStrategy = setmetatable({}, {__index = CriteriaStrategy})
+SkipRousingStrategy = CriteriaStrategy:new()
 SkipRousingStrategy.__index = SkipRousingStrategy
 
 function SkipRousingStrategy:new()
-    local instance = CriteriaStrategy.new(self)
+    local instance = setmetatable({}, self)
     return instance
 end
 
@@ -2891,11 +2911,11 @@ function SkipRousingStrategy:evaluate(cacheDetails, count)
     return not ShiGuangPerDB.CanOpenerShowRousing and cacheDetails.isRousing
 end
 
-SkipRemixGemsStrategy = setmetatable({}, {__index = CriteriaStrategy})
+SkipRemixGemsStrategy = CriteriaStrategy:new()
 SkipRemixGemsStrategy.__index = SkipRemixGemsStrategy
 
 function SkipRemixGemsStrategy:new()
-    local instance = CriteriaStrategy.new(self)
+    local instance = setmetatable({}, self)
     return instance
 end
 
@@ -2903,11 +2923,11 @@ function SkipRemixGemsStrategy:evaluate(cacheDetails, count)
     return not ShiGuangPerDB.CanOpenershowRemixGems and cacheDetails.mopRemixGem
 end
 
-SkipRemixEpicGemsStrategy = setmetatable({}, {__index = CriteriaStrategy})
+SkipRemixEpicGemsStrategy = CriteriaStrategy:new()
 SkipRemixEpicGemsStrategy.__index = SkipRemixEpicGemsStrategy
 
 function SkipRemixEpicGemsStrategy:new()
-    local instance = CriteriaStrategy.new(self)
+    local instance = setmetatable({}, self)
     return instance
 end
 
@@ -2915,11 +2935,11 @@ function SkipRemixEpicGemsStrategy:evaluate(cacheDetails, count)
     return not ShiGuangPerDB.CanOpenerRemixEpicGems and cacheDetails.mopRemixEpicGem
 end
 
-ThresholdStrategy = setmetatable({}, {__index = CriteriaStrategy})
+ThresholdStrategy = CriteriaStrategy:new()
 ThresholdStrategy.__index = ThresholdStrategy
 
 function ThresholdStrategy:new()
-    local instance = CriteriaStrategy.new(self)
+    local instance = setmetatable({}, self)
     return instance
 end
 
@@ -2938,12 +2958,130 @@ local strategies = {
     skipRousingStrategy,
     thresholdStrategy
 }
-if CanOpenerGlobal.remixActive then
+if CanOpenerGlobal.IsRemixActive then
     strategies.insert(2, skipRemixGemsStrategy)
     strategies.insert(3, skipRemixEpicGemsStrategy)
 end
 
 CanOpenerGlobal.CriteriaContext = CriteriaContext:new(strategies)
+
+-- Initialize the settings for the addon
+function InitSettingsMenu()
+    local category = Settings.RegisterVerticalLayoutCategory("CanOpener")
+
+    do
+        local variable = "CanOpenerShowRousing"
+        local name = "Show Rousing Items"
+        local tooltip = "If Checked, Rousing Elements will be shown."
+        local defaultValue = true
+
+        local function GetValue()
+            return ShiGuangPerDB.CanOpenerShowRousing
+        end
+
+        local function SetValue(value)
+            ShiGuangPerDB.CanOpenerShowRousing = value
+        end
+
+        local setting = Settings.RegisterProxySetting(
+            category,
+            "CanOpener_" .. variable,
+            Settings.VarType.Boolean,
+            name,
+            defaultValue,
+            GetValue,
+            SetValue
+        )
+
+        Settings.CreateCheckbox(category, setting, tooltip)
+    end
+
+    if (CanOpenerGlobal.IsRemixActive) then
+        do
+            local variable = "CanOpenershowRemixGems"
+            local name = "Show Remix Gems"
+            local tooltip = "Display Remix Gems in the CanOpener UI."
+            local defaultValue = true
+
+            local function GetValue()
+                return ShiGuangPerDB.CanOpenershowRemixGems;
+            end
+
+            local function SetValue(value)
+                ShiGuangPerDB.CanOpenershowRemixGems = value
+            end
+
+            local setting = Settings.RegisterProxySetting(
+                category,
+                "CanOpener_" .. variable,
+                Settings.VarType.Boolean,
+                name,
+                defaultValue,
+                GetValue,
+                SetValue
+            )
+
+            Settings.CreateCheckbox(category, setting, tooltip);
+        end
+
+        do
+            local variable = "CanOpenerRemixEpicGems"
+            local name = "Include Epic Gems in Remix"
+            local tooltip = "Show Epic Remix Gems."
+            local defaultValue = true
+
+            local function GetValue()
+                return ShiGuangPerDB.CanOpenerRemixEpicGems;
+            end
+
+            local function SetValue(value)
+                ShiGuangPerDB.CanOpenerRemixEpicGems = value
+            end
+
+            local setting = Settings.RegisterProxySetting(
+                category,
+                "CanOpener_" .. variable,
+                Settings.VarType.Boolean,
+                name,
+                defaultValue,
+                GetValue,
+                SetValue
+            )
+
+            Settings.CreateCheckbox(category, setting, tooltip)
+        end
+    end
+
+    -- do
+    --     local variable = "CanOpenerPosition"
+    --     local name = "Position"
+    --     local tooltip = "Set the CanOpenerPosition of the CanOpener UI."
+    --     local defaultValue = { "CENTER", "CENTER", 0, 0 }
+
+    --     local function GetValue()
+    --         return ShiGuangPerDB.CanOpenerPosition
+    --     end
+
+    --     local function SetValue(value)
+    --         ShiGuangPerDB.CanOpenerPosition = value
+    --     end
+
+    --     local setting = Settings.RegisterProxySetting(
+    --         category,
+    --         "CanOpener_" .. variable,
+    --         Settings.VarType.Table,
+    --         name,
+    --         defaultValue,
+    --         GetValue,
+    --         SetValue
+    --     )
+
+    --     Settings.CreateCheckbox(category, setting, tooltip)
+    -- end
+
+    Settings.RegisterAddOnCategory(category)
+end
+
 
 local buttons = {};
 local buttonQueue = {};
@@ -2960,22 +3098,22 @@ local function slashHandler(msg)
 		ShiGuangPerDB.CanOpenerShowRousing = not ShiGuangPerDB.CanOpenerShowRousing;
 		CanOpenerGlobal.ForceButtonRefresh();
 		CanOpenerGlobal.CanOut(": Elemental Rousings " .. CanOpenerGlobal.PosOrNegColor(ShiGuangPerDB.CanOpenerShowRousing, "will", "will not") .. " be shown");
-	elseif (CanOpenerGlobal.remixActive and command == "remixgem") then
+	elseif (CanOpenerGlobal.IsRemixActive and command == "remixgem") then
 		ShiGuangPerDB.CanOpenershowRemixGems = not ShiGuangPerDB.CanOpenershowRemixGems;
 		CanOpenerGlobal.ForceButtonRefresh();
 		CanOpenerGlobal.CanOut(": Remix Gems " .. CanOpenerGlobal.PosOrNegColor(ShiGuangPerDB.CanOpenershowRemixGems, "will", "will not") .. " be shown");
-	elseif (CanOpenerGlobal.remixActive and command == "CanOpenerRemixEpicGems") then
+	elseif (CanOpenerGlobal.IsRemixActive and command == "remixepicgems") then
 		ShiGuangPerDB.CanOpenerRemixEpicGems = not ShiGuangPerDB.CanOpenerRemixEpicGems;
 		CanOpenerGlobal.ForceButtonRefresh();
 		CanOpenerGlobal.CanOut(": Remix Gems " .. CanOpenerGlobal.PosOrNegColor(ShiGuangPerDB.CanOpenerRemixEpicGems, "will", "will not") .. " be combined higher than Epic");
 	elseif (command == "reset") then
-		CanOpenerGlobal.CanOut(": Resetting settings and CanOpenerPosition.");
+		CanOpenerGlobal.CanOut(": Resetting settings and position.");
 		CanOpenerGlobal.ResetSavedVariables();
 	else
 		CanOpenerGlobal.CanOut("Commands for |cffffa500/CanOpener|r :");
 		local rousingState = CanOpenerGlobal.PosOrNegColor(ShiGuangPerDB.CanOpenerShowRousing, "On", "Off");
 		CanOpenerGlobal.CanOut("  |cffffa500 rousing|r - Toggle showing Elemental Rousings (" .. rousingState .. ")");
-		if(CanOpenerGlobal.remixActive) then
+		if (CanOpenerGlobal.IsRemixActive) then
 			local remixGemsState = CanOpenerGlobal.PosOrNegColor(ShiGuangPerDB.CanOpenershowRemixGems, "On", "Off");
 			CanOpenerGlobal.CanOut("  |cffffa500 remixGem|r - Toggle showing Remix Gems (" .. remixGemsState .. ")");
 			local remixEpicGemsState = CanOpenerGlobal.PosOrNegColor(ShiGuangPerDB.CanOpenerRemixEpicGems, "On", "Off");
@@ -3020,7 +3158,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 end);
 
 --[[frame:SetScript("OnShow", function(self, event, ...)
-	--Restore CanOpenerPosition
+	--Restore position
 	self:ClearAllPoints();
 	self:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -80, -260);
 end);]]
@@ -3069,9 +3207,9 @@ local function createButton(cacheDetails, id)
 	btn.countString:SetPoint("BOTTOMRIGHT", btn, -0, 2);
 	btn.countString:SetJustifyH("RIGHT");
 	btn.icon = btn:CreateTexture(nil, "BACKGROUND");
-	btn.icon:SetTexture(GetItemIcon(id));
+	btn.icon:SetTexture(C_Item.GetItemIconByID(id));
 	btn.texture = btn.icon;
-	btn.texture:SetAllPoints(btn);
+	btn.texture:SetAllPoints();
 	btn:RegisterForClicks("LeftButtonUp", "LeftButtonDown");
 
 	--Tooltip
@@ -3085,7 +3223,7 @@ local UpdateButtons = function()
 			local itemID = C_Container.GetContainerItemID(bagID, slot);
 			local cacheDetails = CanOpenerGlobal.openables[itemID];
 			if itemID and cacheDetails and not cacheDetails.lockbox then -- Don't show lockboxes in the button bar for now
-				local count = GetItemCount(itemID);
+				local count = C_Item.GetItemCount(itemID);
 
 				if CanOpenerGlobal.CriteriaContext:evaluateAll(cacheDetails, count) and not itemIDsInQueue[itemID] then
 					table.insert(buttonQueue, itemID)
@@ -3137,7 +3275,7 @@ CanOpenerGlobal.DrawButtons = drawButtons;
 
 function SetButton(button, buttonIndex, itemID)
 	button:SetPoint("LEFT", frame, "LEFT", buttonIndex * 52, 0);
-	local count = GetItemCount(itemID) or 0;
+	local count = C_Item.GetItemCount(itemID) or 0;
 	button.countString:SetText(tostring(count));
 	button.texture:SetDesaturated(false);
 	buttonIndex = buttonIndex + 1;

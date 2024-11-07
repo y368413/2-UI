@@ -1,6 +1,6 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="Pet.lua"/>
 	<Script file="PetCalc.lua"/>
-	<!--Script file="BattlePetBinds.lua"/-->
+	<Script file="BattlePetBinds.lua"/>
 	<Script file="CancelPetFight.lua"/>
 </Ui>

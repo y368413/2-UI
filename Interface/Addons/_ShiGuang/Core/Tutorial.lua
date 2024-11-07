@@ -21,7 +21,7 @@ local function DefaultSettings()
 	SetCVar("showQuestTrackingTooltips", 1)
 	--SetCVar("fstack_preferParentKeys", 0)
 	SetCVar("missingTransmogSourceInItemTooltips", 1)
-	SetCVar("autoSelfCast", 0) -- disable auto self casting
+	SetCVar("autoSelfCast", 1) -- disable auto self casting
 	--setglobal("MAX_EQUIPMENT_SETS_PER_PLAYER",100)
 	PlayerFrame:SetScale(R.db["UFs"]["PlayerFrameScale"]) 
 	TargetFrame:SetScale(R.db["UFs"]["PlayerFrameScale"])

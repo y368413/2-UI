@@ -1,4 +1,4 @@
-## Interface: 110002
+## Interface: 110005
 ## IconTexture: 464160
 ## Title:|cFFBF00FF[H]|r Something About Pet Battle
 ## Notes:Displays the BreedID of pets in your journal, in battle, in chat links, and in AH tooltips,Type /hpq to config 
@@ -21,7 +21,7 @@ Localization.lua
 
 HPetBattleAny.lua
 BattlePetBreedID.lua
-modules\PetData.lua
+#modules\PetData.lua
 modules\PetDataFrame.lua
 modules\Config.lua
 modules\Hook.lua

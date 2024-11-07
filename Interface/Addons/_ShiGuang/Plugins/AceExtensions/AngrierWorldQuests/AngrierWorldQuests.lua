@@ -1,7 +1,7 @@
 local AngrierWorldQuests = {}
 AngrierWorldQuests = LibStub("AceAddon-3.0"):NewAddon("AngrierWorldQuests")
 AngrierWorldQuests.Name = ANGRYWORLDQUEST_TITLE
-AngrierWorldQuests.Version = "11.0.5-20241023-1"
+AngrierWorldQuests.Version = "11.0.5-20241030-1"
 
 _AngrierWorldQuests = {
     Constants = {
@@ -2104,7 +2104,8 @@ do
 
                 -- We need to also make sure the "No search results" text is hidden.
                 QuestScrollFrame.NoSearchResultsText:Hide()
-            else
+            elseif ConfigModule:HasFilters() == false then
+                -- We should only hide the header, if no filters are active.
                 QuestFrameModule:HideWorldQuestsHeader()
                 return
             end

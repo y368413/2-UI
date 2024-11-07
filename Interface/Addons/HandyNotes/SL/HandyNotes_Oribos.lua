@@ -66,9 +66,13 @@ constants.defaults = {
         -- show_others = true,
 
         show_onlymytrainers = false,
+        use_old_picons = false,
+        picons_vendor = false,
+        picons_trainer = false,
         fmaster_waypoint = true,
         fmaster_waypoint_dropdown = 1,
         easy_waypoint = true,
+        easy_waypoint_dropdown = 1,
 
         force_nodes = false,
         show_prints = false,
@@ -107,25 +111,9 @@ constants.icongroup = {
     "zonegateway"
 }
 
-local left, right, top, bottom = GetObjectIconTextureCoords("4772") --MagePortalAlliance
-local left2, right2, top2, bottom2 = GetObjectIconTextureCoords("4773") --MagePortalHorde
-
 constants.icon = {
-    portal = {
-        icon = [[Interface\MINIMAP\OBJECTICONSATLAS]],
-        tCoordLeft = left,
-        tCoordRight = right,
-        tCoordTop = top,
-        tCoordBottom = bottom,
-    },
-
-    MagePortalHorde = {
-        icon = [[Interface\MINIMAP\OBJECTICONSATLAS]],
-        tCoordLeft = left2,
-        tCoordRight = right2,
-        tCoordTop = top2,
-        tCoordBottom = bottom2,
-    },
+    portal          = "Interface\\AddOns\\HandyNotes\\icons\\portal_blue",
+    portal_red      = "Interface\\AddOns\\HandyNotes\\icons\\portal_red",
 
     -- npc/poi icons
     auctioneer      = "Interface\\MINIMAP\\TRACKING\\Auctioneer",
@@ -137,7 +125,7 @@ constants.icon = {
     mail            = "Interface\\MINIMAP\\TRACKING\\Mailbox",
     reforge         = "Interface\\AddOns\\HandyNotes\\icons\\reforge",
     stablemaster    = "Interface\\MINIMAP\\TRACKING\\StableMaster",
-    trainer      = "Interface\\MINIMAP\\TRACKING\\Profession",
+    trainer         = "Interface\\MINIMAP\\TRACKING\\Profession",
     portaltrainer   = "Interface\\MINIMAP\\TRACKING\\Profession",
     transmogrifier  = "Interface\\MINIMAP\\TRACKING\\Transmogrifier",
     tpplatform      = "Interface\\MINIMAP\\TempleofKotmogu_ball_cyan",
@@ -150,33 +138,47 @@ constants.icon = {
     nightfae        = "Interface\\AddOns\\HandyNotes\\icons\\nightfae",
     venthyr         = "Interface\\AddOns\\HandyNotes\\icons\\venthyr",
 
-    -- profession icons
-    alchemy         = "Interface\\ICONS\\trade_alchemy",
-    blacksmithing   = "Interface\\ICONS\\trade_blacksmithing",
-    cooking         = "Interface\\ICONS\\INV_Misc_Food_15",
-    enchanting      = "Interface\\ICONS\\trade_engraving",
-    engineering     = "Interface\\ICONS\\trade_engineering",
-    fishing         = "Interface\\ICONS\\trade_fishing",
-    herbalism       = "Interface\\ICONS\\spell_nature_naturetouchgrow",
-    inscription     = "Interface\\ICONS\\inv_inscription_tradeskill01",
-    jewelcrafting   = "Interface\\ICONS\\inv_misc_gem_01",
-    leatherworking  = "Interface\\ICONS\\inv_misc_armorkit_17",
-    mining          = "Interface\\ICONS\\trade_mining",
-    skinning        = "Interface\\ICONS\\inv_misc_pelt_wolf_01",
-    tailoring       = "Interface\\ICONS\\trade_tailoring"
+    -- profession icons (since Dragonflight)
+    alchemy = "Interface\\ICONS\\ui_profession_alchemy",
+    blacksmithing = "Interface\\ICONS\\ui_profession_blacksmithing",
+    cooking = "Interface\\ICONS\\ui_profession_cooking",
+    enchanting = "Interface\\ICONS\\ui_profession_enchanting",
+    engineering = "Interface\\ICONS\\ui_profession_engineering",
+    fishing = "Interface\\ICONS\\ui_profession_fishing",
+    herbalism = "Interface\\ICONS\\ui_profession_herbalism",
+    inscription = "Interface\\ICONS\\ui_profession_inscription",
+    jewelcrafting = "Interface\\ICONS\\ui_profession_jewelcrafting",
+    leatherworking = "Interface\\ICONS\\ui_profession_leatherworking",
+    mining = "Interface\\ICONS\\ui_profession_mining",
+    skinning = "Interface\\ICONS\\ui_profession_skinning",
+    tailoring = "Interface\\ICONS\\ui_profession_tailoring",
 
+    -- profession icons OLD
+    alchemy_old = "Interface\\ICONS\\trade_alchemy",
+    blacksmithing_old = "Interface\\ICONS\\trade_blacksmithing",
+    cooking_old = "Interface\\ICONS\\INV_Misc_Food_15",
+    enchanting_old = "Interface\\ICONS\\trade_engraving",
+    engineering_old = "Interface\\ICONS\\trade_engineering",
+    fishing_old = "Interface\\ICONS\\trade_fishing",
+    herbalism_old = "Interface\\ICONS\\spell_nature_naturetouchgrow",
+    inscription_old = "Interface\\ICONS\\inv_inscription_tradeskill01",
+    jewelcrafting_old = "Interface\\ICONS\\inv_misc_gem_01",
+    leatherworking_old = "Interface\\ICONS\\inv_misc_armorkit_17",
+    mining_old = "Interface\\ICONS\\trade_mining",
+    skinning_old = "Interface\\ICONS\\inv_misc_pelt_wolf_01",
+    tailoring_old = "Interface\\ICONS\\trade_tailoring"
 }
 
 
 ----------------------------------------------------------------------------------------------------
 ------------------------------------------AddOn NAMESPACE-------------------------------------------
 ----------------------------------------------------------------------------------------------------
-local HandyNotes_Oribos = LibStub("AceAddon-3.0"):NewAddon("HandyNotes_Oribos", "AceEvent-3.0", "AceTimer-3.0")
-local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes")
+local HandyNotes_Oribos = LibStub("AceAddon-3.0"):NewAddon("HandyNotes_Oribos", "AceEvent-3.0")
 local AceDB = LibStub("AceDB-3.0")
+local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes")
+local HBD = LibStub('HereBeDragons-2.0')
 local L = LibStub("AceLocale-3.0"):GetLocale("HandyNotes")
-
-HandyNotes_Oribos.constants = Oribos.constants
+Oribos.locale = L
 
 _G.HandyNotes_Oribos = HandyNotes_Oribos
 
@@ -196,9 +198,11 @@ local RetrievingData    = L["handler_tooltip_data"]
 ----------------------------------------------------------------------------------------------------
 
 local NPClinkOribos = CreateFrame("GameTooltip", "NPClinkOribos", UIParent, "GameTooltipTemplate")
-local function GetCreatureNamebyID(id)
-	NPClinkOribos:SetOwner(UIParent, "ANCHOR_NONE")
-	NPClinkOribos:SetHyperlink(("unit:Creature-0-0-0-0-%d"):format(id))
+local function GetCreatureNameByID(id)
+    if (not id) then return end
+
+    NPClinkOribos:SetOwner(UIParent, "ANCHOR_NONE")
+    NPClinkOribos:SetHyperlink(("unit:Creature-0-0-0-0-%d"):format(id))
     local name      = _G["NPClinkOribosTextLeft1"]:GetText()
     local sublabel  = _G["NPClinkOribosTextLeft2"]:GetText()
     return name, sublabel
@@ -221,7 +225,7 @@ end
 
 local function HasTwoProfessions()
     local prof1, prof2 = GetProfessions()
-    if prof1 and prof2 then
+    if (prof1 and prof2) then
         return true
     end
     return false
@@ -235,23 +239,23 @@ local fmaster_waypoint = 0
 local function CreateFlightMasterWaypoint()
     local dropdown = Oribos.db.fmaster_waypoint_dropdown
 
-    if dropdown == 1 then
+    if (dropdown == 1) then
         -- create Blizzard waypoint
         C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(1550, 47.02/100, 51.16/100))
         C_SuperTrack.SetSuperTrackedUserWaypoint(true)
         fmaster_waypoint = 1
-        --HandyNotes_Oribos:debugmsg("Create Blizzard")
-    elseif IsAddOnLoaded("TomTom") and dropdown == 2 then
+       --HandyNotes_Oribos:debugmsg("Create Blizzard")
+    elseif (C_AddOns.IsAddOnLoaded("TomTom") and dropdown == 2) then
         -- create TomTom waypoint
-        Oribos.uid = TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNamebyID(162666)})
+        Oribos.uid = TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNameByID(162666)})
         fmaster_waypoint = 1
         --HandyNotes_Oribos:debugmsg("Create TomTom")
-    elseif dropdown == 3 then
+    elseif (dropdown == 3) then
         -- create both waypoints
         C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(1550, 47.02/100, 51.16/100))
         C_SuperTrack.SetSuperTrackedUserWaypoint(true)
-        if IsAddOnLoaded("TomTom") then
-            Oribos.uid = TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNamebyID(162666)})
+        if (C_AddOns.IsAddOnLoaded("TomTom")) then
+            Oribos.uid = TomTom:AddWaypoint(1671, 61.91/100, 68.78/100, {title = GetCreatureNameByID(162666)})
         end
         fmaster_waypoint = 1
         --HandyNotes_Oribos:debugmsg("Create Both")
@@ -261,21 +265,21 @@ end
 local function RemoveFlightMasterWaypoint()
     local dropdown = Oribos.db.fmaster_waypoint_dropdown
 
-    if fmaster_waypoint == 1 then
-        if dropdown == 1 then
+    if (fmaster_waypoint == 1) then
+        if (dropdown == 1) then
             -- remove Blizzard waypoint
             C_Map.ClearUserWaypoint()
             fmaster_waypoint = 0
             --HandyNotes_Oribos:debugmsg("Remove Blizzard")
-        elseif IsAddOnLoaded("TomTom") and dropdown == 2 then
+        elseif (C_AddOns.IsAddOnLoaded("TomTom") and dropdown == 2) then
             -- remove TomTom waypoint
             TomTom:RemoveWaypoint(Oribos.uid)
             fmaster_waypoint = 0
             --HandyNotes_Oribos:debugmsg("Remove TomTom")
-        elseif dropdown == 3 then
+        elseif (dropdown == 3) then
             -- remove both waypoints
             C_Map.ClearUserWaypoint()
-            if IsAddOnLoaded("TomTom") then
+            if (C_AddOns.IsAddOnLoaded("TomTom")) then
                 TomTom:RemoveWaypoint(Oribos.uid)
             end
             fmaster_waypoint = 0
@@ -285,13 +289,48 @@ local function RemoveFlightMasterWaypoint()
 end
 
 ----------------------------------------------------------------------------------------------------
+----------------------------------------------PREPARE-----------------------------------------------
+local function Prepare(label, note)
+    local t = {}
+    local NOTE
+
+    for i, name in ipairs(label) do
+
+        -- set spell name as label
+        if (type(name) == "number") then
+            name = C_Spell.GetSpellInfo(name).name
+        end
+
+        -- add additional notes
+        if (note and note[i]) then
+            NOTE = " ("..note[i]..")"
+        else
+            NOTE = ''
+        end
+
+        -- store everything together
+        t[i] = name..NOTE
+    end
+
+    return table.concat(t, "\n")
+end
+
+----------------------------------------------------------------------------------------------------
 ------------------------------------------------ICON------------------------------------------------
 ----------------------------------------------------------------------------------------------------
 
-local function SetIcon(point)
-    local icon_key = (Oribos.db.picons_vendor and point.icon == "vendor" and point.picon)
-                  or (Oribos.db.picons_trainer and point.icon == "trainer" and point.picon)
-                  or point.icon
+local function SetIcon(node)
+    local icon_key = node.icon
+
+    if (node.picon) then
+        if (Oribos.db.picons_vendor and (node.icon == "vendor" or node.icon == "anvil")) then
+            icon_key = Oribos.db.use_old_picons and node.picon.."_old" or node.picon
+        end
+
+        if (Oribos.db.picons_trainer and node.icon == "trainer") then
+            icon_key = Oribos.db.use_old_picons and node.picon.."_old" or node.picon
+        end
+    end
 
     if (icon_key and constantsicon[icon_key]) then
         return constantsicon[icon_key]
@@ -300,13 +339,13 @@ end
 
 local function GetIconScale(icon, picon)
     -- makes the picon smaller
-    if picon ~= nil and Oribos.db.picons_vendor and icon == "vendor" then return Oribos.db["icon_scale_vendor"] * 0.75 end
-    if picon ~= nil and Oribos.db.picons_trainer and icon == "trainer" then return Oribos.db["icon_scale_trainer"] * 0.75 end
+    if (picon ~= nil and Oribos.db.picons_vendor and (icon == "vendor" or icon == "anvil")) then return Oribos.db["icon_scale_vendor"] * 0.75 end
+    if (picon ~= nil and Oribos.db.picons_trainer and icon == "trainer") then return Oribos.db["icon_scale_trainer"] * 0.75 end
     -- anvil npcs are vendors
-    if icon == "anvil" then
+    if (icon == "anvil") then
         return Oribos.db["icon_scale_vendor"]
     -- combine the four zone gateway icons
-    elseif icon == "kyrian" or icon == "necrolord" or icon == "nightfae" or icon == "venthyr" then
+    elseif (icon == "kyrian" or icon == "necrolord" or icon == "nightfae" or icon == "venthyr") then
         return  Oribos.db["icon_scale_zonegateway"]
     end
 
@@ -315,58 +354,61 @@ end
 
 local function GetIconAlpha(icon)
     -- anvil npcs are vendors
-    if icon == "anvil" then
+    if (icon == "anvil") then
         return Oribos.db["icon_alpha_vendor"]
     -- combine the four zone gateway icons
-    elseif icon == "kyrian" or icon == "necrolord" or icon == "nightfae" or icon == "venthyr" then
+    elseif (icon == "kyrian" or icon == "necrolord" or icon == "nightfae" or icon == "venthyr") then
         return  Oribos.db["icon_alpha_zonegateway"]
     end
 
     return Oribos.db["icon_alpha_"..icon]
 end
 
-local GetPointInfo = function(point)
+local GetNodeInfo = function(node)
     local icon
-    if point then
-        local label = GetCreatureNamebyID(point.npc) or point.label or UNKNOWN
-        if (point.icon == "portal" and point.quest and not IsQuestCompleted(point.quest)) then
-            icon = Oribos.constants.icon["MagePortalHorde"]
+    if (node) then
+        local label = GetCreatureNameByID(node.npc) or node.label or node.multilabel and Prepare(node.multilabel) or UNKNOWN
+        if (node.icon == "portal" and node.quest and not IsQuestCompleted(node.quest)) then
+            icon = Oribos.constants.icon["portal_red"]
         else
-            icon = SetIcon(point)
+            icon = SetIcon(node)
         end
-        return label, icon, point.icon, point.picon, point.scale, point.alpha -- icon returns the path
+        return label, icon, node.icon, node.picon, node.scale, node.alpha -- icon returns the path
     end
 end
 
-local GetPoinInfoByCoord = function(uMapID, coord)
-    return GetPointInfo(Oribos.DB.points[uMapID] and Oribos.DB.points[uMapID][coord])
+local GetNodeInfoByCoord = function(uMapID, coord)
+    return GetNodeInfo(Oribos.DB.nodes[uMapID] and Oribos.DB.nodes[uMapID][coord])
 end
 
 ----------------------------------------------------------------------------------------------------
 ----------------------------------------------TOOLTIP-----------------------------------------------
 ----------------------------------------------------------------------------------------------------
 
-local function SetTooltip(tooltip, point)
+local function SetTooltip(tooltip, node)
 
-    if point then
-        if point.npc then
-            local name, sublabel = GetCreatureNamebyID(point.npc)
-            if name then
+    if (node) then
+        if (node.npc) then
+            local name, sublabel = GetCreatureNameByID(node.npc)
+            if (name) then
                 tooltip:AddLine(name)
             end
-            if sublabel then
+            if (sublabel) then
                 tooltip:AddLine(sublabel,1,1,1)
             end
         end
-        if point.label then
-            tooltip:AddLine(point.label)
+        if (node.label) then
+            tooltip:AddLine(node.label)
         end
-        if point.note then
-            tooltip:AddLine(point.note)
+        if (node.note) then
+            tooltip:AddLine("("..node.note..")")
         end
-        if (point.quest and not IsQuestCompleted(point.quest)) then
-            if C_QuestLog.GetTitleForQuestID(point.quest) ~= nil then
-                tooltip:AddLine(RequiresQuest..": ["..C_QuestLog.GetTitleForQuestID(point.quest).."] (ID: "..point.quest..")",1,0,0)
+        if (node.multilabel) then
+            tooltip:AddLine(Prepare(node.multilabel, node.multinote))
+        end
+        if (node.quest and not IsQuestCompleted(node.quest)) then
+            if (C_QuestLog.GetTitleForQuestID(node.quest) ~= nil) then
+                tooltip:AddLine(RequiresQuest..": ["..C_QuestLog.GetTitleForQuestID(node.quest).."] (ID: "..node.quest..")",1,0,0)
             else
                 tooltip:AddLine(RetrievingData,1,0,1) -- pink
                 C_Timer.After(1, function() HandyNotes_Oribos:Refresh() end) -- Refresh
@@ -380,7 +422,7 @@ local function SetTooltip(tooltip, point)
 end
 
 local SetTooltipByCoord = function(tooltip, uMapID, coord)
-    return SetTooltip(tooltip, Oribos.DB.points[uMapID] and Oribos.DB.points[uMapID][coord])
+    return SetTooltip(tooltip, Oribos.DB.nodes[uMapID] and Oribos.DB.nodes[uMapID][coord])
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -401,7 +443,7 @@ function PluginHandler:OnEnter(uMapID, coord)
 end
 
 function PluginHandler:OnLeave(uMapID, coord)
-    if self:GetParent() == WorldMapButton then
+    if (self:GetParent() == WorldMapButton) then
         WorldMapTooltip:Hide()
     else
         GameTooltip:Hide()
@@ -418,15 +460,29 @@ local function closeAllDropdowns()
 end
 
 local function addTomTomWaypoint(button, uMapID, coord)
-    if TomTom then
+    if (C_AddOns.IsAddOnLoaded("TomTom")) then
         local x, y = HandyNotes:getXY(coord)
         TomTom:AddWaypoint(uMapID, x, y, {
-            title = GetPoinInfoByCoord(uMapID, coord),
+            title = GetNodeInfoByCoord(uMapID, coord),
+            from = L["handler_context_menu_addon_name"],
             persistent = nil,
             minimap = true,
             world = true
         })
     end
+end
+
+local function addBlizzardWaypoint(button, uMapID, coord)
+    local x, y = HandyNotes:getXY(coord)
+    local parentMapID = C_Map.GetMapInfo(uMapID)["parentMapID"]
+    if (not C_Map.CanSetUserWaypointOnMap(uMapID)) then
+        local wx, wy = HBD:GetWorldCoordinatesFromZone(x, y, uMapID)
+        uMapID = parentMapID
+        x, y = HBD:GetZoneCoordinatesFromWorld(wx, wy, parentMapID)
+    end
+
+    C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(uMapID, x, y))
+    C_SuperTrack.SetSuperTrackedUserWaypoint(true)
 end
 
 --------------------------------------------CONTEXT MENU--------------------------------------------
@@ -437,45 +493,50 @@ do
     local function generateMenu(button, level)
         if (not level) then return end
         if (level == 1) then
---      local spacer = {text='', disabled=true, notClickable=true, notCheckable=true}
 
             -- Create the title of the menu
-            info = UIDropDownMenu_CreateInfo()
-            info.isTitle = true
-            info.text = L["handler_context_menu_addon_name"]
-            info.notCheckable = true
-            UIDropDownMenu_AddButton(info, level)
+            UIDropDownMenu_AddButton({
+                isTitle = true,
+                text = L["handler_context_menu_addon_name"],
+                notCheckable = true
+            }, level)
 
---            UIDropDownMenu_AddButton(spacer, level)
-
-            if TomTom and not Oribos.db.easy_waypoint then
-                -- Waypoint menu item
-                info = UIDropDownMenu_CreateInfo()
-                info.text = L["handler_context_menu_add_tomtom"]
-                info.notCheckable = true
-                info.func = addTomTomWaypoint
-                info.arg1 = currentMapID
-                info.arg2 = currentCoord
-                UIDropDownMenu_AddButton(info, level)
+            -- TomTom waypoint menu item
+            if (C_AddOns.IsAddOnLoaded("TomTom")) then
+                UIDropDownMenu_AddButton({
+                    text = L["handler_context_menu_add_tomtom"],
+                    notCheckable = true,
+                    func = addTomTomWaypoint,
+                    arg1 = currentMapID,
+                    arg2 = currentCoord
+                }, level)
             end
 
-            -- Hide menu item
-            info = UIDropDownMenu_CreateInfo()
-            info.text         = L["handler_context_menu_hide_node"]
-            info.notCheckable = true
-            info.func         = hideNode
-            info.arg1         = currentMapID
-            info.arg2         = currentCoord
-            UIDropDownMenu_AddButton(info, level)
+            -- Blizzard waypoint menu item
+            UIDropDownMenu_AddButton({
+                text = L["handler_context_menu_add_map_pin"],
+                notCheckable = true,
+                func = addBlizzardWaypoint,
+                arg1 = currentMapID,
+                arg2 = currentCoord
+            }, level)
 
---          UIDropDownMenu_AddButton(spacer, level)
+            -- Hide menu item
+            UIDropDownMenu_AddButton({
+                text         = L["handler_context_menu_hide_node"],
+                notCheckable = true,
+                func         = hideNode,
+                arg1         = currentMapID,
+                arg2         = currentCoord
+            }, level)
 
             -- Close menu item
-            info = UIDropDownMenu_CreateInfo()
-            info.text         = CLOSE
-            info.func         = closeAllDropdowns
-            info.notCheckable = true
-            UIDropDownMenu_AddButton(info, level)
+            UIDropDownMenu_AddButton({
+                text         = CLOSE,
+                func         = closeAllDropdowns,
+                notCheckable = true
+            }, level)
+
         end
     end
 
@@ -484,35 +545,38 @@ do
     HL_Dropdown.initialize = generateMenu
 
     function PluginHandler:OnClick(button, down, uMapID, coord)
-        if ((down or button ~= "RightButton") and Oribos.db.easy_waypoint and TomTom) then
-            return
-        end
-        if ((button == "RightButton" and not down) and (not Oribos.db.easy_waypoint or not TomTom)) then
+        local TomTom = select(2, C_AddOns.IsAddOnLoaded('TomTom'))
+        local dropdown = Oribos.db.easy_waypoint_dropdown
+
+        if (down or button ~= "RightButton") then return end
+
+        if (button == "RightButton" and not down and not Oribos.db.easy_waypoint) then
             currentMapID = uMapID
             currentCoord = coord
             ToggleDropDownMenu(1, nil, HL_Dropdown, self, 0, 0)
-        end
-        if (IsControlKeyDown() and Oribos.db.easy_waypoint and TomTom) then
+        elseif (IsControlKeyDown() and Oribos.db.easy_waypoint) then
             currentMapID = uMapID
             currentCoord = coord
             ToggleDropDownMenu(1, nil, HL_Dropdown, self, 0, 0)
-        else
-        if Oribos.db.easy_waypoint and TomTom then
+        elseif (not TomTom or dropdown == 1) then
+            addBlizzardWaypoint(button, uMapID, coord)
+        elseif (TomTom and dropdown == 2) then
             addTomTomWaypoint(button, uMapID, coord)
-        end
+        else
+            addBlizzardWaypoint(button, uMapID, coord)
+            if (TomTom) then addTomTomWaypoint(button, uMapID, coord) end
         end
     end
 end
 
 do
-
-local currentMapID = nil
+    local currentMapID = nil
     local function iter(t, prestate)
-        if not t then return nil end
+        if (not t) then return nil end
         local state, value = next(t, prestate)
         while state do
-            if value and Oribos:ShouldShow(state, value, currentMapID) then
-                local _, icon, iconname, piconname, scale, alpha = GetPointInfo(value)
+            if (value and Oribos:ShouldShow(state, value, currentMapID)) then
+                local _, icon, iconname, piconname, scale, alpha = GetNodeInfo(value)
                     scale = (scale or 1) * GetIconScale(iconname, piconname)
                     alpha = (alpha or 1) * GetIconAlpha(iconname)
                 return state, nil, icon, scale, alpha
@@ -521,49 +585,51 @@ local currentMapID = nil
         end
         return nil, nil, nil, nil, nil, nil
     end
+
     function PluginHandler:GetNodes2(uMapID, minimap)
         currentMapID = uMapID
-        return iter, Oribos.DB.points[uMapID], nil
+        return iter, Oribos.DB.nodes[uMapID], nil
     end
-    function Oribos:ShouldShow(coord, point, currentMapID)
-    if not Oribos.db.force_nodes then
-        if (Oribos.hidden[currentMapID] and Oribos.hidden[currentMapID][coord]) then
-            return false
+
+    function Oribos:ShouldShow(coord, node, currentMapID)
+        if (not Oribos.db.force_nodes) then
+            if (Oribos.hidden[currentMapID] and Oribos.hidden[currentMapID][coord]) then
+                return false
+            end
+            -- this will check if any node is for a specific class
+            if (node.class and node.class ~= select(2, UnitClass("player"))) then
+                return false
+            end
+            -- this will check if any node is for a specific faction
+            if (node.faction and node.faction ~= select(1, UnitFactionGroup("player"))) then
+                return false
+            end
+            -- this will check if any node is for a specific covenant
+            if (node.covenant and node.covenant ~= C_Covenants.GetActiveCovenantID()) then
+                return false
+            end
+            -- this will check if the node is for a specific profession
+            if (node.profession and (not HandyNotes_Oribos:CharacterHasProfession(node.profession) and HasTwoProfessions()) and Oribos.db.show_onlymytrainers and not node.auctioneer) then
+                return false
+            end
+            if (node.icon == "auctioneer" and (not HandyNotes_Oribos:CharacterHasProfession(node.profession) or not Oribos.db.show_auctioneer)) then return false end
+            if (node.icon == "banker" and not Oribos.db.show_banker) then return false end
+            if (node.icon == "barber" and not Oribos.db.show_barber) then return false end
+            if (node.icon == "greatvault" and not Oribos.db.show_greatvault) then return false end
+            if (node.icon == "guildvault" and not Oribos.db.show_guildvault) then return false end
+            if (node.icon == "innkeeper" and not Oribos.db.show_innkeeper) then return false end
+            if (node.icon == "mail" and not Oribos.db.show_mail) then return false end
+            if (node.icon == "portal" and (not Oribos.db.show_portal or C_AddOns.IsAddOnLoaded("HandyNotes_TravelGuide"))) then return false end
+            if (node.icon == "tpplatform" and (not Oribos.db.show_tpplatform or C_AddOns.IsAddOnLoaded("HandyNotes_TravelGuide"))) then return false end
+            if (node.icon == "reforge" and not Oribos.db.show_reforge) then return false end
+            if (node.icon == "stablemaster" and not Oribos.db.show_stablemaster) then return false end
+            if (node.icon == "trainer" and not Oribos.db.show_trainer) then return false end
+            if (node.icon == "portaltrainer" and not Oribos.db.show_portaltrainer) then return false end
+            if (node.icon == "transmogrifier" and not Oribos.db.show_transmogrifier) then return false end
+            if ((node.icon == "vendor" or node.icon == "anvil") and not Oribos.db.show_vendor) then return false end
+            if (node.icon == "void" and not Oribos.db.show_void) then return false end
+            if ((node.icon == "kyrian" or node.icon == "necrolord" or node.icon == "nightfae" or node.icon == "venthyr") and not Oribos.db.show_zonegateway) then return false end
         end
-        -- this will check if any node is for a specific class
-        if (point.class and point.class ~= select(2, UnitClass("player"))) then
-            return false
-        end
-        -- this will check if any node is for a specific faction
-        if (point.faction and point.faction ~= select(1, UnitFactionGroup("player"))) then
-            return false
-        end
-        -- this will check if any node is for a specific covenant
-        if (point.covenant and point.covenant ~= C_Covenants.GetActiveCovenantID()) then
-            return false
-        end
-        -- this will check if the node is for a specific profession
-        if (point.profession and (not HandyNotes_Oribos:CharacterHasProfession(point.profession) and HasTwoProfessions()) and Oribos.db.show_onlymytrainers and not point.auctioneer) then
-            return false
-        end
-        if (point.icon == "auctioneer" and (not HandyNotes_Oribos:CharacterHasProfession(point.profession) or not Oribos.db.show_auctioneer)) then return false end
-        if (point.icon == "banker" and not Oribos.db.show_banker) then return false end
-        if (point.icon == "barber" and not Oribos.db.show_barber) then return false end
-        if (point.icon == "greatvault" and not Oribos.db.show_greatvault) then return false end
-        if (point.icon == "guildvault" and not Oribos.db.show_guildvault) then return false end
-        if (point.icon == "innkeeper" and not Oribos.db.show_innkeeper) then return false end
-        if (point.icon == "mail" and not Oribos.db.show_mail) then return false end
-        if (point.icon == "portal" and (not Oribos.db.show_portal or IsAddOnLoaded("HandyNotes_TravelGuide"))) then return false end
-        if (point.icon == "tpplatform" and (not Oribos.db.show_tpplatform or IsAddOnLoaded("HandyNotes_TravelGuide"))) then return false end
-        if (point.icon == "reforge" and not Oribos.db.show_reforge) then return false end
-        if (point.icon == "stablemaster" and not Oribos.db.show_stablemaster) then return false end
-        if (point.icon == "trainer" and not Oribos.db.show_trainer) then return false end
-        if (point.icon == "portaltrainer" and not Oribos.db.show_portaltrainer) then return false end
-        if (point.icon == "transmogrifier" and not Oribos.db.show_transmogrifier) then return false end
-        if ((point.icon == "vendor" or point.icon == "anvil") and not Oribos.db.show_vendor) then return false end
-        if (point.icon == "void" and not Oribos.db.show_void) then return false end
-        if ((point.icon == "kyrian" or point.icon == "necrolord" or point.icon == "nightfae" or point.icon == "venthyr") and not Oribos.db.show_zonegateway) then return false end
-    end
         return true
     end
 end
@@ -583,7 +649,7 @@ function HandyNotes_Oribos:OnInitialize()
 
     Oribos.hidden = self.db.char.hidden
 
-    if Oribos.global.dev then
+    if (Oribos.global.dev) then
         Oribos.devmode()
     end
 
@@ -603,7 +669,7 @@ end
 local frame, events = CreateFrame("Frame"), {};
 function events:PLAYER_ENTERING_WORLD(...)
     -- MapID is 1550 when you use the Portal to Korthia
-    if C_Map.GetBestMapForUnit("player") == 1550 then
+    if (C_Map.GetBestMapForUnit("player") == 1550) then
         RemoveFlightMasterWaypoint()
     end
 end
@@ -614,7 +680,7 @@ function events:ZONE_CHANGED(...)
     --HandyNotes_Oribos:debugmsg("Oribos: refreshed after ZONE_CHANGED")
     --HandyNotes_Oribos:debugmsg("MapID: "..C_Map.GetBestMapForUnit("player"))
 
-    if C_Map.GetBestMapForUnit("player") == 1671 then
+    if (C_Map.GetBestMapForUnit("player") == 1671) then
         RemoveFlightMasterWaypoint()
     end
 end
@@ -697,13 +763,13 @@ config.options = {
                     type = "description",
                     name = L["config_travelguide_note"],
                     hidden = function()
-                        return not IsAddOnLoaded("HandyNotes_TravelGuide")
+                        return not C_AddOns.IsAddOnLoaded("HandyNotes_TravelGuide")
                     end,
                     order = 30,
                 },
-                other_line = {
+                line_trade_skills = {
                     type = "header",
-                    name = "",
+                    name = TRADE_SKILLS, -- Professions
                     order = 31,
                 },
                 show_onlymytrainers = {
@@ -715,7 +781,7 @@ config.options = {
                 },
                 picons = {
                     type = "description",
-                    width = 0.9,
+                    width = 0.97,
                     name = L["config_picons"],
                     fontSize = "medium",
                     order = 33,
@@ -729,41 +795,57 @@ config.options = {
                 },
                 picons_trainer = {
                     type = "toggle",
-                    width = 0.6,
+                    width = 0.8,
                     name = L["config_trainer"],
                     desc = L["config_picons_trainer_desc"],
                     order = 33.2,
                 },
+                use_old_picons = {
+                    type = "toggle",
+                    width = "full",
+                    name = L["config_use_old_picons"],
+                    desc = L["config_use_old_picons_desc"],
+                    disabled = function() return not (Oribos.db.picons_trainer or Oribos.db.picons_vendor) end,
+                    order = 34,
+                },
+                line_misc = {
+                    type = "header",
+                    name = "",
+                    order = 35,
+                },
                 fmaster_waypoint = {
                     type = "toggle",
-                    width = 1.3,
+                    width = 1.57,
                     name = L["config_fmaster_waypoint"],
                     desc = L["config_fmaster_waypoint_desc"],
-                    order = 34,
+                    order = 36,
                 },
                 fmaster_waypoint_dropdown = {
                     type = "select",
                     values = { L["Blizzard"], L["TomTom"], L["Both"] },
                     disabled = function() return not Oribos.db.fmaster_waypoint end,
-                    hidden = function() return not IsAddOnLoaded("TomTom") end,
-                    name = L["config_fmaster_waypoint_dropdown"],
-                    desc = L["config_fmaster_waypoint_dropdown_desc"],
+                    hidden = function() return not C_AddOns.IsAddOnLoaded("TomTom") end,
+                    name = L["config_waypoint_dropdown"],
+                    desc = L["config_waypoint_dropdown_desc"],
                     width = 0.7,
-                    order = 35,
+                    order = 36.1,
                 },
                 easy_waypoint = {
                     type = "toggle",
-                    width = "full",
-                    name = function()
-                        if IsAddOnLoaded("TomTom") then
-                            return L["config_easy_waypoints"]
-                        else
-                            return L["config_easy_waypoints"].." |cFFFF0000("..L["handler_tooltip_requires"].." TomTom)|r"
-                        end
-                    end,
-                    disabled = function() return not IsAddOnLoaded("TomTom") end,
+                    width = 1.57,
+                    name = L["config_easy_waypoints"],
                     desc = L["config_easy_waypoints_desc"],
-                    order = 36,
+                    order = 37,
+                },
+                easy_waypoint_dropdown = {
+                    type = "select",
+                    values = { L["Blizzard"], L["TomTom"], L["Both"] },
+                    disabled = function() return not Oribos.db.easy_waypoint end,
+                    hidden = function() return not C_AddOns.IsAddOnLoaded("TomTom") end,
+                    name = L["config_waypoint_dropdown"],
+                    desc = L["config_waypoint_dropdown_desc"],
+                    width = 0.7,
+                    order = 37.1,
                 },
                 unhide = {
                     type = "execute",
@@ -777,7 +859,7 @@ config.options = {
                         HandyNotes_Oribos:Refresh()
                         print("Oribos: "..L["config_restore_nodes_print"])
                     end,
-                    order = 37,
+                    order = 38,
                 },
             },
             },
@@ -810,13 +892,13 @@ end
 local gcmp = config.options.args.ICONDISPLAY.args.display.args
 gcmp.show_auctioneer["hidden"] = function() return not HandyNotes_Oribos:CharacterHasProfession(202) end
 
-gcmp.show_portal["name"] = function() return IsAddOnLoaded("HandyNotes_TravelGuide") and L["config_portal"].." |cFFFF0000(*)|r" or L["config_portal"] end
-gcmp.show_portal["disabled"] = function() return IsAddOnLoaded("HandyNotes_TravelGuide") end
+gcmp.show_portal["name"] = function() return C_AddOns.IsAddOnLoaded("HandyNotes_TravelGuide") and L["config_portal"].." |cFFFF0000(*)|r" or L["config_portal"] end
+gcmp.show_portal["disabled"] = function() return C_AddOns.IsAddOnLoaded("HandyNotes_TravelGuide") end
 
 gcmp.show_portaltrainer["hidden"] = function() return not (select(2, UnitClass("player")) == "MAGE") end
 
-gcmp.show_tpplatform["name"] = function() return IsAddOnLoaded("HandyNotes_TravelGuide") and L["config_tpplatform"].." |cFFFF0000(*)|r" or L["config_tpplatform"] end
-gcmp.show_tpplatform["disabled"] = function() return IsAddOnLoaded("HandyNotes_TravelGuide") end
+gcmp.show_tpplatform["name"] = function() return C_AddOns.IsAddOnLoaded("HandyNotes_TravelGuide") and L["config_tpplatform"].." |cFFFF0000(*)|r" or L["config_tpplatform"] end
+gcmp.show_tpplatform["disabled"] = function() return C_AddOns.IsAddOnLoaded("HandyNotes_TravelGuide") end
 
 -- create the scale / alpha config menu
 for i, icongroup in ipairs(Oribos.constants.icongroup) do
@@ -833,7 +915,7 @@ for i, icongroup in ipairs(Oribos.constants.icongroup) do
         desc = L["config_icon_scale_desc"],
         min = 0.25, max = 3, step = 0.01,
         arg = "icon_scale_"..icongroup,
-        width = 1.07,
+        width = 1.19,
         order = i *10 + 1,
     }
 
@@ -843,28 +925,28 @@ for i, icongroup in ipairs(Oribos.constants.icongroup) do
         desc = L["config_icon_alpha_desc"],
         min = 0, max = 1, step = 0.01,
         arg = "icon_alpha_"..icongroup,
-        width = 1.07,
+        width = 1.19,
         order = i *10 + 2,
     }
 end
 
--- set some parameters for scale / aplha config menu points
+-- set some parameters for scale / alpha config menu points
 local sacmp = config.options.args.SCALEALPHA.args
 sacmp.name_auctioneer["hidden"] = function() return not HandyNotes_Oribos:CharacterHasProfession(202) end
 sacmp.icon_scale_auctioneer["hidden"] = function() return not HandyNotes_Oribos:CharacterHasProfession(202) end
 sacmp.icon_alpha_auctioneer["hidden"] = function() return not HandyNotes_Oribos:CharacterHasProfession(202) end
 
-sacmp.name_portal["name"] = function() return IsAddOnLoaded("HandyNotes_TravelGuide") and L["config_portal"].." |cFFFF0000(*)|r" or L["config_portal"] end
-sacmp.icon_scale_portal["disabled"] = function() return IsAddOnLoaded("HandyNotes_TravelGuide") end
-sacmp.icon_alpha_portal["disabled"] = function() return IsAddOnLoaded("HandyNotes_TravelGuide") end
+sacmp.name_portal["name"] = function() return C_AddOns.IsAddOnLoaded("HandyNotes_TravelGuide") and L["config_portal"].." |cFFFF0000(*)|r" or L["config_portal"] end
+sacmp.icon_scale_portal["disabled"] = function() return C_AddOns.IsAddOnLoaded("HandyNotes_TravelGuide") end
+sacmp.icon_alpha_portal["disabled"] = function() return C_AddOns.IsAddOnLoaded("HandyNotes_TravelGuide") end
 
 sacmp.name_portaltrainer["hidden"] = function() return not (select(2, UnitClass("player")) == "MAGE") end
 sacmp.icon_scale_portaltrainer["hidden"] = function() return not (select(2, UnitClass("player")) == "MAGE") end
 sacmp.icon_alpha_portaltrainer["hidden"] = function() return not (select(2, UnitClass("player")) == "MAGE") end
 
-sacmp.name_tpplatform["name"] = function() return IsAddOnLoaded("HandyNotes_TravelGuide") and L["config_tpplatform"].." |cFFFF0000(*)|r" or L["config_tpplatform"] end
-sacmp.icon_scale_tpplatform["disabled"] = function() return IsAddOnLoaded("HandyNotes_TravelGuide") end
-sacmp.icon_alpha_tpplatform["disabled"] = function() return IsAddOnLoaded("HandyNotes_TravelGuide") end
+sacmp.name_tpplatform["name"] = function() return C_AddOns.IsAddOnLoaded("HandyNotes_TravelGuide") and L["config_tpplatform"].." |cFFFF0000(*)|r" or L["config_tpplatform"] end
+sacmp.icon_scale_tpplatform["disabled"] = function() return C_AddOns.IsAddOnLoaded("HandyNotes_TravelGuide") end
+sacmp.icon_alpha_tpplatform["disabled"] = function() return C_AddOns.IsAddOnLoaded("HandyNotes_TravelGuide") end
 
 
 ----------------------------------------------------------------------------------------------------
@@ -905,8 +987,7 @@ local function devmode()
 
     SLASH_ORIBOS1 = "/oribos"
     SlashCmdList["ORIBOS"] = function(msg)
-        InterfaceOptionsFrame_Show()
-        InterfaceOptionsFrame_OpenToCategory('HandyNotes')
+        Settings.OpenToCategory('HandyNotes')
         LibStub('AceConfigDialog-3.0'):SelectGroup('HandyNotes', 'plugins', 'Oribos')
     end
 
@@ -922,7 +1003,11 @@ Oribos.devmode = devmode
 ----------------------------------------------------------------------------------------------------
 
 local function GetMapNames(id1, id2)
-    return format("%s, %s", C_Map.GetMapInfo(id1).name, C_Map.GetMapInfo(id2).name)
+    if (id1 and id2) then
+        return format("%s, %s", C_Map.GetMapInfo(id1).name, C_Map.GetMapInfo(id2).name)
+    else
+        return C_Map.GetMapInfo(id1).name
+    end
 end
 
 local PtoOG = L["Portal to Orgrimmar"]
@@ -934,6 +1019,7 @@ local RingFates = L["To Ring of Fates"]
 local IntoTheMaw = L["Into the Maw"]
 local Korthia = GetMapNames(1543, 1961)
 local KeepersRespite = L["To Keeper's Respite"]
+local PtoZerethMortis = L["Portal to Zereth Mortis"]
 
 local guildvault = L["config_guildvault"]
 local mailbox = L["Mailbox"]
@@ -945,7 +1031,7 @@ local mailbox = L["Mailbox"]
 local DB = {}
 Oribos.DB = DB
 
-DB.points = {
+DB.nodes = {
 
 [1670] = { -- Ring of Fates
     -- HALL OF SHAPES
@@ -1047,6 +1133,7 @@ DB.points = {
     [62183266] = { icon="necrolord", label=C_Map.GetMapInfo(1536).name },
     [49587788] = { icon="nightfae", label=C_Map.GetMapInfo(1565).name },
     [32015156] = { icon="venthyr", label=C_Map.GetMapInfo(1525).name },
+    [49562609] = { icon="portal", label=PtoZerethMortis, quest=64957 }
 },
 
 [1672] = {

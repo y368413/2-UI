@@ -502,7 +502,6 @@ thj.StopQuesting = function()
     thj.info.isQuesting = false;
 end
 
-
 local cp = CreateFrame('Frame', 'hkc', UIParent)
 -- 位置可移动，宽高分别为205 150
 cp:SetPoint('BOTTOM', UIParent, 'BOTTOM', -485, 95)
@@ -729,4 +728,20 @@ local btnFunnel = thj.createSwitchButton({
     height = 20,
     anchor = {"LEFT", btnReactive, "RIGHT", 0, 0},
     tip = "漏斗模式：AOE时用群攻技能攒能量，施放单体终结技。\n适用于敏锐、奇袭、增强、毁灭专精。"
+})
+-- 播放按键声音钮 
+local btnVoice = thj.createSwitchButton({
+    name = "VoiceButton",
+    parent = cp,
+    text = "语音",
+    getter = function()
+        return HSstop
+    end,
+    setter = function(v)
+        HSstop = false
+    end,
+    width = 60,
+    height = 20,
+    anchor = {"LEFT", btnFunnel, "RIGHT", 0, 0},
+    tip = "语音播报下一个按键"
 })]]

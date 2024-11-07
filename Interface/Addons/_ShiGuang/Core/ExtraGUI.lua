@@ -1643,16 +1643,16 @@ function G:SetupNameplateSize(parent)
 		createOptionSlider(parent, U["Height"], 5, 50, 8, offset-130, optionValues[value][2], func, "Nameplate")
 		createOptionSlider(parent, U["InteractWidth"], 50, 500, 190, offset-200, optionValues[value][9], func, "Nameplate")
 		createOptionSlider(parent, U["InteractHeight"], 5, 50, 8, offset-270, optionValues[value][10], func, "Nameplate")
-		createOptionSlider(parent, U["NameTextSize"], 10, 50, 14, offset-200, optionValues[value][3], func, "Nameplate")
-		createOptionSlider(parent, U["NameOffset"], -100, 50, 5, offset-340, optionValues[value][11], func, "Nameplate")
-		createOptionSlider(parent, U["HealthTextSize"], 10, 50, 16, offset-270, optionValues[value][4], func, "Nameplate")
-		createOptionSlider(parent, U["Health Offset"], -50, 50, 5, offset-340, optionValues[value][5], func, "Nameplate")
-		createOptionSlider(parent, U["Castbar Height"], 5, 50, 8, offset-410, optionValues[value][6], func, "Nameplate")
-		createOptionSlider(parent, U["CastbarTextSize"], 10, 50, 14, offset-480, optionValues[value][7], func, "Nameplate")
-		createOptionSlider(parent, U["CastbarTextOffset"], -50, 50, -1, offset-550, optionValues[value][8], func, "Nameplate")
+		createOptionSlider(parent, U["NameTextSize"], 10, 50, 14, offset-340, optionValues[value][3], func, "Nameplate")
+		createOptionSlider(parent, U["NameOffset"], -100, 50, 5, offset-410, optionValues[value][11], func, "Nameplate")
+		createOptionSlider(parent, U["HealthTextSize"], 10, 50, 16, offset-480, optionValues[value][4], func, "Nameplate")
+		createOptionSlider(parent, U["Health Offset"], -50, 50, 5, offset-550, optionValues[value][5], func, "Nameplate")
+		createOptionSlider(parent, U["Castbar Height"], 5, 50, 8, offset-620, optionValues[value][6], func, "Nameplate")
+		createOptionSlider(parent, U["CastbarTextSize"], 10, 50, 14, offset-690, optionValues[value][7], func, "Nameplate")
+		createOptionSlider(parent, U["CastbarTextOffset"], -50, 50, -1, offset-760, optionValues[value][8], func, "Nameplate")
 		if isEnemy then
-			createOptionSlider(parent, U["RaidTargetX"], -50, 500, 0, offset-620, "RaidTargetX", func, "Nameplate")
-			createOptionSlider(parent, U["RaidTargetY"], -200, 200, 3, offset-680, "RaidTargetY", func, "Nameplate")
+			createOptionSlider(parent, U["RaidTargetX"], -50, 500, 0, offset-830, "RaidTargetX", func, "Nameplate")
+			createOptionSlider(parent, U["RaidTargetY"], -200, 200, 3, offset-900, "RaidTargetY", func, "Nameplate")
 		end
 	end
 
@@ -1940,16 +1940,16 @@ function G:SetupActionbarStyle(parent)
 	local Bar = M:GetModule("Actionbar")
 
 	local styleString = {
-		[1] = "NAB:35:12:8:8:40:12:12:12:40:12:12:12:40:12:12:6:40:12:12:6:34:12:12:12:34:12:12:12:34:12:12:12:26:12:10:30:12:10:0M282:0M0:0M42:-516BR0:515BL0:-515BR0:0T-482:0T-442:0T-442:112M84:-236M88",
+		[1] = "NAB:34:12:12:12:34:12:12:12:34:12:12:6:34:12:12:6:32:12:12:1:34:12:12:12:34:12:12:12:34:12:12:12:26:12:10:30:12:10:0M0:-1M36:326M0:-329M0:-330M0:0BR279:0T-482:0T-442:0T-442:294M72:234M76",
 		[2] = "NAB:34:12:12:12:34:12:12:12:34:12:12:12:32:12:12:1:32:12:12:1:34:12:12:12:34:12:12:12:34:12:12:12:26:12:10:30:12:10:0M0:0M36:0M72:0BR268:-35BR268:0BR268:0T-482:0T-442:0T-442:76M108:-200M112",
 		[3] = "NAB:34:12:12:12:34:12:12:12:34:12:0:1:32:12:12:1:32:12:12:1:34:12:12:12:34:12:12:12:34:12:12:12:26:12:10:30:12:10:0M0:0M36:-273M0:272M0:-35BR268:0BR268:0T-482:0T-442:0T-442:521BL72:-311M76",
-		[4] = "NAB:34:12:12:12:34:12:12:12:34:12:12:6:34:12:12:6:32:12:12:1:34:12:12:12:34:12:12:12:34:12:12:12:26:12:10:30:12:10:0M0:-1M36:326M0:-329M0:-330M0:0BR279:0T-482:0T-442:0T-442:294M72:234M76",
+		[4] = "NAB:35:12:8:8:40:12:12:12:40:12:12:12:40:12:12:6:40:12:12:6:34:12:12:12:34:12:12:12:34:12:12:12:26:12:10:30:12:10:0M282:0M0:0M42:-516BR0:515BL0:-515BR0:0T-482:0T-442:0T-442:112M84:-236M88",
 	}
 	local styleName = {
-		[1] = _G.DEFAULT,
+		[1] = _G.DEFAULT,  --_G.DEFAULT
 		[2] = "3X12",
 		[3] = "2X18",
-		[4] = "12+24+12",
+		[4] = "2UI Style",
 		[5] = U["Export"],
 		[6] = U["Import"],
 	}

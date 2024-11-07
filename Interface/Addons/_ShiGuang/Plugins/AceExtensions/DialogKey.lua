@@ -1,4 +1,4 @@
---- @class DialogKeyNS
+--- @class DialogKeyNS ## Version: v1.2.7 ## Author: Numy (previous verions by: Foxthorn, N01ch, FuriousProgrammer)
 local DialogKeyNS = {}
 
 if GetLocale() == "zhCN" then

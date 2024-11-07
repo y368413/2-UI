@@ -557,46 +557,7 @@ AutoThanks:SetScript("OnEvent", function(self, event, reviver)
     end
 end)
 
---[[PetHealthAlarm------------------## Version: 1.2 ## Author: Dephotian
-local PetHealthAlarmFrame=CreateFrame("ScrollingMessageFrame","PetHealthAlarm",UIParent)	
-PetHealthAlarmFrame:RegisterEvent("PLAYER_LOGIN")
-PetHealthAlarmFrame:RegisterEvent("UNIT_HEALTH")
-PetHealthAlarmFrame.Threshold=35
-PetHealthAlarmFrame.Warned=false
-PetHealthAlarmFrame:SetScript("OnEvent",function(Event,Arg1,...)
-	if(Event=="UNIT_HEALTH" and Arg1=="pet")then
-			if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)<=PetHealthAlarmFrame.Threshold and PetHealthAlarmFrame.Warned==false)then
-			if(not UnitName("pet")) then
-			    PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Beep.ogg")	
-				PetHealthAlarmFrame:AddMessage("- CRITICAL PET HEALTH -", 1, 0, 0, nil, 3)
-		else
-			    PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Beep.ogg")	
-				PetHealthAlarmFrame:AddMessage(UnitName("pet") .. "- CRITICAL PET HEALTH -", 1, 0, 0, nil, 3)
-		end
-				PetHealthAlarmFrame.Warned=true
-				return
-			end
-			if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)>PetHealthAlarmFrame.Threshold) then
-				PetHealthAlarmFrame.Warned=false
-				return
-			end	
-		return
-	end
-	if(Event=="PLAYER_LOGIN")then
-			PetHealthAlarmFrame:SetWidth(450)
-			PetHealthAlarmFrame:SetHeight(200)
-			PetHealthAlarmFrame:SetPoint("CENTER",UIParent,"CENTER",0,360)	
-			PetHealthAlarmFrame:SetFont("Interface\\AddOns\\_ShiGuang\\Media\\Fonts\\RedCircl.TTF",36,"THICKOUTLINE")
-			PetHealthAlarmFrame:SetShadowColor(0.00,0.00,0.00,0.75)
-			PetHealthAlarmFrame:SetShadowOffset(3.00,-3.00)
-			PetHealthAlarmFrame:SetJustifyH("CENTER")		
-			PetHealthAlarmFrame:SetMaxLines(2)
-			PetHealthAlarmFrame:SetTimeVisible(2)
-			PetHealthAlarmFrame:SetFadeDuration(1)		
-		return
-	end	
-end)]]
-
+--PetHealthAlarm------------------## Version: 1.2 ## Author: Dephotian
 local PetHealthAlert = {}
 local PetHealthAlarmFrame=CreateFrame("ScrollingMessageFrame","PetHealthAlarm",UIParent)
 PetHealthAlarmFrame.Threshold=35
@@ -605,7 +566,7 @@ PetHealthAlarmFrame.Warned=false
 function PetHealthAlert:Initialize()
 	PetHealthAlarmFrame:SetWidth(450)
 	PetHealthAlarmFrame:SetHeight(200)
-	PetHealthAlarmFrame:SetPoint("CENTER",UIParent,"CENTER",0,50)
+	PetHealthAlarmFrame:SetPoint("CENTER",UIParent,"CENTER",0,80)
 	--PetHealthAlarmFrame:SetPoint("CENTER",UIParent,"CENTER",0,360)
 	--PetHealthAlarmFrame:SetFont("Interface\\AddOns\\PetHealthAlarm\\ComicSansMS3.ttf",25,"THICKOUTLINE")
 	PetHealthAlarmFrame:SetFont("Interface\\AddOns\\_ShiGuang\\Media\\Fonts\\RedCircl.TTF",36,"THICKOUTLINE")

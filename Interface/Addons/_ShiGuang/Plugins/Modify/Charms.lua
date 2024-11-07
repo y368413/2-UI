@@ -678,16 +678,21 @@ local answers = {
     ["41676"] = "格尔宾·梅卡托克",
     ["45705"] = "奥里登"
 }
+local AnswerYes = CreateFrame("Frame")
+AnswerYes:RegisterEvent("GOSSIP_SHOW")
+AnswerYes:RegisterEvent("QUEST_GREETING")
+AnswerYes:SetScript("OnEvent", function()
 if UnitGUID("target") then
     local unitID = tonumber(select(6, strsplit("-", UnitGUID("target"))), 10);
     if unitID == 110034 or unitID == 110035 then
         local info = C_GossipInfo.GetOptions()
         if info then
             for _, option in pairs(info) do
-                if aura_env.answers[tostring(option["gossipOptionID"])] then
+                if answers[tostring(option["gossipOptionID"])] then
                     C_GossipInfo.SelectOption(option["gossipOptionID"])
                 end
             end
         end
     end
 end
+end)

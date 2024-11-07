@@ -1,4 +1,4 @@
-﻿--## Version: v53  ## Author: Kemayo
+﻿--## Version: v54  ## Author: Kemayo
 local AppearanceTooltip = {}
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
@@ -2126,6 +2126,22 @@ f:RegisterAddonHook("Combuctor", function()
 end)
 
 
+-- SilverDragon
+f:RegisterAddonHook("SilverDragon", function()
+    if not (SilverDragon and SilverDragon.RegisterCallback) then
+        -- Geniunely unsure what'd cause this, but see #11 on github
+        return
+    end
+    SilverDragon.RegisterCallback("AppearanceTooltip", "LootWindowOpened", function(_, window)
+        AppearanceTooltip.RegisterTooltip(_G["SilverDragonLootTooltip"])
+        if window and window.buttons and #window.buttons then
+            for i, button in ipairs(window.buttons) do
+                UpdateOverlay(button, button:GetItem())
+            end
+        end
+    end)
+end)
+
 -- Baganator
 f:RegisterAddonHook("Baganator", function()
     Baganator.API.RegisterCornerWidget("|cff8080ff[幻化]|r预览增强", "appearancetooltip",
@@ -2153,6 +2169,11 @@ EventRegistry:RegisterFrameEventAndCallback("TRANSMOG_COLLECTION_SOURCE_ADDED", 
     end
     if PerksProgramFrame and PerksProgramFrame:IsShown() then
         -- Trading Post, and core UI handles showing this
+        return
+    end
+    if C_ContentTracking and C_ContentTracking.IsTracking(Enum.ContentTrackingType.Appearance, itemModifiedAppearanceID) then
+        -- Boss loot, generally
+        -- print("Blocked toast: contenttracking")
         return
     end
     NewCosmeticAlertFrameSystem:AddAlert(itemModifiedAppearanceID)

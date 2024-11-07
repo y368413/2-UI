@@ -119,7 +119,7 @@ function MISC:HandleUITitle()
 		if not text then text = self:GetText() end
 		if not text or text == "" then return end
 
-		if strfind(text, "2 UI") or strfind(text, "BaudErrorFrame") then
+		if strfind(text, "_ShiGuang") or strfind(text, "BaudErrorFrame") then
 			local newText, count = gsub(text, "|T([^:]-):[%d+:]+|t", "|T"..I.chatLogo..":12:24|t")
 			if count > 0 then self:SetFormattedText("%s", newText) end
 		end
