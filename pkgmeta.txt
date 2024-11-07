@@ -1,16 +1,16 @@
 package-as: _ShiGuang
 
 move-folders:
-    2-UI/Interface/AddOns/_ShiGuang: 2-UI
-    2-UI/Interface/AddOns/AngryKeystones: 2-UI
-    2-UI/Interface/AddOns/Baganator: 2-UI
-    2-UI/Interface/AddOns/CanIMogIt: 2-UI
-    2-UI/Interface/AddOns/CollectionShop: 2-UI
-    2-UI/Interface/AddOns/HandyNotes: 2-UI
-    2-UI/Interface/AddOns/HPetBattleAny: 2-UI
-    2-UI/Interface/AddOns/LiteBuff: 2-UI
-    2-UI/Interface/AddOns/Skada: 2-UI
-    2-UI/Interface/AddOns/Syndicator: 2-UI
+    2-UI/Interface/AddOns/_ShiGuang: _ShiGuang
+    2-UI/Interface/AddOns/AngryKeystones: AngryKeystones
+    2-UI/Interface/AddOns/Baganator: Baganator
+    2-UI/Interface/AddOns/CanIMogIt: CanIMogIt
+    2-UI/Interface/AddOns/CollectionShop: CollectionShop
+    2-UI/Interface/AddOns/HandyNotes: HandyNotes
+    2-UI/Interface/AddOns/HPetBattleAny: HPetBattleAny
+    2-UI/Interface/AddOns/LiteBuff: LiteBuff
+    2-UI/Interface/AddOns/Skada: Skada
+    2-UI/Interface/AddOns/Syndicator: Syndicator
 
 ignore:
   - .github/*
