@@ -4,7 +4,6 @@
 	<Script file="rlTools.lua"/>
 	<!--Script file="HardYards.lua"/-->
 	<Script file="Expansions.lua"/>
-	<Script file="GotoCroods.lua"/>
 	<Script file="RandomPoly.lua"/>
 	<Script file="ColorFrames.lua"/>
 	<Script file="RandomHearth.lua"/>
