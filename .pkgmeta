@@ -1,4 +1,4 @@
-package-as: 2ui
+package-as: _ShiGuang
 
 move-folders:
     2ui/Interface/AddOns/_ShiGuang: _ShiGuang
