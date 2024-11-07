@@ -1,12 +1,5 @@
 package-as: 2ui
 
-ignore:
-  - .github/*
-  - Interface/AddOns/2ui
-  - Interface/TargetingFrame
-  - Interface/Tooltips
-  - README.md
-
 move-folders:
     2ui/Interface/AddOns/_ShiGuang: _ShiGuang
     2ui/Interface/AddOns/AngryKeystones: AngryKeystones
@@ -19,3 +12,8 @@ move-folders:
     2ui/Interface/AddOns/Skada: Skada
     2ui/Interface/AddOns/Syndicator: Syndicator
 
+ignore:
+  - .github/*
+  - Interface/TargetingFrame
+  - Interface/Tooltips
+  - README.md
