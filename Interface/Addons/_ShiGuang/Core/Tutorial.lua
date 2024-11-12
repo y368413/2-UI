@@ -25,6 +25,15 @@ local function DefaultSettings()
 	--setglobal("MAX_EQUIPMENT_SETS_PER_PLAYER",100)
 	PlayerFrame:SetScale(R.db["UFs"]["PlayerFrameScale"]) 
 	TargetFrame:SetScale(R.db["UFs"]["PlayerFrameScale"])
+	SetGuildNewsFilter(1, 0)
+	SetGuildNewsFilter(2, 0)
+	SetGuildNewsFilter(3, 0)
+	SetGuildNewsFilter(4, 0)
+	SetGuildNewsFilter(5, 0)
+	SetGuildNewsFilter(6, 0)
+	SetGuildNewsFilter(7, 0)
+	SetGuildNewsFilter(8, 0)
+	SetGuildNewsFilter(9, 0)
 end
 
 local function ForceDefaultSettings()
@@ -117,7 +126,7 @@ local function ForceRaidFrame()
 	--CompactRaidFrameContainer:SetScale(0.85)
 	--SetRaidProfileOption(GetActiveRaidProfile(), "healthText", "none")
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "useClassColors", true) --显示职业颜色
-	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayPowerBar", false) --显示能量条 
+	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayPowerBar", true) --显示能量条 
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayBorder", false) --显示边框
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "frameWidth", 160) --设置宽度
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "frameHeight", 21) --设置高度

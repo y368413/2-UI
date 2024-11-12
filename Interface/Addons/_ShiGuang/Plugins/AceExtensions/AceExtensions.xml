@@ -1,9 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-  <!--Script file="Castbars.lua"/-->
+    <Script file="SocketHelper.lua"/>
 	<Script file="DialogKey.lua"/>
 	<Script file="WQAchievements.lua"/>
-	<!--Include file="Breakables\Breakables.xml"/>
-	<Include file="InboxMailBag\InboxMailBag.xml"/-->
+	<!--Include file="Breakables\Breakables.xml"/-->
+	<Include file="InboxMailBag\InboxMailBag.xml"/>
 	<Include file="Simulationcraft\Simulationcraft.xml"/>
 	<Include file="AngrierWorldQuests\AngrierWorldQuests.xml"/>
 	<Include file="MountCollectionLog\MountCollectionLog.xml"/>

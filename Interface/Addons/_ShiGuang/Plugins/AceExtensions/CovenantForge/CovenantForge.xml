@@ -1,0 +1,405 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="CovenantForge.lua"/>
+	<Frame name="CovenantForge_SoulbindInfoTemplate" parentKey="SoulbindInfo" virtual="true" setAllPoints="true" frameLevel="150">
+		<Anchors>
+			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
+			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString parentKey="soulbindName" inherits="GameFontHighlightMedium" text="Name">
+					<Anchors>
+						<Anchor point="TOP" y="2"/>
+					</Anchors>
+					<Color r="0.804" g="0.725" b="0.616"/>
+				</FontString>
+			</Layer>
+		<Layer level="OVERLAY">
+				<FontString parentKey="soulbindWeight" inherits="GameFontHighlightMedium" text="">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"  y="25" relativePoint="BOTTOMLEFT"/>
+						<Anchor point="BOTTOMRIGHT"  relativePoint="BOTTOMRIGHT"/>
+					</Anchors>
+					<Shadow>
+						<Offset x="5" y="-5" />
+						<Color r="0.804" g="0.725" b="0.616"/>
+					</Shadow>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	
+	<Frame name="CovenantForge_ConduitInfoTemplate" parentKey="SoulbindInfo" virtual="true" setAllPoints="true" frameLevel="150">
+		<Anchors>
+			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
+			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString parentKey="Name" inherits="GameFontHighlightSmall" text="Name">
+					<Anchors>
+						<Anchor point="TOP" y="15"/>
+					</Anchors>
+					<Color r="0.804" g="0.725" b="0.616"/>
+				</FontString>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString parentKey="Value" inherits="GameFontHighlightMedium" text="Value">
+					<Anchors>
+						<Anchor point="BOTTOM" x="-2" y="-4"/>
+					</Anchors>
+					<Shadow>
+					<Offset x="5" y="-5" />
+						<Color r="0.804" g="0.725" b="0.616"/>
+					</Shadow>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="CovenantForge_WeightTotalTemplate" parentKey="WeightTotal" virtual="true" setAllPoints="true" frameLevel="150">
+		<Size x="500" y="50"/>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString parentKey="Weight" inherits="GameFontHighlightMedium" text="Name">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
+					</Anchors>
+					<Color r="0.804" g="0.725" b="0.616"/>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="CovenantForge_PathStorageTemplate" parentKey="PathStorage" virtual="true" setAllPoints="true" frameLevel="100" enablemouse="true" inherits="ShadowOverlayTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
+			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Anchors>
+					<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
+				</Anchors>
+				<Texture parentKey="Background" atlas="ui-frame-kyrianchoice-cardparchment" setAllPoints="true" />
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString parentKey="Title" inherits="GameFontNormalLarge" text="Title">
+					<Anchors>
+						<Anchor point="CENTER" x="2" y="-12" relativePoint="TOP"/>
+					</Anchors>
+					<Color r="1" g="1" b="1"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<EditBox parentKey="EditBox" autoFocus="false" inherits="InputBoxTemplate" bytes="64">
+				<Size x="130" y="50"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.Title" relativePoint="BOTTOMLEFT" x="-80" y="05"/>
+				</Anchors>
+				<Scripts>
+					<OnEnterPressed>
+						--self:ClearFocus();
+					</OnEnterPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<Button parentKey="CreateButton" inherits="UIPanelButtonTemplate" motionScriptsWhileDisabled="true" text=" + " mixin="CovenantForge_SavedPathMixin" >
+				<Size x="80" y="22"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.EditBox" relativePoint="RIGHT" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnClick method="OnClick"/>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<CheckButton name="CovenantForge_TabTemplate" frameLevel="510" virtual="true" hidden="true">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\SpellBook\SpellBook-SkillLineTab">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-3" y="11"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK" textureSubLevel="1">
+				<Texture name="$parentTabardEmblem" parentKey="TabardEmblem" hidden="false" file="Interface\GuildFrame\GuildEmblemsLG_01">
+					<Size x="33" y="38"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="TOPLEFT" x="16" y="-15"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK" textureSubLevel="2">
+				<Texture name="$parentTabardIconFrame" file="Interface\Spellbook\GuildSpellbooktabIconFrame" parentKey="TabardIconFrame" hidden="true">
+					<Size x="32" y="32"/>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>
+				CovenantForgeSavedTab_OnClick(self);
+			</OnClick>
+			<OnEnter>
+				GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+				GameTooltip:SetText(self.tooltip);
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+		<NormalTexture/>
+		<HighlightTexture name="$parentHighlightTexture" file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+		<CheckedTexture name="$parentCheckedTexture" file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/>
+	</CheckButton>
+
+	<Frame name="CovenantForge_SavedPathEditFrame" parent="UIParent" hidden="true" frameStrata="DIALOG"  mixin="CovenantForge_SavedPathEditFrameMixin">
+		<Size x="320" y="174"/>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Title" inherits="GameFontHighlight" text="Enter Path Name">
+					<Anchors>
+						<Anchor point="TOP" x="0" y="-20"/>
+					</Anchors>
+				</FontString>
+				<Texture parentKey="Separator">
+					<Size x="276" y="1"/>
+					<Anchors>
+						<Anchor point="TOP" x="0" y="-127"/>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="0.14"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="Border" inherits="DialogBorderTemplate"/>
+			<EditBox parentKey="EditBox" historyLines="1" letters="31">
+				<Size x="260" y="32"/>
+				<Anchors>
+					<Anchor point="TOP" x="0" y="-40"/>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="LeftTexture" file="Interface\ChatFrame\UI-ChatInputBorder-Left2">
+							<Size x="32" y="32"/>
+							<Anchors>
+								<Anchor point="LEFT" x="-10" y="0"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="RightTexture" file="Interface\ChatFrame\UI-ChatInputBorder-Right2">
+							<Size x="32" y="32"/>
+							<Anchors>
+								<Anchor point="RIGHT" x="10" y="0"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="MiddleTexture" file="Interface\ChatFrame\UI-ChatInputBorder-Mid2" horizTile="true">
+							<Size x="0" y="32"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeKey="$parent.LeftTexture" relativePoint="TOPRIGHT"/>
+								<Anchor point="TOPRIGHT" relativeKey="$parent.RightTexture" relativePoint="TOPLEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						self:GetParent():OnAccept();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						StaticPopupSpecial_Hide(self:GetParent());
+					</OnEscapePressed>
+					<OnTextChanged>
+						if ( self:GetText() == "" ) then
+							self:GetParent().AcceptButton:Disable();
+						else
+							self:GetParent().AcceptButton:Enable();
+						end
+					</OnTextChanged>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<Button parentKey="AcceptButton" inherits="UIPanelButtonTemplate" text="ACCEPT">
+				<Size x="120" y="22"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="33" y="-80"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+						self:GetParent():OnAccept();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button parentKey="CancelButton" inherits="UIPanelButtonTemplate" text="CANCEL">
+				<Size x="120" y="22"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-33" y="-80"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						StaticPopupSpecial_Hide(self:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+				<Button parentKey="UpdateButton" inherits="UIPanelButtonTemplate" text="Update">
+				<Size x="120" y="22"/>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" x="25" y="17"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+						self:GetParent():OnUpdate();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button parentKey="DeleteButton" inherits="UIPanelButtonTemplate" text=" x ">
+				<Size x="120" y="22"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" x="-25" y="17"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+						self:GetParent():OnDelete();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self.exclusive = true;
+				self.hideOnEscape = true;
+				self.DeleteButton:SetWidth(self.DeleteButton:GetTextWidth() + 50);
+			</OnLoad>
+			<OnHide>
+				PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE);
+			</OnHide>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CovenantForge_WeightsEditFrame" parent="UIParent" hidden="true" frameStrata="DIALOG"  mixin="CovenantForge_WeightsEditFrameMixin">
+		<Size x="320" y="140"/>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Title" inherits="GameFontHighlight" text="Profile Name">
+					<Anchors>
+						<Anchor point="TOP" x="0" y="-20"/>
+					</Anchors>
+				</FontString>
+				<Texture parentKey="Separator">
+					<Size x="276" y="1"/>
+					<Anchors>
+						<Anchor point="TOP" x="0" y="-127"/>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="0.14"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="Border" inherits="DialogBorderTemplate"/>
+			<EditBox parentKey="EditBox" historyLines="1" letters="31">
+				<Size x="260" y="32"/>
+				<Anchors>
+					<Anchor point="TOP" x="0" y="-40"/>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="LeftTexture" file="Interface\ChatFrame\UI-ChatInputBorder-Left2">
+							<Size x="32" y="32"/>
+							<Anchors>
+								<Anchor point="LEFT" x="-10" y="0"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="RightTexture" file="Interface\ChatFrame\UI-ChatInputBorder-Right2">
+							<Size x="32" y="32"/>
+							<Anchors>
+								<Anchor point="RIGHT" x="10" y="0"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="MiddleTexture" file="Interface\ChatFrame\UI-ChatInputBorder-Mid2" horizTile="true">
+							<Size x="0" y="32"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeKey="$parent.LeftTexture" relativePoint="TOPRIGHT"/>
+								<Anchor point="TOPRIGHT" relativeKey="$parent.RightTexture" relativePoint="TOPLEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						self:GetParent():OnAccept();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						StaticPopupSpecial_Hide(self:GetParent());
+					</OnEscapePressed>
+					<OnTextChanged>
+						if ( self:GetText() == "" ) then
+							self:GetParent().AcceptButton:Disable();
+						else
+							self:GetParent().AcceptButton:Enable();
+						end
+					</OnTextChanged>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<Button parentKey="AcceptButton" inherits="UIPanelButtonTemplate" text="ACCEPT">
+				<Size x="120" y="22"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="33" y="-80"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+						self:GetParent():OnAccept();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button parentKey="CancelButton" inherits="UIPanelButtonTemplate" text="CANCEL">
+				<Size x="120" y="22"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-33" y="-80"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						StaticPopupSpecial_Hide(self:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self.exclusive = true;
+				self.hideOnEscape = true;
+			</OnLoad>
+			<OnHide>
+				PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE);
+			</OnHide>
+		</Scripts>
+	</Frame>
+</Ui>

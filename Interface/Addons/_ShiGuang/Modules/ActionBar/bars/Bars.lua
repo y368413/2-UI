@@ -39,7 +39,7 @@ function Bar:UpdateActionSize(name)
 	local perRow = R.db["Actionbar"][name.."PerRow"]
 	if name == "BarPet" then num = 10 end
 
-	if num == 0 then
+	--[[if num == 0 then
 		local column = 3
 		local rows = 2
 		frame:SetWidth(3*size + (column-1)*margin + 2*padding)
@@ -64,7 +64,7 @@ function Bar:UpdateActionSize(name)
 			button:Show()
 			Bar:UpdateFontSize(button, fontSize)
 		end
-	else
+	else]]
 		for i = 1, num do
 			local button = frame.buttons[i]
 			button:SetSize(size, size)
@@ -92,7 +92,7 @@ function Bar:UpdateActionSize(name)
 		frame:SetHeight(size*rows + (rows-1)*margin + 2*padding)
 		frame.mover:SetSize(frame:GetSize())
 		if frame.child then frame.child.mover.isDisable = true end
-	end
+	--end
 end
 
 local directions = {"UP", "DOWN", "LEFT", "RIGHT"}
@@ -233,35 +233,35 @@ function Bar:CreateBars()
 	end
 
 	local BAR_DATA = {
-		[1] = {page = 1, bindName = "ACTIONBUTTON", anchor = {"CENTER", UIParent, "CENTER", 0, -236}},
-		[2] = {page = 6, bindName = "MULTIACTIONBAR1BUTTON", anchor = {"BOTTOM", UIParent, "BOTTOM", 0, 0}},
-		[3] = {page = 5, bindName = "MULTIACTIONBAR2BUTTON", anchor = {"BOTTOM", _G.UI_ActionBar2, "TOP", 0, -margin}},
-		[4] = {page = 3, bindName = "MULTIACTIONBAR3BUTTON", anchor = {"LEFT", _G.UI_ActionBar2, "RIGHT", -margin, 0}},
-		[5] = {page = 4, bindName = "MULTIACTIONBAR4BUTTON", anchor = {"RIGHT", _G.UI_ActionBar2, "LEFT", margin, 0}},
-		[6] = {page = 13, bindName = "MULTIACTIONBAR5BUTTON", anchor = {"RIGHT", _G.UI_ActionBar2, "LEFT", margin, 0}},
-		[7] = {page = 14, bindName = "MULTIACTIONBAR6BUTTON", anchor = {"CENTER", UIParent, "CENTER", 0, 40}},
-		[8] = {page = 15, bindName = "MULTIACTIONBAR7BUTTON", anchor = {"CENTER", UIParent, "CENTER", 0, 80}},
+		[1] = {page = 1, bindName = "ACTIONBUTTON", anchor = {"BOTTOM", UIParent, "BOTTOM", 0, 0}},
+		[2] = {page = 6, bindName = "MULTIACTIONBAR1BUTTON", anchor = {"BOTTOM", _G.UI_ActionBar1, "TOP", 0, -margin}},
+		[3] = {page = 5, bindName = "MULTIACTIONBAR2BUTTON", anchor = {"LEFT", _G.UI_ActionBar1, "TOPRIGHT", -margin, 0}},
+		[4] = {page = 3, bindName = "MULTIACTIONBAR3BUTTON", anchor = {"RIGHT", _G.UI_ActionBar1, "TOPLEFT", margin, 0}},
+		[5] = {page = 4, bindName = "MULTIACTIONBAR4BUTTON", anchor = {"RIGHT", UIParent, "RIGHT", -1, 0}},
+		[6] = {page = 13, bindName = "MULTIACTIONBAR5BUTTON", anchor = {"RIGHT", _G.UI_ActionBar5, "LEFT", margin, 0}},
+		[7] = {page = 14, bindName = "MULTIACTIONBAR6BUTTON", anchor = {"CENTER", UIParent, "CENTER", 210, 50}},
+		[8] = {page = 15, bindName = "MULTIACTIONBAR7BUTTON", anchor = {"CENTER", UIParent, "CENTER", -210, 50}},
 	}
 
 	local mIndex = 1
 	for index = 1, 8 do
 		local data = BAR_DATA[index]
 		local frame = Bar.headers[index]
-		if index == 3 then
-			frame.mover = M.Mover(frame, U["Actionbar"].."3L", "Bar3L", {"RIGHT", _G.UI_ActionBar1, "TOPLEFT", -margin, -padding/2})
-			local child = CreateFrame("Frame", nil, frame)
-			child:SetSize(1, 1)
-			child.mover = M.Mover(child, U["Actionbar"].."3R", "Bar3R", {"LEFT", _G.UI_ActionBar1, "TOPRIGHT", margin, -padding/2})
-			frame.child = child
+		--if index == 3 then
+			--frame.mover = M.Mover(frame, U["Actionbar"].."3L", "Bar3L", {"RIGHT", _G.UI_ActionBar1, "TOPLEFT", -margin, -padding/2})
+			--local child = CreateFrame("Frame", nil, frame)
+			--child:SetSize(1, 1)
+			--child.mover = M.Mover(child, U["Actionbar"].."3R", "Bar3R", {"LEFT", _G.UI_ActionBar1, "TOPRIGHT", margin, -padding/2})
+			--frame.child = child
 
-			Bar.movers[mIndex] = frame.mover
-			Bar.movers[mIndex+1] = child.mover
-			mIndex = mIndex + 2
-		else
+			--Bar.movers[mIndex] = frame.mover
+			--Bar.movers[mIndex+1] = child.mover
+			--mIndex = mIndex + 2
+		--else
 			frame.mover = M.Mover(frame, U["Actionbar"]..index, "Bar"..index, data.anchor)
 			Bar.movers[mIndex] = frame.mover
 			mIndex = mIndex + 1
-		end
+		--end
 		frame.buttons = {}
 
 		for i = 1, 12 do

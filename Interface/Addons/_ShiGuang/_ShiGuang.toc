@@ -2,12 +2,12 @@
 ## Title:- |cFFFFFF00 2|r|cFFFF0000 UI |r -
 ## Author: ShiGuang、TuTu、Siweia
 ## Notes: Time Flies...
-## Version: 4.3.6
-## SavedVariables: MaoRUISetDB,MaoRUIPerDB,ShiGuangDB,WQADB,DCP_Saved,ParagonReputationDB,rhDB,BreakablesDB,rpolyOptions,AngrierWorldQuests_Config,AngrierWorldQuestsDB,DialogKeyNumyDB,MCL_DB,MOUNTLIST,MCL_PINNED,MCL_SETTINGS,SoulbindCacheOpenerDB,DelverViewDB
+## Version: 4.3.9
+## SavedVariables: MaoRUISetDB,MaoRUIPerDB,ShiGuangDB,WQADB,DCP_Saved,ParagonReputationDB,rhDB,BreakablesDB,rpolyOptions,AngrierWorldQuests_Config,AngrierWorldQuestsDB,DialogKeyNumyDB,MCL_DB,MOUNTLIST,MCL_PINNED,MCL_SETTINGS,SoulbindCacheOpenerDB,DelverViewDB,HAMDB,DSHDB
 ## SavedVariablesPerCharacter: MaoRUIDB,ShiGuangPerDB,DEX_SAVE,DCP_SavedPerCharacter
 ## X-Support: 11.0.5
 ## X-Repple: 2 UI
-## X-StatsVersion: 20241107
+## X-StatsVersion: 20241112
 ## X-LoadOn-Always: Delayed
 ## X-Website: https://github.com/y368413/2UI
 ## IconTexture: Interface\AddOns\_ShiGuang\Media\2UI.blp

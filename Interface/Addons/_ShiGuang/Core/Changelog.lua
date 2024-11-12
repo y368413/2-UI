@@ -5,21 +5,23 @@ if I.Client ~= "zhCN" then return end
 local strsplit, pairs = string.split, pairs
 
 local UIQuestsandHelp = {
-   "更多设置请|cFF00DDFF右键小地图|r",
- 	 "任何你不喜欢的，请你控制台关了它.|cff3399FF        自己去下载自己喜欢的",
- 	 "|cff3399FF头像样式一就仅只有你看到这些.              要更多就去用头像二",
- 	 "聊天框怎样回到最新消息而不是一直滚轮.|cff3399FF        Shift+鼠标滚轮下",
-	 "我找不到在哪关闭自动交接任务. |cff3399FF            左上任务追踪栏上 框里的勾",
-	 "我缩放完了UI，系统头像位置变了.|cff3399FF          右键解锁挪回去",
-	 "我用的简易头像,右键解锁挪不动啊.|cff3399FF         /bht",
-	 "为何没有Buff或者Debuff ID显示啊.|cff3399FF         按着你的Shift再看",
-	 "点击聊天框角色名称可实现:|cff3399FF     Shift-密语 Ctrl-邀请工会 Alt-组队邀请",
+   "|cff00ff00更多设置请按|r|cff69ccf0 Esc - 2UI |r|cff00ff00按钮|r",
+ 	 "1、任何你不喜欢的，请你控制台关了它.|cff3399FF                  自己去下载自己喜欢的",
+ 	 "2、|cFFFF0000头像样式一就仅只有你看到这些|r.                        |cff3399FF要更多就去用头像二",
+	 "3、我找不到在哪|cFFFF0000关闭自动交接任务|r.                        |cff3399FF左上任务追踪栏上 框里的勾",
+	 "4、我缩放完了UI，系统头像位置变了.                     |cff3399FF编辑模式挪动下",
+	 "5、我用的简易头像,右键解锁挪不动啊.|cff3399FF                     /bht",
+	 "6、为何没有Buff或者Debuff ID显示啊.|cff3399FF                    按着你的Shift再看",
+	 "7、按住功能键点击聊天框角色名称:               |cff3399FFShift-密语 Ctrl-邀请工会 Alt-组队邀请",
+   "|cffff7d0a[Tips]控制台设置后的 红色齿轮 可以点击后设置更多|r",
+   "|cffff7d0a[Tips]使用多功能团框的话，记得控制台别勾选“简易模式框体”|r",
    "|cFF00DDFF如需改进和反馈，可以回帖或者在讨论组(n9PnFl0o)告诉我，谢谢。",
-   "-------------------------------"..C_AddOns.GetAddOnMetadata("_ShiGuang", "X-StatsVersion").."----[正式]",
-   "|cFFFF0000[注意]控制台设置后的 红色齿轮 可以点击后设置更多|r",
-   "|cFFFF0000[注意]使用多功能团框的话，记得控制台别勾选“简易模式框体”|r",
-   "[插件]版本号升级为v "..C_AddOns.GetAddOnMetadata("_ShiGuang", "Version"),
-   "--------------------------over",
+   "----------------------------------------------------------------------"..C_AddOns.GetAddOnMetadata("_ShiGuang", "X-StatsVersion"),
+   "【修复】动作条布局调整，只有单一样式了，但是丰富了自行DIY色彩，加油！",
+   "【调整】所有便捷设置集中到了控制台，对新手友好些~",
+   "【移除】右键小地图功能",
+   "【移除】密语提醒插件",
+   "------------------------------ For "..C_AddOns.GetAddOnMetadata("_ShiGuang", "X-Support"),
 }
 local story = {
   "1、|cFF00DDFF我见过一个指挥，在午夜11点钟在教授面前的时候，他说我们休息一下吧，有人问为什么，他说：<你们记不得了？昨天这个时候，MT的小孩要睡觉了>",
@@ -54,7 +56,7 @@ local function Helplist()
 	local bgTexture = f:CreateTexture("name", "BACKGROUND")
     bgTexture:SetTexture("Interface\\PETBATTLES\\Weather-StaticField");
     bgTexture:SetAllPoints();
-    bgTexture:SetAlpha(.6)
+    bgTexture:SetAlpha(.8)
 	f:SetPoint("TOPLEFT", 260, -60)
 	f:SetScale(1.1)
 	f:SetFrameStrata("HIGH")
@@ -64,17 +66,17 @@ local function Helplist()
 	M.CreateFS(f, 16, I.Version, true, "TOPLEFT", 112, 6)
 	local offset = 0
 	for n, t in pairs(UIQuestsandHelp) do
-		M.CreateFS(f, 14, n..": "..t, false, "TOPLEFT", 21, -(21 + offset))
+		M.CreateFS(f, 14, t, false, "TOPLEFT", 21, -(21 + offset))  --n..": "..
 		offset = offset + 21
 	end
-	f:SetSize(520, 36 + offset)
+	f:SetSize(600, 36 + offset)
 	local close = M.CreateButton(f, 21, 21, "X")
 	close:SetPoint("TOPRIGHT", -8, 8)
 	close:SetScript("OnClick", function() f:Hide() end)
 end
 local function lovewow()
 	local f = CreateFrame("Frame", "welovewow", UIParent)
-		 local bgTexture = f:CreateTexture("name", "BACKGROUND")
+	local bgTexture = f:CreateTexture("name", "BACKGROUND")
     bgTexture:SetTexture("Interface\\PETBATTLES\\Weather-StaticField");
     bgTexture:SetAllPoints();
     bgTexture:SetAlpha(.9)

@@ -203,7 +203,6 @@ CreateDestination(
 		CreateItem(64488),				-- The Innkeeper's Daughter	  旅店老板的女儿
 		CreateItem(142298),				-- Astonishingly Scarlet Slippers
 		CreateConsumable(142543),		-- Scroll of Town Portal
-		CreateItem(142542),				-- Tome of Town Portal  城镇传送门
 		CreateItem(162973),				-- Greatfather Winter's Hearthstone  冬天爷爷的炉石 278244
 		CreateItem(163045),				-- Headless Horseman's Hearthstone  无头骑士的炉石 278559
 		CreateItem(166747),				-- Brewfest Reveler's Hearthstone  美酒节狂欢者的炉石
@@ -229,9 +228,10 @@ CreateDestination(
 		CreateItem(206195),				-- Path of the Naaru
 		CreateItem(208704),				-- Deepdweller's Earthen Hearthstone
 		CreateItem(209035),				-- Hearthstone of the Flame
-		CreateItem(212337),				-- Stone of the Hearth
 		CreateConditionalItem(210455, IsDraenei),	-- Draenic Hologem
 		CreateItem(228940),				-- Notorious Thread's Hearthstone
+		CreateItem(142542),				-- Tome of Town Portal
+		CreateItem(212337),				-- Stone of the Hearth
 	})
 
 -- Any hearthstones that shouldn't be randomised.

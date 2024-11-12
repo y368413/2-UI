@@ -1644,7 +1644,7 @@ function G:SetupNameplateSize(parent)
 		createOptionSlider(parent, U["InteractWidth"], 50, 500, 190, offset-200, optionValues[value][9], func, "Nameplate")
 		createOptionSlider(parent, U["InteractHeight"], 5, 50, 8, offset-270, optionValues[value][10], func, "Nameplate")
 		createOptionSlider(parent, U["NameTextSize"], 10, 50, 14, offset-340, optionValues[value][3], func, "Nameplate")
-		createOptionSlider(parent, U["NameOffset"], -100, 50, 5, offset-410, optionValues[value][11], func, "Nameplate")
+		createOptionSlider(parent, U["Name Offset"], -100, 50, 5, offset-410, optionValues[value][11], func, "Nameplate")
 		createOptionSlider(parent, U["HealthTextSize"], 10, 50, 16, offset-480, optionValues[value][4], func, "Nameplate")
 		createOptionSlider(parent, U["Health Offset"], -50, 50, 5, offset-550, optionValues[value][5], func, "Nameplate")
 		createOptionSlider(parent, U["Castbar Height"], 5, 50, 8, offset-620, optionValues[value][6], func, "Nameplate")
@@ -1712,14 +1712,14 @@ function G:SetupActionBar(parent)
 	local Bar = M:GetModule("Actionbar")
 	local defaultValues = {
 		-- defaultSize, minButtons, maxButtons, defaultButtons, defaultPerRow, flyoutDirec
-		["Bar1"] = {33, 6, 12, 12, 8, "UP"},
-		["Bar2"] = {40, 1, 12, 12, 12, "UP"},
-		["Bar3"] = {40, 0, 12, 12, 12, "UP"},
-		["Bar4"] = {40, 1, 12, 12, 6, "UP"},
-		["Bar5"] = {40, 1, 12, 12, 6, "UP"},
-		["Bar6"] = {34, 1, 12, 12, 12, "UP"},
-		["Bar7"] = {34, 1, 12, 12, 12, "UP"},
-		["Bar8"] = {34, 1, 12, 12, 12, "UP"},
+		["Bar1"] = {35, 6, 12, 12, 12, "UP"},
+		["Bar2"] = {35, 1, 12, 12, 12, "UP"},
+		["Bar3"] = {35, 1, 12, 12, 6, "UP"},
+		["Bar4"] = {35, 1, 12, 12, 6, "UP"},
+		["Bar5"] = {35, 1, 12, 12, 12, "LEFT"},
+		["Bar6"] = {35, 1, 12, 12, 1, "LEFT"},
+		["Bar7"] = {35, 1, 12, 12, 1, "UP"},
+		["Bar8"] = {35, 1, 12, 12, 12, "UP"},
 		["BarPet"] = {26, 1, 10, 10, 10},
 	}
 	local directions = {U["GO_UP"], U["GO_DOWN"], U["GO_LEFT"], U["GO_RIGHT"]}
@@ -1876,15 +1876,15 @@ function G:SetupUFAuras(parent)
 			createOptionDropdown(parent, U["GrowthDirection"], offset-50, growthOptions, "", "UFs", value.."AuraDirec", 1, func)
 			createOptionSlider(parent, U["yOffset"], 0, 200, 10, offset-110, value.."AuraOffset", func)
 		end
-		createOptionDropdown(parent, U["BuffType"], offset-50, buffOptions, nil, "UFs", value.."BuffType", default[1], func)
-		createOptionDropdown(parent, U["DebuffType"], offset-110, debuffOptions, nil, "UFs", value.."DebuffType", default[2], func)
-		createOptionSlider(parent, U["MaxBuffs"], 1, 40, default[4], offset-180, value.."NumBuff", func)
-		createOptionSlider(parent, U["MaxDebuffs"], 1, 40, default[5], offset-250, value.."NumDebuff", func)
+		createOptionDropdown(parent, U["BuffType"], offset-180, buffOptions, nil, "UFs", value.."BuffType", default[1], func)
+		createOptionDropdown(parent, U["DebuffType"], offset-240, debuffOptions, nil, "UFs", value.."DebuffType", default[2], func)
+		createOptionSlider(parent, U["MaxBuffs"], 1, 40, default[4], offset-300, value.."NumBuff", func)
+		createOptionSlider(parent, U["MaxDebuffs"], 1, 40, default[5], offset-370, value.."NumDebuff", func)
 		if isBoss then
-			createOptionSlider(parent, "Buff "..U["IconsPerRow"], 5, 20, default[3], offset-320, value.."BuffPerRow", func)
-			createOptionSlider(parent, "Debuff "..U["IconsPerRow"], 5, 20, default[3], offset-390, value.."DebuffPerRow", func)
+			createOptionSlider(parent, "Buff "..U["IconsPerRow"], 5, 20, default[3], offset-440, value.."BuffPerRow", func)
+			createOptionSlider(parent, "Debuff "..U["IconsPerRow"], 5, 20, default[3], offset-510, value.."DebuffPerRow", func)
 		else
-			createOptionSlider(parent, U["IconsPerRow"], 5, 20, default[3], offset-320, value.."AurasPerRow", func)
+			createOptionSlider(parent, U["IconsPerRow"], 5, 20, default[3], offset-440, value.."AurasPerRow", func)
 		end
 	end
 
@@ -1930,25 +1930,25 @@ end
 
 function G:SetupActionbarStyle(parent)
 	local maxButtons = 6
-	local size, padding = 26, 2
+	local size, padding = 80, 2
 
 	local frame = CreateFrame("Frame", "UIActionbarStyleFrame", parent.child)
 	frame:SetSize((size+padding)*maxButtons + padding, size + 2*padding)
-	frame:SetPoint("TOPRIGHT", 105, -70)
+	frame:SetPoint("TOP", 160, -10)
 	--M.CreateBDFrame(frame, .25)
 
 	local Bar = M:GetModule("Actionbar")
 
 	local styleString = {
-		[1] = "NAB:34:12:12:12:34:12:12:12:34:12:12:6:34:12:12:6:32:12:12:1:34:12:12:12:34:12:12:12:34:12:12:12:26:12:10:30:12:10:0M0:-1M36:326M0:-329M0:-330M0:0BR279:0T-482:0T-442:0T-442:294M72:234M76",
-		[2] = "NAB:34:12:12:12:34:12:12:12:34:12:12:12:32:12:12:1:32:12:12:1:34:12:12:12:34:12:12:12:34:12:12:12:26:12:10:30:12:10:0M0:0M36:0M72:0BR268:-35BR268:0BR268:0T-482:0T-442:0T-442:76M108:-200M112",
-		[3] = "NAB:34:12:12:12:34:12:12:12:34:12:0:1:32:12:12:1:32:12:12:1:34:12:12:12:34:12:12:12:34:12:12:12:26:12:10:30:12:10:0M0:0M36:-273M0:272M0:-35BR268:0BR268:0T-482:0T-442:0T-442:521BL72:-311M76",
-		[4] = "NAB:35:12:8:8:40:12:12:12:40:12:12:12:40:12:12:6:40:12:12:6:34:12:12:12:34:12:12:12:34:12:12:12:26:12:10:30:12:10:0M282:0M0:0M42:-516BR0:515BL0:-515BR0:0T-482:0T-442:0T-442:112M84:-236M88",
+		[1] = "NAB:35:12:12:12:35:12:12:12:35:12:12:6:35:12:12:6:35:12:12:1:35:12:12:1:35:12:4:1:35:12:12:4:26:12:10:30:12:10:0M0:0M37:333M1:-333M1:-1BR318:-38BR318:210T-416:-210T-435",
+		[2] = "NAB:35:12:12:12:35:12:12:12:35:12:12:12:35:12:12:1:35:12:12:1:35:12:12:1:35:12:4:1:35:12:12:4:26:12:10:30:12:10:0M0:0M37:0M75:-36TR-317:-1BR318:-38BR318:210T-416:-210T-435",
+		[3] = "NAB:35:12:12:12:35:12:12:12:35:12:12:4:35:12:12:4:35:12:12:12:35:12:12:1:35:12:12:1:35:12:12:8:26:12:10:30:12:10:0M0:0M37:300M0:-300M0:0M74:-1BR318:-38BR318:0M293",
+		[4] = "NAB:35:12:8:8:40:12:12:12:40:12:12:12:40:12:12:6:40:12:12:6:35:12:12:1:35:12:12:12:35:12:12:12:26:12:10:30:12:10:0M282:0M0:0M42:383M0:-383M0:0BR262:0T-482:0T-442",
 	}
 	local styleName = {
-		[1] = _G.DEFAULT,  --_G.DEFAULT
+		[1] = _G.DEFAULT,
 		[2] = "3X12",
-		[3] = "2X18",
+		[3] = "12+24+12",
 		[4] = "2UI Style",
 		[5] = U["Export"],
 		[6] = U["Import"],
@@ -1959,7 +1959,7 @@ function G:SetupActionbarStyle(parent)
 	}
 
 	local function applyBarStyle(self)
-		if not IsControlKeyDown() then return end
+		--if not IsControlKeyDown() then return end
 		local str = styleString[self.index]
 		if not str then return end
 		Bar:ImportActionbarStyle(str)
@@ -2034,16 +2034,16 @@ function G:SetupActionbarStyle(parent)
 
 	local function GetButtonText(i)
 		if i == 5 then
-			return "|T"..I.ArrowUp..":18|t"
+			return "导出布局"--"|T"..I.ArrowUp..":18|t"
 		elseif i == 6 then
-			return "|T"..I.ArrowUp..":18:18:0:0:1:1:0:1:1:0|t"
+			return "导入布局"--"|T"..I.ArrowUp..":18:18:0:0:1:1:0:1:1:0|t"
 		else
-			return i
+			return styleName[i]
 		end
 	end
 
 	for i = 1, maxButtons do
-		local bu = M.CreateButton(frame, size, size, GetButtonText(i))
+		local bu = M.CreateButton(frame, size, 24, GetButtonText(i))
 		bu:SetPoint("LEFT", (i-1)*(size + padding) + padding, 0)
 		bu.index = i
 		bu.title = styleName[i]

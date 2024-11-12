@@ -58,15 +58,14 @@ local optionValues = {
 local moverValues = {
 	[1] = "Bar1",
 	[2] = "Bar2",
-	[3] = "Bar3L",
-	[4] = "Bar3R",
-	[5] = "Bar4",
-	[6] = "Bar5",
-	[7] = "Bar6",
-	[8] = "Bar7",
-	[9] = "Bar8",
-	[10] = "PetBar",
-	[11] = "StanceBar",
+	[3] = "Bar3",
+	[4] = "Bar4",
+	[5] = "Bar5",
+	[6] = "Bar6",
+	[7] = "Bar7",
+	[8] = "Bar8",
+	[9] = "PetBar",
+	[10] = "StanceBar",
 }
 
 local abbrToAnchor = {

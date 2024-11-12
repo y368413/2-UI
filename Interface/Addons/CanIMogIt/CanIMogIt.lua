@@ -1,4 +1,4 @@
-﻿ --  11.0.2v2.3
+﻿ --  11.0.5v2.5
 -- Constants for CanIMogIt
 
 local L = CanIMogIt.L
@@ -696,6 +696,8 @@ local EVENTS = {
     "NEW_TOY_ADDED",
     "NEW_MOUNT_ADDED",
     "ITEM_LOCK_CHANGED",
+    "LOADING_SCREEN_ENABLED",
+    "LOADING_SCREEN_DISABLED",
 }
 
 if CanIMogIt.isRetail then
@@ -711,22 +713,98 @@ for i, event in pairs(EVENTS) do
     CanIMogIt.frame:RegisterEvent(event);
 end
 
+CanIMogIt.Events = {}
+
+for i, event in pairs(EVENTS) do
+    CanIMogIt.Events[event] = true
+end
+
 
 -- Skip the itemOverlayEvents function until the loading screen is disabled.
-local lastOverlayEventCheck = 0
-local overlayEventCheckThreshold = .01 -- once per frame at 100 fps
-local futureOverlayPrepared = false
+local ifNotBusyLimit = .008
+-- a dictionary of functions to run if we are not busy. Each event should only be in this once.
+local ifNotBusyEvents = {}
+local ifNotBusyKeys = {}
 
-local function futureOverlay(event)
-    -- Updates the overlay in ~THE FUTURE~. If the overlay events had multiple
-    -- requests in the same frame, then this gets called.
-    futureOverlayPrepared = false
-    local currentTime = GetTime()
-    if currentTime - lastOverlayEventCheck > overlayEventCheckThreshold then
-        lastOverlayEventCheck = currentTime
-        CanIMogIt.frame:ItemOverlayEvents(event)
+local loadingScreenEnabled = true
+-- These events should be run during the loading screen, if it's enabled.
+local loadingScreenEvents = {
+    ["PLAYER_LOGIN"] = true,
+    ["ADDON_LOADED"] = true,
+}
+
+
+
+local function makeKey(name, ...)
+    -- Get the name of the function somehow??
+    local key = name
+    for i, arg in ipairs({...}) do
+        key = key .. tostring(arg)
     end
+    return key
 end
+
+--- Schedules a function to be executed when the system is not busy.
+---
+--- This function takes a name, a function, and additional arguments, and schedules the function
+--- to be run later when the system is not busy. It ensures that the function is only added to
+--- the schedule if it is not already present.
+---
+--- The function creates a unique key using the provided name and arguments. If the key is not
+--- already in the `ifNotBusyEvents` dictionary, it adds the function and its arguments to the
+--- dictionary and the key to the `ifNotBusyKeys` list.
+---
+--- @param name string: The name associated with the function to be scheduled.
+--- @param func function: The function to be executed.
+--- @param ... any: Additional arguments to be passed to the function when it is executed.
+--- @return nil
+local function RunIfNotBusy(name, func, ...)
+    -- Sets the function to run the next time we aren't busy.
+    local args = {...}
+    -- only add it to the dict if it's not already in the there.
+    local key = makeKey(name, ...)
+    if ifNotBusyEvents[key] then
+        return
+    end
+    ifNotBusyEvents[key] = {func, args}
+    table.insert(ifNotBusyKeys, key)
+end
+
+--- Processes and executes functions that were scheduled to run when the system is not busy.
+---
+--- This function checks the list of scheduled functions (`ifNotBusyKeys`) and executes them
+--- until the time limit (`ifNotBusyLimit`) is reached or there are no more functions to run.
+--- It ensures that each function is only run once by removing it from the list and dictionary
+--- after execution.
+---
+--- The function also updates the `eventTypes` and `functionsRun` tables to keep track of the
+--- number of times each event type and function has been executed.
+---
+--- The execution loop will break if the time taken exceeds `ifNotBusyLimit` to prevent long
+--- blocking operations.
+local function RunIfNotBusyEvents()
+
+    if #ifNotBusyKeys == 0 or loadingScreenEnabled then
+        return
+    end
+    local startTime = GetTimePreciseSec()
+    while #ifNotBusyKeys > 0 do
+        local key = ifNotBusyKeys[1]
+        local currentTime = GetTimePreciseSec()
+        if currentTime - startTime > ifNotBusyLimit then
+            break
+        end
+        local eventData = ifNotBusyEvents[key]
+        table.remove(ifNotBusyKeys, 1)
+        ifNotBusyEvents[key] = nil
+        local func, args = eventData[1], eventData[2]
+        func(unpack(args))
+    end
+    RunIfNotBusyEvents()
+end
+
+
+CanIMogIt.frame:SetScript("OnUpdate", RunIfNotBusyEvents)
 
 
 CanIMogIt.frame.eventFunctions = {}
@@ -738,36 +816,60 @@ function CanIMogIt.frame:AddEventFunction(func)
 end
 
 
-CanIMogIt.frame:HookScript("OnEvent", function(self, event, ...)
-    --[[
-        To add functions you want to run with CIMI's "OnEvent", do:
+-- a dictionary of event names to a list of functions to run.
+-- {event, {name, func}}
+CanIMogIt.frame.smartEventFunctions = {}
 
-        local function MyOnEventFunc(event, ...)
-            Do stuff here
+
+function CanIMogIt.frame:AddSmartEvent(name, func, events)
+    -- Smart events only run if there is enough time in the frame, otherwise,
+    -- it pushes it off to the next frame to run.
+    for i, event in ipairs(events) do
+        if not CanIMogIt.frame.smartEventFunctions[event] then
+            CanIMogIt.frame.smartEventFunctions[event] = {}
         end
-        CanIMogIt.frame:AddEventFunction(MyOnEventFunc)
-        ]]
+        table.insert(CanIMogIt.frame.smartEventFunctions[event], {name, func})
+    end
+end
 
+
+local function RunSmartEvent(event, ...)
+    -- Run the overlay events if we are not busy.
+    for i, eventData in ipairs(CanIMogIt.frame.smartEventFunctions[event]) do
+        local name, func = unpack(eventData)
+        RunIfNotBusy(name, func, event, ...)
+    end
+end
+
+
+local function SmartEventHook(self, event, ...)
+    if event == "LOADING_SCREEN_ENABLED" then
+        loadingScreenEnabled = true
+    elseif event == "LOADING_SCREEN_DISABLED" then
+        loadingScreenEnabled = false
+    end
+
+    -- If the event is a loading screen event, run it and return.
+    if loadingScreenEvents[event] then
+        RunSmartEvent(event, ...)
+        return
+    end
+
+    if loadingScreenEnabled then
+        return
+    end
+
+    -- For backwards compatibility, run the normal events.
     for i, func in ipairs(CanIMogIt.frame.eventFunctions) do
-        func(event, ...)
+        RunIfNotBusy(tostring(func), func, event, ...)
     end
 
-    -- TODO: Move this to it's own event function.
-    -- Prevent the ItemOverlayEvents handler from running more than is needed.
-    -- If more than one occur in the same frame, we update the first time, then
-    -- prepare a future update in a couple frames.
-    local currentTime = GetTime()
-    if currentTime - lastOverlayEventCheck > overlayEventCheckThreshold then
-        lastOverlayEventCheck = currentTime
-        self:ItemOverlayEvents(event, ...)
-    else
-        -- If we haven't already, plan to update the overlay in the future.
-        if not futureOverlayPrepared then
-            futureOverlayPrepared = true
-            C_Timer.After(.02, function () futureOverlay(event) end)
-        end
+    -- Smart events
+    if CanIMogIt.frame.smartEventFunctions[event] then
+        RunSmartEvent(event, ...)
     end
-end)
+end
+CanIMogIt.frame:HookScript("OnEvent", SmartEventHook)
 
 
 function CanIMogIt.frame.AddonLoaded(event, addonName)
@@ -775,7 +877,7 @@ function CanIMogIt.frame.AddonLoaded(event, addonName)
         CanIMogIt.frame.Loaded()
     end
 end
-CanIMogIt.frame:AddEventFunction(CanIMogIt.frame.AddonLoaded)
+CanIMogIt.frame:AddSmartEvent("AddonLoaded", CanIMogIt.frame.AddonLoaded, {"ADDON_LOADED"})
 
 
 local transmogEvents = {
@@ -790,7 +892,7 @@ local function TransmogCollectionUpdated(event, ...)
     end
 end
 
-CanIMogIt.frame:AddEventFunction(TransmogCollectionUpdated)
+CanIMogIt.frame:AddSmartEvent("TransmogCollectionUpdated", TransmogCollectionUpdated, {"TRANSMOG_COLLECTION_SOURCE_ADDED", "TRANSMOG_COLLECTION_SOURCE_REMOVED", "TRANSMOG_COLLECTION_UPDATED"})
 
 
 local changesSavedStack = {}
@@ -1057,7 +1159,6 @@ Can I Mog It? help:
     e.g. /cimi help
 
     help            Displays this help message.
-    debug           Toggles the debug tooltip.
     verbose         Toggles verbose mode on tooltip.
     overlay         Toggles the icon overlay.
     refresh         Refreshes the overlay, forcing a redraw.
@@ -1229,7 +1330,7 @@ local function OnClearCacheEvent(event)
     end
 end
 
-CanIMogIt.frame:AddEventFunction(OnClearCacheEvent)
+CanIMogIt.frame:AddSmartEvent("OnClearCacheEvent", OnClearCacheEvent, {"TRANSMOG_COLLECTION_UPDATED"})
 
 local function OnClearBindCacheEvent(event, bag, slot)
     if event == "ITEM_LOCK_CHANGED" then
@@ -1237,7 +1338,7 @@ local function OnClearBindCacheEvent(event, bag, slot)
     end
 end
 
-CanIMogIt.frame:AddEventFunction(OnClearBindCacheEvent)
+CanIMogIt.frame:AddSmartEvent("OnClearBindCacheEvent", OnClearBindCacheEvent, {"ITEM_LOCK_CHANGED"})
 
 CanIMogIt.cache:Clear()
 
@@ -2694,7 +2795,7 @@ local function GetAppearancesEvent(event, ...)
         CanIMogIt:GetSets()
     end
 end
-CanIMogIt.frame:AddEventFunction(GetAppearancesEvent)
+CanIMogIt.frame:AddSmartEvent("GetAppearancesEvent", GetAppearancesEvent, {"PLAYER_LOGIN"})
 
 
 
@@ -2863,7 +2964,7 @@ local function OnMountAdded(event)
     if event ~= "NEW_MOUNT_ADDED" then return end
     CanIMogIt:ResetCache()
 end
-CanIMogIt.frame:AddEventFunction(OnMountAdded)
+CanIMogIt.frame:AddSmartEvent("OnMountAdded", OnMountAdded, {"NEW_MOUNT_ADDED"})
 
 
 function CanIMogIt:IsItemToy(itemLink)
@@ -2902,7 +3003,7 @@ local function OnLearnedToy(event)
     if event ~= "NEW_TOY_ADDED" then return end
     CanIMogIt:ResetCache()
 end
-CanIMogIt.frame:AddEventFunction(OnLearnedToy)
+CanIMogIt.frame:AddSmartEvent("OnLearnedToy", OnLearnedToy, {"NEW_TOY_ADDED"})
 
 
 function CanIMogIt:IsItemPet(itemLink)
@@ -2955,7 +3056,7 @@ local function OnPetUpdate(event)
     if event ~= "PET_JOURNAL_LIST_UPDATE" then return end
     CanIMogIt:ResetCache()
 end
-CanIMogIt.frame:AddEventFunction(OnPetUpdate)
+CanIMogIt.frame:AddSmartEvent("OnPetUpdate", OnPetUpdate, {"PET_JOURNAL_LIST_UPDATE"})
 
 
 function CanIMogIt:IsItemEnsemble(itemLink)
@@ -3044,50 +3145,129 @@ function CanIMogIt:CalculateEnsembleText(itemLink)
     end
 end
 
--- Adds overlays to Combuctor https://mods.curse.com/addons/wow/Combuctor
+-- Adds overlays to items in the addon Auctionator: https://www.curseforge.com/wow/addons/auctionator
 
-if C_AddOns.IsAddOnLoaded("Combuctor") then
 
-    -- Needs a slightly modified version of ContainerFrameItemButton_CIMIUpdateIcon(),
-    -- to support cached Combuctor bags (e.g. bank when not at bank or other characters).
-    function CombuctorItemButton_CIMIUpdateIcon(self)
+if C_AddOns.IsAddOnLoaded("Auctionator") then
 
-        if not self or not self:GetParent() or not self:GetParent():GetParent() then return end
+
+    ----------------------------
+    -- UpdateIcon functions   --
+    ----------------------------
+
+    CanIMogIt.ICON_LOCATIONS["AUCTIONATOR"] = {"LEFT", 0, 0}
+
+
+    local function GetAuctionatorItemLink(auctionatorButton)
+        -- rowData format: {
+        --     ["battlePetSpeciesID"] = 0,
+        --     ["itemID"] = 2140,
+        --     ["itemLevel"] = 11,
+        --     ["itemSuffix"] = 0,
+        --     ["appearanceLink"] = 12345  -- Only sometimes
+        --}
+        local rowData = auctionatorButton.rowData
+        if rowData then
+            if rowData.appearanceLink then
+                -- Items that have multiple appearances under the same itemID also include an appearance ID.
+                -- Use that to get the appearance instead.
+                local sourceID = string.match(rowData.appearanceLink, ".*transmogappearance:?(%d*)|.*")
+                if sourceID then
+                    return CanIMogIt:GetItemLinkFromSourceID(sourceID)
+                else
+                    -- This results in a bug from Blizzard, where the item is flagged as having an
+                    -- appearanceLink (such as upgradable item appearances), but one is not provided.
+                    -- Seem to be limited to crafted items. Making the same query twice causes the
+                    -- data to be filled correctly.
+                    return
+                end
+            else
+                -- Most items have a single appearance, and will use this code.
+                local itemKey = rowData.itemKey
+                return "|Hitem:".. itemKey.itemID .."|h"
+            end
+        else
+            -- No row data
+            return
+        end
+    end
+
+
+    function AuctionatorFrame_CIMIUpdateIcon(self)
+        if not self then return end
         if not CIMI_CheckOverlayIconEnabled() then
             self.CIMIIconTexture:SetShown(false)
             self:SetScript("OnUpdate", nil)
             return
         end
 
-        local bag, slot = self:GetParent():GetParent():GetID(), self:GetParent():GetID()
-        -- need to catch 0, 0 and 100, 0 here because the bank frame doesn't
-        -- load everything immediately, so the OnUpdate needs to run until those frames are opened.
-        if (bag == 0 and slot == 0) or (bag == 100 and slot == 0) then return end
+        local button = self:GetParent()
+        local itemLink = GetAuctionatorItemLink(button)
 
-        -- For cached Combuctor bags, GetContainerItemLink(bag, slot) would not work in CanIMogIt:GetTooltipText(nil, bag, slot).
-        -- Therefore provide GetTooltipText() with itemLink when available.
-        -- If the itemLink isn't available, then try with the bag/slot as backup (fixes battle pets).
-        local itemLink = self:GetParent():GetItem()
-        if not itemLink then
-            -- This may be void storage or guild bank
-            itemLink = self:GetParent():GetInfo().link
-        end
-        local cached = self:GetParent().info.cached
-        -- Need to prevent guild bank items from using bag/slot from Combuctor,
-        -- since they don't match Blizzard's frames.
-        if itemLink or cached or self:GetParent().__name == "CombuctorGuildItem" then
-            CIMI_SetIcon(self, CombuctorItemButton_CIMIUpdateIcon, CanIMogIt:GetTooltipText(itemLink))
+        if itemLink == nil then
+            -- Mark the items we can't figure out as a question mark (rather than empty).
+            CIMI_SetIcon(self, AuctionatorFrame_CIMIUpdateIcon, CanIMogIt.CANNOT_DETERMINE, CanIMogIt.CANNOT_DETERMINE)
         else
-            CIMI_SetIcon(self, CombuctorItemButton_CIMIUpdateIcon, CanIMogIt:GetTooltipText(itemLink, bag, slot))
+            CIMI_SetIcon(self, AuctionatorFrame_CIMIUpdateIcon, CanIMogIt:GetTooltipText(itemLink))
         end
     end
 
-    function CIMI_CombuctorUpdate(self)
-        CIMI_AddToFrame(self, CombuctorItemButton_CIMIUpdateIcon)
-        CombuctorItemButton_CIMIUpdateIcon(self.CanIMogItOverlay)
+    ------------------------
+    -- Function hooks     --
+    ------------------------
+
+    function AuctionatorFrame_CIMIOnValueChanged(_, elapsed)
+        -- Some other addons *coughTSMcough* prevent this frame from loading.
+        if _G["AuctionatorShoppingFrame"] == nil then return end
+        if not CanIMogIt.FrameShouldUpdate("AuctionatorShopping", elapsed or 1) then return end
+        local buttons = _G["AuctionatorShoppingFrame"].ResultsListing.ScrollArea.ScrollBox:GetFrames()
+        if buttons == nil then
+            return
+        end
+        for i, button in pairs(buttons) do
+            if button then
+                button.CIMI_index = i
+                CIMI_AddToFrame(button, AuctionatorFrame_CIMIUpdateIcon, "AuctionatorShoppingList"..i, "AUCTIONATOR")
+                AuctionatorFrame_CIMIUpdateIcon(button.CanIMogItOverlay)
+            end
+        end
     end
 
-    hooksecurefunc(Combuctor.Item, "Update", CIMI_CombuctorUpdate)
-    CanIMogIt:RegisterMessage("ResetCache", function () Combuctor.Frames:Update() end)
+
+    ----------------------------
+    -- Begin adding to frames --
+    ----------------------------
+
+    local function HookOverlay()
+        -- Some other addons *coughTSMcough* prevent this frame from loading.
+        if _G["AuctionatorShoppingFrame"] == nil then return end
+
+        local scrollArea = _G["AuctionatorShoppingFrame"].ResultsListing.ScrollArea
+        scrollArea:HookScript("OnUpdate", AuctionatorFrame_CIMIOnValueChanged)
+
+        -- This GetChildren returns an _unpacked_ value for some reason, so we have to pack it in a table.
+        local headers = {AuctionatorShoppingFrame.ResultsListing.HeaderContainer:GetChildren()}
+        for i, header in ipairs(headers) do
+            header:HookScript("OnClick", AuctionatorFrame_CIMIOnValueChanged)
+        end
+    end
+
+    local function HookOverlayAuctionator(event)
+        if event ~= "AUCTION_HOUSE_SHOW" then return end
+        C_Timer.After(.1, function () HookOverlay() end)
+    end
+
+    CanIMogIt.frame:AddSmartEvent("HookOverlayAuctionator", HookOverlayAuctionator, {"AUCTION_HOUSE_SHOW"})
+
+    ------------------------
+    -- Event functions    --
+    ------------------------
+
+    local function AuctionatorUpdateEvents(event, ...)
+        if event ~= "AUCTION_HOUSE_BROWSE_RESULTS_UPDATED" then return end
+        C_Timer.After(.1, AuctionatorFrame_CIMIOnValueChanged)
+    end
+
+    CanIMogIt.frame:AddSmartEvent("AuctionatorUpdateEvents", AuctionatorUpdateEvents, {"AUCTION_HOUSE_BROWSE_RESULTS_UPDATED"})
 
 end

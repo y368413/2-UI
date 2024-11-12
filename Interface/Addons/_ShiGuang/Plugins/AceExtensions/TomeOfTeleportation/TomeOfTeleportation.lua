@@ -1,4 +1,4 @@
-﻿--## Author: Remeen  4.2.1
+﻿--## Author: Remeen  5.6.1  GameMenuFrame
 local ST_Item = 1
 local ST_Spell = 2
 local ST_Challenge = 3
@@ -1154,12 +1154,12 @@ local DungeonsTitle = "地下城"
 
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1")
 local icon = LibStub("LibDBIcon-1.0")
---[[local dataobj = ldb:NewDataObject("TomeTele", {
+local dataobj = ldb:NewDataObject("TomeTele", {
 	label = TOMEOFTELEPORTATIONTITLE, 
 	type = "data source", 
 	icon = "Interface\\Icons\\Spell_arcane_portalshattrath",  --Interface\\Icons\\Spell_Arcane_TeleportDalaran
 	text = "Teleport"
-})]]
+})
 
 local TeleporterParentFrame = nil
 local CastSpell = nil
@@ -1185,7 +1185,7 @@ local ChosenHearth = nil
 local IsRefreshing = nil
 
 BINDING_NAME_TOMEOFTELEPORTATION = TOMEOFTELEPORTATIONTITLE
-_G["BINDING_NAME_TOMEOFTELEPORTATIONSHOW"] = "    "..TOMEOFTELEPORTATIONTITLE
+_G["BINDING_NAME_TOMEOFTELEPORTATIONSHOW"] = TOMEOFTELEPORTATIONTITLE
 
 local InvTypeToSlot = 
 {	
@@ -1349,7 +1349,9 @@ end
 
 function Teleporter_OnEvent(self, event, ...)
 	if event == "ADDON_LOADED" then
+		if ((...) == "_ShiGuang") then
 			Teleporter_OnAddonLoaded()
+		end
 	elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
 		local player, guid, spell = ...
 		if player == "player" then
@@ -2758,7 +2760,7 @@ function Teleporter_OnAddonLoaded()
 		--TomeOfTele_Icon = {}
 	--end
 	
-	--icon:Register("TomeTele", dataobj, TomeOfTele_Icon)		
+	icon:Register("TomeTele", dataobj)		--, TomeOfTele_Icon
 	RebuildSpellList()
 	for index, spell in ipairs(TeleporterSpells) do		
 		local spellId = spell.spellId
@@ -2860,7 +2862,7 @@ function TeleporterHideCreatedUI()
 	uiElements = {}
 end
 
---[[------- Isle of Thunder Weekly Check---- by Fluffies------DIY by y368413-------------------------------------------
+--------- Isle of Thunder Weekly Check---- by Fluffies------DIY by y368413-------------------------------------------
 local chest_icon = "|TInterface\\Icons\\Trade_Archaeology_ChestofTinyGlassAnimals:12|t "
 local rare_icon = "|TInterface\\Icons\\Achievement_Boss_Archaedas:12|t "
 local quest_icon = "|TInterface\\CURSOR\\QUEST:12|t "
@@ -2910,20 +2912,19 @@ local function CheckIslandweekly()
 	if iwqID and UnitLevel("player") == 120 and C_QuestLog.IsQuestFlaggedCompleted(iwqID) then return AddColor(COMPLETE,LIGHT_RED) elseif iwqID and UnitLevel("player") == 120 then return AddColor(cur.." / "..max,LIGHT_GREEN) end
 end
 ------------------------------------------------------------------------------------
-
 function dataobj:OnEnter()
     GameTooltip:SetOwner(self, "ANCHOR_NONE")
     GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
     GameTooltip:ClearLines()
     GameTooltip:AddDoubleLine(TITLEREADME)
     --GameTooltip:AddDoubleLine(ERR_QUEST_HAS_IN_PROGRESS,"|T".."Interface\\Addons\\_ShiGuang\\Media\\Modules\\MaoR-UI"..":32|t")
-    GameTooltip:AddLine(" ")
+    --GameTooltip:AddLine(" ")
     --GameTooltip:AddDoubleLine(quest_icon..AddColor("[|cffFFaaaa"..C_CurrencyInfo.GetCurrencyInfo(1580).."|r] ",GOLD), CheckCurrency())
     --GameTooltip:AddDoubleLine(quest_icon..AddColor(GetItemInfo(138019),LIGHT_BLUE), completedstring(44554))            --史诗钥石
     GameTooltip:AddDoubleLine(quest_icon..AddColor(GARRISON_LANDING_INVASION,LIGHT_BLUE), GarrisonInvade())
     --GameTooltip:AddDoubleLine(quest_icon..AddColor(PLAYER_DIFFICULTY_TIMEWALKER,LIGHT_BLUE), TimeTravelFB())   --TBC--WLK--CTM 
     --GameTooltip:AddDoubleLine(quest_icon..AddColor(GetItemInfo(132892),LIGHT_BLUE), completedstring(34774))            --布林顿 C_PetJournal.GetPetAbilityInfo(989)
-    GameTooltip:AddLine(" ")
+    --GameTooltip:AddLine(" ")
  --GameTooltip:AddDoubleLine(rare_icon..AddColor("Legion  1/11 ",PINK), LegionWolrdBoss())
  --GameTooltip:AddDoubleLine(rare_icon..AddColor("Tomb  1/4 ",PINK), TombWolrdBoss())
  --GameTooltip:AddDoubleLine(rare_icon..AddColor("Argus  1/4 ",PINK), ArgusWolrdBoss())
@@ -2934,8 +2935,8 @@ function dataobj:OnEnter()
    GameTooltip:AddDoubleLine(rare_icon..AddColor("WOD-鲁克玛",ZONE_BLUE), completedstring(37464)) 
    GameTooltip:AddDoubleLine(rare_icon..AddColor("MOP-怒之煞",ZONE_BLUE), completedstring(32099))
    GameTooltip:AddDoubleLine(rare_icon..AddColor("MOP-炮舰",ZONE_BLUE), completedstring(32098))
-   GameTooltip:AddDoubleLine(rare_icon..AddColor("MOP-纳拉克",ZONE_BLUE), completedstring(32518))
-   GameTooltip:AddDoubleLine(rare_icon..AddColor("MOP-乌达斯塔",ZONE_BLUE), completedstring(32519))
+   --GameTooltip:AddDoubleLine(rare_icon..AddColor("MOP-纳拉克",ZONE_BLUE), completedstring(32518))
+   --GameTooltip:AddDoubleLine(rare_icon..AddColor("MOP-乌达斯塔",ZONE_BLUE), completedstring(32519))
    GameTooltip:AddLine(" ")
    --GameTooltip:AddDoubleLine(quest_icon..AddColor(ISLANDS_HEADER,LIGHT_BLUE), CheckIslandweekly())
    --GameTooltip:AddLine(" ")
@@ -2951,9 +2952,124 @@ function dataobj:OnLeave()
     GameTooltip:Hide()
 end
 
+
+----------------------------------------------------------------------------	右键菜单---------------------------------------
+--动作条样式
+local SetMrbarMenuFrame = CreateFrame("Frame", "ClickMenu", UIParent, "UIDropDownMenuTemplate")
+local SetMrbarMicromenu = {  
+    --{ text = "|cffff8800 ------------------------|r", notCheckable = true },
+    --{ text = "           "..MAINMENU_BUTTON.."", isTitle = true, notCheckable = true},
+    --{ text = "|cffff8800 ------------------------|r", notCheckable = true },
+    --{ text = CHARACTER, icon = 'Interface\\PaperDollInfoFrame\\UI-EquipmentManager-Toggle',
+        --func = function() ToggleFrame(CharacterFrame) end, notCheckable = true},
+    --{ text = SPELLBOOK, icon = 'Interface\\MINIMAP\\TRACKING\\Class',
+        --func = function() ToggleFrame(SpellBookFrame) end, notCheckable = true},
+    --{ text = TALENTS, icon = 'Interface\\MINIMAP\\TRACKING\\Ammunition',
+        --func = function() if (not PlayerTalentFrame) then C_AddOns.LoadAddOn('Blizzard_TalentUI') end
+        --if (not GlyphFrame) then C_AddOns.LoadAddOn('Blizzard_GlyphUI') end
+        --ToggleTalentFrame() end, notCheckable = true},
+    --{ text = INVENTORY_TOOLTIP,  icon = 'Interface\\MINIMAP\\TRACKING\\Banker',
+        --func = function() ToggleAllBags() end, notCheckable = true},
+    --{ text = ACHIEVEMENTS, icon = 'Interface\\ACHIEVEMENTFRAME\\UI-Achievement-Shield',
+        --func = function() ToggleAchievementFrame() end, notCheckable = true},
+    --{ text = QUEST_LOG, icon = 'Interface\\GossipFrame\\ActiveQuestIcon',
+        --func = function() ToggleQuestLog() end, notCheckable = true},
+    --{ text = FRIENDS, icon = 'Interface\\FriendsFrame\\PlusManz-BattleNet',
+        --func = function() ToggleFriendsFrame() end, notCheckable = true},
+    --{ text = GUILD, icon = 'Interface\\GossipFrame\\TabardGossipIcon',
+        --func = function() if (IsTrialAccount()) then UIErrorsFrame:AddMessage(ERR_RESTRICTED_ACCOUNT, 1, 0, 0) else ToggleGuildFrame() end end, notCheckable = true},
+    --{ text = GROUP_FINDER, icon = 'Interface\\LFGFRAME\\BattleNetWorking0',
+        --func = function() securecall(PVEFrame_ToggleFrame, 'GroupFinderFrame', LFDParentFrame) end, notCheckable = true},
+    --{ text = ENCOUNTER_JOURNAL, icon = 'Interface\\MINIMAP\\TRACKING\\Profession',
+        --func = function() ToggleEncounterJournal() end, notCheckable = true},
+    --{ text = PLAYER_V_PLAYER, icon = 'Interface\\MINIMAP\\TRACKING\\BattleMaster', --broke
+	     --func = function() securecall(PVEFrame_ToggleFrame, 'PVPUIFrame', HonorFrame) end, notCheckable = true},
+    --{ text = MOUNTS, icon = 'Interface\\MINIMAP\\TRACKING\\StableMaster',  --broke
+	      --func = function() ToggleCollectionsJournal() end, notCheckable = true},
+   -- { text = PETS, icon = 'Interface\\MINIMAP\\TRACKING\\StableMaster',  --broke
+	  --func = function() securecall(ToggleCollectionsJournal, 2) end, tooltipTitle = securecall(MicroButtonTooltipText, MOUNTS_AND_PETS, 'TOGGLEPETJOURNAL'), notCheckable = true},
+    --{ text = TOY_BOX, icon = 'Interface\\MINIMAP\\TRACKING\\Reagents',  --broke 
+	  --func = function() securecall(ToggleCollectionsJournal, 3) end, tooltipTitle = securecall(MicroButtonTooltipText, TOY_BOX, 'TOGGLETOYBOX'), notCheckable = true},
+    --{ text = 'Heirlooms', icon = 'Interface\\MINIMAP\\TRACKING\\Reagents',  --broke
+	  --func = function() securecall(ToggleCollectionsJournal, 4) end, tooltipTitle = securecall(MicroButtonTooltipText, TOY_BOX, 'TOGGLETOYBOX'), notCheckable = true},
+    --{ text = "Calender",icon = 'Interface\\Calendar\\UI-Calendar-Button',  --broke 
+         --func = function() C_AddOns.LoadAddOn('Blizzard_Calendar') Calendar_Toggle() end, notCheckable = true},
+    --{ text = BLIZZARD_STORE, icon = 'Interface\\MINIMAP\\TRACKING\\BattleMaster',
+         --func = function() C_AddOns.LoadAddOn('Blizzard_StoreUI') securecall(ToggleStoreUI) end, notCheckable = true},
+    --{ text = GAMEMENU_HELP, icon = 'Interface\\CHATFRAME\\UI-ChatIcon-Blizz',
+         --func = function() ToggleFrame(HelpFrame) end, notCheckable = true},
+    --{ text = BATTLEFIELD_MINIMAP,
+         --func = function() securecall(ToggleBattlefieldMinimap) end, notCheckable = true},
+    { text = "|cffff8800 ------------------------|r", notCheckable = true },
+    { text = "           -|cFFFFFF00 2|r|cFFFF0000 UI |r- ", isTitle = true, notCheckable = true},
+    { text = "|cffff8800 ------------------------|r", notCheckable = true },
+    --{ text = MINIMAP_MENU_BARSTYLE,  icon = 'Interface\\MINIMAP\\TRACKING\\BattleMaster',
+         --func = function() SenduiCmd("/mr");  end, notCheckable = true},
+    { text = MINIMAP_MENU_KEYBIND, icon = 'Interface\\MacroFrame\\MacroFrame-Icon.blp',
+        func = function() SenduiCmd("/Keybind"); end, notCheckable = true},
+    { text = "|cFF00DDFF ----- "..BINDING_NAME_MOVEANDSTEER.." -----|r", isTitle = true, notCheckable = true },
+    { text = MINIMAP_MENU_SPECIALBUTTON, icon = 'Interface\\Icons\\INV_Inscription_RunescrollOfFortitude_Red',
+        func = function() SenduiCmd("/moveit"); end, notCheckable = true},
+    { text = MINIMAP_MENU_AURADIY, icon = 'Interface\\ACHIEVEMENTFRAME\\UI-Achievement-Shield',
+        func = function() SenduiCmd("/awc"); end, notCheckable = true},
+    --{ text = MINIMAP_MENU_QUESTBUTTON, icon = 'Interface\\GossipFrame\\ActiveQuestIcon',
+        --func = function() SenduiCmd("/eqb"); end, notCheckable = true},
+    --{ text = MINIMAP_MENU_CASTBAR, icon = 'Interface\\Icons\\INV_Misc_Bone_HumanSkull_02',
+        --func = function() SenduiCmd("/cbs"); end, notCheckable = true},
+    { text = MINIMAP_MENU_DAMAGESTYLE, icon = 'Interface\\PaperDollInfoFrame\\UI-EquipmentManager-Toggle',
+        func = function() SenduiCmd("/dex"); end, notCheckable = true },
+    { text = MINIMAP_MENU_DOOMCOOLDOWN, icon = 'Interface\\Icons\\Spell_Nature_Earthbind',
+        func = function() SenduiCmd("/dcp"); end, notCheckable = true},
+    { text = "传送助手", icon = 'Interface\\Calendar\\UI-Calendar-Button',
+        func = function() SenduiCmd("/tomeofteleport"); end, notCheckable = true},
+    --{ text = "|cFF00DDFF ------- "..MINIMAP_MENU_ONOFF.." -------|r", isTitle = true, notCheckable = true},
+    --{ text = MINIMAP_MENU_INTERRUPT, icon = 'Interface\\MINIMAP\\TRACKING\\BattleMaster',
+        --func = function() SenduiCmd("/esi"); end, notCheckable = true},
+    --{text = MINIMAP_MENU_DISTANCE, hasArrow = true, notCheckable = true,
+        --menuList={  
+            --{ text = YES, func = function() SenduiCmd("/hardyards sho") end, notCheckable = true},
+            --{ text = NO, func = function() SenduiCmd("/hardyards hid") end, notCheckable = true}
+        --}
+    --},
+    --{text = MINIMAP_MENU_COMBOPOINTS, hasArrow = true, notCheckable = true,
+        --menuList={  
+            --{ text = YES, func = function() SenduiCmd("/bht hiton") end, notCheckable = true},
+            --{ text = NO, func = function() SenduiCmd("/bht hitoff") end, notCheckable = true}
+        --}
+    --},
+    --{text = MINIMAP_MENU_COMPAREITEMS, hasArrow = true, notCheckable = true,
+        --menuList={  
+            --{ text = YES, func = function() SenduiCmd("/run SetCVar('alwaysCompareItems', 1)") end, notCheckable = true},
+            --{ text = NO, func = function() SenduiCmd("/run SetCVar('alwaysCompareItems', 0)") end, notCheckable = true}
+        --}
+    --},
+    { text = "|cFF00DDFF ------- Style -------|r", isTitle = true, notCheckable = true },
+    { text = MINIMAP_MENU_SWITCHUF, icon = 'Interface\\Icons\\Spell_Holy_Crusade',
+        func = function() SenduiCmd("/loadmr"); end, notCheckable = true},
+    { text = MINIMAP_MENU_AFKSCREEN, icon = 'Interface\\Icons\\Spell_Nature_Sentinal',
+        func = function() SenduiCmd("/wallpaperkit"); end, notCheckable = true},
+    --{ text = MINIMAP_MENU_CHECKFOODSSS, icon = 'Interface\\MINIMAP\\TRACKING\\Reagents',
+        --func = function() SenduiCmd("/hj"); end, notCheckable = true  },
+    --{ text = MINIMAP_MENU_WORLDQUESTREWARD, icon = 'Interface\\Calendar\\UI-Calendar-Button',
+        --func = function() SenduiCmd("/wqa popup"); end, notCheckable = true},
+    --{ text = "|cFF00DDFF -- OneKeyMacro --|r", func = function() SenduiCmd("/MacroHelp"); end, notCheckable = true},
+    { text = "  |cFFBF00FFSimc|r", func = function() SenduiCmd("/simc"); end, notCheckable = true},
+    { text = "  |cFFBF00FFWe Love WOW|r", func = function() SenduiCmd("/welovewow"); end, notCheckable = true},
+    { text = "|cffff8800 --------------------------|r", isTitle = true, notCheckable = true  },
+    { text = "  |cFFBF00FF"..MINIMAP_MENU_QUSETIONANSWER.."|r", func = function() SenduiCmd("/MrHelp"); end, notCheckable = true},
+    { text = "  |cFFBF00FF2 UI"..MINIMAP_MENU_UISETTING.."|r", func = function() SenduiCmd("/mr"); end, notCheckable = true},
+    { text = "|cffff8800 --------------------------|r", isTitle = true, notCheckable = true  },
+    { text = "            |cFFBF00FF"..MINIMAP_MENU_MORE.."|r", func = function() SenduiCmd("/ip"); end, notCheckable = true},
+    --{ text = "ESC菜单", func = function() ToggleFrame(GameMenuFrame) end, notCheckable = true},
+    --{ text = "                       ", isTitle = true, notCheckable = true  },
+    --{ text = LOGOUT, func = function() Logout() end, notCheckable = true},
+    --{ text = QUIT, func = function() ForceQuit() end, notCheckable = true},
+}
+
+
 function dataobj:OnClick(button)
-	TeleporterFunction()
-end]]
+	if button == "RightButton" then EasyMenu(SetMrbarMicromenu, SetMrbarMenuFrame, "cursor", 0, 0, "MENU", 2) else TeleporterFunction() end
+end
 
 function TeleporterIsUnsupportedItem(spell)
 	return false

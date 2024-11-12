@@ -40,50 +40,50 @@ G.DefaultSettings = {
 		Bar1Flyout = 1,
 		Bar1Size = 35,
 		Bar1Font = 12,
-		Bar1Num = 8,
-		Bar1PerRow = 8,
+		Bar1Num = 12,
+		Bar1PerRow = 12,
 		Bar2 = true,
 		Bar2Flyout = 1,
-		Bar2Size = 40,
+		Bar2Size = 35,
 		Bar2Font = 12,
 		Bar2Num = 12,
 		Bar2PerRow = 12,
 		Bar3 = true,
 		Bar3Flyout = 1,
-		Bar3Size = 40,
+		Bar3Size = 35,
 		Bar3Font = 12,
 		Bar3Num = 12,
-		Bar3PerRow = 12,
+		Bar3PerRow = 6,
 		Bar4 = true,
 		Bar4Flyout = 1,
-		Bar4Size = 40,
+		Bar4Size = 35,
 		Bar4Font = 12,
 		Bar4Num = 12,
 		Bar4PerRow = 6,
 		Bar5 = true,
 		Bar5Flyout = 1,
-		Bar5Size = 40,
+		Bar5Size = 35,
 		Bar5Font = 12,
 		Bar5Num = 12,
-		Bar5PerRow = 6,
-		Bar6 = false,
+		Bar5PerRow = 1,
+		Bar6 = true,
 		Bar6Flyout = 1,
-		Bar6Size = 34,
+		Bar6Size = 35,
 		Bar6Font = 12,
 		Bar6Num = 12,
-		Bar6PerRow = 12,
+		Bar6PerRow = 1,
 		Bar7 = false,
 		Bar7Flyout = 1,
-		Bar7Size = 34,
+		Bar7Size = 35,
 		Bar7Font = 12,
-		Bar7Num = 12,
-		Bar7PerRow = 12,
+		Bar7Num = 4,
+		Bar7PerRow = 1,
 		Bar8 = false,
 		Bar8Flyout = 1,
-		Bar8Size = 34,
+		Bar8Size = 35,
 		Bar8Font = 12,
 		Bar8Num = 12,
-		Bar8PerRow = 12,
+		Bar8PerRow = 4,
 
 		BarPetSize = 26,
 		BarPetFont = 12,
@@ -103,6 +103,7 @@ G.DefaultSettings = {
 		VerticalTotems = false,
 		TotemSize = 32,
 		ClassAuras = true,
+		MMT29X4 = false,
 		BuffFrame = true,
 		HideBlizBuff = false,
 		ReverseBuff = false,
@@ -1128,12 +1129,12 @@ G.OptionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	[1] = {
 		{1, "Actionbar", "Enable", HeaderTag..U["Enable Actionbar"], nil, nil, setupActionBar},
 		--{1, "Actionbar", "MicroMenu", U["Micromenu"], true, nil, setupMicroMenu, nil, U["MicroMenuTip"]},
-		{1, "Actionbar", "ShowStance", U["ShowStanceBar"], true, true, setupStanceBar},
 		--{},--blank
 		--{4, "Actionbar", "Style", U["Actionbar Style"], true, true, {"-- 2*(3+12+3) --", "-- 2*(6+12+6) --", "-- 2*6+3*12+2*6 --", "-- 3*12 --", "-- 2*(12+6) --", "-- 3*(4+12+4) --", "-- What --", "-- MR --", "-- PVP2 --", "-- Cool --", "-- JK --"}},  --nop
 		{},--blank
 		{1, "Actionbar", "Cooldown", HeaderTag..U["Show Cooldown"]},
 		{1, "Actionbar", "OverrideWA", U["HideCooldownOnWA"].."*", true},
+		{1, "Actionbar", "ShowStance", U["ShowStanceBar"], true, true, setupStanceBar},
 		--{1, "Misc", "SendActionCD", HeaderTag..U["SendActionCD"].."*", true, nil, nil, nil, U["SendActionCDTip"]},
 		{3, "Actionbar", "MmssTH", IsNew..U["MmssThreshold"].."*", nil, nil, {60, 600, 1}, nil, U["MmssThresholdTip"]},
 		{3, "Actionbar", "TenthTH", IsNew..U["TenthThreshold"].."*", true, nil, {0, 60, 1}, nil, U["TenthThresholdTip"]},
@@ -1728,12 +1729,16 @@ local function OpenGUI()
 	M.CreateFS(f, 43, "2 UI", true, "TOP", 0, -62)
 	M.CreateFS(f, 21, "v"..I.Version, false, "TOP", 80, -80)
 
-	--local close = M.CreateButton(f, 36, 36, "X")
-	--close:SetPoint("TOP", 310, -60)
-	--close:SetScript("OnClick", function() f:Hide() end)
+	--[[local close = M.CreateButton(f, 72, 21, "关闭")
+	close:SetPoint("BOTTOM", -310, 68)
+	close:SetScript("OnClick", function() f:Hide() end)]]
+	
+	local MrHelp = M.CreateButton(f, 72, 21, "帮助")
+	MrHelp:SetPoint("BOTTOM", -310, 68)
+	MrHelp:SetScript("OnClick", function() SenduiCmd("/MrHelp") f:Hide() end)
 
-	local ok = M.CreateButton(f, 72, 21, "O K")
-	ok:SetPoint("BOTTOM", 335, 66)
+	local ok = M.CreateButton(f, 72, 21, "确定")
+	ok:SetPoint("BOTTOM", 320, 68)
 	ok:SetScript("OnClick", function()
 		M:SetupUIScale()
 		f:Hide()
@@ -1742,7 +1747,47 @@ local function OpenGUI()
 			G.needUIReload = nil
 		end
 	end)
+	
+	local KeyBind = M.CreateButton(f, 80, 21, MINIMAP_MENU_KEYBIND)
+	KeyBind:SetPoint("BOTTOM", -380, 100)
+	KeyBind:SetScript("OnClick", function() SenduiCmd("/Keybind") f:Hide() end)
+	
+	local MoveFrames = M.CreateButton(f, 80, 21, MINIMAP_MENU_SPECIALBUTTON)
+	MoveFrames:SetPoint("BOTTOM", -295, 100)
+	MoveFrames:SetScript("OnClick", function() SenduiCmd("/moveit") f:Hide() end)
+	
+	local Awc = M.CreateButton(f, 80, 21, MINIMAP_MENU_AURADIY)
+	Awc:SetPoint("BOTTOM", -210, 100)
+	Awc:SetScript("OnClick", function() SenduiCmd("/awc") f:Hide() end)
+	
+	local Dex = M.CreateButton(f, 80, 21, MINIMAP_MENU_DAMAGESTYLE)
+	Dex:SetPoint("BOTTOM", -125, 100)
+	Dex:SetScript("OnClick", function() SenduiCmd("/dex") f:Hide() end)
+	
+	local Dcp = M.CreateButton(f, 80, 21, MINIMAP_MENU_DOOMCOOLDOWN)
+	Dcp:SetPoint("BOTTOM", -40, 100)
+	Dcp:SetScript("OnClick", function() SenduiCmd("/dcp") f:Hide() end)
 
+	local SwitchUF = M.CreateButton(f, 80, 21, MINIMAP_MENU_SWITCHUF)
+	SwitchUF:SetPoint("BOTTOM", 45, 100)
+	SwitchUF:SetScript("OnClick", function() SenduiCmd("/loadmr") f:Hide() end)
+
+	local AFKScreen = M.CreateButton(f, 80, 21, MINIMAP_MENU_AFKSCREEN)
+	AFKScreen:SetPoint("BOTTOM", 130, 100)
+	AFKScreen:SetScript("OnClick", function() SenduiCmd("/wallpaperkit") f:Hide() end)
+
+	local Simc = M.CreateButton(f, 80, 21, "Simc")
+	Simc:SetPoint("BOTTOM", 215, 100)
+	Simc:SetScript("OnClick", function() SenduiCmd("/simc") f:Hide() end)
+
+	local Love = M.CreateButton(f, 80, 21, "Love")
+	Love:SetPoint("BOTTOM", 300, 100)
+	Love:SetScript("OnClick", function() SenduiCmd("/welovewow") f:Hide() end)
+	
+	local MoreSet = M.CreateButton(f, 80, 21, MINIMAP_MENU_MORE)
+	MoreSet:SetPoint("BOTTOM", 385, 100)
+	MoreSet:SetScript("OnClick", function() SenduiCmd("/ip") f:Hide() end)
+											
 	for i, name in pairs(G.TabList) do
 		local rawName, isNew = gsub(name, "ISNEW", "")
 		guiTab[i] = CreateTab(f, i, rawName)
@@ -1760,7 +1805,7 @@ local function OpenGUI()
 	G:SetupActionbarStyle(guiPage[1])
 
 	local helpInfo = M.CreateHelpInfo(f, U["Option* Tips"])
-	helpInfo:SetPoint("TOP", 21, -21)
+	helpInfo:SetPoint("TOP", 280, -90)
 	local guiHelpInfo = {
 		text = U["GUIPanelHelp"],
 		buttonStyle = HelpTip.ButtonStyle.GotIt,

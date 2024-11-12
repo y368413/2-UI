@@ -2,8 +2,9 @@
 	<Script file="Charms.lua"/>
 	<Script file="MacroMr.lua"/>
 	<Script file="rlTools.lua"/>
-	<!--Script file="HardYards.lua"/-->
+	<Script file="AutoPotion.lua"/>
 	<Script file="Expansions.lua"/>
+	<Script file="GotoCroods.lua"/>
 	<Script file="RandomPoly.lua"/>
 	<Script file="ColorFrames.lua"/>
 	<Script file="RandomHearth.lua"/>
@@ -16,6 +17,7 @@
 	<Script file="Killauctionlowprice.lua"/>
 	<Script file="OneClickDisenchanting.lua"/>
 	<Script file="PlayerFrame_Experience.lua"/>
+	<Script file="SimpleUnfoldingCurrency.lua"/>
 	<Script file="FriendGroups.lua"/>
 	<Button name="FriendGroupsFrameFriendDividerTemplate" registerForClicks="LeftButtonUp, RightButtonUp" virtual="true">
 		<Size x="298" y="16"/>

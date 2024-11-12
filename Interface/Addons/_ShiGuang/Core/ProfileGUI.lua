@@ -303,7 +303,7 @@ end
 
 function G:CreateProfileGUI(parent)
 	local reset = M.CreateButton(parent, 120, 24, U["UI Reset"])
-	reset:SetPoint("BOTTOMLEFT", 100, 30)
+	reset:SetPoint("BOTTOMLEFT", 100, 60)
 	reset:SetScript("OnClick", function()
 		StaticPopup_Show("RESET_UI")
 	end)
@@ -561,8 +561,8 @@ function G:ImportGUIData()
 			else
 				R.db[key][value] = toBoolean(arg1)
 			end
-		--elseif arg1 == "EMPTYTABLE" then
-			--R.db[key][value] = {}
+		elseif arg1 == "EMPTYTABLE" then
+			R.db[key][value] = {}
 		elseif strfind(value, "Color") and (arg1 == "r" or arg1 == "g" or arg1 == "b") then
 			local colors = {select(3, strsplit(":", option))}
 			if R.db[key][value] then
@@ -597,11 +597,11 @@ function G:ImportGUIData()
 			for i = 1, #results, 2 do
 				R.db[key][value][tonumber(results[i]) or results[i]] = toBoolean(results[i+1])
 			end
-		--elseif value == "CustomItems" or value == "CustomNames" then
-			--local results = {select(3, strsplit(":", option))}
-			--for i = 1, #results, 2 do
-				--R.db[key][value][tonumber(results[i])] = tonumber(results[i+1]) or results[i+1]
-			--end
+		elseif value == "CustomItems" or value == "CustomNames" then
+			local results = {select(3, strsplit(":", option))}
+			for i = 1, #results, 2 do
+				R.db[key][value][tonumber(results[i])] = tonumber(results[i+1]) or results[i+1]
+			end
 		elseif key == "Mover" or key == "AuraWatchMover" then
 			local relFrom, parent, relTo, x, y = select(3, strsplit(":", option))
 			value = tonumber(value) or value

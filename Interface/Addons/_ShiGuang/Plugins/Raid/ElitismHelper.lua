@@ -1639,24 +1639,24 @@ local function maybeSendChatMessage(message)
 	if activeUser ~= playerUser then
 		return
 	end
-	if ElitismHelperDB.OutputMode == "self" then
+	if ShiGuangDB.OutputMode == "self" then
 		print(message)
-	elseif ElitismHelperDB.OutputMode == "party" and IsInGroup() and not IsInGroup(2) then
+	elseif ShiGuangDB.OutputMode == "party" and IsInGroup() and not IsInGroup(2) then
 		SendChatMessage(message,"PARTY")
-	elseif ElitismHelperDB.OutputMode == "raid" and IsInGroup() and not IsInGroup(2) and IsInRaid() then
+	elseif ShiGuangDB.OutputMode == "raid" and IsInGroup() and not IsInGroup(2) and IsInRaid() then
 		SendChatMessage(message,"RAID")
-	elseif ElitismHelperDB.OutputMode == "yell" then
+	elseif ShiGuangDB.OutputMode == "yell" then
 		SendChatMessage(message,"YELL")
-	elseif ElitismHelperDB.OutputMode == "emote" then
+	elseif ShiGuangDB.OutputMode == "emote" then
 		SendChatMessage(message,"EMOTE")
-	elseif ElitismHelperDB.OutputMode:find('^channel') ~= nil then
-		local args = ElitismFrame:SplitString(ElitismHelperDB.OutputMode," ")
+	elseif ShiGuangDB.OutputMode:find('^channel') ~= nil then
+		local args = ElitismFrame:SplitString(ShiGuangDB.OutputMode," ")
 		if(args[2] == nil) then
-			print("ERROR: Invalid channel string in ElitismHelperDB!")
+			print("ERROR: Invalid channel string in ShiGuangDB!")
 			return
 		end
 		SendChatMessage(message,"CHANNEL",GetDefaultLanguage(),args[2])
-	elseif ElitismHelperDB.OutputMode == "default" then
+	elseif ShiGuangDB.OutputMode == "default" then
 		if IsInGroup() and not IsInGroup(2) and not IsInRaid() then
 			SendChatMessage(message,"PARTY")
 		elseif IsInGroup() and not IsInGroup(2) and IsInRaid() then

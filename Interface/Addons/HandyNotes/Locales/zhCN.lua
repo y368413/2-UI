@@ -4848,8 +4848,15 @@ L['alyx_kickoff_note'] = '与 {npc:226683} 交谈以启用新的艾泽拉斯之�
 L['celebration_crates_label'] = '庆典箱子'
 L['celebration_crates_note'] = '找到并交还隐藏在 {location:艾泽拉斯} 中的所有 {object:庆典箱子}。'
 
+
 L['1_soggy_celebration_crate_note'] = '从 {location:深潜酒吧} 的 {npc:143029}（{dot:Blue}）购买 {item:225996} 并将其交给 {npc:189119} 以揭示 {item:226200}。'
 L['2_hazy_celebration_crate_note'] = '活着的时候，寻找发出绿光的区域。{note:但是，必须死了才能揭示 {item:232263}。}'
+L['3_dirt_caked_celebration_crate_note'] = '{note:无需从 {npc:226683} 附近的公告板上收集此箱子的 {item:228321}。}\n\n1. 进入 {location:卡拉赞} 后面的 {location:被遗忘的墓穴}。\n\n2. 走下楼梯，穿过 {location:遗忘之井}，走下 {location:乞丐行道} 的斜坡，进入 {location:被遗忘的墓穴} 的下一层。\n\n3. 右转并沿着隧道穿过 {location:乞丐行道}。\n\n4. 穿过大房间，朝着 {location:倒吊深渊} 走去。\n\n5. 径直穿过水面，进入 {location:绝望泥沼} 拿取 {item:228322}。'
+L['4_sandy_celebration_crate'] = '1. 从 {location:卡利姆多} 的 {location:千针石林} {location:沉没的挖掘场} 收集 {item:228768}。\n\n2. 在 {location:阿苏纳} 的东边道路上找到游荡的 {npc:91079}。\n\n3. 花费 %s 购买 {item:228767}。'
+L['5_battered_celebration_crate'] = '靠在 {npc:24026} 附近洞穴的岩石上。'
+L['6_waterlogged_celebration_crate'] = '位于侏儒建筑二楼的水下。\n\n{note:不要触碰电梯。当前它会导致游戏崩溃。}'
+
+L['water_resistant_receipt_note'] = '1. 进入充满 {npc:47390} 的隧道，右转从管道后面的 {object:防水的销售收据} 中收集 {item:228768}。\n\n2. 在 {location:破碎群岛} 的 {location:阿苏纳} 找到 {npc:91079}。'
 
 
 --Core
@@ -5044,10 +5051,10 @@ L['options_toggle_per_map_settings_desc'] = '应用切换，缩放和透明度�
 L['options_restore_hidden_nodes'] = '恢复隐藏项'
 L['options_restore_hidden_nodes_desc'] = '使用右击菜单恢复全部隐藏项。'
 
-L['ignore_class_restrictions'] = nil
-L['ignore_class_restrictions_desc'] = nil
-L['ignore_faction_restrictions'] = nil
-L['ignore_faction_restrictions_desc'] = nil
+L['ignore_class_restrictions'] = '忽略职业限制'
+L['ignore_class_restrictions_desc'] = '显示需要与当前角色不同职业的组、项和奖励。'
+L['ignore_faction_restrictions'] = '忽略阵营限制'
+L['ignore_faction_restrictions_desc'] = '显示需要对立阵营的组、项和奖励。'
 
 L['options_rewards_settings'] = '奖励'
 L['options_reward_behaviors_settings'] = '奖励行为'

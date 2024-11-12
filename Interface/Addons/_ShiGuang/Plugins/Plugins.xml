@@ -1,6 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Include file="Pet\Pet.xml"/>
-	<Include file="Chat\Chat.xml"/>
+	<!--Include file="Chat\Chat.xml"/-->
 	<Include file="Loot\Loot.xml"/>
 	<Include file="Raid\Raid.xml"/>
 	<Include file="Quest\Quest.xml"/>

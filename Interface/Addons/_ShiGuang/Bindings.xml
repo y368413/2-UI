@@ -15,7 +15,8 @@
 		  ChatFrame_SendTell(name)
 		end
 	</Binding>
-	<!--Binding name= "COVENANTFORGE_BINDING_TOGGLE_SOULBINDS" hidden="false" header="COVENANTFORGE" category="BINDING_HEADER_ACE3">
+	<!--Binding name="AutoPotion Macro" category="BINDING_HEADER_ACE3"> AutoPotion() </Binding>
+	<Binding name= "COVENANTFORGE_BINDING_TOGGLE_SOULBINDS" hidden="false" header="COVENANTFORGE" category="BINDING_HEADER_ACE3">
 		if UIParentLoadAddOn("Blizzard_Soulbinds") then SoulbindViewer:Open(); end	
 	</Binding-->
 </Bindings>

@@ -48,7 +48,6 @@ L["Requires /reload to take effect."] = "需要/重载使其生效。"
 L["Right"] = "右侧"
 L["Show Bag Icons"] = "显示状态图标"
 L["Show information on the tooltip about transmog sets."] = "在提示上显示幻化套装信息。"
---[[Translation missing --]]
 L["Show Mount Items"] = "显示坐骑物品"
 L["Show Source Location Tooltip"] = "显示来源位置提示"
 L["Show Transmog Set Info"] = "显示幻化套装信息"
