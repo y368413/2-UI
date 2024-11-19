@@ -2,7 +2,7 @@
 ## Title: Syndicator
 ## Title-zhCN: |cff00ff00[背包]|r账号助手
 ## Title-zhTW: |cff00ff00[背包]|r账号助手
-## Version: 130
+## Version: 134
 ## Author: plusmouse
 ## SavedVariables: SYNDICATOR_CONFIG, SYNDICATOR_DATA, SYNDICATOR_SUMMARIES
 ## IconTexture: Interface\AddOns\Syndicator\Assets\logo.tga

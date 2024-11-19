@@ -9,8 +9,8 @@
 ## Author: Qshine,Simca@Malfurion
 ## Author-zhCN: 上官晓雾,Simca@Malfurion
 ## Author-zhTW: 上官曉霧,Simca@Malfurion
-## X-Date: 2024-08-16,2024-09-25T23:11:48Z
-## Version: 2.3.4 + v1.30.4
+## X-Date: 2024-08-16,2024-10-28T17:27:03Z
+## Version: 2.3.4 + v1.31.1
 ## SavedVariables: HPetSaves,BID_Options
 ## IconTexture: Interface\AddOns\HandyNotes\Icons\Krag.blp
 ## Dependencies: _ShiGuang
@@ -20,12 +20,13 @@
 Localization.lua
 
 HPetBattleAny.lua
-BattlePetBreedID.lua
-#modules\PetData.lua
+modules\PetData.lua
 modules\PetDataFrame.lua
 modules\Config.lua
 modules\Hook.lua
 modules\Search.lua
 modules\Ability.lua
 
-modules\AutoSelectPet.lua
+#modules\AutoSelectPet.lua
+
+BattlePetBreedID.lua

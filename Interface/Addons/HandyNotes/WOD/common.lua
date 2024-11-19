@@ -307,7 +307,7 @@ hooksecurefunc(EncounterJournalPinMixin, 'OnMouseEnter', function(self)
         end
         if self.encounterID == 1262 then -- Render POI dot at Rukhmar spawn location
             WarlordsOfDraenor.poi.POI({37183845}):Render(self:GetMap(),
-                ADDON_NAME .. 'WorldMapPinTemplate')
+                'HandtNote' .. 'WorldMapPinTemplate')
         end
         -- GameTooltip:AddLine(self.encounterID) -- Debug to show the encounterID
     end

@@ -247,7 +247,7 @@ function Follower:GetType(category)
             ['locale'] = L['follower_type_companion']
         }
     }
-    return types[Core.expansion][category]
+    return types[category] --[Core.expansion]
 end
 
 function Follower:GetText()

@@ -83,6 +83,7 @@ function zrMM:CreateButtonFrame()
     Minimap.manualTarget['ZygorGuidesViewerMapIcon'] = true
     Minimap.manualTarget['PeggledMinimapIcon'] = true
     Minimap.manualTarget['EnxMiniMapIcon'] = true
+    Minimap.manualTarget['addoncompartmentframe'] = true
 
     Minimap.ignoreFrames['zrButtonFrame'] = true
     Minimap.ignoreFrames['GameTimeFrame'] = true
@@ -103,12 +104,13 @@ function zrMM:CreateButtonFrame()
     Minimap.ignoreFrames['MinimapZoomOut'] = true
     --Minimap.ignoreFrames['MiniMapTrackingButton'] = true
     --Minimap.ignoreFrames['MiniMapTracking'] = true
-    Minimap.ignoreFrames['MinimapCluster.Tracking'] = false
-    Minimap.ignoreFrames['MinimapCluster.Tracking.Button'] = false
+    Minimap.ignoreFrames['MinimapCluster.Tracking'] = true
+    Minimap.ignoreFrames['MinimapCluster.Tracking.Button'] = true
     Minimap.ignoreFrames['QueueStatusButton'] = true
     Minimap.ignoreFrames['QueueStatusMinimapButton'] = true
     Minimap.ignoreFrames['QueueStatusMinimapButtonDropDownButton'] = true
     Minimap.ignoreFrames['BaudErrorFrameMinimapButton'] = true
+    Minimap.ignoreFrames['TTMinimapButton'] = true
 
     --hideTextures['Interface\\Minimap\\MiniMap-TrackingBorder'] = true
     hideTextures['Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight'] = true

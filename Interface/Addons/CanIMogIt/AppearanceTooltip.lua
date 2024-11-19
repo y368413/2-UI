@@ -1,4 +1,4 @@
-﻿--## Version: v54  ## Author: Kemayo
+﻿--## Version: v55  ## Author: Kemayo
 local AppearanceTooltip = {}
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
@@ -1956,15 +1956,24 @@ end)
 -- Merchant frame
 
 hooksecurefunc("MerchantFrame_Update", function()
-    for i = 1, MERCHANT_ITEMS_PER_PAGE do
+    local limit, infoFunc
+    if MerchantFrame.selectedTab == 1 then
+        limit = MERCHANT_ITEMS_PER_PAGE
+        infoFunc = GetMerchantItemLink
+    else
+        limit = BUYBACK_ITEMS_PER_PAGE
+        infoFunc = GetBuybackItemLink
+    end
+    for i = 1, limit do
         local frame = _G["MerchantItem"..i.."ItemButton"]
         if frame then
             if frame.appearancetooltipoverlay then frame.appearancetooltipoverlay:Hide() end
             if not AppearanceTooltip.db.merchant then
                 return
             end
-            if frame.link then
-                UpdateOverlay(frame, frame.link)
+            local link = infoFunc(frame:GetID())
+            if link then
+                UpdateOverlay(frame, link)
             end
         end
     end
@@ -2106,23 +2115,6 @@ f:RegisterAddonHook("Blizzard_Collections", function()
             WardrobeCollectionFrame.SetsCollectionFrame.ListContainer.ScrollBox:ForEachFrame(handleSlot)
         end)
     end
-end)
-
---Combuctor:
-f:RegisterAddonHook("Combuctor", function()
-    hooksecurefunc(Combuctor.Item, "Update", function(button)
-        if button and button.appearancetooltipoverlay then button.appearancetooltipoverlay:Hide() end
-        local bag = button:GetBag()
-        if type(bag) ~= "number" or button:GetClassName() ~= "CombuctorContainerItem" then
-            local info = button:GetInfo()
-            if info and info.hyperlink then
-                local item = Item:CreateFromItemLink(info.hyperlink)
-                UpdateButtonFromItem(button, item, "bags")
-            end
-            return
-        end
-        UpdateContainerButton(button, bag)
-    end)
 end)
 
 

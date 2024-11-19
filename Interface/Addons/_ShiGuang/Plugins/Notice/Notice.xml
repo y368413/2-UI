@@ -1,5 +1,5 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<!--Script file="PvPPP.lua"/-->
+	<Script file="PvPPP.lua"/>
 	<Script file="Paragon.lua"/>
 	<Script file="ParagonReputation.lua"/>
 	<Script file="NPCTime.lua"/>

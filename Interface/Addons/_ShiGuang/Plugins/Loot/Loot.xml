@@ -1,19 +1,9 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="BGRoll.lua"/>
 	<Script file="CanOpener.lua"/>
-    <Script file="ExtMerchant.lua"/>
-    <!--Script file="LootRollUI.lua"/-->
 	<Script file="MasterGypsy.lua"/>
-	<!--Script file="RollHistory.lua"/>
-	<Script file="ToggleLootSpec.lua"/-->
+	<Script file="RollHistory.lua"/>
+	<!--Script file="ToggleLootSpec.lua"/-->
 	<Script file="LootSpecSwapper.lua"/>
-	<!--Script file="PersonalLootHelper.lua"/-->
-    <Frame name="ExtMerchant">
-        <Scripts>
-            <OnLoad>
-                ExtMerchant_OnLoad(self)
-            </OnLoad>
-        </Scripts>
-    </Frame>
   <!--Include file="AtlasLootReverse\AtlasLootReverse.xml"/-->
 </Ui>

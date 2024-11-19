@@ -145,11 +145,13 @@ local BLZCommunitiesGuildNewsFrame_OnEvent = CommunitiesGuildNewsFrame_OnEvent
 local newsRequireUpdate, newsTimer
 CommunitiesFrameGuildDetailsFrameNews:SetScript("OnEvent", function(frame, event)
     if event == "GUILD_NEWS_UPDATE" then
-        if newsTimer then
+        if CommunitiesFrame:IsShown() then
+            return
+        elseif newsTimer then
             newsRequireUpdate = true
         else
             BLZCommunitiesGuildNewsFrame_OnEvent(frame, event)
-
+            
             -- 1秒后, 如果还需要更新公会新闻, 再次更新
             newsTimer = C_Timer.NewTimer(1, function()
                 if newsRequireUpdate then

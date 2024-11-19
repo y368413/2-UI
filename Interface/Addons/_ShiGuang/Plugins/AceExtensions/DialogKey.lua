@@ -573,8 +573,8 @@ DialogKey.playerChoiceButtons = {}
 DialogKey.activeOverrideBindings = {}
 
 function DialogKey:OnInitialize()
-    DialogKeyNumyDB = DialogKeyNumyDB or {}
-    self.db = DialogKeyNumyDB
+    DialogKeyDB = DialogKeyDB or {}
+    self.db = DialogKeyDB
     DialogKeyNS:InitDB(self)
 
     self:InitGlowFrame()

@@ -1,15 +1,7 @@
 --## Version: v1.28  ## Author: iceeagle
---------------------------------------------------------------------------------------------------------
---                                    QuestLevelPatch variables                                       --
---------------------------------------------------------------------------------------------------------
-local QuestLevelPatch = {}
-
---------------------------------------------------------------------------------------------------------
---                                QuestLevelPatch hooked functions                                    --
---------------------------------------------------------------------------------------------------------
 
 -- Hook quest log on map
-function QuestLogQuests_hook(self, poiTable)
+hooksecurefunc("QuestLogQuests_Update", function(self, poiTable)
 	local button
 	local prevButton = nil
 	for button in QuestScrollFrame.titleFramePool:EnumerateActive() do
@@ -26,11 +18,10 @@ function QuestLogQuests_hook(self, poiTable)
 		local newHeight = button.Text:GetStringHeight()
 		button:SetHeight(oldBlockHeight + newHeight - oldHeight)
 	end
-end
-hooksecurefunc("QuestLogQuests_Update", QuestLogQuests_hook)
+end)
 
 -- Hook quest info
-function QuestInfo_hook(template, parentFrame, acceptButton, material, mapView)
+hooksecurefunc("QuestInfo_Display", function(template, parentFrame, acceptButton, material, mapView)
 	local elementsTable = template.elements
 	for i = 1, #elementsTable, 3 do
 		if elementsTable[i] == QuestInfo_ShowTitle then
@@ -48,5 +39,4 @@ function QuestInfo_hook(template, parentFrame, acceptButton, material, mapView)
 			end
 		end
 	end
-end
-hooksecurefunc("QuestInfo_Display", QuestInfo_hook)
+end)

@@ -1,8 +1,7 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="WorldMap.lua"/>
 	<Script file="Minimap.lua"/>
+	<Script file="MapShrinker.lua"/>
 	<Script file="RawMapData.lua"/>
 	<Script file="zrMMbuttons.lua"/>
-	<Script file="DelverView.lua"/>
-	<Frame name="DelverViewPinTemplate" inherits="DelveEntrancePinTemplate" mixin="DelverViewPinMixin" virtual="true"/>
 </Ui>

@@ -4,20 +4,27 @@
 	<Script file="rlTools.lua"/>
 	<Script file="AutoPotion.lua"/>
 	<Script file="Expansions.lua"/>
-	<Script file="GotoCroods.lua"/>
 	<Script file="RandomPoly.lua"/>
 	<Script file="ColorFrames.lua"/>
-	<Script file="RandomHearth.lua"/>
 	<Script file="PinyinSearch.lua"/>
 	<Script file="WallpaperKit.lua"/>
 	<Script file="ActsFunctions.lua"/>
 	<Script file="ClassSpecStats.lua"/>
 	<Script file="ParagonRewards.lua"/>
 	<Script file="AlterCurrencies.lua"/>
+	<Script file="RandomHearthToy.lua"/>
 	<Script file="Killauctionlowprice.lua"/>
 	<Script file="OneClickDisenchanting.lua"/>
 	<Script file="PlayerFrame_Experience.lua"/>
 	<Script file="SimpleUnfoldingCurrency.lua"/>
+    <Script file="ExtMerchant.lua"/>
+    <Frame name="ExtMerchant">
+        <Scripts>
+            <OnLoad>
+                ExtMerchant_OnLoad(self)
+            </OnLoad>
+        </Scripts>
+    </Frame>
 	<Script file="FriendGroups.lua"/>
 	<Button name="FriendGroupsFrameFriendDividerTemplate" registerForClicks="LeftButtonUp, RightButtonUp" virtual="true">
 		<Size x="298" y="16"/>

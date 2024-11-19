@@ -1,4 +1,4 @@
-﻿ --  11.0.5v2.5
+﻿ --  11.0.5v2.5.1
 -- Constants for CanIMogIt
 
 local L = CanIMogIt.L
@@ -810,12 +810,6 @@ CanIMogIt.frame:SetScript("OnUpdate", RunIfNotBusyEvents)
 CanIMogIt.frame.eventFunctions = {}
 
 
-function CanIMogIt.frame:AddEventFunction(func)
-    -- Adds the func to the list of functions that are called for all events.
-    table.insert(CanIMogIt.frame.eventFunctions, func)
-end
-
-
 -- a dictionary of event names to a list of functions to run.
 -- {event, {name, func}}
 CanIMogIt.frame.smartEventFunctions = {}
@@ -857,11 +851,6 @@ local function SmartEventHook(self, event, ...)
 
     if loadingScreenEnabled then
         return
-    end
-
-    -- For backwards compatibility, run the normal events.
-    for i, func in ipairs(CanIMogIt.frame.eventFunctions) do
-        RunIfNotBusy(tostring(func), func, event, ...)
     end
 
     -- Smart events
