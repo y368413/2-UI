@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/1001/XMLSchema-instance"
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd"
 >
-    <Script file="MogPartialSetsUI.lua"/>
+    <Script file="MogPartialSets.lua"/>
     <Button name="MogPartialSets_FilterButton" inherits="UIMenuButtonStretchTemplate" text="FILTER" hidden="true">
         <Size x="93" y="22"/>
 
@@ -178,7 +178,7 @@
 
         <Layers>
             <Layer>
-                <FontString inherits="GameFontHighlightSmall" wordwrap="false" text="Equipment slots">
+                <FontString inherits="GameFontHighlightSmall" wordwrap="false" text="装备部位">
                     <Size>
                         <AbsDimension x="0" y="10"/>
                     </Size>
@@ -198,7 +198,7 @@
                     </Anchors>
                 </Texture>
 
-                <FontString inherits="GameFontNormalGraySmall" wordwrap="false" text="Slot">
+                <FontString inherits="GameFontNormalGraySmall" wordwrap="false" text="部位">
                     <Size>
                         <AbsDimension x="0" y="10"/>
                     </Size>
@@ -208,7 +208,7 @@
                     </Anchors>
                 </FontString>
 
-                <FontString inherits="GameFontNormalGraySmall" wordwrap="false" justifyH="CENTER" text="Ignored">
+                <FontString inherits="GameFontNormalGraySmall" wordwrap="false" justifyH="CENTER" text="忽略">
                     <Size>
                         <AbsDimension x="50" y="10"/>
                     </Size>
@@ -218,7 +218,7 @@
                     </Anchors>
                 </FontString>
 
-                <FontString inherits="GameFontNormalGraySmall" wordwrap="false" justifyH="CENTER" text="Hidden">
+                <FontString inherits="GameFontNormalGraySmall" wordwrap="false" justifyH="CENTER" text="隐藏">
                     <Size>
                         <AbsDimension x="50" y="10"/>
                     </Size>
@@ -253,7 +253,7 @@
         <Frames>
             <Frame parentKey="ShowExtraSetsToggle" inherits="MogPartialSets_FilterRowTemplate">
                 <KeyValues>
-                    <KeyValue key="label" value="show extra sets"/>
+                    <KeyValue key="label" value="显示额外套装"/>
                 </KeyValues>
 
                 <Anchors>
@@ -271,7 +271,7 @@
 
             <Frame parentKey="OnlyFavoriteToggle" inherits="MogPartialSets_FilterRowTemplate">
                 <KeyValues>
-                    <KeyValue key="label" value="only favorite sets"/>
+                    <KeyValue key="label" value="仅显示收藏套装"/>
                 </KeyValues>
 
                 <Anchors>
@@ -289,7 +289,7 @@
 
             <Frame parentKey="FavoriteVariantsToggle" inherits="MogPartialSets_FilterRowTemplate">
                 <KeyValues>
-                    <KeyValue key="label" value="show favorite variants"/>
+                    <KeyValue key="label" value="显示套装换色版"/>
                 </KeyValues>
 
                 <Anchors>
@@ -307,7 +307,7 @@
 
             <Frame parentKey="UseHiddenIfMissingToggle" inherits="MogPartialSets_FilterRowTemplate">
                 <KeyValues>
-                    <KeyValue key="label" value="use hidden item if missing"/>
+                    <KeyValue key="label" value="隐藏缺失部件"/>
                 </KeyValues>
 
                 <Anchors>
@@ -325,7 +325,7 @@
 
             <Frame parentKey="MaxMissingPieces" inherits="MogPartialSets_FilterRowTemplate">
                 <KeyValues>
-                    <KeyValue key="label" value="max missing pieces"/>
+                    <KeyValue key="label" value="最大缺失部件"/>
                 </KeyValues>
 
                 <Anchors>
@@ -361,7 +361,7 @@
 
             <Frame parentKey="HeadSlot" inherits="MogPartialSets_FilterSlotTemplate">
                 <KeyValues>
-                    <KeyValue key="label" value="Head"/>
+                    <KeyValue key="label" value="头部"/>
                     <KeyValue key="slot" value="INVSLOT_HEAD" type="global"/>
                 </KeyValues>
 
@@ -372,7 +372,7 @@
 
             <Frame parentKey="ShoulderSlot" inherits="MogPartialSets_FilterSlotTemplate">
                 <KeyValues>
-                    <KeyValue key="label" value="Shoulder"/>
+                    <KeyValue key="label" value="肩部"/>
                     <KeyValue key="slot" value="INVSLOT_SHOULDER" type="global"/>
                 </KeyValues>
 
@@ -383,7 +383,7 @@
 
             <Frame parentKey="CloakSlot" inherits="MogPartialSets_FilterSlotTemplate">
                 <KeyValues>
-                    <KeyValue key="label" value="Cloak"/>
+                    <KeyValue key="label" value="披风"/>
                     <KeyValue key="slot" value="INVSLOT_BACK" type="global"/>
                 </KeyValues>
 
@@ -394,7 +394,7 @@
 
             <Frame parentKey="ChestSlot" inherits="MogPartialSets_FilterSlotTemplate">
                 <KeyValues>
-                    <KeyValue key="label" value="Chest"/>
+                    <KeyValue key="label" value="胸部"/>
                     <KeyValue key="slot" value="INVSLOT_CHEST" type="global"/>
                 </KeyValues>
 
@@ -405,7 +405,7 @@
 
             <Frame parentKey="WristSlot" inherits="MogPartialSets_FilterSlotTemplate">
                 <KeyValues>
-                    <KeyValue key="label" value="Wrist"/>
+                    <KeyValue key="label" value="手腕"/>
                     <KeyValue key="slot" value="INVSLOT_WRIST" type="global"/>
                 </KeyValues>
 
@@ -416,7 +416,7 @@
 
             <Frame parentKey="HandsSlot" inherits="MogPartialSets_FilterSlotTemplate">
                 <KeyValues>
-                    <KeyValue key="label" value="Hands"/>
+                    <KeyValue key="label" value="手部"/>
                     <KeyValue key="slot" value="INVSLOT_HAND" type="global"/>
                 </KeyValues>
 
@@ -427,7 +427,7 @@
 
             <Frame parentKey="WaistSlot" inherits="MogPartialSets_FilterSlotTemplate">
                 <KeyValues>
-                    <KeyValue key="label" value="Waist"/>
+                    <KeyValue key="label" value="腰部"/>
                     <KeyValue key="slot" value="INVSLOT_WAIST" type="global"/>
                 </KeyValues>
 
@@ -438,7 +438,7 @@
 
             <Frame parentKey="LegsSlot" inherits="MogPartialSets_FilterSlotTemplate">
                 <KeyValues>
-                    <KeyValue key="label" value="Legs"/>
+                    <KeyValue key="label" value="腿部"/>
                     <KeyValue key="slot" value="INVSLOT_LEGS" type="global"/>
                 </KeyValues>
 
@@ -449,7 +449,7 @@
 
             <Frame parentKey="FeetSlot" inherits="MogPartialSets_FilterSlotTemplate">
                 <KeyValues>
-                    <KeyValue key="label" value="Feet"/>
+                    <KeyValue key="label" value="足部"/>
                     <KeyValue key="slot" value="INVSLOT_FEET" type="global"/>
                 </KeyValues>
 
@@ -458,7 +458,7 @@
                 </Anchors>
             </Frame>
 
-            <Button parentKey="OkButton" inherits="UIPanelButtonTemplate" text="OK">
+            <Button parentKey="OkButton" inherits="UIPanelButtonTemplate" text="确定">
                 <Size x="78" y="20"/>
                 <Anchors>
                     <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="12" y="10"/>
@@ -468,7 +468,7 @@
                 </Scripts>
             </Button>
 
-            <Button parentKey="RefreshButton" inherits="UIPanelButtonTemplate" text="Refresh">
+            <Button parentKey="RefreshButton" inherits="UIPanelButtonTemplate" text="刷新">
                 <Size x="78" y="20"/>
                 <Anchors>
                     <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="94" y="10"/>
@@ -479,5 +479,4 @@
             </Button>
         </Frames>
     </Frame>
-    <Script file="MogPartialSets.lua"/>
 </Ui>

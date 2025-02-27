@@ -61,8 +61,6 @@ function S:OnLogin()
    Bottomline:SetHeight(16)
    Bottomline:SetWidth(UIParent:GetWidth())
    Bottomline:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 0) 
-   --Bottomline:SetBackdrop({bgFile = "Interface\\AddOns\\_ShiGuang\\Media\\Modules\\line"}) 
-   --Bottomline:SetBackdropColor(I.r, I.g, I.b, 0.8)
    end
 
 	self:LoadAddOnSkins()
@@ -77,6 +75,7 @@ function S:OnLogin()
 	if media then
 		media:Register("statusbar", "normTex", I.normTex)
 		media:Register("statusbar", "ShiGuang", [[Interface\Addons\_ShiGuang\Media\Modules\Raid\ColorBar]])
+		media:Register("statusbar", "SorasThreat", [[Interface\Addons\_ShiGuang\Media\Modules\Raid\SorasThreatbar]])
 		media:Register("statusbar", "HalfStyle", [[Interface\Addons\_ShiGuang\Media\Modules\Skada\YaSkada05]])
 		media:Register("statusbar", "AtlzSkada", [[Interface\Addons\_ShiGuang\Media\Modules\Skada\AtlzSkada]])
 		media:Register("statusbar", "Yaskada", [[Interface\Addons\_ShiGuang\Media\Modules\Skada\Yaskada]])

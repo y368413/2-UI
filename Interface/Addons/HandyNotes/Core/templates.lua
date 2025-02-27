@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Core = ...
-local L = Core.locale
+local _, ns = ...
+local L = ns.locale
 
 --local LibDD = LibStub:GetLibrary('LibUIDropDownMenu-4.0')
 
@@ -70,14 +70,14 @@ end
 
 function WorldMapOptionsButtonMixin:OnEnter()
     GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
-    GameTooltip_SetTitle(GameTooltip, Core.plugin_name)
+    GameTooltip_SetTitle(GameTooltip, ns.plugin_name)
     GameTooltip_AddNormalLine(GameTooltip, L['map_button_text'])
     GameTooltip:Show()
 end
 
 function WorldMapOptionsButtonMixin:Refresh()
-    local enabled = Core:GetOpt('show_worldmap_button')
-    local map = Core.maps[self:GetParent():GetMapID() or 0]
+    local enabled = ns:GetOpt('show_worldmap_button')
+    local map = ns.maps[self:GetParent():GetMapID() or 0]
     if enabled and map and map:HasEnabledGroups() then
         self:Show()
     else
@@ -86,14 +86,14 @@ function WorldMapOptionsButtonMixin:Refresh()
 end
 
 function WorldMapOptionsButtonMixin:AddGroupButton(group, level)
-    local map = Core.maps[self:GetParent():GetMapID()]
+    local map = ns.maps[self:GetParent():GetMapID()]
     local icon, iconLink = group.icon
     local status = ''
     if group.achievement then
         local _, _, _, completed, _, _, _, _, _, _, _, _, earnedByMe =
             GetAchievementInfo(group.achievement)
-        status = ' ' .. (earnedByMe and Core.GetIconLink('check_gn') or
-                     (completed and Core.GetIconLink('check_bl') or ''))
+        status = ' ' .. (earnedByMe and ns.GetIconLink('check_gn') or
+                     (completed and ns.GetIconLink('check_bl') or ''))
     end
 
     if group.name == 'misc' then
@@ -107,13 +107,13 @@ function WorldMapOptionsButtonMixin:AddGroupButton(group, level)
     end
 
     if type(icon) == 'number' then
-        iconLink = Core.GetIconLink(icon, 12, 1, 0) .. ' '
+        iconLink = ns.GetIconLink(icon, 12, 1, 0) .. ' '
     else
-        iconLink = Core.GetIconLink(icon, 16)
+        iconLink = ns.GetIconLink(icon, 16)
     end
 
     UIDropDownMenu_AddButton({
-        text = iconLink .. ' ' .. Core.RenderLinks(group.label, true) .. status,
+        text = iconLink .. ' ' .. ns.RenderLinks(group.label, true) .. status,
         isNotRadio = true,
         keepShownOnClick = true,
         hasArrow = true,
@@ -127,9 +127,9 @@ function WorldMapOptionsButtonMixin:AddGroupButton(group, level)
 end
 
 function WorldMapOptionsButtonMixin:AddGroupOptions(group, level)
-    local map = Core.maps[self:GetParent():GetMapID()]
+    local map = ns.maps[self:GetParent():GetMapID()]
 
-    self.GroupDesc.Text:SetText(Core.RenderLinks(group.desc))
+    self.GroupDesc.Text:SetText(ns.RenderLinks(group.desc))
     UIDropDownMenu_AddButton({customFrame = self.GroupDesc}, level)
     UIDropDownMenu_AddButton({notClickable = true, notCheckable = true},
         level)
@@ -157,7 +157,7 @@ function WorldMapOptionsButtonMixin:AddGroupOptions(group, level)
 end
 
 function WorldMapOptionsButtonMixin:InitializeDropDown(level)
-    local map = Core.maps[self:GetParent():GetMapID()]
+    local map = ns.maps[self:GetParent():GetMapID()]
 
     if level == 1 then
         local current_group_type = nil
@@ -171,10 +171,10 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
             current_group_type = group.type
 
             if group:IsEnabled() and group:HasEnabledNodes(map) then
-                if group.type == Core.group_types.ACHIEVEMENT and
+                if group.type == ns.group_types.ACHIEVEMENT and
                     not achievements_menu_added then
                     UIDropDownMenu_AddButton({
-                        text = Core.GetIconLink(236671, 12, 1, 0) .. '  ' ..
+                        text = ns.GetIconLink(236671, 12, 1, 0) .. '  ' ..
                             ACHIEVEMENTS,
                         isNotRadio = true,
                         notCheckable = true,
@@ -183,7 +183,7 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
                         value = 'achievements'
                     })
                     achievements_menu_added = true
-                elseif group.type ~= Core.group_types.ACHIEVEMENT then
+                elseif group.type ~= ns.group_types.ACHIEVEMENT then
                     self:AddGroupButton(group, 1)
                 end
             end
@@ -202,36 +202,36 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
             text = L['options_show_completed_nodes'],
             isNotRadio = true,
             keepShownOnClick = true,
-            checked = Core:GetOpt('show_completed_nodes'),
+            checked = ns:GetOpt('show_completed_nodes'),
             func = function(button, option)
-                Core:SetOpt('show_completed_nodes', button.checked)
+                ns:SetOpt('show_completed_nodes', button.checked)
             end
         })
         UIDropDownMenu_AddButton({
             text = L['options_toggle_hide_done_rare'],
             isNotRadio = true,
             keepShownOnClick = true,
-            checked = Core:GetOpt('hide_done_rares'),
+            checked = ns:GetOpt('hide_done_rares'),
             func = function(button, option)
-                Core:SetOpt('hide_done_rares', button.checked)
+                ns:SetOpt('hide_done_rares', button.checked)
             end
         })
         UIDropDownMenu_AddButton({
             text = L['options_toggle_hide_done_treasure'],
             isNotRadio = true,
             keepShownOnClick = true,
-            checked = Core:GetOpt('hide_done_treasures'),
+            checked = ns:GetOpt('hide_done_treasures'),
             func = function(button, option)
-                Core:SetOpt('hide_done_treasures', button.checked)
+                ns:SetOpt('hide_done_treasures', button.checked)
             end
         })
         UIDropDownMenu_AddButton({
             text = L['options_toggle_use_char_achieves'],
             isNotRadio = true,
             keepShownOnClick = true,
-            checked = Core:GetOpt('use_char_achieves'),
+            checked = ns:GetOpt('use_char_achieves'),
             func = function(button, option)
-                Core:SetOpt('use_char_achieves', button.checked)
+                ns:SetOpt('use_char_achieves', button.checked)
             end
         })
         UIDropDownMenu_AddSeparator()
@@ -239,18 +239,18 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
             text = L['ignore_class_restrictions'],
             isNotRadio = true,
             keepShownOnClick = true,
-            checked = Core:GetOpt('ignore_class_restrictions'),
+            checked = ns:GetOpt('ignore_class_restrictions'),
             func = function(button, option)
-                Core:SetOpt('ignore_class_restrictions', button.checked)
+                ns:SetOpt('ignore_class_restrictions', button.checked)
             end
         })
         UIDropDownMenu_AddButton({
             text = L['ignore_faction_restrictions'],
             isNotRadio = true,
             keepShownOnClick = true,
-            checked = Core:GetOpt('ignore_faction_restrictions'),
+            checked = ns:GetOpt('ignore_faction_restrictions'),
             func = function(button, option)
-                Core:SetOpt('ignore_faction_restrictions', button.checked)
+                ns:SetOpt('ignore_faction_restrictions', button.checked)
             end
         })
         UIDropDownMenu_AddSeparator()
@@ -263,13 +263,13 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
                 HideUIPanel(WorldMapFrame)
                 Settings.OpenToCategory('HandyNotes')
                 LibStub('AceConfigDialog-3.0'):SelectGroup('HandyNotes',
-                    'plugins', "HandyNotes-Core", 'ZonesTab', 'Zone_' .. map.id)
+                    'plugins', "HandyNotes", 'ZonesTab', 'Zone_' .. map.id)
             end
         })
     elseif level == 2 then
         if UIDROPDOWNMENU_MENU_VALUE == 'achievements' then
             for i, group in ipairs(map.groups) do
-                if group.type == Core.group_types.ACHIEVEMENT and
+                if group.type == ns.group_types.ACHIEVEMENT and
                     group:IsEnabled() and group:HasEnabledNodes(map) then
                     self:AddGroupButton(group, 2)
                 end
@@ -282,9 +282,9 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
                     text = L['options_' .. type .. '_rewards'],
                     isNotRadio = true,
                     keepShownOnClick = true,
-                    checked = Core:GetOpt('show_' .. type .. '_rewards'),
+                    checked = ns:GetOpt('show_' .. type .. '_rewards'),
                     func = function(button, option)
-                        Core:SetOpt('show_' .. type .. '_rewards', button.checked)
+                        ns:SetOpt('show_' .. type .. '_rewards', button.checked)
                     end
                 }, 2)
             end
@@ -296,9 +296,9 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
                     text = L['options_manuscript_rewards'],
                     isNotRadio = true,
                     keepShownOnClick = true,
-                    checked = Core:GetOpt('show_manuscript_rewards'),
+                    checked = ns:GetOpt('show_manuscript_rewards'),
                     func = function(button, option)
-                        Core:SetOpt('show_manuscript_rewards', button.checked)
+                        ns:SetOpt('show_manuscript_rewards', button.checked)
                     end
                 }, 2)
             end
@@ -309,18 +309,18 @@ function WorldMapOptionsButtonMixin:InitializeDropDown(level)
                 text = L['options_all_transmog_rewards'],
                 isNotRadio = true,
                 keepShownOnClick = true,
-                checked = Core:GetOpt('show_all_transmog_rewards'),
+                checked = ns:GetOpt('show_all_transmog_rewards'),
                 func = function(button, option)
-                    Core:SetOpt('show_all_transmog_rewards', button.checked)
+                    ns:SetOpt('show_all_transmog_rewards', button.checked)
                 end
             }, 2)
             UIDropDownMenu_AddButton({
                 text = L['options_claimed_rep_rewards'],
                 isNotRadio = true,
                 keepShownOnClick = true,
-                checked = Core:GetOpt('show_claimed_rep_rewards'),
+                checked = ns:GetOpt('show_claimed_rep_rewards'),
                 func = function(button, option)
-                    Core:SetOpt('show_claimed_rep_rewards', button.checked)
+                    ns:SetOpt('show_claimed_rep_rewards', button.checked)
                 end
             }, 2)
         else

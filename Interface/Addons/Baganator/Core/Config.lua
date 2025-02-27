@@ -1,226 +1,124 @@
 local _, addonTable = ...
 addonTable.Config = {}
 
-addonTable.Config.Options = {
-  GLOBAL_VIEW_TYPE = "view_type",
-  BAG_VIEW_TYPE = "bag_view_type",
-  BANK_VIEW_TYPE = "bank_view_type",
-  SEEN_WELCOME = "seen_welcome",
-  BAG_VIEW_WIDTH = "bag_view_width",
-  BANK_VIEW_WIDTH = "bank_view_width",
-  WARBAND_BANK_VIEW_WIDTH = "warband_bank_view_width",
-  GUILD_VIEW_WIDTH = "guild_view_width",
-  BAG_ICON_SIZE = "bag_icon_size",
-  VIEW_ALPHA = "view_alpha",
-  LOCK_FRAMES = "lock_frames",
-  NO_FRAME_BORDERS = "no_frame_borders",
-  EMPTY_SLOT_BACKGROUND = "empty_slot_background",
-  HIDE_SPECIAL_CONTAINER = "hide_special_container",
-  SHOW_SORT_BUTTON = "show_sort_button_2",
-  SORT_METHOD = "sort_method",
-  REVERSE_GROUPS_SORT_ORDER = "reverse_groups_sort_order",
-  SORT_START_AT_BOTTOM = "sort_start_at_bottom",
-  SORT_IGNORE_SLOTS_AT_END = "sort_ignore_slots_at_end",
-  SORT_IGNORE_BAG_SLOTS_COUNT = "sort_ignore_slots_count_2",
-  SORT_IGNORE_BANK_SLOTS_COUNT = "sort_ignore_bank_slots_count",
-  SHOW_RECENTS_TABS = "show_recents_tabs_main_view",
-  AUTO_SORT_ON_OPEN = "auto_sort_on_open",
-  BAG_EMPTY_SPACE_AT_TOP = "bag_empty_space_at_top",
-  REDUCE_SPACING = "reduce_spacing",
-  CURRENCY_HEADERS_COLLAPSED = "currency_headers_collapsed",
-  CURRENCIES_TRACKED = "currencies_tracked",
-  CURRENCIES_TRACKED_IMPORTED = "currencies_tracked_imported",
+local Refresh = addonTable.Constants.RefreshReason
+local Zone = addonTable.Constants.RefreshZone
+local settings = {
+  GLOBAL_VIEW_TYPE = {key = "view_type", default = "unset"},
+  BAG_VIEW_TYPE = {key = "bag_view_type", default = "single"},
+  BANK_VIEW_TYPE = {key = "bank_view_type", default = "single"},
+  SEEN_WELCOME = {key = "seen_welcome", default = 1},
+  BAG_VIEW_WIDTH = {key = "bag_view_width", default = 15, refresh = {Refresh.Layout}, zone = {Zone.Bags}},
+  BANK_VIEW_WIDTH = {key = "bank_view_width", default = addonTable.Constants.IsRetail and 25 or 15, refresh = {Refresh.Layout}, zone = {Zone.CharacterBank}},
+  WARBAND_BANK_VIEW_WIDTH = {key = "warband_bank_view_width", default = 15, refresh = {Refresh.Layout}, zone = {Zone.WarbandBank}},
+  GUILD_VIEW_WIDTH = {key = "guild_view_width", default = 15, refresh = {Refresh.Layout}, zone = {Zone.GuildBank}},
+  BAG_ICON_SIZE = {key = "bag_icon_size", default = 40, refresh = {Refresh.Layout, Refresh.Flow}},
+  LOCK_FRAMES = {key = "lock_frames", default = false},
+  HIDE_SPECIAL_CONTAINER = {key = "hide_special_container", default = {}, refresh = {Refresh.Layout}, zone = {Zone.Bags, Zone.CharacterBank}},
+  SHOW_SORT_BUTTON = {key = "show_sort_button_2", default = true, refresh = {Refresh.Buttons}},
+  SORT_METHOD = {key = "sort_method", default = "type", refresh = {Refresh.Sorts}},
+  REVERSE_GROUPS_SORT_ORDER = {key = "reverse_groups_sort_order", default = false, refresh = {Refresh.Sorts}},
+  SORT_START_AT_BOTTOM = {key = "sort_start_at_bottom", default = false},
+  SORT_IGNORE_SLOTS_AT_END = {key = "sort_ignore_slots_at_end", default = false},
+  SORT_IGNORE_BAG_SLOTS_COUNT = {key = "sort_ignore_slots_count_2", default = 0},
+  SORT_IGNORE_BANK_SLOTS_COUNT = {key = "sort_ignore_bank_slots_count", default = 0},
+  SHOW_RECENTS_TABS = {key = "show_recents_tabs_main_view", default = true, refresh = {Refresh.Layout}},
+  AUTO_SORT_ON_OPEN = {key = "auto_sort_on_open", default = false},
+  BAG_EMPTY_SPACE_AT_TOP = {key = "bag_empty_space_at_top", default = false, refresh = {Refresh.Flow, Refresh.Layout}},
+  REDUCE_SPACING = {key = "reduce_spacing", default = false, refresh = {Refresh.Layout, Refresh.Flow}},
+  CURRENCY_HEADERS_COLLAPSED = {key = "currency_headers_collapsed", default = {}},
+  CURRENCIES_TRACKED = {key = "currencies_tracked", default = {}},
+  CURRENCIES_TRACKED_IMPORTED = {key = "currencies_tracked_imported", default = 0},
+  SHOW_SEARCH_BOX = {key = "show_search_box", default = true, refresh = {Refresh.Layout}},
 
-  WARBAND_CURRENT_TAB = "warband_current_tab",
-  GUILD_CURRENT_TAB = "guild_current_tab",
+  WARBAND_CURRENT_TAB = {key = "warband_current_tab", default = 1},
+  GUILD_CURRENT_TAB = {key = "guild_current_tab", default = 1},
 
-  RECENT_CHARACTERS_MAIN_VIEW = "recent_characters_main_view",
+  RECENT_CHARACTERS_MAIN_VIEW = {key = "recent_characters_main_view", default = {}},
 
-  HIDE_BOE_ON_COMMON = "hide_boe_on_common",
-  ICON_TEXT_QUALITY_COLORS = "icon_text_quality_colors",
-  ICON_TEXT_FONT_SIZE = "icon_text_font_size",
-  ICON_TOP_LEFT_CORNER_ARRAY = "icon_top_left_corner_array",
-  ICON_TOP_RIGHT_CORNER_ARRAY = "icon_top_right_corner_array",
-  ICON_BOTTOM_LEFT_CORNER_ARRAY = "icon_bottom_left_corner_array",
-  ICON_BOTTOM_RIGHT_CORNER_ARRAY = "icon_bottom_right_corner_array",
-  ICON_CORNERS_AUTO_INSERT_APPLIED = "icon_corners_auto_insert_applied",
-  ICON_GREY_JUNK = "icon_grey_junk",
-  ICON_EQUIPMENT_SET_BORDER = "icon_equipment_set_border",
-  ICON_FLASH_SIMILAR_ALT = "icon_flash_similar_alt",
+  HIDE_BOE_ON_COMMON = {key = "hide_boe_on_common", default = true, refresh = {Refresh.ItemWidgets}},
+  ICON_TEXT_QUALITY_COLORS = {key = "icon_text_quality_colors", default = false, refresh = {Refresh.ItemWidgets}},
+  ICON_MARK_UNUSABLE  = {key = "icon_mark_unusable", default = false, refresh = {Refresh.ItemWidgets}},
+  ICON_TEXT_FONT_SIZE = {key = "icon_text_font_size", default = 14, refresh = {Refresh.ItemTextures}},
+  ICON_TOP_LEFT_CORNER_ARRAY = {key = "icon_top_left_corner_array", default = {"pawn","appearancetooltip","battle_pet_level","boa","junk","keystone_level","item_level",}, refresh = {Refresh.ItemTextures, Refresh.ItemWidgets}},
+  ICON_TOP_RIGHT_CORNER_ARRAY = {key = "icon_top_right_corner_array", default = {"can_i_mog_it",}, refresh = {Refresh.ItemTextures, Refresh.ItemWidgets}},
+  ICON_BOTTOM_LEFT_CORNER_ARRAY = {key = "icon_bottom_left_corner_array", default = {"bag_type","equipment_set","boe",}, refresh = {Refresh.ItemTextures, Refresh.ItemWidgets}},
+  ICON_BOTTOM_RIGHT_CORNER_ARRAY = {key = "icon_bottom_right_corner_array", default = {"quantity"}, refresh = {Refresh.ItemTextures, Refresh.ItemWidgets}},
+  ICON_CORNERS_AUTO_INSERT_APPLIED = {key = "icon_corners_auto_insert_applied", default = {}},
+  ICON_GREY_JUNK = {key = "icon_grey_junk", default = false, refresh = {Refresh.ItemWidgets}},
+  ICON_EQUIPMENT_SET_BORDER = {key = "icon_equipment_set_border", default = true, refresh = {Refresh.ItemWidgets}},
+  ICON_FLASH_SIMILAR_ALT = {key = "icon_flash_similar_alt", default = true},
+  ICON_CONTEXT_FADING = {key = "icon_context_fading", default = true, refresh = {Refresh.ItemWidgets}},
 
-  JUNK_PLUGIN = "junk_plugin",
-  JUNK_PLUGINS_IGNORED = "junk_plugin_ignored",
-  UPGRADE_PLUGIN = "upgrade_plugin",
-  UPGRADE_PLUGINS_IGNORED = "upgrade_plugin_ignored",
+  JUNK_PLUGIN = {key = "junk_plugin", default = "poor_quality", refresh = {Refresh.Searches, Refresh.ItemWidgets}},
+  JUNK_PLUGINS_IGNORED = {key = "junk_plugin_ignored", default = {}},
+  UPGRADE_PLUGIN = {key = "upgrade_plugin", default = "none", refresh = {Refresh.Searches, Refresh.ItemWidgets}},
+  UPGRADE_PLUGINS_IGNORED = {key = "upgrade_plugin_ignored", default = {}},
 
-  MAIN_VIEW_POSITION = "main_view_position",
-  MAIN_VIEW_SHOW_BAG_SLOTS = "main_view_show_bag_slots",
-  BANK_ONLY_VIEW_POSITION = "bank_only_view_position",
-  BANK_ONLY_VIEW_SHOW_BAG_SLOTS = "bank_only_view_show_bag_slots",
-  GUILD_VIEW_POSITION = "guild_view_position",
-  GUILD_VIEW_DIALOG_POSITION = "guild_view_dialog_position",
-  SHOW_BUTTONS_ON_ALT = "show_buttons_on_alt",
-  CHARACTER_SELECT_POSITION = "character_select_position",
-  CURRENCY_PANEL_POSITION = "currency_panel_position",
-  SETTING_ANCHORS = "setting_anchors",
+  MAIN_VIEW_POSITION = {key = "bag_view_position", default = {"RIGHT", addonTable.Constants.IsRetail and 20 or -30, 0}},
+  MAIN_VIEW_SHOW_BAG_SLOTS = {key = "bag_view_show_bag_slots", default = false, refresh = {Refresh.Buttons}, zone = {Zone.Bags}},
+  BANK_ONLY_VIEW_POSITION = {key = "bank_view_position", default = {"LEFT", 20, addonTable.Constants.IsRetail and 0 or 15}},
+  BANK_ONLY_VIEW_SHOW_BAG_SLOTS = {key = "bank_view_show_bag_slots", default = true, refresh = {Refresh.Buttons}, zone = {Zone.CharacterBank}},
+  GUILD_VIEW_POSITION = {key = "guild_view_position_2", default = {"LEFT", 20, 0}},
+  GUILD_VIEW_DIALOG_POSITION = {key = "guild_view_dialog_position", default = {"BOTTOM", "Baganator_GuildViewFrame", "TOP", 0, 0}},
+  SHOW_BUTTONS_ON_ALT = {key = "show_buttons_on_alt", default = false, refresh = {Refresh.Buttons}},
+  CHARACTER_SELECT_POSITION = {key = "character_select_position", default = {"RIGHT", "Baganator_BackpackViewFrame", "LEFT", 0, 0}},
+  CURRENCY_PANEL_POSITION = {key = "currency_panel_position", default = {"RIGHT", "Baganator_BackpackViewFrame", "LEFT", 0, 0}},
+  SETTING_ANCHORS = {key = "setting_anchors", default = false},
 
-  DEBUG_TIMERS = "debug_timers",
-  DEBUG_KEYWORDS = "debug_keywords",
-  DEBUG_CATEGORIES = "debug_categories",
-  DEBUG_CATEGORIES_SEARCH = "debug_categories_search",
+  DEBUG_TIMERS = {key = "debug_timers", default = false},
+  DEBUG_KEYWORDS = {key = "debug_keywords", default = false},
+  DEBUG_CATEGORIES = {key = "debug_categories", default = false},
+  DEBUG_CATEGORIES_SEARCH = {key = "debug_categories_search", default = false},
 
-  AUTO_OPEN = "auto_open",
+  AUTO_OPEN = {key = "auto_open", default = {}},
 
-  GUILD_BANK_SORT_METHOD = "guild_bank_sort_method",
+  CUSTOM_CATEGORIES = {key = "custom_categories", default = {}, refresh = {Refresh.Searches}},
+  CATEGORY_MODIFICATIONS = {key = "category_modifications", default = {}, refresh = {Refresh.Searches}},
+  CATEGORY_SECTIONS = {key = "category_sections", default = {}, refresh = {Refresh.Layout}},
+  CATEGORY_MIGRATION = {key = "category_migration", default = 0},
+  CATEGORY_DEFAULT_IMPORT = {key = "category_default_import", default = 2},
+  AUTOMATIC_CATEGORIES_ADDED = {key = "automatic_categories_added", default = {}},
+  CATEGORY_DISPLAY_ORDER = {key = "category_display_order", default = {}, refresh = {Refresh.Searches, Refresh.Layout}},
+  CATEGORY_HIDDEN = {key = "category_hidden", default = {}, refresh = {Refresh.Layout, Refresh.Cosmetic}},
+  CATEGORY_SECTION_TOGGLED = {key = "category_section_toggled", default = {}, refresh = {Refresh.Cosmetic, Refresh.Layout}},
+  CATEGORY_HORIZONTAL_SPACING = {key = "category_horizontal_spacing_2", default = 0.15, refresh = {Refresh.Layout}},
+  CATEGORY_ITEM_GROUPING = {key = "category_item_grouping", default = true, refresh = {Refresh.ItemData}},
+  CATEGORY_GROUP_EMPTY_SLOTS = {key = "category_group_empty_slots", default = true, refresh = {Refresh.Searches}},
+  RECENT_TIMEOUT = {key = "recent_timeout", default = 15},
+  ADD_TO_CATEGORY_BUTTONS = {key = "add_to_category_buttons_2", default = "drag"},
 
-  CUSTOM_CATEGORIES = "custom_categories",
-  CATEGORY_MODIFICATIONS = "category_modifications",
-  CATEGORY_MIGRATION = "category_migration",
-  CATEGORY_DEFAULT_IMPORT = "category_default_import",
-  AUTOMATIC_CATEGORIES_ADDED = "automatic_categories_added",
-  CATEGORY_DISPLAY_ORDER = "category_display_order",
-  CATEGORY_HIDDEN = "category_hidden",
-  CATEGORY_SECTION_TOGGLED = "category_section_toggled",
-  CATEGORY_HORIZONTAL_SPACING = "category_horizontal_spacing_2",
-  CATEGORY_ITEM_GROUPING = "category_item_grouping",
-  CATEGORY_GROUP_EMPTY_SLOTS = "category_group_empty_slots",
-  RECENT_TIMEOUT = "recent_timeout",
-  ADD_TO_CATEGORY_BUTTONS = "add_to_category_buttons_2",
+  SAVED_SEARCHES = {key = "saved_searches", default = {}},
+
+  SKINS = {key = "skins", default = {}},
+  DISABLED_SKINS = {key = "disabled_skins", default = {}},
+  CURRENT_SKIN = {key = "current_skin", default = "blizzard"},
+
+  CATEGORY_EDIT_SEARCH_MODE = {key = "category_edit_search_mode", default = "visual"},
 }
 
-addonTable.Config.Defaults = {
-  [addonTable.Config.Options.GLOBAL_VIEW_TYPE] = "unset",
-  [addonTable.Config.Options.BAG_VIEW_TYPE] = "single", -- "single" or "category"
-  [addonTable.Config.Options.BANK_VIEW_TYPE] = "single",
-  [addonTable.Config.Options.SEEN_WELCOME] = 1,
+addonTable.Config.RefreshType = {}
 
-  [addonTable.Config.Options.BAG_VIEW_WIDTH] = 10,
-  [addonTable.Config.Options.BANK_VIEW_WIDTH] = addonTable.Constants.IsRetail and 25 or 15,
-  [addonTable.Config.Options.WARBAND_BANK_VIEW_WIDTH] = 15,
-  [addonTable.Config.Options.GUILD_VIEW_WIDTH] = 15,
-  [addonTable.Config.Options.BAG_ICON_SIZE] = 36,
-  [addonTable.Config.Options.VIEW_ALPHA] = 0.8,
-  [addonTable.Config.Options.LOCK_FRAMES] = false,
-  [addonTable.Config.Options.NO_FRAME_BORDERS] = false,
-  [addonTable.Config.Options.EMPTY_SLOT_BACKGROUND] = false,
-  [addonTable.Config.Options.HIDE_SPECIAL_CONTAINER] = {},
-  [addonTable.Config.Options.SHOW_SORT_BUTTON] = true,
-  [addonTable.Config.Options.RECENT_CHARACTERS_MAIN_VIEW] = {},
-  [addonTable.Config.Options.HIDE_BOE_ON_COMMON] = false,
-  [addonTable.Config.Options.SHOW_RECENTS_TABS] = false,
-  [addonTable.Config.Options.ICON_TEXT_QUALITY_COLORS] = false,
-  [addonTable.Config.Options.MAIN_VIEW_POSITION] = {"RIGHT", -20, 0},
-  [addonTable.Config.Options.BANK_ONLY_VIEW_POSITION] = {"LEFT", 20, 0},
-  [addonTable.Config.Options.GUILD_VIEW_POSITION] = {"LEFT", 20, 0},
-  [addonTable.Config.Options.GUILD_VIEW_DIALOG_POSITION] = {"BOTTOM", "Baganator_GuildViewFrame", "TOP", 0, 0},
-  [addonTable.Config.Options.CHARACTER_SELECT_POSITION] = {"RIGHT", "Baganator_BackpackViewFrame", "LEFT", 0, 0},
-  [addonTable.Config.Options.CURRENCY_PANEL_POSITION] = {"RIGHT", "Baganator_BackpackViewFrame", "LEFT", 0, 0},
-  [addonTable.Config.Options.ICON_TEXT_FONT_SIZE] = 14,
-  [addonTable.Config.Options.ICON_TOP_LEFT_CORNER_ARRAY] = {"appearancetooltip","battle_pet_level","boa","junk","keystone_level","item_level"},
-  [addonTable.Config.Options.ICON_TOP_RIGHT_CORNER_ARRAY] = {"can_i_mog_it"},
-  [addonTable.Config.Options.ICON_BOTTOM_LEFT_CORNER_ARRAY] = {"equipment_set","boe"},
-  [addonTable.Config.Options.ICON_BOTTOM_RIGHT_CORNER_ARRAY] = {"quantity"},
-  [addonTable.Config.Options.ICON_CORNERS_AUTO_INSERT_APPLIED] = {},
-  [addonTable.Config.Options.ICON_GREY_JUNK] = true,
-  [addonTable.Config.Options.ICON_EQUIPMENT_SET_BORDER] = true,
-  [addonTable.Config.Options.AUTO_OPEN] = {},
-  [addonTable.Config.Options.MAIN_VIEW_SHOW_BAG_SLOTS] = false,
-  [addonTable.Config.Options.BANK_ONLY_VIEW_SHOW_BAG_SLOTS] = true,
-  [addonTable.Config.Options.SHOW_BUTTONS_ON_ALT] = false,
-  [addonTable.Config.Options.BAG_EMPTY_SPACE_AT_TOP] = false,
-  [addonTable.Config.Options.REDUCE_SPACING] = false,
-  [addonTable.Config.Options.SORT_METHOD] = "type",
-  [addonTable.Config.Options.REVERSE_GROUPS_SORT_ORDER] = false,
-  [addonTable.Config.Options.SORT_START_AT_BOTTOM] = false,
-  [addonTable.Config.Options.ICON_FLASH_SIMILAR_ALT] = true,
-  [addonTable.Config.Options.SORT_IGNORE_SLOTS_AT_END] = false,
-  [addonTable.Config.Options.SORT_IGNORE_BAG_SLOTS_COUNT] = 0,
-  [addonTable.Config.Options.SORT_IGNORE_BANK_SLOTS_COUNT] = 0,
-  [addonTable.Config.Options.AUTO_SORT_ON_OPEN] = false,
-  [addonTable.Config.Options.JUNK_PLUGIN] = "poor_quality",
-  [addonTable.Config.Options.JUNK_PLUGINS_IGNORED] = {},
-  [addonTable.Config.Options.UPGRADE_PLUGIN] = "none",
-  [addonTable.Config.Options.UPGRADE_PLUGINS_IGNORED] = {},
-  [addonTable.Config.Options.SETTING_ANCHORS] = false,
-  [addonTable.Config.Options.WARBAND_CURRENT_TAB] = 1,
-  [addonTable.Config.Options.GUILD_CURRENT_TAB] = 1,
-  [addonTable.Config.Options.CURRENCY_HEADERS_COLLAPSED] = {},
-  [addonTable.Config.Options.CURRENCIES_TRACKED] = {},
-  [addonTable.Config.Options.CURRENCIES_TRACKED_IMPORTED] = 0,
+addonTable.Config.Options = {}
+addonTable.Config.Defaults = {}
 
-  [addonTable.Config.Options.DEBUG_TIMERS] = false,
-  [addonTable.Config.Options.DEBUG_KEYWORDS] = false,
-  [addonTable.Config.Options.DEBUG_CATEGORIES] = false,
-  [addonTable.Config.Options.DEBUG_CATEGORIES_SEARCH] = false,
-
-  [addonTable.Config.Options.GUILD_BANK_SORT_METHOD] = "unset",
-
-  [addonTable.Config.Options.CUSTOM_CATEGORIES] = {
-    --[[
-    ["Tinker Gems"] = { -- Search group
-      name = "Tinker Gems",
-      search = "gem&tinker",
-      searchPriority = 250,
-    },
-    ["Special Gems"] = { -- Group with specific items in it
-      name = "Special Gems",
-      search = nil,
-      searchPriority = 350,
-    },
-    ]]
-  },
-  [addonTable.Config.Options.CATEGORY_MODIFICATIONS] = {
-    --[[
-    ["default_gem"] = {
-      addedItems = {["i:154128] = true, ["p:2959] = true}, --stored by item id or pet id
-    },
-    ]]
-  },
-  [addonTable.Config.Options.CATEGORY_MIGRATION] = 0,
-  [addonTable.Config.Options.CATEGORY_DEFAULT_IMPORT] = 0,
-  [addonTable.Config.Options.AUTOMATIC_CATEGORIES_ADDED] = {},
-  [addonTable.Config.Options.CATEGORY_DISPLAY_ORDER] = {},
-  [addonTable.Config.Options.CATEGORY_HIDDEN] = {},
-  [addonTable.Config.Options.CATEGORY_SECTION_TOGGLED] = {},
-  [addonTable.Config.Options.CATEGORY_HORIZONTAL_SPACING] = 0.15,
-  [addonTable.Config.Options.CATEGORY_ITEM_GROUPING] = true,
-  [addonTable.Config.Options.CATEGORY_GROUP_EMPTY_SLOTS] = true,
-  [addonTable.Config.Options.ADD_TO_CATEGORY_BUTTONS] = "drag",
-  [addonTable.Config.Options.RECENT_TIMEOUT] = 15,
-}
+for key, details in pairs(settings) do
+  if details.refresh then
+    local refreshType = {}
+    for _, r in ipairs(details.refresh) do
+      refreshType[r] = true
+    end
+    addonTable.Config.RefreshType[details.key] = refreshType
+  end
+  addonTable.Config.Options[key] = details.key
+  addonTable.Config.Defaults[details.key] = details.default
+end
 
 addonTable.Config.IsCharacterSpecific = {
   [addonTable.Config.Options.SORT_IGNORE_BAG_SLOTS_COUNT] = true,
   [addonTable.Config.Options.SORT_IGNORE_BANK_SLOTS_COUNT] = true,
   [addonTable.Config.Options.CURRENCIES_TRACKED] = true,
   [addonTable.Config.Options.CURRENCIES_TRACKED_IMPORTED] = true,
-}
-
-addonTable.Config.VisualsFrameOnlySettings = {
-  addonTable.Config.Options.VIEW_ALPHA,
-  addonTable.Config.Options.NO_FRAME_BORDERS,
-}
-
-addonTable.Config.ItemButtonsRelayoutSettings = {
-  addonTable.Config.Options.BAG_ICON_SIZE,
-  addonTable.Config.Options.EMPTY_SLOT_BACKGROUND,
-  addonTable.Config.Options.BAG_VIEW_WIDTH,
-  addonTable.Config.Options.BANK_VIEW_WIDTH,
-  addonTable.Config.Options.WARBAND_BANK_VIEW_WIDTH,
-  addonTable.Config.Options.GUILD_VIEW_WIDTH,
-  addonTable.Config.Options.SHOW_SORT_BUTTON,
-  addonTable.Config.Options.HIDE_BOE_ON_COMMON,
-  addonTable.Config.Options.ICON_TEXT_QUALITY_COLORS,
-  addonTable.Config.Options.ICON_TEXT_FONT_SIZE,
-  addonTable.Config.Options.BAG_EMPTY_SPACE_AT_TOP,
-  addonTable.Config.Options.ICON_GREY_JUNK,
-  addonTable.Config.Options.REDUCE_SPACING,
-  addonTable.Config.Options.JUNK_PLUGIN,
-  addonTable.Config.Options.UPGRADE_PLUGIN,
-  addonTable.Config.Options.ICON_TOP_LEFT_CORNER_ARRAY,
-  addonTable.Config.Options.ICON_TOP_RIGHT_CORNER_ARRAY,
-  addonTable.Config.Options.ICON_BOTTOM_LEFT_CORNER_ARRAY,
-  addonTable.Config.Options.ICON_BOTTOM_RIGHT_CORNER_ARRAY,
 }
 
 function addonTable.Config.IsValidOption(name)
@@ -242,12 +140,13 @@ function addonTable.Config.Create(constant, name, defaultValue)
   end
 end
 
-function addonTable.Config.Set(name, value)
+local function RawSet(name, value)
+  local tree = {strsplit(".", name)}
   if BAGANATOR_CONFIG == nil then
     error("JOURNALATOR_CONFIG not initialized")
-  elseif not addonTable.Config.IsValidOption(name) then
+  elseif not addonTable.Config.IsValidOption(tree[1]) then
     error("Invalid option '" .. name .. "'")
-  else
+  elseif #tree == 1 then
     local oldValue
     if addonTable.Config.IsCharacterSpecific[name] then
       local characterName = Syndicator.API.GetCurrentCharacter()
@@ -258,18 +157,92 @@ function addonTable.Config.Set(name, value)
       BAGANATOR_CONFIG[name] = value
     end
     if value ~= oldValue then
-      addonTable.CallbackRegistry:TriggerEvent("SettingChangedEarly", name)
-      addonTable.CallbackRegistry:TriggerEvent("SettingChanged", name)
+      return true
+    end
+  else
+    local root = BAGANATOR_CONFIG
+    for i = 1, #tree - 1 do
+      root = root[tree[i]]
+      if type(root) ~= "table" then
+        error("Invalid option '" .. name .. "', broke at [" .. i .. "]")
+      end
+    end
+    local tail = tree[#tree]
+    if root[tail] == nil then
+      error("Invalid option '" .. name .. "', broke at [tail]")
+    end
+    local oldValue = root[tail]
+    root[tail] = value
+    if value ~= oldValue then
+      return true
+    end
+  end
+  return false
+end
+
+function addonTable.Config.Set(name, value)
+  if RawSet(name, value) then
+    addonTable.CallbackRegistry:TriggerEvent("SettingChanged", name)
+    if addonTable.Config.RefreshType[name] then
+      addonTable.CallbackRegistry:TriggerEvent("RefreshStateChange", addonTable.Config.RefreshType[name])
+    end
+  end
+end
+
+-- Set multiple settings at once and after all are set fire the setting changed
+-- events
+function addonTable.Config.MultiSet(nameValueMap)
+  local changed = {}
+  for name, value in pairs(nameValueMap) do
+    if RawSet(name, value) then
+      table.insert(changed, name)
+    end
+  end
+
+  local refreshState = {}
+  for _, name in ipairs(changed) do
+    addonTable.CallbackRegistry:TriggerEvent("SettingChanged", name)
+    if addonTable.Config.RefreshType[name] then
+      refreshState = Mixin(refreshState, addonTable.Config.RefreshType[name])
+    end
+  end
+  if next(refreshState) ~= nil then
+    addonTable.CallbackRegistry:TriggerEvent("RefreshStateChange", refreshState)
+  end
+end
+
+function addonTable.Config.Install(name, defaultValue)
+  if BAGANATOR_CONFIG == nil then
+    error("BAGANATOR_CONFIG not initialized")
+  elseif name:find("%.") == nil then
+    if BAGANATOR_CONFIG[name] == nil then
+      BAGANATOR_CONFIG[name] = defaultValue
+    end
+  else
+    local tree = {strsplit(".", name)}
+    local root = BAGANATOR_CONFIG
+    for i = 1, #tree - 1 do
+      if not root[tree[i]] then
+        root[tree[i]] = {}
+      end
+      root = root[tree[i]]
+    end
+    if root[tree[#tree]] == nil then
+      root[tree[#tree]] = defaultValue
     end
   end
 end
 
 function addonTable.Config.ResetOne(name)
   local newValue = addonTable.Config.Defaults[name]
-  if type(newValue) == "table" then
-    newValue = CopyTable(newValue)
+  if newValue == nil then
+    error("Can't reset that", name)
+  else
+    if type(newValue) == "table" then
+      newValue = CopyTable(newValue)
+    end
+    addonTable.Config.Set(name, newValue)
   end
-  addonTable.Config.Set(name, newValue)
 end
 
 function addonTable.Config.Reset()
@@ -305,14 +278,26 @@ function addonTable.Config.Get(name, characterName)
   -- This is ONLY if a config is asked for before variables are loaded
   if BAGANATOR_CONFIG == nil then
     return addonTable.Config.Defaults[name]
-  elseif addonTable.Config.IsCharacterSpecific[name] then
-    local value = BAGANATOR_CONFIG[name][characterName or Syndicator.API.GetCurrentCharacter()]
-    if value == nil then
-      return addonTable.Config.Defaults[name]
+  elseif name:find("%.") == nil then
+    if addonTable.Config.IsCharacterSpecific[name] then
+      local value = BAGANATOR_CONFIG[name][characterName or Syndicator.API.GetCurrentCharacter()]
+      if value == nil then
+        return addonTable.Config.Defaults[name]
+      else
+        return value
+      end
     else
-      return value
+      return BAGANATOR_CONFIG[name]
     end
   else
-    return BAGANATOR_CONFIG[name]
+    local tree = {strsplit(".", name)}
+    local root = BAGANATOR_CONFIG
+    for i = 1, #tree do
+      root = root[tree[i]]
+      if root == nil then
+        break
+      end
+    end
+    return root
   end
 end

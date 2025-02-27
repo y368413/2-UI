@@ -1,29 +1,29 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, BattleForAzeroth = ...
-local L = BattleForAzeroth.locale
-local Class = BattleForAzeroth.Class
-local Map = BattleForAzeroth.Map
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Class = ns.Class
+local Map = ns.Map
 
-local Collectible = BattleForAzeroth.node.Collectible
-local NPC = BattleForAzeroth.node.NPC
-local PetBattle = BattleForAzeroth.node.PetBattle
-local Rare = BattleForAzeroth.node.Rare
-local Safari = BattleForAzeroth.node.Safari
-local Supply = BattleForAzeroth.node.Supply
-local Treasure = BattleForAzeroth.node.Treasure
+local Collectible = ns.node.Collectible
+local NPC = ns.node.NPC
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
+local Supply = ns.node.Supply
+local Treasure = ns.node.Treasure
 
-local Achievement = BattleForAzeroth.reward.Achievement
-local Item = BattleForAzeroth.reward.Item
-local Mount = BattleForAzeroth.reward.Mount
-local Pet = BattleForAzeroth.reward.Pet
-local Transmog = BattleForAzeroth.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Transmog = ns.reward.Transmog
 
-local Arrow = BattleForAzeroth.poi.Arrow
-local Line = BattleForAzeroth.poi.Line
-local Path = BattleForAzeroth.poi.Path
-local POI = BattleForAzeroth.poi.POI
+local Arrow = ns.poi.Arrow
+local Line = ns.poi.Line
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -355,7 +355,7 @@ map.nodes[64712167] = Treasure({
 ----------------------------- SECRET SUPPLY CHESTS ----------------------------
 -------------------------------------------------------------------------------
 
-local SECRET_CHEST = BattleForAzeroth.node.SecretSupply({
+local SECRET_CHEST = ns.node.SecretSupply({
     quest = 55391,
     rewards = {Achievement({id = 13317, criteria = 43936})}
 }) -- quest = 54720 (looted ever) 55391 (looted today)
@@ -405,7 +405,7 @@ map.nodes[48403500] = PetBattle({
     id = 142114,
     note = L['talia_spark_note'],
     rewards = {
-        Achievement({id = 12936, criteria = 44230}), BattleForAzeroth.reward.Spacer(),
+        Achievement({id = 12936, criteria = 44230}), ns.reward.Spacer(),
         Achievement({id = 13270, criteria = 18, oneline = true}), -- Beast
         Achievement({id = 13271, criteria = 18, oneline = true}), -- Critter
         Achievement({id = 13272, criteria = 18, oneline = true}), -- Dragon
@@ -423,7 +423,7 @@ map.nodes[50562391] = PetBattle({
     id = 142234,
     note = L['zujai_note'],
     rewards = {
-        Achievement({id = 12936, criteria = 44232}), BattleForAzeroth.reward.Spacer(),
+        Achievement({id = 12936, criteria = 44232}), ns.reward.Spacer(),
         Achievement({id = 13270, criteria = 19, oneline = true}), -- Beast
         Achievement({id = 13271, criteria = 19, oneline = true}), -- Critter
         Achievement({id = 13272, criteria = 19, oneline = true}), -- Dragon
@@ -441,7 +441,7 @@ map.nodes[70552959] = PetBattle({
     id = 142096,
     note = L['karaga_note'],
     rewards = {
-        Achievement({id = 12936, criteria = 44229}), BattleForAzeroth.reward.Spacer(),
+        Achievement({id = 12936, criteria = 44229}), ns.reward.Spacer(),
         Achievement({id = 13270, criteria = 17, oneline = true}), -- Beast
         Achievement({id = 13271, criteria = 17, oneline = true}), -- Critter
         Achievement({id = 13272, criteria = 17, oneline = true}), -- Dragon
@@ -462,7 +462,7 @@ map.nodes[70552959] = PetBattle({
 local Totem = Class('Totem', NPC, {
     id = 131154,
     icon = 'flight_point_y',
-    group = BattleForAzeroth.groups.PAKU_TOTEMS,
+    group = ns.groups.PAKU_TOTEMS,
     note = L['totem_of_paku_note']
 })
 
@@ -490,7 +490,7 @@ daz.nodes[72081446] = Totem({pois = {Line({72081446, 59232283})}})
 map.nodes[51692825] = Collectible({
     quest = 53535,
     icon = 1875083,
-    group = BattleForAzeroth.groups.TALES_OF_DE_LOA,
+    group = ns.groups.TALES_OF_DE_LOA,
     note = L['tales_gonk_note'],
     rewards = {Achievement({id = 13036, criteria = 41566})}
 }) -- Tales of de Loa: Gonk
@@ -498,7 +498,7 @@ map.nodes[51692825] = Collectible({
 map.nodes[75506760] = Collectible({
     quest = 53536,
     icon = 1875083,
-    group = BattleForAzeroth.groups.TALES_OF_DE_LOA,
+    group = ns.groups.TALES_OF_DE_LOA,
     note = L['tales_gral_note'],
     rewards = {Achievement({id = 13036, criteria = 41567})}
 }) -- Tales of de Loa: Gral
@@ -506,7 +506,7 @@ map.nodes[75506760] = Collectible({
 map.nodes[48545460] = Collectible({
     quest = 53538,
     icon = 1875083,
-    group = BattleForAzeroth.groups.TALES_OF_DE_LOA,
+    group = ns.groups.TALES_OF_DE_LOA,
     note = L['tales_jani_note'],
     rewards = {Achievement({id = 13036, criteria = 41569})}
 }) -- Tales of de Loa: Jani
@@ -514,7 +514,7 @@ map.nodes[48545460] = Collectible({
 map.nodes[49004129] = Collectible({
     quest = 53541,
     icon = 1875083,
-    group = BattleForAzeroth.groups.TALES_OF_DE_LOA,
+    group = ns.groups.TALES_OF_DE_LOA,
     note = L['tales_paku_note'],
     rewards = {Achievement({id = 13036, criteria = 41572})}
 }) -- Tales of de Loa: Paku
@@ -522,7 +522,7 @@ map.nodes[49004129] = Collectible({
 map.nodes[43737673] = Collectible({
     quest = 53542,
     icon = 1875083,
-    group = BattleForAzeroth.groups.TALES_OF_DE_LOA,
+    group = ns.groups.TALES_OF_DE_LOA,
     note = L['tales_rezan_note'],
     rewards = {Achievement({id = 13036, criteria = 41573})}
 }) -- Tales of de Loa: Rezan
@@ -530,7 +530,7 @@ map.nodes[43737673] = Collectible({
 map.nodes[47842884] = Collectible({
     quest = 53544,
     icon = 1875083,
-    group = BattleForAzeroth.groups.TALES_OF_DE_LOA,
+    group = ns.groups.TALES_OF_DE_LOA,
     note = L['tales_shadra_note'],
     rewards = {Achievement({id = 13036, criteria = 41576})}
 }) -- Tales of de Loa: Shadra
@@ -538,7 +538,7 @@ map.nodes[47842884] = Collectible({
 map.nodes[67281762] = Collectible({
     quest = 53546,
     icon = 1875083,
-    group = BattleForAzeroth.groups.TALES_OF_DE_LOA,
+    group = ns.groups.TALES_OF_DE_LOA,
     note = L['tales_torcali_note'],
     rewards = {Achievement({id = 13036, criteria = 41577})}
 }) -- Tales of de Loa: Torcali
@@ -546,7 +546,7 @@ map.nodes[67281762] = Collectible({
 daz.nodes[53230929] = Collectible({
     quest = 53548,
     icon = 1875083,
-    group = BattleForAzeroth.groups.TALES_OF_DE_LOA,
+    group = ns.groups.TALES_OF_DE_LOA,
     note = L['tales_zandalar_note'],
     parent = map.id,
     rewards = {Achievement({id = 13036, criteria = 41581})}
@@ -560,7 +560,7 @@ map.nodes[49274433] = Collectible({
     id = 129740,
     icon = 1850548,
     sublabel = L['bow_to_your_masters_note'],
-    group = BattleForAzeroth.groups.BOW_TO_YOUR_MASTERS,
+    group = ns.groups.BOW_TO_YOUR_MASTERS,
     rewards = {Achievement({id = 13020, criteria = 41498})}
 }) -- Gonk
 
@@ -568,7 +568,7 @@ daz.nodes[35350767] = Collectible({
     id = 126334,
     icon = 1850548,
     sublabel = L['bow_to_your_masters_note'],
-    group = BattleForAzeroth.groups.BOW_TO_YOUR_MASTERS,
+    group = ns.groups.BOW_TO_YOUR_MASTERS,
     note = L['jani_note'],
     parent = map.id,
     rewards = {Achievement({id = 13020, criteria = 41500})}
@@ -578,7 +578,7 @@ map.nodes[71544942] = Collectible({
     id = 127377,
     icon = 1850548,
     sublabel = L['bow_to_your_masters_note'],
-    group = BattleForAzeroth.groups.BOW_TO_YOUR_MASTERS,
+    group = ns.groups.BOW_TO_YOUR_MASTERS,
     rewards = {Achievement({id = 13020, criteria = 41501})}
 }) -- Pa'ku
 
@@ -586,7 +586,7 @@ Map({id = 935}).nodes[37185259] = Collectible({
     id = 124948,
     icon = 1850548,
     sublabel = L['bow_to_your_masters_note'],
-    group = BattleForAzeroth.groups.BOW_TO_YOUR_MASTERS,
+    group = ns.groups.BOW_TO_YOUR_MASTERS,
     note = L['rezan_note'],
     parent = map.id,
     rewards = {Achievement({id = 13020, criteria = 41502})}
@@ -598,7 +598,7 @@ Map({id = 935}).nodes[37185259] = Collectible({
 
 map.nodes[64203930] = Collectible({
     icon = 1881827,
-    group = BattleForAzeroth.groups.BRUTOSAURS,
+    group = ns.groups.BRUTOSAURS,
     note = L['makafon_note'],
     rewards = {Achievement({id = 13029, criteria = 41580})},
     pois = {
@@ -614,7 +614,7 @@ map.nodes[66211662] = Collectible({
     quest = 50332,
     icon = 1604165,
     note = L['hunter_junk_note'],
-    group = BattleForAzeroth.groups.GET_HEKD,
+    group = ns.groups.GET_HEKD,
     rewards = {Achievement({id = 12482, criteria = 40038})}
 }) -- Big Hunter Mon
 
@@ -622,7 +622,7 @@ map.nodes[62632058] = Collectible({
     quest = 50431,
     icon = 1604165,
     note = L['feathered_junk_note'],
-    group = BattleForAzeroth.groups.GET_HEKD,
+    group = ns.groups.GET_HEKD,
     rewards = {Achievement({id = 12482, criteria = 40040})}
 }) -- Feathered Viper Scale (157794)
 
@@ -630,7 +630,7 @@ map.nodes[71704128] = Collectible({
     quest = 50308,
     icon = 1604165,
     note = L['golden_junk_note'],
-    group = BattleForAzeroth.groups.GET_HEKD,
+    group = ns.groups.GET_HEKD,
     rewards = {Achievement({id = 12482, criteria = 40037})}
 }) -- Golden Ravasaur Egg (156963)
 
@@ -638,7 +638,7 @@ daz.nodes[61825347] = Collectible({
     quest = 50381,
     icon = 1604165,
     note = L['great_hat_junk_note'],
-    group = BattleForAzeroth.groups.GET_HEKD,
+    group = ns.groups.GET_HEKD,
     parent = map.id,
     rewards = {Achievement({id = 12482, criteria = 40039})}
 }) -- The Great Hat Robbery
@@ -648,7 +648,7 @@ daz.nodes[61825347] = Collectible({
 -------------------------------------------------------------------------------
 
 local LifeFindsAWay = Class('LifeFindsAWay', Collectible,
-    {icon = 236192, group = BattleForAzeroth.groups.LIFE_FINDS_A_WAY})
+    {icon = 236192, group = ns.groups.LIFE_FINDS_A_WAY})
 
 map.nodes[67012670] = LifeFindsAWay({
     id = 135510,
@@ -702,7 +702,7 @@ map.nodes[67802900] = LifeFindsAWay({
 map.nodes[45497920] = Collectible({
     id = 143314,
     icon = 1869654,
-    group = BattleForAzeroth.groups.MUSHROOM_HARVEST,
+    group = ns.groups.MUSHROOM_HARVEST,
     rewards = {Achievement({id = 13027, criteria = 41391})}
 }) -- Bane of the Woods
 
@@ -714,7 +714,7 @@ daz.nodes[35411665] = Collectible({
     id = 131781,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Horde',
     parent = map.id,
     rewards = {
@@ -732,7 +732,7 @@ daz.nodes[47049155] = Collectible({
     id = 129376,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     parent = map.id,
     rewards = {
         Achievement({id = 13061, criteria = 41403}) -- Dark and Stormy
@@ -743,7 +743,7 @@ Map({id = 1164}).nodes[26525057] = Collectible({
     id = 131511,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Horde',
     parent = {daz.id, map.id},
     rewards = {
@@ -789,19 +789,19 @@ map.nodes[70605100] = Collectible({
 ------------------- TO ALL THE SQUIRRELS I SET SAIL TO SEE --------------------
 -------------------------------------------------------------------------------
 
-map.nodes[62721652] = BattleForAzeroth.node.Squirrel({
+map.nodes[62721652] = ns.node.Squirrel({
     id = 130445,
     rewards = {Achievement({id = 14730, criteria = 50242})},
     pois = {POI({59802560, 54802000})}
 }) -- Jungle Gulper
 
-map.nodes[67114189] = BattleForAzeroth.node.Squirrel({
+map.nodes[67114189] = ns.node.Squirrel({
     id = 130716,
     rewards = {Achievement({id = 14730, criteria = 50243})},
     pois = {POI({68804030, 68104340})}
 }) -- Crested Gekkota
 
-daz.nodes[42603540] = BattleForAzeroth.node.Squirrel({
+daz.nodes[42603540] = ns.node.Squirrel({
     id = 130441,
     parent = map.id,
     rewards = {Achievement({id = 14730, criteria = 50246})},

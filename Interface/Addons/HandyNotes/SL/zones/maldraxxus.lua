@@ -1,34 +1,34 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Shadowlands = ...
-local L = Shadowlands.locale
-local Class = Shadowlands.Class
-local Map = Shadowlands.Map
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Class = ns.Class
+local Map = ns.Map
 
-local Collectible = Shadowlands.node.Collectible
-local PetBattle = Shadowlands.node.PetBattle
-local Rare = Shadowlands.node.Rare
-local Safari = Shadowlands.node.Safari
-local Soulshape = Shadowlands.node.Soulshape
-local Squirrel = Shadowlands.node.Squirrel
-local Treasure = Shadowlands.node.Treasure
+local Collectible = ns.node.Collectible
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
+local Soulshape = ns.node.Soulshape
+local Squirrel = ns.node.Squirrel
+local Treasure = ns.node.Treasure
 
-local Achievement = Shadowlands.reward.Achievement
-local Item = Shadowlands.reward.Item
-local Mount = Shadowlands.reward.Mount
-local Pet = Shadowlands.reward.Pet
-local Toy = Shadowlands.reward.Toy
-local Transmog = Shadowlands.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Circle = Shadowlands.poi.Circle
-local Path = Shadowlands.poi.Path
-local POI = Shadowlands.poi.POI
+local Circle = ns.poi.Circle
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
-local NECROLORD = Shadowlands.covenants.NEC
-local NIGHTFAE = Shadowlands.covenants.FAE
+local NECROLORD = ns.covenants.NEC
+local NIGHTFAE = ns.covenants.FAE
 
 local map = Map({id = 1536, settings = true})
 local vos = Map({id = 1652}) -- Vault of Souls
@@ -108,7 +108,7 @@ map.nodes[31603540] = Rare({
     id = 162741,
     quest = 58872,
     covenant = NECROLORD,
-    requires = Shadowlands.requirement.GarrisonTalent(1250, L['anima_channeled']),
+    requires = ns.requirement.GarrisonTalent(1250, L['anima_channeled']),
     note = L['gieger_note'],
     rewards = {
         Achievement({id = 14833, criteria = 49876, covenant = NECROLORD}),
@@ -193,7 +193,7 @@ map.nodes[51744439] = Rare({
     id = 168147,
     quest = 58784,
     covenant = NECROLORD,
-    requires = Shadowlands.requirement.GarrisonTalent(1253, L['anima_channeled']),
+    requires = ns.requirement.GarrisonTalent(1253, L['anima_channeled']),
     note = L['sabriel_note'],
     rewards = {
         Achievement({id = 14308, criteria = 48874}),
@@ -282,7 +282,7 @@ map.nodes[33718016] = Rare({
 map.nodes[28965138] = Rare({
     id = 157125,
     quest = 59290,
-    requires = Shadowlands.requirement.Item(175841),
+    requires = ns.requirement.Item(175841),
     note = L['zargox_the_reborn_note'],
     rewards = {
         Achievement({id = 14308, criteria = 48864}),
@@ -349,7 +349,7 @@ map.nodes[57007421] = Rare({
         Transmog({item = 184301, slot = L['leather'], note = '{npc:157309}'}), -- Twenty-Loop Violet Girdle
         Transmog({item = 184300, slot = L['cloak'], note = '{npc:157312}'}), -- Fused Spineguard
         Transmog({item = 184156, slot = L['cloak'], note = '{npc:157312}'}), -- Recovered Containment Pack
-        Shadowlands.reward.Spacer(),
+        ns.reward.Spacer(),
         Pet({item = 181270, id = 2960, note = '{npc:157312}'}), -- Decaying Oozewalker
         Toy({item = 183903}), -- Smelly Jelly
         Mount({item = 182079, id = 1410, note = '{npc:157309}'}) -- Slime-Covered Reins of the Hulking Deathroc
@@ -496,7 +496,7 @@ map.nodes[57667581] = Treasure({
 
 map.nodes[64672475] = Treasure({
     quest = 61514,
-    requires = Shadowlands.requirement.Spell(337041),
+    requires = ns.requirement.Spell(337041),
     note = L['ritualists_cache_note'],
     rewards = {
         Achievement({id = 14312, criteria = 50075}),
@@ -506,7 +506,7 @@ map.nodes[64672475] = Treasure({
 
 map.nodes[31737004] = Treasure({
     quest = 61491,
-    requires = Shadowlands.requirement.Item(181777),
+    requires = ns.requirement.Item(181777),
     note = L['runespeakers_trove_note'],
     rewards = {
         Achievement({id = 14312, criteria = 50073}),
@@ -583,7 +583,7 @@ map.nodes[34005526] = PetBattle({
     id = 173263,
     note = L['rotgut_note'],
     rewards = {
-        Achievement({id = 14625, criteria = 49412}), Shadowlands.reward.Spacer(),
+        Achievement({id = 14625, criteria = 49412}), ns.reward.Spacer(),
         Achievement({id = 14868, criteria = 4, oneline = true}), -- Aquatic
         Achievement({id = 14869, criteria = 4, oneline = true}), -- Beast
         Achievement({id = 14870, criteria = 4, oneline = true}), -- Critter
@@ -601,7 +601,7 @@ map.nodes[46865000] = PetBattle({
     id = 173257,
     note = L['maximillian_note'],
     rewards = {
-        Achievement({id = 14625, criteria = 49413}), Shadowlands.reward.Spacer(),
+        Achievement({id = 14625, criteria = 49413}), ns.reward.Spacer(),
         Achievement({id = 14868, criteria = 6, oneline = true}), -- Aquatic
         Achievement({id = 14869, criteria = 6, oneline = true}), -- Beast
         Achievement({id = 14870, criteria = 6, oneline = true}), -- Critter
@@ -624,7 +624,7 @@ map.nodes[63234687] = PetBattle({
     id = 173267,
     note = L['dundley_note'],
     rewards = {
-        Achievement({id = 14625, criteria = 49411}), Shadowlands.reward.Spacer(),
+        Achievement({id = 14625, criteria = 49411}), ns.reward.Spacer(),
         Achievement({id = 14868, criteria = 5, oneline = true}), -- Aquatic
         Achievement({id = 14869, criteria = 5, oneline = true}), -- Beast
         Achievement({id = 14870, criteria = 5, oneline = true}), -- Critter
@@ -645,7 +645,7 @@ map.nodes[63234687] = PetBattle({
 local Kitten = Class('Kitten', Collectible, {
     sublabel = L['pet_cat'],
     icon = 3732497, -- inv_catslime
-    group = Shadowlands.groups.SLIME_CAT
+    group = ns.groups.SLIME_CAT
 })
 
 map.nodes[65225065] = Kitten({
@@ -707,8 +707,8 @@ map.nodes[28805160] = Collectible({
     icon = 134846,
     quest = 62404,
     note = L['ashen_ink_note'] .. '\n\n' .. L['zargox_the_reborn_note'],
-    requires = Shadowlands.requirement.Item(175841),
-    group = Shadowlands.groups.CRYPT_COUTURE,
+    requires = ns.requirement.Item(175841),
+    group = ns.groups.CRYPT_COUTURE,
     rewards = {
         Item({item = 183690, quest = 62404}), -- Ashen Ink
         Achievement({id = 14763, criteria = 49929})
@@ -721,7 +721,7 @@ map.nodes[49602360] = Collectible({
     icon = 1064192,
     quest = 62408,
     note = L['jagged_bonesaw_note'],
-    group = Shadowlands.groups.CRYPT_COUTURE,
+    group = ns.groups.CRYPT_COUTURE,
     rewards = {
         Item({item = 183692, quest = 62408}), -- Jagged Bonesaw
         Achievement({id = 14763, criteria = 49930})
@@ -733,7 +733,7 @@ map.nodes[70402780] = Collectible({
     icon = 133737,
     quest = 62297, -- A Fatal Failure
     note = L['discarded_grimoire_note'],
-    group = Shadowlands.groups.CRYPT_COUTURE,
+    group = ns.groups.CRYPT_COUTURE,
     rewards = {
         Item({item = 183394, quest = 62266}), -- Discarded Grimoire
         Achievement({id = 14763, criteria = 49931})
@@ -745,7 +745,7 @@ local sorcerersBlade = Collectible({
     icon = 463557,
     quest = 62306, -- Casting Doubt
     note = L['sorcerers_blade_note'],
-    group = Shadowlands.groups.CRYPT_COUTURE,
+    group = ns.groups.CRYPT_COUTURE,
     rewards = {
         Item({item = 183397, quest = 62306}), -- Sorcerer's Blade
         Achievement({id = 14763, criteria = 49932})
@@ -760,7 +760,7 @@ map.nodes[64007000] = Collectible({
     icon = 134877,
     quest = 62405,
     note = L['mucosal_pigment_note'],
-    group = Shadowlands.groups.CRYPT_COUTURE,
+    group = ns.groups.CRYPT_COUTURE,
     rewards = {
         Item({item = 183691, quest = 62405}), -- Mucosal Pigment
         Achievement({id = 14763, criteria = 49933})
@@ -779,7 +779,7 @@ map.nodes[71603280] = Collectible({
     icon = 1385242,
     quest = 62320, -- Regalia de Rigueur
     note = L['amethystine_dye_note'],
-    group = Shadowlands.groups.CRYPT_COUTURE,
+    group = ns.groups.CRYPT_COUTURE,
     rewards = {
         Item({item = 183401, quest = 62319}), -- Amethystine Dye
         Achievement({id = 14763, criteria = 49934})
@@ -797,7 +797,7 @@ map.nodes[67803060] = Collectible({
     icon = 3087539,
     quest = 62308, -- Mantle of Mastery
     note = L['ritualists_mantle_note'],
-    group = Shadowlands.groups.CRYPT_COUTURE,
+    group = ns.groups.CRYPT_COUTURE,
     rewards = {
         Item({item = 183399, quest = 62311}), -- Ritualists Mantle
         Achievement({id = 14763, criteria = 49935})

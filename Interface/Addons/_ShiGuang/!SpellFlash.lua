@@ -4,6 +4,7 @@
 2. 提供自动交互
 ]] 
 local thj = {}
+_G["SFC"] = thj
 thj.createFrame = function(name, parent, monitorEvents)
     local f = CreateFrame("Frame", name, parent or UIParent);
     if monitorEvents then
@@ -153,6 +154,8 @@ local keyMapping = {
     ["SPACE"] = 32,
     ["MOUSEWHEELDOWN"] = 174,
     ["MOUSEWHEELUP"] = 175,
+    ["MwD"] = 174,
+    ["MwU"] = 175,
     ["F1"] = 112,
     ["F2"] = 113,
     ["F3"] = 114,
@@ -474,7 +477,7 @@ thj.ItemName = function(id)
     -- print("ItemName->"..id)
     local name = thj.items[id];
     if not name then
-        name = GetItemInfo(id);
+        name = C_Item.GetItemInfo(id);
         thj.items[id] = name;
     end
     local hd = Hekili.Class.abilities[name]
@@ -520,7 +523,7 @@ local cpIcon = CreateFrame('Frame', 'cpIcon', UIParent)
 --texture:SetAllPoints(cpIcon)
 local cptext = cpIcon:CreateFontString()
 cptext:SetFont(STANDARD_TEXT_FONT, 15, "OUTLINE")
-cptext:SetText("Hekili")
+cptext:SetText("2-UI")
 cptext:SetPoint("TOPLEFT", cpIcon, "TOPLEFT", 3, -3)
 thj.debugger = text;
 cpIcon:SetSize( 50, 20 )
@@ -745,3 +748,4 @@ local btnVoice = thj.createSwitchButton({
     anchor = {"LEFT", btnFunnel, "RIGHT", 0, 0},
     tip = "语音播报下一个按键"
 })]]
+

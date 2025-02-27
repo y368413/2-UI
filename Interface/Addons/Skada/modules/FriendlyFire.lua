@@ -65,14 +65,18 @@ Skada:AddLoadableModule("Friendly Fire", "Shows damage done on players by friend
 				dmg.playerid = srcGUID
 				dmg.playername = srcName
 				dmg.spellid = 6603
-				dmg.spellname = C_Spell.GetSpellInfo(6603)
-				dmg.amount = (amount or 0) + (overkill or 0) + (absorb or 0)
-				dmg.targetid = dstGUID
-				dmg.targetname = dstName
+		spellInfo = C_Spell.GetSpellInfo(dmg.spellid)
+		if spellInfo then
 
-				log_ffdamage_done(Skada.current, dmg)
-				log_ffdamage_done(Skada.total, dmg)
+			dmg.spellname  = spellInfo.name
+			dmg.amount     = (amount or 0) + (overkill or 0) + (absorb or 0)
+			dmg.targetid   = dstGUID
+			dmg.targetname = dstName
+
+			log_ffdamage_done(Skada.current, dmg)
+			log_ffdamage_done(Skada.total, dmg)
 		end
+	end
 
 		function mod:Update(win, set)
 				local max = 0
@@ -125,18 +129,26 @@ Skada:AddLoadableModule("Friendly Fire", "Shows damage done on players by friend
 
 								d.label = spellname
 								d.value = spell.damage
-								d.icon = select(3, C_Spell.GetSpellInfo(spell.id))
-								d.id = spellname
-								d.spellid = spell.id
-								d.valuetext = Skada:FormatNumber(spell.damage)..(" (%02.1f%%)"):format(spell.damage / player.ffdamagedone * 100)
+				local spellInfo = C_Spell.GetSpellInfo(spell.id)
 
-								nr = nr + 1
-						end
+				-- | Returns nil if spell is not found
+				if spellInfo then
 
-						-- Sort the possibly changed bars.
-						win.metadata.maxvalue = player.ffdamagedone
+					icon	    = spellInfo.iconID
+
+					d.icon	    = icon
+					d.id	    = spellname
+					d.spellid   = spell.id
+					d.valuetext = Skada:FormatNumber(spell.damage) .. (" (%02.1f%%)"):format(spell.damage / player.ffdamagedone * 100)
+
+					nr = nr + 1
 				end
+			end
 		end
+
+		win.metadata.maxvalue = player.ffdamagedone
+	end
+
 
 		-- Detail view of a player - targets.
 		function playermod:Update(win, set)

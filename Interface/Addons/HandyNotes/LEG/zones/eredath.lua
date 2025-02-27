@@ -1,24 +1,24 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Legion = ...
-local Class = Legion.Class
-local L = Legion.locale
-local Map = Legion.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Treasure = Legion.node.Treasure
-local Rare = Legion.node.Rare
+local Treasure = ns.node.Treasure
+local Rare = ns.node.Rare
 
-local Achievement = Legion.reward.Achievement
-local Item = Legion.reward.Item
-local Mount = Legion.reward.Mount
-local Pet = Legion.reward.Pet
-local Section = Legion.reward.Section
-local Toy = Legion.reward.Toy
-local Transmog = Legion.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Section = ns.reward.Section
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Path = Legion.poi.Path
-local POI = Legion.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -249,7 +249,7 @@ map.nodes[70204600] = Rare({
 
 map.nodes[40205140] = Treasure({
     quest = 48747,
-    requires = Legion.requirement.Quest(47994), -- Forming a Bond (Lightforged Warframe)
+    requires = ns.requirement.Quest(47994), -- Forming a Bond (Lightforged Warframe)
     note = L['lightforged_warframe_treasure_note'],
     rewards = {
         Achievement({id = 12074, criteria = 37598}),
@@ -259,14 +259,14 @@ map.nodes[40205140] = Treasure({
 
 map.nodes[43400450] = Treasure({
     quest = 48743,
-    requires = Legion.requirement.Quest(47994), -- Forming a Bond (Lightforged Warframe)
+    requires = ns.requirement.Quest(47994), -- Forming a Bond (Lightforged Warframe)
     note = L['lightforged_warframe_treasure_note'],
     rewards = {Achievement({id = 12074, criteria = 37595})}
 }) -- Eredar Treasure Cache
 
 map.nodes[50603840] = Treasure({
     quest = 48744,
-    requires = Legion.requirement.Quest(47287), -- The Vindicaar Matrix Core (Light's Judgement)
+    requires = ns.requirement.Quest(47287), -- The Vindicaar Matrix Core (Light's Judgement)
     note = L['lights_judgement_treasure_note'],
     rewards = {
         Achievement({id = 12074, criteria = 37596}),
@@ -276,7 +276,7 @@ map.nodes[50603840] = Treasure({
 
 map.nodes[62207120] = Treasure({
     quest = 48745,
-    requires = Legion.requirement.Quest(47287), -- The Vindicaar Matrix Core (Light's Judgement)
+    requires = ns.requirement.Quest(47287), -- The Vindicaar Matrix Core (Light's Judgement)
     note = L['lights_judgement_treasure_note'],
     rewards = {
         Achievement({id = 12074, criteria = 37597}),
@@ -286,7 +286,7 @@ map.nodes[62207120] = Treasure({
 
 map.nodes[40806980] = Treasure({
     quest = 49153,
-    requires = Legion.requirement.Quest(48107), -- The Sigil of Awakening (Shroud of Arcane Echoes)
+    requires = ns.requirement.Quest(48107), -- The Sigil of Awakening (Shroud of Arcane Echoes)
     note = L['shroud_of_arcane_echoes_treasures_note'],
     rewards = {
         Achievement({id = 12074, criteria = 37957}),
@@ -296,7 +296,7 @@ map.nodes[40806980] = Treasure({
 
 map.nodes[62202240] = Treasure({
     quest = 49151,
-    requires = Legion.requirement.Quest(48107), -- The Sigil of Awakening (Shroud of Arcane Echoes)
+    requires = ns.requirement.Quest(48107), -- The Sigil of Awakening (Shroud of Arcane Echoes)
     note = L['shroud_of_arcane_echoes_treasures_note'],
     rewards = {
         Achievement({id = 12074, criteria = 37956}),
@@ -306,7 +306,7 @@ map.nodes[62202240] = Treasure({
 
 map.nodes[70602730] = Treasure({
     quest = 49129,
-    requires = Legion.requirement.Quest(48107), -- The Sigil of Awakening (Shroud of Arcane Echoes)
+    requires = ns.requirement.Quest(48107), -- The Sigil of Awakening (Shroud of Arcane Echoes)
     note = L['shroud_of_arcane_echoes_treasures_note'],
     rewards = {
         Achievement({id = 12074, criteria = 37955}),
@@ -355,10 +355,10 @@ map.nodes[57027686] = Treasure({
 -------------------------------------------------------------------------------
 
 local AECache = Class('AECache', Treasure, {
-    group = Legion.groups.ANCIENT_EREDAR_CACHE,
+    group = ns.groups.ANCIENT_EREDAR_CACHE,
     label = L['ancient_eredar_cache'],
     note = L['ancient_eredar_cache_note'],
-    requires = Legion.requirement.Quest(48107), -- The Sigil of Awakening
+    requires = ns.requirement.Quest(48107), -- The Sigil of Awakening
     rewards = {
         Transmog({item = 153331, slot = L['plate']}), -- Eredath Lightseeker's Helmet
         Transmog({item = 153334, slot = L['plate']}), -- Eredath Lightseeker's Spaulders
@@ -473,10 +473,10 @@ map.nodes[59305870] = AEC6
 -------------------------------------------------------------------------------
 
 local VSCache = Class('VSCache', Treasure, {
-    group = Legion.groups.VOID_SEEPED_CACHE,
+    group = ns.groups.VOID_SEEPED_CACHE,
     label = L['void_seeped_cache'],
     note = L['void_seeped_cache_note'],
-    requires = Legion.requirement.Quest(48107) -- The Sigil of Awakening
+    requires = ns.requirement.Quest(48107) -- The Sigil of Awakening
 })
 
 local VSC1 = VSCache({quest = 48361, icon = 'chest_pk'})

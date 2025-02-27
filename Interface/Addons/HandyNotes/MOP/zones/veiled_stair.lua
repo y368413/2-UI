@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, MistsOfPandaria = ...
-local Map = MistsOfPandaria.Map
-local L = MistsOfPandaria.locale
+local _, ns = ...
+local Map = ns.Map
+local L = ns.locale
 
-local Treasure = MistsOfPandaria.node.Treasure
+local Treasure = ns.node.Treasure
 
-local Achievement = MistsOfPandaria.reward.Achievement
-local Item = MistsOfPandaria.reward.Item
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
 -------------------------------------------------------------------------------

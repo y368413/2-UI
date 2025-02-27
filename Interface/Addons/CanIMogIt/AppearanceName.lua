@@ -1,4 +1,4 @@
---## Author: Morizo  ## Notes: Show appearance name without mouseover.  ## Version: 1.2.2
+--## Author: Morizo  ## Notes: Show appearance name without mouseover.  ## Version: 1.2.4
 local AppearanceName = {};
 
 AppearanceName.GetName = function(visualInfo)

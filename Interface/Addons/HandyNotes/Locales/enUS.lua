@@ -4498,7 +4498,6 @@ L['moon_priestess_lasara_note'] = 'Exchange {currency:2003} for transmog.'
 
 
 --wow
-
 -------------------------------------------------------------------------------
 --------------------------------- KHAZ ALGAR ----------------------------------
 -------------------------------------------------------------------------------
@@ -4518,6 +4517,9 @@ L['options_icons_khaz_algar_lore_hunter_desc'] = 'Display lore object locations 
 
 L['options_icons_flight_master'] = '{achievement:40430}'
 L['options_icons_flight_master_desc'] = 'Display {npc:Flight Master} locations for {achievement:40430}.'
+
+L['options_icons_worldsoul_memories'] = 'Worldsoul Memories'
+L['options_icons_worldsoul_memories_desc'] = 'Display rewards for {object:Worldsoul Memories}.'
 
 -------------------------------------------------------------------------------
 -------------------------------- ISLE OF DORN ---------------------------------
@@ -4842,6 +4844,66 @@ L['tsw_chest_4_location'] = 'High up on a beam. Drop down from the pillar near t
 L['tuk_chest_1_note'] = 'Behind the Statue.'
 L['tuk_chest_2_note'] = '{note:Only available in the "Runaway Evolution" and "Torture Victims" story variants.}'
 L['tuk_chest_3_note'] = '{note:Only available in the "Runaway Evolution" and "Weaver Rescue" story variants.}'
+L['sss_chest_2_location'] = 'Across the metal beam.'
+
+-------------------------------------------------------------------------------
+--------------------------------- SIREN ISLE ----------------------------------
+-------------------------------------------------------------------------------
+
+L['the_drowned_lair_note'] = 'Contribute {currency:3090} to {location:The Drowned Lair} at the {object:Siren Isle Command Map} to open this cave and spawn the rare.'
+L['the_drain_note'] = 'Contribute {currency:3090} to {location:The Drain} at the {object:Siren Isle Command Map} to open this cave and spawn the rare.'
+L['shuddering_hollow_note'] = 'Contribute {currency:3090} to {location:Shuddering Hollow} at the {object:Siren Isle Command Map} to open this cave and spawn the rare.'
+
+L['vrykul_sublabel'] = '{note:Only available with {npc:Bloodwake Vrykul} on the island.}'
+L['naga_sublabel'] = '{note:Only available with {npc:Naga} on the island.}'
+L['pirate_sublabel'] = '{note:Only available with {npc:pirates} on the island.}'
+
+L['storm_required'] = 'Requires active %s storm on {location:Siren Isle}.' -- %s becomes "(icon) [Seafury Tempest]"
+L['slaughtershell_location'] = 'Roams around the entire {location:Siren Isle}.'
+
+L['within_the_forgotten_vault'] = 'Use the {object:Singing Tablet} within {location:The Sacred Hollow} to enter the vault.\n\nThe vault contains treasures, a toy, a mount, and {npc:231368}.'
+
+L['options_icons_runed_storm_chest'] = '{achievement:41131}'
+L['options_icons_runed_storm_chest_desc'] = 'Display {object:Runed Storm Cache} locations for {achievement:41131}.'
+
+L['runed_storm_chest_label'] = 'Runed Storm Cache'
+L['runed_storm_chest_suffix'] = 'caches opened'
+L['runed_storm_chest_note'] = 'Follow the wind to a hidden {object:Runed Storm Cache} and reveal it with {spell:472051}.'
+
+L['flame_blessed_iron_item'] = 'Return this item for bonus {currency:3090}.'
+
+L['barnacle_encrusted_chest'] = 'Barnacle-Encrusted Chest'
+L['pilfered_earthen_chest'] = 'Pilfered Earthen Chest'
+
+L['soweezi_note'] = 'Exchange {currency:3090} for a mount, toy, pet, or transmog.'
+
+L['thrayir_note_start'] = 'Collect 5x runestone keys from around the {location:Siren Isle} and complete the ritual within {location:The Forgotten Vault} to recieve {item:232639}:'
+
+L['whirling_runekey_note'] = 'Drops from the {npc:231368} in the {location:The Forgotten Vault} during a storm.'
+L['torrential_runekey_note'] = 'Requires 7x {item:234328} dropped from {note:any} mob (normal, elite, or rare) on {location:Siren Isle} during {spell:458069}.'
+L['thunderous_runekey_note'] = 'Requires 5x {item:232605} found with {note:any} chest on the {location:Siren Isle}. {note:Does not require a {spell:458069}}.'
+L['cyclonic_runekey_note'] = 'Drops from {npc:231357} in the {location:Deadfin Mire} on {location:Siren Isle} during a storm. Or get it from fishing nearby.'
+L['turbulent_runekey_note'] = 'Requires 3x {item:234327} found scattered around {location:Siren Isle} during a storm.'
+
+L['turbulent_fragment_a'] = 'Hidden in a {object:Dirt Pile} behind the {location:Salt and Shany} inn near the digging {npc:Kul Tiran} ghost.'
+L['turbulent_fragment_b'] = 'Loot the {object:Runic Fragment} in front of the cowering {npc:Kul Tiran} ghost inside a cave in the {location:Rotting Hole}.'
+L['turbulent_fragment_c'] = 'Loot the {object:Runic Fragment} held by the {npc:Kul Tiran} ghost inside the {location:Spirit Scarred Cave}.'
+
+L['prismatic_snapdragon_note_start'] = 'Over the course of 10 days, help save the {npc:235216} in the {location:Flotsam Shoal} to recieve {item:233489}.\n\n{note:You can miss a day but there is no catch-up mechanic}.'
+L['prismatic_day'] = 'Day %d' -- "Day 1" or "Day 4" or "Day 7"
+
+L['pris_quest_1'] = 'A Lifeline' -- 86482
+L['pris_quest_2'] = 'Snap To It' -- 86483
+L['pris_quest_3'] = 'Temper Like A Tempest' -- 86484
+L['pris_quest_4'] = 'A Loyal Friend' -- 86485
+
+L['unsolved_amethyst_runelock'] = 'Unsolved Amethyst Runelock'
+L['bilge_rat_supply_chest'] = 'Bilge Rat Supply Chest'
+L['bilge_rat_supply_chest_note'] = 'Collect the {item:228621} from {npc:228582} nearby to open the chest.'
+
+L['stone_carvers_scamseax_note'] = 'Collect a {object:Radiant Citrine} ({dot:Yellow}) to recieve the {spell:1216785} buff for 2 minutes allowing you to loot the {item:233834}.'
+
+L['marmaduke_note'] = '1. Collect the {item:233027} from the top floor of the {location:Salt and Shanty} inn and bring it to {npc:234365}.\n\n{note:{npc:234365} patrols between the cliff and the {location:Flotsam Shoal}.}\n\n2. After giving him the toy, head back to {location:Flotsam Shoal} and complete {quest:86261} to receive {item:233056}.'
 
 -------------------------------------------------------------------------------
 ----------------------------- SECRETS OF AZEROTH ------------------------------
@@ -4852,7 +4914,7 @@ L['options_icons_secrets_of_azeroth_desc'] = 'Display clue locations for {locati
 
 L['alyx_kickoff_note'] = 'Speak with {npc:226683} to enable the new Secrets of Azeroth puzzles.'
 
-L['celebration_crates_label'] = 'Celebration Crates'
+-- L['celebration_crates_label'] = 'Celebration Crates'
 L['celebration_crates_note'] = 'Find and return all {object:Celebration Crates} hidden throughout {location:Azeroth}.'
 
 L['1_soggy_celebration_crate_note'] = 'Purchase a {item:225996} from {npc:143029} ({dot:Blue}) at {location:The Dive Bar} and give it to {npc:189119} to reveal the {item:226200}.'
@@ -4861,8 +4923,189 @@ L['3_dirt_caked_celebration_crate_note'] = '{note:You do NOT need to collect the
 L['4_sandy_celebration_crate'] = '1. Collect the {item:228768} from the {location:Sunken Dig Site} in {location:Thousand Needles} in {location:Kalimdor}.\n\n2. Find {npc:91079} wandering along the eastern road in {location:Azsuna}.\n\n3. Purchase {item:228767} for %s.'
 L['5_battered_celebration_crate'] = 'Against the rocks of the cave near the {npc:24026}.'
 L['6_waterlogged_celebration_crate'] = 'Underwater on the second floor of the Gnomish building.\n\n{note:Do not touch the elevator. Currently it will crash your game.}'
+L['7_charred_celebration_crate'] = 'Tucked at the base of the trampoline in the {location:Whistling Grove}.'
+L['8_mildewed_celebration_crate'] = '1. Find and drink the {object:Potion of Truth} behind {npc:34295} on top of {location:Thunder Peak} in {location:Ashenvale}.\n\n2. Loot the {object:Mildewed Celebration Crate} in {location:Dire Maul} in {location:Feralas}.\n\n{note:The {spell:463368} only lasts 30 minutes. You must manually fly to {location:Feralas}. Changing continents, taking portals, or using your {item:6948} will remove the buff.}'
+L['9_crystalized_celebration_crate'] = 'Inside of {location:Oshu\'gun} in {location:Nagrand}.'
+L['10_surprisingly_pristine_celebration_crate'] = '1. Collect the {item:228772} from within the cave in {location:Ahn\'Qiraj} in {location:Kalimdor}.\n\n2. Place the {item:228772} at the {object:Unmarked Grave} in {location:Stormheim} in the {location:Broken Isles}.'
+L['11_ghostly_celebration_crate'] = 'On top of the {location:Seat of the Primus} to the right of the portal.'
 
 L['water_resistant_receipt_note'] = '1. Enter the tunnel filled with {npc:47390}, turn right, and collect the {item:228768} from the {object:Water-Resistant Receipt of Sale} behind the pipe.\n\n2. Find {npc:91079} in {location:Azsuna} in the {location:Broken Isles}.'
+L['mysterious_bones_note'] = 'Collect the {item:228772} hidden behind {npc:71533} within the cave.\n\nUse a dog battle pet such as {item:136925} or {item:49912} to dig up the bones.'
+
+L['crates_found'] = 'crates found'
+
+-------------------------------------------------------------------------------
+------------------------------- RATT'S REVENGE --------------------------------
+-------------------------------------------------------------------------------
+
+L['options_icons_ratts_revenge'] = '{achievement:40967}'
+L['options_icons_ratts_revenge_desc'] = 'Display secret locations for {achievement:40967}.'
+
+-- INERT PECULIAR KEY
+L['inert_peculiar_key_note'] = 'Hidden within the trunk of large hollow tree behind the crate.\n\n{note:Next Location:}\nIf you {bug:do not} have {item:228938} go to {location:Dornogal} in {location:Khaz Algar}.\n\nIf you |cFF00FF00do|r have the {item:228938} go to {location:Deadwind Pass} in {location:Eastern Kingdoms}.'
+
+-- PECULIAR GEM
+L['carefully_penned_note'] = 'Talk with the {npc:230042} while wearing the {title:Detective} title to receive {quest:84684}.\n\n{note:Next Location:} {location:Azj-Kahet}'
+L['unfinished_note'] = 'In a small cave in {location:Deepwalker Pass} surrounded by a ring of {npc:229596}.\n\n{note:Next Location:} {location:City of Threads}'
+L['hastily_scrawled_note'] = 'High up on the ledge overlooking the {location:City of Threads}.\n\n{note:Next Location:} {location:Hallowfall}'
+L['water_resistant_note'] = 'In the center of a hidden lake high up in the cliff between {location:Azj-Kahet} and {location:Hallowfall}.\n\n{note:Next Location:} {location:Faerin\'s Advance} in {location:Azj-Kahet}'
+L['peculiar_gem_note'] = 'Take the hidden hole entrance within the cave down to {location:Pillar-nest Vosh}.\n\n{note:The hole is hidden against the wall and requires some clever jumping.}\n\nApproach {npc:233550} and she will run away dropping the {item:228938}.\n\n{note:Next Location:}\nIf you {bug:do not} have {item:228941} go to {location:Un\'Goro Crater} in {location:Kalimdor}.\n\nIf you |cFF00FF00do|r have the {item:228941} go to {location:Deadwind Pass} in {location:Eastern Kingdoms}.'
+
+-- KARAZHAN CATACOMBS
+L['karazhan_catacombs_label'] = 'Karazhan Catacombs'
+L['karazhan_catacombs_entrance_note'] = 'Collect the {item:44124} starting in {location:Un\'Goro Crater} in {location:Kalimdor}\n\nCollect the {item:228938} starting in {location:Dornogal} in {location:Khaz Algar}\n\nCombine the gem and the key to form the {item:44124}.\n\nWith the {item:44124} in your bag and the {item:208092} active approach the gate to reveal a red instance entrance.'
+
+-- ORB 1
+L['orb_1_label'] = 'Orb 1'
+L['orb_1_note'] = 'Use the {item:208092} at each location involving {npc:228249} and gain 1 of 3 stacks of {spell:153715}.'
+L['orb_1_locations'] = '1. {location:Northern Barrens} in {location:Kalimdor}\n2. {location:Nagrand} in {location:Draenor}\n3. {location:Maldraxxus} in {location:The Shadowlands}'
+L['humble_monument'] = 'Humble Monument'
+L['olgra_location'] = '{note:Location changes based on the completion of {quest:35170}.}'
+
+-- ORB 2
+L['orb_2_label'] = 'Orb 2'
+L['orb_2_note'] = 'Stand next to the {npc:153297} using one of the following gifts of {npc:147393}:\n\n{item:168123}\n{item:175140}\n{item:168004}\n\nSummon {item:49912} and using one of the following costumes:\n\n{item:229413}\n{item:116812}\n\nType {emote:/pray} and wait to receive the {item:53156}.\n\n{note:Other players around completing the above steps you can also obtain {item:53156}.}\n\nReturn to the {location:Karazhan Catacombs} and use the key to open both doors in the room with the fountain.'
+
+-- ORB 3
+L['orb_3_label'] = 'Orb 3'
+
+L['astral_soup_label'] = 'Astral Soup'
+L['astral_chest_label'] = 'Astral Chest'
+L['astral_rewards_note'] = 'Go fishing in the {object:Astral Soup} to receive the {item:228965}.\n\nUse the {item:228965} to open the {object:Astral Chest} and recieve the {item:228966}.\n\nYou may now collect {item:228967} from machines around {location:Karazhan Catacombs}.'
+
+L['decryption_machine_label'] = 'Decryption Machine'
+L['decryption_console_label'] = 'Decryption Console'
+L['rubensteins_console'] = 'Rubenstein\'s Console'
+
+L['code_machine_note_1'] = 'Enter the code and open the {object:Property of Elder Ko\'nani} to recieve a {item:228967}.\n\n{object:Code}: 88224646'
+L['code_machine_note_2'] = 'Enter the code and open the {object:Encrypted Chest} to recieve a {item:228967}.\n\n{object:Code}: 10638'
+L['code_machine_note_3'] = 'Enter the code and open the {object:Encrypted Chest} to recieve a {item:228967}.\n\n{object:Code}: 5661'
+L['code_machine_note_4'] = 'Enter the code and open {object:Rubenstein\'s Safe} to recieve a {item:228967}.\n\n{object:Code}: 52233'
+L['code_machine_note_5'] = 'Enter the code and open the {object:Encrypted Chest} to recieve a {item:228967}.\n\n{object:Code}: 51567'
+L['code_machine_note_6'] = 'Enter the code and open the {object:Encrypted Chest} to recieve a {item:228967}.\n\n{object:Code}: 115'
+L['code_machine_note_7'] = 'Enter the code and open the {object:Encrypted Puzzle Box} to recieve a {item:228967}.\n\n{object:Code}: 17112317'
+L['code_machine_note_8'] = 'Enter the code and open the {object:Encrypted Chest} to recieve a {item:228967}.\n\n{object:Code}: 19019'
+
+L['slot_machine_label'] = '"Feeling Lucky?" Slot Machine'
+L['slot_machine_note_a'] = 'Collect five of the lucky items then enter the code:\n\n'
+L['slot_machine_note_b'] = '{npc:2795} in {location:Stormwind}:\n'
+L['slot_machine_note_c'] = '{npc:219197} in {location:Dornogal}:\n'
+L['slot_machine_note_d'] = '{npc:186650} in {location:Ohn\'ahran Plains}\n'
+L['slot_machine_note_e'] = '{object:Code}: 777, 77777 or 7777777'
+L['slot_machine_vendor_note'] = 'Purchase these items for the {object:"Feeling Lucky?" Slot Machine}.'
+
+-- ORB 4
+L['orb_4_label'] = 'Orb 4'
+L['vashti_note'] = 'Purchase {item:228987} from {npc:91079} for %s.'
+L['uthers_tomb_label'] = 'Uther\'s Tomb'
+L['uthers_tomb_note'] = 'Summon a {npc:231482} to {location:Uther\'s Tomb} in the {location:Western Plaguelands}.\n\nUse a {item:228987} sold by {npc:91079} in {location:Azsuna} or have a Warlock use {spell:342601}.\n\nOnce you die and resurrect, read the hidden graffiti.\n\n{note:The graffiti will remain as long as the {npc:231482} stays alive, so do not kill it!}'
+
+-- ORB 5
+L['orb_5_label'] = 'Orb 5'
+L['jeremy_feasel_note'] = '{npc:232048} is hidden in the {location:Cavern of Lost Spirits} in the {location:Timeless Isle}.\n\nDefeat {npc:232048} in a pet battle using only battle pets from past secrets.%s\n\nOnce you win, complete {quest:84781} to receive the {item:228995}.\n\nYou can now visit the {npc:230310} in {location:Booty Bay}.'
+L['zarhym_note'] = 'Speak with {npc:71876} within the cave to enter the spirit realm.'
+L['pointless_treasure_salesman_location'] = 'Hidden within the goblin statue at {location:Janeiro\'s Point}.'
+L['pointless_treasure_salesman_note'] = 'Purchase the {item:228996}:'
+
+-- ORB 6
+L['orb_6_label'] = 'Orb 6'
+L['blood_altar_label'] = 'Blood Altar'
+L['corrupt_altar_label'] = 'Corrupt Altar'
+L['lust_altar_label'] = 'Lust Altar'
+L['sin_altar_label'] = 'Sin Altar'
+L['void_altar_label'] = 'Void Altar'
+
+L['altar_note'] = 'Use the {item:208092} to summon the spirit. Equip certain mounts, pets, toys or transmogs to appease it:'
+L['blood_altar_note'] = '{object:%s}: Any mount with "Blood" in the name.\n\n{object:%s}: Any pet with "Blood" in the name.\n\n{object:%s}: {item:127709}'
+L['corrupt_altar_note'] = '{object:%s}: Any mount with "Corrupt" in the name.\n\n{object:%s}: Any pet with "Corrupt" in the name.\n\n{object:%s}: {item:116067}\n\n{object:%s}: Any cloak with the same appearance as {item:86316}'
+L['lust_altar_note'] = '{object:%s}: {pet:1628}\n\n{object:%s}: {item:129211}\n\n{object:%s}: Completely naked or under the effects of {item:119092}'
+L['sin_altar_note'] = '{object:%s}: {pet:2966}\n\n{object:%s}: {item:183986}\n\n{object:%s}: Any Venthyr Sinstone cloak transmog'
+L['void_altar_note'] = '{object:%s}: {pet:1234}, {pet:2434}, or {pet:4543}\n\n{object:%s}: {item:119003} and {item:174830}\n\n{object:%s}: Any cloak with the same appearance as {item:24252}'
+
+L['chest_of_acquisitions_label'] = 'Chest of Acquisitions'
+L['chest_of_acquisitions_note'] = '1. Appease all the spirits at the altars in {location:Zul\'Gurub} in {location:Northern Stranglethorn}.\n\n2. Equip the {item:228966} and loot the {object:Chest of Acquisitions} to receive the {item:229007}.'
+
+-- Orb 7
+L['orb_7_label'] = 'Orb 7'
+L['orb_7_summary'] = '1. Begin at on the {location:Isle of the Watchers} in {location:Azsuna}.\n\n2. Empower your {pet:1716} with the various {object:Owl of the Watchers} statues around the island.\n\n3. Enter the {location:Vault of the Wardens} and defeat the bosses to reveal a secret {item:229046}.\n\n4. Use the {item:229046} to begin a challenging logic puzzle and ultimately reveal a chest containing the {item:229054}.'
+
+L['marin_bladewing_note'] = 'Purchase the {pet:1716} from {npc:107379} for %s after reaching %s with {faction:1894} or from the {location:Auction House}.'
+L['owl_of_the_watchers_label'] = 'Owl of the Watchers'
+L['owl_of_the_watchers_note'] = '{note:Only 3 statues are active at one time.}\n\nStand near an active statue with your {pet:1716} summoned to collect all 4 buffs:\n\n{spell:225049} {dot:Red}\n{spell:225038} {dot:Purple}\n{spell:223160} {dot:Green}\n{spell:225059} {dot:Blue}\n\nOnce your {pet:1716} is empowered,\n\n{note:{pet:1716} is followed by white smoke}\n\nEnter the {location:Vault of the Wardens} dungeon.'
+
+L['sentry_statue_note'] = '1. Defeat {npc:95885} to open the secret room within the {location:Chamber of Night}.\n\n2. Defeat the remaining bosses including {npc:95888}.\n\n3. Bring the {spell:204481} back to the secret room along with your {pet:1716} to spawn the {item:229046}.\n\n4. Bring the {item:229046} to {npc:95887} room.'
+L['sentry_note'] = '1. Place the {item:229046} here at the entrance to spawn a {npc:109300}.\n\n2. Interact with the {npc:109300} to begin the puzzle. The goal is to lower all {npc:98082} into the floor.\n\n3. Once complete, loot the {object:Treasure of the Wardens} to recieve the {item:229054}.'
+
+-- Orb 8
+L['orb_8_label'] = 'Orb 8'
+
+L['enigma_machine_label'] = 'Enigma Machine'
+L['enigma_machine_note'] = '1. Insert the {item:229007} and {item:229054} into the {object:Enigma Machine}.\n\n2. Click Begin and then click Submit. You must now unlock 3 hidden locks.\n\n3. Unlock a lock by counting each {npc:230596} in the instance, dragging the correct amount of statues to the correct platform, and clicking Submit again.\n\n{note:It is recommended to kill, but not count, each {npc:230599} to prevent them from standing on the platforms.}'
+
+L['lock_statue_note'] = 'Drag this statue to a platform.'
+L['lock_platform_note'] = 'Drag statues to this platform.'
+
+L['platform_1_label'] = 'Platform 1'
+L['platform_2_label'] = 'Platform 2'
+L['platform_3_label'] = 'Platform 3'
+L['platform_4_label'] = 'Platform 4'
+L['platform_5_label'] = 'Platform 5'
+L['platform_6_label'] = 'Platform 6'
+L['platform_7_label'] = 'Platform 7'
+
+L['rats_label'] = 'Rats'
+L['lock_label'] = 'Lock %d'
+L['code_label'] = '%d on %s'
+
+-- Orb 9
+L['orb_9_label'] = 'Orb 9'
+
+L['ak_decryption_console_note'] = 'Back to the hidden hole, entrance within the cave down to {location:Pillar-nest Vosh} in {location:Azj-Kahet}.\n\nEquip your {item:228966} to reveal a hidden platform.\n\nTarget the {npc:230383} and use the {item:228996} to reach platform. Enter the code and open the {object:Encrypted Chest} to recieve the {item:229348}.\n\n{object:Code}: 84847078'
+
+-------------------------------------------------------------------------------
+---------------------------------- UNDERMINE ----------------------------------
+-------------------------------------------------------------------------------
+
+L['requires_ally'] = '{note:Must be allied with |cFFFFFF00{faction:%d}|r.}'
+L['complete_event'] = 'Speak with {npc:%d} and complete the event to summon.'
+L['in_sewer'] = 'Within the sewer. Use the nearby {object:Sewer Grate} to enter.'
+L['and_slimesby'] = 'and {npc:230947}'
+
+L['inert_plunger_label'] = 'Inert Plunger?'
+L['exploded_plunger_label'] = 'Exploded Plunger'
+
+L['unexploded_fireworks_location'] = 'On the roof of {location:Tailgate Park}.'
+L['suspicious_book_note'] = '1. {dot:Red} Hidden on a bookcase on the first floor. Attempt to collect it and it will fly to a new bookcase upstairs.\n\n2. {dot:Green} Hidden behind a bookcase on the second floor. Attempt to collect it and it will fly to the desk upstairs.\n\n3. On the desk on the third floor. Finally, collect the book!'
+L['fireworks_hat_note'] = 'Attempt to grab the hat causing it to fly from the rooftop and land here.'
+L['blackened_dice_note'] = 'Turn the nearby {object:Pipe Valve} to release the dice.'
+L['lonely_tub_note'] = 'Grab the nearby {object:Fire Extinguisher} ({dot:Blue}) to put out the flames on the {object:Lonely Tub}.'
+L['impotent_potable_location'] = 'Below the dock next to the {location:Plunder Party}'
+L['abandoned_toolbox_location'] = 'High on the roof of {location:The Scrapshop}.\n\nFollow the stairs to the top.'
+L['trick_deck_of_cards_location'] = 'On the desk next to {npc:231045} inside {location:The Incontinental Hotel}.'
+
+L['ditty_fuzeboy_note'] = 'Exchange {item:234741} for pets.'
+L['angelo_rustbin_note'] = 'Exchange {currency:3220} for pets and {object:G-99 Breakneck} customizations.'
+
+L['options_icons_nine_tenths'] = '{achievement:40948}'
+L['options_icons_nine_tenths_desc'] = 'Display all {object:Muff\'s Auto-Locker} locations for {achievement:40948}.'
+L['muffs_auto_locker_label'] = 'Muff\'s Auto-Locker'
+L['muffs_auto_locker_note'] = 'Collect all 5x Gorillion pieces and complete {quest:87406} to build {item:232843}.'
+L['muffs_auto_locker_suffix'] = 'Muff\'s Auto-Lockers opened'
+
+L['options_icons_between_the_lines'] = '{achievement:41588}'
+L['options_icons_between_the_lines_desc'] = 'Display the book locations for {achievement:41588}.'
+L['a_threatening_letter_location'] = 'On the bottom floor of {location:Steamwheedle Laboratories} beneath the staircase.'
+L['gallywixs_notes_location'] = 'On a table in the back of {location:The Hoardroom}.'
+
+L['options_icons_can_do_attitude'] = '{achievement:41589}'
+L['options_icons_can_do_attitude_desc'] = 'Display {npc:237103} locations for {achievement:41589}.'
+L['discarded_can_label'] = '{npc:237103}'
+L['discarded_can_note'] = 'Kick the {npc:237103} a few times.'
+L['discarded_can_suffix'] = 'cans kicked'
+
+L['options_icons_scrap_rewards'] = 'S.C.R.A.P. Heaps'
+L['options_icons_scrap_rewards_desc'] = 'Display rewards for {object:S.C.R.A.P. Heaps}.'
+L['scrap_heap_suffix'] = 'S.C.R.A.P. jobs completed'
 
 
 --Core
@@ -4901,6 +5144,7 @@ L['ring'] = 'Ring'
 L['neck'] = 'Neck'
 L['cloak'] = 'Cloak'
 L['trinket'] = 'Trinket'
+
 
 -------------------------------------------------------------------------------
 ---------------------------------- TOOLTIPS -----------------------------------
@@ -5266,6 +5510,14 @@ L["Portal to Ardenweald"] = true
 L["Portal to Bastion"] = true
 L["Portal to Tiragarde Sound"] = true
 L["Portal to Twilight Highlands"] = true
+L["Zeppelin to Siren Isle"] = true
+L["Zeppelin to Dornogal"] = true
+L["Mole Machine to Siren Isle"] = true
+L["Mole Machine to Gundargaz"] = true
+L["Rocket Drill to Undermine"] = true
+L["Rocket Drill to Ringing Deeps"] = true
+L["Teleporter to Undermine"] = true
+L["Teleporter to Dornogal"] = true
 
 --==========================================DRAGONFLIGHT==========================================--
 

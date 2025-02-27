@@ -1,24 +1,24 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Shadowlands = ...
+local ADDON_NAME, ns = ...
 
-local L = Shadowlands.locale
-local Map = Shadowlands.Map
+local L = ns.locale
+local Map = ns.Map
 
-local Node = Shadowlands.node.Node
+local Node = ns.node.Node
 
-local Achievement = Shadowlands.reward.Achievement
-local Item = Shadowlands.reward.Item
-local Mount = Shadowlands.reward.Mount
-local Pet = Shadowlands.reward.Pet
-local Section = Shadowlands.reward.Section
-local Spacer = Shadowlands.reward.Spacer
-local Title = Shadowlands.reward.Title
-local Toy = Shadowlands.reward.Toy
-local Transmog = Shadowlands.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Section = ns.reward.Section
+local Spacer = ns.reward.Spacer
+local Title = ns.reward.Title
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local NIGHTFAE = Shadowlands.covenants.FAE
+local NIGHTFAE = ns.covenants.FAE
 
 -------------------------------------------------------------------------------
 
@@ -360,7 +360,7 @@ map.nodes[62947482] = Node({
     label = L['adamant_vaults'],
     icon = 3853943,
     scale = 1.5,
-    requires = Shadowlands.requirement.GarrisonTalent(1788),
+    requires = ns.requirement.GarrisonTalent(1788),
     rewards = {
         Transmog({item = 187081, slot = L['cloak']}), -- Blackflame Skull Crescent
         Transmog({item = 187084, slot = L['cloak']}), -- Jailer's Eye Crescent
@@ -386,7 +386,7 @@ map.nodes[55197712] = Node({
     label = L['twisting_corridors'],
     icon = 3717273,
     scale = 1.5,
-    requires = Shadowlands.requirement.Quest(62836),
+    requires = ns.requirement.Quest(62836),
     rewards = {
         Section(L['torghast_layer2']), Pet({item = 183412, id = 3041}), -- Death Seeker
         Spacer(), Section(L['torghast_layer4']), Toy({item = 184223}), -- Helm of the Dominated
@@ -427,7 +427,7 @@ map.nodes[36044728] = Node({
     note = L['the_box_of_many_things_note'],
     icon = 4094821,
     scale = 1.5,
-    requires = Shadowlands.requirement.Quest(64216),
+    requires = ns.requirement.Quest(64216),
     rewards = {
         Achievement({id = 15076}), -- The Box of Many Things
         Achievement({id = 15079}), -- Many, Many Things

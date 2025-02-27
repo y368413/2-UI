@@ -44,8 +44,6 @@
 	<Script file="Totems.lua"/>
 	<Script file="AuraWatch.lua"/>
 	<Include file="Lumos\Lumos.xml"/>
-	<!--Script file="RaidCD.lua"/>
-	<Script file="EnemyCD.lua"/>
-	<Script file="PulseCD.lua"/>
-	<Script file="SorasThreat.lua"/-->
+	<Script file="PrivateAuras.lua"/>
+	<!--Script file="SorasThreat.lua"/-->
 </Ui>

@@ -1,22 +1,21 @@
-﻿--------------------------------	Announce enemy drinking in arena(by Duffed)----------------------------------
+--------------------------------	Announce enemy drinking in arena(by Duffed)----------------------------------
 local drinkSpell = {
 	[C_Spell.GetSpellInfo(118358)] = true,	-- Drink
 	[C_Spell.GetSpellInfo(167152)] = true,	-- Refreshment
 	[C_Spell.GetSpellInfo(167268)] = true,	-- Ba'ruun's Bountiful Bloom
 }
 
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
-frame:SetScript("OnEvent", function(self, event, ...)
+local AnenemyDrink = CreateFrame("Frame")
+AnenemyDrink:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+AnenemyDrink:SetScript("OnEvent", function(self, event, ...)
 	if not (event == "UNIT_SPELLCAST_SUCCEEDED" and GetZonePVPInfo() == "arena") then return end
-
 	local unit, _, spellID = ...
 	if UnitIsEnemy("player", unit) and drinkSpell[C_Spell.GetSpellInfo(spellID)] then
-		SendChatMessage(UnitClass(unit).." "..UnitName(unit)..TUTORIAL_TITLE11, CheckChat(true))
+		SendChatMessage(UnitClass(unit).." "..UnitName(unit)..TUTORIAL_TITLE11, "YELL")
 	end
 end)
 
---------------------------------	Kill count ----------------------------------
+--[[------------------------------	Kill count ----------------------------------
 local NextLimit = { 100, 500, 1000, 5000, 10000, 25000, 50000, 100000,250000,500000,1000000 }
 local GetNextLimit = function(kills)
 	for i =1, #NextLimit do
@@ -39,9 +38,9 @@ UIErrorsFrame:SetScript("OnUpdate",function(self,elapsed)
 		end
 		self.nextUpdate = 0
 	end
-end)
+end)]]
 
------------------------------------------------------------ KillingBlows---------------------------------------------------------
+--[[--------------------------------------------------------- KillingBlows---------------------------------------------------------
 local KB_FILTER_ENEMY = bit.bor(
 	COMBATLOG_OBJECT_AFFILIATION_PARTY,
 	COMBATLOG_OBJECT_AFFILIATION_RAID,
@@ -79,7 +78,7 @@ KillingBlows:SetScript("OnEvent", function(self, event, ...)
 	end
 end)
 
---[[--------------------------------------------------------- DuelCountdown------------## Author: meribold   ## Version: 1.0.3
+----------------------------------------------------------- DuelCountdown------------## Author: meribold   ## Version: 1.0.3
 DuelCountdown = {_G = _G}
 setfenv(1, DuelCountdown)
 
@@ -140,3 +139,94 @@ end
 
 handlerFrame:SetScript("OnEvent", function(self, event, ...) return self[event] and self[event](self, ...) end)
 handlerFrame:RegisterEvent("ADDON_LOADED")]]
+
+--SimpleBattlefieldAlert  --## Author: cc27
+local function CreateButton(name, label, func, point, relativeTo, relativePoint, offsetX, offsetY)
+    local button = CreateFrame("Button", name, UIParent, "UIPanelButtonTemplate")
+    button:SetSize(70, 50)
+    button:SetPoint(point, relativeTo, relativePoint, offsetX, offsetY)
+
+    local buttonText = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    buttonText:SetPoint("CENTER")
+    buttonText:SetText(label)
+    buttonText:SetJustifyH("CENTER")
+    buttonText:SetJustifyV("MIDDLE")
+
+    button:SetMovable(true)
+    button:EnableMouse(true)
+    button:RegisterForDrag("LeftButton")
+    button:SetScript("OnDragStart", function(self)
+        if IsShiftKeyDown() then
+            self:StartMoving()
+        end
+    end)
+    button:SetScript("OnDragStop", function(self)
+        self:StopMovingOrSizing()
+    end)
+
+    button:SetScript("OnClick", func)
+
+    button:Hide() 
+    return button
+end
+
+local function GetLocalizedText()
+    local locale = GetLocale()
+    if locale == "zhCN" then
+        return "安全", "警报", "【%s】有%d个敌人！", "【%s】安全。"
+    elseif locale == "zhTW" then
+        return "安全", "警報", "【%s】有%d個敵人！", "【%s】安全。"
+    else
+        return "Safe", "Alert", "[%s] There are %d enemies!", "[%s] is safe."
+    end
+end
+
+
+local safeText, alertText, alertMessageFormat, safeMessageFormat = GetLocalizedText()
+
+local enemyCount, lastPressTime, alertDelay = 0, 0, 5
+local function BattlefieldAlert()
+    local currentTime = GetTime()
+    if currentTime - lastPressTime > alertDelay then
+        enemyCount = 0
+    end
+    enemyCount = enemyCount + 1
+    lastPressTime = currentTime
+    local playerSubZone = GetSubZoneText() or "Unknown Location"
+    SendChatMessage(format(alertMessageFormat, playerSubZone, enemyCount), "INSTANCE_CHAT")
+end
+
+local function BattlefieldSafe()
+    local playerSubZone = GetSubZoneText() or "Unknown Location"
+    SendChatMessage(format(safeMessageFormat, playerSubZone), "INSTANCE_CHAT")
+end
+
+local forceShowButtons = false
+
+local safeButton = CreateButton("SafeButton", safeText, BattlefieldSafe, "CENTER", UIParent, "CENTER", 300, -120)
+local alertButton = CreateButton("AlertButton", alertText, BattlefieldAlert, "CENTER", UIParent, "CENTER", 370, -120)
+
+local function UpdateButtonVisibility()
+    if C_PvP.IsBattleground() or forceShowButtons then
+        safeButton:Show()
+        alertButton:Show()
+    else
+        safeButton:Hide()
+        alertButton:Hide()
+    end
+end
+
+SLASH_SIMPLEBA1 = '/SimpleBA'
+SlashCmdList["SIMPLEBA"] = function(msg)
+    if msg == "show" then
+        forceShowButtons = true
+        UpdateButtonVisibility()
+    end
+end
+
+local frame = CreateFrame("Frame")
+frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+frame:RegisterEvent("ZONE_CHANGED_NEW_AREA") 
+frame:SetScript("OnEvent", function(self, event, ...)
+    UpdateButtonVisibility()
+end)

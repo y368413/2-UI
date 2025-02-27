@@ -55,12 +55,10 @@ local function GetAuto(category, everything)
         end
       end
       for _, n in ipairs(names) do
-        if groupedItems[n] ~= nil then
-          local index = #searches + 1
-          searches[index] = ""
-          searchLabels[index] = n
-          attachedItems[index] = groupedItems[n]
-        end
+        local index = #searches + 1
+        searches[index] = ""
+        searchLabels[index] = n
+        attachedItems[index] = groupedItems[n] -- nil if no items
       end
     end
   elseif category.auto == "inventory_slots" then
@@ -75,9 +73,22 @@ local function GetAuto(category, everything)
     table.insert(searches, "")
     table.insert(searchLabels, BAGANATOR_L_CATEGORY_RECENT)
     local newItems = {}
+    local newByKey = {}
     for _, item in ipairs(everything) do
       if newItems[item.key] ~= false and item.bagID ~= nil then
-        newItems[item.key] = addonTable.NewItems:IsNewItemTimeout(item.bagID, item.slotID)
+        newItems[item.key] = addonTable.NewItems:IsNewItemTimeout(item.bagID, item.slotID) == true
+        if newItems[item.key] == false and newByKey[item.key] ~= nil then
+          for _, prevItem in ipairs(newByKey[item.key]) do
+            addonTable.NewItems:ClearNewItem(item.bagID, item.slotID)
+            addonTable.NewItems:ClearNewItemTimeout(prevItem.bagID, prevItem.slotID)
+          end
+        else
+          newByKey[item.key] = newByKey[item.key] or {}
+          table.insert(newByKey[item.key], item)
+        end
+      elseif newItems[item.key] == false then
+        addonTable.NewItems:ClearNewItem(item.bagID, item.slotID)
+        addonTable.NewItems:ClearNewItemTimeout(item.bagID, item.slotID)
       end
     end
     attachedItems[1] = newItems
@@ -88,25 +99,38 @@ local function GetAuto(category, everything)
       if itemString then
         local groupPath = TSM_API.GetGroupPathByItem(itemString)
         if groupPath then
-          if groupPath:find("`") then
-            groupPath = groupPath:match("`([^`]*)$")
-          end
           if not groups[groupPath] then
             groups[groupPath] = {}
           end
-          groups[groupPath][item.key] = true
+          groups[groupPath][item.key] = addonTable.CategoryViews.Utilities.GetAddedItemData(item.itemID, item.itemLink)
         end
       end
     end
+    local prevLevel = 1
     for _, groupPath in ipairs(TSM_API.GetGroupPaths({})) do
-      if groupPath:find("`") then
-        groupPath = groupPath:match("`([^`]*)$")
+      local parts = {strsplit("`", groupPath)}
+      if #parts > prevLevel then
+        -- Previous entry will be root of group
+        attachedItems[#searches + 1] = attachedItems[#searches]
+        attachedItems[#searches] = nil
+        table.insert(searches, #searches, "__start")
+        searchLabels[#searches] = searchLabels[#searches - 1]
+        searchLabels[#searches - 1] = parts[prevLevel]
       end
-      if groups[groupPath] then
-        table.insert(searches, "")
-        table.insert(searchLabels, groupPath)
-        table.insert(attachedItems, groups[groupPath])
+      while #parts < prevLevel do
+        prevLevel = prevLevel - 1
+        table.insert(searches, "__end")
       end
+      local index = #searches + 1
+      searches[index] = ""
+      searchLabels[index] = parts[#parts]
+      assert(searchLabels[index], #searches)
+      attachedItems[index] = groups[groupPath] -- nil if no items
+      prevLevel = #parts
+    end
+    while prevLevel > 1 do
+      prevLevel = prevLevel - 1
+      table.insert(searches, "__end")
     end
   else
     error("automatic category type not supported")
@@ -120,40 +144,47 @@ function addonTable.CategoryViews.ComposeCategories(everything)
   local allDetails = {}
 
   local customCategories = addonTable.Config.Get(addonTable.Config.Options.CUSTOM_CATEGORIES)
-  local sectionToggled = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_SECTION_TOGGLED)
   local categoryMods = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_MODIFICATIONS)
+  local sections = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_SECTIONS)
   local categoryKeys = {}
-  local emptySlots = {index = -1, section = ""}
-  local currentSection = ""
-  local prevSection = ""
+  local currentSection = {}
   for _, source in ipairs(addonTable.Config.Get(addonTable.Config.Options.CATEGORY_DISPLAY_ORDER)) do
-    local section = source:match("^_(.*)")
-    if source == addonTable.CategoryViews.Constants.DividerName and not sectionToggled[currentSection] then
+    local section = CopyTable(currentSection)
+    if source == addonTable.CategoryViews.Constants.DividerName then
       table.insert(allDetails, {
         type = "divider",
+        section = section,
       })
     end
     if source == addonTable.CategoryViews.Constants.SectionEnd then
+      table.remove(currentSection)
+      table.remove(section)
       table.insert(allDetails, {
         type = "divider",
+        section = section,
       })
-      prevSection = currentSection
-      currentSection = ""
-    elseif section then
+    elseif source:sub(1, 1) == "_" then
+      local sectionID = source:match("^_(.*)")
       table.insert(allDetails, {
         type = "divider",
+        section = section,
       })
-      currentSection = _G["BAGANATOR_L_SECTION_" .. section] or section
+      local sectionDetails = sections[sectionID]
+      local sectionName = sectionDetails.name
+      local label = _G["BAGANATOR_L_SECTION_" .. sectionName] or sectionName
+      table.insert(currentSection, sectionID)
       table.insert(allDetails, {
         type = "section",
-        label = currentSection,
+        source = sectionID,
+        label = label,
+        section = section,
       })
     end
 
     local priority = categoryMods[source] and categoryMods[source].priority and (categoryMods[source].priority + 1) * 200 or 0
 
     local mods = categoryMods[source]
-    local group, groupPrefix, attachedItems
+    local group, groupPrefix, attachedItems, color
     if mods then
       if mods.addedItems and next(mods.addedItems) then
         attachedItems = mods.addedItems
@@ -166,31 +197,62 @@ function addonTable.CategoryViews.ComposeCategories(everything)
     if category then
       if category.auto then
         local autoDetails = GetAuto(category, everything)
+        local currentTree = {}
         for index = 1, #autoDetails.searches do
+          section = CopyTable(currentSection)
           local search = autoDetails.searches[index]
-          if search == "" then
-            search = "________" .. (#allDetails + 1)
+          if search == "__start" or search == "__end" then
+            if search == "__end" then
+              table.remove(currentTree)
+              table.remove(currentSection)
+              table.remove(section)
+              table.insert(allDetails, {
+                type = "divider",
+                section = section,
+              })
+            elseif search == "__start" then
+              table.insert(allDetails, {
+                type = "divider",
+                section = section,
+              })
+              table.insert(currentTree, autoDetails.searchLabels[index])
+              local sectionSource = source .. "$" .. table.concat(currentTree, "$")
+              table.insert(currentSection, sectionSource)
+              table.insert(allDetails, {
+                type = "section",
+                color = category.source,
+                source = sectionSource,
+                label = autoDetails.searchLabels[index],
+                section = section,
+              })
+            end
+          else
+            if search == "" then
+              search = "________" .. (#allDetails + 1)
+            end
+            allDetails[#allDetails + 1] = {
+              type = "category",
+              source = source,
+              search = search,
+              label = autoDetails.searchLabels[index],
+              priority = category.priorityOffset + priority,
+              index = #allDetails + 1,
+              attachedItems = autoDetails.attachedItems[index],
+              group = group,
+              groupPrefix = groupPrefix,
+              color = category.source,
+              auto = true,
+              autoIndex = index,
+              section = section,
+            }
           end
-          allDetails[#allDetails + 1] = {
-            type = "category",
-            source = source,
-            search = search,
-            label = autoDetails.searchLabels[index],
-            priority = category.priorityOffset + priority,
-            index = #allDetails + 1,
-            attachedItems = autoDetails.attachedItems[index],
-            group = group,
-            groupPrefix = groupPrefix,
-            auto = true,
-            section = currentSection,
-          }
         end
       elseif category.emptySlots then
         allDetails[#allDetails + 1] = {
           type = "category",
           source = source,
           index = #allDetails + 1,
-          section = currentSection,
+          section = section,
           search = "________" .. (#allDetails + 1),
           priority = 0,
           auto = true,
@@ -208,7 +270,7 @@ function addonTable.CategoryViews.ComposeCategories(everything)
           attachedItems = attachedItems,
           group = group,
           groupPrefix = groupPrefix,
-          section = currentSection,
+          section = section,
         }
       end
     end
@@ -229,7 +291,7 @@ function addonTable.CategoryViews.ComposeCategories(everything)
         attachedItems = attachedItems,
         group = group,
         groupPrefix = groupPrefix,
-        section = currentSection,
+        section = section,
       }
     end
   end
@@ -255,6 +317,7 @@ function addonTable.CategoryViews.ComposeCategories(everything)
 
   local result = {
     details = allDetails,
+    start = 1,
     searches = {},
     section = {},
     categoryKeys = {},
@@ -265,6 +328,7 @@ function addonTable.CategoryViews.ComposeCategories(everything)
     if details.search then
       details.results = {}
     end
+    details.next = index + 1
     details.index = nil
     details.priority = nil
     if details.type == "category" then
@@ -272,6 +336,9 @@ function addonTable.CategoryViews.ComposeCategories(everything)
       table.insert(result.section, details.section)
       result.categoryKeys[details.search] = details.source
     end
+  end
+  if next(allDetails) then
+    allDetails[#allDetails].next = nil
   end
 
   return result

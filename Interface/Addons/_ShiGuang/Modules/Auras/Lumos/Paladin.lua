@@ -70,19 +70,19 @@ function A:ChantLumos(self)
 		UpdateCooldown(self.lumos[1], 31935, true)
 		UpdateBuff(self.lumos[2], 53600, 132403, true, "END")
 		UpdateBuff(self.lumos[3], 31884, 31884, true, true)
-		UpdateBuff(self.lumos[4], 31850, 31850, true, true)
+		UpdateBuff(self.lumos[4], 375576, 375576, true, true)  --31850
 
 		do
 			local button = self.lumos[5]
 			if A.hasQueenGlyph then
 				UpdateBuff(button, 212641, 212641, true, true)
 			else
-				UpdateBuff(button, 86659, 86659, true, true)
+				UpdateBuff(button, 31850, 31850, true, true)  --86659
 			end
 		end
 	elseif spec == 3 then
 		UpdateCooldown(self.lumos[1], 20271, true)
-		UpdateCooldown(self.lumos[2], 35395, true)
+		UpdateCooldown(self.lumos[2], 375576, true)  --35395
 		UpdateCooldown(self.lumos[3], 184575, true)
 		UpdateCooldown(self.lumos[4], 255937, true)
 

@@ -1,12 +1,12 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, WrathOfTheLichKing = ...
-local Map = WrathOfTheLichKing.Map
+local ADDON_NAME, ns = ...
+local Map = ns.Map
 
-local Safari = WrathOfTheLichKing.node.Safari
+local Safari = ns.node.Safari
 
-local POI = WrathOfTheLichKing.poi.POI
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 

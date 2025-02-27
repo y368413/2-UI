@@ -1,28 +1,28 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, WarlordsOfDraenor = ...
-local Class = WarlordsOfDraenor.Class
-local L = WarlordsOfDraenor.locale
-local Map = WarlordsOfDraenor.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = WarlordsOfDraenor.node.Collectible
-local PetBattle = WarlordsOfDraenor.node.PetBattle
-local Rare = WarlordsOfDraenor.node.Rare
-local Treasure = WarlordsOfDraenor.node.Treasure
+local Collectible = ns.node.Collectible
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local Achievement = WarlordsOfDraenor.reward.Achievement
-local Currency = WarlordsOfDraenor.reward.Currency
-local Follower = WarlordsOfDraenor.reward.Follower
-local Item = WarlordsOfDraenor.reward.Item
-local Mount = WarlordsOfDraenor.reward.Mount
-local Pet = WarlordsOfDraenor.reward.Pet
-local Quest = WarlordsOfDraenor.reward.Quest
-local Toy = WarlordsOfDraenor.reward.Toy
-local Transmog = WarlordsOfDraenor.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Currency = ns.reward.Currency
+local Follower = ns.reward.Follower
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Quest = ns.reward.Quest
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Path = WarlordsOfDraenor.poi.Path
-local POI = WarlordsOfDraenor.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -540,7 +540,7 @@ map.nodes[40608950] = Treasure({
     label = L['yuuris_gift_treasure'],
     quest = 34140,
     faction = 'Alliance',
-    requires = WarlordsOfDraenor.requirement.Quest(33530), -- Nightmare in the Tomb
+    requires = ns.requirement.Quest(33530), -- Nightmare in the Tomb
     rewards = {
         Achievement({
             id = 9728,
@@ -863,7 +863,7 @@ map.nodes[50976330] = Collectible({
     note = L['knight_pepe_note'],
     icon = 1044996,
     quest = 39266,
-    group = WarlordsOfDraenor.groups.PEPE,
+    group = ns.groups.PEPE,
     rewards = {
         Achievement({id = 10053, criteria = 28183}), Item({item = 127869})
     }
@@ -876,7 +876,7 @@ map.nodes[50976330] = Collectible({
 local ShattrathCityRare = Class('ShattrathCityRare', Collectible, {
     icon = 'peg_rd',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.CUT_OFF_THE_HEAD
+    group = ns.groups.CUT_OFF_THE_HEAD
 })
 
 map.nodes[44003800] = ShattrathCityRare({
@@ -929,8 +929,8 @@ local FelPortal = Collectible({
     label = L['fel_portal'],
     icon = 'peg_gn',
     scale = 1.5,
-    -- requires = WarlordsOfDraenor.requirement.GarrisonTalent(152), -- TODO: This should be Barracks: Level 2 but I can get it to show up correctly
-    group = WarlordsOfDraenor.groups.WINGMEN,
+    -- requires = ns.requirement.GarrisonTalent(152), -- TODO: This should be Barracks: Level 2 but I can get it to show up correctly
+    group = ns.groups.WINGMEN,
     note = L['wingmen_note'],
     rewards = {
         Achievement({
@@ -980,7 +980,7 @@ map.nodes[50963241] = Voidtalon
 map.nodes[58095306] = Collectible({
     id = 85768,
     icon = 136172,
-    group = WarlordsOfDraenor.groups.GARRFOLLOWER,
+    group = ns.groups.GARRFOLLOWER,
     note = L['aeda_brightdawn_follower_note'],
     faction = 'Horde',
     rewards = {Follower({id = 207, icon = 136172})}
@@ -989,7 +989,7 @@ map.nodes[58095306] = Collectible({
 map.nodes[57405120] = Collectible({
     id = 85772,
     icon = 236264,
-    group = WarlordsOfDraenor.groups.GARRFOLLOWER,
+    group = ns.groups.GARRFOLLOWER,
     note = L['defender_illona_follower_note'],
     faction = 'Alliance',
     rewards = {Follower({id = 207, icon = 236264})}
@@ -998,7 +998,7 @@ map.nodes[57405120] = Collectible({
 map.nodes[64214772] = Collectible({
     id = 79870,
     icon = 132347,
-    group = WarlordsOfDraenor.groups.GARRFOLLOWER,
+    group = ns.groups.GARRFOLLOWER,
     faction = 'Horde',
     note = string.format(L['pleasure_bot_8000_follower_note'], 34751),
     rewards = {Follower({id = 171, icon = 132347})}
@@ -1007,7 +1007,7 @@ map.nodes[64214772] = Collectible({
 map.nodes[62755038] = Collectible({
     id = 79901,
     icon = 132347,
-    group = WarlordsOfDraenor.groups.GARRFOLLOWER,
+    group = ns.groups.GARRFOLLOWER,
     faction = 'Alliance',
     note = string.format(L['pleasure_bot_8000_follower_note'], 34761),
     rewards = {Follower({id = 171, icon = 132347})}
@@ -1016,7 +1016,7 @@ map.nodes[62755038] = Collectible({
 map.nodes[56902597] = Collectible({
     id = 85776,
     icon = 132355,
-    group = WarlordsOfDraenor.groups.GARRFOLLOWER,
+    group = ns.groups.GARRFOLLOWER,
     note = L['ahm_follower_note'],
     rewards = {Follower({id = 208, icon = 132355})}
 }) -- Ahm
@@ -1024,7 +1024,7 @@ map.nodes[56902597] = Collectible({
 map.nodes[45283706] = Collectible({
     label = '{quest:34465}', -- Mysterious Hat
     icon = 135932,
-    group = WarlordsOfDraenor.groups.GARRFOLLOWER,
+    group = ns.groups.GARRFOLLOWER,
     note = L['image_of_archmage_vargoth_follower_note'],
     rewards = {Quest({id = 34465}), Follower({id = 190, icon = 135932})}
 }) -- Image of Archmage Vargoth
@@ -1032,14 +1032,14 @@ map.nodes[45283706] = Collectible({
 map.nodes[85003100] = Collectible({
     id = 86949,
     icon = 135932,
-    group = WarlordsOfDraenor.groups.GARRFOLLOWER,
+    group = ns.groups.GARRFOLLOWER,
     quest = 34472, -- Temporal Juxtaposition
     note = L['image_of_archmage_vargoth_follower_note'],
     requires = {
-        WarlordsOfDraenor.requirement.Quest(34463), -- Mysterious Ring
-        WarlordsOfDraenor.requirement.Quest(34464), -- Mysterious Boots
-        WarlordsOfDraenor.requirement.Quest(34465), -- Mysterious Hat
-        WarlordsOfDraenor.requirement.Quest(34466) -- Mysterious Staff
+        ns.requirement.Quest(34463), -- Mysterious Ring
+        ns.requirement.Quest(34464), -- Mysterious Boots
+        ns.requirement.Quest(34465), -- Mysterious Hat
+        ns.requirement.Quest(34466) -- Mysterious Staff
     },
     rewards = {Follower({id = 190, icon = 135932})}
 }) -- Zooti Fizzlefury
@@ -1048,18 +1048,18 @@ map.nodes[85003100] = Collectible({
 ---------------------------------- SQUIRRELS ----------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[80932730] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[80932730] = ns.node.Squirrel({
     id = 88996,
     rewards = {Achievement({id = 14728, criteria = 12})}
 }) -- Shadow Sporebat
 
-map.nodes[38716966] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[38716966] = ns.node.Squirrel({
     id = 88975,
     label = '{npc:88975}, {npc:88994}',
     rewards = {Achievement({id = 14728, criteria = {1, 6}})}
 }) -- Royal Moth, Brilliant Bloodfeather
 
-map.nodes[55768145] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[55768145] = ns.node.Squirrel({
     id = 88983,
     rewards = {Achievement({id = 14728, criteria = 7})}
 }) -- Flat-Tooth Calf

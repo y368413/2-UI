@@ -465,3 +465,7 @@ function module:SetupMinimap()
 	-- HybridMinimap
 	M:RegisterEvent("ADDON_LOADED", module.HybridMinimapOnLoad)
 end
+
+--屏蔽小地图插件数字
+AddonCompartmentFrame:HookScript("OnShow", AddonCompartmentFrame.Hide)
+AddonCompartmentFrame:Hide()

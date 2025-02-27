@@ -56,19 +56,34 @@ GarrisonLandingPageMinimapButton:HookScript("OnEnter", function(self)
 	GameTooltip:Show()
 end)]]
 
---[[--RepSwitch by Ne0nguy(## Version: 7.3.5.9 ## X-Website: Ne0nguy.com)
+----RepSwitch by Ne0nguy(## Version: 11.0.2.28 ## X-Website: Ne0nguy.com)
 RepSwitch = {};
+RepSwitch.lastupdate = 0;
+RepSwitch.lastamount = 0;
 RepSwitch.frame = CreateFrame("Frame", nil, UIParent);
 RepSwitch.frame:RegisterEvent("COMBAT_TEXT_UPDATE");
-RepSwitch.frame:SetScript("OnEvent", function(_, event, arg1, arg2)
-	if(event == "COMBAT_TEXT_UPDATE" and arg1 == "FACTION" and arg2 ~= "Guild") then
-		for i=1,C_Reputation.GetNumFactions() do
-			if arg2 == C_CreatureInfo.GetFactionInfo(i) then
-				SetWatchedFactionIndex(i);
+RepSwitch.frame:SetScript("OnEvent", function(_, event, arg1)
+	if(event == "COMBAT_TEXT_UPDATE" and arg1 == "FACTION") then
+		local faction, amount = GetCurrentCombatTextEventInfo()
+		--print(faction);
+		--print(amount);
+		if (faction ~= "Guild") then
+			if (amount > RepSwitch.lastamount) or (time() > RepSwitch.lastupdate) then
+				C_Reputation.ExpandAllFactionHeaders();
+				for i=1,C_Reputation.GetNumFactions() do
+					local repData = C_Reputation.GetFactionDataByIndex(i);
+					if repData and faction == repData.name then
+						--print(repData.name);
+						--print(i);
+						C_Reputation.SetWatchedFactionByIndex(i);
+					end
+				end
 			end
+			RepSwitch.lastamount = amount;
+			RepSwitch.lastupdate = time();
 		end
 	end
-end);]]
+end);
 --[[SonicReputation by 小刺猬(updata for 7.2 by 灰原哀709@NGA)
 local rep = {};
 local extraRep = {};  --额外声望
@@ -201,139 +216,6 @@ hooksecurefunc("ReputationFrame_Update",function(_,n,id,x,bar,row) f.update()
 		else f[i]=nil end
 	end
 end)]]
---[[----------  v1.15.2 by DarkStarX, modified by nj55top @ 2012-11-17     ---------
-local SAO = {}
-local nextUpdate = 0.2
-local activeNum = 0
-local OverlayRemap = { [88843] = 19615, [93426] = 91342, [60349] = 53817, [79808] = -1, [126084] = 44544, }--[5143] = 79808,--[126084] = 112965,
-local useIcon = False
-local iconSize = 48  --64
-local iconGap = 8
-
-local SAOF = SpellActivationOverlayFrame
-
-local function SAO_GetTimeLeft(spellID, onwho)
-	local i = 1
-	local name, icon, count, _, _, buff_expiretime, _, _, _, buff_spellid = UnitBuff(onwho, i)
-	while name do
-		i = i + 1
-		if buff_spellid == spellID then
-			return floor(buff_expiretime-GetTime()), name, count, icon
-		end
-		name, icon, count, _, _, buff_expiretime, _, _, _, buff_spellid = UnitBuff(onwho, i)
-	end
-	return false, false
-end
-
-local function SAO_CreateTimeText(self, isCount)
-	local name = isCount and self.spellID .. "Count" or self.spellID .. "Timeleft"
-	local timerText = self:CreateFontString(self.spellID, "ARTWORK", "CombatTextFont")
-	timerText:SetTextColor(1, 0, 0, 1)
-	timerText:SetTextHeight(24)
-	return timerText
-end
-
-local function SAOTimer_OnUpdate(self, elapsed)
-	nextUpdate = nextUpdate - elapsed
-	if nextUpdate > 0 then return end
-	local timeleft, spellname, count = SAO_GetTimeLeft(self.spellID, self.checkwho)
-	if timeleft and timeleft < 0 then timeleft = 0 end
-	if timeleft then
-		spellname = useIcon and "" or format("|cff3366ff%s|r ", spellname)
-		self.text:SetText(timeleft.." s")
-		--self.text:SetText(spellname..timeleft.." s")
-	else
-		self.text:SetText("")
-	end
-	if count and count > 1 then
-		self.count:SetText(count)
-	else
-		self.count:SetText("")
-	end
-	nextUpdate = 0.2
-end
-
-function SAO_ShowTimer(...)
-	local self, spellID, texturePath, position = ...
-	--local icon = C_Spell.GetSpellTexture(spellID)
-	local overlay = SpellActivationOverlay_GetOverlay(self, spellID, position)
-	if OverlayRemap[spellID] then spellID = OverlayRemap[spellID] end
-	local checkwho = "player"
-	local spellname, timeleft, count, icon = SAO_GetTimeLeft(spellID, checkwho)
-	if timeleft == false then
-		checkwho = "pet"
-		spellname, timeleft, count, icon  = SAO_GetTimeLeft(spellID, checkwho)
-	end
-	if timeleft == false then return end
-
-	if not SAO[spellID] then
-		SAO[spellID] = {}
-		SAO[spellID].timer = CreateFrame("frame", spellID)
-		SAO[spellID].timer.spellID = spellID
-		SAO[spellID].timer.checkwho = checkwho
-		SAO[spellID].timer.text = SAO_CreateTimeText(SAO[spellID].timer)
-		SAO[spellID].timer.count = SAO_CreateTimeText(SAO[spellID].timer, true)
-		SAO[spellID].timer:Hide()
-		SAO[spellID].position = position
-		SAO[spellID].active = false
-	end
-	if not SAO[spellID].active then
-		activeNum = activeNum + 1
-		SAO[spellID].active = true
-		SAO[spellID].timer:Show()
-		SAO[spellID].timer:SetScript("OnUpdate", SAOTimer_OnUpdate)
-	end
-	SAO[spellID].timer.text:ClearAllPoints()
-	if useIcon and icon then
-		overlay.texture:SetTexture(icon)
-		overlay:SetSize(iconSize, iconSize)
-		overlay:ClearAllPoints()
-		overlay:SetPoint("TOP", SAOF, "BOTTOM", ( activeNum - 1 ) * ( iconSize + iconGap ), 0)
-		SAO[spellID].timer.text:SetPoint("TOP", overlay, "BOTTOM")
-	elseif SAO[spellID].position ~= position then
-		SAO[spellID].timer.text:SetPoint("CENTER", overlay, "TOP", 135, 0)
-	else
-		SAO[spellID].timer.text:SetPoint("CENTER", overlay, "TOP")
-	end
-end
-
-function SAO_HideTimer(...)
-	local self, spellID = ...
-	if OverlayRemap[spellID] then spellID = OverlayRemap[spellID] end
-	if not SAO[spellID] or not SAO[spellID].active then return end
-	activeNum = activeNum - 1
-	SAO[spellID].active = false
-	SAO[spellID].timer:Hide()
-	SAO[spellID].timer:SetScript("OnUpdate", nil)
-end
-hooksecurefunc("SpellActivationOverlay_ShowOverlay", SAO_ShowTimer)
-hooksecurefunc("SpellActivationOverlay_HideOverlays", SAO_HideTimer)]]
-
--- adjust LossOfControlFrame by nj55top
-hooksecurefunc("LossOfControlFrame_SetUpDisplay", function(self)
-	self.blackBg:SetAlpha(0)
-	self.RedLineTop:SetAlpha(0)
-	self.RedLineBottom:SetAlpha(0)
---	self.Icon:SetSize(iconSize, iconSize)
-	self.Icon:ClearAllPoints()
-	self.TimeLeft.NumberText:ClearAllPoints()
-	if useIcon or useBuffIcon then
-		self.Icon:SetPoint("TOP", SpellActivationOverlayFrame, "BOTTOM", -(iconSize + iconGap), 21)
-		self.TimeLeft.NumberText:SetPoint("TOPLEFT", self.Icon, "BOTTOMLEFT")
-	else
-		self.Icon:SetPoint("TOP", SpellActivationOverlayFrame, "BOTTOM", 0, 21)
-		self.TimeLeft.NumberText:SetPoint("LEFT", self.Icon, "RIGHT")
-	end
---	self.TimeLeft.NumberText:SetTextHeight(fontSize)
---	self.TimeLeft.SecondsText:SetTextHeight(fontSize)
-	self.TimeLeft.SecondsText:SetText("")
---	self.AbilityName:SetTextHeight(fontSize)
-	self.AbilityName:ClearAllPoints()
-	self.AbilityName:SetPoint("RIGHT", self.Icon, "LEFT")
-	--self.AbilityName:SetText("")
-end)
-
-
 ------------------------------BattleResAlert---------------------------
 local BattleResAlert = CreateFrame("Frame")
 BattleResAlert:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -342,6 +224,19 @@ BattleResAlert:SetScript("OnEvent",function(a,b,c,event, d,e,sourceName, f,g,h,d
 		DEFAULT_CHAT_FRAME:AddMessage("战复 "..sourceName..".")
 		PlaySound(SOUNDKIT.READY_CHECK, "Master")
 	end
+end)
+
+--## Author: V4M0N0S
+local AutoThanks = CreateFrame("Frame")
+AutoThanks:RegisterEvent("RESURRECT_REQUEST")
+AutoThanks:SetScript("OnEvent", function(self, event, reviver)
+    if IsInRaid() then
+        SendChatMessage("Thanks for rezzing me!", "RAID")
+    elseif IsInGroup() then
+        SendChatMessage("Thanks for rezzing me!", "PARTY")
+    else
+        SendChatMessage("Thanks for rezzing me!", "SAY")
+    end
 end)
 
 --------------------------     HideFishingBobberTooltip     -----------------------------------
@@ -383,25 +278,26 @@ Echof:SetScript("OnEvent", function(self, event, ...)
 	end
 end)
 
----------------------[[ Bag Space Checker Created by BrknSoul on 17th January 2014 --]]
+--------------------- Bag Space Checker Created by BrknSoul on 17th January 2014 --
 --Frame creation and event registration
 local frameBSC=CreateFrame("FRAME")
 --frameBSC:RegisterEvent("BAG_UPDATE_DELAYED")
 frameBSC:RegisterEvent("BAG_UPDATE")
-frameBSC:SetScript("OnEvent",function(event,arg1)  --Event Handlers
-  if event == "BAG_UPDATE" then
+frameBSC:SetScript("OnEvent",function(self)  --Event Handlers
     local BSCSpace = 0
     for i=0,NUM_BAG_SLOTS do 
       BSCSpace = BSCSpace + C_Container.GetContainerNumFreeSlots(i)
     end
     if BSCSpace <= 8 then
-      UIErrorsFrame:AddMessage(REMINDER_BAGS_SPACE..BSCSpace,1,0,0,5)
-      PlaySoundFile(540594, "Master")  --"Sound\\SPELLS\\SPELL_Treasure_Goblin_Coin_Toss_09.OGG"
+      --SendChatMessage(REMINDER_BAGS_SPACE..BSCSpace,"SAY")
+      --RaidNotice_AddMessage(RaidWarningFrame, REMINDER_BAGS_SPACE..BSCSpace, ChatTypeInfo["RAID_WARNING"])
+      UIErrorsFrame:AddMessage(REMINDER_BAGS_SPACE..BSCSpace)
+      elseif BSCSpace <= 8 then
+      --PlaySoundFile(540594, "Master")  --"Sound\\SPELLS\\SPELL_Treasure_Goblin_Coin_Toss_09.OGG"
     end
-  end
 end)
 
-------------------------------------------------------------------------------AltTabLfgNotification
+--[[----------------------------------------------------------------------------AltTabLfgNotification
 local AltTabLfgNotification, Flashevents = CreateFrame("Frame", "AltTabLfgNotification"), {};
 ------------------------------------------------------- start of events
 -- party invite
@@ -443,7 +339,7 @@ AltTabLfgNotification:SetScript("OnEvent", function(self, event, ...)
  if not R.db["Misc"]["AltTabLfgNotification"] then return end
  Flashevents[event](self, ...);
 end);
-for k, v in pairs(Flashevents) do AltTabLfgNotification:RegisterEvent(k);  end
+for k, v in pairs(Flashevents) do AltTabLfgNotification:RegisterEvent(k);  end]]
 
 --  CtrlIndicator    Author: 图图   --检测Ctrl是否卡住,Ctrl按下4.5秒之后就会提示
 local ctrlCnt, AltCnt, ShiftCnt = 0, 0, 0;
@@ -469,7 +365,7 @@ C_Timer.NewTicker(0.1, function()
     end
 end)
 
---[[------------------------------------------------------------------------- CrazyCatLady
+--------------------------------------------------------------------------- CrazyCatLady
 local CrazyCatLady = CreateFrame("Frame") 
 CrazyCatLady:RegisterEvent("UNIT_AURA") 
 CrazyCatLady:RegisterEvent("PLAYER_DEAD")
@@ -478,7 +374,7 @@ CrazyCatLady:SetScript("OnEvent", function(self, event, ...)
   if not R.db["Misc"]["CrazyCatLady"] then self:UnregisterAllEvents() return end
 	if event == "PLAYER_DEAD" then PlaySoundFile("Sound\\creature\\Auriaya\\UR_Auriaya_Death01.ogg", "Master")
 	elseif event == "PLAYER_UNGHOST" then StopMusic() end
-end)]]
+end)
 
 --------------------------------------------------------------------------- m4xLegendary
 local m4xLegendary = CreateFrame("Frame")
@@ -544,28 +440,15 @@ CombatNotificationAlertFrame:SetScript("OnEvent", function(self, event)
     CombatNotificationAlertFrame:Show()
 end)
 
---## Author: V4M0N0S
-local AutoThanks = CreateFrame("Frame")
-AutoThanks:RegisterEvent("RESURRECT_REQUEST")
-AutoThanks:SetScript("OnEvent", function(self, event, reviver)
-    if IsInRaid() then
-        SendChatMessage("Thanks for rezzing me!", "RAID")
-    elseif IsInGroup() then
-        SendChatMessage("Thanks for rezzing me!", "PARTY")
-    else
-        SendChatMessage("Thanks for rezzing me!", "SAY")
-    end
-end)
-
---PetHealthAlarm------------------## Version: 1.2 ## Author: Dephotian
+--[[PetHealthAlarm------------------## Version: 1.2 ## Author: Dephotian
 local PetHealthAlert = {}
 local PetHealthAlarmFrame=CreateFrame("ScrollingMessageFrame","PetHealthAlarm",UIParent)
 PetHealthAlarmFrame.Threshold=35
 PetHealthAlarmFrame.Warned=false
 -- Initialize
 function PetHealthAlert:Initialize()
-	PetHealthAlarmFrame:SetWidth(450)
-	PetHealthAlarmFrame:SetHeight(200)
+	--PetHealthAlarmFrame:SetWidth(450)
+	--PetHealthAlarmFrame:SetHeight(200)
 	PetHealthAlarmFrame:SetPoint("CENTER",UIParent,"CENTER",0,80)
 	--PetHealthAlarmFrame:SetPoint("CENTER",UIParent,"CENTER",0,360)
 	--PetHealthAlarmFrame:SetFont("Interface\\AddOns\\PetHealthAlarm\\ComicSansMS3.ttf",25,"THICKOUTLINE")
@@ -610,4 +493,34 @@ function PetHealthAlert:OnEvent(Event,Arg1,...)
 end
 PetHealthAlarmFrame:SetScript("OnEvent",PetHealthAlert.OnEvent)
 PetHealthAlarmFrame:RegisterEvent("PLAYER_LOGIN")
-PetHealthAlarmFrame:RegisterEvent("UNIT_HEALTH")
+PetHealthAlarmFrame:RegisterEvent("UNIT_HEALTH")]]
+
+local PetHealthAlert = CreateFrame("Frame")
+PetHealthAlert:RegisterEvent("UNIT_HEALTH")
+PetHealthAlert.Threshold=35
+PetHealthAlert.Warned=false
+PetHealthAlert:SetScript("OnEvent", function(Event,Arg1,...)
+	if(Event=="UNIT_HEALTH" and Arg1=="pet")then
+	  if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)<=PetHealthAlert.Threshold and PetHealthAlert.Warned==false)then
+			PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Beep.ogg")	
+			--UIErrorsFrame:AddMessage("|cFFFF0000".."- CRITICAL PET HEALTH -")
+			RaidNotice_AddMessage(RaidWarningFrame, "|cFFFF0000".."- CRITICAL PET HEALTH -", ChatTypeInfo["RAID_WARNING"])
+		PetHealthAlert.Warned=true
+		return
+	  end
+	  if(floor((UnitHealth("pet")/UnitHealthMax("pet"))*100)>PetHealthAlert.Threshold)then
+		PetHealthAlert.Warned=false
+		return
+	  end
+		return
+	end
+end)
+
+function UnitFrame_UpdateTooltip (self)
+	GameTooltip_SetDefaultAnchor(GameTooltip, self);
+	if ( GameTooltip:SetUnit(self.unit, self.hideStatusOnTooltip) ) then
+		self.UpdateTooltip = UnitFrame_UpdateTooltip;
+	else
+		self.UpdateTooltip = nil;
+	end
+end

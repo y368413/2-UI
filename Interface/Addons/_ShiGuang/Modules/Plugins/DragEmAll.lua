@@ -102,6 +102,7 @@ local lodFrames = {
 	Blizzard_TrainerUI			= { ["ClassTrainerFrame"] = false },
 	Blizzard_VoidStorageUI		= { ["VoidStorageFrame"] = false, ["VoidStorageBorderFrameMouseBlockFrame"] = "VoidStorageFrame" },
 	Blizzard_WeeklyRewards		= { ["WeeklyRewardsFrame"] = false },
+	--Blizzard_PlayerSpells = {["PlayerSpellsFrame"] = false},
 }
 
 local parentFrame, hooked = {}, {}

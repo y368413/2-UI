@@ -1,27 +1,27 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, WarlordsOfDraenor = ...
-local Class = WarlordsOfDraenor.Class
-local L = WarlordsOfDraenor.locale
-local Map = WarlordsOfDraenor.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = WarlordsOfDraenor.node.Collectible
-local PetBattle = WarlordsOfDraenor.node.PetBattle
-local Rare = WarlordsOfDraenor.node.Rare
-local Treasure = WarlordsOfDraenor.node.Treasure
+local Collectible = ns.node.Collectible
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local Achievement = WarlordsOfDraenor.reward.Achievement
-local Currency = WarlordsOfDraenor.reward.Currency
-local Follower = WarlordsOfDraenor.reward.Follower
-local Item = WarlordsOfDraenor.reward.Item
-local Mount = WarlordsOfDraenor.reward.Mount
-local Pet = WarlordsOfDraenor.reward.Pet
-local Toy = WarlordsOfDraenor.reward.Toy
-local Transmog = WarlordsOfDraenor.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Currency = ns.reward.Currency
+local Follower = ns.reward.Follower
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local POI = WarlordsOfDraenor.poi.POI
-local Path = WarlordsOfDraenor.poi.Path
+local POI = ns.poi.POI
+local Path = ns.poi.Path
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -602,8 +602,8 @@ map.nodes[57962229] = Treasure({
 
 local ArchaeologyTreasure = Class('ArchaeologyTreasure', Treasure, {
     icon = 'chest_bn',
-    group = WarlordsOfDraenor.groups.ARCHAEOLOGY_TREASURE,
-    requires = WarlordsOfDraenor.requirement.Profession(794), -- Archaeology
+    group = ns.groups.ARCHAEOLOGY_TREASURE,
+    requires = ns.requirement.Profession(794), -- Archaeology
     rewards = {
         Achievement({
             id = 9728,
@@ -669,7 +669,7 @@ map.nodes[67383983] = ArchaeologyTreasure({
 local OfferingToTheRavenMother = Class('OfferingToTheRavenMother', Treasure, {
     label = L['offering_to_the_raven_mother_treasure'],
     icon = 'chest_gn',
-    group = WarlordsOfDraenor.groups.OFFERING,
+    group = ns.groups.OFFERING,
     rewards = {
         Achievement({
             id = 9728,
@@ -691,7 +691,7 @@ map.nodes[60986387] = OfferingToTheRavenMother({quest = 36410}) -- Offering to t
 local ElixirOfShadowSight = Class('ElixirOfShadowSight', Treasure, {
     label = L['elixir_of_shadow_sight_treasure'],
     icon = 'chest_pk',
-    group = WarlordsOfDraenor.groups.SHRINES_OF_TEROKK,
+    group = ns.groups.SHRINES_OF_TEROKK,
     rewards = {Item({item = 115463})}
 })
 
@@ -729,9 +729,9 @@ map.nodes[53148451] = ElixirOfShadowSight({
 
 local GiftOfAnzu = Class('GiftOfAnzu', Treasure, {
     label = L['gift_of_anzu_treasure'],
-    requires = WarlordsOfDraenor.requirement.Item(115463), -- Elixir of Shadow Sight
+    requires = ns.requirement.Item(115463), -- Elixir of Shadow Sight
     icon = 'chest_pk',
-    group = WarlordsOfDraenor.groups.SHRINES_OF_TEROKK
+    group = ns.groups.SHRINES_OF_TEROKK
 })
 
 map.nodes[42392667] = GiftOfAnzu({
@@ -777,7 +777,7 @@ map.nodes[54128361] = Collectible({
     note = L['pirate_pepe_note'],
     icon = 1044996,
     quest = 39268,
-    group = WarlordsOfDraenor.groups.PEPE,
+    group = ns.groups.PEPE,
     rewards = {
         Achievement({id = 10053, criteria = 28185}), Item({item = 127870})
     }
@@ -791,7 +791,7 @@ local ForbiddenTome = Collectible({
     id = 85992,
     icon = 'peg_bl',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.WOULD_YOU_LIKE_A_PAMPLET,
+    group = ns.groups.WOULD_YOU_LIKE_A_PAMPLET,
     note = L['forbidden_tome_note'],
     rewards = {Achievement({id = 9432})} -- Would You Like A Pamplet?
 })
@@ -809,7 +809,7 @@ map.nodes[71202285] = ForbiddenTome
 local KingOfTheMonstersRare = Class('KingOfTheMonstersRare', Collectible, {
     icon = 'peg_rd',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.KING_OF_THE_MONSTERS
+    group = ns.groups.KING_OF_THE_MONSTERS
 })
 
 map.nodes[73404500] = KingOfTheMonstersRare({
@@ -883,12 +883,12 @@ map.nodes[54206295] = Collectible({
 ---------------------------------- SQUIRRELS ----------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[53152983] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[53152983] = ns.node.Squirrel({
     id = 88462,
     rewards = {Achievement({id = 14728, criteria = 13})}
 }) -- Thicket Skitterer
 
-map.nodes[50502940] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[50502940] = ns.node.Squirrel({
     id = 83674,
     rewards = {Achievement({id = 14728, criteria = 14})}
 }) -- Mud Jumper

@@ -1,18 +1,18 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, WrathOfTheLichKing = ...
-local Map = WrathOfTheLichKing.Map
-local L = WrathOfTheLichKing.locale
+local ADDON_NAME, ns = ...
+local Map = ns.Map
+local L = ns.locale
 
-local Rare = WrathOfTheLichKing.node.Rare
-local Safari = WrathOfTheLichKing.node.Safari
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
 
-local Achievement = WrathOfTheLichKing.reward.Achievement
-local Transmog = WrathOfTheLichKing.reward.Transmog
-local Mount = WrathOfTheLichKing.reward.Mount
+local Achievement = ns.reward.Achievement
+local Transmog = ns.reward.Transmog
+local Mount = ns.reward.Mount
 
-local POI = WrathOfTheLichKing.poi.POI
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 

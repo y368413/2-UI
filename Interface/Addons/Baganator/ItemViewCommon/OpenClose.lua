@@ -18,6 +18,8 @@ local interactions = {
   [IT.TradePartner] = {option = "trade_partner", default = false },
   [IT.ScrappingMachine] = {option = "scrapping_machine", default = true },
   [IT.Soulbind] = {option = "forge_of_bonds", default = false },
+  [IT.ItemUpgrade] = {option = "item_upgrade", default = true },
+  [IT.ItemInteraction] = {option = "item_interaction", default = true },
 }
 
 local frames = {
@@ -41,6 +43,13 @@ function BaganatorOpenCloseMixin:OnLoad()
 
   local wagoNotDefault = false
   for _, details in pairs(interactions) do
+    if data[details.option] == nil then
+      data[details.option] = details.default
+    elseif addonTable.WagoAnalytics and data[details.option] ~= details.default then
+      wagoNotDefault = true
+    end
+  end
+  for _, details in pairs(frames) do
     if data[details.option] == nil then
       data[details.option] = details.default
     elseif addonTable.WagoAnalytics and data[details.option] ~= details.default then

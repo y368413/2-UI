@@ -250,44 +250,22 @@ Skada:AddLoadableModule("Debuffs", nil, function(Skada, L)
 			local auracount = 0
 			local aurauptime = 0
 			for spellname, spell in pairs(player.auras) do
-				if spell.auratype == auratype then
-					auracount = auracount + 1
---[[
-					aurauptime = aurauptime + spell.uptime
 
-					-- Account for active auras
-					if spell.active > 0 and spell.started then
-						aurauptime = aurauptime + math.floor((time() - spell.started) + 0.5)
-					end
-]]
-				end
+				if spell.auratype == auratype then auracount = auracount + 1 end
 			end
 
+
 			if auracount > 0 then
---[[
-				-- Calculate player max possible uptime.
-				local maxtime = PlayerActiveTime(set, player) --Skada:PlayerActiveTime(set, player)
 
-				-- Now divide by the number of spells to get the average uptime.
-				local uptime = min(maxtime, aurauptime / auracount)
-]]
-
-				local d = win.dataset[nr] or {}
+				local d		= win.dataset[nr] or {}
 				win.dataset[nr] = d
 
-				d.id = player.id
-				d.value = auracount --uptime
-				--d.valuetext = ("%02.1f%% / %u"):format(uptime / maxtime * 100, auracount)
-				d.valuetext = ("%u"):format(auracount)
-				d.label = player.name
-				d.class = player.class
-				d.role = player.role
-
---[[
-				if uptime > max then
-					max = uptime
-				end
-]]
+				d.id		= player.id
+				d.value		= auracount
+				d.valuetext	= ("%u"):format(auracount)
+				d.label		= player.name
+				d.class		= player.class
+				d.role		= player.role
 
 				nr = nr + 1
 			end

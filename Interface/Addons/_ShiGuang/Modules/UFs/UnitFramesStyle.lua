@@ -6,7 +6,7 @@ local showPlayerSpeed = true								-- 显示玩家移动速度
 local showTargetSpeed = true								-- 显示目标移动速度
 local barMult = 1
 local FONT_STRING = "Interface\\addons\\_ShiGuang\\Media\\Fonts\\Pixel.TTF"
-local barTexture = "Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-StatusBar" -- 状态条材质
+local barTexture = "Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs-UI-StatusBar" -- 状态条材质
 local updateElapsed, lastPlayerSpeed, lastTargetSpeed
 local function textUpdate(bar)
 	if bar then													-- Party Pet frames don't have a mana bar.
@@ -122,7 +122,7 @@ function CreateBarPctText(frame, ap, rp, x, y, fontsize)
 	end
 end
 
---## Version: 1.0.110005 ## Author: Fusselchen
+--[[## Version: 1.0.110005 ## Author: Fusselchen
 TargetFrame:HookScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_TARGET_CHANGED" and UnitExists("target") then
         -- Boss frame pieces (dragon frame, icons)
@@ -134,7 +134,7 @@ TargetFrame:HookScript("OnEvent", function(self, event, ...)
             bossPortraitFrameTexture:Show();
         end
     end
-end)
+end)]]
 
 --------------------------- Frames ----------------------------
 CreateBarPctText(PlayerFrame, "RIGHT", "LEFT", -66, -3, 36)  --"LEFT", "RIGHT", 4, 0, 14
@@ -214,7 +214,7 @@ end)
 --TargetFrame.type:SetPoint("BOTTOM", TargetFrame.icon, "TOP")
 --TargetFrame.type:SetFont(FONT_STRING, 12, "OUTLINE") ----目标类型名字文字大小
 hooksecurefunc(TargetFrame, "Update", function(self)
-	if not UnitExists(self.unit) then return end
+	--if not UnitExists(self.unit) then return end
 	--local type, color
 	if UnitIsPlayer(self.unit) then
 		if self.icon then

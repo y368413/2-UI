@@ -1,102 +1,103 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, BattleForAzeroth = ...
-local L = BattleForAzeroth.locale
+local _, ns = ...
+local L = ns.locale
 
-local Class = BattleForAzeroth.Class
-local Group = BattleForAzeroth.Group
-local Map = BattleForAzeroth.Map
+local Class = ns.Class
+local Group = ns.Group
+local Map = ns.Map
 
-local Collectible = BattleForAzeroth.node.Collectible
-local Node = BattleForAzeroth.node.Node
-local Quest = BattleForAzeroth.node.Quest
-local Achievement = BattleForAzeroth.reward.Achievement
-local Pet = BattleForAzeroth.reward.Pet
+local Collectible = ns.node.Collectible
+local Node = ns.node.Node
+local Quest = ns.node.Quest
 
--------------------------------------------------------------------------------
-
-BattleForAzeroth.expansion = 8
+local Achievement = ns.reward.Achievement
+local Pet = ns.reward.Pet
 
 -------------------------------------------------------------------------------
 
-BattleForAzeroth.groups.ASSAULT_EVENT = Group('assault_events', 'peg_yw')
-BattleForAzeroth.groups.BOW_TO_YOUR_MASTERS = Group('bow_to_your_masters', 1850548, {
-    defaults = BattleForAzeroth.GROUP_HIDDEN,
+ns.expansion = 8
+
+-------------------------------------------------------------------------------
+
+ns.groups.ASSAULT_EVENT = Group('assault_events', 'peg_yw')
+ns.groups.BOW_TO_YOUR_MASTERS = Group('bow_to_your_masters', 1850548, {
+    defaults = ns.GROUP_HIDDEN,
     faction = 'Horde'
 })
-BattleForAzeroth.groups.BRUTOSAURS =
-    Group('brutosaurs', 1881827, {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.CARVED_IN_STONE = Group('carved_in_stone', 134424,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.CATS_NAZJ = Group('cats_nazj', 454045, {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.FABIOUS = Group('fabious', 2741477, {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.COFFERS = Group('coffers', 'star_chest_g')
-BattleForAzeroth.groups.DAILY_CHESTS = Group('daily_chests', 'chest_bl',
-    {defaults = BattleForAzeroth.GROUP_ALPHA75})
-BattleForAzeroth.groups.CURSED_HUNTER = Group('cursed_hunter', 1027879,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.DRUST_FACTS = Group('drust_facts', 2101971,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.DUNE_RIDER = Group('dune_rider', 134962, {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.EMBER_RELICS = Group('ember_relics', 514016, {
-    defaults = BattleForAzeroth.GROUP_HIDDEN,
+ns.groups.BRUTOSAURS =
+    Group('brutosaurs', 1881827, {defaults = ns.GROUP_HIDDEN})
+ns.groups.CARVED_IN_STONE = Group('carved_in_stone', 134424,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.CATS_NAZJ = Group('cats_nazj', 454045, {defaults = ns.GROUP_HIDDEN})
+ns.groups.FABIOUS = Group('fabious', 2741477, {defaults = ns.GROUP_HIDDEN})
+ns.groups.COFFERS = Group('coffers', 'star_chest_g')
+ns.groups.DAILY_CHESTS = Group('daily_chests', 'chest_bl',
+    {defaults = ns.GROUP_ALPHA75})
+ns.groups.CURSED_HUNTER = Group('cursed_hunter', 1027879,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.DRUST_FACTS = Group('drust_facts', 2101971,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.DUNE_RIDER = Group('dune_rider', 134962, {defaults = ns.GROUP_HIDDEN})
+ns.groups.EMBER_RELICS = Group('ember_relics', 514016, {
+    defaults = ns.GROUP_HIDDEN,
     faction = 'Alliance'
 })
-BattleForAzeroth.groups.GET_HEKD = Group('get_hekd', 1604165, {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.HONEYBACKS = Group('honeybacks', 2066005,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN, faction = 'Alliance'})
-BattleForAzeroth.groups.HOPPIN_SAD = Group('hoppin_sad', 804969, {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.LIFE_FINDS_A_WAY = Group('life_finds_a_way', 236192,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.LOCKED_CHEST = Group('locked_chest', 'chest_gy',
-    {defaults = BattleForAzeroth.GROUP_ALPHA75})
-BattleForAzeroth.groups.MECH_CHEST = Group('mech_chest', 'chest_rd',
-    {defaults = BattleForAzeroth.GROUP_ALPHA75})
-BattleForAzeroth.groups.MISC_NAZJ = Group('misc_nazj', 528288)
-BattleForAzeroth.groups.MUSHROOM_HARVEST = Group('mushroom_harvest', 1869654,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.PAKU_TOTEMS = Group('paku_totems', 'flight_point_y',
-    {defaults = BattleForAzeroth.GROUP_HIDDEN, faction = 'Horde'})
-BattleForAzeroth.groups.PRISMATICS = Group('prismatics', 'crystal_p',
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.RECRIG = Group('recrig', 'peg_bl')
-BattleForAzeroth.groups.SAUSAGE_SAMPLER = Group('sausage_sampler', 133200, {
-    defaults = BattleForAzeroth.GROUP_HIDDEN,
+ns.groups.GET_HEKD = Group('get_hekd', 1604165, {defaults = ns.GROUP_HIDDEN})
+ns.groups.HONEYBACKS = Group('honeybacks', 2066005,
+    {defaults = ns.GROUP_HIDDEN, faction = 'Alliance'})
+ns.groups.HOPPIN_SAD = Group('hoppin_sad', 804969, {defaults = ns.GROUP_HIDDEN})
+ns.groups.LIFE_FINDS_A_WAY = Group('life_finds_a_way', 236192,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.LOCKED_CHEST = Group('locked_chest', 'chest_gy',
+    {defaults = ns.GROUP_ALPHA75})
+ns.groups.MECH_CHEST = Group('mech_chest', 'chest_rd',
+    {defaults = ns.GROUP_ALPHA75})
+ns.groups.MISC_NAZJ = Group('misc_nazj', 528288)
+ns.groups.MUSHROOM_HARVEST = Group('mushroom_harvest', 1869654,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.PAKU_TOTEMS = Group('paku_totems', 'flight_point_y',
+    {defaults = ns.GROUP_HIDDEN, faction = 'Horde'})
+ns.groups.PRISMATICS = Group('prismatics', 'crystal_p',
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.RECRIG = Group('recrig', 'peg_bl')
+ns.groups.SAUSAGE_SAMPLER = Group('sausage_sampler', 133200, {
+    defaults = ns.GROUP_HIDDEN,
     faction = 'Alliance'
 })
-BattleForAzeroth.groups.SCAVENGER_OF_THE_SANDS = Group('scavenger_of_the_sands', 135725,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.SECRET_SUPPLY = Group('secret_supplies', 'star_chest_b',
-    {defaults = BattleForAzeroth.GROUP_HIDDEN75})
-BattleForAzeroth.groups.SHANTY_RAID = Group('shanty_raid', 1500866,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.SLIMES_NAZJ = Group('slimes_nazj', 132107,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.SUPPLY = Group('supplies', 'star_chest_g',
-    {defaults = BattleForAzeroth.GROUP_HIDDEN75})
-BattleForAzeroth.groups.TALES_OF_DE_LOA = Group('tales_of_de_loa', 1875083,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.THREE_SHEETS = Group('three_sheets', 135999,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.TIDESAGE_LEGENDS = Group('tidesage_legends', 1500881,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.UPRIGHT_CITIZENS = Group('upright_citizens', 516667, {
-    defaults = BattleForAzeroth.GROUP_HIDDEN,
+ns.groups.SCAVENGER_OF_THE_SANDS = Group('scavenger_of_the_sands', 135725,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.SECRET_SUPPLY = Group('secret_supplies', 'star_chest_b',
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.SHANTY_RAID = Group('shanty_raid', 1500866,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.SLIMES_NAZJ = Group('slimes_nazj', 132107,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.SUPPLY = Group('supplies', 'star_chest_g',
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.TALES_OF_DE_LOA = Group('tales_of_de_loa', 1875083,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.THREE_SHEETS = Group('three_sheets', 135999,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.TIDESAGE_LEGENDS = Group('tidesage_legends', 1500881,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.UPRIGHT_CITIZENS = Group('upright_citizens', 516667, {
+    defaults = ns.GROUP_HIDDEN,
     faction = 'Alliance'
 })
-BattleForAzeroth.groups.VISIONS_BUFFS = Group('visions_buffs', 132183)
-BattleForAzeroth.groups.VISIONS_CHEST = Group('visions_chest', 'chest_gy')
-BattleForAzeroth.groups.VISIONS_CRYSTALS = Group('visions_crystals', 'crystal_o')
-BattleForAzeroth.groups.VISIONS_MAIL = Group('visions_mail', 'envelope')
-BattleForAzeroth.groups.VISIONS_MISC = Group('visions_misc', 2823166)
-BattleForAzeroth.groups.SQUIRRELS = Group('squirrels', 237182, {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.BATTLE_SAFARI = Group('battle_safari', 651137,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.MECHA_SAFARI = Group('mecha_safari', 1694136,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
-BattleForAzeroth.groups.NAZJA_SAFARI = Group('nazja_safari', 2267049,
-    {defaults = BattleForAzeroth.GROUP_HIDDEN})
+ns.groups.VISIONS_BUFFS = Group('visions_buffs', 132183)
+ns.groups.VISIONS_CHEST = Group('visions_chest', 'chest_gy')
+ns.groups.VISIONS_CRYSTALS = Group('visions_crystals', 'crystal_o')
+ns.groups.VISIONS_MAIL = Group('visions_mail', 'envelope')
+ns.groups.VISIONS_MISC = Group('visions_misc', 2823166)
+ns.groups.SQUIRRELS = Group('squirrels', 237182, {defaults = ns.GROUP_HIDDEN})
+ns.groups.BATTLE_SAFARI = Group('battle_safari', 651137,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.MECHA_SAFARI = Group('mecha_safari', 1694136,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.NAZJA_SAFARI = Group('nazja_safari', 2267049,
+    {defaults = ns.GROUP_HIDDEN})
 
 -------------------------------------------------------------------------------
 ---------------------------------- CALLBACKS ----------------------------------
@@ -104,35 +105,35 @@ BattleForAzeroth.groups.NAZJA_SAFARI = Group('nazja_safari', 2267049,
 
 -- Listen for aura applied/removed events so we can refresh when the player
 -- enters and exits the alternate future
-BattleForAzeroth.addon:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED', function()
+ns.addon:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED', function()
     local _, e, _, _, _, _, _, _, t, _, _, s = CombatLogGetCurrentEventInfo()
     if (e == 'SPELL_AURA_APPLIED' or e == 'SPELL_AURA_REMOVED') and t ==
         UnitName('player') and s == 296644 then
-        C_Timer.After(1, function() BattleForAzeroth.addon:Refresh() end)
+        C_Timer.After(1, function() ns.addon:Refresh() end)
     end
 end)
 
-BattleForAzeroth.addon:RegisterEvent('QUEST_ACCEPTED', function(_, _, id)
+ns.addon:RegisterEvent('QUEST_ACCEPTED', function(_, _, id)
     if id == 56540 then
-        BattleForAzeroth.Debug('Vale assaults unlock detected')
-        C_Timer.After(1, function() BattleForAzeroth.addon:Refresh() end)
+        ns.Debug('Vale assaults unlock detected')
+        C_Timer.After(1, function() ns.addon:Refresh() end)
     end
 end)
 
-BattleForAzeroth.addon:RegisterEvent('QUEST_WATCH_UPDATE', function(_, index)
+ns.addon:RegisterEvent('QUEST_WATCH_UPDATE', function(_, index)
     local info = C_QuestLog.GetInfo(index)
     if info and info.questID == 56376 then
-        BattleForAzeroth.Debug('Uldum assaults unlock detected')
-        C_Timer.After(1, function() BattleForAzeroth.addon:Refresh() end)
+        ns.Debug('Uldum assaults unlock detected')
+        C_Timer.After(1, function() ns.addon:Refresh() end)
     end
 end)
 
-BattleForAzeroth.addon:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', function(...)
+ns.addon:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', function(...)
     -- Watch for a spellcast event that signals a ravenous slime was fed
     -- https://www.wowhead.com/spell=293775/schleimphage-feeding-tracker
     local _, source, _, spellID = ...
     if source == 'player' and spellID == 293775 then
-        C_Timer.After(1, function() BattleForAzeroth.addon:Refresh() end)
+        C_Timer.After(1, function() ns.addon:Refresh() end)
     end
 end)
 
@@ -143,7 +144,7 @@ end)
 local TimedEvent = Class('TimedEvent', Quest, {
     icon = 'peg_yw',
     scale = 2,
-    group = BattleForAzeroth.groups.ASSAULT_EVENT,
+    group = ns.groups.ASSAULT_EVENT,
     note = ''
 })
 
@@ -152,7 +153,7 @@ function TimedEvent:PrerequisiteCompleted()
     return C_TaskQuest.GetQuestTimeLeftMinutes(self.quest[1])
 end
 
-BattleForAzeroth.node.TimedEvent = TimedEvent
+ns.node.TimedEvent = TimedEvent
 
 -------------------------------------------------------------------------------
 ------------------------------ WAR SUPPLY CRATES ------------------------------
@@ -160,28 +161,28 @@ BattleForAzeroth.node.TimedEvent = TimedEvent
 
 -- quest = 53640 (50 conquest looted for today)
 
-BattleForAzeroth.node.Supply = Class('Supply', Node, {
+ns.node.Supply = Class('Supply', Node, {
     icon = 'star_chest_g',
     scale = 1.5,
     label = L['supply_chest'],
-    rlabel = BattleForAzeroth.GetIconLink('war_mode_swords', 16),
+    rlabel = ns.GetIconLink('war_mode_swords', 16),
     note = L['supply_chest_note'],
-    requires = BattleForAzeroth.requirement.WarMode,
+    requires = ns.requirement.WarMode,
     rewards = {Achievement({id = 12572})},
-    group = BattleForAzeroth.groups.SUPPLY
+    group = ns.groups.SUPPLY
 })
 
-BattleForAzeroth.node.SecretSupply = Class('SecretSupply', BattleForAzeroth.node.Supply, {
+ns.node.SecretSupply = Class('SecretSupply', ns.node.Supply, {
     icon = 'star_chest_b',
-    group = BattleForAzeroth.groups.SECRET_SUPPLY,
+    group = ns.groups.SECRET_SUPPLY,
     label = L['secret_supply_chest'],
     note = L['secret_supply_chest_note']
 })
 
-BattleForAzeroth.node.Coffer = Class('Coffer', Node, {
+ns.node.Coffer = Class('Coffer', Node, {
     icon = 'star_chest_g',
     scale = 1.5,
-    group = BattleForAzeroth.groups.COFFERS
+    group = ns.groups.COFFERS
 })
 
 -------------------------------------------------------------------------------
@@ -209,7 +210,7 @@ function VisionsMap:CanDisplay(node, coord, minimap)
     return Map.CanDisplay(self, node, coord, minimap)
 end
 
-BattleForAzeroth.VisionsMap = VisionsMap
+ns.VisionsMap = VisionsMap
 
 -------------------------------------------------------------------------------
 -------------------------------- WARFRONT MAP ---------------------------------
@@ -227,32 +228,32 @@ function WarfrontMap:CanDisplay(node, coord, minimap)
     return Map.CanDisplay(self, node, coord, minimap)
 end
 
-BattleForAzeroth.WarfrontMap = WarfrontMap
+ns.WarfrontMap = WarfrontMap
 
 -------------------------------------------------------------------------------
 ------------------- TO ALL THE SQUIRRELS I SET SAIL TO SEE --------------------
 -------------------------------------------------------------------------------
 
 local Squirrel = Class('Squirrel', Collectible, {
-    group = BattleForAzeroth.groups.SQUIRRELS,
+    group = ns.groups.SQUIRRELS,
     icon = 237182,
     note = L['squirrels_note']
 })
 
-BattleForAzeroth.node.Squirrel = Squirrel
+ns.node.Squirrel = Squirrel
 
 -------------------------------------------------------------------------------
 ------------------------------------ SAFARI -----------------------------------
 -------------------------------------------------------------------------------
 
 local Battle_Safari = Class('Battle_Safari', Collectible,
-    {icon = 'paw_g', group = BattleForAzeroth.groups.BATTLE_SAFARI})
+    {icon = 'paw_g', group = ns.groups.BATTLE_SAFARI})
 local Nazja_Safari = Class('Nazja_Safari', Collectible,
-    {icon = 'paw_g', group = BattleForAzeroth.groups.NAZJA_SAFARI})
+    {icon = 'paw_g', group = ns.groups.NAZJA_SAFARI})
 local Mecha_Safari = Class('Mecha_Safari', Collectible,
-    {icon = 'paw_g', group = BattleForAzeroth.groups.MECHA_SAFARI})
+    {icon = 'paw_g', group = ns.groups.MECHA_SAFARI})
 
-BattleForAzeroth.node.Safari = {
+ns.node.Safari = {
     BarrierHermit = Class('BarrierHermit', Battle_Safari, {
         id = 143044,
         rewards = {

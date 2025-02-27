@@ -1,51 +1,51 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, MistsOfPandaria = ...
-local Class = MistsOfPandaria.Class
-local Group = MistsOfPandaria.Group
-local L = MistsOfPandaria.locale
+local _, ns = ...
+local Class = ns.Class
+local Group = ns.Group
+local L = ns.locale
 
-local Collectible = MistsOfPandaria.node.Collectible
+local Collectible = ns.node.Collectible
 
-local Achievement = MistsOfPandaria.reward.Achievement
-local Mount = MistsOfPandaria.reward.Mount
-local Transmog = MistsOfPandaria.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Mount = ns.reward.Mount
+local Transmog = ns.reward.Transmog
 
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.expansion = 5
+ns.expansion = 5
 
 -------------------------------------------------------------------------------
 ----------------------------------- GROUPS ------------------------------------
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.groups.KROSHIK = Group('kroshik', 458255, {defaults = MistsOfPandaria.GROUP_HIDDEN})
-MistsOfPandaria.groups.LOREWALKER = Group('lorewalker', 645218, {defaults = MistsOfPandaria.GROUP_HIDDEN})
--- MistsOfPandaria.groups.SAFARI = Group('safari', 4048818, {defaults = MistsOfPandaria.GROUP_HIDDEN})
-MistsOfPandaria.groups.SQUIRRELS = Group('squirrels', 237182, {defaults = MistsOfPandaria.GROUP_HIDDEN})
+ns.groups.KROSHIK = Group('kroshik', 458255, {defaults = ns.GROUP_HIDDEN})
+ns.groups.LOREWALKER = Group('lorewalker', 645218, {defaults = ns.GROUP_HIDDEN})
+-- ns.groups.SAFARI = Group('safari', 4048818, {defaults = ns.GROUP_HIDDEN})
+ns.groups.SQUIRRELS = Group('squirrels', 237182, {defaults = ns.GROUP_HIDDEN})
 
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.node.Squirrel = Class('Squirrel', Collectible, {
-    group = MistsOfPandaria.groups.SQUIRRELS,
+ns.node.Squirrel = Class('Squirrel', Collectible, {
+    group = ns.groups.SQUIRRELS,
     icon = 237182,
     note = L['squirrels_note']
 })
 
 -------------------------------------------------------------------------------
 
-MistsOfPandaria.node.Lorewalker = Class('Lorewalker', Collectible,
-    {icon = 645218, group = MistsOfPandaria.groups.LOREWALKER})
+ns.node.Lorewalker = Class('Lorewalker', Collectible,
+    {icon = 645218, group = ns.groups.LOREWALKER})
 
 -------------------------------------------------------------------------------
 ------------------------------------ SAFARI -----------------------------------
 -------------------------------------------------------------------------------
 
 -- local Safari = Class('Safari', Collectible,
---     {icon = 'paw_g', group = MistsOfPandaria.groups.SAFARI})
+--     {icon = 'paw_g', group = ns.groups.SAFARI})
 
--- MistsOfPandaria.node.Safari = {
+-- ns.node.Safari = {
 --     AlpineFoxling = Class('AlpineFoxling', Safari, {
 --         id = 63550,
 --         rewards = {
@@ -442,12 +442,12 @@ local WORLD_BOSS_REWARDS = {
     [691] = { -- Sha of Anger
         Achievement({id = 6480}), -- Settle Down, Bro
         Achievement({id = 6926, criteria = 19136}), -- Tranquil Master
-        MistsOfPandaria.reward.Spacer(), --
+        ns.reward.Spacer(), --
         Mount({item = 87771, id = 473}) -- Heavenly Onyx Cloud Serpent
     },
     [725] = { -- Galleon
         Mount({item = 89783, id = 515}), -- Son of Galleon
-        MistsOfPandaria.reward.Spacer(), --
+        ns.reward.Spacer(), --
         Transmog({item = 90419, slot = L['leather']}), -- Fireproofed Chestguard
         Transmog({item = 90451, slot = L['leather']}), -- Cannoneer's Gunpowder Carrier
         Transmog({item = 90442, slot = L['leather']}), -- Flamefoot Tabi
@@ -487,7 +487,7 @@ local WORLD_BOSS_REWARDS = {
     },
     [814] = { -- Nalak <The Storm Lord>
         Achievement({id = 8028}), -- Praise the Sun!
-        MistsOfPandaria.reward.Spacer(), --
+        ns.reward.Spacer(), --
         Mount({item = 95057, id = 542}) -- Thundering Cobalt Cloud Serpent
     },
     [826] = {}, -- Oondasta

@@ -6,6 +6,7 @@ function Syndicator.Search.GetBaseInfo(cacheData)
   info.quality = cacheData.quality
   info.itemCount = cacheData.itemCount or 1
   info.isBound = cacheData.isBound or false
+  info.hasLoot = cacheData.hasLoot or false
 
   if C_TooltipInfo then
     info.tooltipGetter = function() return C_TooltipInfo.GetHyperlink(cacheData.itemLink) end
@@ -15,3 +16,16 @@ function Syndicator.Search.GetBaseInfo(cacheData)
 
   return info
 end
+
+--[[
+You can potentially add the following keys after calling this function to alter
+search results (any may be left as nil to be ignored):
+- setInfo: array, with entries {name: string} for equipment sets the item is in, leave nil if the array would be empty
+- isUpgrade: boolean -- Is the item (usually gear) an upgrade compared to current equipped
+- isEngravable: boolean -- Does the item support runes (classic Season of Discovery)
+- engravingInfo: table -- Any details about the SoD runes currently applied on the item, leave nil if no runes applied
+- isJunk: boolean -- Is this item junk to just be sold to a vendor (used for junk status overrides)
+- tooltipGetter: function() return {lines: {{leftText: string, rightText:string?, leftColor: ColorMixin, rightColor: ColorMixin?}}} end
+    - Used to get live tooltip information, a hyperlink based tooltipGetter is supplied by default.
+- itemLocation: {bagID, slotIndex} OR {equipmentSlotIndex} (ie an ItemLocation), used for data only available live
+]]

@@ -1,23 +1,23 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Legion = ...
-local Class = Legion.Class
-local L = Legion.locale
-local Map = Legion.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = Legion.node.Collectible
-local PetBattle = Legion.node.PetBattle
-local Rare = Legion.node.Rare
-local Treasure = Legion.node.Treasure
+local Collectible = ns.node.Collectible
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local Achievement = Legion.reward.Achievement
-local Item = Legion.reward.Item
-local Toy = Legion.reward.Toy
-local Transmog = Legion.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local POI = Legion.poi.POI
-local Path = Legion.poi.Path
+local POI = ns.poi.POI
+local Path = ns.poi.Path
 
 -------------------------------------------------------------------------------
 
@@ -546,7 +546,7 @@ map.nodes[46404040] = PetBattle({
     note = L['general_pet_tamer_note'] .. '\n\n' ..
         L['nightwatcher_merayl_note'],
     rewards = {
-        Achievement({id = 10876, criteria = 31521}), Legion.reward.Spacer(),
+        Achievement({id = 10876, criteria = 31521}), ns.reward.Spacer(),
         Achievement({id = 9686, criteria = 1, oneline = true}), -- Aquatic
         Achievement({id = 9687, criteria = 1, oneline = true}), -- Beast
         Achievement({id = 9688, criteria = 1, oneline = true}), -- Critter
@@ -579,7 +579,7 @@ map.nodes[53141620] = PetBattle({
 map.nodes[46904143] = Collectible({
     id = 107376,
     icon = 134915,
-    group = Legion.groups.HIGHER_DIMENSIONAL_LEARNING,
+    group = ns.groups.HIGHER_DIMENSIONAL_LEARNING,
     note = L['higher_dimensional_learning_note'] .. '\n\n' ..
         L['higher_dimensional_learning_disclaimer'],
     rewards = {
@@ -590,8 +590,8 @@ map.nodes[46904143] = Collectible({
 
 local Book = Class('Book', Collectible, {
     icon = 134915,
-    requires = Legion.requirement.Reputation(1900, 7), -- Court of Farondis (Revered)
-    group = Legion.groups.HIGHER_DIMENSIONAL_LEARNING,
+    requires = ns.requirement.Reputation(1900, 7), -- Court of Farondis (Revered)
+    group = ns.groups.HIGHER_DIMENSIONAL_LEARNING,
     getters = {
         rewards = function(self)
             return {
@@ -658,7 +658,7 @@ map.nodes[55604820] = Book({
 ----------------------------- BROKEN ISLES SAFARI -----------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[43001900] = Legion.node.Safari.AlbatrossChick({
+map.nodes[43001900] = ns.node.Safari.AlbatrossChick({
     pois = {
         POI({
             38202420, 39202900, 41401900, 41402280, 41402540, 41602080,
@@ -668,7 +668,7 @@ map.nodes[43001900] = Legion.node.Safari.AlbatrossChick({
     }
 })
 
-map.nodes[60203860] = Legion.node.Safari.CoastalSandpiper({
+map.nodes[60203860] = ns.node.Safari.CoastalSandpiper({
     pois = {
         POI({
             50004140, 50004160, 51203460, 53004260, 53803220, 54003340,
@@ -679,7 +679,7 @@ map.nodes[60203860] = Legion.node.Safari.CoastalSandpiper({
     }
 })
 
-map.nodes[56201760] = Legion.node.Safari.EldritchManafiend({
+map.nodes[56201760] = ns.node.Safari.EldritchManafiend({
     pois = {
         POI({
             54401780, 54601780, 55001860, 56001240, 56001260, 56001380,
@@ -689,7 +689,7 @@ map.nodes[56201760] = Legion.node.Safari.EldritchManafiend({
     }
 })
 
-map.nodes[36805580] = Legion.node.Safari.Felspider({
+map.nodes[36805580] = ns.node.Safari.Felspider({
     pois = {
         POI({
             25605140, 26204600, 26204720, 26204920, 27004740, 29605240,
@@ -702,7 +702,7 @@ map.nodes[36805580] = Legion.node.Safari.Felspider({
     }
 })
 
-map.nodes[42802100] = Legion.node.Safari.FledglingKingfeather({
+map.nodes[42802100] = ns.node.Safari.FledglingKingfeather({
     pois = {
         POI({
             38202420, 39202900, 41401900, 41402280, 41602080, 41602520,
@@ -712,7 +712,7 @@ map.nodes[42802100] = Legion.node.Safari.FledglingKingfeather({
     }
 })
 
-map.nodes[43001900] = Legion.node.Safari.FledglingOliveback({
+map.nodes[43001900] = ns.node.Safari.FledglingOliveback({
     pois = {
         POI({
             38202420, 39202900, 41401900, 41402280, 41402540, 41602080,
@@ -722,7 +722,7 @@ map.nodes[43001900] = Legion.node.Safari.FledglingOliveback({
     }
 })
 
-map.nodes[59605960] = Legion.node.Safari.JuvenileScuttleback({
+map.nodes[59605960] = ns.node.Safari.JuvenileScuttleback({
     pois = {
         POI({
             31203040, 31203060, 31803440, 32802800, 37001500, 44405000,
@@ -733,7 +733,7 @@ map.nodes[59605960] = Legion.node.Safari.JuvenileScuttleback({
     }
 })
 
-map.nodes[46002980] = Legion.node.Safari.OlivetailHare({
+map.nodes[46002980] = ns.node.Safari.OlivetailHare({
     pois = {
         POI({
             37403000, 39202520, 40602340, 40602440, 40602460, 42002220,
@@ -743,6 +743,6 @@ map.nodes[46002980] = Legion.node.Safari.OlivetailHare({
     }
 })
 
-map.nodes[64404720] = Legion.node.Safari.SlitheringBrownscale({
+map.nodes[64404720] = ns.node.Safari.SlitheringBrownscale({
     pois = {POI({48807360, 57406480, 64404720, 65604720})}
 })

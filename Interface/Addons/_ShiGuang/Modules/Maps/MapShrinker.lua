@@ -5,6 +5,7 @@ local module = M:GetModule("Maps")
 
 -- Retrive addon folder name, and our local, private namespace.
 local MapShrinker = {}
+-- Lua API
 local ipairs = ipairs
 local pairs = pairs
 local select = select
@@ -20,6 +21,7 @@ local GetMapInfo = C_Map and C_Map.GetMapInfo
 local GetPlayerMapPosition = C_Map and C_Map.GetPlayerMapPosition
 local hooksecurefunc = hooksecurefunc
 local InCombatLockdown = InCombatLockdown
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 local UIParent = UIParent
 
 
@@ -135,7 +137,7 @@ end
 local WorldMapFrame_UpdateMaximizedSize = function()
 	local WorldMapFrame = WorldMapFrame
 	local width, height = WorldMapFrame:GetSize()
-	local scale = CalculateScale() +0.1
+	local scale = CalculateScale() + 0.1
 	local magicNumber = (1 - scale) * 100
 	WorldMapFrame:SetSize((width * scale) - (magicNumber + 2), (height * scale) - 2)
 
@@ -247,7 +249,7 @@ end
 
 MapShrinker.OnEnable = function(self)
 	if not R.db["Map"]["MapShrinker"] then return end
-	if (C_AddOns.IsAddOnLoaded("Blizzard_WorldMap")) then
+	if (IsAddOnLoaded("Blizzard_WorldMap")) then
 		self:SetUpMap()
 	else
 		self:RegisterEvent("ADDON_LOADED")

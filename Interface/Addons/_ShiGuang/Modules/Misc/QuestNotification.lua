@@ -35,8 +35,8 @@ local function acceptText(questID, daily)
 end
 
 local function completeText(questID)
-	PlaySound(soundKitID, "Master")
-	return format("%s-%s", GetQuestLinkOrName(questID), QUEST_COMPLETE)
+	PlaySound(soundKitID, "Master")  --PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\QuestNotifier.ogg", "Master")
+	return format("%s-%s", GetQuestLinkOrName(questID), QUEST_COMPLETE)  --"✓"
 end
 
 local function sendQuestMsg(msg)

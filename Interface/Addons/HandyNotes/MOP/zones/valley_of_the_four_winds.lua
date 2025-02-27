@@ -1,23 +1,23 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, MistsOfPandaria = ...
-local Map = MistsOfPandaria.Map
-local L = MistsOfPandaria.locale
-local Class = MistsOfPandaria.Class
+local _, ns = ...
+local Map = ns.Map
+local L = ns.locale
+local Class = ns.Class
 
-local Rare = MistsOfPandaria.node.Rare
-local Collectible = MistsOfPandaria.node.Collectible
-local Treasure = MistsOfPandaria.node.Treasure
-local Squirrel = MistsOfPandaria.node.Squirrel
+local Rare = ns.node.Rare
+local Collectible = ns.node.Collectible
+local Treasure = ns.node.Treasure
+local Squirrel = ns.node.Squirrel
 
-local Achievement = MistsOfPandaria.reward.Achievement
-local Toy = MistsOfPandaria.reward.Toy
-local Item = MistsOfPandaria.reward.Item
-local Transmog = MistsOfPandaria.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Toy = ns.reward.Toy
+local Item = ns.reward.Item
+local Transmog = ns.reward.Transmog
 
-local POI = MistsOfPandaria.poi.POI
-local Path = MistsOfPandaria.poi.Path
+local POI = ns.poi.POI
+local Path = ns.poi.Path
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
 -------------------------------------------------------------------------------
@@ -254,7 +254,7 @@ map.nodes[52076376] = Treasure({
 -------------------------------------------------------------------------------
 
 local Lorewalker = Class('Lorewalker', Collectible,
-    {icon = 645218, group = MistsOfPandaria.groups.LOREWALKER})
+    {icon = 645218, group = ns.groups.LOREWALKER})
 
 map.nodes[55064713] = Lorewalker({
     rewards = {Achievement({id = 6856, criteria = 19794})}

@@ -1,35 +1,35 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Dragonflight = ...
-local Class = Dragonflight.Class
-local L = Dragonflight.locale
-local Map = Dragonflight.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Node = Dragonflight.node.Node
+local Node = ns.node.Node
 
-local Achievement = Dragonflight.reward.Achievement
-local Item = Dragonflight.reward.Item
-local Toy = Dragonflight.reward.Toy
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Toy = ns.reward.Toy
 
 -------------------------------------------------------------------------------
 
-local ohn = Dragonflight.maps[2023] or Map({id = 2023, settings = true}) -- Ohn'ahran Plains
-local tas = Dragonflight.maps[2024] or Map({id = 2024, settings = true}) -- The Azure Span
-local tha = Dragonflight.maps[2025] or Map({id = 2025, settings = true}) -- Thaldraszus
-local tws = Dragonflight.maps[2022] or Map({id = 2022, settings = true}) -- The Waking Shores
-local val = Dragonflight.maps[2112] or Map({id = 2112, settings = true}) -- Valdrakken
+local ohn = ns.maps[2023] or Map({id = 2023, settings = true}) -- Ohn'ahran Plains
+local tas = ns.maps[2024] or Map({id = 2024, settings = true}) -- The Azure Span
+local tha = ns.maps[2025] or Map({id = 2025, settings = true}) -- Thaldraszus
+local tws = ns.maps[2022] or Map({id = 2022, settings = true}) -- The Waking Shores
+local val = ns.maps[2112] or Map({id = 2112, settings = true}) -- Valdrakken
 
-local sto = Dragonflight.maps[84] or Map({id = 84, settings = true}) -- Stormwind
-local org = Dragonflight.maps[85] or Map({id = 85, settings = true}) -- Orgimmar
-local dur = Dragonflight.maps[1] or Map({id = 1, settings = true}) -- Durotar
+local sto = ns.maps[84] or Map({id = 84, settings = true}) -- Stormwind
+local org = ns.maps[85] or Map({id = 85, settings = true}) -- Orgimmar
+local dur = ns.maps[1] or Map({id = 1, settings = true}) -- Durotar
 
 -------------------------------------------------------------------------------
 
 local Coin = Class('Coin', Node, {
     label = L['rumble_coin_bag'],
     icon = 5149946,
-    group = Dragonflight.groups.WARCRAFT_RUMBLE,
+    group = ns.groups.WARCRAFT_RUMBLE,
     rewards = {
         Item({item = 202162}) -- Rumble Coin
     }
@@ -38,7 +38,7 @@ local Coin = Class('Coin', Node, {
 local Foil = Class('Foil', Node, {
     label = L['rumble_foil_bag'],
     icon = 5149946,
-    group = Dragonflight.groups.WARCRAFT_RUMBLE,
+    group = ns.groups.WARCRAFT_RUMBLE,
     rewards = {
         Item({item = 202395}) -- Rumble Foil
     }
@@ -47,17 +47,17 @@ local Foil = Class('Foil', Node, {
 local Both = Class('Both', Node, {
     label = L['rumble_both_bags'],
     icon = 5149946,
-    group = Dragonflight.groups.WARCRAFT_RUMBLE,
+    group = ns.groups.WARCRAFT_RUMBLE,
     rewards = {
         Item({item = 202162}), -- Rumble Coin
         Item({item = 202395}) -- Rumble Foil
     }
 })
 
-local Machine = Class('Machine', Dragonflight.node.Collectible, {
+local Machine = Class('Machine', ns.node.Collectible, {
     label = L['warcraft_rumble_machine'],
     icon = 5149946,
-    group = Dragonflight.groups.WARCRAFT_RUMBLE,
+    group = ns.groups.WARCRAFT_RUMBLE,
     rewards = {
         Achievement({
             id = 17361,

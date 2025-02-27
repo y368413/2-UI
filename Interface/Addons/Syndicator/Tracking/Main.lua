@@ -20,7 +20,7 @@ local function InitializeSavedVariables()
   end
   if SYNDICATOR_DATA == nil then
     SYNDICATOR_DATA = {
-      Version = 1,
+      Version = 2,
       Characters = {},
       Guilds = {},
     }
@@ -30,6 +30,31 @@ local function InitializeSavedVariables()
     SYNDICATOR_DATA.Warband = { { bank = SYNDICATOR_DATA.Warband.bank } }
   end
   SYNDICATOR_DATA.Warband[1].money = SYNDICATOR_DATA.Warband[1].money or 0
+  SYNDICATOR_DATA.Warband[1].details = SYNDICATOR_DATA.Warband[1].details or {gold = true, inventory = true}
+
+  if SYNDICATOR_DATA.Version == 1 then
+    for _, characterData in pairs(SYNDICATOR_DATA.Characters) do
+      if characterData.details.show == nil then
+        characterData.details.show = {
+          inventory = not characterData.details.hidden,
+          gold = true,
+        }
+        characterData.details.hidden = nil
+      end
+    end
+
+    for _, guildData in pairs(SYNDICATOR_DATA.Guilds) do
+      if guildData.details.show == nil then
+        guildData.details.show = {
+          inventory = not guildData.details.hidden,
+          gold = false,
+        }
+        guildData.details.hidden = nil
+      end
+    end
+
+    SYNDICATOR_DATA.Version = 2
+  end
 end
 
 local currentCharacter
@@ -45,7 +70,10 @@ local function InitCurrentCharacter()
         realmNormalized = GetNormalizedRealmName(),
         realm = GetRealmName(),
         character = UnitName("player"),
-        hidden = false,
+        show = {
+          inventory = true,
+          gold = true,
+        },
       }
     }
   end
@@ -109,9 +137,15 @@ local function SetupTooltips()
       if ValidateTooltip(tooltip) and Syndicator.ItemSummaries then
         local itemName, itemLink = TooltipUtil.GetDisplayedItem(tooltip)
 
+        local info = tooltip.processingInfo
+        -- not info checked because some weird tooltips are missing it (probably
+        -- from addon old-style tooltip scans)
+        if not info or info.excludeLines then
+          return
+        end
+
         -- Fix to get recipes to show the inventory data for the recipe when
         -- tooltip shown via a hyperlink
-        local info = tooltip.processingInfo
         if info and info.getterName == "GetHyperlink" then
           local _, newItemLink = C_Item.GetItemInfo(info.getterArgs[1])
           if newItemLink ~= nil then

@@ -951,6 +951,39 @@ items = {
         PRIEST = {51264, 51255, 51256, 51257, 51258, 51259, 51260, 51261, 51262, 51263},
         WARLOCK = {51232, 51233, 51234, 51230, 51231},
     },
+    -- 4.0 Bastion of Twilight
+    [63682] = { -- Helm of the Forlorn Vanquisher
+        DEATHKNIGHT = {60351, 60341},
+        DRUID = {60282, 60286, 60277},
+        MAGE = {60243},
+        ROGUE = {60299},
+    },
+    [63683] = { -- Helm of the Forlorn Conqueror
+        PALADIN = {60356, 60359, 60346},
+        PRIEST = {60258, 60256},
+        WARLOCK = {60249},
+    },
+    [63684] = { -- Helm of the Forlorn Protector
+        HUNTER = {60303},
+        SHAMAN = {60308, 60315, 60320},
+        WARRIOR = {60328, 60325},
+    },
+    [64314] = { -- Mantle of the Forlorn Vanquisher
+        DEATHKNIGHT = {60343, 60353},
+        DRUID = {60279, 60284, 60289},
+        MAGE = {60246},
+        ROGUE = {60302},
+    },
+    [64315] = { -- Mantle of the Forlorn Conqueror
+        PALADIN = {60362, 60348, 60358},
+        PRIEST = {60262, 60253},
+        WARLOCK = {60252},
+    },
+    [64316] = { -- Mantle of the Forlorn Protector
+        HUNTER = {60306},
+        SHAMAN = {60311, 60317, 60322},
+        WARRIOR = {60327, 60331},
+    },
     [65000] = { -- Crown of the Forlorn Protector
         HUNTER = {65206},
         SHAMAN = {65256, 65251, 65246},
@@ -1031,86 +1064,120 @@ items = {
         MAGE = {65209},
         ROGUE = {65240},
     },
-    [71669] = { -- Gauntlets of the Fiery Vanquisher
+    -- 4.2.0 Firelands
+    [71668] = { -- Helm of the Fiery Vanquisher
+        DEATHKNIGHT = {70954, 71060},
+        DRUID = {71108, 71098, 71103},
+        MAGE = {71287},
+        ROGUE = {71047},
+    },
+    [71669] = { -- Gauntlets of the Fiery Vanquisher (heroic)
         DEATHKNIGHT = {71482, 71477},
         DRUID = {71496, 71491, 71487},
         MAGE = {71507},
         ROGUE = {71538},
     },
-    [71670] = { -- Crown of the Fiery Vanquisher
+    [71670] = { -- Crown of the Fiery Vanquisher (heroic)
         DEATHKNIGHT = {71483, 71478},
         DRUID = {71488, 71497, 71492},
         MAGE = {71508},
         ROGUE = {71539},
     },
-    [71671] = { -- Leggings of the Fiery Vanquisher
+    [71671] = { -- Leggings of the Fiery Vanquisher (heroic)
         DEATHKNIGHT = {71484, 71479},
         DRUID = {71489, 71498, 71493},
         MAGE = {71509},
         ROGUE = {71540},
     },
-    [71672] = { -- Chest of the Fiery Vanquisher
+    [71672] = { -- Chest of the Fiery Vanquisher (heroic)
         DEATHKNIGHT = {71481, 71476},
         DRUID = {71486, 71499, 71494},
         MAGE = {71510},
         ROGUE = {71537},
     },
-    [71673] = { -- Shoulders of the Fiery Vanquisher
+    [71673] = { -- Shoulders of the Fiery Vanquisher (heroic)
         DEATHKNIGHT = {71480, 71485},
         DRUID = {71490, 71500, 71495},
         MAGE = {71511},
         ROGUE = {71541},
     },
-    [71676] = { -- Gauntlets of the Fiery Conqueror
+    [71674] = { -- Mantle of the Fiery Vanquisher
+        DEATHKNIGHT = {71062, 70951},
+        DRUID = {71106, 71111, 71101},
+        MAGE = {71290},
+        ROGUE = {71049},
+    },
+    [71675] = { -- Helm of the Fiery Conqueror
+        PALADIN = {70948, 71093, 71065},
+        PRIEST = {71272, 71277},
+        WARLOCK = {71282},
+    },
+    [71676] = { -- Gauntlets of the Fiery Conqueror (heroic)
         PALADIN = {71513, 71523, 71518},
         PRIEST = {71532, 71527},
         WARLOCK = {71594},
     },
-    [71677] = { -- Crown of the Fiery Conqueror
+    [71677] = { -- Crown of the Fiery Conqueror (heroic)
         PALADIN = {71514, 71524, 71519},
         PRIEST = {71528, 71533},
         WARLOCK = {71595},
     },
-    [71678] = { -- Leggings of the Fiery Conqueror
+    [71678] = { -- Leggings of the Fiery Conqueror (heroic)
         PALADIN = {71520, 71515, 71525},
         PRIEST = {71529, 71534},
         WARLOCK = {71596},
     },
-    [71679] = { -- Chest of the Fiery Conqueror
+    [71679] = { -- Chest of the Fiery Conqueror (heroic)
         PALADIN = {71512, 71522, 71517},
         PRIEST = {71530, 71535},
         WARLOCK = {71597},
     },
-    [71680] = { -- Shoulders of the Fiery Conqueror
+    [71680] = { -- Shoulders of the Fiery Conqueror (heroic)
         PALADIN = {71521, 71516, 71526},
         PRIEST = {71536, 71531},
         WARLOCK = {71598},
     },
-    [71683] = { -- Gauntlets of the Fiery Protector
+    [71681] = { -- Mantle of the Fiery Conqueror
+        PALADIN = {71095, 71067, 70946},
+        PRIEST = {71275, 71280},
+        WARLOCK = {71285},
+    },
+    [71682] = { -- Helm of the Fiery Protector
+        HUNTER = {71051},
+        SHAMAN = {71298, 71293, 71303},
+        WARRIOR = {71070, 70944},
+    },
+    [71683] = { -- Gauntlets of the Fiery Protector (heroic)
         HUNTER = {71502},
         SHAMAN = {71553, 71548, 71543},
         WARRIOR = {71601, 71605},
     },
-    [71684] = { -- Crown of the Fiery Protector
+    [71684] = { -- Crown of the Fiery Protector (heroic)
         HUNTER = {71503},
         SHAMAN = {71544, 71554, 71549},
         WARRIOR = {71606, 71599},
     },
-    [71685] = { -- Leggings of the Fiery Protector
+    [71685] = { -- Leggings of the Fiery Protector (heroic)
         HUNTER = {71504},
         SHAMAN = {71545, 71555, 71550},
         WARRIOR = {71602, 71607},
     },
-    [71686] = { -- Chest of the Fiery Protector
+    [71686] = { -- Chest of the Fiery Protector (heroic)
         HUNTER = {71501},
         SHAMAN = {71552, 71547, 71542},
         WARRIOR = {71600, 71604},
     },
-    [71687] = { -- Shoulders of the Fiery Protector
+    [71687] = { -- Shoulders of the Fiery Protector (heroic)
         HUNTER = {71505},
         SHAMAN = {71546, 71556, 71551},
         WARRIOR = {71608, 71603},
     },
+    [71688] = { -- Mantle of the Fiery Protector
+        HUNTER = {71053},
+        SHAMAN = {71300, 71295, 71305},
+        WARRIOR = {71072, 70941},
+    },
+    -- 4.3 Dragon Soul
     [78170] = { -- Shoulders of the Corrupted Vanquisher
         DEATHKNIGHT = {76978, 77012},
         DRUID = {76753, 77017, 77022},

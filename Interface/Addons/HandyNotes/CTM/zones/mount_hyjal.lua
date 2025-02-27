@@ -1,22 +1,22 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Cataclysm = ...
-local Class = Cataclysm.Class
-local Group = Cataclysm.Group
-local L = Cataclysm.locale
-local Map = Cataclysm.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local Group = ns.Group
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = Cataclysm.node.Collectible
-local NPC = Cataclysm.node.NPC
-local Rare = Cataclysm.node.Rare
-local Safari = Cataclysm.node.Safari
+local Collectible = ns.node.Collectible
+local NPC = ns.node.NPC
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
 
-local Achievement = Cataclysm.reward.Achievement
-local Transmog = Cataclysm.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Transmog = ns.reward.Transmog
 
-local POI = Cataclysm.poi.POI
-local Path = Cataclysm.poi.Path
+local POI = ns.poi.POI
+local Path = ns.poi.Path
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -29,99 +29,99 @@ local mf = Map({id = 338, settings = true}) -- Molten Front
 ----------------------------------- GROUPS ------------------------------------
 -------------------------------------------------------------------------------
 
-Cataclysm.groups.UNBEATABLE_PTERODACTYL = Group('unbeatable_pterodactyl', 132200, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.UNBEATABLE_PTERODACTYL = Group('unbeatable_pterodactyl', 132200, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5860,
     label = '{achievement:5860}'
 })
 
-Cataclysm.groups.LUDICROUS_SPEED = Group('ludicrous_speed', 132172, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.LUDICROUS_SPEED = Group('ludicrous_speed', 132172, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5862,
     label = '{achievement:5862}'
 })
 
-Cataclysm.groups.HAVE_WE_MET = Group('have_we_met', 135646, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.HAVE_WE_MET = Group('have_we_met', 135646, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5865,
     label = '{achievement:5865}'
 })
 
-Cataclysm.groups.SPIDER_HILL = Group('spider_hill', 132196, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.SPIDER_HILL = Group('spider_hill', 132196, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5872,
     label = '{achievement:5872}'
 })
 
-Cataclysm.groups.R4R_2 = Group('r4r_2', 135789, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.R4R_2 = Group('r4r_2', 135789, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5873,
     label = '{achievement:5873}'
 })
 
-Cataclysm.groups.FLAWLESS_VICTORY = Group('flawless_victory', 459027, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.FLAWLESS_VICTORY = Group('flawless_victory', 459027, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5867,
     label = '{achievement:5867}'
 })
 
-Cataclysm.groups.GANG_WAR = Group('gang_war', 135415, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.GANG_WAR = Group('gang_war', 135415, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5864,
     label = '{achievement:5864}'
 })
 
-Cataclysm.groups.MOLTEN_FLOW_MASTER = Group('molten_flow_master', 135822, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.MOLTEN_FLOW_MASTER = Group('molten_flow_master', 135822, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5871,
     label = '{achievement:5871}'
 })
 
-Cataclysm.groups.CRITTER_REVENGE = Group('critter_revenge', 132200, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.CRITTER_REVENGE = Group('critter_revenge', 132200, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5868,
     label = '{achievement:5868}'
 })
 
-Cataclysm.groups.FIERY_LORDS = Group('fiery_lords', 135790, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.FIERY_LORDS = Group('fiery_lords', 135790, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5861,
     label = '{achievement:5861}'
 })
 
-Cataclysm.groups.INFERNAL_AMBASSADORS = Group('infernal_ambassadors', 236191, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.INFERNAL_AMBASSADORS = Group('infernal_ambassadors', 236191, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5869,
     label = '{achievement:5869}'
 })
 
-Cataclysm.groups.FIRESIDE_CHAT = Group('fireside_chat', 236450, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.FIRESIDE_CHAT = Group('fireside_chat', 236450, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5870,
     label = '{achievement:5870}'
 })
 
-Cataclysm.groups.GANG_WAR = Group('gang_war', 135415, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.GANG_WAR = Group('gang_war', 135415, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5864,
     label = '{achievement:5864}'
 })
-Cataclysm.groups.DEATH_FROM_ABOVE = Group('death_from_above', 512904, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.DEATH_FROM_ABOVE = Group('death_from_above', 512904, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5874,
     label = '{achievement:5874}'
 })
@@ -130,7 +130,7 @@ Cataclysm.groups.DEATH_FROM_ABOVE = Group('death_from_above', 512904, {
 --------------------------------- PHASE NODES ---------------------------------
 -------------------------------------------------------------------------------
 
-local HyjalPhase = Class('HyjalPhase', Cataclysm.requirement.Requirement)
+local HyjalPhase = Class('HyjalPhase', ns.requirement.Requirement)
 
 function HyjalPhase:Initialize(phase) self.phase = phase end
 
@@ -159,7 +159,7 @@ function HyjalPhase:IsMet()
     return false
 end
 
-map.nodes[19563787] = Cataclysm.node.Intro({
+map.nodes[19563787] = ns.node.Intro({
     note = L['hyjal_phase1_note'],
     quest = 29389,
     requires = HyjalPhase(0)
@@ -190,7 +190,7 @@ mf.nodes[47039139] = NPC({
     rewards = {Achievement({id = 5870, criteria = 17878})}
 }) -- starts Phase 4a/b - The Druids of the Talon Area / The Shadow Wardens Area
 
-mf.nodes[10001400] = Cataclysm.node.Node({
+mf.nodes[10001400] = ns.node.Node({
     label = L['hyjal_phase5'],
     note = L['hyjal_phase5_note'],
     icon = 513195,
@@ -249,7 +249,7 @@ map.nodes[47795645] = Rare({
 -------------------------------------------------------------------------------
 
 local FiresideChat = Class('FiresideChat', Collectible,
-    {icon = 236450, group = Cataclysm.groups.FIRESIDE_CHAT})
+    {icon = 236450, group = ns.groups.FIRESIDE_CHAT})
 
 map.nodes[27176257] = FiresideChat({
     id = 52669,
@@ -305,14 +305,14 @@ mf.nodes[45598583] = FiresideChat({
 
 local Ambassador = Class('Ambassador', Collectible, {
     icon = 236191,
-    group = Cataclysm.groups.INFERNAL_AMBASSADORS
+    group = ns.groups.INFERNAL_AMBASSADORS
 })
 
 map.nodes[13294490] = Ambassador({
     id = 52749,
     quest = 29162,
     requires = {
-        HyjalPhase(2), Cataclysm.requirement.Quest(29161, nil, true) -- Those Bears Up There
+        HyjalPhase(2), ns.requirement.Quest(29161, nil, true) -- Those Bears Up There
     },
     rewards = {Achievement({id = 5869, criteria = 17829})}
 }) -- Pyrachnis
@@ -321,7 +321,7 @@ map.nodes[13184472] = Ambassador({
     id = 52649,
     quest = 29148,
     requires = {
-        HyjalPhase(2), Cataclysm.requirement.Quest(29147, nil, true) -- Call the Flock
+        HyjalPhase(2), ns.requirement.Quest(29147, nil, true) -- Call the Flock
     },
     rewards = {Achievement({id = 5869, criteria = 17831})}
 }) -- Millagazor
@@ -330,7 +330,7 @@ map.nodes[41945604] = Ambassador({
     id = 52766,
     quest = 29165,
     requires = {
-        HyjalPhase(2), Cataclysm.requirement.Quest(29164, nil, true) -- Perfecting Your Howl
+        HyjalPhase(2), ns.requirement.Quest(29164, nil, true) -- Perfecting Your Howl
     },
     rewards = {Achievement({id = 5869, criteria = 17832})}
 }) -- Lylagar
@@ -339,7 +339,7 @@ map.nodes[41795575] = Ambassador({
     id = 52399,
     quest = 19126,
     requires = {
-        HyjalPhase(2), Cataclysm.requirement.Quest(29125, nil, true) -- Between the Trees
+        HyjalPhase(2), ns.requirement.Quest(29125, nil, true) -- Between the Trees
     },
     rewards = {Achievement({id = 5869, criteria = 17833})}
 }) -- Galenges
@@ -348,7 +348,7 @@ map.nodes[24785525] = Ambassador({
     id = 52383,
     quest = 29122,
     requires = {
-        HyjalPhase(2), Cataclysm.requirement.Quest(29101, nil, true) -- Punting Season
+        HyjalPhase(2), ns.requirement.Quest(29101, nil, true) -- Punting Season
     },
     rewards = {Achievement({id = 5869, criteria = 17834})}
 }) -- Nemesis
@@ -360,7 +360,7 @@ map.nodes[24785525] = Ambassador({
 local FieryLord = Class('FieryLord', Collectible, {
     note = L['fiery_lords_note'],
     icon = 135790,
-    group = Cataclysm.groups.FIERY_LORDS,
+    group = ns.groups.FIERY_LORDS,
     requires = {HyjalPhase(3)}
 })
 
@@ -398,7 +398,7 @@ map.nodes[30858706] = FieryLord({
 
 local CritterRevenge = Class('CritterRevenge', Collectible, {
     icon = 132328,
-    group = Cataclysm.groups.CRITTER_REVENGE,
+    group = ns.groups.CRITTER_REVENGE,
     requires = {HyjalPhase(3)}
 })
 
@@ -473,9 +473,9 @@ mf.nodes[17501200] = dfa({
 
 local MoltenFlowMaster = Class('MoltenFlowMaster', NPC, {
     icon = 135822,
-    group = Cataclysm.groups.MOLTEN_FLOW_MASTER,
-    requires = {HyjalPhase(41), Cataclysm.requirement.Quest(29206)},
-    pois = {Path({Cataclysm.poi.Circle({origin = 48005000, radius = 10})})}
+    group = ns.groups.MOLTEN_FLOW_MASTER,
+    requires = {HyjalPhase(41), ns.requirement.Quest(29206)},
+    pois = {Path({ns.poi.Circle({origin = 48005000, radius = 10})})}
 })
 
 mf.nodes[46005000] = MoltenFlowMaster({
@@ -499,11 +499,11 @@ mf.nodes[50005000] = MoltenFlowMaster({
 ------------------------------------ MISC -------------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[27495634] = Cataclysm.node.Node({
+map.nodes[27495634] = ns.node.Node({
     label = L['portal_molten_front'],
     icon = 'portal_rd',
     scale = 2,
-    requires = {HyjalPhase(1), Cataclysm.requirement.Quest(29200)},
+    requires = {HyjalPhase(1), ns.requirement.Quest(29200)},
     rewards = {
         Achievement({id = 5867}),
         Achievement(
@@ -517,7 +517,7 @@ map.nodes[27495634] = Cataclysm.node.Node({
     clabel = L['change_map']
 }) -- Portal to the Molten Front
 
-mf.nodes[54308550] = Cataclysm.node.Node({
+mf.nodes[54308550] = ns.node.Node({
     label = L['portal_mount_hyjal'],
     scale = 2,
     icon = 'portal_rd',
@@ -529,10 +529,10 @@ map.nodes[37225618] = Collectible({
     id = 40578,
     quest = 29177,
     icon = 132200,
-    group = Cataclysm.groups.UNBEATABLE_PTERODACTYL,
+    group = ns.groups.UNBEATABLE_PTERODACTYL,
     requires = {
         HyjalPhase(1), -- review
-        Cataclysm.requirement.Quest(25560)
+        ns.requirement.Quest(25560)
     },
     rewards = {Achievement({id = 5860, criteria = {id = 17798, qty = true}})},
     pois = {POI({39185826, icon = 'portal_bl'})}
@@ -543,10 +543,10 @@ map.nodes[12003900] = Collectible({
     note = L['ludicrous_speed_note'],
     quest = 29177,
     icon = 132172,
-    group = Cataclysm.groups.LUDICROUS_SPEED,
+    group = ns.groups.LUDICROUS_SPEED,
     requires = {HyjalPhase(3)},
     rewards = {Achievement({id = 5862})},
-    pois = {Path({Cataclysm.poi.Circle({origin = 12003900, radius = 5})})}
+    pois = {Path({ns.poi.Circle({origin = 12003900, radius = 5})})}
 }) -- Ludicrous Speed
 
 map.nodes[27336160] = Collectible({
@@ -554,7 +554,7 @@ map.nodes[27336160] = Collectible({
     quest = 29128,
     icon = 135646,
     note = L['have_we_met_note'],
-    group = Cataclysm.groups.HAVE_WE_MET,
+    group = ns.groups.HAVE_WE_MET,
     requires = {HyjalPhase(3)},
     rewards = {
         Achievement({id = 5865, criteria = {17806, 17807, 17808, 17809, 17810}})
@@ -566,18 +566,18 @@ mf.nodes[66035682] = Collectible({
     label = '{achievement:5872}',
     note = L['spider_hill_note'],
     icon = 132196,
-    group = Cataclysm.groups.SPIDER_HILL,
+    group = ns.groups.SPIDER_HILL,
     requires = {HyjalPhase(3)},
     rewards = {Achievement({id = 5872})},
-    pois = {Path({Cataclysm.poi.Circle({origin = 66035600, radius = 2.25})})}
+    pois = {Path({ns.poi.Circle({origin = 66035600, radius = 2.25})})}
 }) -- King of the Spider-Hill
 
 mf.nodes[50381958] = Collectible({
     label = '{achievement:5873}',
     note = L['ready_for_raiding_2_note'],
     icon = 135789,
-    group = Cataclysm.groups.R4R_2,
-    requires = {HyjalPhase(5), Cataclysm.requirement.Quest(29244)},
+    group = ns.groups.R4R_2,
+    requires = {HyjalPhase(5), ns.requirement.Quest(29244)},
     rewards = {
         Achievement({id = 5873, criteria = {17840, 17841, 17842, 17843, 17844}})
     }
@@ -587,7 +587,7 @@ mf.nodes[44004900] = Collectible({
     id = 52552,
     icon = 459027,
     note = L['flawless_victory_note'],
-    group = Cataclysm.groups.FLAWLESS_VICTORY,
+    group = ns.groups.FLAWLESS_VICTORY,
     requires = {HyjalPhase(3)},
     rewards = {Achievement({id = 5867})}
 }) -- Flawless Victory
@@ -596,7 +596,7 @@ map.nodes[31007700] = Collectible({
     label = '{achievement:5864}',
     icon = 135415,
     note = L['gang_war_note'],
-    group = Cataclysm.groups.GANG_WAR,
+    group = ns.groups.GANG_WAR,
     requires = {HyjalPhase(3)},
     rewards = {Achievement({id = 5864})}
 }) -- Gang War
@@ -791,7 +791,7 @@ map.nodes[56808480] = Safari.TwilightBeetle({
 --------------------------------- DRAGONRACES ---------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[56712795] = Cataclysm.node.Dragonrace({
+map.nodes[56712795] = ns.node.Dragonrace({
     label = '{quest:75317}',
     normal = {2314, 50, 45},
     advanced = {2344, 46, 41},
@@ -809,7 +809,7 @@ map.nodes[56712795] = Cataclysm.node.Dragonrace({
     }
 }) -- Nordrassil Spiral
 
-map.nodes[21965429] = Cataclysm.node.Dragonrace({
+map.nodes[21965429] = ns.node.Dragonrace({
     label = '{quest:75330}',
     normal = {2315, 75, 70},
     advanced = {2345, 72, 69},

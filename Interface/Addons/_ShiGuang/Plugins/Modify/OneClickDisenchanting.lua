@@ -8,7 +8,7 @@ local TEMPLATES = {
 }
 
 local button = CreateFrame("Button", "OneClickMPD", UIParent, table.concat(TEMPLATES, ','))
-button:RegisterForClicks("AnyUp", "AnyDown")
+button:RegisterForClicks("AnyUp", "AnyDown")  --"RightButtonUp", "RightButtonDown"
 button:SetScript("OnEvent", function(self, event, ...) self[event](self, ...) end)
 button:RegisterEvent("PLAYER_LOGIN")
 
@@ -252,7 +252,7 @@ function button:PLAYER_LOGIN()
 		rogue = ITEM_MIN_SKILL:gsub("%%s", C_Spell.GetSpellName(1809)):gsub("%%d", "%(.*%)")
 	end
 
-	local function OnTooltipSetUnit(self)
+	local function OnTooltipSetUnit(self, data)
 		if self ~= GameTooltip or self:IsForbidden() then return end
 		local _, link = TooltipUtil.GetDisplayedItem(self)
 
@@ -286,6 +286,21 @@ function button:PLAYER_LOGIN()
 				end
 			end
 
+			--[[if data.guid then
+				local location = C_Item.GetItemLocation(data.guid)
+				if location and location:IsBagAndSlot() then
+					local bagID, slotID = location:GetBagAndSlot()
+					if spell and C_Container.GetContainerItemLink(bagID, slotID) == link then
+						button:SetAttribute("macrotext", string.format("/cast %s\n/use %s %s", spell, bagID, slotID))
+						local slot = self:GetOwner()
+						button:SetPoint("TOPLEFT", slot, "TOPLEFT", 2, 0)
+						button:SetPoint("BOTTOMRIGHT", slot, "BOTTOMRIGHT", 2, 0)
+						button:Show()
+						--StartSparkles(button, r, g, b)
+					end
+				end
+			end]]
+
 			local mouseFoci = GetMouseFoci()
 			local bag, slot
 			if mouseFoci and mouseFoci[1] then
@@ -303,12 +318,11 @@ function button:PLAYER_LOGIN()
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetUnit)
 
 	self:SetFrameStrata("TOOLTIP")
-	self:SetAttribute("*type1", "macro")
+	self:SetAttribute("*type2", "macro")   -- type1 左键
 	self:SetScript("OnLeave", self.MODIFIER_STATE_CHANGED)
 
 	self:RegisterEvent("MODIFIER_STATE_CHANGED")
 	self:Hide()
-
 end
 
 function button:MODIFIER_STATE_CHANGED(key)
@@ -321,6 +335,8 @@ function button:MODIFIER_STATE_CHANGED(key)
 		self:ClearAllPoints()
 		self:SetAlpha(1)
 		self:Hide()
+		
+		--StopSparkles(self)
 		 -- 修改 Glow 纹理的大小设置
 		local Glow = button:CreateTexture(nil, 'ARTWORK')
 		Glow:SetPoint('CENTER')
@@ -342,7 +358,6 @@ function button:MODIFIER_STATE_CHANGED(key)
 
 		function SetColor(color)
 			Glow:SetVertexColor(color:GetRGB())
-
 			-- need to adjust the size too
 			local width, height = self:GetSize()
 			Glow:SetSize(width * 1.4, height * 1.4)

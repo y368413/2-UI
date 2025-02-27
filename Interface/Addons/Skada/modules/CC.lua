@@ -6,23 +6,58 @@ Skada:AddLoadableModule("CC", nil, function(Skada, L)
 
 	-- CC spell IDs shamelessly stolen from Recount - thanks!
 	local CCId = {
-		[118] = true, -- Polymorph
-		[28272] = true, -- Polymorph Pig
-		[28271] = true, -- Polymorph Turtle
-		[61305] = true, -- Polymorph Black Cat
-		[61721] = true, -- Polymorph Rabbit
-		[61780] = true, -- Polymorph Turkey
-		[9484] = true, -- Shackle Undead
-		[3355] = true, -- Freezing Trap
-		[19386] = true, -- Wyvern Sting
-		[339] = true, -- Entangling Roots
-		[2637] = true, -- Hibernate
-		[6770] = true, -- Sap
-		[6358] = true, -- Seduction (succubus)
-		[20066] = true, -- Repentance
-		[51514] = true, -- Hex
-		[76780] = true, -- Bind Elemental
-	}
+
+			-- | Deamon Hunter
+			[217832] = true,	-- | Imprison			max  1 min
+
+			-- | Death Knight
+			[111673] = true,	-- | Control Undead		max  5 min
+
+			-- | Druid
+			[339]    = true,	-- | Entangling Roots		max 30 sec	
+			[2637]   = true,	-- | Hibernate			max 40 sec
+
+			-- | Evoker
+			[360806]   = true,	-- | Sleep Walk			max 20 sec	! Disorientation
+
+			-- | Hunter
+			[187650] = true,	-- | Freezing Trap		max  1 min
+			[268501] = true,	-- | Wyvern Sting		max 30 sec				Survival
+
+			-- | Mage
+			[61305]  = true,	-- | Polymorph Black Cat	max  1 min
+			[28272]  = true,	-- | Polymorph Pig
+			[61721]  = true,	-- | Polymorph Rabbit
+			[118]    = true,	-- | Polymorph Sheep
+			[61780]  = true,	-- | Polymorph Turkey
+			[28271]  = true,	-- | Polymorph Turtle
+
+			-- | Monk
+			[115078] = true,	-- | Paralyse			max  1 min
+
+			-- | Paladin
+			[20066] = true,		-- | Repentance			max  1 min
+
+			-- | Priest
+			[9484]	 = true,	-- | Shackle Undead		max 50 sec
+
+			-- | Rogue
+			[2094]	 = true,	-- | Blind			max 18 sec	! Disorientation
+			[6770]   = true,	-- | Sap			max  1 min
+
+			-- | Shaman
+			[51514]  = true,	-- | Hex			max  1 min
+
+			-- | Warlock
+			[710]	 = true,	-- | Banisch			max 30 sec
+			[5782]	 = true,	-- | Fear			max 20 sec	! Disorientation
+			[5484]	 = true,	-- | Howl of Terror		max 20 sec	! Disorientation
+			[119909] = true,	-- | Seduction			max 30 sec	! Disorientation	Sayaad
+
+			-- | Warrior 
+			[275338] = true,	-- | Menace			max 15 sec
+
+	             }
 
 	local function log_ccbreak(set, srcGUID, srcName)
 		-- Fetch the player.
@@ -80,7 +115,7 @@ Skada:AddLoadableModule("CC", nil, function(Skada, L)
 
 				-- Go ahead and announce it.
 				if extraSpellName then
-					local spellLink = GetSpellLink(extraSpellId)
+					local spellLink = C_Spell.GetSpellLink(extraSpellId) or ""
 					SendChatMessage(string.format(L["%s on %s removed by %s's %s"], spellName, dstName, srcName, spellLink), "RAID")
 				else
 					SendChatMessage(string.format(L["%s on %s removed by %s"], spellName, dstName, srcName), "RAID")

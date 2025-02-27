@@ -123,46 +123,31 @@ function G:SetupRaidDebuffs(parent)
 		end)
 	end
 
-	local maxLevel = UnitLevel("player") > 70
-	local dungeons = {}
+	--local maxLevel = UnitLevel("player") > 70
 
-	if maxLevel then
-		for dungeonID = 1267, 1274 do
-			if dungeonID ~= 1273 then
-				AddNewDungeon(dungeons, dungeonID)
-			end
+	local dungeons = {}
+	for dungeonID = 1267, 1274 do
+		if dungeonID ~= 1273 then
+			AddNewDungeon(dungeons, dungeonID)
 		end
-		AddNewDungeon(dungeons, 1210) -- 暗焰裂口
-		AddNewDungeon(dungeons, 71) -- 格瑞姆巴托
-		AddNewDungeon(dungeons, 1023) -- 围攻伯拉勒斯
-		AddNewDungeon(dungeons, 1182) -- 通灵战潮
-		AddNewDungeon(dungeons, 1184) -- 塞兹仙林的迷雾
-	else
-		for dungeonID = 1196, 1204 do
-			if dungeonID ~= 1200 then
-				AddNewDungeon(dungeons, dungeonID)
-			end
-		end
-		AddNewDungeon(dungeons, 1209)  -- 永恒黎明
-		AddNewDungeon(dungeons, 65)  -- 潮汐王座
-		AddNewDungeon(dungeons, 556)  -- 永茂林地
-		AddNewDungeon(dungeons, 740)  -- 黑鸦堡垒
-		AddNewDungeon(dungeons, 762)  -- 黑心林地
-		AddNewDungeon(dungeons, 968)  -- 阿塔达萨
-		AddNewDungeon(dungeons, 1021)  -- 维克雷斯庄园
+	end
+	AddNewDungeon(dungeons, 1210) -- 暗焰裂口
+	AddNewDungeon(dungeons, 71) -- 格瑞姆巴托
+	AddNewDungeon(dungeons, 1023) -- 围攻伯拉勒斯
+	AddNewDungeon(dungeons, 1182) -- 通灵战潮
+	AddNewDungeon(dungeons, 1184) -- 塞兹仙林的迷雾
+	if I.isNewPatch then
+		AddNewDungeon(dungeons, 1298) -- 水闸行动
+		AddNewDungeon(dungeons, 1187) -- 伤逝剧场
+		AddNewDungeon(dungeons, 1178) -- 麦卡贡行动
+		AddNewDungeon(dungeons, 1012) -- 暴富矿区！！
 	end
 
-	local raids
-	if maxLevel then
-		raids = {
-			[1] = EJ_GetInstanceInfo(1273), -- 尼鲁巴尔王宫
-		}
-	else
-		raids = {
-			[1] = EJ_GetInstanceInfo(1200),
-			[2] = EJ_GetInstanceInfo(1208),
-			[3] = EJ_GetInstanceInfo(1207),
-		}
+	local raids = {
+		[1] = EJ_GetInstanceInfo(1273), -- 尼鲁巴尔王宫
+	}
+	if I.isNewPatch then
+		raids[2] = EJ_GetInstanceInfo(1296) -- Liberation of Undermine
 	end
 
 	options[1] = G:CreateDropdown(frame, DUNGEONS.."*", 120, -30, dungeons, U["Dungeons Intro"], 130, 30)
@@ -737,7 +722,7 @@ function G:SetupSpellsIndicator(parent)
 	local showAll = M.CreateCheckBox(frame)
 	showAll:SetPoint("LEFT", swatch, "RIGHT", 2, 0)
 	showAll:SetHitRectInsets(0, 0, 0, 0)
-	showAll.bg:SetBackdropBorderColor(1, .8, 0, .5)
+	--showAll.bg:SetBackdropBorderColor(1, .8, 0, .5)
 	M.AddTooltip(showAll, "ANCHOR_TOPRIGHT", U["ShowAllTip"], "info", true)
 	scroll.showAll = showAll
 
@@ -1085,16 +1070,16 @@ function G:SetupUnitFrame(parent)
 	local scroll = G:CreateScroll(panel, 260, 540)
 
 	local sliderRange = {
-		["Player"] = {120, 400},
-		["Focus"] = {120, 400},
-		["Pet"] = {100, 300},
+		--["Player"] = {120, 400},
+		--["Focus"] = {120, 400},
+		--["Pet"] = {100, 300},
 		["Boss"] = {100, 400},
 	}
 
 	local defaultValue = { -- healthWidth, healthHeight, powerHeight, healthTag, powerTag, powerOffset, nameOffset
-		["Player"] = {245, 24, 4, 2, 4, 2, 0},
-		["Focus"] = {200, 22, 3, 2, 4, 2, 0},
-		["Pet"] = {100, 18, 2, 5, 0},
+		--["Player"] = {245, 24, 4, 2, 4, 2, 0},
+		--["Focus"] = {200, 22, 3, 2, 4, 2, 0},
+		--["Pet"] = {100, 18, 2, 5, 0},
 		["Boss"] = {120, 21, 3, 5, 5, 2, 0},
 	}
 
@@ -1118,7 +1103,7 @@ function G:SetupUnitFrame(parent)
 	end
 
 	local UF = M:GetModule("UnitFrames")
-	local mainFrames = {_G.oUF_Player, _G.oUF_Target}
+	--[[local mainFrames = {_G.oUF_Player, _G.oUF_Target}
 	local function updatePlayerSize()
 		for _, frame in pairs(mainFrames) do
 			SetUnitFrameSize(frame, "Player")
@@ -1143,7 +1128,7 @@ function G:SetupUnitFrame(parent)
 			SetUnitFrameSize(frame, "Pet")
 			UF.UpdateFrameHealthTag(frame)
 		end
-	end
+	end]]
 
 	local function updateBossSize()
 		for _, frame in pairs(ns.oUF.objects) do
@@ -1156,16 +1141,16 @@ function G:SetupUnitFrame(parent)
 	end
 
 	local options = {
-		[1] = U["Player&Target"],
-		[2] = U["FocusUF"],
-		[3] = U["Pet&*Target"],
-		[4] = U["Boss&Arena"],
+		--[1] = U["Player&Target"],
+		--[2] = U["FocusUF"],
+		--[3] = U["Pet&*Target"],
+		[1] = U["Boss&Arena"],
 	}
 	local data = {
-		[1] = {"Player", updatePlayerSize},
-		[2] = {"Focus", updateFocusSize},
-		[3] = {"Pet", updatePetSize},
-		[4] = {"Boss", updateBossSize},
+		--[1] = {"Player", updatePlayerSize},
+		--[2] = {"Focus", updateFocusSize},
+		--[3] = {"Pet", updatePetSize},
+		[1] = {"Boss", updateBossSize},
 	}
 
 	local dd = G:CreateDropdown(scroll.child, "", 40, -15, options, nil, 180, 28)
@@ -1232,7 +1217,7 @@ function G:SetupRaidFrame(parent)
 	createOptionDropdown(scroll.child, U["GrowthDirection"], -30, options, U["RaidDirectionTip"], "UFs", "RaidDirec", 1, updateRaidDirection)
 	createOptionSlider(scroll.child, U["Width"], 60, 200, defaultValue[1], -100, "RaidWidth", resizeRaidFrame)
 	createOptionSlider(scroll.child, U["Height"], 25, 60, defaultValue[2], -180, "RaidHeight", resizeRaidFrame)
-	createOptionSlider(scroll.child, U["Power Height"], 2, 30, defaultValue[3], -260, "RaidPowerHeight", resizeRaidFrame)
+	createOptionSlider(scroll.child, U["Power Height"], 0, 30, defaultValue[3], -260, "RaidPowerHeight", resizeRaidFrame)
 	createOptionSlider(scroll.child, U["Num Groups"], 2, 8, defaultValue[4], -340, "NumGroups", updateNumGroups)
 	createOptionSlider(scroll.child, U["RaidRows"], 1, 8, defaultValue[5], -420, "RaidRows", updateNumGroups)
 end
@@ -1302,7 +1287,7 @@ function G:SetupPartyFrame(parent)
 		UF:UpdatePartyElements()
 	end
 
-	local defaultValue = {100, 32, 2}
+	local defaultValue = {130, 26, 6}
 	local options = {}
 	for i = 1, 4 do
 		options[i] = UF.PartyDirections[i].name
@@ -1311,8 +1296,8 @@ function G:SetupPartyFrame(parent)
 	createOptionCheck(scroll.child, -40, U["DescRole"], "UFs", "DescRole", resizePartyFrame, U["DescRoleTip"])
 	createOptionDropdown(scroll.child, U["GrowthDirection"], -100, options, nil, "UFs", "PartyDirec", 1, resizePartyFrame)
 	createOptionSlider(scroll.child, U["Width"], 80, 200, defaultValue[1], -180, "PartyWidth", resizePartyFrame)
-	createOptionSlider(scroll.child, U["Height"], 25, 60, defaultValue[2], -260, "PartyHeight", resizePartyFrame)
-	createOptionSlider(scroll.child, U["Power Height"], 2, 30, defaultValue[3], -340, "PartyPowerHeight", resizePartyFrame)
+	createOptionSlider(scroll.child, U["Height"], 16, 80, defaultValue[2], -260, "PartyHeight", resizePartyFrame)
+	createOptionSlider(scroll.child, U["Power Height"], 0, 30, defaultValue[3], -340, "PartyPowerHeight", resizePartyFrame)
 end
 
 function G:SetupPartyPetFrame(parent)
@@ -1351,7 +1336,7 @@ function G:SetupPartyPetFrame(parent)
 	createOptionDropdown(scroll.child, U["Visibility"], -90, {U["ShowInParty"], U["ShowInRaid"], U["ShowInGroup"]}, nil, "UFs", "PartyPetVsby", 1, UF.UpdateAllHeaders)
 	createOptionSlider(scroll.child, U["Width"], 60, 200, 100, -150, "PartyPetWidth", resizePartyPetFrame)
 	createOptionSlider(scroll.child, U["Height"], 20, 60, 22, -220, "PartyPetHeight", resizePartyPetFrame)
-	createOptionSlider(scroll.child, U["Power Height"], 2, 30, 2, -290, "PartyPetPowerHeight", resizePartyPetFrame)
+	createOptionSlider(scroll.child, U["Power Height"], 0, 30, 2, -290, "PartyPetPowerHeight", resizePartyPetFrame)
 	createOptionSlider(scroll.child, U["UnitsPerColumn"], 5, 40, 5, -360, "PartyPetPerCol", updatePartyPetHeader)
 	createOptionSlider(scroll.child, U["MaxColumns"], 1, 5, 1, -430, "PartyPetMaxCol", updatePartyPetHeader)
 end
@@ -1853,39 +1838,39 @@ function G:SetupUFAuras(parent)
 	local parent, offset = scroll.child, -10
 
 	local defaultData = {
-		["Player"] = {1, 1, 9, 20, 20},
-		["Target"] = {2, 2, 9, 20, 20},
-		["Focus"] = {3, 2, 9, 20, 20},
-		["ToT"] = {1, 1, 5, 6, 6},
-		["Pet"] = {1, 1, 5, 6, 6},
+		--["Player"] = {1, 1, 9, 20, 20},
+		--["Target"] = {2, 2, 9, 20, 20},
+		--["Focus"] = {3, 2, 9, 20, 20},
+		--["ToT"] = {1, 1, 5, 6, 6},
+		--["Pet"] = {1, 1, 5, 6, 6},
 		["Boss"] = {2, 3, 6, 6, 6},
 	}
 	local buffOptions = {DISABLE, U["ShowAll"], U["ShowDispell"]}
 	local debuffOptions = {DISABLE, U["ShowAll"], U["BlockOthers"]}
 	local growthOptions = {}
-	for i = 1, 4 do
-		growthOptions[i] = UF.AuraDirections[i].name
-	end
+	--for i = 1, 4 do
+		--growthOptions[i] = UF.AuraDirections[i].name
+	--end
 
 	local function createOptionGroup(parent, offset, value, func, isBoss)
 		local default = defaultData[value]
 		createOptionTitle(parent, "", offset)
-		if isBoss then
+		--if isBoss then
 			offset = offset + 130
-		else
-			createOptionDropdown(parent, U["GrowthDirection"], offset-50, growthOptions, "", "UFs", value.."AuraDirec", 1, func)
-			createOptionSlider(parent, U["yOffset"], 0, 200, 10, offset-110, value.."AuraOffset", func)
-		end
+		--else
+			--createOptionDropdown(parent, U["GrowthDirection"], offset-50, growthOptions, "", "UFs", value.."AuraDirec", 1, func)
+			--createOptionSlider(parent, U["yOffset"], 0, 200, 10, offset-110, value.."AuraOffset", func)
+		--end
 		createOptionDropdown(parent, U["BuffType"], offset-180, buffOptions, nil, "UFs", value.."BuffType", default[1], func)
 		createOptionDropdown(parent, U["DebuffType"], offset-240, debuffOptions, nil, "UFs", value.."DebuffType", default[2], func)
 		createOptionSlider(parent, U["MaxBuffs"], 1, 40, default[4], offset-300, value.."NumBuff", func)
 		createOptionSlider(parent, U["MaxDebuffs"], 1, 40, default[5], offset-370, value.."NumDebuff", func)
-		if isBoss then
+		--if isBoss then
 			createOptionSlider(parent, "Buff "..U["IconsPerRow"], 5, 20, default[3], offset-440, value.."BuffPerRow", func)
 			createOptionSlider(parent, "Debuff "..U["IconsPerRow"], 5, 20, default[3], offset-510, value.."DebuffPerRow", func)
-		else
-			createOptionSlider(parent, U["IconsPerRow"], 5, 20, default[3], offset-440, value.."AurasPerRow", func)
-		end
+		--else
+			--createOptionSlider(parent, U["IconsPerRow"], 5, 20, default[3], offset-440, value.."AurasPerRow", func)
+		--end
 	end
 
 	createOptionTitle(parent, GENERAL, offset)
@@ -1893,20 +1878,20 @@ function G:SetupUFAuras(parent)
 	createOptionCheck(parent, offset-70, U["DebuffColor"], "UFs", "DebuffColor", UF.UpdateUFAuras, U["DebuffColorTip"])
 
 	local options = {
-		[1] = U["PlayerUF"],
-		[2] = U["TargetUF"],
-		[3] = U["TotUF"],
-		[4] = U["PetUF"],
-		[5] = U["FocusUF"],
-		[6] = U["BossFrame"],
+		--[1] = U["PlayerUF"],
+		--[2] = U["TargetUF"],
+		--[3] = U["TotUF"],
+		--[4] = U["PetUF"],
+		--[5] = U["FocusUF"],
+		[1] = U["BossFrame"],
 	}
 	local data = {
-		[1] = "Player",
-		[2] = "Target",
-		[3] = "ToT",
-		[4] = "Pet",
-		[5] = "Focus",
-		[6] = "Boss",
+		--[1] = "Player",
+		--[2] = "Target",
+		--[3] = "ToT",
+		--[4] = "Pet",
+		--[5] = "Focus",
+		[1] = "Boss",
 	}
 
 	local dd = G:CreateDropdown(scroll.child, "", 40, -135, options, nil, 180, 28)
@@ -1920,7 +1905,7 @@ function G:SetupUFAuras(parent)
 		panel:SetSize(260, 1)
 		panel:SetPoint("TOP", 0, -30)
 		panel:Hide()
-		createOptionGroup(panel, -130, data[i], UF.UpdateUFAuras, i == 6)
+		createOptionGroup(panel, -130, data[i], UF.UpdateUFAuras, i == 1)
 
 		dd.panels[i] = panel
 		dd.options[i]:HookScript("OnClick", toggleOptionsPanel)
@@ -1929,12 +1914,12 @@ function G:SetupUFAuras(parent)
 end
 
 function G:SetupActionbarStyle(parent)
-	local maxButtons = 6
+	local maxButtons = 7
 	local size, padding = 80, 2
 
 	local frame = CreateFrame("Frame", "UIActionbarStyleFrame", parent.child)
 	frame:SetSize((size+padding)*maxButtons + padding, size + 2*padding)
-	frame:SetPoint("TOP", 160, -10)
+	frame:SetPoint("TOP", 180, -10)
 	--M.CreateBDFrame(frame, .25)
 
 	local Bar = M:GetModule("Actionbar")
@@ -1943,19 +1928,21 @@ function G:SetupActionbarStyle(parent)
 		[1] = "NAB:35:12:12:12:35:12:12:12:35:12:12:6:35:12:12:6:35:12:12:1:35:12:12:1:35:12:4:1:35:12:12:4:26:12:10:30:12:10:0M0:0M37:333M1:-333M1:-1BR318:-38BR318:210T-416:-210T-435",
 		[2] = "NAB:35:12:12:12:35:12:12:12:35:12:12:12:35:12:12:1:35:12:12:1:35:12:12:1:35:12:4:1:35:12:12:4:26:12:10:30:12:10:0M0:0M37:0M75:-36TR-317:-1BR318:-38BR318:210T-416:-210T-435",
 		[3] = "NAB:35:12:12:12:35:12:12:12:35:12:12:4:35:12:12:4:35:12:12:12:35:12:12:1:35:12:12:1:35:12:12:8:26:12:10:30:12:10:0M0:0M37:300M0:-300M0:0M74:-1BR318:-38BR318:0M293",
-		[4] = "NAB:35:12:8:8:40:12:12:12:40:12:12:12:40:12:12:6:40:12:12:6:35:12:12:1:35:12:12:12:35:12:12:12:26:12:10:30:12:10:0M282:0M0:0M42:383M0:-383M0:0BR262:0T-482:0T-442",
+		[4] = "NAB:36:12:12:12:36:12:12:12:36:12:12:12:55:12:12:12:55:12:12:12:35:12:12:1:35:12:4:1:35:12:12:4:26:12:10:30:12:10:0M0:663BL0:-663BR0:-344M39:344M39:0BR280:210T-416:-210T-435",
+		[5] = "NAB:35:12:8:8:40:12:12:12:40:12:12:12:40:12:12:6:40:12:12:6:35:12:12:1:35:12:12:12:35:12:12:12:26:12:10:30:12:10:0M282:0M0:0M42:383M0:-383M0:0BR262:0T-482:0T-442",
 	}
 	local styleName = {
 		[1] = _G.DEFAULT,
 		[2] = "3X12",
-		[3] = "12+24+12",
-		[4] = "2UI Style",
-		[5] = U["Export"],
-		[6] = U["Import"],
+		[3] = "12+36+12",
+		[4] = "Wide",
+		[5] = "2UI Style",
+		[6] = U["Export"],
+		[7] = U["Import"],
 	}
 	local tooltips = {
-		[5] = U["ExportActionbarStyle"],
-		[6] = U["ImportActionbarStyle"],
+		[6] = U["ExportActionbarStyle"],
+		[7] = U["ImportActionbarStyle"],
 	}
 
 	local function applyBarStyle(self)
@@ -2033,9 +2020,9 @@ function G:SetupActionbarStyle(parent)
 	end
 
 	local function GetButtonText(i)
-		if i == 5 then
+		if i == 6 then
 			return "导出布局"--"|T"..I.ArrowUp..":18|t"
-		elseif i == 6 then
+		elseif i == 7 then
 			return "导入布局"--"|T"..I.ArrowUp..":18:18:0:0:1:1:0:1:1:0|t"
 		else
 			return styleName[i]
@@ -2048,9 +2035,9 @@ function G:SetupActionbarStyle(parent)
 		bu.index = i
 		bu.title = styleName[i]
 		bu.tip = tooltips[i] or U["ApplyBarStyle"]
-		if i == 5 then
+		if i == 6 then
 			bu:SetScript("OnClick", exportBarStyle)
-		elseif i == 6 then
+		elseif i == 7 then
 			bu:SetScript("OnClick", importBarStyle)
 		else
 			bu:SetScript("OnClick", applyBarStyle)

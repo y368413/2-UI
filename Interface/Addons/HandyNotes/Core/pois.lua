@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Core = ...
-local Class = Core.Class
+local _, ns = ...
+local Class = ns.Class
 local HBD = LibStub('HereBeDragons-2.0')
-local L = Core.locale
+local L = ns.locale
 
 local ARROW = "Interface\\AddOns\\HandyNotes\\Icons\\Artwork\\arrow"
 local CIRCLE = "Interface\\AddOns\\HandyNotes\\Icons\\Artwork\\circle"
@@ -35,16 +35,16 @@ function POI:Initialize(attrs)
     for k, v in pairs(attrs) do self[k] = v end
 
     -- normalize table values
-    self.quest = Core.AsTable(self.quest)
-    self.questDeps = Core.AsTable(self.questDeps)
+    self.quest = ns.AsTable(self.quest)
+    self.questDeps = ns.AsTable(self.questDeps)
 
     -- normalize points = {} back into the POI itself for legacy reasons
     if self.points then
-        self.points = Core.AsTable(self.points)
+        self.points = ns.AsTable(self.points)
         for k, v in ipairs(self.points) do self[k] = v end
     end
 
-    if self.color then self.r, self.g, self.b = Core.getARGB(self.color) end
+    if self.color then self.r, self.g, self.b = ns.getARGB(self.color) end
 end
 
 function POI:IsCompleted()
@@ -89,16 +89,16 @@ function POI:Draw(pin, xy)
     local t = ResetPin(pin)
 
     local size = (pin.minimap and 10 or (pin.parentHeight * 0.012))
-    size = size * Core:GetOpt('poi_scale') * (self.size or 1)
+    size = size * ns:GetOpt('poi_scale') * (self.size or 1)
 
-    local r, g, b, a = Core:GetColorOpt('poi_color')
+    local r, g, b, a = ns:GetColorOpt('poi_color')
     if self.icon then
         r, g, b, a = 1, 1, 1, 1
     elseif self.color then
-        r, g, b = Core.getARGB(self.color)
+        r, g, b = ns.getARGB(self.color)
     end
 
-    t:SetTexture(self.icon and Core.GetIconPath(self.icon) or CIRCLE)
+    t:SetTexture(self.icon and ns.GetIconPath(self.icon) or CIRCLE)
     t:SetVertexColor(r, g, b, a)
     pin:SetSize(size, size)
 
@@ -156,7 +156,7 @@ end
 
 function Path:Draw(pin, type, xy1, xy2)
     local t = ResetPin(pin)
-    local color = {Core:GetColorOpt('path_color')}
+    local color = {ns:GetColorOpt('path_color')}
     if self.color then color = {self.r, self.g, self.b} end
     t:SetVertexColor(unpack(color))
     t:SetTexture(type)
@@ -166,8 +166,8 @@ function Path:Draw(pin, type, xy1, xy2)
     local line_width = pin.minimap and 60 or (pin.parentHeight * 0.05)
 
     -- apply user scaling
-    size = size * Core:GetOpt('poi_scale')
-    line_width = line_width * Core:GetOpt('poi_scale')
+    size = size * ns:GetOpt('poi_scale')
+    line_width = line_width * ns:GetOpt('poi_scale')
 
     if type == CIRCLE then
         pin:SetSize(size, size)
@@ -299,8 +299,8 @@ function Arrow:Draw(pin, type, xy1, xy2)
     -- constant size for minimaps, variable size for world maps
     local head_length = pin.minimap and 40 or (pin.parentHeight * 0.04)
     local head_width = pin.minimap and 15 or (pin.parentHeight * 0.015)
-    head_length = head_length * Core:GetOpt('poi_scale')
-    head_width = head_width * Core:GetOpt('poi_scale')
+    head_length = head_length * ns:GetOpt('poi_scale')
+    head_width = head_width * ns:GetOpt('poi_scale')
     pin:SetSize(head_width, head_length)
 
     local x1, y1 = HandyNotes:getXY(xy1)
@@ -336,7 +336,7 @@ end
 
 -------------------------------------------------------------------------------
 
-Core.poi = {
+ns.poi = {
     POI = POI,
     Glow = Glow,
     Path = Path,

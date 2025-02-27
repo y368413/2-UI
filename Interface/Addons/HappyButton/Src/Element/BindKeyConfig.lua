@@ -1,0 +1,6 @@
+---@class BindKeyConfig
+---@field key string | nil 按键
+---@field characters table<string, true> | nil -- 绑定指定角色table，key为角色playerGUID，value为true。nil表示不指定
+---@field classes table<Class, true> | nil -- 绑定指定职业，nil表示不指定
+---@field combat true | false | nil  -- 战斗中加载true，战斗外加载false，都加载nil
+---@field attachFrame boolean | nil -- 依附显示加载为true，依附不显示加载为false，都加载nil

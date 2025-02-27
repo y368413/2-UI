@@ -1,5 +1,5 @@
 --------------------------------------------------------
--- Namespaces## Version: 2.3.8 ## Author: Discord: Cam#7332
+-- Namespaces## Version: 2.4.0 ## Author: Discord: Cam#7332
 --------------------------------------------------------
 local MountCollectionlog = {}
 
@@ -126,7 +126,7 @@ MountCollectionlog.mountList[2] = {
 	categories = {
 		Achievement = {
 			name = "成就",
-			mounts = {168056, 168055, 169162, 163577, 169194, 168329, 161215, 163216, 166539, 167171, 174861, 174654},
+			mounts = {168056, 168055, 169162, 163577, 169194, 168329, 161215, 163216, 166539, 167171, 174861, 174654, 235515},
 			mountID = {}
 		},
 		Vendor = {
@@ -146,7 +146,7 @@ MountCollectionlog.mountList[2] = {
 		},
 		AlliedRaces = {
 			name = "同盟种族",
-			mounts = {155662, 156487, 161330, 157870, 174066, 156486, 155656, 161331, 164762, 174067},
+			mounts = {155662, 156487, 161330, 157870, 174066, 156486, 155656, 161331, 164762, 174067, 223572},
 			mountID = {}
 		},
 		Reputation = {
@@ -751,7 +751,7 @@ MountCollectionlog.mountList[14] = {
 		},
 		LoveAir = {
 			name = "情人节",
-			mounts = {72146, 50250, 210973},
+			mounts = {72146, 50250, 210973, 232926},
 			mountID = {}
 		},
 		NobleGarden = {
@@ -766,7 +766,7 @@ MountCollectionlog.mountList[14] = {
 		},
 		Brawlers = {
 			name = "搏击俱乐部",
-			mounts = {98405, 142403, 166724},
+			mounts = {98405},
 			mountID = {}
 		},
 		DarkmoonFaire = {
@@ -776,7 +776,12 @@ MountCollectionlog.mountList[14] = {
 		},
 		TimeWalking = {
 			name = "时空漫游",
-			mounts = {129923, 129922, 87775, 167894, 167895, 133543, 188674, 187595, 231374, 224398, 224399},
+			mounts = {129923, 129922, 87775, 167894, 167895, 133543, 188674, 187595, 231374, 224398, 224399,234730,232624,205208,234721,234716,234740},
+			mountID = {}
+		},
+		Lunar = {
+			name = "春节",
+			mounts = {232901},
 			mountID = {}
 		}
 	}
@@ -786,7 +791,7 @@ MountCollectionlog.mountList[15] = {
 	categories = {	
 		BlizzardStore = {
 			name = "游戏商城",
-			mounts = {54811, 69846, 78924, 95341, 97989, 107951, 112326, 122469, 147901, 156564, 160589, 166775, 166774, 166776, "m1266", "m1267", "m1290", "m1346", "m1291", "m1456", "m1330", "m1531", "m1581", "m1312", "m1662", 76755, "m1594", "m1583", "m1797", 203727, "m1795", "m1692", 212229, 228751, 229128, 219450, 224574, "m2237", 229418},
+			mounts = {54811, 69846, 78924, 95341, 97989, 107951, 112326, 122469, 147901, 156564, 160589, 166775, 166774, 166776, "m1266", "m1267", "m1290", "m1346", "m1291", "m1456", "m1330", "m1531", "m1581", "m1312", "m1662", 76755, "m1594", "m1583", "m1797", 203727, "m1795", "m1692", 212229, 228751, 229128, 219450, 224574, "m2237", 229418, 230184, 230200, 230201, 230185},
 			mountID = {1266, 1267, 1290, 1346, 1291, 1456, 1330, 1531, 1581}
 		},
 		CollectorsEdition = {
@@ -801,7 +806,7 @@ MountCollectionlog.mountList[15] = {
 		},
 		anniversary = {
 			name = "魔兽世界周年庆",
-			mounts = {172022, 172023, 186469, 208572, 228760},
+			mounts = {172022, 172023, 186469, 208572, 228760, 229348},
 			mountID = {}
 		},
 		Hearthstone = {
@@ -841,7 +846,7 @@ MountCollectionlog.mountList[15] = {
 		},
 		PlunderStorm = {
 			name="强袭风暴",
-			mounts = {"m1259","m994", "m2090"},
+			mounts = {"m1259","m994",233241,233240,233243,233242},
 		},
 		ProductPromotion = {
 			name="Product Promotion",
@@ -898,7 +903,7 @@ MountCollectionlog.mountList[16] = {
 		},
 		TradingPost = {
 			name = "商栈",
-			mounts = {190231, 190168, 190539, 190767, 190613, 206156, 137576, 208598, 211074, 210919, 212227, 212630, 212920, 192766, 226041, 226040, 226044, 226042, 226506, 223449, 223469, 187674},
+			mounts = {190231, 190168, 190539, 190767, 190613, 206156, 137576, 208598, 211074, 210919, 212227, 212630, 212920, 192766, 226041, 226040, 226044, 226042, 226506, 223449, 223469, 187674, 233019,233020,233023,233354,212631, 223285, 221814, 207821, 190169, 189978, 206976, 206027, "m1595"},
 		},		
 	}
 }
@@ -932,7 +937,7 @@ MountCollectionlog.mountList[17] = {
 		},
 		Brawl = {
 			name = "搏击俱乐部",
-			mounts = {142403, 98405},
+			mounts = {142403, 98405, 166724},
 			mountID = {}
 		},
 		Arena = {
@@ -952,7 +957,7 @@ MountCollectionlog.mountList[17] = {
 		},
 		Promotion = {
 			name = "旧版促销坐骑",
-			mounts = {76755, 95341, 112327, 92724, 143631, 163128, 163127, 43599, 151618, "m1458"},
+			mounts = {76755, 95341, 112327, 92724, 143631, 163127, 43599, 151618, "m1458"},
 			mountID = {}
 		},	
 		RaidMounts = {
@@ -1039,7 +1044,7 @@ MountCollectionlog.mountList[19] = {
 		},
 		Achievement = {
 			name = "成就",
-			mounts = {223266,224415,226357,223267,223286,223158},
+			mounts = {223266,224415,226357,223267,223286,223158, "m2190"},
 		},
 		Quest = {
 			name = "任务",
@@ -1064,10 +1069,13 @@ MountCollectionlog.mountList[19] = {
 		Zone = {
 			name = "区域",
 			mounts = {223269, 223318},
-		},			
+		},
+		SirenIsland = {
+			name = "Siren Island",
+			mounts = {232639, 233058, 233489, 232991}
+		}			
 	}
 }
-
 MountCollectionlog.sectionNames[11] = {
 	name = "经典旧世",
 	mounts = MountCollectionlog.mountList[9],
@@ -1471,9 +1479,9 @@ function MCL_functions:initSections()
             end
         end)
         
-        if not success then
+        --if not success then
             --print("迭代错误 "..i..": "..err)
-        end
+        --end
     end    
 
     OverviewStats(MountCollectionlog.overview)
@@ -2957,9 +2965,9 @@ function CountMounts()
 end
 
 -- Global for Addon Compartment
-MCL_OnAddonCompartmentClick = function()
-    MCL_Load:Toggle()
-end
+--MCL_OnAddonCompartmentClick = function()
+    --MCL_Load:Toggle()
+--end
 
 -- Save total mount count
 local totalMountCount = CountMounts()

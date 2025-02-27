@@ -1,4 +1,81 @@
---## Version: 3.7.6 ## Author: ollidiemaus
+--## Version: 3.8.10 ## Author: ollidiemaus
+
+local hamL = {}
+if GetLocale() == "zhCN" then
+
+-- InterfaceOptionsFrame
+hamL["Addon Behaviour"] = "插件功能"
+hamL["Auto Potion Settings"] = "Auto Potion 设置"
+hamL["Cavedweller's Delight"] = "洞穴住民的挚爱"
+hamL["Class/Racial Spells"] = "职业/种族技能"
+hamL["Configure the behavior of the addon. IE: if you want to include class spells"] = "您可以在此设置技能。例：是否启用已添加的职业专属回血技能"
+hamL["Current Priority"] = "当前优先"
+hamL["Heartseeking Health Injector (tinker)"] = "觅心生命注射器（匠械）"
+hamL["Include /stopcasting in the macro"] = "添加停止施法（/stopcasting）到宏内（重载界面生效）"
+hamL["Includes the shortest Cooldown in the reset Condition of Castsequence. !!USE CAREFULLY!!"] = "包括了队列施法（Castsequence）重置条件中最短的冷却时间|cffff0000!!小心使用!!|r"
+hamL["Invalid option: "] = "无效选项："
+hamL["Items"] = "药水"
+hamL["Low Priority Healthstones"] = "低优先使用治疗石"
+hamL["Potion of Withering Dreams"] = "凋零梦境药水"
+hamL["Potion of Withering Vitality"] = "枯萎活力药水"
+hamL["Prioritize health potions over a healthstone."] = "优先使用治疗药水，而不是治疗石。"
+hamL["Reset successful!"] = "重置成功！"
+hamL["Reset to Default"] = "重置为默认"
+hamL["The Settings of AutoPotion were reset due to breaking changes."] = "因为插件的代码重写，AutoPotion的设置已被重置。"
+hamL["Useful for casters."] = "对于施法职业有用。"
+-- code
+hamL["AutoPotion"] = "自疗"
+hamL["Auto Potion Title"]  = "|cff33ff99[便捷]|r自动药剂"
+elseif GetLocale() == "zhTW" then
+-- InterfaceOptionsFrame
+hamL["Addon Behaviour"] = "插件功能"
+hamL["Auto Potion Settings"] = "自動藥水 設定"
+hamL["Cavedweller's Delight"] = "穴居者之喜"
+hamL["Class/Racial Spells"] = "職業/種族技能"
+hamL["Configure the behavior of the addon. IE: if you want to include class spells"] = "這裡可以調整插件的功能，例如也能使用職業法術。"
+hamL["Current Priority"] = "目前的優先順序"
+hamL["Heartseeking Health Injector (tinker)"] = "覓心生命注射器 (裝置)"
+hamL["Include /stopcasting in the macro"] = "包含 /在巨集中的停止施法"
+hamL["Includes the shortest Cooldown in the reset Condition of Castsequence. !!USE CAREFULLY!!"] = "連續施放的重置條件使用最短的冷卻時間。!!請謹慎使用!!"
+hamL["Invalid option: "] = "無效選項："
+hamL["Items"] = "物品"
+hamL["Low Priority Healthstones"] = "低優先級治療石"
+hamL["Potion of Withering Dreams"] = "枯萎夢境藥水"
+hamL["Potion of Withering Vitality"] = "凋萎活力藥水"
+hamL["Prioritize health potions over a healthstone."] = "將治療藥水優先於治療石。"
+hamL["Reset successful!"] = "重置成功！"
+hamL["Reset to Default"] = "重置為預設值"
+hamL["The Settings of AutoPotion were reset due to breaking changes."] = "因為插件大改版的關係，自動藥水的設定已被重置。"
+hamL["Useful for casters."] = "對於施法者是很有用的。"
+-- code
+hamL["AutoPotion"] = "自動藥水"
+hamL["Auto Potion Title"]  = "|cff33ff99[便捷]|r自动药剂"
+else
+-- InterfaceOptionsFrame
+hamL["Addon Behaviour"] = "Addon Behaviour"
+hamL["Auto Potion Settings"] = "Auto Potion Settings"
+hamL["Cavedweller's Delight"] = "Cavedweller's Delight"
+hamL["Class/Racial Spells"] = "Class/Racial Spells"
+hamL["Configure the behavior of the addon. IE: if you want to include class spells"] = "Configure the behavior of the addon. IE: if you want to include class spells"
+hamL["Current Priority"] = "Current Priority"
+hamL["Heartseeking Health Injector (tinker)"] = "Heartseeking Health Injector (tinker)"
+hamL["Include /stopcasting in the macro"] = "Include /stopcasting in the macro"
+hamL["Includes the shortest Cooldown in the reset Condition of Castsequence. !!USE CAREFULLY!!"] = "Includes the shortest Cooldown in the reset Condition of Castsequence. !!USE CAREFULLY!!"
+hamL["Invalid option: "] = "Invalid option: "
+hamL["Items"] = "Items"
+hamL["Low Priority Healthstones"] = "Low Priority Healthstones"
+hamL["Potion of Withering Dreams"] = "Potion of Withering Dreams"
+hamL["Potion of Withering Vitality"] = "Potion of Withering Vitality"
+hamL["Prioritize health potions over a healthstone."] = "Prioritize health potions over a healthstone."
+hamL["Reset successful!"] = "Reset successful!"
+hamL["Reset to Default"] = "Reset to Default"
+hamL["The Settings of AutoPotion were reset due to breaking changes."] = "The Settings of AutoPotion were reset due to breaking changes."
+hamL["Useful for casters."] = "Useful for casters."
+-- code
+hamL["AutoPotion"] = "AutoPotion"
+hamL["Auto Potion Title"] = "|cff33ff99[Cool]|rAutoPotion"
+end
+
 local ham = {}
 local isRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
 
@@ -7,10 +84,13 @@ ham.crimsonVialSpell = 185311
 ham.renewal = 108238
 ham.exhilaration = 109304
 ham.fortitudeOfTheBear = 388035
+ham.lastStand = 12975
 ham.bitterImmunity = 383762
 ham.desperatePrayer = 19236
 ham.expelHarm = 322101
 ham.healingElixir = 122281
+ham.darkPact = 108416
+ham.vampiricBlood = 55233
 
 --Racials WTF These are all seperate Spells
 ham.giftOfTheNaaruDK = 59545
@@ -24,15 +104,20 @@ ham.giftOfTheNaaruRogue = 370626
 ham.giftOfTheNaaruShaman = 59547
 ham.giftOfTheNaaruWarrior = 28880
 
+ham.bagOfTricks = 312411
+
 ham.supportedSpells = {}
 table.insert(ham.supportedSpells, ham.crimsonVialSpell)
 table.insert(ham.supportedSpells, ham.renewal)
 table.insert(ham.supportedSpells, ham.exhilaration)
 table.insert(ham.supportedSpells, ham.fortitudeOfTheBear)
+table.insert(ham.supportedSpells, ham.lastStand)
 table.insert(ham.supportedSpells, ham.bitterImmunity)
 table.insert(ham.supportedSpells, ham.desperatePrayer)
 table.insert(ham.supportedSpells, ham.expelHarm)
 table.insert(ham.supportedSpells, ham.healingElixir)
+table.insert(ham.supportedSpells, ham.darkPact)
+table.insert(ham.supportedSpells, ham.vampiricBlood)
 table.insert(ham.supportedSpells, ham.giftOfTheNaaruDK)
 table.insert(ham.supportedSpells, ham.giftOfTheNaaruHunter)
 table.insert(ham.supportedSpells, ham.giftOfTheNaaruMage)
@@ -43,6 +128,7 @@ table.insert(ham.supportedSpells, ham.giftOfTheNaaruPriest)
 table.insert(ham.supportedSpells, ham.giftOfTheNaaruRogue)
 table.insert(ham.supportedSpells, ham.giftOfTheNaaruShaman)
 table.insert(ham.supportedSpells, ham.giftOfTheNaaruWarrior)
+table.insert(ham.supportedSpells, ham.bagOfTricks)
 
 
 ham.Spell = {}
@@ -109,10 +195,12 @@ ham.defaults = {
     witheringDreamsPotion = false,
     cavedwellerDelight = true,
     heartseekingInjector = false,
-    activatedSpells = { ham.crimsonVialSpell, ham.renewal, ham.exhilaration, ham.fortitudeOfTheBear, ham.bitterImmunity,
-        ham.desperatePrayer, ham.healingElixir, ham.giftOfTheNaaruDK, ham.giftOfTheNaaruHunter, ham.giftOfTheNaaruMage,
+    activatedSpells = { ham.crimsonVialSpell, ham.renewal, ham.exhilaration, ham.fortitudeOfTheBear, ham.lastStand, ham
+        .bitterImmunity,
+        ham.desperatePrayer, ham.healingElixir, ham.darkPact, ham.giftOfTheNaaruDK, ham.giftOfTheNaaruHunter, ham
+        .giftOfTheNaaruMage,
         ham.giftOfTheNaaruMageWarlock, ham.giftOfTheNaaruMonk, ham.giftOfTheNaaruPaladin, ham.giftOfTheNaaruPriest, ham
-        .giftOfTheNaaruRogue, ham.giftOfTheNaaruShaman, ham.giftOfTheNaaruWarrior }
+        .giftOfTheNaaruRogue, ham.giftOfTheNaaruShaman, ham.giftOfTheNaaruWarrior, ham.bagOfTricks }
 }
 
 
@@ -214,9 +302,12 @@ ham.minor2 = ham.Item.new(19005, "Minor Healthstone")
 ham.lesser0 = ham.Item.new(5511, "Lesser Healthstone")
 ham.lesser1 = ham.Item.new(19006, "Lesser Healthstone")
 ham.lesser2 = ham.Item.new(19007, "Lesser Healthstone")
+ham.crystalFlakeThroatLozenge = ham.Item.new(23683, "Crystal Flake Throat Lozenge")
 ham.healtsthone0 = ham.Item.new(5509, "Healthstone")
+ham.lilyRoot = ham.Item.new(14894, "Lily Root")
 ham.healtsthone1 = ham.Item.new(19008, "Healthstone")
 ham.healtsthone2 = ham.Item.new(19009, "Healthstone")
+ham.wipperRootTuber = ham.Item.new(11951, "Whipper Root Tuber")
 ham.greater0 = ham.Item.new(5510, "Greater Healthstone")
 ham.greater1 = ham.Item.new(19010, "Greater Healthstone")
 ham.greater2 = ham.Item.new(19011, "Greater Healthstone")
@@ -260,12 +351,12 @@ end
 function ham.getPots()
   if isRetail then
     local pots = {
-      ham.algariHealingPotionR3,
-      ham.algariHealingPotionR2,
-      ham.algariHealingPotionR1,
       ham.fleetingAlgariHealingPotionR3,
+      ham.algariHealingPotionR3,
       ham.fleetingAlgariHealingPotionR2,
+      ham.algariHealingPotionR2,
       ham.fleetingAlgariHealingPotionR1,
+      ham.algariHealingPotionR1,
       ham.thirdWind,
       ham.witheringDreamsR3,
       ham.witheringDreamsR2,
@@ -388,9 +479,12 @@ function ham.getHealthstonesClassic()
       ham.greater2,
       ham.greater1,
       ham.greater0,
+      ham.wipperRootTuber,
       ham.healtsthone2,
       ham.healtsthone1,
+      ham.lilyRoot,
       ham.healtsthone0,
+      ham.crystalFlakeThroatLozenge,
       ham.lesser2,
       ham.lesser1,
       ham.lesser0,
@@ -488,7 +582,7 @@ ham.Player.new = function()
 end
 
 
-local macroName = "Eat"
+local macroName = hamL["AutoPotion"]
 local isRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
 local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
 local isWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
@@ -547,7 +641,7 @@ local tinkerSlots = {
 
 local function log(message)
   if ham.debug then
-    print("|cffb48ef9自动药剂：|r " .. message)
+    print(hamL["Auto Potion Title"] .. message)
   end
 end
 
@@ -798,7 +892,7 @@ function ham.updateMacro()
     if ham.options.stopCast then
       macroStr = macroStr .. "/stopcasting \n"
     end
-    macroStr = macroStr .. "/castsequence reset=" .. resetType .. " "
+    macroStr = macroStr .. "/castsequence [@player] reset=" .. resetType .. " "
     if spellsMacroString ~= "" then
       macroStr = macroStr .. spellsMacroString
     end
@@ -951,11 +1045,11 @@ local lastStaticElement = nil
 
 function ham.settingsFrame:updateConfig(option, value)
 	if ham.options[option] ~= nil then
-        ham.options[option] = value  -- Update in-memory
-        HAMDB[option] = value        -- Persist to DB
-    else
-        print("无效选项：" .. tostring(option))
-    end
+		ham.options[option] = value -- Update in-memory
+		HAMDB[option] = value       -- Persist to DB
+	else
+		print(hamL["Invalid option: "] .. tostring(option))
+	end
 	-- Rebuild the macro and update priority frame
 	ham.checkTinker()
 	ham.updateHeals()
@@ -968,7 +1062,7 @@ function ham.settingsFrame:OnEvent(event, addOnName)
 		if event == "ADDON_LOADED" then
 			HAMDB = HAMDB or CopyTable(ham.defaults)
 			if HAMDB.activatedSpells == nil then
-				print("由于重大变更，自动药剂的设置已重置。")
+				print(hamL["The Settings of AutoPotion were reset due to breaking changes."])
 				HAMDB = CopyTable(ham.defaults)
 			end
 			self:InitializeOptions()
@@ -996,7 +1090,7 @@ function ham.settingsFrame:createPrioFrame(id, iconTexture, positionx, isSpell, 
 		if isSpell == true then
 			GameTooltip:SetSpellByID(id)
 		elseif isTinker then
-            GameTooltip:SetInventoryItem("player", id)
+			GameTooltip:SetInventoryItem("player", id)
 		else
 			GameTooltip:SetItemByID(id)
 		end
@@ -1069,7 +1163,6 @@ function ham.settingsFrame:updatePrio()
 	-- Add items to priority frames
 	if next(ham.itemIdList) ~= nil then
 		for i, id in ipairs(ham.itemIdList) do
-
 			local entry
 			local iconTexture
 			local isTinker = false
@@ -1078,9 +1171,9 @@ function ham.settingsFrame:updatePrio()
 			if type(id) == "string" and id:match("^slot:") then
 				local slot = assert(tonumber(id:sub(6)), "Invalid slot number")
 				entry = GetInventoryItemID("player", slot)
-        		iconTexture = GetInventoryItemTexture("player", slot)
+				iconTexture = GetInventoryItemTexture("player", slot)
 				isTinker = true
-			-- otherwise its a normal item id
+				-- otherwise its a normal item id
 			else
 				local _, _, _, _, _, _, _, _, _, tmpTexture = C_Item.GetItemInfo(id)
 				entry = id
@@ -1118,28 +1211,19 @@ function ham.settingsFrame:updatePrio()
 	end
 end
 
-if GetLocale() == "zhCN" then
-  AutoPotionLocal = "|cff33ff99[便捷]|r自动药剂"
-elseif GetLocale() == "zhTW" then
-  AutoPotionLocal = "|cff33ff99[便捷]|r自动药剂"
-else
-  AutoPotionLocal = "|cff33ff99[Cool]|rAutoPotion"
-end
-
 function ham.settingsFrame:InitializeOptions()
-
 	-- Create the main panel inside the Interface Options container
-	self.panel = CreateFrame("Frame", AutoPotionLocal, InterfaceOptionsFramePanelContainer)
-	self.panel.name = AutoPotionLocal
+	self.panel = CreateFrame("Frame", hamL["Auto Potion Title"], InterfaceOptionsFramePanelContainer)
+	self.panel.name = hamL["Auto Potion Title"]
 
 	-- Register with Interface Options
-    if InterfaceOptions_AddCategory then
-        InterfaceOptions_AddCategory(self.panel)
-    else
-        local category = Settings.RegisterCanvasLayoutCategory(self.panel, AutoPotionLocal)
-        Settings.RegisterAddOnCategory(category)
-        self.panel.categoryID = category:GetID() -- for OpenToCategory use
-    end
+	if InterfaceOptions_AddCategory then
+		InterfaceOptions_AddCategory(self.panel)
+	else
+        local category = Settings.RegisterCanvasLayoutCategory(self.panel, hamL["Auto Potion Title"])
+		Settings.RegisterAddOnCategory(category)
+		self.panel.categoryID = category:GetID() -- for OpenToCategory use
+	end
 
 	-- inset frame to provide some padding
 	self.content = CreateFrame("Frame", nil, self.panel)
@@ -1147,32 +1231,32 @@ function ham.settingsFrame:InitializeOptions()
 	self.content:SetPoint("BOTTOMRIGHT", self.panel, "BOTTOMRIGHT", -16, 16)
 
 	-- title
-    local title = self.content:CreateFontString(nil, "ARTWORK", "GameFontNormalHuge")
-    title:SetPoint("TOP", 0, 0)
-    title:SetText("自动药剂设置")
+	local title = self.content:CreateFontString(nil, "ARTWORK", "GameFontNormalHuge")
+	title:SetPoint("TOP", 0, 0)
+	title:SetText(hamL["Auto Potion Settings"])
 
-    -- subtitle
-    local subtitle = self.content:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    subtitle:SetPoint("TOPLEFT", 0, -40)
-    subtitle:SetText("设置自动药剂插件的各项参数。比如：如果你想包含职业技能")
+	-- subtitle
+	local subtitle = self.content:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+	subtitle:SetPoint("TOPLEFT", 0, -40)
+	subtitle:SetText(hamL["Configure the behavior of the addon. IE: if you want to include class spells"])
 
-    -- behavior title
-    local behaviourTitle = self.content:CreateFontString(nil, "ARTWORK", "GameFontNormalHuge")
-    behaviourTitle:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -30)
-    behaviourTitle:SetText("插件功能")
+	-- behavior title
+	local behaviourTitle = self.content:CreateFontString(nil, "ARTWORK", "GameFontNormalHuge")
+	behaviourTitle:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -30)
+	behaviourTitle:SetText(hamL["Addon Behaviour"])
 
 	-------------  Stop Casting  -------------	
 	local stopCastButton = CreateFrame("CheckButton", nil, self.content, "InterfaceOptionsCheckButtonTemplate")
 	stopCastButton:SetPoint("TOPLEFT", behaviourTitle, 0, -PADDING)
 	---@diagnostic disable-next-line: undefined-field
-	stopCastButton.Text:SetText("在宏中包含/stopcasting")
+	stopCastButton.Text:SetText(hamL["Include /stopcasting in the macro"])
 	stopCastButton:HookScript("OnClick", function(_, btn, down)
 		ham.settingsFrame:updateConfig("stopCast", stopCastButton:GetChecked())
 	end)
 	stopCastButton:HookScript("OnEnter", function(_, btn, down)
 		---@diagnostic disable-next-line: param-type-mismatch
 		GameTooltip:SetOwner(stopCastButton, "ANCHOR_TOPRIGHT")
-		GameTooltip:SetText("对施法者起效。")
+		GameTooltip:SetText(hamL["Useful for casters."])
 		GameTooltip:Show()
 	end)
 	stopCastButton:HookScript("OnLeave", function(_, btn, down)
@@ -1185,7 +1269,7 @@ function ham.settingsFrame:InitializeOptions()
 	local cdResetButton = CreateFrame("CheckButton", nil, self.content, "InterfaceOptionsCheckButtonTemplate")
 	cdResetButton:SetPoint("TOPLEFT", lastStaticElement, 0, -PADDING)
 	---@diagnostic disable-next-line: undefined-field
-	cdResetButton.Text:SetText("在施法序列（Castsequence）的重置条件中使用最短的冷却时间。！！慎用！！")
+	cdResetButton.Text:SetText(hamL["Includes the shortest Cooldown in the reset Condition of Castsequence. !!USE CAREFULLY!!"])
 	cdResetButton:HookScript("OnClick", function(_, btn, down)
 		ham.settingsFrame:updateConfig("cdReset", cdResetButton:GetChecked())
 	end)
@@ -1196,14 +1280,14 @@ function ham.settingsFrame:InitializeOptions()
 	local raidStoneButton = CreateFrame("CheckButton", nil, self.content, "InterfaceOptionsCheckButtonTemplate")
 	raidStoneButton:SetPoint("TOPLEFT", lastStaticElement, 0, -PADDING)
 	---@diagnostic disable-next-line: undefined-field
-	raidStoneButton.Text:SetText("治疗石低优先级")
+	raidStoneButton.Text:SetText(hamL["Low Priority Healthstones"])
 	raidStoneButton:HookScript("OnClick", function(_, btn, down)
 		ham.settingsFrame:updateConfig("raidStone", raidStoneButton:GetChecked())
 	end)
 	raidStoneButton:HookScript("OnEnter", function(_, btn, down)
 		---@diagnostic disable-next-line: param-type-mismatch
 		GameTooltip:SetOwner(raidStoneButton, "ANCHOR_TOPRIGHT")
-		GameTooltip:SetText("优先使用治疗药剂而不是治疗石。")
+		GameTooltip:SetText(hamL["Prioritize health potions over a healthstone."])
 		GameTooltip:Show()
 	end)
 	raidStoneButton:HookScript("OnLeave", function(_, btn, down)
@@ -1221,13 +1305,13 @@ function ham.settingsFrame:InitializeOptions()
 	if isRetail then
 		local itemsTitle = self.content:CreateFontString("ARTWORK", nil, "GameFontNormalHuge")
 		itemsTitle:SetPoint("TOPLEFT", lastStaticElement, 0, -PADDING_CATERGORY)
-		itemsTitle:SetText("道具")
+		itemsTitle:SetText(hamL["Items"])
 
 		---Withering Potion---
 		witheringPotionButton = CreateFrame("CheckButton", nil, self.content, "InterfaceOptionsCheckButtonTemplate")
 		witheringPotionButton:SetPoint("TOPLEFT", itemsTitle, 0, -PADDING)
 		---@diagnostic disable-next-line: undefined-field
-		witheringPotionButton.Text:SetText("枯萎活力药剂")
+		witheringPotionButton.Text:SetText(hamL["Potion of Withering Vitality"])
 		witheringPotionButton:HookScript("OnClick", function(_, btn, down)
 			ham.settingsFrame:updateConfig("witheringPotion", witheringPotionButton:GetChecked())
 		end)
@@ -1246,7 +1330,7 @@ function ham.settingsFrame:InitializeOptions()
 		witheringDreamsPotionButton = CreateFrame("CheckButton", nil, self.content, "InterfaceOptionsCheckButtonTemplate")
 		witheringDreamsPotionButton:SetPoint("TOPLEFT", itemsTitle, 220, -PADDING)
 		---@diagnostic disable-next-line: undefined-field
-		witheringDreamsPotionButton.Text:SetText("凋零梦境药剂")
+		witheringDreamsPotionButton.Text:SetText(hamL["Potion of Withering Dreams"])
 		witheringDreamsPotionButton:HookScript("OnClick", function(_, btn, down)
 			ham.settingsFrame:updateConfig("witheringDreamsPotion", witheringDreamsPotionButton:GetChecked())
 		end)
@@ -1265,7 +1349,7 @@ function ham.settingsFrame:InitializeOptions()
 		cavedwellerDelightButton = CreateFrame("CheckButton", nil, self.content, "InterfaceOptionsCheckButtonTemplate")
 		cavedwellerDelightButton:SetPoint("TOPLEFT", itemsTitle, 440, -PADDING)
 		---@diagnostic disable-next-line: undefined-field
-		cavedwellerDelightButton.Text:SetText("穴居住民的挚爱")
+		cavedwellerDelightButton.Text:SetText(hamL["Cavedweller's Delight"])
 		cavedwellerDelightButton:HookScript("OnClick", function(_, btn, down)
 			ham.settingsFrame:updateConfig("cavedwellerDelight", cavedwellerDelightButton:GetChecked())
 		end)
@@ -1284,7 +1368,7 @@ function ham.settingsFrame:InitializeOptions()
 		heartseekingButton = CreateFrame("CheckButton", nil, self.content, "InterfaceOptionsCheckButtonTemplate")
 		heartseekingButton:SetPoint("TOPLEFT", itemsTitle, 0, -60)
 		---@diagnostic disable-next-line: undefined-field
-		heartseekingButton.Text:SetText("觅心生命注射器（匠械）")
+		heartseekingButton.Text:SetText(hamL["Heartseeking Health Injector (tinker)"])
 		heartseekingButton:HookScript("OnClick", function(_, btn, down)
 			ham.settingsFrame:updateConfig("heartseekingInjector", heartseekingButton:GetChecked())
 		end)
@@ -1308,13 +1392,13 @@ function ham.settingsFrame:InitializeOptions()
 	-------------  CURRENT PRIORITY  -------------
 	currentPrioTitle = self.content:CreateFontString("ARTWORK", nil, "GameFontNormalHuge")
 	currentPrioTitle:SetPoint("BOTTOMLEFT", 0, PADDING_PRIO_CATEGORY)
-	currentPrioTitle:SetText("当前优先级")
+	currentPrioTitle:SetText(hamL["Current Priority"])
 
 
 	-------------  RESET BUTTON  -------------
 	local btn = CreateFrame("Button", nil, self.content, "UIPanelButtonTemplate")
 	btn:SetPoint("BOTTOMLEFT", 2, 3)
-	btn:SetText("重置为默认")
+	btn:SetText(hamL["Reset to Default"])
 	btn:SetWidth(120)
 	btn:SetScript("OnClick", function()
 		HAMDB = CopyTable(ham.defaults)
@@ -1336,7 +1420,7 @@ function ham.settingsFrame:InitializeOptions()
 		ham.updateHeals()
 		ham.updateMacro()
 		self:updatePrio()
-		print("重置成功！")
+		print(hamL["Reset successful!"])
 	end)
 end
 
@@ -1344,7 +1428,7 @@ function ham.settingsFrame:InitializeClassSpells(relativeTo)
 	-------------  CLASS / RACIALS  -------------
 	local myClassTitle = self.content:CreateFontString("ARTWORK", nil, "GameFontNormalHuge")
 	myClassTitle:SetPoint("TOPLEFT", relativeTo, 0, -PADDING_CATERGORY)
-	myClassTitle:SetText("职业/种族技能")
+	myClassTitle:SetText(hamL["Class/Racial Spells"])
 
 	local lastbutton = nil
 	local posy = -PADDING
@@ -1401,19 +1485,19 @@ SLASH_HAM3 = "/ap"
 SLASH_HAM4 = "/autopotion"
 
 SlashCmdList.HAM = function(msg, editBox)
-    -- Check if the message contains "debug"
-    if msg and msg:trim():lower() == "debug" then
-        ham.debug = not ham.debug
+	-- Check if the message contains "debug"
+	if msg and msg:trim():lower() == "debug" then
+		ham.debug = not ham.debug
 		ham.checkTinker()
-        print("|cffb48ef9自动药剂|r 开发模式已经" .. (ham.debug and "启用" or "禁用"))
-        return
-    end
+        print(hamL["Auto Potion Title"].." 开发模式已经" .. (ham.debug and "启用" or "禁用"))
+		return
+	end
 
-    -- Open settings if no "debug" keyword was passed
-    if InterfaceOptions_AddCategory then
-        InterfaceOptionsFrame_OpenToCategory(AutoPotionLocal)
-    else
-        local settingsCategoryID = _G[AutoPotionLocal].categoryID
-        Settings.OpenToCategory(settingsCategoryID)
-    end
+	-- Open settings if no "debug" keyword was passed
+	if InterfaceOptions_AddCategory then
+        InterfaceOptionsFrame_OpenToCategory(hamL["Auto Potion Title"])
+	else
+        local settingsCategoryID = _G[hamL["Auto Potion Title"]].categoryID
+		Settings.OpenToCategory(settingsCategoryID)
+	end
 end

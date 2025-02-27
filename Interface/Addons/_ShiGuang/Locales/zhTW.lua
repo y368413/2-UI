@@ -285,48 +285,88 @@ DEX_FontList = {
 	"Fonts\\bLEI00D.TTF",
 	"Fonts\\bKAI00M.TTF",
 	"Fonts\\bHEI00M.TTF",
-};
-DEX_TXT_CRUSH = "碾壓!";
-DEX_TXT_DISPELLED = "驅散! ";
-DEX_TXT_STOLEN = "偷取! ";
-DEX_TXT_REFLECT = " 反彈! ";
+	"Fonts\\bHEI01B.TTF",
+	"Fonts\\bHEI01B.TTF",
+	"Fonts\\Damage.TTF",
+}
+
+DEX_TXT_CRUSH = "碾壓!"
+DEX_TXT_DISPELLED = "驅散! "
+DEX_TXT_STOLEN = "偷取! "
+DEX_TXT_REFLECT = " 反彈! "
 DEX_TXT_CRIT = "暴擊! ";
 DEX_TXT_INTERUPT = "打斷! ";
 DEX_MAIN_OPTION = "DamageEx";
 DEX_BUTTON_RESET_TIP = "恢復預設值";
 DEX_PREVIEW_LABEL = "拖動我改*變*文字位置";
-DEXColorMode_T = "顏色模式";
+
+DEXColorMode_T = "顏色模式"
 DEXOptionsDropDown = {"單色","雙色","漸變色"};
+
+DEXShowDamage_T = "受傷模式"
+DEXOptionsDropDownWOW = {"關閉顯示","滾動向上","拋物向上"};
+
 DEXOptionsFrameCheckButtons = {
 	["DEX_Enable"] = { title = "開啟", tooltipText = "開啟攻擊傷害顯示器"},
 	["DEX_ShowWithMess"] = { title = "以戰鬥訊息方式顯示", tooltipText = "以戰鬥訊息方式顯示所有傷害資訊"},
-	["DEX_ShowSpellName"] = { title = "顯示技能名", tooltipText = "在傷害數值邊顯示造成此次傷害的技能名"},
-	["DEX_ShowNameOnCrit"] = { title = "當暴擊才顯示", tooltipText = "只有在致命一擊時才顯示技能名"},
-	["DEX_ShowNameOnMiss"] = { title = "當未擊中等才顯示", tooltipText = "只有在技能未擊中，被抵抗等才顯示技能名"},
 	["DEX_ShowInterruptCrit"] = { title = "暴擊方式顯示中斷", tooltipText = "暴擊方式顯示中斷"},
 	["DEX_ShowCurrentOnly"] = { title = "只顯示當前選中目標的數值", tooltipText = "只顯示當前選中目標的傷害和治療,非當前選中目標則不顯示"},
 	["DEX_ShowDamagePeriodic"] = { title = "顯示持續傷害", tooltipText = "顯示持續攻擊的傷害"},
 	["DEX_ShowDamageShield"] = { title = "顯示反彈傷害", tooltipText = "顯示你對敵人傷害的反射量"},
-	["DEX_ShowDamageHealth"] = { title = "顯示治療量", tooltipText = "顯示對目標的實際治療量和過量治療"},
+	["DEX_ShowDamageHealth"] = { title = "顯示治療數據", tooltipText = "顯示治療數據信息"},
 	["DEX_ShowDamagePet"] = { title = "顯示寵物傷害", tooltipText = "顯示寵物對目標的傷害，含圖騰"},
 	["DEX_ShowBlockNumber"] = { title = "顯示被格檔的傷害", tooltipText = "以xxx-xx方式顯示對目標的傷害被格檔、抵抗的數值"},
-	["DEX_ShowDamageWoW"] = { title = "顯示系統默認傷害", tooltipText = "顯示系統原有的傷害"},
+	["DEX_ShowDamageWoW"] = { title = "顯示受到傷害", tooltipText = "顯示玩家受到的傷害"},
 	["DEX_ShowOwnHealth"] = { title = "顯示自身治療", tooltipText = "當目標為自己的時候也顯示治療量"},
-	["DEX_UniteSpell"] = { title = "合併瞬間多次同技能傷害", tooltipText = "如風怒武器,毀傷等瞬間對同一目標造成多次傷害的技能將被合併為一個傷害顯示"},
-	--["DEX_NumberFormat"] = { title = "顯示分隔符號", tooltipText = "是否顯示千分位傷害數字分隔符號"},
-	["DEX_NumberFormat"] = { title = "萬進制顯示", tooltipText = "是否以萬為單位顯示"},	
-	["DEX_ShowSpellIcon"] = { title = "顯示技能圖標", tooltipText = "是否顯示技能圖標，選中則替換顯示技能名稱"},		
-	["DEX_ShowInterrupt"] = { title = "是否顯示中斷", tooltipText = "是否顯示中斷提示"},	
+	["DEX_UniteSpell"] = { title = "合併瞬間同技能信息", tooltipText = "連續造成多次相同的技能將被合併為一個信息顯示（包括傷害和治療）"},
+	["DEX_NumberFormat"] = { title = "顯示數字分隔符", tooltipText = "是否顯示千分位傷害數字分隔符"},
+	["DEX_ShowInterrupt"] = { title = "是否顯示打斷", tooltipText = "是否顯示中斷提示"},	
 	["DEX_ShowOverHeal"] = { title = "是否顯示過量治療", tooltipText = "是否顯示過量治療，關閉則不顯示"},				
-};
+	["DEX_ShowHit"] = { title = "是否顯示連擊點/真氣", tooltipText = "是否顯示盜賊/野德連擊點\武僧真氣，關閉則不顯示"},		
+	["DEX_ShowHealthType"] = { title = "默認顯示方式", tooltipText = "治療默認的顯示方式爲向上滾動，其他爲拋物線"},		
+	["DEX_ShowHealthSpellIconOnCrit"] = { title = "當暴擊才顯示", tooltipText = "治療當暴擊才顯示圖標"},		
+	["DEX_ShowHealthSpellIcon"] = { title = "顯示圖標", tooltipText = "治療顯示圖標"},		
+	["DEX_ShowHealthNameOnCrit"] = { title = "當暴擊才顯示", tooltipText = "治療當暴擊才顯示才顯示技能名"},		
+	["DEX_ShowHealthSpellName"] = { title = "顯示技能名", tooltipText = "治療顯示技能名"},		
+	["DEX_ShowBuff"] = { title = "顯示增益", tooltipText = "顯示增益BUFF效果"},		
+	["DEX_ShowDamageType"] = { title = "顯示方式", tooltipText = "受到傷害默認的顯示方式爲向上滾動，其他爲拋物線"},		
+	["DEX_ShowDebuff"] = { title = "顯示減益", tooltipText = "顯示減益DEBUFF效果"},		
+	["DEX_ShowDamageSpellIconOnCrit"] = { title = "當暴擊才顯示", tooltipText = "受到傷害當暴擊才顯示圖標"},		
+	["DEX_ShowDamageSpellIcon"] = { title = "顯示圖標", tooltipText = "受到傷害顯示圖標"},		
+	["DEX_ShowDamageNameOnCrit"] = { title = "當暴擊才顯示", tooltipText = "受到傷害當暴擊才顯示技能名"},		
+	["DEX_ShowDamageSpellName"] = { title = "顯示技能名", tooltipText = "受到傷害顯示技能名"},		
+	["DEX_ShowDamage"] = { title = "顯示傷害", tooltipText = "顯示傷害輸出"},		
+	["DEX_ShowSpellName"] = { title = "顯示技能名", tooltipText = "在傷害數值邊顯示造成此次傷害的技能名"},
+	["DEX_ShowNameOnCrit"] = { title = "當暴擊才顯示", tooltipText = "只有在致命一擊時才顯示技能名"},
+	["DEX_ShowDamageIconOnCrit"] = { title = "圖標", tooltipText = "圖標替代技能名"},		
+	["DEX_ShowNameOnMiss"] = { title = "當未擊中等才顯示", tooltipText = "只有在技能未擊中，被抵抗等才顯示技能名"},
+	["DEX_ShowSpellIcon"] = { title = "顯示技能圖標", tooltipText = "是否顯示技能圖標，選中則顯示技能名稱"},		
+	["DEX_ShowSpellIconOnCrit"] = { title = "當暴擊才顯示", tooltipText = "傷害當暴擊才顯示圖標"},		
+	["DEX_State"] = { title = "戰鬥狀態", tooltipText = "提示進入或離開戰鬥"},		
+	["DEX_NoCombatHeal"] = { title = "非戰鬥狀態治療", tooltipText = "在非戰鬥狀態下顯示治療"},		
+	["DEX_AdjustTime"] = { title = "優化時間復位", tooltipText = "優化時間過度進行復位"},		
+}
+
 DEXOptionsFrameSliders = {
-	["DEX_Font"] = {  title = "字型 ", minText="字型1", maxText="字型3", tooltipText = "設置文字字型"},
+	["DEX_FrameLevel"] = {  title = "框架層 ", minText="1", maxText="9", tooltipText = "設置框架層的效果"},
+	["DEX_Font"] = {  title = "字型 ", minText="字型1", maxText="字型3", tooltipText = "設置文字字型\n1=bLEI00D\n2=bKAI00M\n3=bHEI00M\n4=bHEI01B\n5=bHEI01B\n6=Damage"},
 	["DEX_FontSize"] = {  title = "文字大小 ", minText="小", maxText="大", tooltipText = "設置文字的大小"},
 	["DEX_OutLine"] = {  title = "字型描邊 ", minText="無", maxText="粗", tooltipText = "設置文字的描邊效果"},
 	["DEX_Speed"] = {  title = "文字移動速度 ", minText="慢", maxText="快", tooltipText = "設置文字的移動速度"},
 	["DEX_LOGLINE"] = {  title = "訊息最大條目 ", minText="5條", maxText="20條", tooltipText = "設置訊息最大顯示條目數"},
 	["DEX_LOGTIME"] = {  title = "訊息停留時間 ", minText="5秒", maxText="1分鐘", tooltipText = "設置訊息文字停留時間"},
-};
+	["DEX_ShowHitX"] = {  title = "是否顯示連擊點/真氣X坐標 ", minText="-300", maxText="300", tooltipText = "顯示盜賊/野德連擊點\武僧真氣X坐標"},
+	["DEX_ShowHitY"] = {  title = "是否顯示連擊點/真氣Y坐標 ", minText="-300", maxText="300", tooltipText = "顯示盜賊/野德連擊點\武僧真氣Y坐標"},
+	["DEX_HealthPosX"] = {  title = "顯示治疗X坐標", minText="-800", maxText="800", tooltipText = "設置顯示治疗X坐標"},
+	["DEX_HealthPosY"] = {  title = "顯示治疗Y坐標", minText="-800", maxText="800", tooltipText = "設置顯示治疗Y坐標"},
+	["DEX_BeAttackPosX"] = {  title = "顯示被攻擊X坐標", minText="-800", maxText="800", tooltipText = "設置顯示被攻擊X坐標"},
+	["DEX_BeAttackPosY"] = {  title = "顯示被攻擊Y坐標", minText="-800", maxText="800", tooltipText = "設置顯示被攻擊Y坐標"},
+	["DEX_PetPosX"] = {  title = "顯示宠物攻擊X坐標", minText="-800", maxText="800", tooltipText = "設置顯示宠物攻擊X坐標"},
+	["DEX_PetPosY"] = {  title = "顯示宠物攻擊Y坐標", minText="-800", maxText="800", tooltipText = "設置顯示宠物攻擊Y坐標"},
+	["DEX_IconSize"] = {  title = "圖標大小", minText="1", maxText="10", tooltipText = "設置圖標與字體大小比例"},
+	["DEX_AOETime"] = {  title = "合併時間", minText="1", maxText="9", tooltipText = "設置技能合併時長"},
+}
+
 DEXOptionsColorPickerEx = {
 	["DEX_ColorNormal"] = { title = "物理傷害顏色"},
 	["DEX_ColorSkill"] = { title = "技能傷害顏色"},
@@ -335,8 +375,20 @@ DEXOptionsColorPickerEx = {
 	["DEX_ColorPet"] = { title = "寵物傷害顏色"},
 	["DEX_ColorSpec"] = { title = "中斷,驅散等顏色"},
 	["DEX_ColorMana"] = { title = "法力傷害顏色"},
-};
-
+	["DEX_ColorAttack"] = { title = "受到傷害顏色"},
+}
+U["+2timeLimit"] = "加二时间 "
+U["+3timeLimit"] = "加三时间 "
+U["CastAlertInfo"] = "开启%s，前往%s ！"
+U["Instance Difficulty"] = "当前副本难度：%s"
+U["LM Message 1"] = "你好！请问%s有需求吗？没有的话能让给我吗？谢谢！"
+U["LM Message 2"] = "老哥！求个%s！毕业的！谢谢！"
+U["LM Message 3"] = "你好！能让一下%s吗？谢谢！"
+U["LM Message 4"] = "老哥！求个%s啊，刷了很久了！谢谢！"
+U["LootMonitor Info"] = "左键：贴出 右键：密语"
+U["LootMonitor Title"] = "拾取监控助手"
+U["MapID"] = "地图ID: "
+U["Socket"] = "插槽"
 
 U["Damage"] = "傷害"  
 U["PlayerFrame Scale"] = "頭像縮放"
@@ -396,7 +448,7 @@ U["Tell"] = "告訴"
 U["Ghost"] = "靈魂"
 U["Skip"] = "跳過"
 U["Sort"] = "整理"
-U["Chat Copy"] = "%s複製|n%s選單"
+U["Chat Copy"] = "%s複製"  --|n%s選單
 U["Attach List"] = "附件清單:"
 U["Arch Count"] = "各種族考古統計"
 U["Rare"] = "稀有"
@@ -468,7 +520,7 @@ U["Enable Totembar"] = "啟用圖騰助手"
 U["Totembar"] = "圖騰欄"
 U["VerticalTotems"] = "竪直排列圖騰"
 U["TotemSize"] = "圖騰圖示大小"
-U["Enable UFs"] = "啟用頭像框架"
+U["Enable UFs"] = "啟用首領/競技場框架"
 U["UFs Portrait"] = "顯示頭像3D模型"
 U["Arena Frame"] = "顯示競技場框架"
 U["UFs Castbar"] = "啟用施法條"
@@ -588,9 +640,9 @@ U["BrokenAlert"] = "控制技能打破通報"
 U["BrokenAlertTip"] = "|n當有人打破控制技能時，進行通報。|n例如致盲、冰凍陷阱、變形術等。"
 U["InstAlertOnly"] = "只在副本中通報"
 U["InstAlertOnlyTip"] = "|n勾選後，只在副本中進行上述通報，在野外及隨機副本中不進行通報。"
-U["Interrupt"] = "打斷 - %s > %s"
-U["Steal"] = "偷取 - %s > %s"
-U["Dispel"] = "驅散 - %s > %s"
+U["Interrupt"] = "打斷→%s"
+U["Steal"] = "偷取→%s"
+U["Dispel"] = "驅散→%s"
 U["BrokenSpell"] = "破控 - %s > %s"
 U["QuestNotification"] = "啟用任務通報"
 U["QuestProgress"] = "通報任務的詳盡進度"
@@ -1311,3 +1363,5 @@ U["OverAbsorbTip"] = "|n勾選後，當吸收盾大於當前最大血量時，�
 U["ShowHealthAbsorb"] = "當前數值+吸收"
 U["LeaderOnly"] = "僅擁有隊伍權限時通報"
 U["LeaderOnlyTip"] = "|n勾選後，只有當你為小隊隊長、團長或者團隊助理時，才進行上述通報！"
+U["SingingSocket"] = "海妖戒指增强"
+U["SingingSocketTip"] = "|n勾選後，在海妖戒指的寶石頁面添加一個快速選擇寶石的小工具。"

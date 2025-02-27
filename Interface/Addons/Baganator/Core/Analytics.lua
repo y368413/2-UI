@@ -11,11 +11,9 @@ function addonTable.Core.RunAnalytics()
   local WagoAnalytics = WagoAnalytics:Register("kGr09M6y")
   addonTable.WagoAnalytics = WagoAnalytics
 
-  WagoAnalytics:Switch("UsingSkin", false)
+  WagoAnalytics:Switch("UsingSkinRaw", false)
   WagoAnalytics:Switch("UsingCategories", addonTable.Config.Get(addonTable.Config.Options.BAG_VIEW_TYPE) == "category" or addonTable.Config.Get(addonTable.Config.Options.BANK_VIEW_TYPE) == "category")
   WagoAnalytics:Switch("DifferentViews", addonTable.Config.Get(addonTable.Config.Options.BAG_VIEW_TYPE) ~= addonTable.Config.Get(addonTable.Config.Options.BANK_VIEW_TYPE))
-
-  WagoAnalytics:Switch("NoFrameBorders", addonTable.Config.Get(addonTable.Config.Options.NO_FRAME_BORDERS))
 
   WagoAnalytics:Switch("EmptySpaceAtTop", addonTable.Config.Get(addonTable.Config.Options.BAG_EMPTY_SPACE_AT_TOP))
   WagoAnalytics:Switch("FlashSimilarAlt", addonTable.Config.Get(addonTable.Config.Options.ICON_FLASH_SIMILAR_ALT))
@@ -71,10 +69,7 @@ function addonTable.Core.RunAnalytics()
     [addonTable.Config.Options.WARBAND_BANK_VIEW_WIDTH] = true,
     [addonTable.Config.Options.GUILD_VIEW_WIDTH] = true,
     [addonTable.Config.Options.BAG_ICON_SIZE] = true,
-    [addonTable.Config.Options.VIEW_ALPHA] = true,
     [addonTable.Config.Options.LOCK_FRAMES] = true,
-    [addonTable.Config.Options.NO_FRAME_BORDERS] = true,
-    [addonTable.Config.Options.EMPTY_SLOT_BACKGROUND] = true,
     [addonTable.Config.Options.SHOW_SORT_BUTTON] = true,
     [addonTable.Config.Options.HIDE_BOE_ON_COMMON] = true,
     [addonTable.Config.Options.SHOW_RECENTS_TABS] = true,
@@ -99,6 +94,8 @@ function addonTable.Core.RunAnalytics()
     [addonTable.Config.Options.CATEGORY_GROUP_EMPTY_SLOTS] = true,
     [addonTable.Config.Options.ADD_TO_CATEGORY_BUTTONS] = true,
     [addonTable.Config.Options.RECENT_TIMEOUT] = true,
+
+    [addonTable.Config.Options.CURRENT_SKIN] = true,
   }
 
   local frame = CreateFrame("Frame")
@@ -129,7 +126,7 @@ function addonTable.Core.RunAnalytics()
   end)
 
   do
-    local sortMethod = addonTable.Config.Get(addonTable.Config.SORT_METHOD)
+    local sortMethod = addonTable.Config.Get(addonTable.Config.Options.SORT_METHOD)
     local possibleSortMethods = {
       "type",
       "quality",

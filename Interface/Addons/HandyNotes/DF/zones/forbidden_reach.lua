@@ -1,19 +1,19 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Dragonflight = ...
+local ADDON_NAME, ns = ...
 
-local L = Dragonflight.locale
-local Map = Dragonflight.Map
+local L = ns.locale
+local Map = ns.Map
 
-local Rare = Dragonflight.node.Rare
-local Treasure = Dragonflight.node.Treasure
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local Item = Dragonflight.reward.Item
-local Transmog = Dragonflight.reward.Transmog
+local Item = ns.reward.Item
+local Transmog = ns.reward.Transmog
 
-local Path = Dragonflight.poi.Path
-local POI = Dragonflight.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 

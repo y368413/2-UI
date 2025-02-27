@@ -37,6 +37,7 @@ local expansionIDToText = {
   [7] = "BfA",
   [8] = "SL",
   [9] = "DF",
+  [10] = "TWW",
 }
 
 local function CacheSettings()
@@ -50,7 +51,7 @@ local function CacheSettings()
     iconSettings.junkPlugin = nil
   end
 end
-addonTable.CallbackRegistry:RegisterCallback("SettingChangedEarly", CacheSettings)
+addonTable.CallbackRegistry:RegisterCallback("SettingChanged", CacheSettings)
 addonTable.Utilities.OnAddonLoaded("Baganator", CacheSettings)
 
 local function textInit(itemButton)
@@ -79,6 +80,34 @@ Baganator.API.RegisterCornerWidget(BAGANATOR_L_ITEM_LEVEL, "item_level", functio
   end
   return false
 end, textInit)
+
+do
+  -- Level up (as heirlooms may change ilvl) or timewalking raid begin/end
+  local frame = CreateFrame("Frame")
+  frame:RegisterEvent("PLAYER_LEVEL_UP")
+  frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+
+  local lastDifficultyID
+
+  frame:SetScript("OnEvent", function(_, eventName)
+    if not Baganator.API.IsCornerWidgetActive("item_level") then
+      return
+    end
+
+    if eventName == "PLAYER_LEVEL_UP" then
+      Baganator.API.RequestItemButtonsRefresh({Baganator.Constants.RefreshReason.ItemWidgets})
+    -- Detect entering or leaving a timewalking raid instance
+    elseif eventName == "PLAYER_ENTERING_WORLD" then
+      local newDifficultyID = GetDungeonDifficultyID()
+      if lastDifficultyID ~= nil and lastDifficultyID ~= newDifficultyID and (
+        newDifficultyID == 33 or lastDifficultyID == 33
+        ) then
+        Baganator.API.RequestItemButtonsRefresh({Baganator.Constants.RefreshReason.ItemWidgets})
+      end
+      lastDifficultyID = newDifficultyID
+    end
+  end)
+end
 
 local function IsBindOnEquip(details)
   local classID = select(6, C_Item.GetItemInfoInstant(details.itemLink))
@@ -117,6 +146,21 @@ local function IsBindOnAccount(details)
   end
   if details.tooltipInfo then
     for _, row in ipairs(details.tooltipInfo.lines) do
+      if tIndexOf(Syndicator.Constants.AccountBoundTooltipLines, row.leftText) ~= nil or
+          (not details.isBound and tIndexOf(Syndicator.Constants.AccountBoundTooltipLinesNotBound, row.leftText) ~= nil) then
+        return true
+      end
+    end
+  end
+  return false
+end
+
+local function IsWarboundOnly(details)
+  if not details.tooltipInfo then
+    details.tooltipInfo = details.tooltipGetter()
+  end
+  if details.tooltipInfo then
+    for _, row in ipairs(details.tooltipInfo.lines) do
       if tIndexOf(Syndicator.Constants.AccountBoundTooltipLines, row.leftText) ~= nil then
         return true
       end
@@ -129,9 +173,9 @@ local function IsWarboundUntilEquipped(details)
   if not details.tooltipInfo then
     details.tooltipInfo = details.tooltipGetter()
   end
-  if details.tooltipInfo then
+  if details.tooltipInfo and not details.isBound then
     for _, row in ipairs(details.tooltipInfo.lines) do
-      if row.leftText == ITEM_ACCOUNTBOUND_UNTIL_EQUIP or (not details.isBound and row.leftText == ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP) then
+      if tIndexOf(Syndicator.Constants.AccountBoundTooltipLinesNotBound, row.leftText) ~= nil then
         return true
       end
     end
@@ -225,7 +269,7 @@ Baganator.API.RegisterCornerWidget(BAGANATOR_L_QUANTITY, "quantity", function(_,
 end, function(itemButton)
   itemButton.Count.sizeFont = true
   return itemButton.Count
-end)
+end, nil, true)
 
 Baganator.API.RegisterCornerWidget(BAGANATOR_L_JUNK, "junk", function(JunkIcon, details)
   return details.isJunk == true
@@ -235,7 +279,7 @@ function(itemButton)
     itemButton.JunkIcon.padding = 0
     return itemButton.JunkIcon
   end
-end)
+end, nil, true)
 
 local function RegisterExpansionWidget()
   Baganator.API.RegisterCornerWidget(BAGANATOR_L_EXPANSION, "expansion", function(Expansion, details)
@@ -258,7 +302,16 @@ end, function(itemButton)
   EquipmentSet:SetTexture("interface\\addons\\baganator\\assets\\equipment-set-shield")
   EquipmentSet:SetSize(15, 15)
   return EquipmentSet
-end)
+end, nil, true)
+
+Baganator.API.RegisterCornerWidget(BAGANATOR_L_EQUIPMENT_SET_ICON, "equipment_set_icon", function(EquipmentSetIcon, details)
+  EquipmentSetIcon:SetTexture(details.setInfo and details.setInfo[1].iconTexture or nil)
+  return details.setInfo ~= nil and details.setInfo[1].iconTexture ~= nil
+end, function(itemButton)
+  local EquipmentSetIcon = itemButton:CreateTexture(nil, "ARTWORK")
+  EquipmentSetIcon:SetSize(15, 15)
+  return EquipmentSetIcon
+end, nil, true)
 
 addonTable.Utilities.OnAddonLoaded("CanIMogIt", function()
   local function IsPet(itemID)
@@ -288,7 +341,7 @@ addonTable.Utilities.OnAddonLoaded("CanIMogIt", function()
 
   local function Callback()
     if Baganator.API.IsCornerWidgetActive("can_i_mog_it") then
-      Baganator.API.RequestItemButtonsRefresh()
+      Baganator.API.RequestItemButtonsRefresh({Baganator.Constants.RefreshReason.ItemWidgets})
     end
   end
   CanIMogIt:RegisterMessage("OptionUpdate", function()
@@ -319,7 +372,7 @@ addonTable.Utilities.OnAddonLoaded("BattlePetBreedID", function()
     end
     local speciesID, level, rarity, maxHealth, power, speed = BattlePetToolTip_UnpackBattlePetLink(details.itemLink)
     local breednum = BPBID_Internal.CalculateBreedID(speciesID, rarity + 1, level, maxHealth, power, speed, false, false)
-    local name = BPBID_Internal.RetrieveBreedName(breednum):gsub("/", "")
+    local name = tostring(BPBID_Internal.RetrieveBreedName(breednum)):gsub("/", "")
     Breed:SetText(name)
     if iconSettings.useQualityColors then
       local color = qualityColors[details.quality]
@@ -346,7 +399,7 @@ if addonTable.Constants.IsRetail then
     Level:SetText((details.itemLink:match("battlepet:.-:(%d+)")))
     return true
   end,
-  textInit, {corner = "top_left", priority = 2})
+  textInit, {corner = "top_left", priority = 2}, true)
 end
 
 if C_Engraving and C_Engraving.IsEngravingEnabled() then
@@ -383,6 +436,20 @@ if addonTable.Constants.IsRetail then
     return true
   end, textInit, {corner = "top_left", priority = 3})
 
+  Baganator.API.RegisterCornerWidget(BAGANATOR_L_WARBOUND_ONLY, "warbound_only", function(BindingText, details)
+    if IsWarboundOnly(details) then
+      BindingText:SetText(BAGANATOR_L_W)
+      if iconSettings.useQualityColors then
+        local color = qualityColors[details.quality]
+        BindingText:SetTextColor(color.r, color.g, color.b)
+      else
+        BindingText:SetTextColor(1,1,1)
+      end
+      return true
+    end
+    return false
+  end, textInit)
+
   Baganator.API.RegisterCornerWidget(BAGANATOR_L_WARBOUND_UNTIL_EQUIPPED, "wue", function(BindingText, details)
     if IsWarboundUntilEquipped(details) then
       BindingText:SetText(BAGANATOR_L_WUE)
@@ -397,3 +464,24 @@ if addonTable.Constants.IsRetail then
     return false
   end, textInit)
 end
+
+Baganator.API.RegisterCornerWidget(BAGANATOR_L_BAG_TYPE_CATEGORIES, "bag_type", function(Type, details)
+  local info = addonTable.Constants.ContainerKeyToInfo[details.bagType]
+  if info then
+    Type:SetDesaturated(true)
+    if info.type == "file" then
+      Type:SetSize(15, 15)
+      Type:SetTexture(info.value)
+    else
+      local size = info.size or 64
+      Type:SetSize(size/64 * 15, size/64 * 15)
+      Type:SetAtlas(info.value)
+    end
+    return true
+  end
+  return false
+end, function(itemButton)
+  local Type = itemButton:CreateTexture(nil, "ARTWORK")
+  Type.padding = -1
+  return Type
+end, {corner = "bottom_left", priority = 1}, true)

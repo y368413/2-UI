@@ -1,16 +1,16 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, WrathOfTheLichKing = ...
-local Map = WrathOfTheLichKing.Map
-local L = WrathOfTheLichKing.locale
-local Class = WrathOfTheLichKing.Class
+local ADDON_NAME, ns = ...
+local Map = ns.Map
+local L = ns.locale
+local Class = ns.Class
 
-local Collectible = WrathOfTheLichKing.node.Collectible
+local Collectible = ns.node.Collectible
 
-local Achievement = WrathOfTheLichKing.reward.Achievement
-local Pet = WrathOfTheLichKing.reward.Pet
-local Toy = WrathOfTheLichKing.reward.Toy
+local Achievement = ns.reward.Achievement
+local Pet = ns.reward.Pet
+local Toy = ns.reward.Toy
 
 -------------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ local sewers = Map({id = 126, settings = true})
 local function HigherLearning_Rewards(criteria)
     return {
         Achievement({id = 1956, criteria = criteria}), -- Higher Learning
-        WrathOfTheLichKing.reward.Item({item = 43824}) -- The Schools of Arcane Magic - Mastery
+        ns.reward.Item({item = 43824}) -- The Schools of Arcane Magic - Mastery
     }
 end
 
@@ -72,7 +72,7 @@ map.nodes[46784001] = HigherLearning({
 map.nodes[24355372] = HigherLearning({
     label = '{npc:90430}',
     note = L['higher_learning_vargoth'],
-    requires = {WrathOfTheLichKing.requirement.Achievement(1956), WrathOfTheLichKing.requirement.Toy(43824)},
+    requires = {ns.requirement.Achievement(1956), ns.requirement.Toy(43824)},
     rewards = {
         Pet({id = 199, item = 44738}), -- Kirin Tor Familiar
         Toy({item = 43824}) -- The Schools of Arcane Magic - Mastery

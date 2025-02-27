@@ -1,42 +1,42 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Dragonflight = ...
-local Class = Dragonflight.Class
-local L = Dragonflight.locale
-local Map = Dragonflight.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = Dragonflight.node.Collectible
-local Dragonglyph = Dragonflight.node.Dragonglyph
-local ElusiveCreature = Dragonflight.node.ElusiveCreature
-local Node = Dragonflight.node.Node
-local NPC = Dragonflight.node.NPC
-local PT = Dragonflight.node.ProfessionTreasures
-local Rare = Dragonflight.node.Rare
-local Treasure = Dragonflight.node.Treasure
-local Vendor = Dragonflight.node.Vendor
+local Collectible = ns.node.Collectible
+local Dragonglyph = ns.node.Dragonglyph
+local ElusiveCreature = ns.node.ElusiveCreature
+local Node = ns.node.Node
+local NPC = ns.node.NPC
+local PT = ns.node.ProfessionTreasures
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
+local Vendor = ns.node.Vendor
 
-local WarSupply = Dragonflight.node.WarSupply
+local WarSupply = ns.node.WarSupply
 
-local Achievement = Dragonflight.reward.Achievement
-local Currency = Dragonflight.reward.Currency
-local Item = Dragonflight.reward.Item
-local Mount = Dragonflight.reward.Mount
-local Pet = Dragonflight.reward.Pet
-local Recipe = Dragonflight.reward.Recipe
-local Section = Dragonflight.reward.Section
-local Spacer = Dragonflight.reward.Spacer
-local Toy = Dragonflight.reward.Toy
-local Transmog = Dragonflight.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Currency = ns.reward.Currency
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Recipe = ns.reward.Recipe
+local Section = ns.reward.Section
+local Spacer = ns.reward.Spacer
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Path = Dragonflight.poi.Path
-local POI = Dragonflight.poi.POI
-local Circle = Dragonflight.poi.Circle
+local Path = ns.poi.Path
+local POI = ns.poi.POI
+local Circle = ns.poi.Circle
 
-local ItemStatus = Dragonflight.tooltip.ItemStatus
-local QuestStatus = Dragonflight.tooltip.QuestStatus
+local ItemStatus = ns.tooltip.ItemStatus
+local QuestStatus = ns.tooltip.QuestStatus
 
-local DC = Dragonflight.DRAGON_CUSTOMIZATIONS
+local DC = ns.DRAGON_CUSTOMIZATIONS
 
 -------------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ function DRUID_GLYPH:Note(note)
     return DRUID_GLYPH({item = self.item, quest = self.quest, note = note})
 end
 
-Dragonflight.DRUID_GLYPHS = {
+ns.DRUID_GLYPHS = {
     Moonkin = {FireMoonkin = DRUID_GLYPH({item = 211280, quest = 78525})},
     Feral = {
         EvergreenDreamsaber = DRUID_GLYPH({item = 210669, quest = 78507}),
@@ -92,10 +92,10 @@ Dragonflight.DRUID_GLYPHS = {
     }
 }
 
-local DG = Dragonflight.DRUID_GLYPHS
+local DG = ns.DRUID_GLYPHS
 
 local DruidSpacer = Class('DruidSpacer', Spacer, {
-    IsEnabled = function() return Dragonflight.class == 'DRUID' end
+    IsEnabled = function() return ns.class == 'DRUID' end
 })
 
 -------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ map.nodes[64178399] = Rare({
     quest = 77867,
     vignette = {5806, 5814},
     note = L['reefbreaker_moruud_note'],
-    rlabel = Dragonflight.status.LightBlue('+50 ' .. L['rep']),
+    rlabel = ns.status.LightBlue('+50 ' .. L['rep']),
     rewards = {
         Achievement({id = 19316, criteria = 62931}), -- Adventurer of the Emerald Dream
         Transmog({item = 208334, slot = L['plate']}), -- Legplates of the Krakken
@@ -142,7 +142,7 @@ map.nodes[34716316] = Rare({
     quest = 77878,
     vignette = 5816,
     note = L['envoy_of_winter_note'],
-    rlabel = Dragonflight.status.LightBlue('+50 ' .. L['rep']),
+    rlabel = ns.status.LightBlue('+50 ' .. L['rep']),
     rewards = {
         Achievement({id = 19316, criteria = 62933}), -- Adventurer of the Emerald Dream
         Transmog({item = 208365, slot = L['polearm']}), -- Winter's Stand
@@ -156,7 +156,7 @@ map.nodes[29862077] = Rare({
     id = 209893,
     quest = 78015,
     vignette = 5835,
-    rlabel = Dragonflight.status.LightBlue('+50 ' .. L['rep']),
+    rlabel = ns.status.LightBlue('+50 ' .. L['rep']),
     rewards = {
         Achievement({id = 19316, criteria = 62930}), -- Adventurer of the Emerald Dream
         Transmog({item = 209881, slot = L['dagger']}), -- Fystia's Fiery Kris
@@ -194,7 +194,7 @@ map.nodes[54034142] = Rare({
     quest = 77982,
     vignette = {5817, 5969},
     note = L['greedy_gessie_note'],
-    rlabel = Dragonflight.status.LightBlue('+50 ' .. L['rep']),
+    rlabel = ns.status.LightBlue('+50 ' .. L['rep']),
     rewards = {
         Achievement({id = 19316, criteria = 62932}) -- Adventurer of the Emerald Dream
     }
@@ -315,7 +315,7 @@ map.nodes[61747187] = Rare({
     quest = 77570,
     note = L['nuoberon_note'],
     vignette = 5786,
-    rlabel = Dragonflight.status.LightBlue('+50 ' .. L['rep']),
+    rlabel = ns.status.LightBlue('+50 ' .. L['rep']),
     rewards = {
         Achievement({id = 19316, criteria = 62929}), -- Adventurer of the Emerald Dream
         Transmog({item = 209880, slot = L['bow']}) -- Curve of Starry Dusks
@@ -444,7 +444,7 @@ local Raszageth = Class('Raszageth', Rare, {
     quest = 77859,
     fgroup = 'raszageth'
     -- note = L['raszageths_note'],
-    -- rlabel = Dragonflight.status.LightBlue('+50 ' .. L['rep']), -- NOT confirm yet
+    -- rlabel = ns.status.LightBlue('+50 ' .. L['rep']), -- NOT confirm yet
     -- rewards = {}
 }) -- Raszageth's Last Breath
 
@@ -463,7 +463,7 @@ local Amalgamation = Class('Amalgamation', Rare, {
     quest = 77856,
     fgroup = 'amalgamation'
     -- note = L['amalgamation_note'],
-    -- rlabel = Dragonflight.status.LightBlue('+50 ' .. L['rep']), -- NOT confirm yet
+    -- rlabel = ns.status.LightBlue('+50 ' .. L['rep']), -- NOT confirm yet
     -- rewards = {}
 }) -- Amalgamation of Dreams
 
@@ -501,13 +501,13 @@ map.nodes[72002700] = Node({
         Item({item = 208067}), -- Plump Dreamseed
         Item({item = 208047}), -- Gigantic Dreamseed
         Spacer(),
-        Recipe({item = 191578, profession = Dragonflight.professions.ALCHEMY.skillID}), -- Recipe: Transmute: Awakened Fire
-        Recipe({item = 210171, profession = Dragonflight.professions.ENCHANTING.skillID}), -- Formula: Enchanted Aspect's Dreaming Crest
-        Recipe({item = 210172, profession = Dragonflight.professions.ENCHANTING.skillID}), -- Formula: Enchanted Wyrm's Dreaming Crest
-        Recipe({item = 210173, profession = Dragonflight.professions.ENCHANTING.skillID}), -- Formula: Enchanted Whelpling's Dreaming Crest
-        Recipe({item = 210491, profession = Dragonflight.professions.INSCRIPTION.skillID}), -- Technique: Winding Slitherdrake: Hairy Chin
-        Recipe({item = 210492, profession = Dragonflight.professions.INSCRIPTION.skillID}), -- Technique: Grotto Netherwing Drake: Chin Tendrils
-        Recipe({item = 210493, profession = Dragonflight.professions.INSCRIPTION.skillID}), -- Technique: Grotto Netherwing Drake: Spiked Jaw
+        Recipe({item = 191578, profession = ns.professions.ALCHEMY.skillID}), -- Recipe: Transmute: Awakened Fire
+        Recipe({item = 210171, profession = ns.professions.ENCHANTING.skillID}), -- Formula: Enchanted Aspect's Dreaming Crest
+        Recipe({item = 210172, profession = ns.professions.ENCHANTING.skillID}), -- Formula: Enchanted Wyrm's Dreaming Crest
+        Recipe({item = 210173, profession = ns.professions.ENCHANTING.skillID}), -- Formula: Enchanted Whelpling's Dreaming Crest
+        Recipe({item = 210491, profession = ns.professions.INSCRIPTION.skillID}), -- Technique: Winding Slitherdrake: Hairy Chin
+        Recipe({item = 210492, profession = ns.professions.INSCRIPTION.skillID}), -- Technique: Grotto Netherwing Drake: Chin Tendrils
+        Recipe({item = 210493, profession = ns.professions.INSCRIPTION.skillID}), -- Technique: Grotto Netherwing Drake: Spiked Jaw
         DC.GrottoNetherwingDrake.BarbedTail,
         DC.GrottoNetherwingDrake.ShortHorns,
         DC.GrottoNetherwingDrake.TripleSpikedCrest, Spacer(),
@@ -523,7 +523,7 @@ map.nodes[72002700] = Node({
 map.nodes[39146553] = Treasure({
     quest = 77950,
     location = L['in_a_tree'],
-    rlabel = Dragonflight.status.LightBlue('+200 ' .. L['rep']),
+    rlabel = ns.status.LightBlue('+200 ' .. L['rep']),
     rewards = {
         Achievement({id = 19317, criteria = 62954}), -- Treasures of The Emerald Dream
         Item({item = 208047, note = '50%'}) -- Gigantic Dreamseed
@@ -534,7 +534,7 @@ map.nodes[47493485] = Treasure({
     label = L['hidden_moonkin_stash_label'],
     quest = 77858,
     location = L['in_a_tree'],
-    rlabel = Dragonflight.status.LightBlue('+200 ' .. L['rep']),
+    rlabel = ns.status.LightBlue('+200 ' .. L['rep']),
     rewards = {
         Achievement({id = 19317, criteria = 62953}), -- Treasures of The Emerald Dream
         Toy({item = 210725}) -- Owl Post
@@ -544,7 +544,7 @@ map.nodes[47493485] = Treasure({
 map.nodes[61625960] = Treasure({
     quest = 78005,
     note = L['magical_bloom_note'],
-    rlabel = Dragonflight.status.LightBlue('+200 ' .. L['rep']),
+    rlabel = ns.status.LightBlue('+200 ' .. L['rep']),
     rewards = {
         Achievement({id = 19317, criteria = 62960}), -- Treasures of The Emerald Dream
         Item({item = 208047}) -- Gigantic Dreamseed
@@ -555,7 +555,7 @@ map.nodes[61625960] = Treasure({
 map.nodes[55275726] = Treasure({
     quest = 78006,
     location = L['in_a_tree'],
-    rlabel = Dragonflight.status.LightBlue('+200 ' .. L['rep']),
+    rlabel = ns.status.LightBlue('+200 ' .. L['rep']),
     rewards = {
         Achievement({id = 19317, criteria = 62961}), -- Treasures of The Emerald Dream
         Item({item = 208067}) -- Plump Dreamseed
@@ -639,7 +639,7 @@ map.nodes[34105633] = Treasure({
 
 -------------------------------------------------------------------------------
 
-local Book = Class('Book', Dragonflight.node.Item, {icon = 133741})
+local Book = Class('Book', ns.node.Item, {icon = 133741})
 
 map.nodes[49816171] = Book({
     id = 210049,
@@ -665,8 +665,8 @@ local UnwakingEcho = Class('UnwakingEcho', Treasure, {
     icon = 'chest_gn',
     label = L['unwaking_echo_label'],
     note = L['unwaking_echo_note'],
-    requires = Dragonflight.requirement.Spell(421216), -- Dreaming
-    rlabel = Dragonflight.status.LightBlue('+200 ' .. L['rep'])
+    requires = ns.requirement.Spell(421216), -- Dreaming
+    rlabel = ns.status.LightBlue('+200 ' .. L['rep'])
 }) -- Unwaking Echo
 
 map.nodes[46408615] = UnwakingEcho({
@@ -821,7 +821,7 @@ map.nodes[61677548] = Dragonglyph({rewards = {Achievement({id = 19303})}}) -- Dr
 
 local MoonkinHatchling = Class('Hatchling', Collectible, {
     icon = 467894,
-    group = Dragonflight.groups.MOONKIN_HATCHLING,
+    group = ns.groups.MOONKIN_HATCHLING,
     note = L['moonkin_hatchling_note'],
     getters = {
         rewards = function(self)
@@ -923,9 +923,9 @@ map.nodes[37777028] = MoonkinHatchling({
 -------------------------------------------------------------------------------
 
 local AgelessBlossom = Class('AgelessBlossom', Collectible, {
-    requires = Dragonflight.requirement.Quest(78172), -- ![Mysterious Seeds]
+    requires = ns.requirement.Quest(78172), -- ![Mysterious Seeds]
     icon = 464030,
-    group = Dragonflight.groups.DREAM_OF_SEEDS,
+    group = ns.groups.DREAM_OF_SEEDS,
     rewards = {
         Achievement({id = 19013, criteria = 62396}) -- I Dream of Seeds
     },
@@ -940,10 +940,10 @@ map.nodes[60101818] = AgelessBlossom()
 local EmeraldBounty = Class('EmeraldBounty', Node, {
     note = L['dreamseed_soil_note'],
     requires = {
-        Dragonflight.requirement.Item(208066) -- Small Dreamseed
+        ns.requirement.Item(208066) -- Small Dreamseed
     },
     icon = 464030,
-    group = Dragonflight.groups.DREAM_OF_SEEDS,
+    group = ns.groups.DREAM_OF_SEEDS,
     getters = {
         label = function(self)
             local id = self.criteriaID
@@ -1006,20 +1006,20 @@ hooksecurefunc(VignettePinMixin, 'DisplayNormalTooltip', function(self)
     if self.vignetteID ~= 5971 then return end
 
     local mapID = self:GetMap().mapID
-    local group = Dragonflight.groups.DREAM_OF_SEEDS
-    if not Dragonflight.maps[mapID] or not group:GetDisplay(mapID) then return end
+    local group = ns.groups.DREAM_OF_SEEDS
+    if not ns.maps[mapID] or not group:GetDisplay(mapID) then return end
 
     local x, y =
         C_VignetteInfo.GetVignettePosition(self.vignetteGUID, mapID):GetXY()
-    local node = Dragonflight.maps[mapID].nodes[HandyNotes:getCoord(x, y)]
+    local node = ns.maps[mapID].nodes[HandyNotes:getCoord(x, y)]
     if not node then return end
 
     -- GameTooltip:AddLine(node.requires, true, 1, 1, 1)
-    if Dragonflight:GetOpt('show_notes') then
-        --GameTooltip:AddLine(' ')
-        GameTooltip:AddLine(Dragonflight.RenderLinks(node.note), 1, 1, 1, true)
+    if ns:GetOpt('show_notes') then
+        GameTooltip:AddLine(' ')
+        GameTooltip:AddLine(ns.RenderLinks(node.note), 1, 1, 1, true)
     end
-    if Dragonflight:GetOpt('show_loot') then node:RenderRewards(GameTooltip) end
+    if ns:GetOpt('show_loot') then node:RenderRewards(GameTooltip) end
 
     GameTooltip:Show()
 end)
@@ -1032,7 +1032,7 @@ map.nodes[51555972] = Collectible({
     icon = 3939983,
     label = '{quest:78319}',
     vignette = 5813,
-    rlabel = Dragonflight.status.LightBlue('+50 ' .. L['rep']),
+    rlabel = ns.status.LightBlue('+50 ' .. L['rep']),
     rewards = {
         Achievement({id = 19312}), -- Super Duper Bloom
         Achievement({
@@ -1083,14 +1083,14 @@ map.nodes[51555972] = Collectible({
 local Dreamfruit = Class('Dreamfruit', Collectible, {
     icon = 5390643,
     label = L['dreamfruit_label'],
-    group = Dragonflight.groups.DREAMFRUIT
+    group = ns.groups.DREAMFRUIT
 })
 
 map.nodes[51265990] = Dreamfruit({
     note = L['dreamfruit_note_1'],
     requires = {
-        Dragonflight.requirement.Reputation(2574, 1, true),
-        Dragonflight.requirement.Reputation(2574, 4, true)
+        ns.requirement.Reputation(2574, 1, true),
+        ns.requirement.Reputation(2574, 4, true)
     },
     rewards = {
         Achievement({
@@ -1124,8 +1124,8 @@ map.nodes[51265990] = Dreamfruit({
 map.nodes[52847357] = Dreamfruit({
     note = L['dreamfruit_note_2'],
     requires = {
-        Dragonflight.requirement.Reputation(2574, 8, true),
-        Dragonflight.requirement.Reputation(2574, 12, true)
+        ns.requirement.Reputation(2574, 8, true),
+        ns.requirement.Reputation(2574, 12, true)
     },
     rewards = {
         Achievement({
@@ -1159,8 +1159,8 @@ map.nodes[52847357] = Dreamfruit({
 map.nodes[46276304] = Dreamfruit({
     note = L['dreamfruit_note_2'],
     requires = {
-        Dragonflight.requirement.Reputation(2574, 8, true),
-        Dragonflight.requirement.Reputation(2574, 12, true)
+        ns.requirement.Reputation(2574, 8, true),
+        ns.requirement.Reputation(2574, 12, true)
     },
     rewards = {
         Achievement({
@@ -1197,7 +1197,7 @@ map.nodes[46276304] = Dreamfruit({
 
 local DruidGlyph = Class('DruidGlyph', Collectible, {
     icon = 625999,
-    group = Dragonflight.groups.DRUID_GLYPH,
+    group = ns.groups.DRUID_GLYPH,
     class = 'DRUID'
 }) -- Druid Glyph
 
@@ -1244,22 +1244,22 @@ map.nodes[70002700] = DruidGlyph({
     }
 }) -- Druid Glyph List
 
-local RareKill = Class('RareKill', Dragonflight.reward.Reward)
+local RareKill = Class('RareKill', ns.reward.Reward)
 
 function RareKill:IsEnabled()
     local completed = C_QuestLog.IsQuestFlaggedCompleted(self.nQuest)
     return not completed
 end
 
-function RareKill:GetText() return Dragonflight.RenderLinks('{npc:' .. self.id .. '}') end
+function RareKill:GetText() return ns.RenderLinks('{npc:' .. self.id .. '}') end
 
 function RareKill:IsObtained()
     return C_QuestLog.IsQuestFlaggedCompleted(self.kQuest)
 end
 
 function RareKill:GetStatus()
-    local Green = Dragonflight.status.Green
-    local Red = Dragonflight.status.Red
+    local Green = ns.status.Green
+    local Red = ns.status.Red
     return self:IsObtained() and Green(L['completed']) or Red(L['incomplete'])
 end
 
@@ -1314,7 +1314,7 @@ map.nodes[63743916] = DruidGlyph({
 map.nodes[34656926] = DruidGlyph({
     label = '{npc:210524}',
     note = L['azure_somnowl_note'],
-    requires = Dragonflight.requirement.Quest(77178), -- Tactical Withdrawal
+    requires = ns.requirement.Quest(77178), -- Tactical Withdrawal
     rewards = {DG.Flight.AzureSomnowl}, -- Feather of Friends
     pois = {POI({50786208})} -- Cenarius
 }) -- Q'onzu
@@ -1337,7 +1337,7 @@ end
 
 map.nodes[29703103] = PrismaticWhiskerfish()
 
-local wel = Dragonflight.maps[2232] or Map({id = 2232, settings = false}) -- Wellspring Atrium
+local wel = ns.maps[2232] or Map({id = 2232, settings = false}) -- Wellspring Atrium
 
 wel.nodes[50706200] = PrismaticWhiskerfish({
     pois = {
@@ -1347,7 +1347,7 @@ wel.nodes[50706200] = PrismaticWhiskerfish({
     }
 })
 
-local tsh = Dragonflight.maps[2244] or Map({id = 2244, settings = false}) -- The Scorched Hall
+local tsh = ns.maps[2244] or Map({id = 2244, settings = false}) -- The Scorched Hall
 
 tsh.nodes[55006800] = PrismaticWhiskerfish({
     pois = {
@@ -1383,12 +1383,12 @@ map.nodes[54507698] = SlumberingSomnowl({
 
 -------------------- DRUID GLYPH: MOON-BLESSED DREAMSABER ---------------------
 
-local Dragonblight = Dragonflight.maps[115] or Map({id = 115, settings = true})
-local Valsharah = Dragonflight.maps[641] or Map({id = 641, settings = true})
-local Duskwood = Dragonflight.maps[47] or Map({id = 47, settings = true})
-local Moonglade = Dragonflight.maps[80] or Map({id = 80, settings = true})
-local ShadowmoonValley = Dragonflight.maps[539] or Map({id = 539, settings = true})
-local TerokkarForest = Dragonflight.maps[108] or Map({id = 108, settings = true})
+local Dragonblight = ns.maps[115] or Map({id = 115, settings = true})
+local Valsharah = ns.maps[641] or Map({id = 641, settings = true})
+local Duskwood = ns.maps[47] or Map({id = 47, settings = true})
+local Moonglade = ns.maps[80] or Map({id = 80, settings = true})
+local ShadowmoonValley = ns.maps[539] or Map({id = 539, settings = true})
+local TerokkarForest = ns.maps[108] or Map({id = 108, settings = true})
 
 local EMPTY_VIALS = {
     [1] = {
@@ -1461,10 +1461,10 @@ local MoonBlessedClaw = Class('MoonBlessedClaw', DruidGlyph, {
 
 function MoonBlessedClaw.getters:note()
     local function complete(rlabel, vialFilledID)
-        if Dragonflight.PlayerHasItem(vialFilledID) or Dragonflight.PlayerHasItem(210977) then
-            return Dragonflight.status.Green(rlabel)
+        if ns.PlayerHasItem(vialFilledID) or ns.PlayerHasItem(210977) then
+            return ns.status.Green(rlabel)
         end
-        return Dragonflight.status.Red(rlabel)
+        return ns.status.Red(rlabel)
     end
 
     local note = L['mbc_note_start'] .. '\n'
@@ -1497,7 +1497,7 @@ for num, vial in ipairs(EMPTY_VIALS) do
     vial.map.nodes[vial.coordinates] = DruidGlyph({
         label = L['mbc_moonwell_label'],
         location = format(L['mbc_vial_location'], e, l, z, c, f),
-        rlabel = Dragonflight.status.Gray(format('"%s"', vial.rlabel)),
+        rlabel = ns.status.Gray(format('"%s"', vial.rlabel)),
         parent = vial.parent,
         playerHasItem = {vial.vialFilledID, 210977},
         rewards = {Item({item = vial.vialFilledID, count = '1'})},
@@ -1507,7 +1507,7 @@ for num, vial in ipairs(EMPTY_VIALS) do
             end
             if self.playerHasItem then
                 for i, v in ipairs(self.playerHasItem) do
-                    if Dragonflight.PlayerHasItem(v) then return true end
+                    if ns.PlayerHasItem(v) then return true end
                 end
             end
             return Node.IsCompleted(self)
@@ -1523,10 +1523,10 @@ end
 local Somnut = Class('Somnut', Node, {
     label = L['somnut'],
     icon = 656681,
-    group = Dragonflight.groups.SOMNUT,
-    requires = {Dragonflight.requirement.Reputation(2574, 2, true)}, -- review required? i can loot them at renown 1
+    group = ns.groups.SOMNUT,
+    requires = {ns.requirement.Reputation(2574, 2, true)}, -- review required? i can loot them at renown 1
     rewards = {
-        Dragonflight.reward.Quest({id = 78172}), -- Mysterious Seeds
+        ns.reward.Quest({id = 78172}), -- Mysterious Seeds
         Item({item = 208066}), -- Small Dreamseed
         DC.WindingSlitherdrake.SpikedHorns, --
         DC.WindingSlitherdrake.SpikedTail, --
@@ -1615,8 +1615,8 @@ map.nodes[47984506] = WarSupply({fgroup = 'supply_emerald_dream'})
 ---------------------------- EMERALD DREAM SAFARI -----------------------------
 -------------------------------------------------------------------------------
 
-local EmeraldDream_Safari = Class('EmeraldDream_Safari', Dragonflight.node.Safari,
-    {group = Dragonflight.groups.EMERALD_DREAM_SAFARI})
+local EmeraldDream_Safari = Class('EmeraldDream_Safari', ns.node.Safari,
+    {group = ns.groups.EMERALD_DREAM_SAFARI})
 
 map.nodes[51606080] = EmeraldDream_Safari({
     id = 212557,
@@ -1678,7 +1678,7 @@ map.nodes[46607960] = EmeraldDream_Safari({
 }) -- Leyhart
 
 map.nodes[34316765] = EmeraldDream_Safari({
-    requires = Dragonflight.requirement.Toy(209944),
+    requires = ns.requirement.Toy(209944),
     id = 212437,
     rewards = {Achievement({id = 19401, criteria = 63275}), Pet({id = 4302})},
     pois = {
@@ -1778,7 +1778,7 @@ local SeedbloomVendor = Class('SeedbloomVendor', Vendor, {
         DG.Travel.AuroralDreamtalon:Count('1'), --
         DG.Guardian.SnowyUmbraclaw:Count('1'), --
         DruidSpacer(), --
-        Section(Dragonflight.requirement.Reputation(2574, 11, true):GetText()),
+        Section(ns.requirement.Reputation(2574, 11, true):GetText()),
         Pet({item = 210690, id = 4306, count = '1'}), -- Elmer
         Pet({item = 210689, id = 4305, count = '1'}), -- Snoots
         Pet({item = 210571, id = 4296, count = '1'}), -- Snoozles
@@ -1786,7 +1786,7 @@ local SeedbloomVendor = Class('SeedbloomVendor', Vendor, {
         Pet({item = 210651, id = 4299, count = '1'}), -- Dustite
         Pet({item = 210648, id = 4298, count = '1'}), -- Seedle
         Spacer(), --
-        Section(Dragonflight.requirement.Reputation(2574, 18, true):GetText()),
+        Section(ns.requirement.Reputation(2574, 18, true):GetText()),
         Mount({item = 209950, id = 1810, count = '1'}), -- Reins of the Rekindled Dreamstag
         Mount({item = 209947, id = 1808, count = '1'}), -- Reins of the Blossoming Dreamstag
         -- Mount({item = 210775, id = 1835, count = '1'}), -- Reins of the Snowfluff Dreamtalon
@@ -1801,7 +1801,7 @@ map.nodes[49776211] = SeedbloomVendor({id = 212797}) -- Talisa Whisperbloom <Dre
 
 local Elianna = Class('Elianna', Vendor, {
     id = 211209,
-    requires = {Dragonflight.requirement.Reputation(2574, 5, true)},
+    requires = {ns.requirement.Reputation(2574, 5, true)},
     rewards = {
         Pet({item = 210785, id = 4310, count = '1'}), -- Snorr
         Pet({item = 210553, id = 4289, count = '1'}), -- Dreamborne Scarab
@@ -1894,7 +1894,7 @@ map.nodes[48676789] = OchreDreamtalon()
 
 local ThornLadenHeart = Class('ThornLadenHeart', Node, {
     label = '{item:209860}',
-    rlabel = Dragonflight.status.Gray('1/4'),
+    rlabel = ns.status.Gray('1/4'),
     icon = 415052,
     class = 'HUNTER',
     pois = {Path({Circle({origin = 49645610, radius = 16})})}
@@ -1912,15 +1912,15 @@ end
 map.nodes[49645610] = ThornLadenHeart()
 
 -- STEP 2
-local drustvar = Dragonflight.maps[896] or Map({id = 896, settings = false})
+local drustvar = ns.maps[896] or Map({id = 896, settings = false})
 
 local Athainne = Class('Athainne', NPC, {
     id = 140044,
-    rlabel = Dragonflight.status.Gray('2/4'),
+    rlabel = ns.status.Gray('2/4'),
     icon = 960685,
     class = 'HUNTER',
     IsEnabled = function(self)
-        if self.class and self.class ~= Dragonflight.class then return false end
+        if self.class and self.class ~= ns.class then return false end
         local spawn = 'nighttime'
         local hour, _ = GetGameTime()
         if hour >= 5 and hour < 19 then spawn = 'daytime' end
@@ -1957,7 +1957,7 @@ drustvar.nodes[51653967] = Athainne({
 
 local Ulfar = Class('Ulfar', NPC, {
     id = 141159,
-    rlabel = Dragonflight.status.Gray('3/4'),
+    rlabel = ns.status.Gray('3/4'),
     icon = 2101969,
     class = 'HUNTER',
     pois = {POI({46124524})} -- Entrance
@@ -1978,10 +1978,10 @@ drustvar.nodes[45194585] = Ulfar()
 
 map.nodes[44646425] = NPC({
     id = 210976, -- Wandering Gladehart
-    rlabel = Dragonflight.status.Gray('4/4'),
+    rlabel = ns.status.Gray('4/4'),
     icon = 132144,
     requires = {
-        Dragonflight.requirement.Item(209866) -- Thornspeaker Ritual Knife (Stag)
+        ns.requirement.Item(209866) -- Thornspeaker Ritual Knife (Stag)
     },
     class = 'HUNTER',
     note = format(L['thornbeast_disclaimer'], 209866) .. '\n\n' ..
@@ -1995,11 +1995,11 @@ map.nodes[44646425] = NPC({
 
 map.nodes[57204780] = NPC({
     id = 210975, -- Listless Dreamsaber
-    rlabel = Dragonflight.status.Gray('4/4'),
+    rlabel = ns.status.Gray('4/4'),
     icon = 132115,
     location = L['in_cave'],
     requires = {
-        Dragonflight.requirement.Item(209867) -- Thornspeaker Ritual Knife (Saber)
+        ns.requirement.Item(209867) -- Thornspeaker Ritual Knife (Saber)
     },
     class = 'HUNTER',
     note = format(L['thornbeast_disclaimer'], 209866) .. '\n\n' ..
@@ -2009,10 +2009,10 @@ map.nodes[57204780] = NPC({
 
 map.nodes[36596203] = NPC({
     id = 210977, -- Displaced Bristlebruin
-    rlabel = Dragonflight.status.Gray('4/4'),
+    rlabel = ns.status.Gray('4/4'),
     icon = 132276,
     requires = {
-        Dragonflight.requirement.Item(209868) -- Thornspeaker Ritual Knife (Bear)
+        ns.requirement.Item(209868) -- Thornspeaker Ritual Knife (Bear)
     },
     class = 'HUNTER',
     note = format(L['thornbeast_disclaimer'], 209866) .. '\n\n' ..
@@ -2024,7 +2024,7 @@ map.nodes[36596203] = NPC({
 map.nodes[45507220] = NPC({
     id = 210908,
     icon = 5171363,
-    requires = {Dragonflight.requirement.Quest(78842, '{item:211314}')}, -- Cinder of Companionship
+    requires = {ns.requirement.Quest(78842, '{item:211314}')}, -- Cinder of Companionship
     class = 'HUNTER',
     note = L['nahqi_note'],
     pois = {
@@ -2077,8 +2077,8 @@ end
 
 map.nodes[50536096] = Alarashinu({id = 213029}) -- Landeron Felfury
 
-local brokenshore = Dragonflight.maps[646] or Map({id = 646, settings = false})
+local brokenshore = ns.maps[646] or Map({id = 646, settings = false})
 brokenshore.nodes[71674147] = Alarashinu({id = 213114}) -- Memory of Landeron Felfury
 
-local valsharah = Dragonflight.maps[641] or Map({id = 641, settings = false})
+local valsharah = ns.maps[641] or Map({id = 641, settings = false})
 valsharah.nodes[51185689] = Alarashinu({id = 213186}) -- Memory of Landeron Felfury

@@ -1,8 +1,7 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="BGRoll.lua"/>
 	<Script file="CanOpener.lua"/>
 	<Script file="MasterGypsy.lua"/>
-	<Script file="RollHistory.lua"/>
+	<Script file="LightLoot.lua"/>
 	<!--Script file="ToggleLootSpec.lua"/-->
 	<Script file="LootSpecSwapper.lua"/>
   <!--Include file="AtlasLootReverse\AtlasLootReverse.xml"/-->

@@ -1,5 +1,24 @@
 local _, addonTable = ...
 
+local function AddBankTabSettingsToTooltip(tooltip, depositFlags)
+  -- Copied Blizzard function
+  if not tooltip or not depositFlags then
+    return;
+  end
+
+  if FlagsUtil.IsSet(depositFlags, Enum.BagSlotFlags.ExpansionCurrent) then
+    GameTooltip_AddNormalLine(tooltip, BANK_TAB_EXPANSION_ASSIGNMENT:format(BANK_TAB_EXPANSION_FILTER_CURRENT));
+  elseif FlagsUtil.IsSet(depositFlags, Enum.BagSlotFlags.ExpansionLegacy) then
+    GameTooltip_AddNormalLine(tooltip, BANK_TAB_EXPANSION_ASSIGNMENT:format(BANK_TAB_EXPANSION_FILTER_LEGACY));
+  end
+
+  local filterList = ContainerFrameUtil_ConvertFilterFlagsToList(depositFlags);
+  if filterList then
+    local wrapText = true;
+    GameTooltip_AddNormalLine(tooltip, BANK_TAB_DEPOSIT_ASSIGNMENTS:format(filterList), wrapText);
+  end
+end
+
 BaganatorItemViewCommonBankViewWarbandViewMixin = {}
 
 function BaganatorItemViewCommonBankViewWarbandViewMixin:OnLoad()
@@ -16,11 +35,24 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:OnLoad()
     self:ApplySearch(text)
   end)
 
+  self.refreshState = {}
+  for _, value in pairs(addonTable.Constants.RefreshReason) do
+    self.refreshState[value] = true
+  end
+
   Syndicator.CallbackRegistry:RegisterCallback("WarbandBankCacheUpdate",  function(_, index, updates)
     self:NotifyBagUpdate(updates)
-    self.searchToApply = true
     if updates.tabInfo then
       self.updateTabs = true
+    end
+    if self.tabsSearchCache[index] then
+      for bagID in pairs(updates.bags) do
+        self.tabsSearchCache[index][tIndexOf(Syndicator.Constants.AllWarbandIndexes, bagID)] = nil
+      end
+    end
+    self.refreshState[addonTable.Constants.RefreshReason.ItemData] = true
+    if updates.tabInfo then
+      self.refreshState[addonTable.Constants.RefreshReason.Layout] = true
     end
     if self:IsVisible() then
       self:GetParent():UpdateView()
@@ -33,16 +65,20 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:OnLoad()
     end
   end)
 
-  addonTable.CallbackRegistry:RegisterCallback("SettingChanged",  function(_, settingName)
-    if tIndexOf(addonTable.Config.ItemButtonsRelayoutSettings, settingName) ~= nil then
-      for _, layout in ipairs(self.Container.Layouts) do
-        layout:InformSettingChanged(settingName)
-      end
-      if self:IsVisible() then
-        self:GetParent():UpdateView()
-      end
+  addonTable.CallbackRegistry:RegisterCallback("RefreshStateChange",  function(_, refreshState)
+    self.refreshState = Mixin(self.refreshState, refreshState)
+
+    for _, layout in ipairs(self.Container.Layouts) do
+      layout:UpdateRefreshState(refreshState)
+    end
+
+    if self:IsVisible() then
+      self:GetParent():UpdateView()
     end
   end)
+
+  self.searchMonitors = {}
+  self.tabsSearchCache = {}
 
   addonTable.Skins.AddFrame("Button", self.DepositItemsButton)
   addonTable.Skins.AddFrame("Button", self.WithdrawMoneyButton)
@@ -55,6 +91,21 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:OnLoad()
     PlaySound(SOUNDKIT.IG_MAINMENU_OPTION);
   end)
   self.purchaseButton:RegisterForClicks("AnyUp", "AnyDown")
+  self.purchaseButton:SetScript("OnEnter", function()
+    GameTooltip:SetOwner(self.purchaseButton, "ANCHOR_RIGHT")
+    GameTooltip:SetText(LINK_FONT_COLOR:WrapTextInColorCode(BAGANATOR_L_BUY_WARBAND_BANK_TAB))
+    local cost = C_Bank.FetchNextPurchasableBankTabCost(Enum.BankType.Account)
+    if cost > GetMoney() then
+      GameTooltip:AddLine(BAGANATOR_L_COST_X:format(RED_FONT_COLOR:WrapTextInColorCode(addonTable.Utilities.GetMoneyString(cost, true))))
+    else
+      GameTooltip:AddLine(BAGANATOR_L_COST_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(addonTable.Utilities.GetMoneyString(cost, true))))
+    end
+    GameTooltip:Show()
+  end)
+  self.purchaseButton:SetScript("OnLeave", function()
+    GameTooltip:Hide()
+  end)
+  addonTable.Skins.AddFrame("SideTabButton", self.purchaseButton)
 end
 
 local function GetUnifiedSortData()
@@ -69,6 +120,58 @@ local function GetUnifiedSortData()
   end
 
   return bagData, indexesToUse, sortOrder
+end
+
+function BaganatorItemViewCommonBankViewWarbandViewMixin:ApplySearch(text)
+  if not self:IsVisible() then
+    return
+  end
+
+  self:ApplyTabButtonSearch(text)
+
+  for _, layout in ipairs(self.Container.Layouts) do
+    if layout:IsShown() then
+      layout:ApplySearch(text)
+    end
+  end
+end
+
+function BaganatorItemViewCommonBankViewWarbandViewMixin:ApplyTabButtonSearch(text)
+  if not self:IsShown() then
+    return
+  end
+
+  for _, tabButton in ipairs(self.Tabs) do
+    tabButton.Icon:SetAlpha(1)
+  end
+
+  if text == "" then
+    return
+  end
+
+  for _, monitor in ipairs(self.searchMonitors) do
+    monitor:Stop()
+  end
+
+  local warbandData = Syndicator.API.GetWarband(1)
+
+  for index, tab in ipairs(warbandData.bank) do
+    if not self.tabsSearchCache[1] then
+      self.tabsSearchCache[1] = {}
+    end
+
+    if self.tabsSearchCache[1][index] == nil then
+      self.tabsSearchCache[1][index] = Syndicator.Search.GetBaseInfoFromList(tab.slots)
+    end
+
+    self.searchMonitors[index]:StartSearch(self.tabsSearchCache[1][index], text, function(matches)
+      if #matches > 0 then
+        self.Tabs[index + 1].Icon:SetAlpha(1)
+      else
+        self.Tabs[index + 1].Icon:SetAlpha(0.2)
+      end
+    end)
+  end
 end
 
 function BaganatorItemViewCommonBankViewWarbandViewMixin:DoSort(isReverse)
@@ -158,17 +261,18 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:RemoveSearchMatches(get
   end
   matches = newMatches
 
-  local emptyBagSlots = addonTable.Transfers.GetEmptyBagsSlots(
+  local bagSlots = addonTable.Transfers.GetBagsSlots(
     Syndicator.API.GetCharacter(Syndicator.API.GetCurrentCharacter()).bags,
     Syndicator.Constants.AllBagIndexes
   )
 
   local status
+  local counts = addonTable.Transfers.CountByItemIDs(bagSlots)
   -- Only move more items if the last set moved in, or the last transfer
   -- completed.
-  if #emptyBagSlots ~= self.transferState.emptyBagSlots then
-    self.transferState.emptyBagSlots = #emptyBagSlots
-    status = addonTable.Transfers.FromBagsToBags(matches, Syndicator.Constants.AllBagIndexes, emptyBagSlots)
+  if not self.transferState.counts or not tCompare(counts, self.transferState.counts, 2) then
+    self.transferState.counts = counts
+    status = addonTable.Transfers.FromBagsToBags(matches, Syndicator.Constants.AllBagIndexes, bagSlots)
   else
     status = addonTable.Constants.SortStatus.WaitingMove
   end
@@ -178,10 +282,6 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:RemoveSearchMatches(get
   end, function()
     self.transferState = {}
   end)
-end
-
-function BaganatorItemViewCommonBankViewWarbandViewMixin:ResetToLive()
-  self.lastCharacter = self.liveCharacter
 end
 
 function BaganatorItemViewCommonBankViewWarbandViewMixin:SetupBlizzardFramesForTab()
@@ -248,28 +348,40 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:UpdateTabs()
   local lastTab = nil
   local tabs = {}
 
-  local tabButton = self.tabsPool:Acquire()
-  addonTable.Skins.AddFrame("SideTabButton", tabButton)
-  tabButton:RegisterForClicks("LeftButtonUp")
-  tabButton.Icon:SetTexture("Interface\\AddOns\\Baganator\\Assets\\Everything.png")
-  tabButton:SetScript("OnClick", function(_, button)
-    self:SetCurrentTab(0)
-    self:GetParent():UpdateView()
-  end)
-  tabButton:SetPoint("TOPLEFT", self, "TOPRIGHT", 2, -20)
-  tabButton.SelectedTexture:Hide()
-  tabButton:SetScale(tabScale)
-  tabButton:Show()
-  tabButton.tabName = BAGANATOR_L_EVERYTHING
-  lastTab = tabButton
-  table.insert(tabs, tabButton)
+  if #warbandData.bank ~= 0 then
+    local tabButton = self.tabsPool:Acquire()
+    addonTable.Skins.AddFrame("SideTabButton", tabButton)
+    tabButton:RegisterForClicks("LeftButtonUp")
+    tabButton.Icon:SetTexture("Interface\\AddOns\\Baganator\\Assets\\Everything.png")
+    tabButton.Icon:SetAlpha(1)
+    tabButton:SetScript("OnClick", function(_, button)
+      self:SetCurrentTab(0)
+      self:GetParent():UpdateView()
+    end)
+    tabButton:SetPoint("TOPLEFT", self, "TOPRIGHT", 2, -20)
+    tabButton.SelectedTexture:Hide()
+    tabButton:SetScale(tabScale)
+    tabButton:SetScript("OnEnter", function()
+      GameTooltip:SetOwner(tabButton, "ANCHOR_RIGHT")
+      GameTooltip:SetText(LINK_FONT_COLOR:WrapTextInColorCode(BAGANATOR_L_EVERYTHING))
+      GameTooltip:Show()
+    end)
+    tabButton:SetScript("OnLeave", function()
+      GameTooltip:Hide()
+    end)
+    tabButton:Show()
+    lastTab = tabButton
+    table.insert(tabs, tabButton)
+  end
 
   for index, tabInfo in ipairs(warbandData.bank) do
     local tabButton = self.tabsPool:Acquire()
     addonTable.Skins.AddFrame("SideTabButton", tabButton)
     tabButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     tabButton.Icon:SetTexture(tabInfo.iconTexture)
+    tabButton.Icon:SetAlpha(1)
     tabButton:SetScript("OnClick", function(_, button)
+      addonTable.CallbackRegistry:TriggerEvent("ClearHighlightBag")
       self:SetCurrentTab(index)
       self:GetParent():UpdateView()
 
@@ -277,19 +389,37 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:UpdateTabs()
         self.TabSettingsMenu:OnOpenTabSettingsRequested(Syndicator.Constants.AllWarbandIndexes[index])
       end
     end)
+    tabButton:SetScript("OnEnter", function()
+      GameTooltip:SetOwner(tabButton, "ANCHOR_RIGHT")
+      GameTooltip:SetText(tabInfo.name)
+      AddBankTabSettingsToTooltip(GameTooltip, tabInfo.depositFlags)
+      if self.isLive then
+        GameTooltip:AddLine(BAGANATOR_L_RIGHT_CLICK_FOR_SETTINGS, GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
+      end
+      GameTooltip:Show()
+      addonTable.CallbackRegistry:TriggerEvent("HighlightBagItems", {[Syndicator.Constants.AllWarbandIndexes[index]] = true})
+    end)
+    tabButton:SetScript("OnLeave", function()
+      GameTooltip:Hide()
+      addonTable.CallbackRegistry:TriggerEvent("ClearHighlightBag")
+    end)
     tabButton:SetPoint("TOPLEFT", lastTab, "BOTTOMLEFT", 0, -12)
     tabButton.SelectedTexture:Hide()
     tabButton:SetScale(tabScale)
     tabButton:Show()
-    tabButton.tabName = tabInfo.name
     lastTab = tabButton
     table.insert(tabs, tabButton)
+  end
+
+  while #self.searchMonitors < #warbandData.bank do
+    table.insert(self.searchMonitors, CreateFrame("Frame", nil, self, "SyndicatorOfflineListSearchTemplate"))
   end
 
   if self.isLive and C_Bank.CanPurchaseBankTab(Enum.BankType.Account) and not C_Bank.HasMaxBankTabs(Enum.BankType.Account) then
     local tabButton = self.purchaseButton
     addonTable.Skins.AddFrame("SideTabButton", tabButton)
     tabButton.Icon:SetTexture("Interface\\GuildBankFrame\\UI-GuildBankFrame-NewTab")
+    tabButton.Icon:SetAlpha(1)
     if not lastTab then
       tabButton:SetPoint("TOPLEFT", self, "TOPRIGHT", 2, -20)
     else
@@ -298,8 +428,6 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:UpdateTabs()
     tabButton.SelectedTexture:Hide()
     tabButton:SetScale(tabScale)
     tabButton:Show()
-    tabButton.tabName = BAGANATOR_L_BUY_WARBAND_BANK_TAB
-    tabButton:SetEnabled(true)
     tabButton.Icon:SetDesaturated(false)
     table.insert(tabs, tabButton)
     self.purchaseTabAdded = true
@@ -335,12 +463,26 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:UpdateView()
 end
 
 function BaganatorItemViewCommonBankViewWarbandViewMixin:ShowTab(tabIndex, isLive)
+  if tabIndex ~= self.lastTab or self.isLive ~= isLive then
+    self.refreshState[addonTable.Constants.RefreshReason.ItemData] = true
+    self.refreshState[addonTable.Constants.RefreshReason.Character] = true
+  end
+  self.lastTab = tabIndex
+
   self.isLive = isLive
+
+  self.searchToApply = self.searchToApply or self.refreshState[addonTable.Constants.RefreshReason.Searches] or self.refreshState[addonTable.Constants.RefreshReason.ItemData] or self.refreshState[addonTable.Constants.RefreshReason.ItemWidgets]
 
   addonTable.Utilities.AddGeneralDropSlot(self, function()
     local bagData = {}
-    for _, tab in ipairs(Syndicator.API.GetWarband(1).bank) do
-      table.insert(bagData, tab.slots)
+    for index, tab in ipairs(Syndicator.API.GetWarband(1).bank) do
+      if index == self.currentTab or self.currentTab == 0 then
+        table.insert(bagData, tab.slots)
+      -- mark tabs as unavailable for dropping into if they aren't the current
+      -- one
+      else
+        table.insert(bagData, {})
+      end
     end
     return bagData
   end, Syndicator.Constants.AllWarbandIndexes)
@@ -349,9 +491,10 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:ShowTab(tabIndex, isLiv
 
   local warbandBank = Syndicator.API.GetWarband(1).bank[self.currentTab ~= 0 and self.currentTab or 1]
 
-  local isWarbandData = warbandBank and #warbandBank.slots ~= 0 and (not self.isLive or C_PlayerInfo.HasAccountInventoryLock())
+  self.isLocked = self.isLive and not C_PlayerInfo.HasAccountInventoryLock()
+  local isWarbandData = warbandBank and #warbandBank.slots ~= 0 and not self.isLocked
   self.BankMissingHint:SetShown(not isWarbandData)
-  self:GetParent().SearchWidget:SetShown(isWarbandData)
+  self:GetParent().SearchWidget:SetShown(addonTable.Config.Get(addonTable.Config.Options.SHOW_SEARCH_BOX) and isWarbandData)
 
   if self.BankMissingHint:IsShown() then
     if self.isLive and C_Bank.CanPurchaseBankTab(Enum.BankType.Account) then
@@ -367,11 +510,11 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:ShowTab(tabIndex, isLiv
 
   local searchText = self:GetParent().SearchWidget.SearchBox:GetText()
 
-  for _, button in ipairs(self.LiveButtons) do
-    button:SetShown(self.isLive)
-  end
-  self.DepositItemsButton:SetShown(isWarbandData and self.isLive)
   self.IncludeReagentsCheckbox:SetShown(isWarbandData and self.isLive)
+  self.DepositItemsButton:SetShown(isWarbandData and self.isLive)
+
+  self.DepositMoneyButton:SetShown(self.isLive and C_PlayerInfo.HasAccountInventoryLock())
+  self.WithdrawMoneyButton:SetShown(self.isLive and C_PlayerInfo.HasAccountInventoryLock())
 
   self:UpdateCurrencies()
 
@@ -385,16 +528,27 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:ShowTab(tabIndex, isLiv
     self.IncludeReagentsCheckbox:SetPoint("LEFT", self, "LEFT", addonTable.Constants.ButtonFrameOffset + sideSpacing - 2, 0)
     self.DepositItemsButton:SetPoint("LEFT", self, "LEFT", addonTable.Constants.ButtonFrameOffset + sideSpacing - 2, 0)
 
-    self.DepositMoneyButton:SetPoint("RIGHT", self, "RIGHT", -sideSpacing, 0)
+    self.DepositMoneyButton:ClearAllPoints()
+    if isWarbandData then
+      self.DepositMoneyButton:SetPoint("BOTTOM", self, 0, 29)
+      self.DepositMoneyButton:SetPoint("RIGHT",  self,-sideSpacing, 0)
+    else
+      self.DepositMoneyButton:SetPoint("BOTTOM",  self, 0, 5)
+      self.DepositMoneyButton:SetPoint("RIGHT", self.Money, "LEFT", -sideSpacing, 0)
+    end
   end
 
   self:UpdateTabs()
   self:SetupBlizzardFramesForTab()
   self:HighlightCurrentTab()
 
+  for _, tab in ipairs(self.Tabs) do
+    tab:SetShown(not self.isLive or C_PlayerInfo.HasAccountInventoryLock())
+  end
+
   if self.BankMissingHint:IsShown() then
     -- Ensure bank missing hint has enough space to display
-    local minWidth = self.BankMissingHint:GetWidth() + 40
+    local minWidth = self.BankMissingHint:GetWidth()
     local maxHeight = 30
 
     for _, layout in ipairs(self.Container.Layouts) do
@@ -402,8 +556,8 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:ShowTab(tabIndex, isLiv
     end
 
     self:SetSize(
-      math.max(minWidth, addonTable.CategoryViews.Constants.MinWidth),
-      maxHeight + 75 + topSpacing / 2
+      math.max(400, self.BankMissingHint:GetWidth()) + sideSpacing * 2 + addonTable.Constants.ButtonFrameOffset + 40,
+      80 + topSpacing / 2
     )
 
     addonTable.CallbackRegistry:TriggerEvent("ViewComplete")
@@ -413,7 +567,11 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:ShowTab(tabIndex, isLiv
 end
 
 function BaganatorItemViewCommonBankViewWarbandViewMixin:OnFinished(character, isLive)
-  local sideSpacing, topSpacing = addonTable.Utilities.GetSpacing()
+  if self.BankMissingHint:IsShown() then
+    return
+  end
+
+  local sideSpacing, topSpacing, searchSpacing = addonTable.Utilities.GetSpacing()
 
   local buttonPadding = 0
   if self.isLive then
@@ -422,13 +580,18 @@ function BaganatorItemViewCommonBankViewWarbandViewMixin:OnFinished(character, i
 
   self:SetSize(10, 10)
   local externalVerticalSpacing = self:GetParent().Tabs[1] and self:GetParent().Tabs[1]:IsShown() and (self:GetParent():GetBottom() - self:GetParent().Tabs[1]:GetBottom() + 5) or 0
+  local tabHeight = #self.Tabs * (self.Tabs[1]:GetHeight() + 12) * self.Tabs[1]:GetScale() + 20 * self.Tabs[1]:GetScale()
+  local screenHeightSpace = UIParent:GetHeight() / self:GetParent():GetScale() - externalVerticalSpacing
+  local spaceOccupied = self.Container:GetHeight() + 50 + searchSpacing + topSpacing / 2 + buttonPadding
 
   self:SetSize(
     self.Container:GetWidth() + sideSpacing * 2 + addonTable.Constants.ButtonFrameOffset - 2,
-    math.min(self.Container:GetHeight() + 75 + topSpacing / 2 + buttonPadding, UIParent:GetHeight() / self:GetParent():GetScale() - externalVerticalSpacing)
+    math.max(tabHeight, math.min(spaceOccupied, screenHeightSpace))
   )
 
-  self:UpdateScroll(75 + topSpacing * 1/4 + buttonPadding + externalVerticalSpacing, self:GetParent():GetScale())
+  self.Container:SetHeight(math.max(self.Container:GetHeight(), self:GetHeight() - spaceOccupied + self.Container:GetHeight()))
+
+  self:UpdateScroll(50 + searchSpacing + topSpacing * 1/4 + buttonPadding + externalVerticalSpacing, self:GetParent():GetScale())
 end
 
 function BaganatorItemViewCommonBankViewWarbandViewMixin:DepositMoney()

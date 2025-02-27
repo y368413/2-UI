@@ -1,22 +1,22 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Legion = ...
-local L = Legion.locale
-local Map = Legion.Map
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Map = ns.Map
 
-local PetBattle = Legion.node.PetBattle
-local Rare = Legion.node.Rare
-local Treasure = Legion.node.Treasure
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local Achievement = Legion.reward.Achievement
-local Item = Legion.reward.Item
-local Pet = Legion.reward.Pet
-local Toy = Legion.reward.Toy
-local Transmog = Legion.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Pet = ns.reward.Pet
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local POI = Legion.poi.POI
-local Path = Legion.poi.Path
+local POI = ns.poi.POI
+local Path = ns.poi.Path
 
 -------------------------------------------------------------------------------
 
@@ -657,7 +657,7 @@ map.nodes[47606900] = PetBattle({
     id = 99077,
     note = L['bredda_tenderhide_note'],
     rewards = {
-        Achievement({id = 10876, criteria = 31531}), Legion.reward.Spacer(),
+        Achievement({id = 10876, criteria = 31531}), ns.reward.Spacer(),
         Achievement({id = 9686, criteria = 6, oneline = true}), -- Aquatic
         Achievement({id = 9687, criteria = 6, oneline = true}), -- Beast
         Achievement({id = 9688, criteria = 6, oneline = true}), -- Critter
@@ -675,7 +675,7 @@ map.nodes[41803580] = PetBattle({
     id = 99150,
     note = L['general_pet_tamer_note'] .. '\n\n' .. L['grixis_tinypop_note'],
     rewards = {
-        Achievement({id = 10876, criteria = 31532}), Legion.reward.Spacer(),
+        Achievement({id = 10876, criteria = 31532}), ns.reward.Spacer(),
         Achievement({id = 9686, criteria = 7, oneline = true}), -- Aquatic
         Achievement({id = 9687, criteria = 7, oneline = true}), -- Beast
         Achievement({id = 9688, criteria = 7, oneline = true}), -- Critter
@@ -707,7 +707,7 @@ grotto.nodes[47744458] = PetBattle({
         L['odrogg_note']),
     parent = {id = map.id, note = L['in_cave'], pois = {POI({42572533})}},
     rewards = {
-        Achievement({id = 10876, criteria = 31535}), Legion.reward.Spacer(),
+        Achievement({id = 10876, criteria = 31535}), ns.reward.Spacer(),
         Achievement({id = 9686, criteria = 8, oneline = true}), -- Aquatic
         Achievement({id = 9687, criteria = 8, oneline = true}), -- Beast
         Achievement({id = 9688, criteria = 8, oneline = true}), -- Critter
@@ -731,7 +731,7 @@ map.nodes[32705760] = PetBattle({
 ----------------------------- BROKEN ISLES SAFARI -----------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[44005120] = Legion.node.Safari.BlackFootedFoxKit({
+map.nodes[44005120] = ns.node.Safari.BlackFootedFoxKit({
     pois = {
         POI({
             26006200, 34002440, 34006160, 35407080, 35802300, 35802360,
@@ -743,7 +743,7 @@ map.nodes[44005120] = Legion.node.Safari.BlackFootedFoxKit({
     }
 })
 
-map.nodes[45807120] = Legion.node.Safari.BurrowSpiderling({
+map.nodes[45807120] = ns.node.Safari.BurrowSpiderling({
     pois = {
         POI({
             42203600, 42803240, 42803260, 43203000, 43402440, 44403040,
@@ -753,7 +753,7 @@ map.nodes[45807120] = Legion.node.Safari.BurrowSpiderling({
     }
 })
 
-map.nodes[42601080] = Legion.node.Safari.CoralbackFiddler({
+map.nodes[42601080] = ns.node.Safari.CoralbackFiddler({
     pois = {
         POI({
             25803580, 26403480, 27003300, 27203420, 27402980, 27804820,
@@ -768,7 +768,7 @@ map.nodes[42601080] = Legion.node.Safari.CoralbackFiddler({
     }
 })
 
-map.nodes[50403600] = Legion.node.Safari.EchoBatling({
+map.nodes[50403600] = ns.node.Safari.EchoBatling({
     pois = {
         POI({
             40804560, 49203480, 50403600, 50603540, 50603600, 49604040,
@@ -777,7 +777,7 @@ map.nodes[50403600] = Legion.node.Safari.EchoBatling({
     }
 })
 
-map.nodes[49603640] = Legion.node.Safari.HogNosedBat({
+map.nodes[49603640] = ns.node.Safari.HogNosedBat({
     pois = {
         POI({
             46403940, 48403680, 49203620, 49403680, 49603640, 49603660,
@@ -786,15 +786,15 @@ map.nodes[49603640] = Legion.node.Safari.HogNosedBat({
     }
 })
 
-map.nodes[56406500] = Legion.node.Safari.LongEaredOwl({
+map.nodes[56406500] = ns.node.Safari.LongEaredOwl({
     pois = {POI({35002460, 55206520, 56005440, 56406500, 57605520, 58002760})}
 })
 
-map.nodes[46603280] = Legion.node.Safari.MistFoxKit({
+map.nodes[46603280] = ns.node.Safari.MistFoxKit({
     pois = {POI({26404380, 46603280, 47803020})}
 })
 
-map.nodes[48201220] = Legion.node.Safari.MudshellConch({
+map.nodes[48201220] = ns.node.Safari.MudshellConch({
     pois = {
         POI({
             36201700, 37001620, 38601440, 39601360, 40001200, 42201020,
@@ -805,7 +805,7 @@ map.nodes[48201220] = Legion.node.Safari.MudshellConch({
     }
 })
 
-map.nodes[54608960] = Legion.node.Safari.NorthernHawkOwl({
+map.nodes[54608960] = ns.node.Safari.NorthernHawkOwl({
     pois = {
         POI({
             47607280, 47607480, 49207860, 49607720, 49807540, 50007040,
@@ -818,7 +818,7 @@ map.nodes[54608960] = Legion.node.Safari.NorthernHawkOwl({
     }
 })
 
-map.nodes[41805940] = Legion.node.Safari.SpiketailBeaver({
+map.nodes[41805940] = ns.node.Safari.SpiketailBeaver({
     pois = {
         POI({
             27405520, 27805460, 31606220, 33206480, 33806340, 34806740,

@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Core = ...
-local L = Core.locale
+local _, ns = ...
+local L = ns.locale
 
 -------------------------------------------------------------------------------
 --------------------------------- DEVELOPMENT ---------------------------------
@@ -25,39 +25,39 @@ To enable all development settings and functionality:
 -- Register all addons objects for the CTRL+ALT handler
 local plugins = 'HandyNotes_ZarPlugins'
 if _G[plugins] == nil then _G[plugins] = {} end
-_G[plugins][#_G[plugins] + 1] = Core
+_G[plugins][#_G[plugins] + 1] = ns
 
 local function BootstrapDevelopmentEnvironment()
     _G['HandyNotes_ZarPluginsDevelopment'] = true
 
     -- Add development settings to the UI
-    Core.options.args.GeneralTab.args.DevelopmentHeader = {
+    ns.options.args.GeneralTab.args.DevelopmentHeader = {
         type = 'header',
         name = L['options_dev_settings'],
         order = 100
     }
-    Core.options.args.GeneralTab.args.show_debug_map = {
+    ns.options.args.GeneralTab.args.show_debug_map = {
         type = 'toggle',
         arg = 'show_debug_map',
         name = L['options_toggle_show_debug_map'],
         desc = L['options_toggle_show_debug_map_desc'],
         order = 101
     }
-    Core.options.args.GeneralTab.args.show_debug_quest = {
+    ns.options.args.GeneralTab.args.show_debug_quest = {
         type = 'toggle',
         arg = 'show_debug_quest',
         name = L['options_toggle_show_debug_quest'],
         desc = L['options_toggle_show_debug_quest_desc'],
         order = 102
     }
-    Core.options.args.GeneralTab.args.force_nodes = {
+    ns.options.args.GeneralTab.args.force_nodes = {
         type = 'toggle',
         arg = 'force_nodes',
         name = L['options_toggle_force_nodes'],
         desc = L['options_toggle_force_nodes_desc'],
         order = 103
     }
-    Core.options.args.GeneralTab.args.show_debug_currency = {
+    ns.options.args.GeneralTab.args.show_debug_currency = {
         type = 'toggle',
         arg = 'show_debug_currency',
         name = L['options_toggle_show_debug_currency'],
@@ -67,7 +67,7 @@ local function BootstrapDevelopmentEnvironment()
 
     -- Print debug messages for each quest ID that is flipped
     local QTFrame = CreateFrame('Frame', "HandyNotes_Core" .. 'QT')
-    local history = Core.GetDatabaseTable('quest_id_history')
+    local history = ns.GetDatabaseTable('quest_id_history')
     local lastCheck = GetTime()
     local quests = {}
     local changed = {}
@@ -75,18 +75,18 @@ local function BootstrapDevelopmentEnvironment()
 
     local CurrencyFrame = CreateFrame('Frame', "HandyNotes_Core" .. 'C')
     local c_lastCheck = GetTime()
-    local c_history = Core.GetDatabaseTable('currency_id_history')
+    local c_history = ns.GetDatabaseTable('currency_id_history')
     local currency = {}
     local c_changed = {}
 
-    if Core:GetOpt('show_debug_quest') then
+    if ns:GetOpt('show_debug_quest') then
         C_Timer.After(2, function()
             -- Give some time for quest info to load in before we start
             for id = 65000, max_quest_id do
                 quests[id] = C_QuestLog.IsQuestFlaggedCompleted(id)
             end
             QTFrame:SetScript('OnUpdate', function()
-                if GetTime() - lastCheck > 5 and Core:GetOpt('show_debug_quest') then
+                if GetTime() - lastCheck > 5 and ns:GetOpt('show_debug_quest') then
                     for id = 65000, max_quest_id do
                         local s = C_QuestLog.IsQuestFlaggedCompleted(id)
                         if s ~= quests[id] then
@@ -116,7 +116,7 @@ local function BootstrapDevelopmentEnvironment()
         end)
     end
 
-    if Core:GetOpt('show_debug_currency') then
+    if ns:GetOpt('show_debug_currency') then
         C_Timer.After(2, function()
             -- Give some time for currency info to load in before we start
             for id = 1, 3000 do
@@ -125,7 +125,7 @@ local function BootstrapDevelopmentEnvironment()
             end
             CurrencyFrame:SetScript('OnUpdate', function()
                 if GetTime() - c_lastCheck > 5 and
-                    Core:GetOpt('show_debug_currency') then
+                    ns:GetOpt('show_debug_currency') then
                     for id = 1, 3000 do
                         local c = C_CurrencyInfo.GetCurrencyInfo(id) or false
                         if c then
@@ -220,7 +220,7 @@ end
 -- Debug function that prints entries from the quest id history
 
 _G["HandyNotes_Core" .. 'QuestHistory'] = function(count)
-    local history = Core.GetDatabaseTable('quest_id_history')
+    local history = ns.GetDatabaseTable('quest_id_history')
     if #history == 0 then return print('Quest ID history is empty') end
     for i = 1, (count or 10) do
         if i > #history then break end
@@ -237,7 +237,7 @@ _G["HandyNotes_Core" .. 'QuestHistory'] = function(count)
 end
 
 _G["HandyNotes_Core" .. 'CurrencyHistory'] = function(count)
-    local c_history = Core.GetDatabaseTable('currency_id_history')
+    local c_history = ns.GetDatabaseTable('currency_id_history')
     if #c_history == 0 then return print('Currency history is empty') end
     for i = 1, (count or 10) do
         if i > #c_history then break end
@@ -272,19 +272,19 @@ end
 
 -------------------------------------------------------------------------------
 
-function Core.Debug(...)
-    if not Core.addon.db then return end
-    if Core:GetOpt('development') then print(Core.color.Blue('DEBUG:'), ...) end
+function ns.Debug(...)
+    if not ns.addon.db then return end
+    if ns:GetOpt('development') then print(ns.color.Blue('DEBUG:'), ...) end
 end
 
-function Core.Warn(...)
-    if not Core.addon.db then return end
-    if Core:GetOpt('development') then print(Core.color.Orange('WARN:'), ...) end
+function ns.Warn(...)
+    if not ns.addon.db then return end
+    if ns:GetOpt('development') then print(ns.color.Orange('WARN:'), ...) end
 end
 
-function Core.Error(...)
-    if not Core.addon.db then return end
-    if Core:GetOpt('development') then print(Core.color.Red('ERROR:'), ...) end
+function ns.Error(...)
+    if not ns.addon.db then return end
+    if ns:GetOpt('development') then print(ns.color.Red('ERROR:'), ...) end
 end
 
 -------------------------------------------------------------------------------
@@ -306,4 +306,4 @@ _G["HandyNotes_Core" .. 'ScanQuestObjectives'] =
 
 -------------------------------------------------------------------------------
 
-Core.BootstrapDevelopmentEnvironment = BootstrapDevelopmentEnvironment
+ns.BootstrapDevelopmentEnvironment = BootstrapDevelopmentEnvironment

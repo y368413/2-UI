@@ -1,18 +1,18 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, BurningCrusade = ...
-local Map = BurningCrusade.Map
-local L = BurningCrusade.locale
+local ADDON_NAME, ns = ...
+local Map = ns.Map
+local L = ns.locale
 
-local Rare = BurningCrusade.node.Rare
-local Safari = BurningCrusade.node.Safari
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
 
-local Achievement = BurningCrusade.reward.Achievement
-local Transmog = BurningCrusade.reward.Transmog
-local Pet = BurningCrusade.reward.Pet
+local Achievement = ns.reward.Achievement
+local Transmog = ns.reward.Transmog
+local Pet = ns.reward.Pet
 
-local POI = BurningCrusade.poi.POI
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -144,10 +144,10 @@ map.nodes[35006480] = Safari.NetherRoach({
 ------------------------------- CRAZY FOR CATS --------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[43523526] = BurningCrusade.node.Collectible({
+map.nodes[43523526] = ns.node.Collectible({
     id = 20980,
     icon = 656579,
-    group = BurningCrusade.groups.CRAZYFORCATS,
+    group = ns.groups.CRAZYFORCATS,
     rewards = {
         Achievement({id = 8397, criteria = 23591, oneline = true}),
         Pet({item = 8490, id = 44}), Pet({item = 8495, id = 51}),
@@ -156,3 +156,4 @@ map.nodes[43523526] = BurningCrusade.node.Collectible({
         Pet({item = 29902, id = 139}), Pet({item = 29958, id = 145})
     }
 }) -- Dealer Rashaad - Siamese Cat
+

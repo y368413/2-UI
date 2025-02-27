@@ -467,7 +467,7 @@ function OpenAllMail:AdvanceToNextItem()
 	return true
 end
 
--- LockboxMailer ## Version: 0.1.5
+-- LockboxMailer ## Version: 0.1.14
 local LockboxMailer = CreateFrame("Frame")
 LockboxMailer:RegisterEvent("PLAYER_LOGIN")
 LockboxMailer:SetScript("OnEvent", function(event, ...) LockboxMailer.LockboxTable = {} end)  
@@ -475,34 +475,62 @@ local LockBoxButton = CreateFrame("Button", "LockBoxMailButton", SendMailFrame, 
 LockBoxButton:ClearAllPoints()
 LockBoxButton:SetPoint("BOTTOMRIGHT", SendMailFrame, "BOTTOMRIGHT", -66, 123)
 LockBoxButton:SetSize(26,26)
+    if LE_EXPANSION_LEVEL_CURRENT >= 9 then
+        LockBoxButton.HighlightTexture:SetSize(26,27)
+        LockBoxButton.PushedTexture:SetSize(28,28)
+    end
 LockBoxButton:RegisterForClicks("AnyUp")
 LockBoxButton:SetScript("OnClick", function(_,btn) LockboxMailer:ProcessMailing() end)
 LockBoxButton.icon:SetTexture(134344)
-local LockboxMailerTooltip = CreateFrame("GameTooltip","LockboxMailerTooltip", UIParent, "GameTooltipTemplate");
-LockboxMailerTooltip:SetOwner(LockboxMailer, "ANCHOR_NONE");
+LockBoxButton.NormalTexture:ClearAllPoints()
+
+if not C_TooltipInfo then
+    LockboxMailer.tooltip = CreateFrame("GameTooltip","LockboxMailerTooltip", UIParent);
+    LockboxMailer.tooltip:SetOwner(LockboxMailer, "ANCHOR_NONE");
+end
+
+function LockboxMailer:ScanTooltip(bag, slot)
+    if C_TooltipInfo then
+        local tooltipData = C_TooltipInfo.GetBagItem(bag, slot)
+        for i = 1, #tooltipData.lines do
+            local line = tooltipData.lines[i].leftText
+            if (line == LOCKED) or (line == ITEM_OPENABLE) then
+                tinsert(self.LockboxTable, { bag, slot } )
+                break
+            end
+        end
+    else
+        self.tooltip:SetBagItem(bag, slot)
+        if self.tooltip:IsShown() then
+            for i = 1, self.tooltip:NumLines() do
+                local line = _G[self.tooltip:GetName().."TextLeft"..i]:GetText()
+                if (line == LOCKED) or (line == ITEM_OPENABLE) then
+                    tinsert(self.LockboxTable, { bag, slot } )
+                    break
+                end
+            end
+        end
+    end
+end
+
 function LockboxMailer:FindLockboxes()
     wipe(LockboxMailer.LockboxTable)
     for bag = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
-        for slot = 1, GetContainerNumSlots(bag) do
-            local lootable, itemLink = select(6,GetContainerItemInfo(bag, slot))
-            if itemLink then
-                local bindType = select(14, GetItemInfo(itemLink))
-
-                if bindType ~= 1 and lootable then
-                    LockboxMailerTooltip:SetBagItem(bag, slot)
-                    if LockboxMailerTooltip:IsShown() then
-                        for i = 1, LockboxMailerTooltip:NumLines() do
-                            local line = _G["LockboxMailerTooltipTextLeft"..i]:GetText()
-                            if (line == LOCKED) or (line == ITEM_OPENABLE) then
-                                tinsert(LockboxMailer.LockboxTable, { bag, slot } )
-                            end
-                        end
+        for slot = 1, C_Container.GetContainerNumSlots(bag) do
+            local containerInfo = C_Container.GetContainerItemInfo(bag, slot)
+            if containerInfo and containerInfo.hasLoot then
+                local itemLink = containerInfo.hyperlink
+                if itemLink then
+                    local bindType = select(14, C_Item.GetItemInfo(itemLink))
+                    if bindType ~= 1 then
+                        self:ScanTooltip(bag, slot)
                     end
                 end
             end
         end
     end
 end
+
 function LockboxMailer:ProcessMailing()
         --ClearSendMail()
         --SendMailNameEditBox:SetText("烂柯人")
@@ -527,13 +555,14 @@ function LockboxMailer:ProcessMailing()
                 return
             end
             ClearCursor()
-            PickupContainerItem(item[1], item[2])
+            C_Container.PickupContainerItem(item[1], item[2])
             ClickSendMailItemButton()
             attachmentIndex = attachmentIndex + 1
         end
             SendMailSubjectEditBox:SetText("["..quantity.."]")
         end
 end
+
 -------MailinputboxResizer---------------------------------------------------------------
 SendMailCostMoneyFrame:ClearAllPoints()
 SendMailCostMoneyFrame:SetPoint("TOPLEFT","SendMailFrame","TOPLEFT",82,-70)

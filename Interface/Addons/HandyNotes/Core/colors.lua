@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Core = ...
+local _, ns = ...
 
 -------------------------------------------------------------------------------
 ----------------------------------- COLORS ------------------------------------
 -------------------------------------------------------------------------------
 
-Core.COLORS = {
+ns.COLORS = {
     Blue = 'FF0066FF',
     Bronze = 'FFCD7F32',
     Gold = 'FFFFD700',
@@ -25,19 +25,19 @@ Core.COLORS = {
     Spell = 'FF71D5FF'
 }
 
-Core.color = {}
-Core.status = {}
+ns.color = {}
+ns.status = {}
 
-for name, color in pairs(Core.COLORS) do
-    Core.color[name] = function(t) return string.format('|c%s%s|r', color, t) end
-    Core.status[name] = function(t)
+for name, color in pairs(ns.COLORS) do
+    ns.color[name] = function(t) return string.format('|c%s%s|r', color, t) end
+    ns.status[name] = function(t)
         return string.format('(|c%s%s|r)', color, t)
     end
 end
 
 -- Get ARGB values from HEX Colors
-Core.getARGB = function(color, mul)
-    local c = Core.COLORS[color] or 'FFFF00FF'
+ns.getARGB = function(color, mul)
+    local c = ns.COLORS[color] or 'FFFF00FF'
     local argb = {}
     for k, v in pairs({c:match('(%x%x)(%x%x)(%x%x)(%x%x)')}) do
         argb[k] = tonumber(v, 16) / 255 * (mul or 1)

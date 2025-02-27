@@ -7,6 +7,7 @@
 	<Script file="IgnoreNote.lua"/>
 	<Script file="ItemLevel.lua"/>
 	<Script file="Mail.lua"/>
+	<Script file="MDEnhance.lua"/>
 	<Script file="MDGuildBest.lua"/>
 	<Script file="MissingStats.lua"/>
 	<Script file="Notifications.lua"/>
@@ -16,7 +17,6 @@
 	<Script file="QuickJoin.lua"/>
 	<Script file="RaidTool.lua"/>
 	<Script file="TradeTabs.lua"/>
-	<!--Script file="FreeMountCD.lua"/>
-	<Script file="xMerchant.lua"/>
-	<Script file="BlinkRogueHelper.lua"/-->
+	<!--Script file="FreeMountCD.lua"/-->
+	<Script file="SingingSockets.lua"/>
 </Ui>

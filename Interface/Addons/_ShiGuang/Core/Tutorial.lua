@@ -11,7 +11,7 @@ print("----------------- 有你们的魔兽,才是世界 -->>>")
 
 -- Tuitorial
 local function DefaultSettings()
-	SetCVar("scriptErrors", 1)     --0是屏蔽错误1是不屏蔽错误
+	SetCVar("scriptErrors", 0)     --0是屏蔽错误1是不屏蔽错误
 	SetCVar("autoQuestWatch", 1)  
 	SetCVar("synchronizeSettings", 1)
 	SetCVar("synchronizeMacros", 1)
@@ -23,8 +23,8 @@ local function DefaultSettings()
 	SetCVar("missingTransmogSourceInItemTooltips", 1)
 	SetCVar("autoSelfCast", 1) -- disable auto self casting
 	--setglobal("MAX_EQUIPMENT_SETS_PER_PLAYER",100)
-	PlayerFrame:SetScale(R.db["UFs"]["PlayerFrameScale"]) 
-	TargetFrame:SetScale(R.db["UFs"]["PlayerFrameScale"])
+	--PlayerFrame:SetScale(R.db["UFs"]["PlayerFrameScale"]) 
+	--TargetFrame:SetScale(R.db["UFs"]["PlayerFrameScale"])
 	SetGuildNewsFilter(1, 0)
 	SetGuildNewsFilter(2, 0)
 	SetGuildNewsFilter(3, 0)
@@ -444,7 +444,7 @@ local function HelloWorld()
   end)
 	SmallText1 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ TWW " ..C_AddOns.GetAddOnMetadata("_ShiGuang", "X-Support").. " v"..C_AddOns.GetAddOnMetadata("_ShiGuang", "Version").." ]", "LEFT",RightPic,"RIGHT",-26,60, I.r, I.g, I.b)
 	SmallText2 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ https://www.maorui.net ]", "LEFT",RightPic,"RIGHT",-26,20, I.r, I.g, I.b)
-	SmallText3 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 鼠标右键点击小地图便捷插件设置 ]", "LEFT",RightPic,"RIGHT",-26,-20, I.r, I.g, I.b)
+	SmallText3 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 使用 ESC - 2ui 更多便捷插件设置 ]", "LEFT",RightPic,"RIGHT",-26,-20, I.r, I.g, I.b)
 	SmallText4 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 系统自带功能，插件有针对性增强或者删减 ]", "LEFT",RightPic,"RIGHT",-26,-60, I.r, I.g, I.b)
 
 	local ModulesBack = CreateFrame("Frame", nil, welcome, "BackdropTemplate") 

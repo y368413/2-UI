@@ -1,29 +1,29 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, BattleForAzeroth = ...
-local L = BattleForAzeroth.locale
-local Class = BattleForAzeroth.Class
-local Map = BattleForAzeroth.VisionsMap
-local Clone = BattleForAzeroth.Clone
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Class = ns.Class
+local Map = ns.VisionsMap
+local Clone = ns.Clone
 
-local Coffer = BattleForAzeroth.node.Coffer
-local Collectible = BattleForAzeroth.node.Node
-local PetBattle = BattleForAzeroth.node.PetBattle
-local Rare = BattleForAzeroth.node.Rare
-local TimedEvent = BattleForAzeroth.node.TimedEvent
-local Treasure = BattleForAzeroth.node.Treasure
+local Coffer = ns.node.Coffer
+local Collectible = ns.node.Node
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local TimedEvent = ns.node.TimedEvent
+local Treasure = ns.node.Treasure
 
-local Achievement = BattleForAzeroth.reward.Achievement
-local Item = BattleForAzeroth.reward.Item
-local Mount = BattleForAzeroth.reward.Mount
-local Pet = BattleForAzeroth.reward.Pet
-local Quest = BattleForAzeroth.reward.Quest
-local Toy = BattleForAzeroth.reward.Toy
-local Transmog = BattleForAzeroth.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Quest = ns.reward.Quest
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Path = BattleForAzeroth.poi.Path
-local POI = BattleForAzeroth.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -32,18 +32,18 @@ local AQR, EMP, AMA = 0, 1, 2 -- assaults
 local function GetAssault()
     local textures = C_MapExplorationInfo.GetExploredMapTextures(1527)
     if textures and textures[1].fileDataIDs[1] == 3165083 then
-        if BattleForAzeroth:GetOpt('show_debug_map') then
-            BattleForAzeroth.Debug('Uldum assault: AQR')
+        if ns:GetOpt('show_debug_map') then
+            ns.Debug('Uldum assault: AQR')
         end
         return AQR -- left
     elseif textures and textures[1].fileDataIDs[1] == 3165092 then
-        if BattleForAzeroth:GetOpt('show_debug_map') then
-            BattleForAzeroth.Debug('Uldum assault: EMP')
+        if ns:GetOpt('show_debug_map') then
+            ns.Debug('Uldum assault: EMP')
         end
         return EMP -- middle
     elseif textures and textures[1].fileDataIDs[1] == 3165098 then
-        if BattleForAzeroth:GetOpt('show_debug_map') then
-            BattleForAzeroth.Debug('Uldum assault: AMA')
+        if ns:GetOpt('show_debug_map') then
+            ns.Debug('Uldum assault: AMA')
         end
         return AMA -- right
     end
@@ -62,7 +62,7 @@ local map = Map({
 ------------------------------------ INTRO ------------------------------------
 -------------------------------------------------------------------------------
 
-local Intro = Class('Intro', BattleForAzeroth.node.Intro)
+local Intro = Class('Intro', ns.node.Intro)
 
 Intro.note = L['uldum_intro_note']
 
@@ -383,7 +383,7 @@ map.nodes[77005000] = Rare({
     quest = 55629,
     assault = AMA,
     note = L['kanebti'],
-    requires = BattleForAzeroth.requirement.Item(168160)
+    requires = ns.requirement.Item(168160)
 }) -- Kaneb-ti
 
 map.nodes[66842035] = Rare({id = 157157, quest = 57277, assault = AMA}) -- Muminah the Incandescent
@@ -432,7 +432,7 @@ map.nodes[67486382] = Rare({
     quest = 55716,
     assault = AMA,
     note = L['uatka'],
-    requires = BattleForAzeroth.requirement.Item(171208),
+    requires = ns.requirement.Item(171208),
     rewards = {
         Item({item = 174875}) -- Obelisk of the Sun
     }
@@ -515,7 +515,7 @@ map.nodes[coord(5, 0)] = NefRare({id = 157469, quest = 57435}) -- Zoth'rum the I
 
 local AQRChest = Class('AQRChest', Treasure, {
     assault = AQR,
-    group = BattleForAzeroth.groups.DAILY_CHESTS,
+    group = ns.groups.DAILY_CHESTS,
     label = L['infested_cache']
 })
 
@@ -582,14 +582,14 @@ map.nodes[36252324] = Coffer({
     assault = AQR,
     label = L['infested_strongbox'],
     note = L['chamber_of_the_moon'],
-    requires = BattleForAzeroth.requirement.Item(174761)
+    requires = ns.requirement.Item(174761)
 })
 
 -------------------------------------------------------------------------------
 
 local EMPChest = Class('EMPChest', Treasure, {
     assault = EMP,
-    group = BattleForAzeroth.groups.DAILY_CHESTS,
+    group = ns.groups.DAILY_CHESTS,
     label = L['black_empire_cache']
 })
 
@@ -668,7 +668,7 @@ local EMPCOFF = Coffer({
     quest = 57628,
     assault = EMP,
     label = L['black_empire_coffer'],
-    requires = BattleForAzeroth.requirement.Item(174768)
+    requires = ns.requirement.Item(174768)
 })
 
 map.nodes[71657334] = EMPCOFF
@@ -677,7 +677,7 @@ map.nodes[71657334] = EMPCOFF
 
 local AMAChest = Class('AMAChest', Treasure, {
     assault = AMA,
-    group = BattleForAzeroth.groups.DAILY_CHESTS,
+    group = ns.groups.DAILY_CHESTS,
     label = L['amathet_cache']
 })
 
@@ -759,7 +759,7 @@ local AMACOFF = Coffer({
     assault = AMA,
     fgroup = 'amacoffer',
     label = L['amathet_reliquary'],
-    requires = BattleForAzeroth.requirement.Item(174765)
+    requires = ns.requirement.Item(174765)
 })
 
 map.nodes[64463415] = Clone(AMACOFF, {note = L['chamber_of_the_stars']})
@@ -1100,7 +1100,7 @@ map.nodes[61745440] = PetBattle({id = 162461}) -- Whispers
 
 local function GetAlpacaStatus()
     local count = select(4, GetQuestObjectiveInfo(58881, 0, false))
-    if count ~= nil then return BattleForAzeroth.status.Gray(tostring(count) .. '/7') end
+    if count ~= nil then return ns.status.Gray(tostring(count) .. '/7') end
 end
 
 local alpaca = Class('Alpaca', Collectible, {

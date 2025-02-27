@@ -39,7 +39,7 @@ function MISC:RaidTool_Header()
 	end)
 
 	frame:RegisterForClicks("AnyUp")
-	--[[frame:SetScript("OnClick", function(self, btn)
+	frame:SetScript("OnClick", function(self, btn)
 		if btn == "LeftButton" then
 			local menu = self.menu
 			M:TogglePanel(menu)
@@ -62,9 +62,9 @@ function MISC:RaidTool_Header()
 		end
 	end)
 	frame:SetScript("OnHide", function(self)
-		self.bg:SetBackdropColor(0, 0, 0, .5)
-		self.bg:SetBackdropBorderColor(0, 0, 0, 1)
-	end)]]
+		--self.bg:SetBackdropColor(0, 0, 0, .5)
+		--self.bg:SetBackdropBorderColor(0, 0, 0, 1)
+	end)
 
 	return frame
 end
@@ -172,10 +172,10 @@ function MISC:RaidTool_UpdateRes(elapsed)
 				self.Count:SetTextColor(0, 1, 0)
 			end
 			self.__owner.resFrame:SetAlpha(1)
-			--self.__owner.roleFrame:SetAlpha(0)
+			self.__owner.roleFrame:SetAlpha(0)
 		else
 			self.__owner.resFrame:SetAlpha(0)
-			--self.__owner.roleFrame:SetAlpha(1)
+			self.__owner.roleFrame:SetAlpha(1)
 		end
 
 		self.elapsed = 0
@@ -279,9 +279,9 @@ end
 
 function MISC:RaidTool_BuffChecker(parent)
 	local frame = CreateFrame("Button", nil, parent)
-	frame:SetPoint("RIGHT", parent, "LEFT", -3, 0)
-	frame:SetSize(28, 28)
-	M.CreateFS(frame, 16, "!", true)
+	frame:SetPoint("LEFT", parent, "RIGHT", -8, 3)
+	frame:SetSize(19, 19)
+	--M.CreateFS(frame, 16, "!", true)
 	--M.ReskinMenuButton(frame)
 	local icon = frame:CreateTexture(nil, "ARTWORK")
 	icon:SetOutside(nil, 5, 5)
@@ -363,9 +363,46 @@ function MISC:RaidTool_BuffChecker(parent)
 	frame:HookScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
 		GameTooltip:ClearLines()
-		GameTooltip:AddLine(U["Raid Tool"], 0,.6,1)
-		GameTooltip:AddLine(" ")
-		GameTooltip:AddDoubleLine(I.LeftButton..I.InfoColor..U["Check Status"])
+		--GameTooltip:AddLine(U["Raid Tool"], 0,.6,1)
+		--GameTooltip:AddLine(" ")
+		GameTooltip:AddDoubleLine(I.LeftButton..I.InfoColor..READY_CHECK)
+		GameTooltip:AddDoubleLine(I.RightButton..I.InfoColor..U["Check Status"])
+		GameTooltip:Show()
+	end)
+	frame:HookScript("OnLeave", M.HideTooltip)
+
+	local reset = true
+	M:RegisterEvent("PLAYER_REGEN_ENABLED", function() reset = true end)
+	frame:HookScript("OnMouseDown", function(_, btn)
+		if btn == "LeftButton" then
+			if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
+			if IsInGroup() and (UnitIsGroupLeader("player") or (UnitIsGroupAssistant("player") and IsInRaid())) then
+				DoReadyCheck()
+			else
+				UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_LEADER)
+			end
+		else
+			scanBuff()
+		end
+	end)
+end
+
+function MISC:RaidTool_CountDown(parent)
+	local frame = CreateFrame("Button", nil, parent)
+	frame:SetPoint("LEFT", parent, "RIGHT", 12, 3)
+	frame:SetSize(18, 18)
+	--M.ReskinMenuButton(frame)
+
+	local icon = frame:CreateTexture(nil, "ARTWORK")
+	icon:SetOutside(nil, 5, 5)
+	icon:SetAtlas("GM-icon-countdown")
+
+	frame:HookScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
+		GameTooltip:ClearLines()
+		--GameTooltip:AddLine(U["Raid Tool"], 0,.6,1)
+		--GameTooltip:AddLine(" ")
+		GameTooltip:AddDoubleLine(I.InfoColor..U["Count Down"])
 		if potionCheck then
 			GameTooltip:AddDoubleLine(I.RightButton..I.InfoColor..U["MRT Potioncheck"])
 		end
@@ -378,46 +415,6 @@ function MISC:RaidTool_BuffChecker(parent)
 
 	frame:HookScript("OnMouseDown", function(_, btn)
 		if btn == "LeftButton" then
-			scanBuff()
-		elseif potionCheck then
-			SlashCmdList["mrtSlash"]("potionchat")
-		end
-	end)
-end
-
-function MISC:RaidTool_CountDown(parent)
-	local frame = CreateFrame("Button", nil, parent)
-	frame:SetPoint("LEFT", parent, "RIGHT", 0, 0)
-	frame:SetSize(28, 28)
-	--M.ReskinMenuButton(frame)
-
-	local icon = frame:CreateTexture(nil, "ARTWORK")
-	icon:SetOutside(nil, 5, 5)
-	icon:SetAtlas("GM-icon-countdown")
-
-	frame:HookScript("OnEnter", function(self)
-		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
-		GameTooltip:ClearLines()
-		GameTooltip:AddLine(U["Raid Tool"], 0,.6,1)
-		GameTooltip:AddLine(" ")
-		GameTooltip:AddDoubleLine(I.LeftButton..I.InfoColor..READY_CHECK)
-		GameTooltip:AddDoubleLine(I.RightButton..I.InfoColor..U["Count Down"])
-		GameTooltip:Show()
-	end)
-	frame:HookScript("OnLeave", M.HideTooltip)
-
-	local reset = true
-	M:RegisterEvent("PLAYER_REGEN_ENABLED", function() reset = true end)
-
-	frame:HookScript("OnMouseDown", function(_, btn)
-		if btn == "LeftButton" then
-			if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
-			if IsInGroup() and (UnitIsGroupLeader("player") or (UnitIsGroupAssistant("player") and IsInRaid())) then
-				DoReadyCheck()
-			else
-				UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_LEADER)
-			end
-		else
 			if IsInGroup() and (UnitIsGroupLeader("player") or (UnitIsGroupAssistant("player") and IsInRaid())) then
 				if IsAddOnLoaded("DBM-Core") then
 					if reset then
@@ -440,6 +437,8 @@ function MISC:RaidTool_CountDown(parent)
 			else
 				UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_LEADER)
 			end
+		elseif potionCheck then
+			SlashCmdList["mrtSlash"]("potionchat")
 		end
 	end)
 end
@@ -533,6 +532,7 @@ function MISC:RaidTool_CreateMenu(parent)
 end
 
 function MISC:RaidTool_EasyMarker()
+	if I.isNewPatch then return end
 	local menuList = {}
 
 	local function GetMenuTitle(text, ...)
@@ -601,19 +601,19 @@ end
 
 function MISC:RaidTool_WorldMarker()
 	local iconTexture = {
-		"Interface\\TargetingFrame\\UI-RaidTargetingIcon_6",
-		"Interface\\TargetingFrame\\UI-RaidTargetingIcon_4",
-		"Interface\\TargetingFrame\\UI-RaidTargetingIcon_3",
-		"Interface\\TargetingFrame\\UI-RaidTargetingIcon_7",
 		"Interface\\TargetingFrame\\UI-RaidTargetingIcon_1",
 		"Interface\\TargetingFrame\\UI-RaidTargetingIcon_2",
+		"Interface\\TargetingFrame\\UI-RaidTargetingIcon_3",
+		"Interface\\TargetingFrame\\UI-RaidTargetingIcon_4",
 		"Interface\\TargetingFrame\\UI-RaidTargetingIcon_5",
+		"Interface\\TargetingFrame\\UI-RaidTargetingIcon_6",
+		"Interface\\TargetingFrame\\UI-RaidTargetingIcon_7",
 		"Interface\\TargetingFrame\\UI-RaidTargetingIcon_8",
 		"Interface\\Buttons\\UI-GroupLoot-Pass-Up",
 	}
 
 	local frame = CreateFrame("Frame", "UI_WorldMarkers", UIParent)
-	frame:SetPoint("RIGHT", -100, 0)
+	frame:SetPoint("RIGHT", -88, 88)
 	M.CreateMF(frame, nil, true)
 	M.RestoreMF(frame)
 	M.SetBD(frame)
@@ -626,12 +626,17 @@ function MISC:RaidTool_WorldMarker()
 		button.Icon:SetTexture(iconTexture[i])
 
 		if i ~= 9 then
-			button:RegisterForClicks("AnyDown")
+			button:RegisterForClicks("AnyUp", "AnyDown")
 			button:SetAttribute("type", "macro")
-			button:SetAttribute("macrotext1", format("/wm %d", i))
-			button:SetAttribute("macrotext2", format("/cwm %d", i))
+			button:SetAttribute("macrotext1", format("/run if UnitExists('target') then SetRaidTarget('target', %d) end", i))
+			--button:SetAttribute("macrotext1", format("/run if SecureCmdOptionParse('[btn:1]') and UnitExists('target') then SetRaidTargetIcon('target', %d) end", i))
+			button:SetAttribute("macrotext2", format("/wm [btn:2] %d", i))
 		else
-			button:SetScript("OnClick", ClearRaidMarker)
+			--button:SetScript("OnClick", ClearRaidMarker)
+			button:RegisterForClicks("AnyUp", "AnyDown")
+			button:SetAttribute("type","macro")
+			button:SetAttribute("macrotext1","/tm [btn:1] 0")
+			button:SetAttribute("macrotext2","/cwm [btn:2] 0")  --/run ClearRaidMarker()
 		end
 		frame.buttons[i] = button
 	end
@@ -681,19 +686,35 @@ function MISC:RaidTool_Misc()
 	end
 end
 
+function MISC:RaidTool_AutoMark()
+  if not R.db["Misc"]["AutoMark"] then return end
+	if (not IsInRaid()) and IsInGroup() then
+		local ROLEMARKS={["TANK"]=2,["HEALER"]=5}
+		for i=1,5 do 
+			local role=UnitGroupRolesAssigned("party"..i)
+			if ROLEMARKS[role]then 
+				SetRaidTarget("party"..i,ROLEMARKS[role])
+			end 
+	end
+	local currentSpecID, currentSpecName = GetSpecializationInfo(GetSpecialization())
+	local roleToken = GetSpecializationRoleByID(currentSpecID)
+	if ROLEMARKS[roleToken]then SetRaidTarget("player", ROLEMARKS[roleToken]) end else SetRaidTarget("player", 0) end	
+end
+
 function MISC:RaidTool_Init()
 	if not R.db["Misc"]["RaidTool"] then return end
 
 	local frame = MISC:RaidTool_Header()
 	MISC:RaidTool_RoleCount(frame)
 	MISC:RaidTool_CombatRes(frame)
-	--MISC:RaidTool_ReadyCheck(frame)
-	--MISC:RaidTool_BuffChecker(frame)
-	--MISC:RaidTool_CreateMenu(frame)
-	--MISC:RaidTool_CountDown(frame)
+	MISC:RaidTool_ReadyCheck(frame)
+	MISC:RaidTool_BuffChecker(frame)
+	MISC:RaidTool_CreateMenu(frame)
+	MISC:RaidTool_CountDown(frame)
 
-	--MISC:RaidTool_EasyMarker()
-	--MISC:RaidTool_WorldMarker()
+	MISC:RaidTool_EasyMarker()
+	MISC:RaidTool_WorldMarker()
+	MISC:RaidTool_AutoMark()
 	MISC:RaidTool_Misc()
 end
 MISC:RegisterMisc("RaidTool", MISC.RaidTool_Init)

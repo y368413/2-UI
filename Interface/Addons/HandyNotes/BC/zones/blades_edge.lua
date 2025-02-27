@@ -1,18 +1,18 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, BurningCrusade = ...
-local Map = BurningCrusade.Map
-local L = BurningCrusade.locale
+local ADDON_NAME, ns = ...
+local Map = ns.Map
+local L = ns.locale
 
-local Rare = BurningCrusade.node.Rare
-local Safari = BurningCrusade.node.Safari
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
 
-local Achievement = BurningCrusade.reward.Achievement
-local Transmog = BurningCrusade.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Transmog = ns.reward.Transmog
 
-local POI = BurningCrusade.poi.POI
-local Path = BurningCrusade.poi.Path
+local POI = ns.poi.POI
+local Path = ns.poi.Path
 
 -------------------------------------------------------------------------------
 

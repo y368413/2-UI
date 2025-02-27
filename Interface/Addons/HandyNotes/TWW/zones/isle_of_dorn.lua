@@ -1,35 +1,35 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, TheWarWithin = ...
-local Class = TheWarWithin.Class
-local L = TheWarWithin.locale
-local Map = TheWarWithin.Map
+local _, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = TheWarWithin.node.Collectible
-local DisturbedEarth = TheWarWithin.node.DisturbedEarth
-local PT = TheWarWithin.node.ProfessionTreasures
-local Rare = TheWarWithin.node.Rare
-local Treasure = TheWarWithin.node.Treasure
+local Collectible = ns.node.Collectible
+local DisturbedEarth = ns.node.DisturbedEarth
+local PT = ns.node.ProfessionTreasures
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local FlightMaster = TheWarWithin.node.FlightMaster
--- local LoreObject = TheWarWithin.node.LoreObject
-local SkyridingGlyph = TheWarWithin.node.SkyridingGlyph
+local FlightMaster = ns.node.FlightMaster
+local LoreObject = ns.node.LoreObject
+local SkyridingGlyph = ns.node.SkyridingGlyph
 
-local Achievement = TheWarWithin.reward.Achievement
-local Item = TheWarWithin.reward.Item
-local Mount = TheWarWithin.reward.Mount
-local Pet = TheWarWithin.reward.Pet
-local Recipe = TheWarWithin.reward.Recipe
-local Reputation = TheWarWithin.reward.Reputation
-local Section = TheWarWithin.reward.Section
-local Toy = TheWarWithin.reward.Toy
-local Transmog = TheWarWithin.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Recipe = ns.reward.Recipe
+local Reputation = ns.reward.Reputation
+local Section = ns.reward.Section
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Circle = TheWarWithin.poi.Circle
-local Entrance = TheWarWithin.poi.Entrance
-local Path = TheWarWithin.poi.Path
-local POI = TheWarWithin.poi.POI
+local Circle = ns.poi.Circle
+local Entrance = ns.poi.Entrance
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -523,9 +523,9 @@ local TurtlesThanks = Class('TurtlesThanks', Treasure, {
 }) -- Turtle's Thanks (Dalaran Sewer Turtle)
 
 function TurtlesThanks.getters:note()
-    local note = TheWarWithin.tooltip.ItemStatus(220143, 5, L['turtles_thanks_1_note'],
+    local note = ns.tooltip.ItemStatus(220143, 5, L['turtles_thanks_1_note'],
         false)
-    note = note .. TheWarWithin.tooltip.ItemStatus(222533, 1, L['turtles_thanks_2_note'])
+    note = note .. ns.tooltip.ItemStatus(222533, 1, L['turtles_thanks_2_note'])
     return note .. '\n\n' .. L['turtles_thanks_3_note']
 end
 
@@ -546,8 +546,8 @@ map.nodes[31445130] = Treasure({
     quest = 83094,
     label = '{npc:225537}',
     requires = {
-        TheWarWithin.requirement.Reputation(1272, 33600, false, true),
-        TheWarWithin.requirement.Quest(30526)
+        ns.requirement.Reputation(1272, 33600, false, true),
+        ns.requirement.Quest(30526)
     },
     note = L['faithful_dog_note'],
     rewards = {Pet({item = 224766, id = 4596})}
@@ -580,11 +580,11 @@ map.nodes[31445130] = Treasure({
 --------------------------------- BATTLE PETS ---------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[38337882] = TheWarWithin.node.PetBattle({
+map.nodes[38337882] = ns.node.PetBattle({
     id = 223446,
     rewards = {
         Achievement({id = 40153, criteria = 67135, oneline = true}), -- Battle on Khaz Algar
-        TheWarWithin.reward.Spacer(),
+        ns.reward.Spacer(),
         Achievement({id = 40154, criteria = 67139, oneline = true}), -- Aquatic Battler of Khaz Algar
         Achievement({id = 40155, criteria = 67143, oneline = true}), -- Beast Battler of Khaz Algar
         Achievement({id = 40156, criteria = 67147, oneline = true}), -- Critter Battler of Khaz Algar
@@ -598,7 +598,7 @@ map.nodes[38337882] = TheWarWithin.node.PetBattle({
     }
 }) -- Collector Dyna
 
-map.nodes[48163195] = TheWarWithin.node.PetBattle({
+map.nodes[48163195] = ns.node.PetBattle({
     id = 223407,
     rewards = {
         Achievement({id = 40153, criteria = 67131, oneline = true}) -- Battle on Khaz Algar
@@ -706,41 +706,41 @@ map.nodes[71904721] = SkyridingGlyph({
 --------------------- ACHIEVEMENT: KHAZ ALGAR LORE HUNTER ---------------------
 -------------------------------------------------------------------------------
 
--- map.nodes[37295254] = LoreObject({
---     note = L['in_water'],
---     rewards = {
---         Achievement({id = 40762, criteria = 69369}),
---         Reputation({id = 2590, gain = 250})
---     }
--- }) -- Galan's Edict
+map.nodes[37295254] = LoreObject({
+    note = L['in_water'],
+    rewards = {
+        Achievement({id = 40762, criteria = 69369}),
+        Reputation({id = 2590, gain = 250})
+    }
+}) -- Galan's Edict
 
--- map.nodes[44083014] = LoreObject({
---     rewards = {
---         Achievement({id = 40762, criteria = 69371}),
---         Reputation({id = 2590, gain = 250})
---     }
--- }) -- Stone of The Unbound
+map.nodes[44083014] = LoreObject({
+    rewards = {
+        Achievement({id = 40762, criteria = 69371}),
+        Reputation({id = 2590, gain = 250})
+    }
+}) -- Stone of The Unbound
 
--- map.nodes[78132785] = LoreObject({
---     rewards = {
---         Achievement({id = 40762, criteria = 69370}),
---         Reputation({id = 2590, gain = 250})
---     }
--- }) -- Titan Console
+map.nodes[78132785] = LoreObject({
+    rewards = {
+        Achievement({id = 40762, criteria = 69370}),
+        Reputation({id = 2590, gain = 250})
+    }
+}) -- Titan Console
 
--- map.nodes[57222001] = LoreObject({
---     rewards = {
---         Achievement({id = 40762, criteria = 69372}),
---         Reputation({id = 2590, gain = 250})
---     }
--- }) -- Watcher of the North
+map.nodes[57222001] = LoreObject({
+    rewards = {
+        Achievement({id = 40762, criteria = 69372}),
+        Reputation({id = 2590, gain = 250})
+    }
+}) -- Watcher of the North
 
--- map.nodes[42128025] = LoreObject({
---     rewards = {
---         Achievement({id = 40762, criteria = 69373}),
---         Reputation({id = 2590, gain = 250})
---     }
--- }) -- Watcher of the South
+map.nodes[42128025] = LoreObject({
+    rewards = {
+        Achievement({id = 40762, criteria = 69373}),
+        Reputation({id = 2590, gain = 250})
+    }
+}) -- Watcher of the South
 
 -------------------------------------------------------------------------------
 -------------------------------- DISTURBED DIRT -------------------------------
@@ -807,10 +807,17 @@ map.nodes[67484330] = FlightMaster({
 dor.nodes[50006188] = Collectible({
     icon = 4620670,
     label = '{achievement:40606}',
-    group = TheWarWithin.groups.FLAT_EARTHEN,
+    group = ns.groups.FLAT_EARTHEN,
     rewards = {Achievement({id = 40606, criteria = 0})},
     parent = map.id
 }) -- Flat Earthen
+
+-------------------------------------------------------------------------------
+----------------------------- WORLDSOUL MEMORIES ------------------------------
+-------------------------------------------------------------------------------
+
+map.nodes[51262924] = ns.node.WorldsoulMemory({areaPoiID = 7838}) -- The Worldcarvers
+map.nodes[55417749] = ns.node.WorldsoulMemory({areaPoiID = 7837}) -- Ancient Explorers
 
 -------------------------------------------------------------------------------
 -------------------------------- MISCELLANEOUS --------------------------------
@@ -831,7 +838,7 @@ map.nodes[74334530] = Collectible({
 
 ------------------------- TOME OF POLYMORPH: MOSSWOOL -------------------------
 
-dor.nodes[60960531] = TheWarWithin.node.Node({
+dor.nodes[60960531] = ns.node.Node({
     label = '{item:227710}',
     icon = 133739,
     quest = 84438,
@@ -846,15 +853,15 @@ dor.nodes[60960531] = TheWarWithin.node.Node({
 
 ----------------------- ARADAN: STORMROOK SPIRIT BEAST ------------------------
 
-local rookeryLanding = TheWarWithin.maps[2315] or Map({id = 2315, settings = false})
-local stormsRoost = TheWarWithin.maps[2316] or Map({id = 2316, settings = false})
-local stormriderBarracks = TheWarWithin.maps[2318] or Map({id = 2318, settings = false})
+local rookeryLanding = ns.maps[2315] or Map({id = 2315, settings = false})
+local stormsRoost = ns.maps[2316] or Map({id = 2316, settings = false})
+local stormriderBarracks = ns.maps[2318] or Map({id = 2318, settings = false})
 
-local Aradan = Class('Aradan', TheWarWithin.node.Node, {
+local Aradan = Class('Aradan', ns.node.Node, {
     label = '{item:220770}',
     icon = 5357845,
     class = 'HUNTER',
-    requires = TheWarWithin.requirement.Specialization(253), -- Beast Mastery
+    requires = ns.requirement.Specialization(253), -- Beast Mastery
     -- LuaFormatter off
     note = format('%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s',
         L['aradan_note_start'],

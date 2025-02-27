@@ -1,18 +1,18 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Cataclysm = ...
-local L = Cataclysm.locale
-local Map = Cataclysm.Map
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Map = ns.Map
 
-local Rare = Cataclysm.node.Rare
+local Rare = ns.node.Rare
 
-local Mount = Cataclysm.reward.Mount
-local Toy = Cataclysm.reward.Toy
-local Transmog = Cataclysm.reward.Transmog
+local Mount = ns.reward.Mount
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Path = Cataclysm.poi.Path
-local POI = Cataclysm.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -26,9 +26,9 @@ local expanse = Map({id = 205, settings = true})
 ----------------------------------- GROUPS ------------------------------------
 -------------------------------------------------------------------------------
 
-Cataclysm.groups.WHALE_SHARK = Cataclysm.Group('whale_shark', 237311, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.WHALE_SHARK = ns.Group('whale_shark', 237311, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 4975,
     label = '{achievement:4975}'
 })
@@ -90,7 +90,7 @@ depths.nodes[63123162] = Rare({
         Transmog({item = 67149, slot = L['offhand']}),
         Transmog({item = 67150, slot = L['mail']})
     },
-    pois = {Path({Cataclysm.poi.Circle({origin = 70502950, radius = 7.5})})}
+    pois = {Path({ns.poi.Circle({origin = 70502950, radius = 7.5})})}
 }) -- Mobus
 
 depths.nodes[46202980] = Rare({
@@ -101,8 +101,8 @@ depths.nodes[46202980] = Rare({
 
 expanse.nodes[56804220] = Rare({
     id = 40728,
-    rewards = {Cataclysm.reward.Achievement({id = 4975})}, -- From Hell's Heart I Stab at Thee
-    group = {Cataclysm.groups.RARE, Cataclysm.groups.WHALE_SHARK},
+    rewards = {ns.reward.Achievement({id = 4975})}, -- From Hell's Heart I Stab at Thee
+    group = {ns.groups.RARE, ns.groups.WHALE_SHARK},
     pois = {
         Path({
             64403820, 60404000, 55804280, 52804440, 50204800, 48805280,

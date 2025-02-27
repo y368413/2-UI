@@ -1,9 +1,7 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="Mingy.lua"/>
+	<!--Script file="Mingy.lua"/-->
 	<Script file="QuestMods.lua"/>
-	<Script file="QuestLevelPatch.lua"/>
 	<Script file="QuestLogCounter.lua" />
-	<Script file="CollapseQuestLog.lua" />
 	<Frame mixin='ShowQuestCountMixin' hidden='false'>
 		<Scripts>
 			<OnEvent method='OnEvent' />
@@ -11,5 +9,14 @@
 			<OnLoad method='OnLoad' />
 		</Scripts>
 	</Frame>
-	<Script file="WorldMapQuestRewardIcon.lua"/>
+	<Script file="CollapseQuestLog.lua" />
+	<Script file="AutoQuestTracker_MkIII.lua"/>
+	<Button name='BetterWorldQuestPinTemplate' inherits='POIButtonTemplate, LegendHighlightableMapPoiPinTemplate' mixin='BetterWorldQuestPinMixin' virtual='true'>
+		<KeyValues>
+			<KeyValue key="questRewardTooltipStyle" value="TOOLTIP_QUEST_REWARDS_STYLE_WORLD_QUEST" type="global"/>
+		</KeyValues>
+	</Button>
+	<Button name='BetterWorldQuestPOITemplate' inherits='AreaPOIPinTemplate' virtual='true'/>
+	<Button name='BetterWorldQuestEventTemplate' inherits='AreaPOIEventPinTemplate' virtual='true'/>
+	<Script file="BetterWorldQuests.lua"/>
 </Ui>

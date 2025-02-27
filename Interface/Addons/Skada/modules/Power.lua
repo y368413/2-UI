@@ -4,12 +4,22 @@ Skada:AddLoadableModule("Power", nil, function(Skada, L)
 
 	local mod = Skada:NewModule("power gains")
 
-	local MANA      = 0
-	local RAGE      = 1
-	local FOCUS     = 2
-	local ENERGY    = 3
-	local RUNIC     = 6
-	local HOLY      = 9
+
+	-- | PowerTypes				    Description
+	local MANA		=  0		-- | Mage, Priest(Heals), Monk(Heal), Shaman(Heal)
+	local RAGE		=  1		-- | Druid(Tank), Warrior
+	local FOCUS		=  2		-- | Hunter
+	local ENERGY		=  3		-- | Druid(MDD), Monk(Tank), Rouge
+	local COMBO		=  4		-- | Druid(MDD), Rouge
+	local RUNIC		=  6		-- | Deathknight
+	local SHARDS		=  7		-- | Warlock
+	local LUNAR		=  8		-- | Druid(Tank, RDD)
+	local HOLY		=  9		-- | Paldin
+	local MAELSTROM		= 11		-- | Shaman(RDD)
+	local CHI		= 12		-- | Monk(DD)
+	local INSANE		= 13		-- | Priest(DD)
+	local CHARGES		= 16		-- | Mage(Arcane)
+	local PAIN		= 17		-- | Daemonhunter
 
 	local function log_gain(set, gain)
 		-- Get the player from set.
@@ -155,66 +165,117 @@ Skada:AddLoadableModule("Power", nil, function(Skada, L)
 
 			for spellid, amount in pairs(player.power[self.power].spells) do
 
-				local SpellInfo = C_Spell.GetSpellInfo(spellid)
-				local name = SpellInfo.name
-				local icon = SpellInfo.iconID
-				local castTime = SpellInfo.castTime
-				local minRange = SpellInfo.minRange
-				local maxRange = SpellInfo.maxRange
-				local SpellPower = C_Spell.GetSpellPowerCost(spellid)
-				local powerType = SpellPower.type
-					  
-				local d = win.dataset[nr] or {}
-				win.dataset[nr] = d
+				-- =====================================
+				-- | API   : C_Spell.GetSpellInfo      |
+				-- | valid : + 11.0.0 / 4.4.1 / 1.15.4 |
+				-- =====================================
+				local spellInfo  = C_Spell.GetSpellInfo(spellid)
 
-				d.id = spellid
-				d.label = name
-				d.value = amount
-				if self.power == MANA then
-					d.valuetext = Skada:FormatNumber(amount)..(" (%02.1f%%)"):format(amount / player.power[self.power].amount * 100)
-				else
-					d.valuetext = amount..(" (%02.1f%%)"):format(amount / player.power[self.power].amount * 100)
+				-- | Returns nil if spell is not found
+				if spellInfo then
+
+					local name       = spellInfo.name
+					local icon       = spellInfo.iconID
+
+					-- =====================================
+					-- | API   : C_Spell.GetSpellPowerCost |
+					-- | valid : + 11.0.0 / 4.4.1 / 1.15.4 |
+					-- =====================================
+					local spellPower = C_Spell.GetSpellPowerCost(spellid)
+
+					-- | May return nil if spell is not found or has no resource costs
+					if spellPower then
+
+						local powerType  = spellPower.type
+	
+						local d          = win.dataset[nr] or {}
+						win.dataset[nr]  = d
+
+						d.id		 = spellid
+						d.label		 = name
+						d.value		 = amount
+
+
+						if self.power == MANA then
+
+							d.valuetext = Skada:FormatNumber(amount) .. (" (%02.1f%%)"):format(amount / player.power[self.power].amount * 100)
+						else
+
+							d.valuetext = amount .. (" (%02.1f%%)"):format(amount / player.power[self.power].amount * 100)
+						end
+
+
+						d.icon    = icon
+						d.spellid = spellid
+
+
+						if amount > max then max = amount end
+
+
+						nr = nr + 1
+					end
 				end
-				d.icon = icon
-				d.spellid = spellid
 
-				if amount > max then
-					max = amount
-				end
-
-				nr = nr + 1
 			end
 		end
 
-		win.metadata.hasicon = true
+		win.metadata.hasicon  = true
 		win.metadata.maxvalue = max
 	end
 
-	local manamod = basemod:Create(MANA, L["Mana gained"], L["Mana gain spell list"], "Interface\\Icons\\Inv_misc_ancient_mana")
-	local energymod = basemod:Create(ENERGY, L["Energy gained"], L["Energy gain sources"], "Interface\\Icons\\Ability_rogue_sprint")
-	local runicmod = basemod:Create(RUNIC, L["Runic power gained"], L["Runic power gain sources"], "Interface\\Icons\\Ability_deathknight_runicimpowerment")
-	local ragemod = basemod:Create(RAGE, L["Rage gained"], L["Rage gain sources"], "Interface\\Icons\\Ability_warrior_rampage")
-	local holymod = basemod:Create(HOLY, L["Holy power gained"], L["Holy power gain sources"], "Interface\\Icons\\Ability_paladin_beaconoflight")
-	local focusmod = basemod:Create(FOCUS, L["Focus gained"], L["Focus gain sources"], "Interface\\Icons\\Ability_hunter_focusedaim")
+
+	--  | local variables PowerTypes
+	local chargesmod = basemod:Create(CHARGES,   L["Charges gained"],     L["Charges gain sources"],     "Interface\\Icons\\Spell_arcane_arcane01")
+	local chimod     = basemod:Create(CHI,       L["Chi gained"],         L["Chi gain sources"],         "Interface\\Icons\\Ability_hunter_markedfordeath")
+	local combomod   = basemod:Create(COMBO,     L["Combo gained"],       L["Combo gain sources"],       "Interface\\Icons\\Ability_rogue_rupture")
+	local energymod  = basemod:Create(ENERGY,    L["Energy gained"],      L["Energy gain sources"],      "Interface\\Icons\\Ability_rogue_sprint")
+	local focusmod   = basemod:Create(FOCUS,     L["Focus gained"],       L["Focus gain sources"],       "Interface\\Icons\\Ability_hunter_focusedaim")
+	local holymod    = basemod:Create(HOLY,      L["Holy power gained"],  L["Holy power gain sources"],  "Interface\\Icons\\Ability_paladin_beaconoflight")
+	local insanemod  = basemod:Create(INSANE,    L["Insane gained"],      L["Insane gain sources"],      "Interface\\Icons\\Ability_priest_darkarchangel")
+	local lunarmod   = basemod:Create(LUNAR,     L["Lunar gained"],       L["Lunar gain sources"],       "Interface\\Icons\\Spell_nature_starfall")
+	local maelmod    = basemod:Create(MAELSTROM, L["Maelstrom gained"],   L["Maelstrom gain sources"],   "Interface\\Icons\\Inv_misc_ancient_mana")
+	local manamod    = basemod:Create(MANA,      L["Mana gained"],        L["Mana gain spell list"],     "Interface\\Icons\\Inv_misc_ancient_mana")
+	local painmod    = basemod:Create(PAIN,      L["Pain gained"],        L["Pain gain sources"],        "Interface\\Icons\\Ability_demonhunter_felblade")
+	local ragemod    = basemod:Create(RAGE,      L["Rage gained"],        L["Rage gain sources"],        "Interface\\Icons\\Ability_warrior_rampage")
+	local runicmod   = basemod:Create(RUNIC,     L["Runic power gained"], L["Runic power gain sources"], "Interface\\Icons\\Ability_deathknight_runicimpowerment")
+	local shardsmod  = basemod:Create(SHARDS,    L["Shards gained"],      L["Shards gain sources"],      "Interface\\Icons\\inv_misc_gem_amethyst_02")
 
 	function mod:OnEnable()
 		Skada:RegisterForCL(SpellEnergize, 'SPELL_ENERGIZE', {src_is_interesting = true})
 		Skada:RegisterForCL(SpellEnergize, 'SPELL_PERIODIC_ENERGIZE', {src_is_interesting = true})
 
-		Skada:AddMode(manamod, L["Power gains"])
-		Skada:AddMode(energymod, L["Power gains"])
-		Skada:AddMode(ragemod, L["Power gains"])
-		Skada:AddMode(runicmod, L["Power gains"])
-		Skada:AddMode(holymod, L["Power gains"])
-		Skada:AddMode(focusmod, L["Power gains"])
+		Skada:AddMode(chargesmod, L["Power gains"])
+		Skada:AddMode(chimod,     L["Power gains"])
+		Skada:AddMode(combomod,   L["Power gains"])
+		Skada:AddMode(energymod,  L["Power gains"])
+		Skada:AddMode(focusmod,   L["Power gains"])
+		Skada:AddMode(holymod,    L["Power gains"])
+		Skada:AddMode(insanemod,  L["Power gains"])
+		Skada:AddMode(lunarmod,   L["Power gains"])
+		Skada:AddMode(maelmod,    L["Power gains"])
+		Skada:AddMode(manamod,    L["Power gains"])
+		Skada:AddMode(painmod,    L["Power gains"])
+		Skada:AddMode(ragemod,    L["Power gains"])
+		Skada:AddMode(runicmod,   L["Power gains"])
+		Skada:AddMode(shardsmod,  L["Power gains"])
 	end
 
 	function mod:OnDisable()
-		Skada:RemoveMode(manamod)
+
+		Skada:RemoveMode(chargesmod)
+		Skada:RemoveMode(chimod)
+		Skada:RemoveMode(combomod)
 		Skada:RemoveMode(energymod)
+		Skada:RemoveMode(focusmod)
+		Skada:RemoveMode(holymod)
+		Skada:RemoveMode(insanemod)
+		Skada:RemoveMode(lunarmod)
+		Skada:RemoveMode(maelmod)
+		Skada:RemoveMode(manamod)
+		Skada:RemoveMode(painmod)
 		Skada:RemoveMode(ragemod)
 		Skada:RemoveMode(runicmod)
-		Skada:RemoveMode(holymod)
+		Skada:RemoveMode(shardsmod)
 	end
 
 	-- Called by Skada when a new player is added to a set.

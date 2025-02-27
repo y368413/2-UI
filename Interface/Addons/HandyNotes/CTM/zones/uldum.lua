@@ -1,17 +1,17 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Cataclysm = ...
-local L = Cataclysm.locale
-local Map = Cataclysm.Map
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Map = ns.Map
 
-local Rare = Cataclysm.node.Rare
-local Safari = Cataclysm.node.Safari
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
 
-local Achievement = Cataclysm.reward.Achievement
-local Transmog = Cataclysm.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Transmog = ns.reward.Transmog
 
-local POI = Cataclysm.poi.POI
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -294,13 +294,13 @@ map.nodes[45601740] = Safari.TolvirScarab({
 -------------------------- MYSTERIOUS CAMEL FIGURINE --------------------------
 -------------------------------------------------------------------------------
 
-local Camel = Cataclysm.node.Collectible({
+local Camel = ns.node.Collectible({
     id = 50409,
     icon = 454772,
     fgroup = 'camel',
     rewards = {
-        Achievement({id = 5767}), Cataclysm.reward.Mount({item = 63046, id = 400}),
-        Cataclysm.reward.Title({id = 143, pattern = '{player}, {title}'})
+        Achievement({id = 5767}), ns.reward.Mount({item = 63046, id = 400}),
+        ns.reward.Title({id = 143, pattern = '{player}, {title}'})
     }
 }) -- Mysterious Camel Figurine
 
@@ -359,7 +359,7 @@ map.nodes[64703030] = Camel
 --------------------------------- DRAGONRACES ---------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[55774218] = Cataclysm.node.Dragonrace({
+map.nodes[55774218] = ns.node.Dragonrace({
     label = '{quest:75481}',
     normal = {2326, 89, 84},
     advanced = {2356, 81, 76},

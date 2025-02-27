@@ -382,7 +382,7 @@ do
 		if self.GetNumRegions then
 			for i = 1, self:GetNumRegions() do
 				local region = select(i, self:GetRegions())
-				if region and region.IsObjectType and region:IsObjectType("Texture") then
+				if region and region.IsObjectType and region:IsObjectType("Texture") and not region.isIgnored then
 					if kill and type(kill) == "boolean" then
 						M.HideObject(region)
 					elseif tonumber(kill) then
@@ -1808,7 +1808,7 @@ do
 		slider.High:SetText(maxValue)
 		slider.High:SetPoint("TOPRIGHT", slider, "BOTTOMRIGHT", -10, -2)
 		slider.Text:ClearAllPoints()
-		slider.Text:SetPoint("CENTER", 0, 25)
+		slider.Text:SetPoint("CENTER", 0, 18)
 		slider.Text:SetText(name)
 		slider.Text:SetTextColor(1, .8, 0)
 		slider.value = M.CreateEditBox(slider, 50, 20)

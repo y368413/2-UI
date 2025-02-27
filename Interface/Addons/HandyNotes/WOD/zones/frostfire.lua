@@ -1,28 +1,28 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, WarlordsOfDraenor = ...
-local Class = WarlordsOfDraenor.Class
-local L = WarlordsOfDraenor.locale
-local Map = WarlordsOfDraenor.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = WarlordsOfDraenor.node.Collectible
-local PetBattle = WarlordsOfDraenor.node.PetBattle
-local Rare = WarlordsOfDraenor.node.Rare
-local Treasure = WarlordsOfDraenor.node.Treasure
+local Collectible = ns.node.Collectible
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local Achievement = WarlordsOfDraenor.reward.Achievement
-local Currency = WarlordsOfDraenor.reward.Currency
-local Follower = WarlordsOfDraenor.reward.Follower
-local Item = WarlordsOfDraenor.reward.Item
-local Mount = WarlordsOfDraenor.reward.Mount
-local Pet = WarlordsOfDraenor.reward.Pet
-local Quest = WarlordsOfDraenor.reward.Quest
-local Toy = WarlordsOfDraenor.reward.Toy
-local Transmog = WarlordsOfDraenor.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Currency = ns.reward.Currency
+local Follower = ns.reward.Follower
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Quest = ns.reward.Quest
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Path = WarlordsOfDraenor.poi.Path
-local POI = WarlordsOfDraenor.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -705,7 +705,7 @@ local BladeSpireTreasure = Class('BladeSpireTreasure', Treasure, {
     getters = {
         requirement = function(self)
             if (UnitFactionGroup('player') == 'Horde') then
-                return WarlordsOfDraenor.requirement.Quest(33657) -- Moving In
+                return ns.requirement.Quest(33657) -- Moving In
             else
                 return nil
             end
@@ -817,7 +817,7 @@ map.nodes[68606460] = PetBattle({
 local TatteredJournalPage = Collectible({
     id = 82833,
     icon = 133680,
-    group = WarlordsOfDraenor.groups.WRITING_IN_THE_SNOW,
+    group = ns.groups.WRITING_IN_THE_SNOW,
     note = L['multiple_spawn_note'],
     rewards = {
         Achievement({id = 9531, faction = 'Horde'}), -- Writing in the Snow
@@ -841,7 +841,7 @@ map.nodes[48541459] = TatteredJournalPage
 
 local Slave = Class('Slave', Collectible, {
     scale = 1.1,
-    group = WarlordsOfDraenor.groups.BREAKER_OF_CHAINS,
+    group = ns.groups.BREAKER_OF_CHAINS,
     rewards = {
         Achievement({
             id = 9533,
@@ -865,7 +865,7 @@ map.nodes[43402160] = FrozenSlave
 local PrisonerCage = Slave({
     label = L['prisoner_cage_label'],
     icon = 'peg_yw',
-    requires = WarlordsOfDraenor.requirement.Quest(35637)
+    requires = ns.requirement.Quest(35637)
 })
 
 map.nodes[47361305] = PrisonerCage
@@ -889,8 +889,8 @@ local Delicacy = Collectible({
     note = L['delectable_ogre_delicacies_note'],
     icon = 'peg_gn',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.DELECTABLE_OGRE_DELICACIES,
-    requires = WarlordsOfDraenor.requirement.Quest(35637),
+    group = ns.groups.DELECTABLE_OGRE_DELICACIES,
+    requires = ns.requirement.Quest(35637),
     rewards = {
         Achievement({id = 9534}) -- Delectable Ogre Delicacies
     }
@@ -939,7 +939,7 @@ map.nodes[65053951] = Collectible({
 map.nodes[65906080] = Collectible({
     id = 79607,
     icon = 132320,
-    group = WarlordsOfDraenor.groups.GARRFOLLOWER,
+    group = ns.groups.GARRFOLLOWER,
     note = L['dagg_follower_note'],
     rewards = {Follower({id = 32, icon = 132320})},
     pois = {POI({39602800}), Path({65906080, 39602800})}
@@ -948,7 +948,7 @@ map.nodes[65906080] = Collectible({
 map.nodes[68001900] = Collectible({
     label = '{quest:34464}', -- Mysterious Boots
     icon = 135932,
-    group = WarlordsOfDraenor.groups.GARRFOLLOWER,
+    group = ns.groups.GARRFOLLOWER,
     note = L['image_of_archmage_vargoth_follower_note'],
     rewards = {Quest({id = 34464}), Follower({id = 190, icon = 135932})}
 }) -- Image of Archmage Vargoth
@@ -956,7 +956,7 @@ map.nodes[68001900] = Collectible({
 map.nodes[52634042] = Collectible({
     id = 78208,
     icon = 236179,
-    group = WarlordsOfDraenor.groups.GARRFOLLOWER,
+    group = ns.groups.GARRFOLLOWER,
     note = L['shadow_hunter_rala_follower_note'],
     faction = 'Horde',
     rewards = {Follower({id = 180, icon = 236179})}
@@ -965,7 +965,7 @@ map.nodes[52634042] = Collectible({
 map.nodes[59453179] = Collectible({
     id = 79229,
     icon = 236179,
-    group = WarlordsOfDraenor.groups.GARRFOLLOWER,
+    group = ns.groups.GARRFOLLOWER,
     note = L['gronnstalker_rokash_follower_note'],
     faction = 'Horde',
     rewards = {Follower({id = 183, icon = 236179})}
@@ -975,17 +975,17 @@ map.nodes[59453179] = Collectible({
 ---------------------------------- SQUIRRELS ----------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[65177799] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[65177799] = ns.node.Squirrel({
     id = 88985,
     rewards = {Achievement({id = 14728, criteria = 8})} -- To All the Squirrels Through Time and Space
 }) -- Frostfur Rat
 
-map.nodes[66277641] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[66277641] = ns.node.Squirrel({
     id = 88441,
     rewards = {Achievement({id = 14728, criteria = 9})} -- To All the Squirrels Through Time and Space
 }) -- Icespine Hatchling
 
-map.nodes[64747906] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[64747906] = ns.node.Squirrel({
     id = 88427,
     rewards = {Achievement({id = 14728, criteria = 10})} -- To All the Squirrels Through Time and Space
 }) -- Twilight Wasp

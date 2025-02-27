@@ -1,23 +1,23 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Legion = ...
-local L = Legion.locale
-local Class = Legion.Class
-local Map = Legion.Map
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Class = ns.Class
+local Map = ns.Map
 
--- local Collectible = Legion.node.Collectible
-local PetBattle = Legion.node.PetBattle
-local Rare = Legion.node.Rare
-local Treasure = Legion.node.Treasure
+-- local Collectible = ns.node.Collectible
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local Achievement = Legion.reward.Achievement
-local Pet = Legion.reward.Pet
-local Toy = Legion.reward.Toy
-local Transmog = Legion.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Pet = ns.reward.Pet
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local POI = Legion.poi.POI
-local Path = Legion.poi.Path
+local POI = ns.poi.POI
+local Path = ns.poi.Path
 
 -------------------------------------------------------------------------------
 
@@ -406,7 +406,7 @@ map.nodes[47003960] = PetBattle({
     id = 99035,
     note = L['general_pet_tamer_note'] .. '\n\n' .. L['durian_strongfruit_note'],
     rewards = {
-        Achievement({id = 10876, criteria = nil}), Legion.reward.Spacer(),
+        Achievement({id = 10876, criteria = nil}), ns.reward.Spacer(),
         Achievement({id = 9686, criteria = 14, oneline = true}), -- Aquatic
         Achievement({id = 9687, criteria = 14, oneline = true}), -- Beast
         Achievement({id = 9688, criteria = 14, oneline = true}), -- Critter
@@ -442,7 +442,7 @@ map.nodes[63606060] = PetBattle({
     id = 104970,
     note = L['general_pet_tamer_note'] .. '\n\n' .. L['xorvasc_note'],
     rewards = {
-        Achievement({id = 10876, criteria = 31554}), Legion.reward.Spacer(),
+        Achievement({id = 10876, criteria = 31554}), ns.reward.Spacer(),
         Achievement({id = 9686, criteria = 15, oneline = true}), -- Aquatic
         Achievement({id = 9687, criteria = 15, oneline = true}), -- Beast
         Achievement({id = 9688, criteria = 15, oneline = true}), -- Critter
@@ -460,7 +460,7 @@ map.nodes[63606060] = PetBattle({
 ----------------------------- BROKEN ISLES SAFARI -----------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[62807480] = Legion.node.Safari.AuburnRingtail({
+map.nodes[62807480] = ns.node.Safari.AuburnRingtail({
     pois = {
         POI({
             42408020, 42408060, 47007940, 50808620, 51806960, 52408820,
@@ -471,7 +471,7 @@ map.nodes[62807480] = Legion.node.Safari.AuburnRingtail({
     }
 })
 
-map.nodes[55606860] = Legion.node.Safari.GleamhoofFawn({
+map.nodes[55606860] = ns.node.Safari.GleamhoofFawn({
     pois = {
         POI({
             47203880, 49407320, 50607900, 52006480, 52407540, 52806400,
@@ -484,7 +484,7 @@ map.nodes[55606860] = Legion.node.Safari.GleamhoofFawn({
     }
 })
 
-map.nodes[54608620] = Legion.node.Safari.ShimmeringAquafly({
+map.nodes[54608620] = ns.node.Safari.ShimmeringAquafly({
     pois = {
         POI({
             52008160, 52208080, 52608240, 52808060, 52808260, 53008380,
@@ -495,7 +495,7 @@ map.nodes[54608620] = Legion.node.Safari.ShimmeringAquafly({
     }
 })
 
-map.nodes[49006860] = Legion.node.Safari.SpringStrider({
+map.nodes[49006860] = ns.node.Safari.SpringStrider({
     pois = {
         POI({
             43807100, 44607000, 44607060, 45607000, 46207100, 46406920,
@@ -504,7 +504,7 @@ map.nodes[49006860] = Legion.node.Safari.SpringStrider({
     }
 })
 
-map.nodes[62603800] = Legion.node.Safari.TerrorLarva({
+map.nodes[62603800] = ns.node.Safari.TerrorLarva({
     pois = {
         POI({
             54804020, 56204320, 56604220, 56604260, 57204080, 57804120,
@@ -515,7 +515,7 @@ map.nodes[62603800] = Legion.node.Safari.TerrorLarva({
     }
 })
 
-map.nodes[65207220] = Legion.node.Safari.ValeFlitter({
+map.nodes[65207220] = ns.node.Safari.ValeFlitter({
     pois = {
         POI({
             43806980, 47807740, 51607220, 52207760, 54807760, 56207440,

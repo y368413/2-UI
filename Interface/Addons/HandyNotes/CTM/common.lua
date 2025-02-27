@@ -1,28 +1,28 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Cataclysm = ...
-local L = Cataclysm.locale
+local _, ns = ...
+local L = ns.locale
 
-local Class = Cataclysm.Class
-local Group = Cataclysm.Group
+local Class = ns.Class
+local Group = ns.Group
 
-local Collectible = Cataclysm.node.Collectible
+local Collectible = ns.node.Collectible
 
-local Achievement = Cataclysm.reward.Achievement
-local Pet = Cataclysm.reward.Pet
+local Achievement = ns.reward.Achievement
+local Pet = ns.reward.Pet
 
 -------------------------------------------------------------------------------
 
-Cataclysm.expansion = 4
+ns.expansion = 4
 
 -------------------------------------------------------------------------------
 ----------------------------------- GROUPS ------------------------------------
 -------------------------------------------------------------------------------
 
-Cataclysm.groups.DRAGONRACE = Group('dragonrace', 1100022, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.EXPANSION,
+ns.groups.DRAGONRACE = Group('dragonrace', 1100022, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION,
     IsEnabled = function(self)
         if select(2, C_AddOns.IsAddOnLoaded('HandyNotes')) then
             return false
@@ -30,9 +30,9 @@ Cataclysm.groups.DRAGONRACE = Group('dragonrace', 1100022, {
         return Group.IsEnabled(self)
     end
 })
-Cataclysm.groups.SAFARI = Group('safari', 4048818, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.SAFARI = Group('safari', 4048818, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 6585
 })
 
@@ -41,9 +41,9 @@ Cataclysm.groups.SAFARI = Group('safari', 4048818, {
 -------------------------------------------------------------------------------
 
 local Safari = Class('Safari', Collectible,
-    {icon = 'paw_g', group = Cataclysm.groups.SAFARI})
+    {icon = 'paw_g', group = ns.groups.SAFARI})
 
-Cataclysm.node.Safari = {
+ns.node.Safari = {
     AlpineChipmunk = Class('AlpineChipmunk', Safari, {
         id = 62189,
         rewards = {
@@ -274,7 +274,7 @@ Cataclysm.node.Safari = {
 -------------------------------------------------------------------------------
 
 local Dragonrace = Class('DragonRace', Collectible,
-    {icon = 1100022, group = Cataclysm.groups.DRAGONRACE})
+    {icon = 1100022, group = ns.groups.DRAGONRACE})
 
 function Dragonrace.getters:sublabel()
     if self.normal then
@@ -292,8 +292,8 @@ end
 
 function Dragonrace.getters:note()
     if self.normal then
-        local silver = Cataclysm.color.Silver
-        local gold = Cataclysm.color.Gold
+        local silver = ns.color.Silver
+        local gold = ns.color.Gold
 
         -- LuaFormatter off
         if self.advanced and self.reverse then
@@ -315,7 +315,7 @@ function Dragonrace.getters:note()
     end
 end
 
-Cataclysm.node.Dragonrace = Dragonrace
+ns.node.Dragonrace = Dragonrace
 
 local DRAGONRACE_POI = {
     [7496] = 56712795, -- Nordassil Spiral
@@ -326,23 +326,23 @@ local DRAGONRACE_POI = {
 }
 
 hooksecurefunc(AreaPOIPinMixin, 'TryShowTooltip', function(self)
-    if not Cataclysm.groups.DRAGONRACE:IsEnabled() or
+    if not ns.groups.DRAGONRACE:IsEnabled() or
         not DRAGONRACE_POI[self.areaPoiID] then return end
     local mapID = self:GetMap().mapID
-    local group = Cataclysm.groups.DRAGONRACE
+    local group = ns.groups.DRAGONRACE
 
-    if not Cataclysm.maps[mapID] or not group:GetDisplay(mapID) then return end
+    if not ns.maps[mapID] or not group:GetDisplay(mapID) then return end
 
-    local node = Cataclysm.maps[mapID].nodes[DRAGONRACE_POI[self.areaPoiID]]
+    local node = ns.maps[mapID].nodes[DRAGONRACE_POI[self.areaPoiID]]
     if not node then return end
 
     ----GameTooltip:AddLine(' ')
-    GameTooltip:AddLine(Cataclysm.RenderLinks(node.sublabel, true), 1, 1, 1)
-    if Cataclysm:GetOpt('show_notes') then
+    GameTooltip:AddLine(ns.RenderLinks(node.sublabel, true), 1, 1, 1)
+    if ns:GetOpt('show_notes') then
         ----GameTooltip:AddLine(' ')
-        GameTooltip:AddLine(Cataclysm.RenderLinks(node.note), 1, 1, 1, true)
+        GameTooltip:AddLine(ns.RenderLinks(node.note), 1, 1, 1, true)
     end
-    if Cataclysm:GetOpt('show_loot') then
+    if ns:GetOpt('show_loot') then
         ----GameTooltip:AddLine(' ')
         for i, reward in ipairs(node.rewards) do
             if reward:IsEnabled() then reward:Render(GameTooltip) end
@@ -353,29 +353,29 @@ hooksecurefunc(AreaPOIPinMixin, 'TryShowTooltip', function(self)
 end)
 
 hooksecurefunc(VignettePinMixin, 'DisplayNormalTooltip', function(self)
-    if not Cataclysm.groups.DRAGONRACE:IsEnabled() or self.vignetteID ~= 5104 then
+    if not ns.groups.DRAGONRACE:IsEnabled() or self.vignetteID ~= 5104 then
         return
     end
 
     local mapID = self:GetMap().mapID
-    local group = Cataclysm.groups.DRAGONRACE
-    if not Cataclysm.maps[mapID] or not group:GetDisplay(mapID) then return end
+    local group = ns.groups.DRAGONRACE
+    if not ns.maps[mapID] or not group:GetDisplay(mapID) then return end
 
     local x = C_VignetteInfo.GetVignettePosition(self.vignetteGUID, mapID).x
     local y = C_VignetteInfo.GetVignettePosition(self.vignetteGUID, mapID).y
 
     GameTooltip:AddLine('XY ' .. HandyNotes:getCoord(x, y), 1, 1, 1, true) -- DEBUG
 
-    local node = Cataclysm.maps[mapID].nodes[HandyNotes:getCoord(x, y)]
+    local node = ns.maps[mapID].nodes[HandyNotes:getCoord(x, y)]
     if not node then return end
 
-    GameTooltip:SetText(Cataclysm.RenderLinks(node.label, true))
-    GameTooltip:AddLine(Cataclysm.RenderLinks(node.sublabel, true), 1, 1, 1)
-    if Cataclysm:GetOpt('show_notes') then
+    GameTooltip:SetText(ns.RenderLinks(node.label, true))
+    GameTooltip:AddLine(ns.RenderLinks(node.sublabel, true), 1, 1, 1)
+    if ns:GetOpt('show_notes') then
         ----GameTooltip:AddLine(' ')
-        GameTooltip:AddLine(Cataclysm.RenderLinks(node.note), 1, 1, 1, true)
+        GameTooltip:AddLine(ns.RenderLinks(node.note), 1, 1, 1, true)
     end
-    if Cataclysm:GetOpt('show_loot') then
+    if ns:GetOpt('show_loot') then
         ----GameTooltip:AddLine(' ')
         for i, reward in ipairs(node.rewards) do
             if reward:IsEnabled() then reward:Render(GameTooltip) end

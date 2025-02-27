@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Core = ...
+local _, ns = ...
 
-local L = Core.locale
-local Class = Core.Class
+local L = ns.locale
+local Class = ns.Class
 
 -------------------------------------------------------------------------------
 --------------------------------- REQUIREMENT ---------------------------------
@@ -119,7 +119,20 @@ function Item:Initialize(id, count, quality)
     end
 end
 
-function Item:IsMet() return Core.PlayerHasItem(self.id, self.count) end
+function Item:IsMet() return ns.PlayerHasItem(self.id, self.count) end
+
+-------------------------------------------------------------------------------
+------------------------------------- PET -------------------------------------
+-------------------------------------------------------------------------------
+
+local Pet = Class('Pet', Requirement, {type = L['pet']})
+
+function Pet:Initialize(id)
+    self.id = id
+    self.text = select(1, C_PetJournal.GetPetInfoBySpeciesID(self.id))
+end
+
+function Pet:IsMet() return C_PetJournal.GetNumCollectedInfo(self.id) > 0 end
 
 -------------------------------------------------------------------------------
 --------------------------------- PROFESSION ----------------------------------
@@ -136,7 +149,7 @@ function Profession:Initialize(skillID, variantID, level)
     if level then self.text = self.text .. ' (' .. level .. ')' end
 end
 
-function Profession:IsMet() return Core.PlayerHasProfession(self.skillID) end
+function Profession:IsMet() return ns.PlayerHasProfession(self.skillID) end
 
 -------------------------------------------------------------------------------
 ------------------------------------ QUEST ------------------------------------
@@ -174,22 +187,22 @@ end
 function Reputation:GetText()
     local level = self.level
     if self.isAmount then
-        level = Core.FormatReputation(self.level)
+        level = ns.FormatReputation(self.level)
     elseif self.isRenown then
         level = _G['COVENANT_SANCTUM_LEVEL']:format(level)
     else
         level = GetText('FACTION_STANDING_LABEL' .. level)
     end
-    return ('%s (%s)'):format(Core.api.GetFactionInfoByID(self.id), level)
+    return ('%s (%s)'):format(ns.api.GetFactionInfoByID(self.id), level)
 end
 
 function Reputation:IsMet()
     if self.isAmount then
-        return select(6, Core.api.GetFactionInfoByID(self.id)) >= self.level
+        return select(6, ns.api.GetFactionInfoByID(self.id)) >= self.level
     elseif self.isRenown then
         return C_MajorFactions.GetCurrentRenownLevel(self.id) >= self.level
     else
-        return select(3, Core.api.GetFactionInfoByID(self.id)) >= self.level
+        return select(3, ns.api.GetFactionInfoByID(self.id)) >= self.level
     end
 end
 
@@ -244,12 +257,13 @@ local WarMode = Class('WarMode', Requirement, {
 
 -------------------------------------------------------------------------------
 
-Core.requirement = {
+ns.requirement = {
     Achievement = Achievement,
     Currency = Currency,
     GarrisonTalent = GarrisonTalent,
     GarrisonTalentRank = GarrisonTalentRank,
     Item = Item,
+    Pet = Pet,
     Profession = Profession,
     Quest = Quest,
     Reputation = Reputation,

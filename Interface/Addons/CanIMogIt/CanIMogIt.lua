@@ -584,7 +584,7 @@ end
 
 
 -- OptionsVersion: Keep this as an integer, so comparison is easy.
-CanIMogIt_OptionsVersion = "23"
+CanIMogIt_OptionsVersion = "24"
 
 CanIMogItOptions_Defaults = {
     ["options"] = {
@@ -601,6 +601,7 @@ CanIMogItOptions_Defaults = {
         ["showToyItems"] = true,
         ["showPetItems"] = true,
         ["showMountItems"] = true,
+        ["showCatalizableItems"] = true,
     },
 }
 
@@ -653,6 +654,10 @@ CanIMogItOptions_DisplayData = {
     ["showMountItems"] = {
         ["displayName"] = L["Show Mount Items"],
         ["description"] = L["Show tooltips and overlays on mounts (otherwise, shows as not transmoggable)."]
+    },
+    ["showCatalizableItems"] = {
+        ["displayName"] = L["Show Catalizable Items"],
+        ["description"] = L["Show extra tooltip for items that can be catalyzed."]
     },
 }
 
@@ -714,6 +719,7 @@ for i, event in pairs(EVENTS) do
 end
 
 CanIMogIt.Events = {}
+CanIMogIt.EventsList = EVENTS
 
 for i, event in pairs(EVENTS) do
     CanIMogIt.Events[event] = true
@@ -722,9 +728,8 @@ end
 
 -- Skip the itemOverlayEvents function until the loading screen is disabled.
 local ifNotBusyLimit = .008
--- a dictionary of functions to run if we are not busy. Each event should only be in this once.
+-- a list of functions to run if we are not busy.
 local ifNotBusyEvents = {}
-local ifNotBusyKeys = {}
 
 local loadingScreenEnabled = true
 -- These events should be run during the loading screen, if it's enabled.
@@ -734,73 +739,29 @@ local loadingScreenEvents = {
 }
 
 
-
-local function makeKey(name, ...)
-    -- Get the name of the function somehow??
-    local key = name
-    for i, arg in ipairs({...}) do
-        key = key .. tostring(arg)
-    end
-    return key
-end
-
---- Schedules a function to be executed when the system is not busy.
----
---- This function takes a name, a function, and additional arguments, and schedules the function
---- to be run later when the system is not busy. It ensures that the function is only added to
---- the schedule if it is not already present.
----
---- The function creates a unique key using the provided name and arguments. If the key is not
---- already in the `ifNotBusyEvents` dictionary, it adds the function and its arguments to the
---- dictionary and the key to the `ifNotBusyKeys` list.
----
---- @param name string: The name associated with the function to be scheduled.
---- @param func function: The function to be executed.
---- @param ... any: Additional arguments to be passed to the function when it is executed.
---- @return nil
-local function RunIfNotBusy(name, func, ...)
+local function RunIfNotBusy(func, ...)
     -- Sets the function to run the next time we aren't busy.
     local args = {...}
     -- only add it to the dict if it's not already in the there.
-    local key = makeKey(name, ...)
-    if ifNotBusyEvents[key] then
-        return
-    end
-    ifNotBusyEvents[key] = {func, args}
-    table.insert(ifNotBusyKeys, key)
+    table.insert(ifNotBusyEvents, {func, args})
 end
 
---- Processes and executes functions that were scheduled to run when the system is not busy.
----
---- This function checks the list of scheduled functions (`ifNotBusyKeys`) and executes them
---- until the time limit (`ifNotBusyLimit`) is reached or there are no more functions to run.
---- It ensures that each function is only run once by removing it from the list and dictionary
---- after execution.
----
---- The function also updates the `eventTypes` and `functionsRun` tables to keep track of the
---- number of times each event type and function has been executed.
----
---- The execution loop will break if the time taken exceeds `ifNotBusyLimit` to prevent long
---- blocking operations.
-local function RunIfNotBusyEvents()
 
-    if #ifNotBusyKeys == 0 or loadingScreenEnabled then
+local function RunIfNotBusyEvents()
+    if #ifNotBusyEvents == 0 or loadingScreenEnabled then
         return
     end
     local startTime = GetTimePreciseSec()
-    while #ifNotBusyKeys > 0 do
-        local key = ifNotBusyKeys[1]
+    while #ifNotBusyEvents > 0 do
         local currentTime = GetTimePreciseSec()
         if currentTime - startTime > ifNotBusyLimit then
             break
         end
-        local eventData = ifNotBusyEvents[key]
-        table.remove(ifNotBusyKeys, 1)
-        ifNotBusyEvents[key] = nil
+        local eventData = ifNotBusyEvents[1]
+        table.remove(ifNotBusyEvents, 1)
         local func, args = eventData[1], eventData[2]
         func(unpack(args))
     end
-    RunIfNotBusyEvents()
 end
 
 
@@ -811,27 +772,26 @@ CanIMogIt.frame.eventFunctions = {}
 
 
 -- a dictionary of event names to a list of functions to run.
--- {event, {name, func}}
+-- {event, {func}}
 CanIMogIt.frame.smartEventFunctions = {}
 
 
-function CanIMogIt.frame:AddSmartEvent(name, func, events)
+function CanIMogIt.frame:AddSmartEvent(func, events)
     -- Smart events only run if there is enough time in the frame, otherwise,
     -- it pushes it off to the next frame to run.
     for i, event in ipairs(events) do
         if not CanIMogIt.frame.smartEventFunctions[event] then
             CanIMogIt.frame.smartEventFunctions[event] = {}
         end
-        table.insert(CanIMogIt.frame.smartEventFunctions[event], {name, func})
+        table.insert(CanIMogIt.frame.smartEventFunctions[event], func)
     end
 end
 
 
 local function RunSmartEvent(event, ...)
     -- Run the overlay events if we are not busy.
-    for i, eventData in ipairs(CanIMogIt.frame.smartEventFunctions[event]) do
-        local name, func = unpack(eventData)
-        RunIfNotBusy(name, func, event, ...)
+    for i, func in ipairs(CanIMogIt.frame.smartEventFunctions[event]) do
+        RunIfNotBusy(func, event, ...)
     end
 end
 
@@ -866,7 +826,7 @@ function CanIMogIt.frame.AddonLoaded(event, addonName)
         CanIMogIt.frame.Loaded()
     end
 end
-CanIMogIt.frame:AddSmartEvent("AddonLoaded", CanIMogIt.frame.AddonLoaded, {"ADDON_LOADED"})
+CanIMogIt.frame:AddSmartEvent(CanIMogIt.frame.AddonLoaded, {"ADDON_LOADED"})
 
 
 local transmogEvents = {
@@ -881,7 +841,7 @@ local function TransmogCollectionUpdated(event, ...)
     end
 end
 
-CanIMogIt.frame:AddSmartEvent("TransmogCollectionUpdated", TransmogCollectionUpdated, {"TRANSMOG_COLLECTION_SOURCE_ADDED", "TRANSMOG_COLLECTION_SOURCE_REMOVED", "TRANSMOG_COLLECTION_UPDATED"})
+CanIMogIt.frame:AddSmartEvent(TransmogCollectionUpdated, {"TRANSMOG_COLLECTION_SOURCE_ADDED", "TRANSMOG_COLLECTION_SOURCE_REMOVED", "TRANSMOG_COLLECTION_UPDATED"})
 
 
 local changesSavedStack = {}
@@ -1099,6 +1059,7 @@ local function createOptionsMenu()
     CanIMogIt.frame.showToyItems = newCheckbox(CanIMogIt.frame, "showToyItems")
     CanIMogIt.frame.showPetItems = newCheckbox(CanIMogIt.frame, "showPetItems")
     CanIMogIt.frame.showMountItems = newCheckbox(CanIMogIt.frame, "showMountItems")
+    CanIMogIt.frame.showCatalizableItems = newCheckbox(CanIMogIt.frame, "showCatalizableItems")
 
     -- position the checkboxes
     CanIMogIt.frame.showEquippableOnly:SetPoint("TOPLEFT", 16, -16)
@@ -1113,6 +1074,7 @@ local function createOptionsMenu()
     CanIMogIt.frame.showToyItems:SetPoint("TOPLEFT", CanIMogIt.frame.iconLocation, "BOTTOMLEFT")
     CanIMogIt.frame.showPetItems:SetPoint("TOPLEFT", CanIMogIt.frame.showToyItems, "BOTTOMLEFT")
     CanIMogIt.frame.showMountItems:SetPoint("TOPLEFT", CanIMogIt.frame.showPetItems, "BOTTOMLEFT")
+    CanIMogIt.frame.showCatalizableItems:SetPoint("TOPLEFT", CanIMogIt.frame.showMountItems, "BOTTOMLEFT")
 
     changesSavedText()
 end
@@ -1180,6 +1142,8 @@ function CanIMogIt:SlashCommands(input)
         CanIMogIt.frame.showPetItems:Click()
     elseif input == 'mountitems' then
         CanIMogIt.frame.showMountItems:Click()
+    elseif input == 'catalizableitems' then
+        CanIMogIt.frame.showCatalizableItems:Click()
     elseif input == 'refresh' then
         self:ResetCache()
     elseif input == 'help' then
@@ -1319,7 +1283,7 @@ local function OnClearCacheEvent(event)
     end
 end
 
-CanIMogIt.frame:AddSmartEvent("OnClearCacheEvent", OnClearCacheEvent, {"TRANSMOG_COLLECTION_UPDATED"})
+CanIMogIt.frame:AddSmartEvent(OnClearCacheEvent, {"TRANSMOG_COLLECTION_UPDATED"})
 
 local function OnClearBindCacheEvent(event, bag, slot)
     if event == "ITEM_LOCK_CHANGED" then
@@ -1327,7 +1291,7 @@ local function OnClearBindCacheEvent(event, bag, slot)
     end
 end
 
-CanIMogIt.frame:AddSmartEvent("OnClearBindCacheEvent", OnClearBindCacheEvent, {"ITEM_LOCK_CHANGED"})
+CanIMogIt.frame:AddSmartEvent(OnClearBindCacheEvent, {"ITEM_LOCK_CHANGED"})
 
 CanIMogIt.cache:Clear()
 
@@ -2784,7 +2748,7 @@ local function GetAppearancesEvent(event, ...)
         CanIMogIt:GetSets()
     end
 end
-CanIMogIt.frame:AddSmartEvent("GetAppearancesEvent", GetAppearancesEvent, {"PLAYER_LOGIN"})
+CanIMogIt.frame:AddSmartEvent(GetAppearancesEvent, {"PLAYER_LOGIN"})
 
 
 
@@ -2953,7 +2917,7 @@ local function OnMountAdded(event)
     if event ~= "NEW_MOUNT_ADDED" then return end
     CanIMogIt:ResetCache()
 end
-CanIMogIt.frame:AddSmartEvent("OnMountAdded", OnMountAdded, {"NEW_MOUNT_ADDED"})
+CanIMogIt.frame:AddSmartEvent(OnMountAdded, {"NEW_MOUNT_ADDED"})
 
 
 function CanIMogIt:IsItemToy(itemLink)
@@ -2992,7 +2956,7 @@ local function OnLearnedToy(event)
     if event ~= "NEW_TOY_ADDED" then return end
     CanIMogIt:ResetCache()
 end
-CanIMogIt.frame:AddSmartEvent("OnLearnedToy", OnLearnedToy, {"NEW_TOY_ADDED"})
+CanIMogIt.frame:AddSmartEvent(OnLearnedToy, {"NEW_TOY_ADDED"})
 
 
 function CanIMogIt:IsItemPet(itemLink)
@@ -3045,7 +3009,7 @@ local function OnPetUpdate(event)
     if event ~= "PET_JOURNAL_LIST_UPDATE" then return end
     CanIMogIt:ResetCache()
 end
-CanIMogIt.frame:AddSmartEvent("OnPetUpdate", OnPetUpdate, {"PET_JOURNAL_LIST_UPDATE"})
+CanIMogIt.frame:AddSmartEvent(OnPetUpdate, {"PET_JOURNAL_LIST_UPDATE"})
 
 
 function CanIMogIt:IsItemEnsemble(itemLink)
@@ -3133,6 +3097,35 @@ function CanIMogIt:CalculateEnsembleText(itemLink)
         end
     end
 end
+
+-- Checks to see if the item can be catalyzed.
+
+local function DisplayCatalyzeTooltip(tooltip, itemLocation)
+    if C_Item.DoesItemExist(itemLocation) then
+        if C_Item.IsItemConvertibleAndValidForPlayer(itemLocation) then
+            tooltip:AddDoubleLine(" ", CanIMogIt.UNKNOWN_ICON .. CanIMogIt.RED_ORANGE .. "Item can be Catalyzed!")
+            tooltip:Show()
+        end
+    end
+end
+
+local function OnTooltipSetInventoryItem(tooltip, unit, slot)
+    if CanIMogItOptions["showCatalizableItems"] == false then return end
+    local itemLocation = ItemLocation:CreateFromEquipmentSlot(slot)
+    DisplayCatalyzeTooltip(tooltip, itemLocation)
+end
+
+
+local function OnTooltipSetItem(tooltip, bag, slot)
+    if CanIMogItOptions["showCatalizableItems"] == false then return end
+    local itemLocation = ItemLocation:CreateFromBagAndSlot(bag, slot)
+    DisplayCatalyzeTooltip(tooltip, itemLocation)
+end
+
+
+-- Hook the function to the GameTooltip.
+hooksecurefunc(GameTooltip, "SetInventoryItem", OnTooltipSetInventoryItem)
+hooksecurefunc(GameTooltip, "SetBagItem", OnTooltipSetItem)
 
 -- Adds overlays to items in the addon Auctionator: https://www.curseforge.com/wow/addons/auctionator
 

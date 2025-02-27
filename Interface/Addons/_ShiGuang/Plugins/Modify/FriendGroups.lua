@@ -11,7 +11,7 @@ local expansionMaxLevel = {}
 local friendsListEmpty = false
 local searchBoxInit = false
 local lastFriendsListEmptyWarning = 0
-local currentExpansionMaxLevel, FriendGroupFrame, searchOpened
+local currentExpansionMaxLevel, FriendGroups_Menu, FriendGroupFrame, searchOpened
 local searchValue = ""
 
 --[[
@@ -232,7 +232,7 @@ function FriendGroups_AddDropDownNew(ownerRegion, rootDescription, contextData)
 			end
 		end
 
-		local remove = rootDescription:CreateButton("[DEL]⬅")
+		local remove = rootDescription:CreateButton("[DEL]x")
 
 		for _, group in ipairs(groupsSorted) do
 			if FriendGroups_HasValue(groups, group) then
@@ -1039,7 +1039,7 @@ function FriendGroups_FriendsListUpdateFriendButton(button, elementData)
 			_, isGameAFK, isDND, isGameBusy, mobile, zoneName, gameText, battleTag, factionName, timerunningSeasonID =
 				FriendGroups_GetFriendInfoById(button.id)
 
-			if ShiGuangDB.show_mobile_afk and client == 'BSAp' then
+			if ShiGuangDB.FriendGroupsshow_mobile_afk and client == 'BSAp' then
 				statusTexture = FRIENDS_TEXTURE_AFK
 			end
 
@@ -1459,15 +1459,16 @@ function FriendGroups_FrameFriendDividerTemplateHeaderClick(self, button, down)
 	local groupName = self and self:GetParent() and self:GetParent().name and self:GetParent().name:GetText() or
 		self.name and self.name:GetText()
 
-	if button == "MiddleButton" and groupName == "Search..." then  --LeftButton
+	if button == "MiddleButton" then  -- and groupName == "Search..."
 		ShiGuangDB["FriendGroupshide_offline"] = not ShiGuangDB["FriendGroupshide_offline"] --searchOpened = true
 		FriendGroups_FriendsListUpdate()
 	elseif button == "RightButton" and groupName ~= "Search..." then
 		ShiGuangDB["FriendGroupsingame_only"] = not ShiGuangDB["FriendGroupsingame_only"]--ToggleDropDownMenu(1, self, FriendGroups_Menu, "cursor", 0, 0)
 		FriendGroups_FriendsListUpdate()
 	else
-		ShiGuangDB["FriendGroupsCollapsed"][groupName] = not ShiGuangDB["FriendGroupsCollapsed"][groupName]--FriendGroups_FrameFriendDividerTemplateCollapseClick(self, button, down)
-		FriendGroups_FriendsListUpdate()
+		FriendGroups_FrameFriendDividerTemplateCollapseClick(self, button, down)
+		--ShiGuangDB["FriendGroupsCollapsed"][groupName] = not ShiGuangDB["FriendGroupsCollapsed"][groupName]--FriendGroups_FrameFriendDividerTemplateCollapseClick(self, button, down)
+		--FriendGroups_FriendsListUpdate()
 	end
 end
 
@@ -1551,6 +1552,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		if ShiGuangDB["FriendGroupscolour_classes"] == nil then ShiGuangDB["FriendGroupscolour_classes"] = true end
 		if ShiGuangDB["FriendGroupsgray_faction"] == nil then ShiGuangDB["FriendGroupsgray_faction"] = false end
 		if ShiGuangDB["FriendGroupshide_high_level"] == nil then ShiGuangDB["FriendGroupshide_high_level"] = false end
+		if ShiGuangDB["FriendGroupsshow_mobile_afk"] == nil then ShiGuangDB["FriendGroupsshow_mobile_afk"] = false end
 		if ShiGuangDB["FriendGroupsadd_mobile_text"] == nil then ShiGuangDB["FriendGroupsadd_mobile_text"] = true end
 		if ShiGuangDB["FriendGroupsingame_only"] == nil then ShiGuangDB["FriendGroupsingame_only"] = false end
 		if ShiGuangDB["FriendGroupsingame_retail"] == nil then ShiGuangDB["FriendGroupsingame_retail"] = false end

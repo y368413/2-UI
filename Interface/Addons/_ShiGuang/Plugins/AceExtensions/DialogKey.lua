@@ -1,4 +1,4 @@
---- @class DialogKeyNS ## Version: v1.2.7 ## Author: Numy (previous verions by: Foxthorn, N01ch, FuriousProgrammer)
+--- @class DialogKeyNS ## Version: v1.2.27 ## Author: Numy (previous verions by: Foxthorn, N01ch, FuriousProgrammer)
 local DialogKeyNS = {}
 
 if GetLocale() == "zhCN" then
@@ -14,23 +14,27 @@ DialogKeyNS.defaultOptions = {
     keys = {
         "SPACE",
     },
-    ignoreDisabledButtons = false,
-    ignoreWithModifier = false,
+    ignoreDisabledButtons = true,
+    ignoreWithModifier = true,
     showGlow = false,
     dialogBlacklist = {},
     customFrames = {},
     numKeysForGossip = true,
+    riskyNumKeysForGossip = true,
     numKeysForQuestRewards = true,
     dontClickSummons = true,
     dontClickDuels = true,
     dontClickRevives = true,
     dontClickReleases = true,
     dontAcceptInvite = true,
+    dontAcceptInstanceLocks = true,
     useSoulstoneRez = true,
     handleCraftingOrders = true,
     handlePlayerChoice = true,
     numKeysForPlayerChoice = true,
-    postAuctions = false,
+    handleSpecFrame = true,
+    postAuctions = true,
+    ignoreInProgressQuests = true,
 }
 
 --- @param dialogKey DialogKey
@@ -232,10 +236,23 @@ function DialogKeyNS:GetOptionsTable()
                         desc = "不允许快捷点击禁用的（灰色的）按钮。",
                         descStyle = "inline", width = "full", type = "toggle",
                     },
+                    ignoreInProgressQuests = {
+                        order = increment(),
+                        name = wrapName("Ignore In-Progress Quests"),
+                        desc = "Gossip options for in-progress quests are ignored, and only completed or unaccepted quests are clicked",
+                        descStyle = "inline", width = "full", type = "toggle",
+                    },
                     numKeysForGossip = {
                         order = increment(),
                         name = wrapName("为对话选项设置数字键"),
                         desc = "使用数字键（1到0）从NPC对话窗口中选择对话选项或任务。",
+                        descStyle = "inline", width = "full", type = "toggle",
+                    },
+                    riskyNumKeysForGossip = {
+                        order = increment(),
+                        name = wrapName("Number keys for Gossip - Risky"),
+                        disabled = function() return not db.numKeysForGossip end,
+                        desc = "Ensure scrollbar is enabled if the text becomes too long. This may taint objective frame buttons, such as dropping candles in delves. If you encounter issues, just disable this option.",
                         descStyle = "inline", width = "full", type = "toggle",
                     },
                     numKeysForQuestRewards = {
@@ -255,19 +272,28 @@ function DialogKeyNS:GetOptionsTable()
                         name = wrapName("制造订单"),
                         desc = "处理制造订单：启动、制作、完成。",
                         descStyle = "inline", width = "full", type = "toggle",
+                        hidden = WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE,
                     },
                     handlePlayerChoice = {
                         order = increment(),
                         name = wrapName("玩家选择"),
                         desc = "使用按键绑定来选择第一个玩家选择选项。",
                         descStyle = "inline", width = "full", type = "toggle",
+                        hidden = not C_AddOns.DoesAddOnExist("Blizzard_PlayerChoice"),
                     },
                     numKeysForPlayerChoice = {
                         order = increment(),
                         name = wrapName("为对话选项设置数字键"),
                         desc = "使用数字键（1到0）来选择玩家选择选项。",
-                        disabled = function() return not db.handlePlayerChoice end,
                         descStyle = "inline", width = "full", type = "toggle",
+                        hidden = not C_AddOns.DoesAddOnExist("Blizzard_PlayerChoice"),
+                    },
+                    handleSpecFrame = {
+                        order = increment(),
+                        name = wrapName(SPECIALIZATION),
+                        desc = "Use the number keys (1 -> 4) to select a specialization while the specialization tab is open",
+                        descStyle = "inline", width = "full", type = "toggle",
+                        hidden = WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE,
                     },
                 },
             },
@@ -321,6 +347,12 @@ function DialogKeyNS:GetOptionsTable()
                         order = increment(),
                         name = wrapName("不接受组队邀请"),
                         desc = "不允许快捷点击接受团队/小队邀请。",
+                        descStyle = "inline", width = "full", type = "toggle",
+                    },
+                    dontAcceptInstanceLocks = {
+                        order = increment(),
+                        name = wrapName("Don't Accept Instance Lockouts"),
+                        desc = "Don't allow DialogKey to accept/\"save\" Instance Lockouts",
                         descStyle = "inline", width = "full", type = "toggle",
                     },
                     dontClickSummons = {
@@ -438,6 +470,9 @@ function DialogKeyNS:CreateCustomFramesPriorityListOptions(order, swapWatchlistF
 
         return options;
     end
+    local numberOfIcons = 4;
+    local iconWidth = 26;
+    local groupWidth = 405; -- depends on whether there's a scrollbar
     for i, frame in ipairs(self.orderedCustomFrames) do
         options.args["glow" .. i] = {
             order = increment(),
@@ -456,14 +491,14 @@ function DialogKeyNS:CreateCustomFramesPriorityListOptions(order, swapWatchlistF
             imageCoords = {
                 search.leftTexCoord, search.rightTexCoord, search.topTexCoord, search.bottomTexCoord,
             },
-            width = 26 / width_multiplier,
+            width = iconWidth / width_multiplier,
         };
         options.args["name" .. i] = {
             order = increment(),
             name = frame,
             type = "description",
             fontSize = "medium",
-            width = (400 - 30 * 3) / width_multiplier,
+            width = (groupWidth - iconWidth * numberOfIcons) / width_multiplier,
         };
         options.args["up" .. i] = {
             order = increment(),
@@ -483,7 +518,7 @@ function DialogKeyNS:CreateCustomFramesPriorityListOptions(order, swapWatchlistF
                 arrowBack.leftTexCoord, arrowBack.topTexCoord, -- UR
                 arrowBack.rightTexCoord, arrowBack.topTexCoord, -- LR
             },
-            width = 26 / width_multiplier,
+            width = iconWidth / width_multiplier,
         };
         options.args["down" .. i] = {
             order = increment(),
@@ -497,7 +532,7 @@ function DialogKeyNS:CreateCustomFramesPriorityListOptions(order, swapWatchlistF
             image = arrowNext.file,
             imageWidth = 16,
             imageHeight = 16,
-            width = 26 / width_multiplier,
+            width = iconWidth / width_multiplier,
             imageCoords = {
                 arrowNext.leftTexCoord, arrowNext.bottomTexCoord, -- UL
                 arrowNext.rightTexCoord, arrowNext.bottomTexCoord, -- LL
@@ -519,7 +554,13 @@ function DialogKeyNS:CreateCustomFramesPriorityListOptions(order, swapWatchlistF
             imageCoords = {
                 cross.leftTexCoord, cross.rightTexCoord, cross.topTexCoord, cross.bottomTexCoord,
             },
-            width = 26 / width_multiplier,
+            width = iconWidth / width_multiplier,
+        };
+        options.args["spacer" .. i] = {
+            order = increment(),
+            name = "",
+            type = "description",
+            width = "full",
         };
     end
 
@@ -570,7 +611,10 @@ end
 
 --- @type Button[]
 DialogKey.playerChoiceButtons = {}
+DialogKey.specButtons = {}
 DialogKey.activeOverrideBindings = {}
+
+DialogKey.dummyButton = CreateFrame("Button")
 
 function DialogKey:OnInitialize()
     DialogKeyDB = DialogKeyDB or {}
@@ -579,8 +623,8 @@ function DialogKey:OnInitialize()
 
     self:InitGlowFrame()
 
-    self:RegisterEvent("GOSSIP_SHOW")
     self:RegisterEvent("QUEST_GREETING")
+    self:RegisterEvent("QUEST_LOG_UPDATE")
     self:RegisterEvent("QUEST_COMPLETE")
     self:RegisterEvent("PLAYER_REGEN_DISABLED")
     self:RegisterEvent("ADDON_LOADED")
@@ -611,6 +655,9 @@ function DialogKey:ADDON_LOADED(_, addon)
     if addon == 'Blizzard_PlayerChoice' then
         self:SecureHook(PlayerChoiceFrame, "TryShow", "OnPlayerChoiceShow")
         self:SecureHookScript(PlayerChoiceFrame, "OnHide", "OnPlayerChoiceHide")
+    elseif addon == 'Blizzard_PlayerSpells' then
+        self:SecureHookScript(PlayerSpellsFrame.SpecFrame, "OnShow", "OnSpecFrameShow")
+        self:SecureHookScript(PlayerSpellsFrame.SpecFrame, "OnHide", "OnSpecFrameHide")
     end
 end
 
@@ -618,12 +665,12 @@ function DialogKey:QUEST_COMPLETE()
     self.itemChoice = (GetNumQuestChoices() > 1 and -1 or 1)
 end
 
-function DialogKey:GOSSIP_SHOW()
-    RunNextFrame(function() self:EnumerateGossips(true) end)
+function DialogKey:QUEST_GREETING()
+    RunNextFrame(function() self:EnumerateGossips() end)
 end
 
-function DialogKey:QUEST_GREETING()
-    RunNextFrame(function() self:EnumerateGossips(false) end)
+function DialogKey:QUEST_LOG_UPDATE()
+    RunNextFrame(function() self:EnumerateGossips() end)
 end
 
 function DialogKey:PLAYER_REGEN_DISABLED()
@@ -670,7 +717,7 @@ function DialogKey:InitMainProxyFrame()
 end
 
 function DialogKey:OnPlayerChoiceShow()
-    if not self.db.handlePlayerChoice then return end
+    if not self.db.handlePlayerChoice and not self.db.numKeysForPlayerChoice then return end
     local frame = PlayerChoiceFrame;
     if not frame or not frame:IsVisible() then return end
 
@@ -686,12 +733,23 @@ function DialogKey:OnPlayerChoiceShow()
     end
 
     for option in frame.optionPools:EnumerateActive() do
-        for button in option.buttons.buttonPool:EnumerateActive() do
-            local key = buttons[button.buttonID]
-            if self.db.numKeysForPlayerChoice then
-                button.Text:SetText(key .. ' ' .. button.Text:GetText())
+        if option.buttons.buttonFramePool then -- 11.1.0
+            for buttonFrame in option.buttons.buttonFramePool:EnumerateActive() do
+                local button = buttonFrame.Button
+                local key = buttons[button.buttonID]
+                if self.db.numKeysForPlayerChoice then
+                    button.Text:SetText(key .. ' ' .. button.Text:GetText())
+                end
+                self.playerChoiceButtons[key] = button
             end
-            self.playerChoiceButtons[key] = button
+        else -- 11.0.7
+            for button in option.buttons.buttonPool:EnumerateActive() do
+                local key = buttons[button.buttonID]
+                if self.db.numKeysForPlayerChoice then
+                    button.Text:SetText(key .. ' ' .. button.Text:GetText())
+                end
+                self.playerChoiceButtons[key] = button
+            end
         end
     end
 end
@@ -700,41 +758,153 @@ function DialogKey:OnPlayerChoiceHide()
     self.playerChoiceButtons = {}
 end
 
--- Prefix list of GossipFrame options with 1., 2., 3. etc.
---- @param gossipFrame GossipFrame
-function DialogKey:OnGossipFrameUpdate(gossipFrame)
-    if not self.db.numKeysForGossip then return end
-    local scrollbox = gossipFrame.GreetingPanel.ScrollBox
+function DialogKey:OnSpecFrameShow()
+    --- @type FramePool<Frame, ClassSpecContentFrameTemplate>
+    local framePool = PlayerSpellsFrame.SpecFrame.SpecContentFramePool
 
+    self.specButtons = {}
+    for specContentFrame in framePool:EnumerateActive() do
+        --- @type ClassSpecContentFrameTemplate
+        local specContentFrame = specContentFrame
+        self.specButtons[specContentFrame.specIndex] = specContentFrame.ActivateButton
+        local text = self.db.handleSpecFrame and (specContentFrame.specIndex .. ' ' .. TALENT_SPEC_ACTIVATE) or TALENT_SPEC_ACTIVATE
+        specContentFrame.ActivateButton:SetText(text)
+    end
+end
+
+function DialogKey:OnSpecFrameHide()
+    self.specButtons = {}
+end
+
+--- @param GossipFrame GossipFrame
+function DialogKey:OnGossipFrameUpdate(GossipFrame)
+    local scrollbox = GossipFrame.GreetingPanel.ScrollBox
+
+    self.frames = {};
     local n = 1
     for _, frame in scrollbox:EnumerateFrames() do
         local data = frame.GetElementData and frame:GetElementData()
         local tag
-        if data.buttonType == GOSSIP_BUTTON_TYPE_OPTION then
+        if GOSSIP_BUTTON_TYPE_OPTION == data.buttonType then
             tag = "name"
-        elseif data.buttonType == GOSSIP_BUTTON_TYPE_ACTIVE_QUEST or data.buttonType == GOSSIP_BUTTON_TYPE_AVAILABLE_QUEST then
+        elseif GOSSIP_BUTTON_TYPE_AVAILABLE_QUEST == data.buttonType then
+            tag = "title"
+        elseif GOSSIP_BUTTON_TYPE_ACTIVE_QUEST == data.buttonType and (data.info.isComplete or not self.db.ignoreInProgressQuests) then
             tag = "title"
         end
         if tag then
-            frame:SetText((n % 10) .. ". " .. data.info[tag])
-            frame:SetHeight(frame:GetFontString():GetHeight() + 2)
+            if self.db.numKeysForGossip then
+                local oldText = data.info[tag]
+                if data.info.flags and FlagsUtil.IsSet(data.info.flags, Enum.GossipOptionRecFlags.QuestLabelPrepend) then
+                    oldText = GOSSIP_QUEST_OPTION_PREPEND:format(oldText);
+                end
+                local newText = (n % 10) .. ". " .. (oldText:match("^%d. (.+)$") or oldText)
+                if self.db.riskyNumKeysForGossip then
+                    data.info[tag] = newText -- this may not be safe, but it looks like the only somewhat reliable way to ensure the scrollbar is enabled when needed
+                end
+                frame:SetText(newText)
+                frame:SetHeight(frame:GetFontString():GetHeight() + 2)
+            end
+            self.frames[n] = frame
             n = n + 1
         end
         if n > 10 then break end
     end
-    local oldScale = scrollbox:GetScale()
-    scrollbox:SetScale(oldScale + 0.002) -- trigger OnSizeChanged
-    RunNextFrame(function() scrollbox:SetScale(oldScale) end) -- OnSizeChanged only fires if the size actually changed at the end of the frame
+    --- @type ScrollBoxListLinearViewMixin
+    local view = scrollbox:GetView()
+    view:Layout()
+    if self.db.riskyNumKeysForGossip then
+        scrollbox:ScrollIncrease() -- force the scrollbar to show if needed
+    end
 end
 
---- @return StaticPopupTemplate|nil
-function DialogKey:GetFirstVisiblePopup()
+--- @return Button[]|nil
+function DialogKey:GetValidPopupButtons()
+    local buttons = {}
+    local popupFrames = {}
     for i = 1, 4 do
         local popup = _G["StaticPopup"..i]
         if popup and popup:IsVisible() then
-            return popup
+            table.insert(popupFrames, popup)
         end
     end
+    table.sort(popupFrames, function(a, b) return a:GetTop() > b:GetTop() end)
+    for _, popupFrame in ipairs(popupFrames) do
+        local button = self:GetPopupButton(popupFrame)
+        if button then
+            table.insert(buttons, button)
+        end
+    end
+
+    return next(buttons) and buttons or nil
+end
+
+-- Takes a global string like '%s has challenged you to a duel.' and converts it to a format suitable for string.find
+local summonMatch = CONFIRM_SUMMON:gsub("%%d", ".+"):format(".+", ".+", ".+")
+local duelMatch = DUEL_REQUESTED:format(".+")
+local resurrectMatch = RESURRECT_REQUEST_NO_SICKNESS:format(".+")
+local groupinviteMatch = INVITATION:format(".+")
+local instanceLogMatches = {
+    INSTANCE_LOCK_TIMER:format(".+", ".+"),
+    INSTANCE_LOCK_TIMER_PREVIOUSLY_SAVED:format(".+", ".+"),
+    INSTANCE_LOCK_WARNING:format(".+"),
+    INSTANCE_LOCK_WARNING_PREVIOUSLY_SAVED:format(".+"),
+}
+
+--- @param popupFrame StaticPopupTemplate # One of the StaticPopup1-4 frames
+--- @return Frame|nil|false # The button to click, nil if no button should be clicked, false if the text is empty and should be checked again later
+function DialogKey:GetPopupButton(popupFrame)
+    local text = popupFrame.text:GetText()
+
+    -- Some popups have no text when they initially show, and instead get text applied OnUpdate (summons are an example)
+    -- False is returned in that case, so we know to keep checking OnUpdate
+    if not text or text == " " or text == "" then return false end
+
+    -- Don't accept group invitations if the option is enabled
+    if self.db.dontAcceptInvite and text:find(groupinviteMatch) then return end
+
+    -- Don't accept summons/duels/resurrects if the options are enabled
+    if self.db.dontClickSummons and text:find(summonMatch) then return end
+    if self.db.dontClickDuels and text:find(duelMatch) then return end
+    if self.db.dontAcceptInstanceLocks then
+        for _, match in pairs(instanceLogMatches) do
+            if text:find(match) then return end
+        end
+    end
+
+    -- If resurrect dialog has three buttons, and the option is enabled, use the middle one instead of the first one (soulstone, etc.)
+    -- Located before resurrect/release checks/returns so it happens even if you have releases/revives disabled
+    -- Also, Check if Button2 is visible instead of Button3 since Recap is always 3; 2 is hidden if you can't soulstone rez
+
+    -- the ordering here means that a revive will be taken before a battle rez before a release.
+    -- if revives are disabled but soulstone battlerezzes *aren't*, nothing will happen if both are available!
+    local canRelease = popupFrame.button1:GetText() == DEATH_RELEASE
+    if self.db.useSoulstoneRez and canRelease and popupFrame.button2:IsVisible() then
+        return popupFrame.button2
+    end
+
+    if self.db.dontClickRevives and (text == RECOVER_CORPSE or text:find(resurrectMatch)) then return end
+    if self.db.dontClickReleases and canRelease then return end
+
+    -- Ignore blacklisted popup dialogs!
+    local lowerCaseText = text:lower()
+    for blacklistText, _ in pairs(self.db.dialogBlacklist) do
+        -- Prepend non-alphabetical characters with '%' to escape them
+        blacklistText = blacklistText:gsub("%W", "%%%0"):gsub("%%%%s", ".+")
+        if lowerCaseText:find(blacklistText:lower()) then return end
+    end
+
+    for _, blacklistText in pairs(defaultPopupBlacklist) do
+        -- Prepend non-alphabetical characters with '%' to escape them
+        -- Replace %s and %d with .+ to match any string or number
+        -- Trim whitespaces
+        blacklistText = blacklistText:gsub("%W", "%%%0"):gsub("%%%%s", ".+"):gsub("%%%%d", ".+"):gsub("^%s*(.-)%s*$", "%1")
+        if lowerCaseText:find(blacklistText:lower()) then
+            return
+        end
+    end
+
+    return popupFrame.button1:IsVisible() and popupFrame.button1 or nil
 end
 
 --- @param frame Button
@@ -777,11 +947,11 @@ function DialogKey:ShouldIgnoreInput()
     if self.db.ignoreWithModifier and (IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown()) then return true end
     -- Ignore input while typing, unless at the Send Mail confirmation while typing into it!
     local focus = GetCurrentKeyBoardFocus()
-    if focus and not (self:GetFirstVisiblePopup() and (focus:GetName() == "SendMailNameEditBox" or focus:GetName() == "SendMailSubjectEditBox")) then return true end
+    if focus and not (self:GetValidPopupButtons() and (focus:GetName() == "SendMailNameEditBox" or focus:GetName() == "SendMailSubjectEditBox")) then return true end
 
     if
         -- Ignore input if there's nothing for DialogKey to click
-        not GossipFrame:IsVisible() and not QuestFrame:IsVisible() and not self:GetFirstVisiblePopup()
+        not GossipFrame:IsVisible() and not QuestFrame:IsVisible() and not self:GetValidPopupButtons()
         -- Ignore input if the Auction House sell frame is not open
         and (not AuctionHouseFrame or not AuctionHouseFrame:IsVisible())
         and not self:GetFirstVisibleCraftingOrderFrame()
@@ -789,70 +959,13 @@ function DialogKey:ShouldIgnoreInput()
         and not self:GetFirstVisibleCustomFrame()
         -- Ignore input if no player choice buttons are visible
         and not next(self.playerChoiceButtons)
+        -- Ignore input if no spec buttons are visible
+        and not next (self.specButtons)
     then
         return true
     end
 
     return false
-end
-
--- Primary functions --
-
--- Takes a global string like '%s has challenged you to a duel.' and converts it to a format suitable for string.find
-local summon_match = CONFIRM_SUMMON:gsub("%%d", ".+"):format(".+", ".+", ".+")
-local duel_match = DUEL_REQUESTED:format(".+")
-local resurrect_match = RESURRECT_REQUEST_NO_SICKNESS:format(".+")
-local groupinvite_match = INVITATION:format(".+")
-
---- @param popupFrame StaticPopupTemplate # One of the StaticPopup1-4 frames
---- @return Frame|nil|false # The button to click, nil if no button should be clicked, false if the text is empty and should be checked again later
-function DialogKey:GetPopupButton(popupFrame)
-    local text = popupFrame.text:GetText()
-
-    -- Some popups have no text when they initially show, and instead get text applied OnUpdate (summons are an example)
-    -- False is returned in that case, so we know to keep checking OnUpdate
-    if not text or text == " " or text == "" then return false end
-
-    -- Don't accept group invitations if the option is enabled
-    if self.db.dontAcceptInvite and text:find(groupinvite_match) then return end
-
-    -- Don't accept summons/duels/resurrects if the options are enabled
-    if self.db.dontClickSummons and text:find(summon_match) then return end
-    if self.db.dontClickDuels and text:find(duel_match) then return end
-
-    -- If resurrect dialog has three buttons, and the option is enabled, use the middle one instead of the first one (soulstone, etc.)
-    -- Located before resurrect/release checks/returns so it happens even if you have releases/revives disabled
-    -- Also, Check if Button2 is visible instead of Button3 since Recap is always 3; 2 is hidden if you can't soulstone rez
-
-    -- the ordering here means that a revive will be taken before a battle rez before a release.
-    -- if revives are disabled but soulstone battlerezzes *aren't*, nothing will happen if both are available!
-    local canRelease = popupFrame.button1:GetText() == DEATH_RELEASE
-    if self.db.useSoulstoneRez and canRelease and popupFrame.button2:IsVisible() then
-        return popupFrame.button2
-    end
-
-    if self.db.dontClickRevives and (text == RECOVER_CORPSE or text:find(resurrect_match)) then return end
-    if self.db.dontClickReleases and canRelease then return end
-
-    -- Ignore blacklisted popup dialogs!
-    local lowerCaseText = text:lower()
-    for blacklistText, _ in pairs(self.db.dialogBlacklist) do
-        -- Prepend non-alphabetical characters with '%' to escape them
-        blacklistText = blacklistText:gsub("%W", "%%%0"):gsub("%%%%s", ".+")
-        if lowerCaseText:find(blacklistText:lower()) then return end
-    end
-
-    for _, blacklistText in pairs(defaultPopupBlacklist) do
-        -- Prepend non-alphabetical characters with '%' to escape them
-        -- Replace %s and %d with .+ to match any string or number
-        -- Trim whitespaces
-        blacklistText = blacklistText:gsub("%W", "%%%0"):gsub("%%%%s", ".+"):gsub("%%%%d", ".+"):gsub("^%s*(.-)%s*$", "%1")
-        if lowerCaseText:find(blacklistText:lower()) then
-            return
-        end
-    end
-
-    return popupFrame.button1:IsVisible() and popupFrame.button1
 end
 
 -- Clears all override bindings associated with an owner, clears all override bindings if no owner is passed
@@ -907,10 +1020,10 @@ function DialogKey:HandleKey(key)
     -- DialogKey pressed, interact with popups, accepts..
     if doAction then
         -- Popups
-        local popupFrame = self:GetFirstVisiblePopup()
-        local popupButton = popupFrame and self:GetPopupButton(popupFrame)
-        if popupButton then
-            self:SetClickbuttonBinding(popupButton, key)
+        local popupButtons = self:GetValidPopupButtons()
+        if popupButtons then
+            -- todo: set a binding for each popup button?
+            self:SetClickbuttonBinding(popupButtons[1], key)
             return
         end
 
@@ -966,9 +1079,23 @@ function DialogKey:HandleKey(key)
     end
 
     -- Player Choice
-    if self.db.handlePlayerChoice and next(self.playerChoiceButtons) and (doAction or self.db.numKeysForPlayerChoice) then
+    if
+        ((self.db.handlePlayerChoice and doAction) or (self.db.numKeysForPlayerChoice and not doAction))
+        and next(self.playerChoiceButtons)
+    then
         local button = self.playerChoiceButtons[keynum]
         if button and (not self.db.ignoreDisabledButtons or button:IsEnabled()) then
+            self:SetClickbuttonBinding(button, key)
+            return
+        end
+    end
+
+    -- Spec Frame
+    if self.db.handleSpecFrame and next(self.specButtons) then
+        local button = self.specButtons[keynum]
+        if button then
+            -- blocks keybind for currently selected spec index
+            if not button:IsVisible() then button = self.dummyButton end
             self:SetClickbuttonBinding(button, key)
             return
         end
@@ -1024,37 +1151,50 @@ function DialogKey:SelectItemReward()
     end
 end
 
--- Prefix list of QuestGreetingFrame(!!) options with 1., 2., 3. etc.
+-- Prefix list of QuestGreetingFrame options with 1., 2., 3. etc.
 -- Also builds DialogKey.frames, used to click said options
-function DialogKey:EnumerateGossips(isGossipFrame)
-    if not ( QuestFrameGreetingPanel:IsVisible() or GossipFrame.GreetingPanel:IsVisible() ) then return end
+function DialogKey:EnumerateGossips()
+    if not QuestFrameGreetingPanel:IsVisible() then return end
 
-    self.frames = {}
-    if isGossipFrame then
-        for _, child in pairs{ GossipFrame.GreetingPanel.ScrollBox.ScrollTarget:GetChildren() } do
-            if child:GetObjectType() == "Button" and child:IsVisible() then
-                table.insert(self.frames, child)
-            end
+    local checkQuestsToHandle = false
+    local questsToHandle = {}
+
+    if self.db.ignoreInProgressQuests then
+        checkQuestsToHandle = true
+        local numActiveQuests = GetNumActiveQuests()
+        local numAvailableQuests = GetNumAvailableQuests()
+        for i = 1, numActiveQuests do
+            local _, isComplete = GetActiveTitle(i)
+            questsToHandle[i] = isComplete
         end
-    else
-        if QuestFrameGreetingPanel and QuestFrameGreetingPanel.titleButtonPool then
-            for tab in QuestFrameGreetingPanel.titleButtonPool:EnumerateActive() do
-                if tab:GetObjectType() == "Button" then
-                    table.insert(self.frames, tab)
-                end
-            end
-        elseif QuestFrameGreetingPanel and not QuestFrameGreetingPanel.titleButtonPool then
-            for _, child in ipairs({ QuestGreetingScrollChildFrame:GetChildren() }) do
-                if child:GetObjectType() == "Button" and child:IsVisible() then
-                    table.insert(self.frames, child)
-                end
-            end
-        else
-            return
+        for i = (numActiveQuests + 1), (numActiveQuests + numAvailableQuests) do
+            questsToHandle[i] = true
         end
     end
 
-    table.sort(self.frames, function(a,b)
+    local frames = {}
+    self.frames = {}
+    if QuestFrameGreetingPanel and QuestFrameGreetingPanel.titleButtonPool then
+        --- @type FramePool<Button, QuestTitleButtonTemplate>
+        local pool = QuestFrameGreetingPanel.titleButtonPool
+        for tab in (pool:EnumerateActive()) do
+            if tab:GetObjectType() == "Button" then
+                table.insert(frames, tab)
+            end
+        end
+    elseif QuestFrameGreetingPanel and not QuestFrameGreetingPanel.titleButtonPool then
+        --- @type ScriptRegion[]
+        local children = { QuestGreetingScrollChildFrame:GetChildren() }
+        for _, child in ipairs(children) do
+            if child:GetObjectType() == "Button" and child:IsVisible() then
+                table.insert(frames, child)
+            end
+        end
+    else
+        return
+    end
+
+    table.sort(frames, function(a,b)
         if a.GetOrderIndex then
             return a:GetOrderIndex() < b:GetOrderIndex()
         else
@@ -1062,13 +1202,24 @@ function DialogKey:EnumerateGossips(isGossipFrame)
         end
     end)
 
-    if self.db.numKeysForGossip and not isGossipFrame then
-        for i, frame in ipairs(self.frames) do
-            if i > 10 then break end
-            frame:SetText((i % 10) .. ". " .. frame:GetText())
+    if self.db.numKeysForGossip then
+        local n = 1
+        for i, frame in ipairs(frames) do
+            if not checkQuestsToHandle or questsToHandle[i] then
+                if n > 10 then break end
+                local oldText = frame:GetText()
+                local newText = (n % 10) .. ". " .. (oldText:match("^%d. (.+)$") or oldText)
+                frame:SetText(newText)
 
-            -- Make the button taller if the text inside is wrapped to multiple lines
-            frame:SetHeight(frame:GetFontString():GetHeight() + 2)
+                -- Make the button taller if the text inside is wrapped to multiple lines
+                frame:SetHeight(frame:GetFontString():GetHeight() + 2)
+                n = n + 1
+            end
+        end
+    end
+    for i, frame in ipairs(frames) do
+        if not checkQuestsToHandle or questsToHandle[i] then
+            table.insert(self.frames, frame)
         end
     end
 end

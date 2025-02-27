@@ -1,18 +1,19 @@
-## Interface: 110005
+## Interface: 110007, 110100
 ## Title: Syndicator
 ## Title-zhCN: |cff00ff00[背包]|r账号助手
 ## Title-zhTW: |cff00ff00[背包]|r账号助手
-## Version: 134
+## Version: 174
 ## Author: plusmouse
 ## SavedVariables: SYNDICATOR_CONFIG, SYNDICATOR_DATA, SYNDICATOR_SUMMARIES
 ## IconTexture: Interface\AddOns\Syndicator\Assets\logo.tga
 ## Dependencies: _ShiGuang
 
 ## X-Repple: 2 UI
+## Category:- |cFFFFFF00 2|r|cFFFF0000 UI |r -
 
 Locales.lua
 
-Libs\LibBattlePetTooltipLine\LibStub\LibStub.lua
+Libs\LibStub.lua
 Libs\LibBattlePetTooltipLine\LibBattlePetTooltipLine.xml
 
 Core\Objects.lua
@@ -32,8 +33,8 @@ Tracking\EquippedCache.lua
 Tracking\CurrencyCache.lua
 Tracking\GuildCache.lua
 Tracking\VoidCache.lua
-Tracking\AuctionCacheRetail.lua
-Tracking\AuctionCacheClassic.lua
+Tracking\AuctionCacheModern.lua
+Tracking\AuctionCacheLegacy.lua
 Tracking\ItemSummaries.lua
 Tracking\Tooltips.lua
 Tracking\CurrencyTooltipData.lua
@@ -46,7 +47,8 @@ Search\CheckItem.lua
 Search\GetGroupingKey.lua
 Search\OfflineList.lua
 Search\OfflineList.xml
-Search\MegaSearch.lua
+Search\SearchEverywhere.lua
+Search\SearchBuilder.lua
 Search\Utilities.lua
 
 API\Main.lua

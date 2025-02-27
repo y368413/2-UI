@@ -4,7 +4,6 @@
 	<Script file="ParagonReputation.lua"/>
 	<Script file="NPCTime.lua"/>
 	<Script file="Reminder.lua"/>
-	<!--Script file="DaisyCosp.lua"/-->
 	<Script file="SimpleFoxCamp.lua"/>
 	<Script file="MountSource.lua"/>
 	<Script file="TransmogHeadsUp.lua"/>
@@ -12,7 +11,6 @@
 	<Script file="IncentiveProgram.lua"/>
 	<Script file="DoomCooldownPulse.lua"/>
 	<Script file="SpellActivationText.lua"/>
-	<Script file="SimpleBattlefieldAlert.lua"/>
 	<!--Script file="Defs-Rare-Safari.lua"/>
 	<Script file="TomeOfIllusionsCheck.lua"/-->
 </Ui>

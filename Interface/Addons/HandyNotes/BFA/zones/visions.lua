@@ -1,38 +1,38 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, BattleForAzeroth = ...
-local L = BattleForAzeroth.locale
-local Class = BattleForAzeroth.Class
-local Clone = BattleForAzeroth.Clone
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Class = ns.Class
+local Clone = ns.Clone
 
-local Map = BattleForAzeroth.Map
+local Map = ns.Map
 
-local Collectible = BattleForAzeroth.node.Collectible
-local Node = BattleForAzeroth.node.Node
-local NPC = BattleForAzeroth.node.NPC
-local Rare = BattleForAzeroth.node.Rare
+local Collectible = ns.node.Collectible
+local Node = ns.node.Node
+local NPC = ns.node.NPC
+local Rare = ns.node.Rare
 
-local Mount = BattleForAzeroth.reward.Mount
-local Toy = BattleForAzeroth.reward.Toy
+local Mount = ns.reward.Mount
+local Toy = ns.reward.Toy
 
-local Path = BattleForAzeroth.poi.Path
+local Path = ns.poi.Path
 
 -------------------------------------------------------------------------------
 
-local Buff = Class('Buff', Node, {group = BattleForAzeroth.groups.VISIONS_BUFFS})
+local Buff = Class('Buff', Node, {group = ns.groups.VISIONS_BUFFS})
 
 local Crystal = Class('Crystal', Node, {
     icon = 'crystal_o',
     scale = 1.5,
-    group = BattleForAzeroth.groups.VISIONS_CRYSTALS,
+    group = ns.groups.VISIONS_CRYSTALS,
     label = L['odd_crystal']
 })
 
 local MAIL = Node({
     icon = 'envelope',
     scale = 1.2,
-    group = BattleForAzeroth.groups.VISIONS_MAIL,
+    group = ns.groups.VISIONS_MAIL,
     label = L['mailbox'],
     note = L['mail_muncher'],
     rewards = {
@@ -43,7 +43,7 @@ local MAIL = Node({
 local Chest = Class('VisionsChest', Node, {
     icon = 'chest_gy',
     scale = 1.3,
-    group = BattleForAzeroth.groups.VISIONS_CHEST,
+    group = ns.groups.VISIONS_CHEST,
     label = L['black_empire_cache']
 })
 
@@ -182,13 +182,13 @@ orgrimmar.nodes[57676513] = Buff({
 orgrimmar.nodes[54027044] = NPC({
     id = 162358,
     icon = 2823166,
-    group = BattleForAzeroth.groups.VISIONS_MISC,
+    group = ns.groups.VISIONS_MISC,
     note = L['ethereal_note']
 }) -- Zarhaal
 
 orgrimmar.nodes[46828078] = Node({
     icon = 967522,
-    group = BattleForAzeroth.groups.VISIONS_MISC,
+    group = ns.groups.VISIONS_MISC,
     label = L['colored_potion'],
     note = string.format(L['colored_potion_note'], '{npc:162324}')
 })
@@ -196,7 +196,7 @@ orgrimmar.nodes[46828078] = Node({
 orgrimmar.nodes[39906120] = Collectible({
     id = 163441,
     icon = 1001616,
-    group = BattleForAzeroth.groups.VISIONS_MISC,
+    group = ns.groups.VISIONS_MISC,
     note = L['shave_kit_note'],
     rewards = {
         Toy({item = 174920}) -- Coifcurl's Close Shave Kit
@@ -309,20 +309,20 @@ stormwind.nodes[63107740] = Buff({
 stormwind.nodes[57204620] = NPC({
     id = 162358,
     icon = 2823166,
-    group = BattleForAzeroth.groups.VISIONS_MISC,
+    group = ns.groups.VISIONS_MISC,
     note = L['ethereal_note']
 }) -- Zarhaal
 
 stormwind.nodes[51765852] = Node({
     icon = 967522,
-    group = BattleForAzeroth.groups.VISIONS_MISC,
+    group = ns.groups.VISIONS_MISC,
     label = L['colored_potion'],
     note = string.format(L['colored_potion_note'], '{npc:162231}')
 })
 
 stormwind.nodes[58905290] = Collectible({
     icon = 237272,
-    group = BattleForAzeroth.groups.VISIONS_MISC,
+    group = ns.groups.VISIONS_MISC,
     label = '{item:174921}',
     note = L['void_skull_note'],
     rewards = {
@@ -332,7 +332,7 @@ stormwind.nodes[58905290] = Collectible({
 
 stormwind.nodes[59106390] = Rare({
     id = 158284,
-    group = BattleForAzeroth.groups.VISIONS_MISC,
+    group = ns.groups.VISIONS_MISC,
     note = L['craggle'],
     pois = {
         Path({

@@ -28,7 +28,7 @@ local function CreatePlayerStyle(self)
 		UF:ReskinMirrorBars()
 		UF:ReskinTimerTrakcer(self)
 	end
-	--if R.db["Map"]["DisableMinimap"] or not R.db["Misc"]["ExpRep"] then UF:CreateExpRepBar(self) end
+	if R.db["Map"]["DisableMinimap"] or not R.db["Misc"]["ExpRep"] then UF:CreateExpRepBar(self) end
 end
 
 local function CreateTargetStyle(self)
@@ -38,20 +38,32 @@ end
 
 local function CreateFocusStyle(self)
 	self.mystyle = "focus"
-	SetUnitFrameSize(self, "Focus")
+	--SetUnitFrameSize(self, "Focus")
+
+	--UF:CreateHeader(self)
+	--UF:CreateHealthBar(self)
+	--UF:CreateHealthText(self)
+	--UF:CreatePowerBar(self)
+	--UF:CreatePowerText(self)
+	--UF:CreatePortrait(self)
+	UF:CreateCastBar(self)
+	--UF:CreateRaidMark(self)
+	--UF:CreateIcons(self)
+	--UF:CreatePrediction(self)
+	--UF:CreateAuras(self)
+	--UF:DemonicGatewayIcon(self)
+end
+
+local function CreateToTStyle(self)
+	self.mystyle = "tot"
+	SetUnitFrameSize(self, "Pet")
 
 	UF:CreateHeader(self)
 	UF:CreateHealthBar(self)
 	UF:CreateHealthText(self)
 	UF:CreatePowerBar(self)
-	UF:CreatePowerText(self)
-	UF:CreatePortrait(self)
-	UF:CreateCastBar(self)
 	UF:CreateRaidMark(self)
-	UF:CreateIcons(self)
-	UF:CreatePrediction(self)
 	UF:CreateAuras(self)
-	--UF:DemonicGatewayIcon(self)
 end
 
 local function CreateFocusTargetStyle(self)
@@ -63,6 +75,19 @@ local function CreateFocusTargetStyle(self)
 	UF:CreateHealthText(self)
 	UF:CreatePowerBar(self)
 	UF:CreateRaidMark(self)
+end
+
+local function CreatePetStyle(self)
+	self.mystyle = "pet"
+	SetUnitFrameSize(self, "Pet")
+
+	UF:CreateHeader(self)
+	UF:CreateHealthBar(self)
+	UF:CreateHealthText(self)
+	UF:CreatePowerBar(self)
+	UF:CreateRaidMark(self)
+	UF:CreateAuras(self)
+	UF:CreateSparkleCastBar(self)
 end
 
 local function CreateBossStyle(self)
@@ -80,6 +105,7 @@ local function CreateBossStyle(self)
 	UF:CreateBuffs(self)
 	UF:CreateDebuffs(self)
 	UF:CreateClickSets(self)
+	UF:CreatePrivateAuras(self)
 end
 
 local function CreateArenaStyle(self)
@@ -117,6 +143,7 @@ local function CreateRaidStyle(self)
 	if self.raidType ~= "simple" then
 		UF:CreateRaidAuras(self)
 	end
+	UF:CreatePrivateAuras(self)
 end
 
 local function CreateSimpleRaidStyle(self)
@@ -288,6 +315,9 @@ function UF:OnLogin()
 
 	-- Default Clicksets for RaidFrame
 	UF:DefaultClickSets()
+
+	if R.db["UFs"]["Enable"] then
+		-- Register
 		oUF:RegisterStyle("Player", CreatePlayerStyle)
 		oUF:RegisterStyle("Target", CreateTargetStyle)
 		if (ShiGuangPerDB["BHT"] == true) then
@@ -297,10 +327,19 @@ function UF:OnLogin()
 		-- Loader
 		oUF:SetActiveStyle("Player")
 		local player = oUF:Spawn("player", "oUF_Player")
+		UF.ToggleCastBar(player, "Player")
 		oUF:SetActiveStyle("Target")
 		local target = oUF:Spawn("target", "oUF_Target")
-
+		UF.ToggleCastBar(target, "Target")
 		if (ShiGuangPerDB["BHT"] == true) then
+		oUF:SetActiveStyle("ToT")
+		local targettarget = oUF:Spawn("targettarget", "oUF_ToT")
+		M.Mover(targettarget, U["TotUF"], "TotUF", R.UFs.ToTPos)
+
+		oUF:SetActiveStyle("Pet")
+		local pet = oUF:Spawn("pet", "oUF_Pet")
+		M.Mover(pet, U["PetUF"], "PetUF", R.UFs.PetPos)
+
 		oUF:SetActiveStyle("Focus")
 		local focus = oUF:Spawn("focus", "oUF_Focus")
 		M.Mover(focus, U["FocusUF"], "FocusUF", R.UFs.FocusPos)
@@ -339,14 +378,14 @@ function UF:OnLogin()
 
 		--UF:ToggleAddPower()
 		UF:ToggleSwingBars()
-		UF:ToggleUFClassPower()
-		UF:UpdateTextScale()
+		--UF:ToggleUFClassPower()
+		--UF:UpdateTextScale()
 		UF:ToggleAllAuras()
 		--UF:UpdateScrollingFont()
 		--UF:TogglePortraits()
 		UF:CheckPowerBars()
 		UF:UpdateRaidInfo() -- RaidAuras
-	--end
+	end
 
 	if R.db["UFs"]["RaidFrame"] then
 		M:LockCVar("predictedHealth", "1")

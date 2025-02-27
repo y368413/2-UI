@@ -1,23 +1,23 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Cataclysm = ...
-local Class = Cataclysm.Class
-local Group = Cataclysm.Group
-local L = Cataclysm.locale
-local Map = Cataclysm.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local Group = ns.Group
+local L = ns.locale
+local Map = ns.Map
 
-local Rare = Cataclysm.node.Rare
-local Safari = Cataclysm.node.Safari
-local Collectible = Cataclysm.node.Collectible
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
+local Collectible = ns.node.Collectible
 
-local Achievement = Cataclysm.reward.Achievement
-local Mount = Cataclysm.reward.Mount
-local Pet = Cataclysm.reward.Pet
-local Transmog = Cataclysm.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Transmog = ns.reward.Transmog
 
-local Path = Cataclysm.poi.Path
-local POI = Cataclysm.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -29,37 +29,37 @@ local map = Map({id = 207, settings = true})
 ----------------------------------- GROUPS ------------------------------------
 -------------------------------------------------------------------------------
 
-Cataclysm.groups.FUNGAL_FRENZY = Group('fungal_frenzy', 134528, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.FUNGAL_FRENZY = Group('fungal_frenzy', 134528, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5450,
     label = '{achievement:5450}'
 })
 
-Cataclysm.groups.ROCK_LOVER = Group('rock_lover', 136024, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.ROCK_LOVER = Group('rock_lover', 136024, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5449,
     label = '{achievement:5449}'
 })
 
-Cataclysm.groups.GLOP_FAMILY = Group('glop_family', 134533, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.GLOP_FAMILY = Group('glop_family', 134533, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5446,
     label = '{achievement:5446}'
 })
 
-Cataclysm.groups.FUNGALOPHOBIA = Group('fungalophobia', 134527, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.FUNGALOPHOBIA = Group('fungalophobia', 134527, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5445,
     label = '{achievement:5445}'
 })
 
-Cataclysm.groups.BROODMOTHER = Group('broodmother', 433446, {
-    defaults = Cataclysm.GROUP_HIDDEN,
-    type = Cataclysm.group_types.ACHIEVEMENT,
+ns.groups.BROODMOTHER = Group('broodmother', 433446, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 5447,
     label = '{achievement:5447}'
 })
@@ -101,7 +101,7 @@ map.nodes[55202440] = Rare({
 map.nodes[43106080] = Rare({
     id = 50061,
     rewards = {Transmog({item = 69876, slot = L['mail']})},
-    pois = {Path({Cataclysm.poi.Circle({origin = 50005250, radius = 9})})}
+    pois = {Path({ns.poi.Circle({origin = 50005250, radius = 9})})}
 }) -- Xariona
 
 -------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ map.nodes[58301342] = Collectible({
     icon = 134528,
     note = L['fungal_frenzy_note'],
     rewards = {Achievement({id = 5450})},
-    group = Cataclysm.groups.FUNGAL_FRENZY,
+    group = ns.groups.FUNGAL_FRENZY,
     pois = {
         Path({59351425, 58301342, 57341248}), POI({
             color = 'Bronze',
@@ -168,7 +168,7 @@ map.nodes[55371414] = Collectible({
     icon = 136024,
     quest = 26710,
     note = L['rock_lover_note'],
-    group = Cataclysm.groups.ROCK_LOVER,
+    group = ns.groups.ROCK_LOVER,
     rewards = {
         Achievement({id = 5449, criteria = {id = 15644, qty = true}}), -- Rock Lover
         Pet({item = 60869, id = 265}) -- Pebble
@@ -186,7 +186,7 @@ map.nodes[59591404] = Collectible({
     id = 44973,
     icon = 134527,
     quest = 28390,
-    group = {Cataclysm.groups.GLOP_FAMILY, Cataclysm.groups.FUNGALOPHOBIA},
+    group = {ns.groups.GLOP_FAMILY, ns.groups.FUNGALOPHOBIA},
     rewards = {
         Achievement({id = 5446, criteria = {id = 15640, qty = true}}), -- The Glop Family Line
         Achievement({id = 5445}) -- Fungalophobia
@@ -197,7 +197,7 @@ map.nodes[54581430] = Collectible({
     id = 43806,
     icon = 433446,
     quest = 28391,
-    group = Cataclysm.groups.BROODMOTHER,
+    group = ns.groups.BROODMOTHER,
     rewards = {Achievement({id = 5447})} -- My Very Own Broodmother
 }) -- Terrath the Steady
 
@@ -250,14 +250,14 @@ map.nodes[63405440] = Safari.TwilightSpider({
 -------------------------------- MISCELLANEOUS --------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[49275030] = Cataclysm.node.Node({
+map.nodes[49275030] = ns.node.Node({
     label = L['portal_to_therazane'],
     icon = 'portal_gy',
     pois = {Path({49275030, 57241355})},
     fgroup = 'therazane_portal'
 })
 
-map.nodes[57241355] = Cataclysm.node.Node({
+map.nodes[57241355] = ns.node.Node({
     label = L['portal_to_earth_temple'],
     icon = 'portal_gy',
     fgroup = 'therazane_portal'

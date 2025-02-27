@@ -1,25 +1,25 @@
 ﻿-------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Shadowlands = ...
-local Class = Shadowlands.Class
-local Group = Shadowlands.Group
-local L = Shadowlands.locale
+local _, ns = ...
+local Class = ns.Class
+local Group = ns.Group
+local L = ns.locale
 
-local Map = Shadowlands.Map
+local Map = ns.Map
 
-local Collectible = Shadowlands.node.Collectible
+local Collectible = ns.node.Collectible
 
-local Achievement = Shadowlands.reward.Achievement
-local Mount = Shadowlands.reward.Mount
-local Pet = Shadowlands.reward.Pet
-local Reward = Shadowlands.reward.Reward
-local Toy = Shadowlands.reward.Toy
-local Transmog = Shadowlands.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Reward = ns.reward.Reward
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
 -------------------------------------------------------------------------------
 
-Shadowlands.expansion = 9
+ns.expansion = 9
 
 -------------------------------------------------------------------------------
 ------------------------------------ ICONS ------------------------------------
@@ -30,34 +30,34 @@ local GLOWS = "Interface\\Addons\\HandyNotes\\Icons\\artwork\\glows"
 local function Icon(name) return ICONS .. '\\' .. name .. '.blp' end
 local function Glow(name) return GLOWS .. '\\' .. name .. '.blp' end
 
-Shadowlands.icons.cov_sigil_ky = {Icon('covenant_kyrian'), nil}
-Shadowlands.icons.cov_sigil_nl = {Icon('covenant_necrolord'), nil}
-Shadowlands.icons.cov_sigil_nf = {Icon('covenant_nightfae'), nil}
-Shadowlands.icons.cov_sigil_vn = {Icon('covenant_venthyr'), nil}
-Shadowlands.icons.tormentor = {Icon('tormentor'), Glow('tormentor')}
+ns.icons.cov_sigil_ky = {Icon('covenant_kyrian'), nil}
+ns.icons.cov_sigil_nl = {Icon('covenant_necrolord'), nil}
+ns.icons.cov_sigil_nf = {Icon('covenant_nightfae'), nil}
+ns.icons.cov_sigil_vn = {Icon('covenant_venthyr'), nil}
+ns.icons.tormentor = {Icon('tormentor'), Glow('tormentor')}
 
 -------------------------------------------------------------------------------
 ---------------------------------- CALLBACKS ----------------------------------
 -------------------------------------------------------------------------------
 
-Shadowlands.addon:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED', function()
+ns.addon:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED', function()
     -- Listen for aura applied/removed events so we can refresh when the player
     -- enters and exits the rift in Korthia and the Maw
     local _, e, _, _, _, _, _, _, t, _, _, s = CombatLogGetCurrentEventInfo()
     if (e == 'SPELL_AURA_APPLIED' or e == 'SPELL_AURA_REMOVED') and t ==
         UnitName('player') and (s == 352795 or s == 354870) then
-        C_Timer.After(1, function() Shadowlands.addon:Refresh() end)
+        C_Timer.After(1, function() ns.addon:Refresh() end)
     end
 end)
 
-Shadowlands.addon:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', function(...)
+ns.addon:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', function(...)
     -- Watch for a spellcast event that signals the kitten was pet.
     -- https://www.wowhead.com/spell=321337/petting
     -- Watch for a spellcast event for collecting a shard
-    -- https://Shadowlands.wowhead.com/spell=335400/collecting
+    -- https://shadowlands.wowhead.com/spell=335400/collecting
     local _, source, _, spellID = ...
     if source == 'player' and (spellID == 321337 or spellID == 335400) then
-        C_Timer.After(1, function() Shadowlands.addon:Refresh() end)
+        C_Timer.After(1, function() ns.addon:Refresh() end)
     end
 end)
 
@@ -154,7 +154,7 @@ end)
 ---------------------------------- COVENANTS ----------------------------------
 -------------------------------------------------------------------------------
 
-Shadowlands.covenants = {
+ns.covenants = {
     KYR = {id = 1, icon = 'cov_sigil_ky', assault = 63824},
     VEN = {id = 2, icon = 'cov_sigil_vn', assault = 63822},
     FAE = {id = 3, icon = 'cov_sigil_nf', assault = 63823},
@@ -169,8 +169,8 @@ local function ProcessCovenant(node)
     local name = C_Covenants.GetCovenantData(covenant.id).name
     local str = node.covenant and L['covenant_required'] or
                     L['cov_assault_only']
-    local subl = Shadowlands.color.Orange(string.format(str, name))
-    local ricon = Shadowlands.GetIconLink(covenant.icon, 13)
+    local subl = ns.color.Orange(string.format(str, name))
+    local ricon = ns.GetIconLink(covenant.icon, 13)
 
     -- not compatible with rlabel getters
     if not node.getters.rlabel then
@@ -181,7 +181,7 @@ local function ProcessCovenant(node)
 end
 
 function Reward:GetCategoryIcon()
-    return self.covenant and Shadowlands.GetIconPath(self.covenant.icon)
+    return self.covenant and ns.GetIconPath(self.covenant.icon)
 end
 
 function Reward:IsObtainable()
@@ -197,86 +197,86 @@ end
 ----------------------------------- GROUPS ------------------------------------
 -------------------------------------------------------------------------------
 
-Shadowlands.groups.ANIMA_SHARD = Group('anima_shard', 'crystal_b',
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.BLESSINGS = Group('blessings', 1022951, {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.BONUS_BOSS = Group('bonus_boss', 'peg_rd',
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.CARRIAGE = Group('carriages', 'horseshoe_g',
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.CODE_CREATURE = Group('code_creature', 348545,
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.CONCORDANCES = Group('concordances', 4238797,
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.COVENANT_ASSAULTS = Group('covenant_assaults', 236352,
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.CRYPT_COUTURE = Group('crypt_couture', 237274,
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.CRYPT_KICKER = Group('crypt_kicker', 236399,
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.DREDBATS = Group('dredbats', 'flight_point_g',
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.ECHOED_JIROS = Group('echoed_jiros', 'peg_gn',
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.EXILE_TALES = Group('exile_tales', 4072784,
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.FAERIE_TALES = Group('faerie_tales', 355498,
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.FUGITIVES = Group('fugitives', 236247, {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.GRAPPLES = Group('grapples', 'peg_bk', {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.HELGARDE_CACHE = Group('helgarde_cache', 'chest_gy',
-    {defaults = Shadowlands.GROUP_HIDDEN75})
-Shadowlands.groups.HYMNS = Group('hymns', 'scroll', {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.INQUISITORS = Group('inquisitors', 3528307,
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.INVASIVE_MAWSHROOM = Group('invasive_mawshroom', 134534,
-    {defaults = Shadowlands.GROUP_HIDDEN75})
-Shadowlands.groups.KORTHIA_SHARED = Group('korthia_dailies', 1506458,
-    {defaults = Shadowlands.GROUP_HIDDEN75})
-Shadowlands.groups.MAWSWORN_BLACKGUARD = Group('mawsworn_blackguard', 236173,
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.MAWSWORN_CACHE = Group('mawsworn_cache', 3729814,
-    {defaults = Shadowlands.GROUP_HIDDEN75})
-Shadowlands.groups.MAWSWORN_SUPPLY_CACHE = Group('mawsworn_supply_cache', 'chest_bk',
-    {defaults = Shadowlands.GROUP_HIDDEN75})
-Shadowlands.groups.NEST_MATERIALS = Group('nest_materials', 136064,
-    {defaults = Shadowlands.GROUP_HIDDEN75})
-Shadowlands.groups.NILGANIHMAHT_MOUNT = Group('nilganihmaht', 1391724,
-    {defaults = Shadowlands.GROUP_HIDDEN75})
-Shadowlands.groups.PROTO_MATERIALS = Group('proto_materials', 838813,
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.PROTOFORM_SCHEMATICS = Group('protoform_schematics', 4217590,
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.PUZZLE_CACHE = Group('puzzle_caches', 'star_chest_g',
-    {defaults = Shadowlands.GROUP_HIDDEN75})
-Shadowlands.groups.RIFT_HIDDEN_CACHE = Group('rift_hidden_cache', 'chest_bk',
-    {defaults = Shadowlands.GROUP_ALPHA75})
-Shadowlands.groups.RIFT_PORTAL = Group('rift_portal', 'portal_gy')
-Shadowlands.groups.RIFTBOUND_CACHE = Group('riftbound_cache', 'chest_bk',
-    {defaults = Shadowlands.GROUP_ALPHA75})
-Shadowlands.groups.RIFTSTONE = Group('riftstone', 'portal_bl')
-Shadowlands.groups.SHROUDED_CYPHER = Group('shrouded_cyphers', 'chest_pp',
-    {defaults = Shadowlands.GROUP_HIDDEN75})
-Shadowlands.groups.SINRUNNER = Group('sinrunners', 'horseshoe_o',
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.SLIME_CAT = Group('slime_cat', 3732497, {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.SQUIRRELS = Group('squirrels', 237182, {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.STYGIAN_CACHES = Group('stygian_caches', 'chest_nv',
-    {defaults = Shadowlands.GROUP_HIDDEN75})
-Shadowlands.groups.STYGIA_NEXUS = Group('stygia_nexus', 'peg_gn',
-    {defaults = Shadowlands.GROUP_HIDDEN75})
-Shadowlands.groups.VESPERS = Group('vespers', 3536181, {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.WILD_HUNTING = Group('wild_hunting', 1604164,
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.WILDSEED_SPIRITS = Group('wildseed_spirits', 895888,
-    {defaults = Shadowlands.GROUP_HIDDEN})
-Shadowlands.groups.ZERETH_CACHE = Group('zereth_caches', 3950362,
-    {defaults = Shadowlands.GROUP_HIDDEN75})
-Shadowlands.groups.ZOVAAL_VAULT = Group('zovault', 'star_chest_g',
-    {defaults = Shadowlands.GROUP_ALPHA75})
+ns.groups.ANIMA_SHARD = Group('anima_shard', 'crystal_b',
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.BLESSINGS = Group('blessings', 1022951, {defaults = ns.GROUP_HIDDEN})
+ns.groups.BONUS_BOSS = Group('bonus_boss', 'peg_rd',
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.CARRIAGE = Group('carriages', 'horseshoe_g',
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.CODE_CREATURE = Group('code_creature', 348545,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.CONCORDANCES = Group('concordances', 4238797,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.COVENANT_ASSAULTS = Group('covenant_assaults', 236352,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.CRYPT_COUTURE = Group('crypt_couture', 237274,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.CRYPT_KICKER = Group('crypt_kicker', 236399,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.DREDBATS = Group('dredbats', 'flight_point_g',
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.ECHOED_JIROS = Group('echoed_jiros', 'peg_gn',
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.EXILE_TALES = Group('exile_tales', 4072784,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.FAERIE_TALES = Group('faerie_tales', 355498,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.FUGITIVES = Group('fugitives', 236247, {defaults = ns.GROUP_HIDDEN})
+ns.groups.GRAPPLES = Group('grapples', 'peg_bk', {defaults = ns.GROUP_HIDDEN})
+ns.groups.HELGARDE_CACHE = Group('helgarde_cache', 'chest_gy',
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.HYMNS = Group('hymns', 'scroll', {defaults = ns.GROUP_HIDDEN})
+ns.groups.INQUISITORS = Group('inquisitors', 3528307,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.INVASIVE_MAWSHROOM = Group('invasive_mawshroom', 134534,
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.KORTHIA_SHARED = Group('korthia_dailies', 1506458,
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.MAWSWORN_BLACKGUARD = Group('mawsworn_blackguard', 236173,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.MAWSWORN_CACHE = Group('mawsworn_cache', 3729814,
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.MAWSWORN_SUPPLY_CACHE = Group('mawsworn_supply_cache', 'chest_bk',
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.NEST_MATERIALS = Group('nest_materials', 136064,
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.NILGANIHMAHT_MOUNT = Group('nilganihmaht', 1391724,
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.PROTO_MATERIALS = Group('proto_materials', 838813,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.PROTOFORM_SCHEMATICS = Group('protoform_schematics', 4217590,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.PUZZLE_CACHE = Group('puzzle_caches', 'star_chest_g',
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.RIFT_HIDDEN_CACHE = Group('rift_hidden_cache', 'chest_bk',
+    {defaults = ns.GROUP_ALPHA75})
+ns.groups.RIFT_PORTAL = Group('rift_portal', 'portal_gy')
+ns.groups.RIFTBOUND_CACHE = Group('riftbound_cache', 'chest_bk',
+    {defaults = ns.GROUP_ALPHA75})
+ns.groups.RIFTSTONE = Group('riftstone', 'portal_bl')
+ns.groups.SHROUDED_CYPHER = Group('shrouded_cyphers', 'chest_pp',
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.SINRUNNER = Group('sinrunners', 'horseshoe_o',
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.SLIME_CAT = Group('slime_cat', 3732497, {defaults = ns.GROUP_HIDDEN})
+ns.groups.SQUIRRELS = Group('squirrels', 237182, {defaults = ns.GROUP_HIDDEN})
+ns.groups.STYGIAN_CACHES = Group('stygian_caches', 'chest_nv',
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.STYGIA_NEXUS = Group('stygia_nexus', 'peg_gn',
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.VESPERS = Group('vespers', 3536181, {defaults = ns.GROUP_HIDDEN})
+ns.groups.WILD_HUNTING = Group('wild_hunting', 1604164,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.WILDSEED_SPIRITS = Group('wildseed_spirits', 895888,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.ZERETH_CACHE = Group('zereth_caches', 3950362,
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.ZOVAAL_VAULT = Group('zovault', 'star_chest_g',
+    {defaults = ns.GROUP_ALPHA75})
 
-Shadowlands.groups.ANIMA_VESSEL = Group('anima_vessel', 'chest_tl', {
-    defaults = Shadowlands.GROUP_ALPHA75,
+ns.groups.ANIMA_VESSEL = Group('anima_vessel', 'chest_tl', {
+    defaults = ns.GROUP_ALPHA75,
     IsEnabled = function(self)
         -- Anima vessels and caches cannot be seen until the "Vault Anima Tracker"
         -- upgrade is purchased from the Death's Advance quartermaster
@@ -287,8 +287,8 @@ Shadowlands.groups.ANIMA_VESSEL = Group('anima_vessel', 'chest_tl', {
     end
 })
 
-Shadowlands.groups.BROKEN_MIRROR = Group('broken_mirror', 3854020, {
-    defaults = Shadowlands.GROUP_ALPHA75,
+ns.groups.BROKEN_MIRROR = Group('broken_mirror', 3854020, {
+    defaults = ns.GROUP_ALPHA75,
     IsEnabled = function(self)
         -- Broken mirrors are Venthyr-only (might have completed the quest and then swapped covenants)
         if C_Covenants.GetActiveCovenantID() ~= 2 then return false end
@@ -300,8 +300,8 @@ Shadowlands.groups.BROKEN_MIRROR = Group('broken_mirror', 3854020, {
     end
 })
 
-Shadowlands.groups.RELIC = Group('relic', 'star_chest_b', {
-    defaults = Shadowlands.GROUP_ALPHA75,
+ns.groups.RELIC = Group('relic', 'star_chest_b', {
+    defaults = ns.GROUP_ALPHA75,
     IsEnabled = function(self)
         -- Relics cannot be collected until the quest "What Must Be Found" is completed
         if not C_QuestLog.IsQuestFlaggedCompleted(64506) then
@@ -311,8 +311,8 @@ Shadowlands.groups.RELIC = Group('relic', 'star_chest_b', {
     end
 })
 
-Shadowlands.groups.CORELESS_AUTOMA = Group('coreless_automa', 4327618, {
-    defaults = Shadowlands.GROUP_HIDDEN,
+ns.groups.CORELESS_AUTOMA = Group('coreless_automa', 4327618, {
+    defaults = ns.GROUP_HIDDEN,
     IsEnabled = function(self)
         -- Coreless automa cannot be controlled by Pocopoc until the quest "Core Control" is complete
         if not C_QuestLog.IsQuestFlaggedCompleted(65700) then
@@ -322,35 +322,35 @@ Shadowlands.groups.CORELESS_AUTOMA = Group('coreless_automa', 4327618, {
     end
 })
 
-Shadowlands.groups.SAFARI = Group('safari', 3046536, {defaults = Shadowlands.GROUP_HIDDEN})
+ns.groups.SAFARI = Group('safari', 3046536, {defaults = ns.GROUP_HIDDEN})
 
 -------------------------------------------------------------------------------
 --------------------------------- SOULSHAPES ----------------------------------
 -------------------------------------------------------------------------------
 
 local Soulshape = Class('Soulshape', Collectible, {
-    covenant = Shadowlands.covenants.FAE,
+    covenant = ns.covenants.FAE,
     IsEnabled = function(self)
-        if C_Covenants.GetActiveCovenantID() ~= Shadowlands.covenants.FAE.id then
+        if C_Covenants.GetActiveCovenantID() ~= ns.covenants.FAE.id then
             return false
         end
         return Collectible.IsEnabled(self)
     end
 })
 
-Shadowlands.node.Soulshape = Soulshape
+ns.node.Soulshape = Soulshape
 
 -------------------------------------------------------------------------------
 ------------------ TO ALL THE SQUIRRELS I'VE LOVED AND LOST -------------------
 -------------------------------------------------------------------------------
 
 local Squirrel = Class('Squirrel', Collectible, {
-    group = Shadowlands.groups.SQUIRRELS,
+    group = ns.groups.SQUIRRELS,
     icon = 237182,
     note = L['squirrels_note']
 })
 
-Shadowlands.node.Squirrel = Squirrel
+ns.node.Squirrel = Squirrel
 
 -------------------------------------------------------------------------------
 ------------------------------------ MAPS -------------------------------------
@@ -366,7 +366,7 @@ function SLMap:Prepare()
     end
 end
 
-Shadowlands.Map = SLMap
+ns.Map = SLMap
 
 -------------------------------------------------------------------------------
 
@@ -377,7 +377,7 @@ function RiftMap:Prepare()
 
     self.rifted = false
     for i, spellID in ipairs {352795, 354870} do
-        if AuraUtil.FindAuraByName(Shadowlands.api.GetSpellInfo(spellID), 'player') then
+        if AuraUtil.FindAuraByName(ns.api.GetSpellInfo(spellID), 'player') then
             self.rifted = true
         end
     end
@@ -390,13 +390,13 @@ function RiftMap:CanDisplay(node, coord, minimap)
     return SLMap.CanDisplay(self, node, coord, minimap)
 end
 
-Shadowlands.RiftMap = RiftMap
+ns.RiftMap = RiftMap
 
 -------------------------------------------------------------------------------
 --------------------------------- REQUIREMENTS --------------------------------
 -------------------------------------------------------------------------------
 
-local Venari = Class('Venari', Shadowlands.requirement.Requirement)
+local Venari = Class('Venari', ns.requirement.Requirement)
 
 function Venari:Initialize(quest)
     self.text = L['venari_upgrade']
@@ -405,16 +405,16 @@ end
 
 function Venari:IsMet() return C_QuestLog.IsQuestFlaggedCompleted(self.quest) end
 
-Shadowlands.requirement.Venari = Venari
+ns.requirement.Venari = Venari
 
 -------------------------------------------------------------------------------
 ------------------------------------ SAFARI -----------------------------------
 -------------------------------------------------------------------------------
 
 local Safari = Class('Safari', Collectible,
-    {icon = 'paw_g', group = Shadowlands.groups.SAFARI})
+    {icon = 'paw_g', group = ns.groups.SAFARI})
 
-Shadowlands.node.Safari = {
+ns.node.Safari = {
     AnimatedCruor = Class('AnimatedCruor', Safari, {
         id = 175023,
         rewards = {

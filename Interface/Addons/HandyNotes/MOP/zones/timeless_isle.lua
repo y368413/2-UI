@@ -1,30 +1,30 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, MistsOfPandaria = ...
-local Class = MistsOfPandaria.Class
-local Map = MistsOfPandaria.Map
-local L = MistsOfPandaria.locale
+local _, ns = ...
+local Class = ns.Class
+local Map = ns.Map
+local L = ns.locale
 
-local Node = MistsOfPandaria.node.Node
-local NPC = MistsOfPandaria.node.NPC
-local Treasure = MistsOfPandaria.node.Treasure
+local Node = ns.node.Node
+local NPC = ns.node.NPC
+local Treasure = ns.node.Treasure
 
-local Achievement = MistsOfPandaria.reward.Achievement
-local Item = MistsOfPandaria.reward.Item
-local Mount = MistsOfPandaria.reward.Mount
-local Pet = MistsOfPandaria.reward.Pet
-local Toy = MistsOfPandaria.reward.Toy
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Toy = ns.reward.Toy
 
-local Path = MistsOfPandaria.poi.Path
-local POI = MistsOfPandaria.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
-local Rare = Class('TimelessRare', MistsOfPandaria.node.Rare)
+local Rare = Class('TimelessRare', ns.node.Rare)
 
 function Rare:Render(tooltip)
-    MistsOfPandaria.node.Rare.Render(self, tooltip)
+    ns.node.Rare.Render(self, tooltip)
 
     -- If two quests are given, the first is flipped the first time you ever
     -- loot the rare and the second is the daily tracker. On the first day, you
@@ -32,7 +32,7 @@ function Rare:Render(tooltip)
     if self.quest and #self.quest == 2 then
         if not C_QuestLog.IsQuestFlaggedCompleted(self.quest[1]) then
             tooltip:AddLine(' ')
-            tooltip:AddLine(MistsOfPandaria.color.Orange(L['looted_twice']), 1, 1, 1, true)
+            tooltip:AddLine(ns.color.Orange(L['looted_twice']), 1, 1, 1, true)
         end
     end
 end
@@ -125,7 +125,7 @@ map.nodes[43896989] = Rare({
 map.nodes[26082283] = Rare({
     id = 73281,
     quest = {33290, 33314},
-    requires = MistsOfPandaria.requirement.Item(104115),
+    requires = ns.requirement.Item(104115),
     note = L['dread_ship_note'],
     rewards = {
         Achievement({id = 8714, criteria = 23987}),
@@ -623,7 +623,7 @@ map.nodes[70608090] = Treasure({
 
 map.nodes[40409300] = Treasure({
     quest = 32957,
-    requires = MistsOfPandaria.requirement.Item(104015),
+    requires = ns.requirement.Item(104015),
     icon = 'star_chest_g',
     scale = 1.5,
     note = L['sunken_treasure_note'],

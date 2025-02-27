@@ -1,213 +1,254 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, TheWarWithin = ...
-local L = TheWarWithin.locale
+local _, ns = ...
+local L = ns.locale
 
-local Class = TheWarWithin.Class
-local Group = TheWarWithin.Group
+local Class = ns.Class
+local Group = ns.Group
 
-local Collectible = TheWarWithin.node.Collectible
+local Collectible = ns.node.Collectible
+
+local Achievement = ns.reward.Achievement
 
 -------------------------------------------------------------------------------
 
-TheWarWithin.expansion = 11
+ns.expansion = 11
 
 -------------------------------------------------------------------------------
 ----------------------------------- GROUPS ------------------------------------
 -------------------------------------------------------------------------------
 
-TheWarWithin.groups.DELVE_REWARDS = Group('delve_rewards', 4203076, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.EXPANSION,
+ns.groups.DELVE_REWARDS = Group('delve_rewards', 4203076, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION,
     HasEnabledNodes = function() return true end
 })
 
-TheWarWithin.groups.DISTURBED_EARTH = Group('disturbed_earth', 132386, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.EXPANSION
+ns.groups.DISTURBED_EARTH = Group('disturbed_earth', 132386, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-TheWarWithin.groups.PROFESSION_TREASURES = Group('profession_treasures', 4620676, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.EXPANSION
+ns.groups.PROFESSION_TREASURES = Group('profession_treasures', 4620676, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-TheWarWithin.groups.SKYRIDING_GLYPH = Group('skyriding_glyph', 4728198, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.EXPANSION
+ns.groups.RATTS_REVENGE = Group('ratts_revenge', 5370377, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
+})
+
+ns.groups.SCRAP_REWARDS = ns.Group('scrap_rewards', 5768266, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
+})
+
+ns.groups.SKYRIDING_GLYPH = Group('skyriding_glyph', 4728198, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
+})
+
+ns.groups.WORLDSOUL_MEMORIES = Group('worldsoul_memories', 2967105, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
 -------------------------------------------------------------------------------
 
-TheWarWithin.groups.BACK_TO_THE_WALL = Group('back_to_the_wall', 236681, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.BACK_TO_THE_WALL = Group('back_to_the_wall', 236681, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40620
 })
 
-TheWarWithin.groups.BEACON_OF_HOPE = Group('beacon_of_hope', 135922, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.BEACON_OF_HOPE = Group('beacon_of_hope', 135922, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40308
 })
 
-TheWarWithin.groups.BIBLO_ARCHIVIST = Group('biblo_archivist', 5341597, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.BIBLO_ARCHIVIST = Group('biblo_archivist', 5341597, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40622
 })
 
-TheWarWithin.groups.BOOKWORM = Group('bookworm', 4549129, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.BOOKWORM = Group('bookworm', 4549129, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40629
 })
 
-TheWarWithin.groups.FLAMEGARDS_HOPE = Group('flamegards_hope', 463526, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.FLAMEGARDS_HOPE = Group('flamegards_hope', 463526, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 20594
 })
 
-TheWarWithin.groups.FLAT_EARTHEN = Group('flat_earthen', 4620670, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.FLAT_EARTHEN = Group('flat_earthen', 4620670, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40606
 })
 
-TheWarWithin.groups.FLIGHT_MASTER = Group('flight_master', 'flight_point_y', {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.FLIGHT_MASTER = Group('flight_master', 'flight_point_y', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40430
 })
 
-TheWarWithin.groups.FOR_THE_COLLECTIVE = Group('for_the_collective', 975747, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.FOR_THE_COLLECTIVE = Group('for_the_collective', 975747, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40630
 })
 
-TheWarWithin.groups.GOBBLIN_WITH_GLUBLURP = Group('gobblin_with_glublurp', 5763494, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.GOBBLIN_WITH_GLUBLURP = Group('gobblin_with_glublurp', 5763494, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40614
 })
 
-TheWarWithin.groups.ITSY_BITSY_SPIDER = Group('itsy_bitsy_spider', 5793405, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.ITSY_BITSY_SPIDER = Group('itsy_bitsy_spider', 5793405, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40624
 })
-TheWarWithin.groups.I_ONLY_NEED_ONE_TRIP = Group('i_only_need_one_trip', 236316, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.I_ONLY_NEED_ONE_TRIP = Group('i_only_need_one_trip', 236316, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40623
 })
 
--- TheWarWithin.groups.KHAZ_ALGAR_LORE_HUNTER = Group('khaz_algar_lore_hunter', 4419344, {
---     defaults = TheWarWithin.GROUP_HIDDEN,
---     type = TheWarWithin.group_types.ACHIEVEMENT,
---     achievement = 40762
--- })
+ns.groups.KHAZ_ALGAR_LORE_HUNTER = Group('khaz_algar_lore_hunter', 4419344, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
+    achievement = 40762
+})
 
-TheWarWithin.groups.LOST_AND_FOUND = Group('lost_and_found', 4635200, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.CAN_DO_ATTITUDE = Group('can_do_attitude', 236996, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
+    achievement = 41589
+})
+
+ns.groups.LOST_AND_FOUND = Group('lost_and_found', 4635200, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40618
 })
 
-TheWarWithin.groups.MERELDAR_MENACE = Group('mereldar_menace', 135232, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.MERELDAR_MENACE = Group('mereldar_menace', 135232, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40151
 })
 
-TheWarWithin.groups.MISSING_LYNX = Group('missing_lynx', 5689905, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.MISSING_LYNX = Group('missing_lynx', 5689905, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40625
 })
 
-TheWarWithin.groups.NO_HARM_FROM_READING = Group('no_harm_from_reading', 463284, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.NINE_TENTHS = Group('nine_tenths', 2201832, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
+    achievement = 40948
+})
+
+ns.groups.NO_HARM_FROM_READING = Group('no_harm_from_reading', 463284, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40632
 })
 
-TheWarWithin.groups.NOT_SO_QUICK_FIX = Group('not_so_quick_fix', 134067, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.NOT_SO_QUICK_FIX = Group('not_so_quick_fix', 134067, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40473
 })
 
-TheWarWithin.groups.NOTABLE_MACHINES = Group('notable_machines', 1506451, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.NOTABLE_MACHINES = Group('notable_machines', 1506451, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40628
 })
 
-TheWarWithin.groups.ROCKED_TO_SLEEP = Group('rocked_to_sleep', 5788303, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.BETWEEN_THE_LINES = Group('between_the_lines', 4549129, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
+    achievement = 41588
+})
+
+ns.groups.ROCKED_TO_SLEEP = Group('rocked_to_sleep', 5788303, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40504
 })
 
--- TheWarWithin.groups.SAFARI = Group('safari', 4048818, {
---     defaults = TheWarWithin.GROUP_HIDDEN,
---     type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.RUNED_STORM_CHEST = Group('runed_storm_chest', 'chest_rd', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
+    achievement = 41131
+})
+
+-- ns.groups.SAFARI = Group('safari', 4048818, {
+--     defaults = ns.GROUP_HIDDEN,
+--     type = ns.group_types.ACHIEVEMENT,
 --     achievement = 40194
 -- })
 
-TheWarWithin.groups.SECRETS_OF_AZEROTH = Group('secrets_of_azeroth', 'peg_gn', {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.EXPANSION
+ns.groups.SECRETS_OF_AZEROTH = Group('secrets_of_azeroth', 'peg_gn', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-TheWarWithin.groups.SKITTERSHAW_SPIN = Group('skittershaw_spin', 879828, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.SKITTERSHAW_SPIN = Group('skittershaw_spin', 879828, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40727
 })
 
-TheWarWithin.groups.SMELLING_HISTORY = Group('smelling_history', 4549130, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.SMELLING_HISTORY = Group('smelling_history', 4549130, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40542
 })
 
-TheWarWithin.groups.THE_UNSEEMING = Group('the_unseeming', 1386549, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.THE_UNSEEMING = Group('the_unseeming', 1386549, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40633
 })
 
-TheWarWithin.groups.YOU_CANT_HANG_WITH_US = Group('you_cant_hang_with_us', 5763494, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.YOU_CANT_HANG_WITH_US = Group('you_cant_hang_with_us', 5763494, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40634
 })
 
-TheWarWithin.groups.CRITTER_LOVE = Group('critter_love', 3459801, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.ACHIEVEMENT,
+ns.groups.CRITTER_LOVE = Group('critter_love', 3459801, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 40475
 })
 
-TheWarWithin.groups.DRAGONRACE = Group('dragonrace', 1100022, {
-    defaults = TheWarWithin.GROUP_HIDDEN,
-    type = TheWarWithin.group_types.EXPANSION
+ns.groups.DRAGONRACE = Group('dragonrace', 1100022, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 -------------------------------------------------------------------------------
 ---------------------------- KHAZ ALGAR LORE HUNTER ---------------------------
 -------------------------------------------------------------------------------
 
--- local LoreObject = Class('LoreObject', Collectible, {
---     icon = 4419344,
---     group = TheWarWithin.groups.KHAZ_ALGAR_LORE_HUNTER
--- })
+local LoreObject = Class('LoreObject', Collectible, {
+    icon = 4419344,
+    group = ns.groups.KHAZ_ALGAR_LORE_HUNTER
+})
 
--- TheWarWithin.node.LoreObject = LoreObject
+ns.node.LoreObject = LoreObject
 
 -------------------------------------------------------------------------------
 ------------------------------- SKYRIDING GLYPH -------------------------------
@@ -216,42 +257,42 @@ TheWarWithin.groups.DRAGONRACE = Group('dragonrace', 1100022, {
 local SkyridingGlyph = Class('SkyridingGlyph', Collectible, {
     icon = 4728198,
     label = L['skyriding_glyph'],
-    group = TheWarWithin.groups.SKYRIDING_GLYPH
+    group = ns.groups.SKYRIDING_GLYPH
 })
 
-TheWarWithin.node.SkyridingGlyph = SkyridingGlyph
+ns.node.SkyridingGlyph = SkyridingGlyph
 
 -------------------------------------------------------------------------------
 ----------------------------- PROFESSION TREASURES ----------------------------
 -------------------------------------------------------------------------------
 
-local ProfessionMaster = Class('ProfessionMaster', TheWarWithin.node.NPC, {
+local ProfessionMaster = Class('ProfessionMaster', ns.node.NPC, {
     scale = 0.9,
-    group = TheWarWithin.groups.PROFESSION_TREASURES
+    group = ns.groups.PROFESSION_TREASURES
 })
 
 function ProfessionMaster:IsEnabled()
-    if not TheWarWithin.PlayerHasProfession(self.skillID) then return false end
-    return TheWarWithin.node.NPC.IsEnabled(self)
+    if not ns.PlayerHasProfession(self.skillID) then return false end
+    return ns.node.NPC.IsEnabled(self)
 end
 
-local ProfessionTreasure = Class('ProfessionTreasure', TheWarWithin.node.Item, {
+local ProfessionTreasure = Class('ProfessionTreasure', ns.node.Item, {
     scale = 0.9,
-    group = TheWarWithin.groups.PROFESSION_TREASURES
+    group = ns.groups.PROFESSION_TREASURES
 })
 
 function ProfessionTreasure:IsEnabled()
-    if not TheWarWithin.PlayerHasProfession(self.skillID) then return false end
-    return TheWarWithin.node.Item.IsEnabled(self)
+    if not ns.PlayerHasProfession(self.skillID) then return false end
+    return ns.node.Item.IsEnabled(self)
 end
 
-TheWarWithin.node.ProfessionMasters = {}
-TheWarWithin.node.ProfessionTreasures = {}
+ns.node.ProfessionMasters = {}
+ns.node.ProfessionTreasures = {}
 
-local PM = TheWarWithin.node.ProfessionMasters
-local PT = TheWarWithin.node.ProfessionTreasures
+local PM = ns.node.ProfessionMasters
+local PT = ns.node.ProfessionTreasures
 
-for _, profession in pairs(TheWarWithin.professions) do
+for _, profession in pairs(ns.professions) do
     if profession.variantID ~= nil then
         local name = profession.name
         local icon = profession.icon
@@ -261,36 +302,32 @@ for _, profession in pairs(TheWarWithin.professions) do
         PM[name] = Class(name .. 'Master', ProfessionMaster, {
             icon = icon,
             skillID = skillID,
-            requires = TheWarWithin.requirement.Profession(skillID, variantID, 1)
+            requires = ns.requirement.Profession(skillID, variantID, 1)
         })
 
         PT[name] = Class(name .. 'Treasure', ProfessionTreasure, {
             icon = icon,
             skillID = skillID,
-            requires = TheWarWithin.requirement.Profession(skillID, variantID, 1)
+            requires = ns.requirement.Profession(skillID, variantID, 1)
         })
     end
 end
-
--- Herbalism
--- map.nodes[0000] = PT.Herbalism({quest = nil, id = 224265}) -- Deepgrove Rose -- Random Drop 5 per week
 
 -------------------------------------------------------------------------------
 -------------------------------- DISTURBED DIRT -------------------------------
 -------------------------------------------------------------------------------
 
-TheWarWithin.node.DisturbedEarth = Class('Disturbed_earth', TheWarWithin.node.Node, {
+ns.node.DisturbedEarth = Class('Disturbed_earth', ns.node.Node, {
     icon = 132386,
     scale = 0.7,
     label = '{npc:213440}',
-    group = TheWarWithin.groups.DISTURBED_EARTH,
-    requires = {TheWarWithin.requirement.Reputation(2594, 2, true)}, -- Assembly of the Deeps Renown 2
+    group = ns.groups.DISTURBED_EARTH,
+    requires = {ns.requirement.Reputation(2594, 2, true)}, -- Assembly of the Deeps Renown 2
     rewards = {
-        TheWarWithin.reward.Item({item = 212493}), -- Odd Glob of Wax
-        TheWarWithin.reward.Achievement({id = 40585, criteria = {id = 1, qty = true}}) -- Super Size Snuffling
+        ns.reward.Item({item = 212493}), -- Odd Glob of Wax
+        Achievement({id = 40585, criteria = {id = 1, qty = true}}) -- Super Size Snuffling
     }
-}) -- Disturbed Earth - Not on Minimap but quite visible from some distance
--- first loot triggered quest 84543 probably not relevant
+}) -- Disturbed Earth
 
 -------------------------------------------------------------------------------
 -------------------- ACHIEVEMENT: KHAZ ALGAR FLIGHT MASTER --------------------
@@ -299,19 +336,103 @@ TheWarWithin.node.DisturbedEarth = Class('Disturbed_earth', TheWarWithin.node.No
 local FlightMaster = Class('FlightMaster', Collectible, {
     icon = 'flight_point_y',
     scale = 2,
-    group = TheWarWithin.groups.FLIGHT_MASTER
+    group = ns.groups.FLIGHT_MASTER
 }) -- Flight Point
 
-TheWarWithin.node.FlightMaster = FlightMaster
+ns.node.FlightMaster = FlightMaster
+
+-------------------------------------------------------------------------------
+----------------------------- WORLDSOUL MEMORIES ------------------------------
+-------------------------------------------------------------------------------
+
+local WORLDSOUL_REWARDS = {
+    [7833] = {
+        Achievement({id = 40252, criteria = 67594}), -- Descendants of Distant Waters
+        Achievement({id = 40314, criteria = 68241}), -- Echoing Fragment: Hallowfall
+        Achievement({id = 40222, criteria = {67512, 67513, 67514, 67515, 67516}}) -- Echoes of Danger
+    },
+    [7834] = {
+        Achievement({id = 40252, criteria = 67593}), -- Reign of The Old Gods
+        Achievement({id = 40314, criteria = 68241}), -- Echoing Fragment: Hallowfall
+        Achievement({id = 40222, criteria = {67509, 67510, 67507, 67508, 67511}}) -- Echoes of Danger
+    },
+    [7835] = {
+        Achievement({id = 40252, criteria = 67595}), -- Elemental Fury
+        Achievement({id = 40314, criteria = 68257}), -- Echoing Fragment: The Ringing Deeps
+        Achievement({id = 40222, criteria = {67523, 67524, 67525, 67526, 67527}}) -- Echoes of Danger
+    },
+    [7836] = {
+        Achievement({id = 40252, criteria = 67596}), -- Primal Predators
+        Achievement({id = 40314, criteria = 68257}), -- Echoing Fragment: The Ringing Deeps
+        Achievement({id = 40222, criteria = {67517, 67518, 67519, 67520, 67521}}) -- Echoes of Danger
+    },
+    [7837] = {
+        Achievement({id = 40252, criteria = 67589}), -- Ancient Explorers
+        Achievement({id = 40314, criteria = 68256}), -- Echoing Fragment: Isle of Dorn
+        Achievement({id = 40222, criteria = {67528, 67529, 67530, 67531, 67532}}) -- Echoes of Danger
+    },
+    [7838] = {
+        Achievement({id = 40252, criteria = 67590}), -- The Worldcarvers
+        Achievement({id = 40314, criteria = 68256}), -- Echoing Fragment: Isle of Dorn
+        Achievement({id = 40222, criteria = {67534, 67535, 67540, 67541}}) -- Echoes of Danger
+    },
+    [7839] = {
+        Achievement({id = 40252, criteria = 67591}), -- Old Gods Forsaken
+        Achievement({id = 40314, criteria = 68258}), -- Echoing Fragment: Azj-Kahet
+        Achievement({id = 40222, criteria = {67544, 67545, 67546, 67547, 67548}}) -- Echoes of Danger
+    },
+    [7840] = {
+        Achievement({id = 40252, criteria = 67592}), -- A Wounded Soul
+        Achievement({id = 40314, criteria = 68258}), -- Echoing Fragment: Azj-Kahet
+        Achievement({id = 40222, criteria = {67549, 67550, 67552, 67553}}) -- Echoes of Danger
+    },
+    [8200] = {
+        Achievement({id = 41214, criteria = 71579}), -- Early Cartel Wars
+        Achievement({id = 41215, criteria = {71581, 71582, 71583, 71584, 71585}}) -- Echoes of Deeper Dangers
+    },
+    [8201] = {
+        Achievement({id = 41214, criteria = 71580}), -- Kaja'mite Contact
+        Achievement({id = 41215, criteria = {71586, 71587, 71588, 71589, 71590}}) -- Echoes of Deeper Dangers
+    }
+}
+
+local WorldsoulMemory = Class('WorldsoulMemory', Collectible, {
+    icon = 2967105,
+    group = ns.groups.WORLDSOUL_MEMORIES
+}) -- Worldsoul Memory
+
+function WorldsoulMemory.getters:rewards()
+    return WORLDSOUL_REWARDS[self.areaPoiID]
+end
+
+ns.node.WorldsoulMemory = WorldsoulMemory
+
+hooksecurefunc(AreaPOIEventPinMixin, 'OnMouseEnter', function(self)
+    if not self.poiInfo then return end
+    local areaPoiID = self.poiInfo.areaPoiID
+    if not WORLDSOUL_REWARDS[areaPoiID] then return end
+    local mapID = self:GetMap().mapID
+    local group = ns.groups.WORLDSOUL_MEMORIES
+    if group:GetDisplay(mapID) then
+        local rewards = WORLDSOUL_REWARDS[areaPoiID]
+        for _, reward in pairs(rewards) do
+            if reward and reward:IsEnabled() then
+                reward:Render(GameTooltip)
+            end
+        end
+        GameTooltip:AddLine(' ')
+        GameTooltip:Show()
+    end
+end)
 
 -------------------------------------------------------------------------------
 ------------------------------ KHAZ ALGAR SAFARI ------------------------------
 -------------------------------------------------------------------------------
 
 -- local Safari = Class('Safari', Collectible,
---     {icon = 'paw_g', group = TheWarWithin.groups.SAFARI}) -- Khaz Algar Safari
+--     {icon = 'paw_g', group = ns.groups.SAFARI}) -- Khaz Algar Safari
 
--- TheWarWithin.node.Safari = Safari
+-- ns.node.Safari = Safari
 
 -- map.nodes[0000] = Safari({
 --     id = 222071,

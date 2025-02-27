@@ -30,7 +30,7 @@ end
 function MISC:CreateItemTexture(slot, relF, x, y)
 	local icon = slot:CreateTexture()
 	icon:SetPoint(relF, x, y)
-	icon:SetSize(16, 16)
+	icon:SetSize(14, 14)
 	icon:SetTexCoord(unpack(I.TexCoord))
 	icon.bg = M.ReskinIcon(icon)
 	icon.bg:SetFrameLevel(3)
@@ -53,13 +53,14 @@ function MISC:CreateItemString(frame, strType)
 	for index, slot in pairs(inspectSlots) do
 		if index ~= 4 then
 			local slotFrame = _G[strType..slot.."Slot"]
+			local relF, x, y = MISC:GetSlotAnchor(index)
 			slotFrame.iLvlText = M.CreateFS(slotFrame, I.Font[2]+1)
 			slotFrame.iLvlText:ClearAllPoints()
-			slotFrame.iLvlText:SetPoint("BOTTOM", slotFrame, 1, 1)
-			local relF, x, y = MISC:GetSlotAnchor(index)
+			slotFrame.iLvlText:SetPoint(relF, slotFrame, x, y)  --"BOTTOM", slotFrame, 1, 1
+			--local relF, x, y = MISC:GetSlotAnchor(index)
 			slotFrame.enchantText = M.CreateFS(slotFrame, I.Font[2]-3)
 			slotFrame.enchantText:ClearAllPoints()
-			slotFrame.enchantText:SetPoint(relF, slotFrame, x, y)
+			slotFrame.enchantText:SetPoint(relF, slotFrame, x, y-10)
 			slotFrame.enchantText:SetTextColor(0, 1, 0)
 
 			slotFrame.enchantText:SetJustifyH(strsub(relF, 7))
@@ -74,9 +75,9 @@ function MISC:CreateItemString(frame, strType)
 				local iconX = x > 0 and x+offset or x-offset
 				local iconY = index > 15 and 20 or 2
 				if index == 10 or index == 11 or index == 12 then
-				slotFrame["textureIcon"..i] = MISC:CreateItemTexture(slotFrame, relF, x-39, y)
+				slotFrame["textureIcon"..i] = MISC:CreateItemTexture(slotFrame, relF, x-3, y-23)
 				else
-				slotFrame["textureIcon"..i] = MISC:CreateItemTexture(slotFrame, relF, iconX, iconY)
+				slotFrame["textureIcon"..i] = MISC:CreateItemTexture(slotFrame, relF, iconX-3, iconY-3)
 				end
 			end
 		end

@@ -100,3 +100,123 @@ if UnitGUID("target") then
     end
 end
 end)
+
+--ObjectiveTrackerFrame.Header.Background:SetTexture(nil)
+----------------------------------------------------------------------------------------
+--[[	Auto collapse Objective Tracker
+----------------------------------------------------------------------------------------
+-- NOTE: SetCollapsed() cause UseQuestLogSpecialItem() taint
+local QuestAutoCollapse = "RAID"
+local headers = {
+	ScenarioObjectiveTracker,
+	BonusObjectiveTracker,
+	UIWidgetObjectiveTracker,
+	CampaignQuestObjectiveTracker,
+	QuestObjectiveTracker,
+	AdventureObjectiveTracker,
+	AchievementObjectiveTracker,
+	MonthlyActivitiesObjectiveTracker,
+	ProfessionsRecipeTracker,
+	WorldQuestObjectiveTracker,
+}
+if QuestAutoCollapse ~= "NONE" then
+	local collapse = CreateFrame("Frame")
+	--collapse:RegisterEvent("PLAYER_ENTERING_WORLD")
+	collapse:RegisterEvent("PLAYER_REGEN_ENABLED")
+	collapse:RegisterEvent("PLAYER_REGEN_DISABLED")
+	collapse:SetScript("OnEvent", function()
+		if QuestAutoCollapse == "RAID" then
+			if IsInInstance() then
+				C_Timer.After(0.1, function()
+					--ObjectiveTrackerFrame:SetCollapsed(true)
+					if QuestObjectiveTracker and QuestObjectiveTracker.ContentsFrame then
+    if QuestObjectiveTracker.ContentsFrame:IsShown() and QuestObjectiveTracker.Header and QuestObjectiveTracker.Header.MinimizeButton then
+        QuestObjectiveTracker.Header.MinimizeButton:Click()
+        --print("任务列表")
+    end
+end
+				end)
+			elseif not InCombatLockdown() then
+				if ObjectiveTrackerFrame.isCollapsed then
+					--ObjectiveTrackerFrame:SetCollapsed(false)
+						if QuestObjectiveTracker and QuestObjectiveTracker.ContentsFrame then
+    if not QuestObjectiveTracker.ContentsFrame:IsShown() and QuestObjectiveTracker.Header and QuestObjectiveTracker.Header.MinimizeButton then
+        QuestObjectiveTracker.Header.MinimizeButton:Click()
+        print("已自动展开任务列表")
+    end
+end
+				end
+			end
+		elseif QuestAutoCollapse == "SCENARIO" then
+			local inInstance, instanceType = IsInInstance()
+			if inInstance then
+				if instanceType == "party" or instanceType == "scenario" then
+					C_Timer.After(0.1, function() -- for some reason it got error after reload in instance
+						--for i = 3, #headers do
+							--headers[i]:SetCollapsed(true)
+						--end
+						if QuestObjectiveTracker and QuestObjectiveTracker.ContentsFrame then
+    if QuestObjectiveTracker.ContentsFrame:IsShown() and QuestObjectiveTracker.Header and QuestObjectiveTracker.Header.MinimizeButton then
+        QuestObjectiveTracker.Header.MinimizeButton:Click() --print("任务列表")
+    end
+end
+					end)
+				else
+					--C_Timer.After(0.1, function()
+						--ObjectiveTrackerFrame:SetCollapsed(true)
+					--end)
+					if QuestObjectiveTracker and QuestObjectiveTracker.ContentsFrame then
+    if QuestObjectiveTracker.ContentsFrame:IsShown() and QuestObjectiveTracker.Header and QuestObjectiveTracker.Header.MinimizeButton then
+        QuestObjectiveTracker.Header.MinimizeButton:Click() --print("任务列表")
+    end
+end
+				end
+			else
+				if not InCombatLockdown() then
+					for i = 3, #headers do
+						--if headers[i].isCollapsed then
+							--headers[i]:SetCollapsed(false)
+						--end
+						if QuestObjectiveTracker and QuestObjectiveTracker.ContentsFrame then
+    if not QuestObjectiveTracker.ContentsFrame:IsShown() and QuestObjectiveTracker.Header and QuestObjectiveTracker.Header.MinimizeButton then
+        QuestObjectiveTracker.Header.MinimizeButton:Click()
+        print("已自动展开任务列表")
+    end
+end
+					end
+					if ObjectiveTrackerFrame.isCollapsed then
+						--ObjectiveTrackerFrame:SetCollapsed(false)
+						if QuestObjectiveTracker and QuestObjectiveTracker.ContentsFrame then
+    if not QuestObjectiveTracker.ContentsFrame:IsShown() and QuestObjectiveTracker.Header and QuestObjectiveTracker.Header.MinimizeButton then
+        QuestObjectiveTracker.Header.MinimizeButton:Click()
+        print("已自动展开任务列表")
+    end
+end
+					end
+				end
+			end
+		elseif QuestAutoCollapse == "RELOAD" then
+			C_Timer.After(0.1, function()
+				--ObjectiveTrackerFrame:SetCollapsed(true)
+				if QuestObjectiveTracker and QuestObjectiveTracker.ContentsFrame then
+    if QuestObjectiveTracker.ContentsFrame:IsShown() and QuestObjectiveTracker.Header and QuestObjectiveTracker.Header.MinimizeButton then
+        QuestObjectiveTracker.Header.MinimizeButton:Click() print("任务列表")
+    end
+end
+			end)
+		end
+	end)
+end]]
+	
+----------------------------------------------------------------------------------------
+--	Ctrl+Click to abandon a quest or Alt+Click to share a quest(by Suicidal Katt)
+----------------------------------------------------------------------------------------
+hooksecurefunc("QuestMapLogTitleButton_OnClick", function(self) 
+	if IsControlKeyDown() then
+		Menu.GetManager():HandleESC()
+		QuestMapQuestOptions_AbandonQuest(self.questID)
+	elseif IsAltKeyDown() and C_QuestLog.IsPushableQuest(self.questID) then
+		Menu.GetManager():HandleESC()
+		QuestMapQuestOptions_ShareQuest(self.questID)
+	end
+end)

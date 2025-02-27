@@ -1,21 +1,21 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Legion = ...
-local L = Legion.locale
-local Map = Legion.Map
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Map = ns.Map
 
-local PetBattle = Legion.node.PetBattle
-local Rare = Legion.node.Rare
-local Treasure = Legion.node.Treasure
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local Achievement = Legion.reward.Achievement
-local Item = Legion.reward.Item
-local Toy = Legion.reward.Toy
-local Transmog = Legion.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Path = Legion.poi.Path
-local POI = Legion.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ local falanaar_tunnels = Map({id = 685, settings = true})
 
 map.nodes[42078013] = Rare({
     id = 109954,
-    quest = 43348, -- needs to be checked
+    quest = 43348,
     rewards = {
         Achievement({id = 11265, criteria = 33353}) -- Adventurer of Suramar
     }
@@ -39,7 +39,7 @@ map.nodes[42078013] = Rare({
 
 map.nodes[49677898] = Rare({
     id = 111007,
-    quest = 43602, -- 43603 -- needs to be ckecked
+    quest = 43603,
     rewards = {
         Achievement({id = 11265, criteria = 33364}) -- Adventurer of Suramar
     }
@@ -660,7 +660,7 @@ map.nodes[52005480] = PetBattle({
     id = 105250,
     note = L['general_pet_tamer_note'] .. '\n\n' .. L['aulier_note'],
     rewards = {
-        Achievement({id = 10876, criteria = 31543}), Legion.reward.Spacer(),
+        Achievement({id = 10876, criteria = 31543}), ns.reward.Spacer(),
         Achievement({id = 9686, criteria = 11, oneline = true}), -- Aquatic
         Achievement({id = 9687, criteria = 11, oneline = true}), -- Beast
         Achievement({id = 9688, criteria = 11, oneline = true}), -- Critter
@@ -685,7 +685,7 @@ map.nodes[25206260] = PetBattle({
     note = L['general_pet_tamer_note'] .. '\n\n' ..
         L['master_tamer_flummox_note'],
     rewards = {
-        Achievement({id = 10876, criteria = 31546}), Legion.reward.Spacer(),
+        Achievement({id = 10876, criteria = 31546}), ns.reward.Spacer(),
         Achievement({id = 9686, criteria = 12, oneline = true}), -- Aquatic
         Achievement({id = 9687, criteria = 12, oneline = true}), -- Beast
         Achievement({id = 9688, criteria = 12, oneline = true}), -- Critter
@@ -709,7 +709,7 @@ map.nodes[63006060] = PetBattle({
     id = 105674,
     note = L['general_pet_tamer_note'] .. '\n\n' .. L['varenne_note'],
     rewards = {
-        Achievement({id = 10876, criteria = 31545}), Legion.reward.Spacer(),
+        Achievement({id = 10876, criteria = 31545}), ns.reward.Spacer(),
         Achievement({id = 9686, criteria = 13, oneline = true}), -- Aquatic
         Achievement({id = 9687, criteria = 13, oneline = true}), -- Beast
         Achievement({id = 9688, criteria = 13, oneline = true}), -- Critter
@@ -727,7 +727,7 @@ map.nodes[63006060] = PetBattle({
 ----------------------------- BROKEN ISLES SAFARI -----------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[73406460] = Legion.node.Safari.CoastalSandpiper({
+map.nodes[73406460] = ns.node.Safari.CoastalSandpiper({
     pois = {
         POI({
             14804960, 17605460, 70805700, 73406460, 74604980, 75005060,
@@ -736,7 +736,7 @@ map.nodes[73406460] = Legion.node.Safari.CoastalSandpiper({
     }
 })
 
-map.nodes[20404260] = Legion.node.Safari.CrystallineBroodling({
+map.nodes[20404260] = ns.node.Safari.CrystallineBroodling({
     pois = {
         POI({
             18604000, 19804180, 20004840, 20404260, 21804020, 22004280,
@@ -745,7 +745,7 @@ map.nodes[20404260] = Legion.node.Safari.CrystallineBroodling({
     }
 })
 
-map.nodes[33406900] = Legion.node.Safari.ThornclawBroodling({
+map.nodes[33406900] = ns.node.Safari.ThornclawBroodling({
     pois = {
         POI({
             25006160, 25206140, 25406320, 25606040, 25606060, 25805880,
@@ -757,7 +757,7 @@ map.nodes[33406900] = Legion.node.Safari.ThornclawBroodling({
     }
 })
 
-map.nodes[29608260] = Legion.node.Safari.ViciousBroodling({
+map.nodes[29608260] = ns.node.Safari.ViciousBroodling({
     pois = {
         POI({
             25006160, 25406340, 25406360, 25606320, 28208180, 28806500,

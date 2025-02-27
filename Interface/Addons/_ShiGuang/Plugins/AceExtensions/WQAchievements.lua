@@ -15,7 +15,7 @@ WQA.Rewards = {}
 
 --	Legion
 local data = {
-    name = "Legion"
+    name = "军团再临"
 }
 WQA.data[7] = data
 
@@ -267,7 +267,7 @@ data.toys = {
 
 -- Battle for Azeroth
 local data = {
-    name = "Battle for Azeroth"
+    name = "争霸艾泽拉斯"
 }
 WQA.data[8] = data
 
@@ -711,7 +711,7 @@ data.mounts = {
 
 -- Shadowlands
 local data = {
-    name = "Shadowlands"
+    name = "暗影之地"
 }
 WQA.data[9] = data
 
@@ -833,7 +833,7 @@ data.toys = {
 
 -- Dragonflight
 local data = {
-    name = "Dragonflight"
+    name = "巨龙时代"
 }
 WQA.data[10] = data
 
@@ -1355,7 +1355,7 @@ data.mounts = {
 
 -- War Within
 local data = {
-    name = "War Within"
+    name = "地心之战"
 }
 WQA.data[11] = data
 
@@ -4358,9 +4358,9 @@ end
 local anchor
 function dataobj:OnEnter()
 	anchor = self
-	if not PopUpIsShown() then
-		WQA:Show("LDB")
-	end
+	--if not PopUpIsShown() then
+		--WQA:Show("LDB")
+	--end
 end
 
 function dataobj:OnClick(button)
@@ -4714,9 +4714,9 @@ local CraftingReagentIDList = {
 
 local worldQuestType = {
 	["PVP"] = Enum.QuestTagType.PvP,
-	["Pet Battle"] = Enum.QuestTagType.PetBattle,
-	["Profession"] = Enum.QuestTagType.Profession,
-	["Dungeon"] = Enum.QuestTagType.Dungeon
+	["宠物对战"] = Enum.QuestTagType.PetBattle,
+	["制造业"] = Enum.QuestTagType.Profession,
+	["地下城"] = Enum.QuestTagType.Dungeon
 }
 
 WQA.EmissaryQuestIDList = {

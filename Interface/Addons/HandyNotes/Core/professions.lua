@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Core = ...
+local _, ns = ...
 
 -------------------------------------------------------------------------------
 --------------------------------- PROFESSIONS ---------------------------------
 -------------------------------------------------------------------------------
 
 -- LuaFormatter off
-Core.professions = {
+ns.professions = {
     ALCHEMY = {
         name = 'Alchemy',
         icon = 4620669,
@@ -101,9 +101,9 @@ local function GetName(self)
     return C_TradeSkillUI.GetTradeSkillDisplayName(self.skillID)
 end
 
-local function HasProfession(self) return Core.PlayerHasProfession(self.skillID) end
+local function HasProfession(self) return ns.PlayerHasProfession(self.skillID) end
 
-for name, profession in pairs(Core.professions) do
+for name, profession in pairs(ns.professions) do
     profession.GetName = GetName
     profession.HasProfession = HasProfession
 end

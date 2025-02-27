@@ -1,15 +1,15 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Core = ...
+local _, ns = ...
 
-local Class = Core.Class
-local L = Core.locale
+local Class = ns.Class
+local L = ns.locale
 
-local Green = Core.status.Green
-local Orange = Core.status.Orange
-local Red = Core.status.Red
-local White = Core.color.White
+local Green = ns.status.Green
+local Orange = ns.status.Orange
+local Red = ns.status.Red
+local White = ns.color.White
 
 -------------------------------------------------------------------------------
 
@@ -30,20 +30,20 @@ function Reward:Initialize(attrs)
 end
 
 function Reward:IsEnabled()
-    if self.display_option and not Core:GetOpt(self.display_option) then
+    if self.display_option and not ns:GetOpt(self.display_option) then
         return false
     end
 
     -- Check faction
     if self.faction then
-        if Core:GetOpt('ignore_faction_restrictions') then return true end
-        if self.faction ~= Core.faction then return false end
+        if ns:GetOpt('ignore_faction_restrictions') then return true end
+        if self.faction ~= ns.faction then return false end
     end
 
     -- Check class
     if self.class then
-        if Core:GetOpt('ignore_class_restrictions') then return true end
-        if self.class ~= Core.class then return false end
+        if ns:GetOpt('ignore_class_restrictions') then return true end
+        if self.class ~= ns.class then return false end
     end
 
     return true
@@ -98,10 +98,10 @@ function Section:Initialize(title) self.title = title end
 
 function Section:IsEnabled() return true end
 
-function Section:Prepare() Core.PrepareLinks(self.title) end
+function Section:Prepare() ns.PrepareLinks(self.title) end
 
 function Section:Render(tooltip)
-    tooltip:AddLine(Core.RenderLinks(self.title, true) .. ':')
+    tooltip:AddLine(ns.RenderLinks(self.title, true) .. ':')
 end
 
 -------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ local GetCriteriaInfo = function(id, criteria)
         if criteria <= GetAchievementNumCriteria(id) then
             results = {GetAchievementCriteriaInfo(id, criteria)}
         else
-            Core.Error(
+            ns.Error(
                 'unknown achievement criteria (' .. id .. ', ' .. criteria ..
                     ')')
             return UNKNOWN
@@ -137,13 +137,13 @@ end
 
 function Achievement:Initialize(attrs)
     Reward.Initialize(self, attrs)
-    self.criteria = Core.AsIDTable(self.criteria)
+    self.criteria = ns.AsIDTable(self.criteria)
 end
 
 function Achievement:IsObtained()
     local _, _, _, completed, _, _, _, _, _, _, _, _, earnedByMe =
         GetAchievementInfo(self.id)
-    completed = completed and (not Core:GetOpt('use_char_achieves') or earnedByMe)
+    completed = completed and (not ns:GetOpt('use_char_achieves') or earnedByMe)
     if completed then return true end
     if self.criteria then
         for i, c in ipairs(self.criteria) do
@@ -159,7 +159,7 @@ function Achievement:GetText()
     local _, name, _, _, _, _, _, _, _, icon = GetAchievementInfo(self.id)
     local text = Icon(icon) .. ACHIEVEMENT_COLOR_CODE .. '[' .. name .. ']|r'
     if self.note then
-        text = text .. Core.color.White('\n(' .. self.note .. ')')
+        text = text .. ns.color.White('\n(' .. self.note .. ')')
     end
     return text
 end
@@ -195,15 +195,41 @@ function Achievement:GetLines()
         local note, status = c.note
         if c.quest then
             if C_QuestLog.IsQuestFlaggedCompleted(c.quest) then
-                status = Core.status.Green(L['defeated'])
+                status = ns.status.Green(L['defeated'])
             else
-                status = Core.status.Red(L['undefeated'])
+                status = ns.status.Red(L['undefeated'])
             end
             note = note and (note .. '  ' .. status) or status
         end
 
         return ctext, note, r, g, b
     end
+end
+
+-------------------------------------------------------------------------------
+------------------------------------ BUFF -------------------------------------
+-------------------------------------------------------------------------------
+
+local Buff = Class('Buff', Reward, {type = L['buff']})
+
+function Buff:Initialize(attrs)
+    if attrs then for k, v in pairs(attrs) do self[k] = v end end
+end
+
+function Buff:GetText()
+    local text = ns.RenderLinks(string.format('{spell:%d}', self.id))
+    return text .. ' (' .. self.type .. ')'
+end
+
+function Buff:GetStatus()
+    local stacks = self.stacks or 1
+    local aura = C_UnitAuras.GetPlayerAuraBySpellID(self.id)
+    if aura then
+        local applications = aura.applications
+        local status = applications .. '/' .. stacks
+        return (applications >= stacks) and Green(status) or Red(status)
+    end
+    return Red('0/' .. stacks)
 end
 
 -------------------------------------------------------------------------------
@@ -247,7 +273,7 @@ function Follower:GetType(category)
             ['locale'] = L['follower_type_companion']
         }
     }
-    return types[category] --[Core.expansion]
+    return types[category]  --[ns.expansion]
 end
 
 function Follower:GetText()
@@ -255,7 +281,7 @@ function Follower:GetText()
     if self.icon then text = Icon(self.icon) .. text end
     text = text .. ' (' .. self:GetType('locale') .. ')'
     if self.note then
-        text = text .. ' (' .. Core.RenderLinks(self.note, true) .. ')'
+        text = text .. ' (' .. ns.RenderLinks(self.note, true) .. ')'
     end
     return text
 end
@@ -296,11 +322,11 @@ function Item:Initialize(attrs)
     end
 end
 
-function Item:Prepare() Core.PrepareLinks(self.note) end
+function Item:Prepare() ns.PrepareLinks(self.note) end
 
 function Item:IsObtained()
     if self.quest then return C_QuestLog.IsQuestFlaggedCompleted(self.quest) end
-    if self.bag then return Core.PlayerHasItem(self.item) end
+    if self.bag then return ns.PlayerHasItem(self.item) end
     return true
 end
 
@@ -316,14 +342,14 @@ function Item:GetText()
         text = text .. string.format(' (%sx)', BreakUpLargeNumbers(self.count))
     end
     if self.note then -- additional info
-        text = text .. ' (' .. Core.RenderLinks(self.note, true) .. ')'
+        text = text .. ' (' .. ns.RenderLinks(self.note, true) .. ')'
     end
     return Icon(self.itemIcon) .. text
 end
 
 function Item:GetStatus()
     if self.bag then
-        local collected = Core.PlayerHasItem(self.item)
+        local collected = ns.PlayerHasItem(self.item)
         return collected and Green(L['completed']) or Red(L['incomplete'])
     elseif self.status then
         return format('(%s)', self.status)
@@ -386,7 +412,7 @@ function Pet:Initialize(attrs)
         Reward.Initialize(self, attrs)
         local name, icon = C_PetJournal.GetPetInfoBySpeciesID(self.id)
         self.itemIcon = icon
-        self.itemLink = Core.color.Green(name)
+        self.itemLink = ns.color.Green(name)
     end
 end
 
@@ -418,7 +444,7 @@ end
 
 function Quest:GetText()
     local name = C_QuestLog.GetTitleForQuestID(self.id[1])
-    return Core.GetIconLink('quest_ay', 13) .. ' ' .. (name or UNKNOWN)
+    return ns.GetIconLink('quest_ay', 13) .. ' ' .. (name or UNKNOWN)
 end
 
 function Quest:GetStatus()
@@ -475,7 +501,7 @@ end
 
 function Recipe:IsEnabled()
     if not Item.IsEnabled(self) then return false end
-    return Core.PlayerHasProfession(self.profession)
+    return ns.PlayerHasProfession(self.profession)
 end
 
 -------------------------------------------------------------------------------
@@ -507,7 +533,7 @@ function Title:GetText()
     text = White(text)
     if self.type then text = text .. ' (' .. self.type .. ')' end
     if self.note then
-        text = text .. ' (' .. Core.RenderLinks(self.note, true) .. ')'
+        text = text .. ' (' .. ns.RenderLinks(self.note, true) .. ')'
     end
     return text
 end
@@ -584,7 +610,7 @@ end
 
 function Transmog:IsEnabled()
     if not Item.IsEnabled(self) then return false end
-    if Core:GetOpt('show_all_transmog_rewards') then return true end
+    if ns:GetOpt('show_all_transmog_rewards') then return true end
     if not (self:IsLearnable() and self:IsObtainable()) then return false end
     return true
 end
@@ -658,24 +684,24 @@ local Reputation = Class('Reputation', Reward,
     {display_option = 'show_rep_rewards', type = L['rep']})
 
 function Reputation:GetText()
-    local text = Core.api.GetFactionInfoByID(self.id)
+    local text = ns.api.GetFactionInfoByID(self.id)
     if self.gain then text = ('+%d %s'):format(self.gain, text) end
-    text = Core.color.LightBlue(text) .. ' (' .. self.type .. ')'
+    text = ns.color.LightBlue(text) .. ' (' .. self.type .. ')'
     if self.note then
-        text = text .. ' (' .. Core.RenderLinks(self.note, true) .. ')'
+        text = text .. ' (' .. ns.RenderLinks(self.note, true) .. ')'
     end
     return text
 end
 
 function Reputation:IsEnabled()
     if not Reward.IsEnabled(self) then return false end
-    if self:IsObtained() and not Core:GetOpt('show_claimed_rep_rewards') then
+    if self:IsObtained() and not ns:GetOpt('show_claimed_rep_rewards') then
         return false
     end
 
     return true
 end
-function Reputation:Prepare() Core.PrepareLinks(self.note) end
+function Reputation:Prepare() ns.PrepareLinks(self.note) end
 
 function Reputation:GetStatus()
     if not self.quest then return end
@@ -698,11 +724,12 @@ end
 
 -------------------------------------------------------------------------------
 
-Core.reward = {
+ns.reward = {
     Reward = Reward,
     Section = Section,
     Spacer = Spacer,
     Achievement = Achievement,
+    Buff = Buff,
     Currency = Currency,
     Follower = Follower,
     Item = Item,

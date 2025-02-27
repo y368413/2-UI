@@ -82,27 +82,38 @@ Skada:AddLoadableModule("Overhealing", nil, function(Skada, L)
 				local d = win.dataset[nr] or {}
 				win.dataset[nr] = d
 
-				d.id = spell.name -- ticket 362: this needs to be spellname because spellid is not unique with pets that mirror abilities (DK DRW)
-				d.label = spell.name
-				d.value = spell.overhealing
-				d.valuetext = Skada:FormatValueText(
-					Skada:FormatNumber(spell.overhealing), self.metadata.columns.Healing,
-					string.format("%02.1f%%", spell.overhealing / player.overhealing * 100), self.metadata.columns.Percent
-				)
-				local SpellInfo = C_Spell.GetSpellInfo(spell.id)
-                      icon = SpellInfo.iconID
-				d.icon = icon
-				d.spellid = spell.id
+				d.id		= spell.id
+				d.label		= spell.name
+				d.value		= spell.overhealing
 
-				if spell.overhealing > max then
-					max = spell.overhealing
+				d.valuetext	= Skada:FormatValueText(
+
+										Skada:FormatNumber(spell.overhealing), self.metadata.columns.Healing,
+										string.format("%02.1f%%", spell.overhealing / player.overhealing * 100), self.metadata.columns.Percent
+
+								       )
+
+				-- =====================================
+				-- | API   : C_Spell.GetSpellInfo      |
+				-- | valid : + 11.0.0 / 4.4.1 / 1.15.4 |
+				-- =====================================
+				local spellInfo = C_Spell.GetSpellInfo(spell.id)
+
+				-- | Returns nil if spell is not found
+				if spellInfo then
+
+					icon            = spellInfo.iconID
+					d.icon          = icon
+					d.spellid       = spellInfo.spellID
+
+					if spell.overhealing > max then	max = spell.overhealing	end
+
+					nr = nr + 1
 				end
-
-				nr = nr + 1
 			end
 		end
 
-		win.metadata.hasicon = true
+		win.metadata.hasicon  = true
 		win.metadata.maxvalue = max
 	end
 

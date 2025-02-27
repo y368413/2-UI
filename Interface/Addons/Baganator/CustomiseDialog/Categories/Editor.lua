@@ -34,6 +34,117 @@ local function GetCheckBox(self)
   return checkBoxWrapper
 end
 
+local function GetVisualSearch(parent)
+  local scrollBox = CreateFrame("Frame", nil, parent, "WowScrollBox")
+  local view = CreateScrollBoxLinearView()
+  view:SetHorizontal(true)
+  local CategorySearch = Syndicator.Search.GetSearchBuilder(scrollBox)
+  CategorySearch:RegisterCallback("OnSkin", function(_, regionType, region, tags)
+    addonTable.Skins.AddFrame(regionType, region, tags)
+  end)
+  CategorySearch:RegisterCallback("OnResize", function()
+    scrollBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
+  end)
+  CategorySearch.scrollable = true
+  CategorySearch:SetPoint("TOPLEFT")
+  CategorySearch:SetHeight(30)
+  scrollBox:SetPoint("TOPLEFT", 20, -65)
+  scrollBox:SetPoint("RIGHT", -10, 0)
+  scrollBox:SetHeight(30)
+  scrollBox:Init(view)
+  do
+    local function Scroll(frame, direction)
+      local elapsed = 0
+      local delay = 0.1
+      local stepCount = 0
+      frame:SetScript("OnUpdate", function(tbl, dt)
+        elapsed = elapsed + dt
+        if elapsed > delay then
+          elapsed = 0
+
+          local visibleExtentPercentage = scrollBox:GetVisibleExtentPercentage();
+          if visibleExtentPercentage > 0 then
+            local pages = 1 / visibleExtentPercentage;
+            local magnitude = .8;
+            local span = pages - 1;
+            if span > 0 then
+              scrollBox:ScrollInDirection((1 / span) * magnitude, direction)
+            end
+          end
+        end
+      end)
+    end
+    local leftButton = CreateFrame("Button", nil, parent)
+    leftButton:SetSize(9, 15)
+    leftButton:SetPoint("RIGHT", scrollBox, "LEFT", -5, 0)
+    leftButton:SetScript("OnEnter", function()
+      leftButton:SetAlpha(1)
+    end)
+    leftButton:SetScript("OnLeave", function()
+      leftButton:SetAlpha(0.8)
+    end)
+    leftButton:SetAlpha(0.8)
+    leftButton:SetScript("OnMouseDown", function()
+      Scroll(leftButton, ScrollControllerMixin.Directions.Decrease)
+    end)
+    leftButton:SetScript("OnMouseUp", function()
+      leftButton:SetScript("OnUpdate", nil)
+    end)
+    leftButton:SetScript("OnHide", function()
+      leftButton:SetScript("OnUpdate", nil)
+    end)
+    leftButton:SetNormalAtlas("Minimal_SliderBar_Button_Left")
+    local rightButton = CreateFrame("Button", nil, parent)
+    rightButton:SetSize(9, 15)
+    rightButton:SetPoint("LEFT", scrollBox, "RIGHT", 5, 0)
+    rightButton:SetScript("OnMouseDown", function()
+      Scroll(rightButton, ScrollControllerMixin.Directions.Increase)
+    end)
+    rightButton:SetScript("OnMouseUp", function()
+      rightButton:SetScript("OnUpdate", nil)
+    end)
+    rightButton:SetScript("OnHide", function()
+      rightButton:SetScript("OnUpdate", nil)
+    end)
+    rightButton:SetScript("OnEnter", function()
+      rightButton:SetAlpha(1)
+    end)
+    rightButton:SetScript("OnLeave", function()
+      rightButton:SetAlpha(0.8)
+    end)
+    rightButton:SetAlpha(0.8)
+    rightButton:SetNormalAtlas("Minimal_SliderBar_Button_Right")
+    local function Update(scrollPercentage, visibleExtentPercentage)
+      if visibleExtentPercentage < 1 then
+        leftButton:SetShown(scrollPercentage > 0)
+        rightButton:SetShown(scrollPercentage < 1)
+      else
+        leftButton:Hide()
+        rightButton:Hide()
+      end
+    end
+    scrollBox:RegisterCallback(BaseScrollBoxEvents.OnScroll, function(_, scrollPercentage, visibleExtentPercentage)
+      Update(scrollPercentage, visibleExtentPercentage)
+    end)
+    scrollBox:RegisterCallback(BaseScrollBoxEvents.OnSizeChanged, function(_, visibleExtentPercentage)
+      if visibleExtentPercentage >= 1 then
+        leftButton:Hide()
+        rightButton:Hide()
+      end
+    end)
+    scrollBox:RegisterCallback(BaseScrollBoxEvents.OnAllowScrollChanged, function(_, allowScroll)
+      if not allowScroll then
+        leftButton:Hide()
+        rightButton:Hide()
+      else
+        Update(scrollBox:GetScrollPercentage(), scrollBox:GetVisibleExtentPercentage())
+      end
+    end)
+  end
+
+  return CategorySearch
+end
+
 function BaganatorCustomiseDialogCategoriesEditorMixin:OnLoad()
   self.currentCategory = "-1"
 
@@ -41,31 +152,46 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:OnLoad()
     addonTable.Help.ShowSearchDialog()
   end)
 
+  local operationInProgress = false
+
   local function Save()
-    if self.CategoryName:GetText() == "" then
+    if self.CategoryName:GetText() == "" or operationInProgress then
       return
     end
+    operationInProgress = true
 
     local customCategories = addonTable.Config.Get(addonTable.Config.Options.CUSTOM_CATEGORIES)
     local categoryMods = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_MODIFICATIONS)
     local displayOrder = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_DISPLAY_ORDER)
-    local oldMods = categoryMods[self.currentCategory]
+    local mods = categoryMods[self.currentCategory]
     local oldIndex
     local isNew, isDefault = self.currentCategory == "-1", customCategories[self.currentCategory] == nil
     if not isNew and not isDefault then
       oldIndex = tIndexOf(displayOrder, self.currentCategory)
     end
-    if not oldMods then
-      oldMods = {}
+    if not mods then
+      mods = {}
     end
+    local oldMods = CopyTable(mods)
+    local oldCat = customCategories[self.currentCategory] or {}
     if isNew then
       self.currentCategory = tostring(1)
       while customCategories[self.currentCategory] do
         self.currentCategory = tostring(tonumber(self.currentCategory) + 1)
       end
     end
-    oldMods.priority = self.PrioritySlider:GetValue()
-    oldMods.showGroupPrefix = self.PrefixCheckBox:GetChecked()
+    mods.priority = self.PrioritySlider:GetValue()
+    mods.showGroupPrefix = self.PrefixCheckBox:GetChecked()
+    if self.CategoryColorSwatch.pendingColor then
+      local c = self.CategoryColorSwatch.pendingColor
+      if c.r == 1 and c.g == 1 and c.b == 1 then
+        mods.color = nil
+      else
+        mods.color = c:GenerateHexColorNoAlpha()
+      end
+    end
+
+    local refreshState = {}
 
     local hidden = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_HIDDEN)
     local oldHidden = hidden[self.currentCategory] == true
@@ -76,29 +202,57 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:OnLoad()
         name = newName,
         search = self.CategorySearch:GetText(),
       }
-      categoryMods[self.currentCategory] = oldMods
+      categoryMods[self.currentCategory] = mods
 
       hidden[self.currentCategory] = self.HiddenCheckBox:GetChecked()
 
       self.CategoryName:SetText(newName)
 
       if isNew and tIndexOf(displayOrder, self.currentCategory) == nil then
+        refreshState[addonTable.Constants.RefreshReason.Searches] = true
+        refreshState[addonTable.Constants.RefreshReason.Layout] = true
         table.insert(displayOrder, 1, self.currentCategory)
-        addonTable.Config.Set(addonTable.Config.Options.CATEGORY_DISPLAY_ORDER, CopyTable(displayOrder))
+      end
+
+      if not tCompare(oldCat, customCategories[self.currentCategory]) then
+        refreshState[addonTable.Constants.RefreshReason.Searches] = true
+        refreshState[addonTable.Constants.RefreshReason.Layout] = true
       end
     else
       hidden[self.currentCategory] = self.HiddenCheckBox:GetChecked()
-      categoryMods[self.currentCategory] = oldMods
+      categoryMods[self.currentCategory] = mods
     end
 
     if hidden[self.currentCategory] ~= oldHidden then
-      addonTable.Config.Set(addonTable.Config.Options.CATEGORY_HIDDEN, CopyTable(hidden))
+      refreshState[addonTable.Constants.RefreshReason.Layout] = true
     end
 
-    addonTable.Config.Set(addonTable.Config.Options.CUSTOM_CATEGORIES, CopyTable(customCategories))
+    for key, value in pairs(mods) do
+      if value ~= oldMods[key] and key ~= "color" and key ~= "addedItems" then
+        refreshState[addonTable.Constants.RefreshReason.Searches] = true
+        refreshState[addonTable.Constants.RefreshReason.Layout] = true
+      elseif value ~= oldMods[key] and key == "color" then
+        refreshState[addonTable.Constants.RefreshReason.Cosmetic] = true
+      end
+    end
+
+    for key, value in pairs(oldMods) do
+      if value ~= mods[key] and key ~= "color" and key ~= "addedItems" then
+        refreshState[addonTable.Constants.RefreshReason.Searches] = true
+        refreshState[addonTable.Constants.RefreshReason.Layout] = true
+      elseif value ~= mods[key] and key == "color" then
+        refreshState[addonTable.Constants.RefreshReason.Cosmetic] = true
+      end
+    end
+
+    if next(refreshState) ~= nil then
+      addonTable.CallbackRegistry:TriggerEvent("RefreshStateChange", refreshState)
+    end
+    operationInProgress = false
   end
 
   local function SetState(value)
+    operationInProgress = true
     local customCategories = addonTable.Config.Get(addonTable.Config.Options.CUSTOM_CATEGORIES)
 
     for _, region in ipairs(self.ChangeAlpha) do
@@ -106,12 +260,16 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:OnLoad()
     end
     self.Blocker:SetPoint("TOPLEFT", self.CategoryName)
     self.Blocker:SetPoint("BOTTOMRIGHT", self.CategorySearch)
-    self.DeleteButton:Enable()
+    self.DeleteButton:SetEnabled(tIndexOf(addonTable.CategoryViews.Constants.ProtectedCategories, value) == nil)
+    self.ItemsEditor:Enable()
+    self.CategoryColorSwatch:Enable()
+    self.CategoryColorSwatch.pendingColor = nil
 
     if value == "" then
       self.currentCategory = "-1"
       self.CategoryName:SetText(BAGANATOR_L_NEW_CATEGORY)
       self.CategorySearch:SetText("")
+      self.CategorySearch:Enable()
       self.PrioritySlider:SetValue(0)
       self.GroupDropDown:SetText(BAGANATOR_L_NONE)
       self.PrefixCheckBox:SetChecked(true)
@@ -119,6 +277,12 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:OnLoad()
       self.PrioritySlider:Enable()
       self.Blocker:Hide()
       self.ExportButton:Enable()
+      self.ItemsEditor:SetupItems()
+      self.HelpButton:Enable()
+      self.ChangeSearchModeButton:Enable()
+      self.CategoryColorSwatch.lastColor = CreateColor(1, 1, 1)
+      self.CategoryColorSwatch:SetColorRGB(self.CategoryColorSwatch.lastColor:GetRGBA())
+      operationInProgress = false
       Save()
       return
     end
@@ -130,11 +294,22 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:OnLoad()
       category = customCategories[value]
       self.Blocker:Hide()
       self.ExportButton:Enable()
+      self.HelpButton:Enable()
+      self.CategorySearch:Enable()
+      self.ChangeSearchModeButton:Enable()
     else
       category = addonTable.CategoryViews.Constants.SourceToCategory[value]
+      self.ItemsEditor:SetEnabled(not category.auto)
+      if category.auto then
+        self.ItemsEditor:SetAlpha(disabledAlpha)
+      end
       self.CategoryName:SetAlpha(disabledAlpha)
       self.CategorySearch:SetAlpha(disabledAlpha)
+      self.CategorySearch:Disable()
+      self.ChangeSearchModeButton:SetAlpha(disabledAlpha)
+      self.ChangeSearchModeButton:Disable()
       self.HelpButton:SetAlpha(disabledAlpha)
+      self.HelpButton:Disable()
       self.Blocker:Show()
       self.ExportButton:Disable()
     end
@@ -154,19 +329,26 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:OnLoad()
       self.PrefixCheckBox:GetParent():Hide()
       self.GroupDropDown:SetText(BAGANATOR_L_NONE)
     end
-    if categoryMods[value] and categoryMods[value].addedItems then
-      self.ItemsEditor:SetupItems()
-    else
-      self.ItemsEditor:SetupItems({})
-    end
+    self.ItemsEditor:SetupItems()
     if categoryMods[value] and categoryMods[value].showGroupPrefix == false then
       self.PrefixCheckBox:SetChecked(false)
     else
       self.PrefixCheckBox:SetChecked(true)
     end
+    if categoryMods[value] and categoryMods[value].color then
+      self.CategoryColorSwatch.lastColor = CreateColorFromRGBAHexString(categoryMods[value].color .. "ff")
+    else
+      self.CategoryColorSwatch.lastColor = CreateColor(1, 1, 1)
+    end
+    self.CategoryColorSwatch:SetColorRGB(self.CategoryColorSwatch.lastColor:GetRGBA())
+
+    operationInProgress = false
   end
 
   addonTable.CallbackRegistry:RegisterCallback("EditCategory", function(_, value)
+    if not self:GetParent():IsVisible() then
+      return
+    end
     SetState(value)
   end)
 
@@ -233,8 +415,8 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:OnLoad()
     addonTable.Config.Set(addonTable.Config.Options.CATEGORY_MODIFICATIONS, CopyTable(categoryMods))
   end)
   self.GroupDropDown:SetPoint("TOP", 0, -120)
-  self.GroupDropDown:SetPoint("LEFT", 5, 0)
-  self.GroupDropDown:SetPoint("RIGHT")
+  self.GroupDropDown:SetPoint("LEFT", 15, 0)
+  self.GroupDropDown:SetPoint("RIGHT", -10, 0)
   table.insert(self.ChangeAlpha, self.GroupDropDown)
 
   self.Blocker = CreateFrame("Frame", nil, self)
@@ -242,28 +424,90 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:OnLoad()
   self.Blocker:SetScript("OnMouseWheel", function() end)
   self.Blocker:SetPoint("TOPLEFT", self.CategoryName)
   self.Blocker:SetFrameStrata("DIALOG")
+  self.Blocker:SetFrameLevel(10000)
 
   self.CategoryName:SetScript("OnEditFocusLost", Save)
-  self.CategorySearch:SetScript("OnEditFocusLost", Save)
+  self.CategoryName:SetScript("OnEnterPressed", Save)
+  self.CategoryName:SetScript("OnTabPressed", function()
+    if self.TextCategorySearch:IsVisible() then
+      self.CategoryName:ClearHighlightText()
+      self.TextCategorySearch:SetFocus()
+    end
+  end)
+
+  self.CategoryColorSwatch = addonTable.CustomiseDialog.GetColorSwatch(self, self.NameLabel, Save)
+  table.insert(self.ChangeAlpha, self.CategoryColorSwatch)
+
+  self.CategorySearchOptions = {
+    text = {holder = self.TextCategorySearch, widget = self.TextCategorySearch, changeText = BAGANATOR_L_VISUAL_MODE},
+  }
+
+  if Syndicator.Search.GetSearchBuilder then
+    self.VisualCategorySearchHolder = CreateFrame("Frame", nil, self)
+    self.VisualCategorySearchHolder:SetAllPoints()
+    self.VisualCategorySearch = GetVisualSearch(self.VisualCategorySearchHolder)
+    self.VisualCategorySearch:RegisterCallback("OnChange", Save)
+    table.insert(self.ChangeAlpha, self.VisualCategorySearch)
+
+    self.CategorySearchOptions["visual"] = {holder = self.VisualCategorySearchHolder, widget = self.VisualCategorySearch, changeText = BAGANATOR_L_RAW_MODE}
+  end
+
+  self.TextCategorySearch:SetScript("OnEnterPressed", Save)
+  addonTable.Skins.AddFrame("IconButton", self.ChangeSearchModeButton, {"changeSearchMode"})
+
+  local function ApplySearchMode()
+    local mode = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_EDIT_SEARCH_MODE)
+    if not self.VisualCategorySearch then
+      mode = "text"
+      self.ChangeSearchModeButton:Hide()
+    end
+    self.ChangeSearchModeButton.tooltipHeader = self.CategorySearchOptions[mode].changeText
+
+    if GameTooltip:GetOwner() == self.ChangeSearchModeButton then
+      self.ChangeSearchModeButton:GetScript("OnEnter")(self.ChangeSearchModeButton)
+    end
+
+    local oldSearch = self.CategorySearch
+    self.CategorySearch = self.CategorySearchOptions[mode].widget
+    self.CategorySearchOptions[mode].holder:Show()
+    for altMode, details in pairs(self.CategorySearchOptions) do
+      if altMode ~= mode then
+        details.holder:Hide()
+      end
+    end
+
+    if self.currentCategory ~= "-1" and oldSearch then
+      self.CategorySearch:SetText(oldSearch:GetText())
+    end
+    if oldSearch then
+      if oldSearch.IsEnabled then
+        self.CategorySearch:SetEnabled(oldSearch:IsEnabled())
+      elseif oldSearch.enabled ~= nil then
+        self.CategorySearch:SetEnabled(oldSearch.enabled)
+      end
+    end
+  end
+
+  ApplySearchMode()
+
+  self.ChangeSearchModeButton:SetScript("OnClick", function()
+    local mode = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_EDIT_SEARCH_MODE)
+    if mode == "visual" then
+      addonTable.Config.Set(addonTable.Config.Options.CATEGORY_EDIT_SEARCH_MODE, "text")
+    else
+      addonTable.Config.Set(addonTable.Config.Options.CATEGORY_EDIT_SEARCH_MODE, "visual")
+    end
+    ApplySearchMode()
+  end)
+
+  addonTable.CallbackRegistry:RegisterCallback("SettingChanged", function(_, settingName)
+    if settingName == addonTable.Config.Options.CATEGORY_SEARCH_EDIT_MODE then
+      ApplySearchMode()
+    end
+  end)
+
   self.HiddenCheckBox:SetScript("OnClick", Save)
   self.PrefixCheckBox:SetScript("OnClick", Save)
-
-  self.CategoryName:SetScript("OnKeyDown", function(_, key)
-    if key == "ENTER" then
-      Save()
-    elseif key == "TAB" then
-      self.CategoryName:ClearHighlightText()
-      self.CategorySearch:SetFocus()
-    end
-  end)
-  self.CategorySearch:SetScript("OnKeyDown", function(_, key)
-    if key == "ENTER" then
-      Save()
-    elseif key == "TAB" then
-      self.CategorySearch:ClearHighlightText()
-      self.CategoryName:SetFocus()
-    end
-  end)
 
   self.ItemsEditor = self:MakeItemsEditor()
   self.ItemsEditor:SetPoint("TOP", 0, -290)
@@ -302,13 +546,14 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:OnLoad()
   addonTable.Skins.AddFrame("Button", self.DeleteButton)
   addonTable.Skins.AddFrame("Button", self.ExportButton)
   addonTable.Skins.AddFrame("EditBox", self.CategoryName)
-  addonTable.Skins.AddFrame("EditBox", self.CategorySearch)
 
   self:Disable()
 end
 
 function BaganatorCustomiseDialogCategoriesEditorMixin:Disable()
   self.CategoryName:SetText("")
+  self.CategoryColorSwatch:Disable()
+  self.CategoryColorSwatch:SetColorRGB(1, 1, 1)
   self.CategorySearch:SetText("")
   self.PrioritySlider:SetValue(0)
   self.GroupDropDown:SetText(BAGANATOR_L_NONE)
@@ -317,10 +562,15 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:Disable()
   self.currentCategory = "-1"
   self.DeleteButton:Disable()
   self.ExportButton:Disable()
+  self.ItemsEditor:Disable()
   self.ItemsEditor:SetupItems()
+  self.TextCategorySearch:Disable()
   for _, region in ipairs(self.ChangeAlpha) do
     region:SetAlpha(disabledAlpha)
   end
+  self.HelpButton:Disable()
+  self.ChangeSearchModeButton:Disable()
+  self.CategorySearch:Disable()
   self.Blocker:Show()
   self.Blocker:SetPoint("TOPLEFT")
   self.Blocker:SetPoint("BOTTOMRIGHT")
@@ -342,6 +592,57 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:MakeItemsEditor()
 
   container.ItemsScrollBox:SetPoint("TOPLEFT", 0, -25)
 
+  local dropRegion = CreateFrame("Button", nil, container)
+  local dropTexture=  dropRegion:CreateTexture(nil, "ARTWORK")
+  dropTexture:SetAtlas("Garr_Building-AddFollowerPlus")
+  dropTexture:SetSize(100, 100)
+  dropTexture:SetPoint("CENTER", dropRegion)
+  dropRegion:SetAllPoints(container.ItemsScrollBox)
+  dropRegion:Hide()
+  local function DropCursor()
+    local t, itemID, itemLink = GetCursorInfo()
+    if t ~= "item" then
+      return
+    end
+    ClearCursor()
+    local details = addonTable.CategoryViews.Utilities.GetAddedItemData(itemID, itemLink)
+    local categoryMods = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_MODIFICATIONS)
+    for _, mods in pairs(categoryMods) do
+      if mods.addedItems and mods.addedItems[details] then
+        mods.addedItems[details] = nil
+        if next(mods.addedItems) == nil then
+          mods.addedItems = nil
+        end
+        break
+      end
+    end
+
+    if not categoryMods[self.currentCategory] then
+      categoryMods[self.currentCategory] = {}
+    end
+
+    categoryMods[self.currentCategory].addedItems = categoryMods[self.currentCategory].addedItems or {}
+
+    categoryMods[self.currentCategory].addedItems[details] = true
+
+    addonTable.Config.Set(addonTable.Config.Options.CATEGORY_MODIFICATIONS, CopyTable(categoryMods))
+  end
+  dropRegion:SetScript("OnReceiveDrag", DropCursor)
+  dropRegion:SetScript("OnClick", DropCursor)
+
+  container:SetScript("OnShow", function()
+    container:RegisterEvent("CURSOR_CHANGED")
+  end)
+  container:SetScript("OnHide", function()
+    container:UnregisterEvent("CURSOR_CHANGED")
+  end)
+  local function UpdateForCursor()
+    local t, itemID, itemLink = GetCursorInfo()
+    dropRegion:SetShown(t == "item" and container.enabled)
+  end
+  container:SetScript("OnEvent", UpdateForCursor)
+  hooksecurefunc(container, "SetupItems", UpdateForCursor)
+
   local addItemsEditBox = CreateFrame("EditBox", nil, container, "InputBoxTemplate")
   addItemsEditBox:SetSize(70, 22)
   addItemsEditBox:SetPoint("BOTTOMLEFT", 3, 0)
@@ -349,7 +650,7 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:MakeItemsEditor()
   addonTable.Skins.AddFrame("EditBox", addItemsEditBox)
   local addButton = CreateFrame("Button", nil, container, "UIPanelDynamicResizeButtonTemplate")
   addonTable.Skins.AddFrame("Button", addButton)
-  addButton:SetPoint("LEFT", addItemsEditBox, "RIGHT", 1, 0)
+  addButton:SetPoint("LEFT", addItemsEditBox, "RIGHT", 1, 1)
   addButton:SetText(BAGANATOR_L_ADD_IDS)
   DynamicResizeButton_Resize(addButton)
 
@@ -359,8 +660,10 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:MakeItemsEditor()
     end
   end)
   addItemsEditBox:SetScript("OnEnter", function()
-    GameTooltip:SetOwner(addItemsEditBox, "ANCHOR_TOP")
-    GameTooltip:SetText(BAGANATOR_L_ADD_ITEM_IDS_MESSAGE)
+    if container.enabled then
+      GameTooltip:SetOwner(addItemsEditBox, "ANCHOR_TOP")
+      GameTooltip:SetText(BAGANATOR_L_ADD_ITEM_IDS_MESSAGE)
+    end
   end)
   addItemsEditBox:SetScript("OnLeave", function()
     GameTooltip:Hide()
@@ -394,9 +697,25 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:MakeItemsEditor()
     addonTable.Config.Set(addonTable.Config.Options.CATEGORY_MODIFICATIONS, CopyTable(categoryMods))
   end)
 
+  local addFromATTButton
   if ATTC then
-    local addFromATTButton = self:MakeATTImportButton(container)
+    addFromATTButton = self:MakeATTImportButton(container)
     addFromATTButton:SetPoint("BOTTOMRIGHT")
+  end
+
+  container.Enable = function()
+    container:SetEnabled(true)
+  end
+  container.Disable = function()
+    container:SetEnabled(false)
+  end
+  container.SetEnabled = function(_, state)
+    container.enabled = state
+    addButton:SetEnabled(state)
+    addItemsEditBox:SetEnabled(state)
+    if addFromATTButton then
+      addFromATTButton:SetEnabled(state)
+    end
   end
 
   return container
@@ -504,6 +823,7 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:MakeItemsGrid(container)
   local scrollBar = CreateFrame("EventFrame", nil, container, "MinimalScrollBar")
   scrollBar:SetPoint("TOPLEFT", scrollBox, "TOPRIGHT", 8, 0)
   scrollBar:SetPoint("BOTTOMLEFT", scrollBox, "BOTTOMRIGHT", 8, 0)
+  addonTable.Skins.AddFrame("TrimScrollBar", scrollBar)
   local view = CreateScrollBoxListLinearView()
 
   local inset =  CreateFrame("Frame", nil, container, "InsetFrameTemplate")
@@ -536,6 +856,7 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:MakeItemsGrid(container)
         itemButton:SetParent(row)
         itemButton:SetScale(itemSize / 37)
         itemButton:SetPoint("LEFT", 37/itemSize * ((i - 1) * itemSize + (i - 1) * 3 + 4), 0)
+        addonTable.Skins.AddFrame("ItemButton", itemButton)
         addonTable.Utilities.MasqueRegistration(itemButton)
         itemButton:UpdateTextures()
         itemButton:SetScript("OnClick", function(_, mouseButton)
@@ -620,7 +941,6 @@ function BaganatorCustomiseDialogCategoriesEditorMixin:MakeItemsGrid(container)
       table.insert(items, lastGroup)
     end
     scrollBox:SetDataProvider(CreateDataProvider(items), true)
-    scrollBox:FullUpdate(ScrollBoxConstants.UpdateImmediately);
   end
 
   addonTable.CallbackRegistry:RegisterCallback("SettingChanged", function(_, settingName)

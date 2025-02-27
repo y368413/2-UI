@@ -1,21 +1,21 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, MistsOfPandaria = ...
-local Map = MistsOfPandaria.Map
-local L = MistsOfPandaria.locale
+local _, ns = ...
+local Map = ns.Map
+local L = ns.locale
 
-local Rare = MistsOfPandaria.node.Rare
-local Collectible = MistsOfPandaria.node.Collectible
-local Lorewalker = MistsOfPandaria.node.Lorewalker
-local Squirrel = MistsOfPandaria.node.Squirrel
+local Rare = ns.node.Rare
+local Collectible = ns.node.Collectible
+local Lorewalker = ns.node.Lorewalker
+local Squirrel = ns.node.Squirrel
 
-local Achievement = MistsOfPandaria.reward.Achievement
-local Transmog = MistsOfPandaria.reward.Transmog
-local Toy = MistsOfPandaria.reward.Toy
+local Achievement = ns.reward.Achievement
+local Transmog = ns.reward.Transmog
+local Toy = ns.reward.Toy
 
-local Path = MistsOfPandaria.poi.Path
-local POI = MistsOfPandaria.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
 -------------------------------------------------------------------------------

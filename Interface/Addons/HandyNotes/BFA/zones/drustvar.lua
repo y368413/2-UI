@@ -1,28 +1,27 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Class = ns.Class
+local Map = ns.Map
 
-local _, BattleForAzeroth = ...
-local L = BattleForAzeroth.locale
-local Class = BattleForAzeroth.Class
-local Map = BattleForAzeroth.Map
+local Collectible = ns.node.Collectible
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
+local Supply = ns.node.Supply
+local Treasure = ns.node.Treasure
 
-local Collectible = BattleForAzeroth.node.Collectible
-local PetBattle = BattleForAzeroth.node.PetBattle
-local Rare = BattleForAzeroth.node.Rare
-local Safari = BattleForAzeroth.node.Safari
-local Supply = BattleForAzeroth.node.Supply
-local Treasure = BattleForAzeroth.node.Treasure
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Pet = ns.reward.Pet
+local Transmog = ns.reward.Transmog
+local Toy = ns.reward.Toy
 
-local Achievement = BattleForAzeroth.reward.Achievement
-local Item = BattleForAzeroth.reward.Item
-local Pet = BattleForAzeroth.reward.Pet
-local Transmog = BattleForAzeroth.reward.Transmog
-local Toy = BattleForAzeroth.reward.Toy
-
-local Arrow = BattleForAzeroth.poi.Arrow
-local Path = BattleForAzeroth.poi.Path
-local POI = BattleForAzeroth.poi.POI
+local Arrow = ns.poi.Arrow
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -412,7 +411,7 @@ map.nodes[18515133] = Treasure({
 
 map.nodes[25751995] = Treasure({
     quest = 53357,
-    requires = BattleForAzeroth.requirement.Item(163710),
+    requires = ns.requirement.Item(163710),
     note = L['merchants_chest_note'],
     rewards = {
         Achievement({id = 12995, criteria = 41698}),
@@ -462,7 +461,7 @@ map.nodes[33713008] = Treasure({
 ----------------------------- SECRET SUPPLY CHESTS ----------------------------
 -------------------------------------------------------------------------------
 
-local SECRET_CHEST = BattleForAzeroth.node.SecretSupply({
+local SECRET_CHEST = ns.node.SecretSupply({
     quest = 55375,
     rewards = {Achievement({id = 13317, criteria = 43931})}
 }) -- quest = 54715 (looted ever) 55375 (looted today)
@@ -500,7 +499,7 @@ map.nodes[21406645] = PetBattle({
     id = 139489,
     note = L['captain_hermes_note'],
     rewards = {
-        Achievement({id = 12936, criteria = 44208}), BattleForAzeroth.reward.Spacer(),
+        Achievement({id = 12936, criteria = 44208}), ns.reward.Spacer(),
         Achievement({id = 13270, criteria = 1, oneline = true}), -- Beast
         Achievement({id = 13271, criteria = 1, oneline = true}), -- Critter
         Achievement({id = 13272, criteria = 1, oneline = true}), -- Dragon
@@ -518,7 +517,7 @@ map.nodes[38153860] = PetBattle({
     id = 140813,
     note = L['fizzie_spark_note'],
     rewards = {
-        Achievement({id = 12936, criteria = 44213}), BattleForAzeroth.reward.Spacer(),
+        Achievement({id = 12936, criteria = 44213}), ns.reward.Spacer(),
         Achievement({id = 13270, criteria = 4, oneline = true}), -- Beast
         Achievement({id = 13271, criteria = 4, oneline = true}), -- Critter
         Achievement({id = 13272, criteria = 4, oneline = true}), -- Dragon
@@ -536,7 +535,7 @@ map.nodes[61061771] = PetBattle({
     id = 140880,
     note = L['michael_skarn_note'],
     rewards = {
-        Achievement({id = 12936, criteria = 44214}), BattleForAzeroth.reward.Spacer(),
+        Achievement({id = 12936, criteria = 44214}), ns.reward.Spacer(),
         Achievement({id = 13270, criteria = 5, oneline = true}), -- Beast
         Achievement({id = 13271, criteria = 5, oneline = true}), -- Critter
         Achievement({id = 13272, criteria = 5, oneline = true}), -- Dragon
@@ -554,7 +553,7 @@ map.nodes[63605971] = PetBattle({
     id = 140461,
     note = L['dilbert_mcclint_note'],
     rewards = {
-        Achievement({id = 12936, criteria = 44212}), BattleForAzeroth.reward.Spacer(),
+        Achievement({id = 12936, criteria = 44212}), ns.reward.Spacer(),
         Achievement({id = 13270, criteria = 3, oneline = true}), -- Beast
         Achievement({id = 13271, criteria = 3, oneline = true}), -- Critter
         Achievement({id = 13272, criteria = 3, oneline = true}), -- Dragon
@@ -574,7 +573,7 @@ map.nodes[63605971] = PetBattle({
 
 local Stele = Class('Stele', Collectible, {
     icon = 2101971,
-    group = BattleForAzeroth.groups.DRUST_FACTS,
+    group = ns.groups.DRUST_FACTS,
     sublabel = L['drust_facts_note']
 })
 
@@ -628,12 +627,12 @@ map.nodes[59396668] = Stele({
 
 local Relic = Class('OrderRelic', Collectible, {
     icon = 514016,
-    group = BattleForAzeroth.groups.EMBER_RELICS,
+    group = ns.groups.EMBER_RELICS,
     pois = {
         POI({44892743}) -- Gol Var entrance
     },
     IsCompleted = function(self)
-        if BattleForAzeroth.PlayerHasItem(self.item) then return true end
+        if ns.PlayerHasItem(self.item) then return true end
         return Collectible.IsCompleted(self)
     end
 })
@@ -666,7 +665,7 @@ map.nodes[42432548] = Collectible({
     icon = 514016,
     label = L['golvar_ruins'],
     note = L['embers_golvar_note'],
-    group = BattleForAzeroth.groups.EMBER_RELICS,
+    group = ns.groups.EMBER_RELICS,
     rewards = {
         Achievement({
             id = 13082,
@@ -691,7 +690,7 @@ map.nodes[55563479] = Collectible({
     id = 128467,
     icon = 133200,
     note = L['sausage_sampler_note'] .. ' ' .. L['elijah_note'],
-    group = BattleForAzeroth.groups.SAUSAGE_SAMPLER,
+    group = ns.groups.SAUSAGE_SAMPLER,
     rewards = {
         Achievement({
             id = 13087,
@@ -709,7 +708,7 @@ map.nodes[37894905] = Collectible({
     id = 137031,
     icon = 133200,
     note = L['sausage_sampler_note'],
-    group = BattleForAzeroth.groups.SAUSAGE_SAMPLER,
+    group = ns.groups.SAUSAGE_SAMPLER,
     rewards = {
         Achievement({
             id = 13087,
@@ -724,7 +723,7 @@ map.nodes[26677253] = Collectible({
     id = 136655,
     icon = 133200,
     note = L['sausage_sampler_note'] .. ' ' .. L['alisha_note'],
-    group = BattleForAzeroth.groups.SAUSAGE_SAMPLER,
+    group = ns.groups.SAUSAGE_SAMPLER,
     rewards = {
         Achievement({
             id = 13087,
@@ -740,7 +739,7 @@ local raal = Collectible({
     id = 131863,
     icon = 133200,
     note = L['sausage_sampler_note'] .. '\n\n' .. L['raal_note'],
-    group = BattleForAzeroth.groups.SAUSAGE_SAMPLER,
+    group = ns.groups.SAUSAGE_SAMPLER,
     rewards = {
         Achievement({
             id = 13087,
@@ -762,7 +761,7 @@ map.nodes[21146615] = Collectible({
     id = 139638,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     rewards = {
         Achievement({
             id = 13061,
@@ -781,7 +780,7 @@ map.nodes[21474360] = Collectible({
     id = 137040,
     icon = 135999,
     note = L['three_sheets_note'] .. '\n\n' .. L['linda_deepwater_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     rewards = {
         Achievement({
             id = 13061,
@@ -807,13 +806,13 @@ map.nodes[21474360] = Collectible({
 ------------------- TO ALL THE SQUIRRELS I SET SAIL TO SEE --------------------
 -------------------------------------------------------------------------------
 
-map.nodes[53202880] = BattleForAzeroth.node.Squirrel({
+map.nodes[53202880] = ns.node.Squirrel({
     id = 129791,
     rewards = {Achievement({id = 14730, criteria = 50239})},
     pois = {POI({51802640, 53803340})}
 }) -- Drustbat
 
-map.nodes[60802340] = BattleForAzeroth.node.Squirrel({
+map.nodes[60802340] = ns.node.Squirrel({
     id = 128798,
     rewards = {Achievement({id = 14730, criteria = 50241})},
     pois = {POI({60801600, 62602380, 59202340})}
@@ -853,7 +852,7 @@ map.nodes[21602880] = Safari.ShackCrab({
 
 local Cursed = Class('Cursed', Collectible, {
     icon = 1027879,
-    group = BattleForAzeroth.groups.CURSED_HUNTER,
+    group = ns.groups.CURSED_HUNTER,
     label = L['cursed_hunter_label'],
     note = L['cursed_hunter_note']
 })

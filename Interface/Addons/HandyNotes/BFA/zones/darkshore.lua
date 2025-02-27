@@ -1,18 +1,18 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, BattleForAzeroth = ...
-local L = BattleForAzeroth.locale
-local Map = BattleForAzeroth.WarfrontMap
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Map = ns.WarfrontMap
 
-local Collectible = BattleForAzeroth.node.Collectible
-local Rare = BattleForAzeroth.Class('WFRare', BattleForAzeroth.node.Rare, {questAny = true})
+local Collectible = ns.node.Collectible
+local Rare = ns.Class('WFRare', ns.node.Rare, {questAny = true})
 
-local Mount = BattleForAzeroth.reward.Mount
-local Pet = BattleForAzeroth.reward.Pet
-local Toy = BattleForAzeroth.reward.Toy
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Toy = ns.reward.Toy
 
-local POI = BattleForAzeroth.poi.POI
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 

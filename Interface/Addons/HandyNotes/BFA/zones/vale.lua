@@ -1,28 +1,28 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, BattleForAzeroth = ...
-local L = BattleForAzeroth.locale
-local Class = BattleForAzeroth.Class
-local Map = BattleForAzeroth.VisionsMap
-local Clone = BattleForAzeroth.Clone
+local _, ns = ...
+local L = ns.locale
+local Class = ns.Class
+local Map = ns.VisionsMap
+local Clone = ns.Clone
 
-local Coffer = BattleForAzeroth.node.Coffer
-local PetBattle = BattleForAzeroth.node.PetBattle
-local Rare = BattleForAzeroth.node.Rare
-local TimedEvent = BattleForAzeroth.node.TimedEvent
-local Treasure = BattleForAzeroth.node.Treasure
+local Coffer = ns.node.Coffer
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local TimedEvent = ns.node.TimedEvent
+local Treasure = ns.node.Treasure
 
-local Achievement = BattleForAzeroth.reward.Achievement
-local Item = BattleForAzeroth.reward.Item
-local Mount = BattleForAzeroth.reward.Mount
-local Pet = BattleForAzeroth.reward.Pet
-local Quest = BattleForAzeroth.reward.Quest
-local Toy = BattleForAzeroth.reward.Toy
-local Transmog = BattleForAzeroth.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Quest = ns.reward.Quest
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Path = BattleForAzeroth.poi.Path
-local POI = BattleForAzeroth.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -31,13 +31,13 @@ local MAN, MOG, EMP = 0, 1, 2 -- assaults
 local function GetAssault()
     local textures = C_MapExplorationInfo.GetExploredMapTextures(1530)
     if textures and textures[1].fileDataIDs[1] == 3155826 then
-        if BattleForAzeroth:GetOpt('show_debug_map') then BattleForAzeroth.Debug('Vale assault: MAN') end
+        if ns:GetOpt('show_debug_map') then ns.Debug('Vale assault: MAN') end
         return MAN -- left
     elseif textures and textures[1].fileDataIDs[1] == 3155832 then
-        if BattleForAzeroth:GetOpt('show_debug_map') then BattleForAzeroth.Debug('Vale assault: MOG') end
+        if ns:GetOpt('show_debug_map') then ns.Debug('Vale assault: MOG') end
         return MOG -- middle
     elseif textures and textures[1].fileDataIDs[1] == 3155841 then
-        if BattleForAzeroth:GetOpt('show_debug_map') then BattleForAzeroth.Debug('Vale assault: EMP') end
+        if ns:GetOpt('show_debug_map') then ns.Debug('Vale assault: EMP') end
         return EMP -- right
     end
 end
@@ -56,7 +56,7 @@ local pools = Map({id = 1579, GetAssault = GetAssault})
 ------------------------------------ INTRO ------------------------------------
 -------------------------------------------------------------------------------
 
-local Intro = Class('Intro', BattleForAzeroth.node.Intro)
+local Intro = Class('Intro', ns.node.Intro)
 
 Intro.note = L['vale_intro_note']
 
@@ -415,7 +415,7 @@ map.nodes[70954053] = Rare({id = 154087, quest = 56084, assault = EMP}) -- Zror'
 
 local MANChest = Class('MANChest', Treasure, {
     assault = MAN,
-    group = BattleForAzeroth.groups.DAILY_CHESTS,
+    group = ns.groups.DAILY_CHESTS,
     label = L['ambered_cache']
 })
 
@@ -475,14 +475,14 @@ map.nodes[21586246] = Coffer({
     quest = 58770,
     assault = MAN,
     label = L['ambered_coffer'],
-    requires = BattleForAzeroth.requirement.Item(174766)
+    requires = ns.requirement.Item(174766)
 })
 
 -------------------------------------------------------------------------------
 
 local MOGChest = Class('MOGChest', Treasure, {
     assault = MOG,
-    group = BattleForAzeroth.groups.DAILY_CHESTS,
+    group = ns.groups.DAILY_CHESTS,
     label = L['mogu_plunder']
 })
 
@@ -546,7 +546,7 @@ local MOGCOFF = Coffer({
     assault = MOG,
     fgroup = 'mogcoffer',
     label = L['mogu_strongbox'],
-    requires = BattleForAzeroth.requirement.Item(174767)
+    requires = ns.requirement.Item(174767)
 })
 
 map.nodes[10782831] = MOGCOFF
@@ -559,7 +559,7 @@ map.nodes[50182143] = MOGCOFF
 
 local EMPChest = Class('EMPChest', Treasure, {
     assault = EMP,
-    group = BattleForAzeroth.groups.DAILY_CHESTS,
+    group = ns.groups.DAILY_CHESTS,
     label = L['black_empire_cache']
 })
 
@@ -642,7 +642,7 @@ local EMPCOFF = Coffer({
     assault = EMP,
     fgroup = 'empcoffer',
     label = L['black_empire_coffer'],
-    requires = BattleForAzeroth.requirement.Item(174768)
+    requires = ns.requirement.Item(174768)
 })
 
 map.nodes[53116634] = EMPCOFF

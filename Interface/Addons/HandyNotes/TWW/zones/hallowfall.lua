@@ -1,36 +1,36 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, TheWarWithin = ...
-local Class = TheWarWithin.Class
-local L = TheWarWithin.locale
-local Map = TheWarWithin.Map
+local _, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = TheWarWithin.node.Collectible
-local DisturbedEarth = TheWarWithin.node.DisturbedEarth
-local PT = TheWarWithin.node.ProfessionTreasures
-local Rare = TheWarWithin.node.Rare
-local Treasure = TheWarWithin.node.Treasure
+local Collectible = ns.node.Collectible
+local DisturbedEarth = ns.node.DisturbedEarth
+local PT = ns.node.ProfessionTreasures
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local FlightMaster = TheWarWithin.node.FlightMaster
--- local LoreObject = TheWarWithin.node.LoreObject
-local SkyridingGlyph = TheWarWithin.node.SkyridingGlyph
+local FlightMaster = ns.node.FlightMaster
+local LoreObject = ns.node.LoreObject
+local SkyridingGlyph = ns.node.SkyridingGlyph
 
-local Achievement = TheWarWithin.reward.Achievement
-local Item = TheWarWithin.reward.Item
-local Mount = TheWarWithin.reward.Mount
-local Pet = TheWarWithin.reward.Pet
-local Recipe = TheWarWithin.reward.Recipe
-local Reputation = TheWarWithin.reward.Reputation
-local Toy = TheWarWithin.reward.Toy
-local Transmog = TheWarWithin.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Recipe = ns.reward.Recipe
+local Reputation = ns.reward.Reputation
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local ItemStatus = TheWarWithin.tooltip.ItemStatus
+local ItemStatus = ns.tooltip.ItemStatus
 
-local Circle = TheWarWithin.poi.Circle
-local Entrance = TheWarWithin.poi.Entrance
-local Path = TheWarWithin.poi.Path
-local POI = TheWarWithin.poi.POI
+local Circle = ns.poi.Circle
+local Entrance = ns.poi.Entrance
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -60,7 +60,7 @@ local BeledarsSpawn = Class('BeledarsSpawn', Rare, {
 
 function BeledarsSpawn.getters:note()
     local timeFormat =
-        TheWarWithin:GetOpt('use_standard_time') and L['time_format_12hrs'] or
+        ns:GetOpt('use_standard_time') and L['time_format_12hrs'] or
             L['time_format_24hrs']
 
     local timeLeft = (GetQuestResetTime() + 3660) % 10800
@@ -69,9 +69,9 @@ function BeledarsSpawn.getters:note()
     local spawnsIn = timeLeft <= 60 and L['now'] or
                          SecondsToTime(timeLeft, true, true)
 
-    local color = TheWarWithin.color.Orange
-    if timeLeft < 1800 then color = TheWarWithin.color.Yellow end -- 30 mins
-    if timeLeft < 600 then color = TheWarWithin.color.Green end -- 10 mins
+    local color = ns.color.Orange
+    if timeLeft < 1800 then color = ns.color.Yellow end -- 30 mins
+    if timeLeft < 600 then color = ns.color.Green end -- 10 mins
     spawnsIn = color(spawnsIn)
 
     return format(L['beledars_spawn_note'], spawnsIn,
@@ -524,7 +524,7 @@ map.nodes[58382715] = Treasure({
 
 local IllusiveKobyssLure = Class('IllusiveKobyssLure', Treasure, {
     quest = 83299,
-    rlabel = TheWarWithin.status.Gray('{item:225641}'),
+    rlabel = ns.status.Gray('{item:225641}'),
     fgroup = 'illusive_kobyss_lure',
     rewards = {
         Achievement({id = 40848, criteria = 69696}), --
@@ -699,7 +699,7 @@ map.nodes[45944513] = Treasure({
 
 map.nodes[55135193] = Treasure({
     quest = 83273,
-    requires = TheWarWithin.requirement.Item(225335), -- Smuggler's Key
+    requires = ns.requirement.Item(225335), -- Smuggler's Key
     location = L['smugglers_treasure_location'],
     note = L['smugglers_treasure_note'],
     rewards = {
@@ -723,7 +723,7 @@ map.nodes[76765382] = Treasure({ -- review, was not there when i looked
 map.nodes[63990612] = Treasure({
     quest = 80687,
     label = L['coral_fused_clam'],
-    requires = TheWarWithin.requirement.Item(218354), -- Clammer's Pry Bar
+    requires = ns.requirement.Item(218354), -- Clammer's Pry Bar
     note = L['coral_fused_clam_note'],
     pois = {
         POI({61890609}) -- Clammer's Kit
@@ -741,11 +741,11 @@ map.nodes[63990612] = Treasure({
 --------------------------------- BATTLE PETS ---------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[52436278] = TheWarWithin.node.PetBattle({
+map.nodes[52436278] = ns.node.PetBattle({
     id = 223442,
     rewards = {
         Achievement({id = 40153, criteria = 67137, oneline = true}), -- Battle on Khaz Algar
-        TheWarWithin.reward.Spacer(),
+        ns.reward.Spacer(),
         Achievement({id = 40154, criteria = 67141, oneline = true}), -- Aquatic Battler of Khaz Algar
         Achievement({id = 40155, criteria = 67145, oneline = true}), -- Beast Battler of Khaz Algar
         Achievement({id = 40156, criteria = 67149, oneline = true}), -- Critter Battler of Khaz Algar
@@ -759,7 +759,7 @@ map.nodes[52436278] = TheWarWithin.node.PetBattle({
     }
 }) -- Kyrie
 
-map.nodes[61066899] = TheWarWithin.node.PetBattle({
+map.nodes[61066899] = ns.node.PetBattle({
     id = 223409,
     rewards = {
         Achievement({id = 40153, criteria = 67133, oneline = true}) -- Battle on Khaz Algar
@@ -842,7 +842,7 @@ map.nodes[57616460] = SkyridingGlyph({
 -------------------------------------------------------------------------------
 
 local BibloBook = Class('BibloBook', Collectible,
-    {icon = 5341597, group = TheWarWithin.groups.BIBLO_ARCHIVIST})
+    {icon = 5341597, group = ns.groups.BIBLO_ARCHIVIST})
 
 map.nodes[48153959] = BibloBook({
     location = L['biblo_book_01_location'],
@@ -905,62 +905,62 @@ map.nodes[52635999] = BibloBook({
 
 local Momento = Class('Momento', Collectible, {
     icon = 4635200,
-    group = TheWarWithin.groups.LOST_AND_FOUND,
+    group = ns.groups.LOST_AND_FOUND,
     note = L['lost_and_found_note'],
     pois = {POI({60486018, label = '{npc:220718}', color = 'Red'})} -- Maera Ashyld
 })
 
 map.nodes[65463222] = Momento({
     location = L['broken_bracelet_location'],
-    requires = TheWarWithin.requirement.Quest(80678), -- Time Lost
+    requires = ns.requirement.Quest(80678), -- Time Lost
     rewards = {Achievement({id = 40618, criteria = 68932})}
 }) -- Broken Bracelet
 
 map.nodes[43285542] = Momento({
     location = L['stuffed_lynx_toy_location'],
-    requires = TheWarWithin.requirement.Quest(80678), -- Time Lost
+    requires = ns.requirement.Quest(80678), -- Time Lost
     rewards = {Achievement({id = 40618, criteria = 68933})}
 }) -- Stuffed Lynx Toy
 
 map.nodes[43465171] = Momento({
     location = L['tarnished_compass_location'],
-    requires = TheWarWithin.requirement.Quest(80678), -- Time Lost
+    requires = ns.requirement.Quest(80678), -- Time Lost
     rewards = {Achievement({id = 40618, criteria = 68934})}
 }) -- Tarnished Compass
 
 map.nodes[43204979] = Momento({
     location = L['sturdy_locket_location'],
-    requires = TheWarWithin.requirement.Quest(82813), -- Time Borrowed
+    requires = ns.requirement.Quest(82813), -- Time Borrowed
     rewards = {Achievement({id = 40618, criteria = 68935})}
 }) -- Sturdy Locket
 
 map.nodes[69264384] = Momento({
     location = L['wooden_figure_location'],
-    requires = TheWarWithin.requirement.Quest(82813), -- Time Borrowed
+    requires = ns.requirement.Quest(82813), -- Time Borrowed
     rewards = {Achievement({id = 40618, criteria = 68937})}
 }) -- Wooden Figure
 
 map.nodes[48423888] = Momento({
     location = L['calcified_journal_location'],
-    requires = TheWarWithin.requirement.Quest(82813), -- Time Borrowed
+    requires = ns.requirement.Quest(82813), -- Time Borrowed
     rewards = {Achievement({id = 40618, criteria = 68940})}
 }) -- Calcified Journal
 
 map.nodes[41643474] = Momento({
     location = L['ivory_tinderbox_location'],
-    requires = TheWarWithin.requirement.Quest(82810), -- Time Found
+    requires = ns.requirement.Quest(82810), -- Time Found
     rewards = {Achievement({id = 40618, criteria = 68942})}
 }) -- Ivory Tinderbox
 
 map.nodes[42355502] = Momento({
     location = L['dented_spear_location'],
-    requires = TheWarWithin.requirement.Quest(82810), -- Time Found
+    requires = ns.requirement.Quest(82810), -- Time Found
     rewards = {Achievement({id = 40618, criteria = 68943})}
 }) -- Dented Spear
 
 map.nodes[43974970] = Momento({
     location = L['filigreed_cleric_location'],
-    requires = TheWarWithin.requirement.Quest(82810), -- Time Found
+    requires = ns.requirement.Quest(82810), -- Time Found
     rewards = {Achievement({id = 40618, criteria = 68945})}
 }) -- Filigreed Cleric
 
@@ -970,7 +970,7 @@ map.nodes[43974970] = Momento({
 
 local MissingLynx = Class('MissingLynx', Collectible, {
     icon = 5689905,
-    group = TheWarWithin.groups.MISSING_LYNX,
+    group = ns.groups.MISSING_LYNX,
     note = L['missing_lynx_note']
 })
 
@@ -1005,7 +1005,7 @@ map.nodes[69274372] = MissingLynx({
 }) -- Iggy
 
 map.nodes[63182936] = MissingLynx({
-    requires = TheWarWithin.requirement.Item(206350, 3), -- Radiant Remnant
+    requires = ns.requirement.Item(206350, 3), -- Radiant Remnant
     location = L['nightclaw_location'],
     rewards = {Achievement({id = 40625, criteria = 69003})}
 }) -- Nightclaw
@@ -1050,40 +1050,40 @@ map.nodes[42145371] = MissingLynx({
 --------------------- ACHIEVEMENT: KHAZ ALGAR LORE HUNTER ---------------------
 -------------------------------------------------------------------------------
 
--- map.nodes[62214557] = LoreObject({
---     rewards = {
---         Achievement({id = 40762, criteria = 69383}),
---         Reputation({id = 2570, gain = 250})
---     }
--- }) -- A Scout's Journal
+map.nodes[62214557] = LoreObject({
+    rewards = {
+        Achievement({id = 40762, criteria = 69383}),
+        Reputation({id = 2570, gain = 250})
+    }
+}) -- A Scout's Journal
 
--- map.nodes[71433667] = LoreObject({
---     rewards = {
---         Achievement({id = 40762, criteria = 69382}),
---         Reputation({id = 2570, gain = 250})
---     }
--- }) -- A Tattered Note
+map.nodes[71433667] = LoreObject({
+    rewards = {
+        Achievement({id = 40762, criteria = 69382}),
+        Reputation({id = 2570, gain = 250})
+    }
+}) -- A Tattered Note
 
--- map.nodes[78244041] = LoreObject({
---     rewards = {
---         Achievement({id = 40762, criteria = 69381}),
---         Reputation({id = 2570, gain = 250})
---     }
--- }) -- A Weathered Tome
+map.nodes[78244041] = LoreObject({
+    rewards = {
+        Achievement({id = 40762, criteria = 69381}),
+        Reputation({id = 2570, gain = 250})
+    }
+}) -- A Weathered Tome
 
--- map.nodes[25085371] = LoreObject({
---     rewards = {
---         Achievement({id = 40762, criteria = 69380}),
---         Reputation({id = 2570, gain = 250})
---     }
--- }) -- A Worn Down Book
+map.nodes[25085371] = LoreObject({
+    rewards = {
+        Achievement({id = 40762, criteria = 69380}),
+        Reputation({id = 2570, gain = 250})
+    }
+}) -- A Worn Down Book
 
--- map.nodes[25723845] = LoreObject({
---     rewards = {
---         Achievement({id = 40762, criteria = 69379}),
---         Reputation({id = 2570, gain = 250})
---     }
--- }) -- Captain's Chest
+map.nodes[25723845] = LoreObject({
+    rewards = {
+        Achievement({id = 40762, criteria = 69379}),
+        Reputation({id = 2570, gain = 250})
+    }
+}) -- Captain's Chest
 
 -------------------------------------------------------------------------------
 ------------------------- ACHIEVEMENT: MERELDAR MENACE ------------------------
@@ -1091,7 +1091,7 @@ map.nodes[42145371] = MissingLynx({
 
 local MereldarMenace = Class('mereldar_menace', Collectible, {
     icon = 135232,
-    group = TheWarWithin.groups.MERELDAR_MENACE,
+    group = ns.groups.MERELDAR_MENACE,
     note = L['mereldar_menace_note']
 })
 
@@ -1210,8 +1210,8 @@ map.nodes[44947610] = DisturbedEarth()
 
 local BeaconOfHope = Class('beacon_of_hope', Collectible, {
     icon = 135922,
-    group = TheWarWithin.groups.BEACON_OF_HOPE,
-    requires = TheWarWithin.requirement.Item(206350, 3), -- Radiant Remnant
+    group = ns.groups.BEACON_OF_HOPE,
+    requires = ns.requirement.Item(206350, 3), -- Radiant Remnant
     note = L['beacon_of_hope_note']
 })
 
@@ -1321,7 +1321,7 @@ map.nodes[43205177] = Collectible({
     quest = 79081,
     label = '{achievement:20594}',
     note = L['flamegards_hope_note'],
-    group = TheWarWithin.groups.FLAMEGARDS_HOPE,
+    group = ns.groups.FLAMEGARDS_HOPE,
     rewards = {Achievement({id = 20594, criteria = {id = 1, qty = true}})}
 })
 
@@ -1420,3 +1420,10 @@ map.nodes[64451882] = Collectible({
         POI({label = '{npc:222374}', points = {66702100}, color = 'Red'}) -- Cap'n Elaena
     }
 }) -- Thunder
+
+-------------------------------------------------------------------------------
+----------------------------- WORLDSOUL MEMORIES ------------------------------
+-------------------------------------------------------------------------------
+
+map.nodes[46902323] = ns.node.WorldsoulMemory({areaPoiID = 7833}) -- Descendants of Distant Waters
+map.nodes[60586768] = ns.node.WorldsoulMemory({areaPoiID = 7834}) -- Reign of the Old Gods

@@ -26,3 +26,22 @@ function SlashCmdList.SLASHIN(msg)
 		CTimerAfter(secs, function() OnCallback(command) end)
 	end
 end
+
+-- Provide an additional (/in-throttled) slash command for those that like to spam click macros
+SLASH_SLASHINT1 = "/int"
+
+local throttle = {}
+function SlashCmdList.SLASHINT(msg)
+	local secs, command = msg:match("^([^%s]+)%s+(.*)$")
+	secs = tonumber(secs)
+	if (not secs) or (#command == 0) then
+		print("|cff33ff99SlashIn:|r")
+		print("|cff33ff99Usage:|r /in <seconds> <command>")
+		print("|cff33ff99Example:|r /in 1.5 /emote rocks")
+	else
+		if not throttle[command] then
+			throttle[command] = true
+			CTimerAfter(secs, function() throttle[command] = nil OnCallback(command) end)
+		end
+	end
+end

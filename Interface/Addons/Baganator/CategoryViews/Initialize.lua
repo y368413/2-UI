@@ -59,20 +59,87 @@ local function MigrateFormat()
     end
     addonTable.Config.Set(addonTable.Config.Options.CATEGORY_MIGRATION, 4)
   end
+  if addonTable.Config.Get(addonTable.Config.Options.CATEGORY_MIGRATION) == 4 then
+    local categorySections = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_SECTIONS)
+    local displayOrder = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_DISPLAY_ORDER)
+    local index = 1
+    for displayIndex, entry in ipairs(displayOrder) do
+      if entry:match("^_") and entry ~= addonTable.CategoryViews.Constants.SectionEnd then
+        local name = entry:match("_(.*)")
+        categorySections[tostring(index)] = { name = name }
+        displayOrder[displayIndex] = "_" .. index
+        index = index + 1
+      end
+    end
+    addonTable.Config.Set(addonTable.Config.Options.CATEGORY_MIGRATION, 5)
+  end
+end
+
+-- Somehow on older versions a few users have missing SectionEnds for their
+-- sections, or the SectionEnd is in the wrong place, this fixes that.
+function addonTable.CategoryViews.FixAnyBrokenSections()
+  local displayOrder = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_DISPLAY_ORDER)
+
+  local level = 0
+  local index = 0
+  local currentSection = {}
+  while index < # displayOrder do
+    index = index + 1
+    local source = displayOrder[index]
+    if source == addonTable.CategoryViews.Constants.SectionEnd and level == 0 then
+      table.remove(displayOrder, index)
+      index = index - 1
+    elseif source == addonTable.CategoryViews.Constants.SectionEnd then
+      level = level - 1
+      table.remove(currentSection)
+    elseif source:match("^_") then
+      level = level + 1
+      table.insert(currentSection, index)
+    end
+  end
+
+  if #currentSection > 0 then
+    for i = #currentSection, 1, -1 do
+      local insertIndex = #displayOrder + 1
+      for j = currentSection[i] + 1, #displayOrder do
+        if displayOrder[j]:match("^_") then
+          insertIndex = j
+          break
+        end
+      end
+      table.insert(displayOrder, insertIndex, addonTable.CategoryViews.Constants.SectionEnd)
+    end
+  end
+  addonTable.Config.Set(addonTable.Config.Options.CATEGORY_DISPLAY_ORDER, CopyTable(displayOrder))
 end
 
 local function CompareCurrent()
   local current = addonTable.CustomiseDialog.CategoriesExport()
   local toMod = addonTable.json.decode(current)
-  toMod.modifications = {}
-  toMod.hidden = {}
-  local reencoded = addonTable.json.encode(toMod)
-  return reencoded == addonTable.CategoryViews.Constants.DefaultImport[addonTable.Config.Get(addonTable.Config.Options.CATEGORY_DEFAULT_IMPORT)]
+  local defaultImport = addonTable.json.decode(
+  -- math.max(1 in case the user has an old category layout from before the
+  -- defaults import was added
+    addonTable.CategoryViews.Constants.DefaultImport[math.max(1, addonTable.Config.Get(addonTable.Config.Options.CATEGORY_DEFAULT_IMPORT))]
+  )
+
+  if #toMod.order ~= #defaultImport.order then
+    return false
+  end
+
+  for index, toModEntry in ipairs(toMod.order) do
+    local defaultEntry = defaultImport.order[index]
+    -- Complicated comparison to account for change in section storage
+    if defaultEntry ~= toModEntry and (defaultEntry:sub(1, 1) ~= "_" or toModEntry:sub(1, 1) ~= "_") then
+      return false
+    end
+  end
+  return true
 end
 
 local function SetupCategories()
   local displayOrder = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_DISPLAY_ORDER)
   local oldCategoryMods = CopyTable(addonTable.Config.Get(addonTable.Config.Options.CATEGORY_MODIFICATIONS))
+  local oldSections = CopyTable(addonTable.Config.Get(addonTable.Config.Options.CATEGORY_SECTIONS))
 
   if addonTable.Config.Get(addonTable.Config.Options.CATEGORY_DEFAULT_IMPORT) < addonTable.CategoryViews.Constants.DefaultImportVersion then
     local displayOrderForCmp = CopyTable(displayOrder)
@@ -83,6 +150,7 @@ local function SetupCategories()
     if tCompare(displayOrderForCmp, addonTable.CategoryViews.Constants.OldDefaults) or #displayOrder == 0 or CompareCurrent() then
 
       addonTable.CustomiseDialog.CategoriesImport(addonTable.CategoryViews.Constants.DefaultImport[addonTable.CategoryViews.Constants.DefaultImportVersion])
+      Mixin(addonTable.Config.Get(addonTable.Config.Options.CATEGORY_SECTIONS, oldSections))
       addonTable.Config.Set(addonTable.Config.Options.CATEGORY_MODIFICATIONS, oldCategoryMods)
       local newAdded = {}
       for _, source in ipairs(addonTable.Config.Get(addonTable.Config.Options.CATEGORY_DISPLAY_ORDER)) do
@@ -102,6 +170,8 @@ local function SetupCategories()
     end
     addonTable.Config.Set(addonTable.Config.Options.AUTOMATIC_CATEGORIES_ADDED, newAdded)
   end
+
+  addonTable.CategoryViews.FixAnyBrokenSections()
 
   for _, source in ipairs(addonTable.CategoryViews.Constants.ProtectedCategories) do
     if tIndexOf(displayOrder, source) == nil then
@@ -164,22 +234,3 @@ function addonTable.CategoryViews.Initialize()
 
   SetupAddRemoveItems()
 end
-
-EventRegistry:RegisterFrameEventAndCallback("PLAYER_LOGIN", function()
-  if not Syndicator then
-    return
-  end
-
-  local displayOrder = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_DISPLAY_ORDER)
-  local customCategories = addonTable.Config.Get(addonTable.Config.Options.CUSTOM_CATEGORIES)
-  if #displayOrder > 0 then
-    for i = #displayOrder, 1, -1 do
-      local source = displayOrder[i]
-      local category = addonTable.CategoryViews.Constants.SourceToCategory[source] or customCategories[source]
-      if not category and source ~= addonTable.CategoryViews.Constants.DividerName and not source:match("^_") then
-        table.remove(displayOrder, i)
-      end
-    end
-  end
-  addonTable.Config.Set(addonTable.Config.Options.CATEGORY_DISPLAY_ORDER, CopyTable(displayOrder))
-end)

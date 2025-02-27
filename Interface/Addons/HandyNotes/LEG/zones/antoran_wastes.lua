@@ -1,25 +1,25 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Legion = ...
-local Class = Legion.Class
-local L = Legion.locale
-local Map = Legion.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = Legion.node.Collectible
-local Rare = Legion.node.Rare
-local Treasure = Legion.node.Treasure
+local Collectible = ns.node.Collectible
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local Achievement = Legion.reward.Achievement
-local Item = Legion.reward.Item
-local Mount = Legion.reward.Mount
-local Pet = Legion.reward.Pet
-local Section = Legion.reward.Section
-local Toy = Legion.reward.Toy
-local Transmog = Legion.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Section = ns.reward.Section
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Path = Legion.poi.Path
-local POI = Legion.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -240,7 +240,7 @@ map.nodes[76405590] = Rare({
 map.nodes[84358112] = Rare({
     id = 127700,
     quest = 48967,
-    requires = Legion.requirement.Quest(49007), -- Commander On Deck!
+    requires = ns.requirement.Quest(49007), -- Commander On Deck!
     note = L['squadron_commander_vishax_note'],
     rewards = {
         Achievement({id = 12078, criteria = 37662}), Toy({item = 153253}) -- S.F.E. Interceptor
@@ -288,10 +288,10 @@ local TheManyFacedDevourer = Class('TheManyFacedDevourer', Rare, {
 
 function TheManyFacedDevourer.getters:note()
     local function collected(i)
-        if Legion.PlayerHasItem(self.requiredItems[i]) then
-            return Legion.status.Green('x')
+        if ns.PlayerHasItem(self.requiredItems[i]) then
+            return ns.status.Green('x')
         else
-            return Legion.status.Red('x')
+            return ns.status.Red('x')
         end
     end
 
@@ -312,21 +312,21 @@ map.nodes[54803910] = TheManyFacedDevourer()
 
 map.nodes[58906140] = Treasure({
     quest = 49017,
-    requires = Legion.requirement.Quest(47994), -- Forming a Bond (Lightforged Warframe)
+    requires = ns.requirement.Quest(47994), -- Forming a Bond (Lightforged Warframe)
     note = L['lightforged_warframe_treasure_note'],
     rewards = {Achievement({id = 12074, criteria = 37695})}
 }) -- Forgotten Legion Supplies
 
 map.nodes[52102720] = Treasure({
     quest = 49019,
-    requires = Legion.requirement.Quest(47287), -- The Vindicaar Matrix Core (Light's Judgement)
+    requires = ns.requirement.Quest(47287), -- The Vindicaar Matrix Core (Light's Judgement)
     note = L['lights_judgement_treasure_note'],
     rewards = {Achievement({id = 12074, criteria = 37697})}
 }) -- Fel-Bound Chest
 
 map.nodes[65903980] = Treasure({
     quest = 49018,
-    requires = Legion.requirement.Quest(47287), -- The Vindicaar Matrix Core (Light's Judgement)
+    requires = ns.requirement.Quest(47287), -- The Vindicaar Matrix Core (Light's Judgement)
     note = L['lights_judgement_treasure_note'],
     rewards = {
         Achievement({id = 12074, criteria = 37696}),
@@ -336,7 +336,7 @@ map.nodes[65903980] = Treasure({
 
 map.nodes[57406360] = Treasure({
     quest = 49159,
-    requires = Legion.requirement.Quest(48107), -- The Sigil of Awakening (Shroud of Arcane Echoes)
+    requires = ns.requirement.Quest(48107), -- The Sigil of Awakening (Shroud of Arcane Echoes)
     note = L['shroud_of_arcane_echoes_treasures_note'],
     rewards = {
         Achievement({id = 12074, criteria = 37960}),
@@ -362,10 +362,10 @@ map.nodes[75705260] = Treasure({
 -------------------------------------------------------------------------------
 
 local LWSupplies = Class('LWSupplies', Treasure, {
-    group = Legion.groups.LEGION_WAR_SUPPLIES,
+    group = ns.groups.LEGION_WAR_SUPPLIES,
     label = L['legion_war_supplies'],
     note = L['legion_war_supplies_note'],
-    requires = Legion.requirement.Quest(47473), -- Sizing Up The Opposition
+    requires = ns.requirement.Quest(47473), -- Sizing Up The Opposition
     rewards = {
         Transmog({item = 153339, slot = L['plate']}), -- Triumvirate High Guard's Casque
         Transmog({item = 153342, slot = L['plate']}), -- Triumvirate High Guard's Pauldrons

@@ -128,6 +128,20 @@ local ClassData = {
   }
 }
 
+Syndicator.Search.Constants.AllClassSpecializations = {}
+for classID in ipairs(ClassData) do
+  local index = 1
+  local id
+  while true do
+    id = GetSpecializationInfoForClassID(classID, index)
+    index = index + 1
+    table.insert(Syndicator.Search.Constants.AllClassSpecializations, id)
+    if id == nil then
+      break
+    end
+  end
+end
+
 Syndicator.Search.Constants.ClassGear = {}
 
 local currentClass = select(3, UnitClass("player"))
@@ -141,3 +155,23 @@ for _, typeDetails in ipairs(classDetails) do
     Syndicator.Search.Constants.ClassGear[typeDetails[1]][typeDetails[2]][typeDetails[3]] = true
   end
 end
+
+Syndicator.Search.Constants.KeywordGroupOrder = {
+  SYNDICATOR_L_GROUP_ITEM_TYPE,
+  SYNDICATOR_L_GROUP_ITEM_DETAIL,
+  SYNDICATOR_L_GROUP_QUALITY,
+
+  SYNDICATOR_L_GROUP_SLOT,
+  SYNDICATOR_L_GROUP_WEAPON_TYPE,
+  SYNDICATOR_L_GROUP_ARMOR_TYPE,
+  SYNDICATOR_L_GROUP_STAT,
+  SYNDICATOR_L_GROUP_SOCKET,
+
+  SYNDICATOR_L_GROUP_TRADE_GOODS,
+  SYNDICATOR_L_GROUP_RECIPE,
+  SYNDICATOR_L_GROUP_GLYPH,
+  SYNDICATOR_L_GROUP_CONSUMABLE,
+
+  SYNDICATOR_L_GROUP_EXPANSION,
+  SYNDICATOR_L_GROUP_BATTLE_PET,
+}

@@ -1,12 +1,12 @@
-## Interface: 110005
+## Interface: 110007, 110100
 ## Title: Skada
-## Notes: Modular damage meter.
+## Notes: Modulares Damage Meter
 ## Title-zhCN:|cff8000ff[战斗]|r伤害统计
 ## Title-zhTW:|cff8000ff[戰鬥]|r傷害统计
 ## Notes-zhCN: 模块化伤害统计。
 ## Notes-zhTW: 模組化的傷害統計。
-## Author: Zarnivoop, OwnlyMe, Fadedtimes
-## Version: 11.0.2
+## Author: Zarnivoop, OwnlyMe, Fadedtimes，Zarnivoop (Basis 10.0.2, thx) / Baltha (Revision +11.0.0)
+## Version: 1.9.1
 ## IconTexture: Interface\AddOns\Skada\media\logo\pic
 ## SavedVariables: SkadaDB, PermanentActivity
 ## SavedVariablesPerCharacter: SkadaPerCharDB, SessionActivity, DCovenant, DCovenantLog
@@ -15,6 +15,7 @@
 ## X-Category: Combat
 
 ## X-Repple: 2 UI
+## Category:- |cFFFFFF00 2|r|cFFFF0000 UI |r -
 
 lib\SpecializedLibBars-1.0.lua
 lib\LibWindow-1.1.lua

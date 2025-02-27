@@ -292,7 +292,7 @@ Skada:AddLoadableModule("Damage", nil, function(Skada, L)
 				if spell.school then
 					local c = CombatLog_Color_ColorArrayBySchool(spell.school)
 					if c then
-						tooltip:AddLine(GetSchoolString(spell.school), c.r, c.g, c.b)
+						tooltip:AddLine(C_Spell.GetSchoolString(spell.school), c.r, c.g, c.b)
 					end
 				end
 				if spell.max and spell.min then

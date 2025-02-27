@@ -1,35 +1,36 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Shadowlands = ...
-local Class = Shadowlands.Class
-local L = Shadowlands.locale
-local Map = Shadowlands.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = Shadowlands.node.Collectible
-local Node = Shadowlands.node.Node
-local PetBattle = Shadowlands.node.PetBattle
-local Rare = Shadowlands.node.Rare
-local Safari = Shadowlands.node.Safari
-local Soulshape = Shadowlands.node.Soulshape
-local Squirrel = Shadowlands.node.Squirrel
-local Treasure = Shadowlands.node.Treasure
+local Collectible = ns.node.Collectible
+local Node = ns.node.Node
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
+local Soulshape = ns.node.Soulshape
+local Squirrel = ns.node.Squirrel
+local Treasure = ns.node.Treasure
 
-local Achievement = Shadowlands.reward.Achievement
-local Item = Shadowlands.reward.Item
-local Mount = Shadowlands.reward.Mount
-local Pet = Shadowlands.reward.Pet
-local Section = Shadowlands.reward.Section
-local Toy = Shadowlands.reward.Toy
-local Transmog = Shadowlands.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Section = ns.reward.Section
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Path = Shadowlands.poi.Path
-local POI = Shadowlands.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
-local NECROLORD = Shadowlands.covenants.NEC
-local NIGHTFAE = Shadowlands.covenants.FAE
+local NECROLORD = ns.covenants.NEC
+local NIGHTFAE = ns.covenants.FAE
+
 local map = Map({id = 1565, settings = true})
 local tqc = Map({id = 1662}) -- The Queen's Conservatory
 local hft = Map({id = 1701}) -- Heart of the Forest - The Trunk
@@ -117,7 +118,7 @@ map.nodes[27885248] = Rare({
 map.nodes[32423026] = Rare({
     id = 164112,
     quest = 59157,
-    requires = Shadowlands.requirement.Item(175247),
+    requires = ns.requirement.Item(175247),
     note = L['humongozz_note'],
     rewards = {
         Achievement({id = 14309, criteria = 48782}),
@@ -164,7 +165,7 @@ map.nodes[62102470] = Rare({
     }
 }) -- Mymaen
 
-local RainbowGlow = Class('RainbowGlow', Shadowlands.poi.Glow)
+local RainbowGlow = Class('RainbowGlow', ns.poi.Glow)
 
 function RainbowGlow:Draw(pin, xy)
     local r, g, b, diff = 10, 0, 0, 1
@@ -185,14 +186,14 @@ function RainbowGlow:Draw(pin, xy)
         pin.texture:SetVertexColor(r / 10, g / 10, b / 10, 1)
     end)
     self.r, self.g, self.b, self.a = 1, 0, 0, 1
-    return Shadowlands.poi.Glow.Draw(self, pin, xy)
+    return ns.poi.Glow.Draw(self, pin, xy)
 end
 
 map.nodes[65702809] = Rare({
     id = 164547,
     quest = 59235,
     note = L['rainbowhorn_note'],
-    glow = RainbowGlow({icon = Shadowlands.GetGlowPath('skull_w')}),
+    glow = RainbowGlow({icon = ns.GetGlowPath('skull_w')}),
     rewards = {
         Achievement({id = 14309, criteria = 48715}),
         Transmog({item = 179586, slot = L['bow']}), -- Elderwood Piercer
@@ -231,7 +232,7 @@ map.nodes[65702809] = Rare({
 map.nodes[57874983] = Rare({
     id = 168135,
     quest = 60306,
-    requires = Shadowlands.requirement.Item(178675),
+    requires = ns.requirement.Item(178675),
     note = L['night_mare_note'],
     rewards = {
         Achievement({id = 14309, criteria = 48793}),
@@ -309,7 +310,7 @@ map.nodes[30115536] = Rare({
     id = 168647,
     quest = 61632,
     covenant = NIGHTFAE,
-    requires = Shadowlands.requirement.GarrisonTalent(1247, L['anima_channeled']),
+    requires = ns.requirement.GarrisonTalent(1247, L['anima_channeled']),
     note = L['valfir_note'],
     rewards = {
         Achievement({id = 14309, criteria = 48796}),
@@ -336,7 +337,7 @@ map.nodes[41254443] = Rare({
     id = 171743,
     quest = 61633, -- 61205 ??
     covenant = NIGHTFAE,
-    requires = Shadowlands.requirement.GarrisonTalent(1244, L['anima_channeled']),
+    requires = ns.requirement.GarrisonTalent(1244, L['anima_channeled']),
     label = L['star_lake'],
     note = L['star_lake_note'],
     rewards = {
@@ -388,7 +389,7 @@ map.nodes[63893778] = Treasure({
 
 map.nodes[36236527] = Treasure({
     quest = 61110,
-    requires = Shadowlands.requirement.Item(180652),
+    requires = ns.requirement.Item(180652),
     note = L['cache_of_the_night'],
     rewards = {
         Achievement({id = 14313, criteria = 50044}),
@@ -587,7 +588,7 @@ map.nodes[51274406] = PetBattle({
     id = 173377,
     note = L['faryl_note'],
     rewards = {
-        Achievement({id = 14625, criteria = 49403}), Shadowlands.reward.Spacer(),
+        Achievement({id = 14625, criteria = 49403}), ns.reward.Spacer(),
         Achievement({id = 14868, criteria = 11, oneline = true}), -- Aquatic
         Achievement({id = 14869, criteria = 11, oneline = true}), -- Beast
         Achievement({id = 14870, criteria = 11, oneline = true}), -- Critter
@@ -605,7 +606,7 @@ map.nodes[58205690] = PetBattle({
     id = 173372,
     note = L['glitterdust_note'],
     rewards = {
-        Achievement({id = 14625, criteria = 49405}), Shadowlands.reward.Spacer(),
+        Achievement({id = 14625, criteria = 49405}), ns.reward.Spacer(),
         Achievement({id = 14868, criteria = 10, oneline = true}), -- Aquatic
         Achievement({id = 14869, criteria = 10, oneline = true}), -- Beast
         Achievement({id = 14870, criteria = 10, oneline = true}), -- Critter
@@ -626,12 +627,12 @@ map.nodes[58205690] = PetBattle({
 local Tale = Class('Tale', Collectible, {
     icon = 355498,
     note = L['lost_book_note'],
-    group = Shadowlands.groups.FAERIE_TALES,
+    group = ns.groups.FAERIE_TALES,
     pois = {
         POI({63622274}) -- Archivist Dreyden
     },
     IsCollected = function(self)
-        if Shadowlands.PlayerHasItem(self.rewards[2].item) then return true end
+        if ns.PlayerHasItem(self.rewards[2].item) then return true end
         return Collectible.IsCollected(self)
     end
 })
@@ -710,7 +711,7 @@ map.nodes[51005480] = NAUGHTY
 -------------------------------------------------------------------------------
 
 local Beast = Class('Beast', Collectible,
-    {group = Shadowlands.groups.WILD_HUNTING, icon = 1604164})
+    {group = ns.groups.WILD_HUNTING, icon = 1604164})
 
 map.nodes[37695691] = Beast({
     id = 161889,
@@ -830,19 +831,19 @@ map.nodes[35205750] = Squirrel({
 -------------------------------------------------------------------------------
 
 local WildseedSpirit = Class('WildseedSpirit', Node,
-    {scale = 1.5, group = Shadowlands.groups.WILDSEED_SPIRITS})
+    {scale = 1.5, group = ns.groups.WILDSEED_SPIRITS})
 
 tqc.nodes[26504100] = WildseedSpirit({
     label = L['martial_spirit_label'],
     icon = 3528296,
     rewards = ({
         Section(L['0x_wildseed_root_grain']), Item({item = 180974}), -- Novice's Satchel
-        Shadowlands.reward.Spacer(), Section(L['1x_wildseed_root_grain']),
+        ns.reward.Spacer(), Section(L['1x_wildseed_root_grain']),
         Transmog({item = 181321, slot = L['wand']}), -- Gem-Crowned Wand
         Transmog({item = 181327, slot = L['1h_mace']}), -- Spineforged Tenderizer
         Transmog({item = 181329, slot = L['2h_sword']}), -- Marrowfused Claymore
         Item({item = 180975}), -- Journeyman's Satchel
-        Shadowlands.reward.Spacer(), Section(L['2x_wildseed_root_grain']),
+        ns.reward.Spacer(), Section(L['2x_wildseed_root_grain']),
         Transmog({item = 181323, slot = L['staff']}), -- Blightclutched Greatstaff
         Transmog({item = 181325, slot = L['dagger']}), -- Marrowfused Dagger
         Transmog({item = 181326, slot = L['dagger']}), -- Bloodstained Hacksaw
@@ -852,7 +853,7 @@ tqc.nodes[26504100] = WildseedSpirit({
         Pet({item = 181264, id = 2954}), -- Plaguelouse Larva
         Pet({item = 181168, id = 2945}), -- Corpulent Bonetusk
         Item({item = 180976}), -- Artisan's Satchel
-        Shadowlands.reward.Spacer(), Section(L['4x_wildseed_root_grain']),
+        ns.reward.Spacer(), Section(L['4x_wildseed_root_grain']),
         Transmog({item = 181320, slot = L['crossbow']}), -- Bonejowl Ballista
         Transmog({item = 181322, slot = L['offhand']}), -- Bonebound Tome
         Transmog({item = 181310, slot = L['cloak']}), -- Spirit Tender's Pack
@@ -874,13 +875,13 @@ tqc.nodes[29504100] = WildseedSpirit({
     icon = 3528288,
     rewards = ({
         Section(L['0x_wildseed_root_grain']), Item({item = 180974}), -- Novice's Satchel
-        Shadowlands.reward.Spacer(), Section(L['1x_wildseed_root_grain']),
+        ns.reward.Spacer(), Section(L['1x_wildseed_root_grain']),
         Transmog({item = 181225, slot = L['crossbow']}), -- Crossbow of Contemplative Calm
         Transmog({item = 181226, slot = L['warglaive']}), -- Bronze Dual-Bladed Glaive
         Transmog({item = 181232, slot = L['2h_sword']}), -- Cupbearer's Claymore
         Transmog({item = 181234, slot = L['dagger']}), -- Dutybound Spellblade
         Item({item = 180975}), -- Journeyman's Satchel
-        Shadowlands.reward.Spacer(), Section(L['2x_wildseed_root_grain']),
+        ns.reward.Spacer(), Section(L['2x_wildseed_root_grain']),
         Transmog({item = 181228, slot = L['polearm']}), -- Temple Guard's Partisan
         Transmog({item = 181229, slot = L['offhand']}), -- Tranquil's Censer
         Transmog({item = 181230, slot = L['fist']}), -- Pugilist's Chakram
@@ -888,7 +889,7 @@ tqc.nodes[29504100] = WildseedSpirit({
         Pet({item = 180814, id = 2933}), -- Sable
         Pet({item = 180815, id = 2931}), -- Brightscale Hatchling
         Item({item = 180976}), -- Artisan's Satchel
-        Shadowlands.reward.Spacer(), Section(L['4x_wildseed_root_grain']),
+        ns.reward.Spacer(), Section(L['4x_wildseed_root_grain']),
         Transmog({item = 181227, slot = L['shield']}), -- Bronze Ceremonial Targe
         Transmog({item = 181231, slot = L['dagger']}), -- Broadbladed Severer
         Transmog({item = 181235, slot = L['1h_mace']}), -- Final Arbiter's Gavel
@@ -911,13 +912,13 @@ tqc.nodes[26504550] = WildseedSpirit({
     icon = 3528312,
     rewards = ({
         Section(L['0x_wildseed_root_grain']), Item({item = 180974}), -- Novice's Satchel
-        Shadowlands.reward.Spacer(), Section(L['1x_wildseed_root_grain']),
+        ns.reward.Spacer(), Section(L['1x_wildseed_root_grain']),
         Transmog({item = 180955, slot = L['polearm']}), -- Stonewing Halberd
         Transmog({item = 180956, slot = L['gun']}), -- Axeblade Blunderbuss
         Transmog({item = 180957, slot = L['warglaive']}), -- Batwing Glaive
         Transmog({item = 180963, slot = L['offhand']}), -- Crypt Keeper's Vessel
         Item({item = 180975}), -- Journeyman's Satchel
-        Shadowlands.reward.Spacer(), Section(L['2x_wildseed_root_grain']),
+        ns.reward.Spacer(), Section(L['2x_wildseed_root_grain']),
         Transmog({item = 180954, slot = L['staff']}), -- Crypt Watcher's Spire
         Transmog({item = 180959, slot = L['dagger']}), -- Dredger Anklebiter
         Transmog({item = 180960, slot = L['2h_mace']}), -- Shiny-Metal Topped Basher
@@ -925,7 +926,7 @@ tqc.nodes[26504550] = WildseedSpirit({
         Pet({item = 180603, id = 2904}), -- Violet Dredwing Pup
         Pet({item = 181315, id = 2965}), -- Bloodfeaster Spiderling
         Item({item = 180976}), -- Artisan's Satchel
-        Shadowlands.reward.Spacer(), Section(L['4x_wildseed_root_grain']),
+        ns.reward.Spacer(), Section(L['4x_wildseed_root_grain']),
         Transmog({item = 180958, slot = L['1h_sword']}), -- Redelev House Foil
         Transmog({item = 180961, slot = L['dagger']}), -- Silver-Bladed Ritual Dagger
         Transmog({item = 180962, slot = L['1h_mace']}), -- Sterling-Silver Cudgel
@@ -948,13 +949,13 @@ tqc.nodes[29504550] = WildseedSpirit({
     icon = 3528280,
     rewards = ({
         Section(L['0x_wildseed_root_grain']), Item({item = 180974}), -- Novice's Satchel
-        Shadowlands.reward.Spacer(), Section(L['1x_wildseed_root_grain']),
+        ns.reward.Spacer(), Section(L['1x_wildseed_root_grain']),
         Transmog({item = 179548, slot = L['1h_mace']}), -- Elderwood Gavel
         Transmog({item = 179563, slot = L['offhand']}), -- Heartwood Stem
         Item({item = 181313, quest = 62420}), -- Snapper Soul
         Item({item = 181314, quest = 62421}), -- Gulper Soul
         Item({item = 180975}), -- Journeyman's Satchel
-        Shadowlands.reward.Spacer(), Section(L['2x_wildseed_root_grain']),
+        ns.reward.Spacer(), Section(L['2x_wildseed_root_grain']),
         Transmog({item = 179499, slot = L['dagger']}), -- Nightwillow Barb
         Transmog({item = 179514, slot = L['1h_sword']}), -- Ripvine Saber
         Transmog({item = 179538, slot = L['2h_mace']}), -- Grove Warden's Maul
@@ -965,7 +966,7 @@ tqc.nodes[29504550] = WildseedSpirit({
         Pet({item = 180639, id = 2912}), -- Dusty Sporeflutterer
         Mount({item = 180414, id = 1355}), -- Wakener's Runestag
         Item({item = 180976}), -- Artisan's Satchel
-        Shadowlands.reward.Spacer(), Section(L['4x_wildseed_root_grain']),
+        ns.reward.Spacer(), Section(L['4x_wildseed_root_grain']),
         Transmog({item = 179509, slot = L['warglaive']}), -- Grove Warden's Edge
         Transmog({item = 179516, slot = L['staff']}), -- Songwood Staff
         Transmog({item = 179533, slot = L['polearm']}), -- Grove Warden's Harvester

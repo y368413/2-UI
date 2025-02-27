@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Core = ...
+local _, ns = ...
 
 local Addon = LibStub('AceAddon-3.0'):NewAddon("HandyNotes_Core", 'AceBucket-3.0',
     'AceConsole-3.0', 'AceEvent-3.0', 'AceTimer-3.0')
@@ -11,9 +11,9 @@ if not HandyNotes then return end
 
 --local LibDD = LibStub:GetLibrary('LibUIDropDownMenu-4.0')
 
-Core.addon = Addon
-Core.locale = L
-Core.maps = {}
+ns.addon = Addon
+ns.locale = L
+ns.maps = {}
 
 _G["HandyNotes_Core"] = Addon
 
@@ -25,12 +25,12 @@ local DropdownMenu = CreateFrame("Frame", "HandyNotes_Core" .. 'DropdownMenu', n
 DropdownMenu.displayMode = 'MENU'
 local function InitializeDropdownMenu(level, mapID, coord)
     if not level then return end
-    local node = Core.maps[mapID].nodes[coord]
+    local node = ns.maps[mapID].nodes[coord]
     local spacer = {text = '', disabled = 1, notClickable = 1, notCheckable = 1}
 
     if (level == 1) then
         UIDropDownMenu_AddButton({
-            text = Core.plugin_name,
+            text = ns.plugin_name,
             isTitle = 1,
             notCheckable = 1
         }, level)
@@ -57,18 +57,18 @@ local function InitializeDropdownMenu(level, mapID, coord)
                 text = L['context_menu_add_tomtom'],
                 notCheckable = 1,
                 func = function(button)
-                    Core.tomtom.AddSingleWaypoint(node, mapID, coord)
+                    ns.tomtom.AddSingleWaypoint(node, mapID, coord)
                     TomTom:SetClosestWaypoint(false)
                 end
             }, level)
             -- Add waypoints to TomTom for entire group
             for i, group in pairs(node.group) do
-                if group ~= Core.groups.MISC then
+                if group ~= ns.groups.MISC then
                     UIDropDownMenu_AddButton({
                         text = L['context_menu_add_group_tomtom'],
                         notCheckable = 1,
                         func = function(button)
-                            Core.tomtom.AddGroupWaypoints(node, mapID, coord)
+                            ns.tomtom.AddGroupWaypoints(node, mapID, coord)
                             TomTom:SetClosestWaypoint(false)
                         end
                     }, level)
@@ -80,7 +80,7 @@ local function InitializeDropdownMenu(level, mapID, coord)
                     text = L['context_menu_add_focus_group_tomtom'],
                     notCheckable = 1,
                     func = function(button)
-                        Core.tomtom.AddFocusGroupWaypoints(node, mapID)
+                        ns.tomtom.AddFocusGroupWaypoints(node, mapID)
                         TomTom:SetClosestWaypoint(false)
                     end
                 }, level)
@@ -122,7 +122,7 @@ end
 -------------------------------------------------------------------------------
 
 function Addon:OnEnter(mapID, coord)
-    local map = Core.maps[mapID]
+    local map = ns.maps[mapID]
     local node = map.nodes[coord]
 
     if self:GetCenter() > UIParent:GetCenter() then
@@ -139,24 +139,24 @@ function Addon:OnEnter(mapID, coord)
     -- Rendering in the next frame appears to help asset name issues
     C_Timer.After(0, function()
         node:Render(GameTooltip, map:CanFocus(node))
-        Core.MinimapDataProvider:RefreshAllData()
-        Core.WorldMapDataProvider:RefreshAllData()
+        ns.MinimapDataProvider:RefreshAllData()
+        ns.WorldMapDataProvider:RefreshAllData()
         GameTooltip:Show()
     end)
 end
 
 function Addon:OnLeave(mapID, coord)
-    local map = Core.maps[mapID]
+    local map = ns.maps[mapID]
     local node = map.nodes[coord]
     map:SetFocus(node, coord, false, true)
-    Core.MinimapDataProvider:RefreshAllData()
-    Core.WorldMapDataProvider:RefreshAllData()
+    ns.MinimapDataProvider:RefreshAllData()
+    ns.WorldMapDataProvider:RefreshAllData()
     node:Unrender(GameTooltip)
     GameTooltip:Hide()
 end
 
 function Addon:OnClick(button, down, mapID, coord)
-    local map = Core.maps[mapID]
+    local map = ns.maps[mapID]
     local node = map.nodes[coord]
     if button == 'RightButton' and down then
         DropdownMenu.initialize = function(_, level)
@@ -174,32 +174,32 @@ function Addon:OnClick(button, down, mapID, coord)
 end
 
 function Addon:OnInitialize()
-    Core.class = select(2, UnitClass('player'))
-    Core.faction = UnitFactionGroup('player')
-    self.db = LibStub('AceDB-3.0'):New("HandyNotes_Core" .. 'DB', Core.optionDefaults,
+    ns.class = select(2, UnitClass('player'))
+    ns.faction = UnitFactionGroup('player')
+    self.db = LibStub('AceDB-3.0'):New("HandyNotes_Core" .. 'DB', ns.optionDefaults,
         'Default')
     self:RegisterEvent('PLAYER_ENTERING_WORLD', function()
         self:UnregisterEvent('PLAYER_ENTERING_WORLD')
         self:ScheduleTimer('RegisterWithHandyNotes', 1)
 
         -- Query localized expansion title
-        if not Core.expansion then
+        if not ns.expansion then
             error('Expansion not set: ' .. "HandyNotes_Core")
         end
-        local expansion_name = _G['EXPANSION_NAME' .. (Core.expansion - 1)]
-        Core.plugin_name = 'HandyNotes: ' .. expansion_name
-        Core.options.name = ('%02d - '):format(Core.expansion) .. expansion_name
+        local expansion_name = _G['EXPANSION_NAME' .. (ns.expansion - 1)]
+        ns.plugin_name = 'HandyNotes: ' .. expansion_name
+        ns.options.name = ('%02d - '):format(ns.expansion) .. expansion_name
     end)
 
     -- Add global groups to settings panel
-    Core.CreateGlobalGroupOptions()
+    ns.CreateGlobalGroupOptions()
 
     -- Update calendar events
-    Core.UpdateActiveCalendarEvents()
+    ns.UpdateActiveCalendarEvents()
 
     -- Add quick-toggle menu button to top-right corner of world map
     local template = "HandyNotes_Core" .. 'WorldMapOptionsButtonTemplate'
-    Core.world_map_button = LibStub('Krowi_WorldMapButtons-1.4'):Add(template,
+    ns.world_map_button = LibStub('Krowi_WorldMapButtons-1.4'):Add(template,
         'DROPDOWNTOGGLEBUTTON')
 end
 
@@ -212,7 +212,7 @@ function Addon:RegisterWithHandyNotes()
         local map, minimap, force
         local function iter(nodes, precoord)
             if not nodes then return nil end
-            if minimap and Core:GetOpt('hide_minimap') then return nil end
+            if minimap and ns:GetOpt('hide_minimap') then return nil end
             local coord, node = next(nodes, precoord)
             while coord do -- Have we reached the end of this zone?
                 if node and (force or map:IsNodeEnabled(node, coord, minimap)) then
@@ -225,14 +225,14 @@ function Addon:RegisterWithHandyNotes()
             return nil, nil, nil, nil
         end
         function Addon:GetNodes2(mapID, isMinimap)
-            if Core:GetOpt('show_debug_map') then
-                Core.Debug('Loading nodes for map: ' .. mapID .. ' (minimap=' ..
+            if ns:GetOpt('show_debug_map') then
+                ns.Debug('Loading nodes for map: ' .. mapID .. ' (minimap=' ..
                              tostring(isMinimap) .. ')')
             end
 
-            map = Core.maps[mapID]
+            map = ns.maps[mapID]
             minimap = isMinimap
-            force = Core:GetOpt('force_nodes') or Core.dev_force
+            force = ns:GetOpt('force_nodes') or ns.dev_force
 
             if map then
                 map:Prepare()
@@ -244,9 +244,9 @@ function Addon:RegisterWithHandyNotes()
         end
     end
 
-    if Core:GetOpt('development') then Core.BootstrapDevelopmentEnvironment() end
+    if ns:GetOpt('development') then ns.BootstrapDevelopmentEnvironment() end
 
-    HandyNotes:RegisterPluginDB("HandyNotes_Core", self, Core.options)
+    HandyNotes:RegisterPluginDB("HandyNotes_Core", self, ns.options)
 
     -- Refresh in any cases where node status may have changed
     self:RegisterBucketEvent({
@@ -284,6 +284,6 @@ end
 
 function Addon:RefreshImmediate()
     self:SendMessage('HandyNotes_NotifyUpdate', "HandyNotes")
-    Core.MinimapDataProvider:RefreshAllData()
-    Core.WorldMapDataProvider:RefreshAllData()
+    ns.MinimapDataProvider:RefreshAllData()
+    ns.WorldMapDataProvider:RefreshAllData()
 end

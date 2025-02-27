@@ -1,21 +1,21 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, BurningCrusade = ...
-local Map = BurningCrusade.Map
-local L = BurningCrusade.locale
+local ADDON_NAME, ns = ...
+local Map = ns.Map
+local L = ns.locale
 
-local Node = BurningCrusade.node.Node
-local Quest = BurningCrusade.node.Quest
-local Rare = BurningCrusade.node.Rare
-local Safari = BurningCrusade.node.Safari
+local Node = ns.node.Node
+local Quest = ns.node.Quest
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
 
-local Achievement = BurningCrusade.reward.Achievement
-local Mount = BurningCrusade.reward.Mount
-local Transmog = BurningCrusade.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Mount = ns.reward.Mount
+local Transmog = ns.reward.Transmog
 
-local Path = BurningCrusade.poi.Path
-local POI = BurningCrusade.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -92,17 +92,17 @@ map.nodes[61885948] = Quest({
     quest = 10804,
     note = '{npc:22113} starts the questline to get your reputation of {note:Netherwing} from Hated to Neutral to unlock repeatable quests on the island to the south.',
     rewards = {
-        BurningCrusade.reward.Quest({id = 10804}), --  Kindness
-        BurningCrusade.reward.Quest({id = 10811}), --  Seek Out Neltharaku
-        BurningCrusade.reward.Quest({id = 10814}), --  Neltharaku's Tale
-        BurningCrusade.reward.Quest({id = 10836}), --  Infiltrating Dragonmaw Fortress
-        BurningCrusade.reward.Quest({id = 10837}), --  To Netherwing Ledge!
-        BurningCrusade.reward.Quest({id = 10854}), --  The Force of Neltharaku
-        BurningCrusade.reward.Quest({id = 10858}), --  Karynaku
-        BurningCrusade.reward.Quest({id = 10866}), --  Zuluhed the Whacked
-        BurningCrusade.reward.Quest({id = 10870}), --  Ally of the Netherwing
-        BurningCrusade.reward.Quest({id = 11012}), --  Blood Oath of the Netherwing
-        BurningCrusade.reward.Quest({id = 11013}) --  In Service of the Illidari
+        ns.reward.Quest({id = 10804}), --  Kindness
+        ns.reward.Quest({id = 10811}), --  Seek Out Neltharaku
+        ns.reward.Quest({id = 10814}), --  Neltharaku's Tale
+        ns.reward.Quest({id = 10836}), --  Infiltrating Dragonmaw Fortress
+        ns.reward.Quest({id = 10837}), --  To Netherwing Ledge!
+        ns.reward.Quest({id = 10854}), --  The Force of Neltharaku
+        ns.reward.Quest({id = 10858}), --  Karynaku
+        ns.reward.Quest({id = 10866}), --  Zuluhed the Whacked
+        ns.reward.Quest({id = 10870}), --  Ally of the Netherwing
+        ns.reward.Quest({id = 11012}), --  Blood Oath of the Netherwing
+        ns.reward.Quest({id = 11013}) --  In Service of the Illidari
     },
     pois = {
         Path({
@@ -118,8 +118,8 @@ map.nodes[71986485] = Quest({
     quest = 11035,
     note = 'This is a good spot to farm the {item:32509}. A {npc:23188} spawns regularly to the north above the building and flys directly over you to be killed by a range attack.',
     rewards = {
-        BurningCrusade.reward.Quest({id = 11035}), -- The Not-So-Friendly Skies...
-        BurningCrusade.reward.Item({item = 32509}) -- Netherwing Relic
+        ns.reward.Quest({id = 11035}), -- The Not-So-Friendly Skies...
+        ns.reward.Item({item = 32509}) -- Netherwing Relic
     }
 }) -- The Not-So-Friendly Skies...
 
@@ -129,18 +129,18 @@ map.nodes[71986485] = Quest({
     quest = 11035,
     note = 'This is a good spot to farm the {item:32509}. A {npc:23188} spawns regularly to the north above the building and flys directly over you to be killed by a range attack.',
     rewards = {
-        BurningCrusade.reward.Quest({id = 11035}), -- The Not-So-Friendly Skies...
-        BurningCrusade.reward.Item({item = 32509}) -- Netherwing Relic
+        ns.reward.Quest({id = 11035}), -- The Not-So-Friendly Skies...
+        ns.reward.Item({item = 32509}) -- Netherwing Relic
     }
 }) -- The Not-So-Friendly Skies...
 
-map.nodes[65598595] = BurningCrusade.node.Collectible({
+map.nodes[65598595] = ns.node.Collectible({
     id = 23489,
     icon = 'peg_bl',
     scale = 2,
     questDeps = {11013}, -- In Service of the Illidari
     requires = {
-        BurningCrusade.requirement.Reputation(1015, 8) -- Netherwing, Exalted
+        ns.requirement.Reputation(1015, 8) -- Netherwing, Exalted
     },
     rewards = {
         Achievement({id = 9713, criteria = 26800}), -- Awake the Drakes
@@ -155,14 +155,14 @@ map.nodes[65598595] = BurningCrusade.node.Collectible({
 
 ------------------------------- NETHERWING EGGS -------------------------------
 
-local NetherwingEgg = BurningCrusade.Class('NetherwingEgg', Node, {
+local NetherwingEgg = ns.Class('NetherwingEgg', Node, {
     label = L['netherwing_egg'],
     note = 'Bring it to {npc:23141} to gain 250 reputation.',
     icon = 'peg_gn',
     questDeps = {11013}, -- In Service of the Illidari
-    group = BurningCrusade.groups.NETHERWING_EGGS,
+    group = ns.groups.NETHERWING_EGGS,
     rewards = {
-        BurningCrusade.reward.Item({item = 32506}) -- Netherwing Egg
+        ns.reward.Item({item = 32506}) -- Netherwing Egg
     },
     pois = {POI({66008647, color = 'Green'})}
 })

@@ -37,7 +37,7 @@ TOASTY_TRANSMOG_ADDED = "幻化外观已添加";
 TOASTY_TRANSMOG_REMOVED = "幻化外观已移除";
 ----------------Binding----------------------
 TOMEOFTELEPORTATIONTITLE = "传送大师";
-TITLEREADME = "点击图标打开传送大师";
+TITLEREADME = "[左键]传送大师 / [右键]每周低保";
 ----------------Title----------------------
 CHAT_WHISPERPOP_TITLE="|cff777777[聊天]|r密语管理";
 GEAR_DELETEEMPTYMAILS_TITLE="|cffFFFFFF[邮件]|r删除空邮件";
@@ -285,50 +285,90 @@ ANGRYWORLDQUEST_TITLE = "|cff0080ff[地图]|r世界任务"
 
 DEX_FontList = {
 	"Fonts\\ARHei.TTF",
-	"Fonts\\ARKai_C.TTF",
+	"Fonts\\ARIALN.TTF",
 	"Fonts\\ARKai_T.TTF",
-};
-DEX_TXT_CRUSH = "碾压!";
-DEX_TXT_DISPELLED = "驱散! ";
-DEX_TXT_STOLEN = "偷取! ";
-DEX_TXT_REFLECT = " 反弹! ";
+	"Fonts\\ARKai_C.TTF",
+	"Fonts\\FRIZQT__.TTF",
+	"Fonts\\Damage.TTF",
+}
+
+DEX_TXT_CRUSH = "碾压!"
+DEX_TXT_DISPELLED = "驱散! "
+DEX_TXT_STOLEN = "偷取! "
+DEX_TXT_REFLECT = " 反弹! "
 DEX_TXT_CRIT = "暴击! ";
 DEX_TXT_INTERUPT = "打断! ";
 DEX_MAIN_OPTION = "DamageEx";
 DEX_BUTTON_RESET_TIP = "恢复预设值";
-DEX_PREVIEW_LABEL = "拖动我 改变伤害文字 位置";
-DEXColorMode_T = "颜色模式";
+DEX_PREVIEW_LABEL = "拖动我改*变*文字位置";
+
+DEXColorMode_T = "颜色模式"
 DEXOptionsDropDown = {"单色","双色","渐变色"};
+
+DEXShowDamage_T = "受伤模式"
+DEXOptionsDropDownWOW = {"关闭显示","滚动向上","抛物向上"};
+
 DEXOptionsFrameCheckButtons = {
 	["DEX_Enable"] = { title = "启用", tooltipText = "启用攻击伤害显示器"},
 	["DEX_ShowWithMess"] = { title = "以战斗讯息方式显示", tooltipText = "以战斗讯息方式显示所有伤害资讯"},
-	["DEX_ShowSpellName"] = { title = "显示技能名", tooltipText = "在伤害数值边显示造成此次伤害的技能名"},
-	["DEX_ShowNameOnCrit"] = { title = "当暴击才显示", tooltipText = "只有在致命一击时才显示技能名"},
-	["DEX_ShowNameOnMiss"] = { title = "当未击中时才显示", tooltipText = "只有在技能未击中、被抵抗等才显示技能名"},
 	["DEX_ShowInterruptCrit"] = { title = "暴击方式显示打断", tooltipText = "暴击方式显示打断"},
-	["DEX_ShowCurrentOnly"] = { title = "只显示选中目标数值", tooltipText = "只显示当前选中目标的伤害和治疗，非当前选中目标则不显示"},
+	["DEX_ShowCurrentOnly"] = { title = "只显示当前选中目标的数值", tooltipText = "只显示当前选中目标的伤害和治疗，非当前选中目标则不显示"},
 	["DEX_ShowDamagePeriodic"] = { title = "显示持续伤害", tooltipText = "显示持续攻击的伤害"},
 	["DEX_ShowDamageShield"] = { title = "显示反弹伤害", tooltipText = "显示你对敌人伤害的反弹量"},
-	["DEX_ShowDamageHealth"] = { title = "显示治疗量", tooltipText = "显示对目标的实际治疗和过量治疗"},
+	["DEX_ShowDamageHealth"] = { title = "显示治疗数据", tooltipText = "显示治疗数据信息"},
 	["DEX_ShowDamagePet"] = { title = "显示宠物伤害", tooltipText = "显示宠物对目标的伤害，含图腾"},
 	["DEX_ShowBlockNumber"] = { title = "显示被格挡的伤害", tooltipText = "以xxx-xx方式显示对目标的伤害被格挡、抵抗等的数值"},
-	["DEX_ShowDamageWoW"] = { title = "显示系统默认伤害", tooltipText = "显示系统原有的伤害"},
+	["DEX_ShowDamageWoW"] = { title = "显示受到伤害", tooltipText = "显示玩家受到的伤害"},
 	["DEX_ShowOwnHealth"] = { title = "显示自身治疗", tooltipText = "等目标为自己时也显示治疗量"},
-	["DEX_UniteSpell"] = { title = "合并瞬间多次同技能伤害", tooltipText = "如风怒武器、毁伤等瞬间对同一目标造成多次伤害的技能将被合并为一个伤害显示"},
-	--["DEX_NumberFormat"] = { title = "显示分隔符", tooltipText = "是否显示千分位伤害数字分隔符"},	
-	["DEX_NumberFormat"] = { title = "万进制显示", tooltipText = "是否以万为单位显示"},	
-	["DEX_ShowSpellIcon"] = { title = "显示技能图标", tooltipText = "是否显示技能图标，选中则替换显示技能名称"},
-	["DEX_ShowInterrupt"] = { title = "是否显示中断", tooltipText = "是否显示中断提示"},	
+	["DEX_UniteSpell"] = { title = "合并瞬间同技能信息", tooltipText = "连续造成多次相同的技能将被合并为一个信息显示（包括伤害及治疗）"},
+	["DEX_NumberFormat"] = { title = "缩短数字长度", tooltipText = "是否将超过1万/亿的数字以万/亿为单位显示"},	
+	["DEX_ShowInterrupt"] = { title = "是否显示打断", tooltipText = "是否显示打断提示"},	
 	["DEX_ShowOverHeal"] = { title = "是否显示过量治疗", tooltipText = "是否显示过量治疗，关闭则不提示"},		
-};
+	["DEX_ShowHit"] = { title = "是否显示连击点/真气", tooltipText = "是否显示盗贼/野德连击点\武僧真气，关闭则不提示"},		
+	["DEX_ShowHealthType"] = { title = "默认显示方式", tooltipText = "治疗默认的显示方式为向上滚动，其他为抛物线"},		
+	["DEX_ShowHealthSpellIconOnCrit"] = { title = "当暴击才显示", tooltipText = "治疗暴击才显示图标"},		
+	["DEX_ShowHealthSpellIcon"] = { title = "显示图标", tooltipText = "治疗显示图标"},		
+	["DEX_ShowHealthNameOnCrit"] = { title = "当暴击才显示", tooltipText = "治疗暴击才显示技能名"},		
+	["DEX_ShowHealthSpellName"] = { title = "显示技能名", tooltipText = "治疗显示技能名"},		
+	["DEX_ShowBuff"] = { title = "显示增益", tooltipText = "显示增益BUFF效果"},		
+	["DEX_ShowDamageType"] = { title = "默认显示方式", tooltipText = "受到伤害默认的显示方式为向上滚动，其他为抛物线"},		
+	["DEX_ShowDebuff"] = { title = "显示减益", tooltipText = "显示减益DEBUFF效果"},		
+	["DEX_ShowDamageSpellIconOnCrit"] = { title = "当暴击才显示", tooltipText = "受到伤害当暴击才显示图标"},		
+	["DEX_ShowDamageSpellIcon"] = { title = "显示图标", tooltipText = "受到伤害显示图标"},		
+	["DEX_ShowDamageNameOnCrit"] = { title = "当暴击才显示", tooltipText = "受到伤害当暴击才显示技能名"},		
+	["DEX_ShowDamageSpellName"] = { title = "显示技能名", tooltipText = "受到伤害显示技能名"},		
+	["DEX_ShowDamage"] = { title = "显示伤害数据", tooltipText = "显示伤害输出"},		
+	["DEX_ShowSpellName"] = { title = "显示技能名", tooltipText = "在伤害数值边显示造成此次伤害的技能名"},
+	["DEX_ShowNameOnCrit"] = { title = "当暴击才显示", tooltipText = "伤害只有在致命一击时才显示技能名"},
+	["DEX_ShowNameOnMiss"] = { title = "当未击中时才显示", tooltipText = "伤害只有在技能未击中、被抵抗等才显示技能名"},
+	["DEX_ShowDamageIconOnCrit"] = { title = "图标", tooltipText = "图标替代名称"},		
+	["DEX_ShowSpellIcon"] = { title = "显示技能图标", tooltipText = "伤害是否显示技能图标，选中则显示技能名称"},
+	["DEX_ShowSpellIconOnCrit"] = { title = "当暴击才显示", tooltipText = "伤害输出当暴击才显示图标"},		
+	["DEX_State"] = { title = "战斗状态", tooltipText = "提示进入或离开战斗"},		
+	["DEX_NoCombatHeal"] = { title = "非战斗状态治疗", tooltipText = "在非战斗状态下显示治疗"},		
+	["DEX_AdjustTime"] = { title = "优化时间复位", tooltipText = "优化时间过度进行复位"},		
+}
+
 DEXOptionsFrameSliders = {
-	["DEX_Font"] = {  title = "字型 ", minText="字型1", maxText="字型3", tooltipText = "设置文字字型"},
+	["DEX_FrameLevel"] = {  title = "框架层 ", minText="1", maxText="9", tooltipText = "设置框架层的效果"},
+	["DEX_Font"] = {  title = "字型 ", minText="字型1", maxText="字型6", tooltipText = "设置文字字型\n1=ARHei\n2=ARIALN\n3=ARKai_T\n4=ARKai_C\n5=FRIZQT__\n6=Damage"},
 	["DEX_FontSize"] = {  title = "文字大小 ", minText="小", maxText="大", tooltipText = "设置文字的大小"},
 	["DEX_OutLine"] = {  title = "字型描边 ", minText="无", maxText="粗", tooltipText = "设置文字的描边效果"},
 	["DEX_Speed"] = {  title = "文字移动速度 ", minText="慢", maxText="快", tooltipText = "设置文字的移动速度"},
 	["DEX_LOGLINE"] = {  title = "讯息最大条目 ", minText="5", maxText="20", tooltipText = "设置讯息最大显示条目数"},
 	["DEX_LOGTIME"] = {  title = "讯息停留时间 ", minText="5秒", maxText="1分钟", tooltipText = "设置讯息文字停留时间"},
-};
+	["DEX_ShowHitX"] = {  title = "显示连击点/真气X坐标 ", minText="-300", maxText="300", tooltipText = "显示盗贼/野德连击点\武僧真气X坐标"},
+	["DEX_ShowHitY"] = {  title = "显示连击点/真气Y坐标 ", minText="-300", maxText="300", tooltipText = "显示盗贼/野德连击点\武僧真气Y坐标"},
+	["DEX_HealthPosX"] = {  title = "显示治疗X坐标", minText="-800", maxText="800", tooltipText = "设置显示治疗X坐标"},
+	["DEX_HealthPosY"] = {  title = "显示治疗Y坐标", minText="-800", maxText="800", tooltipText = "设置显示治疗Y坐标"},
+	["DEX_BeAttackPosX"] = {  title = "显示被攻击X坐标", minText="-800", maxText="800", tooltipText = "设置显示被攻击X坐标"},
+	["DEX_BeAttackPosY"] = {  title = "显示被攻击Y坐标", minText="-800", maxText="800", tooltipText = "设置显示被攻击Y坐标"},
+	["DEX_PetPosX"] = {  title = "显示宠物攻击X坐标", minText="-800", maxText="800", tooltipText = "设置显示宠物攻击X坐标"},
+	["DEX_PetPosY"] = {  title = "显示宠物攻击Y坐标", minText="-800", maxText="800", tooltipText = "设置显示宠物攻击Y坐标"},
+	["DEX_AOETime"] = {  title = "合并时间", minText="1", maxText="9", tooltipText = "设置合并技能时长"},
+	["DEX_IconSize"] = {  title = "图标大小", minText="1", maxText="10", tooltipText = "设置图标与字体大小比例"},
+}
+
 DEXOptionsColorPickerEx = {
 	["DEX_ColorNormal"] = { title = "物理伤害颜色"},
 	["DEX_ColorSkill"] = { title = "技能伤害颜色"},
@@ -337,8 +377,20 @@ DEXOptionsColorPickerEx = {
 	["DEX_ColorPet"] = { title = "宠物伤害颜色"},
 	["DEX_ColorSpec"] = { title = "打断、驱散等颜色"},
 	["DEX_ColorMana"] = { title = "法力伤害颜色"},
-};
-
+	["DEX_ColorAttack"] = { title = "受到伤害颜色"},
+}
+U["+2timeLimit"] = "加二时间 "
+U["+3timeLimit"] = "加三时间 "
+U["CastAlertInfo"] = "开启%s，前往%s ！"
+U["Instance Difficulty"] = "当前副本难度：%s"
+U["LM Message 1"] = "你好！请问%s有需求吗？没有的话能让给我吗？谢谢！"
+U["LM Message 2"] = "老哥！求个%s！毕业的！谢谢！"
+U["LM Message 3"] = "你好！能让一下%s吗？谢谢！"
+U["LM Message 4"] = "老哥！求个%s啊，刷了很久了！谢谢！"
+U["LootMonitor Info"] = "左键：贴出 右键：密语"
+U["LootMonitor Title"] = "拾取监控助手"
+U["MapID"] = "地图ID: "
+U["Socket"] = "插槽"
 
 U["Damage"] = "伤害"
 U["PlayerFrame Scale"] = "头像缩放"
@@ -364,8 +416,8 @@ U["BommIcon"] = "爆炸物大图标标识"
 U["Auras Border"] = "显示技能类型染色边框"
 U["PlayerPlate Aura"] = "隐藏玩家姓名板法术"
 U["Alert In Chat"] = "同时通报在聊天框"
-U["Interrupt Alarm"] = "打断音效"
-U["Death Alarm"] = "!死亡爽翻天惨叫!"
+U["Interrupt Alarm"] = "打断音效[Shotup Fool]"
+U["Death Alarm"] = "! 死亡爽翻天惨叫 !"
 U["FriendGroups"] = "好友分组功能"
 U["WallpaperKit"] = "屏保"
 U["xMerchant"] = "商人购买列表美化"
@@ -398,7 +450,7 @@ U["Tell"] = "告诉"
 U["Ghost"] = "灵魂"
 U["Skip"] = "跳过"
 U["Sort"] = "整理"
-U["Chat Copy"] = "%s复制|n%s菜单"
+U["Chat Copy"] = "%s复制"  --%s复制|n%s菜单
 U["Attach List"] = "附件清单:"
 U["Arch Count"] = "各种族考古统计"
 U["Rare"] = "稀有"
@@ -450,9 +502,9 @@ U["Unitframes"] = "头像及施法条"
 U["Auras"] = "技能/法术"
 U["Raid Tools"] = "组队与通知"
 U["ChatFrame"] = "聊天窗口"
-U["Maps"] = "地图框体"
+U["Maps"] = "地图"
 U["Nameplate"] = "姓名板"
-U["Skins"] = "界面美化"
+U["Skins"] = "美化"
 U["Tooltip"] = "鼠标提示框"
 U["Misc"] = "易用性"
 U["UI Settings"] = "插件设置"
@@ -470,7 +522,7 @@ U["Enable Totembar"] = "启用图腾助手"
 U["Totembar"] = "图腾栏"
 U["VerticalTotems"] = "竖直排列图腾"
 U["TotemSize"] = "图腾图标大小"
-U["Enable UFs"] = "启用头像框体"
+U["Enable UFs"] = "启用首领和竞技场框体"
 U["UFs Portrait"] = "显示头像3D模型"
 U["Arena Frame"] = "显示竞技场框体"
 U["UFs Castbar"] = "启用施法条"
@@ -492,7 +544,7 @@ U["FotUF"] = "焦点目标框体"
 U["BossFrame"] = "Boss/竞技场框体"
 U["UFs RaidFrame"] = "启用团队框体"
 U["RaidFrameTip"] = "|n禁用后，简易模式、小队和宠物框体也会同时禁用。"
-U["RaidFrame"] = "团队框体"
+U["RaidFrame"] = "队伍框体"
 U["Num Groups"] = "显示队伍数量"
 U["UFs AutoRes"] = "鼠标中键点击战复/复活"
 U["RaidFrame TeamIndex"] = "显示队伍编号"
@@ -590,10 +642,10 @@ U["BrokenAlert"] = "控制技能打破通报"
 U["BrokenAlertTip"] = "|n当有人打破控制技能时，进行通报。|n例如致盲、冰冻陷阱、变形术等。"
 U["InstAlertOnly"] = "仅在副本中通报"
 U["InstAlertOnlyTip"] = "|n勾选后，只在副本中进行上述通报，在野外及随机副本中不进行通报。"
-U["Interrupt"] = "打断 - [%s] > %s"
-U["Steal"] = "偷取 - [%s] > %s"
-U["Dispel"] = "驱散 - [%s] > %s"
-U["BrokenSpell"] = "破控 - [%s] > %s"
+U["Interrupt"] = "打断→%s" --[%s] > [%s]
+U["Steal"] = "偷取→%s"
+U["Dispel"] = "驱散→%s"
+U["BrokenSpell"] = "破控-%s>%s" --"破控→%s"
 U["QuestNotification"] = "启用任务通报"
 U["QuestProgress"] = "通报任务的详尽进度"
 U["AcceptQuest"] = "接受任务"
@@ -828,7 +880,7 @@ U["Strike"] = "影袭"
 U["Power"] = "能量"
 U["PartyFrame"] = "小队框体"
 U["PartyFrameTip"] = "|n使用独立设置的小队框体。如果关闭，则根据设置，使用团队框体或者简易模式框体。"
-U["AngryKeystones Progress"] = "显示AngryKeystones小怪进度"
+U["MythicProgress"] = "显示MDT的小怪进度"
 U["HideCooldownOnWA"] = "在WA图标上禁用冷却计时"
 U["Account Keystones"] = "账号角色钥石信息"
 U["AutoBubbles"] = "团本外关闭聊天气泡"
@@ -1313,3 +1365,6 @@ U["OverAbsorbTip"] = "|n启用后，当吸收盾大于当前最大血量时，�
 U["ShowHealthAbsorb"] = "当期数值+吸收"
 U["LeaderOnly"] = "仅拥有队伍权限时通报"
 U["LeaderOnlyTip"] = "|n启用后，只有当你为小队队长、团长或团队助理时，才进行上述通报！"
+U["SingingSocket"] = "海妖戒指增强"
+U["SingingSocketTip"] = "|n启用后，在海妖戒指的宝石页面添加一个快速选择宝石的小工具。"
+U["PlateRangeTip"] = ""

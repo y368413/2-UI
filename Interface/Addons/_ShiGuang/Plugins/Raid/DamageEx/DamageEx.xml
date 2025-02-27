@@ -1,8 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 
-	<Script file="DEX_ui_path.lua"/>
 	<Script file="damageEx.lua"/>
-	<Frame name="DEX_TEXT" toplevel="true" enableMouse="false" parent="UIParent" frameStrata="HIGH">
+	<Script file="DEX_ui_path.lua"/>
+	<Frame name="DEX_TEXT" toplevel="true" enableMouse="false" parent="UIParent" frameStrata="BACKGROUND">
 		<Size>
 			<AbsDimension x="24" y="24"/>
 		</Size>
@@ -40,7 +40,12 @@
 				<FontString name="DEXaniText23" inherits="GameFontNormal"/>
 				<FontString name="DEXaniText24" inherits="GameFontNormal"/>
 				<FontString name="DEXaniText25" inherits="GameFontNormal"/>
-			</Layer>
+				<FontString name="DEXaniText26" inherits="GameFontNormal"/>
+				<FontString name="DEXaniText27" inherits="GameFontNormal"/>
+				<FontString name="DEXaniText28" inherits="GameFontNormal"/>
+				<FontString name="DEXaniText29" inherits="GameFontNormal"/>
+				<FontString name="DEXaniText30" inherits="GameFontNormal"/>
+			</Layer>		
 		</Layers>
 		<Scripts>
 	      	<OnLoad>

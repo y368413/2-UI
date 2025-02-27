@@ -1,29 +1,29 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, WarlordsOfDraenor = ...
-local Class = WarlordsOfDraenor.Class
-local L = WarlordsOfDraenor.locale
-local Map = WarlordsOfDraenor.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = WarlordsOfDraenor.node.Collectible
-local NPC = WarlordsOfDraenor.node.NPC
-local PetBattle = WarlordsOfDraenor.node.PetBattle
-local Rare = WarlordsOfDraenor.node.Rare
-local Treasure = WarlordsOfDraenor.node.Treasure
+local Collectible = ns.node.Collectible
+local NPC = ns.node.NPC
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local Achievement = WarlordsOfDraenor.reward.Achievement
-local Follower = WarlordsOfDraenor.reward.Follower
-local Item = WarlordsOfDraenor.reward.Item
-local Mount = WarlordsOfDraenor.reward.Mount
-local Pet = WarlordsOfDraenor.reward.Pet
-local Quest = WarlordsOfDraenor.reward.Quest
-local Toy = WarlordsOfDraenor.reward.Toy
-local Transmog = WarlordsOfDraenor.reward.Transmog
-local Currency = WarlordsOfDraenor.reward.Currency
+local Achievement = ns.reward.Achievement
+local Follower = ns.reward.Follower
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Quest = ns.reward.Quest
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
+local Currency = ns.reward.Currency
 
-local Path = WarlordsOfDraenor.poi.Path
-local POI = WarlordsOfDraenor.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -72,7 +72,7 @@ end
 map.nodes[62905520] = Rare({
     id = 75207,
     note = L['trophy_of_glory_note'],
-    requires = WarlordsOfDraenor.requirement.Quest(TrophyOfGloryQuests['outpost']),
+    requires = ns.requirement.Quest(TrophyOfGloryQuests['outpost']),
     rewards = {
         Achievement({id = 9400, criteria = 25568}),
         Item({item = 116160, quest = TrophyOfGloryQuests['biolante']}) -- Writhing Green Tendril
@@ -87,7 +87,7 @@ map.nodes[62905520] = Rare({
 map.nodes[43806060] = Rare({
     id = 81528,
     note = L['trophy_of_glory_note'],
-    requires = WarlordsOfDraenor.requirement.Quest(TrophyOfGloryQuests['outpost']),
+    requires = ns.requirement.Quest(TrophyOfGloryQuests['outpost']),
     rewards = {
         Achievement({id = 9400, criteria = 25570}),
         Item({item = 113448, quest = TrophyOfGloryQuests['crater lord igneous']}) -- Chunk of Crater Lord
@@ -97,7 +97,7 @@ map.nodes[43806060] = Rare({
 map.nodes[45205160] = Rare({
     id = 81548,
     note = L['trophy_of_glory_note'],
-    requires = WarlordsOfDraenor.requirement.Quest(TrophyOfGloryQuests['outpost']),
+    requires = ns.requirement.Quest(TrophyOfGloryQuests['outpost']),
     rewards = {
         Achievement({id = 9400, criteria = 25574}),
         Item({item = 113457, quest = TrophyOfGloryQuests['charl doomwing']}) -- Fang of the Doomwing
@@ -108,7 +108,7 @@ map.nodes[45205160] = Rare({
 map.nodes[53206880] = Rare({
     id = 81537,
     note = L['trophy_of_glory_note'],
-    requires = WarlordsOfDraenor.requirement.Quest(TrophyOfGloryQuests['outpost']),
+    requires = ns.requirement.Quest(TrophyOfGloryQuests['outpost']),
     rewards = {
         Achievement({id = 9400, criteria = 25572}),
         Item({item = 113460, quest = TrophyOfGloryQuests['khargax devourer']}) -- Shimmering Scale
@@ -123,7 +123,7 @@ map.nodes[53206880] = Rare({
 
 map.nodes[50806760] = Rare({
     id = 77093,
-    requires = WarlordsOfDraenor.requirement.Quest(TrophyOfGloryQuests['outpost']),
+    requires = ns.requirement.Quest(TrophyOfGloryQuests['outpost']),
     note = L['roardan_sky_terror_note'] .. '\n\n' .. L['trophy_of_glory_note'],
     rewards = {
         Achievement({id = 9400, criteria = 25569}),
@@ -135,7 +135,7 @@ map.nodes[50806760] = Rare({
 map.nodes[38805120] = Rare({
     id = 81529,
     note = L['trophy_of_glory_note'],
-    requires = WarlordsOfDraenor.requirement.Quest(TrophyOfGloryQuests['outpost']),
+    requires = ns.requirement.Quest(TrophyOfGloryQuests['outpost']),
     rewards = {
         Achievement({id = 9400, criteria = 25571}),
         Item({item = 113447, quest = TrophyOfGloryQuests['dessicus dead pools']}) -- Globe of Dead Water
@@ -145,7 +145,7 @@ map.nodes[38805120] = Rare({
 map.nodes[51804160] = Rare({
     id = 81540,
     note = L['trophy_of_glory_note'],
-    requires = WarlordsOfDraenor.requirement.Quest(TrophyOfGloryQuests['outpost']),
+    requires = ns.requirement.Quest(TrophyOfGloryQuests['outpost']),
     rewards = {
         Achievement({id = 9400, criteria = 25573}),
         Item({item = 113444, quest = TrophyOfGloryQuests['erosian violent']}) -- Crystalized Steam
@@ -155,7 +155,7 @@ map.nodes[51804160] = Rare({
 map.nodes[58006360] = Rare({
     id = 80785,
     note = L['trophy_of_glory_note'],
-    requires = WarlordsOfDraenor.requirement.Quest(TrophyOfGloryQuests['outpost']),
+    requires = ns.requirement.Quest(TrophyOfGloryQuests['outpost']),
     rewards = {
         Achievement({id = 9400, criteria = 25575}),
         Item({item = 113453, quest = TrophyOfGloryQuests['fungal praetorian']}) -- Precious Mushroom
@@ -809,7 +809,7 @@ map.nodes[47504130] = Collectible({
     note = L['ninja_pepe_note'],
     icon = 1044996,
     quest = 39267,
-    group = WarlordsOfDraenor.groups.PEPE,
+    group = ns.groups.PEPE,
     rewards = {
         Achievement({id = 10053, criteria = 28182}), Item({item = 127867})
     }
@@ -820,7 +820,7 @@ map.nodes[47504130] = Collectible({
 -------------------------------------------------------------------------------
 
 local AttackPlans = Collectible({
-    group = WarlordsOfDraenor.groups.ATTACK_PLANS,
+    group = ns.groups.ATTACK_PLANS,
     icon = 'chest_pp',
     label = L['attack_plans_treasure'],
     note = L['multiple_spawn_note'],
@@ -839,7 +839,7 @@ map.nodes[49002400] = AttackPlans
 local AncientRare = Class('AncientRare', Collectible, {
     scale = 1.5,
     icon = 'peg_yw',
-    group = WarlordsOfDraenor.groups.ANCIENT_NO_MORE
+    group = ns.groups.ANCIENT_NO_MORE
 })
 
 map.nodes[59603180] = AncientRare({
@@ -896,7 +896,7 @@ map.nodes[55004600] = AncientRare({
 local PowerRare = Class('PowerRare', Collectible, {
     scale = 1.5,
     icon = 'peg_rd',
-    group = WarlordsOfDraenor.groups.FIGHT_THE_POWER
+    group = ns.groups.FIGHT_THE_POWER
 })
 
 map.nodes[49203300] = PowerRare({
@@ -942,7 +942,7 @@ map.nodes[46002340] = PowerRare({
 
 local FactionRepresentative = Class('FactionRepresentative', NPC, {
     icon = 874578,
-    group = WarlordsOfDraenor.groups.PROVE_YOUR_STRENGTH,
+    group = ns.groups.PROVE_YOUR_STRENGTH,
     note = L['prove_your_strength_note'],
     rewards = {Achievement({id = 9402})}
 })
@@ -956,7 +956,7 @@ map.nodes[43808100] = Collectible({
     icon = 133749,
     note = string.format(L['prove_your_strength_drop_double'], '{npc:81630}',
         '{npc:81005}') .. '\n\n' .. L['prove_your_strength_note'],
-    group = WarlordsOfDraenor.groups.PROVE_YOUR_STRENGTH,
+    group = ns.groups.PROVE_YOUR_STRENGTH,
     rewards = {Achievement({id = 9402, criteria = 1})}
 }) -- Ancient Branch
 
@@ -965,7 +965,7 @@ map.nodes[51006880] = Collectible({
     icon = 615303,
     note = string.format(L['prove_your_strength_drop_single'], '{npc:85694}') ..
         '\n\n' .. L['prove_your_strength_note'],
-    group = WarlordsOfDraenor.groups.PROVE_YOUR_STRENGTH,
+    group = ns.groups.PROVE_YOUR_STRENGTH,
     rewards = {Achievement({id = 9402, criteria = 2})}
 }) -- Basilisk Scale
 
@@ -974,7 +974,7 @@ map.nodes[43807840] = Collectible({
     icon = 959803,
     note = string.format(L['prove_your_strength_drop_double'], '{npc:80696}',
         '{npc:81575}') .. '\n\n' .. L['prove_your_strength_note'],
-    group = WarlordsOfDraenor.groups.PROVE_YOUR_STRENGTH,
+    group = ns.groups.PROVE_YOUR_STRENGTH,
     rewards = {Achievement({id = 9402, criteria = 3})}
 }) -- Botani Bloom
 
@@ -983,7 +983,7 @@ map.nodes[43206200] = Collectible({
     icon = 615303,
     note = string.format(L['prove_your_strength_drop_double'], '{npc:83458}',
         '{npc:81685}') .. '\n\n' .. L['prove_your_strength_note'],
-    group = WarlordsOfDraenor.groups.PROVE_YOUR_STRENGTH,
+    group = ns.groups.PROVE_YOUR_STRENGTH,
     rewards = {Achievement({id = 9402, criteria = 4})}
 }) -- Elemental Crystal
 
@@ -992,7 +992,7 @@ map.nodes[43806480] = Collectible({
     icon = 133725,
     note = string.format(L['prove_your_strength_drop_single'], '{npc:80690}') ..
         '\n\n' .. L['prove_your_strength_note'],
-    group = WarlordsOfDraenor.groups.PROVE_YOUR_STRENGTH,
+    group = ns.groups.PROVE_YOUR_STRENGTH,
     rewards = {Achievement({id = 9402, criteria = 5})}
 }) -- Acid-Stained Goren Tooth
 
@@ -1001,7 +1001,7 @@ map.nodes[46604660] = Collectible({
     icon = 237299,
     note = string.format(L['prove_your_strength_drop_single'], '{npc:80689}') ..
         '\n\n' .. L['prove_your_strength_note'],
-    group = WarlordsOfDraenor.groups.PROVE_YOUR_STRENGTH,
+    group = ns.groups.PROVE_YOUR_STRENGTH,
     rewards = {Achievement({id = 9402, criteria = 6})}
 }) -- Gronn Eye
 
@@ -1010,7 +1010,7 @@ map.nodes[45806560] = Collectible({
     icon = 134319,
     note = string.format(L['prove_your_strength_drop_single'], '{npc:80685}') ..
         '\n\n' .. L['prove_your_strength_note'],
-    group = WarlordsOfDraenor.groups.PROVE_YOUR_STRENGTH,
+    group = ns.groups.PROVE_YOUR_STRENGTH,
     rewards = {Achievement({id = 9402, criteria = 7})}
 }) -- Gronnling Scale
 
@@ -1019,7 +1019,7 @@ map.nodes[43004740] = Collectible({
     icon = 133725,
     note = string.format(L['prove_your_strength_drop_single'], '{npc:81240}') ..
         '\n\n' .. L['prove_your_strength_note'],
-    group = WarlordsOfDraenor.groups.PROVE_YOUR_STRENGTH,
+    group = ns.groups.PROVE_YOUR_STRENGTH,
     rewards = {Achievement({id = 9402, criteria = 8})}
 }) -- Worn Ogron Horn
 
@@ -1028,7 +1028,7 @@ map.nodes[48207280] = Collectible({
     icon = 136104,
     note = string.format(L['prove_your_strength_drop_single'], '{npc:81617}') ..
         '\n\n' .. L['prove_your_strength_note'],
-    group = WarlordsOfDraenor.groups.PROVE_YOUR_STRENGTH,
+    group = ns.groups.PROVE_YOUR_STRENGTH,
     rewards = {Achievement({id = 9402, criteria = 9})}
 }) -- Orc Thorn
 
@@ -1037,7 +1037,7 @@ map.nodes[45608060] = Collectible({
     icon = 615303,
     note = string.format(L['prove_your_strength_drop_double'], '{npc:81561}',
         '{npc:85779}') .. '\n\n' .. L['prove_your_strength_note'],
-    group = WarlordsOfDraenor.groups.PROVE_YOUR_STRENGTH,
+    group = ns.groups.PROVE_YOUR_STRENGTH,
     rewards = {Achievement({id = 9402, criteria = 10})}
 }) -- Ravager Claw
 
@@ -1046,7 +1046,7 @@ map.nodes[52606760] = Collectible({
     icon = 615303,
     note = string.format(L['prove_your_strength_drop_double'], '{npc:85807}',
         '{npc:85695}') .. '\n\n' .. L['prove_your_strength_note'],
-    group = WarlordsOfDraenor.groups.PROVE_YOUR_STRENGTH,
+    group = ns.groups.PROVE_YOUR_STRENGTH,
     rewards = {Achievement({id = 9402, criteria = 11})}
 }) -- Wasp Stinger
 
@@ -1097,12 +1097,12 @@ map.nodes[42559100] = Collectible({
 ---------------------------------- SQUIRRELS ----------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[43675520] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[43675520] = ns.node.Squirrel({
     id = 88639,
     rewards = {Achievement({id = 14728, criteria = 11})}
 }) -- Parched Lizard
 
-map.nodes[62815481] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[62815481] = ns.node.Squirrel({
     id = 88427,
     rewards = {Achievement({id = 14728, criteria = 10})}
 }) -- Parched Lizard

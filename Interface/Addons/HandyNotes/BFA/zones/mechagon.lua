@@ -1,27 +1,27 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, BattleForAzeroth = ...
-local L = BattleForAzeroth.locale
-local Class = BattleForAzeroth.Class
-local Map = BattleForAzeroth.Map
+local _, ns = ...
+local L = ns.locale
+local Class = ns.Class
+local Map = ns.Map
 
-local Node = BattleForAzeroth.node.Node
-local NPC = BattleForAzeroth.node.NPC
-local PetBattle = BattleForAzeroth.node.PetBattle
-local Quest = BattleForAzeroth.node.Quest
-local Rare = BattleForAzeroth.node.Rare
-local Safari = BattleForAzeroth.node.Safari
-local Treasure = BattleForAzeroth.node.Treasure
+local Node = ns.node.Node
+local NPC = ns.node.NPC
+local PetBattle = ns.node.PetBattle
+local Quest = ns.node.Quest
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
+local Treasure = ns.node.Treasure
 
-local Achievement = BattleForAzeroth.reward.Achievement
-local Item = BattleForAzeroth.reward.Item
-local Mount = BattleForAzeroth.reward.Mount
-local Pet = BattleForAzeroth.reward.Pet
-local Toy = BattleForAzeroth.reward.Toy
-local Transmog = BattleForAzeroth.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local POI = BattleForAzeroth.poi.POI
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -31,7 +31,7 @@ local map = Map({id = 1462, settings = true})
 
 function map:Prepare()
     Map.Prepare(self)
-    self.future = AuraUtil.FindAuraByName(BattleForAzeroth.api.GetSpellInfo(296644), 'player')
+    self.future = AuraUtil.FindAuraByName(ns.api.GetSpellInfo(296644), 'player')
 end
 
 function map:CanDisplay(node, coord, minimap)
@@ -114,7 +114,7 @@ map.nodes[35464229] = Rare({
     id = 151569,
     quest = 55514,
     note = L['deepwater_note'],
-    requires = BattleForAzeroth.requirement.Item(167649),
+    requires = ns.requirement.Item(167649),
     rewards = {
         Achievement({id = 13470, criteria = 45128}),
         Item({item = 167836, quest = 55057}) -- Blueprint: Canned Minnows
@@ -216,7 +216,7 @@ map.nodes[60654217] = Rare({
     id = 151933,
     quest = 55544,
     note = L['beastbot_note'],
-    requires = BattleForAzeroth.requirement.Item(168045),
+    requires = ns.requirement.Item(168045),
     rewards = {
         Achievement({id = 13470, criteria = 45136}),
         Achievement({id = 13708, criteria = {45772, 45775, 45776, 45777, 45778}}), -- Most Minis Wins
@@ -230,7 +230,7 @@ map.nodes[57165258] = Rare({
     id = 151124,
     quest = 55207,
     note = L['nullifier_note'],
-    requires = {BattleForAzeroth.requirement.Item(168023), BattleForAzeroth.requirement.Item(168435)},
+    requires = {ns.requirement.Item(168023), ns.requirement.Item(168435)},
     rewards = {
         Achievement({id = 13470, criteria = 45117}),
         Item({item = 168490, quest = 55069}), -- Blueprint: Protocol Transference Device
@@ -362,7 +362,7 @@ map.nodes[80962019] = Rare({
     quest = 56419,
     label = GetAchievementCriteriaInfoByID(13470, 45433),
     note = L['doppel_note'],
-    requires = BattleForAzeroth.requirement.Item(169470),
+    requires = ns.requirement.Item(169470),
     rewards = {Achievement({id = 13470, criteria = 45433})}
 }) -- The Doppel Gang
 
@@ -382,7 +382,7 @@ map.nodes[57335827] = Rare({
     quest = 56182,
     future = 2,
     note = L['rusty_note'],
-    requires = BattleForAzeroth.requirement.Item(169114),
+    requires = ns.requirement.Item(169114),
     rewards = {
         Achievement({id = 13470, criteria = 45374}), Toy({item = 169347}), -- Judgment of Mechagon
         Transmog({item = 170467, slot = L['1h_sword']}) -- Whirring Chainblade
@@ -411,7 +411,7 @@ map.nodes[53824933] = Rare({
     quest = 55546,
     future = 2,
     note = L['vaultbot_note'],
-    requires = BattleForAzeroth.requirement.Item(167062),
+    requires = ns.requirement.Item(167062),
     rewards = {
         Achievement({id = 13470, criteria = 45158}),
         Item({item = 167843, quest = 55058}), -- Blueprint: Vaultbot Key
@@ -467,13 +467,13 @@ map.nodes[72107290] = PetBattle({
 local Locked = Class('LockedChest', Node, {
     icon = 'chest_gy',
     scale = 1.3,
-    group = BattleForAzeroth.groups.LOCKED_CHEST
+    group = ns.groups.LOCKED_CHEST
 })
 
 local iron = Locked({
     label = L['iron_chest'],
     note = L['iron_chest_note'],
-    requires = BattleForAzeroth.requirement.Item(169872),
+    requires = ns.requirement.Item(169872),
     rewards = {
         Item({item = 170146, quest = 56907}) -- Paint Bottle: Nukular Red
     }
@@ -482,7 +482,7 @@ local iron = Locked({
 local mech = Locked({
     label = L['msup_chest'],
     note = L['msup_chest_note'],
-    requires = BattleForAzeroth.requirement.Item(169873),
+    requires = ns.requirement.Item(169873),
     rewards = {
         Achievement({id = 13708, criteria = {45773, 45781, 45779, 45780, 45785}}), -- Most Minis Wins
         Item({item = 169850, weekly = 57133}) -- Azeroth Mini Pack: Mechagon
@@ -492,7 +492,7 @@ local mech = Locked({
 local rusty = Locked({
     label = L['rust_chest'],
     note = L['rust_chest_note'],
-    requires = BattleForAzeroth.requirement.Item(169218)
+    requires = ns.requirement.Item(169218)
 })
 
 map.nodes[23195699] = iron
@@ -510,7 +510,7 @@ map.nodes[23988441] = rusty
 
 local MechChest = Class('MechChest', Treasure)
 
-MechChest.group = BattleForAzeroth.groups.MECH_CHEST
+MechChest.group = ns.groups.MECH_CHEST
 MechChest.label = L['mech_chest']
 MechChest.rewards = {
     Achievement({id = 13708, criteria = {45773, 45781, 45779, 45780, 45785}}), -- Most Minis Wins
@@ -871,7 +871,7 @@ map.nodes[69976201] = Class('RegRig', NPC, {
     icon = 'peg_bl',
     scale = 2,
     note = L['rec_rig_note'],
-    group = BattleForAzeroth.groups.RECRIG,
+    group = ns.groups.RECRIG,
     rewards = {
         Achievement({id = 13708, criteria = {45773, 45781, 45779, 45780, 45785}}), -- Most Minis Wins
         Item({item = 169850, note = L['normal'], weekly = 57132}), -- Azeroth Mini Pack: Mechagon
@@ -881,7 +881,7 @@ map.nodes[69976201] = Class('RegRig', NPC, {
     },
     getters = {
         rlabel = function(self)
-            local G, GR, N, H = BattleForAzeroth.status.Green, BattleForAzeroth.status.Gray, L['normal'],
+            local G, GR, N, H = ns.status.Green, ns.status.Gray, L['normal'],
                 L['hard']
             local normal = C_QuestLog.IsQuestFlaggedCompleted(55847) and G(N) or
                                GR(N)

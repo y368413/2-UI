@@ -1,6 +1,7 @@
 ﻿-- BINDINGs labels
 BINDING_HEADER_ACE3 = "-|cFFFFFF00 2|r|cFFFF0000 UI |r-"
 BINDING_NAME_RELOADUI = "重载UI / ReloadUI"
+BINDING_NAME_WHISPERPOP_TOGGLE = WHISPER
 
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")

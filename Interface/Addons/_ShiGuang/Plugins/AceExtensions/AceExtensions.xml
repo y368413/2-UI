@@ -1,8 +1,11 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Script file="Quester.lua"/>
     <Script file="DialogKey.lua"/>
+    <Script file="StatPriority.lua"/>
+	<Script file="Disenchanter.lua"/>
 	<Script file="SocketHelper.lua"/>
 	<Script file="WQAchievements.lua"/>
-	<!--Script file="ExtendVenderLite.lua"/-->
+	<!--Script file="SmartQuestTracker.lua"/-->
 	<Include file="InboxMailBag\InboxMailBag.xml"/>
 	<Include file="Simulationcraft\Simulationcraft.xml"/>
 	<Include file="AngrierWorldQuests\AngrierWorldQuests.xml"/>

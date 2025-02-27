@@ -1,9 +1,9 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Core = ...
-local L = Core.locale
-local Class = Core.Class
+local _, ns = ...
+local L = ns.locale
+local Class = ns.Class
 
 -------------------------------------------------------------------------------
 ------------------------------------ GROUP ------------------------------------
@@ -22,12 +22,12 @@ function Group:Initialize(name, icon, attrs)
     self.desc = L['options_icons_' .. name .. '_desc']
 
     -- Prepare any links in this group label/description
-    Core.PrepareLinks(self.label)
-    Core.PrepareLinks(self.desc)
+    ns.PrepareLinks(self.label)
+    ns.PrepareLinks(self.desc)
 
     if attrs then for k, v in pairs(attrs) do self[k] = v end end
 
-    self.type = self.type or Core.group_types.EXPANSION
+    self.type = self.type or ns.group_types.EXPANSION
     self.order = self.order or 1
 
     self.alphaArg = 'icon_alpha_' .. self.name
@@ -54,14 +54,14 @@ function Group:IsEnabled()
 
     -- Check faction
     if self.faction then
-        if Core:GetOpt('ignore_faction_restrictions') then return true end
-        if self.faction ~= Core.faction then return false end
+        if ns:GetOpt('ignore_faction_restrictions') then return true end
+        if self.faction ~= ns.faction then return false end
     end
 
     -- Check class
     if self.class then
-        if Core:GetOpt('ignore_class_restrictions') then return true end
-        if self.class ~= Core.class then return false end
+        if ns:GetOpt('ignore_class_restrictions') then return true end
+        if self.class ~= ns.class then return false end
     end
 
     return true
@@ -69,19 +69,19 @@ end
 
 function Group:_GetOpt(option, default, mapID)
     local value
-    if Core:GetOpt('per_map_settings') then
-        value = Core:GetOpt(option .. '_' .. mapID)
+    if ns:GetOpt('per_map_settings') then
+        value = ns:GetOpt(option .. '_' .. mapID)
     else
-        value = Core:GetOpt(option)
+        value = ns:GetOpt(option)
     end
     return (value == nil) and default or value
 end
 
 function Group:_SetOpt(option, value, mapID)
-    if Core:GetOpt('per_map_settings') then
-        return Core:SetOpt(option .. '_' .. mapID, value)
+    if ns:GetOpt('per_map_settings') then
+        return ns:SetOpt(option .. '_' .. mapID, value)
     end
-    return Core:SetOpt(option, value)
+    return ns:SetOpt(option, value)
 end
 
 -- Get group settings
@@ -102,13 +102,13 @@ function Group:SetDisplay(v, mapID) self:_SetOpt(self.displayArg, v, mapID) end
 
 -------------------------------------------------------------------------------
 
-Core.Group = Group
+ns.Group = Group
 
-Core.GROUP_HIDDEN = {display = false}
-Core.GROUP_HIDDEN75 = {alpha = 0.75, display = false}
-Core.GROUP_ALPHA75 = {alpha = 0.75}
+ns.GROUP_HIDDEN = {display = false}
+ns.GROUP_HIDDEN75 = {alpha = 0.75, display = false}
+ns.GROUP_ALPHA75 = {alpha = 0.75}
 
-Core.group_types = {
+ns.group_types = {
     -- Standard groups that apply to all zones in all expansions (rares, treasures,
     -- pet battles, etc).
     STANDARD = 1,
@@ -125,21 +125,21 @@ Core.group_types = {
     OTHER = 4
 }
 
-Core.groups = {
+ns.groups = {
     RARE = Group('rares', 'skull_w', {
-        defaults = Core.GROUP_ALPHA75,
-        type = Core.group_types.STANDARD,
+        defaults = ns.GROUP_ALPHA75,
+        type = ns.group_types.STANDARD,
         order = 1
     }),
     TREASURE = Group('treasures', 'chest_gy', {
-        defaults = Core.GROUP_ALPHA75,
-        type = Core.group_types.STANDARD,
+        defaults = ns.GROUP_ALPHA75,
+        type = ns.group_types.STANDARD,
         order = 2
     }),
     PETBATTLE = Group('pet_battles', 'paw_y',
-        {type = Core.group_types.STANDARD, order = 3}),
+        {type = ns.group_types.STANDARD, order = 3}),
     QUEST = Group('quests', 'quest_ay',
-        {type = Core.group_types.STANDARD, order = 4}),
-    VENDOR = Group('vendors', 'bag', {type = Core.group_types.STANDARD, order = 5}),
-    MISC = Group('misc', 454046, {type = Core.group_types.STANDARD, order = 6})
+        {type = ns.group_types.STANDARD, order = 4}),
+    VENDOR = Group('vendors', 'bag', {type = ns.group_types.STANDARD, order = 5}),
+    MISC = Group('misc', 454046, {type = ns.group_types.STANDARD, order = 6})
 }

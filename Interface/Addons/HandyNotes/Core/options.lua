@@ -1,20 +1,20 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Core = ...
-local L = Core.locale
+local _, ns = ...
+local L = ns.locale
 
 -------------------------------------------------------------------------------
 ---------------------------------- DEFAULTS -----------------------------------
 -------------------------------------------------------------------------------
 
-Core.optionDefaults = {
+ns.optionDefaults = {
     profile = {
         show_worldmap_button = true,
 
         -- visibility
-        hide_done_rares = false,
-        hide_done_treasures = false,
+        hide_done_rares = true,
+        hide_done_treasures = true,
         hide_minimap = false,
         maximized_enlarged = true,
         show_completed_nodes = false,
@@ -68,33 +68,33 @@ Core.optionDefaults = {
 ----------------------------------- HELPERS -----------------------------------
 -------------------------------------------------------------------------------
 
-function Core:GetOpt(n) return Core.addon.db.profile[n] end
-function Core:SetOpt(n, v)
-    Core.addon.db.profile[n] = v;
-    Core.addon:Refresh()
+function ns:GetOpt(n) return ns.addon.db.profile[n] end
+function ns:SetOpt(n, v)
+    ns.addon.db.profile[n] = v;
+    ns.addon:Refresh()
 end
 
-function Core:GetColorOpt(n)
-    local db = Core.addon.db.profile
+function ns:GetColorOpt(n)
+    local db = ns.addon.db.profile
     return db[n .. '_R'], db[n .. '_G'], db[n .. '_B'], db[n .. '_A']
 end
 
-function Core:SetColorOpt(n, r, g, b, a)
-    local db = Core.addon.db.profile
+function ns:SetColorOpt(n, r, g, b, a)
+    local db = ns.addon.db.profile
     db[n .. '_R'], db[n .. '_G'], db[n .. '_B'], db[n .. '_A'] = r, g, b, a
-    Core.addon:Refresh()
+    ns.addon:Refresh()
 end
 
 -------------------------------------------------------------------------------
 --------------------------------- OPTIONS UI ----------------------------------
 -------------------------------------------------------------------------------
 
-Core.options = {
+ns.options = {
     type = 'group',
     name = nil, -- populated in core.lua
     childGroups = 'tab',
-    get = function(info) return Core:GetOpt(info.arg) end,
-    set = function(info, v) Core:SetOpt(info.arg, v) end,
+    get = function(info) return ns:GetOpt(info.arg) end,
+    set = function(info, v) ns:SetOpt(info.arg, v) end,
     args = {
         GeneralTab = {
             type = 'group',
@@ -113,8 +113,8 @@ Core.options = {
                     name = L['options_show_worldmap_button'],
                     desc = L['options_show_worldmap_button_desc'],
                     set = function(info, v)
-                        Core:SetOpt(info.arg, v)
-                        Core.world_map_button:Refresh()
+                        ns:SetOpt(info.arg, v)
+                        ns.world_map_button:Refresh()
                         LibStub('Krowi_WorldMapButtons-1.4').SetPoints()
                     end,
                     order = 2,
@@ -290,8 +290,8 @@ Core.options = {
                     order = 39,
                     width = 'full',
                     func = function()
-                        wipe(Core.addon.db.char)
-                        Core.addon:Refresh()
+                        wipe(ns.addon.db.char)
+                        ns.addon:Refresh()
                     end
                 },
                 FocusHeader = {
@@ -316,10 +316,10 @@ Core.options = {
                     desc = L['options_poi_color_desc'],
                     hasAlpha = true,
                     set = function(_, ...)
-                        Core:SetColorOpt('poi_color', ...)
+                        ns:SetColorOpt('poi_color', ...)
                     end,
                     get = function()
-                        return Core:GetColorOpt('poi_color')
+                        return ns:GetColorOpt('poi_color')
                     end,
                     order = 42
                 },
@@ -329,10 +329,10 @@ Core.options = {
                     desc = L['options_path_color_desc'],
                     hasAlpha = true,
                     set = function(_, ...)
-                        Core:SetColorOpt('path_color', ...)
+                        ns:SetColorOpt('path_color', ...)
                     end,
                     get = function()
-                        return Core:GetColorOpt('path_color')
+                        return ns:GetColorOpt('path_color')
                     end,
                     order = 43
                 },
@@ -343,10 +343,10 @@ Core.options = {
                     order = 44,
                     width = 'full',
                     func = function()
-                        local df = Core.optionDefaults.profile
-                        Core:SetColorOpt('poi_color', df.poi_color_R,
+                        local df = ns.optionDefaults.profile
+                        ns:SetColorOpt('poi_color', df.poi_color_R,
                             df.poi_color_G, df.poi_color_B, df.poi_color_A)
-                        Core:SetColorOpt('path_color', df.path_color_R,
+                        ns:SetColorOpt('path_color', df.path_color_R,
                             df.path_color_G, df.path_color_B, df.path_color_A)
                     end
                 },
@@ -390,7 +390,7 @@ Core.options = {
             name = L['options_global'],
             desc = L['options_global_description'],
             disabled = function()
-                return Core:GetOpt('per_map_settings')
+                return ns:GetOpt('per_map_settings')
             end,
             order = 1,
             args = {}
@@ -409,19 +409,19 @@ Core.options = {
 -- Display these groups in the global settings tab. They are the most common
 -- group options that players might want to customize.
 
-function Core.CreateGlobalGroupOptions()
+function ns.CreateGlobalGroupOptions()
     for i, group in ipairs({
-        Core.groups.RARE, Core.groups.TREASURE, Core.groups.PETBATTLE, Core.groups.MISC
+        ns.groups.RARE, ns.groups.TREASURE, ns.groups.PETBATTLE, ns.groups.MISC
     }) do
-        Core.options.args.GlobalTab.args['group_icon_' .. group.name] = {
+        ns.options.args.GlobalTab.args['group_icon_' .. group.name] = {
             type = 'header',
             name = function()
-                return Core.RenderLinks(group.label, true)
+                return ns.RenderLinks(group.label, true)
             end,
             order = i * 10
         }
 
-        Core.options.args.GlobalTab.args['icon_scale_' .. group.name] = {
+        ns.options.args.GlobalTab.args['icon_scale_' .. group.name] = {
             type = 'range',
             name = L['options_scale'],
             desc = L['options_scale_desc'],
@@ -433,7 +433,7 @@ function Core.CreateGlobalGroupOptions()
             order = i * 10 + 1
         }
 
-        Core.options.args.GlobalTab.args['icon_alpha_' .. group.name] = {
+        ns.options.args.GlobalTab.args['icon_alpha_' .. group.name] = {
             type = 'range',
             name = L['options_opacity'],
             desc = L['options_opacity_desc'],
@@ -453,7 +453,7 @@ end
 
 local _INITIALIZED = {}
 
-function Core.CreateGroupOptions(map, group)
+function ns.CreateGroupOptions(map, group)
     -- Check if we've already initialized this group
     if _INITIALIZED[group.name .. map.id] then return end
     _INITIALIZED[group.name .. map.id] = true
@@ -463,7 +463,7 @@ function Core.CreateGroupOptions(map, group)
     if not map_info then return end
 
     -- Create map options group under zones tab
-    local options = Core.options.args.ZonesTab.args['Zone_' .. map.id]
+    local options = ns.options.args.ZonesTab.args['Zone_' .. map.id]
     if not options then
         options = {
             type = 'group',
@@ -499,7 +499,7 @@ function Core.CreateGroupOptions(map, group)
                 }
             }
         }
-        Core.options.args.ZonesTab.args['Zone_' .. map.id] = options
+        ns.options.args.ZonesTab.args['Zone_' .. map.id] = options
     end
 
     map._icons_order = map._icons_order or 0
@@ -509,8 +509,8 @@ function Core.CreateGroupOptions(map, group)
         type = 'toggle',
         get = function() return group:GetDisplay(map.id) end,
         set = function(info, v) group:SetDisplay(v, map.id) end,
-        name = function() return Core.RenderLinks(group.label, true) end,
-        desc = function() return Core.RenderLinks(group.desc) end,
+        name = function() return ns.RenderLinks(group.label, true) end,
+        desc = function() return ns.RenderLinks(group.desc) end,
         disabled = function() return not group:IsEnabled() end,
         width = 0.9,
         order = map._icons_order
@@ -518,7 +518,7 @@ function Core.CreateGroupOptions(map, group)
 
     options.args.VisibilityGroup.args['header_' .. group.name] = {
         type = 'header',
-        name = function() return Core.RenderLinks(group.label, true) end,
+        name = function() return ns.RenderLinks(group.label, true) end,
         order = map._visibility_order
     }
 

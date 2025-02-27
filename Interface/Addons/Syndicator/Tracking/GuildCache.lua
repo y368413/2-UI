@@ -8,14 +8,18 @@ local function InitGuild(key, guild, realm)
       details = {
         guild = guild,
         faction = UnitFactionGroup("player"),
-        hidden = false,
+        show = {
+          inventory = true,
+          gold = false
+        },
         visited = false,
         realm = realm,
       },
     }
   end
-  SYNDICATOR_DATA.Guilds[key].details.realms = nil
-  SYNDICATOR_DATA.Guilds[key].details.realm = realm
+  local guildData = SYNDICATOR_DATA.Guilds[key]
+  guildData.details.realms = nil
+  guildData.details.realm = realm
 end
 
 local seenGuilds = {}
@@ -26,16 +30,23 @@ local GUILD_OPEN_EVENTS = {
   "GUILDBANK_UPDATE_MONEY",
 }
 
+local ROSTER_EVENTS = {
+  "GUILD_ROSTER_UPDATE",
+  "PLAYER_GUILD_UPDATE",
+}
+
 function SyndicatorGuildCacheMixin:OnLoad()
   FrameUtil.RegisterFrameForEvents(self, {
     "PLAYER_INTERACTION_MANAGER_FRAME_SHOW",
     "PLAYER_INTERACTION_MANAGER_FRAME_HIDE",
-    "GUILD_ROSTER_UPDATE",
-    "PLAYER_GUILD_UPDATE",
+    "LOADING_SCREEN_ENABLED",
+    "LOADING_SCREEN_DISABLED",
   })
+  FrameUtil.RegisterFrameForEvents(self, ROSTER_EVENTS)
 
   self:GetGuildKey()
   self.lastTabPickups = {}
+  self.seenBagPickup = false
 
   local function UpdateForPickup(tabIndex, slotID)
     table.insert(self.lastTabPickups, tabIndex)
@@ -45,6 +56,9 @@ function SyndicatorGuildCacheMixin:OnLoad()
   end
   hooksecurefunc("PickupGuildBankItem", UpdateForPickup)
   hooksecurefunc("SplitGuildBankItem", UpdateForPickup)
+  hooksecurefunc(C_Container, "PickupContainerItem", function()
+    self.seenBagPickup = true
+  end)
 end
 
 function SyndicatorGuildCacheMixin:GetGuildKey()
@@ -82,7 +96,6 @@ function SyndicatorGuildCacheMixin:GetGuildKey()
 
   if not gmRealm then
     if gmGUID then
-      print("guid")
       GetPlayerInfoByGUID(gmGUID)
     else
       C_GuildInfo.GuildRoster()
@@ -139,6 +152,10 @@ function SyndicatorGuildCacheMixin:OnEvent(eventName, ...)
   elseif eventName == "GUILD_ROSTER_UPDATE" or eventName == "PLAYER_GUILD_UPDATE" then
     local oldGuild = self.currentGuild
     self:GetGuildKey()
+  elseif eventName == "LOADING_SCREEN_DISABLED" then
+    FrameUtil.RegisterFrameForEvents(self, ROSTER_EVENTS)
+  elseif eventName == "LOADING_SCREEN_ENABLED" then
+    FrameUtil.UnregisterFrameForEvents(self, ROSTER_EVENTS)
   end
 end
 
@@ -165,10 +182,7 @@ function SyndicatorGuildCacheMixin:OnUpdate()
 end
 
 function SyndicatorGuildCacheMixin:ProcessTransfers(changed)
-  if next(changed) == nil then
-    return
-  end
-  if #self.lastTabPickups > 1 then
+  if (next(changed) ~= nil and #self.lastTabPickups > 1) or (next(changed) == nil and #self.lastTabPickups == 1 and self.seenBagPickup) then
     local indexes = {}
     for _, tabIndex in ipairs(self.lastTabPickups) do
       indexes[tabIndex] = true
@@ -187,6 +201,7 @@ function SyndicatorGuildCacheMixin:ProcessTransfers(changed)
     end
     self.lastTabPickups = {}
   end
+  self.seenBagPickup = false
 end
 
 function SyndicatorGuildCacheMixin:ExamineGeneralTabInfo()

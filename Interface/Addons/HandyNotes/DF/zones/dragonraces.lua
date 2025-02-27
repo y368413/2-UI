@@ -1,41 +1,41 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Dragonflight = ...
-local Map = Dragonflight.Map
-local L = Dragonflight.locale
-local Class = Dragonflight.Class
+local ADDON_NAME, ns = ...
+local Map = ns.Map
+local L = ns.locale
+local Class = ns.Class
 
-local Collectible = Dragonflight.node.Collectible
-local Vendor = Dragonflight.node.Vendor
+local Collectible = ns.node.Collectible
+local Vendor = ns.node.Vendor
 
-local Achievement = Dragonflight.reward.Achievement
-local Section = Dragonflight.reward.Section
-local Spacer = Dragonflight.reward.Spacer
-local Transmog = Dragonflight.reward.Transmog
-local Item = Dragonflight.reward.Item
-local DC = Dragonflight.DRAGON_CUSTOMIZATIONS
+local Achievement = ns.reward.Achievement
+local Section = ns.reward.Section
+local Spacer = ns.reward.Spacer
+local Transmog = ns.reward.Transmog
+local Item = ns.reward.Item
+local DC = ns.DRAGON_CUSTOMIZATIONS
 
 -------------------------------------------------------------------------------
 
-local AzureSpan = Dragonflight.maps[2024]
-local ForbiddenReach = Dragonflight.maps[2151]
-local OhnahranPlains = Dragonflight.maps[2023]
-local Thaldraszus = Dragonflight.maps[2025]
-local WakingShores = Dragonflight.maps[2022]
-local ZaralekCavern = Dragonflight.maps[2133]
-local EmeraldDream = Dragonflight.maps[2200]
+local AzureSpan = ns.maps[2024]
+local ForbiddenReach = ns.maps[2151]
+local OhnahranPlains = ns.maps[2023]
+local Thaldraszus = ns.maps[2025]
+local WakingShores = ns.maps[2022]
+local ZaralekCavern = ns.maps[2133]
+local EmeraldDream = ns.maps[2200]
 
-local Orgimmar = Dragonflight.maps[85] or Map({id = 85, settings = true})
-local Stormwind = Dragonflight.maps[84] or Map({id = 84, settings = true})
-local Valdrakken = Dragonflight.maps[2112] or Map({id = 2112, settings = true})
+local Orgimmar = ns.maps[85] or Map({id = 85, settings = true})
+local Stormwind = ns.maps[84] or Map({id = 84, settings = true})
+local Valdrakken = ns.maps[2112] or Map({id = 2112, settings = true})
 
 -------------------------------------------------------------------------------
 --------------------------------- DRAGONRACES ---------------------------------
 -------------------------------------------------------------------------------
 
 local Dragonrace = Class('DragonRace', Collectible,
-    {icon = 1100022, group = Dragonflight.groups.DRAGONRACE})
+    {icon = 1100022, group = ns.groups.DRAGONRACE})
 
 local DRAGONRIDING_RACE_TYPES = {
     [1] = {type = 'normal', label = L['dr_normal']},
@@ -73,18 +73,18 @@ function Dragonrace.getters:sublabel()
 end
 
 function Dragonrace.getters:note()
-    local Silver = Dragonflight.color.Silver
-    local Gold = Dragonflight.color.Gold
+    local Silver = ns.color.Silver
+    local Gold = ns.color.Gold
     local note = L['dr_target_time']
     local txt = L['dr_your_target_time']
     for _, race in ipairs(DRAGONRIDING_RACE_TYPES) do
         if self[race.type] then
             local label = race.label
-            local sTime = Dragonflight.color.Red('??')
+            local sTime = ns.color.Red('??')
             if self[race.type][2] then
                 sTime = Silver(self[race.type][2])
             end
-            local gTime = Dragonflight.color.Red('??')
+            local gTime = ns.color.Red('??')
             if self[race.type][3] then
                 gTime = Gold(self[race.type][3])
             end
@@ -113,7 +113,7 @@ end
 local DragonridingVendor = Class('DragonridingVendor', Vendor, {
     note = L['dr_vendor_note'],
     rewards = {
-        Dragonflight.reward.Toy({item = 212518, count = 40}), -- Vial of Endless Draconic Scales
+        ns.reward.Toy({item = 212518, count = 40}), -- Vial of Endless Draconic Scales
         DC.SetCount(DC.WindborneVelocidrake.TealScales, 50),
         DC.SetCount(DC.WindingSlitherdrake.BlondeHair, 25),
         DC.SetCount(DC.WindingSlitherdrake.CurvedNoseHorn, 25),
@@ -915,7 +915,7 @@ EmeraldDream.nodes[32364825] = Dragonrace({
 -------------------------------------------------------------------------------
 
 local KalimdorCup = Class('KalimdorCup', Dragonrace,
-    {parent = 12, group = Dragonflight.groups.KALIMDOR_CUP})
+    {parent = 12, group = ns.groups.KALIMDOR_CUP})
 
 local function Kalimdor_Rewards(c)
     return {
@@ -931,7 +931,7 @@ local function Kalimdor_Rewards(c)
     }
 end
 
-local Felwood = Dragonflight.maps[77] or Map({id = 77, settings = true})
+local Felwood = ns.maps[77] or Map({id = 77, settings = true})
 Felwood.nodes[58181079] = KalimdorCup({
     label = '{quest:75277}',
     normal = {2312, 75, 70},
@@ -941,7 +941,7 @@ Felwood.nodes[58181079] = KalimdorCup({
     areaPoiID = 7494
 }) -- Fel Flyover
 
-local Winterspring = Dragonflight.maps[83] or Map({id = 83, settings = true})
+local Winterspring = ns.maps[83] or Map({id = 83, settings = true})
 Winterspring.nodes[68836804] = KalimdorCup({
     label = '{quest:75310}',
     normal = {2313, 81, 76},
@@ -951,7 +951,7 @@ Winterspring.nodes[68836804] = KalimdorCup({
     areaPoiID = 7495
 }) -- Winter Wander
 
-local Hyjal = Dragonflight.maps[198] or Map({id = 198, settings = true})
+local Hyjal = ns.maps[198] or Map({id = 198, settings = true})
 Hyjal.nodes[56702790] = KalimdorCup({
     label = '{quest:75317}',
     normal = {2314, 50, 45},
@@ -970,7 +970,7 @@ Hyjal.nodes[21905420] = KalimdorCup({
     areaPoiID = 7497
 }) -- Hyjal Hotfoot
 
-local Azshara = Dragonflight.maps[76] or Map({id = 76, settings = true})
+local Azshara = ns.maps[76] or Map({id = 76, settings = true})
 Azshara.nodes[67202617] = KalimdorCup({
     label = '{quest:75347}',
     normal = {2316, 105, 100},
@@ -980,7 +980,7 @@ Azshara.nodes[67202617] = KalimdorCup({
     areaPoiID = 7498
 }) -- Rocketway Ride
 
-local Ashenvale = Dragonflight.maps[63] or Map({id = 63, settings = true})
+local Ashenvale = ns.maps[63] or Map({id = 63, settings = true})
 Ashenvale.nodes[37043058] = KalimdorCup({
     label = '{quest:75378}',
     normal = {2317, 69, 64},
@@ -990,7 +990,7 @@ Ashenvale.nodes[37043058] = KalimdorCup({
     areaPoiID = 7499
 }) -- Ashenvale Ambit
 
-local Durotar = Dragonflight.maps[1] or Map({id = 1, settings = true})
+local Durotar = ns.maps[1] or Map({id = 1, settings = true})
 Durotar.nodes[56906286] = KalimdorCup({
     label = '{quest:75385}',
     normal = {2318, 85, 80},
@@ -1000,7 +1000,7 @@ Durotar.nodes[56906286] = KalimdorCup({
     areaPoiID = 7500
 }) -- Durotar Tour
 
-local StonetalonMontains = Dragonflight.maps[65] or Map({id = 65, settings = true})
+local StonetalonMontains = ns.maps[65] or Map({id = 65, settings = true})
 StonetalonMontains.nodes[66778681] = KalimdorCup({
     label = '{quest:75394}',
     normal = {2319, 85, 80},
@@ -1010,7 +1010,7 @@ StonetalonMontains.nodes[66778681] = KalimdorCup({
     areaPoiID = 7501
 }) -- Webwinder Weave
 
-local Desolace = Dragonflight.maps[66] or Map({id = 66, settings = true})
+local Desolace = ns.maps[66] or Map({id = 66, settings = true})
 Desolace.nodes[28106328] = KalimdorCup({
     label = '{quest:75409}',
     normal = {2320, 80, 75},
@@ -1020,7 +1020,7 @@ Desolace.nodes[28106328] = KalimdorCup({
     areaPoiID = 7502
 }) -- Desolace Drift
 
-local SouthernBarrens = Dragonflight.maps[199] or Map({id = 199, settings = true})
+local SouthernBarrens = ns.maps[199] or Map({id = 199, settings = true})
 SouthernBarrens.nodes[41431300] = KalimdorCup({
     label = '{quest:75412}',
     normal = {2321, 53, 48},
@@ -1039,7 +1039,7 @@ SouthernBarrens.nodes[42809308] = KalimdorCup({
     areaPoiID = 7504
 }) -- Razorfen Roundabout
 
-local ThousandNeedles = Dragonflight.maps[64] or Map({id = 64, settings = true})
+local ThousandNeedles = ns.maps[64] or Map({id = 64, settings = true})
 ThousandNeedles.nodes[09731735] = KalimdorCup({
     label = '{quest:75463}',
     normal = {2323, 92, 87},
@@ -1049,7 +1049,7 @@ ThousandNeedles.nodes[09731735] = KalimdorCup({
     areaPoiID = 7505
 }) -- Thousand Needles Thread
 
-local Feralas = Dragonflight.maps[69] or Map({id = 69, settings = true})
+local Feralas = ns.maps[69] or Map({id = 69, settings = true})
 Feralas.nodes[64125435] = KalimdorCup({
     label = '{quest:75468}',
     normal = {2324, 94, 89},
@@ -1059,7 +1059,7 @@ Feralas.nodes[64125435] = KalimdorCup({
     areaPoiID = 7506
 }) -- Feralas Ruins Ramble
 
-local Silithus = Dragonflight.maps[81] or Map({id = 81, settings = true})
+local Silithus = ns.maps[81] or Map({id = 81, settings = true})
 Silithus.nodes[39548419] = KalimdorCup({
     label = '{quest:75472}',
     normal = {2325, 80, 75},
@@ -1069,7 +1069,7 @@ Silithus.nodes[39548419] = KalimdorCup({
     areaPoiID = 7507
 }) -- Ahn'Qiraj Circuit
 
-local Uldum = Dragonflight.maps[249] or Map({id = 249, settings = true})
+local Uldum = ns.maps[249] or Map({id = 249, settings = true})
 Uldum.nodes[55764218] = KalimdorCup({
     label = '{quest:75481}',
     normal = {2326, 89, 84},
@@ -1079,7 +1079,7 @@ Uldum.nodes[55764218] = KalimdorCup({
     areaPoiID = 7508
 }) -- Uldum Tour
 
-local UngoroCrater = Dragonflight.maps[78] or Map({id = 78, settings = true})
+local UngoroCrater = ns.maps[78] or Map({id = 78, settings = true})
 UngoroCrater.nodes[53379308] = KalimdorCup({
     label = '{quest:75485}',
     normal = {2327, 105, 100},
@@ -1095,7 +1095,7 @@ UngoroCrater.nodes[53379308] = KalimdorCup({
 
 local EasternKingdomsCup = Class('EasternKingdomsCup', Dragonrace, {
     parent = 13,
-    group = Dragonflight.groups.EASTERN_KINGDOMS_CUP
+    group = ns.groups.EASTERN_KINGDOMS_CUP
 })
 
 local function EasternKingdoms_Rewards(c)
@@ -1112,7 +1112,7 @@ local function EasternKingdoms_Rewards(c)
     }
 end
 
-local Gilneas = Dragonflight.maps[217] or Map({id = 217, settings = true}) -- Missing Map ID
+local Gilneas = ns.maps[217] or Map({id = 217, settings = true}) -- Missing Map ID
 Gilneas.nodes[58611160] = EasternKingdomsCup({
     label = '{quest:76309}',
     normal = {2536, 83, 78},
@@ -1122,7 +1122,7 @@ Gilneas.nodes[58611160] = EasternKingdomsCup({
     areaPoiID = 7571
 }) -- Gilneas Gambit
 
-local LochModan = Dragonflight.maps[48] or Map({id = 48, settings = true})
+local LochModan = ns.maps[48] or Map({id = 48, settings = true})
 LochModan.nodes[46921391] = EasternKingdomsCup({
     label = '{quest:76339}',
     normal = {2537, 68, 63},
@@ -1132,7 +1132,7 @@ LochModan.nodes[46921391] = EasternKingdomsCup({
     areaPoiID = 7572
 }) -- Loch Modan Loop
 
-local SearingGorge = Dragonflight.maps[32] or Map({id = 32, settings = true})
+local SearingGorge = ns.maps[32] or Map({id = 32, settings = true})
 SearingGorge.nodes[73244238] = EasternKingdomsCup({
     label = '{quest:76357}',
     normal = {2538, 57, 52},
@@ -1142,7 +1142,7 @@ SearingGorge.nodes[73244238] = EasternKingdomsCup({
     areaPoiID = 7573
 }) -- Searing Slalom
 
-local TwilightHighlands = Dragonflight.maps[241] or Map({id = 241, settings = true})
+local TwilightHighlands = ns.maps[241] or Map({id = 241, settings = true})
 TwilightHighlands.nodes[34797786] = EasternKingdomsCup({
     label = '{quest:76364}',
     normal = {2539, 78, 73},
@@ -1152,7 +1152,7 @@ TwilightHighlands.nodes[34797786] = EasternKingdomsCup({
     areaPoiID = 7574
 }) -- Twilight Terror
 
-local DeadwindPass = Dragonflight.maps[42] or Map({id = 42, settings = true})
+local DeadwindPass = ns.maps[42] or Map({id = 42, settings = true})
 DeadwindPass.nodes[46227221] = EasternKingdomsCup({
     label = '{quest:76380}',
     normal = {2540, 65, 60},
@@ -1162,7 +1162,7 @@ DeadwindPass.nodes[46227221] = EasternKingdomsCup({
     areaPoiID = 7575
 }) -- Deadwind Derby
 
-local ElwynnForest = Dragonflight.maps[37] or Map({id = 37, settings = true})
+local ElwynnForest = ns.maps[37] or Map({id = 37, settings = true})
 ElwynnForest.nodes[64704879] = EasternKingdomsCup({
     label = '{quest:76397}',
     normal = {2541, 78, 73},
@@ -1172,8 +1172,8 @@ ElwynnForest.nodes[64704879] = EasternKingdomsCup({
     areaPoiID = 7576
 }) -- Elwynn Forest Flash
 
-local StranglethornVale = Dragonflight.maps[224] or Map({id = 224, settings = true})
-local NorthernStranglethorn = Dragonflight.maps[50] or Map({id = 50, settings = true})
+local StranglethornVale = ns.maps[224] or Map({id = 224, settings = true})
+local NorthernStranglethorn = ns.maps[50] or Map({id = 50, settings = true})
 local GurubashiGala = EasternKingdomsCup({
     label = '{quest:76438}',
     normal = {2542, 61, 56},
@@ -1186,7 +1186,7 @@ local GurubashiGala = EasternKingdomsCup({
 NorthernStranglethorn.nodes[70102655] = GurubashiGala
 StranglethornVale.nodes[62691781] = GurubashiGala
 
-local DunMorogh = Dragonflight.maps[27] or Map({id = 27, settings = true})
+local DunMorogh = ns.maps[27] or Map({id = 27, settings = true})
 DunMorogh.nodes[74133398] = EasternKingdomsCup({
     label = '{quest:76445}',
     normal = {2543, 75, 70},
@@ -1196,7 +1196,7 @@ DunMorogh.nodes[74133398] = EasternKingdomsCup({
     areaPoiID = 7578
 }) -- Ironforge Interceptor
 
-local BlastedLands = Dragonflight.maps[17] or Map({id = 17, settings = true})
+local BlastedLands = ns.maps[17] or Map({id = 17, settings = true})
 BlastedLands.nodes[62662616] = EasternKingdomsCup({
     label = '{quest:76469}',
     normal = {2544, 74, 69},
@@ -1206,7 +1206,7 @@ BlastedLands.nodes[62662616] = EasternKingdomsCup({
     areaPoiID = 7579
 }) -- Blasted Lands Bolt
 
-local EasternPlaguelands = Dragonflight.maps[23] or Map({id = 23, settings = true})
+local EasternPlaguelands = ns.maps[23] or Map({id = 23, settings = true})
 EasternPlaguelands.nodes[34753792] = EasternKingdomsCup({
     label = '{quest:76510}',
     normal = {2545, 68, 63},
@@ -1216,7 +1216,7 @@ EasternPlaguelands.nodes[34753792] = EasternKingdomsCup({
     areaPoiID = 7580
 }) -- Plaguelands Plunge
 
-local CapeOfStranglethorn = Dragonflight.maps[210] or Map({id = 210, settings = true})
+local CapeOfStranglethorn = ns.maps[210] or Map({id = 210, settings = true})
 local BootyBayBlast = EasternKingdomsCup({
     label = '{quest:76515}',
     normal = {2546, 68, 63},
@@ -1229,7 +1229,7 @@ local BootyBayBlast = EasternKingdomsCup({
 CapeOfStranglethorn.nodes[40417782] = BootyBayBlast
 StranglethornVale.nodes[37608240] = BootyBayBlast
 
-local Badlands = Dragonflight.maps[15] or Map({id = 15, settings = true})
+local Badlands = ns.maps[15] or Map({id = 15, settings = true})
 Badlands.nodes[67113676] = EasternKingdomsCup({
     label = '{quest:76523}',
     normal = {2547, 69, 64},
@@ -1248,7 +1248,7 @@ TwilightHighlands.nodes[72892784] = EasternKingdomsCup({
     areaPoiID = 7583
 }) -- Krazzworks Klash
 
-local RedridgeMountains = Dragonflight.maps[49] or Map({id = 49, settings = true})
+local RedridgeMountains = ns.maps[49] or Map({id = 49, settings = true})
 RedridgeMountains.nodes[40822500] = EasternKingdomsCup({
     label = '{quest:76536}',
     normal = {2549, 62, 57},
@@ -1263,7 +1263,7 @@ RedridgeMountains.nodes[40822500] = EasternKingdomsCup({
 -------------------------------------------------------------------------------
 
 local OutlandCup = Class('OutlandCup', Dragonrace,
-    {parent = 101, group = Dragonflight.groups.OUTLAND_CUP})
+    {parent = 101, group = ns.groups.OUTLAND_CUP})
 
 local function Outland_Rewards(c)
     return {
@@ -1279,7 +1279,7 @@ local function Outland_Rewards(c)
     }
 end
 
-local HellfirePeninsula = Dragonflight.maps[100] or Map({id = 100, settings = true})
+local HellfirePeninsula = ns.maps[100] or Map({id = 100, settings = true})
 HellfirePeninsula.nodes[75514425] = OutlandCup({
     label = '{quest:77102}',
     normal = {2600, 80, 75},
@@ -1289,7 +1289,7 @@ HellfirePeninsula.nodes[75514425] = OutlandCup({
     areaPoiID = 7589
 }) -- Hellfire Hustle
 
-local Zangarmarsh = Dragonflight.maps[102] or Map({id = 102, settings = true})
+local Zangarmarsh = ns.maps[102] or Map({id = 102, settings = true})
 Zangarmarsh.nodes[36923719] = OutlandCup({
     label = '{quest:77169}',
     normal = {2601, 80, 75},
@@ -1299,7 +1299,7 @@ Zangarmarsh.nodes[36923719] = OutlandCup({
     areaPoiID = 7590
 }) -- Coilfang Caper
 
-local BladesEdge = Dragonflight.maps[105] or Map({id = 105, settings = true})
+local BladesEdge = ns.maps[105] or Map({id = 105, settings = true})
 BladesEdge.nodes[61032759] = OutlandCup({
     label = '{quest:77205}',
     normal = {2602, 80, 75},
@@ -1309,7 +1309,7 @@ BladesEdge.nodes[61032759] = OutlandCup({
     areaPoiID = 7591
 }) -- Blade's Edge Brawl
 
-local ShadowmoonValley = Dragonflight.maps[104] or Map({id = 104, settings = true})
+local ShadowmoonValley = ns.maps[104] or Map({id = 104, settings = true})
 ShadowmoonValley.nodes[61734841] = OutlandCup({
     label = '{quest:77346}',
     normal = {2608, 75, 70},
@@ -1328,7 +1328,7 @@ ShadowmoonValley.nodes[51014006] = OutlandCup({
     areaPoiID = 7601
 }) -- Fel Pit Fracas
 
-local Nagrand = Dragonflight.maps[107] or Map({id = 107, settings = true})
+local Nagrand = ns.maps[107] or Map({id = 107, settings = true})
 Nagrand.nodes[58267599] = OutlandCup({
     label = '{quest:77238}',
     normal = {2603, 69, 64},
@@ -1347,8 +1347,8 @@ Nagrand.nodes[29472503] = OutlandCup({
     areaPoiID = 7599
 }) -- Warmaul Wingding
 
-local TerokkarForest = Dragonflight.maps[108] or Map({id = 108, settings = true})
-local Shattrath = Dragonflight.maps[111] or Map({id = 111, settings = true})
+local TerokkarForest = ns.maps[108] or Map({id = 108, settings = true})
+local Shattrath = ns.maps[111] or Map({id = 111, settings = true})
 local ShattrathCitySashay = OutlandCup({
     label = '{quest:77322}',
     normal = {2607, 80, 75},
@@ -1391,7 +1391,7 @@ TerokkarForest.nodes[67256586] = OutlandCup({
     areaPoiID = 7600
 }) -- Skettis Scramble
 
-local Netherstorm = Dragonflight.maps[109] or Map({id = 109, settings = true})
+local Netherstorm = ns.maps[109] or Map({id = 109, settings = true})
 Netherstorm.nodes[51204193] = OutlandCup({
     label = '{quest:77398}',
     normal = {2609, 120, 115},
@@ -1472,21 +1472,21 @@ hooksecurefunc(VignettePinMixin, 'DisplayNormalTooltip', function(self)
     if self.vignetteID ~= 5104 then return end
 
     local mapID = self:GetMap().mapID
-    local group = Dragonflight.groups.DRAGONRACE
-    if not Dragonflight.maps[mapID] or not group:GetDisplay(mapID) then return end
+    local group = ns.groups.DRAGONRACE
+    if not ns.maps[mapID] or not group:GetDisplay(mapID) then return end
 
     local x = C_VignetteInfo.GetVignettePosition(self.vignetteGUID, mapID).x
     local y = C_VignetteInfo.GetVignettePosition(self.vignetteGUID, mapID).y
-    local node = Dragonflight.maps[mapID].nodes[HandyNotes:getCoord(x, y)]
+    local node = ns.maps[mapID].nodes[HandyNotes:getCoord(x, y)]
     if not node then return end
 
-    GameTooltip:SetText(Dragonflight.RenderLinks(node.label, true))
-    GameTooltip:AddLine(Dragonflight.RenderLinks(node.sublabel, true), 1, 1, 1)
-    if Dragonflight:GetOpt('show_notes') then
-        --GameTooltip:AddLine(' ')
-        GameTooltip:AddLine(Dragonflight.RenderLinks(node.note), 1, 1, 1, true)
+    GameTooltip:SetText(ns.RenderLinks(node.label, true))
+    GameTooltip:AddLine(ns.RenderLinks(node.sublabel, true), 1, 1, 1)
+    if ns:GetOpt('show_notes') then
+        GameTooltip:AddLine(' ')
+        GameTooltip:AddLine(ns.RenderLinks(node.note), 1, 1, 1, true)
     end
-    if Dragonflight:GetOpt('show_loot') then node:RenderRewards(GameTooltip) end
+    if ns:GetOpt('show_loot') then node:RenderRewards(GameTooltip) end
 
     GameTooltip:Show()
 end)
@@ -1499,19 +1499,19 @@ hooksecurefunc(AreaPOIPinMixin, 'TryShowTooltip', function(self)
     -- local pos = C_AreaPoiInfo.GetAreaPOIInfo(WorldMapFrame:GetMapID(), self.areaPoiID).position
     -- GameTooltip:AddLine(('\nXY: %.2f %.2f'):format(pos.x * 100, pos.y * 100)) -- Debug
     local mapID = self:GetMap().mapID
-    local group = Dragonflight.groups.DRAGONRACE
-    local map = Dragonflight.maps[mapID]
+    local group = ns.groups.DRAGONRACE
+    local map = ns.maps[mapID]
     if not map or not group:GetDisplay(mapID) then return end
 
     for _, node in pairs(map.nodes) do
         if node.areaPoiID and node.areaPoiID == self.areaPoiID then
-            --GameTooltip:AddLine(' ')
-            GameTooltip:AddLine(Dragonflight.RenderLinks(node.sublabel, true), 1, 1, 1)
-            if Dragonflight:GetOpt('show_notes') then
-                --GameTooltip:AddLine(' ')
-                GameTooltip:AddLine(Dragonflight.RenderLinks(node.note), 1, 1, 1, true)
+            GameTooltip:AddLine(' ')
+            GameTooltip:AddLine(ns.RenderLinks(node.sublabel, true), 1, 1, 1)
+            if ns:GetOpt('show_notes') then
+                GameTooltip:AddLine(' ')
+                GameTooltip:AddLine(ns.RenderLinks(node.note), 1, 1, 1, true)
             end
-            if Dragonflight:GetOpt('show_loot') then
+            if ns:GetOpt('show_loot') then
                 node:RenderRewards(GameTooltip)
             end
         end

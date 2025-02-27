@@ -349,3 +349,69 @@ function module:ChatFilter()
 
 	M:RegisterEvent("PLAYER_ENTERING_WORLD", isPlayerOnIslands) -- filter azerite msg
 end
+
+local frame = CreateFrame("Frame")
+
+local function MsgToFindRegex(str)
+	return "^" .. string.gsub(str, "%%s", ".*") .. "$"
+end
+
+local talentsSpellId = 384255
+local specSpellId = 200749
+
+local learnSpellMsg = MsgToFindRegex(ERR_LEARN_SPELL_S)
+local learnAbilityMsg = MsgToFindRegex(ERR_LEARN_ABILITY_S)
+local learnPassiveMsg = MsgToFindRegex(ERR_LEARN_PASSIVE_S)
+local unlearnSpellMsg = MsgToFindRegex(ERR_SPELL_UNLEARNED_S)
+local petLearnSpellMsg = MsgToFindRegex(ERR_PET_LEARN_SPELL_S)
+local petLearnAbilityMsg = MsgToFindRegex(ERR_PET_LEARN_ABILITY_S)
+local petUnlearnSpellMsg = MsgToFindRegex(ERR_PET_SPELL_UNLEARNED_S)
+local soulbindChangedMsg = MsgToFindRegex(ERR_ACTIVATE_SOULBIND_S)
+-- local gainTitleMsg = MsgToFindRegex(NEW_TITLE_EARNED)
+-- local loseTitleMsg = MsgToFindRegex(OLD_TITLE_LOST)
+
+function frame:ChatFilter(event, msg)
+	if not frame.spellId then
+		return
+	end
+
+	return strfind(msg, learnSpellMsg)
+		or strfind(msg, learnAbilityMsg)
+		or strfind(msg, learnPassiveMsg)
+		or strfind(msg, unlearnSpellMsg)
+		or strfind(msg, petLearnSpellMsg)
+		or strfind(msg, petLearnAbilityMsg)
+		or strfind(msg, petUnlearnSpellMsg)
+		or strfind(msg, soulbindChangedMsg)
+end
+
+local function startsWith(String, Start)
+	return string.sub(String, 1, #Start) == Start
+end
+
+function frame:OnEvent(event, ...)
+	if startsWith(event, "UNIT_SPELLCAST") then
+		local unit, castGUID, spellId = ...
+		if unit ~= "player" or (spellId ~= talentsSpellId and spellId ~= specSpellId) then
+			return
+		end
+
+		if event == "UNIT_SPELLCAST_START" then
+			frame.spellId = spellId
+		else
+			frame.spellId = nil
+		end
+	else
+		if event == "PLAYER_TALENT_UPDATE" then
+			if frame.spellId == talentsSpellId then
+				frame.spellId = nil
+			end
+		elseif event == "PLAYER_SPECIALIZATION_CHANGED" then
+			if frame.spellId == specSpellId then
+				RunNextFrame(function()
+					frame.spellId = nil
+				end)
+			end
+		end
+	end
+end

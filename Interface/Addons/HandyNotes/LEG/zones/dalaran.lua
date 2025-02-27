@@ -1,17 +1,17 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Legion = ...
-local L = Legion.locale
-local Map = Legion.Map
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = Legion.node.Collectible
-local PetBattle = Legion.node.PetBattle
+local Collectible = ns.node.Collectible
+local PetBattle = ns.node.PetBattle
 
-local Achievement = Legion.reward.Achievement
-local Toy = Legion.reward.Toy
+local Achievement = ns.reward.Achievement
+local Toy = ns.reward.Toy
 
-local POI = Legion.poi.POI
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ map.nodes[28082610] = PetBattle({
     id = 107489,
     note = L['general_pet_tamer_note'] .. '\n\n' .. L['amalia_note'],
     rewards = {
-        Achievement({id = 10876, criteria = 31524}), Legion.reward.Spacer(),
+        Achievement({id = 10876, criteria = 31524}), ns.reward.Spacer(),
         Achievement({id = 9686, criteria = 4, oneline = true}), -- Aquatic
         Achievement({id = 9687, criteria = 4, oneline = true}), -- Beast
         Achievement({id = 9688, criteria = 4, oneline = true}), -- Critter
@@ -68,7 +68,7 @@ map.nodes[26992530] = PetBattle({
     id = 99210,
     note = L['general_pet_tamer_note'] .. '\n\n' .. L['bohdi_sunwayver_note'],
     rewards = {
-        Achievement({id = 10876, criteria = 31525}), Legion.reward.Spacer(),
+        Achievement({id = 10876, criteria = 31525}), ns.reward.Spacer(),
         Achievement({id = 9686, criteria = 2, oneline = true}), -- Aquatic
         Achievement({id = 9687, criteria = 2, oneline = true}), -- Beast
         Achievement({id = 9688, criteria = 2, oneline = true}), -- Critter
@@ -92,7 +92,7 @@ map.nodes[27192195] = PetBattle({
     id = 99182,
     note = L['general_pet_tamer_note'] .. '\n\n' .. L['sir_galveston_note'],
     rewards = {
-        Achievement({id = 10876, criteria = 31527}), Legion.reward.Spacer(),
+        Achievement({id = 10876, criteria = 31527}), ns.reward.Spacer(),
         Achievement({id = 9686, criteria = 5, oneline = true}), -- Aquatic
         Achievement({id = 9687, criteria = 5, oneline = true}), -- Beast
         Achievement({id = 9688, criteria = 5, oneline = true}), -- Critter
@@ -122,7 +122,7 @@ map.nodes[29672412] = PetBattle({
     id = 97804,
     note = L['general_pet_tamer_note'] .. '\n\n' .. L['tiffany_nelson_note'],
     rewards = {
-        Achievement({id = 10876, criteria = 31530}), Legion.reward.Spacer(),
+        Achievement({id = 10876, criteria = 31530}), ns.reward.Spacer(),
         Achievement({id = 9686, criteria = 3, oneline = true}), -- Aquatic
         Achievement({id = 9687, criteria = 3, oneline = true}), -- Beast
         Achievement({id = 9688, criteria = 3, oneline = true}), -- Critter
@@ -140,7 +140,7 @@ map.nodes[29672412] = PetBattle({
 ----------------------------- BROKEN ISLES SAFARI -----------------------------
 -------------------------------------------------------------------------------
 
-swrs.nodes[52805260] = Legion.node.Safari.BlindRat({
+swrs.nodes[52805260] = ns.node.Safari.BlindRat({
     parent = {
         id = map.id,
         pois = {POI({60224829, 34604549})},
@@ -161,7 +161,7 @@ swrs.nodes[52805260] = Legion.node.Safari.BlindRat({
     }
 })
 
-map.nodes[50406400] = Legion.node.Safari.DustBunny({
+map.nodes[50406400] = ns.node.Safari.DustBunny({
     pois = {
         POI({
             21003060, 21603120, 32004240, 32004340, 32004360, 36204420,

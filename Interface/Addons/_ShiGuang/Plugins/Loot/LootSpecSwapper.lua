@@ -1,4 +1,4 @@
---## Author: Cilraaz ## Version: 11.0.2.01
+--## Author: Cilraaz ## Version: 11.0.7.02
 local LootSpecSwapper = {}
 
 function LSS_CreateOptionsPanel()

@@ -1,27 +1,27 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, WarlordsOfDraenor = ...
-local L = WarlordsOfDraenor.locale
-local Map = WarlordsOfDraenor.Map
-local Class = WarlordsOfDraenor.Class
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Map = ns.Map
+local Class = ns.Class
 
-local Collectible = WarlordsOfDraenor.node.Collectible
-local PetBattle = WarlordsOfDraenor.node.PetBattle
-local Rare = WarlordsOfDraenor.node.Rare
-local Treasure = WarlordsOfDraenor.node.Treasure
+local Collectible = ns.node.Collectible
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local Achievement = WarlordsOfDraenor.reward.Achievement
-local Currency = WarlordsOfDraenor.reward.Currency
-local Follower = WarlordsOfDraenor.reward.Follower
-local Item = WarlordsOfDraenor.reward.Item
-local Mount = WarlordsOfDraenor.reward.Mount
-local Toy = WarlordsOfDraenor.reward.Toy
-local Pet = WarlordsOfDraenor.reward.Pet
-local Transmog = WarlordsOfDraenor.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Currency = ns.reward.Currency
+local Follower = ns.reward.Follower
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Toy = ns.reward.Toy
+local Pet = ns.reward.Pet
+local Transmog = ns.reward.Transmog
 
-local POI = WarlordsOfDraenor.poi.POI
-local Path = WarlordsOfDraenor.poi.Path
+local POI = ns.poi.POI
+local Path = ns.poi.Path
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -840,9 +840,9 @@ local DarkwingAdolescent = Collectible({
     id = 85357,
     icon = 'peg_rd',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.YOU_HAVE_BEEN_RYLAKINATED,
+    group = ns.groups.YOU_HAVE_BEEN_RYLAKINATED,
     rewards = {Achievement({id = 9481})}, -- You Have Been Rylakinated!
-    requires = WarlordsOfDraenor.requirement.Item(116978), -- Rylakinator 3000 Power Cell
+    requires = ns.requirement.Item(116978), -- Rylakinator 3000 Power Cell
     note = L['you_have_been_rylakinated_note']
 })
 
@@ -896,22 +896,22 @@ map.nodes[42804040] = Collectible({
 ---------------------------------- SQUIRRELS ----------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[43872998] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[43872998] = ns.node.Squirrel({
     id = 88417,
     rewards = {Achievement({id = 14728, criteria = 1})}
 }) -- Royal Moth
 
-map.nodes[66443013] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[66443013] = ns.node.Squirrel({
     id = 88976,
     rewards = {Achievement({id = 14728, criteria = 2})}
 }) -- Moonshell Crab
 
-map.nodes[44234859] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[44234859] = ns.node.Squirrel({
     id = 75475,
     rewards = {Achievement({id = 14728, criteria = 3})}
 }) -- Moon Snake
 
-map.nodes[48968232] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[48968232] = ns.node.Squirrel({
     id = 85005,
     rewards = {Achievement({id = 14728, criteria = 4})}
 }) -- Mossbite Skitterer

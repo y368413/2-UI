@@ -1,57 +1,57 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Dragonflight = ...
-local Class = Dragonflight.Class
-local L = Dragonflight.locale
-local Map = Dragonflight.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = Dragonflight.node.Collectible
-local NPC = Dragonflight.node.NPC
-local PetBattle = Dragonflight.node.PetBattle
-local Rare = Dragonflight.node.Rare
-local Treasure = Dragonflight.node.Treasure
-local Vendor = Dragonflight.node.Vendor
+local Collectible = ns.node.Collectible
+local NPC = ns.node.NPC
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
+local Vendor = ns.node.Vendor
 
-local AncientStone = Dragonflight.node.AncientStone
-local Disturbeddirt = Dragonflight.node.Disturbeddirt
-local Dragonglyph = Dragonflight.node.Dragonglyph
-local ElementalStorm = Dragonflight.node.ElementalStorm
-local ElusiveCreature = Dragonflight.node.ElusiveCreature
-local Flag = Dragonflight.node.Flag
-local Fragment = Dragonflight.node.Fragment
-local GrandHunt = Dragonflight.node.GrandHunt
-local LegendaryCharacter = Dragonflight.node.LegendaryCharacter
-local MagicBoundChest = Dragonflight.node.MagicBoundChest
-local PM = Dragonflight.node.ProfessionMasters
-local PrettyNeat = Dragonflight.node.PrettyNeat
-local PT = Dragonflight.node.ProfessionTreasures
-local RareElite = Dragonflight.node.RareElite
-local RichSoil = Dragonflight.node.RichSoil
-local Safari = Dragonflight.node.Safari
-local Scoutpack = Dragonflight.node.Scoutpack
-local SignalTransmitter = Dragonflight.node.SignalTransmitter
-local Squirrel = Dragonflight.node.Squirrel
-local TuskarrTacklebox = Dragonflight.node.TuskarrTacklebox
-local WarSupply = Dragonflight.node.WarSupply
+local AncientStone = ns.node.AncientStone
+local Disturbeddirt = ns.node.Disturbeddirt
+local Dragonglyph = ns.node.Dragonglyph
+local ElementalStorm = ns.node.ElementalStorm
+local ElusiveCreature = ns.node.ElusiveCreature
+local Flag = ns.node.Flag
+local Fragment = ns.node.Fragment
+local GrandHunt = ns.node.GrandHunt
+local LegendaryCharacter = ns.node.LegendaryCharacter
+local MagicBoundChest = ns.node.MagicBoundChest
+local PM = ns.node.ProfessionMasters
+local PrettyNeat = ns.node.PrettyNeat
+local PT = ns.node.ProfessionTreasures
+local RareElite = ns.node.RareElite
+local RichSoil = ns.node.RichSoil
+local Safari = ns.node.Safari
+local Scoutpack = ns.node.Scoutpack
+local SignalTransmitter = ns.node.SignalTransmitter
+local Squirrel = ns.node.Squirrel
+local TuskarrTacklebox = ns.node.TuskarrTacklebox
+local WarSupply = ns.node.WarSupply
 
-local Achievement = Dragonflight.reward.Achievement
-local Appearance = Dragonflight.reward.Appearance
-local Currency = Dragonflight.reward.Currency
-local Item = Dragonflight.reward.Item
-local Mount = Dragonflight.reward.Mount
-local Pet = Dragonflight.reward.Pet
-local Recipe = Dragonflight.reward.Recipe
-local Spacer = Dragonflight.reward.Spacer
-local Toy = Dragonflight.reward.Toy
-local Transmog = Dragonflight.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Appearance = ns.reward.Appearance
+local Currency = ns.reward.Currency
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Recipe = ns.reward.Recipe
+local Spacer = ns.reward.Spacer
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Path = Dragonflight.poi.Path
-local POI = Dragonflight.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
-local QuestStatus = Dragonflight.tooltip.QuestStatus
+local QuestStatus = ns.tooltip.QuestStatus
 
-local DC = Dragonflight.DRAGON_CUSTOMIZATIONS
+local DC = ns.DRAGON_CUSTOMIZATIONS
 
 -------------------------------------------------------------------------------
 
@@ -84,7 +84,7 @@ map.nodes[61636958] = Rare({
     id = 193220,
     vignette = 5193,
     quest = 73987,
-    interval = Dragonflight.Intervals.Interval14h({id = 25}),
+    interval = ns.Intervals.Interval14h({id = 25}),
     rewards = {
         Achievement({id = 16679, criteria = 56149}),
         Transmog({item = 200131, slot = L['dagger']}), -- Reclaimed Survivalist's Dagger
@@ -169,7 +169,7 @@ map.nodes[47675115] = Rare({
     id = 193234,
     vignette = 5198,
     quest = 73990,
-    interval = Dragonflight.Intervals.Interval14h({id = 6}),
+    interval = ns.Intervals.Interval14h({id = 6}),
     rewards = {
         Achievement({id = 16446, criteria = 55398, note = L['pretty_neat_note']}),
         Achievement({id = 16679, criteria = 56147}),
@@ -252,7 +252,7 @@ map.nodes[52895903] = Rare({
     id = 193246,
     vignette = 5204,
     quest = 74013,
-    interval = Dragonflight.Intervals.Interval14h({id = 12}),
+    interval = ns.Intervals.Interval14h({id = 12}),
     rewards = {
         Achievement({id = 16679, criteria = 56141}),
         Transmog({item = 200257, slot = L['2h_mace']}), -- Decay Infused Branch
@@ -270,7 +270,7 @@ map.nodes[59806100] = Rare({
     id = 193688,
     vignette = 5248,
     quest = 74020,
-    -- interval = Dragonflight.Intervals.Interval14h({id = 7}), -- wait for blizz fix.
+    -- interval = ns.Intervals.Interval14h({id = 7}), -- wait for blizz fix.
     rewards = {
         Achievement({id = 16679, criteria = 56140}),
         Transmog({item = 200146, slot = L['1h_mace']}), -- Phenran's Discordant Smasher
@@ -288,7 +288,7 @@ map.nodes[57218420] = Rare({
     id = 193210,
     vignette = 5192,
     quest = 74021,
-    interval = Dragonflight.Intervals.Interval14h({id = 0}),
+    interval = ns.Intervals.Interval14h({id = 0}),
     rewards = {
         Achievement({id = 16679, criteria = 56142}),
         Transmog({item = 200202, slot = L['mail']}), -- Tomorrow's Chains
@@ -345,7 +345,7 @@ map.nodes[40087014] = Rare({
     id = 193240,
     vignette = 5201,
     quest = 74024,
-    interval = Dragonflight.Intervals.Interval14h({id = 4}),
+    interval = ns.Intervals.Interval14h({id = 4}),
     rewards = {
         Achievement({id = 16679, criteria = 56148}),
         Transmog({item = 200131, slot = L['dagger']}), -- Reclaimed Survivalist's Dagger
@@ -366,7 +366,7 @@ map.nodes[50005180] = Rare({
     id = 193666,
     vignette = 5238,
     quest = 74025,
-    interval = Dragonflight.Intervals.Interval14h({id = 10}),
+    interval = ns.Intervals.Interval14h({id = 10}),
     rewards = {
         Achievement({id = 16679, criteria = 56151}),
         Transmog({item = 200131, slot = L['dagger']}), -- Reclaimed Survivalist's Dagger
@@ -385,7 +385,7 @@ map.nodes[37607780] = Rare({
     id = 193176,
     vignette = 5185,
     quest = 74029,
-    interval = Dragonflight.Intervals.Interval14h({id = 18}),
+    interval = ns.Intervals.Interval14h({id = 18}),
     location = L['in_cave'],
     rewards = {
         Achievement({id = 16679, criteria = 56150}),
@@ -405,7 +405,7 @@ map.nodes[47207895] = Rare({
     id = 193258,
     vignette = 5207,
     quest = 74035,
-    interval = Dragonflight.Intervals.Interval14h({id = 21}),
+    interval = ns.Intervals.Interval14h({id = 21}),
     rewards = {
         Achievement({id = 16679, criteria = 56144}),
         Transmog({item = 200139, slot = L['bow']}), -- Tempest Arc
@@ -464,7 +464,7 @@ map.nodes[35027001] = Rare({
     id = 193146,
     vignette = 5431,
     quest = 74036,
-    interval = Dragonflight.Intervals.Interval14h({id = 15}),
+    interval = ns.Intervals.Interval14h({id = 15}),
     location = L['in_cave'],
     rewards = {
         Achievement({id = 16679, criteria = 56146}),
@@ -665,9 +665,9 @@ map.nodes[52607673] = Treasure({
     quest = 70408,
     note = L['gem_cluster_note'],
     requires = {
-        Dragonflight.requirement.Reputation(2507, 21, true), -- Dragonscale Expedition
-        Dragonflight.requirement.Quest(70833), -- Rumors of the Jeweled Whelplings
-        Dragonflight.requirement.Quest(70407, '{item:198852}') -- Bear Termination Orders
+        ns.requirement.Reputation(2507, 21, true), -- Dragonscale Expedition
+        ns.requirement.Quest(70833), -- Rumors of the Jeweled Whelplings
+        ns.requirement.Quest(70407, '{item:198852}') -- Bear Termination Orders
     },
     rewards = {
         Achievement({id = 16301, criteria = 54812}), -- Treasures of Thaldraszus
@@ -679,8 +679,8 @@ map.nodes[33967695] = Treasure({
     quest = 70607,
     note = L['cracked_hourglass_note'],
     requires = {
-        Dragonflight.requirement.Quest(72709), -- Funding a Treasure Hunt
-        Dragonflight.requirement.Quest(70537, '{item:199068}') -- Time-Lost Memo
+        ns.requirement.Quest(72709), -- Funding a Treasure Hunt
+        ns.requirement.Quest(70537, '{item:199068}') -- Time-Lost Memo
     },
     rewards = {
         Achievement({id = 16301, criteria = 54810}), -- Treasures of Thaldraszus
@@ -699,7 +699,7 @@ map.nodes[60244164] = Treasure({
 map.nodes[58168007] = Treasure({
     quest = 70608,
     note = L['sandy_wooden_duck_note'],
-    requires = Dragonflight.requirement.Quest(70538, '{item:199069}'), -- Yennu's Map
+    requires = ns.requirement.Quest(70538, '{item:199069}'), -- Yennu's Map
     rewards = {
         Achievement({id = 16301, criteria = 54811}), -- Treasures of Thaldraszus
         Item({item = 200827, count = 5}) -- Weathered Sculpture
@@ -721,7 +721,7 @@ map.nodes[52458361] = Treasure({
     quest = 72355,
     label = '{npc:198604}',
     location = L['in_cave'],
-    requires = Dragonflight.requirement.Profession(186), -- Mining
+    requires = ns.requirement.Profession(186), -- Mining
     rewards = {
         Pet({item = 201463, id = 3415}) -- Cubbly
     }
@@ -739,7 +739,7 @@ val.nodes[09535629] = Treasure({
 
 -------------------------------------------------------------------------------
 
-tpf.nodes[28002590] = Dragonflight.node.ElementalChest({
+tpf.nodes[28002590] = ns.node.ElementalChest({
     quest = 71995,
     parent = map.id,
     label = L['chest_of_the_elements'],
@@ -757,50 +757,50 @@ tpf.nodes[28002590] = Dragonflight.node.ElementalChest({
 ---------------------------- DRACTHYR SUPPLY CHEST ----------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[42708120] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[42808040] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[43405150] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[43807770] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[44408150] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[44607730] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[44805170] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[45007870] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[45305520] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[45705750] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[46205190] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[47408040] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[48407650] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[50108070] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[55206730] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[55606930] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[56007140] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[57406630] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[57506640] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[58206750] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[61201730] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[61901250] = Dragonflight.node.DracthyrSupplyChest()
-map.nodes[65101310] = Dragonflight.node.DracthyrSupplyChest()
+map.nodes[42708120] = ns.node.DracthyrSupplyChest()
+map.nodes[42808040] = ns.node.DracthyrSupplyChest()
+map.nodes[43405150] = ns.node.DracthyrSupplyChest()
+map.nodes[43807770] = ns.node.DracthyrSupplyChest()
+map.nodes[44408150] = ns.node.DracthyrSupplyChest()
+map.nodes[44607730] = ns.node.DracthyrSupplyChest()
+map.nodes[44805170] = ns.node.DracthyrSupplyChest()
+map.nodes[45007870] = ns.node.DracthyrSupplyChest()
+map.nodes[45305520] = ns.node.DracthyrSupplyChest()
+map.nodes[45705750] = ns.node.DracthyrSupplyChest()
+map.nodes[46205190] = ns.node.DracthyrSupplyChest()
+map.nodes[47408040] = ns.node.DracthyrSupplyChest()
+map.nodes[48407650] = ns.node.DracthyrSupplyChest()
+map.nodes[50108070] = ns.node.DracthyrSupplyChest()
+map.nodes[55206730] = ns.node.DracthyrSupplyChest()
+map.nodes[55606930] = ns.node.DracthyrSupplyChest()
+map.nodes[56007140] = ns.node.DracthyrSupplyChest()
+map.nodes[57406630] = ns.node.DracthyrSupplyChest()
+map.nodes[57506640] = ns.node.DracthyrSupplyChest()
+map.nodes[58206750] = ns.node.DracthyrSupplyChest()
+map.nodes[61201730] = ns.node.DracthyrSupplyChest()
+map.nodes[61901250] = ns.node.DracthyrSupplyChest()
+map.nodes[65101310] = ns.node.DracthyrSupplyChest()
 
 -------------------------------------------------------------------------------
 ------------------------------- SIMMERING CHEST -------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[35608530] = Dragonflight.node.SimmeringChest()
-map.nodes[38908510] = Dragonflight.node.SimmeringChest()
-map.nodes[39908480] = Dragonflight.node.SimmeringChest()
-map.nodes[46906030] = Dragonflight.node.SimmeringChest()
-map.nodes[48905840] = Dragonflight.node.SimmeringChest()
-map.nodes[48905850] = Dragonflight.node.SimmeringChest()
-map.nodes[51406090] = Dragonflight.node.SimmeringChest()
+map.nodes[35608530] = ns.node.SimmeringChest()
+map.nodes[38908510] = ns.node.SimmeringChest()
+map.nodes[39908480] = ns.node.SimmeringChest()
+map.nodes[46906030] = ns.node.SimmeringChest()
+map.nodes[48905840] = ns.node.SimmeringChest()
+map.nodes[48905850] = ns.node.SimmeringChest()
+map.nodes[51406090] = ns.node.SimmeringChest()
 
 -------------------------------------------------------------------------------
 --------------------------------- TITAN CHEST ---------------------------------
 -------------------------------------------------------------------------------
 
-local TitanChest = Class('TitanChest', Dragonflight.node.Node, {
+local TitanChest = Class('TitanChest', ns.node.Node, {
     label = L['titan_chest'],
     icon = 'chest_pk',
-    group = Dragonflight.groups.TITAN_CHEST,
+    group = ns.groups.TITAN_CHEST,
     rewards = {
         Item({item = 191784}), -- Dragon Shard of Knowledge
         Transmog({item = 201048, slot = L['cloth']}), -- Tyrhold Epaulets
@@ -859,9 +859,9 @@ map.nodes[61906180] = TitanChest()
 ------------------------------ FROSTBOUND CHEST -------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[54006140] = Dragonflight.node.FrostboundChest()
-map.nodes[55206290] = Dragonflight.node.FrostboundChest()
-map.nodes[56206450] = Dragonflight.node.FrostboundChest()
+map.nodes[54006140] = ns.node.FrostboundChest()
+map.nodes[55206290] = ns.node.FrostboundChest()
+map.nodes[56206450] = ns.node.FrostboundChest()
 
 -------------------------------------------------------------------------------
 ------------------------------ WAR SUPPLY CHESTS ------------------------------
@@ -886,7 +886,7 @@ map.nodes[39467359] = PetBattle({
     id = 197336,
     rewards = {
         Achievement({id = 16464, criteria = 55490}), -- Battle on the Dragon Isles
-        Dragonflight.reward.Spacer(),
+        ns.reward.Spacer(),
         Achievement({id = 16501, criteria = 3, oneline = true}), -- Aquatic
         Achievement({id = 16503, criteria = 3, oneline = true}), -- Beast
         Achievement({id = 16504, criteria = 3, oneline = true}), -- Critter
@@ -904,7 +904,7 @@ map.nodes[56274924] = PetBattle({
     id = 197350,
     rewards = {
         Achievement({id = 16464, criteria = 55493}), -- Battle on the Dragon Isles
-        Dragonflight.reward.Spacer(),
+        ns.reward.Spacer(),
         Achievement({id = 16501, criteria = 6, oneline = true}), -- Aquatic
         Achievement({id = 16503, criteria = 6, oneline = true}), -- Beast
         Achievement({id = 16504, criteria = 6, oneline = true}), -- Critter
@@ -1190,8 +1190,8 @@ map.nodes[35107050] = MagicBoundChest({
 })
 map.nodes[42606660] = MagicBoundChest({
     requires = {
-        Dragonflight.requirement.Reputation(2507, 16, true),
-        Dragonflight.requirement.Profession(186)
+        ns.requirement.Reputation(2507, 16, true),
+        ns.requirement.Profession(186)
     },
     location = L['in_small_cave']
 })
@@ -1201,8 +1201,8 @@ map.nodes[42907900] = MagicBoundChest({
 })
 map.nodes[50205200] = MagicBoundChest({
     requires = {
-        Dragonflight.requirement.Reputation(2507, 16, true),
-        Dragonflight.requirement.Profession(186)
+        ns.requirement.Reputation(2507, 16, true),
+        ns.requirement.Profession(186)
     },
     location = L['in_small_cave']
 })
@@ -1210,8 +1210,8 @@ map.nodes[53005690] = MagicBoundChest()
 map.nodes[54108390] = MagicBoundChest({location = L['in_small_cave']})
 map.nodes[54803270] = MagicBoundChest({
     requires = {
-        Dragonflight.requirement.Reputation(2507, 16, true),
-        Dragonflight.requirement.Profession(186)
+        ns.requirement.Reputation(2507, 16, true),
+        ns.requirement.Profession(186)
     },
     location = L['in_small_cave']
 })
@@ -1284,7 +1284,7 @@ local HemetNesingwaryJr = Class('HemetNesingwaryJr', Collectible, {
     id = 194590,
     icon = 236444,
     sublabel = L['hnj_sublabel'],
-    group = Dragonflight.groups.HEMET_NESINGWARY_JR
+    group = ns.groups.HEMET_NESINGWARY_JR
 }) -- Hemet Nesingwary Jr.
 
 map.nodes[34676541] = HemetNesingwaryJr({
@@ -1304,7 +1304,7 @@ val.nodes[60921096] = Collectible({
     label = '{item:200904}',
     icon = 237358,
     note = L['picante_pomfruit_cake_note'] .. '\n\n' .. L['rumiastrasza_note'],
-    group = Dragonflight.groups.SPECIALTIES,
+    group = ns.groups.SPECIALTIES,
     parent = map.id,
     rewards = {Achievement({id = 16621, criteria = 55733})}
 }) -- Picante Pompfruit Cake
@@ -1313,7 +1313,7 @@ val.nodes[29046503] = Collectible({
     label = '{item:201045}',
     icon = 133994,
     note = L['icecrown_bleu_note'],
-    group = Dragonflight.groups.SPECIALTIES,
+    group = ns.groups.SPECIALTIES,
     parent = map.id,
     rewards = {Achievement({id = 16621, criteria = 55931})}
 }) -- Icecrown Bleu
@@ -1322,7 +1322,7 @@ map.nodes[50054267] = Collectible({
     label = '{item:201046}',
     icon = 132802,
     note = L['dreamwarding_dripbrew_note'],
-    group = Dragonflight.groups.SPECIALTIES,
+    group = ns.groups.SPECIALTIES,
     rewards = {Achievement({id = 16621, criteria = 55933})}
 }) -- Dreamwarding Dripbrew
 
@@ -1330,7 +1330,7 @@ tpf.nodes[61555322] = Collectible({
     label = '{item:201047}',
     icon = 134043,
     note = L['arcanostabilized_provisions_note'],
-    group = Dragonflight.groups.SPECIALTIES,
+    group = ns.groups.SPECIALTIES,
     parent = map.id,
     rewards = {Achievement({id = 16621, criteria = 55934})}
 }) -- Arcanostabilized Provisions
@@ -1339,7 +1339,7 @@ map.nodes[38944629] = Collectible({
     label = '{item:200871}',
     icon = 4639581,
     note = L['steamed_scarab_steak_note'],
-    group = Dragonflight.groups.SPECIALTIES,
+    group = ns.groups.SPECIALTIES,
     rewards = {Achievement({id = 16621, criteria = 55936})}
 }) -- Steamed Scarab Steak
 
@@ -1347,7 +1347,7 @@ map.nodes[58138299] = Collectible({
     label = '{item:201089}',
     icon = 644375,
     note = L['craft_creche_crowler_note'],
-    group = Dragonflight.groups.SPECIALTIES,
+    group = ns.groups.SPECIALTIES,
     rewards = {Achievement({id = 16621, criteria = 55940})}
 }) -- Craft Creche Crowler
 
@@ -1355,7 +1355,7 @@ map.nodes[52476961] = Collectible({
     label = '{item:201089}',
     icon = 644375,
     note = L['craft_creche_crowler_note'],
-    group = Dragonflight.groups.SPECIALTIES,
+    group = ns.groups.SPECIALTIES,
     rewards = {Achievement({id = 16621, criteria = 55940})}
 }) -- Craft Creche Crowler
 
@@ -1363,7 +1363,7 @@ map.nodes[52416987] = Collectible({
     label = '{item:201090}',
     icon = 134022,
     note = L['bivigosas_blood_sausages_note'],
-    group = Dragonflight.groups.SPECIALTIES,
+    group = ns.groups.SPECIALTIES,
     rewards = {Achievement({id = 16621, criteria = 55941})}
 }) -- Bivigosa's Blood Sausages
 
@@ -1420,7 +1420,7 @@ map.nodes[36036939] = LegendaryCharacter({
 local NewPerspective = Class('NewPerspective', Collectible, {
     icon = 1109100,
     note = L['new_perspective_note'],
-    group = Dragonflight.groups.NEW_PERSPECTIVE
+    group = ns.groups.NEW_PERSPECTIVE
 }) -- Framing a New Perspective
 
 function NewPerspective.getters:rewards()
@@ -1648,7 +1648,7 @@ map.nodes[52198159] = Collectible({
     icon = 4630470,
     label = '{achievement:19507}',
     note = L['fringe_benefits_note'],
-    group = Dragonflight.groups.FRINGE_BENEFITS,
+    group = ns.groups.FRINGE_BENEFITS,
     rewards = {
         Achievement({
             id = 19507,
@@ -1664,7 +1664,7 @@ val.nodes[61261096] = Collectible({
     icon = 629060,
     label = '{achievement:16556}',
     note = L['ruby_feast_gourmand'] .. '\n\n' .. L['rumiastrasza_note'],
-    group = Dragonflight.groups.RUBY_FEAST_GOURMAND,
+    group = ns.groups.RUBY_FEAST_GOURMAND,
     rewards = {
         Achievement({
             id = 16556,
@@ -1681,11 +1681,11 @@ val.nodes[13005740] = Collectible({
     icon = 4719556,
     label = '{achievement:18384}',
     note = L['little_scales_daycare_note'],
-    group = Dragonflight.groups.WHELP,
+    group = ns.groups.WHELP,
     requires = {
-        Dragonflight.requirement.Quest(72664), -- Eggs in Abundance
-        Dragonflight.requirement.Quest(72665), -- Whelptender's Wisdom
-        Dragonflight.requirement.Quest(72666) -- Daycare Director Agapanthus
+        ns.requirement.Quest(72664), -- Eggs in Abundance
+        ns.requirement.Quest(72665), -- Whelptender's Wisdom
+        ns.requirement.Quest(72666) -- Daycare Director Agapanthus
     },
     rewards = {
         Achievement({
@@ -1703,8 +1703,8 @@ val.nodes[13005740] = Collectible({
 --------------------------------- DREAMSURGE ---------------------------------
 ------------------------------------------------------------------------------
 
-map.nodes[51134337] = Dragonflight.node.Celestine()
-map.nodes[61792619] = Dragonflight.node.RenewedMagmammoth()
+map.nodes[51134337] = ns.node.Celestine()
+map.nodes[61792619] = ns.node.RenewedMagmammoth()
 
 -------------------------------------------------------------------------------
 ---------------------------------- RICH SOIL ----------------------------------
@@ -1841,11 +1841,11 @@ local HearthstoneEvent = Class('HearthstoneEvent', Collectible, {
         Transmog({item = 212336, slot = L['tabard']}), -- The Tavern's Tabard
         Item({item = 212335, note = L['bag']}) -- Collectors Carryall
     },
-    IsEnabled = function() return Dragonflight.IsCalendarEventActive(1578) end
+    IsEnabled = function() return ns.IsCalendarEventActive(1578) end
 }) -- Heathstone Event
 
-local stormwind = Dragonflight.maps[84] or Map({id = 84, settings = false})
-local durotar = Dragonflight.maps[1] or Map({id = 1, settings = false})
+local stormwind = ns.maps[84] or Map({id = 84, settings = false})
+local durotar = ns.maps[1] or Map({id = 1, settings = false})
 
 -- val.nodes[62556761] = HearthstoneEvent({parent = map.id})
 stormwind.nodes[34002100] = HearthstoneEvent()
@@ -1860,8 +1860,8 @@ val.nodes[43757494] = Collectible({
     parent = map.id,
     id = 187783,
     requires = {
-        Dragonflight.requirement.Item(197792, 3), Dragonflight.requirement.Item(197788, 1),
-        Dragonflight.requirement.Item(197789, 1)
+        ns.requirement.Item(197792, 3), ns.requirement.Item(197788, 1),
+        ns.requirement.Item(197789, 1)
     },
     rewards = {Pet({item = 193571, id = 3303})}
 }) -- Mallard Ducklin
@@ -1876,27 +1876,27 @@ map.nodes[40474531] = Collectible({
 
 ---------------------------- PET: MOTE OF NASZ'URO ----------------------------
 
-map.nodes[62711323] = Dragonflight.node.MoteOfNaszuro({
+map.nodes[62711323] = ns.node.MoteOfNaszuro({
     quest = 76189,
     note = L['naszuro_veiled_ossuary']
 }) -- Veiled Ossuary
 
-map.nodes[61234074] = Dragonflight.node.MoteOfNaszuro({
+map.nodes[61234074] = ns.node.MoteOfNaszuro({
     quest = 76190,
     note = L['naszuro_algethar_academy']
 }) -- Algeth'ar Academy
 
-map.nodes[72885505] = Dragonflight.node.MoteOfNaszuro({
+map.nodes[72885505] = ns.node.MoteOfNaszuro({
     quest = 76191,
     note = L['naszuro_vault_of_the_incarnates']
 }) -- Vault of the Incarnates
 
-map.nodes[70876985] = Dragonflight.node.MoteOfNaszuro({
+map.nodes[70876985] = ns.node.MoteOfNaszuro({
     quest = 76192,
     note = L['naszuro_thaldraszus_peak']
 }) -- Thaldraszus Peak
 
-map.nodes[62618507] = Dragonflight.node.MoteOfNaszuro({
+map.nodes[62618507] = ns.node.MoteOfNaszuro({
     quest = 76193,
     note = L['naszuro_temporal_conflux']
 }) -- Temporal Conflux
@@ -1920,7 +1920,7 @@ map.nodes[54648589] = Collectible({
 
 -------------------------------------------------------------------------------
 
-local Catalyst = Class('Catalyst', Dragonflight.node.Node, {
+local Catalyst = Class('Catalyst', ns.node.Node, {
     label = L['revival_catalyst_label'],
     icon = 348536 -- Season 4
 }) -- Revival Catalyst
@@ -1977,19 +1977,19 @@ val.nodes[35182459] = NPC({
 
 ---------------------------- SPECIAL WORKING TABLE-----------------------------
 
-map.nodes[60918021] = Dragonflight.node.Node({
+map.nodes[60918021] = ns.node.Node({
     label = L['temporal_loom_label'],
     icon = 4549302,
     note = L['temporal_loom_note'],
     IsEnabled = function(self) -- Tailoring
-        if not Dragonflight.PlayerHasProfession(197) then return false end
-        return Dragonflight.node.Item.IsEnabled(self)
+        if not ns.PlayerHasProfession(197) then return false end
+        return ns.node.Item.IsEnabled(self)
     end
 }) -- Temporal Loom
 
 ---------------- PORTAL TO CENTRAL ENCAMPMENT - EMERALD DREAM -----------------
 
-val.nodes[62685732] = Dragonflight.node.Node({
+val.nodes[62685732] = ns.node.Node({
     label = '{spell:370368}',
     sublabel = '{spell:429034}',
     icon = 'portal_gn',

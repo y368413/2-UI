@@ -120,6 +120,13 @@ local function createOverlayGlow()
 	local name = "ButtonGlowOverlay"..tostring(numOverlays)
 	local overlay = CreateFrame("Frame", name, UIParent)
 
+	-- spark
+	overlay.spark = overlay:CreateTexture(name .. "Spark", "BACKGROUND")
+	overlay.spark:SetPoint("CENTER")
+	overlay.spark:SetAlpha(0)
+	overlay.spark:SetTexture([[Interface\SpellActivationOverlay\IconAlert]])
+	overlay.spark:SetTexCoord(0.00781250, 0.61718750, 0.00390625, 0.26953125)
+
 	-- inner glow
 	overlay.innerGlow = overlay:CreateTexture(name.."InnerGlow", "ARTWORK")
 	overlay.innerGlow:SetPoint("CENTER")

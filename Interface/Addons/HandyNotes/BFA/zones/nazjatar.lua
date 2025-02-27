@@ -1,31 +1,30 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Class = ns.Class
+local Map = ns.Map
 
-local _, BattleForAzeroth = ...
-local L = BattleForAzeroth.locale
-local Class = BattleForAzeroth.Class
-local Map = BattleForAzeroth.Map
+local Collectible = ns.node.Collectible
+local Node = ns.node.Node
+local NPC = ns.node.NPC
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
+local Supply = ns.node.Supply
+local Treasure = ns.node.Treasure
 
-local Collectible = BattleForAzeroth.node.Collectible
-local Node = BattleForAzeroth.node.Node
-local NPC = BattleForAzeroth.node.NPC
-local PetBattle = BattleForAzeroth.node.PetBattle
-local Rare = BattleForAzeroth.node.Rare
-local Safari = BattleForAzeroth.node.Safari
-local Supply = BattleForAzeroth.node.Supply
-local Treasure = BattleForAzeroth.node.Treasure
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Quest = ns.reward.Quest
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Achievement = BattleForAzeroth.reward.Achievement
-local Item = BattleForAzeroth.reward.Item
-local Mount = BattleForAzeroth.reward.Mount
-local Pet = BattleForAzeroth.reward.Pet
-local Quest = BattleForAzeroth.reward.Quest
-local Toy = BattleForAzeroth.reward.Toy
-local Transmog = BattleForAzeroth.reward.Transmog
-
-local Arrow = BattleForAzeroth.poi.Arrow
-local POI = BattleForAzeroth.poi.POI
+local Arrow = ns.poi.Arrow
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -42,7 +41,7 @@ end
 ------------------------------------ INTRO ------------------------------------
 -------------------------------------------------------------------------------
 
-local Intro = Class('Intro', BattleForAzeroth.node.Intro)
+local Intro = Class('Intro', ns.node.Intro)
 
 Intro.note = L['naz_intro_note']
 
@@ -125,7 +124,6 @@ map.nodes[58605329] = Rare({
     quest = 56281,
     note = L['anemonar_note'],
     rewards = {
-        Achievement({id = 13691, criteria = 45522}), -- Kill
         Achievement({id = 13692, criteria = {46088, 46089}}), -- Ancient Reefwalker Bark, Reefwalker Bark
         Item({item = 170184, weekly = 57140}) -- Ancient Reefwalker Bark
     }
@@ -135,7 +133,7 @@ map.nodes[36931120] = Rare({
     id = 150191,
     quest = 55584,
     note = L['avarius_note'],
-    requires = BattleForAzeroth.requirement.Item(167012),
+    requires = ns.requirement.Item(167012),
     rewards = {
         Pet({id = 2706, item = 169373}) -- Brinestone Algan
     }
@@ -168,7 +166,7 @@ map.nodes[54664179] = Rare({
     id = 149653,
     quest = 55366,
     note = L['lasher_note'],
-    requires = BattleForAzeroth.requirement.Item(166888),
+    requires = ns.requirement.Item(166888),
     rewards = {
         Pet({id = 2708, item = 169375}) -- Coral Lashling
     }
@@ -260,7 +258,7 @@ map.nodes[50056991] = Rare({
     id = 152567,
     quest = 56287,
     note = L['kelpwillow_note'],
-    requires = BattleForAzeroth.requirement.Item(167893),
+    requires = ns.requirement.Item(167893),
     rewards = {
         Achievement({id = 13691, criteria = 45535}), -- Kill
         Achievement({id = 13692, criteria = {46088, 46089}}), -- Ancient Reefwalker Bark, Reefwalker Bark
@@ -458,7 +456,7 @@ map.nodes[67243458] = Rare({
     id = 151719,
     quest = 56300,
     note = L['voice_deeps_notes'],
-    requires = BattleForAzeroth.requirement.Item(168161),
+    requires = ns.requirement.Item(168161),
     rewards = {
         Achievement({id = 13691, criteria = 45558}), -- Kill
         Achievement({id = 13692, criteria = 46086}) -- Abyss Pearl
@@ -469,7 +467,7 @@ map.nodes[48002427] = Rare({
     id = 150468,
     quest = 55603,
     note = L['vorkoth_note'],
-    requires = BattleForAzeroth.requirement.Item(167059),
+    requires = ns.requirement.Item(167059),
     rewards = {
         Pet({id = 2709, item = 169376}) -- Skittering Eel
     }
@@ -522,7 +520,6 @@ map.nodes[coord(0, 1)] = Rare({
     minimap = false,
     note = L['zone_spawn'] .. ' ' .. L['rockweed_note'],
     rewards = {
-        Achievement({id = 13691, criteria = 45542}), -- Kill
         Pet({id = 2707, item = 169374}) -- Budding Algan
     }
 }) -- Rockweed Shambler
@@ -532,7 +529,7 @@ map.nodes[coord(1, 1)] = Rare({
     quest = 56276,
     minimap = false,
     note = L['sandcastle_note'],
-    requires = BattleForAzeroth.requirement.Item(167077),
+    requires = ns.requirement.Item(167077),
     rewards = {
         Achievement({id = 13691, criteria = 45543}), -- Kill
         Pet({id = 2703, item = 169369}) -- Sandkeep
@@ -608,7 +605,7 @@ local NazSupply = Class('NazSupply', Supply, {
         Achievement({
             id = 13720,
             criteria = {{id = 45790, suffix = L['assassin_looted']}}
-        }), BattleForAzeroth.reward.Spacer(), Achievement({id = 12572})
+        }), ns.reward.Spacer(), Achievement({id = 12572})
     }
 })
 
@@ -709,7 +706,7 @@ map.nodes[55154877] = Node({
     scale = 2,
     label = L['strange_crystal'],
     note = L['strange_crystal_note'],
-    group = BattleForAzeroth.groups.PRISMATICS,
+    group = ns.groups.PRISMATICS,
     -- Hide node even when "Show completed" is enabled
     IsEnabled = function()
         return not C_QuestLog.IsQuestFlaggedCompleted(CRYSTAL_QUEST)
@@ -722,7 +719,7 @@ local Crystal = Class('Crystal', Node, {
     scale = 1.5,
     label = '{item:167893}',
     note = L['prismatic_crystal_note'],
-    group = BattleForAzeroth.groups.PRISMATICS
+    group = ns.groups.PRISMATICS
 })
 
 map.nodes[29503608] = Crystal()
@@ -778,16 +775,16 @@ local SLIME_PETS = {
 local Slime = Class('RavenousSlime', NPC, {
     id = 151782,
     icon = 132107,
-    group = BattleForAzeroth.groups.SLIMES_NAZJ,
+    group = ns.groups.SLIMES_NAZJ,
     questAny = true,
     note = L['ravenous_slime_note'],
-    requires = BattleForAzeroth.requirement.Item(167893),
+    requires = ns.requirement.Item(167893),
     rewards = SLIME_PETS
 })
 
 local Cocoon = Class('SlimyCocoon', Node, {
     icon = 132833,
-    group = BattleForAzeroth.groups.SLIMES_NAZJ,
+    group = ns.groups.SLIMES_NAZJ,
     label = L['slimy_cocoon'],
     note = L['slimy_cocoon_note'],
     rewards = SLIME_PETS
@@ -811,7 +808,7 @@ map.nodes[71722570] = Cocoon({quest = 55476, questDeps = 55471})
 
 local Figurine = Class('CatFigurine', Collectible, {
     icon = 454045,
-    group = BattleForAzeroth.groups.CATS_NAZJ,
+    group = ns.groups.CATS_NAZJ,
     label = L['cat_figurine'],
     rewards = {
         Achievement({
@@ -839,7 +836,7 @@ map.nodes[38004925] = Figurine({quest = 56989, note = L['cat_figurine_10']})
 local FABIOUS = NPC({
     id = 65090,
     icon = 2741477,
-    group = BattleForAzeroth.groups.FABIOUS,
+    group = ns.groups.FABIOUS,
     label = '{item:169201}',
     note = L['fabious_desc'],
     rewards = {Mount({item = 169201, id = 1258})}
@@ -1064,7 +1061,7 @@ map.nodes[42206080] = Safari.SpireshellSnail({
 
 map.nodes[60683221] = Node({
     quest = 55121,
-    group = BattleForAzeroth.groups.MISC_NAZJ,
+    group = ns.groups.MISC_NAZJ,
     icon = 'portal_bl',
     scale = 1.5,
     label = L['mardivas_lab'],
@@ -1132,6 +1129,6 @@ map.nodes[60683221] = Node({
 map.nodes[45993245] = NPC({
     id = 152593,
     icon = 528288,
-    group = BattleForAzeroth.groups.MISC_NAZJ,
+    group = ns.groups.MISC_NAZJ,
     note = L['tentacle_taco']
 })

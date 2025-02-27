@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Core = ...
+local _, ns = ...
 
 -------------------------------------------------------------------------------
 -------------------------------- ICONS & GLOWS --------------------------------
@@ -16,7 +16,7 @@ local function Glow(name) return GLOWS .. '\\' .. name .. '.blp' end
 local DEFAULT_ICON = 454046
 local DEFAULT_GLOW = Glow('square_icon')
 
-Core.icons = { -- name => path
+ns.icons = { -- name => path
 
     bag = {Icon('bag'), Glow('bag')},
 
@@ -105,7 +105,7 @@ Core.icons = { -- name => path
 
 local function GetIconPath(name)
     if type(name) == 'number' then return name end
-    local info = Core.icons[name]
+    local info = ns.icons[name]
     return info and info[1] or DEFAULT_ICON
 end
 
@@ -120,10 +120,10 @@ end
 
 local function GetGlowPath(name)
     if type(name) == 'number' then return DEFAULT_GLOW end
-    local info = Core.icons[name]
+    local info = ns.icons[name]
     return info and info[2] or nil
 end
 
-Core.GetIconLink = GetIconLink
-Core.GetIconPath = GetIconPath
-Core.GetGlowPath = GetGlowPath
+ns.GetIconLink = GetIconLink
+ns.GetIconPath = GetIconPath
+ns.GetGlowPath = GetGlowPath

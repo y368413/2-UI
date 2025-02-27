@@ -9,7 +9,7 @@ I.Version = C_AddOns.GetAddOnMetadata("_ShiGuang", "Version")
 I.Support = C_AddOns.GetAddOnMetadata("_ShiGuang", "X-Support")
 I.Client = GetLocale()
 I.ScreenWidth, I.ScreenHeight = GetPhysicalScreenSize()
-I.isNewPatch = select(4, GetBuildInfo()) >= 110005 -- 11.0.5
+I.isNewPatch = select(4, GetBuildInfo()) >= 110100 -- 11.1.0
 I.isWW = select(4, GetBuildInfo()) >= 110000 -- 11.0.0
 
 -- Deprecated

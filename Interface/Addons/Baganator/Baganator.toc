@@ -1,8 +1,8 @@
-## Interface: 110005
+## Interface: 110007, 110100
 ## Title: Baganator
 ## Title-zhCN: |cff00ff00[背包]|r背包整合
 ## Title-zhTW: |cff00ff00[背包]|r背包整合
-## Version: 508
+## Version: 653
 ## Author: plusmouse
 ## OptionalDeps: Syndicator, Masque
 ## SavedVariables: BAGANATOR_CONFIG, BAGANATOR_DATA
@@ -11,6 +11,7 @@
 ## Dependencies: _ShiGuang
 
 ## X-Repple: 2 UI
+## Category:- |cFFFFFF00 2|r|cFFFF0000 UI |r -
 
 Embeds\json.lua
 
@@ -26,7 +27,10 @@ Core\Welcome.lua
 Core\Analytics.lua
 Core\Main.lua
 
-Skins.lua
+Skins\Utilities.lua
+Skins\Main.lua
+Skins\Blizzard.lua
+Skins\Dark.lua
 
 Sorting\BagUsageChecks.lua
 Sorting\ItemFields.lua
@@ -126,6 +130,7 @@ CustomiseDialog\Categories\DividerEditor.lua
 CustomiseDialog\Categories\DividerEditor.xml
 CustomiseDialog\Categories\RecentEditor.lua
 CustomiseDialog\Categories\EmptyEditor.lua
+CustomiseDialog\Categories\Utilities.lua
 CustomiseDialog\Categories\ImportExport.lua
 CustomiseDialog\Main.lua
 CustomiseDialog\Main.xml
@@ -142,3 +147,6 @@ API\Sorting.lua
 API\Pawn.lua
 
 Compatibility\VanillaEngraving.lua
+Compatibility\Lockpicking.lua
+Compatibility\Refunds.lua
+Compatibility\Contexts.lua

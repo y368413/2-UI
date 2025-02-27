@@ -1,43 +1,43 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Dragonflight = ...
-local Class = Dragonflight.Class
-local L = Dragonflight.locale
-local Map = Dragonflight.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = Dragonflight.node.Collectible
-local Node = Dragonflight.node.Node
-local NPC = Dragonflight.node.NPC
-local PetBattle = Dragonflight.node.PetBattle
-local Rare = Dragonflight.node.Rare
-local Vendor = Dragonflight.node.Vendor
+local Collectible = ns.node.Collectible
+local Node = ns.node.Node
+local NPC = ns.node.NPC
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Vendor = ns.node.Vendor
 
-local Dragonglyph = Dragonflight.node.Dragonglyph
-local ElusiveCreature = Dragonflight.node.ElusiveCreature
-local Flag = Dragonflight.node.Flag
-local SignalTransmitter = Dragonflight.node.SignalTransmitter
-local WarSupply = Dragonflight.node.WarSupply
+local Dragonglyph = ns.node.Dragonglyph
+local ElusiveCreature = ns.node.ElusiveCreature
+local Flag = ns.node.Flag
+local SignalTransmitter = ns.node.SignalTransmitter
+local WarSupply = ns.node.WarSupply
 
-local Achievement = Dragonflight.reward.Achievement
-local Currency = Dragonflight.reward.Currency
-local Item = Dragonflight.reward.Item
-local Mount = Dragonflight.reward.Mount
-local Pet = Dragonflight.reward.Pet
-local Recipe = Dragonflight.reward.Recipe
-local Section = Dragonflight.reward.Section
-local Spacer = Dragonflight.reward.Spacer
-local Toy = Dragonflight.reward.Toy
-local Transmog = Dragonflight.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Currency = ns.reward.Currency
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Recipe = ns.reward.Recipe
+local Section = ns.reward.Section
+local Spacer = ns.reward.Spacer
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Arrow = Dragonflight.poi.Arrow
-local Circle = Dragonflight.poi.Circle
-local Path = Dragonflight.poi.Path
-local POI = Dragonflight.poi.POI
+local Arrow = ns.poi.Arrow
+local Circle = ns.poi.Circle
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
-local ItemStatus = Dragonflight.tooltip.ItemStatus
+local ItemStatus = ns.tooltip.ItemStatus
 
-local DC = Dragonflight.DRAGON_CUSTOMIZATIONS
+local DC = ns.DRAGON_CUSTOMIZATIONS
 
 -------------------------------------------------------------------------------
 
@@ -297,7 +297,7 @@ dragonskullIsland.nodes[28984051] = LootSpecialist({
 local ProfessionRare = Class('ProfessionRare', NPC, {
     icon = 'peg_rd',
     scale = 1.5,
-    group = Dragonflight.groups.PROFESSION_RARES
+    group = ns.groups.PROFESSION_RARES
 }) -- Profession Rare
 
 function ProfessionRare.getters:sublabel()
@@ -305,7 +305,7 @@ function ProfessionRare.getters:sublabel()
 end
 
 function ProfessionRare.getters:requires()
-    return Dragonflight.requirement.Item(self.summoningItem)
+    return ns.requirement.Item(self.summoningItem)
 end
 
 function ProfessionRare.getters:note()
@@ -324,14 +324,14 @@ function ProfessionRare.getters:note()
 end
 
 function ProfessionRare.getters:rlabel()
-    return Dragonflight.GetIconLink(self.profession.icon, 13)
+    return ns.GetIconLink(self.profession.icon, 13)
 end
 
 local Tectonus = Class('Tectonus', ProfessionRare, {
     id = 200619,
     vignette = 5493,
     quest = 74300,
-    profession = Dragonflight.professions.MINING,
+    profession = ns.professions.MINING,
     summoningItem = 203418, -- Amplified Quaking Stone
     summoningObject = L['pr_rumbling_deposit'], -- Rumbling Deposit
     fgroup = 'fgroup_tectonus',
@@ -360,7 +360,7 @@ local SirPinchalot = Class('SirPinchalot', ProfessionRare, {
     id = 200620,
     vignette = 5494,
     quest = 74305,
-    profession = Dragonflight.professions.FISHING,
+    profession = ns.professions.FISHING,
     summoningItem = 203419, -- Elusive Croaking Crab
     summoningObject = L['pr_empty_crab_trap'], -- Empty Crab Trap
     fgroup = 'fgroup_sirpinchalot',
@@ -377,7 +377,7 @@ local Manathema = Class('Manathema', ProfessionRare, {
     id = 200621,
     vignette = 5495,
     quest = 74306,
-    profession = Dragonflight.professions.ENCHANTING,
+    profession = ns.professions.ENCHANTING,
     summoningItem = 203410, -- Glowing Crystal Bookmark
     summoningObject = L['pr_book_of_arcane_entities'], -- Book of Arcane Entities
     summoningReagent = 203401, -- Dull Crystal
@@ -403,7 +403,7 @@ local Snarfang = Class('Snarfang', ProfessionRare, {
     id = 200622,
     vignette = 5496,
     quest = 74307,
-    profession = Dragonflight.professions.LEATHERWORKING,
+    profession = ns.professions.LEATHERWORKING,
     summoningItem = 203414, -- Reinforced Pristine Leather
     summoningObject = L['pr_tuskarr_tanning_rack'], -- Tuskarr Tanning Rack
     summoningReagent = 203405, -- Pristine Pelt
@@ -425,7 +425,7 @@ local Gareed = Class('Gareed', ProfessionRare, {
     id = 200722,
     vignette = 5499,
     quest = 74321,
-    profession = Dragonflight.professions.TAILORING,
+    profession = ns.professions.TAILORING,
     summoningItem = 203415, -- Morqut Kite
     summoningObject = L['pr_tuskarr_kite_post'], -- Tuskarr Kite Post
     summoningReagent = 203406, -- Torn Morqut Kite
@@ -444,7 +444,7 @@ local Faunos = Class('Faunos', ProfessionRare, {
     id = 200725,
     vignette = 5501,
     quest = 74322,
-    profession = Dragonflight.professions.SKINNING,
+    profession = ns.professions.SKINNING,
     summoningItem = 203417, -- Razor-Sharp Animal Bone
     summoningObject = L['pr_raw_argali_pelts'], -- Raw Argali Pelts
     fgroup = 'fgroup_faunos',
@@ -461,7 +461,7 @@ local TidesmithZarviss = Class('TidesmithZarviss', ProfessionRare, {
     id = 200730,
     vignette = 5502,
     quest = 74325,
-    profession = Dragonflight.professions.BLACKSMITHING,
+    profession = ns.professions.BLACKSMITHING,
     summoningItem = 203408, -- Ceremonial Trident
     summoningObject = L['pr_farescale_shrine'], -- Farscale Shrine
     summoningReagent = 203399, -- Damaged Trident
@@ -484,7 +484,7 @@ local Arcantrix = Class('Arcantrix', ProfessionRare, {
     id = 200737,
     vignette = 5503,
     quest = 74328,
-    profession = Dragonflight.professions.INSCRIPTION,
+    profession = ns.professions.INSCRIPTION,
     summoningItem = 203412, -- Dispelling Rune
     summoningObject = L['pr_spellsworn_ward'], -- Spellsword Ward
     summoningReagent = 203403, -- Hastily Scrawled Rune
@@ -509,7 +509,7 @@ local Kangalo = Class('Kangalo', ProfessionRare, {
     id = 200738,
     vignette = 5504,
     quest = 74329,
-    profession = Dragonflight.professions.HERBALISM,
+    profession = ns.professions.HERBALISM,
     summoningItem = 203416, -- Dormant Lifebloom Seeds
     summoningObject = L['pr_awakened_soil'], -- Awakened Soil
     fgroup = 'fgroup_kangalo',
@@ -527,7 +527,7 @@ local Fimbul = Class('Fimbul', ProfessionRare, {
     id = 200739,
     vignette = 5505,
     quest = 74330,
-    profession = Dragonflight.professions.ENGINEERING,
+    profession = ns.professions.ENGINEERING,
     summoningItem = 203411, -- Gnomish Voicebox
     summoningObject = L['pr_damaged_buzzspire'], -- Damaged Buzzspire 505
     summoningReagent = 203402, -- Broken Gnomish Voicebox
@@ -546,7 +546,7 @@ local AgniBlazehoof = Class('AgniBlazehoof', ProfessionRare, {
     id = 200740,
     vignette = 5506,
     quest = 74331,
-    profession = Dragonflight.professions.ALCHEMY,
+    profession = ns.professions.ALCHEMY,
     summoningItem = 203407, -- Draconic Suppression Powder
     summoningObject = L['pr_volatile_brazier'], -- Volatile Brazier
     summoningReagent = 203398, -- Essence of Dampening
@@ -565,7 +565,7 @@ local Luttrok = Class('Luttrok', ProfessionRare, {
     id = 200742,
     vignette = 5507,
     quest = 74332,
-    profession = Dragonflight.professions.COOKING,
+    profession = ns.professions.COOKING,
     summoningItem = 203409, -- Sparkling Spice Pouch
     summoningObject = L['pr_spiceless_stew'], -- Spiceless Stew
     summoningReagent = 203400, -- Lackluster Spices
@@ -585,7 +585,7 @@ local Amephyst = Class('Amephyst', ProfessionRare, {
     id = 200743,
     vignette = 5508,
     quest = 74333,
-    profession = Dragonflight.professions.JEWELCRAFTING,
+    profession = ns.professions.JEWELCRAFTING,
     summoningItem = 203413, -- Tuning Fork
     summoningObject = L['pr_resonant_crystal'], -- Resonant Crystal
     summoningReagent = 203404, -- Crystal Fork
@@ -620,7 +620,7 @@ dragonskullIsland.nodes[84045351] = Amephyst({
 ---------------------------------- TREASURES ----------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[48947352] = Dragonflight.node.ElementalChest({
+map.nodes[48947352] = ns.node.ElementalChest({
     label = L['storm_bound_chest_label'],
     quest = 74567,
     areaPOI = 7415,
@@ -711,7 +711,7 @@ local ForbiddenHoard = Class('ForbiddenHoard', Collectible, {
     icon = 'chest_pp',
     scale = 1.3,
     vignette = {5463, 5614},
-    group = Dragonflight.groups.FORBIDDEN_HOARD,
+    group = ns.groups.FORBIDDEN_HOARD,
     rewards = {
         Achievement({id = 17526, criteria = 58487}), -- Treasures of the Forbidden Reach
         Achievement({
@@ -795,7 +795,7 @@ local FroststoneVaultPrimalStorm = Class('FroststoneVaultPrimalStorm',
         icon = 463562,
         areaPOIs = {7408, 7409, 7410, 7411},
         mapID = map.id,
-        group = Dragonflight.groups.FROSTSTONE_VAULT_STORM,
+        group = ns.groups.FROSTSTONE_VAULT_STORM,
         rewards = FSV_PS['all'],
         note = L['gooey_snailemental_note'],
         IsEnabled = function(self)
@@ -817,16 +817,16 @@ map.nodes[60103875] = FroststoneVaultPrimalStorm()
 hooksecurefunc(AreaPOIPinMixin, 'TryShowTooltip', function(self)
     if self and self.areaPoiID then
         local mapID = self:GetMap().mapID
-        local group = Dragonflight.groups.FROSTSTONE_VAULT_STORM
+        local group = ns.groups.FROSTSTONE_VAULT_STORM
         if FSV_PS[self.areaPoiID] and group:GetDisplay(mapID) then
             local rewards = FSV_PS[self.areaPoiID]
-            Dragonflight.PrepareLinks(L['gooey_snailemental_note'])
-            if Dragonflight:GetOpt('show_notes') then
-                local note = Dragonflight.RenderLinks(L['gooey_snailemental_note'])
-                --GameTooltip:AddLine(' ')
+            ns.PrepareLinks(L['gooey_snailemental_note'])
+            if ns:GetOpt('show_notes') then
+                local note = ns.RenderLinks(L['gooey_snailemental_note'])
+                GameTooltip:AddLine(' ')
                 GameTooltip:AddLine(note)
             end
-            --GameTooltip:AddLine(' ')
+            GameTooltip:AddLine(' ')
             for i, reward in ipairs(rewards) do
                 if reward:IsEnabled() then
                     reward:Render(GameTooltip)
@@ -844,7 +844,7 @@ end)
 local SMALLTREASURE = Collectible({
     label = L['small_treasures_label'],
     icon = 'chest_rd',
-    group = Dragonflight.groups.SMALL_TREASURES,
+    group = ns.groups.SMALL_TREASURES,
     note = L['small_treasures_note'],
     rewards = {
         Achievement({
@@ -951,7 +951,7 @@ map.nodes[41905742] = ElusiveCreature({
         Item({item = 193211}), -- Resilient Leather
         Achievement({id = 18833, criteria = 61481}) -- Elusive Legends of the Dragon Isles
     },
-    pois = {Path({Dragonflight.poi.Circle({origin = 41905742, radius = 4})})}
+    pois = {Path({ns.poi.Circle({origin = 41905742, radius = 4})})}
 }) -- Elusive Frienzied Amberfir
 
 map.nodes[45804040] = ElusiveCreature({
@@ -963,7 +963,7 @@ map.nodes[45804040] = ElusiveCreature({
         Item({item = 204092}), -- Auric Fleece
         Achievement({id = 18833, criteria = 61482}) -- Elusive Legends of the Dragon Isles
     },
-    pois = {Path({Dragonflight.poi.Circle({origin = 45804040, radius = 2})})}
+    pois = {Path({ns.poi.Circle({origin = 45804040, radius = 2})})}
 }) -- Elusive Auric Argali
 
 -------------------------------------------------------------------------------
@@ -1019,8 +1019,8 @@ map.nodes[29265268] = Collectible({
     icon = 4909720,
     note = L['zskera_vaults_note'],
     fgroup = 'zskera_vaults',
-    group = Dragonflight.groups.ZSKERA_VAULTS,
-    requires = Dragonflight.requirement.Quest(73159), -- Exploring Our Past
+    group = ns.groups.ZSKERA_VAULTS,
+    requires = ns.requirement.Quest(73159), -- Exploring Our Past
     areaPOI = 7414,
     rewards = ZSKERA_VAULTS_REWARDS,
     pois = {
@@ -1032,10 +1032,10 @@ map.nodes[29265268] = Collectible({
 hooksecurefunc(AreaPOIPinMixin, 'TryShowTooltip', function(self)
     if self and self.areaPoiID then
         local mapID = self:GetMap().mapID
-        local group = Dragonflight.groups.ZSKERA_VAULTS
+        local group = ns.groups.ZSKERA_VAULTS
         if self.areaPoiID == 7414 and group:GetDisplay(mapID) then
             local rewards = ZSKERA_VAULTS_REWARDS
-            --GameTooltip:AddLine(' ')
+            GameTooltip:AddLine(' ')
             for i, reward in ipairs(rewards) do
                 if reward:IsEnabled() then
                     reward:Render(GameTooltip)
@@ -1054,9 +1054,9 @@ map.nodes[28268000] = Collectible({
     quest = 75047,
     location = L['in_zskera_vaults'],
     note = L['neltharions_toolkit_note'],
-    group = Dragonflight.groups.ZSKERA_VAULTS,
+    group = ns.groups.ZSKERA_VAULTS,
     fgroup = 'zskera_vaults',
-    requires = Dragonflight.requirement.Quest(73159), -- Exploring Our Past
+    requires = ns.requirement.Quest(73159), -- Exploring Our Past
     rewards = {
         DC.RenewedProtoDrake.Antlers -- Renewed Proto-Drake: Antlers
     }
@@ -1069,8 +1069,8 @@ local RecipeRat = Class('RecipeRat', Collectible, {
     location = L['in_zskera_vaults'],
     icon = 4509424,
     fgroup = 'zskera_vaults',
-    group = Dragonflight.groups.ZSKERA_VAULTS,
-    requires = Dragonflight.requirement.Quest(73159), -- Exploring Our Past
+    group = ns.groups.ZSKERA_VAULTS,
+    requires = ns.requirement.Quest(73159), -- Exploring Our Past
     rewards = {
         Recipe({item = 204073, profession = 185}) -- Ratcipe: Deviously Deviled Eggs
     }
@@ -1093,8 +1093,8 @@ local MossyMammoth = Class('MossyMammoth', Collectible, {
     location = L['in_zskera_vaults'],
     icon = 4034841,
     fgroup = 'zskera_vaults',
-    group = Dragonflight.groups.ZSKERA_VAULTS,
-    requires = Dragonflight.requirement.Quest(73159), -- Exploring Our Past
+    group = ns.groups.ZSKERA_VAULTS,
+    requires = ns.requirement.Quest(73159), -- Exploring Our Past
     rewards = {
         Mount({item = 192790, id = 1634}) -- Mossy Mammoth
     }
@@ -1129,9 +1129,9 @@ function MossyMammoth.getters:note()
 
     local function status(idx)
         if steps[idx].complete == true then
-            return Dragonflight.status.Green(idx)
+            return ns.status.Green(idx)
         else
-            return Dragonflight.status.Red(idx)
+            return ns.status.Red(idx)
         end
     end
 
@@ -1159,7 +1159,7 @@ map.nodes[30268000] = Collectible({
     icon = 132762,
     note = L['box_of_rocks_note'],
     fgroup = 'zskera_vaults',
-    group = Dragonflight.groups.ZSKERA_VAULTS,
+    group = ns.groups.ZSKERA_VAULTS,
     rewards = {
         Achievement({id = 18559, criteria = {id = 1, qty = true}}), -- Many Boxes, Many Rockses
         Toy({item = 207099}) -- Tiny Box of Tiny Rocks
@@ -1178,7 +1178,7 @@ map.nodes[36903792] = Flag({quest = 73700})
 -------------------------------------------------------------------------------
 
 local LibraryBook = Class('LibraryBook', Collectible,
-    {icon = 4549135, group = Dragonflight.groups.LIBRARY})
+    {icon = 4549135, group = ns.groups.LIBRARY})
 
 warCreche.nodes[52405962] = LibraryBook({
     label = L['spellsworn_missive_label'],
@@ -1226,7 +1226,7 @@ map.nodes[61533375] = LibraryBook({
 
 local ScrollHunter = Class('ScrollHunter', Collectible, {
     icon = 4549192,
-    group = Dragonflight.groups.SCROLL_HUNTER,
+    group = ns.groups.SCROLL_HUNTER,
     rewards = {
         Achievement({
             id = 17532,
@@ -1285,16 +1285,16 @@ dragonskullIsland.nodes[56317256] = MysteriousWritings({
 
 local ScalecommanderItem = Class('scalecommander_item', Collectible, {
     icon = 134422,
-    group = Dragonflight.groups.SCALECOMMANDER_ITEM,
+    group = ns.groups.SCALECOMMANDER_ITEM,
     IsCollected = function(self)
-        local item = Dragonflight.faction == 'Horde' and self.item[1] or self.item[2]
-        if Dragonflight.PlayerHasItem(item) then return true end
+        local item = ns.faction == 'Horde' and self.item[1] or self.item[2]
+        if ns.PlayerHasItem(item) then return true end
         return Collectible.IsCollected(self)
     end
 })
 
 function ScalecommanderItem.getters:label()
-    return Dragonflight.faction == 'Alliance' and self.allianceLabel or self.hordeLabel
+    return ns.faction == 'Alliance' and self.allianceLabel or self.hordeLabel
 end
 
 map.nodes[59646492] = ScalecommanderItem({
@@ -1343,37 +1343,37 @@ map.nodes[55393586] = ScalecommanderItem({
 ---------------------------------- CLUED IN -----------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[55424648] = Dragonflight.node.CluedIn({
+map.nodes[55424648] = ns.node.CluedIn({
     label = L['sun_bleached_vase'], -- Sun-Bleached Vase
     quest = 77424
 })
 
-map.nodes[54933669] = Dragonflight.node.CluedIn({
+map.nodes[54933669] = ns.node.CluedIn({
     label = L['untranslated_tome'], -- Untranslated Tome
     quest = 77424,
     location = L['untranslated_tome_note'],
     pois = {POI({55103878})} -- Entrance
 })
 
-map.nodes[56383872] = Dragonflight.node.CluedIn({
+map.nodes[56383872] = ns.node.CluedIn({
     label = L['mysterious_boot'], -- Mysterious Boot
     quest = 77424,
     location = L['mysterious_boot_note']
 })
 
-map.nodes[19621537] = Dragonflight.node.CluedIn({
+map.nodes[19621537] = ns.node.CluedIn({
     label = L['decaying_fishing_bucket'],
     quest = 77362,
     location = L['decaying_fishing_bucket_note']
 })
 
-map.nodes[18241313] = Dragonflight.node.CluedIn({
+map.nodes[18241313] = ns.node.CluedIn({
     label = L['forgotten_fishing_pole'],
     quest = 77362,
     location = L['forgotten_fishing_pole_note']
 })
 
-map.nodes[10591156] = Dragonflight.node.CluedIn({
+map.nodes[10591156] = ns.node.CluedIn({
     label = L['overgrown_fishing_bench'],
     quest = 77362,
     location = L['overgrown_fishing_bench_note']
@@ -1383,7 +1383,7 @@ map.nodes[10591156] = Dragonflight.node.CluedIn({
 -------------------------------- GOGGLE WOBBLE --------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[77143837] = Dragonflight.node.GoggleWobble({
+map.nodes[77143837] = ns.node.GoggleWobble({
     rewards = {Achievement({id = 19791, criteria = 65405})}
 })
 
@@ -1391,12 +1391,12 @@ map.nodes[77143837] = Dragonflight.node.GoggleWobble({
 ----------------------------- JUST ONE MORE THING -----------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[53004700] = Dragonflight.node.JustOneMoreThing({
+map.nodes[53004700] = ns.node.JustOneMoreThing({
     quest = {79601, 79600, 79599},
     rewards = {Achievement({id = 19792, criteria = 65408})} -- Lost Atheneum
 }) -- Research: Dracthyr of Forbidden Reach -- 77424
 
-map.nodes[17001600] = Dragonflight.node.JustOneMoreThing({
+map.nodes[17001600] = ns.node.JustOneMoreThing({
     quest = {79613, 79612, 79611},
     rewards = {Achievement({id = 19792, criteria = 65413})} -- Winglord's Perch
 }) -- Research: Drakonid of Forbidden Reach -- 77362
@@ -1465,7 +1465,7 @@ map.nodes[35905744] = Vendor({
 
 ---------------------------- PET: MOTE OF NASZ'URO ----------------------------
 
-map.nodes[36043426] = Dragonflight.node.MoteOfNaszuro({
+map.nodes[36043426] = ns.node.MoteOfNaszuro({
     quest = 76188,
     note = L['naszuro_caldera_of_the_menders']
 }) -- Caldera of the Menders

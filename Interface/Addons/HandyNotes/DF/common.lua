@@ -1,489 +1,489 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Dragonflight = ...
-local L = Dragonflight.locale
+local _, ns = ...
+local L = ns.locale
 
-local Class = Dragonflight.Class
-local Group = Dragonflight.Group
+local Class = ns.Class
+local Group = ns.Group
 
-local Collectible = Dragonflight.node.Collectible
-local Node = Dragonflight.node.Node
-local Rare = Dragonflight.node.Rare
-local Vendor = Dragonflight.node.Vendor
+local Collectible = ns.node.Collectible
+local Node = ns.node.Node
+local Rare = ns.node.Rare
+local Vendor = ns.node.Vendor
 
-local Achievement = Dragonflight.reward.Achievement
-local Currency = Dragonflight.reward.Currency
-local Item = Dragonflight.reward.Item
-local Manuscript = Dragonflight.reward.Manuscript
-local Mount = Dragonflight.reward.Mount
-local Pet = Dragonflight.reward.Pet
-local Recipe = Dragonflight.reward.Recipe
-local Section = Dragonflight.reward.Section
-local Spacer = Dragonflight.reward.Spacer
-local Toy = Dragonflight.reward.Toy
-local Transmog = Dragonflight.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Currency = ns.reward.Currency
+local Item = ns.reward.Item
+local Manuscript = ns.reward.Manuscript
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Recipe = ns.reward.Recipe
+local Section = ns.reward.Section
+local Spacer = ns.reward.Spacer
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
 -------------------------------------------------------------------------------
 
-Dragonflight.expansion = 10
+ns.expansion = 10
 
 -------------------------------------------------------------------------------
 ----------------------------------- GROUPS ------------------------------------
 -------------------------------------------------------------------------------
 
-Dragonflight.groups.CLAN_CHEST = Group('clan_chest', 'chest_bk', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.CLAN_CHEST = Group('clan_chest', 'chest_bk', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.COMMUNITY_FEAST = Group('community_feast', 629056, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.COMMUNITY_FEAST = Group('community_feast', 629056, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.DECAY_COVERED_CHEST = Group('decay_covered_chest', 'chest_pk', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.DECAY_COVERED_CHEST = Group('decay_covered_chest', 'chest_pk', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.DISTURBED_DIRT = Group('disturbed_dirt', 1060570, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.DISTURBED_DIRT = Group('disturbed_dirt', 1060570, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.DJARADIN_CACHE = Group('djaradin_cache', 'chest_pp', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.DJARADIN_CACHE = Group('djaradin_cache', 'chest_pp', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.DRACTHYR_SUPPLY_CHEST = Group('dracthyr_supply_chest', 'chest_bl', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.DRACTHYR_SUPPLY_CHEST = Group('dracthyr_supply_chest', 'chest_bl', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.DRAGON_GLYPH = Group('dragon_glyph', 4728198, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.DRAGON_GLYPH = Group('dragon_glyph', 4728198, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.DRAGONBANE_SIEGE = Group('dragonbane_siege', 3753264, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.DRAGONBANE_SIEGE = Group('dragonbane_siege', 3753264, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.DRAGONRACE = Group('dragonrace', 1100022, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.DRAGONRACE = Group('dragonrace', 1100022, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.DRUID_GLYPH = Group('druid_glyph', 625999, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION,
+ns.groups.DRUID_GLYPH = Group('druid_glyph', 625999, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION,
     class = 'DRUID'
 })
 
-Dragonflight.groups.EASTERN_KINGDOMS_CUP = Group('dragonrace', 1100022, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION,
-    IsEnabled = function() return Dragonflight.IsCalendarEventActive(1400) end
+ns.groups.EASTERN_KINGDOMS_CUP = Group('dragonrace', 1100022, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION,
+    IsEnabled = function() return ns.IsCalendarEventActive(1400) end
 })
 
-Dragonflight.groups.ELEMENTAL_STORM = Group('elemental_storm', 538566, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.ELEMENTAL_STORM = Group('elemental_storm', 538566, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.ELUSIVE_CREATURE = Group('elusive_creature', 644271, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION,
+ns.groups.ELUSIVE_CREATURE = Group('elusive_creature', 644271, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION,
     IsEnabled = function(self)
         -- Only display group for skinning players
-        if not Dragonflight.professions.SKINNING:HasProfession() then return false end
-        return Dragonflight.Group.IsEnabled(self)
+        if not ns.professions.SKINNING:HasProfession() then return false end
+        return ns.Group.IsEnabled(self)
     end
 })
 
-Dragonflight.groups.FORBIDDEN_HOARD = Group('forbidden_hoard', 'chest_pp', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.FORBIDDEN_HOARD = Group('forbidden_hoard', 'chest_pp', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.FROSTBOUND_CHEST = Group('frostbound_chest', 'chest_rd', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.FROSTBOUND_CHEST = Group('frostbound_chest', 'chest_rd', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.FROSTSTONE_VAULT_STORM = Group('froststone_vault_storm', 463562, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.FROSTSTONE_VAULT_STORM = Group('froststone_vault_storm', 463562, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.GRAND_HUNTS = Group('grand_hunts', 237377, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.GRAND_HUNTS = Group('grand_hunts', 237377, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.ICEMAW_STORAGE_CACHE = Group('icemaw_storage_cache', 'chest_nv', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.ICEMAW_STORAGE_CACHE = Group('icemaw_storage_cache', 'chest_nv', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.KALIMDOR_CUP = Group('dragonrace', 1100022, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION,
-    IsEnabled = function() return Dragonflight.IsCalendarEventActive(1395) end
+ns.groups.KALIMDOR_CUP = Group('dragonrace', 1100022, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION,
+    IsEnabled = function() return ns.IsCalendarEventActive(1395) end
 })
 
-Dragonflight.groups.LIGHTNING_BOUND_CHEST = Group('lightning_bound_chest', 'chest_pp', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.LIGHTNING_BOUND_CHEST = Group('lightning_bound_chest', 'chest_pp', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.MAGICBOUND_CHEST = Group('magicbound_chest', 'chest_tl', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.MAGICBOUND_CHEST = Group('magicbound_chest', 'chest_tl', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.OUTLAND_CUP = Group('dragonrace', 1100022, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION,
-    IsEnabled = function() return Dragonflight.IsCalendarEventActive(1407) end
+ns.groups.OUTLAND_CUP = Group('dragonrace', 1100022, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION,
+    IsEnabled = function() return ns.IsCalendarEventActive(1407) end
 })
 
-Dragonflight.groups.PROFESSION_RARES = Group('profession_rares', 'peg_rd', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.PROFESSION_RARES = Group('profession_rares', 'peg_rd', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.PROFESSION_TREASURES = Group('profession_treasures', 4620676, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.PROFESSION_TREASURES = Group('profession_treasures', 4620676, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.REED_CHEST = Group('reed_chest', 'chest_yw', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.REED_CHEST = Group('reed_chest', 'chest_yw', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.RICH_SOIL = Group('rich_soil', 4554355, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION,
+ns.groups.RICH_SOIL = Group('rich_soil', 4554355, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION,
     IsEnabled = function(self)
         -- Only display group for herbalism players
-        if not Dragonflight.professions.HERBALISM:HasProfession() then return false end
+        if not ns.professions.HERBALISM:HasProfession() then return false end
         return Group.IsEnabled(self)
     end
 })
 
-Dragonflight.groups.RITUAL_OFFERING = Group('ritual_offering', 'chest_bn', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.RITUAL_OFFERING = Group('ritual_offering', 'chest_bn', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.SCOUT_PACK = Group('scout_pack', 4562583, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.SCOUT_PACK = Group('scout_pack', 4562583, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.SECRETS_OF_AZEROTH = Group('secrets_of_azeroth', 'peg_gn', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.SECRETS_OF_AZEROTH = Group('secrets_of_azeroth', 'peg_gn', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.SIGNAL_TRANSMITTER = Group('signal_transmitter', 4548860, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION,
+ns.groups.SIGNAL_TRANSMITTER = Group('signal_transmitter', 4548860, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION,
     IsEnabled = function(self)
         -- Only display group for engineering players
-        if not Dragonflight.professions.ENGINEERING:HasProfession() then
+        if not ns.professions.ENGINEERING:HasProfession() then
             return false
         end
         return Group.IsEnabled(self)
     end
 })
 
-Dragonflight.groups.SIMMERING_CHEST = Group('simmering_chest', 'chest_gn', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.SIMMERING_CHEST = Group('simmering_chest', 'chest_gn', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.SOMNUT = Group('somnut', 656681, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.SOMNUT = Group('somnut', 656681, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.SMALL_TREASURES = Group('small_treasures', 'chest_rd', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.SMALL_TREASURES = Group('small_treasures', 'chest_rd', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.SMELLY_TRASH_PILE = Group('smelly_trash_pile', 'chest_gn', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.SMELLY_TRASH_PILE = Group('smelly_trash_pile', 'chest_gn', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.SMELLY_TREASURE_CHEST = Group('smelly_treasure_chest', 'chest_rd', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.SMELLY_TREASURE_CHEST = Group('smelly_treasure_chest', 'chest_rd', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.TITAN_CHEST = Group('titan_chest', 'chest_rd', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.TITAN_CHEST = Group('titan_chest', 'chest_rd', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.TUSKARR_CHEST = Group('tuskarr_chest', 'chest_bn', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.TUSKARR_CHEST = Group('tuskarr_chest', 'chest_bn', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.TUSKARR_TACKLEBOX = Group('tuskarr_tacklebox', 'chest_yw', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.TUSKARR_TACKLEBOX = Group('tuskarr_tacklebox', 'chest_yw', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.WARCRAFT_RUMBLE = Group('warcraft_rumble', 5149946, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.WARCRAFT_RUMBLE = Group('warcraft_rumble', 5149946, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.ZONE_EVENT = Group('zone_event', 'peg_rd', {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.ZONE_EVENT = Group('zone_event', 'peg_rd', {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.ZSKERA_VAULTS = Group('zskera_vaults', 4909720, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.ZSKERA_VAULTS = Group('zskera_vaults', 4909720, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION
 })
 
-Dragonflight.groups.WAR_SUPPLY = Group('war_supplies', 'star_chest_g', {
-    defaults = Dragonflight.GROUP_HIDDEN75,
-    type = Dragonflight.group_types.EXPANSION
+ns.groups.WAR_SUPPLY = Group('war_supplies', 'star_chest_g', {
+    defaults = ns.GROUP_HIDDEN75,
+    type = ns.group_types.EXPANSION
 })
 
 -------------------------------------------------------------------------------
 
-Dragonflight.groups.ANCESTOR = Group('ancestor', 135946, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.ANCESTOR = Group('ancestor', 135946, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16423
 })
 
-Dragonflight.groups.ANCIENT_STONES = Group('ancient_stones', 134461, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.ANCIENT_STONES = Group('ancient_stones', 134461, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 17561
 })
 
-Dragonflight.groups.BAKAR = Group('bakar', 930453, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.BAKAR = Group('bakar', 930453, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16424
 })
 
-Dragonflight.groups.CHISELED_RECORD = Group('chiseled_record', 134455, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.CHISELED_RECORD = Group('chiseled_record', 134455, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16412
 })
 
-Dragonflight.groups.DREAM_OF_SEEDS = Group('dream_of_seeds', 464030, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.DREAM_OF_SEEDS = Group('dream_of_seeds', 464030, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 19013
 })
 
-Dragonflight.groups.DREAMGUARD = Group('dreamguard', 341763, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.DREAMGUARD = Group('dreamguard', 341763, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16574
 })
 
-Dragonflight.groups.DREAMFRUIT = Group('dreamfruit', 5390643, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.DREAMFRUIT = Group('dreamfruit', 5390643, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 19310
 })
 
-Dragonflight.groups.DUCKLINGS = Group('ducklings', 4048818, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.DUCKLINGS = Group('ducklings', 4048818, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16409
 })
 
-Dragonflight.groups.FLAG = Group('flag', 1723999, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.FLAG = Group('flag', 1723999, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 15890
 })
 
-Dragonflight.groups.FRAGMENT = Group('fragment', 134908, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.FRAGMENT = Group('fragment', 134908, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16323
 })
 
-Dragonflight.groups.FRINGE_BENEFITS = Group('fringe_benefits', 4630470, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.FRINGE_BENEFITS = Group('fringe_benefits', 4630470, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 19507
 })
 
-Dragonflight.groups.GRAND_THEFT_MAMMOTH = Group('grand_theft_mammoth', 4034836, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.GRAND_THEFT_MAMMOTH = Group('grand_theft_mammoth', 4034836, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16493
 })
 
-Dragonflight.groups.RUBY_FEAST_GOURMAND = Group('ruby_feast_gourmand', 629060, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.RUBY_FEAST_GOURMAND = Group('ruby_feast_gourmand', 629060, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16556
 })
 
-Dragonflight.groups.HEMET_NESINGWARY_JR = Group('hemet_nesingwary_jr', 236444, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.HEMET_NESINGWARY_JR = Group('hemet_nesingwary_jr', 236444, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16542
 })
 
-Dragonflight.groups.KITE = Group('kite', 133837, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.KITE = Group('kite', 133837, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16584
 })
 
-Dragonflight.groups.LEGENDARY_ALBUM = Group('legendary_album', 1109168, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.LEGENDARY_ALBUM = Group('legendary_album', 1109168, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16570
 })
 
-Dragonflight.groups.LEYLINE = Group('leyline', 1033908, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.LEYLINE = Group('leyline', 1033908, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16638
 })
 
-Dragonflight.groups.LIBRARY = Group('librarian_of_the_reach', 4549135, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.LIBRARY = Group('librarian_of_the_reach', 4549135, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 17530
 })
 
-Dragonflight.groups.MANY_BOXES = Group('many_boxes', 132762, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.MANY_BOXES = Group('many_boxes', 132762, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 18559
 })
 
-Dragonflight.groups.MOONKIN_HATCHLING = Group('moonkin_hatchling', 467894, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.MOONKIN_HATCHLING = Group('moonkin_hatchling', 467894, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 19293
 })
 
-Dragonflight.groups.NEW_PERSPECTIVE = Group('new_perspective', 1109100, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.NEW_PERSPECTIVE = Group('new_perspective', 1109100, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16634
 })
 
-Dragonflight.groups.NOKHUD_DO_IT = Group('nokhud_do_it', 1103068, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.NOKHUD_DO_IT = Group('nokhud_do_it', 1103068, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16583
 })
 
-Dragonflight.groups.PRETTY_NEAT = Group('pretty_neat', 133707, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.PRETTY_NEAT = Group('pretty_neat', 133707, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16446
 })
 
-Dragonflight.groups.SAFARI = Group('safari', 4048818, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.SAFARI = Group('safari', 4048818, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16519
 })
 
-Dragonflight.groups.EMERALD_DREAM_SAFARI = Group('emerald_dream_safari', 4899641, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.EMERALD_DREAM_SAFARI = Group('emerald_dream_safari', 4899641, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 19401
 })
 
-Dragonflight.groups.SCALECOMMANDER_ITEM = Group('scalecommander_item', 134422, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.SCALECOMMANDER_ITEM = Group('scalecommander_item', 134422, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 17315
 })
 
-Dragonflight.groups.SCROLL_HUNTER = Group('scroll_hunter', 4549192, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.SCROLL_HUNTER = Group('scroll_hunter', 4549192, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 17532
 })
 
-Dragonflight.groups.SNACK_ATTACK = Group('snack_attack', 134062, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.SNACK_ATTACK = Group('snack_attack', 134062, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16410
 })
 
-Dragonflight.groups.SPECIALTIES = Group('specialties', 651585, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.SPECIALTIES = Group('specialties', 651585, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16621
 })
 
-Dragonflight.groups.SQUIRRELS = Group('squirrels', 237182, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.SQUIRRELS = Group('squirrels', 237182, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16729
 })
 
-Dragonflight.groups.VEGETARIAN_DIET = Group('vegetarian_diet', 4635249, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.VEGETARIAN_DIET = Group('vegetarian_diet', 4635249, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16762
 })
 
-Dragonflight.groups.WHELP = Group('whelp', 4719556, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.WHELP = Group('whelp', 4719556, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 18384
 })
 
-Dragonflight.groups.ZARALEK_SQUIRRELS = Group('zaralek_squirrels', 237182, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.ZARALEK_SQUIRRELS = Group('zaralek_squirrels', 237182, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 18361
 })
 
-Dragonflight.groups.STORIES = Group('stories', 4549126, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.STORIES = Group('stories', 4549126, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 16406
 })
 
-Dragonflight.groups.CLUED_IN = Group('clued_in', 618973, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.CLUED_IN = Group('clued_in', 618973, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 19787
 })
 
-Dragonflight.groups.GOGGLE_WOBBLE = Group('goggle_wobble', 133023, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.GOGGLE_WOBBLE = Group('goggle_wobble', 133023, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 19791
 })
 
-Dragonflight.groups.JUST_ONE_MORE_THING = Group('just_one_more_thing', 1411833, {
-    defaults = Dragonflight.GROUP_HIDDEN,
-    type = Dragonflight.group_types.ACHIEVEMENT,
+ns.groups.JUST_ONE_MORE_THING = Group('just_one_more_thing', 1411833, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.ACHIEVEMENT,
     achievement = 19792
 })
 
@@ -492,43 +492,43 @@ Dragonflight.groups.JUST_ONE_MORE_THING = Group('just_one_more_thing', 1411833, 
 -------------------------------------------------------------------------------
 
 local RareElite = Class('RareElite', Rare, {
-    rlabel = '(' .. Dragonflight.color.Gray(L['elite']) .. ')',
+    rlabel = '(' .. ns.color.Gray(L['elite']) .. ')',
     sublabel = L['elite_loot_higher_ilvl']
 })
 
-Dragonflight.node.RareElite = RareElite
+ns.node.RareElite = RareElite
 
 -------------------------------------------------------------------------------
 ----------------------------- PROFESSION TREASURES ----------------------------
 -------------------------------------------------------------------------------
 
-local ProfessionMaster = Class('ProfessionMaster', Dragonflight.node.NPC, {
+local ProfessionMaster = Class('ProfessionMaster', ns.node.NPC, {
     scale = 0.9,
-    group = Dragonflight.groups.PROFESSION_TREASURES
+    group = ns.groups.PROFESSION_TREASURES
 })
 
 function ProfessionMaster:IsEnabled()
-    if not Dragonflight.PlayerHasProfession(self.skillID) then return false end
-    return Dragonflight.node.NPC.IsEnabled(self)
+    if not ns.PlayerHasProfession(self.skillID) then return false end
+    return ns.node.NPC.IsEnabled(self)
 end
 
-local ProfessionTreasure = Class('ProfessionTreasure', Dragonflight.node.Item, {
+local ProfessionTreasure = Class('ProfessionTreasure', ns.node.Item, {
     scale = 0.9,
-    group = Dragonflight.groups.PROFESSION_TREASURES
+    group = ns.groups.PROFESSION_TREASURES
 })
 
 function ProfessionTreasure:IsEnabled()
-    if not Dragonflight.PlayerHasProfession(self.skillID) then return false end
-    return Dragonflight.node.Item.IsEnabled(self)
+    if not ns.PlayerHasProfession(self.skillID) then return false end
+    return ns.node.Item.IsEnabled(self)
 end
 
-Dragonflight.node.ProfessionMasters = {}
-Dragonflight.node.ProfessionTreasures = {}
+ns.node.ProfessionMasters = {}
+ns.node.ProfessionTreasures = {}
 
-local PM = Dragonflight.node.ProfessionMasters
-local PT = Dragonflight.node.ProfessionTreasures
+local PM = ns.node.ProfessionMasters
+local PT = ns.node.ProfessionTreasures
 
-for _, profession in pairs(Dragonflight.professions) do
+for _, profession in pairs(ns.professions) do
     if profession.variantID ~= nil then
         local name = profession.name
         local icon = profession.icon
@@ -538,13 +538,13 @@ for _, profession in pairs(Dragonflight.professions) do
         PM[name] = Class(name .. 'Master', ProfessionMaster, {
             icon = icon,
             skillID = skillID,
-            requires = Dragonflight.requirement.Profession(skillID, variantID, 25)
+            requires = ns.requirement.Profession(skillID, variantID, 25)
         })
 
         PT[name] = Class(name .. 'Treasure', ProfessionTreasure, {
             icon = icon,
             skillID = skillID,
-            requires = Dragonflight.requirement.Profession(skillID, variantID, 25)
+            requires = ns.requirement.Profession(skillID, variantID, 25)
         })
     end
 end
@@ -556,11 +556,11 @@ end
 local Dragonglyph = Class('Dragonglyph', Collectible, {
     icon = 4728198,
     label = L['dragon_glyph'],
-    group = Dragonflight.groups.DRAGON_GLYPH,
-    requires = Dragonflight.requirement.Quest(68795) -- Dragonriding
+    group = ns.groups.DRAGON_GLYPH,
+    requires = ns.requirement.Quest(68795) -- Dragonriding
 })
 
-Dragonflight.node.Dragonglyph = Dragonglyph
+ns.node.Dragonglyph = Dragonglyph
 
 -------------------------------------------------------------------------------
 ---------------------------- DRAGON CUSTOMIZATIONS ----------------------------
@@ -570,7 +570,7 @@ Dragonflight.node.Dragonglyph = Dragonglyph
 -- obtainable. Many of these are available from multiple sources, so this
 -- gives us a single easy spot to keep their data and reference it elsewhere.
 
-Dragonflight.DRAGON_CUSTOMIZATIONS = {
+ns.DRAGON_CUSTOMIZATIONS = {
     RenewedProtoDrake = {
         Antlers = Manuscript({item = 202278, quest = 73058}),
         Armor = Manuscript({item = 197357, quest = 69558}),
@@ -984,7 +984,7 @@ Dragonflight.DRAGON_CUSTOMIZATIONS = {
     }
 }
 
-Dragonflight.DRAGON_CUSTOMIZATIONS.SetCount = function(dc, count)
+ns.DRAGON_CUSTOMIZATIONS.SetCount = function(dc, count)
     if not dc.quest then
         return Toy({item = dc.item, count = count, type = false})
     else
@@ -999,11 +999,11 @@ end
 local Flag = Class('Flag', Collectible, {
     icon = 1723999,
     label = L['dragonscale_expedition_flag'], -- Dragonscale Expedition Flag
-    rlabel = Dragonflight.tooltip.ReputationGain(250, 2507), -- Dragonscale Expedition
-    group = Dragonflight.groups.FLAG,
+    rlabel = ns.tooltip.ReputationGain(250, 2507), -- Dragonscale Expedition
+    group = ns.groups.FLAG,
     requires = {
-        Dragonflight.requirement.Reputation(2507, 6, true), -- Dragonscale Expedition
-        Dragonflight.requirement.GarrisonTalent(2164) -- Cartographer Flag
+        ns.requirement.Reputation(2507, 6, true), -- Dragonscale Expedition
+        ns.requirement.GarrisonTalent(2164) -- Cartographer Flag
     },
     rewards = {
         Achievement({
@@ -1016,7 +1016,7 @@ local Flag = Class('Flag', Collectible, {
     end
 })
 
-Dragonflight.node.Flag = Flag
+ns.node.Flag = Flag
 
 -------------------------------------------------------------------------------
 ------------------ WYRMHOLE GENERATOR - SIGNAL TRANSMITTER --------------------
@@ -1026,21 +1026,21 @@ local SignalTransmitter = Class('SignalTransmitter', Collectible, {
     label = L['signal_transmitter_label'],
     icon = 4548860,
     note = L['signal_transmitter_note'],
-    group = Dragonflight.groups.SIGNAL_TRANSMITTER,
+    group = ns.groups.SIGNAL_TRANSMITTER,
     requires = {
-        Dragonflight.requirement.Profession(202, 2827), -- DF Engineering
-        Dragonflight.requirement.Toy(198156) -- Wyrmhole Generator
+        ns.requirement.Profession(202, 2827), -- DF Engineering
+        ns.requirement.Toy(198156) -- Wyrmhole Generator
     },
     IsEnabled = function(self)
-        if not Dragonflight.PlayerHasProfession(202) then return false end
-        return Dragonflight.node.Item.IsEnabled(self)
+        if not ns.PlayerHasProfession(202) then return false end
+        return ns.node.Item.IsEnabled(self)
     end,
     IsCompleted = function(self)
         return C_QuestLog.IsQuestFlaggedCompleted(self.quest[1])
     end
 }) -- Wyrmhole Generator Signal Transmitter
 
-Dragonflight.node.SignalTransmitter = SignalTransmitter
+ns.node.SignalTransmitter = SignalTransmitter
 
 -------------------------------------------------------------------------------
 ---------------------------- FRAGMENTS OF HISTORY -----------------------------
@@ -1048,9 +1048,9 @@ Dragonflight.node.SignalTransmitter = SignalTransmitter
 
 local Fragment = Class('Fragment', Collectible, {
     icon = 134908,
-    group = Dragonflight.groups.FRAGMENT,
+    group = ns.groups.FRAGMENT,
     IsCollected = function(self)
-        if Dragonflight.PlayerHasItem(self.rewards[2].item) then return true end
+        if ns.PlayerHasItem(self.rewards[2].item) then return true end
         return Collectible.IsCollected(self)
     end
 })
@@ -1061,7 +1061,7 @@ function Fragment.getters:note()
                L['fragment_requirement_note']
 end
 
-Dragonflight.node.Fragment = Fragment
+ns.node.Fragment = Fragment
 
 -------------------------------------------------------------------------------
 ------------------------------- DISTURBED DIRT --------------------------------
@@ -1070,10 +1070,10 @@ Dragonflight.node.Fragment = Fragment
 local Disturbeddirt = Class('Disturbed_dirt', Node, {
     icon = 1060570,
     label = L['disturbed_dirt'],
-    group = Dragonflight.groups.DISTURBED_DIRT,
+    group = ns.groups.DISTURBED_DIRT,
     requires = {
-        Dragonflight.requirement.Quest(70813), -- Digging Up Treasure
-        Dragonflight.requirement.Item(191294) -- Small Expedition Shovel
+        ns.requirement.Quest(70813), -- Digging Up Treasure
+        ns.requirement.Item(191294) -- Small Expedition Shovel
     },
     rewards = {
         Item({item = 190453}), -- Spark of Ingenuity
@@ -1094,7 +1094,7 @@ local Disturbeddirt = Class('Disturbed_dirt', Node, {
     }
 })
 
-Dragonflight.node.Disturbeddirt = Disturbeddirt
+ns.node.Disturbeddirt = Disturbeddirt
 
 -------------------------------------------------------------------------------
 -------------------------- EXPEDITION SCOUT'S PACKS ---------------------------
@@ -1103,8 +1103,8 @@ Dragonflight.node.Disturbeddirt = Disturbeddirt
 local Scoutpack = Class('Scoutpack', Node, {
     icon = 4562583,
     label = L['scout_pack'],
-    group = Dragonflight.groups.SCOUT_PACK,
-    requires = Dragonflight.requirement.Quest(70822), -- Lost Expedition Scouts
+    group = ns.groups.SCOUT_PACK,
+    requires = ns.requirement.Quest(70822), -- Lost Expedition Scouts
     rewards = {
         Item({item = 191784}), -- Dragon Shard of Knowledge
         Mount({item = 192764, id = 1617}), -- Verdant Skitterfly
@@ -1128,7 +1128,7 @@ local Scoutpack = Class('Scoutpack', Node, {
     }
 })
 
-Dragonflight.node.Scoutpack = Scoutpack
+ns.node.Scoutpack = Scoutpack
 
 -------------------------------------------------------------------------------
 ------------------------------ Magic-Bound Chest ------------------------------
@@ -1138,8 +1138,8 @@ Dragonflight.node.Scoutpack = Scoutpack
 local MagicBoundChest = Class('MagicBoundChest', Node, {
     icon = 'chest_tl',
     label = L['magicbound_chest'] .. ' / ' .. L['ice_bound_chest'],
-    group = Dragonflight.groups.MAGICBOUND_CHEST,
-    requires = Dragonflight.requirement.Reputation(2507, 16, true), -- Dragonscale Expedition
+    group = ns.groups.MAGICBOUND_CHEST,
+    requires = ns.requirement.Reputation(2507, 16, true), -- Dragonscale Expedition
     rewards = {
         Item({item = 191784}), -- Dragon Shard of Knowledge
         Item({item = 199062, quest = 70528}), -- Ruby Gem Cluster Map
@@ -1151,7 +1151,7 @@ local MagicBoundChest = Class('MagicBoundChest', Node, {
     }
 })
 
-Dragonflight.node.MagicBoundChest = MagicBoundChest
+ns.node.MagicBoundChest = MagicBoundChest
 
 -------------------------------------------------------------------------------
 ------------------------------ TUSKARR TACKLEBOX ------------------------------
@@ -1160,10 +1160,10 @@ Dragonflight.node.MagicBoundChest = MagicBoundChest
 local TuskarrTacklebox = Class('TuskarrTacklebox', Node, {
     label = L['tuskarr_tacklebox'],
     icon = 'chest_yw',
-    group = Dragonflight.groups.TUSKARR_TACKLEBOX,
+    group = ns.groups.TUSKARR_TACKLEBOX,
     requires = {
-        Dragonflight.requirement.Reputation(2511, 27, true), -- Iskaara Tuskarr
-        Dragonflight.requirement.Quest(70952) -- Abandoned or Hidden Caches
+        ns.requirement.Reputation(2511, 27, true), -- Iskaara Tuskarr
+        ns.requirement.Quest(70952) -- Abandoned or Hidden Caches
     },
     rewards = {
         Item({item = 194730}), -- Scalebelly Mackerel
@@ -1180,16 +1180,16 @@ local TuskarrTacklebox = Class('TuskarrTacklebox', Node, {
     }
 })
 
-Dragonflight.node.TuskarrTacklebox = TuskarrTacklebox
+ns.node.TuskarrTacklebox = TuskarrTacklebox
 
 -------------------------------------------------------------------------------
 ---------------------------------- REED CHEST ---------------------------------
 -------------------------------------------------------------------------------
 
-Dragonflight.node.ReedChest = Class('ReedChest', Node, {
+ns.node.ReedChest = Class('ReedChest', Node, {
     label = L['reed_chest'],
     icon = 'chest_yw', -- TODO change color
-    group = Dragonflight.groups.REED_CHEST,
+    group = ns.groups.REED_CHEST,
     rewards = {
         Item({item = 191784}), -- Dragon Shard of Knowledge
         Item({item = 199061, quest = 70527}), -- A Guide to Rare Fish
@@ -1205,10 +1205,10 @@ Dragonflight.node.ReedChest = Class('ReedChest', Node, {
 ---------------------------- DRACTHYR SUPPLY CHEST ----------------------------
 -------------------------------------------------------------------------------
 
-Dragonflight.node.DracthyrSupplyChest = Class('DracthyrSupplyChest', Node, {
+ns.node.DracthyrSupplyChest = Class('DracthyrSupplyChest', Node, {
     label = L['dracthyr_supply_chest'],
     icon = 'chest_bl',
-    group = Dragonflight.groups.DRACTHYR_SUPPLY_CHEST,
+    group = ns.groups.DRACTHYR_SUPPLY_CHEST,
     rewards = {
         Item({item = 191784}), -- Dragon Shard of Knowledge
         Item({item = 199061, quest = 70527}), -- A Guide to Rare Fish
@@ -1225,10 +1225,10 @@ Dragonflight.node.DracthyrSupplyChest = Class('DracthyrSupplyChest', Node, {
 ------------------------------- SIMMERING CHEST -------------------------------
 -------------------------------------------------------------------------------
 
-Dragonflight.node.SimmeringChest = Class('SimmeringChest', Node, {
+ns.node.SimmeringChest = Class('SimmeringChest', Node, {
     label = L['simmering_chest'],
     icon = 'chest_gn',
-    group = Dragonflight.groups.SIMMERING_CHEST,
+    group = ns.groups.SIMMERING_CHEST,
     rewards = {
         Item({item = 191784}), -- Dragon Shard of Knowledge
         Transmog({item = 201446, slot = L['shield']}), -- Primal Revenant's Firewall
@@ -1247,10 +1247,10 @@ Dragonflight.node.SimmeringChest = Class('SimmeringChest', Node, {
 ------------------------------- FROSTBOUND CHEST ------------------------------
 -------------------------------------------------------------------------------
 
-Dragonflight.node.FrostboundChest = Class('FrostboundChest', Node, {
+ns.node.FrostboundChest = Class('FrostboundChest', Node, {
     label = L['frostbound_chest'],
     icon = 'chest_gn',
-    group = Dragonflight.groups.FROSTBOUND_CHEST,
+    group = ns.groups.FROSTBOUND_CHEST,
     rewards = {
         Item({item = 191784}), -- Dragon Shard of Knowledge
         Transmog({item = 201443, slot = L['shield']}), -- Primal Revenant's Icewall
@@ -1269,12 +1269,12 @@ Dragonflight.node.FrostboundChest = Class('FrostboundChest', Node, {
 -------------------------------------------------------------------------------
 
 local Squirrel = Class('Squirrel', Collectible, {
-    group = Dragonflight.groups.SQUIRRELS,
+    group = ns.groups.SQUIRRELS,
     icon = 237182,
     note = L['squirrels_note']
 })
 
-Dragonflight.node.Squirrel = Squirrel
+ns.node.Squirrel = Squirrel
 
 -------------------------------------------------------------------------------
 ----------------------------- THAT'S PRETTY NEAT! -----------------------------
@@ -1283,19 +1283,19 @@ Dragonflight.node.Squirrel = Squirrel
 local PrettyNeat = Class('PrettyNeat', Collectible, {
     icon = 133707,
     sublabel = L['pretty_neat_note'],
-    group = Dragonflight.groups.PRETTY_NEAT,
+    group = ns.groups.PRETTY_NEAT,
     IsEnabled = function(self)
-        if self.isRare and Dragonflight.groups.RARE:GetDisplay(self.mapID) then
+        if self.isRare and ns.groups.RARE:GetDisplay(self.mapID) then
             return false
         end
-        if not Dragonflight:GetOpt('show_completed_nodes') and self:IsCompleted() then
+        if not ns:GetOpt('show_completed_nodes') and self:IsCompleted() then
             return false
         end
         return true
     end
 }) -- That's Pretty Neat!
 
-Dragonflight.node.PrettyNeat = PrettyNeat
+ns.node.PrettyNeat = PrettyNeat
 
 -------------------------------------------------------------------------------
 ------------------------------ A LEGENDARY ALBUM ------------------------------
@@ -1303,14 +1303,14 @@ Dragonflight.node.PrettyNeat = PrettyNeat
 
 local LegendaryCharacter = Class('LegendaryCharacter', Collectible, {
     icon = 1109168,
-    group = Dragonflight.groups.LEGENDARY_ALBUM,
+    group = ns.groups.LEGENDARY_ALBUM,
     requires = {
-        Dragonflight.requirement.Reputation(2507, 8, true), -- Dragonscale Expedition
-        Dragonflight.requirement.GarrisonTalent(2169) -- Lucky Rock
+        ns.requirement.Reputation(2507, 8, true), -- Dragonscale Expedition
+        ns.requirement.GarrisonTalent(2169) -- Lucky Rock
     }
 }) -- A Legendary Album
 
-Dragonflight.node.LegendaryCharacter = LegendaryCharacter
+ns.node.LegendaryCharacter = LegendaryCharacter
 
 -------------------------------------------------------------------------------
 --------------------- ANCIENT STONES OF THE DRAGON ISLES ----------------------
@@ -1319,39 +1319,39 @@ Dragonflight.node.LegendaryCharacter = LegendaryCharacter
 local AncientStone = Class('AncientStone', Collectible, {
     label = L['ancient_stone_label'],
     icon = 134461,
-    group = Dragonflight.groups.ANCIENT_STONES
+    group = ns.groups.ANCIENT_STONES
 }) -- Ancient Stone
 
-Dragonflight.node.AncientStone = AncientStone
+ns.node.AncientStone = AncientStone
 
 -------------------------------------------------------------------------------
 ----------------------------- DRAGON ISLES SAFARI -----------------------------
 -------------------------------------------------------------------------------
 
 local Safari = Class('Safari', Collectible,
-    {icon = 'paw_g', group = Dragonflight.groups.SAFARI}) -- Dragon Isles Safari
+    {icon = 'paw_g', group = ns.groups.SAFARI}) -- Dragon Isles Safari
 
-Dragonflight.node.Safari = Safari
+ns.node.Safari = Safari
 
 -------------------------------------------------------------------------------
 ------------------------------ ELEMENTAL CHESTS -------------------------------
 -------------------------------------------------------------------------------
 
-local ElementalChest = Class('ElementalChest', Dragonflight.node.Treasure, {
+local ElementalChest = Class('ElementalChest', ns.node.Treasure, {
     icon = 'chest_rd',
     getters = {
         rlabel = function(self)
             if self.quest then
                 local completed = C_QuestLog.IsQuestFlaggedCompleted(
                     self.quest[1])
-                local color = completed and Dragonflight.status.Green or Dragonflight.status.Gray
+                local color = completed and ns.status.Green or ns.status.Gray
                 return color(L['weekly'])
             end
         end
     }
 })
 
-Dragonflight.node.ElementalChest = ElementalChest
+ns.node.ElementalChest = ElementalChest
 
 -------------------------------------------------------------------------------
 ------------------------------ WAR SUPPLY CRATES ------------------------------
@@ -1361,10 +1361,10 @@ local WarSupply = Class('WarSupply', Node, {
     icon = 'star_chest_g',
     scale = 1.5,
     label = '{npc:135238}',
-    rlabel = Dragonflight.GetIconLink('war_mode_swords', 16),
+    rlabel = ns.GetIconLink('war_mode_swords', 16),
     quest = {72376, 72377}, -- first loot of the day rewards Conquest and extra Bloody Tokens
     note = L['war_supply_chest_note'],
-    requires = Dragonflight.requirement.WarMode,
+    requires = ns.requirement.WarMode,
     rewards = {
         -- Achievement({id = 19294, criteria = {id = 1, qty = true}}), -- Tour of Duty: Emerald Dream
         -- Achievement({id = 17851, criteria = {id = 1, qty = true}}), -- Tour of Duty: Zaralek Cavern
@@ -1383,22 +1383,22 @@ local WarSupply = Class('WarSupply', Node, {
         Currency({id = 1602, note = '+60'}), -- Conquest
         Currency({id = 1792, note = '+100'}) -- Honor
     },
-    group = Dragonflight.groups.WAR_SUPPLY
+    group = ns.groups.WAR_SUPPLY
 })
 
-Dragonflight.node.WarSupply = WarSupply
+ns.node.WarSupply = WarSupply
 
 -------------------------------------------------------------------------------
 ---------------------------------- INTERVALS ----------------------------------
 -------------------------------------------------------------------------------
-Dragonflight.Intervals = {}
+ns.Intervals = {}
 
-local Interval = Class('Interval', Dragonflight.Interval, {
+local Interval = Class('Interval', ns.Interval, {
     format_12hrs = L['time_format_12hrs'],
     format_24hrs = L['time_format_24hrs']
 })
 
-Dragonflight.Intervals.Interval14h = Class('Interval14h', Interval, {
+ns.Intervals.Interval14h = Class('Interval14h', Interval, {
     initial = {
         eu = 1676237400,
         us = 1677335400,
@@ -1412,7 +1412,7 @@ Dragonflight.Intervals.Interval14h = Class('Interval14h', Interval, {
     text = L['rare_14h']
 })
 
-Dragonflight.Intervals.BrackenhideInterval = Class('BrackenhideInterval', Interval, {
+ns.Intervals.BrackenhideInterval = Class('BrackenhideInterval', Interval, {
     initial = {
         us = 1672531800,
         eu = 1672531200,
@@ -1426,7 +1426,7 @@ Dragonflight.Intervals.BrackenhideInterval = Class('BrackenhideInterval', Interv
     text = L['brackenhide_rare_note']
 })
 
-Dragonflight.Intervals.FeastInterval = Class('FeastInterval', Interval, {
+ns.Intervals.FeastInterval = Class('FeastInterval', Interval, {
     initial = {
         us = 1677164400,
         eu = 1677168000,
@@ -1441,7 +1441,7 @@ Dragonflight.Intervals.FeastInterval = Class('FeastInterval', Interval, {
     text = L['bisquis_note']
 })
 
-Dragonflight.Intervals.AylaagCampInterval = Class('AylaagCampInterval', Interval, {
+ns.Intervals.AylaagCampInterval = Class('AylaagCampInterval', Interval, {
     initial = {
         us = 1677456000,
         eu = 1677502800,
@@ -1615,7 +1615,7 @@ local ELEMENTAL_STORM_FORMULA_REWARDS = {
 }
 
 local function prepTransmog(item, slot, note)
-    Dragonflight.PrepareLinks(note)
+    ns.PrepareLinks(note)
     return Transmog({item = item, slot = slot, note = note})
 end
 
@@ -1642,7 +1642,7 @@ local ELEMENTAL_STORM_TRANSMOG_REWARDS = {
     }
 }
 
-local DC = Dragonflight.DRAGON_CUSTOMIZATIONS
+local DC = ns.DRAGON_CUSTOMIZATIONS
 local ELEMENTAL_STORM_MANUSCRIPT_REWARDS = {
     ['all'] = {
         DC.WindborneVelocidrake.ClusterHorns, DC.RenewedProtoDrake.HeavyHorns
@@ -1663,7 +1663,7 @@ local ELEMENTAL_STORM_MANUSCRIPT_REWARDS = {
 
 local ElementalStorm = Class('ElementalStorm', Collectible, {
     icon = 538566,
-    group = Dragonflight.groups.ELEMENTAL_STORM,
+    group = ns.groups.ELEMENTAL_STORM,
     IsEnabled = function(self)
         local activePOIs = C_AreaPoiInfo.GetAreaPOIForMap(self.mapID)
         local possiblePOIs = self.areaPOIs
@@ -1742,12 +1742,12 @@ function ElementalStorm.getters:rewards()
     }
 end
 
-Dragonflight.node.ElementalStorm = ElementalStorm
+ns.node.ElementalStorm = ElementalStorm
 
 hooksecurefunc(AreaPOIPinMixin, 'TryShowTooltip', function(self)
     if self and self.areaPoiID then
         local mapID = self:GetMap().mapID
-        local group = Dragonflight.groups.ELEMENTAL_STORM
+        local group = ns.groups.ELEMENTAL_STORM
         local stormType = ELEMENTAL_STORM_AREA_POIS[self.areaPoiID]
 
         if ELEMENTAL_STORM_MOB_ACHIVEMENTS[mapID] then -- check if current map has rewards
@@ -1790,14 +1790,14 @@ end)
 ------------------------------ ELUSIVE CREATURES ------------------------------
 -------------------------------------------------------------------------------
 
-local ElusiveCreature = Dragonflight.Class('ElusiveCreature', Dragonflight.node.Node, {
+local ElusiveCreature = ns.Class('ElusiveCreature', ns.node.Node, {
     icon = 644271,
-    requires = Dragonflight.requirement.Item(193906), -- Elusive Creature Bait
-    group = Dragonflight.groups.ELUSIVE_CREATURE,
+    requires = ns.requirement.Item(193906), -- Elusive Creature Bait
+    group = ns.groups.ELUSIVE_CREATURE,
     note = L['elusive_creature_note']
 }) -- Elusive Creature
 
-Dragonflight.node.ElusiveCreature = ElusiveCreature
+ns.node.ElusiveCreature = ElusiveCreature
 
 -- Achievement({id = 18831, criteria = 61435}) -- Elusive Beasts of the Dragon Isles - Elusive Salamanther
 -- Achievement({id = 18831, criteria = 61438}) -- Elusive Beasts of the Dragon Isles - Elusive Proto Dragon
@@ -1855,7 +1855,7 @@ Dragonflight.node.ElusiveCreature = ElusiveCreature
 ---------------------------- PET: MOTE OF NASZ'URO ----------------------------
 -------------------------------------------------------------------------------
 
-Dragonflight.node.MoteOfNaszuro = Class('MoteOfNaszuro', Collectible, {
+ns.node.MoteOfNaszuro = Class('MoteOfNaszuro', Collectible, {
     icon = 5098442,
     label = '{npc:205649}',
     rewards = {Pet({item = 206040, id = 3581})}
@@ -1892,7 +1892,7 @@ local GRAND_HUNT_BAG_REWARDS = {
 local GrandHunt = Class('GrandHunt', Collectible, {
     label = L['grand_hunts_label'],
     icon = 237377,
-    group = Dragonflight.groups.GRAND_HUNTS,
+    group = ns.groups.GRAND_HUNTS,
     IsEnabled = function(self)
         local activePOIs = C_AreaPoiInfo.GetEventsForMap(self.mapID)
         for a = 1, #activePOIs do
@@ -1937,15 +1937,15 @@ function GrandHunt.getters:rewards()
     return rewards
 end
 
-Dragonflight.node.GrandHunt = GrandHunt
+ns.node.GrandHunt = GrandHunt
 
 hooksecurefunc(AreaPOIEventPinMixin, 'TryShowTooltip', function(self)
     if self and self.areaPoiID then
         local mapID = self:GetMap().mapID
-        local group = Dragonflight.groups.GRAND_HUNTS
+        local group = ns.groups.GRAND_HUNTS
         if GRAND_HUNT_AREA_POIS[self.areaPoiID] then
             if group:GetDisplay(mapID) then
-                if Dragonflight:GetOpt('show_loot') then
+                if ns:GetOpt('show_loot') then
                     for i, reward in ipairs(GRAND_HUNT_BAG_REWARDS) do
                         if reward:IsEnabled() then
                             reward:Render(GameTooltip)
@@ -1976,7 +1976,7 @@ hooksecurefunc(VignettePinMixin, 'OnMouseEnter', function(self)
         end
     end
 
-    local map = Dragonflight.maps[WorldMapFrame:GetMapID()] or nil
+    local map = ns.maps[WorldMapFrame:GetMapID()] or nil
 
     if not map then return end
 
@@ -1990,7 +1990,7 @@ hooksecurefunc(VignettePinMixin, 'OnMouseEnter', function(self)
     for _, node in pairs(map.nodes) do
         if node.vignette and
             IsValidVignette(node.vignette, self:GetVignetteID()) and
-            node.rewards and Dragonflight:GetOpt('show_loot') then
+            node.rewards and ns:GetOpt('show_loot') then
             node:RenderRewards(GameTooltip)
             break
         end
@@ -2015,7 +2015,7 @@ local Celestine = Class('Celestine', Vendor, {
     }
 }) -- Celestine of the Harvest
 
-Dragonflight.node.Celestine = Celestine
+ns.node.Celestine = Celestine
 
 local RenewedMagmammoth = Class('RenewedMagmammoth', Collectible, {
     label = '{item:192807}',
@@ -2028,11 +2028,11 @@ local RenewedMagmammoth = Class('RenewedMagmammoth', Collectible, {
 })
 
 function RenewedMagmammoth.getters:note()
-    return Dragonflight.tooltip
+    return ns.tooltip
                .ItemStatus(209419, 20, L['renewed_magmammoth_note'], false)
 end
 
-Dragonflight.node.RenewedMagmammoth = RenewedMagmammoth
+ns.node.RenewedMagmammoth = RenewedMagmammoth
 
 -------------------------------------------------------------------------------
 ---------------------------------- RICH SOIL ----------------------------------
@@ -2041,11 +2041,11 @@ Dragonflight.node.RenewedMagmammoth = RenewedMagmammoth
 local RichSoil = Class('RichSoil', Node, {
     label = L['rich_soil_label'],
     icon = 4554355,
-    group = Dragonflight.groups.RICH_SOIL,
+    group = ns.groups.RICH_SOIL,
     note = L['rich_soil_note']
 }) -- Rich Soil
 
-Dragonflight.node.RichSoil = RichSoil
+ns.node.RichSoil = RichSoil
 
 -------------------------------------------------------------------------------
 ---------------------------------- CLUED IN -----------------------------------
@@ -2064,10 +2064,10 @@ local CluedIn = Class('CluedIn', Collectible, {
             }
         })
     },
-    group = Dragonflight.groups.CLUED_IN
+    group = ns.groups.CLUED_IN
 })
 
-Dragonflight.node.CluedIn = CluedIn
+ns.node.CluedIn = CluedIn
 
 -------------------------------------------------------------------------------
 -------------------------------- GOGGLE WOBBLE --------------------------------
@@ -2077,11 +2077,11 @@ local GoggleWobble = Class('GoggleWobble', Collectible, {
     id = 207763,
     icon = 133023,
     note = L['goggle_wobble_note'],
-    requires = Dragonflight.requirement.Spell(414539), -- Technoscryers
-    group = Dragonflight.groups.GOGGLE_WOBBLE
+    requires = ns.requirement.Spell(414539), -- Technoscryers
+    group = ns.groups.GOGGLE_WOBBLE
 }) -- Goggle Wobble
 
-Dragonflight.node.GoggleWobble = GoggleWobble
+ns.node.GoggleWobble = GoggleWobble
 
 -------------------------------------------------------------------------------
 ----------------------------- JUST ONE MORE THING -----------------------------
@@ -2091,7 +2091,7 @@ local JustOneMoreThing = Class('JustOneMoreThing', Collectible, {
     questCount = true,
     icon = 1411833,
     note = L['just_one_more_thing_note'],
-    group = Dragonflight.groups.JUST_ONE_MORE_THING
+    group = ns.groups.JUST_ONE_MORE_THING
 }) -- Just One More Thing
 
-Dragonflight.node.JustOneMoreThing = JustOneMoreThing
+ns.node.JustOneMoreThing = JustOneMoreThing

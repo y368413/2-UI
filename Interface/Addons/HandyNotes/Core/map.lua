@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Core = ...
-local Class = Core.Class
+local _, ns = ...
+local Class = ns.Class
 
 local HBD = LibStub('HereBeDragons-2.0')
 local HBDPins = LibStub('HereBeDragons-Pins-2.0')
@@ -17,13 +17,19 @@ Base class for all maps.
 
     id (integer): MapID value for this map
     intro (Node): An intro node to display when phased
+    patch (integer): Only add map/nodes if current patch is new enough (default: Classic)
     phased (boolean): If false, hide all nodes except the intro node.
     settings (boolean): Create a settings panel for this map (default: false).
 
 --]]
 
-local Map = Class('Map', nil,
-    {id = 0, intro = nil, phased = true, settings = false})
+local Map = Class('Map', nil, {
+    id = 0,
+    intro = nil,
+    patch = 100000,
+    phased = true,
+    settings = false
+})
 
 function Map:Initialize(attrs)
     for k, v in pairs(attrs) do self[k] = v end
@@ -36,19 +42,24 @@ function Map:Initialize(attrs)
     self.focused = {}
     self.hovered = {}
 
-    setmetatable(self.nodes, {
-        __newindex = function(nodes, coord, node)
-            self:AddNode(coord, node)
-        end
-    })
+    local patch = (select(4, GetBuildInfo()))
+    if patch >= self.patch then
+        setmetatable(self.nodes, {
+            __newindex = function(nodes, coord, node)
+                self:AddNode(coord, node)
+            end
+        })
 
-    -- auto-register this map
-    --if Core.maps[self.id] then error('Map already registered: ' .. self.id) end
-    Core.maps[self.id] = self
+        -- auto-register this map
+        if ns.maps[self.id] then
+            error('Map already registered: ' .. self.id)
+        end
+        ns.maps[self.id] = self
+    end
 end
 
 function Map:AddNode(coord, node)
-    if not Core.IsInstance(node, Core.node.Node) then
+    if not ns.IsInstance(node, ns.node.Node) then
         error(format('All nodes must be instances of the Node() class: %d %s',
             coord, tostring(node)))
     end
@@ -62,10 +73,10 @@ function Map:AddNode(coord, node)
     end
 
     for _, group in pairs(node.group) do
-        if group ~= Core.groups.QUEST then
+        if group ~= ns.groups.QUEST then
             -- Initialize group defaults and UI controls for this map if the group does
             -- not inherit its settings and defaults from a parent map
-            if self.settings then Core.CreateGroupOptions(self, group) end
+            if self.settings then ns.CreateGroupOptions(self, group) end
 
             -- Keep track of all groups associated with this map
             if not self.groups[group.name] then
@@ -93,8 +104,8 @@ function Map:AddNode(coord, node)
                 error(format('Missing map coords: (%d: %d) => (%d: ???)',
                     self.id, coord, parent.id))
             end
-            local map = Core.maps[parent.id] or Map({id = parent.id})
-            map.nodes[HandyNotes:getCoord(px, py)] = Core.Clone(node, {
+            local map = ns.maps[parent.id] or Map({id = parent.id})
+            map.nodes[HandyNotes:getCoord(px, py)] = ns.Clone(node, {
                 pois = parent.pois or nil,
                 note = parent.note or nil,
                 location = parent.location or nil
@@ -131,16 +142,16 @@ function Map:CanDisplay(node, coord, minimap)
     if not node.minimap and minimap then return false end
 
     -- Node may be faction restricted
-    if node.faction and node.faction ~= Core.faction then return false end
+    if node.faction and node.faction ~= ns.faction then return false end
 
     return true
 end
 
 function Map:IsNodeEnabled(node, coord, minimap)
-    local db = Core.addon.db
+    local db = ns.addon.db
 
     -- Check for dev force enable
-    if Core:GetOpt('force_nodes') or Core.dev_force then return true end
+    if ns:GetOpt('force_nodes') or ns.dev_force then return true end
 
     -- Check if we've been hidden by the user
     if db.char[self.id .. '_coord_' .. coord] then return false end
@@ -171,8 +182,8 @@ function Map:Prepare()
     table.sort(self.groups, function(a, b)
         if a.type ~= b.type then return a.type < b.type end
         if a.order ~= b.order then return a.order < b.order end
-        local alabel = Core.RenderLinks(a.label, true)
-        local blabel = Core.RenderLinks(b.label, true)
+        local alabel = ns.RenderLinks(a.label, true)
+        local blabel = ns.RenderLinks(b.label, true)
         return alabel < blabel
     end)
 end
@@ -242,7 +253,7 @@ function MinimapDataProvider:RefreshAllData()
     HBDPins:RemoveAllMinimapIcons(MinimapPinsKey)
     self:ReleaseAllPins()
 
-    local map = Core.maps[HBD:GetPlayerZone()]
+    local map = ns.maps[HBD:GetPlayerZone()]
     if not map then return end
 
     for coord, node in pairs(map.nodes) do
@@ -318,7 +329,7 @@ function MinimapPinMixin:UpdateRotation()
 end
 
 function MinimapPinMixin:OnMouseEnter()
-    if self.label then Core.tooltip.RenderPinTooltip(self) end
+    if self.label then ns.tooltip.RenderPinTooltip(self) end
 end
 
 function MinimapPinMixin:OnMouseLeave() GameTooltip:Hide() end
@@ -327,10 +338,10 @@ MinimapDataProvider:SetScript('OnUpdate', function()
     if GetCVar('rotateMinimap') == '1' then MinimapDataProvider:OnUpdate() end
 end)
 
-Core.addon:RegisterEvent('MINIMAP_UPDATE_ZOOM',
+ns.addon:RegisterEvent('MINIMAP_UPDATE_ZOOM',
     function(...) MinimapDataProvider:RefreshAllData() end)
 
-Core.addon:RegisterEvent('CVAR_UPDATE', function(_, varname)
+ns.addon:RegisterEvent('CVAR_UPDATE', function(_, varname)
     if varname == 'ROTATE_MINIMAP' then MinimapDataProvider:RefreshAllData() end
 end)
 
@@ -356,7 +367,7 @@ function WorldMapDataProvider:RefreshAllData(fromOnShow)
     self:RemoveAllData()
 
     if not self:GetMap() then return end
-    local map = Core.maps[self:GetMap():GetMapID()]
+    local map = ns.maps[self:GetMap():GetMapID()]
     if not map then return end
 
     for coord, node in pairs(map.nodes) do
@@ -381,8 +392,8 @@ function WorldMapDataProvider:RefreshAllData(fromOnShow)
                     end
                 end
             elseif _G['HandyNotes_ZarPluginsDevelopment'] and
-                (Core.IsInstance(node, Core.node.Rare) or
-                    Core.IsInstance(node, Core.node.Treasure)) and not node.quest then
+                (ns.IsInstance(node, ns.node.Rare) or
+                    ns.IsInstance(node, ns.node.Treasure)) and not node.quest then
                 -- Special red glow for certain common node types missing quest IDs
                 -- This helps highlight things that still need to be looted/killed
                 -- during development of new patches.
@@ -433,7 +444,7 @@ function WorldMapPinMixin:ApplyFrameLevel()
 end
 
 function WorldMapPinMixin:OnMouseEnter()
-    if self.label then Core.tooltip.RenderPinTooltip(self) end
+    if self.label then ns.tooltip.RenderPinTooltip(self) end
 end
 
 function WorldMapPinMixin:OnMouseLeave() GameTooltip:Hide() end
@@ -464,6 +475,6 @@ end
 
 -------------------------------------------------------------------------------
 
-Core.Map = Map
-Core.MinimapDataProvider = MinimapDataProvider
-Core.WorldMapDataProvider = WorldMapDataProvider
+ns.Map = Map
+ns.MinimapDataProvider = MinimapDataProvider
+ns.WorldMapDataProvider = WorldMapDataProvider

@@ -1,7 +1,7 @@
 local AngrierWorldQuests = {}
 AngrierWorldQuests = LibStub("AceAddon-3.0"):NewAddon("AngrierWorldQuests")
 AngrierWorldQuests.Name = ANGRYWORLDQUEST_TITLE
-AngrierWorldQuests.Version = "11.0.5-20241030-1"
+AngrierWorldQuests.Version = "11.1.0-20250225-1"
 
 _AngrierWorldQuests = {
     Constants = {
@@ -1354,7 +1354,7 @@ local function WorkaroundMapTaints()
 
     function WorldMapFrame:AcquirePin(pinTemplate, ...)
         if not self.pinPools[pinTemplate] then
-            local pinTemplateType = self.pinTemplateTypes[pinTemplate] or "FRAME";
+            local pinTemplateType = self:GetPinTemplateType(pinTemplate);
             self.pinPools[pinTemplate] = CreateFramePool(pinTemplateType, self:GetCanvas(), pinTemplate, OnPinReleased);
         end
 
@@ -1713,7 +1713,7 @@ do
     local function GetFilterButton(key)
         local index = ConfigModule.Filters[key].index
         if ( not filterButtons[index] ) then
-            local button = CreateFrame("Button", nil, QuestMapFrame.QuestsFrame.Contents)
+            local button = CreateFrame("Button", nil, QuestScrollFrame.Contents)
             button.filter = key
 
             button:SetScript("OnEnter", FilterButton_OnEnter)
@@ -2001,7 +2001,7 @@ do
         end
 
         if not headerButton then
-            headerButton = CreateFrame("BUTTON", "AngrierWorldQuestsHeader", QuestMapFrame.QuestsFrame.Contents, "QuestLogHeaderTemplate")
+            headerButton = CreateFrame("BUTTON", "AngrierWorldQuestsHeader", QuestScrollFrame.Contents, "QuestLogHeaderTemplate")
             headerButton:SetScript("OnClick", HeaderButton_OnClick)
             headerButton:SetText(TRACKER_HEADER_WORLD_QUESTS)
             headerButton.topPadding = 6
@@ -2420,12 +2420,21 @@ do
         end
     end
 
+    local function ShouldMapShowQuest(self, mapID, questInfo)
+        local mapInfo = C_Map.GetMapInfo(mapID);
+        if questInfo.questID == C_SuperTrack.GetSuperTrackedQuestID() and mapInfo.mapType == Enum.UIMapType.Continent then
+            return true;
+        end
+        return false;
+    end
+
     function QuestFrameModule:OverrideShouldShowQuest()
         local dp = GetDataProvider()
 
         if dp ~= nil then
             dataProvider = dp
             dataProvider.ShouldShowQuest = ShouldShowQuest
+            dataProvider.ShouldMapShowQuest = ShouldMapShowQuest
         end
 
         Menu.ModifyMenu("MENU_WORLD_MAP_TRACKING", function(_, rootDescription, _)
@@ -2452,7 +2461,7 @@ do
     function QuestFrameModule:OnEnable()
         self:OverrideShouldShowQuest()
 
-        titleFramePool = CreateFramePool("BUTTON", QuestMapFrame.QuestsFrame.Contents, "QuestLogTitleTemplate")
+        titleFramePool = CreateFramePool("BUTTON", QuestScrollFrame.Contents, "QuestLogTitleTemplate")
         hooksecurefunc("QuestLogQuests_Update", self.QuestLog_Update)
 
         self:RegisterCallbacks()

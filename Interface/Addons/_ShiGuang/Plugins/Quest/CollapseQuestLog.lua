@@ -74,7 +74,7 @@ ColTS:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up")
 
 	--Set Attributes for button (i.e. size, anchor, text)
 ColTS:SetSize(20,20)
-ColTS:SetPoint("TOPRIGHT", -60,20)
+ColTS:SetPoint("TOPLEFT", 20,20)
 --ColTS.tooltipText = "Collapse"
 
 	--make button work with left click and execute collapse. two methods:
@@ -118,7 +118,7 @@ ExTS:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
 
 	--Set Attributes for button (i.e. size, anchor, text)
 ExTS:SetSize(20,20)
-ExTS:SetPoint("TOPRIGHT", -80,20)
+ExTS:SetPoint("TOPLEFT", 40,20)
 --ExTS.tooltipText = "Expand"
 
 	--Make button work with left click and execute Expand
@@ -393,11 +393,5 @@ local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", OnEvent)
 
-
-
-
 --____________________________________________________________________________________________________________________________________________
 --Experimental below this line
-
-
-

@@ -1,4 +1,4 @@
-local _, Core = ...
+local _, ns = ...
 
 -------------------------------------------------------------------------------
 ------------------------------ DATAMINE TOOLTIP -------------------------------
@@ -27,7 +27,7 @@ function NameResolver:Resolve(link)
 
     -- all npcs must be prepared ahead of time to avoid breaking the resolver
     if not self.prepared[link] then
-        Core.Debug('ERROR: npc link not prepared:', link)
+        ns.Debug('ERROR: npc link not prepared:', link)
     end
 
     local name = self.cache[link]
@@ -39,7 +39,7 @@ function NameResolver:Resolve(link)
             if line then name = line.leftText or UNKNOWN end
         end
         if name == UNKNOWN then
-            Core.Debug('NameResolver returned UNKNOWN')
+            ns.Debug('NameResolver returned UNKNOWN')
         else
             self.cache[link] = name
         end
@@ -103,7 +103,7 @@ local function RenderLinks(str, nameOnly)
             local name = NameResolver:Resolve('unit:Creature-0-0-0-0-' .. id)
             name = name .. (suffix or '')
             if nameOnly then return name end
-            return Core.color.NPC(name)
+            return ns.color.NPC(name)
         elseif type == 'achievement' then
             if nameOnly then
                 local _, name = GetAchievementInfo(id)
@@ -111,7 +111,7 @@ local function RenderLinks(str, nameOnly)
             else
                 local link = GetAchievementLink(id)
                 if link then
-                    return Core.GetIconLink('achievement', 15) .. link
+                    return ns.GetIconLink('achievement', 15) .. link
                 end
             end
         elseif type == 'currency' then
@@ -124,9 +124,9 @@ local function RenderLinks(str, nameOnly)
                 end
             end
         elseif type == 'faction' then
-            local name = Core.api.GetFactionInfoByID(id)
+            local name = ns.api.GetFactionInfoByID(id)
             if nameOnly then return name end
-            return Core.color.NPC(name) -- TODO: colorize based on standing?
+            return ns.color.NPC(name) -- TODO: colorize based on standing?
         elseif type == 'item' then
             local name, link, _, _, _, _, _, _, _, icon = C_Item.GetItemInfo(id)
             if link and icon then
@@ -138,48 +138,52 @@ local function RenderLinks(str, nameOnly)
             if name then
                 if nameOnly then return name end
                 local icon = type == 'daily' and 'quest_ab' or 'quest_ay'
-                return Core.GetIconLink(icon, 12) ..
-                           Core.color.Yellow('[' .. name .. ']')
+                return ns.GetIconLink(icon, 12) ..
+                           ns.color.Yellow('[' .. name .. ']')
             end
         elseif type == 'spell' then
-            local name, _, icon = Core.api.GetSpellInfo(id)
+            local name, _, icon = ns.api.GetSpellInfo(id)
             if name and icon then
                 if nameOnly then return name end
-                return Core.color.Spell('|T' .. icon .. ':0|t [' .. name .. ']')
+                return ns.color.Spell('|T' .. icon .. ':0|t [' .. name .. ']')
             end
         elseif type == 'map' then
             local name = C_Map.GetMapInfo(id).name
             if nameOnly then return name end
-            return Core.color.Yellow(name)
+            return ns.color.Yellow(name)
         elseif type == 'area' then
             local name = C_Map.GetAreaInfo(id)
             if nameOnly then return name end
-            return Core.color.Yellow(name)
+            return ns.color.Yellow(name)
+        elseif type == 'pet' then
+            local name, icon = C_PetJournal.GetPetInfoBySpeciesID(id)
+            return ns.GetIconLink(icon, 12) ..
+                       ns.color.Green(' [' .. name .. ']')
         end
         return type .. '+' .. id
     end)
     -- render commonly colored text
     local function renderNonNumeric(str)
         local result = str:gsub('{(%l+):([^{}]+)}', function(type, text)
-            if type == 'bug' then return Core.color.Red(text) end
-            if type == 'emote' then return Core.color.Orange(text) end
+            if type == 'bug' then return ns.color.Red(text) end
+            if type == 'emote' then return ns.color.Orange(text) end
             if type == 'location' or type == 'map' or type == 'area' then
-                return Core.color.Yellow(text)
+                return ns.color.Yellow(text)
             end
-            if type == 'note' then return Core.color.Orange(text) end
-            if type == 'object' then return Core.color.Yellow(text) end
-            if type == 'title' then return Core.color.Yellow(text) end
-            if type == 'npc' then return Core.color.NPC(text) end
-            if type == 'yell' then return Core.color.Red(text) end
-            if type == 'faction' then return Core.color.NPC(text) end
+            if type == 'note' then return ns.color.Orange(text) end
+            if type == 'object' then return ns.color.Yellow(text) end
+            if type == 'title' then return ns.color.Yellow(text) end
+            if type == 'npc' then return ns.color.NPC(text) end
+            if type == 'yell' then return ns.color.Red(text) end
+            if type == 'faction' then return ns.color.NPC(text) end
             if type == 'wq' then
-                local icon = Core.GetIconLink('world_quest', 16, 0, -1)
-                return icon .. Core.color.Yellow('[' .. text .. ']')
+                local icon = ns.GetIconLink('world_quest', 16, 0, -1)
+                return icon .. ns.color.Yellow('[' .. text .. ']')
             end
             if type == 'dot' then
-                local r, g, b = Core.getARGB(text, 255)
+                local r, g, b = ns.getARGB(text, 255)
                 local texStr = '|T%s:0::::16:16::16::16:%d:%d:%d|t'
-                return texStr:format(Core.GetGlowPath('peg_bl'), r, g, b)
+                return texStr:format(ns.GetGlowPath('peg_bl'), r, g, b)
             end
             return type .. '+' .. text
         end)
@@ -263,7 +267,7 @@ local function AsTable(value, class)
     -- normalize to table of scalars
     if type(value) == 'nil' then return end
     if type(value) ~= 'table' then return {value} end
-    if class and Core.IsInstance(value, class) then return {value} end
+    if class and ns.IsInstance(value, class) then return {value} end
     return value
 end
 
@@ -294,15 +298,15 @@ end
 
 -------------------------------------------------------------------------------
 
-Core.AsIDTable = AsIDTable
-Core.AsTable = AsTable
-Core.GetDatabaseTable = GetDatabaseTable
-Core.IsCalendarEventActive = IsCalendarEventActive
-Core.NameResolver = NameResolver
-Core.NewLocale = NewLocale
-Core.PlayerHasItem = PlayerHasItem
-Core.PlayerHasProfession = PlayerHasProfession
-Core.PrepareLinks = PrepareLinks
-Core.RenderLinks = RenderLinks
-Core.UpdateActiveCalendarEvents = UpdateActiveCalendarEvents
-Core.FormatReputation = FormatReputation
+ns.AsIDTable = AsIDTable
+ns.AsTable = AsTable
+ns.GetDatabaseTable = GetDatabaseTable
+ns.IsCalendarEventActive = IsCalendarEventActive
+ns.NameResolver = NameResolver
+ns.NewLocale = NewLocale
+ns.PlayerHasItem = PlayerHasItem
+ns.PlayerHasProfession = PlayerHasProfession
+ns.PrepareLinks = PrepareLinks
+ns.RenderLinks = RenderLinks
+ns.UpdateActiveCalendarEvents = UpdateActiveCalendarEvents
+ns.FormatReputation = FormatReputation

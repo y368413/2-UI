@@ -1,4 +1,4 @@
---## Author: Yuyuli ## Version: 1.0.24
+--## Author: Yuyuli ## Version: 1.0.29
 local NPCTime = CreateFrame('frame')
 local timeFormat = "%H:%M, %d.%m"
 local band = bit.band
@@ -25,10 +25,14 @@ function NPCTime:ShowTime(self)
   if id and (unitType == "Creature" or unitType == "Vehicle") then
     local serverTime = GetServerTime()
     local spawnTime  = ( serverTime - (serverTime % 2^23) ) + band(id, 0x7fffff)
+    local spawnIndex = bit.rshift(bit.band(tonumber(string.sub(uuid, 1, 5), 16), 0xffff8), 3)
     if spawnTime > serverTime then
       spawnTime = spawnTime - ((2^23) - 1)
     end
     AddColoredDoubleLine(self, serverID.."-"..layerUID, timeFormatter:Format((serverTime-spawnTime), false, false).." ("..date(timeFormat, spawnTime)..")")
+      --if spawnIndex > 0 then
+        --AddColoredDoubleLine(self, "Index", spawnIndex)
+      --end
     self:Show()
   end
 end
@@ -41,7 +45,7 @@ function NPCTime:OnLoad()
       self:ShowTime(tooltip)
     end)
   else
-      GameTooltip:HookScript("OnTooltipSetUnit", function(...) self:ShowTime(...) end)
+    GameTooltip:HookScript("OnTooltipSetUnit", function(...) self:ShowTime(...) end)
   end
 end
 

@@ -1,28 +1,28 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, BattleForAzeroth = ...
-local L = BattleForAzeroth.locale
-local Class = BattleForAzeroth.Class
-local Map = BattleForAzeroth.Map
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Class = ns.Class
+local Map = ns.Map
 
-local Collectible = BattleForAzeroth.node.Collectible
-local NPC = BattleForAzeroth.node.NPC
-local PetBattle = BattleForAzeroth.node.PetBattle
-local Rare = BattleForAzeroth.node.Rare
-local Safari = BattleForAzeroth.node.Safari
-local Supply = BattleForAzeroth.node.Supply
-local Treasure = BattleForAzeroth.node.Treasure
+local Collectible = ns.node.Collectible
+local NPC = ns.node.NPC
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
+local Supply = ns.node.Supply
+local Treasure = ns.node.Treasure
 
-local Achievement = BattleForAzeroth.reward.Achievement
-local Item = BattleForAzeroth.reward.Item
-local Pet = BattleForAzeroth.reward.Pet
-local Spell = BattleForAzeroth.reward.Spell
-local Transmog = BattleForAzeroth.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Pet = ns.reward.Pet
+local Spell = ns.reward.Spell
+local Transmog = ns.reward.Transmog
 
-local Arrow = BattleForAzeroth.poi.Arrow
-local Path = BattleForAzeroth.poi.Path
-local POI = BattleForAzeroth.poi.POI
+local Arrow = ns.poi.Arrow
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -500,7 +500,7 @@ map.nodes[66921206] = Treasure({
 ----------------------------- SECRET SUPPLY CHESTS ----------------------------
 -------------------------------------------------------------------------------
 
-local SECRET_CHEST = BattleForAzeroth.node.SecretSupply({
+local SECRET_CHEST = ns.node.SecretSupply({
     quest = 55388,
     rewards = {Achievement({id = 13317, criteria = 43933})}
 }) -- quest = 54716 (looted ever) 55388 (looted today)
@@ -542,7 +542,7 @@ map.nodes[36533365] = PetBattle({
     id = 140315,
     note = L['eddie_fixit_note'],
     rewards = {
-        Achievement({id = 12936, criteria = 44211}), BattleForAzeroth.reward.Spacer(),
+        Achievement({id = 12936, criteria = 44211}), ns.reward.Spacer(),
         Achievement({id = 13270, criteria = 2, oneline = true}), -- Beast
         Achievement({id = 13271, criteria = 2, oneline = true}), -- Critter
         Achievement({id = 13272, criteria = 2, oneline = true}), -- Dragon
@@ -560,7 +560,7 @@ map.nodes[65035082] = PetBattle({
     id = 141002,
     note = L['ellie_vern_note'],
     rewards = {
-        Achievement({id = 12936, criteria = 44215}), BattleForAzeroth.reward.Spacer(),
+        Achievement({id = 12936, criteria = 44215}), ns.reward.Spacer(),
         Achievement({id = 13270, criteria = 6, oneline = true}), -- Beast
         Achievement({id = 13271, criteria = 6, oneline = true}), -- Critter
         Achievement({id = 13272, criteria = 6, oneline = true}), -- Dragon
@@ -578,7 +578,7 @@ map.nodes[77182915] = PetBattle({
     id = 141046,
     note = L['leana_darkwind_note'],
     rewards = {
-        Achievement({id = 12936, criteria = 44216}), BattleForAzeroth.reward.Spacer(),
+        Achievement({id = 12936, criteria = 44216}), ns.reward.Spacer(),
         Achievement({id = 13270, criteria = 7, oneline = true}), -- Beast
         Achievement({id = 13271, criteria = 7, oneline = true}), -- Critter
         Achievement({id = 13272, criteria = 7, oneline = true}), -- Dragon
@@ -602,12 +602,12 @@ map.nodes[77182915] = PetBattle({
 local honeyback = Class('Honeyback', NPC, {
     id = 155193,
     icon = 2066005,
-    group = BattleForAzeroth.groups.HONEYBACKS,
+    group = ns.groups.HONEYBACKS,
     note = L['honeyback_harvester_note'],
     getters = {
         rlabel = function(self)
             local completed = C_QuestLog.IsQuestFlaggedCompleted(56414)
-            local color = completed and BattleForAzeroth.status.Green or BattleForAzeroth.status.Gray
+            local color = completed and ns.status.Green or ns.status.Gray
             return color(L['hourly'])
         end
     }
@@ -633,7 +633,7 @@ local AncientScroll = Class('AncientScroll', Collectible, {
     icon = 1500881,
     label = L['ancient_tidesage_scroll'],
     note = L['ancient_tidesage_scroll_note'],
-    group = BattleForAzeroth.groups.TIDESAGE_LEGENDS
+    group = ns.groups.TIDESAGE_LEGENDS
 })
 
 map.nodes[49518090] = AncientScroll({
@@ -676,7 +676,7 @@ map.nodes[41215020] = Collectible({
     id = 141853,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     rewards = {
         Achievement({
@@ -693,7 +693,7 @@ map.nodes[44455419] = Collectible({
     id = 135600,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     rewards = {
         Achievement({id = 13061, criteria = 41405}) -- Foaming Turtle Broth
@@ -704,7 +704,7 @@ map.nodes[50883354] = Collectible({
     id = 138905,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Horde',
     rewards = {
         Achievement({
@@ -723,7 +723,7 @@ map.nodes[58637025] = Collectible({
     id = 138221,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     rewards = {
         Achievement({
@@ -741,7 +741,7 @@ map.nodes[49075722] = Collectible({
     icon = 135999,
     faction = 'Alliance',
     note = L['three_sheets_note'] .. '\n\n' .. L['long_forgotten_rum_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     rewards = {
         Achievement({id = 13061, criteria = 41409}) -- Long Forgotten Rum
     }
@@ -763,17 +763,17 @@ map.nodes[71106917] = Class('Bumbles', Collectible, {
         note = function(self)
             local function qstep(step, quest)
                 if C_QuestLog.IsQuestFlaggedCompleted(quest) then
-                    return BattleForAzeroth.status.Green(step)
+                    return ns.status.Green(step)
                 else
-                    return BattleForAzeroth.status.Red(step)
+                    return ns.status.Red(step)
                 end
             end
             local function istep(step, item, quest)
-                if BattleForAzeroth.PlayerHasItem(item) or
+                if ns.PlayerHasItem(item) or
                     C_QuestLog.IsQuestFlaggedCompleted(quest) then
-                    return BattleForAzeroth.status.Green(step)
+                    return ns.status.Green(step)
                 else
-                    return BattleForAzeroth.status.Red(step)
+                    return ns.status.Red(step)
                 end
             end
 
@@ -791,7 +791,7 @@ map.nodes[71106917] = Class('Bumbles', Collectible, {
             return note
         end,
         rlabel = function(self)
-            return BattleForAzeroth.status.Gray(
+            return ns.status.Gray(
                 select(9, GetAchievementCriteriaInfo(13062, 1)))
         end
     }
@@ -804,7 +804,7 @@ map.nodes[71106917] = Class('Bumbles', Collectible, {
 map.nodes[41256950] = Collectible({
     label = '{achievement:13046}',
     note = L['these_hills_sing_note'],
-    requires = BattleForAzeroth.requirement.Item(160485), -- An Unforgettable Luncheon
+    requires = ns.requirement.Item(160485), -- An Unforgettable Luncheon
     icon = 2065627,
     rewards = {Achievement({id = 13046})}
 }) -- These Hills Sing
@@ -813,13 +813,13 @@ map.nodes[41256950] = Collectible({
 ------------------- TO ALL THE SQUIRRELS I SET SAIL TO SEE --------------------
 -------------------------------------------------------------------------------
 
-map.nodes[72806720] = BattleForAzeroth.node.Squirrel({
+map.nodes[72806720] = ns.node.Squirrel({
     id = 131376,
     rewards = {Achievement({id = 14730, criteria = 50236})},
     pois = {POI({71206800, 74207260})}
 }) -- Honey Bee
 
-map.nodes[70906670] = BattleForAzeroth.node.Squirrel({
+map.nodes[70906670] = ns.node.Squirrel({
     id = 143220,
     rewards = {Achievement({id = 14730, criteria = 50237})},
     pois = {POI({66407020, 68406880, 72806860})}

@@ -15,48 +15,11 @@ function BaganatorCategoryViewBankViewCharacterViewMixin:OnLoad()
   self:RegisterEvent("CURSOR_CHANGED")
   self:RegisterEvent("MODIFIER_STATE_CHANGED")
 
-  addonTable.CallbackRegistry:RegisterCallback("ContentRefreshRequired",  function()
-    self.searchToApply = true
-    self.LayoutManager:FullRefresh()
-    for _, layout in ipairs(self.Container.Layouts) do
-      layout:RequestContentRefresh()
-    end
-    if self:IsVisible() and self.lastCharacter ~= nil then
-      self:GetParent():UpdateView()
-    end
-  end)
-
-  addonTable.CallbackRegistry:RegisterCallback("SettingChanged",  function(_, settingName)
-    if not self.lastCharacter then
-      return
-    end
-    if tIndexOf(addonTable.CategoryViews.Constants.RedisplaySettings, settingName) ~= nil then
-      self.searchToApply = true
-      self.LayoutManager:SettingChanged(settingName)
-      if self:IsVisible() then
-        self:GetParent():UpdateView()
-      end
-    elseif settingName == addonTable.Config.Options.SORT_METHOD then
-      for _, layout in ipairs(self.Container.Layouts) do
-        layout:InformSettingChanged(settingName)
-      end
-      self.LayoutManager:SettingChanged(settingName)
-      if self:IsVisible() then
-        self:UpdateForCharacter(self.lastCharacter, self.isLive)
-      end
-    elseif settingName == addonTable.Config.Options.JUNK_PLUGIN or settingName == addonTable.Config.Options.UPGRADE_PLUGIN then
-      self.searchToApply = true
-      self.LayoutManager:SettingChanged(settingName)
-      if self:IsVisible() then
-        self:GetParent():UpdateView()
-      end
-    end
-  end)
-
   addonTable.CallbackRegistry:RegisterCallback("CategoryAddItemStart", function(_, fromCategory, itemID, itemLink, addedDirectly)
     self.addToCategoryMode = fromCategory
     self.addedToFromCategory = addedDirectly == true
     if self:IsVisible() and addonTable.CategoryViews.Utilities.GetAddButtonsState() then
+      self.refreshState[addonTable.Constants.RefreshReason.Layout] = true
       self:GetParent():UpdateView()
     end
   end)
@@ -66,19 +29,53 @@ function BaganatorCategoryViewBankViewCharacterViewMixin:OnEvent(eventName, ...)
   if eventName == "CURSOR_CHANGED" and self.addToCategoryMode and not C_Cursor.GetCursorItem() then
     self.addToCategoryMode = nil
     if self:IsVisible() then
+      self.refreshState[addonTable.Constants.RefreshReason.Layout] = true
       self:GetParent():UpdateView()
     end
   elseif eventName == "MODIFIER_STATE_CHANGED" and self.addToCategoryMode and (addonTable.CategoryViews.Utilities.GetAddButtonsState() or self.LayoutManager.showAddButtons) and C_Cursor.GetCursorItem() then
-    self:GetParent():UpdateView()
+    if self:IsVisible() then
+      self.refreshState[addonTable.Constants.RefreshReason.Layout] = true
+      self:GetParent():UpdateView()
+    end
   end
 end
 
-function BaganatorCategoryViewBankViewCharacterViewMixin:TransferCategory(index, source, groupLabel)
+function BaganatorCategoryViewBankViewCharacterViewMixin:TransferCategory(sourceKey)
   if not self.isLive then
     return
   end
 
-  self:RemoveSearchMatches(function() return addonTable.CategoryViews.Utilities.GetItemsFromComposed(self.LayoutManager.composed, index, source, groupLabel) end)
+  self:RemoveSearchMatches(function() return self.layoutsBySourceKey[sourceKey] and self.layoutsBySourceKey[sourceKey].SearchMonitor:GetMatches() or {} end)
+end
+
+function BaganatorCategoryViewBankViewCharacterViewMixin:TransferSection(tree)
+  if not self.isLive then
+    return
+  end
+
+  self:RemoveSearchMatches(function()
+    local matches = {}
+    for _, layout in ipairs(self:GetActiveLayouts()) do
+      if layout.type == "category" then
+        local rootMatch = true
+        for index, label in ipairs(tree) do
+          rootMatch = layout.section[index] == label
+          if not rootMatch then
+            break
+          end
+        end
+        if rootMatch then
+          tAppendAll(matches, layout.SearchMonitor:GetMatches())
+        end
+      end
+    end
+
+    return matches
+  end)
+end
+
+function BaganatorCategoryViewBankViewCharacterViewMixin:GetActiveLayouts()
+  return self.activeLayouts
 end
 
 function BaganatorCategoryViewBankViewCharacterViewMixin:GetSearchMatches()
@@ -102,31 +99,16 @@ function BaganatorCategoryViewBankViewCharacterViewMixin:ApplySearch(text)
 end
 
 function BaganatorCategoryViewBankViewCharacterViewMixin:NotifyBagUpdate(updatedBags)
-  self.LayoutManager:NotifyBagUpdate(updatedBags.bank)
+  --self.LayoutManager:NotifyBagUpdate(updatedBags.bank)
 end
 
 function BaganatorCategoryViewBankViewCharacterViewMixin:UpdateForCharacter(character, isLive)
-  if character ~= self.lastCharacter then
-    self.LayoutManager:NewCharacter()
-  end
-
   BaganatorItemViewCommonBankViewCharacterViewMixin.UpdateForCharacter(self, character, isLive)
 
   local sideSpacing, topSpacing = addonTable.Utilities.GetSpacing()
 
   if self.BankMissingHint:IsShown() then
-    self:SetSize(
-      math.max(400, self.BankMissingHint:GetWidth()) + sideSpacing * 2 + addonTable.Constants.ButtonFrameOffset + 40,
-      80 + topSpacing / 2
-    )
-    self.CurrencyWidget:UpdateCurrencyTextPositions(self.BankMissingHint:GetWidth())
-    for _, l in ipairs(self.Container.Layouts) do
-      l:Hide()
-    end
     self.LayoutManager:ClearVisuals()
-
-    addonTable.CallbackRegistry:TriggerEvent("ViewComplete")
-    self:GetParent():OnTabFinished()
     return
   end
 
@@ -166,16 +148,19 @@ function BaganatorCategoryViewBankViewCharacterViewMixin:UpdateForCharacter(char
   local bagTypes = addonTable.CategoryViews.Utilities.GetBagTypes(characterData, "bank", Syndicator.Constants.AllBankIndexes)
   local bagWidth = addonTable.Config.Get(addonTable.Config.Options.BANK_VIEW_WIDTH)
   self.LayoutManager:Layout(characterData.bank, bagWidth, bagTypes, Syndicator.Constants.AllBankIndexes, sideSpacing, topSpacing, function(maxWidth, maxHeight)
-    self.Container:SetSize(math.max(addonTable.CategoryViews.Constants.MinWidth, maxWidth), maxHeight)
+    self.Container:SetSize(math.max(addonTable.CategoryViews.Utilities.GetMinWidth(bagWidth), maxWidth), maxHeight)
 
     self:OnFinished()
 
-    self.CurrencyWidget:UpdateCurrencyTextPositions(self.Container:GetWidth() - (lastButton and lastButton:GetWidth() + 10 or 0))
+    self.CurrencyWidget:UpdateCurrencyTextPositions(self.Container:GetWidth() - (lastButton and lastButton:GetWidth() + 10 or 0), self.Container:GetWidth())
 
     local searchText = self:GetParent().SearchWidget.SearchBox:GetText()
     if self.searchToApply then
+      self.searchToApply = false
       self:ApplySearch(searchText)
     end
+
+    self.refreshState = {}
 
     addonTable.CallbackRegistry:TriggerEvent("ViewComplete")
 

@@ -1,4 +1,4 @@
-﻿--## Version: v55  ## Author: Kemayo
+﻿--## Version: v56  ## Author: Kemayo
 local AppearanceTooltip = {}
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
@@ -23,7 +23,8 @@ tooltip:RegisterEvent("PLAYER_LOGIN")
 tooltip:RegisterEvent("PLAYER_REGEN_DISABLED")
 tooltip:RegisterEvent("PLAYER_REGEN_ENABLED")
 
-function tooltip:ADDON_LOADED()
+function tooltip:ADDON_LOADED(addon)
+    if addon ~= "CanIMogIt" then return end
 
     _G["AppearanceTooltipDB"] = setDefaults(_G["AppearanceTooltipDB"] or {}, {
         modifier = "None", -- or "Alt", "Ctrl", "Shift"
@@ -44,12 +45,12 @@ function tooltip:ADDON_LOADED()
         byComparison = true, -- whether to show by the comparison, or fall back to vertical if needed
         tokens = true, -- try to preview tokens?
         learnable = true, -- show for other learnable items (toys, mounts)
-        bags = true,
-        bags_unbound = true,
-        merchant = true,
-        loot = true,
-        encounterjournal = true,
-        setjournal = true,
+        bags = false,
+        bags_unbound = false,
+        merchant = false,
+        loot = false,
+        encounterjournal = false,
+        setjournal = false,
         alerts = true,
         appearances_known = {},
     })
@@ -835,7 +836,7 @@ function AppearanceTooltip:GetCameraID(itemLinkOrID, raceID, genderID)
                 gender = 'Male'
             end
         end
-        key = ("%s-%s-%s"):format(race, gender, slot_override[itemid] or slots[slot] or "Default")
+        --key = ("%s-%s-%s"):format(race, gender, slot_override[itemid] or slots[slot] or "Default")            -----------why bug ????
         if not slots_to_cameraids[key] and fallback_races[race] then
             local fallback = fallback_races[race]
             if type(fallback) == "table" then
@@ -1645,7 +1646,7 @@ local notifyKnown = newCheckbox(panel, 'notifyKnown', '提示是否已收藏', "
 local currentClass = newCheckbox(panel, 'currentClass', '仅限当前角色', "Only show previews on items that the current character can collect")
 local byComparison = newCheckbox(panel, 'byComparison', '在对比框显示', "If the comparison tooltip is shown where the preview would want to be, show next to it (this makes it *much* less likely you'll have the preview overlap your cursor)")
 local tokens = newCheckbox(panel, 'tokens', '可预览套装', "Show previews for the items which various tokens can be turned in for when mousing over the token")
-    local alerts = newCheckbox(panel, 'alerts', 'Alert when you learn a new appearance', "Show an alert popup for every new appearance that you learn (like the ones that otherwise only show when you buy something at the Trading Post)")
+    local alerts = newCheckbox(panel, 'alerts', '弹窗提示你获得的新幻化', "Show an alert popup for every new appearance that you learn (like the ones that otherwise only show when you buy something at the Trading Post)")
 
 local zoomWorn = newCheckbox(panel, 'zoomWorn', '仅显示该装备部位', "Zoom in on the part of your model which wears the item")
 local zoomHeld = newCheckbox(panel, 'zoomHeld', '不保持手持状态', "Zoom in on the held item being previewed, without seeing your character")
@@ -1739,7 +1740,7 @@ do
     local panel = CreateFrame("Frame", nil, InterfaceOptionsFramePanelContainer)
     panel:Hide()
     panel:SetAllPoints()
-    panel.name = "Overlays"
+    panel.name = "强化显示"
     panel.parent = "|cff8080ff[幻化]|r预览增强"
 
     local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
@@ -1753,20 +1754,20 @@ do
     subText:SetJustifyH('LEFT')
     subText:SetPoint('TOPLEFT', title, 'BOTTOMLEFT', 0, -8)
     subText:SetPoint('RIGHT', -32, 0)
-    subText:SetText("These options let you control how transmog availability is shown in various places in the UI")
+    subText:SetText("这些选项让你可以控制幻化预览在界面的不同位置时的显示方式")
 
     local bagicon = CreateAtlasMarkup("transmog-icon-hidden")
     local othercharicon = CreateAtlasMarkup("mailbox")
 
     local show = panel:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
-    show:SetText(("Show %s icon for unknown items, and %s icon for unknown items you can't learn on this character:"):format(bagicon, othercharicon))
+    show:SetText(("显示 %s 图标表示未知物品，显示 %s 图标表示当前角色无法习得的未知物品："):format(bagicon, othercharicon))
 
-    local bags = newCheckbox(panel, 'bags', 'in bags', ("For items whose appearance you don't know, show the %s icon on the item in bags. Works with built-in bags, Baggins, Bagnon, and Inventorian."):format(bagicon))
-    local bags_unbound = newCheckbox(panel, 'bags_unbound', '...for non-soulbound items only', "Soulbound items are either known already, or can't be sent to another character")
-    local merchant = newCheckbox(panel, 'merchant', 'at merchants', ("For items whose appearance you don't know, show the %s icon on the item in the merchant frame."):format(bagicon))
-    local loot = newCheckbox(panel, 'loot', 'in loot', ("For items whose appearance you don't know, show the %s icon on the item in the loot frame."):format(bagicon))
-    local encounterjournal = newCheckbox(panel, 'encounterjournal', 'in Encounter Journal', ("For items whose appearance you don't know, show the %s icon on the item in the loot section of the Encounter Journal."):format(bagicon))
-    local setjournal = newCheckbox(panel, 'setjournal', 'in Appearance Sets', ("Show a count of set items known / needed in the sets list"))
+    local bags = newCheckbox(panel, 'bags', '在背包中', ("对于外观未知的物品，在背包中的物品上显示%s图标。支持内置背包、Baggins、Bagnon和Inventorian。"):format(bagicon))
+    local bags_unbound = newCheckbox(panel, 'bags_unbound', '...仅限非灵魂绑定物品', "灵魂绑定的物品要么已经学会，要么无法发送给其他角色")
+    local merchant = newCheckbox(panel, 'merchant', '在商人处', ("对于外观未知的物品，在商人窗口的物品上显示%s图标。"):format(bagicon))
+    local loot = newCheckbox(panel, 'loot', '在拾取框体中', ("对于外观未知的物品，在拾取框体的物品上显示%s图标。"):format(bagicon))
+    local encounterjournal = newCheckbox(panel, 'encounterjournal', '在地下城手册中', ("对于外观未知的物品，在地下城手册的战利品部分显示%s图标。"):format(bagicon))
+    local setjournal = newCheckbox(panel, 'setjournal', '在套装外观中', ("在套装列表中显示已收集/需要的套装物品数量"))
 
     show:SetPoint("TOPLEFT", subText, "BOTTOMLEFT", 0, -8)
     bags:SetPoint("TOPLEFT", show, "BOTTOMLEFT", 0, -8)
@@ -2116,6 +2117,7 @@ f:RegisterAddonHook("Blizzard_Collections", function()
         end)
     end
 end)
+
 
 
 -- SilverDragon

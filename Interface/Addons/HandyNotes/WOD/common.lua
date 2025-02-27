@@ -1,79 +1,79 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, WarlordsOfDraenor = ...
-local Group = WarlordsOfDraenor.Group
-local L = WarlordsOfDraenor.locale
-local Class = WarlordsOfDraenor.Class
+local _, ns = ...
+local Group = ns.Group
+local L = ns.locale
+local Class = ns.Class
 
-local Collectible = WarlordsOfDraenor.node.Collectible
+local Collectible = ns.node.Collectible
 
-local Achievement = WarlordsOfDraenor.reward.Achievement
-local Mount = WarlordsOfDraenor.reward.Mount
-local Transmog = WarlordsOfDraenor.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Mount = ns.reward.Mount
+local Transmog = ns.reward.Transmog
 
 -------------------------------------------------------------------------------
 
-WarlordsOfDraenor.expansion = 6
+ns.expansion = 6
 
 -------------------------------------------------------------------------------
 ----------------------------------- GROUPS ------------------------------------
 -------------------------------------------------------------------------------
 
-WarlordsOfDraenor.groups.ANCIENT_NO_MORE = Group('ancient_no_more', 874578,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.ARCHAEOLOGY_TREASURE = Group('archaeology_treasure', 'chest_bn',
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.ATTACK_PLANS = Group('attack_plans', 'chest_pp',
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN75})
-WarlordsOfDraenor.groups.BREAKER_OF_CHAINS = Group('breaker_of_chains', 1035046,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.BROKE_BACK_PRECIPICE = Group('broke_back_precipice', 1016245,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.BURIED_TREASURES = Group('buried_treasures', 134436,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.CUT_OFF_THE_HEAD = Group('cut_off_the_head', 311945,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.DELECTABLE_OGRE_DELICACIES = Group('delectable_ogre_delicacies',
-    236571, {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.FIGHT_THE_POWER = Group('fight_the_power', 1042626,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.FINDING_YOUR_WAYSTONES = Group('finding_your_waystones', 528693,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.GARRFOLLOWER = Group('GarrFollower', 1033590,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.KING_OF_THE_MONSTERS = Group('king_of_the_monsters', 236192,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.MAKING_THE_CUT = Group('making_the_cut', 458732,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.OFFERING = Group('offering', 'chest_gn', {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.PEPE = Group('pepe', 1044996, {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.PROVE_YOUR_STRENGTH = Group('prove_your_strength', 975743,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
--- WarlordsOfDraenor.groups.SAFARI = Group('safari', 4048818, {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.SHRINES_OF_TEROKK = Group('shrines_of_terokk', 'chest_pk',
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.SONG_OF_SILENCE = Group('song_of_silence', 136005,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.SQUIRRELS = Group('squirrels', 237182, {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.STEAMWHEEDLE = Group('steamwheedle', 463874,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.THE_STABLE_MASTER = Group('the_stable_master', 975744,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.WINGMEN = Group('wingmen', 132917, {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.WOULD_YOU_LIKE_A_PAMPLET = Group('would_you_like_a_pamplet', 441147,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.WRITING_IN_THE_SNOW = Group('writing_in_the_snow', 133680,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
-WarlordsOfDraenor.groups.YOU_HAVE_BEEN_RYLAKINATED = Group('you_have_been_rylakinated', 894222,
-    {defaults = WarlordsOfDraenor.GROUP_HIDDEN})
+ns.groups.ANCIENT_NO_MORE = Group('ancient_no_more', 874578,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.ARCHAEOLOGY_TREASURE = Group('archaeology_treasure', 'chest_bn',
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.ATTACK_PLANS = Group('attack_plans', 'chest_pp',
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.BREAKER_OF_CHAINS = Group('breaker_of_chains', 1035046,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.BROKE_BACK_PRECIPICE = Group('broke_back_precipice', 1016245,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.BURIED_TREASURES = Group('buried_treasures', 134436,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.CUT_OFF_THE_HEAD = Group('cut_off_the_head', 311945,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.DELECTABLE_OGRE_DELICACIES = Group('delectable_ogre_delicacies',
+    236571, {defaults = ns.GROUP_HIDDEN})
+ns.groups.FIGHT_THE_POWER = Group('fight_the_power', 1042626,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.FINDING_YOUR_WAYSTONES = Group('finding_your_waystones', 528693,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.GARRFOLLOWER = Group('GarrFollower', 1033590,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.KING_OF_THE_MONSTERS = Group('king_of_the_monsters', 236192,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.MAKING_THE_CUT = Group('making_the_cut', 458732,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.OFFERING = Group('offering', 'chest_gn', {defaults = ns.GROUP_HIDDEN})
+ns.groups.PEPE = Group('pepe', 1044996, {defaults = ns.GROUP_HIDDEN})
+ns.groups.PROVE_YOUR_STRENGTH = Group('prove_your_strength', 975743,
+    {defaults = ns.GROUP_HIDDEN})
+-- ns.groups.SAFARI = Group('safari', 4048818, {defaults = ns.GROUP_HIDDEN})
+ns.groups.SHRINES_OF_TEROKK = Group('shrines_of_terokk', 'chest_pk',
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.SONG_OF_SILENCE = Group('song_of_silence', 136005,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.SQUIRRELS = Group('squirrels', 237182, {defaults = ns.GROUP_HIDDEN})
+ns.groups.STEAMWHEEDLE = Group('steamwheedle', 463874,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.THE_STABLE_MASTER = Group('the_stable_master', 975744,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.WINGMEN = Group('wingmen', 132917, {defaults = ns.GROUP_HIDDEN})
+ns.groups.WOULD_YOU_LIKE_A_PAMPLET = Group('would_you_like_a_pamplet', 441147,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.WRITING_IN_THE_SNOW = Group('writing_in_the_snow', 133680,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.YOU_HAVE_BEEN_RYLAKINATED = Group('you_have_been_rylakinated', 894222,
+    {defaults = ns.GROUP_HIDDEN})
 
 -------------------------------------------------------------------------------
 ---------------------------- Squirrel Achievement -----------------------------
 -------------------------------------------------------------------------------
 
-WarlordsOfDraenor.node.Squirrel = Class('Squirrel', Collectible, {
-    group = WarlordsOfDraenor.groups.SQUIRRELS,
+ns.node.Squirrel = Class('Squirrel', Collectible, {
+    group = ns.groups.SQUIRRELS,
     icon = 237182,
     note = L['squirrels_note']
 })
@@ -83,9 +83,9 @@ WarlordsOfDraenor.node.Squirrel = Class('Squirrel', Collectible, {
 -------------------------------------------------------------------------------
 
 -- local Safari = Class('Safari', Collectible,
---     {icon = 'paw_g', group = WarlordsOfDraenor.groups.SAFARI})
+--     {icon = 'paw_g', group = ns.groups.SAFARI})
 
--- WarlordsOfDraenor.node.Safari = {
+-- ns.node.Safari = {
 --     AmberbarbWasp = Class('AmberbarbWasp', Safari, {
 --         id = nil,
 --         rewards = {
@@ -281,9 +281,9 @@ local WORLD_BOSS_REWARDS = {
     [1262] = {
         Achievement({id = 9425}), -- So Grossly Incandescent
         Achievement({id = 9838, criteria = 27650}), -- What A Strange, Interdimensional Trip It's Been
-        WarlordsOfDraenor.reward.Spacer(), --
+        ns.reward.Spacer(), --
         Mount({id = 634, item = 116771}), -- Solar Spirehawk
-        WarlordsOfDraenor.reward.Spacer(), --
+        ns.reward.Spacer(), --
         Transmog({item = 120113, slot = L['mail']}), -- Talongrip Spurs
         Transmog({item = 115435, slot = L['mail']}), -- Leggings of Flowing Feathers
         Transmog({item = 120114, slot = L['plate']}), -- Wing-Forged Greatboots
@@ -306,7 +306,7 @@ hooksecurefunc(EncounterJournalPinMixin, 'OnMouseEnter', function(self)
             end
         end
         if self.encounterID == 1262 then -- Render POI dot at Rukhmar spawn location
-            WarlordsOfDraenor.poi.POI({37183845}):Render(self:GetMap(),
+            ns.poi.POI({37183845}):Render(self:GetMap(),
                 'HandtNote' .. 'WorldMapPinTemplate')
         end
         -- GameTooltip:AddLine(self.encounterID) -- Debug to show the encounterID
@@ -316,4 +316,4 @@ end)
 
 -- this is only needed to hide the poi after hovering the boss icon
 hooksecurefunc(EncounterJournalPinMixin, 'OnMouseLeave',
-    function(self) WarlordsOfDraenor.WorldMapDataProvider:RefreshAllData() end)
+    function(self) ns.WorldMapDataProvider:RefreshAllData() end)

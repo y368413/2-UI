@@ -7,7 +7,7 @@
     </Scripts>
     <Layers>
       <Layer level="BACKGROUND">
-        <FontString inherits="GameFontHighlight" text="NAME" parentArray="ChangeAlpha">
+        <FontString inherits="GameFontHighlight" parentKey="NameLabel" text="NAME" parentArray="ChangeAlpha">
           <Anchors>
             <Anchor point="TOPLEFT" x="15"/>
           </Anchors>
@@ -38,7 +38,22 @@
           <Anchor point="CENTER" relativeKey="$parent.SearchLabel"/>
         </Anchors>
       </Button>
-      <EditBox autoFocus="false" inherits="InputBoxTemplate" parentKey="CategorySearch" letters="100" parentArray="ChangeAlpha">
+      <Button parentKey="ChangeSearchModeButton" inherits="BaganatorTooltipIconButtonTemplate" parentArray="ChangeAlpha">
+        <Anchors>
+          <Anchor point="RIGHT" relativeKey="$parent.HelpButton" relativePoint="LEFT"/>
+        </Anchors>
+        <Layers>
+          <Layer level="ARTWORK">
+            <Texture parentKey="Icon" file="Interface\AddOns\Baganator\Assets\GuildTabText.png">
+              <Size x="14" y="14"/>
+              <Anchors>
+                <Anchor point="CENTER"/>
+              </Anchors>
+            </Texture>
+          </Layer>
+        </Layers>
+      </Button>
+      <EditBox autoFocus="false" inherits="InputBoxTemplate" parentKey="TextCategorySearch" letters="800" parentArray="ChangeAlpha">
         <Size y="30"/>
         <Anchors>
           <Anchor point="TOPLEFT" x="20" y="-65"/>
@@ -54,7 +69,7 @@
 
       <Button parentKey="DeleteButton" text="DELETE" inherits="UIPanelDynamicResizeButtonTemplate" parentArray="ChangeAlpha">
         <Anchors>
-          <Anchor point="BOTTOMRIGHT" x="-15" y="0"/>
+          <Anchor point="BOTTOMRIGHT" x="-10" y="0"/>
         </Anchors>
       </Button>
     </Frames>

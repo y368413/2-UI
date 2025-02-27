@@ -18,7 +18,7 @@ end)]]
 --MainMenuBarArtFrame.LeftEndCap:Hide()  MainMenuBarArtFrame.RightEndCap:Hide()   
 --------------------------------------NoHelpTips------------------------
 function HelpTip:AreHelpTipsEnabled() return false end
------------------------------------------	     随机队列倒计时    -----------------------------------------
+--[[---------------------------------------	     随机队列倒计时    -----------------------------------------
 local timerBar = CreateFrame("StatusBar", nil, LFGDungeonReadyPopup, "BackdropTemplate")
 local timeLeft = 0
 timerBar:SetPoint("BOTTOM", LFGDungeonReadyPopup, "TOP", 0, 0)
@@ -57,7 +57,7 @@ LFGDungeonReadyTimeFrame:SetScript("OnEvent", function(self, event, ...)
 	timerBar:SetMinMaxValues(0, 40)
 	timeLeft = 40
 	timerBar:Show()
-end)
+end)]]
 ----------------EventBossAutoSelect----------------------
 LFDParentFrame:HookScript("OnShow",function()
   for i=1,GetNumRandomDungeons() do
@@ -65,7 +65,7 @@ LFDParentFrame:HookScript("OnShow",function()
    if(select(15,GetLFGDungeonInfo(id)) and not GetLFGDungeonRewards(id)) then LFDQueueFrame_SetType(id) end
   end
  end)
--------------------------------------------------------------------------------  Auto Reagent Bank
+--[[-----------------------------------------------------------------------------  Auto Reagent Bank
 local AutoReagentBank = CreateFrame("Frame")
 AutoReagentBank:RegisterEvent("BANKFRAME_OPENED")
 AutoReagentBank:SetScript("OnEvent", function(self, event, ...)
@@ -82,6 +82,175 @@ AutoReagentBank:SetScript("OnEvent", function(self, event, ...)
 	end
 	BankFrameItemButton_Update_PASS = true
 	DepositReagentBank()
+end)]]
+--
+--  Reagent Banker
+--    by Tuhljin 2020
+--    Renamed and Hacked back to life by Tsaavik gnoballs@greymane 2024
+--
+-- You can change CHATLOG to true if you would like a log of all deposits in your chat
+local CHATLOG = false
+
+AutoReagentDeposit = {}
+local AutoReagentBank = CreateFrame("Frame")
+AutoReagentDeposit.Frame = AutoReagentBank
+AutoReagentBank:Hide()
+local seenBank
+local prevContents, awaitingChanges
+local REAGENTBANK_ID = ReagentBankFrame:GetID()
+local DepositButton = ReagentBankFrame.DespositButton -- Blizzard typo
+local LIMIT_LINKS_PER_LINE = 10  --3 --15
+
+local function chatprint(msg)
+	DEFAULT_CHAT_FRAME:AddMessage(msg, 1, (170 / 255), (128 / 255)); --1, 0.6, 0.4
+end
+local function doesBagSort(id)
+	-- See ContainerFrameFilterDropDown_Initialize in FrameXML\ContainerFrame.lua
+	if (id == -1) then
+		return not GetBankAutosortDisabled()
+	elseif (id == 0) then
+		return not GetBackpackAutosortDisabled()
+	elseif (id > NUM_BAG_SLOTS) then
+		return not GetBankBagSlotFlag(id - NUM_BAG_SLOTS, LE_BAG_FILTER_FLAG_IGNORE_CLEANUP)
+	else
+		return not GetBagSlotFlag(id, LE_BAG_FILTER_FLAG_IGNORE_CLEANUP)
+	end
+end
+local function setBagSort(id, value)
+	-- See ContainerFrameFilterDropDown_Initialize in FrameXML\ContainerFrame.lua
+	if (id == -1) then
+		SetBankAutosortDisabled(not value)
+	elseif (id == 0) then
+		SetBackpackAutosortDisabled(not value)
+	elseif (id > NUM_BAG_SLOTS) then
+		SetBankBagSlotFlag(id - NUM_BAG_SLOTS, LE_BAG_FILTER_FLAG_IGNORE_CLEANUP, not value)
+	else
+		SetBagSlotFlag(id, LE_BAG_FILTER_FLAG_IGNORE_CLEANUP, not value)
+	end
+end
+local function makeBagsSort()
+	local changed
+	for id=0,NUM_BAG_SLOTS do
+		if (not doesBagSort(id)) then
+			setBagSort(id, true)
+			if (not changed) then  changed = {};  end
+			changed[#changed+1] = id
+		end
+	end
+	return changed
+end
+local function getReagentBankContents()
+	local tab = {}
+	local _, count, itemID
+	local GetContainerItemInfo = C_Container and _G.C_Container.GetContainerItemInfo or _G.GetContainerItemInfo
+	for slot=1,ReagentBankFrame.size do
+		--texture, count, locked, quality, readable, lootable, link, isFiltered, hasNoValue, itemID
+		_, count, _, _, _, _, _, _, _, itemID = GetContainerItemInfo(REAGENTBANK_ID, slot)
+		if (itemID) then
+			--print("GetContainerItemInfo(",REAGENTBANK_ID,",", slot,") => ",count,itemID)
+			tab[itemID] = (tab[itemID] or 0) + count
+		end
+	end
+	if (DEBUG) then
+	  local c = 0
+	  for id,count in pairs(tab) do  c = c + 1;  end
+	  chatprint("- Found " .. c .. " item IDs")
+	end
+	return tab
+end
+AutoReagentDeposit.GetReagentBankContents = getReagentBankContents
+local preDeposit, postDeposit
+do
+	local changedSortFlag
+	function preDeposit(includeSortIgnored)
+		local GetContainerItemInfo = C_Container and _G.C_Container.GetContainerItemInfo or _G.GetContainerItemInfo
+		changedSortFlag = includeSortIgnored and makeBagsSort() or nil
+		if (CHATLOG) then
+			prevContents = getReagentBankContents()
+			awaitingChanges = true
+		else
+			prevContents = nil
+			awaitingChanges = false
+		end
+	end
+	function postDeposit()
+		if (changedSortFlag) then
+			for i,id in ipairs(changedSortFlag) do
+				setBagSort(id, false)
+			end
+			changedSortFlag = nil
+		end
+	end
+end
+local function depositReaction()
+	local newContents = getReagentBankContents()
+	local numAdded = 0 -- numAdded is the number of item IDs that saw an addition of any size
+	local added = {}
+	for id,count in pairs(newContents) do
+		local prev = prevContents[id] or 0
+		if (count > prev) then
+			if (not added) then  added = {};  end
+			added[id] = count - prev
+			numAdded = numAdded + 1
+		end
+	end
+	prevContents = nil
+
+	if (numAdded > 0) then
+		local numLines, numLeft = 0, numAdded
+		local links = {}
+		for id,diff in pairs(added) do
+			local _, link = GetItemInfo(id)
+			links[#links + 1] = diff == 1 and link or L.CHATLOG_DEPOSITED_COUNT:format(link, diff)
+			numLeft = numLeft - 1
+			if (#links == LIMIT_LINKS_PER_LINE) then
+				local s = table.concat(links, L.CHATLOG_DEPOSITED_SEP .. ' ')
+				if (numLeft > 0) then  s = s .. L.CHATLOG_DEPOSITED_SEP;  end
+				links = {}
+				numLines = numLines + 1
+				chatprint(numLines == 1 and L.CHATLOG_DEPOSITED:format(s) or "   " .. s)
+			end
+		end
+		if (#links > 0) then
+			local s = table.concat(links, L.CHATLOG_DEPOSITED_SEP .. ' ')
+			numLines = numLines + 1
+			chatprint(numLines == 1 and L.CHATLOG_DEPOSITED:format(s) or "   " .. s)
+		end
+	end
+end
+local function OnEvent(self, event, ...)
+	if (event == "BANKFRAME_OPENED") then
+		if (not IsReagentBankUnlocked()) then end
+		if (not seenBank) then
+		 	ReagentBankFrame_OnShow(ReagentBankFrame)
+			seenBank = true
+		end
+		C_Timer.After(0, function() -- This delay may prevent the intermittent problem where items already in the reagent bank appear to be newly deposited because getReagentBankContents() somehow failed to find any items when called by preDeposit().
+			preDeposit()
+			DepositReagentBank()
+			postDeposit()
+		end)
+	elseif (event == "PLAYERREAGENTBANKSLOTS_CHANGED") then
+		if (awaitingChanges) then
+			awaitingChanges = false
+			-- Consolidate all PLAYERREAGENTBANKSLOTS_CHANGED events into one reaction:
+			C_Timer.After(0, depositReaction) -- 0 seconds because we should receive all the events at once so the function ought to be triggered after all of them are in
+		end
+	end
+end
+AutoReagentBank:RegisterEvent("ADDON_LOADED")
+AutoReagentBank:SetScript("OnEvent", function(self, event, arg1)
+  if R.db["Misc"]["AutoReagentInBank"] and (arg1 == "_ShiGuang") then
+		AutoReagentBank:UnregisterEvent("ADDON_LOADED")
+		AutoReagentBank:SetScript("OnEvent", OnEvent)
+		AutoReagentBank:RegisterEvent("BANKFRAME_OPENED")
+	end
+end)
+local DepositButton_click_old = DepositButton:GetScript("OnClick")
+DepositButton:SetScript("OnClick", function(...)
+	preDeposit()
+	DepositButton_click_old(...)
+	postDeposit()
 end)
 
 --[[----------------------------------------------------------------------------- ItemQualityIcons
@@ -530,7 +699,85 @@ DressUpFrame.ResetButton:HookScript("OnShow", function ()
     showButtons(true)
 end)
 
---	KayrWiderTransmogUI
+--[[## Version: 1.5  ## Author: Eskiso
+local TransmogrifyResize = CreateFrame("Frame");
+TransmogrifyResize:RegisterEvent("TRANSMOGRIFY_OPEN")
+--TransmogrifyResize:RegisterAllEvents();
+
+TransmogrifyResize:SetScript("OnEvent", function(self,event, ...)
+    if event == "TRANSMOGRIFY_OPEN" then
+        -- print("Improving Transmog window...")
+        ResizeTransmogrify();
+    end  
+end)
+
+local isAddedResize = false
+
+function ResizeTransmogrify(frameWidth, frameHeight)
+    if frameWidth == nil then
+        frameWidth = GetScreenWidth() - 460;   -- 1462
+    end
+    
+    if frameHeight == nil then
+        frameHeight = GetScreenHeight() - 240; -- 841
+    end
+    local modelSceneWidth = frameWidth - 662; -- 800
+    local modelSceneHeight = frameHeight - 111; -- 730
+    if WardrobeFrame ~= nil then
+        WardrobeFrame:SetWidth(frameWidth);
+        WardrobeFrame:SetHeight(frameHeight);
+        WardrobeTransmogFrame.ModelScene:SetWidth(modelSceneWidth);
+        WardrobeTransmogFrame:SetWidth(modelSceneWidth);
+        WardrobeTransmogFrame:SetHeight(modelSceneHeight);
+        WardrobeTransmogFrame.ModelScene:SetHeight(modelSceneHeight);
+        WardrobeTransmogFrame.Inset.BG:SetWidth(modelSceneWidth);
+        WardrobeTransmogFrame.Inset.BG:SetHeight(modelSceneHeight);
+        WardrobeTransmogFrame.HeadButton:SetPoint("LEFT", WardrobeTransmogFrame.ModelScene,"LEFT", 15, 100);
+        WardrobeTransmogFrame.HandsButton:SetPoint("TOPRIGHT", WardrobeTransmogFrame.ModelScene,"TOPRIGHT", -15, 0);
+        WardrobeTransmogFrame.MainHandButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene,"BOTTOM", -50, 15);
+        WardrobeTransmogFrame.SecondaryHandButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene,"BOTTOM", 50, 15);
+        WardrobeTransmogFrame.MainHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene,"BOTTOM", 100, 20);
+        WardrobeTransmogFrame.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene,"BOTTOM", 100, 20);
+        WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("LEFT", WardrobeTransmogFrame.ModelScene,"TOPRIGHT", 50, -200);
+        WardrobeFrame:ClearAllPoints();
+        WardrobeFrame:SetPoint("CENTER", UIParent ,"CENTER",0,0);
+
+        if isAddedResize == false then
+            local resizeButton = CreateFrame("Button", nil, WardrobeFrame)
+            resizeButton:SetSize(16, 16)
+            resizeButton:SetPoint("BOTTOMRIGHT")
+            resizeButton:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+            resizeButton:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+            resizeButton:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+             
+            resizeButton:SetScript("OnMouseDown", function(self, button)
+                WardrobeFrame:SetResizable(true)
+                WardrobeFrame:StartSizing("BOTTOMRIGHT")
+                WardrobeFrame:SetUserPlaced(true)
+
+            end)
+             
+            resizeButton:SetScript("OnMouseUp", function(self, button)
+                WardrobeFrame:StopMovingOrSizing()
+                local newWidth = WardrobeFrame:GetWidth()
+                local newHeight = WardrobeFrame:GetHeight()
+                ResizeTransmogrify(newWidth, newHeight);
+
+            end)
+            isAddedResize = true
+        end
+
+    else
+        print("TransmogrifyResize: Event occured but no Wardrobe found.")
+    end
+    -- WardrobeFrame:SetUserPlaced(true);
+end]]
+
+--	KayrWiderTransmogUI ## Version: 0.2.1 ## Author: Kvalyr
+local function Round(number, decimals)
+    local power = 10 ^ decimals
+    return math.floor(number * power) / power
+end
 KayrWiderTransmogUI = _G["CreateFrame"]("Frame", "KayrWiderTransmogUI", UIParent)
 KayrWiderTransmogUI.initDone = false
 function KayrWiderTransmogUI:ADDON_LOADED(event, addon)
@@ -549,8 +796,7 @@ function KayrWiderTransmogUI.Adjust()
     local desiredTransmogFrameWidth = initialTransmogFrameWidth + parentFrameWidthIncrease
     WardrobeTransmogFrame:SetWidth(desiredTransmogFrameWidth)
     -- These frames are built using absolute sizes instead of relative points for some reason. Let's stick with that..
-    local power = 10 ^ 0
-    local insetWidth = math.floor(initialTransmogFrameWidth - WardrobeTransmogFrame.ModelScene:GetWidth() * power) / power
+    local insetWidth = Round(initialTransmogFrameWidth - WardrobeTransmogFrame.ModelScene:GetWidth(), 0)
     WardrobeTransmogFrame.Inset.BG:SetWidth(WardrobeTransmogFrame.Inset.Bg:GetWidth() - insetWidth)
     WardrobeTransmogFrame.ModelScene:SetWidth(WardrobeTransmogFrame:GetWidth() - insetWidth)
     -- Move HEADSLOT -- Other slots in the left column are attached relative to it
@@ -593,3 +839,20 @@ AutoViewDistance:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 		if GetCVar("graphicsViewDistance") ~= 1 then SetCVar("graphicsViewDistance", 1) end
 	end
 end)]]
+
+--## Author: Rubio ## Version: 11.0.7a
+local UntrackCompletedAchieves = CreateFrame("Frame")
+UntrackCompletedAchieves:RegisterEvent("PLAYER_ENTERING_WORLD") 
+UntrackCompletedAchieves:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
+	local banner = false
+	if event == "PLAYER_ENTERING_WORLD" then
+    if not banner then banner = true end
+    local tracked = C_ContentTracking.GetTrackedIDs(Enum.ContentTrackingType.Achievement) or {}
+    for _, achievementID in ipairs(tracked) do
+	local _, _, _, completed = GetAchievementInfo(achievementID)
+	if completed then
+	    C_ContentTracking.StopTracking(Enum.ContentTrackingType.Achievement, achievementID, Enum.ContentTrackingStopType.Collected)
+	end
+    end
+	end
+end)

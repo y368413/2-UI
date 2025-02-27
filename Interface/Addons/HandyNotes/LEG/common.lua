@@ -1,45 +1,45 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Legion = ...
-local Group = Legion.Group
-local Class = Legion.Class
+local _, ns = ...
+local Group = ns.Group
+local Class = ns.Class
 
-local Collectible = Legion.node.Collectible
+local Collectible = ns.node.Collectible
 
-local Achievement = Legion.reward.Achievement
-local Pet = Legion.reward.Pet
+local Achievement = ns.reward.Achievement
+local Pet = ns.reward.Pet
 
 -------------------------------------------------------------------------------
 
-Legion.expansion = 7
+ns.expansion = 7
 
 -------------------------------------------------------------------------------
 ----------------------------------- GROUPS ------------------------------------
 -------------------------------------------------------------------------------
 
-Legion.groups.ANCIENT_EREDAR_CACHE = Group('ancient_eredar_cache', 'chest_bk',
-    {defaults = Legion.GROUP_HIDDEN75})
-Legion.groups.BRINGING_HOME_THE_BEACON = Group('bringing_home_the_beacon', 133267,
-    {defaults = Legion.GROUP_HIDDEN})
-Legion.groups.EREDAR_WAR_SUPPLIES = Group('eredar_war_supplies', 'chest_bk',
-    {defaults = Legion.GROUP_HIDDEN75})
-Legion.groups.HIGHER_DIMENSIONAL_LEARNING = Group('higher_dimensional_learning',
-    134915, {defaults = Legion.GROUP_HIDDEN})
-Legion.groups.LEGION_WAR_SUPPLIES = Group('legion_war_supplies', 'chest_bk',
-    {defaults = Legion.GROUP_HIDDEN75})
-Legion.groups.SAFARI = Group('safari', 4048818, {defaults = Legion.GROUP_HIDDEN})
-Legion.groups.VOID_SEEPED_CACHE = Group('void_seeped_cache', 'chest_bk',
-    {defaults = Legion.GROUP_HIDDEN75})
+ns.groups.ANCIENT_EREDAR_CACHE = Group('ancient_eredar_cache', 'chest_bk',
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.BRINGING_HOME_THE_BEACON = Group('bringing_home_the_beacon', 133267,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.EREDAR_WAR_SUPPLIES = Group('eredar_war_supplies', 'chest_bk',
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.HIGHER_DIMENSIONAL_LEARNING = Group('higher_dimensional_learning',
+    134915, {defaults = ns.GROUP_HIDDEN})
+ns.groups.LEGION_WAR_SUPPLIES = Group('legion_war_supplies', 'chest_bk',
+    {defaults = ns.GROUP_HIDDEN75})
+ns.groups.SAFARI = Group('safari', 4048818, {defaults = ns.GROUP_HIDDEN})
+ns.groups.VOID_SEEPED_CACHE = Group('void_seeped_cache', 'chest_bk',
+    {defaults = ns.GROUP_HIDDEN75})
 
 -------------------------------------------------------------------------------
 ------------------------------------ SAFARI -----------------------------------
 -------------------------------------------------------------------------------
 
 local Safari = Class('Safari', Collectible,
-    {icon = 'paw_g', group = Legion.groups.SAFARI})
+    {icon = 'paw_g', group = ns.groups.SAFARI})
 
-Legion.node.Safari = {
+ns.node.Safari = {
     AlbatrossChick = Class('AlbatrossChick', Safari, {
         id = 97078,
         rewards = {

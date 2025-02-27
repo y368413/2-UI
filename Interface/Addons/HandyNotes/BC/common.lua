@@ -1,26 +1,26 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, BurningCrusade = ...
-local Class = BurningCrusade.Class
-local Group = BurningCrusade.Group
+local _, ns = ...
+local Class = ns.Class
+local Group = ns.Group
 
-local Collectible = BurningCrusade.node.Collectible
+local Collectible = ns.node.Collectible
 
-local Achievement = BurningCrusade.reward.Achievement
-local Pet = BurningCrusade.reward.Pet
+local Achievement = ns.reward.Achievement
+local Pet = ns.reward.Pet
 
 -------------------------------------------------------------------------------
 
-BurningCrusade.expansion = 2
+ns.expansion = 2
 
 -------------------------------------------------------------------------------
 ----------------------------------- GROUPS ------------------------------------
 -------------------------------------------------------------------------------
 
-BurningCrusade.groups.DRAGONRACE = Group('dragonrace', 1100022, {
-    defaults = BurningCrusade.GROUP_HIDDEN,
-    type = BurningCrusade.group_types.EXPANSION,
+ns.groups.DRAGONRACE = Group('dragonrace', 1100022, {
+    defaults = ns.GROUP_HIDDEN,
+    type = ns.group_types.EXPANSION,
     IsEnabled = function(self)
         if select(2, C_AddOns.IsAddOnLoaded('HandyNotes')) then
             return false
@@ -28,20 +28,20 @@ BurningCrusade.groups.DRAGONRACE = Group('dragonrace', 1100022, {
         return Group.IsEnabled(self)
     end
 })
-BurningCrusade.groups.NETHERWING_EGGS = Group('netherwing_eggs', 134430,
-    {defaults = BurningCrusade.GROUP_HIDDEN})
-BurningCrusade.groups.SAFARI = Group('safari', 4048818, {defaults = BurningCrusade.GROUP_HIDDEN})
-BurningCrusade.groups.CRAZYFORCATS = Group('crazyforcats', 656579,
-    {defaults = BurningCrusade.GROUP_HIDDEN})
+ns.groups.NETHERWING_EGGS = Group('netherwing_eggs', 134430,
+    {defaults = ns.GROUP_HIDDEN})
+ns.groups.SAFARI = Group('safari', 4048818, {defaults = ns.GROUP_HIDDEN})
+ns.groups.CRAZYFORCATS = Group('crazyforcats', 656579,
+    {defaults = ns.GROUP_HIDDEN})
 
 -------------------------------------------------------------------------------
 ----------------------------------- SAFARI ------------------------------------
 -------------------------------------------------------------------------------
 
 local Safari = Class('Safari', Collectible,
-    {icon = 'paw_g', group = BurningCrusade.groups.SAFARI})
+    {icon = 'paw_g', group = ns.groups.SAFARI})
 
-BurningCrusade.node.Safari = {
+ns.node.Safari = {
     Adder = Class('Adder', Safari, {
         id = 61325,
         rewards = {
@@ -231,7 +231,7 @@ BurningCrusade.node.Safari = {
 -------------------------------------------------------------------------------
 
 local Dragonrace = Class('DragonRace', Collectible,
-    {icon = 1100022, group = BurningCrusade.groups.DRAGONRACE})
+    {icon = 1100022, group = ns.groups.DRAGONRACE})
 
 function Dragonrace.getters:sublabel()
     if self.normal then
@@ -249,8 +249,8 @@ end
 
 function Dragonrace.getters:note()
     if self.normal then
-        local silver = BurningCrusade.color.Silver
-        local gold = BurningCrusade.color.Gold
+        local silver = ns.color.Silver
+        local gold = ns.color.Gold
 
         -- LuaFormatter off
         if self.advanced and self.reverse then
@@ -272,7 +272,7 @@ function Dragonrace.getters:note()
     end
 end
 
-BurningCrusade.node.Dragonrace = Dragonrace
+ns.node.Dragonrace = Dragonrace
 
 local DRAGONRACE_POI = {
     -- [] = true, --
@@ -286,23 +286,23 @@ local DRAGONRACE_POI = {
 }
 
 hooksecurefunc(AreaPOIPinMixin, 'TryShowTooltip', function(self)
-    if not BurningCrusade.groups.DRAGONRACE:IsEnabled() or
+    if not ns.groups.DRAGONRACE:IsEnabled() or
         not DRAGONRACE_POI[self.areaPoiID] then return end
     local mapID = self:GetMap().mapID
-    local group = BurningCrusade.groups.DRAGONRACE
+    local group = ns.groups.DRAGONRACE
 
-    if not BurningCrusade.maps[mapID] or not group:GetDisplay(mapID) then return end
+    if not ns.maps[mapID] or not group:GetDisplay(mapID) then return end
 
-    local node = BurningCrusade.maps[mapID].nodes[DRAGONRACE_POI[self.areaPoiID]]
+    local node = ns.maps[mapID].nodes[DRAGONRACE_POI[self.areaPoiID]]
     if not node then return end
 
     ----GameTooltip:AddLine(' ')
-    GameTooltip:AddLine(BurningCrusade.RenderLinks(node.sublabel, true), 1, 1, 1)
-    if BurningCrusade:GetOpt('show_notes') then
+    GameTooltip:AddLine(ns.RenderLinks(node.sublabel, true), 1, 1, 1)
+    if ns:GetOpt('show_notes') then
         ----GameTooltip:AddLine(' ')
-        GameTooltip:AddLine(BurningCrusade.RenderLinks(node.note), 1, 1, 1, true)
+        GameTooltip:AddLine(ns.RenderLinks(node.note), 1, 1, 1, true)
     end
-    if BurningCrusade:GetOpt('show_loot') then
+    if ns:GetOpt('show_loot') then
         ----GameTooltip:AddLine(' ')
         for i, reward in ipairs(node.rewards) do
             if reward:IsEnabled() then reward:Render(GameTooltip) end
@@ -312,30 +312,30 @@ hooksecurefunc(AreaPOIPinMixin, 'TryShowTooltip', function(self)
     GameTooltip:Show()
 end)
 
---[[hooksecurefunc(VignettePinMixin, 'DisplayNormalTooltip', function(self)
-    if not BurningCrusade.groups.DRAGONRACE:IsEnabled() or self.vignetteID ~= 5104 then
+hooksecurefunc(VignettePinMixin, 'DisplayNormalTooltip', function(self)
+    if not ns.groups.DRAGONRACE:IsEnabled() or self.vignetteID ~= 5104 then
         return
     end
 
     local mapID = self:GetMap().mapID
-    local group = BurningCrusade.groups.DRAGONRACE
-    if not BurningCrusade.maps[mapID] or not group:GetDisplay(mapID) then return end
+    local group = ns.groups.DRAGONRACE
+    if not ns.maps[mapID] or not group:GetDisplay(mapID) then return end
 
     local x = C_VignetteInfo.GetVignettePosition(self.vignetteGUID, mapID).x
     local y = C_VignetteInfo.GetVignettePosition(self.vignetteGUID, mapID).y
 
     GameTooltip:AddLine('XY ' .. HandyNotes:getCoord(x, y), 1, 1, 1, true) -- DEBUG
 
-    local node = BurningCrusade.maps[mapID].nodes[HandyNotes:getCoord(x, y)]
+    local node = ns.maps[mapID].nodes[HandyNotes:getCoord(x, y)]
     if not node then return end
 
-    GameTooltip:SetText(BurningCrusade.RenderLinks(node.label, true))
-    GameTooltip:AddLine(BurningCrusade.RenderLinks(node.sublabel, true), 1, 1, 1)
-    if BurningCrusade:GetOpt('show_notes') then
+    GameTooltip:SetText(ns.RenderLinks(node.label, true))
+    GameTooltip:AddLine(ns.RenderLinks(node.sublabel, true), 1, 1, 1)
+    if ns:GetOpt('show_notes') then
         ----GameTooltip:AddLine(' ')
-        GameTooltip:AddLine(BurningCrusade.RenderLinks(node.note), 1, 1, 1, true)
+        GameTooltip:AddLine(ns.RenderLinks(node.note), 1, 1, 1, true)
     end
-    if BurningCrusade:GetOpt('show_loot') then
+    if ns:GetOpt('show_loot') then
         ----GameTooltip:AddLine(' ')
         for i, reward in ipairs(node.rewards) do
             if reward:IsEnabled() then reward:Render(GameTooltip) end
@@ -343,4 +343,4 @@ end)
     end
 
     GameTooltip:Show()
-end)]]
+end)

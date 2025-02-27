@@ -1,4 +1,4 @@
-## Interface: 110005
+## Interface: 110007, 110100
 ## Author: Xinhuan
 ## Version: v1.6.22
 ## Title: HandyNotes
@@ -7,14 +7,14 @@
 ## Notes: Handynotes with Achievments+Treasures+Toys+Mounts
 ## Notes-zhCN: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已击杀过。并替换自带飞行地图，使之更加方便详细。
 ## Notes-zhTW: 稀有、宝藏、坐骑、玩具将会在地图上标记出，并判定是否已擊殺過。并替换自带飞行地图，使之更加方便详细。
-## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, HandyNotes_CoreDB, HandyNotes_LostAndFoundDB, HNMoleMachineConfig, HandyNotes_PetDailiesDB, HandyNotes_Universal_ExplorerDB, HandyNotes_TravelGuideDB, HandyNotes_HigherDimensionalLearningDB, HandyNotes_WitheredChestsDB, HandyNotes_OribosDB, HandyNotesArgusDB, HandyNotes_SuramarTelemancyDB, HandyNotes_SuramarLeylinesDB,HandyNotes_WrathOfTheLichKingDB,HandyNotes_WarlordsOfDraenorDB,HandyNotes_UniversalExplorerDB,HandyNotes_WarfrontTreasuresDB
-## Dependencies: _ShiGuang, Blizzard_FlightMap
+## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, HandyNotes_CoreDB, HandyNotes_LostAndFoundDB, HNMoleMachineConfig, HandyNotes_PetDailiesDB, HandyNotes_Universal_ExplorerDB, HandyNotes_TravelGuideDB, HandyNotes_HigherDimensionalLearningDB, HandyNotes_WitheredChestsDB, HandyNotes_OribosDB, HandyNotesArgusDB, HandyNotes_SuramarTelemancyDB, HandyNotes_SuramarLeylinesDB,HandyNotes_WrathOfTheLichKingDB,HandyNotes_WarlordsOfDraenorDB,HandyNotes_UniversalExplorerDB,HandyNotes_WarfrontTreasuresDB,HandyNotes_SpringfurAlpacaDB,HandyNotes_AdorableRaptorHatchlingsDB
+## Dependencies: _ShiGuang
 ## IconTexture: Interface\AddOns\HandyNotes\Icons\greatvault.blp
 
 ## X-Repple: 2 UI
+## Category:- |cFFFFFF00 2|r|cFFFF0000 UI |r -
 
 # Library files
-Libs\HereBeDragons\HereBeDragons.xml
 Libs\Krowi_WorldMapButtons-1.4.lua
 
 # Locale files
@@ -29,7 +29,7 @@ HandyNotes_WorldMapButton.lua
 
 # Core Mods
 Core\core.xml
-templates.xml
+Core\templates.xml
 
 # BC
 BC\common.lua
@@ -135,7 +135,7 @@ SL\zones\torghast.lua
 SL\zones\zereth_mortis.lua
 SL\HandyNotes_Oribos.lua
 #SL\HandyNotes_WarfrontTreasures.lua
-
+  
 #Dragonflight
 DF\common.lua
 DF\zones\amirdrassil.lua
@@ -157,57 +157,12 @@ TWW\zones\azj_kahet.lua
 TWW\zones\hallowfall.lua
 TWW\zones\isle_of_dorn.lua
 TWW\zones\ringing_deeps.lua
+TWW\zones\siren_isle.lua
+TWW\zones\undermine.lua
 TWW\zones\delves.lua
 TWW\zones\dragonraces.lua
-
-# WorldOfWarcraft
-WOW\common.lua
-WOW\zones\eastern_kingdoms\arathi_highlands.lua
-WOW\zones\eastern_kingdoms\badlands.lua
-WOW\zones\eastern_kingdoms\blasted_lands.lua
-WOW\zones\eastern_kingdoms\burning_steppes.lua
-WOW\zones\eastern_kingdoms\cape_of_stranglethorn.lua
-WOW\zones\eastern_kingdoms\dun_morogh_ironforge.lua
-WOW\zones\eastern_kingdoms\duskwood.lua
-WOW\zones\eastern_kingdoms\eastern_plaguelands.lua
-WOW\zones\eastern_kingdoms\elwynn_forest_stormwind.lua
-WOW\zones\eastern_kingdoms\eversong_woods_silvermoon.lua
-WOW\zones\eastern_kingdoms\ghostlands.lua
-WOW\zones\eastern_kingdoms\hillsbrad_foothills.lua
-WOW\zones\eastern_kingdoms\loch_modan.lua
-WOW\zones\eastern_kingdoms\northern_stranglethorn.lua
-WOW\zones\eastern_kingdoms\redridge_mountains.lua
-WOW\zones\eastern_kingdoms\searing_gorge.lua
-WOW\zones\eastern_kingdoms\silverpine_forest.lua
-WOW\zones\eastern_kingdoms\swamp_of_sorrows.lua
-WOW\zones\eastern_kingdoms\the_hinterlands.lua
-WOW\zones\eastern_kingdoms\tirisfal_glades_undercity.lua
-WOW\zones\eastern_kingdoms\western_plaguelands.lua
-WOW\zones\eastern_kingdoms\westfall.lua
-WOW\zones\eastern_kingdoms\wetlands.lua
-WOW\zones\eastern_kingdoms\zul_gurub.lua
-WOW\zones\kalimdor\ashenvale.lua
-WOW\zones\kalimdor\azshara.lua
-WOW\zones\kalimdor\azuremyst_isle_exodar.lua
-WOW\zones\kalimdor\bloodmyst_isle.lua
-WOW\zones\kalimdor\caverns_of_time.lua
-WOW\zones\kalimdor\darkshore.lua
-WOW\zones\kalimdor\desolace.lua
-WOW\zones\kalimdor\durotar_orgrimmar.lua
-WOW\zones\kalimdor\dustwallow_marsh.lua
-WOW\zones\kalimdor\felwood.lua
-WOW\zones\kalimdor\feralas.lua
-WOW\zones\kalimdor\Moonglade.lua
-WOW\zones\kalimdor\mulgore_thunderbluff.lua
-WOW\zones\kalimdor\northern_barrens.lua
-WOW\zones\kalimdor\silithus.lua
-WOW\zones\kalimdor\southern_barrens.lua
-WOW\zones\kalimdor\stonetalon_mountains.lua
-WOW\zones\kalimdor\tanaris.lua
-WOW\zones\kalimdor\teldrassil_darnassus.lua
-WOW\zones\kalimdor\thousand_needles.lua
-WOW\zones\kalimdor\ungoro_crater.lua
-WOW\zones\kalimdor\winterspring.lua
+TWW\zones\secrets_of_azeroth.lua
+TWW\zones\ratts_revenge.lua
   
 # Mode files
 Mode\HandyNotes_ScarabCoffers.lua
@@ -217,6 +172,8 @@ Mode\HandyNotes_Universal_Explorer.lua
 Mode\TravelGuide\Core.lua
 Mode\TravelGuide\Data.lua
 Mode\HandyNotes_PetDailies.lua
+Mode\SpringfurAlpaca.lua
+Mode\AdorableRaptorHatchlings.lua
 
 # Others files
 CandyBuckets.lua

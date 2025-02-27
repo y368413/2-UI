@@ -8,7 +8,7 @@ local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 local cr, cg, cb = I.r, I.g, I.b
 
 function S:FriendGroups()
-	if not IsAddOnLoaded("FriendGroups") then return end
+	--if not IsAddOnLoaded("FriendGroups") then return end
 
 	if FriendGroups_UpdateFriendButton then
 		local function replaceButtonStatus(self, texture)
@@ -49,7 +49,10 @@ function S:PostalSkin()
 	M.ReskinArrow(Postal_OpenAllMenuButton, "down")
 	M.ReskinArrow(Postal_BlackBookButton, "down")
 	for i = 1, 7 do
-		M.ReskinCheck(_G["PostalInboxCB"..i])
+		local cb = _G["PostalInboxCB"..i]
+		if cb then
+			M.ReskinCheck(cb)
+		end
 	end
 
 	Postal_ModuleMenuButton:ClearAllPoints()
@@ -538,7 +541,7 @@ function S:OtherSkins()
 	S:ATT()
 	S:TrinketMenu()
 	S:ERT()
-	S:PSFJ()
+	--S:PSFJ()
 	S:TLDR()
 	S:ManuscriptsJournal()
 end

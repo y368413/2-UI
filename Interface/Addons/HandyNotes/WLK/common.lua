@@ -1,45 +1,45 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, WrathOfTheLichKing = ...
-local L = WrathOfTheLichKing.locale
+local _, ns = ...
+local L = ns.locale
 
-local Class = WrathOfTheLichKing.Class
-local Group = WrathOfTheLichKing.Group
+local Class = ns.Class
+local Group = ns.Group
 
-local Achievement = WrathOfTheLichKing.reward.Achievement
-local Collectible = WrathOfTheLichKing.node.Collectible
-local Pet = WrathOfTheLichKing.reward.Pet
+local Achievement = ns.reward.Achievement
+local Collectible = ns.node.Collectible
+local Pet = ns.reward.Pet
 
 -------------------------------------------------------------------------------
 
-WrathOfTheLichKing.expansion = 3
+ns.expansion = 3
 
 -------------------------------------------------------------------------------
 ----------------------------------- GROUPS ------------------------------------
 -------------------------------------------------------------------------------
 
-WrathOfTheLichKing.groups.SQUIRRELS = Group('squirrels', 237182, {defaults = WrathOfTheLichKing.GROUP_HIDDEN})
+ns.groups.SQUIRRELS = Group('squirrels', 237182, {defaults = ns.GROUP_HIDDEN})
 
 -------------------------------------------------------------------------------
 ------------------- TO ALL THE SQUIRRELS WHO SHARED MY LIFE -------------------
 -------------------------------------------------------------------------------
 
 local Squirrel = Class('Squirrel', Collectible, {
-    group = WrathOfTheLichKing.groups.SQUIRRELS,
+    group = ns.groups.SQUIRRELS,
     icon = 237182,
     note = L['squirrels_note']
 })
-WrathOfTheLichKing.node.Squirrel = Squirrel
+ns.node.Squirrel = Squirrel
 
 -------------------------------------------------------------------------------
 ----------------------------------- SAFARI ------------------------------------
 -------------------------------------------------------------------------------
 
 local Safari = Class('Safari', Collectible,
-    {icon = 'paw_g', group = WrathOfTheLichKing.groups.SAFARI})
+    {icon = 'paw_g', group = ns.groups.SAFARI})
 
-WrathOfTheLichKing.node.Safari = {
+ns.node.Safari = {
     ArcticFoxKit = Class('ArcticFoxKit', Safari, {
         id = 62864,
         rewards = {

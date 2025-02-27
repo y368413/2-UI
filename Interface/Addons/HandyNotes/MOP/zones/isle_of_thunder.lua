@@ -1,23 +1,23 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, MistsOfPandaria = ...
-local Map = MistsOfPandaria.Map
-local L = MistsOfPandaria.locale
-local Class = MistsOfPandaria.Class
+local _, ns = ...
+local Map = ns.Map
+local L = ns.locale
+local Class = ns.Class
 
-local Rare = MistsOfPandaria.node.Rare
-local Node = MistsOfPandaria.node.Node
-local Collectible = MistsOfPandaria.node.Collectible
-local Lorewalker = MistsOfPandaria.node.Lorewalker
+local Rare = ns.node.Rare
+local Node = ns.node.Node
+local Collectible = ns.node.Collectible
+local Lorewalker = ns.node.Lorewalker
 
-local Achievement = MistsOfPandaria.reward.Achievement
-local Transmog = MistsOfPandaria.reward.Transmog
-local Item = MistsOfPandaria.reward.Item
-local Pet = MistsOfPandaria.reward.Pet
+local Achievement = ns.reward.Achievement
+local Transmog = ns.reward.Transmog
+local Item = ns.reward.Item
+local Pet = ns.reward.Pet
 
-local POI = MistsOfPandaria.poi.POI
-local Path = MistsOfPandaria.poi.Path
+local POI = ns.poi.POI
+local Path = ns.poi.Path
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
 -------------------------------------------------------------------------------
@@ -273,7 +273,7 @@ map.nodes[62533772] = Lorewalker({
 -------------------------------------------------------------------------------
 
 local Kroshik = Class('Kroshik', Collectible,
-    {icon = 458255, group = MistsOfPandaria.groups.KROSHIK})
+    {icon = 458255, group = ns.groups.KROSHIK})
 
 map.nodes[51307104] = Kroshik({
     id = 69907,

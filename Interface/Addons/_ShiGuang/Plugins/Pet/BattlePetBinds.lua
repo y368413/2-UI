@@ -1,4 +1,4 @@
--- Author: Simca@Malfurion   ## Version: v2.28.0
+-- Author: Simca@Malfurion   ## Version: v2.29.0
 
 local  BattlePetBinds = {}
 local SOBC = _G.SetOverrideBindingClick
@@ -221,7 +221,7 @@ end
 local function BattlePetBinds_OnEvent(self, event, ...)
 
 	-- if this addon loads then
-	if event == "ADDON_LOADED" then
+	if (event == "ADDON_LOADED") and (... == "_ShiGuang") then
 		
 		-- create SavedVariables table using default values if not already found
 		--if (not ShiGuangDB) then ShiGuangDB = {} end
@@ -318,8 +318,6 @@ end
 
 -- set our event handler function
 BattlePetBinds:SetScript("OnEvent", BattlePetBinds_OnEvent)
-
-
 -- THERE IS NO NEED TO MODIFY THIS FILE NOW.
 -- ALL SETTINGS ARE IN-GAME UNDER ESCAPE --> INTERFACE --> ADDONS --> BATTLEPETBINDS
 
@@ -370,7 +368,7 @@ end
 
 local title = CreateFont("GameFontNormalLarge", properName)
 title:SetPoint("TOPLEFT", 16, -16)
-local ver = CreateFont("GameFontNormalSmall", "版本 v2.28.0")
+local ver = CreateFont("GameFontNormalSmall", "版本 v2.29.0")
 ver:SetPoint("BOTTOMLEFT", title, "BOTTOMRIGHT", 4, 0)
 local auth = CreateFont("GameFontNormalSmall", "来自于 Simca")
 auth:SetPoint("BOTTOMLEFT", ver, "BOTTOMRIGHT", 3, 0)

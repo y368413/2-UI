@@ -1,31 +1,31 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, TheWarWithin = ...
-local Class = TheWarWithin.Class
-local L = TheWarWithin.locale
-local Map = TheWarWithin.Map
+local _, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = TheWarWithin.node.Collectible
-local DisturbedEarth = TheWarWithin.node.DisturbedEarth
-local PT = TheWarWithin.node.ProfessionTreasures
-local Rare = TheWarWithin.node.Rare
-local Treasure = TheWarWithin.node.Treasure
+local Collectible = ns.node.Collectible
+local DisturbedEarth = ns.node.DisturbedEarth
+local PT = ns.node.ProfessionTreasures
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local FlightMaster = TheWarWithin.node.FlightMaster
--- local LoreObject = TheWarWithin.node.LoreObject
-local SkyridingGlyph = TheWarWithin.node.SkyridingGlyph
+local FlightMaster = ns.node.FlightMaster
+local LoreObject = ns.node.LoreObject
+local SkyridingGlyph = ns.node.SkyridingGlyph
 
-local Achievement = TheWarWithin.reward.Achievement
-local Pet = TheWarWithin.reward.Pet
-local Toy = TheWarWithin.reward.Toy
-local Transmog = TheWarWithin.reward.Transmog
-local Reputation = TheWarWithin.reward.Reputation
+local Achievement = ns.reward.Achievement
+local Pet = ns.reward.Pet
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
+local Reputation = ns.reward.Reputation
 
-local Circle = TheWarWithin.poi.Circle
-local Entrance = TheWarWithin.poi.Entrance
-local Path = TheWarWithin.poi.Path
-local POI = TheWarWithin.poi.POI
+local Circle = ns.poi.Circle
+local Entrance = ns.poi.Entrance
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -369,6 +369,14 @@ map.nodes[63479504] = Rare({
     pois = {Entrance({65309350})} -- Entrance
 }) -- The One Left
 
+local BloodVial = Class('BloodVial', ns.reward.Item, {item = 225952})
+
+function BloodVial:GetStatus()
+    local collected = select(11, C_MountJournal.GetMountInfoByID(2222))
+    return collected and ns.status.Green(L['known']) or
+               ns.status.Red(L['missing'])
+end
+
 map.nodes[62816618] = Rare({
     id = 216046,
     quest = 82289, -- 85166
@@ -379,7 +387,7 @@ map.nodes[62816618] = Rare({
         Reputation({id = 2607, gain = 50, quest = 85166}),
         Transmog({item = 221240, type = L['1h_sword']}), -- Nerubian Stagshell Gouger
         Transmog({item = 221252, type = L['2h_sword']}), -- Nerubian Slayer's Claymore
-        TheWarWithin.reward.Item({item = 225952, quest = 83627})
+        BloodVial()
     } -- starts the questchain to get the Siesbarg mount.
 }) -- Tka'ktath
 
@@ -390,7 +398,7 @@ map.nodes[62816618] = Rare({
 akl.nodes[62728795] = Treasure({
     quest = 82520,
     parent = map.id,
-    requires = TheWarWithin.requirement.Item(223870), -- Cache Key
+    requires = ns.requirement.Item(223870), -- Cache Key
     note = L['memory_cache_note'],
     rewards = {
         Achievement({id = 40828, criteria = 69615}),
@@ -516,12 +524,12 @@ map.nodes[34056102] = Treasure({
 --------------------------------- BATTLE PETS ---------------------------------
 -------------------------------------------------------------------------------
 
-cotl.nodes[61263699] = TheWarWithin.node.PetBattle({
+cotl.nodes[61263699] = ns.node.PetBattle({
     id = 223443,
     parent = {cot.id, map.id},
     rewards = {
         Achievement({id = 40153, criteria = 67138, oneline = true}), -- Battle on Khaz Algar
-        TheWarWithin.reward.Spacer(),
+        ns.reward.Spacer(),
         Achievement({id = 40154, criteria = 67142, oneline = true}), -- Aquatic Battler of Khaz Algar
         Achievement({id = 40155, criteria = 67146, oneline = true}), -- Beast Battler of Khaz Algar
         Achievement({id = 40156, criteria = 67150, oneline = true}), -- Critter Battler of Khaz Algar
@@ -535,7 +543,7 @@ cotl.nodes[61263699] = TheWarWithin.node.PetBattle({
     }
 }) -- Collector Dyna
 
-map.nodes[53093158] = TheWarWithin.node.PetBattle({
+map.nodes[53093158] = ns.node.PetBattle({
     id = 223406,
     rewards = {
         Achievement({id = 40153, criteria = 67134, oneline = true}) -- Battle on Khaz Algar
@@ -610,8 +618,8 @@ cot.nodes[50321682] =
 
 local Bookworm = Class('bookworm', Collectible, {
     icon = 4549129,
-    group = TheWarWithin.groups.BOOKWORM,
-    requires = TheWarWithin.requirement.Spell(456122), -- Polymorphic Translation: Nerubian
+    group = ns.groups.BOOKWORM,
+    requires = ns.requirement.Spell(456122), -- Polymorphic Translation: Nerubian
     note = L['nerubian_potion_note'] .. '\n\n' .. L['bookworm_note'],
     pois = {POI({47166941, label = '{npc:218192}', color = 'Red'})} -- Siesbarg
 })
@@ -687,7 +695,7 @@ map.nodes[65405178] = SkyridingGlyph({
 
 local ItsyBitsySpider = Class('ItsyBitsySpider', Collectible, {
     icon = 5793405,
-    group = TheWarWithin.groups.ITSY_BITSY_SPIDER,
+    group = ns.groups.ITSY_BITSY_SPIDER,
     note = L['itsy_bitsy_spider_note']
 })
 
@@ -754,47 +762,47 @@ map.nodes[56344316] = ItsyBitsySpider({
 --------------------- ACHIEVEMENT: KHAZ ALGAR LORE HUNTER ---------------------
 -------------------------------------------------------------------------------
 
--- cot.nodes[77557018] = LoreObject({
---     parent = map.id,
---     rewards = {
---         Achievement({id = 40762, criteria = 69385}),
---         Reputation({id = 2601, gain = 85}), Reputation({id = 2605, gain = 85}),
---         Reputation({id = 2607, gain = 85})
---     }
--- }) -- Forgotten Shadecaster
+cot.nodes[77557018] = LoreObject({
+    parent = map.id,
+    rewards = {
+        Achievement({id = 40762, criteria = 69385}),
+        Reputation({id = 2601, gain = 85}), Reputation({id = 2605, gain = 85}),
+        Reputation({id = 2607, gain = 85})
+    }
+}) -- Forgotten Shadecaster
 
--- map.nodes[75443325] = LoreObject({
---     rewards = {
---         Achievement({id = 40762, criteria = 69387}),
---         Reputation({id = 2601, gain = 85}), Reputation({id = 2605, gain = 85}),
---         Reputation({id = 2607, gain = 85})
---     }
--- }) -- Kah'teht
+map.nodes[75443325] = LoreObject({
+    rewards = {
+        Achievement({id = 40762, criteria = 69387}),
+        Reputation({id = 2601, gain = 85}), Reputation({id = 2605, gain = 85}),
+        Reputation({id = 2607, gain = 85})
+    }
+}) -- Kah'teht
 
--- map.nodes[54071889] = LoreObject({
---     rewards = {
---         Achievement({id = 40762, criteria = 69388}),
---         Reputation({id = 2601, gain = 85}), Reputation({id = 2605, gain = 85}),
---         Reputation({id = 2607, gain = 85})
---     }
--- }) -- Mad Nerubian
+map.nodes[54071889] = LoreObject({
+    rewards = {
+        Achievement({id = 40762, criteria = 69388}),
+        Reputation({id = 2601, gain = 85}), Reputation({id = 2605, gain = 85}),
+        Reputation({id = 2607, gain = 85})
+    }
+}) -- Mad Nerubian
 
--- cot.nodes[08533058] = LoreObject({
---     parent = map.id,
---     rewards = {
---         Achievement({id = 40762, criteria = 69386}),
---         Reputation({id = 2601, gain = 85}), Reputation({id = 2605, gain = 85}),
---         Reputation({id = 2607, gain = 85})
---     }
--- }) -- Neglected Shadecaster
+cot.nodes[08533058] = LoreObject({
+    parent = map.id,
+    rewards = {
+        Achievement({id = 40762, criteria = 69386}),
+        Reputation({id = 2601, gain = 85}), Reputation({id = 2605, gain = 85}),
+        Reputation({id = 2607, gain = 85})
+    }
+}) -- Neglected Shadecaster
 
--- map.nodes[71126233] = LoreObject({
---     rewards = {
---         Achievement({id = 40762, criteria = 69384}),
---         Reputation({id = 2601, gain = 85}), Reputation({id = 2605, gain = 85}),
---         Reputation({id = 2607, gain = 85})
---     }
--- }) -- Weathered Shadecaster
+map.nodes[71126233] = LoreObject({
+    rewards = {
+        Achievement({id = 40762, criteria = 69384}),
+        Reputation({id = 2601, gain = 85}), Reputation({id = 2605, gain = 85}),
+        Reputation({id = 2607, gain = 85})
+    }
+}) -- Weathered Shadecaster
 
 -------------------------------------------------------------------------------
 --------------------- ACHIEVEMENT: SMELLING HISTORY ---------------------------
@@ -802,8 +810,8 @@ map.nodes[56344316] = ItsyBitsySpider({
 
 local SmellingHistory = Class('smelling_history', Collectible, {
     icon = 4549130,
-    group = TheWarWithin.groups.SMELLING_HISTORY,
-    requires = TheWarWithin.requirement.Spell(456122), -- Polymorphic Translation: Nerubian
+    group = ns.groups.SMELLING_HISTORY,
+    requires = ns.requirement.Spell(456122), -- Polymorphic Translation: Nerubian
     note = L['nerubian_potion_note'] .. '\n\n' .. L['smelling_history_note']
 })
 
@@ -898,7 +906,7 @@ cot.nodes[77984103] = SmellingHistory({
 
 local SkittershawSpin = Class('skittershaw_spin', Collectible, {
     icon = 879828,
-    group = TheWarWithin.groups.SKITTERSHAW_SPIN,
+    group = ns.groups.SKITTERSHAW_SPIN,
     note = L['skittershaw_spin_note']
 })
 
@@ -937,7 +945,7 @@ cot.nodes[65255720] = SkittershawSpin({
 
 local NoHarmFromReading = Class('no_harm_from_reading', Collectible, {
     icon = 463284,
-    group = TheWarWithin.groups.NO_HARM_FROM_READING,
+    group = ns.groups.NO_HARM_FROM_READING,
     rewards = {Achievement({id = 40632, criteria = 0, oneline = true})}
 })
 
@@ -1004,7 +1012,7 @@ akl.nodes[62848495] = Collectible({
     icon = 1386549,
     label = '{achievement:40633}',
     note = L['the_unseeming_note'],
-    group = TheWarWithin.groups.THE_UNSEEMING,
+    group = ns.groups.THE_UNSEEMING,
     rewards = {Achievement({id = 40633})},
     parent = map.id
 })
@@ -1017,7 +1025,7 @@ cot.nodes[53622079] = Collectible({
     icon = 237431,
     label = '{achievement:40634}',
     note = L['you_cant_hang_with_us_note'],
-    group = TheWarWithin.groups.YOU_CANT_HANG_WITH_US,
+    group = ns.groups.YOU_CANT_HANG_WITH_US,
     parent = {
         id = map.id,
         pois = {
@@ -1106,7 +1114,7 @@ local ArathiPrisoner = Class('ArathiPrisoner', Collectible, {
     icon = 'peg_yw',
     scale = 1.5,
     note = L['arathi_prisoner_note'],
-    group = TheWarWithin.groups.BACK_TO_THE_WALL,
+    group = ns.groups.BACK_TO_THE_WALL,
     rewards = {
         Achievement({
             id = 40620,
@@ -1141,7 +1149,7 @@ map.nodes[63880010] = ArathiPrisoner()
 ---------------------- PET: BEAN (FRESHLY WEBBED KEBAB) -----------------------
 -------------------------------------------------------------------------------
 
-local KejPetVendor = Class('KejPetVendor', TheWarWithin.node.Vendor, {
+local KejPetVendor = Class('KejPetVendor', ns.node.Vendor, {
     note = L['kej_pet_vendor_note'],
     fgroup = 'kej_pet_vendor'
 }) -- Kej Pet Vendor
@@ -1198,3 +1206,13 @@ cot.nodes[46282915] = KejPetVendor({
         Pet({item = 222968, id = 4476}) -- Itchbite
     }
 }) -- "Calmest" Gobbu
+
+-------------------------------------------------------------------------------
+----------------------------- WORLDSOUL MEMORIES ------------------------------
+-------------------------------------------------------------------------------
+
+cot.nodes[21074547] = ns.node.WorldsoulMemory({
+    areaPoiID = 7839,
+    parent = map.id
+}) -- Old Gods Forsaken
+map.nodes[65865232] = ns.node.WorldsoulMemory({areaPoiID = 7840}) -- A Wounded Soul

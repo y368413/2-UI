@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, WarlordsOfDraenor = ...
-local L = WarlordsOfDraenor.locale
-local Map = WarlordsOfDraenor.Map
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = WarlordsOfDraenor.node.Collectible
+local Collectible = ns.node.Collectible
 
-local Follower = WarlordsOfDraenor.reward.Follower
+local Follower = ns.reward.Follower
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------

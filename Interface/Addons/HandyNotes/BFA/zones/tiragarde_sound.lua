@@ -1,27 +1,26 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Class = ns.Class
+local Map = ns.Map
 
-local _, BattleForAzeroth = ...
-local L = BattleForAzeroth.locale
-local Class = BattleForAzeroth.Class
-local Map = BattleForAzeroth.Map
+local Collectible = ns.node.Collectible
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
+local Supply = ns.node.Supply
+local Treasure = ns.node.Treasure
 
-local Collectible = BattleForAzeroth.node.Collectible
-local PetBattle = BattleForAzeroth.node.PetBattle
-local Rare = BattleForAzeroth.node.Rare
-local Safari = BattleForAzeroth.node.Safari
-local Supply = BattleForAzeroth.node.Supply
-local Treasure = BattleForAzeroth.node.Treasure
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Transmog = ns.reward.Transmog
+local Toy = ns.reward.Toy
 
-local Achievement = BattleForAzeroth.reward.Achievement
-local Item = BattleForAzeroth.reward.Item
-local Transmog = BattleForAzeroth.reward.Transmog
-local Toy = BattleForAzeroth.reward.Toy
-
-local Arrow = BattleForAzeroth.poi.Arrow
-local Path = BattleForAzeroth.poi.Path
-local POI = BattleForAzeroth.poi.POI
+local Arrow = ns.poi.Arrow
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -484,7 +483,7 @@ map.nodes[73103950] = Treasure({
 ----------------------------- SECRET SUPPLY CHESTS ----------------------------
 -------------------------------------------------------------------------------
 
-local SECRET_CHEST = BattleForAzeroth.node.SecretSupply({
+local SECRET_CHEST = ns.node.SecretSupply({
     quest = 55347,
     rewards = {Achievement({id = 13317, criteria = 43934})}
 }) -- quest = 54714 (looted ever) 55347 (looted today)
@@ -526,7 +525,7 @@ map.nodes[59583330] = PetBattle({
     id = 141292,
     note = L['delia_hanako_note'],
     rewards = {
-        Achievement({id = 12936, criteria = 44219}), BattleForAzeroth.reward.Spacer(),
+        Achievement({id = 12936, criteria = 44219}), ns.reward.Spacer(),
         Achievement({id = 13270, criteria = 9, oneline = true}), -- Beast
         Achievement({id = 13271, criteria = 9, oneline = true}), -- Critter
         Achievement({id = 13272, criteria = 9, oneline = true}), -- Dragon
@@ -544,7 +543,7 @@ map.nodes[67711285] = PetBattle({
     id = 141479,
     note = L['burly_note'],
     rewards = {
-        Achievement({id = 12936, criteria = 44220}), BattleForAzeroth.reward.Spacer(),
+        Achievement({id = 12936, criteria = 44220}), ns.reward.Spacer(),
         Achievement({id = 13270, criteria = 10, oneline = true}), -- Beast
         Achievement({id = 13271, criteria = 10, oneline = true}), -- Critter
         Achievement({id = 13272, criteria = 10, oneline = true}), -- Dragon
@@ -562,7 +561,7 @@ map.nodes[86213862] = PetBattle({
     id = 141077,
     note = L['kwint_note'],
     rewards = {
-        Achievement({id = 12936, criteria = 44217}), BattleForAzeroth.reward.Spacer(),
+        Achievement({id = 12936, criteria = 44217}), ns.reward.Spacer(),
         Achievement({id = 13270, criteria = 8, oneline = true}), -- Beast
         Achievement({id = 13271, criteria = 8, oneline = true}), -- Critter
         Achievement({id = 13272, criteria = 8, oneline = true}), -- Dragon
@@ -584,7 +583,7 @@ bor.nodes[70622130] = Collectible({
     id = 142167,
     icon = 133200,
     note = L['sausage_sampler_note'],
-    group = BattleForAzeroth.groups.SAUSAGE_SAMPLER,
+    group = ns.groups.SAUSAGE_SAMPLER,
     parent = map.id,
     rewards = {
         Achievement({
@@ -603,7 +602,7 @@ bor.nodes[72606841] = Collectible({
     id = 135525,
     icon = 133200,
     note = L['sausage_sampler_note'],
-    group = BattleForAzeroth.groups.SAUSAGE_SAMPLER,
+    group = ns.groups.SAUSAGE_SAMPLER,
     parent = map.id,
     rewards = {
         Achievement({
@@ -620,7 +619,7 @@ bor.nodes[47454604] = Collectible({
     id = 137407,
     icon = 133200,
     note = L['sausage_sampler_note'],
-    group = BattleForAzeroth.groups.SAUSAGE_SAMPLER,
+    group = ns.groups.SAUSAGE_SAMPLER,
     parent = map.id,
     rewards = {
         Achievement({
@@ -642,7 +641,7 @@ bor.nodes[47454604] = Collectible({
 bor.nodes[72426942] = Collectible({
     icon = 1500866,
     note = L['shanty_lively_note'],
-    group = BattleForAzeroth.groups.SHANTY_RAID,
+    group = ns.groups.SHANTY_RAID,
     parent = map.id,
     rewards = {
         Achievement({id = 13057, criteria = 41541}), Item({item = 163714})
@@ -652,7 +651,7 @@ bor.nodes[72426942] = Collectible({
 bor.nodes[53141767] = Collectible({
     icon = 1500866,
     note = L['shanty_inebriation_note'],
-    group = BattleForAzeroth.groups.SHANTY_RAID,
+    group = ns.groups.SHANTY_RAID,
     parent = map.id,
     rewards = {
         Achievement({id = 13057, criteria = 41543}), Item({item = 163716})
@@ -662,7 +661,7 @@ bor.nodes[53141767] = Collectible({
 map.nodes[43482559] = Collectible({
     icon = 1500866,
     note = L['shanty_fruit_note'],
-    group = BattleForAzeroth.groups.SHANTY_RAID,
+    group = ns.groups.SHANTY_RAID,
     rewards = {
         Achievement({id = 13057, criteria = 41542}), Item({item = 163715})
     }
@@ -671,7 +670,7 @@ map.nodes[43482559] = Collectible({
 map.nodes[73218414] = Collectible({
     icon = 1500866,
     note = L['shanty_horse_note'],
-    group = BattleForAzeroth.groups.SHANTY_RAID,
+    group = ns.groups.SHANTY_RAID,
     rewards = {
         Achievement({id = 13057, criteria = 41546}), Item({item = 163719})
     }
@@ -685,7 +684,7 @@ bor.nodes[47744734] = Collectible({
     id = 137411,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     parent = map.id,
     rewards = {
@@ -707,7 +706,7 @@ bor.nodes[58177024] = Collectible({
     id = 143487,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     parent = map.id,
     rewards = {
@@ -725,7 +724,7 @@ bor.nodes[69262986] = Collectible({
     id = 142189,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     parent = map.id,
     rewards = {
@@ -747,7 +746,7 @@ bor.nodes[75331442] = Collectible({
     id = 123639,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     parent = map.id,
     rewards = {
@@ -770,7 +769,7 @@ bor.nodes[74241776] = Collectible({
     id = 142188,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     parent = map.id,
     rewards = {
@@ -792,7 +791,7 @@ bor.nodes[71186089] = Collectible({
     id = 149397,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     parent = map.id,
     rewards = {
@@ -814,7 +813,7 @@ bor.nodes[54994361] = Collectible({
     id = 134729,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     parent = map.id,
     rewards = {
@@ -836,7 +835,7 @@ bor.nodes[75451861] = Collectible({
     id = 143246,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     parent = map.id,
     rewards = {
@@ -854,7 +853,7 @@ bor.nodes[74121265] = Collectible({
     id = 135153,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     parent = map.id,
     rewards = {
@@ -874,7 +873,7 @@ bor.nodes[66516137] = Collectible({
     id = 144115,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     parent = map.id,
     rewards = {
@@ -894,7 +893,7 @@ bor.nodes[72141491] = Collectible({
     id = 143244,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     parent = map.id,
     rewards = {
@@ -922,7 +921,7 @@ bor.nodes[53987523] = Collectible({
     id = 139113,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     parent = map.id,
     rewards = {
@@ -941,7 +940,7 @@ bor.nodes[65463929] = Collectible({
     id = 135216,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     parent = map.id,
     rewards = {
@@ -955,7 +954,7 @@ map.nodes[49792529] = Collectible({
     id = 126601,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     faction = 'Alliance',
     rewards = {
         Achievement({
@@ -976,7 +975,7 @@ map.nodes[77198426] = Collectible({
     id = 129044,
     icon = 135999,
     note = L['three_sheets_note'],
-    group = BattleForAzeroth.groups.THREE_SHEETS,
+    group = ns.groups.THREE_SHEETS,
     rewards = {
         Achievement({
             id = 13061,
@@ -994,7 +993,7 @@ map.nodes[77198426] = Collectible({
 
 local Citizen = Class('UprightCitizen', Collectible, {
     icon = 516667,
-    group = BattleForAzeroth.groups.UPRIGHT_CITIZENS,
+    group = ns.groups.UPRIGHT_CITIZENS,
     note = L['upright_citizens_node']
 })
 
@@ -1023,13 +1022,13 @@ bor.nodes[72706920] = Citizen({
 ------------------- TO ALL THE SQUIRRELS I SET SAIL TO SEE --------------------
 -------------------------------------------------------------------------------
 
-map.nodes[84807780] = BattleForAzeroth.node.Squirrel({
+map.nodes[84807780] = ns.node.Squirrel({
     id = 126546,
     rewards = {Achievement({id = 14730, criteria = 50238})},
     pois = {POI({86408120})}
 }) -- Fluttering Softwing
 
-map.nodes[88207280] = BattleForAzeroth.node.Squirrel({
+map.nodes[88207280] = ns.node.Squirrel({
     id = 126519,
     rewards = {Achievement({id = 14730, criteria = 50240})},
     pois = {POI({88207800, 78008060})}
@@ -1122,7 +1121,7 @@ bor.nodes[76202360] = Safari.ShackCrab({
     parent = map.id
 }) -- ShackCrab
 
-map.nodes[46202200] = BattleForAzeroth.node.Safari.SlitheringBrownscale({
+map.nodes[46202200] = ns.node.Safari.SlitheringBrownscale({
     pois = {
         POI({
             43602300, 43802180, 44401900, 44402520, 44802300, 45402060,

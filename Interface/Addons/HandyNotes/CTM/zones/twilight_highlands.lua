@@ -1,19 +1,19 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Cataclysm = ...
-local Class = Cataclysm.Class
-local L = Cataclysm.locale
-local Map = Cataclysm.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Rare = Cataclysm.node.Rare
-local Safari = Cataclysm.node.Safari
+local Rare = ns.node.Rare
+local Safari = ns.node.Safari
 
-local Achievement = Cataclysm.reward.Achievement
-local Transmog = Cataclysm.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Transmog = ns.reward.Transmog
 
-local Path = Cataclysm.poi.Path
-local POI = Cataclysm.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -383,7 +383,7 @@ map.nodes[53407160] = Safari.YellowBelliedMarmot({
     }
 }) -- Yellow-Bellied Marmot
 
-map.nodes[50745830] = Cataclysm.node.Collectible({
+map.nodes[50745830] = ns.node.Collectible({
     id = 46935,
     icon = 132334,
     rewards = {
@@ -396,7 +396,7 @@ map.nodes[50745830] = Cataclysm.node.Collectible({
 --------------------------------- DRAGONRACES ---------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[10001000] = Cataclysm.node.Dragonrace({
+map.nodes[10001000] = ns.node.Dragonrace({
     label = '{quest:76364}',
     -- normal = {nil, nil, nil},
     -- advanced = {nil, nil, nil},
@@ -414,7 +414,7 @@ map.nodes[10001000] = Cataclysm.node.Dragonrace({
     }
 }) -- Twilight Terror
 
-map.nodes[10001500] = Cataclysm.node.Dragonrace({
+map.nodes[10001500] = ns.node.Dragonrace({
     label = '{quest:76527}',
     -- normal = {nil, nil, nil},
     -- advanced = {nil, nil, nil},

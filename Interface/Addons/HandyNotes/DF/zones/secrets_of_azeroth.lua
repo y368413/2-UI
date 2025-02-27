@@ -1,77 +1,77 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Dragonflight = ...
-local Class = Dragonflight.Class
-local L = Dragonflight.locale
-local Map = Dragonflight.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Achievement = Dragonflight.reward.Achievement
-local Item = Dragonflight.reward.Item
-local Mount = Dragonflight.reward.Mount
-local Pet = Dragonflight.reward.Pet
-local Toy = Dragonflight.reward.Toy
-local Transmog = Dragonflight.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Gray = Dragonflight.color.Gray
+local Gray = ns.color.Gray
 
-local POI = Dragonflight.poi.POI
-local Path = Dragonflight.poi.Path
+local POI = ns.poi.POI
+local Path = ns.poi.Path
 
-local ItemStatus = Dragonflight.tooltip.ItemStatus
-local QuestStatus = Dragonflight.tooltip.QuestStatus
+local ItemStatus = ns.tooltip.ItemStatus
+local QuestStatus = ns.tooltip.QuestStatus
 
 -------------------------------------------------------------------------------
 
 -- Achievement: Whodunnit?
-local bor = Dragonflight.maps[114] or Map({id = 114, settings = true}) -- Borean Tundra
-local kar = Dragonflight.maps[358] or Map({id = 358, settings = true}) -- Karazhan - The Menagerie
-local tws = Dragonflight.maps[2022] or Map({id = 2022, settings = true}) -- The Waking Shores
-local ohn = Dragonflight.maps[2023] or Map({id = 2023, settings = true}) -- Ohn'ahran Plains
-local tas = Dragonflight.maps[2024] or Map({id = 2024, settings = true}) -- The Azure Span
-local tha = Dragonflight.maps[2025] or Map({id = 2025, settings = true}) -- Thaldraszus
-local val = Dragonflight.maps[2112] or Map({id = 2112, settings = true}) -- Valdrakken
-local zar = Dragonflight.maps[2133] or Map({id = 2133, settings = true}) -- Zaralek Cavern
+local bor = ns.maps[114] or Map({id = 114, settings = true}) -- Borean Tundra
+local kar = ns.maps[358] or Map({id = 358, settings = true}) -- Karazhan - The Menagerie
+local tws = ns.maps[2022] or Map({id = 2022, settings = true}) -- The Waking Shores
+local ohn = ns.maps[2023] or Map({id = 2023, settings = true}) -- Ohn'ahran Plains
+local tas = ns.maps[2024] or Map({id = 2024, settings = true}) -- The Azure Span
+local tha = ns.maps[2025] or Map({id = 2025, settings = true}) -- Thaldraszus
+local val = ns.maps[2112] or Map({id = 2112, settings = true}) -- Valdrakken
+local zar = ns.maps[2133] or Map({id = 2133, settings = true}) -- Zaralek Cavern
 
 -- Achievement: Community Rumor Mill
-local bar = Dragonflight.maps[10] or Map({id = 10, settings = true}) -- Northern Barrens
-local bla = Dragonflight.maps[17] or Map({id = 17, settings = true}) -- Blasted Lands
-local dbt = Dragonflight.maps[115] or Map({id = 115, settings = true}) -- Dragonblight
-local epl = Dragonflight.maps[23] or Map({id = 23, settings = true}) -- Eastern Plaguelands
-local fel = Dragonflight.maps[77] or Map({id = 77, settings = true}) -- Felwood
-local gri = Dragonflight.maps[116] or Map({id = 116, settings = true}) -- Grizzly Hills
-local hmt = Dragonflight.maps[650] or Map({id = 650, settings = true}) -- Highmountain
-local nag = Dragonflight.maps[107] or Map({id = 107, settings = true}) -- Nagrand (Outland)
-local net = Dragonflight.maps[109] or Map({id = 109, settings = true}) -- Netherstorm
-local smv = Dragonflight.maps[539] or Map({id = 539, settings = true}) -- Shadowmoon Valley (Draenor)
-local tho = Dragonflight.maps[64] or Map({id = 64, settings = true}) -- Thousand Needles
-local tli = Dragonflight.maps[554] or Map({id = 554, settings = true}) -- Timeless Isle
-local vfw = Dragonflight.maps[376] or Map({id = 376, settings = true}) -- Valley of the Four Winds
-local wpl = Dragonflight.maps[22] or Map({id = 22, settings = true}) -- Western Plaguelands
-local tir = Dragonflight.maps[895] or Map({id = 895, settings = true}) -- Tiragarde Sound
+local bar = ns.maps[10] or Map({id = 10, settings = true}) -- Northern Barrens
+local bla = ns.maps[17] or Map({id = 17, settings = true}) -- Blasted Lands
+local dbt = ns.maps[115] or Map({id = 115, settings = true}) -- Dragonblight
+local epl = ns.maps[23] or Map({id = 23, settings = true}) -- Eastern Plaguelands
+local fel = ns.maps[77] or Map({id = 77, settings = true}) -- Felwood
+local gri = ns.maps[116] or Map({id = 116, settings = true}) -- Grizzly Hills
+local hmt = ns.maps[650] or Map({id = 650, settings = true}) -- Highmountain
+local nag = ns.maps[107] or Map({id = 107, settings = true}) -- Nagrand (Outland)
+local net = ns.maps[109] or Map({id = 109, settings = true}) -- Netherstorm
+local smv = ns.maps[539] or Map({id = 539, settings = true}) -- Shadowmoon Valley (Draenor)
+local tho = ns.maps[64] or Map({id = 64, settings = true}) -- Thousand Needles
+local tli = ns.maps[554] or Map({id = 554, settings = true}) -- Timeless Isle
+local vfw = ns.maps[376] or Map({id = 376, settings = true}) -- Valley of the Four Winds
+local wpl = ns.maps[22] or Map({id = 22, settings = true}) -- Western Plaguelands
+local tir = ns.maps[895] or Map({id = 895, settings = true}) -- Tiragarde Sound
 
 -- Mount: Mimiron's Jumpjets
-local cst = Dragonflight.maps[210] or Map({id = 210, settings = true}) -- Cape of Stranglethorn
+local cst = ns.maps[210] or Map({id = 210, settings = true}) -- Cape of Stranglethorn
 
 -------------------------------------------------------------------------------
 
-local REQUIREMENT_TRICKED_OUT_THINKING_CAP = Dragonflight.requirement.Toy(206696)
-local REQUIREMENT_TORCH_OF_PYRRETH = Dragonflight.requirement.Toy(208092)
-local REQUIREMENT_IDOL_OF_OHNAHRA = Dragonflight.requirement.Toy(207730)
+local REQUIREMENT_TRICKED_OUT_THINKING_CAP = ns.requirement.Toy(206696)
+local REQUIREMENT_TORCH_OF_PYRRETH = ns.requirement.Toy(208092)
+local REQUIREMENT_IDOL_OF_OHNAHRA = ns.requirement.Toy(207730)
 
 -------------------------------------------------------------------------------
 
-local SecretsOfAzeroth = Class('SecretsOfAzeroth', Dragonflight.node.Node, {
+local SecretsOfAzeroth = Class('SecretsOfAzeroth', ns.node.Node, {
     icon = 'peg_gn',
     scale = 2.0,
-    group = Dragonflight.groups.SECRETS_OF_AZEROTH,
+    group = ns.groups.SECRETS_OF_AZEROTH,
     IsCompleted = function(self)
         if self.playerHasItem then
             for i, v in ipairs(self.playerHasItem) do
-                if Dragonflight.PlayerHasItem(v) then return true end
+                if ns.PlayerHasItem(v) then return true end
             end
         end
-        return Dragonflight.node.Node.IsCompleted(self)
+        return ns.node.Node.IsCompleted(self)
     end
 }) -- Secrets of Azeroth
 
@@ -83,7 +83,7 @@ val.nodes[58895410] = SecretsOfAzeroth({
     label = '{item:208056}',
     note = L['soa_01_golden_chalice_note'],
     quest = 77204, -- Clue 01 complete
-    requires = Dragonflight.requirement.Item(208056), -- Golden Chalice
+    requires = ns.requirement.Item(208056), -- Golden Chalice
     rlabel = Gray(L['soa_01_rlabel'])
 }) -- Golden Chalice
 
@@ -109,7 +109,7 @@ tas.nodes[12404933] = SecretsOfAzeroth({
     quest = 76987,
     questDeps = 77203, -- ![Preserving Rarities]
     playerHasItem = {207580}, -- Shomko's Unyidling Spear
-    requires = Dragonflight.requirement.Item(207105), -- Tuskarr Ceremonial Spear
+    requires = ns.requirement.Item(207105), -- Tuskarr Ceremonial Spear
     rlabel = Gray(L['soa_02_rlabel']),
     rewards = {
         Item({item = 207580}) -- Shomko's Unyidling Spear
@@ -121,7 +121,7 @@ bor.nodes[33605843] = SecretsOfAzeroth({
     note = L['soa_02_shomko_note_b'] .. '\n\n' .. L['soa_02_shomko_note_c'],
     quest = 76987, -- Clue 02 complete
     questDeps = 77203, -- ![Preserving Rarities]
-    requires = Dragonflight.requirement.Item(207580), -- Shomko's Unyielding Spear
+    requires = ns.requirement.Item(207580), -- Shomko's Unyielding Spear
     rlabel = Gray(L['soa_02_rlabel']),
     rewards = {
         Achievement({id = 18642}), -- The Inquisitive
@@ -343,7 +343,7 @@ val.nodes[48824783] = SecretsOfAzeroth({
     playerHasItem = {208130},
     questDeps = 77513, -- Clue 03 complete
     quest = 77397,
-    requires = Dragonflight.requirement.Item(208129), -- Copied Artifact Storage Key
+    requires = ns.requirement.Item(208129), -- Copied Artifact Storage Key
     rlabel = Gray(L['soa_04_rlabel']),
     rewards = {
         Item({item = 208130}) -- Maruuk Burial Banner
@@ -353,7 +353,7 @@ val.nodes[48824783] = SecretsOfAzeroth({
 val.nodes[62847284] = SecretsOfAzeroth({
     label = '{npc:208620}',
     note = L['soa_04_sazsel_note_a'] .. '\n\n' .. L['soa_04_sazsel_note_b'],
-    requires = Dragonflight.requirement.Item(208130), -- Maruuk Burial Banner
+    requires = ns.requirement.Item(208130), -- Maruuk Burial Banner
     rlabel = Gray(L['soa_04_rlabel']),
     questDeps = 77513, -- Clue 03 complete
     quest = {
@@ -691,8 +691,8 @@ tws.nodes[24516074] = SecretsOfAzeroth({
     label = '{npc:210837}',
     requires = {
         REQUIREMENT_TORCH_OF_PYRRETH, --
-        Dragonflight.requirement.Item(208836, 8), -- Igneous Flux
-        Dragonflight.requirement.Item(208835, 50) -- Rose Gold Dust
+        ns.requirement.Item(208836, 8), -- Igneous Flux
+        ns.requirement.Item(208835, 50) -- Rose Gold Dust
     },
     note = L['soa_10_weaponsmith_koref_note'],
     rlabel = Gray(L['soa_10_rlabel']),
@@ -748,7 +748,7 @@ ohn.nodes[81335930] = SecretsOfAzeroth({
 }) -- Jhara - OPTIONAL
 
 local BurialMarker = Class('BurialMarker', SecretsOfAzeroth, {
-    requires = Dragonflight.requirement.Item(208857), -- The Path of Ishtar Drawing
+    requires = ns.requirement.Item(208857), -- The Path of Ishtar Drawing
     rlabel = Gray(L['soa_11_rlabel_optional']),
     fgroup = 'PathOfIshtar',
     questAny = true
@@ -1250,11 +1250,11 @@ local MJJ_PARTS = {
     }
 }
 
-local MJJ_List = Class('MJJ_List', Dragonflight.node.Collectible, {
+local MJJ_List = Class('MJJ_List', ns.node.Collectible, {
     label = '{item:210022}',
     icon = 'peg_bl',
     scale = 2.0,
-    group = Dragonflight.groups.SECRETS_OF_AZEROTH,
+    group = ns.groups.SECRETS_OF_AZEROTH,
     rewards = {Mount({id = 1813, item = 210022})}, -- Mimiron's Jumpjets
     pois = {POI({36466204})} -- Arcane Forge
 }) -- Mimiron's Jumpjets List
@@ -1284,11 +1284,11 @@ for num, part in ipairs(MJJ_PARTS) do
         requires = {part.requires} or nil,
         parent = {id = part.parentMapID, note = part.note},
         IsCompleted = function(self)
-            if Dragonflight.PlayerHasItem(part.item) then return true end
+            if ns.PlayerHasItem(part.item) then return true end
             if select(11, C_MountJournal.GetMountInfoByID(1813)) then
                 return true
             end
-            return Dragonflight.node.Node.IsCompleted(self)
+            return ns.node.Node.IsCompleted(self)
         end
     })
 end

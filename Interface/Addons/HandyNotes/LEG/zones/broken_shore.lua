@@ -1,18 +1,18 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Legion = ...
-local Map = Legion.Map
-local Class = Legion.Class
-local L = Legion.locale
+local ADDON_NAME, ns = ...
+local Map = ns.Map
+local Class = ns.Class
+local L = ns.locale
 
-local Collectible = Legion.node.Collectible
-local Rare = Legion.node.Rare
+local Collectible = ns.node.Collectible
+local Rare = ns.node.Rare
 
-local Achievement = Legion.reward.Achievement
+local Achievement = ns.reward.Achievement
 
-local POI = Legion.poi.POI
-local Path = Legion.poi.Path
+local POI = ns.poi.POI
+local Path = ns.poi.Path
 
 -------------------------------------------------------------------------------
 
@@ -25,15 +25,15 @@ local map = Map({id = 646, settings = true})
 ----------------------------- PORTAL STONE RARES ------------------------------
 
 local SentinaxArea = {
-    Path({Legion.poi.Circle({origin = 43434092, radius = 1.5, segments = 12})}),
-    Path({Legion.poi.Circle({origin = 50584415, radius = 1.5, segments = 12})}),
-    Path({Legion.poi.Circle({origin = 44384828, radius = 1.5, segments = 12})}),
-    Path({Legion.poi.Circle({origin = 53186450, radius = 1.5, segments = 12})}),
-    Path({Legion.poi.Circle({origin = 57414520, radius = 1.5, segments = 12})}),
-    Path({Legion.poi.Circle({origin = 82514655, radius = 1.5, segments = 12})}),
-    Path({Legion.poi.Circle({origin = 80352715, radius = 1.5, segments = 12})}),
-    Path({Legion.poi.Circle({origin = 53091437, radius = 1.5, segments = 12})}),
-    Path({Legion.poi.Circle({origin = 37382506, radius = 1.5, segments = 12})})
+    Path({ns.poi.Circle({origin = 43434092, radius = 1.5, segments = 12})}),
+    Path({ns.poi.Circle({origin = 50584415, radius = 1.5, segments = 12})}),
+    Path({ns.poi.Circle({origin = 44384828, radius = 1.5, segments = 12})}),
+    Path({ns.poi.Circle({origin = 53186450, radius = 1.5, segments = 12})}),
+    Path({ns.poi.Circle({origin = 57414520, radius = 1.5, segments = 12})}),
+    Path({ns.poi.Circle({origin = 82514655, radius = 1.5, segments = 12})}),
+    Path({ns.poi.Circle({origin = 80352715, radius = 1.5, segments = 12})}),
+    Path({ns.poi.Circle({origin = 53091437, radius = 1.5, segments = 12})}),
+    Path({ns.poi.Circle({origin = 37382506, radius = 1.5, segments = 12})})
 }
 
 map.nodes[05505400] = Rare({
@@ -42,7 +42,7 @@ map.nodes[05505400] = Rare({
     note = format(L['sentinax_rare_note'], 120675, 146907, 146913, 146919,
         146913),
     requires = {
-        Legion.requirement.Item(146919) -- Portal-Stone: An'thyna
+        ns.requirement.Item(146919) -- Portal-Stone: An'thyna
     },
     rewards = {
         Achievement({id = 11841, criteria = 36672}) -- Naxt Victim
@@ -56,7 +56,7 @@ map.nodes[07505400] = Rare({
     note = format(L['sentinax_rare_note'], 120681, 146908, 146914, 146920,
         146914),
     requires = {
-        Legion.requirement.Item(146920) -- Portal-Stone: Fel Obliterator
+        ns.requirement.Item(146920) -- Portal-Stone: Fel Obliterator
     },
     rewards = {
         Achievement({id = 11841, criteria = 36673}) -- Naxt Victim
@@ -70,7 +70,7 @@ map.nodes[09505400] = Rare({
     note = format(L['sentinax_rare_note'], 120665, 146906, 146912, 146918,
         146912),
     requires = {
-        Legion.requirement.Item(146918) -- Portal-Stone: Force-Commander Xillious
+        ns.requirement.Item(146918) -- Portal-Stone: Force-Commander Xillious
     },
     rewards = {
         Achievement({id = 11841, criteria = 36671}) -- Naxt Victim
@@ -84,7 +84,7 @@ map.nodes[11505400] = Rare({
     note = format(L['sentinax_rare_note'], 120686, 146909, 146915, 146921,
         146915),
     requires = {
-        Legion.requirement.Item(146921) -- Portal-Stone: Illisthyndria
+        ns.requirement.Item(146921) -- Portal-Stone: Illisthyndria
     },
     rewards = {
         Achievement({id = 11841, criteria = 36674}) -- Naxt Victim
@@ -98,7 +98,7 @@ map.nodes[13505400] = Rare({
     note = format(L['sentinax_rare_note'], 120641, 146905, 146911, 146917,
         146911),
     requires = {
-        Legion.requirement.Item(146917) -- Portal-Stone: Skulguloth
+        ns.requirement.Item(146917) -- Portal-Stone: Skulguloth
     },
     rewards = {
         Achievement({id = 11841, criteria = 36670}) -- Naxt Victim
@@ -112,7 +112,7 @@ map.nodes[15505400] = Rare({
     note = format(L['sentinax_rare_note'], 120583, 146903, 146910, 146916,
         146910),
     requires = {
-        Legion.requirement.Item(146916) -- Portal-Stone: Than'otalion
+        ns.requirement.Item(146916) -- Portal-Stone: Than'otalion
     },
     rewards = {
         Achievement({id = 11841, criteria = 36669}) -- Naxt Victim
@@ -333,7 +333,7 @@ map.nodes[41801667] = Rare({
 map.nodes[44645318] = Rare({
     id = 119629,
     quest = 46304,
-    rewards = {Legion.reward.Mount({item = 142233, id = 931})},
+    rewards = {ns.reward.Mount({item = 142233, id = 931})},
     areaPOI = 5298
 }) -- Lord Hel'Nurath
 
@@ -403,13 +403,13 @@ map.nodes[49134792] = Rare({
 
 -- https://www.wowhead.com/guide/comprehensive-broken-shore-guide-5001#treasures
 
-local HiddenWyrmtongueCache = Class('HiddenWyrmtongueCache', Legion.node.Node, {
+local HiddenWyrmtongueCache = Class('HiddenWyrmtongueCache', ns.node.Node, {
     label = L['hidden_wyrmtongue_cache_label'],
     icon = 'chest_gy',
     rewards = {
-        Legion.reward.Currency({id = 1226, note = '40-60'}), -- Nethershard
-        Legion.reward.Currency({id = 1342, note = '2-4'}), -- Legionfall War Supplies
-        Legion.reward.Currency({id = 1220, note = '30-50'}) -- Order Resources
+        ns.reward.Currency({id = 1226, note = '40-60'}), -- Nethershard
+        ns.reward.Currency({id = 1342, note = '2-4'}), -- Legionfall War Supplies
+        ns.reward.Currency({id = 1220, note = '30-50'}) -- Order Resources
     }
 })
 
@@ -560,8 +560,8 @@ map.nodes[61923303] = HiddenWyrmtongueCache()
 
 local Sentinax = Class('Sentinax', Collectible, {
     icon = 133267,
-    requires = Legion.requirement.Quest(46935), -- The Shadow of the Sentinax
-    group = Legion.groups.BRINGING_HOME_THE_BEACON,
+    requires = ns.requirement.Quest(46935), -- The Shadow of the Sentinax
+    group = ns.groups.BRINGING_HOME_THE_BEACON,
     note = L['bringing_home_the_beacon_note']
 })
 

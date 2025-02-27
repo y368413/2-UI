@@ -1,4 +1,4 @@
-## Interface: 110005
+## Interface: 110007, 110100
 ## Title: CollectionShop
 ## Title-zhCN: |cff69ccf0[藏品]|r购买助手
 ## Title-zhTW: |cff69ccf0[藏品]|r购买助手
@@ -11,6 +11,7 @@
 ## Dependencies: _ShiGuang
 
 ## X-Repple: 2 UI
+## Category:- |cFFFFFF00 2|r|cFFFF0000 UI |r -
 
 ## Libs\LibStub.lua
 Libs\LibAHTab.lua

@@ -744,11 +744,11 @@ function UF:CreateCastBar(self)
 	stage:SetPoint("TOPLEFT", cb.Icon, -2, 2)
 	cb.stageString = stage
 
-	--if mystyle == "nameplate" or mystyle == "boss" or mystyle == "arena" then
+	if mystyle == "nameplate" or mystyle == "boss" or mystyle == "arena" then
 		cb.decimal = "%.1f"
-	--else
-		--cb.decimal = "%.2f"
-	--end
+	else
+		cb.decimal = "%.2f"
+	end
 
 	cb.Time = timer
 	cb.Text = name
@@ -1099,7 +1099,7 @@ end
 function UF:UpdateUFAuras()
 	--UF:RefreshUFAuras(_G.oUF_Player)
 	--UF:RefreshUFAuras(_G.oUF_Target)
-	UF:RefreshUFAuras(_G.oUF_Focus)
+	--UF:RefreshUFAuras(_G.oUF_Focus)
 	--UF:RefreshUFAuras(_G.oUF_ToT)
 	--UF:RefreshUFAuras(_G.oUF_Pet)
 
@@ -1125,9 +1125,9 @@ end
 
 function UF:ToggleAllAuras()
 	local enable = R.db["UFs"]["ShowAuras"]
-	UF:ToggleUFAuras(_G.oUF_Player, enable)
-	UF:ToggleUFAuras(_G.oUF_Target, enable)
-	UF:ToggleUFAuras(_G.oUF_Focus, enable)
+	--UF:ToggleUFAuras(_G.oUF_Player, enable)
+	--UF:ToggleUFAuras(_G.oUF_Target, enable)
+	--UF:ToggleUFAuras(_G.oUF_Focus, enable)
 	--UF:ToggleUFAuras(_G.oUF_ToT, enable)
 end
 
@@ -1154,7 +1154,7 @@ local auraUFs = {
 	--["target"] = "Target",
 	--["tot"] = "ToT",
 	--["pet"] = "Pet",
-	["focus"] = "Focus",
+	--["focus"] = "Focus",
 }
 function UF:CreateAuras(self)
 	local mystyle = self.mystyle

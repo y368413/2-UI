@@ -267,7 +267,19 @@ InboxMailBag_TOTAL_MORE = "Total messages: %d (%d)";
 WQACHIEVEMENTS_TITLE = "|cff8080ff[Achieve]|WQA"
 ANGRYWORLDQUEST_TITLE = "|cff0080ff[Angry]|rWorld Quests"
 
- 
+ U["+2timeLimit"] = "加二时间 "
+U["+3timeLimit"] = "加三时间 "
+U["CastAlertInfo"] = "开启%s，前往%s ！"
+U["Instance Difficulty"] = "Instance Difficulty：%s"
+U["LM Message 1"] = "你好！请问%s有需求吗？没有的话能让给我吗？谢谢！"
+U["LM Message 2"] = "老哥！求个%s！毕业的！谢谢！"
+U["LM Message 3"] = "你好！能让一下%s吗？谢谢！"
+U["LM Message 4"] = "老哥！求个%s啊，刷了很久了！谢谢！"
+U["LootMonitor Info"] = "左键：贴出 右键：密语"
+U["LootMonitor Title"] = "LootMonitor"
+U["MapID"] = "MapID: "
+U["Socket"] = "Socket"
+
 U["Damage"] = "Damage"    
 U["PlayerFrame Scale"] = "PlayerFrame Scale"
 U["Enable Stagger"] = "Enable Stagger"
@@ -313,24 +325,26 @@ DEX_FontList = {
 	"Fonts\\ARIALN.TTF",
 	"Fonts\\FRIZQT__.ttf",
 	"Fonts\\skurri.ttf",
-};
-DEX_TXT_CRUSH = "Crush!";
-DEX_TXT_DISPELLED = "Dispel! ";
-DEX_TXT_STOLEN = "Steal! ";
-DEX_TXT_REFLECT = " Reflect! ";
+	"Fonts\\skurri.TTF",
+	"Fonts\\skurri.TTF",
+	"Fonts\\Damage.TTF",
+}
+
+DEX_TXT_CRUSH = "Crush!"
+DEX_TXT_DISPELLED = "Dispel! "
+DEX_TXT_STOLEN = "Steal! "
+DEX_TXT_REFLECT = " Reflect! "
 DEX_TXT_CRIT = "Crit! ";
 DEX_TXT_INTERUPT = "Interrupt! ";
 DEX_MAIN_OPTION = "DamageEx";
 DEX_BUTTON_RESET_TIP = "Restore defaults";
 DEX_PREVIEW_LABEL = "Drag me to *change* text position";
-DEXColorMode_T = "Color mode";
+
+DEXColorMode_T = "Color mode"
 DEXOptionsDropDown = {"Monochrome","Double","Gradient"};
 DEXOptionsFrameCheckButtons = {
 	["DEX_Enable"] = { title = "Enable", tooltipText = "Enable damage displaying"},
 	["DEX_ShowWithMess"] = { title = "As combat log", tooltipText = "Display damage texts as combat log"},
-	["DEX_ShowSpellName"] = { title = "Spell names", tooltipText = "Display spell names next to damage texts"},
-	["DEX_ShowNameOnCrit"] = { title = "Crits only", tooltipText = "Display spell names only for critical hits"},
-	["DEX_ShowNameOnMiss"] = { title = "Missed only", tooltipText = "Display spell names only for missed hits"},
 	["DEX_ShowInterruptCrit"] = { title = "Interrupts as crits", tooltipText = "Display interrupts in the crits way"},
 	["DEX_ShowCurrentOnly"] = { title = "Target only", tooltipText = "Only display damage texts for current target"},
 	["DEX_ShowDamagePeriodic"] = { title = "DOT", tooltipText = "Display DOT"},
@@ -338,23 +352,57 @@ DEXOptionsFrameCheckButtons = {
 	["DEX_ShowDamageHealth"] = { title = "Healing", tooltipText = "Display healing texts"},
 	["DEX_ShowDamagePet"] = { title = "Pet", tooltipText = "Display damages from your pets"},
 	["DEX_ShowBlockNumber"] = { title = "Blocked", tooltipText = "Display blocked/resisted damages"},
-	["DEX_ShowDamageWoW"] = { title = "Enable system combat texts", tooltipText = "Enable system default floating combat texts"},
+	["DEX_ShowDamageWoW"] = { title = "Enable Player BeAttack", tooltipText = "Enable Player BeAttack"},
 	["DEX_ShowOwnHealth"] = { title = "Self healing", tooltipText = "Display healings apply to yourself"},
-	["DEX_UniteSpell"] = { title = "Combine damages", tooltipText = "Combine simutaneous damages against same target"},
-	--["DEX_NumberFormat"] = { title = "Display digit separator", tooltipText = "Display the number of sub digital separation"},	
-	["DEX_NumberFormat"] = { title = "W/Y", tooltipText = "Shot number style"},
-	["DEX_ShowSpellIcon"] = { title = "Show Spell Icon", tooltipText = "Display Spell Icon,Choosen to replace the spell name"},
+	["DEX_UniteSpell"] = { title = "Combine Spell", tooltipText = "Combine simutaneous message against same Spell"},
+	["DEX_NumberFormat"] = { title = "Display digit separator", tooltipText = "Display the number of sub digital separation"},	
 	["DEX_ShowInterrupt"] = { title = "Show Interrupt", tooltipText = "Display Interrupt texts"},	
 	["DEX_ShowOverHeal"] = { title = "Show Overheal", tooltipText = "Display Overhealing apply to all target"},		
-};
+	["DEX_ShowHit"] = { title = "Show Hit/Infuriating Number", tooltipText = "Display ROGUE/MONK Hit/Infuriating Number"},		
+	["DEX_ShowHealthType"] = { title = "Default Display Mode", tooltipText = "Health Data Default Display Mode is up,otherwise arabola"},		
+	["DEX_ShowHealthSpellIconOnCrit"] = { title = "Crits only", tooltipText = "Health Data Display Spell Icons only fo critical"},		
+	["DEX_ShowHealthSpellIcon"] = { title = "Spell Icons", tooltipText = "Health Data Display Spell Icons"},		
+	["DEX_ShowHealthNameOnCrit"] = { title = "Crits only", tooltipText = "Health Data Display spell names only for critical"},		
+	["DEX_ShowHealthSpellName"] = { title = "Spell Names", tooltipText = "Health Data Display Spell Name"},		
+	["DEX_ShowBuff"] = { title = "Show Buff", tooltipText = "Show Buff"},		
+	["DEX_ShowDamageType"] = { title = "Default Display Mode", tooltipText = "BeAttack Data Default Display Mode is up,otherwise arabola"},		
+	["DEX_ShowDebuff"] = { title = "Show Debuff", tooltipText = "Show Debuff"},		
+	["DEX_ShowDamageSpellIconOnCrit"] = { title = "Crits only", tooltipText = "BeAttack Data Display Spell Icons only fo critical"},		
+	["DEX_ShowDamageSpellIcon"] = { title = "Spell Icons", tooltipText = "BeAttack Data Display Spell Icons"},		
+	["DEX_ShowDamageNameOnCrit"] = { title = "Crits only", tooltipText = "BeAttack Data Display spell names only for critical"},		
+	["DEX_ShowDamageSpellName"] = { title = "Show Spell Name", tooltipText = "BeAttack Data Show Spell Name"},		
+	["DEX_ShowDamage"] = { title = "Show Damage", tooltipText = "Show Damage Data"},		
+	["DEX_ShowSpellName"] = { title = "Spell names", tooltipText = "Display spell names next to damage texts"},
+	["DEX_ShowNameOnCrit"] = { title = "Crits only", tooltipText = "Display spell names only for critical hits"},
+	["DEX_ShowDamageIconOnCrit"] = { title = "Icons only", tooltipText = "Display icons only for critical"},		
+	["DEX_ShowNameOnMiss"] = { title = "Missed only", tooltipText = "Display spell names only for missed hits"},
+	["DEX_ShowSpellIcon"] = { title = "Spell Icons", tooltipText = "Display Spell Icons,Choosen to show the spell name"},
+	["DEX_ShowSpellIconOnCrit"] = { title = "Crits only", tooltipText = "Display spell names only for critical"},		
+	["DEX_State"] = { title = "Battle State", tooltipText = "Show Battle Start or End"},		
+	["DEX_NoCombatHeal"] = { title = "NoBattle Health", tooltipText = "Show Health noBattle"},		
+	["DEX_AdjustTime"] = { title = "Adjust the time", tooltipText = "Adjust the battle time"},		
+}
+
 DEXOptionsFrameSliders = {
-	["DEX_Font"] = {  title = "Font ", minText="Font1", maxText="Font3", tooltipText = "Reset font"},
+	["DEX_FrameLevel"] = {  title = "Frame Level ", minText="1", maxText="9", tooltipText = "Config Frame Level"},
+	["DEX_Font"] = {  title = "Font ", minText="Font1", maxText="Font3", tooltipText = "Reset font\n1=ARIALN\n2=FRIZQT__\n3=skurri\n4=skurri\n5=skurri\n6=Damage"},
 	["DEX_FontSize"] = {  title = "Font size ", minText="Small", maxText="Large", tooltipText = "Config font size"},
 	["DEX_OutLine"] = {  title = "Font outline ", minText="None", maxText="Thick", tooltipText = "Config font outline"},
 	["DEX_Speed"] = {  title = "Text floating speed ", minText="Slow", maxText="Fast", tooltipText = "Config text floating speed"},
 	["DEX_LOGLINE"] = {  title = "Max lines ", minText="5", maxText="20", tooltipText = "Config max text lines"},
 	["DEX_LOGTIME"] = {  title = "Fade duration (sec) ", minText="5", maxText="60", tooltipText = "Config line fade duration"},
-};
+	["DEX_ShowHitX"] = {  title = "PosX For  Hit/Infuriating", minText="-300", maxText="300", tooltipText = "Set PosX For ROGUE/MONK Hit/Infuriating Number"},
+	["DEX_ShowHitY"] = {  title = "PosY For  Hit/Infuriating", minText="-300", maxText="300", tooltipText = "Set PosY For ROGUE/MONK Hit/Infuriating Number"},
+	["DEX_HealthPosX"] = {  title = "PosX For  Health", minText="-800", maxText="800", tooltipText = "Set PosX For Show Health"},
+	["DEX_HealthPosY"] = {  title = "PosY For  Health", minText="-800", maxText="800", tooltipText = "Set PosY For Show Health"},
+	["DEX_BeAttackPosX"] = {  title = "PosX For  BeAttack", minText="-800", maxText="800", tooltipText = "Set PosX For Show BeAttack"},
+	["DEX_BeAttackPosY"] = {  title = "PosY For  BeAttack", minText="-800", maxText="800", tooltipText = "Set PosY For Show BeAttack"},
+	["DEX_PetPosX"] = {  title = "PosX For  Pet", minText="-800", maxText="800", tooltipText = "Set PosX For Show Pet"},
+	["DEX_PetPosY"] = {  title = "PosY For  Pet", minText="-800", maxText="800", tooltipText = "Set PosY For Show Pet"},
+	["DEX_AOETime"] = {  title = "UniteSpell Time", minText="1", maxText="9", tooltipText = "Config The Time For UniteSpell"},
+	["DEX_IconSize"] = {  title = "Icon Size", minText="1", maxText="10", tooltipText = "Config The Size For Icon"},
+}
+
 DEXOptionsColorPickerEx = {
 	["DEX_ColorNormal"] = { title = "Physical color"},
 	["DEX_ColorSkill"] = { title = "Spell color"},
@@ -363,7 +411,8 @@ DEXOptionsColorPickerEx = {
 	["DEX_ColorPet"] = { title = "Pet color"},
 	["DEX_ColorSpec"] = { title = "Interrupt/dispel color"},
 	["DEX_ColorMana"] = { title = "Mana burn color"},
-};
+	["DEX_ColorAttack"] = { title = "BeAttack color"},
+}
 
 	
 
@@ -383,7 +432,7 @@ U["Tell"] = "Tell"
 U["Ghost"] = "Ghost"
 U["Skip"] = "Skip"
 U["Sort"] = "Sort"
-U["Chat Copy"] = "%sCopy|n%sMenu"
+U["Chat Copy"] = "%sCopy"  --|n%sMenu
 U["Attach List"] = "Mail Attach List:"
 U["Arch Count"] = "Statistics of Archaeology"
 U["Rare"] = "Rare"
@@ -455,7 +504,7 @@ U["Enable Totembar"] = "Enable TotemBar"
 U["Totembar"] = "TotemBar"
 U["VerticalTotems"] = "Vertical TotemBar"
 U["TotemSize"] = "Totems IconSize"
-U["Enable UFs"] = "Enable UnitFrames"
+U["Enable UFs"] = "Enable Boss/Arena UnitFrames"
 U["UFs Portrait"] = "Show 3D Portraits"
 U["Arena Frame"] = "Show Arena Frame"
 U["UFs Castbar"] = "Enable Castbars"
@@ -575,9 +624,9 @@ U["BrokenAlert"] = "Brokenspell Alert"
 U["BrokenAlertTip"] = "|nAlert when someone breaks a control spell.|neg Blind, Freezing Trap, Polymorph."
 U["InstAlertOnly"] = "Only alert in instance"
 U["InstAlertOnlyTip"] = "|nIf checked, the notifications above only alert in instance. No longer alert in wild and LFG group."
-U["Interrupt"] = "Interrupt - %s > %s"
-U["Steal"] = "Steal - %s > %s"
-U["Dispel"] = "Dispel - %s > %s"
+U["Interrupt"] = "Interrupt→%s"
+U["Steal"] = "Steal→%s"
+U["Dispel"] = "Dispel→%s"
 U["BrokenSpell"] = "Break - %s > %s"
 U["QuestNotification"] = "Enable QuestNotification"
 U["QuestProgress"] = "Alert on QuestProgress"
@@ -813,7 +862,7 @@ U["Strike"] = "SS"
 U["Power"] = "PW"
 U["PartyFrame"] = "PartyFrame"
 U["PartyFrameTip"] = "|nUse PartyFrame with separate settings if you are in a party. If disabled, you will always use RaidFrame or Simple RaidFrame."
-U["AngryKeystones Progress"] = "Show AngryKeystones Progress"
+U["MythicProgress"] = "Show MDT Progress"
 U["HideCooldownOnWA"] = "Hide Cooldown on WA"
 U["Account Keystones"] = "Account Keystone"
 U["AutoBubbles"] = "Auto Bubbles in Raid"
@@ -1297,3 +1346,5 @@ U["OverAbsorbTip"] = "|nIf enabled, show over absorb bar if unit absorb value gr
 U["ShowHealthAbsorb"] = "Current+absorb"
 U["LeaderOnly"] = "Leader alert only"
 U["LeaderOnlyTip"] = "|nIf enabled, notifications only send by leader or assistant."
+U["SingingSocket"] = "Siren ring enhanced"
+U["SingingSocketTip"] = "|nIf enabled, add a quick singing sockets selection tool onto Siren ring panel."

@@ -68,7 +68,7 @@ R.Infobar = {
 	System			= true,												-- 帧数/延迟
 	SystemPos		= {"TOPLEFT", UIParent, "TOPLEFT", 220, -3},		-- 帧数/延迟位置
 	Location		= true,												-- 区域信息
-	LocationPos		= {"TOP", UIParent,"TOP", 0, -3},					-- 区域信息位置
+	LocationPos		= {"TOP", UIParent,"TOP", 0, -6},					-- 区域信息位置
 	Spec			= true,												-- 天赋专精
 	SpecPos			= {"TOPLEFT", UIParent,"TOPLEFT",0, 0},				-- 天赋专精位置
 	Durability		= true,												-- 耐久度
@@ -81,5 +81,5 @@ R.Infobar = {
 	TimePos			= {"TOPLEFT", UIParent, "TOPLEFT", 25, 2},			-- 时间信息位置
 	
 	TimeFonts       = {"Interface\\Addons\\_ShiGuang\\Media\\Fonts\\Pixel.ttf", 24, "outline"},
-	TTFonts         = {STANDARD_TEXT_FONT, 18, "outline"},
+	TTFonts         = {STANDARD_TEXT_FONT, 19, "outline"},
 }

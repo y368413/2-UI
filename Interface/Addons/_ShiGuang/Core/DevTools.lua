@@ -24,7 +24,9 @@ I.Devs = {
 	["烂柯人-时光之穴"] = true,
 	["Yichen-贫瘠之地"] = true,
 	["Helements-贫瘠之地"] = true,
-	["浩劫复仇-鬼雾峰"] = true,
+	["Lightcasting-贫瘠之地"] = true,
+	["柒维胡里-烈焰峰"] = true,
+	["桐敷沙子-血吼"] = true,
 }
 local function isDeveloper()
 	local rawName = gsub(I.MyFullName, "%s", "")

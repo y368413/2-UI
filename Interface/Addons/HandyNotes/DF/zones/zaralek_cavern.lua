@@ -1,39 +1,39 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Dragonflight = ...
-local Class = Dragonflight.Class
-local L = Dragonflight.locale
-local Map = Dragonflight.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = Dragonflight.node.Collectible
-local PetBattle = Dragonflight.node.PetBattle
-local Rare = Dragonflight.node.Rare
-local Treasure = Dragonflight.node.Treasure
-local Vendor = Dragonflight.node.Vendor
+local Collectible = ns.node.Collectible
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
+local Vendor = ns.node.Vendor
 
-local AncientStone = Dragonflight.node.AncientStone
-local Dragonglyph = Dragonflight.node.Dragonglyph
-local PT = Dragonflight.node.ProfessionTreasures
-local ElusiveCreature = Dragonflight.node.ElusiveCreature
-local WarSupply = Dragonflight.node.WarSupply
+local AncientStone = ns.node.AncientStone
+local Dragonglyph = ns.node.Dragonglyph
+local PT = ns.node.ProfessionTreasures
+local ElusiveCreature = ns.node.ElusiveCreature
+local WarSupply = ns.node.WarSupply
 
-local Achievement = Dragonflight.reward.Achievement
-local Currency = Dragonflight.reward.Currency
-local Item = Dragonflight.reward.Item
-local Mount = Dragonflight.reward.Mount
-local Pet = Dragonflight.reward.Pet
-local Recipe = Dragonflight.reward.Recipe
-local Toy = Dragonflight.reward.Toy
-local Transmog = Dragonflight.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Currency = ns.reward.Currency
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Recipe = ns.reward.Recipe
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
--- local Circle = Dragonflight.poi.Circle
-local Path = Dragonflight.poi.Path
-local POI = Dragonflight.poi.POI
+-- local Circle = ns.poi.Circle
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
-local ItemStatus = Dragonflight.tooltip.ItemStatus
+local ItemStatus = ns.tooltip.ItemStatus
 
-local DC = Dragonflight.DRAGON_CUSTOMIZATIONS
+local DC = ns.DRAGON_CUSTOMIZATIONS
 
 -------------------------------------------------------------------------------
 
@@ -51,7 +51,7 @@ local deepflayerNest = Map({id = 2184, settings = false}) -- Deepflayer Nest
 -- Interval ID 3 -> Loamm Zone
 -- Interval ID 4 -> Aberrus Zone
 
--- local ZaralekRotation = Class('ZaralekRotation', Dragonflight.Interval, {
+-- local ZaralekRotation = Class('ZaralekRotation', ns.Interval, {
 --     initial = {eu = 1683259200, us = 1683298800, tw = 1683414000},
 --     offset = 86400,
 --     interval = 86400
@@ -65,7 +65,7 @@ local deepflayerNest = Map({id = 2184, settings = false}) -- Deepflayer Nest
 --         text = self.event and L['zaralek_event_inactive'] or
 --                    L['zaralek_rare_inactive']
 --     end
---     Dragonflight.PrepareLinks(text)
+--     ns.PrepareLinks(text)
 --     return text
 -- end
 
@@ -408,7 +408,7 @@ map.nodes[36694883] = Treasure({
 
 map.nodes[28544791] = Treasure({
     quest = 72986,
-    requires = Dragonflight.requirement.Item(15138),
+    requires = ns.requirement.Item(15138),
     note = L['blazing_shadowflame_chest_note'],
     rewards = {
         Achievement({id = 17786, criteria = 59220}), -- Treasures of Zaralek Cavern
@@ -419,7 +419,7 @@ map.nodes[28544791] = Treasure({
 map.nodes[42976040] = Treasure({
     quest = 75231, -- 75232
     requires = {
-        Dragonflight.requirement.Quest(73047) -- Terrestrial Tunneling
+        ns.requirement.Quest(73047) -- Terrestrial Tunneling
     },
     rewards = {
         Achievement({id = 17786, criteria = 59225}) -- Treasures of Zaralek Cavern
@@ -473,7 +473,7 @@ map.nodes[62715376] = Treasure({
 }) -- Long-Lost Cache
 
 map.nodes[43058256] = Treasure({
-    requires = Dragonflight.requirement.Item(204323), -- Old Trunk Key
+    requires = ns.requirement.Item(204323), -- Old Trunk Key
     quest = 74995,
     note = L['old_trunk_note'],
     rewards = {
@@ -507,7 +507,7 @@ map.nodes[32333935] = Treasure({
 map.nodes[29764054] = Treasure({
     quest = 73395,
     note = L['well_chewed_chest_note'],
-    requires = Dragonflight.requirement.Item(202869), -- Scorching Key
+    requires = ns.requirement.Item(202869), -- Scorching Key
     rewards = {
         Achievement({id = 17786, criteria = 59219}) -- Treasures of Zaralek Cavern
     },
@@ -574,7 +574,7 @@ map.nodes[62055534] = Treasure({
 
 map.nodes[64197495] = Treasure({
     label = L['nal_kskol_reliquary_label'],
-    requires = {Dragonflight.requirement.Quest(72962)},
+    requires = {ns.requirement.Quest(72962)},
     quest = 75745,
     note = L['nal_kskol_reliquary_note'],
     rewards = {
@@ -609,7 +609,7 @@ deepflayerNest.nodes[63698291] = Treasure({
 
 local RitualOffering = Class('RitualOffering', Treasure, {
     label = L['ritual_offering_label'],
-    group = Dragonflight.groups.RITUAL_OFFERING,
+    group = ns.groups.RITUAL_OFFERING,
     icon = 'chest_bn',
     rewards = {
         Item({item = 199906}), -- Titan Relic
@@ -641,11 +641,11 @@ map.nodes[41054876] = RitualOffering({fgroup = 'ritual48', quest = 73548})
 map.nodes[41694457] = RitualOffering({fgroup = 'ritual48', quest = 73548})
 map.nodes[41924712] = RitualOffering({fgroup = 'ritual48', quest = 73548}) -- 75814
 
-local SmellyTrashPile = Class('SmellyTrashPile', Dragonflight.node.Node, {
+local SmellyTrashPile = Class('SmellyTrashPile', ns.node.Node, {
     label = L['smelly_trash_pile_label'],
     icon = 'chest_gn',
-    group = Dragonflight.groups.SMELLY_TRASH_PILE,
-    requires = Dragonflight.requirement.Reputation(2564, 2, true), -- Loamm Niffen (maybe also quest 72974)
+    group = ns.groups.SMELLY_TRASH_PILE,
+    requires = ns.requirement.Reputation(2564, 2, true), -- Loamm Niffen (maybe also quest 72974)
     rewards = {
         DC.WindingSlitherdrake.SpikedChin, --
         Currency({id = 2245}), -- Flightstones
@@ -693,13 +693,13 @@ map.nodes[60195755] = SmellyTrashPile()
 map.nodes[61146860] = SmellyTrashPile()
 map.nodes[62325600] = SmellyTrashPile()
 
-local SmellyTreasureChest = Class('SmellyTreasureChest', Dragonflight.node.Node, {
+local SmellyTreasureChest = Class('SmellyTreasureChest', ns.node.Node, {
     label = L['smelly_treasure_chest_label'],
     icon = 'chest_rd',
-    group = Dragonflight.groups.SMELLY_TREASURE_CHEST,
+    group = ns.groups.SMELLY_TREASURE_CHEST,
     requires = {
-        Dragonflight.requirement.Reputation(2564, 11, true), -- Loamm Niffen
-        Dragonflight.requirement.Item(191294) -- Small Expedition Shovel
+        ns.requirement.Reputation(2564, 11, true), -- Loamm Niffen
+        ns.requirement.Item(191294) -- Small Expedition Shovel
     },
     rewards = {
         DC.RenewedProtoDrake.PlatedJaw, -- Renewed Proto-Drake: Plated Jaw
@@ -770,7 +770,7 @@ map.nodes[52416604] = PetBattle({
     id = 201004,
     rewards = {
         Achievement({id = 17880, criteria = 59352}), -- Battle in Zaralek Cavern
-        Dragonflight.reward.Spacer(),
+        ns.reward.Spacer(),
         Achievement({id = 17881, criteria = 1, oneline = true}), -- Aquatic
         Achievement({id = 17882, criteria = 1, oneline = true}), -- Beast
         Achievement({id = 17883, criteria = 1, oneline = true}), -- Critter
@@ -789,7 +789,7 @@ map.nodes[38254965] = PetBattle({
     location = L['in_small_cave'],
     rewards = {
         Achievement({id = 17880, criteria = 59351}), -- Battle in Zaralek Cavern
-        Dragonflight.reward.Spacer(),
+        ns.reward.Spacer(),
         Achievement({id = 17881, criteria = 2, oneline = true}), -- Aquatic
         Achievement({id = 17882, criteria = 2, oneline = true}), -- Beast
         Achievement({id = 17883, criteria = 2, oneline = true}), -- Critter
@@ -808,7 +808,7 @@ map.nodes[65374960] = PetBattle({
     id = 204926,
     rewards = {
         Achievement({id = 17880, criteria = 59354}), -- Battle in Zaralek Cavern
-        Dragonflight.reward.Spacer(),
+        ns.reward.Spacer(),
         Achievement({id = 17881, criteria = 3, oneline = true}), -- Aquatic
         Achievement({id = 17882, criteria = 3, oneline = true}), -- Beast
         Achievement({id = 17883, criteria = 3, oneline = true}), -- Critter
@@ -826,7 +826,7 @@ map.nodes[45698150] = PetBattle({
     id = 204934,
     rewards = {
         Achievement({id = 17880, criteria = 59353}), -- Battle in Zaralek Cavern
-        Dragonflight.reward.Spacer(),
+        ns.reward.Spacer(),
         Achievement({id = 17881, criteria = 4, oneline = true}), -- Aquatic
         Achievement({id = 17882, criteria = 4, oneline = true}), -- Beast
         Achievement({id = 17883, criteria = 4, oneline = true}), -- Critter
@@ -925,7 +925,7 @@ map.nodes[60233957] = ElusiveCreature({
         Item({item = 205451, quest = 75866}), -- Flawless Crystal Scale
         Achievement({id = 18833, criteria = 61483}) -- Elusive Legends of the Dragon Isles
     },
-    pois = {Path({Dragonflight.poi.Circle({origin = 60233957, radius = 3})})}
+    pois = {Path({ns.poi.Circle({origin = 60233957, radius = 3})})}
 }) -- Elusive Crystalscale Stonecleaver
 
 map.nodes[44054787] = ElusiveCreature({
@@ -946,8 +946,8 @@ map.nodes[44054787] = ElusiveCreature({
 
 -- local EventRotation = Class('EventRotation', ZaralekRotation, {event = true})
 
-local ZoneEvent = Class('ZoneEvent', Dragonflight.node.Node, {
-    group = Dragonflight.groups.ZONE_EVENT,
+local ZoneEvent = Class('ZoneEvent', ns.node.Node, {
+    group = ns.groups.ZONE_EVENT,
     icon = 'peg_rd',
     scale = 1.3,
     rewards = {
@@ -962,7 +962,7 @@ end
 
 function ZoneEvent.getters:rlabel()
     local completed = C_QuestLog.IsQuestFlaggedCompleted(self.quest[1])
-    local color = completed and Dragonflight.status.Green or Dragonflight.status.Gray
+    local color = completed and ns.status.Green or ns.status.Gray
     return color(L['weekly'])
 end
 
@@ -1080,17 +1080,17 @@ map.nodes[55625745] = Collectible({
     id = 203773,
     icon = 5140835,
     requires = {
-        Dragonflight.requirement.Quest(74876) -- The Buddy System
+        ns.requirement.Quest(74876) -- The Buddy System
         -- Are part of the Sniffen Sage Achievement:
-        -- Dragonflight.requirement.Quest(75765), -- Liquid Art
-        -- Dragonflight.requirement.Quest(75766), -- Ruby in the Rough
-        -- Dragonflight.requirement.Quest(75767), -- Good Time Boy
-        -- Dragonflight.requirement.Quest(75768), -- Lucky Ducky
-        -- Dragonflight.requirement.Quest(75769), -- Drawing a Blank
-        -- Dragonflight.requirement.Quest(75770), -- A Glass of Bubbly
-        -- Dragonflight.requirement.Quest(75771), -- Incense Replay
-        -- Dragonflight.requirement.Quest(75772), -- Flask Manager
-        -- Dragonflight.requirement.Quest(75774) --- doesnt exist or is a hidden tracking quest
+        -- ns.requirement.Quest(75765), -- Liquid Art
+        -- ns.requirement.Quest(75766), -- Ruby in the Rough
+        -- ns.requirement.Quest(75767), -- Good Time Boy
+        -- ns.requirement.Quest(75768), -- Lucky Ducky
+        -- ns.requirement.Quest(75769), -- Drawing a Blank
+        -- ns.requirement.Quest(75770), -- A Glass of Bubbly
+        -- ns.requirement.Quest(75771), -- Incense Replay
+        -- ns.requirement.Quest(75772), -- Flask Manager
+        -- ns.requirement.Quest(75774) --- doesnt exist or is a hidden tracking quest
     },
     rewards = {
         Achievement({
@@ -1118,7 +1118,7 @@ map.nodes[55625745] = Collectible({
 map.nodes[44458040] = Collectible({
     label = '{npc:201099}',
     icon = 5003559,
-    requires = Dragonflight.requirement.Reputation(2564, 7, true), -- Loamm Niffen
+    requires = ns.requirement.Reputation(2564, 7, true), -- Loamm Niffen
     note = L['grogul_note'],
     rewards = {
         Achievement({
@@ -1141,35 +1141,35 @@ map.nodes[44458040] = Collectible({
 ---------------------------------- CLUED IN -----------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[40995057] = Dragonflight.node.CluedIn({
+map.nodes[40995057] = ns.node.CluedIn({
     label = L['djaradin_scroll'], -- Djaradin Scroll
     quest = 76734 -- Research: Djaradin of Zaralek Cavern
 })
 
-map.nodes[40894160] = Dragonflight.node.CluedIn({
+map.nodes[40894160] = ns.node.CluedIn({
     label = L['forgotten_incense'], -- Forgotten Incense
     quest = 76734,
     location = L['forgotten_incense_note']
 })
 
-map.nodes[41844525] = Dragonflight.node.CluedIn({
+map.nodes[41844525] = ns.node.CluedIn({
     label = L['historied_heirloom'], -- Historied Heirloom
     quest = 76734
 })
 
-map.nodes[45935148] = Dragonflight.node.CluedIn({
+map.nodes[45935148] = ns.node.CluedIn({
     label = L['rusted_dirt_pale'],
     quest = 76739, -- Research: Niffen of Zaralek Cavern
     location = L['rusted_dirt_pale_note']
 })
 
-map.nodes[49084529] = Dragonflight.node.CluedIn({
+map.nodes[49084529] = ns.node.CluedIn({
     label = L['niffen_pickaxe'],
     quest = 76739,
     location = L['forgotten_incense_note']
 })
 
-map.nodes[47684926] = Dragonflight.node.CluedIn({
+map.nodes[47684926] = ns.node.CluedIn({
     label = L['chipped_grub_pot'],
     quest = 76739,
     location = L['chipped_grub_pot_note'] .. '\n' .. L['rusted_dirt_pale_note']
@@ -1179,7 +1179,7 @@ map.nodes[47684926] = Dragonflight.node.CluedIn({
 -------------------------------- GOGGLE WOBBLE --------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[38134985] = Dragonflight.node.GoggleWobble({
+map.nodes[38134985] = ns.node.GoggleWobble({
     rewards = {Achievement({id = 19791, criteria = 65404})}
 })
 
@@ -1187,12 +1187,12 @@ map.nodes[38134985] = Dragonflight.node.GoggleWobble({
 ----------------------------- JUST ONE MORE THING -----------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[40185717] = Dragonflight.node.JustOneMoreThing({
+map.nodes[40185717] = ns.node.JustOneMoreThing({
     quest = {79604, 79603, 79602},
     rewards = {Achievement({id = 19792, criteria = 65410})} -- Igira's Watch
 }) -- Research: Djaradin of Zaralek Cavern -- 76734
 
-map.nodes[49004900] = Dragonflight.node.JustOneMoreThing({
+map.nodes[49004900] = ns.node.JustOneMoreThing({
     quest = {79607, 79606, 79605},
     rewards = {Achievement({id = 19792, criteria = 65411})} -- Gaze of Neltharion
 }) -- Research: Niffen of Zaralek Cavern -- 76739
@@ -1207,10 +1207,10 @@ local Briggul = Class('Briggul', Collectible, {
     id = 201752,
     icon = 5003561,
     requires = {
-        Dragonflight.requirement.Quest(73708), -- Pay to Play
-        Dragonflight.requirement.Quest(73709), -- Favor on the Side
-        Dragonflight.requirement.Quest(75725), -- Off to the Track
-        Dragonflight.requirement.Reputation(2564, 7, true) -- Loamm Niffen
+        ns.requirement.Quest(73708), -- Pay to Play
+        ns.requirement.Quest(73709), -- Favor on the Side
+        ns.requirement.Quest(75725), -- Off to the Track
+        ns.requirement.Reputation(2564, 7, true) -- Loamm Niffen
     },
     rewards = {
         Mount({item = 205155, id = 1729}) -- Big Slick in the City
@@ -1220,9 +1220,9 @@ local Briggul = Class('Briggul', Collectible, {
 function Briggul.getters:note()
     local function status(questID)
         if C_QuestLog.IsQuestFlaggedCompleted(questID) then
-            return Dragonflight.status.Green(L['completed'])
+            return ns.status.Green(L['completed'])
         else
-            return Dragonflight.status.Red(L['incomplete'])
+            return ns.status.Red(L['incomplete'])
         end
     end
 
@@ -1291,8 +1291,8 @@ map.nodes[52442683] = TheGiftOfCheese()
 ------------------------------- ZARALEK SAFARI --------------------------------
 -------------------------------------------------------------------------------
 
--- local Zaralek_Safari = Class('Zaralek_Safari', Dragonflight.node.Safari,
---     {group = Dragonflight.groups.ZARALEK_SAFARI})
+-- local Zaralek_Safari = Class('Zaralek_Safari', ns.node.Safari,
+--     {group = ns.groups.ZARALEK_SAFARI})
 
 -- map.nodes[49003260] = Zaralek_Safari({
 --     id = 203287,
@@ -1407,7 +1407,7 @@ map.nodes[58085381] = Vendor({
 -------------------------------------------------------------------------------
 
 local Squirrel = Class('Squirrel', Collectible, {
-    group = Dragonflight.groups.ZARALEK_SQUIRRELS,
+    group = ns.groups.ZARALEK_SQUIRRELS,
     icon = 237182,
     note = L['squirrels_note']
 })

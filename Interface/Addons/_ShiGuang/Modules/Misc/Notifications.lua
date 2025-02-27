@@ -93,7 +93,6 @@ local isIgnoredZone = {
 	[2111] = true,	-- 黑海岸前线
 }
 local defaultList = {
-	[5485] = true, -- 海象人工具盒
 	[6149] = true, -- 奥妮克希亚龙蛋
 }
 local isIgnoredIDs = {}
@@ -178,6 +177,21 @@ function MISC:GetMsgChannel()
 	return IsRandomGroup() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
 end
 
+local function msgChannel()
+	if IsRandomGroup() then
+		return "INSTANCE_CHAT"
+	elseif IsInRaid() then
+		--if warning and (UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") or IsEveryoneAssistant()) then
+			--return "RAID_WARNING"
+		--else
+			return "RAID"
+		--end
+	elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
+		return "PARTY"
+	end
+	return "SAY"
+end
+
 local infoType = {}
 
 function MISC:InterruptAlert_Toggle()
@@ -232,7 +246,7 @@ function MISC:IsAllyPet(sourceFlags)
 end
 
 function MISC:InterruptAlert_Update(...)
-	if R.db["Misc"]["LeaderOnly"] and not (UnitIsGroupAssistant("player") or UnitIsGroupLeader("player")) then return end -- only alert for leader, needs review
+	--if R.db["Misc"]["LeaderOnly"] and not (UnitIsGroupAssistant("player") or UnitIsGroupLeader("player")) then return end -- only alert for leader, needs review
 
 	local _, eventType, _, sourceGUID, sourceName, sourceFlags, _, _, destName, _, _, spellID, _, _, extraskillID, _, _, auraType = ...
 	if not sourceGUID or sourceName == destName then return end
@@ -244,20 +258,25 @@ function MISC:InterruptAlert_Update(...)
 			if infoText == U["BrokenSpell"] then
 				if auraType and auraType == AURA_TYPE_BUFF or blackList[spellID] then return end
 				sourceSpellID, destSpellID = extraskillID, spellID
+			    if sourceSpellID and destSpellID then
+				    SendChatMessage(format(infoText, sourceName..GetSpellLink(sourceSpellID), destName..GetSpellLink(destSpellID)), msgChannel())  --MISC:GetMsgChannel()
+			    end
 			elseif infoText == U["Interrupt"] then
 				if R.db["Misc"]["OwnInterrupt"] and sourceName ~= I.MyName and not I:IsMyPet(sourceFlags) then return end
 				sourceSpellID, destSpellID = spellID, extraskillID
+				if sourceSpellID and destSpellID then
+					SendChatMessage(format(infoText, GetSpellLink(destSpellID)), msgChannel())
+				end
 			else
 				if R.db["Misc"]["OwnDispell"] and sourceName ~= I.MyName and not I:IsMyPet(sourceFlags) then return end
 				sourceSpellID, destSpellID = spellID, extraskillID
-			end
-
-			if sourceSpellID and destSpellID then
-				SendChatMessage(format(infoText, sourceName..GetSpellLink(sourceSpellID), destName..GetSpellLink(destSpellID)), MISC:GetMsgChannel())
-			end
-				if R.db["Misc"]["InterruptSound"] then
-				    PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\ShutupFool.ogg", "Master")
+				if sourceSpellID and destSpellID then
+					SendChatMessage(format(infoText, GetSpellLink(destSpellID)), msgChannel())
 				end
+			end
+			if R.db["Misc"]["InterruptSound"] then
+				PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\ShutupFool.ogg", "Master")
+			end
 		end
 	end
 end
@@ -512,10 +531,41 @@ local IncompatibleAddOns = {
 	["BigFoot"] = true,
 	["NDui"] = true,
 	["!!!163UI!!!"] = true,
-	["Aurora"] = true,
-	["AuroraClassic"] = true, -- my own addon
-	["DomiRank"] = true, -- my own addon
-	["MDGuildBest"] = true, -- my own addon
+	["DomiRank"] = true, -- NDui Core addon
+	["MDGuildBest"] = true, -- NDui Core addon
+	["MountCollectionLog"] = true,
+	["Simulationcraft"] = true,
+	["TomeOfTeleportation"] = true,
+	["SocketHelper"] = true,
+	["DialogKey"] = true,
+	["CanOpener"] = true,
+	["LootSpecSwapper"] = true,
+	["AutoPotion"] = true,
+	["FriendGroups"] = true,
+	["ParagonRewards"] = true,
+	["RandomHearthToy"] = true,
+	["RandomPoly"] = true,
+	["DoomCooldownPulse"] = true,
+	["IncentiveProgram"] = true,
+	["Paragon"] = true,
+	["ParagonReputation"] = true,
+	["SpellActivationText"] = true,
+	["BattlePetBinds"] = true,
+	["CollapseQuestLog"] = true,
+	["QuestLevelPatch"] = true,
+	["WorldMapQuestRewardIcon"] = true,
+	["DamageEx"] = true,
+	["AdventureGuideLockouts"] = true,
+	["BossesKilled"] = true,
+	["ElitismHelper"] = true,
+	["LFR_of_the_past"] = true,
+	["PremadeSort"] = true,
+	["AlreadyKnown"] = true,
+	["DragEmAll"] = true,
+	["QuickQuest"] = true,
+	["Quester"] = true,
+	["SmartQuestTracker"] = true,
+	["ExtraQuestButton"] = true,
 }
 local AddonDependency = {
 	["BigFoot"] = "!!!Libs",

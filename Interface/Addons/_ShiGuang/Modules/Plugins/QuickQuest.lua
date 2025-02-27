@@ -27,8 +27,8 @@ local QuestLabelPrepend = Enum.GossipOptionRecFlags.QuestLabelPrepend
 
 local choiceQueue
 
-local QuickQuestCheckButton = CreateFrame("CheckButton", nil, ObjectiveTrackerFrame.Header, "OptionsBaseCheckButtonTemplate")
-QuickQuestCheckButton:SetPoint("TOPLEFT", ObjectiveTrackerFrame.Header, -15, -5)
+local QuickQuestCheckButton = CreateFrame("CheckButton", nil, QuestObjectiveTracker.Header, "OptionsBaseCheckButtonTemplate")  --ObjectiveTrackerFrame.Header
+QuickQuestCheckButton:SetPoint("TOPRIGHT", QuestObjectiveTracker.Header, -20, -5)
 QuickQuestCheckButton:SetSize(21, 21)
 QuickQuestCheckButton:SetHitRectInsets(0, -10, 0, 0)
 QuickQuestCheckButton:RegisterEvent("PLAYER_LOGIN")
@@ -95,6 +95,7 @@ local ignoreQuestNPC = {
 	[162804] = true,	-- 威娜莉
 	[168430] = true,	-- 戴克泰丽丝，格里恩挑战
 	[326027] = true,	-- 运输站回收生成器DX-82	
+	[195935] = true,	-- 塔薇欧，海象人钓鱼道具
 }
 
 R.IgnoreQuestNPC = {}

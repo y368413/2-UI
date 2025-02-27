@@ -1,4 +1,4 @@
-## Interface: 110005
+## Interface: 110007, 110100
 ## IconTexture: 464160
 ## Title:|cFFBF00FF[H]|r Something About Pet Battle
 ## Notes:Displays the BreedID of pets in your journal, in battle, in chat links, and in AH tooltips,Type /hpq to config 
@@ -10,12 +10,13 @@
 ## Author-zhCN: 上官晓雾,Simca@Malfurion
 ## Author-zhTW: 上官曉霧,Simca@Malfurion
 ## X-Date: 2024-08-16,2024-10-28T17:27:03Z
-## Version: 2.3.4 + v1.31.1
+## Version: 2.3.4 + v1.31.2
 ## SavedVariables: HPetSaves,BID_Options
 ## IconTexture: Interface\AddOns\HandyNotes\Icons\Krag.blp
 ## Dependencies: _ShiGuang
 
 ## X-Repple: 2 UI
+## Category:- |cFFFFFF00 2|r|cFFFF0000 UI |r -
 
 Localization.lua
 

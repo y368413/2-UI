@@ -8,7 +8,7 @@ local buttonList, menubar = {}
 
 function Bar:MicroButton_SetupTexture(icon, texture)
 	local r, g, b = I.r, I.g, I.b
-	if not R.db["Skins"]["ClassLine"] then r, g, b = 0, 0, 0 end
+	--if not R.db["Skins"]["ClassLine"] then r, g, b = 0, 0, 0 end
 	icon:SetOutside(nil, 3, 3)
 	icon:SetTexture("Interface\\BUTTONS\\"..texture)
 	icon:SetVertexColor(1, 1, 1)
@@ -30,7 +30,7 @@ function Bar:MicroButton_Create(parent, data)
 
 	local bu = CreateFrame("Frame", nil, parent)
 	tinsert(buttonList, bu)
-	bu:SetSize(16, 36)
+	bu:SetSize(21, 21)
 
 	local icon = bu:CreateTexture(nil, "ARTWORK")
 	Bar:MicroButton_SetupTexture(icon, texture)
@@ -45,25 +45,25 @@ function Bar:MicroButton_Create(parent, data)
 		ResetButtonAnchor(button)
 		hooksecurefunc(button, "SetPoint", ResetButtonAnchor)
 		--button:UnregisterAllEvents() -- statusbar on quest tracker needs this for anchoring
-		button:SetNormalTexture(0)
-		button:SetPushedTexture(0)
-		button:SetDisabledTexture(0)
-		button:SetHighlightTexture(0) -- 10.1.5
+		--button:SetNormalTexture(0)
+		--button:SetPushedTexture(0)
+		--button:SetDisabledTexture(0)
+		--button:SetHighlightTexture(0) -- 10.1.5
 		if tooltip then M.AddTooltip(button, "ANCHOR_RIGHT", tooltip) end
 
-		local hl = button:GetHighlightTexture()
+		--[[local hl = button:GetHighlightTexture()
 		Bar:MicroButton_SetupTexture(hl, texture)
 		hooksecurefunc(button, "SetHighlightAtlas", function()
 			button:SetHighlightTexture("Interface\\BUTTONS\\"..texture)
 			hl:SetBlendMode("ADD")
 		end)
-		if not R.db["Skins"]["ClassLine"] then hl:SetVertexColor(1, 1, 1) end
+		--if not R.db["Skins"]["ClassLine"] then hl:SetVertexColor(1, 1, 1) end
 
 		local flash = button.FlashBorder
 		if flash then
 			Bar:MicroButton_SetupTexture(flash, texture)
-			if not R.db["Skins"]["ClassLine"] then flash:SetVertexColor(1, 1, 1) end
-		end
+			--if not R.db["Skins"]["ClassLine"] then flash:SetVertexColor(1, 1, 1) end
+		end]]
 		if button.FlashContent then button.FlashContent:SetAlpha(0) end
 		if button.Portrait then button.Portrait:Hide() end
 		if button.Background then button.Background:SetAlpha(0) end
@@ -82,72 +82,64 @@ function Bar:MicroButton_Create(parent, data)
 		bu:SetScript("OnMouseUp", method)
 		M.AddTooltip(bu, "ANCHOR_RIGHT", tooltip)
 
-		local hl = bu:CreateTexture(nil, "HIGHLIGHT")
-		hl:SetBlendMode("ADD")
-		Bar:MicroButton_SetupTexture(hl, texture)
-		if not R.db["Skins"]["ClassLine"] then hl:SetVertexColor(1, 1, 1) end
+		--local hl = bu:CreateTexture(nil, "HIGHLIGHT")
+		--hl:SetBlendMode("ADD")
+		--Bar:MicroButton_SetupTexture(hl, texture)
+		--if not R.db["Skins"]["ClassLine"] then hl:SetVertexColor(1, 1, 1) end
 	end
 end
 
 function Bar:MicroMenu_Setup()
 	if not menubar then return end
 
-	--local size = R.db["Actionbar"]["MBSize"]
+	local size = R.db["Actionbar"]["MBSize"]
 	local perRow = R.db["Actionbar"]["MBPerRow"]
-	local margin = 5 --R.db["Actionbar"]["MBSpacing"]
+	local margin = R.db["Actionbar"]["MBSpacing"]
 
 	for i = 1, #buttonList do
 		local button = buttonList[i]
-		--button:SetSize(size, size)
+		button:SetSize(size, size)
 		button:ClearAllPoints()
-		if R.db["Actionbar"]["MBASLINE"] then 
 		if i == 1 then
-			button:SetPoint("BOTTOMLEFT", 3, 0)
+			button:SetPoint("BOTTOMLEFT")
 		elseif mod(i-1, perRow) == 0 then
-			button:SetPoint("TOP", buttonList[i-perRow], "BOTTOM", 0, -margin)
+			button:SetPoint("BOTTOM", buttonList[i-perRow], "TOP", 0, margin)
 		else
 			button:SetPoint("LEFT", buttonList[i-1], "RIGHT", margin, 0)
-		end	
-		else
-		if i == 1 then
-			button:SetPoint("BOTTOMLEFT", 3, 0)
-		--elseif mod(i-1, perRow) == 0 then
-			--button:SetPoint("TOP", buttonList[i-perRow], "BOTTOM", 0, -margin)
-		else
-			--button:SetPoint("LEFT", buttonList[i-1], "RIGHT", margin, 0)
-			button:SetPoint("BOTTOM", buttonList[i-1], "TOP", 0, -12)
-		end
 		end
 	end
-	--local column = min(12, perRow)
-	--local rows = ceil(12/perRow)
-	--local width = column*size + (column-1)*margin
-	--local height = size*rows + (rows-1)*margin
-	--menubar:SetSize(width, height)
-	--menubar.mover:SetSize(width, height)
+
+	local column = min(11, perRow)
+	local rows = ceil(11/perRow)
+	local width = column*size + (column-1)*margin
+	local height = size*rows + (rows)*margin
+	menubar:SetSize(width, height)
+	menubar.mover:SetSize(width, height)
 end
 
 function Bar:MicroMenu()
+	BagsBar:Hide()
+	BagsBar:UnregisterAllEvents()
 	if not R.db["Actionbar"]["MicroMenu"] then return end
 
 	menubar = CreateFrame("Frame", nil, UIParent)
-	menubar:SetSize(21, 186)  --*R.db["Map"]["MinimapScale"]
+	menubar:SetSize(310, 21)
 	menubar.mover = M.Mover(menubar, U["Menubar"], "Menubar", R.Skins.MicroMenuPos)
 
 	-- Generate Buttons
 	local buttonInfo = {
-		{"UI-MicroButton-Raid-Up", "CharacterMicroButton"},
-		{"UI-MicroButton-EJ-Up", "EJMicroButton"},
-		{"UI-MicroButton-Mounts-Up", "CollectionsMicroButton"},
-		{"UI-MicroButton-Talents-Up", "PlayerSpellsMicroButton"},
-		{"UI-MicroButton-LFG-Up", "LFDMicroButton"},
-		{"UI-MicroButton-Achievement-Up", "AchievementMicroButton"},
-		{"UI-MICROBUTTON-SOCIALS-UP", "GuildMicroButton"},
-		{"UI-MicroButton-Spellbook-Up", "ProfessionMicroButton"},
-		{"UI-MICROBUTTON-QUEST-UP", "QuestLogMicroButton"},
-		{"UI-MicroButton-BStore-Up", "StoreMicroButton"},
-		{"UI-MicroButton-Help-Up", "MainMenuMicroButton", MicroButtonTooltipText(MAINMENU_BUTTON, "TOGGLEGAMEMENU")},
-		{"UI-MicroButton-Abilities-Up", function() ToggleAllBags() end, MicroButtonTooltipText(BAGSLOT, "OPENALLBAGS")},
+		{"UI-CheckBox-Up", "CharacterMicroButton"},  --UI-MicroButton-Raid-Up
+		{"UI-CheckBox-Up", "ProfessionMicroButton"},  --UI-MicroButton-Spellbook-Up
+		{"UI-CheckBox-Up", "PlayerSpellsMicroButton"},  --UI-MicroButton-Talents-Up
+		{"UI-CheckBox-Up", "AchievementMicroButton"},  --UI-MicroButton-Achievement-Up
+		{"UI-CheckBox-Up", "QuestLogMicroButton"},  --UI-MICROBUTTON-QUEST-UP
+		{"UI-CheckBox-Up", "GuildMicroButton"},  --UI-MICROBUTTON-SOCIALS-UP
+		{"UI-CheckBox-Up", "LFDMicroButton"},  --UI-MicroButton-LFG-Up
+		{"UI-CheckBox-Up", "EJMicroButton"},  --UI-MicroButton-EJ-Up
+		{"UI-CheckBox-Up", "CollectionsMicroButton"},  --UI-MicroButton-Mounts-Up
+		{"UI-CheckBox-Up", "StoreMicroButton"},  --UI-MicroButton-BStore-Up
+		{"UI-CheckBox-Up", "MainMenuMicroButton", MicroButtonTooltipText(MAINMENU_BUTTON, "TOGGLEGAMEMENU")},  --UI-MicroButton-Help-Up
+		--{"UI-SquareButton-Up", function() ToggleAllBags() end, MicroButtonTooltipText(BAGSLOT, "OPENALLBAGS")},  --UI-MicroButton-Abilities-Up
 	}
 	for _, info in pairs(buttonInfo) do
 		Bar:MicroButton_Create(menubar, info)
@@ -163,8 +155,6 @@ function Bar:MicroMenu()
 	M.HideObject(HelpOpenWebTicketButton)
 	MainMenuMicroButton:SetScript("OnUpdate", nil)
 
-	BagsBar:Hide()
-	BagsBar:UnregisterAllEvents()
 	MicroButtonAndBagsBar:Hide()
 	MicroButtonAndBagsBar:UnregisterAllEvents()
 

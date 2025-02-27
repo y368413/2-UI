@@ -556,8 +556,8 @@ local NPClassifies = {
 function UF:AddCreatureIcon(self)
 	local icon = self.Health:CreateTexture(nil, "ARTWORK")
 	--icon:SetAtlas("auctionhouse-icon-favorite")
-	icon:SetPoint("RIGHT", self.nameText, "LEFT", 0, 0)
-	icon:SetSize(21, 21)
+	icon:SetPoint("RIGHT", self.nameText, "LEFT", 9, 1)
+	icon:SetSize(16, 16)
 	icon:Hide()
 
 	self.ClassifyIndicator = icon
@@ -573,10 +573,21 @@ function UF:UpdateUnitClassify(unit)
 		local class = UnitClassification(unit)
 		local classify = class and NPClassifies[class]
 		if classify then
-			local r, g, b, desature = unpack(classify)
+			local tex, r, g, b, desature = unpack(classify)
 			--self.ClassifyIndicator:SetVertexColor(r, g, b)
-			self.ClassifyIndicator:SetDesaturated(desature)
-			self.ClassifyIndicator:Show()
+			--self.ClassifyIndicator:SetDesaturated(desature)
+			
+			if UnitLevel(unit) and UnitLevel(unit) < UnitLevel("player") then  -- or level == -1
+			    if class == elite then
+			        self.ClassifyIndicator:Hide()
+			    end
+			else    
+			  self.ClassifyIndicator:SetTexture(tex)
+		      self.ClassifyIndicator:SetTexCoord(r, g, b, desature)
+		      self.ClassifyIndicator:Show()
+			end
+		else
+			self.ClassifyIndicator:Hide()
 		end
 	end
 end

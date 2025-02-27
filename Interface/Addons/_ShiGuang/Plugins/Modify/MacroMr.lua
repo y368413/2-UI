@@ -389,6 +389,9 @@ else
 end
 
 do
+    -- 宏界面
+    local tempScrollPer = nil
+    
     -- 初始化函数，调整宏界面元素的大小和位置
     local Init = function()
         -- 当选择宏时恢复滚动条位置
@@ -396,24 +399,37 @@ do
                 if tempScrollPer then
                     -- 恢复宏选择框的滚动条位置
                     MacroFrame.MacroSelector.ScrollBox:SetScrollPercentage(tempScrollPer)
-                    tempScrollPer = nil  -- 重置临时存储
+                    tempScrollPer = nil -- 重置临时存储
                 end
         end)
         
-        -- 调整宏选择框和其他界面元素的高度和位置
-        -- local WWW = MacroFrame:GetWidth()
-        -- MacroFrame:GetWidth()默认宽度为338
-        MacroFrame:SetWidth(338*2);
-        MacroFrame.MacroSelector:SetHeight(326)
-        MacroFrameSelectedMacroBackground:ClearAllPoints();
-        MacroFrameSelectedMacroBackground:SetPoint("TOPLEFT",MacroFrame,"TOPLEFT",338,-60);
-        MacroFrameTextBackground:ClearAllPoints();
-        MacroFrameTextBackground:SetPoint("TOPLEFT",MacroFrame,"TOPLEFT",338,-132);
-        MacroFrameTextBackground:SetHeight(250)
-        MacroFrameScrollFrame:SetHeight(242)
-        MacroFrameCharLimitText:ClearAllPoints();
-        MacroFrameCharLimitText:SetPoint("TOP",MacroFrameTextBackground,"BOTTOM",0,0);
-        MacroHorizontalBarLeft:ClearAllPoints();
+        -- 设置外框高度和宽度
+        MacroFrame:SetHeight(338 * 2.03) -- 外框高度
+        MacroFrame:SetWidth(338 * 2.55) -- 外框宽度
+        
+        -- 调整宏选择框的高度
+        MacroFrame.MacroSelector:SetHeight(590) -- 宏图标区域高度
+        MacroFrame.MacroSelector:SetWidth(515) -- 宏图标区域宽度
+        
+        -- 设置每行显示10个图标
+        if MacroFrame.MacroSelector.SetCustomStride then
+            MacroFrame.MacroSelector:SetCustomStride(10) -- 每行显示10个图标
+        end
+        
+        -- 调整宏选择框和输入框的位置，使其横向排列
+        MacroFrameSelectedMacroBackground:ClearAllPoints()
+        MacroFrameSelectedMacroBackground:SetPoint("TOPLEFT", MacroFrame, "TOPLEFT", 518, -60)
+        
+        MacroFrameTextBackground:ClearAllPoints()
+        MacroFrameTextBackground:SetPoint("TOPLEFT", MacroFrame, "TOPLEFT", 518, -132)
+        MacroFrameTextBackground:SetHeight(510) -- 输入框高度
+        
+        MacroFrameScrollFrame:SetHeight(500) -- 滚动条高度
+        
+        MacroFrameCharLimitText:ClearAllPoints()
+        MacroFrameCharLimitText:SetPoint("TOP", MacroFrameTextBackground, "BOTTOM", 0, 0)
+        
+        MacroHorizontalBarLeft:ClearAllPoints()
     end
     
     -- 如果MacroFrame已经加载，立即执行初始化
@@ -426,15 +442,16 @@ do
                 -- 当加载Blizzard_MacroUI插件时，进行初始化
                 if event == "ADDON_LOADED" then
                     if addon == "Blizzard_MacroUI" then
-                        Init()  -- 初始化宏界面
-                        f:UnregisterEvent("ADDON_LOADED")  -- 完成后取消注册
+                        Init() -- 初始化宏界面
+                        f:UnregisterEvent("ADDON_LOADED") -- 完成后取消注册
                     end
-                    -- 每次更新宏界面时，记录当前滚动条位置
                 elseif MacroFrame then
+                    -- 每次更新宏界面时，记录当前滚动条位置
                     tempScrollPer = MacroFrame.MacroSelector.ScrollBox.scrollPercentage
                 end
         end)
-        f:RegisterEvent("ADDON_LOADED")  -- 监听宏插件的加载事件
+        
+        f:RegisterEvent("ADDON_LOADED") -- 监听宏插件的加载事件
         -- 当宏界面更新时，确保在显示时滚动条位置能恢复
         f:RegisterEvent("UPDATE_MACROS")
     end

@@ -1,15 +1,15 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Core = ...
+local _, ns = ...
 
 -------------------------------------------------------------------------------
 ------------------------------------ CLASS ------------------------------------
 -------------------------------------------------------------------------------
 
-Core.Class = function(name, parent, attrs)
+ns.Class = function(name, parent, attrs)
     if type(name) ~= 'string' then error('name param must be a string') end
-    if parent and not Core.IsClass(parent) then
+    if parent and not ns.IsClass(parent) then
         error('parent param must be a class')
     end
 
@@ -79,11 +79,11 @@ end
 ----------------------------------- HELPERS -----------------------------------
 -------------------------------------------------------------------------------
 
-Core.IsClass = function(class)
+ns.IsClass = function(class)
     return type(class) == 'table' and class.getters and class.setters
 end
 
-Core.IsInstance = function(instance, class)
+ns.IsInstance = function(instance, class)
     if type(instance) ~= 'table' then return false end
     local function compare(c1, c2)
         if c2 == nil then return false end
@@ -93,7 +93,7 @@ Core.IsInstance = function(instance, class)
     return compare(class, instance.__class)
 end
 
-Core.Clone = function(instance, newattrs)
+ns.Clone = function(instance, newattrs)
     local clone = {}
     for k, v in pairs(instance) do clone[k] = v end
     if newattrs then for k, v in pairs(newattrs) do clone[k] = v end end

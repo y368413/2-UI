@@ -6,10 +6,10 @@ end
 addonTable.CategoryViews.Constants = {
   ProtectedCategories = { "default_other", "default_special_empty" },
   EmptySlotsCategory = "default_special_empty",
+  RecentItemsCategory = "default_auto_recents",
   DividerName = "----",
   DividerLabel = "——————",
   SectionEnd = "__end",
-  MinWidth = 400,
 
   GroupingState = {
     SplitStack = 1,
@@ -294,14 +294,12 @@ tAppendAll(addonTable.CategoryViews.Constants.DefaultCategories, {
     key = "auto_recents",
     name = BAGANATOR_L_CATEGORY_RECENT_AUTO,
     auto = "recents",
-    priorityOffset = 600,
-    doNotAdd = true,
+    priorityOffset = 10000,
   },
   {
     key = "special_empty",
     name = BAGANATOR_L_EMPTY,
     emptySlots = true,
-    doNotAdd = true,
   },
 })
 
@@ -313,10 +311,11 @@ for index, category in ipairs(addonTable.CategoryViews.Constants.DefaultCategori
 end
 
 if addonTable.Constants.IsEra then
-  addonTable.CategoryViews.Constants.DefaultImportVersion = 2
+  addonTable.CategoryViews.Constants.DefaultImportVersion = 3
   addonTable.CategoryViews.Constants.DefaultImport = {
     [[{"categories":[],"version":1,"order":["default_hearthstone","default_consumable","default_questitem","_EQUIPMENT","default_auto_equipment_sets","default_weapon","default_armor","__end","_CRAFTING","default_reagent","default_tradegoods","default_recipe","__end","default_projectile","default_container","default_quiver","default_key","default_miscellaneous","default_other","----","default_junk","default_special_empty"],"modifications":[],"hidden":[]}]],
     [[{"categories":[],"version":1,"order":["default_auto_recents","default_hearthstone","default_consumable","default_questitem","_EQUIPMENT","default_auto_equipment_sets","default_weapon","default_armor","__end","_CRAFTING","default_reagent","default_tradegoods","default_recipe","__end","default_projectile","default_container","default_quiver","default_key","default_miscellaneous","default_other","----","default_junk","default_special_empty"],"modifications":[],"hidden":[]}]],
+    [[{"categories":[],"version":1,"order":["default_auto_recents","----","default_hearthstone","default_consumable","default_questitem","_EQUIPMENT","default_auto_equipment_sets","default_weapon","default_armor","__end","_CRAFTING","default_reagent","default_tradegoods","default_recipe","__end","default_projectile","default_container","default_quiver","default_key","default_miscellaneous","default_other","----","default_junk","default_special_empty"],"modifications":[],"hidden":[]}]],
   }
 elseif addonTable.Constants.IsClassic then -- Cata
   addonTable.CategoryViews.Constants.DefaultImportVersion = 3
@@ -339,7 +338,6 @@ addonTable.Utilities.OnAddonLoaded("TradeSkillMaster", function()
     name = BAGANATOR_L_CATEGORY_TRADESKILLMASTER_AUTO,
     auto = "tradeskillmaster",
     priorityOffset = -15,
-    doNotAdd = true,
   }
   table.insert(addonTable.CategoryViews.Constants.DefaultCategories, spec)
   addonTable.CategoryViews.Constants.SourceToCategory[spec.source] = spec

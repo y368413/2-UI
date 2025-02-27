@@ -67,6 +67,7 @@ function MISC:OnLogin()
 	MISC:UpdateMaxZoomLevel()
 	MISC:MoveBlizzFrames()
 	MISC:HandleUITitle()
+	MISC:MDEnhance()
 
 	--MISC:CreateRM()
 	--MISC:FreeMountCD()
@@ -836,3 +837,192 @@ end
 function MISC:MoveBlizzFrames()
 	--M:BlizzFrameMover(CharacterFrame)
 end
+
+----------------------------------------------------------------------------------------
+-- Learn all available skills(TrainAll by SDPhantom)
+----------------------------------------------------------------------------------------
+local frame = CreateFrame("Frame")
+frame:RegisterEvent("ADDON_LOADED")
+frame:SetScript("OnEvent", function(_, _, addon)
+	if addon == "Blizzard_TrainerUI" then
+		local cost, num
+		local button = CreateFrame("Button", "ClassTrainerTrainAllButton", ClassTrainerFrame, "UIPanelButtonTemplate")
+		button:SetText(ACHIEVEMENTFRAME_FILTER_ALL)
+		button:SetScript("OnEnter", function()
+			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
+			GameTooltip:SetText(AVAILABLE..": "..num.."\n"..COSTS_LABEL.." "..GetMoneyString(cost))
+		end)
+		button:SetScript("OnLeave", function()
+			GameTooltip:Hide()
+		end)
+		button:SetPoint("TOPRIGHT", ClassTrainerTrainButton, "TOPLEFT", 0, 0)
+		button:SetWidth(min(50, button:GetTextWidth() + 15))
+		button:SetScript("OnClick", function()
+			for i = 1, GetNumTrainerServices() do
+				if select(2, GetTrainerServiceInfo(i)) == "available" then
+					BuyTrainerService(i)
+				end
+			end
+		end)
+		hooksecurefunc("ClassTrainerFrame_Update", function()
+			num, cost = 0, 0
+			for i = 1, GetNumTrainerServices() do
+				if select(2, GetTrainerServiceInfo(i)) == "available" then
+					num = num + 1
+					cost = cost + GetTrainerServiceCost(i)
+				end
+			end
+			button:SetEnabled(num > 0)
+		end)
+	end
+end)
+
+----------------------------------------------------------------------------------------
+--	Sum up all current auctions(Sigma by Ailae)
+----------------------------------------------------------------------------------------
+local frame = CreateFrame("Frame")
+frame:RegisterEvent("ADDON_LOADED")
+frame:SetScript("OnEvent", function(_, _, addon)
+	if addon == "Blizzard_AuctionHouseUI" then
+		local f = CreateFrame("Frame", nil, AuctionHouseFrame)
+		f:SetSize(200, 20)
+		f:SetPoint("LEFT", AuctionHouseFrame.MoneyFrameBorder, "RIGHT", 38, -1)
+
+		local text = f:CreateFontString(nil, "OVERLAY", "PriceFont")
+		text:SetPoint("LEFT")
+
+		f:RegisterEvent("OWNED_AUCTIONS_UPDATED")
+		f:SetScript("OnEvent", function()
+			local totalBuyout = 0
+			local totalBid = 0
+
+			for i = 1, C_AuctionHouse.GetNumOwnedAuctions() do
+				local info = C_AuctionHouse.GetOwnedAuctionInfo(i)
+				if info.buyoutAmount then
+					totalBuyout = totalBuyout + (info.buyoutAmount * info.quantity)
+				end
+				if info.bidAmount then
+					totalBid = totalBid + info.bidAmount
+				end
+			end
+
+			if totalBid > 0 and totalBuyout > 0 then
+				text:SetText(BIDS..": "..C_CurrencyInfo.GetCoinTextureString(totalBid).."     "..BUYOUT..": "..C_CurrencyInfo.GetCoinTextureString(totalBuyout))
+			elseif totalBid > 0 and totalBuyout == 0 then
+				text:SetText(BIDS..": "..C_CurrencyInfo.GetCoinTextureString(totalBid))
+			elseif totalBid == 0 and totalBuyout > 0 then
+				text:SetText(BUYOUT..": "..C_CurrencyInfo.GetCoinTextureString(totalBuyout))
+			else
+				text:SetText("")
+			end
+		end)
+	end
+end)
+
+----------------------------------------------------------------------------------------
+--	Alt+Click to buy a stack
+----------------------------------------------------------------------------------------
+hooksecurefunc("MerchantItemButton_OnModifiedClick", function(self)
+	if IsAltKeyDown() then
+		local id = self:GetID()
+		local itemLink = GetMerchantItemLink(id)
+		if not itemLink then return end
+
+		local maxStack = select(8, C_Item.GetItemInfo(itemLink))
+		if maxStack and maxStack > 1 then
+			local numAvailable = select(5, GetMerchantItemInfo(id))
+			if numAvailable > -1 then
+				BuyMerchantItem(id, numAvailable)
+			else
+				BuyMerchantItem(id, GetMerchantItemMaxStack(id))
+			end
+		end
+	end
+end)
+
+ITEM_VENDOR_STACK_BUY = _G.ITEM_VENDOR_STACK_BUY.."\n|cff00ff00<".."Alt+右键购买一组"..">|r"
+
+----------------------------------------------------------------------------------------
+--[[	Show item level for weapons and armor in merchant
+----------------------------------------------------------------------------------------
+hooksecurefunc("MerchantFrame_UpdateMerchantInfo", function()
+	local numItems = GetMerchantNumItems()
+
+	for i = 1, MERCHANT_ITEMS_PER_PAGE do
+		local index = (MerchantFrame.page - 1) * MERCHANT_ITEMS_PER_PAGE + i
+		if index > numItems then return end
+
+		local button = _G["MerchantItem"..i.."ItemButton"]
+		if button and button:IsShown() then
+			if not button.text then
+				button.text = button:CreateFontString(nil, "OVERLAY", "SystemFont_Outline_Small")
+				button.text:SetPoint("TOPLEFT", 1, -1)
+				button.text:SetTextColor(1, 1, 0)
+			else
+				button.text:SetText("")
+			end
+
+			local itemLink = GetMerchantItemLink(index)
+			if itemLink then
+				local _, _, quality, itemlevel, _, _, _, _, _, _, _, itemClassID = C_Item.GetItemInfo(itemLink)
+				if (itemlevel and itemlevel > 1) and (quality and quality > 1) and (itemClassID == Enum.ItemClass.Weapon or itemClassID == Enum.ItemClass.Armor) then
+					button.text:SetText(itemlevel)
+				end
+			end
+		end
+	end
+end)]]
+
+----------------------------------------------------------------------------------------
+--	Auto cancel various buffs(by Unknown)
+----------------------------------------------------------------------------------------
+local function SpellName(id)
+	local name = C_Spell.GetSpellInfo(id)
+	if name then
+		return name
+	else
+		print("|cffff0000BadBuffs spell ID ["..tostring(id).."] no longer exists!|r")
+		return "Empty"
+	end
+end
+
+local BadBuffs = {
+	[SpellName(58493)] = true,	-- Mohawked!
+	[SpellName(44212)] = true,	-- Jack-o'-Lanterned!
+	[SpellName(61716)] = true,	-- Rabbit Costume
+	[SpellName(172010)] = true,	-- Abomination Costume
+	[SpellName(24732)] = true,	-- Bat Costume
+	[SpellName(172015)] = true,	-- Geist Costume
+	[SpellName(24735)] = true,	-- Ghost Costume
+	[SpellName(172008)] = true,	-- Ghoul Costume
+	[SpellName(24712)] = true,	-- Leper Gnome Costume
+	[SpellName(24710)] = true,	-- Ninja Costume
+	[SpellName(24709)] = true,	-- Pirate Costume
+	[SpellName(24723)] = true,	-- Skeleton Costume
+	[SpellName(172003)] = true,	-- Slime Costume
+	[SpellName(172020)] = true,	-- Spider Costume
+	[SpellName(24740)] = true,	-- Wisp Costume
+	[SpellName(61781)] = true,	-- Turkey Feathers
+	[SpellName(61734)] = true,	-- Noblegarden Bunny
+}
+
+local UnitBuff = function(unit, auraIndex, filter)
+	return AuraUtil.UnpackAuraData(C_UnitAuras.GetBuffDataByIndex(unit, auraIndex, filter))
+end
+
+local frame = CreateFrame("Frame")
+frame:RegisterEvent("UNIT_AURA")
+frame:SetScript("OnEvent", function(_, event, unit)
+	if event == "UNIT_AURA" and unit == "player" and not InCombatLockdown() then
+		local i = 1
+		while true do
+			local name = UnitBuff(unit, i)
+			if not name then return end
+			if BadBuffs[name] then
+				CancelSpellByName(name)
+				print("|cffffff00"..ACTION_SPELL_AURA_REMOVED.." ["..name.."].|r")
+			end
+			i = i + 1
+		end
+	end
+end)

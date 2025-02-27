@@ -1,5 +1,5 @@
 ﻿		-------------------------------------------------
-		-- Paragon Reputation 1.58 by Fail US-Ragnaros --
+		-- Paragon Reputation 1.59 by Fail US-Ragnaros --
 		-------------------------------------------------
 
 		  --[[	  Special thanks to Ammako for
@@ -571,7 +571,7 @@ PR.PARAGON_DATA = {
 
 
 		-------------------------------------------------
-		-- Paragon Reputation 1.58 by Fail US-Ragnaros --
+		-- Paragon Reputation 1.59 by Fail US-Ragnaros --
 		-------------------------------------------------
 
 		  --[[	  Special thanks to Ammako for
@@ -636,7 +636,7 @@ else
 end
 
 		-------------------------------------------------
-		-- Paragon Reputation 1.58 by Fail US-Ragnaros --
+		-- Paragon Reputation 1.59 by Fail US-Ragnaros --
 		-------------------------------------------------
 
 		  --[[	  Special thanks to Ammako for
@@ -714,7 +714,7 @@ local DB = {
 local vars = CreateFrame("FRAME")
 vars:RegisterEvent("ADDON_LOADED")
 vars:SetScript("OnEvent",function(self,event,name)
-	if event == "ADDON_LOADED" then
+	if event == "ADDON_LOADED" and name == "_ShiGuang" then
 		self:UnregisterEvent("ADDON_LOADED")
 		if ParagonReputationDB == nil then
 			ParagonReputationDB = DB
@@ -761,7 +761,7 @@ function ParagonReputation:CreateOptions()
 	-- [Interface Options] Title
 	PR.options.title = PR.options:CreateFontString(nil,"ARTWORK","GameFontNormalLarge")
 	PR.options.title:SetPoint("TOPLEFT",16,-16)
-	PR.options.title:SetText("|cff0088eeParagon|r Reputation |cff0088eev".."1.58".."|r")
+	PR.options.title:SetText("|cff0088eeParagon|r Reputation |cff0088eev".."1.59".."|r")
 
 	-- [Interface Options] Title Description
 	PR.options.description1 = PR.options:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall")
@@ -955,7 +955,7 @@ function ParagonReputation:LockButton()
 end
 
 		-------------------------------------------------
-		-- Paragon Reputation 1.58 by Fail US-Ragnaros --
+		-- Paragon Reputation 1.59 by Fail US-Ragnaros --
 		-------------------------------------------------
 
 		  --[[	  Special thanks to Ammako for

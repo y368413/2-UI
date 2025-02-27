@@ -1,32 +1,32 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Shadowlands = ...
-local Class = Shadowlands.Class
-local L = Shadowlands.locale
-local Map = Shadowlands.RiftMap
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.RiftMap
 
-local Collectible = Shadowlands.node.Collectible
-local NPC = Shadowlands.node.NPC
-local Rare = Shadowlands.node.Rare
-local Treasure = Shadowlands.node.Treasure
+local Collectible = ns.node.Collectible
+local NPC = ns.node.NPC
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local Achievement = Shadowlands.reward.Achievement
-local Item = Shadowlands.reward.Item
-local Mount = Shadowlands.reward.Mount
-local Pet = Shadowlands.reward.Pet
-local Toy = Shadowlands.reward.Toy
-local Transmog = Shadowlands.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Arrow = Shadowlands.poi.Arrow
-local Line = Shadowlands.poi.Line
-local Path = Shadowlands.poi.Path
-local POI = Shadowlands.poi.POI
+local Arrow = ns.poi.Arrow
+local Line = ns.poi.Line
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
-local KYRIAN = Shadowlands.covenants.KYR
-local NECROLORD = Shadowlands.covenants.NEC
-local NIGHTFAE = Shadowlands.covenants.FAE
-local VENTHYR = Shadowlands.covenants.VEN
+local KYRIAN = ns.covenants.KYR
+local NECROLORD = ns.covenants.NEC
+local NIGHTFAE = ns.covenants.FAE
+local VENTHYR = ns.covenants.VEN
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -35,7 +35,7 @@ local VENTHYR = Shadowlands.covenants.VEN
 local map = Map({id = 1961, settings = true})
 
 function map:CanDisplay(node, coord, minimap)
-    local research = select(3, Shadowlands.api.GetFactionInfoByID(2472)) -- The Archivists' Codex
+    local research = select(3, ns.api.GetFactionInfoByID(2472)) -- The Archivists' Codex
     if node.research and research < node.research then return false end
     return Map.CanDisplay(self, node, coord, minimap)
 end
@@ -51,7 +51,7 @@ map.nodes[58211773] = Rare({
     id = 180246,
     quest = 64258, -- 64439?
     note = L['carriage_crusher_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52290}),
         Transmog({item = 187370, slot = L['cloth']}), -- Carriage Crusher's Padded Slippers
@@ -64,7 +64,7 @@ map.nodes[51164167] = Rare({
     quest = 64243,
     sublabel = L['sl_limited_rare'],
     note = L['consumption_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52285}), --
         Transmog({item = 187245}), -- Death-Enveloped Spires
@@ -76,7 +76,7 @@ map.nodes[51164167] = Rare({
 map.nodes[51822081] = Rare({
     id = 177903,
     quest = 63830,
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52277}),
         Transmog({item = 187390, slot = L['plate']}) -- Dominated Protector's Helm
@@ -88,7 +88,7 @@ map.nodes[33183938] = Rare({
     quest = 64320,
     covenant = NIGHTFAE,
     note = L['escaped_wilderling_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52298}),
         Item({item = 187423, weekly = 64549, covenant = NIGHTFAE}), -- Legend of the Animaswell
@@ -102,7 +102,7 @@ map.nodes[59934371] = Rare({
     quest = 64349,
     covenant = NECROLORD,
     note = L['fleshwing_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52299}),
         Item({item = 187424, weekly = 64551, covenant = NECROLORD}), -- Legend of the Animaswell
@@ -115,7 +115,7 @@ map.nodes[59203580] = Rare({
     id = 179108,
     quest = 64428,
     sublabel = L['sl_limited_rare'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     note = L['kroke_note'],
     rewards = {
         Achievement({id = 15107, criteria = 52304}),
@@ -135,7 +135,7 @@ map.nodes[44222950] = Rare({
     id = 179684,
     quest = 64233,
     note = L['malbog_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52283}),
         Transmog({item = 187377, slot = L['leather']}), -- Malbog's Paws
@@ -158,7 +158,7 @@ map.nodes[22604140] = Rare({
     id = 179931,
     quest = 64291,
     note = L['krelva_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52291}),
         Transmog({item = 187403, slot = L['cloak']}) -- Relic Breaker's Drape
@@ -174,7 +174,7 @@ map.nodes[56276617] = Rare({
     quest = 64455,
     sublabel = L['sl_limited_rare'],
     note = L['reliwik_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52318}),
         Transmog({item = 187388, slot = L['mail']}), -- Barbed Scale Cinch
@@ -187,7 +187,7 @@ map.nodes[46507959] = Rare({
     quest = 64313,
     covenant = VENTHYR,
     note = L['stonecrusher_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52276}),
         Item({item = 187428, weekly = 64553, covenant = VENTHYR}), -- Legend of the Animaswell
@@ -201,7 +201,7 @@ map.nodes[56873237] = Rare({
     quest = 64338,
     covenant = KYRIAN,
     note = L['worldcracker_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52300}),
         Item({item = 187423, weekly = 64549, covenant = KYRIAN}), -- Legend of the Animaswell
@@ -214,9 +214,9 @@ map.nodes[56873237] = Rare({
 map.nodes[44983552] = Rare({
     id = 179859,
     quest = 64278,
-    requires = Shadowlands.requirement.Item(186718),
+    requires = ns.requirement.Item(186718),
     note = L['chamber_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52296}),
         Achievement({id = 15066, criteria = 52263}),
@@ -229,9 +229,9 @@ map.nodes[44983552] = Rare({
 map.nodes[39405240] = Rare({
     id = 179802,
     quest = 64257,
-    requires = Shadowlands.requirement.Item(186718),
+    requires = ns.requirement.Item(186718),
     note = L['chamber_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52295}),
         Achievement({id = 15066, criteria = 52262}),
@@ -247,7 +247,7 @@ map.nodes[27755885] = Rare({
     quest = 64442,
     sublabel = L['sl_limited_rare'],
     note = L['in_cave'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52301}),
         Transmog({item = 187371, slot = L['cloth']}), -- Velvet Gromit Handwraps
@@ -265,7 +265,7 @@ map.nodes[13007500] = Rare({
     quest = 64246, -- 64280?
     scale = 1.5,
     note = L['konthrogz_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52303}),
         Transmog({item = 187375, slot = L['cloth']}), -- Bound Worldeater Tendrils
@@ -281,7 +281,7 @@ map.nodes[16007500] = Rare({
     quest = 64245,
     scale = 1.5,
     note = L['towering_exterminator_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52302}),
         Transmog({item = 187373, slot = L['cloth']}), -- Soul-Enveloping Leggings
@@ -299,7 +299,7 @@ map.nodes[14507900] = Rare({
     quest = 64457,
     scale = 1.5,
     note = L['pop_quiz_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15107, criteria = 52319}),
         Item({item = 187264, quest = 64513}), -- Ve'rayn's Head
@@ -313,8 +313,8 @@ map.nodes[14507900] = Rare({
 map.nodes[59335221] = Rare({
     id = 179913,
     quest = 64285,
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']) ..
-        Shadowlands.GetIconLink('portal_gy', 20, 4, 1),
+    rlabel = ns.status.LightBlue(L['plus_research']) ..
+        ns.GetIconLink('portal_gy', 20, 4, 1),
     note = L['rift_rare_exit_note'],
     rift = 2,
     rewards = {
@@ -326,8 +326,8 @@ map.nodes[59335221] = Rare({
 map.nodes[50307590] = Rare({
     id = 179914,
     quest = 64440,
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']) ..
-        Shadowlands.GetIconLink('portal_gy', 20, 4, 1),
+    rlabel = ns.status.LightBlue(L['plus_research']) ..
+        ns.GetIconLink('portal_gy', 20, 4, 1),
     note = L['rift_rare_only_note'],
     rift = 2,
     rewards = {
@@ -340,8 +340,8 @@ map.nodes[50307590] = Rare({
 map.nodes[44604240] = Rare({
     id = 179608,
     quest = 64263,
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']) ..
-        Shadowlands.GetIconLink('portal_gy', 20, 4, 1),
+    rlabel = ns.status.LightBlue(L['plus_research']) ..
+        ns.GetIconLink('portal_gy', 20, 4, 1),
     note = L['rift_rare_exit_note'],
     rift = 2,
     rewards = {
@@ -354,8 +354,8 @@ map.nodes[44604240] = Rare({
 map.nodes[57607040] = Rare({
     id = 179911,
     quest = 64284,
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']) ..
-        Shadowlands.GetIconLink('portal_gy', 20, 4, 1),
+    rlabel = ns.status.LightBlue(L['plus_research']) ..
+        ns.GetIconLink('portal_gy', 20, 4, 1),
     note = L['rift_rare_exit_note'],
     rift = 2,
     rewards = {
@@ -371,7 +371,7 @@ map.nodes[57607040] = Rare({
 
 map.nodes[29595342] = Treasure({
     quest = 64244,
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15099, criteria = 52241}), Item({item = 187349}) -- Anima Laden Egg
     }
@@ -380,7 +380,7 @@ map.nodes[29595342] = Treasure({
 map.nodes[47502920] = Treasure({
     quest = 64241,
     note = L['dislodged_nest_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15099, criteria = 52240}), Toy({item = 187339}) -- Silver Shardhide Whistle
     }
@@ -388,7 +388,7 @@ map.nodes[47502920] = Treasure({
 
 map.nodes[50478446] = Treasure({
     quest = 64252,
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Achievement({id = 15099, criteria = 52242}),
         Item({item = 187350, status = L['num_research']:format(300)}) -- Displaced Relic
@@ -405,7 +405,7 @@ map.nodes[68902990] = Treasure({
 
 map.nodes[38344296] = Treasure({
     quest = 64222,
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {Achievement({id = 15099, criteria = 52236})}
 }) -- Glittering Nest Material
 
@@ -427,7 +427,7 @@ map.nodes[52991477] = Treasure({
 
 map.nodes[45336714] = Treasure({
     quest = 64268,
-    requires = Shadowlands.requirement.Item(187033),
+    requires = ns.requirement.Item(187033),
     note = L['offering_box_note'],
     rewards = {
         Achievement({id = 15099, criteria = 52246}), Toy({item = 187344}) -- Offering Kit Maker
@@ -441,7 +441,7 @@ map.nodes[62065550] = Treasure({
     quest = 64247,
     note = L['spectral_bound_note'],
     label = L['spectral_bound_chest'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Transmog({item = 187026, slot = L['cloak']}), -- Field Warden's Torture Kit
         Transmog({item = 187240, slot = L['cloak']}) -- Field Warden's Watchful Eye
@@ -457,11 +457,11 @@ map.nodes[62065550] = Treasure({
 ----------------------------------- RELICS ------------------------------------
 -------------------------------------------------------------------------------
 
-local Relic = Class('Relic', Shadowlands.node.Treasure, {
-    group = Shadowlands.groups.RELIC,
+local Relic = Class('Relic', ns.node.Treasure, {
+    group = ns.groups.RELIC,
     icon = 'star_chest_b',
     scale = 1.6,
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     IsCompleted = function(self)
         if C_QuestLog.IsOnQuest(self.quest[1]) then return true end
         return Treasure.IsCompleted(self)
@@ -506,7 +506,7 @@ map.nodes[41146015] = Relic({
     quest = 63924,
     note = L['archivist_key_note']:format('{item:187614}'),
     research = 2,
-    requires = Shadowlands.requirement.Item(187614),
+    requires = ns.requirement.Item(187614),
     rewards = {Achievement({id = 15066, criteria = 52268})}
 }) -- Gorak Claw Fetish
 
@@ -514,7 +514,7 @@ map.nodes[41304330] = Relic({
     quest = 63909,
     note = L['archivist_key_note']:format('{item:186984}'),
     research = 2,
-    requires = Shadowlands.requirement.Item(186984),
+    requires = ns.requirement.Item(186984),
     rewards = {
         Achievement({id = 15066, criteria = 52255}), Toy({item = 187155}) -- Guise of the Changeling
     }
@@ -524,7 +524,7 @@ map.nodes[33004190] = Relic({
     quest = 63910,
     note = L['archivist_key_note']:format('{item:187612}'),
     research = 2,
-    requires = Shadowlands.requirement.Item(187612),
+    requires = ns.requirement.Item(187612),
     rewards = {Achievement({id = 15066, criteria = 52256})}
 }) -- The Netherstar
 
@@ -532,7 +532,7 @@ map.nodes[43847698] = Relic({
     quest = 63921,
     note = L['archivist_key_note']:format('{item:187613}'),
     research = 2,
-    requires = Shadowlands.requirement.Item(187613),
+    requires = ns.requirement.Item(187613),
     rewards = {
         Achievement({id = 15066, criteria = 52265}), Toy({item = 187140}) -- Ring of Duplicity
     }
@@ -543,14 +543,14 @@ map.nodes[43847698] = Relic({
 map.nodes[39405241] = Relic({
     quest = 63915,
     note = L['chamber_note'],
-    requires = Shadowlands.requirement.Item(186718),
+    requires = ns.requirement.Item(186718),
     rewards = {Achievement({id = 15066, criteria = 52269})}
 }) -- Drum of Driving
 
 map.nodes[45003550] = Relic({
     quest = 63916,
     note = L['chamber_note'],
-    requires = Shadowlands.requirement.Item(186718),
+    requires = ns.requirement.Item(186718),
     rewards = {Achievement({id = 15066, criteria = 52261})}
 }) -- Sack of Strange Soil
 
@@ -612,10 +612,10 @@ map.nodes[39404270] = Relic({
 local RiftPortal = Class('RiftPortal', NPC, {
     id = 179595,
     scale = 1.4,
-    group = Shadowlands.groups.RIFT_PORTAL,
+    group = ns.groups.RIFT_PORTAL,
     icon = 'portal_gy',
     note = L['rift_portal_note'],
-    requires = Shadowlands.requirement.Item(186731)
+    requires = ns.requirement.Item(186731)
 })
 
 map.nodes[41104210] = RiftPortal({pois = {POI({42304090})}})
@@ -631,8 +631,8 @@ map.nodes[59405370] = RiftPortal()
 local RiftCache = Class('RiftCache', Treasure, {
     label = L['riftbound_cache'],
     note = L['riftbound_cache_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
-    group = Shadowlands.groups.RIFTBOUND_CACHE,
+    rlabel = ns.status.LightBlue(L['plus_research']),
+    group = ns.groups.RIFTBOUND_CACHE,
     rift = 1,
     rewards = {
         Transmog({item = 187251}), -- Shaded Skull Shoulderguards
@@ -670,13 +670,13 @@ map.nodes[39784299] = RIFT_CACHE4
 ------------------------------ SHARED TREASURES -------------------------------
 -------------------------------------------------------------------------------
 
-local Shared = Class('Shared', Shadowlands.node.Treasure, {
-    group = Shadowlands.groups.KORTHIA_SHARED,
+local Shared = Class('Shared', ns.node.Treasure, {
+    group = ns.groups.KORTHIA_SHARED,
     quest = {64787, 64788, 64789, 64790, 64791},
     questCount = true,
     scale = 0.8,
     note = L['korthia_shared_chest_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     fgroup = 'shared_korthia',
     rewards = {
         Item({item = 185963, quest = 63892}) -- Diviner's Rune Chit
@@ -735,10 +735,10 @@ map.nodes[52322701] = Shared({label = L['shardhide_stash']})
 -------------------------------------------------------------------------------
 
 local Mawshroom = Class('Mawshroom', Treasure, {
-    group = Shadowlands.groups.INVASIVE_MAWSHROOM,
+    group = ns.groups.INVASIVE_MAWSHROOM,
     label = L['invasive_mawshroom'],
     note = L['invasive_mawshroom_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Item({item = 185963, quest = 63892}) -- Diviner's Rune Chit
     }
@@ -782,10 +782,10 @@ map.nodes[54805550] = MAWSH5
 -------------------------------------------------------------------------------
 
 local UMNest = Class('UMNest', Treasure, {
-    group = Shadowlands.groups.NEST_MATERIALS,
+    group = ns.groups.NEST_MATERIALS,
     label = L['unusual_nest'],
     note = L['unusual_nest_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     icon = 'chest_bn',
     fgroup = 'nest_materials',
     rewards = {
@@ -803,10 +803,10 @@ map.nodes[52407270] = UMNest({quest = 64362})
 -------------------------------------------------------------------------------
 
 local MawswornC = Class('MawswornC', Treasure, {
-    group = Shadowlands.groups.MAWSWORN_CACHE,
+    group = ns.groups.MAWSWORN_CACHE,
     label = L['mawsworn_cache'],
     note = L['mawsworn_cache_note'],
-    rlabel = Shadowlands.status.LightBlue(L['plus_research']),
+    rlabel = ns.status.LightBlue(L['plus_research']),
     rewards = {
         Transmog({item = 187020}), -- Necrobinder's Shoulderpads
         Transmog({item = 187026, slot = L['cloak']}), -- Field Warden's Torture Kit
@@ -866,7 +866,7 @@ local function GetMaelieStatus()
             count = count + 1
         end
     end
-    return Shadowlands.status.Gray(tostring(count) .. '/6')
+    return ns.status.Gray(tostring(count) .. '/6')
 end
 
 local maelie = Class('Maelie', Collectible, {
@@ -890,7 +890,7 @@ map.nodes[60682192] = maelie
 
 local function GetDarkmaulStatus()
     local count = select(4, GetQuestObjectiveInfo(64376, 0, false))
-    if count ~= nil then return Shadowlands.status.Gray(tostring(count) .. '/10') end
+    if count ~= nil then return ns.status.Gray(tostring(count) .. '/10') end
 end
 
 local darkmaul = Class('Darkmaul', Collectible, {
@@ -906,7 +906,7 @@ map.nodes[42873269] = darkmaul
 
 local function GetDusklightStatus()
     local count = select(4, GetQuestObjectiveInfo(64274, 0, false))
-    if count ~= nil then return Shadowlands.status.Gray(tostring(count) .. '/10') end
+    if count ~= nil then return ns.status.Gray(tostring(count) .. '/10') end
 end
 
 local dusklight = Class('Dusklight', Collectible, {
@@ -931,7 +931,7 @@ local GRAPPLES = {
 
 for _, coord in ipairs(GRAPPLES) do
     map.nodes[coord] = NPC({
-        group=Shadowlands.groups.GRAPPLES,
+        group=ns.groups.GRAPPLES,
         icon='peg_bk',
         id=178546,
         questDeps==63713,

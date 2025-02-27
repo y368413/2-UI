@@ -527,3 +527,19 @@ L["List of avoidable damaging spells"] = "List of avoidable damaging spells"
 L["Damage taken by avoidable spell"] = "Damage taken by avoidable spell"
 L["List of damaged players by avoidable spells"] = "List of damaged players by avoidable spells"
 L["'s Avoidable damage taken"] = "'s Avoidable damage taken"
+
+
+L["Shards gain sources"]										= true
+L["Shards gained"]											= true
+L["Maelstrom gain sources"]										= true
+L["Maelstrom gained"]											= true
+L["Lunar gain sources"]											= true
+L["Lunar gained"]											= true
+L["Insane gain sources"]										= true
+L["Insane gained"]											= true
+L["Combo gain sources"]											= true
+L["Combo gained"]											= true
+L["Chi gain sources"]											= true
+L["Chi gained"]												= true
+L["Charges gain sources"]										= true
+L["Charges gained"]											= true

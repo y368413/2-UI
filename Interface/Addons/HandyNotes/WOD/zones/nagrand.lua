@@ -1,29 +1,29 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, WarlordsOfDraenor = ...
-local Class = WarlordsOfDraenor.Class
-local L = WarlordsOfDraenor.locale
-local Map = WarlordsOfDraenor.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Collectible = WarlordsOfDraenor.node.Collectible
-local PetBattle = WarlordsOfDraenor.node.PetBattle
-local Rare = WarlordsOfDraenor.node.Rare
-local Treasure = WarlordsOfDraenor.node.Treasure
+local Collectible = ns.node.Collectible
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local Achievement = WarlordsOfDraenor.reward.Achievement
-local Currency = WarlordsOfDraenor.reward.Currency
-local Follower = WarlordsOfDraenor.reward.Follower
-local Item = WarlordsOfDraenor.reward.Item
-local Mount = WarlordsOfDraenor.reward.Mount
-local Pet = WarlordsOfDraenor.reward.Pet
-local Quest = WarlordsOfDraenor.reward.Quest
-local Title = WarlordsOfDraenor.reward.Title
-local Toy = WarlordsOfDraenor.reward.Toy
-local Transmog = WarlordsOfDraenor.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Currency = ns.reward.Currency
+local Follower = ns.reward.Follower
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Quest = ns.reward.Quest
+local Title = ns.reward.Title
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local Path = WarlordsOfDraenor.poi.Path
-local POI = WarlordsOfDraenor.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -1002,7 +1002,7 @@ map.nodes[80185036] = Collectible({
     note = L['viking_pepe_note'],
     icon = 1044996,
     quest = 39265,
-    group = WarlordsOfDraenor.groups.PEPE,
+    group = ns.groups.PEPE,
     rewards = {
         Achievement({id = 10053, criteria = 28184}), Item({item = 127865})
     }
@@ -1030,7 +1030,7 @@ map.nodes[50304130] = Collectible({
     id = 87393,
     icon = 463874,
     note = L['steamwheedle_note'] .. '\n\n' .. L['highmaul_farm_path'],
-    group = WarlordsOfDraenor.groups.STEAMWHEEDLE,
+    group = ns.groups.STEAMWHEEDLE,
     rewards = {
         Achievement({id = 9472}), -- Steamwheedle Preservation Society
         Title({id = 284, pattern = '{title} {player}'}) -- "Conservationist" %s
@@ -1039,7 +1039,7 @@ map.nodes[50304130] = Collectible({
 }) -- Sallee Silverclamp
 
 local SteamwheedleRare = Class('SteamwheedleRare', Rare,
-    {group = WarlordsOfDraenor.groups.STEAMWHEEDLE})
+    {group = ns.groups.STEAMWHEEDLE})
 
 map.nodes[62601680] = SteamwheedleRare({
     id = 86732,
@@ -1102,7 +1102,7 @@ map.nodes[37233899] = SteamwheedleRare({
 local BrokeBackPrecipiceRare = Class('BrokeBackPrecipiceRare', Collectible, {
     icon = 'peg_rd',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.BROKE_BACK_PRECIPICE
+    group = ns.groups.BROKE_BACK_PRECIPICE
 })
 
 map.nodes[38001960] = BrokeBackPrecipiceRare({
@@ -1134,7 +1134,7 @@ map.nodes[31823445] = Collectible({
     label = L['finding_your_waystones_label'],
     icon = 528693,
     note = L['finding_your_waystones_note'] .. '\n\n' .. L['highmaul_farm_path'],
-    group = WarlordsOfDraenor.groups.FINDING_YOUR_WAYSTONES,
+    group = ns.groups.FINDING_YOUR_WAYSTONES,
     rewards = {
         Achievement({
             id = 9497,
@@ -1152,7 +1152,7 @@ map.nodes[42093684] = Collectible({
     id = 87361,
     icon = 'peg_rd',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.SONG_OF_SILENCE,
+    group = ns.groups.SONG_OF_SILENCE,
     note = L['signal_horn_note'],
     rewards = {
         Achievement({
@@ -1170,7 +1170,7 @@ map.nodes[45603480] = Collectible({
     id = 86959,
     icon = 'peg_rd',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.SONG_OF_SILENCE,
+    group = ns.groups.SONG_OF_SILENCE,
     rewards = {Achievement({id = 9541, criteria = 26140})}
 }) -- Karosh Blackwind
 
@@ -1178,7 +1178,7 @@ map.nodes[43103640] = Collectible({
     id = 87234,
     icon = 'peg_rd',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.SONG_OF_SILENCE,
+    group = ns.groups.SONG_OF_SILENCE,
     rewards = {Achievement({id = 9541, criteria = 26141})}
 }) -- Brutag Grimblade
 
@@ -1190,7 +1190,7 @@ map.nodes[41703750] = Collectible({
     id = 87522,
     icon = 'peg_yw',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.BURIED_TREASURES,
+    group = ns.groups.BURIED_TREASURES,
     note = L['garroshs_shackles'],
     rewards = {Achievement({id = 9548, criteria = 26145})}
 }) -- Garrosh's Shackles
@@ -1199,7 +1199,7 @@ map.nodes[45503680] = Collectible({
     id = 87524,
     icon = 'peg_yw',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.BURIED_TREASURES,
+    group = ns.groups.BURIED_TREASURES,
     note = L['warsong_relics'],
     rewards = {Achievement({id = 9548, criteria = 26146})},
     pois = {POI({43003649, 45503680, 42703840})}
@@ -1209,7 +1209,7 @@ map.nodes[42303450] = Collectible({
     id = 87526,
     icon = 'peg_yw',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.BURIED_TREASURES,
+    group = ns.groups.BURIED_TREASURES,
     note = L['stolen_draenei_tome'],
     rewards = {Achievement({id = 9548, criteria = 26148})},
     pois = {POI({45303380, 45103820})}
@@ -1219,7 +1219,7 @@ map.nodes[46203420] = Collectible({
     id = 87530,
     icon = 'peg_yw',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.BURIED_TREASURES,
+    group = ns.groups.BURIED_TREASURES,
     note = L['dirt_mound'],
     rewards = {
         Achievement({
@@ -1241,10 +1241,10 @@ map.nodes[46203420] = Collectible({
 local StablesTarget = Class('StablesTarget', Collectible, {
     icon = 'peg_bl',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.THE_STABLE_MASTER,
+    group = ns.groups.THE_STABLE_MASTER,
     requires = {
-        WarlordsOfDraenor.requirement.Item(118469), -- Black Claw of Sethe
-        WarlordsOfDraenor.requirement.Item(118470) -- Garn-Tooth Necklace
+        ns.requirement.Item(118469), -- Black Claw of Sethe
+        ns.requirement.Item(118470) -- Garn-Tooth Necklace
     },
     getters = {
         note = function(self)
@@ -1305,7 +1305,7 @@ map.nodes[58201200] = Collectible({
     id = 88210,
     icon = 'peg_rd',
     scale = 1.5,
-    group = WarlordsOfDraenor.groups.MAKING_THE_CUT,
+    group = ns.groups.MAKING_THE_CUT,
     note = L['making_the_cut_note'],
     rewards = {
         Achievement({id = 9617}) -- Making the Cut
@@ -1338,7 +1338,7 @@ map.nodes[40287611] = Collectible({
     id = 82453,
     icon = 236270,
     note = L['goldmane_follower_note'],
-    group = WarlordsOfDraenor.groups.GARRFOLLOWER,
+    group = ns.groups.GARRFOLLOWER,
     rewards = {Follower({id = 170, icon = 236270})}
 }) -- Goldmane the Skinner
 
@@ -1346,7 +1346,7 @@ map.nodes[46371604] = Collectible({
     label = '{quest:34466}', -- Mysterious Staff
     icon = 135932,
     note = L['image_of_archmage_vargoth_follower_note'],
-    group = WarlordsOfDraenor.groups.GARRFOLLOWER,
+    group = ns.groups.GARRFOLLOWER,
     rewards = {Quest({id = 34466}), Follower({id = 190, icon = 135932})}
 }) -- Image of Archmage Vargoth
 
@@ -1354,11 +1354,11 @@ map.nodes[67185601] = Collectible({
     id = 86293,
     icon = 135770,
     note = L['abugar_follower_note'],
-    group = WarlordsOfDraenor.groups.GARRFOLLOWER,
+    group = ns.groups.GARRFOLLOWER,
     requires = {
-        WarlordsOfDraenor.requirement.Item(114245), -- Abu'gar's Favorite Lure
-        WarlordsOfDraenor.requirement.Item(114242), -- Abu'gar's Vitality
-        WarlordsOfDraenor.requirement.Item(114243) -- Abu'gar's Finest Reel
+        ns.requirement.Item(114245), -- Abu'gar's Favorite Lure
+        ns.requirement.Item(114242), -- Abu'gar's Vitality
+        ns.requirement.Item(114243) -- Abu'gar's Finest Reel
     },
     rewards = {Follower({id = 209, icon = 135770})},
     pois = {
@@ -1371,7 +1371,7 @@ map.nodes[67185601] = Collectible({
 ---------------------------------- SQUIRRELS ----------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[73584230] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[73584230] = ns.node.Squirrel({
     id = 83617,
     rewards = {Achievement({id = 14728, criteria = 15})}
 }) -- Leatherhide Runt

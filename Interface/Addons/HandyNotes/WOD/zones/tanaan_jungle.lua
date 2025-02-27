@@ -1,25 +1,25 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, WarlordsOfDraenor = ...
-local L = WarlordsOfDraenor.locale
-local Map = WarlordsOfDraenor.Map
+local ADDON_NAME, ns = ...
+local L = ns.locale
+local Map = ns.Map
 
-local PetBattle = WarlordsOfDraenor.node.PetBattle
-local Rare = WarlordsOfDraenor.node.Rare
-local Treasure = WarlordsOfDraenor.node.Treasure
+local PetBattle = ns.node.PetBattle
+local Rare = ns.node.Rare
+local Treasure = ns.node.Treasure
 
-local Achievement = WarlordsOfDraenor.reward.Achievement
-local Item = WarlordsOfDraenor.reward.Item
-local Mount = WarlordsOfDraenor.reward.Mount
-local Pet = WarlordsOfDraenor.reward.Pet
-local Title = WarlordsOfDraenor.reward.Title
-local Toy = WarlordsOfDraenor.reward.Toy
-local Transmog = WarlordsOfDraenor.reward.Transmog
-local Currency = WarlordsOfDraenor.reward.Currency
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Title = ns.reward.Title
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
+local Currency = ns.reward.Currency
 
-local Path = WarlordsOfDraenor.poi.Path
-local POI = WarlordsOfDraenor.poi.POI
+local Path = ns.poi.Path
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 ------------------------------------- MAP -------------------------------------
@@ -482,7 +482,7 @@ map.nodes[34357246] = Rare({
 map.nodes[53908080] = Rare({
     id = 92766,
     quest = 39399,
-    requires = WarlordsOfDraenor.requirement.Item(124093),
+    requires = ns.requirement.Item(124093),
     note = L['akrrilo_note'],
     rewards = {Achievement({id = 10070, criteria = 28373})},
     pois = {
@@ -493,7 +493,7 @@ map.nodes[53908080] = Rare({
 map.nodes[54408130] = Rare({
     id = 92817,
     quest = 39400,
-    requires = WarlordsOfDraenor.requirement.Item(124094),
+    requires = ns.requirement.Item(124094),
     note = L['rendarr_note'],
     rewards = {Achievement({id = 10070, criteria = 28374})},
     pois = {
@@ -504,7 +504,7 @@ map.nodes[54408130] = Rare({
 map.nodes[54408040] = Rare({
     id = 92819,
     quest = 39379,
-    requires = WarlordsOfDraenor.requirement.Item(124095),
+    requires = ns.requirement.Item(124095),
     note = L['eyepiercer_note'],
     rewards = {Achievement({id = 10070, criteria = 28375})},
     pois = {
@@ -703,8 +703,8 @@ map.nodes[47005260] = Rare({
 map.nodes[69603820] = Rare({
     id = 96235,
     requires = {
-        WarlordsOfDraenor.requirement.Achievement(10070), -- Jungle Stalker
-        WarlordsOfDraenor.requirement.Reputation(1849, 8) -- Order of the Awakened (Exalted)
+        ns.requirement.Achievement(10070), -- Jungle Stalker
+        ns.requirement.Reputation(1849, 8) -- Order of the Awakened (Exalted)
     },
     note = L['xemirkol_note'],
     rewards = {
@@ -1010,7 +1010,7 @@ map.nodes[62602053] = Treasure({
 map.nodes[26804420] = Treasure({
     quest = 38683,
     label = L['looted_bleeding_hollow_treasure_treasure'],
-    requires = WarlordsOfDraenor.requirement.Quest(requiredQuests['bleeding hollow']),
+    requires = ns.requirement.Quest(requiredQuests['bleeding hollow']),
     rewards = {
         Achievement({
             id = 10262,
@@ -1147,7 +1147,7 @@ map.nodes[46307270] = Treasure({
     quest = 38739,
     label = L['mysterious_corrupted_obelist_treasure'],
     note = L['in_cave'],
-    requires = WarlordsOfDraenor.requirement.Quest(requiredQuests['cipher of damnation']),
+    requires = ns.requirement.Quest(requiredQuests['cipher of damnation']),
     rewards = {
         Achievement({
             id = 10262,
@@ -1162,7 +1162,7 @@ map.nodes[46307270] = Treasure({
 map.nodes[63302810] = Treasure({
     quest = 38740,
     label = L['forgotten_shard_of_the_cipher_treasure'],
-    requires = WarlordsOfDraenor.requirement.Quest(requiredQuests['cipher of damnation']),
+    requires = ns.requirement.Quest(requiredQuests['cipher of damnation']),
     rewards = {
         Achievement({
             id = 10262,
@@ -1577,7 +1577,7 @@ map.nodes[75403740] = PetBattle({
 ---------------------------------- SQUIRRELS ----------------------------------
 -------------------------------------------------------------------------------
 
-map.nodes[48385040] = WarlordsOfDraenor.node.Squirrel({
+map.nodes[48385040] = ns.node.Squirrel({
     id = 88998,
     rewards = {Achievement({id = 14728, criteria = 5})}
 }) -- Bloodbeak

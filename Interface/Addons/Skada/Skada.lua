@@ -19,6 +19,7 @@ local dataobj = LibStub("LibDataBroker-1.1"):NewDataObject("Skada", {
 })
 
 local popup, cleuFrame
+local realmName	      = ""
 
 -- Used for automatic stop on wipe option
 local deathcounter = 0
@@ -788,11 +789,9 @@ local function slashHandler(param)
 	elseif param == "config" then
 		Skada:OpenOptions()
 	elseif param:sub(1,6) == "report" then
-		local chan = (IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "instance") or
-			(IsInRaid() and "raid") or
-			(IsInGroup() and "party") or
-			"say"
-		local set = "current"
+
+		local chan	       = (IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "instance") or (IsInRaid() and "raid") or (IsInGroup() and "party") or "say"
+		local set	       = "current"
 		local report_mode_name = L["Damage"]
 		local w1, w2, w3, w4 = param:match("^%s*(%w*)%s*(%w*)%s*([^%d]-)%s*(%d*)%s*$",7)
 		if w1 and #w1 > 0 then
@@ -1091,12 +1090,9 @@ end
 -- Fired on blue bar screen
 function Skada:PLAYER_ENTERING_WORLD()
 
-	Skada:ZoneCheck() -- catch reloadui within a zone, which does not fire ZONE_CHANGED_NEW_AREA
-	-- If this event fired in response to a login or teleport, zone info is usually not yet available
-	-- and will be caught by a sunsequent ZONE_CHANGED_NEW_AREA
+	realmName = GetNormalizedRealmName()
+	Skada:ZoneCheck()
 
-	-- make sure we update once on reload
-	-- delay it because group is unavailable during first PLAYER_ENTERING_WORLD on login
 	if wasinparty == nil then Skada:ScheduleTimer("GROUP_ROSTER_UPDATE",1) end
 end
 
@@ -1718,9 +1714,11 @@ function Skada:get_player(set, playerid, playername)
 		if not playername then
 			return
 		end
+		local player_name, realm = string.split("-", playername, 2)
 
+		if realmName == realm then playername = player_name end
 		local _, playerClass = UnitClass(playername)
-		local playerRole = UnitGroupRolesAssigned(playername)
+		local playerRole     = UnitGroupRolesAssigned(playername)
 		player = {id = playerid, class = playerClass, role = playerRole, name = playername, first = time(), ["time"] = 0}
 
 		-- Tell each mode to apply its needed attributes.
@@ -1730,10 +1728,8 @@ function Skada:get_player(set, playerid, playername)
 			end
 		end
 
-		-- Strip realm name
-		-- This is done after module processing due to cross-realm names messing with modules (death log for example, which needs to do UnitHealthMax on the playername).
-		local player_name, realm = string.split("-", playername, 2)
-		player.name = player_name or playername
+
+		player.name	     = player_name or playername
 
 		tinsert(set.players, player)
 	end
@@ -1916,7 +1912,7 @@ local function cleuHandler(timestamp, eventtype, hideCaster, srcGUID, srcName, s
 	-- Pet scheme: save the GUID in a table along with the GUID of the owner.
 	-- Note to self: this needs 1) to be made self-cleaning so it can't grow too much, and 2) saved persistently.
 	-- Now also done on raid roster/party changes.
-	if eventtype == 'SPELL_SUMMON' and srcName and srcName ~= "" and (band(srcFlags, RAID_FLAGS) ~= 0 or band(srcFlags, PET_FLAGS) ~= 0 or (band(dstFlags, PET_FLAGS) ~= 0 and pets[dstGUID])) then
+	if eventtype == 'SPELL_SUMMON' and ( (band(srcFlags, RAID_FLAGS) ~= 0) or ( (band(srcFlags, PET_FLAGS)) ~= 0 ) or ((band(dstFlags, PET_FLAGS) ~= 0) and pets[dstGUID])) then
 		-- assign pet normally
 		pets[dstGUID] = {id = srcGUID, name = srcName}
 		if pets[srcGUID] then
@@ -2014,8 +2010,8 @@ function dataobj:OnClick(button)
 end
 
 local totalbarcolor = {r = 0.2, g = 0.2, b = 0.5, a = 1}
-local bossicon = "Interface\\Icons\\Achievment_boss_ultraxion"
-local nonbossicon = "Interface\\Icons\\icon_petfamily_critter"
+local bossicon	    = "Interface\\Icons\\inv_misc_food_19"
+local nonbossicon   = "Interface\\Icons\\inv_misc_food_24"
 
 function Skada:UpdateDisplay(force)
 	-- Force an update by setting our "changed" flag to true.
@@ -2357,80 +2353,137 @@ end
 function Skada:PlayerActiveTime(set, player)
 	local maxtime = 0
 
-	-- Add recorded time (for total set)
-	if player.time > 0 then
-		maxtime = player.time
-	end
 
-	-- Add in-progress time if set is not ended.
-	if (not set.endtime or set.stopped) and player.first then
-		maxtime = maxtime + player.last - player.first
-	end
+	if player.time > 0 				     then maxtime = player.time				 end
+	if (not set.endtime or set.stopped) and player.first then maxtime = maxtime + player.last - player.first end
+
 	return maxtime
 end
 
+
 do
-	local function GetPetOwner(guid)
-		local data = C_TooltipInfo.GetHyperlink("unit:" .. guid)
+	local tooltip = CreateFrame("GameTooltip", "SkadaTooltip", nil, "GameTooltipTemplate")
+	tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+
+
+	local function GetRussianOwnerID(owner)
+
+		if not _G.LOCALE_ruRU or not Skada.current then	return end
+
+
+		for _, p in Skada.current.players do
+		
+			local sex = UnitSex(p.name)
+
+
+			for set = 1, GetNumDeclensionSets(p.name, sex) do
+
+				local name = DeclineName(p.name, sex, set)
+
+
+				if owner == name then return p.id end
+			end
+		end
 	end
 
-	-- Modify objects if they are pets.
-	-- Expects to find "playerid", "playername", and optionally "spellname" in the object.
-	-- playerid and playername are exchanged for the pet owner's, and spellname is modified to include pet name.
+
+	local ownerPatterns = {}
+
+
+	for i = 1, 44 do
+
+		local title = _G["UNITNAME_SUMMON_TITLE"..i]
+
+		if title and title ~= "%s" and title:find("%s", nil, true) then
+
+			local pattern = title:gsub("%%s", "(.-)")
+			tinsert(ownerPatterns, pattern)
+		end
+	end
+
+
+
+
+	local function GetPetOwner(guid)
+
+		tooltip:SetHyperlink("unit:" .. guid)
+
+		for i = 2, tooltip:NumLines() do
+
+			local text = _G["SkadaTooltipTextLeft" .. i]:GetText()
+
+
+			if text then
+
+				for _, pattern in next, ownerPatterns do
+
+					local owner = text:match(pattern)
+
+
+					if owner then return owner end
+				end
+			end
+		end
+	end
+
+
+
+
 	function Skada:FixPets(action)
+
 		if not action or not action.playername or not action.playerid then return end
+
 
 		local owner = pets[action.playerid]
 
-		-- Try to associate pets and guardians with their owner
+
 		if not owner and action.playerflags and band(action.playerflags, PET_FLAGS) ~= 0 and band(action.playerflags, RAID_FLAGS) ~= 0 then
+
 			if band(action.playerflags, COMBATLOG_OBJECT_AFFILIATION_MINE) ~= 0 then
-				-- Skip tooltip scanning if it belongs to the player
-				owner = { id = UnitGUID("player"), name = UnitName("player") }
-				pets[action.playerid] = owner
+
+				owner				      = { id = UnitGUID("player"), name = UnitName("player") }
+				pets[action.playerid]		      = owner
 			else
-				local id = GetPetOwner(action.playerid)
-				if players[id] then
-					local name, server = select(6, GetPlayerInfoByGUID(id))
-					if name then
-						if server and server ~= "" then name = name.."-"..server end
-						owner = { id = id, name = name }
+				local ownerName			      = GetPetOwner(action.playerid)
+
+				if ownerName then
+
+					local id		      = UnitGUID(ownerName) or GetRussianOwnerID(ownerName)
+
+
+					if players[id] then
+
+						owner		      = { id = id, name = ownerName }
 						pets[action.playerid] = owner
 					end
 				end
 			end
-			if not owner then
-				-- Couldn't resolve the owner. Modify guid so that there will only be 1 similar entry at least.
-				action.playerid = action.playername
-			end
+
+
+			if not owner then action.playerid = action.playername end
 		end
+
 
 		if owner then
+
 			if self.db.profile.mergepets then
-				if action.spellname then
-					action.spellname = action.playername..": "..action.spellname
-				end
-				action.playername = owner.name
-				action.playerid = owner.id
+
+				if action.spellname then action.spellname = action.playername .. ": " .. action.spellname end
+
+
+				action.playername		 = owner.name
+				action.playerid			 = owner.id
 			else
-				action.playername = owner.name..": "..action.playername
-				-- create a unique ID for each player for each type of pet
+				action.playername		 = owner.name .. ": " .. action.playername
 				local _, _, _, _, _, id, spawnId = ("-"):split(action.playerid)
-				action.playerid = owner.id .. id -- just append it to the pets owner id
+				action.playerid			 = owner.id .. id
 			end
 		end
 	end
 end
 
--- Takes a source GUID and name and returns the owner GUID and name if found.
-function Skada:FixMyPets(guid, name)
-	local owner = pets[guid]
-	if owner then
-		return owner.id, owner.name
-	end
-	-- No pet match, return the original source.
-	return guid, name
-end
+
+
 
 function Skada:SetTooltipPosition(tooltip, frame)
 	local p = self.db.profile.tooltippos
@@ -2455,9 +2508,23 @@ function Skada:SetTooltipPosition(tooltip, frame)
 	end
 end
 
--- Format value text in a standardized way. Up to 3 value and boolean (show/don't show) combinations are accepted.
--- Values are rendered from left to right.
--- Idea: "compile" a function on the fly instead and store in mode for re-use.
+
+
+
+function Skada:FixMyPets(playerGUID, playerName)
+
+	local pet = pets[playerGUID]
+
+
+	if pet then return pet.id, pet.name end
+
+
+	return playerGUID, playerName
+end
+
+
+
+
 function Skada:FormatValueText(...)
 	local value1, bool1, value2, bool2, value3, bool3 = ...
 

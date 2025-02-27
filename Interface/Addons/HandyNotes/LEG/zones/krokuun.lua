@@ -1,23 +1,23 @@
 -------------------------------------------------------------------------------
 ---------------------------------- NAMESPACE ----------------------------------
 -------------------------------------------------------------------------------
-local _, Legion = ...
-local Class = Legion.Class
-local L = Legion.locale
-local Map = Legion.Map
+local ADDON_NAME, ns = ...
+local Class = ns.Class
+local L = ns.locale
+local Map = ns.Map
 
-local Treasure = Legion.node.Treasure
-local Rare = Legion.node.Rare
+local Treasure = ns.node.Treasure
+local Rare = ns.node.Rare
 
-local Achievement = Legion.reward.Achievement
-local Item = Legion.reward.Item
-local Mount = Legion.reward.Mount
-local Pet = Legion.reward.Pet
-local Section = Legion.reward.Section
-local Toy = Legion.reward.Toy
-local Transmog = Legion.reward.Transmog
+local Achievement = ns.reward.Achievement
+local Item = ns.reward.Item
+local Mount = ns.reward.Mount
+local Pet = ns.reward.Pet
+local Section = ns.reward.Section
+local Toy = ns.reward.Toy
+local Transmog = ns.reward.Transmog
 
-local POI = Legion.poi.POI
+local POI = ns.poi.POI
 
 -------------------------------------------------------------------------------
 
@@ -176,7 +176,7 @@ map.nodes[70503370] = Rare({
 
 map.nodes[51307620] = Treasure({
     quest = 48884,
-    requires = Legion.requirement.Quest(47994), -- Forming a Bond (Lightforged Warframe)
+    requires = ns.requirement.Quest(47994), -- Forming a Bond (Lightforged Warframe)
     note = L['lightforged_warframe_treasure_note'],
     rewards = {
         Achievement({id = 12074, criteria = 37592}),
@@ -186,21 +186,21 @@ map.nodes[51307620] = Treasure({
 
 map.nodes[48505890] = Treasure({
     quest = 48886,
-    requires = Legion.requirement.Quest(47287), -- The Vindicaar Matrix Core (Light's Judgement)
+    requires = ns.requirement.Quest(47287), -- The Vindicaar Matrix Core (Light's Judgement)
     note = L['lights_judgement_treasure_note'],
     rewards = {Achievement({id = 12074, criteria = 37594})}
 }) -- Lost Krokul Chest
 
 map.nodes[62803760] = Treasure({
     quest = 48885,
-    requires = Legion.requirement.Quest(47287), -- The Vindicaar Matrix Core (Light's Judgement)
+    requires = ns.requirement.Quest(47287), -- The Vindicaar Matrix Core (Light's Judgement)
     note = L['lights_judgement_treasure_note'],
     rewards = {Achievement({id = 12074, criteria = 37593})}
 }) -- Legion Tower Chest
 
 map.nodes[55907410] = Treasure({
     quest = 49156,
-    requires = Legion.requirement.Quest(48107), -- The Sigil of Awakening (Shroud of Arcane Echoes)
+    requires = ns.requirement.Quest(48107), -- The Sigil of Awakening (Shroud of Arcane Echoes)
     note = L['shroud_of_arcane_echoes_treasures_note'],
     rewards = {
         Achievement({id = 12074, criteria = 37959}),
@@ -210,7 +210,7 @@ map.nodes[55907410] = Treasure({
 
 map.nodes[75106980] = Treasure({
     quest = 49154,
-    requires = Legion.requirement.Quest(48107), -- The Sigil of Awakening (Shroud of Arcane Echoes)
+    requires = ns.requirement.Quest(48107), -- The Sigil of Awakening (Shroud of Arcane Echoes)
     note = L['shroud_of_arcane_echoes_treasures_note'],
     rewards = {
         Achievement({id = 12074, criteria = 37958}),
@@ -223,10 +223,10 @@ map.nodes[75106980] = Treasure({
 -------------------------------------------------------------------------------
 
 local EWSupplies = Class('EWSupplies', Treasure, {
-    group = Legion.groups.EREDAR_WAR_SUPPLIES,
+    group = ns.groups.EREDAR_WAR_SUPPLIES,
     label = L['eredar_war_supplies'],
     note = L['eredar_war_supplies_note'],
-    requires = Legion.requirement.Quest(48199), -- The Burning Heart
+    requires = ns.requirement.Quest(48199), -- The Burning Heart
     rewards = {
         Transmog({item = 152946, slot = L['plate']}), -- World-Defiler's Casque
         Transmog({item = 152944, slot = L['plate']}), -- World-Defiler's Shoulderplates
