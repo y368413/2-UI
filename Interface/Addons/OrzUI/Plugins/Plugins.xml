@@ -1,0 +1,24 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Include file="Mog\Mog.xml"/>
+	<Include file="Pet\Pet.xml"/>
+	<Include file="Chat\Chat.xml"/>
+	<Include file="Loot\Loot.xml"/>
+	<Include file="Raid\Raid.xml"/>
+	<Include file="Quest\Quest.xml"/>
+	<Include file="Notice\Notice.xml"/>
+	<Include file="Modify\Modify.xml"/>
+	<Include file="AceExtensions\AceExtensions.xml"/>
+	<!--Button name="SettingsPanelReloadUI" inherits="UIPanelButtonTemplate" text="RELOADUI" parent="SettingsPanel">
+		<Size x="96" y="22"/>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" x="16" y="16"/>
+		</Anchors>
+		<Scripts>
+			<OnClick>
+				PlaySound(SOUNDKIT.IG_MAINMENU_LOGOUT);
+				ReloadUI();
+				HideUIPanel(InterfaceOptionsFrame);
+			</OnClick>
+		</Scripts>
+	</Button-->
+</Ui>

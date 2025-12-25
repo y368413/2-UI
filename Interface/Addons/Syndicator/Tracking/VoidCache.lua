@@ -1,3 +1,6 @@
+---@class addonTableSyndicator
+local addonTable = select(2, ...)
+
 SyndicatorVoidCacheMixin = {}
 
 local VOID_STORAGE_EVENTS = {
@@ -15,7 +18,7 @@ function SyndicatorVoidCacheMixin:OnLoad()
 
   FrameUtil.RegisterFrameForEvents(self, VOID_STORAGE_EVENTS)
 
-  self.currentCharacter = Syndicator.Utilities.GetCharacterFullName()
+  self.currentCharacter = addonTable.Utilities.GetCharacterFullName()
 end
 
 function SyndicatorVoidCacheMixin:OnEvent(eventName, ...)
@@ -30,10 +33,10 @@ function SyndicatorVoidCacheMixin:ScanVoidStorage()
   local void = {}
 
   local function FireVoidChange()
-    if Syndicator.Config.Get(Syndicator.Config.Options.DEBUG_TIMERS) then
+    if addonTable.Config.Get(addonTable.Config.Options.DEBUG_TIMERS) then
       print("void took", debugprofilestop() - start)
     end
-    Syndicator.CallbackRegistry:TriggerEvent("VoidCacheUpdate", self.currentCharacter)
+    addonTable.CallbackRegistry:TriggerEvent("VoidCacheUpdate", self.currentCharacter)
   end
 
   local function DoSlot(page, slot)
@@ -63,7 +66,7 @@ function SyndicatorVoidCacheMixin:ScanVoidStorage()
         if C_Item.IsItemDataCachedByID(itemID) then
           DoSlot(page, slot)
         else
-          Syndicator.Utilities.LoadItemData(itemID, function()
+          addonTable.Utilities.LoadItemData(itemID, function()
             DoSlot(page, slot)
 
             if loopsFinished and waiting == 0 then

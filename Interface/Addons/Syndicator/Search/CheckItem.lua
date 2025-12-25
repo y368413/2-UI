@@ -1,3 +1,6 @@
+---@class addonTableSyndicator
+local addonTable = select(2, ...)
+
 -- Creates all the search keyword functions and binds them to locale dependent
 -- keywords and the English equivalent
 
@@ -6,7 +9,7 @@ local function GetItemName(details)
     return
   end
 
-  if details.itemID == Syndicator.Constants.BattlePetCageID and details.itemLink:find("battlepet:") then
+  if details.itemID == addonTable.Constants.BattlePetCageID and details.itemLink:find("battlepet:") then
     local petID = details.itemLink:match("battlepet:(%d+)")
     details.itemName = C_PetJournal.GetPetInfoBySpeciesID(tonumber(petID))
   elseif C_Item.IsItemDataCachedByID(details.itemID) then
@@ -18,28 +21,54 @@ local function GetItemName(details)
   end
 end
 
-local function GetClassSubClass(details)
-  if details.classID then
-    return
-  end
+local GetClassSubClass
+if addonTable.Constants.IsEra then
+  GetClassSubClass = function(details)
+    if details.classID then
+      return
+    end
 
-  if details.itemID == Syndicator.Constants.BattlePetCageID and details.itemLink:find("battlepet:") then
-    local petID = details.itemLink:match("battlepet:(%d+)")
-    local _, _, petType = C_PetJournal.GetPetInfoBySpeciesID(tonumber(petID))
-    details.classID = Enum.ItemClass.Battlepet
-    details.subClassID = petType - 1
-  else
-    local classID, subClassID = select(6, C_Item.GetItemInfoInstant(details.itemID))
-    details.classID = classID
-    details.subClassID = subClassID
+    local override = addonTable.Search.Constants.TypeOverridesMap[details.itemID]
+    if override then
+      details.classID = override.classID
+      details.subClassID = override.subClassID
+    else
+      local _
+      _, _, _, details.invType, _, details.classID, details.subClassID = C_Item.GetItemInfoInstant(details.itemID)
+      if details.invType == "INVTYPE_CLOAK" then
+        details.subClassID = 0
+      end
+    end
+  end
+else
+  GetClassSubClass = function(details)
+    if details.classID then
+      return
+    end
+
+    if details.itemID == addonTable.Constants.BattlePetCageID and details.itemLink:find("battlepet:") then
+      local petID = details.itemLink:match("battlepet:(%d+)")
+      local _, _, petType = C_PetJournal.GetPetInfoBySpeciesID(tonumber(petID))
+      details.classID = Enum.ItemClass.Battlepet
+      details.subClassID = petType - 1
+    else
+      local _
+      _, _, _, details.invType, _, details.classID, details.subClassID = C_Item.GetItemInfoInstant(details.itemID)
+      if details.invType == "INVTYPE_CLOAK" then
+        details.subClassID = 0
+      end
+    end
   end
 end
+addonTable.Search.GetClassSubClass = GetClassSubClass
 
 local function GetInvType(details)
   if details.invType then
     return
   end
-  details.invType = (select(4, C_Item.GetItemInfoInstant(details.itemID))) or "NONE"
+  local _
+  _, _, _, details.invType = C_Item.GetItemInfoInstant(details.itemID)
+  details.invType = details.invType or "NONE"
 end
 
 local function PetCheck(details)
@@ -48,7 +77,7 @@ local function PetCheck(details)
 end
 
 local ReagentCheck
-if Syndicator.Constants.IsClassic then
+if addonTable.Constants.IsClassic then
   ReagentCheck = function(details)
     GetClassSubClass(details)
     -- Trade good that isn't an explosive or device
@@ -123,9 +152,14 @@ local function SwordCheck(details)
   return details.classID == Enum.ItemClass.Weapon and (details.subClassID == Enum.ItemWeaponSubclass.Sword2H or details.subClassID == Enum.ItemWeaponSubclass.Sword1H)
 end
 
+local function RingCheck(details)
+  GetInvType(details)
+  return details.invType == "INVTYPE_FINGER"
+end
+
 local function StaffCheck(details)
   GetClassSubClass(details)
-  return details.classID == Enum.ItemClass.Weapon and (details.subClassID == Enum.ItemWeaponSubclass.Stave)
+  return details.classID == Enum.ItemClass.Weapon and (details.subClassID == 10)
 end
 
 local function MountCheck(details)
@@ -161,7 +195,7 @@ end
 
 -- Compare item spell details to determine if this item's spell is one for
 -- profession knowledge, using base spell for the spell's name
-local baseKnowledgeSpell, baseKnowledgeName = 384372
+local baseKnowledgeSpell, baseKnowledgeName = 384372, nil
 local function KnowledgeCheck(details)
   if baseKnowledgeName == nil then -- cache the comparison name
     if not C_Spell.IsSpellDataCached(baseKnowledgeSpell) then
@@ -178,7 +212,7 @@ local function KnowledgeCheck(details)
   if spellID == nil then
     return false
   end
-  if spellID and not spellName then
+  if spellID and (not spellName or not C_Spell.IsSpellDataCached(spellID)) then
     C_Spell.RequestLoadSpellData(spellID)
     return nil
   end
@@ -188,18 +222,71 @@ local function KnowledgeCheck(details)
   return spellName == baseKnowledgeName and (spellInfo.iconID == 236225 or spellInfo.iconID == 136175)
 end
 
+local function EnsembleCheck(details)
+  GetInvType(details)
+  GetClassSubClass(details)
+
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return nil
+  end
+
+  if details.classID == Enum.ItemClass.Consumable and details.invType == "INVTYPE_NON_EQUIP_IGNORE" and (C_Item.IsDressableItemByID or IsDressableItem)(details.itemID) then
+    if details.setSources == nil then
+      local setID = C_Item.GetItemLearnTransmogSet(details.itemLink)
+      if setID then
+        details.setSources = C_Transmog.GetAllSetAppearancesByID(setID)
+      end
+    end
+    if not details.setSources then
+      return true
+    end
+    local invSlot = details.setSources[1].invSlot + 1
+    return invSlot ~= 16 and invSlot ~= 17
+  end
+  return false
+end
+
+local function ArsenalCheck(details)
+  GetInvType(details)
+  GetClassSubClass(details)
+
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return nil
+  end
+
+  if details.classID == Enum.ItemClass.Consumable and details.invType == "INVTYPE_NON_EQUIP_IGNORE" and (C_Item.IsDressableItemByID or IsDressableItem)(details.itemID) then
+    if details.setSources == nil then
+      local setID = C_Item.GetItemLearnTransmogSet(details.itemLink)
+      if setID then
+        details.setSources = C_Transmog.GetAllSetAppearancesByID(setID)
+      end
+    end
+    if not details.setSources then
+      return false
+    end
+    local invSlot = details.setSources[1].invSlot + 1
+    return invSlot == 16 or invSlot == 17
+  end
+  return false
+end
+
 local function GetSourceID(itemLink)
   local _, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
   if sourceID then
     return sourceID
   end
-  local _, sourceID = C_TransmogCollection.GetItemInfo((C_Item.GetItemInfoInstant(itemLink)))
-  return sourceID
+  _, sourceID = C_TransmogCollection.GetItemInfo((C_Item.GetItemInfoInstant(itemLink)))
+  if sourceID then
+    return sourceID
+  end
+  return addonTable.Search.RecoverTransmogInfo(itemLink)
 end
 
 local function IsTMogCollectedCompletionist(itemLink)
   local sourceID = GetSourceID(itemLink)
-  if not sourceID then
+  if not sourceID or not select(2, C_TransmogCollection.AccountCanCollectSource(sourceID)) then
     return nil
   else
     return C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(sourceID)
@@ -208,7 +295,7 @@ end
 
 local function IsTMogCollectedUnique(itemLink)
   local sourceID = GetSourceID(itemLink)
-  if not sourceID then
+  if not sourceID or not select(2, C_TransmogCollection.AccountCanCollectSource(sourceID)) then
     return
   else
     local subClass = select(7, C_Item.GetItemInfoInstant(itemLink))
@@ -259,14 +346,14 @@ local function CollectedCheck(details)
 
   local result = nil
 
-  if C_TransmogCollection and Syndicator.Utilities.IsEquipment(details.itemLink) then
+  if C_TransmogCollection and addonTable.Utilities.IsEquipment(details.itemLink) then
     if ATTC and ATTC.Settings and ATTC.Settings.Get and ATTC.Settings:Get("Completionist") then
       result = IsTMogCollectedCompletionist(details.itemLink)
     else
       result = IsTMogCollectedUnique(details.itemLink)
     end
   end
-  if C_PetJournal and details.itemID == Syndicator.Constants.BattlePetCageID then
+  if C_PetJournal and details.itemID == addonTable.Constants.BattlePetCageID then
     result = IsPetCollected(details.itemLink)
   end
   if C_ToyBox and C_ToyBox.GetToyInfo(details.itemID) ~= nil then
@@ -287,14 +374,14 @@ local function UncollectedCheck(details)
 
   local result = nil
 
-  if C_TransmogCollection and Syndicator.Utilities.IsEquipment(details.itemLink) then
+  if C_TransmogCollection and addonTable.Utilities.IsEquipment(details.itemLink) then
     if ATTC and ATTC.Settings and ATTC.Settings.Get and ATTC.Settings:Get("Completionist") then
       result = IsTMogCollectedCompletionist(details.itemLink)
     else
       result = IsTMogCollectedUnique(details.itemLink)
     end
   end
-  if C_PetJournal and details.itemID == Syndicator.Constants.BattlePetCageID then
+  if C_PetJournal and details.itemID == addonTable.Constants.BattlePetCageID then
     result = IsPetCollected(details.itemLink)
   end
   if C_ToyBox and C_ToyBox.GetToyInfo(details.itemID) ~= nil then
@@ -309,6 +396,40 @@ local function UncollectedCheck(details)
   end
 
   return result or false, result == true
+end
+
+local function CatalystCheck(details)
+  if not TransmogUpgradeMaster_API then
+    return false
+  end
+
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return nil
+  end
+
+  if not TransmogUpgradeMaster_API.IsCacheWarmedUp() then
+    return false, true
+  end
+
+  return select(3, TransmogUpgradeMaster_API.IsAppearanceMissing(details.itemLink)) == true
+end
+
+local function CatalystUpgradeCheck(details)
+  if not TransmogUpgradeMaster_API then
+    return false
+  end
+
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return nil
+  end
+
+  if not TransmogUpgradeMaster_API.IsCacheWarmedUp() then
+    return false, true
+  end
+
+  return select(4, TransmogUpgradeMaster_API.IsAppearanceMissing(details.itemLink)) == true
 end
 
 
@@ -331,13 +452,38 @@ local function MyClassCheck(details)
     return true
   end
 
-  local classGear = Syndicator.Search.Constants.ClassGear
+  local classGear = addonTable.Search.Constants.ClassGear
   if classGear[details.classID] and classGear[details.classID][details.subClassID]
     and (next(classGear[details.classID][details.subClassID]) == nil or
       classGear[details.classID][details.subClassID][details.invType]) then
     return true
   end
   return false
+end
+
+local function GetTooltipInfoLink(details)
+  if details.tooltipInfoLink then
+    return
+  end
+
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return
+  end
+
+  local _, spellID = C_Item.GetItemSpell(details.itemID)
+  if spellID and not C_Spell.IsSpellDataCached(spellID) then
+    C_Spell.RequestLoadSpellData(spellID)
+    return
+  end
+
+  if C_TooltipInfo then
+    details.tooltipInfoLink = C_TooltipInfo.GetHyperlink(details.itemLink) or {lines={}}
+  elseif details.itemID == addonTable.Constants.BattlePetCageID then
+    details.tooltipInfoLink = {lines = {}}
+  else
+    details.tooltipInfoLink = addonTable.Utilities.DumpClassicTooltip(function(tooltip) tooltip:SetHyperlink(details.itemLink) end)
+  end
 end
 
 local function GetTooltipInfoSpell(details)
@@ -358,6 +504,9 @@ local function GetTooltipInfoSpell(details)
 
   details.tooltipInfoSpell = details.tooltipGetter() or {lines={}}
 end
+
+addonTable.Search.GetTooltipInfoLink = GetTooltipInfoLink
+addonTable.Search.GetTooltipInfoSpell = GetTooltipInfoSpell
 
 local JUNK_PATTERN = "^" .. SELL_PRICE
 local function JunkCheck(details)
@@ -389,7 +538,7 @@ local function UpgradeCheck(details)
 end
 
 local function BindOnEquipCheck(details)
-  if details.isBound or (not Syndicator.Utilities.IsEquipment(details.itemLink) and details.classID ~= Enum.ItemClass.Container) then
+  if details.isBound or (not addonTable.Utilities.IsEquipment(details.itemLink) and details.classID ~= Enum.ItemClass.Container) then
     return false
   end
 
@@ -406,16 +555,22 @@ local function BindOnEquipCheck(details)
 end
 
 local function BindOnAccountCheck(details)
+  if details.accountBound ~= nil then
+    return details.accountBound
+  end
+
   GetTooltipInfoSpell(details)
 
   if details.tooltipInfoSpell then
+    details.accountBound = false
     for _, row in ipairs(details.tooltipInfoSpell.lines) do
-      if tIndexOf(Syndicator.Constants.AccountBoundTooltipLines, row.leftText) ~= nil or
-          (not details.isBound and tIndexOf(Syndicator.Constants.AccountBoundTooltipLinesNotBound, row.leftText) ~= nil) then
-        return true
+      if tIndexOf(addonTable.Constants.AccountBoundTooltipLines, row.leftText) ~= nil or
+          (not details.isBound and tIndexOf(addonTable.Constants.AccountBoundTooltipLinesNotBound, row.leftText) ~= nil) then
+        details.accountBound = true
+        break
       end
     end
-    return false
+    return details.accountBound
   end
 end
 
@@ -425,7 +580,7 @@ local function WarboundUntilEquippedCheck(details)
   if details.tooltipInfoSpell then
     if not details.isBound then
       for _, row in ipairs(details.tooltipInfoSpell.lines) do
-        if not details.isBound and tIndexOf(Syndicator.Constants.AccountBoundTooltipLinesNotBound, row.leftText) ~= nil then
+        if not details.isBound and tIndexOf(addonTable.Constants.AccountBoundTooltipLinesNotBound, row.leftText) ~= nil then
           return true
         end
       end
@@ -477,7 +632,7 @@ local function UseCheck(details)
     for _, row in ipairs(details.tooltipInfoSpell.lines) do
       if row.leftColor.r == 0 and row.leftColor.g == 1 and row.leftColor.b == 0 and row.leftText:match("^" .. ITEM_SPELL_TRIGGER_ONUSE) then
         usableSeen = true
-      elseif row.leftColor.r == 1 and row.leftColor.g < 0.2 and row.leftColor.b < 0.2 then
+      elseif row.leftColor.r == 1 and row.leftColor.g < 0.2 and row.leftColor.b < 0.2 and row.leftText ~= SPELL_FAILED_NOT_HERE then
         return false
       end
     end
@@ -490,7 +645,7 @@ local function UsableCheck(details)
 
   if details.tooltipInfoSpell then
     for _, row in ipairs(details.tooltipInfoSpell.lines) do
-      if row.leftColor.r == 1 and row.leftColor.g < 0.2 and row.leftColor.b < 0.2 then
+      if row.leftColor.r == 1 and row.leftColor.g < 0.2 and row.leftColor.b < 0.2 and row.leftText ~= SPELL_FAILED_NOT_HERE  then
         return false
       end
       if row.rightColor and row.rightColor.r == 1 and row.rightColor.g < 0.2 and row.rightColor.b < 0.2 then
@@ -499,6 +654,38 @@ local function UsableCheck(details)
     end
     return true
   end
+end
+
+local function ActiveSeasonCheck(details)
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return
+  end
+  if not addonTable.Utilities.IsEquipment(details.itemLink) then
+    return false
+  end
+  local upgradeInfo = C_Item.GetItemUpgradeInfo(details.itemLink)
+  if not upgradeInfo or not upgradeInfo.trackString then
+    return false
+  end
+
+  GetTooltipInfoSpell(details)
+
+  if details.tooltipInfoSpell then
+    for index = 1, math.min(#details.tooltipInfoSpell.lines, 4) do
+      local row = details.tooltipInfoSpell.lines[index]
+      local r, g, b = math.floor(row.leftColor.r * 100), math.floor(row.leftColor.g * 100), math.floor(row.leftColor.b * 100)
+      if r == g and g == b and r < 60 then
+        return false
+      end
+    end
+    return true
+  end
+end
+
+local function CurrentExpansionCheck(details)
+  details.expacID = details.expacID or addonTable.Search.GetExpansion(details)
+  return details.expacID and details.expacID == LE_EXPANSION_LEVEL_CURRENT
 end
 
 local function OpenCheck(details)
@@ -542,7 +729,7 @@ end
 local GetItemStats = C_Item.GetItemStats or GetItemStats
 
 local function SaveGearStats(details)
-  if not Syndicator.Utilities.IsEquipment(details.itemLink) then
+  if not addonTable.Utilities.IsEquipment(details.itemLink) then
     details.itemStats = {}
     return
   end
@@ -608,9 +795,40 @@ local function UniqueCheck(details)
   return false
 end
 
+-- Additional check for quest items because some are tagged wrong
+local function QuestCheck(details)
+  GetTooltipInfoSpell(details)
+
+  if not details.tooltipInfoSpell then
+    return
+  end
+
+  for _, row in ipairs(details.tooltipInfoSpell.lines) do
+    if row.leftText == ITEM_BIND_QUEST or row.leftText == ITEM_STARTS_QUEST then
+      return true
+    end
+  end
+  return false
+end
+
+local function ConjuredCheck(details)
+  GetTooltipInfoSpell(details)
+
+  if not details.tooltipInfoSpell then
+    return
+  end
+
+  for _, row in ipairs(details.tooltipInfoSpell.lines) do
+    if row.leftText == ITEM_CONJURED then
+      return true
+    end
+  end
+  return false
+end
+
 local PVP_PATTERN = PVP_ITEM_LEVEL_TOOLTIP:gsub("%%d", ".*")
 local function PvPCheck(details)
-  if not Syndicator.Utilities.IsEquipment(details.itemLink) then
+  if not addonTable.Utilities.IsEquipment(details.itemLink) then
     return false
   end
 
@@ -651,14 +869,26 @@ local function LockedCheck(details)
   return false
 end
 
-local CRAFTED_PATTERN = ITEM_CREATED_BY:gsub("%%s", ".+")
-
-local function CraftedCheck(details)
-  return details.quality ~= 7 and details.classID ~= Enum.ItemClass.Questitem and details.itemLink:match("Player-") ~= nil
+local CraftedCheck
+if addonTable.Constants.IsEra then
+  local craftedClasses = {
+    [Enum.ItemClass.Armor] = true,
+    [Enum.ItemClass.Weapon] = true,
+    [Enum.ItemClass.Container] = true,
+    [Enum.ItemClass.Quiver] = true,
+  }
+  CraftedCheck = function(details)
+    local _, _, _, _, _, classID = C_Item.GetItemInfoInstant(details.itemID)
+    return craftedClasses[classID] ~= nil and CraftInfoAnywhere ~= nil and CraftInfoAnywhere.Data.ItemsToRecipes[details.itemID] ~= nil
+  end
+else
+  CraftedCheck = function(details)
+    return (details.quality ~= 7 and details.classID ~= Enum.ItemClass.Questitem and details.itemLink:match("Player%-") ~= nil)
+  end
 end
 
 local function SetBonusCheck(details)
-  if not Syndicator.Utilities.IsEquipment(details.itemLink) then
+  if not addonTable.Utilities.IsEquipment(details.itemLink) then
     return false
   end
 
@@ -678,12 +908,47 @@ local function SetBonusCheck(details)
 
   -- We would use the specID in the item link, but that doesn't always
   -- correspond to the class that can use the item
-  for _, specID in ipairs(Syndicator.Search.Constants.AllClassSpecializations) do
+  for _, specID in ipairs(addonTable.Search.Constants.AllClassSpecializations) do
     if C_Item.GetSetBonusesForSpecializationByItemID(specID, details.itemID) ~= nil then
       return true
     end
   end
   return false
+end
+
+local classRestrictionsPattern = ITEM_CLASSES_ALLOWED:gsub("%%s", ".+")
+local multipleUniquesPattern = ITEM_UNIQUE_MULTIPLE:gsub("%%d", ".+")
+-- Check for items with the appropriate item class (which have a lot of
+-- variation), not common (to exclude glyphs) and have a class restriction.
+local function TierTokenCheck(details)
+  GetInvType(details)
+  GetClassSubClass(details)
+
+  if details.quality <= 1 or details.invType ~= "INVTYPE_NON_EQUIP_IGNORE" or (details.classID ~= Enum.ItemClass.Consumable and details.classID ~= Enum.ItemClass.Armor and details.classID ~= Enum.ItemClass.Weapon and details.classID ~= Enum.ItemClass.Miscellaneous and details.classID ~= Enum.ItemClass.Reagent) then
+    return false
+  end
+
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return nil
+  end
+
+  if (C_Item.IsDressableItemByID or IsDressableItem)(details.itemID) then
+    return false
+  end
+
+  GetTooltipInfoLink(details)
+
+  if details.tooltipInfoLink then
+    for _, row in ipairs(details.tooltipInfoLink.lines) do
+      if row.leftText == ITEM_UNIQUE or row.leftText:match(multipleUniquesPattern) then
+        return false
+      elseif row.leftText:match(classRestrictionsPattern) then
+        return true
+      end
+    end
+    return false
+  end
 end
 
 local function UseATTInfo(details)
@@ -717,11 +982,11 @@ local KEYWORDS_TO_CHECK = {}
 local KEYWORD_AND_CATEGORY = {}
 local KEYWORD_AND_CATEGORY_ENGLISH = {}
 
-function Syndicator.Search.CleanKeyword(keyword)
+function addonTable.Search.CleanKeyword(keyword)
   return keyword:gsub("[()&|~!]", " "):gsub("%s+", " "):gsub(" $", "")
 end
 local function AddKeywordInternal(keyword, check)
-  keyword = Syndicator.Search.CleanKeyword(keyword)
+  keyword = addonTable.Search.CleanKeyword(keyword)
   local old = KEYWORDS_TO_CHECK[keyword]
   if old then
     KEYWORDS_TO_CHECK[keyword] = function(...) return old(...) or check(...) end
@@ -741,7 +1006,7 @@ local function AddKeywordDirect(keyword, check, group)
 end
 
 local function AddKeywordLocalised(key, check, group)
-  local keyword = AddKeywordInternal(_G["SYNDICATOR_L_" .. key], check)
+  local keyword = AddKeywordInternal(addonTable.Locales[key], check)
   if keyword ~= SYNDICATOR_LOCALES.enUS[key] then
     local englishKeyword = AddKeywordInternal(SYNDICATOR_LOCALES.enUS[key], check)
     table.insert(KEYWORD_AND_CATEGORY_ENGLISH, {keyword = englishKeyword, group = group or ""})
@@ -761,64 +1026,74 @@ local function AddKeywordManual(keywordLocalised, keywordEnglish, check, group)
   table.insert(KEYWORD_AND_CATEGORY, {keyword = keyword, group = group or ""})
 end
 
-AddKeywordLocalised("KEYWORD_PET", PetCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeywordLocalised("KEYWORD_BATTLE_PET", PetCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeywordLocalised("KEYWORD_SOULBOUND", SoulboundCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_BOP", SoulboundCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_BOE", BindOnEquipCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_BWE", BindOnEquipCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_BOU", BindOnUseCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_EQUIPMENT", EquipmentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeywordLocalised("KEYWORD_GEAR", EquipmentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeywordLocalised("KEYWORD_AXE", AxeCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
-AddKeywordLocalised("KEYWORD_MACE", MaceCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
-AddKeywordLocalised("KEYWORD_SWORD", SwordCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
-AddKeywordLocalised("KEYWORD_STAFF", StaffCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
-AddKeywordLocalised("KEYWORD_REAGENT", ReagentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeywordLocalised("KEYWORD_FOOD", FoodCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeywordLocalised("KEYWORD_DRINK", FoodCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeywordLocalised("KEYWORD_POTION", PotionCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeywordLocalised("KEYWORD_SET", SetCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_EQUIPMENT_SET", SetCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_ENGRAVABLE", EngravableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_ENGRAVED", EngravedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_SOCKET", SocketCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_JUNK", JunkCheck, SYNDICATOR_L_GROUP_QUALITY)
-AddKeywordLocalised("KEYWORD_TRASH", JunkCheck, SYNDICATOR_L_GROUP_QUALITY)
-AddKeywordLocalised("KEYWORD_UPGRADE", UpgradeCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_BOA", BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_ACCOUNT_BOUND", BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_USE", UseCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_USABLE", UsableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_OPEN", OpenCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_READ", ReadCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_TRADEABLE_LOOT", IsTradeableLoot, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_TRADABLE_LOOT", IsTradeableLoot, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_RELIC", RelicCheck, SYNDICATOR_L_GROUP_ARMOR_TYPE)
-AddKeywordLocalised("KEYWORD_STACKS", StackableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_SOCKETED", SocketedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_CURRENCY", CurrencyCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_OBJECTIVE", QuestObjectiveCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_COLLECTED", CollectedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_UNCOLLECTED", UncollectedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_MY_CLASS", MyClassCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_PVP", PvPCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordManual(ITEM_UNIQUE:lower(), "unique", UniqueCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_LOCKED", LockedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_REFUNDABLE", RefundableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_CRAFTED", CraftedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_PET", PetCheck, addonTable.Locales.GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_BATTLE_PET", PetCheck, addonTable.Locales.GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_SOULBOUND", SoulboundCheck, addonTable.Locales.GROUP_BINDING_TYPE)
+AddKeywordLocalised("KEYWORD_BOP", SoulboundCheck, addonTable.Locales.GROUP_BINDING_TYPE)
+AddKeywordLocalised("KEYWORD_BOE", BindOnEquipCheck, addonTable.Locales.GROUP_BINDING_TYPE)
+AddKeywordLocalised("KEYWORD_BWE", BindOnEquipCheck, addonTable.Locales.GROUP_BINDING_TYPE)
+AddKeywordLocalised("KEYWORD_BOU", BindOnUseCheck, addonTable.Locales.GROUP_BINDING_TYPE)
+AddKeywordLocalised("KEYWORD_EQUIPMENT", EquipmentCheck, addonTable.Locales.GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_GEAR", EquipmentCheck, addonTable.Locales.GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_AXE", AxeCheck, addonTable.Locales.GROUP_WEAPON_TYPE)
+AddKeywordLocalised("KEYWORD_MACE", MaceCheck, addonTable.Locales.GROUP_WEAPON_TYPE)
+AddKeywordLocalised("KEYWORD_SWORD", SwordCheck, addonTable.Locales.GROUP_WEAPON_TYPE)
+AddKeywordLocalised("KEYWORD_STAFF", StaffCheck, addonTable.Locales.GROUP_WEAPON_TYPE)
+AddKeywordLocalised("KEYWORD_RING", RingCheck, addonTable.Locales.GROUP_ARMOR_TYPE)
+AddKeywordLocalised("KEYWORD_REAGENT", ReagentCheck, addonTable.Locales.GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_FOOD", FoodCheck, addonTable.Locales.GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_DRINK", FoodCheck, addonTable.Locales.GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_POTION", PotionCheck, addonTable.Locales.GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_SET", SetCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_EQUIPMENT_SET", SetCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_ENGRAVABLE", EngravableCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_ENGRAVED", EngravedCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_SOCKET", SocketCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_JUNK", JunkCheck, addonTable.Locales.GROUP_QUALITY)
+AddKeywordLocalised("KEYWORD_TRASH", JunkCheck, addonTable.Locales.GROUP_QUALITY)
+AddKeywordLocalised("KEYWORD_UPGRADE", UpgradeCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_BOA", BindOnAccountCheck, addonTable.Locales.GROUP_BINDING_TYPE)
+AddKeywordLocalised("KEYWORD_ACCOUNT_BOUND", BindOnAccountCheck, addonTable.Locales.GROUP_BINDING_TYPE)
+AddKeywordLocalised("KEYWORD_USE", UseCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_USABLE", UsableCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_OPEN", OpenCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_READ", ReadCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_TRADEABLE_LOOT", IsTradeableLoot, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_TRADABLE_LOOT", IsTradeableLoot, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_RELIC", RelicCheck, addonTable.Locales.GROUP_ARMOR_TYPE)
+AddKeywordLocalised("KEYWORD_STACKS", StackableCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_SOCKETED", SocketedCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_CURRENCY", CurrencyCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_OBJECTIVE", QuestObjectiveCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_COLLECTED", CollectedCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_UNCOLLECTED", UncollectedCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_MY_CLASS", MyClassCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_PVP", PvPCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordManual(ITEM_UNIQUE:lower(), "unique", UniqueCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_CONJURED", ConjuredCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_LOCKED", LockedCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_REFUNDABLE", RefundableCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_CRAFTED", CraftedCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_TIER_TOKEN", TierTokenCheck, addonTable.Locales.GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_ENSEMBLE", EnsembleCheck, addonTable.Locales.GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_ARSENAL", ArsenalCheck, addonTable.Locales.GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_CURRENT_EXPANSION", CurrentExpansionCheck, addonTable.Locales.GROUP_EXPANSION)
+AddKeywordLocalised("KEYWORD_QUEST", QuestCheck, addonTable.Locales.ITEM_TYPE)
 
-if Syndicator.Constants.IsRetail then
-  AddKeywordLocalised("KEYWORD_COSMETIC", CosmeticCheck, SYNDICATOR_L_GROUP_QUALITY)
-  AddKeywordManual(TOY:lower(), "toy", ToyCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-  AddKeywordLocalised("KEYWORD_KEYSTONE", KeystoneCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-  AddKeywordManual(WORLD_QUEST_REWARD_FILTERS_ANIMA:lower(), "anima", AnimaCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-  AddKeywordLocalised("KEYWORD_KNOWLEDGE", KnowledgeCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-  AddKeywordLocalised("KEYWORD_SET_BONUS", SetBonusCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-  if Syndicator.Constants.WarbandBankActive then
-    AddKeywordManual(ITEM_ACCOUNTBOUND:lower(), "warbound", BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-    AddKeywordManual(ITEM_ACCOUNTBOUND_UNTIL_EQUIP:lower(), "warbound until equipped", WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-    AddKeywordLocalised("KEYWORD_WUE", WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+if addonTable.Constants.IsRetail then
+  AddKeywordLocalised("KEYWORD_COSMETIC", CosmeticCheck, addonTable.Locales.GROUP_QUALITY)
+  AddKeywordManual(TOY:lower(), "toy", ToyCheck, addonTable.Locales.GROUP_ITEM_TYPE)
+  AddKeywordLocalised("KEYWORD_KEYSTONE", KeystoneCheck, addonTable.Locales.GROUP_ITEM_TYPE)
+  AddKeywordManual(WORLD_QUEST_REWARD_FILTERS_ANIMA:lower(), "anima", AnimaCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+  AddKeywordLocalised("KEYWORD_KNOWLEDGE", KnowledgeCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+  AddKeywordLocalised("KEYWORD_SET_BONUS", SetBonusCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+  AddKeywordLocalised("KEYWORD_CATALYST", CatalystCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+  AddKeywordLocalised("KEYWORD_CATALYST_UPGRADE", CatalystUpgradeCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+  AddKeywordLocalised("KEYWORD_ACTIVE_SEASON", ActiveSeasonCheck, addonTable.Locales.GROUP_ITEM_DETAIL)
+  if addonTable.Constants.WarbandBankActive then
+    AddKeywordManual(ITEM_ACCOUNTBOUND:lower(), "warbound", BindOnAccountCheck, addonTable.Locales.GROUP_BINDING_TYPE)
+    AddKeywordManual(ITEM_ACCOUNTBOUND_UNTIL_EQUIP:lower(), "warbound until equipped", WarboundUntilEquippedCheck, addonTable.Locales.GROUP_BINDING_TYPE)
+    AddKeywordLocalised("KEYWORD_WUE", WarboundUntilEquippedCheck, addonTable.Locales.GROUP_BINDING_TYPE)
   end
 end
 
@@ -843,7 +1118,7 @@ local sockets = {
   ["EMPTY_SOCKET_SINGINGWIND"] = "singing wind socket",
 }
 
-if Syndicator.Constants.IsClassic and not Syndicator.Constants.IsEra then
+if addonTable.Constants.IsCata then
   sockets["EMPTY_SOCKET_HYDRAULIC"] = "hydraulic socket"
 end
 
@@ -856,7 +1131,7 @@ for key, english in pairs(sockets) do
         return details.itemStats[key] ~= nil
       end
       return nil
-    end, SYNDICATOR_L_GROUP_SOCKET)
+    end, addonTable.Locales.GROUP_SOCKET)
   end
 end
 
@@ -893,17 +1168,10 @@ local inventorySlots = {
   ["INVTYPE_ROBE"] = "chest",
 }
 
-local function GetInvType(details)
-  if details.invType then
-    return
-  end
-  details.invType = (select(4, C_Item.GetItemInfoInstant(details.itemID))) or "NONE"
-end
-
 for slot, english in pairs(inventorySlots) do
   local text = _G[slot]
   if text ~= nil then
-    AddKeywordManual(text:lower(), english, function(details) GetInvType(details) return details.invType == slot end, SYNDICATOR_L_GROUP_SLOT)
+    AddKeywordManual(text:lower(), english, function(details) GetInvType(details) return details.invType == slot end, addonTable.Locales.GROUP_SLOT)
   end
 end
 
@@ -911,7 +1179,7 @@ do
   AddKeywordLocalised("KEYWORD_OFF_HAND", function(details)
     GetInvType(details)
     return details.invType == "INVTYPE_HOLDABLE" or details.invType == "INVTYPE_SHIELD"
-  end, SYNDICATOR_L_GROUP_SLOT)
+  end, addonTable.Locales.GROUP_SLOT)
 end
 
 local moreSlotMappings = {
@@ -924,13 +1192,13 @@ local moreSlotMappings = {
 }
 
 for keyword, slot in pairs(moreSlotMappings) do
-  AddKeywordLocalised(keyword, function(details) GetInvType(details) return details.invType == slot end, SYNDICATOR_L_GROUP_SLOT)
+  AddKeywordLocalised(keyword, function(details) GetInvType(details) return details.invType == slot end, addonTable.Locales.GROUP_SLOT)
 end
 
-if Syndicator.Constants.IsRetail then
+if addonTable.Constants.IsRetail then
   AddKeywordLocalised("KEYWORD_AZERITE", function(details)
     return C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(details.itemID)
-  end, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+  end, addonTable.Locales.GROUP_ITEM_DETAIL)
 end
 
 local TextToExpansion = {
@@ -957,28 +1225,30 @@ local TextToExpansion = {
   ["tww"] = 10,
   ["war within"] = 10,
   ["the war within"] = 10,
+  ["midnight"] = 11,
 }
 
-function Syndicator.Search.GetExpansion(details)
-  if details.itemID == Syndicator.Constants.BattlePetCageID then
+function addonTable.Search.GetExpansion(details)
+  if details.itemID == addonTable.Constants.BattlePetCageID then
     return -1
   end
 
-  local major = Syndicator.Search.GetExpansionInfo(details.itemID)
+  local major = addonTable.Search.GetExpansionInfo(details.itemID)
   if major then
     return major - 1
   end
-  if not Syndicator.Constants.IsRetail then
+  if not addonTable.Constants.IsRetail then
     return -1
   else
-    return (select(15, C_Item.GetItemInfo(details.itemID)))
+    local _, _, _, _, _, _, _, _, _, _, _, _, _, _, xpac = C_Item.GetItemInfo(details.itemID)
+    return xpac
   end
 end
 for key, expansionID in pairs(TextToExpansion) do
   AddKeywordDirect(key, function(details)
-    details.expacID = details.expacID or Syndicator.Search.GetExpansion(details)
+    details.expacID = details.expacID or addonTable.Search.GetExpansion(details)
     return details.expacID and details.expacID == expansionID
-  end, SYNDICATOR_L_GROUP_EXPANSION)
+  end, addonTable.Locales.GROUP_EXPANSION)
 end
 
 local qualityToEnglish = {
@@ -992,10 +1262,10 @@ local qualityToEnglish = {
   [7] = "heirloom",
   [8] = "wow token",
 }
-for key, quality in pairs(Enum.ItemQuality) do
+for _, quality in pairs(Enum.ItemQuality) do
   local term = _G["ITEM_QUALITY" .. quality .. "_DESC"]
   if term then
-    AddKeywordManual(term:lower(), qualityToEnglish[quality], function(details) return details.quality == quality end, SYNDICATOR_L_GROUP_QUALITY)
+    AddKeywordManual(term:lower(), qualityToEnglish[quality], function(details) return details.quality == quality end, addonTable.Locales.GROUP_QUALITY)
   end
 end
 
@@ -1007,7 +1277,7 @@ AddKeywordLocalised("KEYWORD_KEY", function(details)
   else
     return bit.band(keyringBagFamily, itemFamily) ~= 0
   end
-end, SYNDICATOR_L_GROUP_ITEM_TYPE)
+end, addonTable.Locales.GROUP_ITEM_TYPE)
 
 local fishingBagFamily = bit.lshift(1, 16 - 1)
 AddKeywordLocalised("KEYWORD_FISH", function(details)
@@ -1018,7 +1288,7 @@ AddKeywordLocalised("KEYWORD_FISH", function(details)
   else
     return bit.band(fishingBagFamily, itemFamily) ~= 0 and details.classID == 7 and details.subClassID == 8
   end
-end, SYNDICATOR_L_GROUP_TRADE_GOODS)
+end, addonTable.Locales.GROUP_TRADE_GOODS)
 
 local function GetGearStatCheck(statKey)
   return function(details)
@@ -1027,7 +1297,7 @@ local function GetGearStatCheck(statKey)
       return
     end
 
-    for key, value in pairs(details.itemStats) do
+    for key, _ in pairs(details.itemStats) do
       if key:find(statKey, nil, true) ~= nil then
         return true
       end
@@ -1038,19 +1308,19 @@ end
 
 if C_TradeSkillUI and C_TradeSkillUI.GetItemReagentQualityByItemInfo then
   for tier = 1, 5 do
-    AddKeywordManual(SYNDICATOR_L_KEYWORD_RX:format(tier), SYNDICATOR_LOCALES.enUS["KEYWORD_RX"]:format(tier), function(details)
+    AddKeywordManual(addonTable.Locales.KEYWORD_RX:format(tier), SYNDICATOR_LOCALES.enUS["KEYWORD_RX"]:format(tier), function(details)
       if not C_Item.IsItemDataCachedByID(details.itemID) then
         C_Item.RequestLoadItemDataByID(details.itemID)
         return nil
       end
       local craftedQuality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(details.itemID) or C_TradeSkillUI.GetItemCraftedQualityByItemInfo(details.itemLink)
       return craftedQuality == tier
-    end, SYNDICATOR_L_GROUP_QUALITY)
+    end, addonTable.Locales.GROUP_QUALITY)
   end
 end
 
 local function GetGemStatCheck(statKey)
-  local PATTERN1 = "%+" .. statKey -- Retail remix gems
+  local PATTERN1 = "%+%d+%% " .. statKey -- Retail remix gems
   local PATTERN2 = "%+%d+ " .. statKey -- Normal gems
   return function(details)
     GetClassSubClass(details)
@@ -1074,7 +1344,7 @@ end
 
 local function GetResistanceStatCheck(stat)
   return function(details)
-    if not Syndicator.Utilities.IsEquipment(details.itemLink) then
+    if not addonTable.Utilities.IsEquipment(details.itemLink) then
       return false
     end
 
@@ -1142,7 +1412,7 @@ local stats = {
   ["VERSATILITY"] = "versatility",
 }
 
-if Syndicator.Constants.IsClassic and not Syndicator.Constants.IsEra then
+if addonTable.Constants.IsWrath or addonTable.Constants.IsCata then
   stats = {
     ["AGILITY"] = "agility",
     ["ATTACK_POWER"] = "attack power",
@@ -1194,15 +1464,19 @@ if Syndicator.Constants.IsClassic and not Syndicator.Constants.IsEra then
   }
 end
 
+if addonTable.Constants.IsTitan then
+  stats["CR_LIFESTEAL"] = "lifesteal rating"
+end
+
 for s, english in pairs(stats) do
   local keyword = _G["ITEM_MOD_" .. s .. "_SHORT"] or _G["ITEM_MOD_" .. s]
   if keyword ~= nil then
-    AddKeywordManual(keyword:lower(), english, GetGearStatCheck(s), SYNDICATOR_L_GROUP_STAT)
-    AddKeywordManual(keyword:lower(), english, GetGemStatCheck(keyword), SYNDICATOR_L_GROUP_STAT)
+    AddKeywordManual(keyword:lower(), english, GetGearStatCheck(s), addonTable.Locales.GROUP_STAT)
+    AddKeywordManual(keyword:lower(), english, GetGemStatCheck(keyword), addonTable.Locales.GROUP_STAT)
   end
 end
-AddKeywordManual(STAT_ARMOR:lower(), "armor", GetGemStatCheck(STAT_ARMOR), SYNDICATOR_L_GROUP_STAT)
-if Syndicator.Constants.IsClassic then
+AddKeywordLocalised("KEYWORD_ARMOR_STAT", GetGemStatCheck(STAT_ARMOR), addonTable.Locales.GROUP_STAT)
+if addonTable.Constants.IsClassic then
   local resistances = {
     "holy resistance",
     "fire resistance",
@@ -1215,7 +1489,7 @@ if Syndicator.Constants.IsClassic then
   for i, english in pairs(resistances) do
     local keyword = _G["RESISTANCE" .. i .. "_NAME"]
     if keyword ~= nil then
-      AddKeywordManual(keyword:lower(), english, GetResistanceStatCheck(keyword), SYNDICATOR_L_GROUP_STAT)
+      AddKeywordManual(keyword:lower(), english, GetResistanceStatCheck(keyword), addonTable.Locales.GROUP_STAT)
     end
   end
 end
@@ -1246,12 +1520,12 @@ end
 
 local GetItemLevel
 
-if Syndicator.Constants.IsRetail then
+if addonTable.Constants.IsRetail then
   -- On retail a lot of items have item levels that aren't gear so tooltip scans
   -- are used.
   local ITEM_LEVEL_PATTERN = ITEM_LEVEL:gsub("%%d", "(%%d+)")
   GetItemLevel = function(details)
-    if details.itemID == Syndicator.Constants.BattlePetCageID then
+    if details.itemID == addonTable.Constants.BattlePetCageID then
       if details.itemLevel then
         return
       end
@@ -1308,12 +1582,19 @@ local function ItemLevelPatternCheck(details, text)
     return false
   end
 
-  local wantedItemLevel = tonumber(text)
-  return details.itemLevel and details.itemLevel == wantedItemLevel
-end
+  local operator, value = text:match("([><=]?)(%d+)")
 
-local function ExactItemLevelPatternCheck(details, text)
-  return ItemLevelPatternCheck(details, (text:match("%d+")))
+  local wantedItemLevel = tonumber(value)
+
+  if operator == "" or operator == "=" then
+    return details.itemLevel and details.itemLevel == wantedItemLevel
+  elseif operator == "<" then
+  return details.itemLevel and details.itemLevel <= wantedItemLevel
+  elseif operator == ">" then
+    return details.itemLevel and details.itemLevel >= wantedItemLevel
+  else
+    error("Unexpected item level operator")
+  end
 end
 
 local function ItemLevelRangePatternCheck(details, text)
@@ -1325,75 +1606,49 @@ local function ItemLevelRangePatternCheck(details, text)
   return details.itemLevel and details.itemLevel >= tonumber(minText) and details.itemLevel <= tonumber(maxText)
 end
 
-local function ItemLevelMinPatternCheck(details, text)
-  if GetItemLevel(details) == false then
+local function GetAuctionValue(details)
+  if details.auctionValue then
+    return details.auctionValue >= 0
+  end
+  BindOnAccountCheck(details)
+  if details.accountBound == true or details.isBound then
+    details.auctionValue = -1
     return false
+  elseif details.accountBound == nil then
+    return
+  end
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return
   end
 
-  local minText = text:match("%d+")
-  return details.itemLevel and details.itemLevel <= tonumber(minText)
+  details.auctionValue = addonTable.Search.GetAuctionValue(details.itemLink) or -1
+
+  return details.auctionValue >= 0
 end
 
-local function ItemLevelMaxPatternCheck(details, text)
-  if GetItemLevel(details) == false then
-    return false
+local function AHValuePatternCheck(details, text)
+  if GetAuctionValue(details) == false then
+    return details.auctionValue == -2
   end
 
-  local maxText = text:match("%d+")
-  return details.itemLevel and details.itemLevel >= tonumber(maxText)
-end
+  local operator, value, scale = text:match("^([><=]?)(%d+)([gsc])$")
 
-local function ExpansionPatternCheck(details, text)
-  local itemMajor, itemMinor, itemPatch = Syndicator.Search.GetExpansionInfo(details.itemID)
-  if not itemMajor then
-    return false
+  local wantedAuctionValue = tonumber(value)
+  if scale == "g" then
+    wantedAuctionValue = wantedAuctionValue * 10000
+  elseif scale == "s" then
+    wantedAuctionValue = wantedAuctionValue * 100
   end
 
-  local major, minor, patch = text:match("(%d+)%.(%d*)%.?(%d*)")
-  major, minor, patch = tonumber(major), tonumber(minor), tonumber(patch)
-
-  if not minor then
-    return major == itemMajor
-  elseif not patch then
-    return major == itemMajor and minor == itemMinor
+  if operator == "" or operator == "=" then
+    return details.auctionValue and details.auctionValue == wantedAuctionValue
+  elseif operator == "<" then
+    return details.auctionValue and details.auctionValue <= wantedAuctionValue
+  elseif operator == ">" then
+    return details.auctionValue and details.auctionValue >= wantedAuctionValue
   else
-    return major == itemMajor and minor == itemMinor and patch == itemPatch
-  end
-end
-
-local function ExpansionMinPatternCheck(details, text)
-  local itemMajor, itemMinor, itemPatch = Syndicator.Search.GetExpansionInfo(details.itemID)
-  if not itemMajor then
-    return false
-  end
-
-  local major, minor, patch = text:match("(%d+)%.(%d*)%.?(%d*)")
-  major, minor, patch = tonumber(major), tonumber(minor), tonumber(patch)
-
-  if not minor then
-    return major <= itemMajor
-  elseif not patch then
-    return major <= itemMajor and minor <= itemMinor
-  else
-    return major <= itemMajor and minor <= itemMinor and patch <= itemPatch
-  end
-end
-
-local function ExpansionMaxPatternCheck(details, text)
-  local itemMajor, itemMinor, itemPatch = Syndicator.Search.GetExpansionInfo(details.itemID)
-  if not itemMajor then
-    return false
-  end
-
-  local major, minor, patch = text:match("(%d+)%.(%d*)%.?(%d*)")
-  major, minor, patch = tonumber(major), tonumber(minor), tonumber(patch)
-
-  if not minor then
-    return major >= itemMajor
-  elseif not patch then
-    return major >= itemMajor and minor >= itemMinor
-  else
-    return major >= itemMajor and minor >= itemMinor and patch >= itemPatch
+    error("Unexpected auction value operator")
   end
 end
 
@@ -1407,27 +1662,26 @@ local function ExactKeywordCheck(details, text)
 end
 
 local patterns = {
-  ["^%d+$"] = ItemLevelPatternCheck,
-  ["^=%d+$"] = ExactItemLevelPatternCheck,
+  ["^[><=]?%d+$"] = ItemLevelPatternCheck,
   ["^%d+%-%d+$"] = ItemLevelRangePatternCheck,
-  ["^%>%d+$"] = ItemLevelMaxPatternCheck,
-  ["^%<%d+$"] = ItemLevelMinPatternCheck,
-  ["^%d+%.%d*%.?%d*$"] = ExpansionPatternCheck,
-  ["^%>%d+%.%d*%.?%d*$"] = ExpansionMinPatternCheck,
-  ["^%<%d+%.%d*%.?%d*$"] = ExpansionMaxPatternCheck,
+
+  ["^[><=]?%d+[gsc]$"] = AHValuePatternCheck,
+  ["^%d+[gsc]%-%d+[gsc]$"] = AHValueRangePatternCheck,
+
   ["^%#.*$"] = ExactKeywordCheck,
 }
 
 -- Used to prevent equipment and use returning results based on partial words in
 -- tooltip data
 local EXCLUSIVE_KEYWORDS_NO_TOOLTIP_TEXT = {
-  [SYNDICATOR_L_KEYWORD_USE] = true,
+  [addonTable.Locales.KEYWORD_USE] = true,
   [SYNDICATOR_LOCALES.enUS["KEYWORD_USE"]] = true,
-  [SYNDICATOR_L_KEYWORD_EQUIPMENT] = true,
+  [addonTable.Locales.KEYWORD_EQUIPMENT] = true,
   [SYNDICATOR_LOCALES.enUS["KEYWORD_EQUIPMENT"]] = true,
 }
 
 local UPGRADE_PATH_PATTERN = ITEM_UPGRADE_TOOLTIP_FORMAT_STRING and "^" .. ITEM_UPGRADE_TOOLTIP_FORMAT_STRING:gsub("%%s", ".*"):gsub("%%d", ".*")
+local REQUIRES_PATTERN = ITEM_REQ_SKILL:gsub("%s", "(.*)")
 
 local function GetTooltipSpecialTerms(details)
   if details.searchKeywords then
@@ -1448,11 +1702,13 @@ local function GetTooltipSpecialTerms(details)
     for _, line in ipairs(details.tooltipInfoSpell.lines) do
       local term = line.leftText:match("^|cFF......(.*)|r$")
       if term then
-        table.insert(details.searchKeywords, term:lower())
+        -- Cleanup special characters that interfere with typing in text for
+        -- tooltip search
+        table.insert(details.searchKeywords, (term:lower():gsub("\226\128\147", "-"):gsub("\194\160", " ")))
       else
-        local match = line.leftText:match("^" .. ITEM_SPELL_TRIGGER_ONUSE) or line.leftText:match("^" .. ITEM_SPELL_TRIGGER_ONEQUIP) or (UPGRADE_PATH_PATTERN and line.leftText:match(UPGRADE_PATH_PATTERN))
+        local match = line.leftText:match("^" .. ITEM_SPELL_TRIGGER_ONUSE .. ".*") or line.leftText:match("^" .. ITEM_SPELL_TRIGGER_ONEQUIP .. ".*") or (UPGRADE_PATH_PATTERN and line.leftText:match(UPGRADE_PATH_PATTERN)) or line.leftText:match(REQUIRES_PATTERN)
         if details.classID ~= Enum.ItemClass.Recipe and match then
-          table.insert(details.searchKeywords, line.leftText:lower())
+          table.insert(details.searchKeywords, (match:lower():gsub("\226\128\147", "-"):gsub("\194\160", " ")))
         end
       end
     end
@@ -1460,7 +1716,7 @@ local function GetTooltipSpecialTerms(details)
     if #details.tooltipInfoSpell.lines > 1 then
       local color = details.tooltipInfoSpell.lines[2].leftColor
       if color ~= nil and math.floor(color.r * 100) == 52 and math.floor(color.g * 100) == 67 and color.b == 1 then
-        table.insert(details.searchKeywords, details.tooltipInfoSpell.lines[2].leftText:lower())
+        table.insert(details.searchKeywords, (details.tooltipInfoSpell.lines[2].leftText:lower():gsub("\226\128\147", "-"):gsub("\194\160", " ")))
       end
     end
 
@@ -1514,19 +1770,19 @@ local function PatternSearch(searchString)
 end
 
 -- Previously found search terms checks by keyword or pattern
-local matches = {}
+local savedMatches = {}
 -- Search terms with no keyword or pattern match
-local rejects = {}
+local savedRejects = {}
 
 -- Each keyword/pattern check function returns nil if the data needed to
 -- complete the check doesn't exist yet. Then the item will be queued for
 -- checking again on a later frame. If the data is available either true or
 -- false is returned.
 local function ApplyKeyword(searchString)
-  local check = matches[searchString]
-  if check then
-    return check
-  elseif not rejects[searchString] then
+  local savedCheck = savedMatches[searchString]
+  if savedCheck then
+    return savedCheck
+  elseif not savedRejects[searchString] then
     local keywords = BinarySmartSearch(searchString)
     if #keywords > 0 then
       local matchesTextToUse = MatchesText
@@ -1579,21 +1835,21 @@ local function ApplyKeyword(searchString)
           return false, finalDoNotCache
         end
       end
-      matches[searchString] = check
+      savedMatches[searchString] = check
       return check
     end
 
     -- See if a pattern matches, e.g. item level range
     local patternChecker = PatternSearch(searchString)
     if patternChecker then
-      matches[searchString] = patternChecker
+      savedMatches[searchString] = patternChecker
       return function(details)
         return patternChecker(details, searchString)
       end
     end
 
     -- Couldn't find anything that matched
-    rejects[searchString] = true
+    savedRejects[searchString] = true
   end
   return MatchesText
 end
@@ -1720,7 +1976,7 @@ local function ProcessTerms(text)
   else
     local tokens = {}
 
-    local index = 1
+    index = 1
     text = text:gsub("||", "|")
     while index < #text do
       -- Find operators and any surrounding whitespace
@@ -1751,17 +2007,17 @@ local function ProcessTerms(text)
   end
 end
 
-function Syndicator.Search.CheckItem(details, searchString)
+function addonTable.Search.CheckItem(details, searchString)
   details.fullMatchInfo = details.fullMatchInfo or {}
   local result = details.fullMatchInfo[searchString]
   if result ~= nil then
     return details.fullMatchInfo[searchString]
   end
 
-  local check = matches[searchString]
+  local check = savedMatches[searchString]
   if not check then
     check = ProcessTerms(searchString)
-    matches[searchString] = check
+    savedMatches[searchString] = check
   end
 
   local doNotCache
@@ -1772,12 +2028,12 @@ function Syndicator.Search.CheckItem(details, searchString)
   return result
 end
 
-function Syndicator.Search.ClearCache()
-  matches = {}
-  rejects = {}
+function addonTable.Search.ClearCache()
+  savedMatches = {}
+  savedRejects = {}
 end
 
-function Syndicator.Search.InitializeSearchEngine()
+function addonTable.Search.InitializeSearchEngine()
   local classesToCheck = {
     [0] = "consumable",
     [1] = "container",
@@ -1799,12 +2055,13 @@ function Syndicator.Search.InitializeSearchEngine()
     [17] = "battle pets",
     [18] = "wow token",
     [19] = "profession",
+    [20] = "housing",
   }
-  if Syndicator.Constants.IsClassic then
+  if addonTable.Constants.IsClassic then
     classesToCheck[7] = "trade goods"
     classesToCheck[8] = nil
   end
-  if Syndicator.Constants.IsEra then
+  if addonTable.Constants.IsEra then
     classesToCheck[3] = nil
   end
   for i, english in pairs(classesToCheck) do
@@ -1814,46 +2071,71 @@ function Syndicator.Search.InitializeSearchEngine()
       AddKeywordManual(name:lower(), english, function(details)
         GetClassSubClass(details)
         return details.classID == classID
-      end, SYNDICATOR_L_GROUP_ITEM_TYPE)
+      end, addonTable.Locales.GROUP_ITEM_TYPE)
     end
   end
 
-  local tradeGoodsToCheck = {
-    [1] = "parts",
-    [4] = "jewelcrafting",
-    [5] = "cloth",
-    [6] = "leather",
-    [7] = "metal & stone",
-    [8] = "cooking",
-    [9] = "herb",
-    [10] = "elemental",
-    [12] = "enchanting",
-    [16] = "inscription",
-    [18] = "optional reagents",
-    [19] = "finishing reagents",
-  }
-  if Syndicator.Constants.IsClassic then
-    tradeGoodsToCheck[2] = "explosives"
-    tradeGoodsToCheck[3] = "devices"
-    tradeGoodsToCheck[8] = "meat"
-  end
-  for subClass, english in pairs(tradeGoodsToCheck) do
-    local keyword = C_Item.GetItemSubClassInfo(7, subClass)
-    if keyword ~= nil then
-      AddKeywordManual(keyword:lower(), english, function(details)
+  if not addonTable.Constants.IsEra then
+    local tradeGoodsToCheck = {
+      [1] = "parts",
+      [4] = "jewelcrafting",
+      [5] = "cloth",
+      [6] = "leather",
+      [7] = "metal & stone",
+      [8] = "cooking",
+      [9] = "herb",
+      [10] = "elemental",
+      [12] = "enchanting",
+      [16] = "inscription",
+      [18] = "optional reagents",
+      [19] = "finishing reagents",
+    }
+    if addonTable.Constants.IsClassic then
+      tradeGoodsToCheck[2] = "explosives"
+      tradeGoodsToCheck[3] = "devices"
+    end
+    if addonTable.Constants.IsEra or addonTable.Constants.IsBC or addonTable.Constants.IsWrath or addonTable.Constants.IsCata then
+      tradeGoodsToCheck[8] = "meat"
+    end
+    for subClass, english in pairs(tradeGoodsToCheck) do
+      local keyword = C_Item.GetItemSubClassInfo(7, subClass)
+      if keyword ~= nil then
+        AddKeywordManual(keyword:lower(), english, function(details)
+          GetClassSubClass(details)
+          return details.classID == 7 and details.subClassID == subClass
+        end, addonTable.Locales.GROUP_TRADE_GOODS)
+      end
+    end
+  else
+    local tradeGoodsToCheck = {
+      [1] = "PARTS",
+      [2] = "EXPLOSIVES",
+      [3] = "DEVICES",
+      [5] = "CLOTH",
+      [6] = "LEATHER",
+      [7] = "METAL_AND_STONE",
+      [8] = "MEAT",
+      [9] = "HERB",
+      [10] = "ELEMENTAL",
+      [12] = "ENCHANTING",
+    }
+    for subClass, localeString in pairs(tradeGoodsToCheck) do
+      AddKeywordLocalised("KEYWORD_SUBCLASS_" .. localeString, function(details)
         GetClassSubClass(details)
         return details.classID == 7 and details.subClassID == subClass
-      end, SYNDICATOR_L_GROUP_TRADE_GOODS)
+      end, addonTable.Locales.GROUP_TRADE_GOODS)
     end
   end
 
   local armorTypesToCheck = {
+    --[0] = "miscellaneous", -- handled separately
+    --[1] = "cloth", -- also handled separately
     [2] = "leather",
     [3] = "mail",
     [4] = "plate",
     [6] = "shields",
   }
-  if Syndicator.Constants.IsEra then
+  if addonTable.Constants.IsEra then
     for subClass, english in pairs({
         [7] = "librams",
         [8] = "idols",
@@ -1864,52 +2146,54 @@ function Syndicator.Search.InitializeSearchEngine()
       armorTypesToCheck[subClass] = english
     end
   end
-  local er
   for subClass, english in pairs(armorTypesToCheck) do
     local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Armor, subClass)
     if keyword ~= nil then
       AddKeywordManual(keyword:lower(), english, function(details)
         GetClassSubClass(details)
         return details.classID == Enum.ItemClass.Armor and details.subClassID == subClass
-      end, SYNDICATOR_L_GROUP_ARMOR_TYPE)
+      end, addonTable.Locales.GROUP_ARMOR_TYPE)
     end
   end
   -- cloth armor, but excluding cloaks
   AddKeywordManual(C_Item.GetItemSubClassInfo(Enum.ItemClass.Armor, 1):lower(), "cloth", function(details)
     GetClassSubClass(details)
-    GetInvType(details)
-    return details.classID == Enum.ItemClass.Armor and details.subClassID == 1 and details.invType ~= "INVTYPE_CLOAK"
-  end, SYNDICATOR_L_GROUP_ARMOR_TYPE)
+    return details.classID == Enum.ItemClass.Armor and details.subClassID == Enum.ItemArmorSubclass.Cloth
+  end, addonTable.Locales.GROUP_ARMOR_TYPE)
+  AddKeywordLocalised("KEYWORD_MISCELLANEOUS_ARMOR", function(details)
+    GetClassSubClass(details)
+    return details.classID == Enum.ItemClass.Armor and details.subClassID == 0
+  end, addonTable.Locales.GROUP_ARMOR_TYPE)
 
   local weaponTypesToCheck = {
-    "two-handed axes",
-    "bows",
-    "guns",
-    "one-handed maces",
-    "two-handed maces",
-    "polearms",
-    "one-handed swords",
-    "two-handed swords",
-    "warglaives",
-    "staves",
-    "bear claws",
-    "catclaws",
-    "fist weapons",
-    "miscellaneous",
-    "daggers",
-    "thrown",
-    "spears",
-    "crossbows",
-    "wands",
-    "fishing poles",
+    [1] = "two-handed axes",
+    [2] = "bows",
+    [3] = "guns",
+    [4] = "one-handed maces",
+    [5] = "two-handed maces",
+    [6] = "polearms",
+    [7] = "one-handed swords",
+    [8] = "two-handed swords",
+    [9] = "warglaives",
+    [10] = "staves",
+    [11] = "bear claws",
+    [12] = "catclaws",
+    [13] = "fist weapons",
+    --[14] = "miscellaneous", -- handled elsewhere
+    [15] = "daggers",
+    [16] = "thrown",
+    [17] = "spears",
+    [18] = "crossbows",
+    [19] = "wands",
+    [20] = "fishing poles",
     [0] = "one-handed axes",
   }
-  if Syndicator.Constants.IsClassic then
+  if addonTable.Constants.IsClassic then
     weaponTypesToCheck[9] = nil
     weaponTypesToCheck[11] = "one-handed exotics"
     weaponTypesToCheck[12] = "two-handed exotics"
   end
-  if Syndicator.Constants.IsEra then
+  if addonTable.Constants.IsEra then
     weaponTypesToCheck[20] = "fishing pole"
   end
   -- All weapons + fishingpole
@@ -1919,9 +2203,13 @@ function Syndicator.Search.InitializeSearchEngine()
       AddKeywordManual(keyword:lower(), english, function(details)
         GetClassSubClass(details)
         return details.classID == Enum.ItemClass.Weapon and details.subClassID == subClass
-      end, SYNDICATOR_L_GROUP_WEAPON_TYPE)
+      end, addonTable.Locales.GROUP_WEAPON_TYPE)
     end
   end
+  AddKeywordLocalised("KEYWORD_MISCELLANEOUS_WEAPON", function(details)
+    GetClassSubClass(details)
+    return details.classID == Enum.ItemClass.Armor and details.subClassID == 14
+  end, addonTable.Locales.GROUP_WEAPON_TYPE)
 
   local recipeTypesToCheck = {
     "leatherworking",
@@ -1942,7 +2230,7 @@ function Syndicator.Search.InitializeSearchEngine()
       AddKeywordManual(keyword:lower(), english, function(details)
         GetClassSubClass(details)
         return details.classID == Enum.ItemClass.Recipe and details.subClassID == subClass
-      end, SYNDICATOR_L_GROUP_RECIPE)
+      end, addonTable.Locales.GROUP_RECIPE)
     end
   end
 
@@ -1965,7 +2253,7 @@ function Syndicator.Search.InitializeSearchEngine()
         AddKeywordManual(keyword:lower(), english, function(details)
         GetClassSubClass(details)
           return details.classID == Enum.ItemClass.Battlepet and details.subClassID == subClass
-        end, SYNDICATOR_L_GROUP_BATTLE_PET)
+        end, addonTable.Locales.GROUP_BATTLE_PET)
       end
     end
   end
@@ -1990,11 +2278,11 @@ function Syndicator.Search.InitializeSearchEngine()
       AddKeywordManual(keyword:lower(), english, function(details)
         GetClassSubClass(details)
         return details.classID == Enum.ItemClass.Glyph and details.subClassID == subClass
-      end, SYNDICATOR_L_GROUP_GLYPH)
+      end, addonTable.Locales.GROUP_GLYPH)
     end
   end
 
-  if not Syndicator.Constants.IsEra then
+  if not addonTable.Constants.IsEra then
     local consumablesToCheck = {
       "potions",
       "elixirs",
@@ -2009,7 +2297,7 @@ function Syndicator.Search.InitializeSearchEngine()
       "combat curio",
       [0] = "explosives and devices",
     }
-    if Syndicator.Constants.IsClassic then
+    if addonTable.Constants.IsClassic then
       consumablesToCheck[0] = nil
       consumablesToCheck[1] = "potion"
       consumablesToCheck[2] = "elixir"
@@ -2026,30 +2314,75 @@ function Syndicator.Search.InitializeSearchEngine()
         AddKeywordManual(keyword:lower(), english, function(details)
           GetClassSubClass(details)
           return details.classID == Enum.ItemClass.Consumable and details.subClassID == subClass
-        end, SYNDICATOR_L_GROUP_CONSUMABLE)
+        end, addonTable.Locales.GROUP_CONSUMABLE)
       end
+    end
+  else
+    local consumablesToCheck = {
+      [1] = "POTION",
+      [2] = "ELIXIR",
+      [3] = "FLASK",
+      [4] = "SCROLL",
+      [5] = "FOOD_AND_DRINK",
+      [6] = "ITEM_ENHANCEMENT",
+      [8] = "BANDAGES",
+    }
+    for subClass, localeString in pairs(consumablesToCheck) do
+      AddKeywordLocalised("KEYWORD_SUBCLASS_" .. localeString, function(details)
+        GetClassSubClass(details)
+        return details.classID == Enum.ItemClass.Consumable and details.subClassID == subClass
+      end, addonTable.Locales.GROUP_CONSUMABLE)
     end
   end
 
   local mount = C_Item.GetItemSubClassInfo(Enum.ItemClass.Miscellaneous, Enum.ItemMiscellaneousSubclass.Mount)
   if mount ~= nil then
-    AddKeywordManual(mount:lower(), "mount", MountCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+    AddKeywordManual(mount:lower(), "mount", MountCheck, addonTable.Locales.GROUP_ITEM_TYPE)
   end
 
-  Syndicator.Search.RebuildKeywordList()
+  if C_Item.GetItemClassInfo(20) then -- Housing
+    local decorToCheck = {
+      [0] = "decor",
+      [1] = "housing dye",
+      [2] = "room",
+      [3] = "room customization",
+      [4] = "exterior customization",
+      [5] = "service item",
+    }
+    for subClass, english in pairs(decorToCheck) do
+      local keyword = C_Item.GetItemSubClassInfo(20, subClass)
+      if keyword ~= nil then
+        AddKeywordManual(keyword:lower(), english, function(details)
+          GetClassSubClass(details)
+          return details.classID == 20 and details.subClassID == subClass
+        end, addonTable.Locales.GROUP_HOUSING)
+      end
+    end
+  end
+
+  addonTable.Search.RebuildKeywordList()
 end
 
-function Syndicator.Search.RebuildKeywordList()
+function addonTable.Search.RebuildKeywordList()
   for key in pairs(KEYWORDS_TO_CHECK) do
     table.insert(sortedKeywords, key)
   end
   table.sort(sortedKeywords)
 end
 
-function Syndicator.Search.GetKeywords()
+function addonTable.Search.GetKeywords()
   return KEYWORD_AND_CATEGORY
 end
 
-function Syndicator.Search.GetKeywordsEnglish()
+function addonTable.Search.GetKeywordsEnglish()
   return KEYWORD_AND_CATEGORY_ENGLISH
 end
+
+Syndicator.Search.CheckItem = addonTable.Search.CheckItem
+Syndicator.Search.ClearCache = addonTable.Search.ClearCache
+Syndicator.Search.GetKeywords = addonTable.Search.GetKeywords
+Syndicator.Search.GetKeywordsEnglish = addonTable.Search.GetKeywordsEnglish
+Syndicator.Search.GetClassSubClass = addonTable.Search.GetClassSubClass
+Syndicator.Search.GetTooltipInfoSpell = addonTable.Search.GetTooltipInfoSpell
+Syndicator.Search.GetTooltipInfoLink = addonTable.Search.GetTooltipInfoLink
+Syndicator.Search.GetExpansion = addonTable.Search.GetExpansion

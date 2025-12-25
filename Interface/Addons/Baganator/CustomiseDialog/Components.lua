@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 BaganatorCheckBoxMixin = {}
 function BaganatorCheckBoxMixin:OnLoad()
   if DoesTemplateExist("SettingsCheckBoxTemplate") then
@@ -49,23 +50,24 @@ BaganatorSliderMixin = {}
 
 function BaganatorSliderMixin:Init(details)
   Mixin(self, details)
-  self.Slider:SetMinMaxValues(self.min, self.max)
 
-  self.Slider:SetValueStep(1)
-  self.Slider:SetObeyStepOnDrag(true)
-  self.Label:SetText(self.text)
   self.valuePattern = self.valuePattern or "%s"
+
+  self.Slider:Init(self.max, self.min, self.max, self.max - self.min, {
+    [MinimalSliderWithSteppersMixin.Label.Right]  = CreateMinimalSliderFormatter(MinimalSliderWithSteppersMixin.Label.Right, function(value)
+      return WHITE_FONT_COLOR:WrapTextInColorCode(self.valuePattern:format(value))
+    end)
+  })
+
+  self.Label:SetText(self.text)
 
   addonTable.Skins.AddFrame("Slider", self.Slider)
 
-  self.Slider:SetScript("OnValueChanged", function()
-    local value = self.Slider:GetValue()
+  self.Slider:RegisterCallback("OnValueChanged", function(_, value)
     if self.scale then
       value = value / self.scale
-    else
     end
     addonTable.Config.Set(self.option, value)
-    self.ValueText:SetText(self.valuePattern:format(math.floor(self.Slider:GetValue())))
   end)
 end
 
@@ -74,7 +76,7 @@ function BaganatorSliderMixin:SetValue(value)
 end
 
 function BaganatorSliderMixin:OnMouseWheel(delta)
-  self.Slider:SetValue(self.Slider:GetValue() + delta)
+  self.Slider:SetValue(self.Slider.Slider:GetValue() + delta)
 end
 
 BaganatorHeaderMixin = {}
@@ -99,7 +101,7 @@ function addonTable.CustomiseDialog.GetDraggable(callback, movedCallback)
     frame:Hide()
   end)
   frame:Hide()
-  frame.KeepMoving = function(self)
+  frame.KeepMoving = function()
     local uiScale = UIParent:GetEffectiveScale()
     local x, y = GetCursorPosition()
     frame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x / uiScale, y / uiScale)
@@ -125,7 +127,7 @@ function addonTable.CustomiseDialog.GetContainerForDragAndDrop(parent, callback)
       frame.initialized = true
       frame:SetNormalFontObject(GameFontHighlight)
       frame:SetHighlightAtlas("auctionhouse-ui-row-highlight")
-      frame:SetScript("OnClick", function(self, button)
+      frame:SetScript("OnClick", function(self)
         callback(self.value, self:GetText(), self.indexValue)
       end)
       frame.number = frame:CreateFontString(nil, "ARTWORK", "NumberFontNormal")
@@ -147,7 +149,7 @@ function addonTable.CustomiseDialog.GetContainerForDragAndDrop(parent, callback)
 end
 
 function addonTable.CustomiseDialog.GetMouseOverInContainer(c)
-  for index, f in c.ScrollBox:EnumerateFrames() do
+  for _, f in c.ScrollBox:EnumerateFrames() do
     if f:IsMouseOver() then
       return f, f:IsMouseOver(0, f:GetHeight()/2), f.indexValue
     end
@@ -158,20 +160,18 @@ BaganatorCustomSliderMixin = {}
 
 function BaganatorCustomSliderMixin:Init(details)
   Mixin(self, details)
-  self.callback = self.callback or function() end
+  self.callback = self.callback or function(_) end
 
-  self.Slider:SetMinMaxValues(self.min, self.max)
+  self.Slider:Init(self.max, self.min, self.max, self.max - self.min, {
+    [MinimalSliderWithSteppersMixin.Label.Right]  = CreateMinimalSliderFormatter(MinimalSliderWithSteppersMixin.Label.Right, function(value)
+      return WHITE_FONT_COLOR:WrapTextInColorCode(self.valueToText[value])
+    end)
+  })
+
   self.Label:SetText(self.text)
 
-  self.Slider:SetValueStep(1)
-  self.Slider:SetObeyStepOnDrag(true)
-
-  self.Slider:SetScript("OnValueChanged", function(_, _, userInput)
-    local value = self.Slider:GetValue()
-    if userInput then
-      self.callback(value)
-    end
-    self.ValueText:SetText(self.valueToText[value])
+  self.Slider:RegisterCallback("OnValueChanged", function(_, value)
+    self.callback(value)
   end)
   addonTable.Skins.AddFrame("Slider", self.Slider)
 end
@@ -181,13 +181,12 @@ function BaganatorCustomSliderMixin:SetValue(value)
 end
 
 function BaganatorCustomSliderMixin:GetValue()
-  return self.Slider:GetValue()
+  return self.Slider.Slider:GetValue()
 end
 
 function BaganatorCustomSliderMixin:OnMouseWheel(delta)
   if self.Slider:IsEnabled() then
-    self.Slider:SetValue(self.Slider:GetValue() + delta)
-    self.callback(self.Slider:GetValue())
+    self.Slider:SetValue(self.Slider.Slider:GetValue() + delta)
   end
 end
 
@@ -210,7 +209,7 @@ function addonTable.CustomiseDialog.GetDropdown(parent)
     end)
   end
   dropdown.disableSelectionText = true
-  dropdown.OnEntryClicked = function() end
+  dropdown.OnEntryClicked = function(_, _) end
   addonTable.Skins.AddFrame("Dropdown", dropdown)
   return dropdown
 end
@@ -240,10 +239,11 @@ function addonTable.CustomiseDialog.GetBasicDropdown(parent)
       addonTable.Config.Set(option.option, value)
     end, unpack(entries))
   end
-  frame.SetValue = function(_, value)
+  frame.SetValue = function(_, _)
     dropdown:GenerateMenu()
     -- don't need to do anything as dropdown's onshow handles this
   end
+  frame.Label = label
   frame.DropDown = dropdown
   frame:SetHeight(40)
   addonTable.Skins.AddFrame("Dropdown", frame.DropDown)

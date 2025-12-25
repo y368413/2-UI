@@ -61,12 +61,13 @@ Skada:AddLoadableModule("TotalHealing", nil, function(Skada, L)
 				d.id = player.id
 				d.value = player.healing
 				d.label = player.name
-				-- d.valuetext = Skada:FormatNumber(player.healing).." / "..Skada:FormatNumber(player.overhealing)
+
 				d.valuetext = Skada:FormatValueText(
-					Skada:FormatNumber(player.healing), self.metadata.columns.Healing,
-					Skada:FormatNumber(player.healing + player.overhealing), self.metadata.columns.Total,
-					percentformatted, self.metadata.columns.Percent
-				)
+
+									    Skada:FormatNumber(player.healing), self.metadata.columns.Healing,
+									    Skada:FormatNumber(player.healing + player.overhealing), self.metadata.columns.Total,
+									    percentformatted, self.metadata.columns.Percent
+								   )
 
 				d.color = green
 				d.backgroundcolor = red
@@ -123,20 +124,31 @@ Skada:AddLoadableModule("TotalHealing", nil, function(Skada, L)
 				d.id = spell.name
 				d.label = spell.name
 				d.value = srh
-				d.valuetext = Skada:FormatValueText(
-					Skada:FormatNumber(srh), self.metadata.columns.Healing,
-					string.format("%02.1f%%", srh / (player.healing+player.overhealing) * 100), self.metadata.columns.Percent
-				)
-				local SpellInfo = C_Spell.GetSpellInfo(spell.id)
-                      icon = SpellInfo.iconID
-				d.icon = icon
-				d.spellid = spell.id
+				d.valuetext	= Skada:FormatValueText(
 
-				if spell.healing > max then
-					max = srh
+										Skada:FormatNumber(srh), self.metadata.columns.Healing,
+										string.format("%02.1f%%", srh / (player.healing+player.overhealing) * 100), self.metadata.columns.Percent
+
+								       )
+
+				-- =====================================
+				-- | API   : C_Spell.GetSpellInfo      |
+				-- | valid : + 11.0.0 / 4.4.1 / 1.15.4 |
+				-- =====================================
+				local spellInfo = C_Spell.GetSpellInfo(spell.id)
+
+				-- | Returns nil if spell is not found
+				if spellInfo then
+
+					icon            = spellInfo.iconID
+
+					d.icon          = icon
+					d.spellid       = spell.id
+
+					if spell.healing > max then max = srh end
+
+					nr = nr + 1
 				end
-
-				nr = nr + 1
 			end
 		end
 
@@ -145,7 +157,8 @@ Skada:AddLoadableModule("TotalHealing", nil, function(Skada, L)
 	end
 
 	function mod:OnEnable()
-		mod.metadata = {click1 = thspellsmod, showspots = true, columns = {Healing = true, Total = true, Percent = false}, icon = "Interface\\Icons\\Ability_priest_angelicbulwark"}
+
+		mod.metadata         = {click1  = thspellsmod, showspots = true, columns = {Healing = true, Total = true, Percent = false}, icon = "Interface\\Icons\\Ability_priest_angelicbulwark"}
 		thspellsmod.metadata = {tooltip = thspell_tooltip, columns = {Healing = true, Percent = true}}
 
 		Skada:AddMode(self, L["Healing"])

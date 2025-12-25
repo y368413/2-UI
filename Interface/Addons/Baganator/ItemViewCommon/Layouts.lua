@@ -1,6 +1,5 @@
-local _, addonTable = ...
-
-local MasqueRegistration = addonTable.Utilities.MasqueRegistration
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 
 local function GetNameFromLink(itemLink)
   return (string.match(itemLink, "h%[(.*)%]|h"):gsub(" ?|A.-|a", ""))
@@ -29,7 +28,7 @@ local function RegisterHighlightSimilarItems(self)
 end
 
 -- Supplied by Syndicator
-local LibBattlePetTooltipLine = LibStub("LibBattlePetTooltipLine-1-0")
+local LibBattlePetTooltipLine = LibStub("LibBattlePetTooltipLine-1-0", true)
 -- Used to ease adding to battle pet tooltip which doesn't have AddDoubleLine
 local function AddDoubleLine(tooltip, left, right, ...)
   if tooltip.AddDoubleLine then
@@ -51,7 +50,7 @@ local function AddKeywords(self)
   local tooltip = self.BGR.itemLink:match("battlepet:") and BattlePetTooltip or GameTooltip
 
   tooltip:AddLine(" ")
-  tooltip:AddLine(BAGANATOR_L_HELP_SEARCH_KEYWORDS)
+  tooltip:AddLine(addonTable.Locales.HELP_SEARCH_KEYWORDS)
 
   local groups = addonTable.Help.GetKeywordGroups()
 
@@ -84,7 +83,7 @@ local function AddCategories(self)
   local tooltip = self.BGR.itemLink:match("battlepet:") and BattlePetTooltip or GameTooltip
 
   tooltip:AddLine(" ")
-  tooltip:AddLine(BAGANATOR_L_CATEGORIES)
+  tooltip:AddLine(addonTable.Locales.CATEGORIES)
 
   local data = CopyTable(self.BGR, 1)
   local itemKey = addonTable.CategoryViews.Utilities.GetAddedItemData(self.BGR.itemID, self.BGR.itemLink)
@@ -97,7 +96,7 @@ local function AddCategories(self)
   for _, details in ipairs(composed.details) do
     if details.attachedItems and details.attachedItems[itemKey] then
       tooltip:AddLine(WHITE_FONT_COLOR:WrapTextInColorCode(
-        BAGANATOR_L_ATTACHED_DIRECTLY_TO_X:format(GREEN_FONT_COLOR:WrapTextInColorCode("**" .. details.label .. "**"))
+        addonTable.Locales.ATTACHED_DIRECTLY_TO_X:format(GREEN_FONT_COLOR:WrapTextInColorCode("**" .. details.label .. "**"))
       ))
       tooltip:Show()
       return
@@ -211,7 +210,7 @@ local function IsDifferentCachedData(data1, data2)
 end
 
 function addonTable.ItemViewCommon.Utilities.GetCategoryDataKey(data)
-  return data ~= nil and (tostring(data.keyLink) .. tostring(data.isBound) .. tostring(data.itemCount or 1) .. "_" .. tostring(data.quality) .. "_" .. tostring(data.bagType)) or ""
+  return data ~= nil and (tostring(data.keyLink) .. tostring(data.isBound) .. tostring(data.itemCount or 1) .. "_" .. tostring(data.quality) .. "_" .. tostring(data.bagType)) .. "_" .. tostring(data.specialSplitting) or ""
 end
 
 function addonTable.ItemViewCommon.Utilities.GetCategoryDataKeyNoCount(data)
@@ -298,7 +297,6 @@ function BaganatorCachedBagLayoutMixin:RebuildLayout(newBags, indexes, indexesTo
         addonTable.Skins.AddFrame("ItemButton", button)
         if not button.setup then
           button.setup = true
-          MasqueRegistration(button)
           button:UpdateTextures()
           hooksecurefunc(button, "UpdateTooltip", TooltipAdditions)
         end
@@ -468,8 +466,6 @@ function BaganatorLiveBagLayoutMixin:OnShow()
   end, self)
 
   RegisterHighlightSimilarItems(self)
-
-  self.refreshState = {}
 end
 
 function BaganatorLiveBagLayoutMixin:OnHide()
@@ -524,7 +520,6 @@ function BaganatorLiveBagLayoutMixin:RebuildLayout(indexes, indexesToUse, rowWid
         addonTable.Skins.AddFrame("ItemButton", button)
         if not button.setup then
           button.setup = true
-          MasqueRegistration(button)
           button:UpdateTextures()
           hooksecurefunc(button, "UpdateTooltip", TooltipAdditions)
           if button.OnUpdate then
@@ -623,6 +618,7 @@ function BaganatorLiveBagLayoutMixin:ShowBags(bagData, source, indexes, indexesT
     source = source,
   }
   self.waitingUpdate = {}
+  self.refreshState = {}
 end
 
 function BaganatorLiveBagLayoutMixin:ApplySearch(text)
@@ -874,8 +870,11 @@ function BaganatorLiveCategoryLayoutMixin:ShowGroup(cacheList, rowWidth, categor
       end
       if itemWidgetsRefresh then
         table.insert(toResetCache, {newButton, cacheData})
-      elseif newButton.BGR then
+      elseif newButton.BGR and not newButton.isDummy then
         newButton.BGR.itemLocation = {bagID = cacheData.bagID, slotIndex = cacheData.slotID}
+        if C_Item.DoesItemExist(newButton.BGR.itemLocation) then
+          newButton.BGR.guid = C_Item.GetItemGUID(newButton.BGR.itemLocation)
+        end
       end
       if newButton.index ~= index then
         self.reflowRequired = true
@@ -886,7 +885,6 @@ function BaganatorLiveCategoryLayoutMixin:ShowGroup(cacheList, rowWidth, categor
         addonTable.Skins.AddFrame("ItemButton", newButton)
         if not newButton.texturesSetup then
           newButton.texturesSetup = true
-          MasqueRegistration(newButton)
           newButton:UpdateTextures()
         end
         newButton.label = cacheData.label
@@ -896,7 +894,6 @@ function BaganatorLiveCategoryLayoutMixin:ShowGroup(cacheList, rowWidth, categor
         addonTable.Skins.AddFrame("ItemButton", newButton)
         if not newButton.texturesSetup then
           newButton.texturesSetup = true
-          MasqueRegistration(newButton)
           newButton:UpdateTextures()
         end
         self:SetupButton(newButton)
@@ -952,7 +949,9 @@ function BaganatorLiveCategoryLayoutMixin:ShowGroup(cacheList, rowWidth, categor
   end
 
   for _, details in ipairs(toResetCache) do
-    addonTable.ItemButtonUtil.ResetCache(details[1], details[2])
+    if details[1].BGR then
+      addonTable.ItemButtonUtil.ResetCache(details[1], details[2])
+    end
     if details[2].itemLink == nil then
       InitializeCategoryEmptySlot(details[1], details[2])
     end
@@ -1017,7 +1016,6 @@ function BaganatorCachedCategoryLayoutMixin:ShowGroup(cacheList, rowWidth)
     if not button.setup then
       button.setup = true
       addonTable.Skins.AddFrame("ItemButton", button)
-      MasqueRegistration(button)
       button:UpdateTextures()
       hooksecurefunc(button, "UpdateTooltip", TooltipAdditions)
     elseif self.updateTextures then
@@ -1078,7 +1076,6 @@ function BaganatorGeneralGuildLayoutMixin:RebuildLayout(rowWidth)
     addonTable.Skins.AddFrame("ItemButton", button)
     if not button.setup then
       button.setup = true
-      MasqueRegistration(button)
       button:UpdateTextures()
       hooksecurefunc(button, "UpdateTooltip", TooltipAdditions)
     end
@@ -1212,7 +1209,6 @@ function BaganatorUnifiedGuildLayoutMixin:RebuildLayout(tabCount, rowWidth)
       addonTable.Skins.AddFrame("ItemButton", button)
       if not button.setup then
         button.setup = true
-        MasqueRegistration(button)
         button:UpdateTextures()
         hooksecurefunc(button, "UpdateTooltip", TooltipAdditions)
       end
@@ -1353,7 +1349,6 @@ function BaganatorLiveWarbandLayoutMixin:RebuildLayout(tabSize, rowWidth)
     addonTable.Skins.AddFrame("ItemButton", button)
     if not button.setup then
       button.setup = true
-      MasqueRegistration(button)
       button:UpdateTextures()
       hooksecurefunc(button, "UpdateTooltip", TooltipAdditions)
       hooksecurefunc(button, "OnUpdate", TooltipAdditions)
@@ -1369,16 +1364,14 @@ function BaganatorLiveWarbandLayoutMixin:RebuildLayout(tabSize, rowWidth)
   self.initialized = true
 end
 
-function BaganatorLiveWarbandLayoutMixin:MarkTabsPending(updatedWaiting)
-  self.refreshState[addonTable.Constants.RefreshReason.ItemData] = updatedWaiting.bags[self.prevState.bagID] == true
+function BaganatorLiveWarbandLayoutMixin:MarkTabsPending(section, updatedWaiting)
+  self.refreshState[addonTable.Constants.RefreshReason.ItemData] = updatedWaiting[section][self.prevState.bagID] == true
 end
 
-function BaganatorLiveWarbandLayoutMixin:ShowTab(tabIndex, indexes, rowWidth)
+function BaganatorLiveWarbandLayoutMixin:ShowTab(bankData, tabIndex, indexes, rowWidth)
   local start = debugprofilestop()
 
-  local warbandData = Syndicator.API.GetWarband(1).bank
-
-  if #warbandData == 0 then
+  if #bankData == 0 then
     return
   end
 
@@ -1388,7 +1381,7 @@ function BaganatorLiveWarbandLayoutMixin:ShowTab(tabIndex, indexes, rowWidth)
     if addonTable.Config.Get(addonTable.Config.Options.DEBUG_TIMERS) then
       addonTable.Utilities.DebugOutput("rebuild")
     end
-    self:RebuildLayout(#warbandData[tabIndex].slots, rowWidth)
+    self:RebuildLayout(#bankData[tabIndex].slots, rowWidth)
     self.refreshState[addonTable.Constants.RefreshReason.ItemData] = true
   elseif self.refreshState[addonTable.Constants.RefreshReason.Flow] or rowWidth ~= self.oldRowWidth then
     FlowButtonsColumns(self, rowWidth)
@@ -1401,7 +1394,7 @@ function BaganatorLiveWarbandLayoutMixin:ShowTab(tabIndex, indexes, rowWidth)
   if self.refreshState[addonTable.Constants.RefreshReason.ItemData] or self.refreshState[addonTable.Constants.RefreshReason.ItemWidgets] or self.prevState.tabIndex ~= tabIndex then
     local bagID = indexes[tabIndex]
     self.indexFrame:SetID(bagID)
-    for index, cacheData in ipairs(warbandData[tabIndex].slots) do
+    for index, cacheData in ipairs(bankData[tabIndex].slots) do
       local button = self.buttons[index]
       if IsDifferentCachedData(button.BGR, cacheData) then
         button:SetItemDetails(cacheData)
@@ -1458,7 +1451,6 @@ function BaganatorCachedWarbandLayoutMixin:RebuildLayout(tabSize, rowWidth)
     addonTable.Skins.AddFrame("ItemButton", button)
     if not button.setup then
       button.setup = true
-      MasqueRegistration(button)
       button:UpdateTextures()
       hooksecurefunc(button, "UpdateTooltip", TooltipAdditions)
     end
@@ -1471,12 +1463,10 @@ function BaganatorCachedWarbandLayoutMixin:RebuildLayout(tabSize, rowWidth)
   self.initialized = true
 end
 
-function BaganatorCachedWarbandLayoutMixin:ShowTab(tabIndex, indexes, rowWidth)
+function BaganatorCachedWarbandLayoutMixin:ShowTab(bankData, tabIndex, indexes, rowWidth)
   local start = debugprofilestop()
 
-  local warbandData = Syndicator.API.GetWarband(1).bank
-
-  if #warbandData == 0 then
+  if #bankData == 0 then
     return
   end
 
@@ -1486,7 +1476,7 @@ function BaganatorCachedWarbandLayoutMixin:ShowTab(tabIndex, indexes, rowWidth)
     if addonTable.Config.Get(addonTable.Config.Options.DEBUG_TIMERS) then
       addonTable.Utilities.DebugOutput("rebuild")
     end
-    self:RebuildLayout(#warbandData[tabIndex].slots, rowWidth)
+    self:RebuildLayout(#bankData[tabIndex].slots, rowWidth)
   elseif self.refreshState[addonTable.Constants.RefreshReason.Flow] or rowWidth ~= self.oldRowWidth then
     FlowButtonsColumns(self, rowWidth)
   end
@@ -1495,7 +1485,7 @@ function BaganatorCachedWarbandLayoutMixin:ShowTab(tabIndex, indexes, rowWidth)
     UpdateTextures(self)
   end
 
-  for index, cacheData in ipairs(warbandData[tabIndex].slots) do
+  for index, cacheData in ipairs(bankData[tabIndex].slots) do
     local button = self.buttons[index]
     button:SetItemDetails(cacheData)
   end

@@ -1,26 +1,17 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 if not Syndicator then
   return
 end
 
 local CONTAINER_TYPE_TO_MESSAGE = {
-  equipped = BAGANATOR_L_THAT_ITEM_IS_EQUIPPED,
-  auctions = BAGANATOR_L_THAT_ITEM_IS_LISTED_ON_THE_AUCTION_HOUSE,
-  mail = BAGANATOR_L_THAT_ITEM_IS_IN_A_MAILBOX,
-  void = BAGANATOR_L_THAT_ITEM_IS_IN_VOID_STORAGE,
-}
-
-local dialogName = "Baganator_InventoryItemInX"
-StaticPopupDialogs[dialogName] = {
-  text = "",
-  button1 = OKAY,
-  timeout = 0,
-  hideOnEscape = 1,
+  equipped = addonTable.Locales.THAT_ITEM_IS_EQUIPPED,
+  auctions = addonTable.Locales.THAT_ITEM_IS_LISTED_ON_THE_AUCTION_HOUSE,
+  mail = addonTable.Locales.THAT_ITEM_IS_IN_A_MAILBOX,
+  void = addonTable.Locales.THAT_ITEM_IS_IN_VOID_STORAGE,
 }
 
 Syndicator.API.RegisterShowItemLocation(function(mode, entity, container, itemLink, searchText)
-  StaticPopup_Hide(dialogName)
-
   local self = {}
 
   addonTable.CallbackRegistry:RegisterCallback("ViewComplete", function()
@@ -40,8 +31,7 @@ Syndicator.API.RegisterShowItemLocation(function(mode, entity, container, itemLi
       addonTable.CallbackRegistry:TriggerEvent("BankShow", entity)
       addonTable.CallbackRegistry:TriggerEvent("SearchTextChanged", searchText)
     else
-      StaticPopupDialogs[dialogName].text = CONTAINER_TYPE_TO_MESSAGE[container]
-      StaticPopup_Show(dialogName)
+      addonTable.Dialogs.ShowAcknowledge(CONTAINER_TYPE_TO_MESSAGE[container])
       addonTable.CallbackRegistry:UnregisterCallback("ViewComplete", self)
       return
     end
@@ -65,6 +55,23 @@ Syndicator.API.RegisterShowItemLocation(function(mode, entity, container, itemLi
     return
   end
 end)
+
+local function SaveSearch(label, search)
+  local list = addonTable.Config.Get(addonTable.Config.Options.SAVED_SEARCHES)
+  local oldIndex = FindInTableIf(list, function(a) return a.label == label end)
+  if oldIndex then
+    list[oldIndex].search = search
+  else
+    table.insert(list, {label = label, search = search})
+    table.sort(list, function(a, b)
+      if a.label == b.label then
+        return a.search < b.search
+      else
+        return a.label < b.label
+      end
+    end)
+  end
+end
 
 BaganatorSearchWidgetMixin = {}
 
@@ -111,6 +118,47 @@ function BaganatorSearchWidgetMixin:OnLoad()
 
   self.HelpButton:SetScript("OnClick", function()
     addonTable.Help.ShowSearchDialog()
+  end)
+
+  self.SavedSearchesButton:SetupMenu(function(menu, rootDescription)
+    local list = addonTable.Config.Get(addonTable.Config.Options.SAVED_SEARCHES)
+    for _, details in ipairs(list) do
+      local button = rootDescription:CreateButton(details.label, function()
+        addonTable.CallbackRegistry:TriggerEvent("SearchTextChanged", details.search)
+      end)
+      button:AddInitializer(function(button, description, menu)
+        local delete = MenuTemplates.AttachAutoHideButton(button, "transmog-icon-remove")
+        delete:SetPoint("RIGHT")
+        delete:SetSize(16, 16)
+        delete.Texture:SetAtlas("transmog-icon-remove")
+        delete:SetScript("OnClick", function()
+          local list = addonTable.Config.Get(addonTable.Config.Options.SAVED_SEARCHES)
+          local oldIndex = FindInTableIf(list, function(a) return a.label == details.label end)
+          if oldIndex then
+            table.remove(list, oldIndex)
+          end
+          menu:Close()
+        end)
+        MenuUtil.HookTooltipScripts(delete, function(tooltip)
+          GameTooltip_SetTitle(tooltip, DELETE);
+        end);
+      end)
+    end
+    if #list > 0 then
+      rootDescription:CreateDivider()
+    end
+    if self.SearchBox:GetText() == "" then
+      local text = rootDescription:CreateTitle(GRAY_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.SAVE_SEARCH))
+      text:SetTooltip(function(tooltip)
+        tooltip:AddLine(addonTable.Locales.NOTHING_TO_SAVE)
+      end)
+    else
+      local button = rootDescription:CreateButton(NORMAL_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.SAVE_SEARCH), function()
+        addonTable.Dialogs.ShowEditBox(addonTable.Locales.CHOOSE_A_LABEL_FOR_THIS_SEARCH, ACCEPT, CANCEL, function(name)
+          SaveSearch(name, self.SearchBox:GetText())
+        end)
+      end)
+    end
   end)
 
   addonTable.Skins.AddFrame("SearchBox", self.SearchBox)
@@ -161,85 +209,4 @@ function BaganatorSearchWidgetMixin:SetSpacing(sideSpacing)
     self.GlobalSearchButton:Hide()
     self.HelpButton:Hide()
   end
-end
-
-local function SaveSearch(label, search)
-  local list = addonTable.Config.Get(addonTable.Config.Options.SAVED_SEARCHES)
-  local oldIndex = FindInTableIf(list, function(a) return a.label == label end)
-  if oldIndex then
-    list[oldIndex].search = search
-  else
-    table.insert(list, {label = label, search = search})
-    table.sort(list, function(a, b)
-      if a.label == b.label then
-        return a.search < b.search
-      else
-        return a.label < b.label
-      end
-    end)
-  end
-end
-
-local saveDialog = "Baganator_Save_Search_Dialog"
-StaticPopupDialogs[saveDialog] = {
-  text = BAGANATOR_L_CHOOSE_A_LABEL_FOR_THIS_SEARCH,
-  button1 = ACCEPT,
-  button2 = CANCEL,
-  hasEditBox = 1,
-  OnShow = function(self)
-    self.editBox:SetFocus()
-  end,
-  OnAccept = function(self)
-    SaveSearch(self.editBox:GetText(), self.data)
-  end,
-  EditBoxOnEnterPressed = function(self)
-    SaveSearch(self:GetText(), self:GetParent().data)
-    self:GetParent():Hide()
-  end,
-  EditBoxOnEscapePressed = StaticPopup_StandardEditBoxOnEscapePressed,
-  editBoxWidth = 230,
-  maxLetters = 0,
-  timeout = 0,
-  hideOnEscape = 1,
-}
-
-function BaganatorSearchWidgetMixin:OpenSavedSearches()
-  MenuUtil.CreateContextMenu(self.SavedSearchesButton, function(menu, rootDescription)
-    local list = addonTable.Config.Get(addonTable.Config.Options.SAVED_SEARCHES)
-    for _, details in ipairs(list) do
-      local button = rootDescription:CreateButton(details.label, function()
-        addonTable.CallbackRegistry:TriggerEvent("SearchTextChanged", details.search)
-      end)
-      button:AddInitializer(function(button, description, menu)
-        local delete = MenuTemplates.AttachAutoHideButton(button, "transmog-icon-remove")
-        delete:SetPoint("RIGHT")
-        delete:SetSize(16, 16)
-        delete.Texture:SetAtlas("transmog-icon-remove")
-        delete:SetScript("OnClick", function()
-          local list = addonTable.Config.Get(addonTable.Config.Options.SAVED_SEARCHES)
-          local oldIndex = FindInTableIf(list, function(a) return a.label == details.label end)
-          if oldIndex then
-            table.remove(list, oldIndex)
-          end
-          menu:Close()
-        end)
-        MenuUtil.HookTooltipScripts(delete, function(tooltip)
-          GameTooltip_SetTitle(tooltip, DELETE);
-        end);
-      end)
-    end
-    if #list > 0 then
-      rootDescription:CreateDivider()
-    end
-    if self.SearchBox:GetText() == "" then
-      local text = rootDescription:CreateTitle(GRAY_FONT_COLOR:WrapTextInColorCode(BAGANATOR_L_SAVE_SEARCH))
-      text:SetTooltip(function(tooltip)
-        tooltip:AddLine(BAGANATOR_L_NOTHING_TO_SAVE)
-      end)
-    else
-      local button = rootDescription:CreateButton(NORMAL_FONT_COLOR:WrapTextInColorCode(BAGANATOR_L_SAVE_SEARCH), function()
-        StaticPopup_Show(saveDialog, nil, nil, self.SearchBox:GetText())
-      end)
-    end
-  end)
 end

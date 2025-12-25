@@ -157,7 +157,7 @@ function oribos:getCovenantIcon(covenantID)
             [4] = "necrolord",
         }
 
-        return "|T".."Interface\\AddOns\\Skada\\media\\"..covenantMap[covenantID]..".tga:"..DCovenant["iconSize"]..":"..DCovenant["iconSize"].."|t"
+        return "|T".."Interface\\AddOns\\Skada\\Media\\Covenants\\"..covenantMap[covenantID]..".tga:"..DCovenant["iconSize"]..":"..DCovenant["iconSize"].."|t"
     end
 
     return ""

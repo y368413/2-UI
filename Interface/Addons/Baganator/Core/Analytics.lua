@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 -- This code will _ONLY_ do anything if analytics are manually enabled within
 -- the Wago app.
 --
@@ -11,7 +12,6 @@ function addonTable.Core.RunAnalytics()
   local WagoAnalytics = WagoAnalytics:Register("kGr09M6y")
   addonTable.WagoAnalytics = WagoAnalytics
 
-  WagoAnalytics:Switch("UsingSkinRaw", false)
   WagoAnalytics:Switch("UsingCategories", addonTable.Config.Get(addonTable.Config.Options.BAG_VIEW_TYPE) == "category" or addonTable.Config.Get(addonTable.Config.Options.BANK_VIEW_TYPE) == "category")
   WagoAnalytics:Switch("DifferentViews", addonTable.Config.Get(addonTable.Config.Options.BAG_VIEW_TYPE) ~= addonTable.Config.Get(addonTable.Config.Options.BANK_VIEW_TYPE))
 
@@ -23,13 +23,12 @@ function addonTable.Core.RunAnalytics()
   WagoAnalytics:Switch("UsingJunkPlugin", addonTable.Config.Get(addonTable.Config.Options.JUNK_PLUGIN) ~= "poor_quality" and addonTable.Config.Get(addonTable.Config.Options.JUNK_PLUGIN) ~= "none")
   WagoAnalytics:Switch("UsingUpgradePlugin", addonTable.Config.Get(addonTable.Config.Options.UPGRADE_PLUGIN) ~= "none")
 
-  WagoAnalytics:Switch("RecentCharacterTabs", addonTable.Config.Get(addonTable.Config.Options.SHOW_RECENTS_TABS))
   WagoAnalytics:Switch("AutoSort", addonTable.Config.Get(addonTable.Config.Options.AUTO_SORT_ON_OPEN))
 
   WagoAnalytics:Switch("UsingMasque", (C_AddOns.IsAddOnLoaded("Masque")))
 
   local categoryCount = 0
-  for _, category in pairs(addonTable.Config.Get(addonTable.Config.Options.CUSTOM_CATEGORIES)) do
+  for _, _ in pairs(addonTable.Config.Get(addonTable.Config.Options.CUSTOM_CATEGORIES)) do
     categoryCount = categoryCount + 1
   end
 
@@ -72,7 +71,6 @@ function addonTable.Core.RunAnalytics()
     [addonTable.Config.Options.LOCK_FRAMES] = true,
     [addonTable.Config.Options.SHOW_SORT_BUTTON] = true,
     [addonTable.Config.Options.HIDE_BOE_ON_COMMON] = true,
-    [addonTable.Config.Options.SHOW_RECENTS_TABS] = true,
     [addonTable.Config.Options.ICON_TEXT_QUALITY_COLORS] = true,
     [addonTable.Config.Options.ICON_TEXT_FONT_SIZE] = true,
     [addonTable.Config.Options.ICON_GREY_JUNK] = true,
@@ -83,6 +81,7 @@ function addonTable.Core.RunAnalytics()
     [addonTable.Config.Options.BAG_EMPTY_SPACE_AT_TOP] = true,
     [addonTable.Config.Options.REDUCE_SPACING] = true,
     [addonTable.Config.Options.SORT_METHOD] = true,
+    [addonTable.Config.Options.CATEGORY_SORT_METHOD] = true,
     [addonTable.Config.Options.REVERSE_GROUPS_SORT_ORDER] = true,
     [addonTable.Config.Options.SORT_START_AT_BOTTOM] = true,
     [addonTable.Config.Options.ICON_FLASH_SIMILAR_ALT] = true,
@@ -112,12 +111,12 @@ function addonTable.Core.RunAnalytics()
     end
 
     local nonDefault = false
-    for _, count in pairs(BAGANATOR_CONFIG[addonTable.Config.Options.SORT_IGNORE_BAG_SLOTS_COUNT]) do
+    for _, count in pairs(BAGANATOR_CONFIG.CharacterSpecific[addonTable.Config.Options.SORT_IGNORE_BAG_SLOTS_COUNT]) do
       if count ~= 0 then
         nonDefault = true
       end
     end
-    for _, count in pairs(BAGANATOR_CONFIG[addonTable.Config.Options.SORT_IGNORE_BANK_SLOTS_COUNT]) do
+    for _, count in pairs(BAGANATOR_CONFIG.CharacterSpecific[addonTable.Config.Options.SORT_IGNORE_BANK_SLOTS_COUNT]) do
       if count ~= 0 then
         nonDefault = true
       end

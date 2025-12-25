@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 
 local Refresh = addonTable.Constants.RefreshReason
 
@@ -63,27 +64,17 @@ local function Prearrange(isLive, bagID, bag, bagType, isGrouping)
       info.isJunkGetter = junkPlugin and function() local _, result = pcall(junkPlugin, bagID, slotIndex, info.itemID, info.itemLink); return result == true end
       local location = {bagID = bagID, slotIndex = slotIndex}
       if info.itemID ~= nil and C_Item.DoesItemExist(location) then
-        info.setInfo = addonTable.ItemViewCommon.GetEquipmentSetInfo(location, info.itemLink)
+        info.guid = C_Item.GetItemGUID(location)
+        info.setInfo = addonTable.ItemViewCommon.GetEquipmentSetInfo(location, info.guid, info.itemLink)
         info.itemLocation = location
         if info.setInfo then
-          info.guid = C_Item.GetItemGUID(location)
           info.useGUID = true
-        elseif info.hasLoot and not info.isBound then
-          -- Ungroup lockboxes always
-          local classID, subClassID = select(6, C_Item.GetItemInfoInstant(info.itemID))
-          if classID == Enum.ItemClass.Miscellaneous and subClassID == 0 then
-            info.guid = C_Item.GetItemGUID(location)
-            info.useGUID = true
-          end
-        elseif not isGrouping then
-          info.guid = C_Item.GetItemGUID(location)
         end
       end
       info.bagID = bagID
       info.slotID = slotIndex
     end
     if info.itemID then
-      info.guid = info.guid or ""
       info.isUpgradeGetter = upgradePlugin and function() local _, result = pcall(upgradePlugin, info.itemLink); return result == true end
       info.iconTexture = slot.iconTexture
       info.keyLink = linkMap[info.itemLink]
@@ -96,11 +87,11 @@ local function Prearrange(isLive, bagID, bag, bagType, isGrouping)
         linkMap[info.itemLink] = info.keyLink
       end
       info.keyNoGUID = addonTable.ItemViewCommon.Utilities.GetCategoryDataKeyNoCount(info)
-      info.keyGUID = info.keyNoGUID .. info.guid .. "_" .. tostring(info.refundable)
+      info.keyGUID = info.keyNoGUID .. ((not isGrouping or info.useGUID) and info.guid or "")
       if info.useGUID then
         info.key = info.keyGUID
       else
-        info.key = info.keyNoGUID .. "_" .. tostring(info.refundable)
+        info.key = info.keyNoGUID
       end
       table.insert(everything, info)
     else
@@ -116,11 +107,16 @@ addonTable.CategoryViews.BagLayoutMixin = {}
 function addonTable.CategoryViews.BagLayoutMixin:OnLoad()
   self.labelsPool = CreateFramePool("Button", self:GetParent().Container, "BaganatorCategoryViewsCategoryButtonTemplate")
   self.sectionButtonPool = addonTable.CategoryViews.GetSectionButtonPool(self:GetParent().Container)
-  self.dividerPool = CreateFramePool("Button", self:GetParent().Container, "BaganatorBagDividerTemplate")
+  self.dividerPool = CreateFramePool("Frame", self:GetParent().Container, "BaganatorBagDividerTemplate")
 
   self.notShown = {}
 
   self:SetScript("OnHide", self.OnHide)
+
+  self.SpecialisedSplitting = CreateFrame("Frame", nil, self)
+  Mixin(self.SpecialisedSplitting, BaganatorCategoryViewsSpecialisedSplittingMixin)
+  self.SpecialisedSplitting:OnLoad()
+  self.SpecialisedSplitting:SetScript("OnHide", self.SpecialisedSplitting.OnHide)
 
   self.ItemsPreparation = CreateFrame("Frame", nil, self)
   Mixin(self.ItemsPreparation, BaganatorCategoryViewsItemsPreparationMixin)
@@ -150,13 +146,6 @@ function addonTable.CategoryViews.BagLayoutMixin:OnHide()
   if self.dummyAdded then
     self:GetParent().refreshState[addonTable.Constants.RefreshReason.Layout] = true
   end
-end
-
--- Called in response to the ContentRefreshRequired event triggered when items
--- need updated. NOT in reponse to categories being updated.
-function addonTable.CategoryViews.BagLayoutMixin:FullRefresh()
-  self.CategoryFilter:ResetCaches()
-  self.ItemsPreparation:ResetCaches()
 end
 
 function addonTable.CategoryViews.BagLayoutMixin:ClearVisuals()
@@ -237,11 +226,11 @@ function addonTable.CategoryViews.BagLayoutMixin:Display(bagWidth, bagIndexes, b
       end
       if container.isLive and self.showAddButtons and not details.auto then
         if container.addToCategoryMode ~= details.source then
-          table.insert(entries, {isDummy = true, label = BAGANATOR_L_ADD_TO_CATEGORY, dummyType = "add"})
+          table.insert(entries, {isDummy = true, label = addonTable.Locales.ADD_TO_CATEGORY, dummyType = "add"})
           self.dummyAdded = true
         else
           if container.addedToFromCategory then
-            table.insert(entries, {isDummy = true, label = BAGANATOR_L_REMOVE_FROM_CATEGORY, dummyType = "remove"})
+            table.insert(entries, {isDummy = true, label = addonTable.Locales.REMOVE_FROM_CATEGORY, dummyType = "remove"})
             self.dummyAdded = true
           end
         end
@@ -261,7 +250,7 @@ function addonTable.CategoryViews.BagLayoutMixin:Display(bagWidth, bagIndexes, b
     local anyNew = #composed.details ~= #oldComposed.details
     for index, old in ipairs(oldComposed.details) do
       local current = composed.details[index]
-      if current.source ~= old.source then
+      if not current or current.source ~= old.source then
         anyNew = true
         break
       elseif current.results and (current.source and (current.source ~= addonTable.CategoryViews.Constants.RecentItemsCategory)
@@ -503,6 +492,7 @@ function addonTable.CategoryViews.BagLayoutMixin:Layout(allBags, bagWidth, bagTy
   end
 
   if refreshState[Refresh.Searches] then
+    self.SpecialisedSplitting:ResetCaches()
     self.ItemsPreparation:ResetCaches()
     self.CategoryFilter:ResetCaches()
   end
@@ -513,6 +503,7 @@ function addonTable.CategoryViews.BagLayoutMixin:Layout(allBags, bagWidth, bagTy
 
   -- Just in case the rendering takes so long there's another bag update ready
   -- that triggers a conflicting render.
+  self.SpecialisedSplitting:Cancel()
   self.CategoryFilter:Cancel()
   self.CategoryGrouping:Cancel()
   self.CategorySort:Cancel()
@@ -593,7 +584,16 @@ function addonTable.CategoryViews.BagLayoutMixin:Layout(allBags, bagWidth, bagTy
 
   if refreshState[Refresh.ItemData] or refreshState[Refresh.Searches] then
     table.insert(calls, function()
-      self.state.composed = addonTable.CategoryViews.ComposeCategories(self.state.everything)
+      self.SpecialisedSplitting:ApplySplitting(self.state.everything, function()
+        Next()
+      end)
+    end)
+  end
+
+  if refreshState[Refresh.ItemData] or refreshState[Refresh.Searches] then
+    table.insert(calls, function()
+      local container = self:GetParent()
+      self.state.composed = addonTable.CategoryViews.ComposeCategories(self.state.everything, container.location)
       Next()
     end)
   end

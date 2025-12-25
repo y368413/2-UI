@@ -1,0 +1,38 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="BarrelsOEasy.lua"/>
+	<!--Script file="WorldMapQuestRewardIcon.lua"/-->
+	<Button name='BetterWorldQuestPinTemplate' inherits='POIButtonTemplate, LegendHighlightableMapPoiPinTemplate' mixin='BetterWorldQuestPinMixin' virtual='true'>
+		<KeyValues>
+			<KeyValue key="questRewardTooltipStyle" value="TOOLTIP_QUEST_REWARDS_STYLE_WORLD_QUEST" type="global"/>
+		</KeyValues>
+	</Button>
+	<Button name='BetterWorldQuestPOITemplate' inherits='AreaPOIPinTemplate' virtual='true'/>
+	<Button name='BetterWorldQuestEventTemplate' inherits='AreaPOIEventPinTemplate' virtual='true'/>
+	<Script file="BetterWorldQuests.lua"/>
+	<Frame name="CandyBucketsPinTemplate" inherits="BaseHighlightableMapPoiPinTemplate" enableMouseClicks="true" mixin="CandyBucketsPinMixin" virtual="true">
+		<Layers>
+			<Layer level="BORDER">
+				<Texture parentKey="Border">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="-1" y="1" />
+						<Anchor point="BOTTOMRIGHT" x="1" y="-1" />
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+	<Frame name="CandyBucketsStatsTemplate" inherits="BaseHighlightableMapPoiPinTemplate" enableMouseClicks="true" mixin="CandyBucketsStatsMixin" virtual="true">
+		<Layers>
+			<Layer level="BORDER">
+				<FontString parentKey="Text" inherits="SystemFont_Shadow_Med2" setAllPoints="true" justifyH="CENTER" justifyV="MIDDLE">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="-1" y="1" />
+						<Anchor point="BOTTOMRIGHT" x="1" y="-1" />
+					</Anchors>
+					<Color r="1.0" g="0.82" b="0" />
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	<Script file="CandyBuckets.lua" />
+</Ui>

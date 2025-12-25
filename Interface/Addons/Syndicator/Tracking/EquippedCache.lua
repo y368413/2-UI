@@ -1,10 +1,13 @@
+---@class addonTableSyndicator
+local addonTable = select(2, ...)
+
 SyndicatorEquippedCacheMixin = {}
 
 -- Assumed to run after PLAYER_LOGIN
 function SyndicatorEquippedCacheMixin:OnLoad()
   self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 
-  self.currentCharacter = Syndicator.Utilities.GetCharacterFullName()
+  self.currentCharacter = addonTable.Utilities.GetCharacterFullName()
 
   self:ScanEquipped()
 end
@@ -33,7 +36,7 @@ function SyndicatorEquippedCacheMixin:OnEvent(eventName, ...)
       return
     end
 
-    local storedOffset = slot + Syndicator.Constants.EquippedInventorySlotOffset
+    local storedOffset = slot + addonTable.Constants.EquippedInventorySlotOffset
 
     local equipped = SYNDICATOR_DATA.Characters[self.currentCharacter].equipped
 
@@ -44,13 +47,13 @@ function SyndicatorEquippedCacheMixin:OnEvent(eventName, ...)
       if C_Item.IsItemDataCachedByID(itemID) then
         equipped[storedOffset] = GetSlotInfo(slot)
       else
-        Syndicator.Utilities.LoadItemData(itemID, function()
+        addonTable.Utilities.LoadItemData(itemID, function()
           equipped[storedOffset] = GetSlotInfo(slot)
         end)
       end
     end
 
-    Syndicator.CallbackRegistry:TriggerEvent("EquippedCacheUpdate", self.currentCharacter)
+    addonTable.CallbackRegistry:TriggerEvent("EquippedCacheUpdate", self.currentCharacter)
   end
 end
 
@@ -60,11 +63,11 @@ function SyndicatorEquippedCacheMixin:ScanEquipped()
   local equipped = {}
 
   local function Finish()
-    if Syndicator.Config.Get(Syndicator.Config.Options.DEBUG_TIMERS) then
+    if addonTable.Config.Get(addonTable.Config.Options.DEBUG_TIMERS) then
       print("equipped finish", debugprofilestop() - start)
     end
     SYNDICATOR_DATA.Characters[self.currentCharacter].equipped = equipped
-    Syndicator.CallbackRegistry:TriggerEvent("EquippedCacheUpdate", self.currentCharacter)
+    addonTable.CallbackRegistry:TriggerEvent("EquippedCacheUpdate", self.currentCharacter)
   end
 
   local waiting, loopComplete = C_Container.ContainerIDToInventoryID(1), false
@@ -80,7 +83,7 @@ function SyndicatorEquippedCacheMixin:ScanEquipped()
   local anyStored = false
 
   for slot = 0, C_Container.ContainerIDToInventoryID(1) - 1 do
-    local storedOffset = slot + Syndicator.Constants.EquippedInventorySlotOffset
+    local storedOffset = slot + addonTable.Constants.EquippedInventorySlotOffset
     equipped[storedOffset] = {}
 
     local itemID = GetInventoryItemID("player", slot)
@@ -90,7 +93,7 @@ function SyndicatorEquippedCacheMixin:ScanEquipped()
         DoSlot(slot, storedOffset, itemID)
       else
         if C_Item.GetItemInfoInstant(itemID) ~= nil then
-          Syndicator.Utilities.LoadItemData(itemID, function()
+          addonTable.Utilities.LoadItemData(itemID, function()
             waiting = waiting - 1
             DoSlot(slot, storedOffset, itemID)
           end)

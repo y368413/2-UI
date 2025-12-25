@@ -1,3 +1,6 @@
+---@class addonTableSyndicator
+local addonTable = select(2, ...)
+
 local stackable = {}
 
 local function GetLower(item)
@@ -5,10 +8,10 @@ local function GetLower(item)
   return item.itemNameLower
 end
 
-function Syndicator.Search.GetGroupingKey(item, callback)
+function addonTable.Search.GetGroupingKey(item, callback)
   local function Result()
     local lower = GetLower(item)
-    if item.itemID == Syndicator.Constants.BattlePetCageID and item.itemLink:find("battlepet:") ~= nil then
+    if item.itemID == addonTable.Constants.BattlePetCageID and item.itemLink:find("battlepet:") ~= nil then
       callback(lower .. "_" .. strjoin("-", BattlePetToolTip_UnpackBattlePetLink(item.itemLink)) .. "_" .. tostring(item.isBound))
     elseif stackable[item.itemID] then
       callback(lower .. "_" .. tostring(item.itemID))
@@ -25,7 +28,7 @@ function Syndicator.Search.GetGroupingKey(item, callback)
   if stackable[item.itemID] ~= nil then
     Result()
   else
-    Syndicator.Utilities.LoadItemData(item.itemID, function()
+    addonTable.Utilities.LoadItemData(item.itemID, function()
       stackable[item.itemID] = C_Item.GetItemMaxStackSizeByID(item.itemID) > 1
       Result()
     end)

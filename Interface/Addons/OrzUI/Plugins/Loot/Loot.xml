@@ -1,0 +1,11 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="CanOpener.lua"/>
+	<Script file="Cupcko_mca.lua"/>
+	<Script file="DFCN_Status.lua"/>
+	<Script file="MasterGypsy.lua"/>
+	<!--Script file="VendorFilter.lua"/-->
+	<Script file="LootSpecSwapper.lua"/>
+	<Script file="BiggerBagChecker.lua"/>
+	<Script file="AtlasLootReverseMods.lua"/>
+	<Script file="AutoSellLowLevelGear.lua"/>
+</Ui>

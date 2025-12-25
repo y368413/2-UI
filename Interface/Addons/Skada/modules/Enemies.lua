@@ -375,19 +375,32 @@ Skada:AddLoadableModule("Enemies", nil, function(Skada, L)
 		Skada:RemoveMode(self)
 	end
 
-	function done:GetSetSummary(set)
-		return Skada:FormatNumber(set.mobdone)
-	end
+function done:GetSetSummary(set)
+
+	return Skada:FormatNumber(set.mobdone)
+end
+
+
+
 
 	function taken:GetSetSummary(set)
+
 		return Skada:FormatNumber(set.mobtaken)
 	end
 
+
+
+
 	function hdone:GetSetSummary(set)
+
 		return Skada:FormatNumber(set.mobhdone)
 	end
 
+
+
+
 	function htaken:GetSetSummary(set)
+
 		return Skada:FormatNumber(set.mobhdone)
 	end
 

@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 BaganatorCustomiseDialogCategoriesSectionEditorMixin = {}
 
 function BaganatorCustomiseDialogCategoriesSectionEditorMixin:OnLoad()
@@ -8,9 +9,10 @@ function BaganatorCustomiseDialogCategoriesSectionEditorMixin:OnLoad()
 
     if sections[self.currentSection] then
       sections[self.currentSection] = nil
-      table.remove(displayOrder, tIndexOf(displayOrder, "_" .. self.currentSection))
+      local startIndex = tIndexOf(displayOrder, "_" .. self.currentSection)
+      table.remove(displayOrder, startIndex)
       local level = 0
-      for i = 1, #displayOrder do
+      for i = startIndex, #displayOrder do
         if displayOrder[i] == addonTable.CategoryViews.Constants.SectionEnd then
           if level == 0 then
             table.remove(displayOrder, i)
@@ -32,6 +34,7 @@ function BaganatorCustomiseDialogCategoriesSectionEditorMixin:OnLoad()
 
     local sections = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_SECTIONS)
     local displayOrder = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_DISPLAY_ORDER)
+    local isNew = false
 
     local refreshState = {}
     if sections[self.currentSection] then
@@ -40,6 +43,7 @@ function BaganatorCustomiseDialogCategoriesSectionEditorMixin:OnLoad()
       end
       sections[self.currentSection].name = self.SectionName:GetText()
     else
+      isNew = true
       self.currentSection = tostring(1)
       while sections[self.currentSection] do
         self.currentSection = tostring(tonumber(self.currentSection) + 1)
@@ -66,6 +70,9 @@ function BaganatorCustomiseDialogCategoriesSectionEditorMixin:OnLoad()
     if next(refreshState) ~= nil then
       addonTable.CallbackRegistry:TriggerEvent("RefreshStateChange", refreshState)
     end
+    if isNew then
+      addonTable.CallbackRegistry:TriggerEvent("SetSelectedCategory", "_" .. self.currentSection)
+    end
   end
 
   self.DeleteButton:SetScript("OnClick", function()
@@ -86,23 +93,23 @@ function BaganatorCustomiseDialogCategoriesSectionEditorMixin:OnLoad()
     self.SectionColorSwatch.pendingColor = nil
     if value == "" then
       self.currentSection = "-1"
-      self.SectionName:SetText(BAGANATOR_L_NEW_SECTION)
+      self.SectionName:SetText(addonTable.Locales.NEW_SECTION)
 
-      self.SectionColorSwatch.lastColor = CreateColor(1, 1, 1)
-      self.SectionColorSwatch:SetColorRGB(self.SectionColorSwatch.lastColor:GetRGBA())
+      self.SectionColorSwatch.currentColor = CreateColor(1, 1, 1)
+      self.SectionColorSwatch:SetColorRGB(self.SectionColorSwatch.currentColor:GetRGBA())
 
       Save()
     else
       self.currentSection = value
       local sectionDetails = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_SECTIONS)[value]
-      self.SectionName:SetText(_G["BAGANATOR_L_SECTION_" .. sectionDetails.name] or sectionDetails.name)
+      self.SectionName:SetText(addonTable.Locales["SECTION_" .. sectionDetails.name] or sectionDetails.name)
 
       if sectionDetails.color then
-        self.SectionColorSwatch.lastColor = CreateColorFromRGBAHexString(sectionDetails.color .. "ff")
+        self.SectionColorSwatch.currentColor = CreateColorFromRGBAHexString(sectionDetails.color .. "ff")
       else
-        self.SectionColorSwatch.lastColor = CreateColor(1, 1, 1)
+        self.SectionColorSwatch.currentColor = CreateColor(1, 1, 1)
       end
-      self.SectionColorSwatch:SetColorRGB(self.SectionColorSwatch.lastColor:GetRGBA())
+      self.SectionColorSwatch:SetColorRGB(self.SectionColorSwatch.currentColor:GetRGBA())
     end
   end)
 

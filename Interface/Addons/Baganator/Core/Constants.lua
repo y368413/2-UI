@@ -1,6 +1,10 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 addonTable.Constants = {
   IsRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE,
+  IsMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC,
+  IsCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC,
+  IsWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC,
   IsEra = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC,
   IsClassic = WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE,
 
@@ -47,7 +51,6 @@ addonTable.Constants.Events = {
 
   -- Category view only events
   "CategoryItemDropped",
-  "ResetCategoryOrder",
   "CategoryAddItemStart",
   "CategoryAddItemEnd",
 
@@ -62,6 +65,8 @@ addonTable.Constants.Events = {
   "EditCategoryRecent",
   "EditCategoryEmpty",
   "EditCategoryDivider",
+  "ResetCategoryEditor",
+  "SetSelectedCategory",
 
   "HighlightSimilarItems",
   "HighlightIdenticalItems",
@@ -84,6 +89,9 @@ addonTable.Constants.Events = {
   "BankViewChanged",
 
   "ItemContextChanged", -- Baganator specific context highlighting
+
+  "ItemSpellTargeted", -- Lockpicking (probably)
+  "ItemSpellUsed", -- Right-click item spell (maybe)
 }
 
 addonTable.Constants.SortStatus = {
@@ -93,82 +101,80 @@ addonTable.Constants.SortStatus = {
   WaitingItemData = 3,
 }
 
-if not Syndicator then
-  return
-end
+if Syndicator then
+  addonTable.Constants.KeywordGroupOrder = Syndicator.Search.Constants.KeywordGroupOrder or {
+  -- Stored here temporarily, true list is in Syndicator now
+    Syndicator.Locales.GROUP_ITEM_TYPE,
+    Syndicator.Locales.GROUP_ITEM_DETAIL,
+    Syndicator.Locales.GROUP_QUALITY,
 
-addonTable.Constants.KeywordGroupOrder = Syndicator.Search.Constants.KeywordGroupOrder or {
--- Stored here temporarily, true list is in Syndicator now
-  SYNDICATOR_L_GROUP_ITEM_TYPE,
-  SYNDICATOR_L_GROUP_ITEM_DETAIL,
-  SYNDICATOR_L_GROUP_QUALITY,
+    Syndicator.Locales.GROUP_SLOT,
+    Syndicator.Locales.GROUP_WEAPON_TYPE,
+    Syndicator.Locales.GROUP_ARMOR_TYPE,
+    Syndicator.Locales.GROUP_STAT,
+    Syndicator.Locales.GROUP_SOCKET,
 
-  SYNDICATOR_L_GROUP_SLOT,
-  SYNDICATOR_L_GROUP_WEAPON_TYPE,
-  SYNDICATOR_L_GROUP_ARMOR_TYPE,
-  SYNDICATOR_L_GROUP_STAT,
-  SYNDICATOR_L_GROUP_SOCKET,
+    Syndicator.Locales.GROUP_TRADE_GOODS,
+    Syndicator.Locales.GROUP_RECIPE,
+    Syndicator.Locales.GROUP_GLYPH,
+    Syndicator.Locales.GROUP_CONSUMABLE,
 
-  SYNDICATOR_L_GROUP_TRADE_GOODS,
-  SYNDICATOR_L_GROUP_RECIPE,
-  SYNDICATOR_L_GROUP_GLYPH,
-  SYNDICATOR_L_GROUP_CONSUMABLE,
-
-  SYNDICATOR_L_GROUP_EXPANSION,
-  SYNDICATOR_L_GROUP_BATTLE_PET,
-}
-
-if Syndicator.Constants.WarbandBankActive then
-  -- Note constant values are taken from Blizzard code
-  addonTable.Constants.BlizzardBankTabConstants = {
-    Character = 1,
-    Warband = 3,
+    Syndicator.Locales.GROUP_EXPANSION,
+    Syndicator.Locales.GROUP_BATTLE_PET,
   }
-end
 
-addonTable.Constants.SampleSearchTerms = {
-  "<400",
-  SYNDICATOR_L_KEYWORD_BOE,
-  INVTYPE_SHOULDER:lower(),
-  INVTYPE_TRINKET:lower(),
-  SYNDICATOR_L_KEYWORD_FOOD .. "|" ..  SYNDICATOR_L_KEYWORD_POTION,
-  SYNDICATOR_L_KEYWORD_EQUIPMENT,
-  SYNDICATOR_L_KEYWORD_USE,
-  SYNDICATOR_L_KEYWORD_OPEN,
-  SYNDICATOR_L_KEYWORD_GEAR,
-  SYNDICATOR_L_KEYWORD_SOULBOUND,
-  "~" .. SYNDICATOR_L_KEYWORD_EQUIPMENT,
-  "200-300",
-  SYNDICATOR_L_KEYWORD_GEAR .. "&" .. SYNDICATOR_L_KEYWORD_SOULBOUND .. "&" .. SYNDICATOR_L_KEYWORD_JUNK,
-  ITEM_QUALITY3_DESC:lower(),
-  ITEM_QUALITY2_DESC:lower(),
-  SYNDICATOR_L_KEYWORD_BOA,
-  SYNDICATOR_L_KEYWORD_AXE,
-  SYNDICATOR_L_KEYWORD_SWORD,
-  MOUNT:lower(),
-  SYNDICATOR_L_KEYWORD_TRADEABLE_LOOT,
-  SYNDICATOR_L_KEYWORD_SET,
-  "~" .. SYNDICATOR_L_KEYWORD_SET .. "&" .. SYNDICATOR_L_KEYWORD_GEAR,
-}
-if not addonTable.Constants.IsEra then
-  local socketSearchTerms = {
-    SYNDICATOR_L_KEYWORD_SOCKET,
-    EMPTY_SOCKET_BLUE:lower(),
+  if Syndicator.Constants.WarbandBankActive then
+    -- Note constant values are taken from Blizzard code
+    addonTable.Constants.BlizzardBankTabConstants = {
+      Character = 1,
+      Warband = 3,
+    }
+  end
+
+  addonTable.Constants.SampleSearchTerms = {
+    "<400",
+    Syndicator.Locales.KEYWORD_BOE,
+    INVTYPE_SHOULDER:lower(),
+    INVTYPE_TRINKET:lower(),
+    Syndicator.Locales.KEYWORD_FOOD .. "|" ..  Syndicator.Locales.KEYWORD_POTION,
+    Syndicator.Locales.KEYWORD_EQUIPMENT,
+    Syndicator.Locales.KEYWORD_USE,
+    Syndicator.Locales.KEYWORD_OPEN,
+    Syndicator.Locales.KEYWORD_GEAR,
+    Syndicator.Locales.KEYWORD_SOULBOUND,
+    "~" .. Syndicator.Locales.KEYWORD_EQUIPMENT,
+    "200-300",
+    Syndicator.Locales.KEYWORD_GEAR .. "&" .. Syndicator.Locales.KEYWORD_SOULBOUND .. "&" .. Syndicator.Locales.KEYWORD_JUNK,
+    ITEM_QUALITY3_DESC:lower(),
+    ITEM_QUALITY2_DESC:lower(),
+    Syndicator.Locales.KEYWORD_BOA,
+    Syndicator.Locales.KEYWORD_AXE,
+    Syndicator.Locales.KEYWORD_SWORD,
+    MOUNT:lower(),
+    Syndicator.Locales.KEYWORD_TRADEABLE_LOOT,
+    Syndicator.Locales.KEYWORD_SET,
+    "~" .. Syndicator.Locales.KEYWORD_SET .. "&" .. Syndicator.Locales.KEYWORD_GEAR,
   }
-  tAppendAll(addonTable.Constants.SampleSearchTerms, socketSearchTerms)
-end
-if addonTable.Constants.IsRetail then
-  local retailSearchTerms = {
-    "dragonflight",
-    SYNDICATOR_L_KEYWORD_BOE .. "&" .. "dragonflight",
-    SYNDICATOR_L_KEYWORD_PET,
-    SYNDICATOR_L_KEYWORD_EQUIPMENT .. "&" .. "classic",
-    SYNDICATOR_L_KEYWORD_COSMETIC,
-    SYNDICATOR_L_KEYWORD_REAGENT,
-    SYNDICATOR_L_KEYWORD_MANUSCRIPT,
-    TOY:lower(),
-  }
-  tAppendAll(addonTable.Constants.SampleSearchTerms, retailSearchTerms)
+  if not addonTable.Constants.IsEra then
+    local socketSearchTerms = {
+      Syndicator.Locales.KEYWORD_SOCKET,
+      EMPTY_SOCKET_BLUE:lower(),
+    }
+    tAppendAll(addonTable.Constants.SampleSearchTerms, socketSearchTerms)
+  end
+  if addonTable.Constants.IsRetail then
+    local retailSearchTerms = {
+      "dragonflight",
+      Syndicator.Locales.KEYWORD_BOE .. "&" .. "dragonflight",
+      Syndicator.Locales.KEYWORD_PET,
+      Syndicator.Locales.KEYWORD_EQUIPMENT .. "&" .. "classic",
+      Syndicator.Locales.KEYWORD_COSMETIC,
+      Syndicator.Locales.KEYWORD_REAGENT,
+      Syndicator.Locales.KEYWORD_MANUSCRIPT,
+      TOY:lower(),
+    }
+    tAppendAll(addonTable.Constants.SampleSearchTerms, retailSearchTerms)
+  end
 end
 
 addonTable.Constants.KeyItemFamily = 256
@@ -176,25 +182,25 @@ addonTable.Constants.KeyItemFamily = 256
 addonTable.Constants.ContainerKeyToInfo = {
   ["?"] = {type = "atlas", value="QuestTurnin", tooltipHeader=AMMOSLOT},
   quiver = {type = "atlas", value="Ammunition", tooltipHeader=AMMOSLOT},
-  reagentBag = {type = "atlas", value="Professions_Tracking_Herb", tooltipHeader = BAGANATOR_L_REAGENTS},
-  keyring = {type = "file", value="interface\\addons\\baganator\\assets\\bag_keys", tooltipHeader = BAGANATOR_L_KEYS},
+  reagentBag = {type = "atlas", value="Professions_Tracking_Herb", tooltipHeader = addonTable.Locales.REAGENTS},
+  keyring = {type = "file", value="interface\\addons\\baganator\\assets\\bag_keys", tooltipHeader = addonTable.Locales.KEYS},
   [0] = nil, -- regular bag
-  [1] = {type = "file", value="interface\\addons\\baganator\\assets\\bag_soul_shard", tooltipHeader=BAGANATOR_L_SOUL}, -- soulbag
-  [2] = {type = "atlas", value="Mobile-Herbalism", tooltipHeader=BAGANATOR_L_HERBALISM, size=50}, --herb
-  [3] = {type = "atlas", value="Mobile-Enchanting", tooltipHeader=BAGANATOR_L_ENCHANTING, size=50}, --enchant
-  [4] = {type = "atlas", value="Mobile-Enginnering", tooltipHeader=BAGANATOR_L_ENGINEERING, size=50}, --engineering (not not a typo for the atlas, its really misspelled)
-  [5] = {type = "atlas", value="Mobile-Jewelcrafting", tooltipHeader=BAGANATOR_L_GEMS, size=50}, -- gem
-  [6] = {type = "atlas", value="Mobile-Mining", tooltipHeader=BAGANATOR_L_MINING, size=50}, -- mining
-  [7] = {type = "atlas", value="Mobile-Leatherworking", tooltipHeader=BAGANATOR_L_LEATHERWORKING, size=50}, -- leatherworking
-  [8] = {type = "atlas", value="Mobile-Inscription", tooltipHeader=BAGANATOR_L_INSCRIPTION, size=50}, -- inscription
-  [9] = {type = "atlas", value="Mobile-Fishing", tooltipHeader=BAGANATOR_L_FISHING, size=50}, -- fishing
-  [10] = {type = "atlas", value="Mobile-Cooking", tooltipHeader=BAGANATOR_L_COOKING, size=50}, -- cooking
+  [1] = {type = "file", value="interface\\addons\\baganator\\assets\\bag_soul_shard", tooltipHeader=addonTable.Locales.SOUL}, -- soulbag
+  [2] = {type = "atlas", value="Mobile-Herbalism", tooltipHeader=addonTable.Locales.HERBALISM, size=50}, --herb
+  [3] = {type = "atlas", value="Mobile-Enchanting", tooltipHeader=addonTable.Locales.ENCHANTING, size=50}, --enchant
+  [4] = {type = "atlas", value="Mobile-Enginnering", tooltipHeader=addonTable.Locales.ENGINEERING, size=50}, --engineering (not not a typo for the atlas, its really misspelled)
+  [5] = {type = "atlas", value="Mobile-Jewelcrafting", tooltipHeader=addonTable.Locales.GEMS, size=50}, -- gem
+  [6] = {type = "atlas", value="Mobile-Mining", tooltipHeader=addonTable.Locales.MINING, size=50}, -- mining
+  [7] = {type = "atlas", value="Mobile-Leatherworking", tooltipHeader=addonTable.Locales.LEATHERWORKING, size=50}, -- leatherworking
+  [8] = {type = "atlas", value="Mobile-Inscription", tooltipHeader=addonTable.Locales.INSCRIPTION, size=50}, -- inscription
+  [9] = {type = "atlas", value="Mobile-Fishing", tooltipHeader=addonTable.Locales.FISHING, size=50}, -- fishing
+  [10] = {type = "atlas", value="Mobile-Cooking", tooltipHeader=addonTable.Locales.COOKING, size=50}, -- cooking
 }
 addonTable.Constants.ContainerTypes = 13
 
 addonTable.Constants.BankTabType = {
-  Character = 0,
-  Warband = 1,
+  Character = 1,
+  Warband = 2,
 }
 
 addonTable.Constants.RefreshReason = {

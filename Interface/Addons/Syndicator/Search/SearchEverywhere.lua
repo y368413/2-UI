@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableSyndicator
+local addonTable = select(2, ...)
 
 local cache = {}
 
@@ -25,7 +26,7 @@ local function CacheCharacter(character, callback)
     end
   end
 
-  finishCheck("bag", Syndicator.Search.GetBaseInfoFromList(bagsList))
+  finishCheck("bag", addonTable.Search.GetBaseInfoFromList(bagsList))
 
   local bankList = {}
   for _, bag in ipairs(characterData.bank) do
@@ -33,24 +34,31 @@ local function CacheCharacter(character, callback)
       table.insert(bankList, item)
     end
   end
+  if characterData.bankTabs then
+    for _, tab in ipairs(characterData.bankTabs) do
+      for _, item in ipairs(tab.slots) do
+        table.insert(bankList, item)
+      end
+    end
+  end
 
-  finishCheck("bank", Syndicator.Search.GetBaseInfoFromList(bankList))
+  finishCheck("bank", addonTable.Search.GetBaseInfoFromList(bankList))
 
-  finishCheck("mail", Syndicator.Search.GetBaseInfoFromList(characterData.mail or {}))
+  finishCheck("mail", addonTable.Search.GetBaseInfoFromList(characterData.mail or {}))
 
-  finishCheck("auctions", Syndicator.Search.GetBaseInfoFromList(characterData.auctions or {}))
+  finishCheck("auctions", addonTable.Search.GetBaseInfoFromList(characterData.auctions or {}))
 
   local equippedList = {}
   for _, slot in pairs(characterData.equipped or {}) do
     table.insert(equippedList, slot)
   end
-  for label, containers in pairs(characterData.containerInfo or {}) do
+  for _, containers in pairs(characterData.containerInfo or {}) do
     for _, item in pairs(containers) do
       table.insert(equippedList, item)
     end
   end
 
-  finishCheck("equipped", Syndicator.Search.GetBaseInfoFromList(equippedList))
+  finishCheck("equipped", addonTable.Search.GetBaseInfoFromList(equippedList))
 
   local voidList = {}
   for _, tab in ipairs(characterData.void or {}) do
@@ -59,7 +67,7 @@ local function CacheCharacter(character, callback)
     end
   end
 
-  finishCheck("void", Syndicator.Search.GetBaseInfoFromList(voidList))
+  finishCheck("void", addonTable.Search.GetBaseInfoFromList(voidList))
 end
 
 local function CacheGuild(guild, callback)
@@ -74,7 +82,7 @@ local function CacheGuild(guild, callback)
     end
   end
 
-  local results = Syndicator.Search.GetBaseInfoFromList(guildList)
+  local results = addonTable.Search.GetBaseInfoFromList(guildList)
   for _, r in ipairs(results) do
     r.source = {guild = guild, container = linkToTabIndex[r.itemLink]}
     table.insert(cache, r)
@@ -94,7 +102,7 @@ local function CacheWarband(warbandIndex, callback)
     end
   end
 
-  local results = Syndicator.Search.GetBaseInfoFromList(warbandList)
+  local results = addonTable.Search.GetBaseInfoFromList(warbandList)
   for _, r in ipairs(results) do
     r.source = {warband = warbandIndex, container = linkToTabIndex[r.itemLink]}
     table.insert(cache, r)
@@ -125,26 +133,26 @@ local function CharacterCacheUpdate(_, character)
   end
 end
 
-Syndicator.CallbackRegistry:RegisterCallback("BagCacheUpdate", CharacterCacheUpdate)
-Syndicator.CallbackRegistry:RegisterCallback("MailCacheUpdate", CharacterCacheUpdate)
-Syndicator.CallbackRegistry:RegisterCallback("EquippedCacheUpdate", CharacterCacheUpdate)
-Syndicator.CallbackRegistry:RegisterCallback("VoidCacheUpdate", CharacterCacheUpdate)
+addonTable.CallbackRegistry:RegisterCallback("BagCacheUpdate", CharacterCacheUpdate)
+addonTable.CallbackRegistry:RegisterCallback("MailCacheUpdate", CharacterCacheUpdate)
+addonTable.CallbackRegistry:RegisterCallback("EquippedCacheUpdate", CharacterCacheUpdate)
+addonTable.CallbackRegistry:RegisterCallback("VoidCacheUpdate", CharacterCacheUpdate)
 
-Syndicator.CallbackRegistry:RegisterCallback("GuildCacheUpdate", function(_, guild)
+addonTable.CallbackRegistry:RegisterCallback("GuildCacheUpdate", function(_, guild)
   if pending then
     pending.Guilds[guild] = true
     toPurge.Guilds[guild] = true
   end
 end)
 
-Syndicator.CallbackRegistry:RegisterCallback("WarbandBankCacheUpdate", function(_, index)
+addonTable.CallbackRegistry:RegisterCallback("WarbandBankCacheUpdate", function(_, index)
   if pending then
     pending.Warband[index] = true
     toPurge.Warband[index] = true
   end
 end)
 
-function Syndicator.Search.RequestSearchEverywhereResults(searchTerm, callback)
+function addonTable.Search.RequestSearchEverywhereResults(searchTerm, callback)
   if pending == nil then
     pending = {
       Characters = {},
@@ -166,7 +174,7 @@ function Syndicator.Search.RequestSearchEverywhereResults(searchTerm, callback)
   end
 
   local function PendingCheck()
-    if next(pending.Characters) == nil and (not Syndicator.Config.Get(Syndicator.Config.Options.SHOW_GUILD_BANKS_IN_TOOLTIPS) or next(pending.Guilds) == nil) and next(pending.Warband) == nil then
+    if next(pending.Characters) == nil and (not addonTable.Config.Get(addonTable.Config.Options.SHOW_GUILD_BANKS_IN_TOOLTIPS) or next(pending.Guilds) == nil) and next(pending.Warband) == nil then
       managingFrame:SetScript("OnUpdate", nil)
       for _, query in ipairs(pendingQueries) do
         Query(unpack(query))
@@ -189,7 +197,7 @@ function Syndicator.Search.RequestSearchEverywhereResults(searchTerm, callback)
         end
       end)
     end
-    if Syndicator.Config.Get(Syndicator.Config.Options.SHOW_GUILD_BANKS_IN_TOOLTIPS) then
+    if addonTable.Config.Get(addonTable.Config.Options.SHOW_GUILD_BANKS_IN_TOOLTIPS) then
       for guild in pairs(pending.Guilds) do
         waiting = waiting + 1
         CacheGuild(guild, function()
@@ -228,7 +236,7 @@ end
 local function GetKeys(results, callback)
   local waiting = #results
   for _, r in ipairs(results) do
-    local key = Syndicator.Search.GetGroupingKey(r, function(key)
+    addonTable.Search.GetGroupingKey(r, function(key)
       r.key = key
       waiting = waiting - 1
       if waiting == 0 then
@@ -241,7 +249,7 @@ local function GetKeys(results, callback)
   end
 end
 
-function Syndicator.Search.CombineSearchEverywhereResults(results, callback)
+function addonTable.Search.CombineSearchEverywhereResults(results, callback)
   local items = {}
   local seenCharacters = {}
   local seenGuilds = {}
@@ -262,7 +270,7 @@ function Syndicator.Search.CombineSearchEverywhereResults(results, callback)
       source.itemCount = r.itemCount
       if source.character then
         local characterData = Syndicator.API.GetCharacter(source.character)
-        if not characterData.details.hidden and (source.container ~= "equipped" or Syndicator.Config.Get(Syndicator.Config.Options.SHOW_EQUIPPED_ITEMS_IN_TOOLTIPS)) then
+        if not characterData.details.hidden and (source.container ~= "equipped" or addonTable.Config.Get(addonTable.Config.Options.SHOW_EQUIPPED_ITEMS_IN_TOOLTIPS)) then
           if seenCharacters[key][source.character .. "_" .. source.container] then
             local entry = items[key].sources[seenCharacters[key][source.character .. "_" .. source.container]]
             entry.itemCount = entry.itemCount + source.itemCount
@@ -270,6 +278,7 @@ function Syndicator.Search.CombineSearchEverywhereResults(results, callback)
             table.insert(items[key].sources, source)
             source.itemLink = r.itemLink
             source.itemNameLower = r.itemNameLower
+            source.realm = characterData.details.realmNormalized
             seenCharacters[key][source.character .. "_" .. source.container] = #items[key].sources
           end
           items[key].itemCount = items[key].itemCount + r.itemCount
@@ -284,12 +293,12 @@ function Syndicator.Search.CombineSearchEverywhereResults(results, callback)
             table.insert(items[key].sources, source)
             source.itemLink = r.itemLink
             source.itemNameLower = r.itemNameLower
+            source.realm = guildData.details.realm
             seenGuilds[key][source.guild] = #items[key].sources
           end
           items[key].itemCount = items[key].itemCount + r.itemCount
         end
       elseif source.warband then
-        local warbandData = SYNDICATOR_DATA.Warband[source.warband]
         if seenWarband[key][source.warband] then
           local entry = items[key].sources[seenWarband[key][source.warband]]
           entry.itemCount = entry.itemCount + source.itemCount
@@ -315,7 +324,25 @@ function Syndicator.Search.CombineSearchEverywhereResults(results, callback)
         table.insert(final, items[key])
         table.sort(items[key].sources, function(a, b)
           if a.itemCount == b.itemCount then
-            return tostring(a.container) < tostring(b.container)
+            if a.realm == b.realm then
+              if a.container == b.container then
+                if a.character then
+                  return a.character < b.character
+                elseif a.guild then
+                  return a.guild < b.guild
+                else
+                  return false
+                end
+              else
+                return tostring(a.container) < tostring(b.container)
+              end
+            elseif a.realm and not b.realm then
+              return false
+            elseif b.realm and not a.realm then
+              return true
+            else
+              return a.realm < b.realm
+            end
           else
             return a.itemCount > b.itemCount
           end
@@ -335,7 +362,7 @@ local function GetLink(source, searchTerm, text)
     mode = "character"
   elseif source.warband then
     mode = "warband"
-    text = SYNDICATOR_L_WARBAND
+    text = addonTable.Locales.WARBAND
   else
     return text
   end
@@ -346,12 +373,12 @@ local function GetLink(source, searchTerm, text)
 end
 
 local CONTAINER_TYPE_TO_TEXT = {
-  bag = SYNDICATOR_L_BAGS_LOWER,
-  bank = SYNDICATOR_L_BANK_LOWER,
-  mail = SYNDICATOR_L_MAIL_LOWER,
-  equipped = SYNDICATOR_L_EQUIPPED_LOWER,
-  void = SYNDICATOR_L_VOID_LOWER,
-  auctions = SYNDICATOR_L_AUCTIONS_LOWER,
+  bag = addonTable.Locales.BAGS_LOWER,
+  bank = addonTable.Locales.BANK_LOWER,
+  mail = addonTable.Locales.MAIL_LOWER,
+  equipped = addonTable.Locales.EQUIPPED_LOWER,
+  void = addonTable.Locales.VOID_LOWER,
+  auctions = addonTable.Locales.AUCTIONS_LOWER,
 }
 
 local function PrintSource(indent, source, searchTerm)
@@ -372,17 +399,17 @@ local function PrintSource(indent, source, searchTerm)
     if addonTable.ShowItemLocationCallback then
       guild = GetLink(source, searchTerm, source.guild)
     end
-    print(indent, SYNDICATOR_L_GUILD_LOWER .. count, TRANSMOGRIFY_FONT_COLOR:WrapTextInColorCode(guild))
+    print(indent, addonTable.Locales.GUILD_LOWER .. count, TRANSMOGRIFY_FONT_COLOR:WrapTextInColorCode(guild))
   elseif source.warband then
     local warband = source.warband
     if addonTable.ShowItemLocationCallback then
       warband = GetLink(source, searchTerm, source.warband)
     end
-    print(indent, SYNDICATOR_L_WARBAND_LOWER .. count, PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(warband))
+    print(indent, addonTable.Locales.WARBAND_LOWER .. count, PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(warband))
   end
 end
 
-EventRegistry:RegisterCallback("SetItemRef", function(_, link, text, button, chatFrame)
+EventRegistry:RegisterCallback("SetItemRef", function(_, link)
     local linkType, addonName, searchText, mode, entity, container, itemLink = strsplit(":", link)
     if linkType == "addon" and addonName == "SyndicatorSearch" then
       -- Revert changes to item link to make it fit in the addon link
@@ -392,27 +419,31 @@ EventRegistry:RegisterCallback("SetItemRef", function(_, link, text, button, cha
     end
 end)
 
-function Syndicator.Search.SearchEverywhereAndPrintResults(searchTerm)
+function addonTable.Search.SearchEverywhereAndPrintResults(searchTerm)
   if searchTerm:match("|H") then
-    Syndicator.Utilities.Message(SYNDICATOR_L_CANNOT_SEARCH_BY_ITEM_LINK)
+    addonTable.Utilities.Message(addonTable.Locales.CANNOT_SEARCH_BY_ITEM_LINK)
     return
   end
   searchTerm = searchTerm:lower()
-  Syndicator.Search.RequestSearchEverywhereResults(searchTerm, function(results)
-    print(GREEN_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_SEARCHED_EVERYWHERE_COLON) .. " " .. YELLOW_FONT_COLOR:WrapTextInColorCode(searchTerm))
-    Syndicator.Search.CombineSearchEverywhereResults(results, function(results)
+  addonTable.Search.RequestSearchEverywhereResults(searchTerm, function(results)
+    print(GREEN_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.SEARCHED_EVERYWHERE_COLON) .. " " .. YELLOW_FONT_COLOR:WrapTextInColorCode(searchTerm))
+    addonTable.Search.CombineSearchEverywhereResults(results, function(combinedResults)
       local indent = "       "
-      for _, r in ipairs(results) do
+      for _, r in ipairs(combinedResults) do
         print("   " .. r.itemLink, BLUE_FONT_COLOR:WrapTextInColorCode("x" .. FormatLargeNumber(r.itemCount)))
         for _, s in ipairs(r.sources) do
           PrintSource(indent, s, s.itemNameLower)
         end
       end
-      if #results == 0 then
-        print(indent, RED_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_NO_RESULTS_FOUND))
+      if #combinedResults == 0 then
+        print(indent, RED_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.NO_RESULTS_FOUND))
       end
     end)
   end)
 end
 -- Compatibility
-Syndicator.Search.RunMegaSearchAndPrintResults = Syndicator.Search.SearchEverywhereAndPrintResults
+Syndicator.Search.RunMegaSearchAndPrintResults = addonTable.Search.SearchEverywhereAndPrintResults
+-- Exposed
+Syndicator.Search.SearchEverywhereAndPrintResults = addonTable.Search.SearchEverywhereAndPrintResults
+Syndicator.Search.RequestSearchEverywhereResults = addonTable.Search.RequestSearchEverywhereResults
+Syndicator.Search.CombineSearchEverywhereResults = addonTable.Search.CombineSearchEverywhereResults

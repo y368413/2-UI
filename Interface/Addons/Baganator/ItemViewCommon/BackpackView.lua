@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 
 local classicTabObjectCounter = 0
 
@@ -75,20 +76,9 @@ function BaganatorItemViewCommonBackpackViewMixin:OnLoad()
     if not self.lastCharacter then
       return
     end
-    if settingName == addonTable.Config.Options.SHOW_RECENTS_TABS and self.Tabs ~= nil then
-      local isShown = addonTable.Config.Get(addonTable.Config.Options.SHOW_RECENTS_TABS)
-      for index, tab in ipairs(self.Tabs) do
-        tab:SetShown(isShown)
-        if tab.details == self.lastCharacter then
-          PanelTemplates_SetTab(self, index)
-        end
-      end
-      if self:IsVisible() then
-        self:OnFinished()
-      end
-    elseif settingName == addonTable.Config.Options.MAIN_VIEW_SHOW_BAG_SLOTS and self:IsVisible() then
+    if settingName == addonTable.Config.Options.MAIN_VIEW_SHOW_BAG_SLOTS and self:IsVisible() then
       self.BagSlots:Update(self.lastCharacter, self.isLive)
-      self:OnFinished()
+      self:OnFinished(true)
     end
   end)
 
@@ -99,7 +89,6 @@ function BaganatorItemViewCommonBackpackViewMixin:OnLoad()
 
   addonTable.CallbackRegistry:RegisterCallback("CharacterSelect", function(_, character)
     if character ~= self.lastCharacter then
-      self:AddNewRecent(character)
       self.refreshState[addonTable.Constants.RefreshReason.ItemData] = true
       self.refreshState[addonTable.Constants.RefreshReason.Layout] = true
       if self:IsVisible() then
@@ -115,18 +104,6 @@ function BaganatorItemViewCommonBackpackViewMixin:OnLoad()
       self:UpdateGuildButton()
     end
   end)
-
-  self.confirmTransferAllDialogName = "addonTable.ConfirmTransferAll_" .. self:GetName()
-  StaticPopupDialogs[self.confirmTransferAllDialogName] = {
-    text = BAGANATOR_L_CONFIRM_TRANSFER_ALL_ITEMS_FROM_BAG,
-    button1 = YES,
-    button2 = NO,
-    OnAccept = function()
-      self:Transfer(true, self.data)
-    end,
-    timeout = 0,
-    hideOnEscape = 1,
-  }
 
   if addonTable.Constants.IsEra then
     local index = tIndexOf(self.TopButtons, self.ToggleGuildBankButton)
@@ -181,7 +158,7 @@ function BaganatorItemViewCommonBackpackViewMixin:OnDragStop()
 end
 
 function BaganatorItemViewCommonBackpackViewMixin:ToggleBank()
-  addonTable.CallbackRegistry:TriggerEvent("BankToggle", self.lastCharacter)
+  addonTable.CallbackRegistry:TriggerEvent("BankToggle")
   self:Raise()
 end
 
@@ -197,120 +174,6 @@ function BaganatorItemViewCommonBackpackViewMixin:ToggleBagSlots()
   addonTable.Config.Set(addonTable.Config.Options.MAIN_VIEW_SHOW_BAG_SLOTS, not addonTable.Config.Get(addonTable.Config.Options.MAIN_VIEW_SHOW_BAG_SLOTS))
 end
 
-
-function BaganatorItemViewCommonBackpackViewMixin:SelectTab(character)
-  for index, tab in ipairs(self.Tabs) do
-    if tab.details == character then
-      PanelTemplates_SetTab(self, index)
-      break
-    end
-  end
-end
-
-local function DeDuplicateRecents()
-  local recents = addonTable.Config.Get(addonTable.Config.Options.RECENT_CHARACTERS_MAIN_VIEW)
-  local newRecents = {}
-  local seen = {}
-  for _, character in ipairs(recents) do
-    if Syndicator.API.GetCharacter(character) and not seen[character] and #newRecents < addonTable.Constants.MaxRecents then
-      table.insert(newRecents, character)
-    end
-    seen[character] = true
-  end
-  addonTable.Config.Set(addonTable.Config.Options.RECENT_CHARACTERS_MAIN_VIEW, newRecents)
-end
-
-function BaganatorItemViewCommonBackpackViewMixin:FillRecents(characters)
-  local characters = Syndicator.API.GetAllCharacters()
-
-  table.sort(characters, function(a, b) return a < b end)
-
-  local recents = addonTable.Config.Get(addonTable.Config.Options.RECENT_CHARACTERS_MAIN_VIEW)
-
-  table.insert(recents, 1, self.liveCharacter)
-
-  for _, char in ipairs(characters) do
-    table.insert(recents, char)
-  end
-
-  DeDuplicateRecents()
-
-  self:RefreshTabs()
-end
-
-function BaganatorItemViewCommonBackpackViewMixin:AddNewRecent(character)
-  local recents = addonTable.Config.Get(addonTable.Config.Options.RECENT_CHARACTERS_MAIN_VIEW)
-  local data = Syndicator.API.GetCharacter(character)
-  if not data then
-    return
-  end
-
-  table.insert(recents, 2, character)
-
-  DeDuplicateRecents()
-
-  self:RefreshTabs()
-end
-
-function BaganatorItemViewCommonBackpackViewMixin:RefreshTabs()
-  self.tabsPool:ReleaseAll()
-
-  local characters = addonTable.Config.Get(addonTable.Config.Options.RECENT_CHARACTERS_MAIN_VIEW)
-
-  local isShown = addonTable.Config.Get(addonTable.Config.Options.SHOW_RECENTS_TABS)
-  local sameConnected = {}
-  for _, realmNormalized in ipairs(Syndicator.Utilities.GetConnectedRealms()) do
-    sameConnected[realmNormalized] = true
-  end
-
-  local lastTab
-  local tabs = {}
-  local index = 1
-  while #tabs < addonTable.Constants.MaxRecentsTabs and index <= #characters do
-    local char = characters[index]
-    local details = Syndicator.API.GetCharacter(char).details
-    if sameConnected[details.realmNormalized] then
-      local tabButton = self.tabsPool:Acquire()
-      addonTable.Skins.AddFrame("TabButton", tabButton)
-      tabButton:SetText(details.character)
-      tabButton:SetScript("OnClick", function()
-        addonTable.CallbackRegistry:TriggerEvent("CharacterSelect", char)
-      end)
-      if not lastTab then
-        tabButton:SetPoint("BOTTOM", 0, -30)
-      else
-        tabButton:SetPoint("TOPLEFT", lastTab, "TOPRIGHT")
-      end
-      tabButton.details = char
-      tabButton:SetID(index)
-      tabButton:SetShown(isShown)
-      lastTab = tabButton
-      table.insert(tabs, tabButton)
-    end
-    index = index + 1
-  end
-  self.Tabs = tabs
-
-  PanelTemplates_SetNumTabs(self, #tabs)
-end
-
-function BaganatorItemViewCommonBackpackViewMixin:SetupTabs()
-  if self.tabsSetup then
-    return
-  end
-
-  self:FillRecents(characters)
-
-  self.tabsSetup = self.liveCharacter ~= nil
-end
-
-function BaganatorItemViewCommonBackpackViewMixin:HideExtraTabs()
-  local isShown = addonTable.Config.Get(addonTable.Config.Options.SHOW_RECENTS_TABS)
-  for _, tab in ipairs(self.Tabs) do
-    tab:SetShown(isShown and tab:GetRight() < self:GetRight())
-  end
-end
-
 function BaganatorItemViewCommonBackpackViewMixin:UpdateForCharacter(character, isLive)
   addonTable.ReportEntry()
 
@@ -324,11 +187,8 @@ function BaganatorItemViewCommonBackpackViewMixin:UpdateForCharacter(character, 
     self:SetTitle("")
     return
   else
-    self:SetTitle(BAGANATOR_L_XS_BAGS:format(characterData.details.character))
+    self:SetTitle(addonTable.Locales.XS_BAGS:format(characterData.details.character))
   end
-
-  self:SetupTabs()
-  self:SelectTab(character)
 
   local oldLast = self.lastCharacter
   self.lastCharacter = character
@@ -360,12 +220,6 @@ function BaganatorItemViewCommonBackpackViewMixin:UpdateForCharacter(character, 
 
   local sideSpacing, topSpacing = addonTable.Utilities.GetSpacing()
 
-  if self.tabsSetup then -- Not ready immediately on PLAYER_ENTERING_WORLD
-    self.Tabs[1]:SetPoint("LEFT", self, "LEFT", sideSpacing + addonTable.Constants.ButtonFrameOffset, 0)
-  else
-    self.Tabs = {}
-  end
-
   self.BagSlots:SetPoint("BOTTOMLEFT", self, "TOPLEFT", addonTable.Constants.ButtonFrameOffset, 0)
 
   if self.refreshState[addonTable.Constants.RefreshReason.Layout] then
@@ -377,11 +231,11 @@ function BaganatorItemViewCommonBackpackViewMixin:UpdateForCharacter(character, 
   end
 end
 
-function BaganatorItemViewCommonBackpackViewMixin:OnFinished(character, isLive)
-  if self.refreshState[addonTable.Constants.RefreshReason.Layout] then
+function BaganatorItemViewCommonBackpackViewMixin:OnFinished(forceResize)
+  if self.refreshState[addonTable.Constants.RefreshReason.Layout] or forceResize then
     local sideSpacing, topSpacing, searchSpacing = addonTable.Utilities.GetSpacing()
 
-    local externalVerticalSpacing = (self.BagSlots:GetHeight() > 0 and (self.BagSlots:GetTop() - self:GetTop()) or 0) + (self.Tabs[1] and self.Tabs[1]:IsShown() and (self:GetBottom() - self.Tabs[1]:GetBottom() + 5) or 0)
+    local externalVerticalSpacing = (self.BagSlots:GetHeight() > 0 and (self.BagSlots:GetTop() - self:GetTop()) or 0)
 
     local additionalPadding = 0
     if addonTable.Config.Get(addonTable.Config.Options.REDUCE_SPACING) then
@@ -395,8 +249,6 @@ function BaganatorItemViewCommonBackpackViewMixin:OnFinished(character, isLive)
 
     self:UpdateScroll(74 + additionalPadding + topSpacing / 2 + externalVerticalSpacing, self:GetScale())
   end
-
-  self:HideExtraTabs()
 
   self:UpdateAllButtons()
 end
@@ -465,7 +317,9 @@ function BaganatorItemViewCommonBackpackViewMixin:Transfer(force, getItems)
   for _, transferDetails in ipairs(addonTable.BagTransfers) do
     if transferDetails.condition() then
       if not force and transferDetails.confirmOnAll and self.SearchWidget.SearchBox:GetText() == "" then
-        StaticPopup_Show(self.confirmTransferAllDialogName, nil, nil, getItems)
+        addonTable.Dialogs.ShowConfirm(addonTable.Locales.CONFIRM_TRANSFER_ALL_ITEMS_FROM_BAG, YES, NO, function()
+          self:Transfer(true, self.data)
+        end)
         break
       else
         self:RunAction(transferDetails.action, getItems)
@@ -505,6 +359,9 @@ function BaganatorItemViewCommonBackpackViewMixin:CombineStacksAndSort(isReverse
   end
 
   if addonTable.API.ExternalContainerSorts[sortMethod] then
+    if addonTable.Config.Get(addonTable.Config.Options.SORT_START_AT_BOTTOM) then
+      isReverse = not isReverse
+    end
     addonTable.API.ExternalContainerSorts[sortMethod].callback(isReverse, Baganator.API.Constants.ContainerType.Backpack)
   elseif sortMethod == "combine_stacks_only" then
     self:CombineStacks(function() end)

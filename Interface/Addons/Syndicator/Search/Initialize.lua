@@ -1,7 +1,10 @@
-function Syndicator.Search.Initialize()
-  Syndicator.Search.InitializeSearchEngine()
+---@class addonTableSyndicator
+local addonTable = select(2, ...)
 
-  SlashCmdList["SyndicatorSearch"] = Syndicator.Search.SearchEverywhereAndPrintResults
+function addonTable.Search.Initialize()
+  addonTable.Search.InitializeSearchEngine()
+
+  SlashCmdList["SyndicatorSearch"] = addonTable.Search.SearchEverywhereAndPrintResults
   SLASH_SyndicatorSearch1 = "/baganatorsearch"
   SLASH_SyndicatorSearch2 = "/bgrs"
   SLASH_SyndicatorSearch3 = "/syndicatorsearch"

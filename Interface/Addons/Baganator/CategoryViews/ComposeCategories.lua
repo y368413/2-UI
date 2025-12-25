@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 
 local inventorySlots = {
   "INVTYPE_2HWEAPON",
@@ -39,11 +40,10 @@ local function GetAuto(category, everything)
   if category.auto == "equipment_sets" then
     local names = addonTable.ItemViewCommon.GetEquipmentSetNames()
     if #names == 0 then
-      table.insert(searchLabels, BAGANATOR_L_CATEGORY_EQUIPMENT_SET)
-      table.insert(searches, "#" .. SYNDICATOR_L_KEYWORD_EQUIPMENT_SET)
+      table.insert(searchLabels, addonTable.Locales.CATEGORY_EQUIPMENT_SET)
+      table.insert(searches, "#" .. Syndicator.Locales.KEYWORD_EQUIPMENT_SET)
     else
       local groupedItems = {}
-      local merged = {}
       for i = 1, #everything do
         local item = everything[i]
         if item.setInfo ~= nil then
@@ -66,12 +66,12 @@ local function GetAuto(category, everything)
       local name = _G[slot]
       if name then
         table.insert(searchLabels, name)
-        table.insert(searches, "#" .. SYNDICATOR_L_KEYWORD_GEAR .. "&#" .. name:lower())
+        table.insert(searches, "#" .. Syndicator.Locales.KEYWORD_GEAR .. "&#" .. name:lower())
       end
     end
   elseif category.auto == "recents" then
     table.insert(searches, "")
-    table.insert(searchLabels, BAGANATOR_L_CATEGORY_RECENT)
+    table.insert(searchLabels, addonTable.Locales.CATEGORY_RECENT)
     local newItems = {}
     local newByKey = {}
     for _, item in ipairs(everything) do
@@ -140,13 +140,12 @@ end
 
 -- Organise category data ready for display, including removing duplicate
 -- searches with priority determining which gets kept.
-function addonTable.CategoryViews.ComposeCategories(everything)
+function addonTable.CategoryViews.ComposeCategories(everything, location)
   local allDetails = {}
 
   local customCategories = addonTable.Config.Get(addonTable.Config.Options.CUSTOM_CATEGORIES)
   local categoryMods = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_MODIFICATIONS)
   local sections = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_SECTIONS)
-  local categoryKeys = {}
   local currentSection = {}
   for _, source in ipairs(addonTable.Config.Get(addonTable.Config.Options.CATEGORY_DISPLAY_ORDER)) do
     local section = CopyTable(currentSection)
@@ -171,7 +170,7 @@ function addonTable.CategoryViews.ComposeCategories(everything)
       })
       local sectionDetails = sections[sectionID]
       local sectionName = sectionDetails.name
-      local label = _G["BAGANATOR_L_SECTION_" .. sectionName] or sectionName
+      local label = addonTable.Locales["SECTION_" .. sectionName] or sectionName
       table.insert(currentSection, sectionID)
       table.insert(allDetails, {
         type = "section",
@@ -184,17 +183,19 @@ function addonTable.CategoryViews.ComposeCategories(everything)
     local priority = categoryMods[source] and categoryMods[source].priority and (categoryMods[source].priority + 1) * 200 or 0
 
     local mods = categoryMods[source]
-    local group, groupPrefix, attachedItems, color
+    local group, groupPrefix, attachedItems
+    local shouldShow = true
     if mods then
       if mods.addedItems and next(mods.addedItems) then
         attachedItems = mods.addedItems
       end
       group = mods.group
       groupPrefix = mods.showGroupPrefix
+      shouldShow = mods.hideIn == nil or not mods.hideIn[location]
     end
 
     local category = addonTable.CategoryViews.Constants.SourceToCategory[source]
-    if category then
+    if category and shouldShow then
       if category.auto then
         local autoDetails = GetAuto(category, everything)
         local currentTree = {}
@@ -257,7 +258,7 @@ function addonTable.CategoryViews.ComposeCategories(everything)
           priority = 0,
           auto = true,
           emptySlots = true,
-          label = BAGANATOR_L_EMPTY,
+          label = addonTable.Locales.EMPTY,
         }
       else
         allDetails[#allDetails + 1] = {
@@ -275,7 +276,7 @@ function addonTable.CategoryViews.ComposeCategories(everything)
       end
     end
     category = customCategories[source]
-    if category then
+    if category and shouldShow then
       local search = category.search:lower()
       if search == "" then
         search = "________" .. (#allDetails + 1)
@@ -301,7 +302,7 @@ function addonTable.CategoryViews.ComposeCategories(everything)
     if a.priority == b.priority then
       return a.index < b.index
     else
-      return a.priority > b. priority
+      return a.priority > b.priority
     end
   end)
 

@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 
 local function GetShowState(data)
   if data.details.show then
@@ -17,10 +18,31 @@ function addonTable.ShowGoldSummaryRealm(anchor, point)
     realmsToInclude[r] = true
   end
 
+  local allCharacters = addonTable.Utilities.GetAllCharacters()
+  local allGuilds = addonTable.Utilities.GetAllGuilds()
+  local currentCharacterDetails = Syndicator.API.GetCharacter(Syndicator.API.GetCurrentCharacter()).details
+  local currentRealm = currentCharacterDetails.realmNormalized
+  local currentFaction = currentCharacterDetails.faction
+  local applyFaction = addonTable.Constants.IsClassic
+  local multipleRealms = false
+  -- Identify if any characters/guilds on a different realm to the current one
+  -- will be shown
+  for _, characterInfo in ipairs(allCharacters) do
+    if realmsToInclude[characterInfo.realmNormalized] and GetShowState(Syndicator.API.GetCharacter(characterInfo.fullName)) and characterInfo.realmNormalized ~= currentRealm then
+      multipleRealms = true
+    end
+  end
+  for _, guildInfo in ipairs(allGuilds) do
+    local guildData = Syndicator.API.GetGuild(guildInfo.fullName)
+    if realmsToInclude[guildInfo.realmNormalized] and guildData.details.show and guildData.details.show.gold and guildInfo.realmNormalized ~= currentRealm then
+      multipleRealms = true
+    end
+  end
+
   local lines = {}
   local total = 0
-  for _, characterInfo in ipairs(addonTable.Utilities.GetAllCharacters()) do
-    if realmsToInclude[characterInfo.realmNormalized] and GetShowState(Syndicator.API.GetCharacter(characterInfo.fullName)) then
+  for _, characterInfo in ipairs(allCharacters) do
+    if realmsToInclude[characterInfo.realmNormalized] and GetShowState(Syndicator.API.GetCharacter(characterInfo.fullName)) and (not applyFaction or currentFaction == characterInfo.faction) then
       local money = Syndicator.API.GetCharacter(characterInfo.fullName).money
       local characterName = characterInfo.name
       if characterInfo.className then
@@ -29,7 +51,7 @@ function addonTable.ShowGoldSummaryRealm(anchor, point)
       if characterInfo.race then
         characterName = Syndicator.Utilities.GetCharacterIcon(characterInfo.race, characterInfo.sex) .. " " .. characterName
       end
-      if #connectedRealms > 1 then
+      if multipleRealms then
         characterName = characterName .. "-" .. characterInfo.realmNormalized
       end
       table.insert(lines, {left = characterName, right = addonTable.Utilities.GetMoneyString(money, true)})
@@ -37,12 +59,12 @@ function addonTable.ShowGoldSummaryRealm(anchor, point)
     end
   end
 
-  for _, guildInfo in ipairs(addonTable.Utilities.GetAllGuilds()) do
+  for _, guildInfo in ipairs(allGuilds) do
     local guildData = Syndicator.API.GetGuild(guildInfo.fullName)
-    if realmsToInclude[guildInfo.realmNormalized] and guildData.details.show and guildData.details.show.gold then
+    if realmsToInclude[guildInfo.realmNormalized] and guildData.details.show and guildData.details.show.gold and (not applyFaction or currentFaction == guildData.details.faction) then
       local money = Syndicator.API.GetGuild(guildInfo.fullName).money
       local guildName = TRANSMOGRIFY_FONT_COLOR:WrapTextInColorCode(guildInfo.name)
-      if #connectedRealms > 1 then
+      if multipleRealms then
         guildName = guildName .. "-" .. guildInfo.realmNormalized
       end
       guildName = Syndicator.Utilities.GetGuildIcon() .. " " .. guildName
@@ -51,14 +73,18 @@ function addonTable.ShowGoldSummaryRealm(anchor, point)
     end
   end
 
-  GameTooltip:AddDoubleLine(BAGANATOR_L_REALM_WIDE_GOLD_X:format(""), WHITE_FONT_COLOR:WrapTextInColorCode(addonTable.Utilities.GetMoneyString(total, true)))
+  if applyFaction then
+    GameTooltip:AddDoubleLine(addonTable.Locales.FACTION_REALM_WIDE_GOLD_X:format(""), WHITE_FONT_COLOR:WrapTextInColorCode(addonTable.Utilities.GetMoneyString(total, true)))
+  else
+    GameTooltip:AddDoubleLine(addonTable.Locales.REALM_WIDE_GOLD_X:format(""), WHITE_FONT_COLOR:WrapTextInColorCode(addonTable.Utilities.GetMoneyString(total, true)))
+  end
   GameTooltip:AddLine(" ")
   for _, line in ipairs(lines) do
     GameTooltip:AddDoubleLine(line.left, line.right, nil, nil, nil, 1, 1, 1)
   end
 
   GameTooltip_AddBlankLineToTooltip(GameTooltip)
-  GameTooltip:AddLine(BAGANATOR_L_HOLD_SHIFT_TO_SHOW_ACCOUNT_TOTAL, 0, 1, 0)
+  GameTooltip:AddLine(addonTable.Locales.HOLD_SHIFT_TO_SHOW_ACCOUNT_TOTAL, 0, 1, 0)
   GameTooltip:Show()
 end
 
@@ -67,14 +93,14 @@ function addonTable.ShowGoldSummaryAccount(anchor, point)
 
   local lines = {}
   local function AddRealm(realmName, realmCount, realmTotal)
-    table.insert(lines, {left = BAGANATOR_L_REALM_X_X_X:format(realmName, realmCount), right = addonTable.Utilities.GetMoneyString(realmTotal, true)})
+    table.insert(lines, {left = addonTable.Locales.REALM_X_X_X:format(realmName, realmCount), right = addonTable.Utilities.GetMoneyString(realmTotal, true)})
   end
   local function AddGuild(guildName, guildRealmNormalized, guildTotal)
     table.insert(lines, {left = TRANSMOGRIFY_FONT_COLOR:WrapTextInColorCode(guildName) .. "-" .. guildRealmNormalized, right = addonTable.Utilities.GetMoneyString(guildTotal, true)})
   end
   local function AddWarband(warband)
     if warband > 0 then
-      table.insert(lines, {left = PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(BAGANATOR_L_WARBAND), right = addonTable.Utilities.GetMoneyString(warband, true)})
+      table.insert(lines, {left = PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.WARBAND), right = addonTable.Utilities.GetMoneyString(warband, true)})
       table.insert(lines, {left = " ", right = ""})
     end
   end
@@ -124,7 +150,7 @@ function addonTable.ShowGoldSummaryAccount(anchor, point)
     end
   end
 
-  GameTooltip:AddDoubleLine(BAGANATOR_L_ACCOUNT_GOLD_X:format(""), WHITE_FONT_COLOR:WrapTextInColorCode(addonTable.Utilities.GetMoneyString(total, true)))
+  GameTooltip:AddDoubleLine(addonTable.Locales.ACCOUNT_GOLD_X:format(""), WHITE_FONT_COLOR:WrapTextInColorCode(addonTable.Utilities.GetMoneyString(total, true)))
   GameTooltip:AddLine(" ")
 
   for _, line in ipairs(lines) do

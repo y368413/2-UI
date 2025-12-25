@@ -1,0 +1,41 @@
+﻿<Bindings>
+	<Binding name="RELOADUI" description="Reloads the UI." category="BINDING_HEADER_ACE3"> ReloadUI() </Binding>
+	<Binding name="TOMEOFTELEPORTATION" category="BINDING_HEADER_ACE3"> TeleporterFunction() </Binding>
+ 	<!--Binding name="TOMEOFTELEPORTATIONSEARCH" category="ADDONS"> TeleporterSlashCmdFunction("search") </Binding>
+	<Binding name="TARGETCLASSBUTTON_INSPECT" category="BINDING_HEADER_ACE3"> InspectUnit("target") </Binding>
+	<Binding name="TARGETCLASSBUTTON_TRADE" category="BINDING_HEADER_ACE3"> InitiateTrade("target") </Binding>
+	<Binding name="TARGETCLASSBUTTON_FOLLOW" category="BINDING_HEADER_ACE3"> FollowUnit("target") </Binding>
+	<Binding name="TARGETCLASSBUTTON_COMPARE_ACHIEVEMENTS" category="BINDING_HEADER_ACE3"> InspectAchievements("target") </Binding-->
+	<!--Binding name="TARGETCLASSBUTTON_WHISPER" category="BINDING_HEADER_ACE3">
+		local server = nil;
+		local name, server = UnitName("target");
+		if ( server and (not "target" or UnitRealmRelationship("target") ~= LE_REALM_RELATION_SAME) ) then
+			ChatFrameUtil.SendTell(name.."-"..server)
+		else
+		  ChatFrameUtil.SendTell(name)
+		end
+	</Binding-->
+	<Binding name="WHISPERPOP_TOGGLE" category="BINDING_HEADER_ACE3"> WhisperPop:ToggleFrame() </Binding>
+	<Binding name="AutoPotion Macro" category="BINDING_HEADER_ACE3">
+    -- AutoPotion
+	</Binding>
+  <Binding name="AutoBandage Macro" category="BINDING_HEADER_ACE3">
+    -- AutoBandage
+  </Binding>
+    <Binding name="AppearanceKnown_TooltipScrollUp" hidden="true"> AppearanceTooltipTooltip.activeModel:SetFacing(AppearanceTooltipTooltip.activeModel:GetFacing() + 0.3) </Binding>
+    <Binding name="AppearanceKnown_TooltipScrollDown" hidden="true"> AppearanceTooltipTooltip.activeModel:SetFacing(AppearanceTooltipTooltip.activeModel:GetFacing() - 0.3) </Binding>
+    <Binding name="Refresh LFG" category="Premade Sort">
+        if ( LFGListFrame.SearchPanel.RefreshButton:IsVisible() and not LFGListApplicationDialog:IsVisible() ) then
+            LFGListSearchPanel_DoSearch(LFGListFrame.SearchPanel);
+        end
+    </Binding>
+	<Binding name="AUTOSELL_TOGGLE_UI" category="AutoSell 自动售卖低物品等级插件">
+		AutoSell_ToggleUI()
+	</Binding>
+	<Binding name="AUTOSELL_ADD_BLACKLIST" category="AutoSell 自动售卖低物品等级插件">
+		AutoSell_AddToBlacklist()
+	</Binding>
+	<Binding name="AUTOSELL_ADD_WHITELIST" category="AutoSell 自动售卖低物品等级插件">
+		AutoSell_AddToWhitelist()
+	</Binding>
+</Bindings>

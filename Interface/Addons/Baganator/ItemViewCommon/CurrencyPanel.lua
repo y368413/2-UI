@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 local sounds = {
   567422, -- SOUNDKIT.IG_CHARACTER_INFO_TAB
   567507, -- SOUNDKIT.IG_CHARACTER_INFO_OPEN
@@ -17,14 +18,6 @@ local function Unmute()
   end)
 end
 
-local transferImpossibleDialogName = "Baganator_TransferImpossible"
-StaticPopupDialogs[transferImpossibleDialogName] = {
-  text = CURRENCY_TRANSFER_DISABLED_NO_VALID_SOURCES,
-  button1 = OKAY,
-  timeout = 0,
-  hideOnEscape = 1,
-}
-
 BaganatorCurrencyPanelMixin = {}
 
 function BaganatorCurrencyPanelMixin:OnLoad()
@@ -42,7 +35,7 @@ function BaganatorCurrencyPanelMixin:OnLoad()
 
   self:SetSize(350, 500)
 
-  self:SetTitle(BAGANATOR_L_CURRENCIES)
+  self:SetTitle(addonTable.Locales.CURRENCIES)
 
   self:RegisterEvent("CURSOR_CHANGED")
 
@@ -74,6 +67,7 @@ function BaganatorCurrencyPanelMixin:OnLoad()
   self.searchBox:SetHeight(22)
   self.searchBox:SetAutoFocus(false)
   self.searchBox:HookScript("OnTextChanged", function() self:UpdateCurrencies() end)
+  addonTable.Skins.AddFrame("SearchBox", self.searchBox)
 
   self.warbandOnlyButton = CreateFrame("Button", nil, self)
   self.warbandOnlyButton:SetSize(23, 31)
@@ -84,7 +78,7 @@ function BaganatorCurrencyPanelMixin:OnLoad()
     self.warbandOnlyButton:GetNormalTexture():SetDesaturated(true)
     self.warbandOnlyButton:GetNormalTexture():SetDesaturation(0.5)
     GameTooltip:SetOwner(self.warbandOnlyButton, "ANCHOR_LEFT")
-    GameTooltip:SetText(BAGANATOR_L_SHOW_TRANSFERABLE_ONLY)
+    GameTooltip:SetText(addonTable.Locales.SHOW_TRANSFERABLE_ONLY)
     GameTooltip:Show()
   end)
   self.warbandOnlyButton:SetScript("OnLeave", function()
@@ -222,16 +216,17 @@ function BaganatorCurrencyPanelMixin:UpdateCurrencies()
       elseif details.itemID then
         local itemName = C_Item.GetItemNameByID(details.itemID) or " "
         if itemName:lower():match(search) and not self.isWarbandOnly then
-          table.insert(items, {type = "item", name = itemName, itemID = details.itemID, amount = addonTable.ItemViewCommon.GetTrackedItemCount(details.itemID, self.selectedCharacter), icon = select(5, C_Item.GetItemInfoInstant(details.itemID)), isLive = isLive})
+          local _, _, _, _, icon = C_Item.GetItemInfoInstant(details.itemID)
+          table.insert(items, {type = "item", name = itemName, itemID = details.itemID, amount = addonTable.ItemViewCommon.GetTrackedItemCount(details.itemID, self.selectedCharacter), icon = icon, isLive = isLive})
         end
       end
     end
-    table.insert(currencyByHeaderDisplay, {header = BAGANATOR_L_TRACKED, items = items})
+    table.insert(currencyByHeaderDisplay, {header = addonTable.Locales.TRACKED, items = items})
 
     if isLive then
       table.insert(currencyByHeaderDisplay[#currencyByHeaderDisplay].items, {
         type = "text",
-        name = LIGHTGRAY_FONT_COLOR:WrapTextInColorCode(BAGANATOR_L_ACTION_TO_TRACK_TEXT),
+        name = LIGHTGRAY_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.ACTION_TO_TRACK_TEXT),
         disabled = true,
       })
     end
@@ -384,9 +379,9 @@ function BaganatorCurrencyPanelMixin:SetupRow(row, details)
             GameTooltip:AddLine(LINK_FONT_COLOR:WrapTextInColorCode(self.categories[details.currencyID]))
           end
           if details.isLive then
-            GameTooltip:AddLine(GREEN_FONT_COLOR:WrapTextInColorCode(BAGANATOR_L_SHIFT_CLICK_TO_TRACK_UNTRACK))
+            GameTooltip:AddLine(GREEN_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.SHIFT_CLICK_TO_TRACK_UNTRACK))
             if details.isWarbandTransfer and not InCombatLockdown() then
-              GameTooltip:AddLine(GREEN_FONT_COLOR:WrapTextInColorCode(BAGANATOR_L_CTRL_CLICK_TO_TRANSFER))
+              GameTooltip:AddLine(GREEN_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.CTRL_CLICK_TO_TRANSFER))
             end
           end
           GameTooltip:Show()
@@ -399,7 +394,8 @@ function BaganatorCurrencyPanelMixin:SetupRow(row, details)
         end
       end)
       row:SetScript("OnClick", function()
-        if IsModifiedClick("CHATLINK") and ChatEdit_InsertLink(C_CurrencyInfo.GetCurrencyLink(details.currencyID, 1)) then
+        local GetCurrencyLink = C_CurrencyInfo.GetCurrencyLink or GetCurrencyLink
+        if IsModifiedClick("CHATLINK") and addonTable.Utilities.ChatInsertLink(GetCurrencyLink(details.currencyID, 1)) then
           return
         end
         if details.isLive and IsShiftKeyDown() then
@@ -415,7 +411,7 @@ function BaganatorCurrencyPanelMixin:SetupRow(row, details)
         Syndicator.Tooltips.AddCurrencyLines(GameTooltip, details.currencyID)
         GameTooltip_AddBlankLineToTooltip(GameTooltip)
         GameTooltip:AddLine(LINK_FONT_COLOR:WrapTextInColorCode(self.categories[details.currencyID]))
-        GameTooltip:AddLine(GREEN_FONT_COLOR:WrapTextInColorCode(BAGANATOR_L_SHIFT_CLICK_TO_TRACK_UNTRACK))
+        GameTooltip:AddLine(GREEN_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.SHIFT_CLICK_TO_TRACK_UNTRACK))
         GameTooltip:Show()
       end)
       row:SetScript("OnClick", function()
@@ -471,7 +467,7 @@ function BaganatorCurrencyPanelMixin:GetTransferButton(parent)
     GameTooltip:Hide()
     TokenFramePopup:SetPoint("TOPLEFT", CharacterFrame, "TOPRIGHT", 3, -28)
     if not TokenFramePopup.CurrencyTransferToggleButton:IsEnabled() then
-      StaticPopup_Show(transferImpossibleDialogName)
+      addonTable.Dialogs.ShowAcknowledge(CURRENCY_TRANSFER_DISABLED_NO_VALID_SOURCES)
     end
   end)
 

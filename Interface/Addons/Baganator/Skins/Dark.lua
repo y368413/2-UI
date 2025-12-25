@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 
 local function ToHSL(r, g, b)
   local M = math.max(r, g, b)
@@ -103,7 +104,7 @@ local function ItemButtonQualityHook(frame, quality)
     frame:ClearNormalTexture()
     local c = ITEM_QUALITY_COLORS[quality]
     if c then
-      frame.IconBorder:SetVertexColor(c.r, c.g, c.b)
+      frame.IconBorder:SetVertexColor(c.r, c.g, c.b, quality > 1 and 1 or 0.5)
       frame.IconBorder:Show()
     else
       frame.IconBorder:SetVertexColor(color.r, color.g, color.b, 1)
@@ -256,7 +257,7 @@ end
 
 local function LoadSkin()
   showSlots = not addonTable.Config.Get("skins.dark.empty_slot_background")
-  if addonTable.Utilities.IsMasqueApplying() or not addonTable.Config.Get("skins.dark.square_icons") then
+  if addonTable.API.IsMasqueApplying() or not addonTable.Config.Get("skins.dark.square_icons") then
     skinners.ItemButton = function(frame, tags)
       if not tags.containerBag then
         table.insert(allItemButtons, frame)
@@ -278,7 +279,7 @@ local function LoadSkin()
   end)
 end
 
-addonTable.Skins.RegisterSkin(BAGANATOR_L_DARK, "dark", LoadSkin, SkinFrame, SetConstants, {
+addonTable.Skins.RegisterSkin(addonTable.Locales.DARK, "dark", LoadSkin, SkinFrame, SetConstants, {
   {
     type = "slider",
     min = 0,
@@ -286,27 +287,27 @@ addonTable.Skins.RegisterSkin(BAGANATOR_L_DARK, "dark", LoadSkin, SkinFrame, Set
     lowText = "0%",
     highText = "100%",
     scale = 100,
-    text = BAGANATOR_L_TRANSPARENCY,
-    valuePattern = BAGANATOR_L_PERCENTAGE_PATTERN,
+    text = addonTable.Locales.TRANSPARENCY,
+    valuePattern = addonTable.Locales.PERCENTAGE_PATTERN,
     option = "view_transparency",
     default = 0.3,
   },
   {
     type = "checkbox",
-    text = BAGANATOR_L_REMOVE_BORDERS,
+    text = addonTable.Locales.REMOVE_BORDERS,
     option = "no_frame_borders",
     default = false,
   },
   {
     type = "checkbox",
-    text = BAGANATOR_L_HIDE_ICON_BACKGROUNDS,
+    text = addonTable.Locales.HIDE_ICON_BACKGROUNDS,
     option = "empty_slot_background",
     default = false,
   },
   {
     type = "checkbox",
-    text = BAGANATOR_L_SQUARE_ICONS,
-    rightText = BAGANATOR_L_RELOAD_REQUIRED,
+    text = addonTable.Locales.SQUARE_ICONS,
+    rightText = addonTable.Locales.RELOAD_REQUIRED,
     option = "square_icons",
     default = false,
   },

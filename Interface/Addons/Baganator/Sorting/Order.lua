@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 
 -- See comment in Sorting/ItemFields.lua.
 -- Values generated are cached across the current sort iteration.
@@ -29,6 +30,7 @@ local allSortKeys = {
     "invertedItemID",
     "invertedItemCount",
     "itemLink",
+    "specialSplitting",
   },
   ["type"] = {
     "priority",
@@ -43,6 +45,7 @@ local allSortKeys = {
     "invertedItemID",
     "invertedItemCount",
     "itemLink",
+    "specialSplitting",
   },
   ["name"] = {
     "priority",
@@ -57,6 +60,7 @@ local allSortKeys = {
     "invertedItemID",
     "invertedItemCount",
     "itemLink",
+    "specialSplitting",
   },
   ["item-level"] = {
     "priority",
@@ -72,6 +76,7 @@ local allSortKeys = {
     "invertedItemID",
     "invertedItemCount",
     "itemLink",
+    "specialSplitting",
   },
   ["expansion"] = {
     "invertedExpansion",
@@ -85,7 +90,10 @@ local allSortKeys = {
     "invertedItemID",
     "invertedItemCount",
     "itemLink",
+    "specialSplitting",
   },
+  ["manual"] = {
+  }
 }
 
 -- Remove expansion sort criteria on classic, as there isn't much expansion
@@ -111,20 +119,26 @@ function addonTable.Sorting.AddSortKeys(list)
   for index, item in ipairs(list) do
     if item.itemLink then
       setmetatable(item, itemMetatable)
-      local linkToCheck = item.itemLink
-      if not linkToCheck:match("item:") then
-        linkToCheck = "item:" .. item.itemID
-      end
 
       item.priority = PriorityMap[item.itemID] and 1 or 1000
-      item.classID, item.subClassID = select(6, C_Item.GetItemInfoInstant(linkToCheck))
-      item.invSlotID = C_Item.GetItemInventoryTypeByID(item.itemID)
+      if Syndicator.Search.GetClassSubClass then
+        Syndicator.Search.GetClassSubClass(item)
+      else
+        local _
+        _, _, _, _, _, item.classID, item.subClassID = C_Item.GetItemInfoInstant(item.itemID)
+      end
+      if item.classID == nil then -- Fallback for broken items
+        item.classID, item.subClassID = -1, -1
+      end
+      item.invSlotID = C_Item.GetItemInventoryTypeByID(item.itemID) or -1
       item.index = index
       if item.itemID == addonTable.Constants.BattlePetCageID then
         local speciesID = tonumber(item.itemLink:match("battlepet:(%d+)"))
-        local petName, _, subClassID = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
+        local petName, _, petType = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
         item.itemName = petName
-        item.subClassID = subClassID
+        if not item.subClassID then
+          item.subClassID = petType - 1
+        end
       end
     end
   end

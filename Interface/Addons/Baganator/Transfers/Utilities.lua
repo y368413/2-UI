@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 function addonTable.Transfers.GetBagsSlots(bags, bagIDs)
   local filledSlots = {}
   local emptySlots = {}
@@ -99,4 +100,43 @@ function addonTable.Transfers.CountByItemIDs(slots)
     end
   end
   return result
+end
+
+function addonTable.Transfers.GetCurrentBankSlots()
+  local bankSlots
+  if addonTable.Config.Get(addonTable.Config.Options.BANK_CURRENT_TAB) == addonTable.Constants.BankTabType.Character then
+    if Syndicator.Constants.CharacterBankTabsActive then
+      local tabIndex = addonTable.Config.Get(addonTable.Config.Options.CHARACTER_BANK_CURRENT_TAB)
+      if tabIndex > 0 then
+        local bagsData = {Syndicator.API.GetCharacter(Syndicator.API.GetCurrentCharacter()).bankTabs[tabIndex].slots}
+        local indexes = {Syndicator.Constants.AllBankIndexes[tabIndex]}
+        bankSlots = addonTable.Transfers.GetBagsSlots(bagsData, indexes)
+      else
+        local bagsData = {}
+        local indexes = Syndicator.Constants.AllBankIndexes
+        for _, tab in ipairs(Syndicator.API.GetCharacter(Syndicator.API.GetCurrentCharacter()).bankTabs) do
+          table.insert(bagsData, tab.slots)
+        end
+        bankSlots = addonTable.Transfers.GetBagsSlots(bagsData, indexes)
+      end
+    else
+      bankSlots = addonTable.Transfers.GetBagsSlots(Syndicator.API.GetCharacter(characterName).bank, Syndicator.Constants.AllBankIndexes)
+    end
+  elseif addonTable.Config.Get(addonTable.Config.Options.BANK_CURRENT_TAB) == addonTable.Constants.BankTabType.Warband then
+    local tabIndex = addonTable.Config.Get(addonTable.Config.Options.WARBAND_CURRENT_TAB)
+    if tabIndex > 0 then
+      local bagsData = {Syndicator.API.GetWarband(1).bank[tabIndex].slots}
+      local indexes = {Syndicator.Constants.AllWarbandIndexes[tabIndex]}
+      bankSlots = addonTable.Transfers.GetBagsSlots(bagsData, indexes)
+    else
+      local bagsData = {}
+      local indexes = Syndicator.Constants.AllWarbandIndexes
+      for _, tab in ipairs(Syndicator.API.GetWarband(1).bank) do
+        table.insert(bagsData, tab.slots)
+      end
+      bankSlots = addonTable.Transfers.GetBagsSlots(bagsData, indexes)
+    end
+  end
+
+  return bankSlots
 end

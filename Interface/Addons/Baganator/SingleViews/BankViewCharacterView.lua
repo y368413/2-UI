@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 BaganatorSingleViewBankViewCharacterViewMixin = CreateFromMixins(BaganatorItemViewCommonBankViewCharacterViewMixin)
 
 function BaganatorSingleViewBankViewCharacterViewMixin:OnLoad()
@@ -75,6 +76,9 @@ function BaganatorSingleViewBankViewCharacterViewMixin:NotifyBagUpdate(updatedBa
 end
 
 function BaganatorSingleViewBankViewCharacterViewMixin:UpdateForCharacter(character, isLive)
+  if isLive ~= self.isLive then
+    self.refreshState[addonTable.Constants.RefreshReason.Layout] = true
+  end
   BaganatorItemViewCommonBankViewCharacterViewMixin.UpdateForCharacter(self, character, isLive)
   if self.lastCharacter ~= character then
     return
@@ -119,7 +123,7 @@ function BaganatorSingleViewBankViewCharacterViewMixin:UpdateForCharacter(charac
 
   local bankWidth = addonTable.Config.Get(addonTable.Config.Options.BANK_VIEW_WIDTH)
 
-  if self.refreshState[addonTable.Constants.RefreshReason.ItemData] or self.refreshState[addonTable.Constants.RefreshReason.ItemWidgets] or self.refreshState[addonTable.Constants.RefreshReason.ItemTextures] or self.refreshState[addonTable.Constants.RefreshReason.Flow] then
+  if self.refreshState[addonTable.Constants.RefreshReason.ItemData] or self.refreshState[addonTable.Constants.RefreshReason.ItemWidgets] or self.refreshState[addonTable.Constants.RefreshReason.ItemTextures] or self.refreshState[addonTable.Constants.RefreshReason.Flow] or self.refreshState[addonTable.Constants.RefreshReason.Layout] then
     local characterData = Syndicator.API.GetCharacter(character) 
     local bagData = characterData and characterData.bank
 

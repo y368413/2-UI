@@ -1,12 +1,12 @@
-## Interface: 110007, 110100
+## Interface: 120000, 110207, 110205
 ## Title: Syndicator
 ## Title-zhCN: |cff00ff00[背包]|r账号助手
 ## Title-zhTW: |cff00ff00[背包]|r账号助手
-## Version: 174
+## Version: 252
 ## Author: plusmouse
 ## SavedVariables: SYNDICATOR_CONFIG, SYNDICATOR_DATA, SYNDICATOR_SUMMARIES
 ## IconTexture: Interface\AddOns\Syndicator\Assets\logo.tga
-## Dependencies: _ShiGuang
+## Dependencies: OrzUI
 
 ## X-Repple: 2 UI
 ## Category:- |cFFFFFF00 2|r|cFFFF0000 UI |r -
@@ -22,11 +22,10 @@ Core\Constants.lua
 Core\Config.lua
 Core\Utilities.lua
 Core\SlashCmd.lua
-Core\Main.lua
+Core\Initialize.lua
 
 Options\Initialize.lua
 
-Tracking\Utilities.lua
 Tracking\BagCache.lua
 Tracking\MailCache.lua
 Tracking\EquippedCache.lua
@@ -38,7 +37,7 @@ Tracking\AuctionCacheLegacy.lua
 Tracking\ItemSummaries.lua
 Tracking\Tooltips.lua
 Tracking\CurrencyTooltipData.lua
-Tracking\Main.lua
+Tracking\Initialize.lua
 
 Search\Constants.lua
 Search\Initialize.lua
@@ -48,7 +47,7 @@ Search\GetGroupingKey.lua
 Search\OfflineList.lua
 Search\OfflineList.xml
 Search\SearchEverywhere.lua
-Search\SearchBuilder.lua
+Search\UI\Builder.lua
 Search\Utilities.lua
 
 API\Main.lua

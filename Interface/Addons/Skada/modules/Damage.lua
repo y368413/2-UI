@@ -247,7 +247,7 @@ Skada:AddLoadableModule("Damage", nil, function(Skada, L)
 				win.dataset[nr] = d
 				d.label = player.name
 
-				d.valuetext = Skada:FormatValueText(
+				d.valuetext	= Skada:FormatValueText(
 					Skada:FormatNumber(player.damage), self.metadata.columns.Damage,
 					Skada:FormatNumber(dps), self.metadata.columns.DPS,
 					string.format("%02.1f%%", player.damage / set.damage * 100), self.metadata.columns.Percent
@@ -292,7 +292,7 @@ Skada:AddLoadableModule("Damage", nil, function(Skada, L)
 				if spell.school then
 					local c = CombatLog_Color_ColorArrayBySchool(spell.school)
 					if c then
-						tooltip:AddLine(C_Spell.GetSchoolString(spell.school), c.r, c.g, c.b)
+						tooltip:AddLine(GetSchoolString(spell.school), c.r, c.g, c.b)
 					end
 				end
 				if spell.max and spell.min then
@@ -343,16 +343,14 @@ Skada:AddLoadableModule("Damage", nil, function(Skada, L)
 					win.dataset[nr] = d
 					d.label = spellname
 					d.id = spellname
-					local SpellInfo = C_Spell.GetSpellInfo(spell.id)
-					      icon = SpellInfo.iconID
-					d.icon = icon
+					d.icon = Skada:GetSpellIcon(spell.id)
 					d.spellid = spell.id
 					d.value = spell.damage
 					if spell.school then
 						d.spellschool = spell.school
 					end
 
-					d.valuetext = Skada:FormatValueText(
+						d.valuetext = Skada:FormatValueText(
 						Skada:FormatNumber(spell.damage), self.metadata.columns.Damage,
 						string.format("%02.1f%%", spell.damage / player.damage * 100), self.metadata.columns.Percent
 					)
@@ -390,7 +388,7 @@ Skada:AddLoadableModule("Damage", nil, function(Skada, L)
 					d.label = mob
 					d.id = mob
 					d.value = amount
-					d.valuetext = Skada:FormatValueText(
+					d.valuetext     = Skada:FormatValueText(
 						Skada:FormatNumber(amount), self.metadata.columns.Damage,
 						string.format("%02.1f%%", amount / player.damage * 100), self.metadata.columns.Percent
 					)
@@ -414,7 +412,7 @@ Skada:AddLoadableModule("Damage", nil, function(Skada, L)
 		d.value = value
 		d.label = title
 		d.id = title
-		d.valuetext = Skada:FormatValueText(
+		d.valuetext	= Skada:FormatValueText(
 			value, mod.metadata.columns.Damage,
 			string.format("%02.1f%%", value / spellmod.totalhits * 100), mod.metadata.columns.Percent
 		)
@@ -515,8 +513,10 @@ Skada:AddLoadableModule("Damage", nil, function(Skada, L)
 	end
 
 
-	-- DPS-only view
+
+
 	function dpsmod:GetSetSummary(set)
+
 		return Skada:FormatNumber(getRaidDPS(set))
 	end
 
@@ -605,10 +605,13 @@ Skada:AddLoadableModule("Damage", nil, function(Skada, L)
 	end
 
 	function mod:GetSetSummary(set)
+
 		return Skada:FormatValueText(
-			Skada:FormatNumber(set.damage), self.metadata.columns.Damage,
-			Skada:FormatNumber(getRaidDPS(set)), self.metadata.columns.DPS
-		)
+
+						     Skada:FormatNumber(set.damage), self.metadata.columns.Damage,
+						     Skada:FormatNumber(getRaidDPS(set)), self.metadata.columns.DPS
+
+					    )
 	end
 
 	-- Called by Skada when a new player is added to a set.

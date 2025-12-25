@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 function addonTable.Utilities.Message(text)
   print(LINK_FONT_COLOR:WrapTextInColorCode("Baganator") .. ": " .. text)
 end
@@ -7,7 +8,7 @@ do
   local callbacksPending = {}
   local frame = CreateFrame("Frame")
   frame:RegisterEvent("ADDON_LOADED")
-  frame:SetScript("OnEvent", function(self, eventName, addonName)
+  frame:SetScript("OnEvent", function(_, _, addonName)
     if callbacksPending[addonName] then
       for _, cb in ipairs(callbacksPending[addonName]) do
         xpcall(cb, CallErrorHandler)
@@ -51,6 +52,7 @@ local itemFrame = CreateFrame("Frame")
 itemFrame.elapsed = 0
 itemFrame:SetScript("OnEvent", function(_, _, itemID)
   if pendingItems[itemID] ~= nil then
+    addonTable.ReportEntry()
     local forItemID = pendingItems[itemID]
     pendingItems[itemID] = nil
     for _, callback in ipairs(forItemID) do
@@ -80,4 +82,17 @@ function addonTable.Utilities.LoadItemData(itemID, callback)
   itemFrame:RegisterEvent("ITEM_DATA_LOAD_RESULT")
   itemFrame:SetScript("OnUpdate", itemFrame.OnUpdate)
   C_Item.RequestLoadItemDataByID(itemID)
+end
+
+function addonTable.Utilities.ChatInsertLink(link)
+  if link ~= nil then
+    if ChatFrameUtil and ChatFrameUtil.InsertLink then
+      if not C_ChatInfo.InChatMessagingLockdown or not C_ChatInfo.InChatMessagingLockdown() then
+        return ChatFrameUtil.InsertLink(link)
+      end
+    else
+      return ChatEdit_InsertLink(link)
+    end
+  end
+  return false
 end

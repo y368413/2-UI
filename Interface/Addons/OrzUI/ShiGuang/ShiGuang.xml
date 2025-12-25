@@ -1,0 +1,16 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<!--Include file="Raid\Asentenceintroduction.lua"/-->
+	<!--Script file="RandomHex.lua"/>
+	<Script file="RandomLure.lua"/>
+	<Script file="RandomPoly.lua"/>
+	<cript file="CursorTrail.lua"/-->
+	<Script file="ShowChanceBar.lua"/>
+	<Script file="ChangeDifficult.lua"/>
+	<Script file="DFCN_DelveHelper.lua"/>
+	<Script file="AutoDestroysItems.lua"/>
+	<Script file="SmartQuestTracker.lua"/>
+	<Script file="ConsoleVariableManager.lua"/>
+	<!--Script file="Loot\kAutoOpen.lua"/>
+	<Script file="Loot\SimpleMinimapBlip.lua"/-->
+	<Script file="!SpellFlash.lua"/>
+</Ui>

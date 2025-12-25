@@ -30,6 +30,7 @@ Skada:AddLoadableModule("Overhealing", nil, function(Skada, L)
 	end
 
 	function mod:GetSetSummary(set)
+
 		return Skada:FormatNumber(set.overhealing)
 	end
 
@@ -47,7 +48,7 @@ Skada:AddLoadableModule("Overhealing", nil, function(Skada, L)
 				d.value = player.overhealing
 				d.label = player.name
 
-				d.valuetext = Skada:FormatValueText(
+				d.valuetext	= Skada:FormatValueText(
 					Skada:FormatNumber(player.overhealing), self.metadata.columns.Overheal,
 					string.format("%02.1f%%", player.overhealing / math.max(1, player.healing) * 100), self.metadata.columns.Percent
 				)
@@ -83,20 +84,12 @@ Skada:AddLoadableModule("Overhealing", nil, function(Skada, L)
 				win.dataset[nr] = d
 
 				d.id		= spell.id
-				d.label		= spell.name
-				d.value		= spell.overhealing
-
+				d.label = spell.name
+				d.value = spell.overhealing
 				d.valuetext	= Skada:FormatValueText(
-
-										Skada:FormatNumber(spell.overhealing), self.metadata.columns.Healing,
-										string.format("%02.1f%%", spell.overhealing / player.overhealing * 100), self.metadata.columns.Percent
-
-								       )
-
-				-- =====================================
-				-- | API   : C_Spell.GetSpellInfo      |
-				-- | valid : + 11.0.0 / 4.4.1 / 1.15.4 |
-				-- =====================================
+					Skada:FormatNumber(spell.overhealing), self.metadata.columns.Healing,
+					string.format("%02.1f%%", spell.overhealing / player.overhealing * 100), self.metadata.columns.Percent
+				)
 				local spellInfo = C_Spell.GetSpellInfo(spell.id)
 
 				-- | Returns nil if spell is not found
@@ -113,7 +106,7 @@ Skada:AddLoadableModule("Overhealing", nil, function(Skada, L)
 			end
 		end
 
-		win.metadata.hasicon  = true
+		win.metadata.hasicon = true
 		win.metadata.maxvalue = max
 	end
 

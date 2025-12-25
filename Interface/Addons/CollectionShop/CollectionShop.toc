@@ -1,4 +1,4 @@
-## Interface: 110007, 110100
+## Interface: 120000, 110207, 110205
 ## Title: CollectionShop
 ## Title-zhCN: |cff69ccf0[藏品]|r购买助手
 ## Title-zhTW: |cff69ccf0[藏品]|r购买助手
@@ -7,9 +7,8 @@
 ## Notes: Find and buy the lowest buyout Mounts, Pets, Toys, Appearances, and Recipes.
 ## SavedVariables: COLLECTIONSHOP_SAVEDVARIABLES
 ## SavedVariablesPerCharacter: COLLECTIONSHOP_SAVEDVARIABLESPERCHARACTER
-## IconTexture: Interface\AddOns\HandyNotes\Icons\Trashpile.blp
-## Dependencies: _ShiGuang
-
+## Dependencies: OrzUI
+## IconTexture: 1455684
 ## X-Repple: 2 UI
 ## Category:- |cFFFFFF00 2|r|cFFFF0000 UI |r -
 

@@ -290,11 +290,12 @@ Skada:AddLoadableModule("Healing", nil, function(Skada, L)
 				d.label = player.name
 				d.value = totalhealing
 
-				d.valuetext = Skada:FormatValueText(
+				d.valuetext     = Skada:FormatValueText(
 					Skada:FormatNumber(totalhealing), self.metadata.columns.Healing,
 					Skada:FormatNumber(getHPSByValue(set, player, totalhealing)), self.metadata.columns.HPS,
 					string.format("%02.1f%%", totalhealing / set.healing * 100), self.metadata.columns.Percent
 				)
+
 				d.class = player.class
 				d.role = player.role
 
@@ -324,11 +325,12 @@ Skada:AddLoadableModule("Healing", nil, function(Skada, L)
 				d.label = player.name
 				d.value = player.healing
 
-				d.valuetext = Skada:FormatValueText(
+				d.valuetext     = Skada:FormatValueText(
 					Skada:FormatNumber(player.healing), self.metadata.columns.Healing,
 					Skada:FormatNumber(getHPS(set, player)), self.metadata.columns.HPS,
 					string.format("%02.1f%%", player.healing / set.healing * 100), self.metadata.columns.Percent
 				)
+
 				d.class = player.class
 				d.role = player.role
 
@@ -346,7 +348,7 @@ Skada:AddLoadableModule("Healing", nil, function(Skada, L)
 	local function spell_tooltip(win, id, label, tooltip)
 		local player = Skada:find_player(win:get_selected_set(), spellsmod.playerid)
 		if player then
-			local spell = player. healingspells[label]
+			local spell = player.healingspells[label]
 			if spell then
 				tooltip:AddLine(player.name.." - "..label)
 				if spell.max and spell.min then
@@ -388,13 +390,11 @@ Skada:AddLoadableModule("Healing", nil, function(Skada, L)
 				d.id = spell.name -- ticket 362: this needs to be spellname because spellid is not unique with pets that mirror abilities (DK DRW)
 				d.label = spell.name
 				d.value = spell.healing
-				d.valuetext = Skada:FormatValueText(
+				d.valuetext      = Skada:FormatValueText(
 					Skada:FormatNumber(spell.healing), self.metadata.columns.Healing,
 					string.format("%02.1f%%", spell.healing / player.healing * 100), self.metadata.columns.Percent
 				)
-				local SpellInfo = C_Spell.GetSpellInfo(spell.id)
-                      icon = SpellInfo.iconID
-				d.icon = icon
+				d.icon = Skada:GetSpellIcon(spell.id)
 				d.spellid = spell.id
 
 				if spell.healing > max then
@@ -432,7 +432,7 @@ Skada:AddLoadableModule("Healing", nil, function(Skada, L)
 					d.value = heal.amount
 					d.class = heal.class
 					d.role = player.role
-					d.valuetext = Skada:FormatValueText(
+					d.valuetext     = Skada:FormatValueText(
 						Skada:FormatNumber(heal.amount), self.metadata.columns.Healing,
 						string.format("%02.1f%%", heal.amount / player.healing * 100), self.metadata.columns.Percent
 					)
@@ -450,10 +450,10 @@ Skada:AddLoadableModule("Healing", nil, function(Skada, L)
 	end
 
 	function mod:OnEnable()
-		mod.metadata = {showspots = true, click1 = spellsmod, click2 = healedmod, columns = {Healing = true, HPS = true, Percent = true}, icon = "Interface\\Icons\\Ability_priest_flashoflight"}
+		mod.metadata = {showspots = true, click1 = spellsmod, click2 = healedmod, columns = {Healing = true, HPS = true, Percent = true}, icon = "Interface\\Icons\\Spell_holy_flashheal"}
 		spellsmod.metadata = {tooltip = spell_tooltip, columns = {Healing = true, Percent = true}}
 		healedmod.metadata = {showspots = true, columns = {Healing = true, Percent = true}}
-		healingtaken.metadata = {showspots = true, columns = {Healing = true, HPS = true, Percent = true}, icon = "Interface\\Icons\\Ability_priest_cascade"}
+		healingtaken.metadata = {showspots = true, columns = {Healing = true, HPS = true, Percent = true}, icon = "Interface\\Icons\\Achievement_bg_tophealer_eos"}
 
 		-- handlers for Healing spells
 		Skada:RegisterForCL(SpellHeal, 'SPELL_HEAL', {src_is_interesting = true})
@@ -499,10 +499,14 @@ Skada:AddLoadableModule("Healing", nil, function(Skada, L)
 	end
 
 	function mod:GetSetSummary(set)
+
 		return Skada:FormatValueText(
-			Skada:FormatNumber(set.healing), self.metadata.columns.Healing,
-			Skada:FormatNumber(getRaidHPS(set)), self.metadata.columns.HPS
-		)
+
+						     Skada:FormatNumber(set.healing)    , self.metadata.columns.Healing,
+						     Skada:FormatNumber(getRaidHPS(set)), self.metadata.columns.HPS
+
+					    )
+
 	end
 
 	-- Called by Skada when a new player is added to a set.

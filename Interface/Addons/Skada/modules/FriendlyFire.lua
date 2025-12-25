@@ -65,18 +65,14 @@ Skada:AddLoadableModule("Friendly Fire", "Shows damage done on players by friend
 				dmg.playerid = srcGUID
 				dmg.playername = srcName
 				dmg.spellid = 6603
-		spellInfo = C_Spell.GetSpellInfo(dmg.spellid)
-		if spellInfo then
+				dmg.spellname = C_Spell.GetSpellName(6603)
+				dmg.amount = (amount or 0) + (overkill or 0) + (absorb or 0)
+				dmg.targetid = dstGUID
+				dmg.targetname = dstName
 
-			dmg.spellname  = spellInfo.name
-			dmg.amount     = (amount or 0) + (overkill or 0) + (absorb or 0)
-			dmg.targetid   = dstGUID
-			dmg.targetname = dstName
-
-			log_ffdamage_done(Skada.current, dmg)
-			log_ffdamage_done(Skada.total, dmg)
+				log_ffdamage_done(Skada.current, dmg)
+				log_ffdamage_done(Skada.total, dmg)
 		end
-	end
 
 		function mod:Update(win, set)
 				local max = 0
@@ -129,26 +125,18 @@ Skada:AddLoadableModule("Friendly Fire", "Shows damage done on players by friend
 
 								d.label = spellname
 								d.value = spell.damage
-				local spellInfo = C_Spell.GetSpellInfo(spell.id)
+								d.icon = Skada:GetSpellIcon(spell.id)
+								d.id = spellname
+								d.spellid = spell.id
+								d.valuetext = Skada:FormatNumber(spell.damage)..(" (%02.1f%%)"):format(spell.damage / player.ffdamagedone * 100)
 
-				-- | Returns nil if spell is not found
-				if spellInfo then
+								nr = nr + 1
+						end
 
-					icon	    = spellInfo.iconID
-
-					d.icon	    = icon
-					d.id	    = spellname
-					d.spellid   = spell.id
-					d.valuetext = Skada:FormatNumber(spell.damage) .. (" (%02.1f%%)"):format(spell.damage / player.ffdamagedone * 100)
-
-					nr = nr + 1
+						-- Sort the possibly changed bars.
+						win.metadata.maxvalue = player.ffdamagedone
 				end
-			end
 		end
-
-		win.metadata.maxvalue = player.ffdamagedone
-	end
-
 
 		-- Detail view of a player - targets.
 		function playermod:Update(win, set)
@@ -218,8 +206,8 @@ Skada:AddLoadableModule("Friendly Fire", "Shows damage done on players by friend
 				end
 		end
 
-		function mod:GetSetSummary(set)
-				return Skada:FormatNumber(set.ffdamagedone)
-		end
+	function mod:GetSetSummary(set)
+		return Skada:FormatNumber(set.ffdamagedone)
+	end
 
 end)

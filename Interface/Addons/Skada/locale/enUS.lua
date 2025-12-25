@@ -283,8 +283,7 @@ L["Missed"] = true
 L["Resisted"] = true
 L["Blocked"] = true
 L["Glancing"] = true
-L["Crushing"] = "Crushing"
-L["Multistrike"] = STAT_MULTISTRIKE or true -- XXX compat
+L["Crushing"] = true
 L["Absorbed"] = true
 L["Dispels"] = true
 L["Fails"] = true
@@ -294,7 +293,8 @@ L["Healing"] = true
 L["'s Healing"] = true
 L["Overhealing"] = true
 L["Threat"] = true
-L["Power"] = true
+L["Power"] = "Power"
+L["Power gains"] = "Power gains"
 L["Enemies"] = true
 L["Debuffs"] = true
 L["DamageTaken"] = "Damage Taken"
@@ -521,25 +521,22 @@ L["spells"] = true
 L["targets"] = true
 L["Shows damage done on players by friendly players."] = true
 
-L["AvoidableDamageTaken"] = "AvoidableDamageTaken"
-L["Avoidable damage taken"] = "Avoidable damage taken"
-L["List of avoidable damaging spells"] = "List of avoidable damaging spells"
-L["Damage taken by avoidable spell"] = "Damage taken by avoidable spell"
-L["List of damaged players by avoidable spells"] = "List of damaged players by avoidable spells"
-L["'s Avoidable damage taken"] = "'s Avoidable damage taken"
+L["Pain gain sources"] = true
+L["Soul Shards gain sources"] = true
 
+-- Window Creation
+L["Create Windows"] = true
+L["Create bar window"] = true
+L["Create inline window"] = true
+L["Create broker window"] = true
+L["Enter the name for the new window with the selected display system."] = true
+L["Display Settings"] = true
 
-L["Shards gain sources"]										= true
-L["Shards gained"]											= true
-L["Maelstrom gain sources"]										= true
-L["Maelstrom gained"]											= true
-L["Lunar gain sources"]											= true
-L["Lunar gained"]											= true
-L["Insane gain sources"]										= true
-L["Insane gained"]											= true
-L["Combo gain sources"]											= true
-L["Combo gained"]											= true
-L["Chi gain sources"]											= true
-L["Chi gained"]												= true
-L["Charges gain sources"]										= true
-L["Charges gained"]											= true
+-- Dynamic window creation
+L["Create %s window"] = true
+L["Enter the name for the new %s display window."] = true
+
+L["Version History"] = true
+L["View the version history of Skada."] = true
+L["Show Version History"] = true
+L["Display the version history using the notification system."] = true

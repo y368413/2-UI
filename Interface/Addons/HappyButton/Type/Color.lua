@@ -1,1 +1,0 @@
----@alias RGBAColor table<number, number, number, number>

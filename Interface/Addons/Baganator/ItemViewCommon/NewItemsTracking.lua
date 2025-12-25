@@ -1,18 +1,21 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 BaganatorItemViewCommonNewItemsTrackingMixin = {}
 
 function BaganatorItemViewCommonNewItemsTrackingMixin:OnLoad()
   self:RegisterEvent("BANKFRAME_OPENED")
   self:RegisterEvent("BANKFRAME_CLOSED")
-  self:RegisterEvent("BAG_NEW_ITEMS_UPDATED")
 
   self.firstStart = true
   self.startupCooldown = false
   self.timeout = addonTable.Config.Get(addonTable.Config.Options.RECENT_TIMEOUT)
+  self.includeOwned = addonTable.Config.Get(addonTable.Config.Options.RECENT_INCLUDE_OWNED)
 
   addonTable.CallbackRegistry:RegisterCallback("SettingChanged", function(_, settingName)
     if settingName == addonTable.Config.Options.RECENT_TIMEOUT then
       self.timeout = addonTable.Config.Get(addonTable.Config.Options.RECENT_TIMEOUT)
+    elseif settingName == addonTable.Config.Options.RECENT_INCLUDE_OWNED then
+      self.includeOwned = addonTable.Config.Get(addonTable.Config.Options.RECENT_INCLUDE_OWNED)
     end
   end)
 
@@ -55,7 +58,7 @@ function BaganatorItemViewCommonNewItemsTrackingMixin:OnLoad()
       end
     end
     self.guidsByContainer[bagID] = containerGuids
-    if self.bankOpen then -- Items from the character/warband bank never count as new
+    if self.bankOpen and not self.includeOwned then -- Items from the character/warband bank never count as new
       for _, guid in ipairs(containerGuids) do
         self.seenGUIDs[guid] = true
       end
@@ -73,7 +76,6 @@ function BaganatorItemViewCommonNewItemsTrackingMixin:OnLoad()
         self.startupCooldown = true
         -- Cooldown for further "first start" events to fire on login
         C_Timer.After(5, function()
-          self:UnregisterEvent("BAG_NEW_ITEMS_UPDATED")
           self.firstStart = false
         end)
       end
@@ -90,6 +92,9 @@ function BaganatorItemViewCommonNewItemsTrackingMixin:OnLoad()
   end)
 
   Syndicator.CallbackRegistry:RegisterCallback("EquippedCacheUpdate", function(_, character)
+    if self.includeOwned then
+      return
+    end
     local characterData = Syndicator.API.GetCharacter(character)
     for slot = 1, #characterData.equipped do
       local location = ItemLocation:CreateFromEquipmentSlot(slot - Syndicator.Constants.EquippedInventorySlotOffset)
@@ -104,9 +109,6 @@ end
 function BaganatorItemViewCommonNewItemsTrackingMixin:OnEvent(eventName)
   if eventName == "BANKFRAME_OPENED" or eventName == "BANKFRAME_CLOSED" then
     self.bankOpen = eventName == "BANKFRAME_OPENED"
-  elseif eventName == "BAG_NEW_ITEMS_UPDATED" then
-    self:UnregisterEvent("BAG_NEW_ITEMS_UPDATED")
-    self.firstStart = false
   end
 end
 
@@ -208,4 +210,12 @@ function BaganatorItemViewCommonNewItemsTrackingMixin:ClearNewItemTimeout(bagID,
       self.recentByContainerTimeout[bagID][slotID] = nil
     end
   end
+end
+
+function BaganatorItemViewCommonNewItemsTrackingMixin:MarkNewItemTimeout(bagID, slotID, guid)
+  if not self.recentByContainerTimeout[bagID] then -- Ignore bank/etc. items
+    return
+  end
+  self.recentTimeout[guid] = {time = GetTime(), bagID = bagID, slotID = slotID}
+  self.recentByContainerTimeout[bagID][slotID] = guid
 end

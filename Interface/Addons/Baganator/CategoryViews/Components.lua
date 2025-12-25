@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 BaganatorCategoryViewsCategoryButtonMixin = {}
 
 function BaganatorCategoryViewsCategoryButtonMixin:OnLoad()
@@ -28,14 +29,15 @@ function BaganatorCategoryViewsCategoryButtonMixin:OnEnter()
     GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
     GameTooltip:SetText(self:GetText())
     if isRecent then
-      GameTooltip:AddLine(GREEN_FONT_COLOR:WrapTextInColorCode(BAGANATOR_L_CLICK_TO_CLEAR_RECENT))
+      GameTooltip:AddLine(GREEN_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.CLICK_TO_CLEAR_RECENT))
     end
     if transferActive then
       if C_PlayerInteractionManager.IsInteractingWithNpcOfType(Enum.PlayerInteractionType.Merchant) then
-        GameTooltip:AddLine(GREEN_FONT_COLOR:WrapTextInColorCode(BAGANATOR_L_RIGHT_CLICK_TO_VENDOR_6))
-        GameTooltip:AddLine(GREEN_FONT_COLOR:WrapTextInColorCode(BAGANATOR_L_SHIFT_CLICK_TO_VENDOR_ALL))
+        GameTooltip:AddLine(GREEN_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.RIGHT_CLICK_TO_VENDOR_6))
+        GameTooltip:AddLine(GREEN_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.SHIFT_CLICK_TO_VENDOR_ALL))
+        SetCursor("Interface/Cursor/Buy.blp");
       else
-        GameTooltip:AddLine(GREEN_FONT_COLOR:WrapTextInColorCode(BAGANATOR_L_RIGHT_CLICK_TO_TRANSFER))
+        GameTooltip:AddLine(GREEN_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.RIGHT_CLICK_TO_TRANSFER))
       end
     end
     GameTooltip:Show()
@@ -44,6 +46,7 @@ end
 
 function BaganatorCategoryViewsCategoryButtonMixin:OnLeave()
   GameTooltip:Hide()
+  SetCursor(nil);
 end
 
 function addonTable.CategoryViews.GetSectionButtonPool(parent)
@@ -95,6 +98,28 @@ function addonTable.CategoryViews.GetSectionButtonPool(parent)
       if button == "LeftButton" then
         local sectionToggled = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_SECTION_TOGGLED)
         sectionToggled[self.source] = not sectionToggled[self.source]
+        if IsShiftKeyDown() then -- Expand/collapse all children if Shift+Clicked
+          local displayOrder = addonTable.Config.Get(addonTable.Config.Options.CATEGORY_DISPLAY_ORDER)
+          local level = 0
+          for i = tIndexOf(displayOrder, "_" .. self.source) + 1, #displayOrder do
+            local entry = displayOrder[i]
+            if not entry then
+              break
+            end
+            if entry == addonTable.CategoryViews.Constants.SectionEnd then
+              level = level - 1
+              if level < 0 then
+                break
+              end
+            else
+              local sectionSource = entry:match("^_(.*)")
+              if sectionSource then
+                level = level + 1
+                sectionToggled[sectionSource] = sectionToggled[self.source]
+              end
+            end
+          end
+        end
         addonTable.Config.Set(addonTable.Config.Options.CATEGORY_SECTION_TOGGLED, CopyTable(sectionToggled))
       elseif button == "RightButton" then
         local tree = CopyTable(self.section)

@@ -4,7 +4,69 @@ Skada:AddLoadableModule("Themes", "Adds a set of standard themes to Skada. Custo
 
 	local themes = {
 		{
-			name = "Skada default (Legion)",
+			name = "Skada default (ElvUI)",
+
+			barspacing=0,
+			bartexture="BantoBar",
+			barfont="Expressway",
+			barfontflags="",
+			barfontsize=10,
+			barheight=16,
+			barwidth=240,
+			barorientation=1,
+			barcolor = {r = 0.3, g = 0.3, b = 0.8, a=1},
+			barbgcolor = {r = 0.3, g = 0.3, b = 0.3, a = 0.6},
+			barslocked=false,
+			clickthrough=false,
+
+			classcolorbars = true,
+			classcolortext = false,
+			classicons = true,
+			roleicons = false,
+			showself = true,
+
+			buttons = {menu = true, reset = true, report = true, mode = true, segment = true},
+
+			title = {textcolor = {r = 0.9, g = 0.9, b = 0.9, a = 1}, height = 18, font="Expressway", barfontsize=10, fontsize=10, texture="Armory", bordercolor = {r=0,g=0,b=0,a=1}, bordertexture="None", borderthickness=2, color = {r=0.3,g=0.3,b=0.3,a=1}, fontflags = ""},
+			background = {
+				height=200,
+				texture="Solid",
+				bordercolor = {r=0,g=0,b=0,a=1},
+				bordertexture="Blizzard Party",
+				borderthickness=1,
+				color = {r=0,g=0,b=0,a=0.8},
+				tile = false,
+				tilesize = 0,
+			},
+
+			strata = "LOW",
+			scale = 1,
+
+			hidden = false,
+			enabletitle = true,
+			titleset = true,
+
+			display = "bar",
+			snapto = true,
+			version = 1,
+
+			-- Inline exclusive
+			isonnewline = false,
+			isusingclasscolors = true,
+			height = 30,
+			width = 600,
+			color = {r = 0.3, g = 0.3, b = 0.3, a = 0.6},
+			isusingelvuiskin = true,
+			issolidbackdrop = false,
+			fixedbarwidth = false,
+
+			-- Broker exclusive
+			textcolor = {r = 0.9, g = 0.9, b = 0.9},
+			useframe = true
+		},
+
+		{
+			name = "Legion-era default theme",
 
 			barspacing=0,
 			bartexture="BantoBar",

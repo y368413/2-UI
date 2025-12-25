@@ -1,14 +1,15 @@
-## Interface: 110007, 110100
+## Interface: 120000, 110207, 110205, 50502, 40402, 30405, 38000, 11508
 ## Title: Baganator
 ## Title-zhCN: |cff00ff00[背包]|r背包整合
 ## Title-zhTW: |cff00ff00[背包]|r背包整合
-## Version: 653
-## Author: plusmouse
+## Version: 773
+## Author: plusmouse, wutname1
 ## OptionalDeps: Syndicator, Masque
-## SavedVariables: BAGANATOR_CONFIG, BAGANATOR_DATA
+## SavedVariables: BAGANATOR_CONFIG, BAGANATOR_DATA, BaganatorOpenableDB
+## SavedVariablesPerCharacter: BAGANATOR_CURRENT_PROFILE
 ## IconTexture: Interface\AddOns\Baganator\Assets\logo.tga
 ## OptionalDependencies: WagoAnalytics
-## Dependencies: _ShiGuang
+## Dependencies: OrzUI
 
 ## X-Repple: 2 UI
 ## Category:- |cFFFFFF00 2|r|cFFFF0000 UI |r -
@@ -25,10 +26,11 @@ Core\Utilities.lua
 Core\SlashCmd.lua
 Core\Welcome.lua
 Core\Analytics.lua
-Core\Main.lua
+Core\Dialogs.lua
+Core\Initialize.lua
 
 Skins\Utilities.lua
-Skins\Main.lua
+Skins\Initialize.lua
 Skins\Blizzard.lua
 Skins\Dark.lua
 
@@ -52,7 +54,6 @@ ItemViewCommon\Search.lua
 ItemViewCommon\Search.xml
 ItemViewCommon\ItemButton.lua
 ItemViewCommon\ItemButton.xml
-ItemViewCommon\ItemButtonDataEvents.lua
 ItemViewCommon\Pools.lua
 ItemViewCommon\ContainerSlots.lua
 ItemViewCommon\ContainerSlots.xml
@@ -74,10 +75,13 @@ ItemViewCommon\BackpackView.lua
 ItemViewCommon\BackpackView.xml
 ItemViewCommon\BankViewCharacterView.lua
 ItemViewCommon\BankViewCharacterView.xml
+ItemViewCommon\BankViewCharacterTabsView.lua
+ItemViewCommon\BankViewCharacterTabsView.xml
 ItemViewCommon\BankViewWarbandView.lua
 ItemViewCommon\BankViewWarbandView.xml
 ItemViewCommon\BankView.lua
 ItemViewCommon\BankView.xml
+ItemViewCommon\BankTransferManager.lua
 ItemViewCommon\BagTransfers.lua
 ItemViewCommon\NewItemsTracking.lua
 ItemViewCommon\AnchorSetter.lua
@@ -87,6 +91,8 @@ ItemViewCommon\Initialize.lua
 SingleViews\Pools.lua
 SingleViews\BankViewCharacterView.lua
 SingleViews\BankViewCharacterView.xml
+SingleViews\BankViewCharacterTabsView.lua
+SingleViews\BankViewCharacterTabsView.xml
 SingleViews\BankViewWarbandView.lua
 SingleViews\BankViewWarbandView.xml
 SingleViews\BankView.xml
@@ -105,10 +111,13 @@ CategoryViews\CategoryFilter.lua
 CategoryViews\CategoryGrouping.lua
 CategoryViews\CategorySort.lua
 CategoryViews\ItemsPreparation.lua
+CategoryViews\SpecialisedSplitting.lua
 CategoryViews\Components.lua
 CategoryViews\Components.xml
 CategoryViews\BankViewCharacterView.lua
 CategoryViews\BankViewCharacterView.xml
+CategoryViews\BankViewCharacterTabsView.lua
+CategoryViews\BankViewCharacterTabsView.xml
 CategoryViews\BankViewWarbandView.lua
 CategoryViews\BankViewWarbandView.xml
 CategoryViews\BankView.xml
@@ -132,6 +141,7 @@ CustomiseDialog\Categories\RecentEditor.lua
 CustomiseDialog\Categories\EmptyEditor.lua
 CustomiseDialog\Categories\Utilities.lua
 CustomiseDialog\Categories\ImportExport.lua
+CustomiseDialog\Categories\ImportDialog.lua
 CustomiseDialog\Main.lua
 CustomiseDialog\Main.xml
 CustomiseDialog\Initialize.lua
@@ -145,8 +155,13 @@ API\ItemButton.lua
 API\EquipmentSets.lua
 API\Sorting.lua
 API\Pawn.lua
+API\Skins.lua
 
 Compatibility\VanillaEngraving.lua
 Compatibility\Lockpicking.lua
 Compatibility\Refunds.lua
 Compatibility\Contexts.lua
+Compatibility\ItemLevels.lua
+Compatibility\AuctionValue.lua
+
+Baganator-Openable.lua

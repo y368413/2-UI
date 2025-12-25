@@ -1,15 +1,18 @@
+---@class addonTableSyndicator
+local addonTable = select(2, ...)
+
 SyndicatorCurrencyCacheMixin = {}
 
 -- Assumed to run after PLAYER_LOGIN
 function SyndicatorCurrencyCacheMixin:OnLoad()
   self:RegisterEvent("PLAYER_MONEY")
 
-  if Syndicator.Constants.WarbandBankActive then
+  if addonTable.Constants.WarbandBankActive then
     self:RegisterEvent("ACCOUNT_MONEY")
     self:RegisterEvent("BANKFRAME_OPENED")
   end
 
-  self.currentCharacter = Syndicator.Utilities.GetCharacterFullName()
+  self.currentCharacter = addonTable.Utilities.GetCharacterFullName()
 
   SYNDICATOR_DATA.Characters[self.currentCharacter].money = GetMoney()
 
@@ -17,7 +20,7 @@ function SyndicatorCurrencyCacheMixin:OnLoad()
     self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
     self:ScanAllCurrencies()
   end
-  if Syndicator.Constants.IsRetail then
+  if addonTable.Constants.IsRetail then
     self:RegisterEvent("CURRENCY_TRANSFER_FAILED")
     hooksecurefunc(C_CurrencyInfo, "RequestCurrencyFromAccountCharacter", function(sourceGUID, currencyID, amount)
       if type(sourceGUID) ~= "string" then
@@ -64,10 +67,12 @@ function SyndicatorCurrencyCacheMixin:OnEvent(eventName, ...)
     end
   elseif eventName == "PLAYER_MONEY" then
     SYNDICATOR_DATA.Characters[self.currentCharacter].money = GetMoney()
-    Syndicator.CallbackRegistry:TriggerEvent("CurrencyCacheUpdate", self.currentCharacter)
+    addonTable.CallbackRegistry:TriggerEvent("CurrencyCacheUpdate", self.currentCharacter)
   elseif eventName == "ACCOUNT_MONEY" or eventName == "BANKFRAME_OPENED" then
-    SYNDICATOR_DATA.Warband[1].money = C_Bank.FetchDepositedMoney(Enum.BankType.Account)
-    Syndicator.CallbackRegistry:TriggerEvent("WarbandCurrencyCacheUpdate", 1)
+    if C_PlayerInfo.HasAccountInventoryLock() then
+      SYNDICATOR_DATA.Warband[1].money = C_Bank.FetchDepositedMoney(Enum.BankType.Account)
+      addonTable.CallbackRegistry:TriggerEvent("WarbandCurrencyCacheUpdate", 1)
+    end
   elseif eventName == "CURRENCY_TRANSFER_LOG_UPDATE" then
     local sourceCharacter = self.pendingTransfer.sourceCharacter
     if SYNDICATOR_DATA.Characters[sourceCharacter] then
@@ -89,7 +94,7 @@ function SyndicatorCurrencyCacheMixin:ScanAllCurrencies()
   local currencies = {}
   local currencyByHeader = { { name = UNKNOWN, currencies = {} } }
 
-  if Syndicator.Constants.IsRetail then
+  if addonTable.Constants.IsRetail then
     local index = 0
     local toCollapse = {}
     while index < C_CurrencyInfo.GetCurrencyListSize() do
@@ -161,5 +166,5 @@ end
 function SyndicatorCurrencyCacheMixin:OnUpdate()
   self:SetScript("OnUpdate", nil)
 
-  Syndicator.CallbackRegistry:TriggerEvent("CurrencyCacheUpdate", self.currentCharacter)
+  addonTable.CallbackRegistry:TriggerEvent("CurrencyCacheUpdate", self.currentCharacter)
 end

@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 
 if not Syndicator then
   return
@@ -42,6 +43,7 @@ local groupingsToLabels = {}
 local groupingGetters = {}
 do
   groupings["expansion"] = {
+    "Midnight",
     "The War Within",
     "Dragonflight",
     "Shadowlands",
@@ -56,7 +58,7 @@ do
   }
   groupingsToLabels["expansion"] = {}
   for index, label in ipairs(groupings["expansion"]) do
-    groupingsToLabels["expansion"][11 - index] = label
+    groupingsToLabels["expansion"][12 - index] = label
   end
   groupingGetters["expansion"] = function(item)
     if item.expansion then
@@ -288,7 +290,13 @@ do
   for i = 1, #subTypes, 2 do
     local root = subTypes[i]
     local child = subTypes[i+1]
-    local childLabel = C_Item.GetItemSubClassInfo(subTypes[i], subTypes[i+1])
+    local childLabel
+    if addonTable.Constants.IsEra then
+      childLabel = addonTable.Locales["GROUPING_ERA_" .. root .. "_" .. child]
+    end
+    if not childLabel then
+      childLabel = C_Item.GetItemSubClassInfo(subTypes[i], subTypes[i+1])
+    end
     if childLabel then
       table.insert(groupings["type"], childLabel)
       groupingsToLabels["type"][root .. "_" ..  child] = childLabel
@@ -301,13 +309,15 @@ do
     end
 
     if not item.classID then
-      if item.itemID == Syndicator.Constants.BattlePetCageID then
+      if Syndicator.Search.GetClassSubClass then
+        Syndicator.Search.GetClassSubClass(item)
+      elseif item.itemID == Syndicator.Constants.BattlePetCageID then
         local petID = item.itemLink:match("battlepet:(%d+)")
         local itemName, _, petType = C_PetJournal.GetPetInfoBySpeciesID(tonumber(petID))
         item.classID = Enum.ItemClass.Battlepet
         item.subClassID = petType - 1
       else
-        local classID, subClassID = select(6, C_Item.GetItemInfoInstant(item.itemID))
+        local _, _, _, _, _, classID, subClassID = C_Item.GetItemInfoInstant(item.itemID)
         item.classID = classID
         item.subClassID = subClassID
       end
@@ -345,8 +355,83 @@ do
     if item.slot then
       return true
     end
-    item.slot = (select(4, C_Item.GetItemInfoInstant(item.itemID))) or "NONE"
+    local _, _, _, slot = C_Item.GetItemInfoInstant(item.itemID)
+    item.slot = slot or "NONE"
     return true
+  end
+
+  groupings["track"] = {}
+  groupingsToLabels["track"] = {}
+  groupingGetters["track"] = function()
+    return true
+  end
+
+  if addonTable.Constants.IsRetail then
+    groupingsToLabels["track"] = {}
+    local items = {
+      explorer = "|cnIQ2:|Hitem:237894::::::::80:253::25:5:12265:6652:10394:10392:3171:1:28:2462:::::|h[Pendant of Arcane Havoc]|h|r",
+      adventurer = "|cnIQ3:|Hitem:221145::::::::80:66::2:1:3524:1:28:2720:::::|h[Shipwrecker's Bludgeon]|h|r",
+      veteran = "|cnIQ4:|Hitem:211028::::::::80:253::173:7:12282:6652:12921:11215:12239:3247:10255:1:28:2462:::::|h[Torchbearer's Bracers]|h|r",
+      champion = "|cnIQ4:|Hitem:237739::::::::80:268::3:1:3524:1:28:3228:::::|h[Obliteration Beamglaive]|h|r",
+      hero = "|cnIQ4:|Hitem:237739::::::::80:268::5:1:3524:1:28:3229:::::|h[Obliteration Beamglaive]|h|r",
+      myth = "|cnIQ4:|Hitem:237525::::::::80:268::6:1:3524:1:28:3230:::::|h[Irradiated Impurity Filter]|h|r",
+    }
+    local order = {
+      "myth", "hero", "champion", "veteran", "adventurer", "explorer",
+    }
+    local labelToKey = {}
+    local pending = 0
+    local loopFinished = false
+    local function OnFinished()
+      groupings["track"] = {}
+      for _, key in ipairs(order) do
+        table.insert(groupings["track"], groupingsToLabels["track"][key])
+      end
+    end
+
+    local frame = CreateFrame("Frame")
+    frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    frame:SetScript("OnEvent", function()
+      frame:UnregisterEvent("PLAYER_ENTERING_WORLD")
+      for key, itemLink in pairs(items) do
+        local itemID = C_Item.GetItemInfoInstant(itemLink)
+        pending = pending + 1
+        assert(itemID, "Broken item for upgrade track")
+        addonTable.Utilities.LoadItemData(itemID, function()
+          pending = pending - 1
+          local info = C_Item.GetItemUpgradeInfo(itemLink)
+          local label = info and info.trackString
+          if label then
+            groupingsToLabels["track"][key] = label
+            labelToKey[label] = key
+          end
+          if loopFinished and pending == 0 then
+            OnFinished()
+          end
+        end)
+      end
+      loopFinished = true
+      if pending == 0 then
+        OnFinished()
+      end
+    end)
+
+    groupingGetters["track"] = function(item)
+      if item.track then
+        return true
+      end
+
+      if not C_Item.IsItemDataCachedByID(item.itemID) then
+        C_Item.RequestLoadItemDataByID(item.itemID)
+        return false
+      end
+      local info = C_Item.GetItemUpgradeInfo(item.itemLink)
+      local label = info and info.trackString
+      if label then
+        item.track = labelToKey[label]
+      end
+      return true
+    end
   end
 end
 

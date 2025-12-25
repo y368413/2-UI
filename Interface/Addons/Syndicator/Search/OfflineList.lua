@@ -1,3 +1,6 @@
+---@class addonTableSyndicator
+local addonTable = select(2, ...)
+
 SyndicatorOfflineListSearchMixin = {}
 
 function SyndicatorOfflineListSearchMixin:OnLoad()
@@ -8,7 +11,7 @@ end
 
 function SyndicatorOfflineListSearchMixin:OnUpdate()
   for details in pairs(self.pending) do
-    local result = Syndicator.Search.CheckItem(details, self.searchTerm)
+    local result = addonTable.Search.CheckItem(details, self.searchTerm)
     if result == true then
       table.insert(self.matching, details)
       self.pending[details] = nil
@@ -49,7 +52,7 @@ function SyndicatorOfflineListSearchMixin:StartSearch(baseInfoItems, text, finis
   self.finishedCallback = finishedCallback or function(matches) end
 
   for _, details in ipairs(self.list) do
-    local result = Syndicator.Search.CheckItem(details, self.searchTerm)
+    local result = addonTable.Search.CheckItem(details, self.searchTerm)
     if result == nil then
       self.pending[details] = true
     elseif result then

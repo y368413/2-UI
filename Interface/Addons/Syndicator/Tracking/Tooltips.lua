@@ -1,4 +1,7 @@
-Syndicator.Tooltips = {}
+---@class addonTableSyndicator
+local addonTable = select(2, ...)
+
+addonTable.Tooltips = {}
 
 local LibBattlePetTooltipLine = LibStub("LibBattlePetTooltipLine-1-0")
 
@@ -24,8 +27,8 @@ local function IsBoA(itemLink)
   end
 
   local tooltipData
-  if Syndicator.Constants.IsClassic then
-    tooltipData = Syndicator.Utilities.DumpClassicTooltip(function(tooltip) tooltip:SetHyperlink(itemLink) end)
+  if addonTable.Constants.IsClassic then
+    tooltipData = addonTable.Utilities.DumpClassicTooltip(function(tooltip) tooltip:SetHyperlink(itemLink) end)
   else
     tooltipData = C_TooltipInfo.GetHyperlink(itemLink)
   end
@@ -35,7 +38,7 @@ local function IsBoA(itemLink)
   end
 
   for _, line in ipairs(tooltipData.lines) do
-    if tIndexOf(Syndicator.Constants.AccountBoundTooltipLines, line.leftText) ~= nil then
+    if tIndexOf(addonTable.Constants.AccountBoundTooltipLines, line.leftText) ~= nil then
       return true
     end
   end
@@ -43,19 +46,19 @@ local function IsBoA(itemLink)
   return false
 end
 
-function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
+function addonTable.Tooltips.AddItemLines(tooltip, summaries, itemLink)
   if itemLink == nil then
     return
   end
 
-  local success, key = pcall(Syndicator.Utilities.GetItemKey, itemLink)
+  local success, key = pcall(addonTable.Utilities.GetItemKey, itemLink)
 
   if not success then
     return
   end
 
-  local connectedRealmsOnly = Syndicator.Config.Get("tooltips_connected_realms_only_2")
-  local factionOnly = Syndicator.Config.Get("tooltips_faction_only")
+  local connectedRealmsOnly = addonTable.Config.Get("tooltips_connected_realms_only_2")
+  local factionOnly = addonTable.Config.Get("tooltips_faction_only")
   if IsBoA(itemLink) then
     connectedRealmsOnly = false
     factionOnly = false
@@ -64,13 +67,13 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
 
   -- Remove any equipped information from the tooltip if the option is disabled
   -- (and remove the character if it has none of the items not equipped)
-  if not Syndicator.Config.Get("show_equipped_items_in_tooltips") then
+  if not addonTable.Config.Get("show_equipped_items_in_tooltips") then
     for _, char in ipairs(tooltipInfo.characters) do
       char.equipped = 0
     end
   end
 
-  if Syndicator.Config.Get("tooltips_sort_by_name") then
+  if addonTable.Config.Get("tooltips_sort_by_name") then
     table.sort(tooltipInfo.characters, CharacterAndRealmComparator)
     table.sort(tooltipInfo.guilds, GuildAndRealmComparator)
   else
@@ -92,7 +95,7 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
     end)
   end
 
-  if not Syndicator.Config.Get(Syndicator.Config.Options.SHOW_GUILD_BANKS_IN_TOOLTIPS) then
+  if not addonTable.Config.Get(addonTable.Config.Options.SHOW_GUILD_BANKS_IN_TOOLTIPS) then
     tooltipInfo.guilds = {}
   end
 
@@ -137,28 +140,36 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
     return
   end
 
-  AddDoubleLine(SYNDICATOR_L_INVENTORY, LINK_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_TOTAL_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(totals))))
+  local blankLineAdded = false
+  if addonTable.Config.Get(addonTable.Config.Options.SHOW_BLANK_LINE_BEFORE_INVENTORY) then
+    tooltip:AddLine(" ")
+    blankLineAdded = true
+  end
+
+  if not addonTable.Config.Get(addonTable.Config.Options.SHOW_TOTAL_LINE_AFTER_CHARACTERS) then
+    AddDoubleLine(addonTable.Locales.INVENTORY, LINK_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.TOTAL_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(totals))))
+  end
 
   local charactersShown = 0
   for _, s in ipairs(tooltipInfo.characters) do
     local entries = {}
     if s.bags > 0 then
-      table.insert(entries, SYNDICATOR_L_BAGS_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.bags)))
+      table.insert(entries, addonTable.Locales.BAGS_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.bags)))
     end
     if s.bank > 0 then
-      table.insert(entries, SYNDICATOR_L_BANK_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.bank)))
+      table.insert(entries, addonTable.Locales.BANK_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.bank)))
     end
     if s.mail > 0 then
-      table.insert(entries, SYNDICATOR_L_MAIL_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.mail)))
+      table.insert(entries, addonTable.Locales.MAIL_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.mail)))
     end
     if s.equipped > 0 then
-      table.insert(entries, SYNDICATOR_L_EQUIPPED_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.equipped)))
+      table.insert(entries, addonTable.Locales.EQUIPPED_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.equipped)))
     end
     if s.void > 0 then
-      table.insert(entries, SYNDICATOR_L_VOID_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.void)))
+      table.insert(entries, addonTable.Locales.VOID_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.void)))
     end
     if s.auctions > 0 then
-      table.insert(entries, SYNDICATOR_L_AUCTIONS_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.auctions)))
+      table.insert(entries, addonTable.Locales.AUCTIONS_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.auctions)))
     end
     local character = s.character
     if appendRealm then
@@ -167,11 +178,11 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
     if s.className then
       character = "|c" .. (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[s.className].colorStr .. character .. "|r"
     end
-    if Syndicator.Config.Get(Syndicator.Config.Options.SHOW_CHARACTER_RACE_ICONS) and s.race then
-      character = Syndicator.Utilities.GetCharacterIcon(s.race, s.sex) .. " " .. character
+    if addonTable.Config.Get(addonTable.Config.Options.SHOW_CHARACTER_RACE_ICONS) and s.race then
+      character = addonTable.Utilities.GetCharacterIcon(s.race, s.sex) .. " " .. character
     end
     if #entries > 0 then
-      if charactersShown >= Syndicator.Config.Get("tooltips_character_limit") then
+      if charactersShown >= addonTable.Config.Get("tooltips_character_limit") then
         tooltip:AddLine("  ...")
         break
       end
@@ -180,39 +191,47 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
     end
   end
 
-  for index = 1, math.min(#tooltipInfo.guilds, Syndicator.Config.Get("tooltips_character_limit")) do
+  for index = 1, math.min(#tooltipInfo.guilds, addonTable.Config.Get("tooltips_character_limit")) do
     local s = tooltipInfo.guilds[index]
-    local output = SYNDICATOR_L_GUILD_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.bank))
+    local output = addonTable.Locales.GUILD_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.bank))
     local guild = TRANSMOGRIFY_FONT_COLOR:WrapTextInColorCode(s.guild)
     if appendRealm then
       guild = guild .. "-" .. s.realmNormalized
     end
-    if Syndicator.Config.Get(Syndicator.Config.Options.SHOW_CHARACTER_RACE_ICONS) then
-      guild = Syndicator.Utilities.GetGuildIcon() .. " " .. guild
+    if addonTable.Config.Get(addonTable.Config.Options.SHOW_CHARACTER_RACE_ICONS) then
+      guild = addonTable.Utilities.GetGuildIcon() .. " " .. guild
     end
     AddDoubleLine("  " .. guild, LINK_FONT_COLOR:WrapTextInColorCode(output))
   end
-  if #tooltipInfo.guilds > Syndicator.Config.Get("tooltips_character_limit") then
+  if #tooltipInfo.guilds > addonTable.Config.Get("tooltips_character_limit") then
     tooltip:AddLine("  ...")
   end
   if tooltipInfo.warband[1] > 0 then
     local icon = ""
-    if Syndicator.Config.Get(Syndicator.Config.Options.SHOW_CHARACTER_RACE_ICONS) then
-      icon = Syndicator.Utilities.GetWarbandIcon() .. " "
+    if addonTable.Config.Get(addonTable.Config.Options.SHOW_CHARACTER_RACE_ICONS) then
+      icon = addonTable.Utilities.GetWarbandIcon() .. " "
     end
-    AddDoubleLine("  " .. icon .. PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_WARBAND), LINK_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_BANK_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(tooltipInfo.warband[1]))))
+    AddDoubleLine("  " .. icon .. PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.WARBAND), LINK_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.BANK_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(tooltipInfo.warband[1]))))
   end
+
+  if addonTable.Config.Get(addonTable.Config.Options.SHOW_TOTAL_LINE_AFTER_CHARACTERS) then
+    if addonTable.Config.Get(addonTable.Config.Options.SHOW_BLANK_LINE_BEFORE_INVENTORY) and not blankLineAdded then
+      tooltip:AddLine(" ")
+    end
+    AddDoubleLine(addonTable.Locales.INVENTORY, LINK_FONT_COLOR:WrapTextInColorCode(addonTable.Locales.TOTAL_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(totals))))
+  end
+
   tooltip:Show()
 end
 
-function Syndicator.Tooltips.AddCurrencyLines(tooltip, currencyID)
-  if tIndexOf(Syndicator.Constants.SharedCurrencies, currencyID) ~= nil then
+function addonTable.Tooltips.AddCurrencyLines(tooltip, currencyID)
+  if tIndexOf(addonTable.Constants.SharedCurrencies, currencyID) ~= nil then
     return
   end
 
-  local summary = Syndicator.Tracking.GetCurrencyTooltipData(currencyID, Syndicator.Config.Get("tooltips_connected_realms_only_2"), Syndicator.Config.Get("tooltips_faction_only"))
+  local summary = addonTable.Tracking.GetCurrencyTooltipData(currencyID, addonTable.Config.Get("tooltips_connected_realms_only_2"), addonTable.Config.Get("tooltips_faction_only"))
 
-  if Syndicator.Config.Get("tooltips_sort_by_name") then
+  if addonTable.Config.Get("tooltips_sort_by_name") then
     table.sort(summary, CharacterAndRealmComparator)
   else
     table.sort(summary, function(a, b)
@@ -246,8 +265,8 @@ function Syndicator.Tooltips.AddCurrencyLines(tooltip, currencyID)
     appendRealm = true
   end
 
-  tooltip:AddDoubleLine(SYNDICATOR_L_ALL_CHARACTERS_COLON, WHITE_FONT_COLOR:WrapTextInColorCode(FormatLargeNumber(quantity)))
-  for index = 1, math.min(#summary, Syndicator.Config.Get("tooltips_character_limit")) do
+  tooltip:AddDoubleLine(addonTable.Locales.ALL_CHARACTERS_COLON, WHITE_FONT_COLOR:WrapTextInColorCode(FormatLargeNumber(quantity)))
+  for index = 1, math.min(#summary, addonTable.Config.Get("tooltips_character_limit")) do
     local s = summary[index]
     local character = s.character
     if appendRealm then
@@ -256,12 +275,12 @@ function Syndicator.Tooltips.AddCurrencyLines(tooltip, currencyID)
     if s.className then
       character = "|c" .. (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[s.className].colorStr .. character .. "|r"
     end
-    if Syndicator.Config.Get(Syndicator.Config.Options.SHOW_CHARACTER_RACE_ICONS) and s.race then
-      character = Syndicator.Utilities.GetCharacterIcon(s.race, s.sex) .. " " .. character
+    if addonTable.Config.Get(addonTable.Config.Options.SHOW_CHARACTER_RACE_ICONS) and s.race then
+      character = addonTable.Utilities.GetCharacterIcon(s.race, s.sex) .. " " .. character
     end
     tooltip:AddDoubleLine("  " .. character, WHITE_FONT_COLOR:WrapTextInColorCode(FormatLargeNumber(s.quantity)))
   end
-  if #summary > Syndicator.Config.Get("tooltips_character_limit") then
+  if #summary > addonTable.Config.Get("tooltips_character_limit") then
     tooltip:AddLine("  ...")
   end
   tooltip:Show()

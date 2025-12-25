@@ -1,18 +1,17 @@
-## Interface: 110007, 110100
+## Interface: 120000, 110207, 110205
 ## Title: Angry Keystones
 ## Title-zhCN:|cff8000ff[战斗]|r秘境助手
 ## Title-zhTW:|cff8000ff[戰鬥]|r秘境助手
 ## Notes: Displays additional information for Mythic Keystone dungeons
 ## Notes-zhCN: 显示大秘境钥石的更多信息。
 ## Notes-zhTW: 顯示大秘境鑰石的更多資訊。
-## Version: 0.31.11
+## Version: 0.32.14
 ## Author: Ermad
 ## SavedVariables: AngryKeystones_Config, AngryKeystones_Data
 ## SavedVariablesPerCharacter: AngryKeystones_CharacterConfig
-## OptionalDeps: !KalielsTracker
-## X-Packaged-Version: v0.31.11
-## IconTexture: Interface\AddOns\HandyNotes\Icons\weaponsmith.blp
-## RequiredDeps: _ShiGuang
+## X-Packaged-Version: v0.32.14
+## IconTexture: Interface\Icons\inv_relics_hourglass
+## RequiredDeps: OrzUI
 
 ## X-Repple: 2 UI
 ## Category:- |cFFFFFF00 2|r|cFFFF0000 UI |r -
@@ -27,4 +26,3 @@ Keystone.lua
 Gossip.lua
 Splits.lua
 Schedule.lua
-## TrackerManage.lua

@@ -1,0 +1,14 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="PvPPP.lua"/>
+	<Script file="Paragon.lua"/>
+	<Script file="NPCTime.lua"/>
+	<Script file="Reminder.lua"/>
+	<Script file="ReflectWhat.lua"/>
+	<Script file="SimpleFoxCamp.lua"/>
+	<Script file="CompteMesSauts.lua"/>
+	<Script file="FeastsAndPortals.lua"/>	
+	<Script file="IncentiveProgram.lua"/>
+	<Script file="DoomCooldownPulse.lua"/>
+	<Script file="ParagonReputation.lua"/>
+	<Script file="SpellActivationText.lua"/>
+</Ui>

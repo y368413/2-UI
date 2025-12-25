@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 
 BaganatorItemViewCommonBankViewCharacterViewMixin = {}
 
@@ -47,7 +48,6 @@ function BaganatorItemViewCommonBankViewCharacterViewMixin:OnLoad()
   end)
 
   Syndicator.CallbackRegistry:RegisterCallback("CharacterDeleted", function(_, character)
-    self.tabsSetup = false
     if self.lastCharacter == character then
       self.lastCharacter = self.liveCharacter
     end
@@ -62,7 +62,7 @@ function BaganatorItemViewCommonBankViewCharacterViewMixin:OnLoad()
     end
     if settingName == addonTable.Config.Options.BANK_ONLY_VIEW_SHOW_BAG_SLOTS and self:IsVisible() then
       self.BagSlots:Update(self.lastCharacter, self.isLive)
-      self:OnFinished()
+      self:OnFinished(true)
       self:GetParent():OnTabFinished()
     end
   end)
@@ -71,6 +71,7 @@ function BaganatorItemViewCommonBankViewCharacterViewMixin:OnLoad()
     if character ~= self.lastCharacter then
       self.refreshState[addonTable.Constants.RefreshReason.ItemData] = true
       self.refreshState[addonTable.Constants.RefreshReason.Layout] = true
+      self.refreshState[addonTable.Constants.RefreshReason.Character] = true
       if self:IsVisible() then
         self.lastCharacter = character
         self:GetParent():UpdateView()
@@ -92,6 +93,12 @@ end
 
 function BaganatorItemViewCommonBankViewCharacterViewMixin:SetLiveCharacter(character)
   self.liveCharacter = character
+end
+
+function BaganatorItemViewCommonBankViewCharacterViewMixin:BuyReagentBank(character)
+  addonTable.Dialogs.ShowMoney(CONFIRM_BUY_REAGNETBANK_TAB, GetReagentBankCost(), YES, NO, function()
+    BuyReagentBank();
+  end)
 end
 
 function BaganatorItemViewCommonBankViewCharacterViewMixin:DoSort(isReverse)
@@ -140,6 +147,9 @@ function BaganatorItemViewCommonBankViewCharacterViewMixin:CombineStacksAndSort(
   end
 
   if addonTable.API.ExternalContainerSorts[sortMethod] then
+    if addonTable.Config.Get(addonTable.Config.Options.SORT_START_AT_BOTTOM) then
+      isReverse = not isReverse
+    end
     addonTable.API.ExternalContainerSorts[sortMethod].callback(isReverse, Baganator.API.Constants.ContainerType.Bank)
   elseif sortMethod == "combine_stacks_only" then
     self:CombineStacks(function() end)
@@ -183,7 +193,7 @@ function BaganatorItemViewCommonBankViewCharacterViewMixin:UpdateForCharacter(ch
     self:GetParent():SetTitle("")
     return
   else
-    self:GetParent():SetTitle(BAGANATOR_L_XS_BANK:format(characterData.details.character))
+    self:GetParent():SetTitle(addonTable.Locales.XS_BANK:format(characterData.details.character))
   end
 
   self.searchToApply = self.searchToApply or self.refreshState[addonTable.Constants.RefreshReason.Searches] or self.refreshState[addonTable.Constants.RefreshReason.ItemData] or self.refreshState[addonTable.Constants.RefreshReason.ItemWidgets]
@@ -216,13 +226,13 @@ function BaganatorItemViewCommonBankViewCharacterViewMixin:UpdateForCharacter(ch
   self:GetParent().SearchWidget:SetShown(addonTable.Config.Get(addonTable.Config.Options.SHOW_SEARCH_BOX) and characterData.bank[1] and #characterData.bank[1] ~= 0)
 
   if self.BankMissingHint:IsShown() then
-    self.BankMissingHint:SetText(BAGANATOR_L_BANK_DATA_MISSING_HINT:format(characterData.details.character))
+    self.BankMissingHint:SetText(addonTable.Locales.BANK_DATA_MISSING_HINT:format(characterData.details.character))
   end
 
   local searchText = self:GetParent().SearchWidget.SearchBox:GetText()
 
-  self.DepositIntoReagentsBankButton:SetShown(self.isLive and addonTable.Constants.IsRetail and IsReagentBankUnlocked())
-  self.BuyReagentBankButton:SetShown(self.isLive and addonTable.Constants.IsRetail and not IsReagentBankUnlocked())
+  self.DepositIntoReagentsBankButton:SetShown(self.isLive and addonTable.Constants.IsRetail and not Syndicator.Constants.CharacterBankTabsActive and IsReagentBankUnlocked())
+  self.BuyReagentBankButton:SetShown(self.isLive and addonTable.Constants.IsRetail and not Syndicator.Constants.CharacterBankTabsActive and not IsReagentBankUnlocked())
 
   if self.CurrencyWidget.lastCharacter ~= self.lastCharacter then
     self.CurrencyWidget:UpdateCurrencies(character)
@@ -251,12 +261,12 @@ function BaganatorItemViewCommonBankViewCharacterViewMixin:UpdateForCharacter(ch
   end
 end
 
-function BaganatorItemViewCommonBankViewCharacterViewMixin:OnFinished(character, isLive)
+function BaganatorItemViewCommonBankViewCharacterViewMixin:OnFinished(forceResize)
   if self.BankMissingHint:IsShown() then
     return
   end
 
-  if self.refreshState[addonTable.Constants.RefreshReason.Layout] then
+  if self.refreshState[addonTable.Constants.RefreshReason.Layout] or forceResize then
     local sideSpacing, topSpacing, searchSpacing = addonTable.Utilities.GetSpacing()
 
     local buttonPadding = 5

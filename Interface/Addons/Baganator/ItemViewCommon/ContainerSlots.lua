@@ -1,10 +1,12 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 
 local swapTracker = CreateFrame("Frame")
 
 function ApplyCursor(targetInventorySlot, associatedTargetBag)
   local location = C_Cursor.GetCursorItem()
-  if location == nil or not C_Item.DoesItemExist(location) or select(6, C_Item.GetItemInfoInstant(C_Item.GetItemID(location))) ~= Enum.ItemClass.Container then
+  -- Handle bags dragged from other equipment slots or items dropped into bags
+  if location == nil or not location:HasAnyLocation() or not C_Item.DoesItemExist(location) or select(6, C_Item.GetItemInfoInstant(C_Item.GetItemID(location))) ~= Enum.ItemClass.Container then
     PutItemInBag(targetInventorySlot)
     return
   end
@@ -14,7 +16,6 @@ function ApplyCursor(targetInventorySlot, associatedTargetBag)
   -- dropped on.
   if bagID == associatedTargetBag then
     ClearCursor()
-    local bagID, slotID = location:GetBagAndSlot()
     C_Container.PickupContainerItem(bagID, slotID)
     -- The first bag, the backpack will never be replaced, so using this slot is
     -- fine.
@@ -70,6 +71,8 @@ function ApplyCursor(targetInventorySlot, associatedTargetBag)
   end
 end
 
+local HighlightMonitor = {}
+
 -- REGULAR BAGS
 BaganatorRetailBagSlotButtonMixin = {}
 
@@ -92,11 +95,16 @@ local function ShowBagSlotTooltip(self)
   GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
   GameTooltip:SetInventoryItem("player", GetBagInventorySlot(self))
   GameTooltip:Show()
+  addonTable.CallbackRegistry:RegisterCallback("ViewComplete", function()
+    addonTable.CallbackRegistry:TriggerEvent("ClearHighlightBag")
+    addonTable.CallbackRegistry:TriggerEvent("HighlightBagItems", {[self:GetID()] = true})
+  end, HighlightMonitor)
 end
 
-local function HideBagSlotTooltip(self)
+local function HideBagSlotTooltip()
   addonTable.CallbackRegistry:TriggerEvent("ClearHighlightBag")
   GameTooltip:Hide()
+  addonTable.CallbackRegistry:UnregisterCallback("ViewComplete", HighlightMonitor)
 end
 
 function BaganatorRetailBagSlotButtonMixin:OnLoad()
@@ -156,7 +164,7 @@ function BaganatorRetailBagSlotButtonMixin:OnEnter()
 end
 
 function BaganatorRetailBagSlotButtonMixin:OnLeave()
-  HideBagSlotTooltip(self)
+  HideBagSlotTooltip()
 end
 
 BaganatorClassicBagSlotButtonMixin = {}
@@ -213,7 +221,7 @@ function BaganatorClassicBagSlotButtonMixin:OnEnter()
 end
 
 function BaganatorClassicBagSlotButtonMixin:OnLeave()
-  HideBagSlotTooltip(self)
+  HideBagSlotTooltip()
 end
 
 -- BANK
@@ -221,21 +229,6 @@ end
 local function GetBankInventorySlot(button)
   return BankButtonIDToInvSlotID(button:GetID(), 1)
 end
-
-StaticPopupDialogs["Baganator.ConfirmBuyBankSlot"] = {
-  text = CONFIRM_BUY_BANK_SLOT,
-  button1 = YES,
-  button2 = NO,
-  OnAccept = function(self)
-    PurchaseSlot()
-  end,
-  OnShow = function(self)
-    MoneyFrame_Update(self.moneyFrame, GetBankSlotCost(GetNumBankSlots()))
-  end,
-  hasMoneyFrame = 1,
-  timeout = 0,
-  hideOnEscape = 1,
-}
 
 local function OnBankSlotClick(self, button)
   if button == "RightButton" then
@@ -247,12 +240,15 @@ local function OnBankSlotClick(self, button)
       ApplyCursor(GetBankInventorySlot(self), Syndicator.Constants.AllBankIndexes[self:GetID() + 1])
     end
   else
-    StaticPopup_Show("Baganator.ConfirmBuyBankSlot")
+    addonTable.Dialogs.ShowMoney(CONFIRM_BUY_BANK_SLOT, GetBankSlotCost(GetNumBankSlots()), YES, NO, function()
+      PurchaseSlot()
+    end)
   end
 end
 
 local function ShowBankSlotTooltip(self)
-  addonTable.CallbackRegistry:TriggerEvent("HighlightBagItems", {[Syndicator.Constants.AllBankIndexes[self:GetID() + 1]] = true})
+  local id = Syndicator.Constants.AllBankIndexes[self:GetID() + 1]
+  addonTable.CallbackRegistry:TriggerEvent("HighlightBagItems", {[id] = true})
 
   GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
   if self.needPurchase then
@@ -262,11 +258,16 @@ local function ShowBankSlotTooltip(self)
     GameTooltip:SetInventoryItem("player", GetBankInventorySlot(self))
   end
   GameTooltip:Show()
+  addonTable.CallbackRegistry:RegisterCallback("ViewComplete", function()
+    addonTable.CallbackRegistry:TriggerEvent("ClearHighlightBag")
+    addonTable.CallbackRegistry:TriggerEvent("HighlightBagItems", {[id] = true})
+  end, HighlightMonitor)
 end
 
-local function HideBankSlotTooltip(self)
+local function HideBankSlotTooltip()
   addonTable.CallbackRegistry:TriggerEvent("ClearHighlightBag")
   GameTooltip:Hide()
+  addonTable.CallbackRegistry:UnregisterCallback("ViewComplete", HighlightMonitor)
 end
 
 local function GetBankBagInfo(bankBagID)
@@ -337,7 +338,7 @@ function BaganatorRetailBankButtonMixin:OnEnter()
 end
 
 function BaganatorRetailBankButtonMixin:OnLeave()
-  HideBankSlotTooltip(self)
+  HideBankSlotTooltip()
 end
 
 BaganatorClassicBankButtonMixin = {}
@@ -400,7 +401,7 @@ function BaganatorClassicBankButtonMixin:OnEnter()
 end
 
 function BaganatorClassicBankButtonMixin:OnLeave()
-  HideBankSlotTooltip(self)
+  HideBankSlotTooltip()
 end
 
 BaganatorBagSlotsContainerMixin = {}
@@ -459,7 +460,6 @@ function BaganatorBagSlotsContainerMixin:OnLoad()
     else
       bb:SetPoint("TOPLEFT", self.liveBagSlots[#self.liveBagSlots - 1], "TOPRIGHT")
     end
-    addonTable.Utilities.MasqueRegistration(bb)
     addonTable.Skins.AddFrame("ItemButton", bb, {"containerBag"})
   end
 
@@ -478,16 +478,15 @@ function BaganatorBagSlotsContainerMixin:OnLoad()
   for index = 1, bagSlotsCount do
     local bb = GetCachedBagSlotButton()
     bb.SlotBackground:SetTexture((select(2, GetInventorySlotInfo("Bag1"))))
-    addonTable.Utilities.MasqueRegistration(bb)
     addonTable.Skins.AddFrame("ItemButton", bb, {"containerBag"})
     bb:UpdateTextures()
     bb.isBag = true
     table.insert(self.cachedBagSlots, bb)
     bb:SetID(bagIndexes[index + 1])
-    bb:HookScript("OnEnter", function(self)
-      addonTable.CallbackRegistry:TriggerEvent("HighlightBagItems", {[self:GetID()] = true})
+    bb:HookScript("OnEnter", function()
+      addonTable.CallbackRegistry:TriggerEvent("HighlightBagItems", {[bb:GetID()] = true})
     end)
-    bb:HookScript("OnLeave", function(self)
+    bb:HookScript("OnLeave", function()
       addonTable.CallbackRegistry:TriggerEvent("ClearHighlightBag")
     end)
     if #self.cachedBagSlots == 1 then
@@ -509,23 +508,23 @@ function BaganatorBagSlotsContainerMixin:Update(character, isLive)
   end
 
   local anyShown = false
-  local show = isLive and addonTable.Config.Get(self.config)
+  local showLive = isLive and addonTable.Config.Get(self.config)
   for _, bb in ipairs(self.liveBagSlots) do
-    anyShown = show
+    anyShown = showLive
     -- Show live bag slots if viewing live bags/bank
-    bb:SetShown(show)
+    bb:SetShown(showLive)
   end
 
   -- Show cached bag slots when viewing cached bags for other characters
   local containerInfo = Syndicator.API.GetCharacter(character).containerInfo
   if not isLive and containerInfo and containerInfo[self.mode] then
-    local show = addonTable.Config.Get(self.config)
+    local showCached = addonTable.Config.Get(self.config)
     for index, bb in ipairs(self.cachedBagSlots) do
-      anyShown = show
+      anyShown = showCached
       local details = CopyTable(containerInfo[self.mode][index] or {})
       details.itemCount = addonTable.Utilities.CountEmptySlots(Syndicator.API.GetCharacter(character)[self.mode][index + 1])
       bb:SetItemDetails(details)
-      bb:SetShown(show)
+      bb:SetShown(showCached)
     end
   else
     for _, bb in ipairs(self.cachedBagSlots) do

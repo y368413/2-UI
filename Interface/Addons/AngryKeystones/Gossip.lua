@@ -19,13 +19,13 @@ local function GossipNPCID()
 end
 
 local function IsStaticPopupShown()
-	for index = 1, STATICPOPUP_NUMDIALOGS do
-		local frame = _G["StaticPopup"..index]
-		if frame and frame:IsShown() then
-			return true
+	local dialog = nil
+	StaticPopup_ForEachShownDialog(function(d)
+		if dialog == nil and not d.hasFixedPosition then
+			dialog = d
 		end
-	end
-	return false
+	end)
+	return dialog
 end
 
 local function IsInActiveChallengeMode()
@@ -76,7 +76,10 @@ function Mod:GOSSIP_SHOW()
 			local popupIsShown = IsStaticPopupShown()
 			if popupIsShown then
 				if not popupWasShown then
-					StaticPopup1Button1:Click()
+					local button = popupIsShown:GetButton1()
+					if button then
+						button:Click()
+					end
 					C_GossipInfo.CloseGossip()
 				end
 			else
@@ -88,17 +91,12 @@ end
 
 local function PlayCurrent()
 	if IsInActiveChallengeMode() and Addon.Config.hideTalkingHead then
-		local frame = TalkingHeadFrame
-		if (frame.finishTimer) then
-			frame.finishTimer:Cancel()
-			frame.finishTimer = nil
-		end
-		frame:Hide()
+		TalkingHeadFrame:CloseImmediately()
 	end
 end
 
 function Mod:Blizzard_TalkingHeadUI()
-	hooksecurefunc("TalkingHeadFrame_PlayCurrent", PlayCurrent)
+	hooksecurefunc(TalkingHeadFrame, "PlayCurrent", PlayCurrent)
 end
 
 function Mod:Startup()

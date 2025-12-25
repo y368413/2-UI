@@ -17,7 +17,11 @@ Skada:AddLoadableModule("Interrupts", nil, function(Skada, L)
 		GameTooltip:AddDoubleLine(L["Interrupts"], set.interrupts, 1,1,1)
 	end
 
+
+
+
 	function mod:GetSetSummary(set)
+
 		return set.interrupts
 	end
 

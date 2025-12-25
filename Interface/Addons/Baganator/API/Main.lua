@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 
 function Baganator.API.GetInventoryInfo(itemLink, sameConnectedRealm, sameFaction)
   return Syndicator.API.GetInventoryInfo(itemLink, sameConnectedRealm, sameFaction)
@@ -46,7 +47,7 @@ do
     end
   end
 
-  addonTable.Utilities.OnAddonLoaded("Baganator", function()
+  function addonTable.API.ApplyJunkPluginsInitial()
     addonLoaded = true
 
     for id in pairs(addonTable.API.JunkPlugins) do
@@ -56,7 +57,7 @@ do
     if next(addonTable.API.JunkPlugins) then
       ReportPluginAdded()
     end
-  end)
+  end
 
   -- callback - function(bagID, slotID, itemID, itemLink) returns nil/true/false
   --  Returning true indicates this item is junk and should show a junk coin
@@ -77,6 +78,10 @@ do
     end
 
     ReportPluginAdded()
+  end
+
+  function Baganator.API.IsJunkPluginActive(id)
+    return addonTable.Config.Get(addonTable.Config.Options.JUNK_PLUGIN) == id
   end
 
   addonTable.CallbackRegistry:RegisterCallback("SettingChanged", function(_, settingName)
@@ -106,7 +111,7 @@ do
     end
   end
 
-  addonTable.Utilities.OnAddonLoaded("Baganator", function()
+  function addonTable.API.ApplyUpgradePluginsInitial()
     addonLoaded = true
 
     for id in pairs(addonTable.API.UpgradePlugins) do
@@ -116,7 +121,7 @@ do
     if next(addonTable.API.UpgradePlugins) then
       ReportPluginAdded()
     end
-  end)
+  end
 
   -- callback - function(itemLink) returns nil/true/false
   --  Returning true indicates this item is an upgrade
@@ -187,7 +192,7 @@ do
     end
   end
 
-  addonTable.Utilities.OnAddonLoaded("Baganator", function()
+  function addonTable.API.ApplyCornerPluginsInitial()
     addonLoaded = true
 
     for _, entry in ipairs(autoAddQueue) do
@@ -195,7 +200,7 @@ do
     end
 
     ReportPluginAdded()
-  end)
+  end
 
   -- label: User facing text string describing this corner option.
   -- id: unique value to be used internally for the settings
@@ -262,7 +267,7 @@ Baganator.API.Constants.ContainerType = {
 }
 
 -- Register a sort function for bags and bank.
--- callback: function(isReverse, containerType)
+-- callback: function(isReverse, containerType, tabIndex?)
 --  isReverse: boolean
 --  containerType: Baganator.API.Constants.ContainerType
 function Baganator.API.RegisterContainerSort(label, id, callback)
@@ -286,9 +291,6 @@ end
 
 function Baganator.API.Skins.RegisterListener(callback)
   table.insert(addonTable.Skins.skinListeners, callback)
-  if addonTable.WagoAnalytics then
-    addonTable.WagoAnalytics:Switch("UsingSkinRaw", true)
-  end
 end
 
 local blockedSkins = {

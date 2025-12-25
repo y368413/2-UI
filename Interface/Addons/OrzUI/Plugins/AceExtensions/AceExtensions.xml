@@ -1,0 +1,11 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Script file="Quester.lua"/>
+    <Script file="DialogKey.lua"/>
+    <Script file="Disenchanter.lua"/>
+	<Script file="StatPriority.lua"/>
+	<Script file="WorldBossTimers.lua"/>
+	<Include file="InboxMailBag\InboxMailBag.xml"/>
+	<Script file="Simulationcraft\LibRealmInfo.lua"/>
+	<Script file="Simulationcraft\Simulationcraft.lua"/>
+	<Include file="TomeOfTeleportation\TomeOfTeleportation.xml"/>
+</Ui>

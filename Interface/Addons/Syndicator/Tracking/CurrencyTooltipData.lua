@@ -1,7 +1,10 @@
-function Syndicator.Tracking.GetCurrencyTooltipData(currencyID, sameConnectedRealm, sameFaction)
+---@class addonTableSyndicator
+local addonTable = select(2, ...)
+
+function addonTable.Tracking.GetCurrencyTooltipData(currencyID, sameConnectedRealm, sameFaction)
   local matchingRealms
   if sameConnectedRealm then
-    local realms = Syndicator.Utilities.GetConnectedRealms()
+    local realms = addonTable.Utilities.GetConnectedRealms()
 
     matchingRealms = {}
     for _, r in ipairs(realms) do

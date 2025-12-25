@@ -1,18 +1,23 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 -- Blizzard Equipment sets (Wrath onwards)
-if not addonTable.Constants.IsEra then
+if not addonTable.Constants.IsEra and Syndicator then
   local BlizzardSetTracker = CreateFrame("Frame")
+  local EQUIPMENT_SETS_PATTERN = EQUIPMENT_SETS:gsub("%%s", "(.*)")
 
   function BlizzardSetTracker:OnLoad()
     FrameUtil.RegisterFrameForEvents(self, {
       "BANKFRAME_OPENED",
       "EQUIPMENT_SETS_CHANGED",
-      "PLAYER_LOGIN",
     })
+    Syndicator.CallbackRegistry:RegisterCallback("BagCacheUpdate", function()
+      self:QueueScan()
+      Syndicator.CallbackRegistry:UnregisterCallback("BagCacheUpdate", self)
+    end, self)
     self.equipmentSetInfo = {}
     self.equipmentSetNames = {}
 
-    Baganator.API.RegisterItemSetSource(BAGANATOR_L_BLIZZARD, "blizzard", function(itemLocation, guid)
+    Baganator.API.RegisterItemSetSource(addonTable.Locales.BLIZZARD, "blizzard", function(_, guid)
       return self.equipmentSetInfo[guid]
     end, function()
       return self.equipmentSetNames
@@ -24,7 +29,8 @@ if not addonTable.Constants.IsEra then
     self:SetScript("OnUpdate", self.OnUpdate)
   end
 
-  BlizzardSetTracker:SetScript("OnEvent", function(self)
+  BlizzardSetTracker:SetScript("OnEvent", function(self, eventName)
+    self.bankScan = eventName == "BANKFRAME_OPENED"
     self:QueueScan()
   end)
 
@@ -40,7 +46,20 @@ if not addonTable.Constants.IsEra then
     local oldSetInfo = CopyTable(self.equipmentSetInfo)
 
     local cache = {}
+    local waiting = 0
+    local loopComplete = false
     self.equipmentSetNames = {}
+    local namesRef = self.equipmentSetNames -- Skip if another callback was triggered
+
+    local function Finish()
+      if addonTable.Config.Get(addonTable.Config.Options.DEBUG_TIMERS) then
+        print("equipment set tracking took", debugprofilestop() - start)
+      end
+      if namesRef == self.equipmentSetNames and not tCompare(oldSetInfo, cache, 15) then
+        self.equipmentSetInfo = cache
+        Baganator.API.RequestItemButtonsRefresh()
+      end
+    end
 
     for _, setID in ipairs(C_EquipmentSet.GetEquipmentSetIDs()) do
       local name, iconTexture = C_EquipmentSet.GetEquipmentSetInfo(setID)
@@ -61,13 +80,16 @@ if not addonTable.Constants.IsEra then
       if validItems then
         -- Uses or {} because a set might exist without any associated item
         -- locations
-        for _, location in pairs(C_EquipmentSet.GetItemLocations(setID) or {}) do
-          if location ~= -1 and location ~= 0 and location ~= 1 then
-            local player, bank, bags, voidStorage, slot, bag
-            if addonTable.Constants.IsClassic then
-              player, bank, bags, slot, bag = EquipmentManager_UnpackLocation(location)
+        for _, locationID in pairs(C_EquipmentSet.GetItemLocations(setID) or {}) do
+          if locationID ~= -1 and locationID ~= 0 and locationID ~= 1 then
+            local player, bank, bags, _, slot, bag
+            if EquipmentManager_GetLocationData then
+              local locationData = EquipmentManager_GetLocationData(locationID)
+              player, bank, bags, slot, bag = locationData.isPlayer, locationData.isBank, locationData.isBags, locationData.slot, locationData.bag
+            elseif addonTable.Constants.IsClassic then
+              player, bank, bags, slot, bag = EquipmentManager_UnpackLocation(locationID)
             else
-              player, bank, bags, voidStorage, slot, bag = EquipmentManager_UnpackLocation(location)
+              player, bank, bags, _, slot, bag = EquipmentManager_UnpackLocation(locationID)
             end
             local location, bagID, slotID
             if (player or bank) and bags then
@@ -90,15 +112,69 @@ if not addonTable.Constants.IsEra then
             end
           end
         end
+      else
+        -- API will crash, so we do a much more intensive tooltip scan of all possible items
+        local matchingItemIDs = {}
+        for _, itemID in pairs(C_EquipmentSet.GetItemIDs(setID)) do
+          matchingItemIDs[itemID] = true
+        end
+        local function ProcessSlot(slot, location)
+          if matchingItemIDs[slot.itemID] and C_Item.DoesItemExist(location) then
+            local guid = C_Item.GetItemGUID(location)
+            waiting = waiting + 1
+            addonTable.Utilities.LoadItemData(slot.itemID, function()
+              waiting = waiting - 1
+              local tooltipInfo
+              if addonTable.Constants.IsRetail then
+                tooltipInfo = C_TooltipInfo.GetBagItem(location.bagID, location.slotIndex)
+              elseif location.bagID == Syndicator.Constants.AllBankIndexes[1] then
+                tooltipInfo = Syndicator.Search.DumpClassicTooltip(function(tooltip) tooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(location.slotIndex)) end)
+              else
+                tooltipInfo = Syndicator.Search.DumpClassicTooltip(function(tooltip) tooltip:SetBagItem(location.bagID, location.slotIndex) end)
+              end
+              for _, line in ipairs(tooltipInfo.lines) do
+                local match = line.leftText:match(EQUIPMENT_SETS_PATTERN)
+                if match then
+                  for setName in match:gmatch("%s*([^" .. LIST_DELIMITER:gsub("%s", "") .. "]+)") do
+                    if setName == name then
+                      if not cache[guid] then
+                        cache[guid] = {}
+                      end
+                      table.insert(cache[guid], info)
+                      break
+                    end
+                  end
+                end
+              end
+              if loopComplete and waiting == 0 then
+                Finish()
+              end
+            end)
+          end
+        end
+        local characterData = Syndicator.API.GetCharacter(Syndicator.API.GetCurrentCharacter())
+        for bagIndex, bag in ipairs(characterData.bags) do
+          for slotIndex, slot in ipairs(bag) do
+            local location = {bagID = Syndicator.Constants.AllBagIndexes[bagIndex], slotIndex = slotIndex}
+            ProcessSlot(slot, location)
+          end
+        end
+        if self.bankScan then
+          for bankIndex, bag in ipairs(characterData.bank) do
+            for slotIndex, slot in ipairs(bag) do
+              local location = {bagID = Syndicator.Constants.AllBankIndexes[bankIndex], slotIndex = slotIndex}
+              ProcessSlot(slot, location)
+            end
+          end
+        end
       end
     end
-    if addonTable.Config.Get(addonTable.Config.Options.DEBUG_TIMERS) then
-      print("equipment set tracking took", debugprofilestop() - start)
+    self.bankScan = false
+
+    if waiting == 0 then
+      Finish()
     end
-    if not tCompare(oldSetInfo, cache, 15) then
-      self.equipmentSetInfo = cache
-      Baganator.API.RequestItemButtonsRefresh()
-    end
+    loopComplete = true
   end
 end
 
@@ -115,15 +191,25 @@ if not addonTable.Constants.IsRetail then
         if name:sub(1, 1) ~= "~" then
           table.insert(equipmentSetNames, name)
           local setInfo = {name = name, iconTexture = details.icon}
+          local seenRefs = {}
           for _, itemRef in pairs(details.equip) do
             if itemRef ~= 0 then
+              if seenRefs[itemRef] then -- Some sets use 2 trinkets/rings, this adds a special key for that
+                itemRef = ";" .. itemRef
+              end
               if not equipmentSetInfo[itemRef] then
                 equipmentSetInfo[itemRef] = {}
               end
               table.insert(equipmentSetInfo[itemRef], setInfo)
+              seenRefs[itemRef] = true
             end
           end
         end
+      end
+      for _, info in pairs(equipmentSetInfo) do
+        table.sort(info, function(a, b)
+          return a.name < b.name
+        end)
       end
       table.sort(equipmentSetNames)
       updatePending = true
@@ -153,6 +239,11 @@ if not addonTable.Constants.IsRetail then
       end
     end)
 
+    Syndicator.CallbackRegistry:RegisterCallback("EquippedCacheUpdate", function()
+      updatePending = true
+      Baganator.API.RequestItemButtonsRefresh()
+    end)
+
     local guidToItemRef = {}
     -- Elaborate routine to mimic ItemRack's selection of items that match the
     -- set. Checks exact matches first, then inexact by item ID.
@@ -167,7 +258,8 @@ if not addonTable.Constants.IsRetail then
       end
       local characterData = Syndicator.API.GetCharacter(Syndicator.API.GetCurrentCharacter())
       local function DoLocation(location, slotInfo)
-        if slotInfo.itemLink and Syndicator.Utilities.IsEquipment(slotInfo.itemLink) and C_Item.DoesItemExist(location) then
+        -- We check by inventory slot because some classic era trinkets are Trade Goods -> Devices
+        if slotInfo.itemLink and select(4, C_Item.GetItemInfoInstant(slotInfo.itemLink)) ~= "INVTYPE_NON_EQUIP_IGNORE" and C_Item.DoesItemExist(location) then
           local runeSuffix = ""
           if ItemRack.AppendRuneID then
             local info
@@ -187,10 +279,11 @@ if not addonTable.Constants.IsRetail then
           if missing[itemRackID] then
             missing[itemRackID] = nil
             guidToItemRef[guid] = itemRackID
+          elseif missing[";" .. itemRackID] then
+            guidToItemRef[guid] = ";" .. itemRackID
           else
-          end
-          if itemIDToGUID[slotInfo.itemID] == nil then
-            itemIDToGUID[slotInfo.itemID] = guid
+            itemIDToGUID[slotInfo.itemID] = itemIDToGUID[slotInfo.itemID] or {}
+            table.insert(itemIDToGUID[slotInfo.itemID], guid)
           end
         end
       end
@@ -215,11 +308,17 @@ if not addonTable.Constants.IsRetail then
         end
       end
       if next(missing) then
-        for key in pairs(missing) do
-          local itemID = tonumber(key:match("^%-?%d+"))
-          local guid = itemIDToGUID[itemID]
-          if guid then
-            guidToItemRef[guid] = key
+        local keys = GetKeysArray(missing)
+        table.sort(keys, function(a, b)
+          return equipmentSetInfo[a][1].name < equipmentSetInfo[b][1].name
+        end)
+        for _, key in ipairs(keys) do
+          local itemID = tonumber((key:match("^;?%-?(%d+)")))
+          if itemIDToGUID[itemID] and #itemIDToGUID[itemID] > 0 then
+            local guid = table.remove(itemIDToGUID[itemID])
+            if guid then
+              guidToItemRef[guid] = key
+            end
           end
         end
       end
@@ -231,7 +330,7 @@ if not addonTable.Constants.IsRetail then
       end
     end
 
-    Baganator.API.RegisterItemSetSource("ItemRack", "item_rack_classic", function(itemLocation, guid, itemLink)
+    Baganator.API.RegisterItemSetSource("ItemRack", "item_rack_classic", function(_, guid, _)
       if updatePending then
         updatePending = false
         RefreshSetItems()
@@ -276,7 +375,7 @@ addonTable.Utilities.OnAddonLoaded("Outfitter", function()
   Outfitter_RegisterOutfitEvent("EDIT_OUTFIT", Update)
   Outfitter_RegisterOutfitEvent("DID_RENAME_OUTFIT", Update)
 
-  Baganator.API.RegisterItemSetSource("Outfitter", "outfitter", function(itemLocation, guid, itemLink)
+  Baganator.API.RegisterItemSetSource("Outfitter", "outfitter", function(_, guid, itemLink)
     if not guid or not itemLink then
       return
     end
@@ -294,7 +393,7 @@ addonTable.Utilities.OnAddonLoaded("Outfitter", function()
     local result = {}
     for _, name in ipairs(setNames) do
       local outfit = Outfitter_FindOutfitByName(name)
-      if outfit:OutfitUsesItem(itemInfo) then
+      if outfit and outfit:OutfitUsesItem(itemInfo) then
         table.insert(result, {
           name = name,
           iconTexture = outfit:GetIcon(),

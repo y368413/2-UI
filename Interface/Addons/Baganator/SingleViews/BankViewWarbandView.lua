@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 BaganatorSingleViewBankViewWarbandViewMixin = CreateFromMixins(BaganatorItemViewCommonBankViewWarbandViewMixin)
 
 function BaganatorSingleViewBankViewWarbandViewMixin:GetSearchMatches()
@@ -10,7 +11,7 @@ function BaganatorSingleViewBankViewWarbandViewMixin:GetSearchMatches()
 end
 
 function BaganatorSingleViewBankViewWarbandViewMixin:NotifyBagUpdate(updatedBags)
-  self.Container.BankTabLive:MarkTabsPending(updatedBags)
+  self.Container.BankTabLive:MarkTabsPending("bags", updatedBags)
   self.Container.BankUnifiedLive:MarkBagsPending("bags", updatedBags)
 end
 
@@ -29,7 +30,7 @@ function BaganatorSingleViewBankViewWarbandViewMixin:ShowTab(tabIndex, isLive)
 
   local bankWidth = addonTable.Config.Get(addonTable.Config.Options.WARBAND_BANK_VIEW_WIDTH)
 
-  local refresh = self.refreshState[addonTable.Constants.RefreshReason.ItemData] or self.refreshState[addonTable.Constants.RefreshReason.ItemWidgets] or self.refreshState[addonTable.Constants.RefreshReason.ItemTextures] or self.refreshState[addonTable.Constants.RefreshReason.Flow]
+  local refresh = self.refreshState[addonTable.Constants.RefreshReason.ItemData] or self.refreshState[addonTable.Constants.RefreshReason.ItemWidgets] or self.refreshState[addonTable.Constants.RefreshReason.ItemTextures] or self.refreshState[addonTable.Constants.RefreshReason.Flow] or self.refreshState[addonTable.Constants.RefreshReason.Layout]
 
   local activeBank
 
@@ -41,7 +42,7 @@ function BaganatorSingleViewBankViewWarbandViewMixin:ShowTab(tabIndex, isLive)
     end
 
     if refresh then
-      activeBank:ShowTab(self.currentTab, Syndicator.Constants.AllWarbandIndexes, bankWidth)
+      activeBank:ShowTab(Syndicator.API.GetWarband(1).bank, self.currentTab, Syndicator.Constants.AllWarbandIndexes, bankWidth)
     end
   else
     if self.Container.BankUnifiedLive:IsShown() then

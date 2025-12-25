@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 BaganatorCategoryViewBankViewWarbandViewMixin = CreateFromMixins(BaganatorItemViewCommonBankViewWarbandViewMixin)
 
 function BaganatorCategoryViewBankViewWarbandViewMixin:OnLoad()
@@ -11,13 +12,10 @@ function BaganatorCategoryViewBankViewWarbandViewMixin:OnLoad()
   self.LayoutManager = CreateFrame("Frame", nil, self)
   Mixin(self.LayoutManager, addonTable.CategoryViews.BagLayoutMixin)
   self.LayoutManager:OnLoad()
+  self.location = "warband_bank"
 
   self:RegisterEvent("CURSOR_CHANGED")
   self:RegisterEvent("MODIFIER_STATE_CHANGED")
-
-  self.labelsPool = CreateFramePool("Button", self, "BaganatorCategoryViewsCategoryButtonTemplate")
-  self.sectionButtonPool = addonTable.CategoryViews.GetSectionButtonPool(self)
-  self.dividerPool = CreateFramePool("Button", self, "BaganatorBagDividerTemplate")
 
   addonTable.CallbackRegistry:RegisterCallback("CategoryAddItemStart", function(_, fromCategory, itemID, itemLink, addedDirectly)
     self.addToCategoryMode = fromCategory
@@ -111,7 +109,7 @@ function BaganatorCategoryViewBankViewWarbandViewMixin:ShowTab(tabIndex, isLive)
   end
 
   local warbandData = Syndicator.API.GetWarband(1)
-  local bagData, bagTypes, bagIndexes = {}, {}
+  local bagData, bagTypes, bagIndexes = {}, {}, nil
   local bagWidth = addonTable.Config.Get(addonTable.Config.Options.WARBAND_BANK_VIEW_WIDTH)
   if self.currentTab > 0 then
     table.insert(bagData, warbandData.bank[tabIndex].slots)

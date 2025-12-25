@@ -1,8 +1,10 @@
-local _, addonTable = ...
+---@class addonTableBaganator
+local addonTable = select(2, ...)
 
 function addonTable.CustomiseDialog.SingleCategoryExport(name)
   local export = {
     version = 2,
+    addon = "Baganator",
     categories = {},
     modifications = {},
   }
@@ -26,14 +28,23 @@ function addonTable.CustomiseDialog.SingleCategoryExport(name)
       end
     end
   end
+  local hideIn = {}
+  if mods and mods.hideIn then
+    for key, val in pairs(mods.hideIn) do
+      if val then
+        table.insert(hideIn, key)
+      end
+    end
+  end
   table.insert(export.modifications, {
     source = name,
     items = #items > 0 and items or nil,
     pets = #pets > 0 and pets or nil,
-    group = mods and mods.group,
-    color = mods and mods.color,
+    group = mods.group,
+    color = mods.color,
     showGroupPrefix = mods.showGroupPrefix,
     priority = mods.priority,
+    hideIn = #hideIn > 0 and hideIn or nil,
   })
 
   return addonTable.json.encode(export)
@@ -42,6 +53,7 @@ end
 function addonTable.CustomiseDialog.CategoriesExport()
   local export = {
     version = 2,
+    addon = "Baganator",
     categories = {},
     sections = CopyTable(addonTable.Config.Get("category_sections")),
     modifications = {},
@@ -69,6 +81,14 @@ function addonTable.CustomiseDialog.CategoriesExport()
         end
       end
     end
+    local hideIn = {}
+    if mods and mods.hideIn then
+      for key, val in pairs(mods.hideIn) do
+        if val then
+          table.insert(hideIn, key)
+        end
+      end
+    end
     table.insert(export.modifications, {
       source = key,
       items = #items > 0 and items or nil,
@@ -77,6 +97,7 @@ function addonTable.CustomiseDialog.CategoriesExport()
       color = mods and mods.color,
       showGroupPrefix = mods.showGroupPrefix,
       priority = mods.priority,
+      hideIn = hideIn,
     })
   end
   for source, isHidden in pairs(addonTable.Config.Get("category_hidden")) do
@@ -91,7 +112,7 @@ end
 local function ImportCategories(import)
   if import.version == 1 and import.order then
     if type(import.order) ~= "table" then
-      addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
+      addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
       return
     end
     local sectionIndex = 1
@@ -113,7 +134,7 @@ local function ImportCategories(import)
       type(c.name) ~= "string" or c.name == "" or
       (c.items ~= nil and type(c.items) ~= "table") or
       (c.pets ~= nil and type(c.pets) ~= "table") then
-      addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
+      addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
       return
     end
 
@@ -135,7 +156,7 @@ local function ImportCategories(import)
     local newMods = {}
     if import.modifications then
       if type(c.priority) ~= "nil" and type(c.priority) ~= "number" then
-        addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
+        addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
         return
       end
       newMods.priority = c.priority
@@ -144,7 +165,7 @@ local function ImportCategories(import)
       newMods.addedItems = newMods.addedItems or {}
       for _, itemID in ipairs(c.items) do
         if type(itemID) ~= "number" then
-          addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
+          addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
           return
         end
         local key = "i:" .. itemID
@@ -159,7 +180,7 @@ local function ImportCategories(import)
       newMods.addedItems = newMods.addedItems or {}
       for _, petID in ipairs(c.pets) do
         if type(petID) ~= "number" then
-          addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
+          addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
           return
         end
         local key = "p:" .. petID
@@ -171,24 +192,39 @@ local function ImportCategories(import)
     end
     if c.group then
       if type(c.group) ~= "string" then
-        addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
+        addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
         return
       end
       newMods.group = c.group
     end
     if c.showGroupPrefix ~= nil then
       if type(c.showGroupPrefix) ~= "boolean" then
-        addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
+        addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
         return
       end
       newMods.showGroupPrefix = c.showGroupPrefix
     end
     if c.color then
       if type(c.color) ~= "string" or #c.color ~= 6 then
-        addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
+        addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
         return
       end
       newMods.color = c.color
+    end
+    if c.hideIn then
+      if type(c.hideIn) ~= "table" then
+        addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
+        return
+      end
+      local hideIn = {}
+      for _, key in ipairs(c.hideIn) do
+        if key ~= "backpack" and key ~= "character_bank" and key ~= "warband_bank" then
+          addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
+          return
+        end
+        hideIn[key] = true
+      end
+      newMods.hideIn = hideIn
     end
     categoryMods[c.source or c.name] = newMods
   end
@@ -207,14 +243,18 @@ end
 function addonTable.CustomiseDialog.CategoriesImport(input)
   local success, import = pcall(addonTable.json.decode, input)
   if not success then
-    addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
+    addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
     return
   end
   if type(import.categories) ~= "table" or (import.modifications and type(import.modifications) ~= "table") then
-    addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
+    addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
     return
   end
   local customCategories, categoryMods, seenItems = ImportCategories(import)
+
+  if not customCategories then
+    return
+  end
 
   local sourceMap = {}
   local reverseMap = {}
@@ -234,14 +274,39 @@ function addonTable.CustomiseDialog.CategoriesImport(input)
 
   if import.order then
     if type(import.order) ~= "table" then
-      addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
+      addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
       return
+    end
+
+    local sections = {}
+    if type(import.sections) ~= "table" then
+      addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
+      return
+    end
+    for source, details in pairs(import.sections) do
+      if tIndexOf(import.order, "_" .. source) ~= nil then
+        local s = {}
+        if type(details.name) ~= "string" then
+          addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
+          return
+        end
+        s.name = details.name
+
+        if details.color then
+          if type(details.color) ~= "string" or #details.color ~= 6 then
+            addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
+            return
+          end
+          s.color = details.color
+        end
+        sections[source] = s
+      end
     end
 
     local hidden = {}
     if import.hidden then
       if type(import.hidden) ~= "table" then
-        addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
+        addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
         return
       end
       for _, source in ipairs(import.hidden) do
@@ -251,37 +316,18 @@ function addonTable.CustomiseDialog.CategoriesImport(input)
     local displayOrder = {}
     for _, source in ipairs(import.order) do
       local category = addonTable.CategoryViews.Constants.SourceToCategory[source] or customCategories[source]
-      if category or source == addonTable.CategoryViews.Constants.DividerName or source:match("^_") then
+      if category or source == addonTable.CategoryViews.Constants.DividerName then
         table.insert(displayOrder, sourceMap[source] or source)
+      elseif source:sub(1, 1) == "_" and (source == addonTable.CategoryViews.Constants.SectionEnd or sections[source:sub(2)] ~= nil) then
+        table.insert(displayOrder, source)
+      else
+        addonTable.Utilities.Message(addonTable.Locales.INVALID_CATEGORY_IMPORT_FORMAT)
+        return
       end
     end
     for _, source in ipairs(addonTable.CategoryViews.Constants.ProtectedCategories) do
       if tIndexOf(displayOrder, source) == nil  then
         table.insert(displayOrder, source)
-      end
-    end
-    local sections = {}
-    if type(import.sections) ~= "table" then
-      addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
-      return
-    end
-    for source, details in pairs(import.sections) do
-      if tIndexOf(displayOrder, "_" .. source) ~= nil then
-        local s = {}
-        if type(details.name) ~= "string" then
-          addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
-          return
-        end
-        s.name = details.name
-
-        if details.color then
-          if type(details.color) ~= "string" or #details.color ~= 6 then
-            addonTable.Utilities.Message(BAGANATOR_L_INVALID_CATEGORY_IMPORT_FORMAT)
-            return
-          end
-          s.color = details.color
-        end
-        sections[source] = s
       end
     end
 
