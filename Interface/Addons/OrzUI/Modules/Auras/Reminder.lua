@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local A = M:GetModule("Auras")
+local B, C, L, DB = unpack(ns)
+local A = B:GetModule("Auras")
 
 local pairs, tinsert, next = pairs, table.insert, next
 local GetZonePVPInfo = C_PvP and C_PvP.GetZonePVPInfo or GetZonePVPInfo
@@ -10,7 +10,7 @@ local IsInInstance, IsPlayerSpell = IsInInstance, IsPlayerSpell
 local GetWeaponEnchantInfo, IsEquippedItem = GetWeaponEnchantInfo, IsEquippedItem
 local GetNumGroupMembers = GetNumGroupMembers
 
-local groups = I.ReminderBuffs[I.MyClass]
+local groups = DB.ReminderBuffs[DB.MyClass]
 local iconSize = 36
 local frames, parentFrame = {}
 
@@ -69,8 +69,8 @@ end
 function A:Reminder_Create(cfg)
 	local frame = CreateFrame("Frame", nil, parentFrame)
 	frame:SetSize(iconSize, iconSize)
-	M.PixelIcon(frame)
-	M.CreateSD(frame)
+	B.PixelIcon(frame)
+	B.CreateSD(frame)
 	local texture = cfg.texture
 	if not texture then
 		for spellID in pairs(cfg.spells) do
@@ -79,7 +79,7 @@ function A:Reminder_Create(cfg)
 		end
 	end
 	frame.Icon:SetTexture(texture)
-	frame.text = M.CreateFS(frame, 14, ADDON_MISSING, false, "TOP", 1, 15)
+	frame.text = B.CreateFS(frame, 14, ADDON_MISSING, false, "TOP", 1, 15)
 	frame:Hide()
 	cfg.frame = frame
 
@@ -107,7 +107,7 @@ function A:Reminder_OnEvent()
 end
 
 function A:Reminder_AddItemGroup()
-	for _, value in pairs(I.ReminderBuffs["ITEMS"]) do
+	for _, value in pairs(DB.ReminderBuffs["ITEMS"]) do
 		if not value.disable and C_Item.GetItemCount(value.itemID) > 0 then
 			if not value.texture then
 				value.texture = C_Item.GetItemIconByID(value.itemID)
@@ -119,11 +119,13 @@ function A:Reminder_AddItemGroup()
 end
 
 function A:InitReminder()
+	if DB.isNewPatch then return end
+		
 	A:Reminder_AddItemGroup()
 
 	if not groups or not next(groups) then return end
 
-	if R.db["Auras"]["Reminder"] then
+	if C.db["Auras"]["Reminder"] then
 		if not parentFrame then
 			parentFrame = CreateFrame("Frame", nil, UIParent)
 			parentFrame:SetPoint("CENTER", -220, 130)
@@ -132,25 +134,25 @@ function A:InitReminder()
 		parentFrame:Show()
 
 		A:Reminder_OnEvent()
-		M:RegisterEvent("UNIT_AURA", A.Reminder_OnEvent, "player")
-		M:RegisterEvent("UNIT_EXITED_VEHICLE", A.Reminder_OnEvent)
-		M:RegisterEvent("UNIT_ENTERED_VEHICLE", A.Reminder_OnEvent)
-		M:RegisterEvent("PLAYER_REGEN_ENABLED", A.Reminder_OnEvent)
-		M:RegisterEvent("PLAYER_REGEN_DISABLED", A.Reminder_OnEvent)
-		M:RegisterEvent("ZONE_CHANGED_NEW_AREA", A.Reminder_OnEvent)
-		M:RegisterEvent("PLAYER_ENTERING_WORLD", A.Reminder_OnEvent)
-		M:RegisterEvent("WEAPON_ENCHANT_CHANGED", A.Reminder_OnEvent)
+		B:RegisterEvent("UNIT_AURA", A.Reminder_OnEvent, "player")
+		B:RegisterEvent("UNIT_EXITED_VEHICLE", A.Reminder_OnEvent)
+		B:RegisterEvent("UNIT_ENTERED_VEHICLE", A.Reminder_OnEvent)
+		B:RegisterEvent("PLAYER_REGEN_ENABLED", A.Reminder_OnEvent)
+		B:RegisterEvent("PLAYER_REGEN_DISABLED", A.Reminder_OnEvent)
+		B:RegisterEvent("ZONE_CHANGED_NEW_AREA", A.Reminder_OnEvent)
+		B:RegisterEvent("PLAYER_ENTERING_WORLD", A.Reminder_OnEvent)
+		B:RegisterEvent("WEAPON_ENCHANT_CHANGED", A.Reminder_OnEvent)
 	else
 		if parentFrame then
 			parentFrame:Hide()
-			M:UnregisterEvent("UNIT_AURA", A.Reminder_OnEvent)
-			M:UnregisterEvent("UNIT_EXITED_VEHICLE", A.Reminder_OnEvent)
-			M:UnregisterEvent("UNIT_ENTERED_VEHICLE", A.Reminder_OnEvent)
-			M:UnregisterEvent("PLAYER_REGEN_ENABLED", A.Reminder_OnEvent)
-			M:UnregisterEvent("PLAYER_REGEN_DISABLED", A.Reminder_OnEvent)
-			M:UnregisterEvent("ZONE_CHANGED_NEW_AREA", A.Reminder_OnEvent)
-			M:UnregisterEvent("PLAYER_ENTERING_WORLD", A.Reminder_OnEvent)
-			M:UnregisterEvent("WEAPON_ENCHANT_CHANGED", A.Reminder_OnEvent)
+			B:UnregisterEvent("UNIT_AURA", A.Reminder_OnEvent)
+			B:UnregisterEvent("UNIT_EXITED_VEHICLE", A.Reminder_OnEvent)
+			B:UnregisterEvent("UNIT_ENTERED_VEHICLE", A.Reminder_OnEvent)
+			B:UnregisterEvent("PLAYER_REGEN_ENABLED", A.Reminder_OnEvent)
+			B:UnregisterEvent("PLAYER_REGEN_DISABLED", A.Reminder_OnEvent)
+			B:UnregisterEvent("ZONE_CHANGED_NEW_AREA", A.Reminder_OnEvent)
+			B:UnregisterEvent("PLAYER_ENTERING_WORLD", A.Reminder_OnEvent)
+			B:UnregisterEvent("WEAPON_ENCHANT_CHANGED", A.Reminder_OnEvent)
 		end
 	end
 end

@@ -1,14 +1,14 @@
 ## Interface: 120000, 110207, 110205
 ## Title:- |cFFFFFF00 2|r|cFFFF0000 UI |r -
 ## Notes: Time Flies...
-## Version: 5.0.9
+## Version: 5.2.1
 ## Author: ShiGuang、TuTu、Siweia
 ## Category:- |cFFFFFF00 2|r|cFFFF0000 UI |r -
-## SavedVariables: OrzUISetDB,OrzUIPerDB,ShiGuangDB,WQADB,DCP_Saved,ParagonReputationDB,DialogKeyNumyDB,MCL_DB,MOUNTLIST,MCL_PINNED,MCL_SETTINGS,HAMDB,DSHDB,QuesterDB,AQT_GlobalDB,BetterWorldQuestsDB,TankHappyDB,AppearanceTooltipDB,MogPartialSetsAddonConfig,WorldBossTimersDB,TeleportMenuDB,AutoSellLowLevelGearDB,DFCN_DelveHelperDB,DFCN_StatusDB
-## SavedVariablesPerCharacter: OrzUIDB,ShiGuangPerDB,DEX_SAVE,DCP_SavedPerCharacter,AQT_CharDB,statPriorityStoredStats,HideQuestsConfig
-## X-Support: 11.2.7
+## SavedVariables: OrzUISetDB,OrzUIPerDB,ShiGuangDB,ParagonReputationDB,DialogKeyNumyDB,HAMDB,QuesterDB,BetterWorldQuestsDB,TankHappyDB,AppearanceTooltipDB,DFCN_DelveHelperDB,DFCN_StatusDB,TeleportMenuDB,AQT_GlobalDB,CVM_SETTINGS,NiceDamageDB,TeleportMenuDB
+## SavedVariablesPerCharacter: OrzUIDB,ShiGuangPerDB,LSSDB,AQT_CharDB
+## X-Support: 12.0.0
 ## X-Repple: 2 UI
-## X-StatsVersion: 20251214
+## X-StatsVersion: 20260206
 ## X-Website: https://github.com/y368413/2-UI
 ## IconTexture: Interface\AddOns\OrzUI\Media\2UI.blp
 ## X-Credits: DDCQ、abin, ape47, Coolkid, Elv, Freebaser, Haleth, Haste, Loshine, Monolit, Neal, Neavo, p3lim, Qulight, Ray, superk, Tukz, Tuller, Warbaby, yleaf, Zork, EK, Rubgrsch, siweia & "PaoPao"...

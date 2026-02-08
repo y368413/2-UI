@@ -1,5 +1,5 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 ----- Configuration file for Wallpaper_Kit Version 0.3 -----
 --object container
 local WallpaperKitcfg = {}
@@ -161,6 +161,16 @@ WallpaperKit.fadeOut.anim:SetSmoothing("OUT")
 WallpaperKit.fadeOut.anim:SetFromAlpha(1)
 WallpaperKit.fadeIn.anim:SetToAlpha(0)
 WallpaperKit.fadeOut:HookScript("OnFinished", function(WallpaperKit) WallpaperKit:GetParent():SetAlpha(0) WallpaperKit:GetParent():Hide() end)
+-- Version
+WallpaperKit.SmallRight = WallpaperKit:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
+WallpaperKit.SmallRight:SetText("[ MidNight " ..C_AddOns.GetAddOnMetadata("OrzUI", "X-Support").. " v"..C_AddOns.GetAddOnMetadata("OrzUI", "Version").." ]") 
+WallpaperKit.SmallRight:SetFont(STANDARD_TEXT_FONT, 10, "OUTLINE")
+WallpaperKit.SmallRight:SetPoint("BOTTOMRIGHT", WallpaperKit, "BOTTOMRIGHT", -12, 12) 
+-- WebNet
+WallpaperKit.SmallLeft = WallpaperKit:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
+WallpaperKit.SmallLeft:SetText("[ https://www.maorui.net ]") 
+WallpaperKit.SmallLeft:SetFont(STANDARD_TEXT_FONT, 10, "OUTLINE")
+WallpaperKit.SmallLeft:SetPoint("BOTTOMLEFT", WallpaperKit, "BOTTOMLEFT", 12, 12) 
 ----------------------nice-------------------------------------------
 SLASH_WALLPAPERKIT1 = '/wallpaperkit'; --'/wpk', 3.
 function SlashCmdList.WALLPAPERKIT(msg, editbox) if WallpaperKit:IsShown() then WallpaperKit:Disable() else WallpaperKit:Enable() end end
@@ -203,7 +213,7 @@ WallpaperKit:RegisterEvent("PLAYER_FLAGS_CHANGED")
 WallpaperKit:RegisterEvent("PLAYER_ENTERING_WORLD")
 WallpaperKit:RegisterEvent("PLAYER_LEAVING_WORLD")
 WallpaperKit:SetScript("OnEvent",function()
-  if not R.db["Misc"]["WallpaperKit"] then return end
+  if not C.db["Misc"]["WallpaperKit"] then return end
 	if WallpaperKit:IsShown() then WallpaperKit:Disable() end
 	if UnitIsAFK("player") then WallpaperKit:Enable() AFK = true WallpaperKit:SetScript("OnUpdate", frame_OnUpdate) else AFK = false total = 0 WallpaperKit:SetScript("OnUpdate", nil) end  
 end)

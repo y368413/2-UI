@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:GetModule("Maps")
+local B, C, L, DB = unpack(ns)
+local module = B:GetModule("Maps")
 
 -- https://github.com/fang2hou/WindToolsScripts/blob/master/MapOverlay
 module.RawMapData = {

@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local MISC = M:GetModule("Misc")
+local B, C, L, DB = unpack(ns)
+local M = B:GetModule("Misc")
 
 --[[
 	一个工具条用来替代系统的经验条、声望条、神器经验等等
@@ -36,7 +36,7 @@ local function IsAzeriteAvailable()
 	return itemLocation and itemLocation:IsEquipmentSlot() and not C_AzeriteItem_IsAzeriteItemAtMaxLevel()
 end
 
-function MISC:ExpBar_Update()
+function M:ExpBar_Update()
 	local rest = self.restBar
 	if rest then rest:Hide() end
 
@@ -60,7 +60,11 @@ function MISC:ExpBar_Update()
 		local barMax = factionData.nextReactionThreshold
 		local value = factionData.currentStanding
 		local factionID = factionData.factionID
-		if factionID and C_Reputation_IsMajorFaction(factionID) then
+		local currentValue, threshold = C_Reputation_GetFactionParagonInfo(factionID)
+		if C_Reputation_IsFactionParagon(factionID) and currentValue and currentValue > 0 then
+			currentValue = mod(currentValue, threshold)
+			barMin, barMax, value = 0, threshold, currentValue
+		elseif factionID and C_Reputation_IsMajorFaction(factionID) then
 			local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID)
 			local isMaxRenown = C_MajorFactions.HasMaximumRenown(factionID)
 			if isMaxRenown then
@@ -72,11 +76,7 @@ function MISC:ExpBar_Update()
 		else
 			local repInfo = C_GossipInfo_GetFriendshipReputation(factionID)
 			local friendID, friendRep, friendThreshold, nextFriendThreshold = repInfo.friendshipFactionID, repInfo.standing, repInfo.reactionThreshold, repInfo.nextThreshold
-			if C_Reputation_IsFactionParagon(factionID) then
-				local currentValue, threshold = C_Reputation_GetFactionParagonInfo(factionID)
-				currentValue = mod(currentValue, threshold)
-				barMin, barMax, value = 0, threshold, currentValue
-			elseif friendID and friendID ~= 0 then
+			if friendID and friendID ~= 0 then
 				if nextFriendThreshold then
 					barMin, barMax, value = friendThreshold, nextFriendThreshold, friendRep
 				else
@@ -92,6 +92,17 @@ function MISC:ExpBar_Update()
 		self:SetMinMaxValues(barMin, barMax)
 		self:SetValue(value)
 		self:Show()
+	elseif C_Housing and C_Housing.GetTrackedHouseGuid() then
+		local current, minBar, maxBar, level = 0, 0, 1, 1
+		if M.houseLevelFavor then
+			current = M.houseLevelFavor.houseFavor
+			level = M.houseLevelFavor.houseLevel
+			minBar = C_Housing.GetHouseLevelFavorForLevel(level)
+			maxBar = C_Housing.GetHouseLevelFavorForLevel(level + 1)
+			self:SetStatusBarColor(1, .8, 0)
+			self:SetBarValues(current, minBar, maxBar, level)
+			self:Show()
+		end
 	elseif IsWatchingHonorAsXP() then
 		local current, barMax = UnitHonor("player"), UnitHonorMax("player")
 		self:SetStatusBarColor(1, .24, 0)
@@ -124,7 +135,7 @@ function MISC:ExpBar_Update()
 	end
 end
 
-function MISC:ExpBar_UpdateTooltip()
+function M:ExpBar_UpdateTooltip()
 	GameTooltip:SetOwner(self, "ANCHOR_LEFT")
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(LEVEL.." "..UnitLevel("player"), 0,.6,1)
@@ -189,9 +200,11 @@ function MISC:ExpBar_UpdateTooltip()
 
 		if C_Reputation_IsFactionParagon(factionID) then
 			local currentValue, threshold = C_Reputation_GetFactionParagonInfo(factionID)
-			local paraCount = floor(currentValue/threshold)
-			currentValue = mod(currentValue, threshold)
-			GameTooltip:AddDoubleLine("★"..paraCount, currentValue.."/"..threshold.." ("..floor(currentValue/threshold*100).."%)", .6,.8,1, 1,1,1)
+			if currentValue > 0 then
+				local paraCount = floor(currentValue/threshold)
+				currentValue = mod(currentValue, threshold)
+				GameTooltip:AddDoubleLine("★"..paraCount, currentValue.." / "..threshold.." ("..floor(currentValue/threshold*100).."%)", .6,.8,1, 1,1,1)
+			end
 		end
 
 		if factionID == 2465 then -- 荒猎团
@@ -209,6 +222,20 @@ function MISC:ExpBar_UpdateTooltip()
 			local m = currencyInfo.maxQuantity
 			local name = C_CurrencyInfo.GetCurrencyInfo(2777).name
 			GameTooltip:AddDoubleLine(name, q.." / "..m.." ("..floor(q/m*100).."%)", .6,.8,1, 1,1,1)
+		end
+	end
+
+	if C_Housing.GetTrackedHouseGuid() then
+		local current, maxBar, level = 0, 1, 1
+		if M.houseLevelFavor then
+			current = M.houseLevelFavor.houseFavor
+			level = M.houseLevelFavor.houseLevel
+			maxBar = C_Housing.GetHouseLevelFavorForLevel(level + 1)
+		end
+		if maxBar ~= 0 then
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddLine(HOUSING_DASHBOARD_HOUSEINFO_TOOLTIP, 0,.6,1)
+			GameTooltip:AddDoubleLine(LEVEL.." "..level, current.." / "..maxBar, .6,.8,1, 1,1,1)
 		end
 	end
 
@@ -262,7 +289,7 @@ function sendReports()
    if UnitIsPlayer("target") and not UnitIsEnemy("player", "target") then sendReport("whisper") end
 end
 
-function MISC:SetupScript(bar)
+function M:SetupScript(bar)
 	bar.eventList = {
 		"PLAYER_XP_UPDATE",
 		"PLAYER_LEVEL_UP",
@@ -279,32 +306,47 @@ function MISC:SetupScript(bar)
 	for _, event in pairs(bar.eventList) do
 		bar:RegisterEvent(event)
 	end
-	bar:SetScript("OnEvent", MISC.ExpBar_Update)
-	bar:SetScript("OnEnter", MISC.ExpBar_UpdateTooltip)
-	bar:SetScript("OnLeave", M.HideTooltip)
+	bar:SetScript("OnEvent", M.ExpBar_Update)
+	bar:SetScript("OnEnter", M.ExpBar_UpdateTooltip)
+	bar:SetScript("OnLeave", B.HideTooltip)
 	bar:SetScript("OnMouseUp", function(_, btn)
 	  if btn == "LeftButton" then
 		if not HasArtifactEquipped() then return end
-		if not ArtifactFrame or not ArtifactFrame:IsShown() then SocketInventoryItem(16) else M:TogglePanel(ArtifactFrame) end
+		if not ArtifactFrame or not ArtifactFrame:IsShown() then SocketInventoryItem(16) else B:TogglePanel(ArtifactFrame) end
 	  elseif btn == "RightButton" then
         if (UnitLevel("player") ~= MAX_PLAYER_LEVEL) then sendReports() else return end
       end
 	end)
 	hooksecurefunc(StatusTrackingBarManager, "UpdateBarsShown", function()
-		MISC.ExpBar_Update(bar)
+		M.ExpBar_Update(bar)
 	end)
+
+	-- Housing, fixme: unable to toggle on without reload
+	M.houseLevelFavor = nil
+	B:RegisterEvent("TRACKED_HOUSE_CHANGED", function()
+		M.ExpBar_Update(bar)
+	end)
+	B:RegisterEvent("HOUSE_LEVEL_FAVOR_UPDATED", function(_, houseLevelFavor)
+		if houseLevelFavor.houseGUID == C_Housing.GetTrackedHouseGuid() then
+			M.houseLevelFavor = houseLevelFavor
+			M.ExpBar_Update(bar)
+		end
+	end)
+	if C_Housing.GetTrackedHouseGuid() then
+		C_Housing.GetCurrentHouseLevelFavor(C_Housing.GetTrackedHouseGuid())
+	end
 end
 
-function MISC:Expbar()
-	if R.db["Map"]["DisableMinimap"] then return end
-	if not R.db["Misc"]["ExpRep"] then return end
+function M:Expbar()
+	if C.db["Map"]["DisableMinimap"] then return end
+	if not C.db["Misc"]["ExpRep"] then return end
 
 	local bar = CreateFrame("StatusBar", "OrzUIExpRepBar", MinimapCluster)
 	bar:SetPoint("TOPLEFT", Minimap, "BOTTOMLEFT", 0, 0)
 	bar:SetPoint("TOPRIGHT", Minimap, "BOTTOMRIGHT", 0, 0)
 	bar:SetHeight(3)
 	bar:SetHitRectInsets(0, 0, 0, -10)
-	M.CreateSB(bar)
+	B.CreateSB(bar)
 	
     bar.ArtifactText=bar:CreateFontString("ShowArtifactText", "OVERLAY")
     bar.ArtifactText:SetFont("Interface\\AddOns\\OrzUI\\Media\\Fonts\\Infinity.ttf", 11, "OUTLINE")  --STANDARD_TEXT_FONT
@@ -312,18 +354,18 @@ function MISC:Expbar()
 
 	local rest = CreateFrame("StatusBar", nil, bar)
 	rest:SetAllPoints()
-	rest:SetStatusBarTexture(I.normTex)
+	rest:SetStatusBarTexture(DB.normTex)
 	rest:SetStatusBarColor(0, .4, 1, .6)
 	rest:SetFrameLevel(bar:GetFrameLevel() - 1)
 	bar.restBar = rest
 
-	MISC:SetupScript(bar)
+	M:SetupScript(bar)
 end
-MISC:RegisterMisc("ExpRep", MISC.Expbar)
+M:RegisterMisc("ExpRep", M.Expbar)
 
 -- Paragon reputation info
-function MISC:ParagonReputationSetup()
-	if not R.db["Misc"]["ParagonRep"] then return end
+function M:ParagonReputationSetup()
+	if not C.db["Misc"]["ParagonRep"] then return end
 
 	hooksecurefunc("ReputationFrame_InitReputationRow", function(factionRow, elementData)
 		local factionID = factionRow.factionID
@@ -335,7 +377,7 @@ function MISC:ParagonReputationSetup()
 			local currentValue, threshold = C_Reputation_GetFactionParagonInfo(factionID)
 			if currentValue then
 				local barValue = mod(currentValue, threshold)
-				local factionStandingtext = U["Paragon"]..floor(currentValue/threshold)
+				local factionStandingtext = L["Paragon"]..floor(currentValue/threshold)
 
 				factionBar:SetMinMaxValues(0, threshold)
 				factionBar:SetValue(barValue)
@@ -346,4 +388,4 @@ function MISC:ParagonReputationSetup()
 		end
 	end)
 end
---MISC:RegisterMisc("ParagonRep", MISC.ParagonReputationSetup)
+--M:RegisterMisc("ParagonRep", M.ParagonReputationSetup)

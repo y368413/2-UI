@@ -1,5 +1,5 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
 local Type_StatusBar = _G.Enum.UIWidgetVisualizationType.StatusBar
 local Type_CaptureBar = _G.Enum.UIWidgetVisualizationType.CaptureBar
@@ -31,7 +31,7 @@ local function ReskinWidgetStatusBar(bar)
 			ResetLabelColor(bar.Label)
 			hooksecurefunc(bar.Label, "SetTextColor", ResetLabelColor)
 		end
-		M.SetBD(bar)
+		B.SetBD(bar)
 
 		bar.styled = true
 	end
@@ -47,9 +47,9 @@ local function ReskinDoubleStatusBarWidget(self)
 end
 
 local function ReskinPVPCaptureBar(self)
-	self.LeftBar:SetTexture(I.normTex)
-	self.NeutralBar:SetTexture(I.normTex)
-	self.RightBar:SetTexture(I.normTex)
+	self.LeftBar:SetTexture(DB.normTex)
+	self.NeutralBar:SetTexture(DB.normTex)
+	self.RightBar:SetTexture(DB.normTex)
 
 	self.LeftBar:SetVertexColor(.2, .6, 1)
 	self.NeutralBar:SetVertexColor(.8, .8, .8)
@@ -63,7 +63,7 @@ local function ReskinPVPCaptureBar(self)
 	self.Glow3:SetAlpha(0)
 
 	if not self.bg then
-		self.bg = M.SetBD(self)
+		self.bg = B.SetBD(self)
 		self.bg:SetPoint("TOPLEFT", self.LeftBar, -2, 2)
 		self.bg:SetPoint("BOTTOMRIGHT", self.RightBar, 2, -2)
 	end
@@ -73,7 +73,7 @@ local function ReskinSpellDisplayWidget(spell)
 	if not spell.bg then
 		spell.Border:SetAlpha(0)
 		spell.DebuffBorder:SetAlpha(0)
-		spell.bg = M.ReskinIcon(spell.Icon)
+		spell.bg = B.ReskinIcon(spell.Icon)
 	end
 	spell.IconMask:Hide()
 end
@@ -92,8 +92,8 @@ end
 
 local function ReskinWidgetItemDisplay(item)
 	if not item.bg then
-		item.bg = M.ReskinIcon(item.Icon)
-		M.ReskinIconBorder(item.IconBorder, true)
+		item.bg = B.ReskinIcon(item.Icon)
+		B.ReskinIconBorder(item.IconBorder, true)
 	end
 	item.IconMask:Hide()
 end
@@ -117,8 +117,8 @@ local function ReskinWidgetGroups(self)
 	end
 end
 
-tinsert(R.defaultThemes, function()
-	if not R.db["Skins"]["BlizzardSkins"] then return end
+tinsert(C.defaultThemes, function()
+	if not C.db["Skins"]["BlizzardSkins"] then return end
 
 	hooksecurefunc(_G.UIWidgetTopCenterContainerFrame, "UpdateWidgetLayout", ReskinWidgetGroups)
 	ReskinWidgetGroups(_G.UIWidgetTopCenterContainerFrame)
@@ -155,5 +155,5 @@ tinsert(R.defaultThemes, function()
 		end
 	end)
 
-	--M.Reskin(_G.UIWidgetCenterDisplayFrame.CloseButton)
+	--B.Reskin(_G.UIWidgetCenterDisplayFrame.CloseButton)
 end)

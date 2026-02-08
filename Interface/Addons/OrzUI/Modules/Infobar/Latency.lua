@@ -1,9 +1,9 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-if not R.Infobar.Latency then return end
+local B, C, L, DB = unpack(ns)
+if not C.Infobar.Latency then return end
 
-local module = M:GetModule("Infobar")
-local info = module:RegisterInfobar("Ping", R.Infobar.LatencyPos)
+local module = B:GetModule("Infobar")
+local info = module:RegisterInfobar("Ping", C.Infobar.LatencyPos)
 
 local max, format = max, format
 local GetNetStats, GetNetIpTypes, GetCVarBool = GetNetStats, GetNetIpTypes, GetCVarBool
@@ -45,25 +45,25 @@ info.onEnter = function(self)
 	local _, anchor, offset = module:GetTooltipAnchor(info)
 	GameTooltip:SetOwner(self, "ANCHOR_"..anchor, 0, offset)
 	GameTooltip:ClearLines()
-	GameTooltip:AddLine(U["Latency"], 0,.6,1)
+	GameTooltip:AddLine(L["Latency"], 0,.6,1)
 	GameTooltip:AddLine(" ")
 
 	local _, _, latencyHome, latencyWorld = GetNetStats()
-	GameTooltip:AddDoubleLine(U["Home Latency"], colorLatency(latencyHome).."|r ms", .6,.8,1, 1,1,1)
-	GameTooltip:AddDoubleLine(U["World Latency"], colorLatency(latencyWorld).."|r ms", .6,.8,1, 1,1,1)
+	GameTooltip:AddDoubleLine(L["Home Latency"], colorLatency(latencyHome).."|r ms", .6,.8,1, 1,1,1)
+	GameTooltip:AddDoubleLine(L["World Latency"], colorLatency(latencyWorld).."|r ms", .6,.8,1, 1,1,1)
 
 	if GetCVarBool("useIPv6") then
 		local ipTypeHome, ipTypeWorld = GetNetIpTypes()
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddDoubleLine(U["Home Protocol"], ipTypes[ipTypeHome or 0] or UNKNOWN, .6,.8,1, 1,1,1)
-		GameTooltip:AddDoubleLine(U["World Protocol"], ipTypes[ipTypeWorld or 0] or UNKNOWN, .6,.8,1, 1,1,1)
+		GameTooltip:AddDoubleLine(L["Home Protocol"], ipTypes[ipTypeHome or 0] or UNKNOWN, .6,.8,1, 1,1,1)
+		GameTooltip:AddDoubleLine(L["World Protocol"], ipTypes[ipTypeWorld or 0] or UNKNOWN, .6,.8,1, 1,1,1)
 	end
 
 	local downloading = GetFileStreamingStatus() ~= 0 or GetBackgroundLoadingStatus() ~= 0
 	if downloading then
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddDoubleLine(U["Bandwidth"], format("%.2f Mbps", GetAvailableBandwidth()), .6,.8,1, 1,1,1)
-		GameTooltip:AddDoubleLine(U["Download"], format("%.2f%%", GetDownloadedPercentage()*100), .6,.8,1, 1,1,1)
+		GameTooltip:AddDoubleLine(L["Bandwidth"], format("%.2f Mbps", GetAvailableBandwidth()), .6,.8,1, 1,1,1)
+		GameTooltip:AddDoubleLine(L["Download"], format("%.2f%%", GetDownloadedPercentage()*100), .6,.8,1, 1,1,1)
 	end
 
 	GameTooltip:Show()

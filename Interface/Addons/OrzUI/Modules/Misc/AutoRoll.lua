@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local MISC = M:GetModule("Misc")
+local B, C, L, DB = unpack(ns)
+local M = B:GetModule("Misc")
 
 local rollQueue = {}
 
@@ -21,8 +21,8 @@ local ROLL_TYPES = {
 	TRANSMOG = 4,
 }
 
-function MISC:AutoRoll_OnEvent(rollID)
-	local autoRoll = R.db["Misc"]["AutoRoll"]
+function M:AutoRoll_OnEvent(rollID)
+	local autoRoll = C.db["Misc"]["AutoRoll"]
 	if autoRoll == 3 then return end
 
 	local _, name, _, _, _, canNeed, canGreed, _, _, _, _, _, canTransmog = GetLootRollItemInfo(rollID)
@@ -53,42 +53,43 @@ local options = {
 }
 
 local function UpdateButtonIcon(bu)
-	local option = options[R.db["Misc"]["AutoRoll"]]
+	local option = options[C.db["Misc"]["AutoRoll"]]
 	bu:SetSize(option.size, option.size)
 	bu.Icon:SetTexture(option.icon)
 	bu:SetHighlightTexture(option.icon)
 end
 
-function MISC:AutoRoll_CreateButton()
+function M:AutoRoll_CreateButton()
 	local bu = CreateFrame("Button", nil, GroupLootHistoryFrame)
 	bu.Icon = bu:CreateTexture(nil, "ARTWORK")
 	bu.Icon:SetAllPoints()
 	UpdateButtonIcon(bu)
 	bu:SetPoint("CENTER", GroupLootHistoryFrame.ClosePanelButton, "LEFT", -14, 0)
-	M.AddTooltip(bu, "ANCHOR_RIGHT", U["Auto Roll"], "info")
+	B.AddTooltip(bu, "ANCHOR_RIGHT", L["Auto Roll"], "info")
 
 	local menuList = {}
 	for i, option in ipairs(options) do
 		tinsert(menuList, {
 			text = option.text,
 			func = function()
-				R.db["Misc"]["AutoRoll"] = i
+				C.db["Misc"]["AutoRoll"] = i
 				UpdateButtonIcon(bu)
 			end,
 			checked = function()
-				return i == R.db["Misc"]["AutoRoll"]
+				return i == C.db["Misc"]["AutoRoll"]
 			end
 		})
 	end
 
 	bu:SetScript("OnClick", function()
-		M:EasyMenu(menuList, bu)
+		--B:EasyMenu(menuList, bu)
+		EasyMenu(menuList, bu)
 	end)
 end
 
-function MISC:AutoRoll()
-	MISC:AutoRoll_CreateButton()
-	M:RegisterEvent("START_LOOT_ROLL", MISC.AutoRoll_OnEvent)
+function M:AutoRoll()
+	M:AutoRoll_CreateButton()
+	B:RegisterEvent("START_LOOT_ROLL", M.AutoRoll_OnEvent)
 end
 
-MISC:RegisterMisc("AutoRoll", MISC.AutoRoll)
+M:RegisterMisc("AutoRoll", M.AutoRoll)

@@ -752,7 +752,7 @@ local externalMountData =                                            -- 新增�
     [290134] = { itemID = 166774, versionID = 101, source = 20 }, -- 霍格鲁斯，鸿运亥客
     [290328] = { itemID = 169162, versionID = 8, source = 1 },      -- 奇迹之翼2.0版
     [290608] = { itemID = 0, versionID = 104, source = 102 },      -- 十字军恐角龙
-    [290718] = { itemID = 168830, versionID = 8, source = 3 },      -- R-21/X型空中单位
+    [290718] = { itemID = 168830, versionID = 8, source = 3 },      -- C-21/X型空中单位
     [291492] = { itemID = 168823, versionID = 8, source = 4 },      -- 生锈的机械爬蛛
     [291538] = { itemID = 167170, versionID = 8, source = 2 },      -- 破镣者海波鳐
     [292407] = { itemID = 167167, versionID = 8, source = 2 },      -- 剑鱼人海波鳐
@@ -1305,7 +1305,7 @@ local externalMountData =                                            -- 新增�
     [466017] = { itemID=229941, versionID=11, source=6 }, -- 创新调查者
     [466018] = { itemID=229950, versionID=11, source=6 }, -- 暗索歼灭者
     [466019] = { itemID=229948, versionID=11, source=6 }, -- 黑水伐木机尊享版MK2型
-    [466020] = { itemID=229949, versionID=11, source=6 }, -- 私人订制地精S.C.R.A.P拆废机
+    [466020] = { itemID=229949, versionID=11, source=6 }, -- 私人订制地精S.C.C.A.P拆废机
     [466022] = { itemID=0, versionID=11, source=1012 }, -- 风险投资协调器
     [466023] = { itemID=229952, versionID=11, source=6 }, -- 资产倡导者
     [466024] = { itemID=0, versionID=11, source=1012 }, -- 锈水轰炸机
@@ -1338,7 +1338,7 @@ local externalMountData =                                            -- 新增�
     [1218013] = { itemID=235658, versionID=106, source=18 }, -- 春日彩蝶
     [1218014] = { itemID=235659, versionID=106, source=18 }, -- 午夜彩蝶
     [1218069] = { itemID=235662, versionID=106, source=18 }, -- 翡翠蜗牛
-    [1221155] = { itemID=236960, versionID=11, source=5 }, -- 原型A.S.M.R.
+    [1221155] = { itemID=236960, versionID=11, source=5 }, -- 原型A.S.B.C.
     [1221694] = { itemID=237141, versionID=105, source=1017 }, -- 进取型切割坦克
   
 }
@@ -1351,7 +1351,7 @@ local externalMountData =                                            -- 新增�
 -- myScanner.lua
 local cupcko_mca = {}
 
-local M = {}
+local B = {}
 
 --====================================================================--
 -- 1) 全局/内部表
@@ -1612,7 +1612,7 @@ end
 --====================================================================--
 -- 9) 对外暴露: StartScan()
 --====================================================================--
-function M.StartScan(parentFrame)
+function B.StartScan(parentFrame)
     wipe(itemMountMap)
     wipe(scannedMounts)
     wipe(pendingItems)
@@ -1636,11 +1636,11 @@ function M.StartScan(parentFrame)
 end
 
 -- 如果你想在外部查看 scannedMounts
-function M.GetScannedMounts()
+function B.GetScannedMounts()
     return scannedMounts
 end
 
-cupcko_mca.MyScanner = M
+cupcko_mca.MyScanner = B
 
 
 -- cupcko+mca.lua
@@ -2322,11 +2322,11 @@ function RefreshMountList()
                             if mountData.itemID > 0 then
                                 local itemName, itemLink = GetItemInfo(mountData.itemID)
                                 if itemLink then
-                                    ChatEdit_InsertLink(itemLink)
+                                    ChatFrameUtil.InsertLink(itemLink)
                                 end
                             end
                             if mountLink then
-                                ChatEdit_InsertLink(mountLink)
+                                ChatFrameUtil.InsertLink(mountLink)
                             end
                         elseif IsControlKeyDown() then
                             if DressUpMount and type(DressUpMount)=="function" then

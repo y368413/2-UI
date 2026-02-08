@@ -1,5 +1,4 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Include file="Mog\Mog.xml"/>
 	<Include file="Pet\Pet.xml"/>
 	<Include file="Chat\Chat.xml"/>
 	<Include file="Loot\Loot.xml"/>

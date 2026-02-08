@@ -1,7 +1,7 @@
 --[[## Author: Lars Norberg ## Version: 1.0.37-Release--]]
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:GetModule("Maps")
+local B, C, L, DB = unpack(ns)
+local module = B:GetModule("Maps")
 
 -- Retrive addon folder name, and our local, private namespace.
 local MapShrinker = {}
@@ -147,7 +147,7 @@ local WorldMapFrame_UpdateMaximizedSize = function()
 end
 
 MapShrinker.StyleWorldMap = function(self)
-	if not R.db["Map"]["MapShrinker"] then return end
+	if not C.db["Map"]["MapShrinker"] then return end
 	local backdrop = CreateFrame("Frame", nil, WorldMapFrame, BackdropTemplateMixin and "BackdropTemplate")
 	backdrop:Hide()
 	backdrop:SetFrameLevel(WorldMapFrame:GetFrameLevel())
@@ -202,7 +202,7 @@ MapShrinker.StyleWorldMap = function(self)
 end
 
 MapShrinker.SetUpMap = function(self)
-	if not R.db["Map"]["MapShrinker"] then return end
+	if not C.db["Map"]["MapShrinker"] then return end
 	if (self.Styled) then return end
 	self:StyleWorldMap()
 	SetCVar("miniWorldMap", 0)
@@ -224,7 +224,7 @@ MapShrinker.SetUpMap = function(self)
 end
 
 MapShrinker.OnEvent = function(self, event, ...)
-	if not R.db["Map"]["MapShrinker"] then return end
+	if not C.db["Map"]["MapShrinker"] then return end
 	if (event == "ADDON_LOADED") then
 		local addon = ...
 		if (addon == "Blizzard_WorldMap") then
@@ -237,7 +237,7 @@ MapShrinker.OnEvent = function(self, event, ...)
 end
 
 MapShrinker.OnInit = function(self)
-	if not R.db["Map"]["MapShrinker"] then return end
+	if not C.db["Map"]["MapShrinker"] then return end
 	-- Tell the environment what subfolder to find our media in.
 	-- Create a frame to hide UI elements with.
 	self.UIHider = CreateFrame("Frame", nil, UIParent)
@@ -246,7 +246,7 @@ MapShrinker.OnInit = function(self)
 end
 
 MapShrinker.OnEnable = function(self)
-	if not R.db["Map"]["MapShrinker"] then return end
+	if not C.db["Map"]["MapShrinker"] then return end
 	if (IsAddOnLoaded("Blizzard_WorldMap")) then
 		self:SetUpMap()
 	else
@@ -271,7 +271,7 @@ end
 	MapShrinker.IsEventRegistered = function(_, ...) self:IsEventRegistered(...) end
 	self:RegisterEvent("ADDON_LOADED")
 	self:SetScript("OnEvent", function(self, event, ...)
-	if not R.db["Map"]["MapShrinker"] then return end
+	if not C.db["Map"]["MapShrinker"] then return end
 		if (event == "ADDON_LOADED") then
 			if ((...) == "OrzUI") then
 				self:UnregisterEvent("ADDON_LOADED")

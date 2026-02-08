@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local TT = M:GetModule("Tooltip")
+local B, C, L, DB = unpack(ns)
+local TT = B:GetModule("Tooltip")
 
 local wipe, tinsert, tconcat = table.wipe, table.insert, table.concat
 local IsInGroup, IsInRaid, GetNumGroupMembers = IsInGroup, IsInRaid, GetNumGroupMembers
@@ -9,7 +9,8 @@ local UnitExists, UnitIsUnit, UnitIsDeadOrGhost, UnitName = UnitExists, UnitIsUn
 local targetTable = {}
 
 function TT:ScanTargets(unit)
-	if not R.db["Tooltip"]["TargetBy"] then return end
+	if DB.isNewPatch then return end
+	if not C.db["Tooltip"]["TargetBy"] then return end
 	if not IsInGroup() then return end
 	if not UnitExists(unit) then return end
 
@@ -19,13 +20,13 @@ function TT:ScanTargets(unit)
 	for i = 1, GetNumGroupMembers() do
 		local member = (isInRaid and "raid"..i or "party"..i)
 		if UnitIsUnit(unit, member.."target") and not UnitIsUnit("player", member) and not UnitIsDeadOrGhost(member) then
-			local color = M.HexRGB(M.UnitColor(member))
+			local color = B.HexRGB(B.UnitColor(member))
 			local name = color..UnitName(member).."|r"
 			tinsert(targetTable, name)
 		end
 	end
 
 	if #targetTable > 0 then
-		GameTooltip:AddLine(U["Targeted By"]..I.InfoColor.."("..#targetTable..")|r "..tconcat(targetTable, ", "), nil, nil, nil, 1)
+		GameTooltip:AddLine(L["Targeted By"]..DB.InfoColor.."("..#targetTable..")|r "..tconcat(targetTable, ", "), nil, nil, nil, 1)
 	end
 end

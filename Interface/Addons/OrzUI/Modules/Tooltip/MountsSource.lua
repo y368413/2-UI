@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local TT = M:GetModule("Tooltip")
+local B, C, L, DB = unpack(ns)
+local TT = B:GetModule("Tooltip")
 -----------------------
 -- MountsSource
 -- Author：HopeAsd
@@ -15,6 +15,10 @@ function TT:IsCollected(spell)
 end
 
 function TT:GetOrCreateMountTable(spell)
+	if issecretvalue(spell) then
+		return
+	end
+
 	if not self.MountTable[spell] then
 		local index = C_MountJournal.GetMountFromSpell(spell)
 		if index then
@@ -49,10 +53,12 @@ function TT:MountsSource()
 	hooksecurefunc(GameTooltip, "SetUnitAura", function(self, ...)
 		--if not TT.db["MountsSource"] then return end
 
-		local id = select(10, AuraUtil.UnpackAuraData(C_UnitAuras.GetAuraDataByIndex(...)))
-		local table = id and TT:GetOrCreateMountTable(id)
+		local data = C_UnitAuras.GetAuraDataByIndex(...)
+		if not data then return end
+
+		local table = data.spellId and TT:GetOrCreateMountTable(data.spellId)
 		if table then
-			AddLine(self, table.source, TT:IsCollected(id) and COLLECTED or NOT_COLLECTED, SOURCE)
+			AddLine(self, table.source, TT:IsCollected(data.spellId) and COLLECTED or NOT_COLLECTED, SOURCE)
 		end
 	end)
 
@@ -68,7 +74,7 @@ function TT:MountsSource()
 		end
 	end)
 
-	M:UnregisterEvent("PLAYER_ENTERING_WORLD", TT.MountsSource)
+	B:UnregisterEvent("PLAYER_ENTERING_WORLD", TT.MountsSource)
 end
 
-M:RegisterEvent("PLAYER_ENTERING_WORLD", TT.MountsSource)
+B:RegisterEvent("PLAYER_ENTERING_WORLD", TT.MountsSource)

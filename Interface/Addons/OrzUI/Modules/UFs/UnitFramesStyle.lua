@@ -1,5 +1,5 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 --------------Thanks  nj55top`s iFrame
 local colorbyclass = true									-- 血条按职业着色
 local showPlayerSpeed = true								-- 显示玩家移动速度
@@ -22,7 +22,7 @@ local function textUpdate(bar)
 				bar.pctText:SetText((bar.DeadText or bar.TextString) and "" or DEAD)
 			else
 				bar.pctText:SetText(tostring(math.ceil((value / max) * 100)))
-				if not R.db["UFs"]["UFPctText"] or value == max then bar.pctText:Hide()
+				if not C.db["UFs"]["UFPctText"] or value == max then bar.pctText:Hide()
 		elseif GetCVarBool("statusTextPercentage") and ( bar.unit == PlayerFrame.unit or bar.unit == "target" or bar.unit == "focus" ) then bar.pctText:Hide()
 		else bar.pctText:Show()
 		end
@@ -62,18 +62,18 @@ end
 local function colorHPBar(bar, unit)
 	if bar and not bar.lockValues and unit == bar.unit then
 		local r, g, b
-		local min, max = bar:GetMinMaxValues()
-		local value = bar:GetValue()
-		if max > min then
-			value = (value - min) / (max - min)
-		else
-			value = 0
-		end
-		if value > 0.5 then
-			r, g, b = 2*(1-value), 1, 0
-		else
-			r, g, b = 1, 2*value, 0
-		end
+		--local min, max = bar:GetMinMaxValues()
+		--local value = bar:GetValue()
+		--if max > min then
+			--value = (value - min) / (max - min)
+		--else
+			--value = 0
+		--end
+		--if value > 0.5 then
+			--r, g, b = 2*(1-value), 1, 0
+		--else
+			--r, g, b = 1, 2*value, 0
+		--end
 		if bar.pctText then bar.pctText:SetTextColor(r, g, b) end
 		if colorbyclass then
 			local color = getHealthbarColor(unit)
@@ -278,12 +278,12 @@ local function GetSpeedText(speed)
 end
 
 local iFrame = CreateFrame("Frame")
-iFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
+--iFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 iFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 iFrame:SetScript("OnEvent", function(self, event, ...)
-	if event == "PLAYER_TARGET_CHANGED" then
-		hasTarget = UnitExists("target") and not UnitIsUnit("vehicle", "target")
-	end
+	--if event == "PLAYER_TARGET_CHANGED" then
+		--hasTarget = UnitExists("target") and not UnitIsUnit("vehicle", "target")
+	--end
 	if event == "PLAYER_ENTERING_WORLD" then
 		PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HealthBarsContainer.HealthBar:SetStatusBarTexture(barTexture)
 		--PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.ManaBarsContainer.ManaBar:SetStatusBarTexture(barTexture) 
@@ -316,7 +316,7 @@ iFrame:SetScript("OnUpdate", function(self, elapsed)
 			end
 		end
 		if showTargetSpeed then
-			local targetSpeed = hasTarget and GetUnitSpeed("target") or nil
+			local targetSpeed = GetUnitSpeed("target") or nil  --hasTarget and GetUnitSpeed("target") or nil
 			if lastTargetSpeed ~= targetSpeed then
 				lastTargetSpeed = targetSpeed
 				TargetFrame.speed:SetText(GetSpeedText(targetSpeed))
@@ -347,7 +347,7 @@ end)
   
 --[[----------------------------------------Class icon---------------------------------------
 hooksecurefunc("UnitFramePortrait_Update",function(self) 
-   if not R.db["UFs"]["UFClassIcon"] then return end
+   if not C.db["UFs"]["UFClassIcon"] then return end
         if self.portrait then 
                 if UnitIsPlayer(self.unit) then                 
                         if CLASS_ICON_TCOORDS[select(2, UnitClass(self.unit))] then 
@@ -364,3 +364,48 @@ end)]]
 --PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HitIndicator:Hide()
 --PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HitIndicator:Hide()
 PlayerFrame:UnregisterEvent("UNIT_COMBAT") PetFrame:UnregisterEvent("UNIT_COMBAT")
+
+
+--[[----------------------------------------------------头像渐隐
+local function PowerTypeAscending()
+	PowerTypeID, PowerTypeName = UnitPowerType("player")
+	for _,p in pairs({ 0, 2, 3}) do if p == PowerTypeID then Return = true end end
+	Return = false
+end
+
+local function AutoHidePlayerFrame(self,event, ...)
+	if (not C.db["UFs"]["UFFade"]) or (ShiGuangPerDB["BHT"] == true) then return end
+	--if (event == nil) then event = "TargetFrame or CharacterModelFrame toggled" end
+	if UnitHealth("player") < UnitHealthMax("player") * 0.99 or (powerTypeAscending and UnitPower("player") <= UnitPowerMax("player") * 0.99) or TargetFrame:IsShown() or UnitAffectingCombat("player") or CharacterFrame:IsShown() or ContainerFrame1:IsShown() then
+		if (not PlayerFrame:IsShown()) then
+			if (not InCombatLockdown()) then
+				local returnState, returnMessage = pcall(PlayerFrame.Show, PlayerFrame)
+				if not (returnState) then
+					if not (returnMessage == nil) then else end
+				end
+			end
+		end
+	else
+		if (PlayerFrame:IsShown()) then
+			if (not InCombatLockdown()) then
+				local returnState, returnMessage = pcall(PlayerFrame.Hide, PlayerFrame)
+				if not (returnState) then
+					if not (returnMessage == nil) then else end
+				end
+			end
+		end
+	end
+end
+
+local iPlayerFrame = CreateFrame("Frame", "iPlayerFrame", UIParent, "SecureHandlerStateTemplate")
+iPlayerFrame:RegisterEvent("PLAYER_LOGIN")
+iPlayerFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
+iPlayerFrame:RegisterEvent("UNIT_HEALTH")
+iPlayerFrame:RegisterEvent("UNIT_SPELLCAST_START")
+iPlayerFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+iPlayerFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+iPlayerFrame:RegisterEvent("UNIT_MAXPOWER")
+--iPlayerFrame:RegisterEvent("UNIT_MODEL_CHANGED")
+iPlayerFrame:SetScript("OnEvent", AutoHidePlayerFrame)
+TargetFrame:HookScript("OnShow", AutoHidePlayerFrame)
+TargetFrame:HookScript("OnHide", AutoHidePlayerFrame)]]

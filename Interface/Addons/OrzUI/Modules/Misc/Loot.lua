@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local MISC = M:GetModule("Misc")
+local B, C, L, DB = unpack(ns)
+local M = B:GetModule("Misc")
 ----------------------------
 -- Improved Loot Frame, by Cybeloras
 -- RayUI Loot, by fgprodigal
@@ -17,8 +17,8 @@ local function AnnounceLoot(chn)
 	for i = 1, GetNumLootItems() do
 		local link = GetLootSlotLink(i)
 		local quality = select(5, GetLootSlotInfo(i))
-		if link and quality then  --and quality >= MISC.I["AnnounceRarity"]
-			C_ChatInfo.SendChatMessage(format("- %MISC", link), chn)
+		if link and quality then  --and quality >= M.DB["AnnounceRarity"]
+			C_ChatInfo.SendChatMessage(format("- %M", link), chn)
 		end
 	end
 end
@@ -26,30 +26,30 @@ end
 -- Math
 do
 	-- AceTimer
-	_G.LibStub("AceTimer-3.0"):Embed(MISC)
+	_G.LibStub("AceTimer-3.0"):Embed(M)
 
-	function MISC:WaitFunc(elapse)
+	function M:WaitFunc(elapse)
 		local i = 1
-		while i <= #MISC.WaitTable do
-			local data = MISC.WaitTable[i]
+		while i <= #M.WaitTable do
+			local data = M.WaitTable[i]
 			if data[1] > elapse then
 				data[1], i = data[1] - elapse, i + 1
 			else
-				tremove(MISC.WaitTable, i)
+				tremove(M.WaitTable, i)
 				data[2](unpack(data[3]))
 
-				if #MISC.WaitTable == 0 then
-					MISC.WaitFrame:Hide()
+				if #M.WaitTable == 0 then
+					M.WaitFrame:Hide()
 				end
 			end
 		end
 	end
 
-	MISC.WaitTable = {}
-	MISC.WaitFrame = CreateFrame("Frame", "NDuiPlus_WaitFrame", _G.UIParent)
-	MISC.WaitFrame:SetScript("OnUpdate", MISC.WaitFunc)
+	M.WaitTable = {}
+	M.WaitFrame = CreateFrame("Frame", "NDuiPlus_WaitFrame", _G.UIParent)
+	M.WaitFrame:SetScript("OnUpdate", M.WaitFunc)
 
-	function MISC:Delay(delay, func, ...)
+	function M:Delay(delay, func, ...)
 		if type(delay) ~= "number" or type(func) ~= "function" then
 			return false
 		end
@@ -59,14 +59,14 @@ do
 		if select("#", ...) <= 0 then
 			C_Timer.After(delay, func)
 		else
-			tinsert(MISC.WaitTable,{delay,func,{...}})
-			MISC.WaitFrame:Show()
+			tinsert(M.WaitTable,{delay,func,{...}})
+			M.WaitFrame:Show()
 		end
 
 		return true
 	end
 
-	function MISC.WaitFor(condition, callback, interval, leftTimes)
+	function M.WaitFor(condition, callback, interval, leftTimes)
 		leftTimes = (leftTimes or 10) - 1
 		interval = interval or 0.1
 
@@ -79,36 +79,36 @@ do
 			return
 		end
 
-		MISC:Delay(interval, MISC.WaitFor, condition, callback, interval, leftTimes)
+		M:Delay(interval, M.WaitFor, condition, callback, interval, leftTimes)
 	end
 end
 
 local function Announce(chn)
 	local nums = GetNumLootItems()
 	if nums == 0 then return end
-	--if MISC.I["AnnounceTitle"] then
+	--if M.DB["AnnounceTitle"] then
 		if UnitIsPlayer("target") or not UnitExists("target") then
-			C_ChatInfo.SendChatMessage(format("*** %MISC ***", "箱子中的战利品"), chn)
+			C_ChatInfo.SendChatMessage(format("*** %M ***", "箱子中的战利品"), chn)
 		else
-			C_ChatInfo.SendChatMessage(format("*** %MISC%MISC ***", UnitName("target"), "的战利品"), chn)
+			C_ChatInfo.SendChatMessage(format("*** %M%M ***", UnitName("target"), "的战利品"), chn)
 		end
 	--end
 	if IsInInstance() or chn ~= "say" then
-		MISC:Delay(.1, AnnounceLoot, chn)
+		M:Delay(.1, AnnounceLoot, chn)
 	else
 		AnnounceLoot(chn)
 	end
 end
 
-function MISC:LootEx()
-	--if not MISC.I["Enable"] then return end
+function M:LootEx()
+	--if not M.DB["Enable"] then return end
 
 	local LootFrame = _G.LootFrame
 	LootFrame.panelMaxHeight = 1000
 	LootFrame.ScrollBox:SetPoint("BOTTOMRIGHT", -4, 4)
 
 	local title = LootFrame:CreateFontString(nil, "OVERLAY")
-	title:SetFont(I.Font[1], I.Font[2]+2, I.Font[3])
+	title:SetFont(DB.Font[1], DB.Font[2]+2, DB.Font[3])
 	title:SetPoint("TOPLEFT", 3, -4)
 	title:SetPoint("TOPRIGHT", -105, -4)
 	title:SetHeight(16)
@@ -138,7 +138,7 @@ function MISC:LootEx()
 		end
 	end)
 
-	--if not MISC.I["Announce"] then return end
+	--if not M.DB["Announce"] then return end
 
 	local chn = { "say", "guild", "party", "raid"}
 	local chncolor = {
@@ -152,8 +152,8 @@ function MISC:LootEx()
 	for i = 1, #chn do
 		LootFrame.announce[i] = CreateFrame("Button", nil, LootFrame)
 		LootFrame.announce[i]:SetSize(17, 17)
-		M.PixelIcon(LootFrame.announce[i], I.normTex, true)
-		M.CreateSD(LootFrame.announce[i])
+		B.PixelIcon(LootFrame.announce[i], DB.normTex, true)
+		B.CreateSD(LootFrame.announce[i])
 		LootFrame.announce[i]:SetFrameLevel(999)
 		LootFrame.announce[i].Icon:SetVertexColor(unpack(chncolor[chn[i]]))
 		LootFrame.announce[i]:SetPoint("RIGHT", i==1 and LootFrame.ClosePanelButton or LootFrame.announce[i-1], "LEFT", -3, 0)
@@ -164,6 +164,6 @@ function MISC:LootEx()
 			GameTooltip:AddLine("将战利品通报至".._G[upper(chn[i])])
 			GameTooltip:Show()
 		end)
-		LootFrame.announce[i]:SetScript("OnLeave", M.HideTooltip)
+		LootFrame.announce[i]:SetScript("OnLeave", B.HideTooltip)
 	end
 end

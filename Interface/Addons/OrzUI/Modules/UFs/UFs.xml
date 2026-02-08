@@ -13,8 +13,8 @@
 	<Script file="Elements\BuffsIndicator.lua"/>
 	<Script file="Elements\DebuffsIndicator.lua"/>
 	<Script file="Elements\PrivateAuras.lua"/>
-	<Script file="Elements\ClickCastTooltip.lua"/>
+	<!--Script file="Elements\ClickCastTooltip.lua"/>
 		
-	<Script file="BlinkHealthText.lua"/>
+	<Script file="BlinkHealthText.lua"/-->
 	<Script file="UnitFramesStyle.lua"/>
 </Ui>

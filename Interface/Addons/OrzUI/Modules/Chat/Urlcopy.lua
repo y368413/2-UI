@@ -1,6 +1,6 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:GetModule("Chat")
+local B, C, L, DB = unpack(ns)
+local module = B:GetModule("Chat")
 
 local strfind, strmatch, strsub, gsub = string.find, string.match, string.sub, string.gsub
 local strsplit, strlen = string.split, string.len
@@ -13,7 +13,7 @@ local C_BattleNet_GetAccountInfoByID = C_BattleNet.GetAccountInfoByID
 local foundurl = false
 
 local function convertLink(text, value)
-	return "|Hurl:"..tostring(value).."|h"..I.InfoColor..text.."|r|h"
+	return "|Hurl:"..tostring(value).."|h"..DB.InfoColor..text.."|r|h"
 end
 
 local function highlightURL(_, url)
@@ -125,7 +125,7 @@ function module.SetItemRefHook(link, _, button)
 
 			if fullname and strlen(fullname) > 0 then
 				local name, server = strsplit("-", fullname)
-				if server and server ~= I.MyRealm then name = fullname end
+				if server and server ~= DB.MyRealm then name = fullname end
 
 				if MailFrame and MailFrame:IsShown() then
 					MailFrameTab_OnClick(nil, 2)
@@ -155,7 +155,7 @@ function module:UrlCopy()
 		return orig(self, link, ...)
 	end
 
-	if not I.isNewPatch then
+	if ChatFrame_OnHyperlinkShow then
 		hooksecurefunc("ChatFrame_OnHyperlinkShow", self.HyperlinkShowHook)
 	end
 	hooksecurefunc("SetItemRef", self.SetItemRefHook)

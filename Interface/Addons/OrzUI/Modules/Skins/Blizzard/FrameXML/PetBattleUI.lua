@@ -1,17 +1,17 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
-local r, g, b, pairs = I.r, I.g, I.b, pairs
+local r, g, b, pairs = DB.r, DB.g, DB.b, pairs
 local LE_BATTLE_PET_ALLY = Enum.BattlePetOwner.Ally
 
-tinsert(R.defaultThemes, function()
-	if not R.db["Skins"]["PetBattle"] then return end
+tinsert(C.defaultThemes, function()
+	if not C.db["Skins"]["PetBattle"] then return end
 
-	local mult = R.mult
+	local mult = C.mult
 
 	-- Head Frame
 	local frame = PetBattleFrame
-	M.StripTextures(frame)
+	B.StripTextures(frame)
 	frame.TopVersusText:SetPoint("TOP", 0, -45)
 
 	-- Weather
@@ -22,7 +22,7 @@ tinsert(R.defaultThemes, function()
 	weather.Name:Hide()
 	weather.Icon:ClearAllPoints()
 	weather.Icon:SetPoint("TOP", frame.TopVersusText, "BOTTOM", 0, -15)
-	M.ReskinIcon(weather.Icon, true)
+	B.ReskinIcon(weather.Icon, true)
 	weather.BackgroundArt:SetPoint("TOP", UIParent)
 	weather.Duration:ClearAllPoints()
 	weather.Duration:SetPoint("CENTER", weather.Icon, 1, 0)
@@ -33,8 +33,8 @@ tinsert(R.defaultThemes, function()
 		unit.HealthBarBG:Hide()
 		unit.HealthBarFrame:Hide()
 		unit.healthBarWidth = 250
-		unit.ActualHealthBar:SetTexture(I.normTex)
-		unit.healthBg = M.SetBD(unit.ActualHealthBar)
+		unit.ActualHealthBar:SetTexture(DB.normTex)
+		unit.healthBg = B.SetBD(unit.ActualHealthBar)
 		unit.healthBg:ClearAllPoints()
 		unit.healthBg:SetWidth(unit.healthBarWidth + 2*mult)
 		unit.HealthText:ClearAllPoints()
@@ -42,7 +42,7 @@ tinsert(R.defaultThemes, function()
 
 		unit.petIcon = unit:CreateTexture(nil, "ARTWORK")
 		unit.petIcon:SetSize(25, 25)
-		M.ReskinIcon(unit.petIcon, true)
+		B.ReskinIcon(unit.petIcon, true)
 		unit.PetType:SetAlpha(0)
 		unit.PetType:ClearAllPoints()
 		unit.PetType:SetAllPoints(unit.petIcon)
@@ -51,7 +51,7 @@ tinsert(R.defaultThemes, function()
 		unit.Border:SetAlpha(0)
 		unit.Border2:SetAlpha(0)
 		unit.BorderFlash:SetAlpha(0)
-		unit.Iconbg = M.SetBD(unit.Icon)
+		unit.Iconbg = B.SetBD(unit.Icon)
 
 		unit.LevelUnderlay:SetAlpha(0)
 		unit.Level:SetFontObject(SystemFont_Shadow_Huge1)
@@ -97,7 +97,7 @@ tinsert(R.defaultThemes, function()
 		unit.HealthDivider:SetAlpha(0)
 		unit.BorderAlive:SetAlpha(0)
 		unit.BorderDead:SetAlpha(0)
-		unit.Iconbg = M.ReskinIcon(unit.Icon, true)
+		unit.Iconbg = B.ReskinIcon(unit.Icon, true)
 
 		unit.deadIcon = unit:CreateTexture(nil, "ARTWORK")
 		unit.deadIcon:SetAllPoints(unit.Icon)
@@ -107,8 +107,8 @@ tinsert(R.defaultThemes, function()
 		unit.healthBarWidth = 36
 		unit.ActualHealthBar:ClearAllPoints()
 		unit.ActualHealthBar:SetPoint("TOPLEFT", unit.Icon, "BOTTOMLEFT", 1, -4)
-		unit.ActualHealthBar:SetTexture(I.normTex)
-		unit.healthBg = M.SetBD(unit.ActualHealthBar)
+		unit.ActualHealthBar:SetTexture(DB.normTex)
+		unit.healthBg = B.SetBD(unit.ActualHealthBar)
 		unit.healthBg:ClearAllPoints()
 		unit.healthBg:SetPoint("TOPLEFT", unit.ActualHealthBar, -mult, mult)
 		unit.healthBg:SetPoint("BOTTOMLEFT", unit.ActualHealthBar, -mult, -mult)
@@ -142,13 +142,13 @@ tinsert(R.defaultThemes, function()
 			if petOwner == LE_BATTLE_PET_ALLY then
 				self.Icon:SetTexCoord(.92, .08, .08, .92)
 			else
-				self.Icon:SetTexCoord(unpack(I.TexCoord))
+				self.Icon:SetTexCoord(unpack(DB.TexCoord))
 			end
 		end
 		if self.glow then self.glow:Hide() end
 		if self.Iconbg then
 			local quality = C_PetBattles.GetBreedQuality(self.petOwner, self.petIndex) or 1
-			local color = I.QualityColors[quality]
+			local color = DB.QualityColors[quality]
 			self.Iconbg:SetBackdropBorderColor(color.r, color.g, color.b)
 		end
 	end)
@@ -172,7 +172,7 @@ tinsert(R.defaultThemes, function()
 				local frame = self.frames[nextFrame]
 				frame.DebuffBorder:Hide()
 				if not frame.styled then
-					M.ReskinIcon(frame.Icon, true)
+					B.ReskinIcon(frame.Icon, true)
 					frame.styled = true
 				end
 
@@ -218,14 +218,14 @@ tinsert(R.defaultThemes, function()
 			end
 
 			bu:SetNormalTexture(0)
-			bu:GetPushedTexture():SetTexture(I.pushedTex)
+			bu:GetPushedTexture():SetTexture(DB.pushedTex)
 			bu:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
 			if not bu.bg then
-				bu.bg = M.ReskinIcon(bu.Icon, true)
+				bu.bg = B.ReskinIcon(bu.Icon, true)
 				bu.Icon:SetInside()
 			end
 
-			M.SetFontSize(bu.Cooldown, 26)
+			B.SetFontSize(bu.Cooldown, 26)
 			bu.SelectedHighlight:ClearAllPoints()
 			bu.SelectedHighlight:SetPoint("TOPLEFT", bu, -12, 12)
 			bu.SelectedHighlight:SetPoint("BOTTOMRIGHT", bu, 12, -12)
@@ -236,25 +236,25 @@ tinsert(R.defaultThemes, function()
 	local skipButton = bottomFrame.TurnTimer.SkipButton
 	skipButton:SetParent(bar)
 	skipButton:SetSize(42, 42)
-	M.StripTextures(skipButton)
-	M.PixelIcon(skipButton, "Interface\\Icons\\Ability_Foundryraid_Dormant", true)
-	M.CreateSD(skipButton)
+	B.StripTextures(skipButton)
+	B.PixelIcon(skipButton, "Interface\\Icons\\Ability_Foundryraid_Dormant", true)
+	B.CreateSD(skipButton)
 	skipButton.HL:SetAllPoints(skipButton)
-	skipButton:SetPushedTexture(I.pushedTex)
+	skipButton:SetPushedTexture(DB.pushedTex)
 
 	local xpbar = PetBattleFrameXPBar
-	M.StripTextures(xpbar)
+	B.StripTextures(xpbar)
 	xpbar:SetParent(bar)
 	xpbar:SetWidth(bar:GetWidth())
-	xpbar:SetStatusBarTexture(I.normTex)
-	M.SetBD(xpbar)
+	xpbar:SetStatusBarTexture(DB.normTex)
+	B.SetBD(xpbar)
 
 	local turnTimer = bottomFrame.TurnTimer
 	turnTimer:SetParent(bar)
 	turnTimer:SetSize(xpbar:GetWidth()+4, xpbar:GetHeight()+10)
 	turnTimer:ClearAllPoints()
 	turnTimer:SetPoint("BOTTOM", bar, "TOP", 0, 7)
-	turnTimer.bg = M.SetBD(turnTimer)
+	turnTimer.bg = B.SetBD(turnTimer)
 	turnTimer.Bar:ClearAllPoints()
 	turnTimer.Bar:SetPoint("LEFT", 2, 0)
 	turnTimer.TimerText:ClearAllPoints()
@@ -280,15 +280,15 @@ tinsert(R.defaultThemes, function()
 		local unit = bottomFrame.PetSelectionFrame["Pet"..i]
 		local icon = unit.Icon
 
-		unit.Iconbg = M.ReskinIcon(icon, true)
+		unit.Iconbg = B.ReskinIcon(icon, true)
 		unit.HealthBarBG:Hide()
 		unit.Framing:Hide()
 		unit.HealthDivider:Hide()
 		unit.Name:SetPoint("TOPLEFT", icon, "TOPRIGHT", 3, -3)
 
 		unit.ActualHealthBar:SetPoint("BOTTOMLEFT", icon, "BOTTOMRIGHT", 5, 0)
-		unit.ActualHealthBar:SetTexture(I.normTex)
-		local bg = M.SetBD(unit.ActualHealthBar)
+		unit.ActualHealthBar:SetTexture(DB.normTex)
+		local bg = B.SetBD(unit.ActualHealthBar)
 		bg:SetPoint("TOPLEFT", unit.ActualHealthBar, -1, 1)
 		bg:SetPoint("BOTTOMRIGHT", unit.ActualHealthBar, "BOTTOMLEFT", 129, -1)
 	end
@@ -304,9 +304,9 @@ tinsert(R.defaultThemes, function()
 		frame:SetSize(width, height)
 		frame:SetPoint(anchor, UIParent, "BOTTOM", 0, 3)
 		frame:SetFrameLevel(0)
-		local tex = M.SetGradient(frame, "H", 0, 0, 0, v[1], v[2], width, height)
+		local tex = B.SetGradient(frame, "H", 0, 0, 0, v[1], v[2], width, height)
 		tex:SetPoint("CENTER")
-		local line = M.SetGradient(frame, "H", r, g, b, v[1], v[2], width, R.mult)
+		local line = B.SetGradient(frame, "H", r, g, b, v[1], v[2], width, C.mult)
 		line:SetPoint("BOTTOM", frame, "TOP")
 
 		RegisterStateDriver(frame, "visibility", visibleState)

@@ -1,7 +1,7 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local Bar = M:GetModule("Actionbar")
-local MISC = M:GetModule("Mover")
+local B, C, L, DB = unpack(ns)
+local Bar = B:GetModule("Actionbar")
+local M = B:GetModule("Mover")
 
 local strsplit, tonumber, strmatch, ipairs = strsplit, tonumber, strmatch, ipairs
 
@@ -97,10 +97,10 @@ function Bar:ImportActionbarStyle(preset)
 		local value = values[index]
 		value = tonumber(value)
 		if not value then -- stop if string incorrect
-			UIErrorsFrame:AddMessage(I.InfoColor..U["StyleStringError"])
+			UIErrorsFrame:AddMessage(DB.InfoColor..L["StyleStringError"])
 			return
 		end
-		R.db["Actionbar"][optionValues[index-1]] = value
+		C.db["Actionbar"][optionValues[index-1]] = value
 	end
 	Bar:UpdateAllSize()
 
@@ -114,9 +114,9 @@ function Bar:ImportActionbarStyle(preset)
 			if point and x and y then
 				mover:ClearAllPoints()
 				mover:SetPoint(point, UIParent, point, x, y)
-				R.db["Mover"][moverValues[moverIndex]] = {point, "UIParent", point, x, y}
+				C.db["Mover"][moverValues[moverIndex]] = {point, "UIParent", point, x, y}
 			else
-				UIErrorsFrame:AddMessage(I.InfoColor..U["StyleStringError"])
+				UIErrorsFrame:AddMessage(DB.InfoColor..L["StyleStringError"])
 				return
 			end
 		end
@@ -126,11 +126,11 @@ end
 function Bar:ExportActionbarStyle()
 	local styleStr = "NAB"
 	for _, value in ipairs(optionValues) do
-		styleStr = styleStr..":"..R.db["Actionbar"][value]
+		styleStr = styleStr..":"..C.db["Actionbar"][value]
 	end
 
 	for _, mover in ipairs(Bar.movers) do
-		local x, y, point = MISC:CalculateMoverPoints(mover)
+		local x, y, point = M:CalculateMoverPoints(mover)
 		styleStr = styleStr..":"..x..anchorToAbbr[point]..y
 	end
 

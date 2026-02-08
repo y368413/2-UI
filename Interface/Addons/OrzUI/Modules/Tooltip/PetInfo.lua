@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local TT = M:GetModule("Tooltip")
+local B, C, L, DB = unpack(ns)
+local TT = B:GetModule("Tooltip")
 
 local UnitBattlePetType, UnitBattlePetSpeciesID = UnitBattlePetType, UnitBattlePetSpeciesID
 local PET, ID, UNKNOWN = PET, ID, UNKNOWN
@@ -37,5 +37,5 @@ function TT:PetInfo_Setup(unit)
 
 	-- Pet ID
 	local speciesID = UnitBattlePetSpeciesID(unit)
-	self:AddDoubleLine(PET..ID..":", speciesID and (I.InfoColor..speciesID.."|r") or (I.GreyColor..UNKNOWN.."|r"))
+	self:AddDoubleLine(PET..ID..":", speciesID and (DB.InfoColor..speciesID.."|r") or (DB.GreyColor..UNKNOWN.."|r"))
 end

@@ -1,7 +1,7 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-local MISC = M:GetModule("Misc")
-local TT = M:GetModule("Tooltip")
+local B, C, L, DB = unpack(ns)
+local M = B:GetModule("Misc")
+local TT = B:GetModule("Tooltip")
 
 --[[
 	QuickJoin 优化系统自带的预创建功能
@@ -21,14 +21,14 @@ local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 
 local HEADER_COLON = _G.HEADER_COLON
 local LE_PARTY_CATEGORY_HOME = _G.LE_PARTY_CATEGORY_HOME or 1
-local scoreFormat = I.GreyColor.."(%s) |r%s"
+local scoreFormat = DB.GreyColor.."(%s) |r%s"
 
 local LFGListFrame = _G.LFGListFrame
 local ApplicationViewerFrame = LFGListFrame.ApplicationViewer
 local searchPanel = LFGListFrame.SearchPanel
 local categorySelection = LFGListFrame.CategorySelection
 
-function MISC:HookApplicationClick()
+function M:HookApplicationClick()
 	if LFGListFrame.SearchPanel.SignUpButton:IsEnabled() then
 		LFGListFrame.SearchPanel.SignUpButton:Click()
 	end
@@ -38,7 +38,7 @@ function MISC:HookApplicationClick()
 end
 
 local pendingFrame
-function MISC:DialogHideInSecond()
+function M:DialogHideInSecond()
 	if not pendingFrame then return end
 
 	if pendingFrame.informational then
@@ -49,17 +49,17 @@ function MISC:DialogHideInSecond()
 	pendingFrame = nil
 end
 
-function MISC:HookDialogOnShow()
+function M:HookDialogOnShow()
 	pendingFrame = self
-	C_Timer_After(1, MISC.DialogHideInSecond)
+	C_Timer_After(1, M.DialogHideInSecond)
 end
 
-function MISC:QuickJoin_ShowTips()
+function M:QuickJoin_ShowTips()
 	local quickJoinInfo = {
-		text = U["QuickJoinInfo"],
+		text = L["QuickJoinInfo"],
 		buttonStyle = HelpTip.ButtonStyle.GotIt,
 		targetPoint = HelpTip.Point.RightEdgeCenter,
-		onAcknowledgeCallback = M.HelpInfoAcknowledge,
+		onAcknowledgeCallback = B.HelpInfoAcknowledge,
 		callbackArg = "QuickJoin",
 	}
 	LFGListFrame.SearchPanel.SignUpButton:HookScript("OnShow", function()
@@ -69,28 +69,21 @@ function MISC:QuickJoin_ShowTips()
 	end)
 end
 
-function MISC:AddAutoAcceptButton()
-	local bu = M.CreateCheckBox(ApplicationViewerFrame)
+function M:AddAutoAcceptButton()
+	local bu = B.CreateCheckBox(ApplicationViewerFrame)
 	bu:SetSize(24, 24)
 	bu:SetHitRectInsets(0, -130, 0, 0)
 	bu:SetPoint("BOTTOMLEFT", ApplicationViewerFrame.InfoBackground, 12, 5)
-	M.CreateFS(bu, 14, _G.LFG_LIST_AUTO_ACCEPT, "system", "LEFT", 24, 0)
+	B.CreateFS(bu, 14, _G.LFG_LIST_AUTO_ACCEPT, "system", "LEFT", 24, 0)
 
-	local isCN = GetCVar("portal") == "CN"
 	local lastTime = 0
 	local function clickInviteButton(button)
 		if button.applicantID and button.InviteButton:IsEnabled() then
-			if R.db["Chat"]["Freedom"] and isCN then
-				ConsoleExec("portal CN")
-			end
 			C_LFGList.InviteApplicant(button.applicantID)
-			if R.db["Chat"]["Freedom"] and isCN then
-				ConsoleExec("portal TW")
-			end
 		end
 	end
 
-	M:RegisterEvent("LFG_LIST_APPLICANT_LIST_UPDATED", function()
+	B:RegisterEvent("LFG_LIST_APPLICANT_LIST_UPDATED", function()
 		if not bu:GetChecked() then return end
 		if not UnitIsGroupLeader("player", LE_PARTY_CATEGORY_HOME) then return end
 
@@ -114,7 +107,7 @@ local factionStr = {
 	[0] = "Horde",
 	[1] = "Alliance",
 }
-function MISC:ShowLeaderOverallScore()
+function M:ShowLeaderOverallScore()
 	local resultID = self.resultID
 	local searchResultInfo = resultID and C_LFGList_GetSearchResultInfo(resultID)
 	if searchResultInfo then
@@ -147,7 +140,7 @@ function MISC:ShowLeaderOverallScore()
 	end
 end
 
-function MISC:ReplaceFindGroupButton()
+function M:ReplaceFindGroupButton()
 	if not IsAddOnLoaded("PremadeGroupsFilter") then return end
 
 	categorySelection.FindGroupButton:Hide()
@@ -173,7 +166,7 @@ function MISC:ReplaceFindGroupButton()
 		lastCategory = selectedCategory
 	end)
 
-	if R.db["Skins"]["BlizzardSkins"] then M.Reskin(bu) end
+	if C.db["Skins"]["BlizzardSkins"] then B.Reskin(bu) end
 end
 
 local function clickSortButton(self)
@@ -182,17 +175,17 @@ local function clickSortButton(self)
 end
 
 local function createSortButton(parent, texture, sortStr, panel)
-	local bu = M.CreateButton(parent, 24, 24, true, texture)
+	local bu = B.CreateButton(parent, 24, 24, true, texture)
 	bu.sortStr = sortStr
 	bu.__parent = parent
 	bu.__owner = panel
 	bu:SetScript("OnClick", clickSortButton)
-	M.AddTooltip(bu, "ANCHOR_RIGHT", CLUB_FINDER_SORT_BY)
+	B.AddTooltip(bu, "ANCHOR_RIGHT", CLUB_FINDER_SORT_BY)
 
 	tinsert(parent.__sortBu, bu)
 end
 
-function MISC:AddPGFSortingExpression()
+function M:AddPGFSortingExpression()
 	if not IsAddOnLoaded("PremadeGroupsFilter") then return end
 
 	local PGFDialog = _G.PremadeGroupsFilterDialog
@@ -221,7 +214,7 @@ function MISC:AddPGFSortingExpression()
 	end
 end
 
-function MISC:FixListingTaint() -- From PremadeGroupsFilter
+function M:FixListingTaint() -- From PremadeGroupsFilter
 	if IsAddOnLoaded("PremadeGroupsFilter") then return end
 
     local activityIdOfArbitraryMythicPlusDungeon = 1160 -- Algeth'ar Academy
@@ -251,8 +244,8 @@ function MISC:FixListingTaint() -- From PremadeGroupsFilter
     LFGListEntryCreation_SetTitleFromActivityInfo = function(_) end
 end
 
-function MISC:QuickJoin()
-	if not R.db["Misc"]["QuickJoin"] then return end
+function M:QuickJoin()
+	if not C.db["Misc"]["QuickJoin"] then return end
 
 	hooksecurefunc(LFGListFrame.SearchPanel.ScrollBox, "Update", function(self)
 		for i = 1, self.ScrollTarget:GetNumChildren() do
@@ -260,25 +253,25 @@ function MISC:QuickJoin()
 			if child.Name and not child.hooked then
 				child.Name:SetFontObject(Game14Font)
 				child.ActivityName:SetFontObject(Game12Font)
-				child:HookScript("OnDoubleClick", MISC.HookApplicationClick)
+				child:HookScript("OnDoubleClick", M.HookApplicationClick)
 
 				child.hooked = true
 			end
 		end
 	end)
-	MISC:QuickJoin_ShowTips()
+	M:QuickJoin_ShowTips()
 
 	hooksecurefunc("LFGListInviteDialog_Accept", function()
 		if PVEFrame:IsShown() then HideUIPanel(PVEFrame) end
 	end)
 
-	hooksecurefunc("StaticPopup_Show", MISC.HookDialogOnShow)
-	hooksecurefunc("LFGListInviteDialog_Show", MISC.HookDialogOnShow)
-	hooksecurefunc("LFGListSearchEntry_Update", MISC.ShowLeaderOverallScore)
+	hooksecurefunc("StaticPopup_Show", M.HookDialogOnShow)
+	hooksecurefunc("LFGListInviteDialog_Show", M.HookDialogOnShow)
+	hooksecurefunc("LFGListSearchEntry_Update", M.ShowLeaderOverallScore)
 
-	MISC:AddAutoAcceptButton()
-	MISC:ReplaceFindGroupButton()
-	MISC:AddPGFSortingExpression()
-	MISC:FixListingTaint()
+	M:AddAutoAcceptButton()
+	M:ReplaceFindGroupButton()
+	M:AddPGFSortingExpression()
+	M:FixListingTaint()
 end
-MISC:RegisterMisc("QuickJoin", MISC.QuickJoin)
+M:RegisterMisc("QuickJoin", M.QuickJoin)

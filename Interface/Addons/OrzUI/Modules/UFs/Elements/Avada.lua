@@ -1,12 +1,12 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local UF = M:GetModule("UnitFrames")
+local B, C, L, DB = unpack(ns)
+local UF = B:GetModule("UnitFrames")
 
 local wipe, gmatch, strmatch = table.wipe, string.gmatch, string.match
 local GetSpecialization, GetSpecializationInfo = GetSpecialization, GetSpecializationInfo
 local GetSpellTexture = C_Spell.GetSpellTexture
 local EMPTY_TEXTURE = "Interface\\Icons\\INV_Misc_QuestionMark"
-local myFullName = I.MyFullName
+local myFullName = DB.MyFullName
 
 UF.DefaultAvada = {
 	[0] = "", -- None
@@ -173,7 +173,7 @@ function UF:Avada_UpdateAura(button, unit, spellID, filter)
 
 	if avadaValue then
 		if UF.AvadaValueSpells[spellID] and value then
-			avadaValue:SetText(M.Numb(value))
+			avadaValue:SetText(B.Numb(value))
 		else
 			avadaValue:SetText("")
 		end
@@ -282,12 +282,14 @@ function UF:Avada_OnAura(unit)
 end
 
 function UF:Avada_Toggle(frame)
+	if DB.isNewPatch then return end
+
 	frame = frame or oUF_PlayerPlate
 	if not frame then return end
 
-	if R.db["Avada"]["Enable"] then
+	if C.db["Avada"]["Enable"] then
 		for i = 1, 6 do frame.Avada[i]:Show() end
-		M:RegisterEvent("UNIT_AURA", UF.Avada_OnAura)
+		B:RegisterEvent("UNIT_AURA", UF.Avada_OnAura)
 		frame:RegisterEvent("PLAYER_TARGET_CHANGED", UF.Avada_OnEvent, true)
 		frame:RegisterEvent("SPELL_UPDATE_COOLDOWN", UF.Avada_OnEvent, true)
 		frame:RegisterEvent("SPELL_UPDATE_CHARGES", UF.Avada_OnEvent, true)
@@ -297,7 +299,7 @@ function UF:Avada_Toggle(frame)
 		frame:RegisterEvent("TRAIT_CONFIG_UPDATED", UF.Avada_RefreshAll, true)
 	else
 		for i = 1, 6 do frame.Avada[i]:Hide() end
-		M:UnregisterEvent("UNIT_AURA", UF.Avada_OnAura)
+		B:UnregisterEvent("UNIT_AURA", UF.Avada_OnAura)
 		frame:UnregisterEvent("PLAYER_TARGET_CHANGED", UF.Avada_OnEvent)
 		frame:UnregisterEvent("SPELL_UPDATE_COOLDOWN", UF.Avada_OnEvent)
 		frame:UnregisterEvent("SPELL_UPDATE_CHARGES", UF.Avada_OnEvent)
@@ -307,23 +309,23 @@ function UF:Avada_Toggle(frame)
 end
 
 function UF:AvadaKedavra(self)
-	local iconSize = (R.db["Nameplate"]["PPWidth"]+2*R.mult - R.margin*(maxButtons-1))/maxButtons
+	local iconSize = (C.db["Nameplate"]["PPWidth"]+2*C.mult - C.margin*(maxButtons-1))/maxButtons
 
 	self.Avada = {}
 	for i = 1, maxButtons do
 		local bu = CreateFrame("Frame", "OrzUI_AvadaIcon" .. i, self.Health)
 		bu:SetSize(iconSize, iconSize)
-		M.AuraIcon(bu)
-		--bu.glowFrame = M.CreateGlowFrame(bu, iconSize)
+		B.AuraIcon(bu)
+		--bu.glowFrame = B.CreateGlowFrame(bu, iconSize)
 
 		local fontParent = CreateFrame("Frame", nil, bu)
 		fontParent:SetAllPoints()
 		fontParent:SetFrameLevel(bu:GetFrameLevel() + 6)
-		bu.Count = M.CreateFS(fontParent, 16, "", false, "BOTTOM", 0, -10)
+		bu.Count = B.CreateFS(fontParent, 16, "", false, "BOTTOM", 0, -10)
 		if i == 1 then
-			bu:SetPoint("TOPLEFT", self.Power, "BOTTOMLEFT", -R.mult, -R.margin)
+			bu:SetPoint("TOPLEFT", self.Power, "BOTTOMLEFT", -C.mult, -C.margin)
 		else
-			bu:SetPoint("LEFT", self.Avada[i-1], "RIGHT", R.margin, 0)
+			bu:SetPoint("LEFT", self.Avada[i-1], "RIGHT", C.margin, 0)
 		end
 
 		self.Avada[i] = bu
@@ -331,7 +333,7 @@ function UF:AvadaKedavra(self)
 	avadaButtons = self.Avada
 	UF.avadaData = auraData
 
-	local valueStr = M.CreateFS(self.Health, 18, "", "system")
+	local valueStr = B.CreateFS(self.Health, 18, "", "system")
 	valueStr:ClearAllPoints()
 	valueStr:SetPoint("RIGHT", self.Health, "LEFT", -5, 0)
 	avadaValue = valueStr

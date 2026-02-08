@@ -1,8 +1,8 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-local G = M:GetModule("GUI")
+local B, C, L, DB = unpack(ns)
+local G = B:GetModule("GUI")
 
-local r, g, b = I.r, I.g, I.b
+local r, g, b = DB.r, DB.g, DB.b
 local pairs, floor = pairs, math.floor
 local f
 local GetSpellName = C_Spell.GetSpellName
@@ -18,18 +18,18 @@ local function labelOnEnter(self)
 end
 
 local function createLabel(parent, text, tip)
-	local label = M.CreateFS(parent, 14, text, "system", "CENTER", 0, 25)
+	local label = B.CreateFS(parent, 14, text, "system", "CENTER", 0, 25)
 	if not tip then return end
 	local frame = CreateFrame("Frame", nil, parent)
 	frame:SetAllPoints(label)
 	frame.text = text
 	frame.tip = tip
 	frame:SetScript("OnEnter", labelOnEnter)
-	frame:SetScript("OnLeave", M.HideTooltip)
+	frame:SetScript("OnLeave", B.HideTooltip)
 end
 
 function G:CreateEditbox(parent, text, x, y, tip, width, height)
-	local eb = M.CreateEditBox(parent, width or 90, height or 30)
+	local eb = B.CreateEditBox(parent, width or 90, height or 30)
 	eb:SetPoint("TOPLEFT", x, y)
 	eb:SetMaxLetters(255)
 	createLabel(eb, text, tip)
@@ -38,7 +38,7 @@ function G:CreateEditbox(parent, text, x, y, tip, width, height)
 end
 
 function G:CreateCheckBox(parent, text, x, y, tip)
-	local cb = M.CreateCheckBox(parent)
+	local cb = B.CreateCheckBox(parent)
 	cb:SetPoint("TOPLEFT", x, y)
 	cb:SetHitRectInsets(-5, -5, -5, -5)
 	createLabel(cb, text, tip)
@@ -47,7 +47,7 @@ function G:CreateCheckBox(parent, text, x, y, tip)
 end
 
 function G:CreateDropdown(parent, text, x, y, data, tip, width, height)
-	local dd = M.CreateDropDown(parent, width or 90, height or 30, data)
+	local dd = B.CreateDropDown(parent, width or 90, height or 30, data)
 	dd:SetPoint("TOPLEFT", x, y)
 	createLabel(dd, text, tip)
 
@@ -72,8 +72,8 @@ local function createPage(name)
 	local p = CreateFrame("Frame", nil, f, "BackdropTemplate")
 	p:SetPoint("TOPLEFT", 160, -70)
 	p:SetSize(620, 380)
-	M.CreateBD(p, .25)
-	M.CreateFS(p, 15, name, false, "TOPLEFT", 5, 20)
+	B.CreateBD(p, .25)
+	B.CreateFS(p, 15, name, false, "TOPLEFT", 5, 20)
 	p:Hide()
 	return p
 end
@@ -82,14 +82,14 @@ function G:CreateScroll(parent, width, height, text)
 	local scroll = CreateFrame("ScrollFrame", nil, parent, "UIPanelScrollFrameTemplate")
 	scroll:SetSize(width, height)
 	scroll:SetPoint("BOTTOMLEFT", 10, 10)
-	M.CreateBDFrame(scroll, .25)
+	B.CreateBDFrame(scroll, .25)
 	if text then
-		M.CreateFS(scroll, 15, text, false, "TOPLEFT", 5, 20)
+		B.CreateFS(scroll, 15, text, false, "TOPLEFT", 5, 20)
 	end
 	scroll.child = CreateFrame("Frame", nil, scroll)
 	scroll.child:SetSize(width, 1)
 	scroll:SetScrollChild(scroll.child)
-	--M.ReskinScroll(scroll.ScrollBar)
+	--B.ReskinScroll(scroll.ScrollBar)
 
 	return scroll
 end
@@ -98,7 +98,7 @@ function G:CreateBarWidgets(parent, texture)
 	local icon = CreateFrame("Frame", nil, parent)
 	icon:SetSize(20, 20)
 	icon:SetPoint("LEFT", 5, 0)
-	M.PixelIcon(icon, texture, true)
+	B.PixelIcon(icon, texture, true)
 
 	local close = CreateFrame("Button", nil, parent)
 	close:SetSize(20, 20)
@@ -126,43 +126,43 @@ local function CreatePanel()
 	f = CreateFrame("Frame", "OrzUI_AWConfig", UIParent)
 	f:SetPoint("CENTER")
 	f:SetSize(800, 500)
-	M.SetBD(f)
-	M.CreateMF(f)
-	M.CreateFS(f, 17, "从NDui趴来的自定义技能监视", true, "TOP", 0, -10)
-	M.CreateFS(f, 15, U["Groups"], true, "TOPLEFT", 30, -50)
+	B.SetBD(f)
+	B.CreateMF(f)
+	B.CreateFS(f, 17, "从NDui趴来的自定义技能监视", true, "TOP", 0, -10)
+	B.CreateFS(f, 15, L["Groups"], true, "TOPLEFT", 30, -50)
 	f:SetFrameStrata("HIGH")
 	f:SetFrameLevel(5)
 	tinsert(UISpecialFrames, "OrzUI_AWConfig")
 
-	local helpInfo = M.CreateHelpInfo(f, U["AWConfigTips"])
+	local helpInfo = B.CreateHelpInfo(f, L["AWConfigTips"])
 	helpInfo:SetPoint("TOPLEFT", 20, -5)
 
 	auraWatchShow()
 	f:HookScript("OnShow", auraWatchShow)
 	f:HookScript("OnHide", auraWatchHide)
 
-	f.Close = M.CreateButton(f, 80, 25, CLOSE)
+	f.Close = B.CreateButton(f, 80, 25, CLOSE)
 	f.Close:SetPoint("BOTTOMRIGHT", -20, 15)
 	f.Close:SetScript("OnClick", function()
 		f:Hide()
 	end)
 
-	f.Complete = M.CreateButton(f, 80, 25, OKAY)
+	f.Complete = B.CreateButton(f, 80, 25, OKAY)
 	f.Complete:SetPoint("RIGHT", f.Close, "LEFT", -10, 0)
 	f.Complete:SetScript("OnClick", function()
 		f:Hide()
 		StaticPopup_Show("RELOAD_ORZUI")
 	end)
 
-	f.Reset = M.CreateButton(f, 120, 25, U["OrzUI Reset"])
+	f.Reset = B.CreateButton(f, 120, 25, L["OrzUI Reset"])
 	f.Reset:SetPoint("BOTTOMLEFT", 25, 15)
 	StaticPopupDialogs["RESET_ORZUI_AWLIST"] = {
-		text = U["Reset your AuraWatch List?"],
+		text = L["Reset your AuraWatch List?"],
 		button1 = YES,
 		button2 = NO,
 		OnAccept = function()
-			R.db["AuraWatchList"] = {}
-			R.db["InternalCD"] = {}
+			C.db["AuraWatchList"] = {}
+			C.db["InternalCD"] = {}
 			ReloadUI()
 		end,
 		whileDead = 1,
@@ -175,7 +175,7 @@ local function CreatePanel()
 	local function SortBars(index)
 		local num, onLeft, onRight = 1, 1, 1
 		for k in pairs(barTable[index]) do
-			if (index < 10 and R.db["AuraWatchList"][index][k]) or (index == 10 and R.db["InternalCD"][k]) then
+			if (index < 10 and C.db["AuraWatchList"][index][k]) or (index == 10 and C.db["InternalCD"][k]) then
 				local bar = barTable[index][k]
 				if num == 1 then
 					bar:SetPoint("TOPLEFT", 10, -10)
@@ -225,12 +225,12 @@ local function CreatePanel()
 			name = slotIndex[spellID]
 		elseif typeID == "TotemID" then
 			texture = "Interface\\ICONS\\Spell_Shaman_TotemRecall"
-			name = U["TotemSlot"]..spellID
+			name = L["TotemSlot"]..spellID
 		end
 
 		local bar = CreateFrame("Frame", nil, parent, "BackdropTemplate")
 		bar:SetSize(270, 30)
-		M.CreateBD(bar, .25)
+		B.CreateBD(bar, .25)
 		barTable[index][spellID] = bar
 
 		local icon, close = G:CreateBarWidgets(bar, texture)
@@ -238,20 +238,20 @@ local function CreatePanel()
 		icon.spellID = spellID
 		if typeID ~= "TotemID" then
 			icon:SetScript("OnEnter", iconOnEnter)
-			icon:SetScript("OnLeave", M.HideTooltip)
+			icon:SetScript("OnLeave", B.HideTooltip)
 		end
 		close:SetScript("OnClick", function()
 			bar:Hide()
-			R.db["AuraWatchList"][index][spellID] = nil
+			C.db["AuraWatchList"][index][spellID] = nil
 			barTable[index][spellID] = nil
 			SortBars(index)
 		end)
 
-		local spellName = M.CreateFS(bar, 14, name, false, "LEFT", 30, 0)
+		local spellName = B.CreateFS(bar, 14, name, false, "LEFT", 30, 0)
 		spellName:SetWidth(180)
 		spellName:SetJustifyH("LEFT")
-		M.CreateFS(bar, 14, text, false, "RIGHT", -30, 0)
-		M.AddTooltip(bar, "ANCHOR_TOP", U["Type*"].." "..typeID, "system")
+		B.CreateFS(bar, 14, text, false, "RIGHT", -30, 0)
+		B.AddTooltip(bar, "ANCHOR_TOP", L["Type*"].." "..typeID, "system")
 
 		typeID = typeID.." = "..spellID
 		unitID = unitID and ", UnitID = \""..unitID.."\"" or ""
@@ -282,50 +282,50 @@ local function CreatePanel()
 
 		local bar = CreateFrame("Frame", nil, parent, "BackdropTemplate")
 		bar:SetSize(270, 30)
-		M.CreateBD(bar, .25)
+		B.CreateBD(bar, .25)
 		barTable[index][intID] = bar
 
 		local icon, close = G:CreateBarWidgets(bar, texture)
-		M.AddTooltip(icon, "ANCHOR_RIGHT", intID)
+		B.AddTooltip(icon, "ANCHOR_RIGHT", intID)
 		close:SetScript("OnClick", function()
 			bar:Hide()
-			R.db["InternalCD"][intID] = nil
+			C.db["InternalCD"][intID] = nil
 			barTable[index][intID] = nil
 			SortBars(index)
 		end)
 
-		local spellName = M.CreateFS(bar, 14, name, false, "LEFT", 30, 0)
+		local spellName = B.CreateFS(bar, 14, name, false, "LEFT", 30, 0)
 		spellName:SetWidth(180)
 		spellName:SetJustifyH("LEFT")
-		M.CreateFS(bar, 14, duration, false, "RIGHT", -30, 0)
-		M.AddTooltip(bar, "ANCHOR_TOP", U["Trigger"]..trigger.." - "..unit, "system")
+		B.CreateFS(bar, 14, duration, false, "RIGHT", -30, 0)
+		B.AddTooltip(bar, "ANCHOR_TOP", L["Trigger"]..trigger.." - "..unit, "system")
 
 		SortBars(index)
 	end
 
 	local function createGroupSwitcher(parent, index)
-		local bu = M.CreateCheckBox(parent)
+		local bu = B.CreateCheckBox(parent)
 		bu:SetHitRectInsets(-100, 0, 0, 0)
 		bu:SetPoint("TOPRIGHT", -40, -145)
-		bu:SetChecked(R.db["AuraWatchList"]["Switcher"][index])
+		bu:SetChecked(C.db["AuraWatchList"]["Switcher"][index])
 		bu:SetScript("OnClick", function()
-			R.db["AuraWatchList"]["Switcher"][index] = bu:GetChecked()
+			C.db["AuraWatchList"]["Switcher"][index] = bu:GetChecked()
 		end)
-		M.CreateFS(bu, 15, "|cffff0000"..U["AW Switcher"], false, "RIGHT", -25, 0)
+		B.CreateFS(bu, 15, "|cffff0000"..L["AW Switcher"], false, "RIGHT", -25, 0)
 	end
 
 	-- Main
 	local groups = {
-		U["Player Aura"],			-- 1 PlayerBuff
-		U["Special Aura"],			-- 2 SPECIAL
-		U["Target Aura"],			-- 3 TargetDebuff
-		U["Warning"],				-- 4 Warning
-		U["Focus Aura"],			-- 5 FOCUS
-		U["Spell Cooldown"],		-- 6 CD
-		U["Enchant Aura"],			-- 7 Enchant
-		U["Raid Buff"],				-- 8 RaidBuff
-		U["Raid Debuff"],			-- 9 RaidDebuff
-		U["InternalCD"],			-- 10 InternalCD
+		L["Player Aura"],			-- 1 PlayerBuff
+		L["Special Aura"],			-- 2 SPECIAL
+		L["Target Aura"],			-- 3 TargetDebuff
+		L["Warning"],				-- 4 Warning
+		L["Focus Aura"],			-- 5 FOCUS
+		L["Spell Cooldown"],		-- 6 CD
+		L["Enchant Aura"],			-- 7 Enchant
+		L["Raid Buff"],				-- 8 RaidBuff
+		L["Raid Debuff"],			-- 9 RaidDebuff
+		L["InternalCD"],			-- 10 InternalCD
 	}
 
 	local preSet = {
@@ -364,37 +364,37 @@ local function CreatePanel()
 	end
 
 	for i, group in pairs(groups) do
-		if not R.db["AuraWatchList"][i] then R.db["AuraWatchList"][i] = {} end
+		if not C.db["AuraWatchList"][i] then C.db["AuraWatchList"][i] = {} end
 		barTable[i] = {}
 
 		tabs[i] = CreateFrame("Button", "$parentTab"..i, f, "BackdropTemplate")
 		tabs[i]:SetPoint("TOPLEFT", 20, -40 - i*30)
 		tabs[i]:SetSize(130, 28)
-		M.CreateBD(tabs[i], .25)
-		local label = M.CreateFS(tabs[i], 15, group, "system", "LEFT", 10, 0)
+		B.CreateBD(tabs[i], .25)
+		local label = B.CreateFS(tabs[i], 15, group, "system", "LEFT", 10, 0)
 		if i == 10 then
 			label:SetTextColor(0, .8, .3)
 		end
 		tabs[i].Page = createPage(group)
-		tabs[i].List = G:CreateScroll(tabs[i].Page, 575, 200, U["AuraWatch List"])
+		tabs[i].List = G:CreateScroll(tabs[i].Page, 575, 200, L["AuraWatch List"])
 
 		local Option = {}
 		if i < 10 then
-			for _, v in pairs(R.db["AuraWatchList"][i]) do
+			for _, v in pairs(C.db["AuraWatchList"][i]) do
 				AddAura(tabs[i].List.child, i, v)
 			end
-			Option[1] = G:CreateDropdown(tabs[i].Page, U["Type*"], 20, -30, {"AuraID", "SpellID", "SlotID", "TotemID"}, U["Type Intro"])
-			Option[2] = G:CreateEditbox(tabs[i].Page, "ID*", 140, -30, U["ID Intro"])
-			Option[3] = G:CreateDropdown(tabs[i].Page, U["Unit*"], 260, -30, {"player", "target", "focus", "pet"}, U["Unit Intro"])
-			Option[4] = G:CreateDropdown(tabs[i].Page, U["Caster"], 380, -30, {"player", "target", "pet"}, U["Caster Intro"])
-			Option[5] = G:CreateEditbox(tabs[i].Page, U["Stack"], 500, -30, U["Stack Intro"])
-			Option[6] = G:CreateCheckBox(tabs[i].Page, U["Value"], 40, -95, U["Value Intro"])
-			Option[7] = G:CreateCheckBox(tabs[i].Page, U["Timeless"], 120, -95, U["Timeless Intro"])
-			Option[8] = G:CreateCheckBox(tabs[i].Page, U["Combat"], 200, -95, U["Combat Intro"])
-			Option[9] = G:CreateEditbox(tabs[i].Page, U["Text"], 340, -90, U["Text Intro"])
-			Option[10] = G:CreateCheckBox(tabs[i].Page, U["Flash"], 280, -95, U["Flash Intro"])
-			Option[11] = G:CreateDropdown(tabs[i].Page, U["Slot*"], 140, -30, {slotIndex[6], slotIndex[8], slotIndex[10], slotIndex[11], slotIndex[12], slotIndex[13], slotIndex[14], slotIndex[15], slotIndex[16], slotIndex[17]}, U["Slot Intro"])
-			Option[12] = G:CreateDropdown(tabs[i].Page, U["Totem*"], 140, -30, {U["TotemSlot"].."1", U["TotemSlot"].."2", U["TotemSlot"].."3", U["TotemSlot"].."4"}, U["Totem Intro"])
+			Option[1] = G:CreateDropdown(tabs[i].Page, L["Type*"], 20, -30, {"AuraID", "SpellID", "SlotID", "TotemID"}, L["Type Intro"])
+			Option[2] = G:CreateEditbox(tabs[i].Page, "ID*", 140, -30, L["ID Intro"])
+			Option[3] = G:CreateDropdown(tabs[i].Page, L["Unit*"], 260, -30, {"player", "target", "focus", "pet"}, L["Unit Intro"])
+			Option[4] = G:CreateDropdown(tabs[i].Page, L["Caster"], 380, -30, {"player", "target", "pet"}, L["Caster Intro"])
+			Option[5] = G:CreateEditbox(tabs[i].Page, L["Stack"], 500, -30, L["Stack Intro"])
+			Option[6] = G:CreateCheckBox(tabs[i].Page, L["Value"], 40, -95, L["Value Intro"])
+			Option[7] = G:CreateCheckBox(tabs[i].Page, L["Timeless"], 120, -95, L["Timeless Intro"])
+			Option[8] = G:CreateCheckBox(tabs[i].Page, L["Combat"], 200, -95, L["Combat Intro"])
+			Option[9] = G:CreateEditbox(tabs[i].Page, L["Text"], 340, -90, L["Text Intro"])
+			Option[10] = G:CreateCheckBox(tabs[i].Page, L["Flash"], 280, -95, L["Flash Intro"])
+			Option[11] = G:CreateDropdown(tabs[i].Page, L["Slot*"], 140, -30, {slotIndex[6], slotIndex[8], slotIndex[10], slotIndex[11], slotIndex[12], slotIndex[13], slotIndex[14], slotIndex[15], slotIndex[16], slotIndex[17]}, L["Slot Intro"])
+			Option[12] = G:CreateDropdown(tabs[i].Page, L["Totem*"], 140, -30, {L["TotemSlot"].."1", L["TotemSlot"].."2", L["TotemSlot"].."3", L["TotemSlot"].."4"}, L["Totem Intro"])
 
 			for j = 2, 12 do Option[j]:Hide() end
 
@@ -420,17 +420,17 @@ local function CreatePanel()
 				end)
 			end
 		elseif i == 10 then
-			for _, v in pairs(R.db["InternalCD"]) do
+			for _, v in pairs(C.db["InternalCD"]) do
 				AddInternal(tabs[i].List.child, i, v)
 			end
-			Option[13] = G:CreateEditbox(tabs[i].Page, U["IntID*"], 20, -30, U["IntID Intro"])
-			Option[14] = G:CreateEditbox(tabs[i].Page, U["Duration*"], 140, -30, U["Duration Intro"])
-			Option[15] = G:CreateDropdown(tabs[i].Page, U["Trigger"].."*", 260, -30, {"OnAuraGain", "OnCastSuccess", "UnitCastSucceed"}, U["Trigger Intro"], 180, 30)
-			Option[16] = G:CreateDropdown(tabs[i].Page, U["Unit*"], 470, -30, {"Player", "All"}, U["Trigger Unit Intro"])
-			Option[17] = G:CreateEditbox(tabs[i].Page, U["ItemID"], 20, -95, U["ItemID Intro"])
+			Option[13] = G:CreateEditbox(tabs[i].Page, L["IntID*"], 20, -30, L["IntID Intro"])
+			Option[14] = G:CreateEditbox(tabs[i].Page, L["Duration*"], 140, -30, L["Duration Intro"])
+			Option[15] = G:CreateDropdown(tabs[i].Page, L["Trigger"].."*", 260, -30, {"OnAuraGain", "OnCastSuccess", "UnitCastSucceed"}, L["Trigger Intro"], 180, 30)
+			Option[16] = G:CreateDropdown(tabs[i].Page, L["Unit*"], 470, -30, {"Player", "All"}, L["Trigger Unit Intro"])
+			Option[17] = G:CreateEditbox(tabs[i].Page, L["ItemID"], 20, -95, L["ItemID Intro"])
 		end
 
-		local clear = M.CreateButton(tabs[i].Page, 60, 25, KEY_NUMLOCK_MAC)
+		local clear = B.CreateButton(tabs[i].Page, 60, 25, KEY_NUMLOCK_MAC)
 		clear:SetPoint("TOPRIGHT", -100, -90)
 		clear:SetScript("OnClick", function()
 			if i < 10 then
@@ -441,7 +441,7 @@ local function CreatePanel()
 		end)
 
 		local slotTable = {6, 8, 10, 11, 12, 13, 14, 15, 16, 17}
-		local add = M.CreateButton(tabs[i].Page, 60, 25, ADD)
+		local add = B.CreateButton(tabs[i].Page, 60, 25, ADD)
 		add:SetPoint("TOPRIGHT", -30, -90)
 		add:SetScript("OnClick", function()
 			if i < 10 then
@@ -453,24 +453,24 @@ local function CreatePanel()
 					if Option[12].options[i].selected then totemID = i break end
 				end
 
-				if not typeID then UIErrorsFrame:AddMessage(I.InfoColor..U["Choose a Type"]) return end
-				if (typeID == "AuraID" and (not spellID or not unitID)) or (typeID == "SpellID" and not spellID) or (typeID == "SlotID" and not slotID) or (typeID == "TotemID" and not totemID) then UIErrorsFrame:AddMessage(I.InfoColor..U["Incomplete Input"]) return end
-				if (typeID == "AuraID" or typeID == "SpellID") and not GetSpellName(spellID) then UIErrorsFrame:AddMessage(I.InfoColor..U["Incorrect SpellID"]) return end
+				if not typeID then UIErrorsFrame:AddMessage(DB.InfoColor..L["Choose a Type"]) return end
+				if (typeID == "AuraID" and (not spellID or not unitID)) or (typeID == "SpellID" and not spellID) or (typeID == "SlotID" and not slotID) or (typeID == "TotemID" and not totemID) then UIErrorsFrame:AddMessage(DB.InfoColor..L["Incomplete Input"]) return end
+				if (typeID == "AuraID" or typeID == "SpellID") and not GetSpellName(spellID) then UIErrorsFrame:AddMessage(DB.InfoColor..L["Incorrect SpellID"]) return end
 
 				local realID = spellID or slotID or totemID
-				if R.db["AuraWatchList"][i][realID] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ID"]) return end
+				if C.db["AuraWatchList"][i][realID] then UIErrorsFrame:AddMessage(DB.InfoColor..L["Existing ID"]) return end
 
-				R.db["AuraWatchList"][i][realID] = {typeID, realID, unitID, Option[4].Text:GetText(), tonumber(Option[5]:GetText()) or false, Option[6]:GetChecked(), Option[7]:GetChecked(), Option[8]:GetChecked(), Option[9]:GetText(), Option[10]:GetChecked()}
-				AddAura(tabs[i].List.child, i, R.db["AuraWatchList"][i][realID])
+				C.db["AuraWatchList"][i][realID] = {typeID, realID, unitID, Option[4].Text:GetText(), tonumber(Option[5]:GetText()) or false, Option[6]:GetChecked(), Option[7]:GetChecked(), Option[8]:GetChecked(), Option[9]:GetText(), Option[10]:GetChecked()}
+				AddAura(tabs[i].List.child, i, C.db["AuraWatchList"][i][realID])
 				for i = 2, 12 do G:ClearEdit(Option[i]) end
 			elseif i == 10 then
 				local intID, duration, trigger, unit, itemID = tonumber(Option[13]:GetText()), tonumber(Option[14]:GetText()), Option[15].Text:GetText(), Option[16].Text:GetText(), tonumber(Option[17]:GetText())
-				if not intID or not duration or not trigger or not unit then UIErrorsFrame:AddMessage(I.InfoColor..U["Incomplete Input"]) return end
-				if intID and not GetSpellName(intID) then UIErrorsFrame:AddMessage(I.InfoColor..U["Incorrect SpellID"]) return end
-				if R.db["InternalCD"][intID] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ID"]) return end
+				if not intID or not duration or not trigger or not unit then UIErrorsFrame:AddMessage(DB.InfoColor..L["Incomplete Input"]) return end
+				if intID and not GetSpellName(intID) then UIErrorsFrame:AddMessage(DB.InfoColor..L["Incorrect SpellID"]) return end
+				if C.db["InternalCD"][intID] then UIErrorsFrame:AddMessage(DB.InfoColor..L["Existing ID"]) return end
 
-				R.db["InternalCD"][intID] = {intID, duration, trigger, unit, itemID}
-				AddInternal(tabs[i].List.child, i, R.db["InternalCD"][intID])
+				C.db["InternalCD"][intID] = {intID, duration, trigger, unit, itemID}
+				AddInternal(tabs[i].List.child, i, C.db["InternalCD"][intID])
 				for i = 13, 17 do G:ClearEdit(Option[i]) end
 			end
 		end)
@@ -490,18 +490,18 @@ local function CreatePanel()
 		if event == "PLAYER_REGEN_DISABLED" then
 			if f:IsShown() then
 				f:Hide()
-				M:RegisterEvent("PLAYER_REGEN_ENABLED", showLater)
+				B:RegisterEvent("PLAYER_REGEN_ENABLED", showLater)
 			end
 		else
 			f:Show()
-			M:UnregisterEvent(event, showLater)
+			B:UnregisterEvent(event, showLater)
 		end
 	end
-	M:RegisterEvent("PLAYER_REGEN_DISABLED", showLater)
+	B:RegisterEvent("PLAYER_REGEN_DISABLED", showLater)
 end
 
 SlashCmdList["ORZUI_AWCONFIG"] = function()
-	if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
+	if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end
 	CreatePanel()
 end
 SLASH_ORZUI_AWCONFIG1 = "/awc"

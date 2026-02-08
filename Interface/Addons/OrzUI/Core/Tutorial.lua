@@ -1,6 +1,6 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:RegisterModule("Settings")
+local B, C, L, DB = unpack(ns)
+local module = B:RegisterModule("Settings")
 local pairs, wipe = pairs, table.wipe
 local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 
@@ -95,7 +95,7 @@ local function ForceDefaultSettings()
 		SetCVar("nameplateShowEnemies", 1)
 		SetCVar("alwaysShowActionBars", 1)
 	end
-	--if I.isDeveloper then
+	--if DB.isDeveloper then
 		--SetCVar("ffxGlow", 0)
 		--SetCVar("SpellQueueWindow", 100)
 	--end
@@ -161,7 +161,7 @@ local function ForceDBMOptions()
 				["EndColorR"] = 1,
 				["EndColorG"] = 0,
 				["EndColorB"] = 0,
-				["Texture"] = I.normTex,
+				["Texture"] = DB.normTex,
 				["MinimapIcon"] = "hide",
 			},
 		},
@@ -376,7 +376,7 @@ local function ForceBigwigs()
 			["BigWigs_Plugins_Bars"] = {
 				["profiles"] = {
 					["Default"] = {
-						["outline"] = I.Font[3],
+						["outline"] = DB.Font[3],
 						["fontSize"] = 12,
 						["BigWigsAnchor_y"] = 336,
 						["BigWigsAnchor_x"] = 16,
@@ -387,7 +387,7 @@ local function ForceBigwigs()
 						["LeftButton"] = {
 							["emphasize"] = false,
 						},
-						["font"] = I.Font[1],
+						["font"] = DB.Font[1],
 						["onlyInterceptOnKeypress"] = true,
 						["emphasizeMultiplier"] = 1,
 						["BigWigsEmphasizeAnchor_x"] = 810,
@@ -401,7 +401,7 @@ local function ForceBigwigs()
 				["profiles"] = {
 					["Default"] = {
 						["fontSize"] = 28,
-						["font"] = I.Font[1],
+						["font"] = DB.Font[1],
 					},
 				},
 			},
@@ -409,7 +409,7 @@ local function ForceBigwigs()
 				["profiles"] = {
 					["Default"] = {
 						["fontSize"] = 18,
-						["font"] = I.Font[1],
+						["font"] = DB.Font[1],
 						["BWEmphasizeCountdownMessageAnchor_x"] = 665,
 						["BWMessageAnchor_x"] = 616,
 						["BWEmphasizeCountdownMessageAnchor_y"] = 530,
@@ -421,7 +421,7 @@ local function ForceBigwigs()
 				["profiles"] = {
 					["Default"] = {
 						["fontSize"] = 18,
-						["font"] = I.Font[1],
+						["font"] = DB.Font[1],
 						["posy"] = 346,
 						["width"] = 140,
 						["posx"] = 1024,
@@ -434,8 +434,8 @@ local function ForceBigwigs()
 					["Default"] = {
 						["posx"] = 1002,
 						["fontSize"] = 14,
-						["font"] = I.Font[1],
-						["fontOutline"] = I.Font[3],
+						["font"] = DB.Font[1],
+						["fontOutline"] = DB.Font[3],
 						["posy"] = 490,
 					},
 				},
@@ -463,6 +463,7 @@ local function YesTutor()
 	OrzUISetDB["SkadaRequest"] = true
 	OrzUISetDB["BWRequest"] = true
 	ForceAddonSkins()
+	UIErrorsFrame:AddMessage(DB.InfoColor..L["Tutorial Complete"])
 	OrzUISetDB["YesTutor"] = false
 end
 
@@ -471,8 +472,8 @@ local function HelloWorld()
 	if welcome then welcome:Show() return end
 	local BackDropFile = "Interface\\Addons\\OrzUI\\Media\\Modules\\Raid\\Solid"
 	welcome = CreateFrame("Frame", "UI_Tutorial", UIParent, "BackdropTemplate")
-	welcome:SetPoint("TOPLEFT",0,0)
-	welcome:SetPoint("BOTTOMRIGHT",0,0)
+	welcome:SetPoint("TOPLEFT",0,-410)
+	welcome:SetPoint("BOTTOMRIGHT",0,410)
 	welcome:SetFrameStrata("HIGH")
 	welcome:SetFrameLevel(0)
 	welcome:SetBackdrop({ 
@@ -485,24 +486,32 @@ local function HelloWorld()
 	local BottomBlack = CreateFrame("Frame", nil, welcome) 
 	BottomBlack:SetPoint("TOPLEFT",welcome,"BOTTOMLEFT",0,43)
 	BottomBlack:SetPoint("BOTTOMRIGHT",0,0)
-	--M.CreateBD(BottomBlack, 1)
-	M.CreateBDFrame(BottomBlack, .2)
-	BottomBlackText = M:CreatStyleText(BottomBlack, STANDARD_TEXT_FONT, 16, "OUTLINE", "-----  开袋即食零设置 上手即用懒人包  -----", "BOTTOM",BottomBlack,"BOTTOM",0,16, 0.97,0.75,0) 
+	--B.CreateBD(BottomBlack, 1)
+	B.CreateBDFrame(BottomBlack, .2)
+	BottomBlackText = B:CreatStyleText(BottomBlack, STANDARD_TEXT_FONT, 16, "OUTLINE", "-----  开袋即食零设置 上手即用懒人包  -----", "BOTTOM",BottomBlack,"BOTTOM",0,16, 0.97,0.75,0) 
 	
-	local WelcomeTitle1 = M:CreatStyleButton(nil, welcome, 60, 60, "BOTTOM", welcome, "CENTER", 0, 12, 1, 1) 
-	WelcomeTitle1Text = M:CreatStyleText(WelcomeTitle1, "Interface\\addons\\OrzUI\\Media\\Fonts\\RedCircl.TTF", 120, "OUTLINE", "|cFFFFFF00 2 |r", "CENTER", WelcomeTitle1, "CENTER",0, 3, 1, 0, 0) 
+	local WelcomeTitle1 = B:CreatStyleButton(nil, welcome, 60, 60, "BOTTOM", welcome, "CENTER", 0, 12, 1, 1)
+	WelcomeTitle1:SetScript("OnClick", function(self,Button)
+		welcome:Hide()
+		if OrzUIDB["YesTutor"] then YesTutor() end
+		--ShiGuangPerDB["BHT"] = true
+		C.db["Tutorial"]["Complete"] = true
+		ForceDefaultSettings()
+		ReloadUI()
+	end) 
+	WelcomeTitle1Text = B:CreatStyleText(WelcomeTitle1, "Interface\\addons\\OrzUI\\Media\\Fonts\\RedCircl.TTF", 120, "OUTLINE", "|cFFFFFF00 2 |r", "CENTER", WelcomeTitle1, "CENTER",0, 3, 1, 0, 0) 
 
-	local WelcomeTitle2 = M:CreatStyleButton(nil, welcome, 43, 43, "BOTTOMRIGHT", WelcomeTitle1, "BOTTOMRIGHT", 21, -8, 1, 1) 
-	WelcomeTitle2Text = M:CreatStyleText(WelcomeTitle2, "Interface\\addons\\OrzUI\\Media\\Fonts\\RedCircl.TTF", 23, "OUTLINE", "|cFFFF0000 UI|r", "CENTER", WelcomeTitle2, "CENTER", 0, 3, 1, 1, 0) 
+	local WelcomeTitle2 = B:CreatStyleButton(nil, welcome, 43, 43, "BOTTOMRIGHT", WelcomeTitle1, "BOTTOMRIGHT", 21, -8, 1, 1) 
+	WelcomeTitle2Text = B:CreatStyleText(WelcomeTitle2, "Interface\\addons\\OrzUI\\Media\\Fonts\\RedCircl.TTF", 23, "OUTLINE", "|cFFFF0000 UI|r", "CENTER", WelcomeTitle2, "CENTER", 0, 3, 1, 1, 0) 
 
-	local MadeBy = M:CreatStyleButton(nil, welcome, 210, 21, "BOTTOMRIGHT", BottomBlack, "BOTTOMRIGHT", -8, 31, 10, 1) 
+	local MadeBy = B:CreatStyleButton(nil, welcome, 210, 21, "BOTTOMRIGHT", BottomBlack, "BOTTOMRIGHT", -8, 31, 10, 1) 
 	MadeBy:SetScript("OnClick", function(self,Button) welcome:Hide() end)
-	--MadeByText = M:CreatStyleText(MadeBy, "Interface\\addons\\OrzUI\\Media\\Fonts\\Pixel.TTF", 12, "OUTLINE", "- www.maorui.net -", "CENTER", MadeBy, 0, 0, 0.66,0.66,0.66) --■ ■
-	--MadeByText1 = M:CreatStyleText(MadeBy, "Interface\\addons\\OrzUI\\Media\\Fonts\\Edo.TTF", 52, "OUTLINE", "Breathe deep and accept that you have caused your end.", "TOP",Welcome,"TOP",0,-21, 1, 1, 1)
-	MadeByText2 = M:CreatStyleText(MadeBy, "Interface\\addons\\OrzUI\\Media\\Fonts\\Edo.TTF", 43, "OUTLINE", "Your world is dying!", "TOP",Welcome,"TOP",0,-55, 1, 1, 1)
+	--MadeByText = B:CreatStyleText(MadeBy, "Interface\\addons\\OrzUI\\Media\\Fonts\\Pixel.TTF", 12, "OUTLINE", "- www.maorui.net -", "CENTER", MadeBy, 0, 0, 0.66,0.66,0.66) --■ ■
+	--MadeByText1 = B:CreatStyleText(MadeBy, "Interface\\addons\\OrzUI\\Media\\Fonts\\Edo.TTF", 52, "OUTLINE", "Breathe deep and accept that you have caused your end.", "TOP",Welcome,"TOP",0,-21, 1, 1, 1)
+	MadeByText2 = B:CreatStyleText(MadeBy, "Interface\\addons\\OrzUI\\Media\\Fonts\\Edo.TTF", 43, "OUTLINE", "Your world is dying!", "TOP",Welcome,"TOP",0,-55, 1, 1, 1)
 
-	local LeftPic = M:CreatStyleButton(nil, welcome, 512, 210, "BOTTOMRIGHT", welcome, "BOTTOM", 1, 43, 2, 1)
-	LeftPic:SetNormalTexture("Interface\\AddOns\\OrzUI\\Media\\Modules\\BlinkHealthText\\LeftPic")
+	local LeftPic = B:CreatStyleButton(nil, welcome, 512, 210, "BOTTOMRIGHT", welcome, "BOTTOM", 1, 43, 2, 1)
+	--[[LeftPic:SetNormalTexture("Interface\\AddOns\\OrzUI\\Media\\Modules\\BlinkHealthText\\LeftPic")
   local function Sc(alpha) LeftPic:SetAlpha(alpha) end  --按钮特效--
 	LeftPic:EnableMouse(true)
 	LeftPic:SetScript("OnEnter", function(self) Sc(0.8) end)
@@ -512,18 +521,18 @@ local function HelloWorld()
 	LeftPic:SetScript("OnClick", function()
 		welcome:Hide()
 		if OrzUIDB["YesTutor"] then YesTutor() end
-		ShiGuangPerDB["BHT"] = true
-		R.db["Tutorial"]["Complete"] = true
+		--ShiGuangPerDB["BHT"] = true
+		C.db["Tutorial"]["Complete"] = true
 		ForceDefaultSettings()
 		ReloadUI()
-	end)
-	SmallText1 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 微美化界面 ]", "RIGHT",LeftPic,"LEFT",26,60, I.r, I.g, I.b)
-	SmallText2 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 全职业适用无障碍 ]", "RIGHT",LeftPic,"LEFT",26,20, I.r, I.g, I.b)
-	SmallText3 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 开袋即食 轻优化 无繁琐设置 ]", "RIGHT",LeftPic,"LEFT",26,-20, I.r, I.g, I.b)
-	SmallText4 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 适配主流更新器 更加便捷及时和高效 ]", "RIGHT",LeftPic,"LEFT",26,-60, I.r, I.g, I.b)
+	end)]]
+	SmallText1 = B:CreatStyleText(welcome, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 微美化界面 ]", "RIGHT",welcome,"CENTER",26,60, DB.r, DB.g, DB.b)
+	SmallText2 = B:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 全职业适用无障碍 ]", "RIGHT",LeftPic,"LEFT",26,20, DB.r, DB.g, DB.b)
+	SmallText3 = B:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 开袋即食 轻优化 无繁琐设置 ]", "RIGHT",LeftPic,"LEFT",26,-20, DB.r, DB.g, DB.b)
+	SmallText4 = B:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 适配主流更新器 更加便捷及时和高效 ]", "RIGHT",LeftPic,"LEFT",26,-60, DB.r, DB.g, DB.b)
 
-  local RightPic = M:CreatStyleButton(nil, welcome, 512, 210, "BOTTOMLEFT", welcome, "BOTTOM", -1, 43, 2, 1)
-  RightPic:SetNormalTexture("Interface\\AddOns\\OrzUI\\Media\\Modules\\BlinkHealthText\\RightPic")
+  local RightPic = B:CreatStyleButton(nil, welcome, 512, 210, "BOTTOMLEFT", welcome, "BOTTOM", -1, 43, 2, 1)
+  --[[RightPic:SetNormalTexture("Interface\\AddOns\\OrzUI\\Media\\Modules\\BlinkHealthText\\RightPic")
   local function Sc(alpha) RightPic:SetAlpha(alpha) end  --按钮特效--
 	RightPic:EnableMouse(true)
 	RightPic:SetScript("OnEnter", function(self) Sc(0.8) end)
@@ -533,17 +542,17 @@ local function HelloWorld()
 	RightPic:SetScript("OnClick", function()
 		welcome:Hide()
 		if OrzUIDB["YesTutor"] then YesTutor() end
-		ShiGuangPerDB["BHT"] = false
-		R.db["Tutorial"]["Complete"] = true
+		--ShiGuangPerDB["BHT"] = false
+		C.db["Tutorial"]["Complete"] = true
 		ForceDefaultSettings()
 		ReloadUI()
-  end)
-	SmallText1 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ TWW " ..C_AddOns.GetAddOnMetadata("OrzUI", "X-Support").. " v"..C_AddOns.GetAddOnMetadata("OrzUI", "Version").." ]", "LEFT",RightPic,"RIGHT",-26,60, I.r, I.g, I.b)
-	SmallText2 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ https://www.maorui.net ]", "LEFT",RightPic,"RIGHT",-26,20, I.r, I.g, I.b)
-	SmallText3 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 使用 ESC - 2ui 更多便捷插件设置 ]", "LEFT",RightPic,"RIGHT",-26,-20, I.r, I.g, I.b)
-	SmallText4 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 系统自带功能，插件有针对性增强或者删减 ]", "LEFT",RightPic,"RIGHT",-26,-60, I.r, I.g, I.b)
+  end)]]
+	SmallText1 = B:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ MidNight " ..C_AddOns.GetAddOnMetadata("OrzUI", "X-Support").. " v"..C_AddOns.GetAddOnMetadata("OrzUI", "Version").." ]", "LEFT",RightPic,"RIGHT",-26,60, DB.r, DB.g, DB.b)
+	SmallText2 = B:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ https://www.maorui.net ]", "LEFT",RightPic,"RIGHT",-26,20, DB.r, DB.g, DB.b)
+	SmallText3 = B:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 使用 ESC - 2ui 更多便捷插件设置 ]", "LEFT",RightPic,"RIGHT",-26,-20, DB.r, DB.g, DB.b)
+	SmallText4 = B:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 系统自带功能，插件有针对性增强或者删减 ]", "LEFT",RightPic,"RIGHT",-26,-60, DB.r, DB.g, DB.b)
 
-	local ModulesBack = CreateFrame("Frame", nil, welcome, "BackdropTemplate") 
+	--[[local ModulesBack = CreateFrame("Frame", nil, welcome, "BackdropTemplate") 
 	ModulesBack:SetPoint("TOPLEFT",welcome,"TOPLEFT",0,0)
 	ModulesBack:SetPoint("BOTTOMRIGHT",welcome,"TOPRIGHT",0,0)
 	ModulesBack:SetBackdrop({ 
@@ -553,7 +562,7 @@ local function HelloWorld()
 	ModulesBack:SetBackdropColor(0, 0, 0, 0.3) 
 	ModulesBack:SetBackdropBorderColor(0,0,0,0)
 	
-	--[[local LeftBlue = CreateFrame("Frame", nil, welcome, "BackdropTemplate") 
+	local LeftBlue = CreateFrame("Frame", nil, welcome, "BackdropTemplate") 
 	LeftBlue:SetPoint("TOPLEFT",welcome,"TOPLEFT",0,0)
 	LeftBlue:SetPoint("BOTTOMRIGHT",LeftPic,"TOPRIGHT",0,0)
 	LeftBlue:SetBackdrop({ 
@@ -571,7 +580,7 @@ local function HelloWorld()
    edgeFile = BackDropFile, 
 	})
 	RightRed:SetBackdropColor(0, 0, 0, 0.3) 
-	RightRed:SetBackdropBorderColor(0,0,0,0)]]
+	RightRed:SetBackdropBorderColor(0,0,0,0)
 
 	local NPCModeRight = CreateFrame("PlayerModel", "NPCModeRight", ModulesBack)
 	NPCModeRight:SetSize(UIParent:GetWidth()*0.6, UIParent:GetHeight())
@@ -591,7 +600,7 @@ local function HelloWorld()
 	--NPCModeLeft:SetCamDistanceScale(1)
 	NPCModeLeft:SetPosition(1,-0.18,-0.2)
 	NPCModeLeft:SetRotation(0.3)
-	--NPCModeLeft.rotation = 0.21
+	--NPCModeLeft.rotation = 0.21]]
 
 	local PlayerModel = CreateFrame("PlayerModel", "PlayerModel", welcome)
 	PlayerModel:SetSize(256, 256)
@@ -603,14 +612,19 @@ local function HelloWorld()
 	PlayerModel:SetRotation(0)
 	PlayerModel.rotation = 0
 end
-SlashCmdList["ORZUI"] = HelloWorld
-SLASH_ORZUI1 = "/loadui"
+--SlashCmdList["ORZUI"] = HelloWorld
+--SLASH_ORZUI1 = "/loadui"
 
 -----------------------------------------
 function module:OnLogin()
 	-- Tutorial and settings
 	DefaultSettings()
 	ForceAddonSkins()
-	if not R.db["Tutorial"]["Complete"] then HelloWorld() end
-	if (ShiGuangPerDB["BHT"] == true) then SenduiCmd("/bht on") else SenduiCmd("/bht off") end
+	if not C.db["Tutorial"]["Complete"] then if OrzUIDB["YesTutor"] then YesTutor() end
+		--ShiGuangPerDB["BHT"] = true
+		C.db["Tutorial"]["Complete"] = true
+		ForceDefaultSettings()
+		--ReloadUI()
+	 end
+	--if (ShiGuangPerDB["BHT"] == true) then SenduiCmd("/bht on") else SenduiCmd("/bht off") end
 end

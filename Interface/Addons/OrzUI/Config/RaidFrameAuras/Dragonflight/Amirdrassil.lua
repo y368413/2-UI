@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:GetModule("AurasTable")
+local B, C, L, DB = unpack(ns)
+local module = B:GetModule("AurasTable")
 
 local TIER = 10
 local INSTANCE = 1207 -- 阿梅达希尔，梦境之愿

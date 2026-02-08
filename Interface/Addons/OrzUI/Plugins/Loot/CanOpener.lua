@@ -3175,8 +3175,8 @@ function InitSettingsMenu()
 
     do
         local variable = "CanOpenerShowRousing"
-        local name = "Show Rousing Items"
-        local tooltip = "If Checked, Rousing Elements will be shown."
+        local name = "展示令人兴奋的物品"
+        local tooltip = "如果选中，将显示令人兴奋的物品。"
         local defaultValue = true
 
         local function GetValue()
@@ -3202,8 +3202,8 @@ function InitSettingsMenu()
 
     do
         local variable = "showLevelRestrictedItems"
-        local name = "Show Level-Restricted Items"
-        local tooltip = "If Checked, items with a level requirement higher than your character's level will be shown."
+        local name = "显示等级限制物品"
+        local tooltip = "如果勾选，将显示等级要求高于你角色等级的物品。"
         local defaultValue = true
 
         local function GetValue()
@@ -3330,7 +3330,7 @@ function InitSettingsMenu()
         --------------------------------------------------
         local charHeader = ignoreFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
         charHeader:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -15)
-        charHeader:SetText("This Character’s Ignore List")
+        charHeader:SetText("当前角色的忽略列表")
 
         local charScroll = CreateFrame("ScrollFrame", "CanOpener_CharacterIgnoreScroll", ignoreFrame,
             "UIPanelScrollFrameTemplate")
@@ -3367,11 +3367,11 @@ function InitSettingsMenu()
                 local removeBtn = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
                 removeBtn:SetSize(60, 20)
                 removeBtn:SetPoint("RIGHT")
-                removeBtn:SetText("Remove")
+                removeBtn:SetText("移除")
                 removeBtn:SetScript("OnClick", function()
                     ShiGuangPerDB.excludedItems[itemID] = nil
                     RefreshCharIgnoreList()
-                    CanOpenerGlobal.CanOut("Removed item " .. itemID .. " from your ignore list.")
+                    CanOpenerGlobal.CanOut("已从忽略列表中移除物品 " .. itemID .. "。")
                     CanOpenerGlobal.ForceButtonRefresh()
                 end)
 
@@ -3413,46 +3413,46 @@ local function slashHandler(msg)
 	elseif (command == "levelrestricted") then
         ShiGuangPerDB.showLevelRestrictedItems = not ShiGuangPerDB.showLevelRestrictedItems;
         CanOpenerGlobal.ForceButtonRefresh();
-        CanOpenerGlobal.CanOut(": Level-Restricted Items " ..
-            CanOpenerGlobal.PosOrNegColor(ShiGuangPerDB.showLevelRestrictedItems, "will", "will not") .. " be shown");
+        CanOpenerGlobal.CanOut(": 等级限制物品 " ..
+			CanOpenerGlobal.PosOrNegColor(ShiGuangPerDB.showLevelRestrictedItems, "将", "将不") .. " 显示");
 	elseif (command == "reset") then
-		CanOpenerGlobal.CanOut(": Resetting settings and position.");
+		CanOpenerGlobal.CanOut(": 正在重置设置和位置。");
 		CanOpenerGlobal.ResetSavedVariables();
 	elseif command == "ignore" and rest then
 		local itemID = tonumber(rest)
 		if itemID then
 			ShiGuangPerDB.excludedItems[itemID] = true
-			CanOpenerGlobal.CanOut(": Ignoring item ID " .. itemID)
+			CanOpenerGlobal.CanOut(": 正在忽略物品ID " .. itemID)
 		else
-			CanOpenerGlobal.CanOut(": Invalid item ID.")
+			CanOpenerGlobal.CanOut(": 无效的物品ID。")
 		end
 	elseif command == "unignore" and rest then
 		local itemID = tonumber(rest)
 		if itemID and ShiGuangPerDB.excludedItems[itemID] then
 			ShiGuangPerDB.excludedItems[itemID] = nil
-			CanOpenerGlobal.CanOut(": Removed item ID " .. itemID .. " from ignore list.")
+			CanOpenerGlobal.CanOut(": 已从忽略列表中移除物品ID " .. itemID .. "。")
 		else
-			CanOpenerGlobal.CanOut(": Item ID not found in ignore list.")
+			CanOpenerGlobal.CanOut(": 物品ID未在忽略列表中找到。")
 		end
 	elseif command == "list" then
-		CanOpenerGlobal.CanOut(": Ignored Items List:")
+		CanOpenerGlobal.CanOut(": 忽略物品列表:")
 		CanOpenerGlobal.CanOut(ShiGuangPerDB.excludedItems);
 	else
-		CanOpenerGlobal.CanOut("Commands for |cffffa500/CanOpener|r :");
+		CanOpenerGlobal.CanOut("|cffffa500/CanOpener|r 命令:");
 		local rousingState = CanOpenerGlobal.PosOrNegColor(ShiGuangPerDB.CanOpenerShowRousing, "On", "Off");
-		CanOpenerGlobal.CanOut("  |cffffa500 rousing|r - Toggle showing Elemental Rousings (" .. rousingState .. ")");
+		CanOpenerGlobal.CanOut("  |cffffa500 rousing|r - 切换元素觉醒显示 (" .. rousingState .. ")");
 		if (CanOpenerGlobal.IsRemixActive) then
 			local remixGemsState = CanOpenerGlobal.PosOrNegColor(ShiGuangPerDB.CanOpenershowRemixGems, "On", "Off");
-			CanOpenerGlobal.CanOut("  |cffffa500 remixGem|r - Toggle showing Remix Gems (" .. remixGemsState .. ")");
+			CanOpenerGlobal.CanOut("  |cffffa500 remixGem|r - 切换混音宝石显示 (" .. remixGemsState .. ")");
 			local remixEpicGemsState = CanOpenerGlobal.PosOrNegColor(ShiGuangPerDB.CanOpenerRemixEpicGems, "On", "Off");
-			CanOpenerGlobal.CanOut("  |cffffa500 RemixEpicGems|r - Toggle combining gems higher than Epic (" .. remixEpicGemsState .. ")");
+			CanOpenerGlobal.CanOut("  |cffffa500 RemixEpicGems|r - 切换组合高于史诗品质的宝石 (" .. remixEpicGemsState .. ")");
 		end
         local levelRestrictedState = CanOpenerGlobal.PosOrNegColor(ShiGuangPerDB.showLevelRestrictedItems, "On", "Off");
-        CanOpenerGlobal.CanOut("  |cffffa500 levelrestricted|r - Toggle showing level-restricted items (" .. levelRestrictedState .. ")");
-        CanOpenerGlobal.CanOut("  |cffffa500 ignore|r <itemID> - Ignore a specific item");
-        CanOpenerGlobal.CanOut("  |cffffa500 unignore|r <itemID> - Remove an item from the ignore list");
-        CanOpenerGlobal.CanOut("  |cffffa500 list|r - Show ignored items");
-        CanOpenerGlobal.CanOut("  |cffffa500 reset|r - Reset all settings!");
+        CanOpenerGlobal.CanOut("  |cffffa500 levelrestricted|r - 切换等级限制物品显示 (" .. levelRestrictedState .. ")");
+        CanOpenerGlobal.CanOut("  |cffffa500 ignore|r <物品ID> - 忽略特定物品");
+        CanOpenerGlobal.CanOut("  |cffffa500 unignore|r <物品ID> - 从忽略列表中移除物品");
+        CanOpenerGlobal.CanOut("  |cffffa500 list|r - 显示忽略的物品");
+        CanOpenerGlobal.CanOut("  |cffffa500 reset|r - 重置所有设置!");
     end
 end
 

@@ -302,7 +302,7 @@ function TeleporterSpell:Equals(other)
 	return ""..self.spellId == ""..other.spellId and self.spellType == other.spellType
 end
 
-local ExpansionNames = { EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9, EXPANSION_NAME10 }
+local ExpansionNames = { EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9, EXPANSION_NAME10, EXPANSION_NAME11 or "Midnight" }
 
 function TeleporterSpell:MatchesSearch(searchString)
 	local searchLower = string.lower(searchString)
@@ -1229,8 +1229,9 @@ function TeleporterSettings_OnLoad()
     CreateSettings(TeleporterSettings.settingsPanel)
 
     local category = Settings.RegisterCanvasLayoutCategory(TeleporterSettings.settingsPanel, TeleporterSettings.settingsPanel.name, TeleporterSettings.settingsPanel.name);
-    category.ID = TeleporterSettings.settingsPanel.name;
+    --category.ID = TeleporterSettings.settingsPanel.name;
     Settings.RegisterAddOnCategory(category);
+    TeleporterSettings.settingsPanel.category = category
 
     TeleporterSettings.spellsPanel = CreateFrame("Frame")
 	TeleporterSettings.spellsPanel.name = "自定义传送法术"
@@ -1246,7 +1247,7 @@ function TeleporterSettings_OnLoad()
 end
 
 function TeleporterOpenSettings()
-    Settings.OpenToCategory(TeleporterSettings.settingsPanel.name);
+    Settings.OpenToCategory(TeleporterSettings.settingsPanel.category:GetID());
 end
 -- Tome of Teleportation by Remeen.
 
@@ -1294,7 +1295,7 @@ local ldb = LibStub:GetLibrary("LibDataBroker-1.1")
 local icon = LibStub("LibDBIcon-1.0")
 local dataobj = ldb:NewDataObject("TomeTele", {
 	label = TOMEOFTELEPORTATIONTITLE, 
-	type = "data source", 
+	type = "data source",
 	icon = "Interface\\Addons\\OrzUI\\Media\\2UI",  --Interface\\Icons\\Spell_Arcane_TeleportDalaran  --Icons\\Spell_arcane_portalshattrath
 	--text = "Teleport"
 })
@@ -1430,7 +1431,7 @@ local function GetCachedItemInfo(itemId)
 		return GetItemInfo(itemId)
 	end
 end
-	
+
 -- [Orignal spell ID] = { Alt spell ID, Buff }
 -- Currently unused
 local SpellBuffs =
@@ -2849,7 +2850,7 @@ function TeleporterOpenFrame(isSearching)
 				SortDownIconOffset = -iconOffsetX
 				
 				buttonFrame.RemoveIcon = AddCustomizationIcon(buttonFrame.RemoveIcon, buttonFrame, cooldownbar, RemoveIconOffset, iconOffsetY, iconW, iconH, "removeButtonIcon", function() OnClickRemove(spell) end, not spell.isCustom)
-				buttonFrame.ShowIcon = AddCustomizationIcon(buttonFrame.ShowIcon, buttonFrame, cooldownbar, ShowIconOffset, iconOffsetY, iconW, iconH, "showButtonIcon", function() OnClickShow(spell) end)				
+				buttonFrame.ShowIcon = AddCustomizationIcon(buttonFrame.ShowIcon, buttonFrame, cooldownbar, ShowIconOffset, iconOffsetY, iconW, iconH, "showButtonIcon", function() OnClickShow(spell) end)
 				buttonFrame.SortUpIcon = AddCustomizationIcon(buttonFrame.SortUpIcon, buttonFrame, cooldownbar, SortUpIconOffset, iconOffsetY, iconW, iconH, "sortUpIcon", function() OnClickSortUp(spell) end)
 				buttonFrame.SortDownIcon = AddCustomizationIcon(buttonFrame.SortDownIcon, buttonFrame, cooldownbar, SortDownIconOffset, iconOffsetY, iconW, iconH, "sortDownIcon", function() OnClickSortDown(spell) end)
 
@@ -2873,9 +2874,9 @@ function TeleporterOpenFrame(isSearching)
 				spellIndex = spellIndex + 1
 			end
 		end
-		
-		local helpTextHeight		
-		
+
+		local helpTextHeight
+
 		if TeleporterHelpString then
 			if numColumns == 1 then
 				helpTextHeight = 40
@@ -2884,7 +2885,7 @@ function TeleporterOpenFrame(isSearching)
 			end
 			TeleporterHelpString:SetPoint("TOPLEFT", TeleporterParentFrame, "TOPLEFT", 4 + buttonInset, -maxyoffset - 3 )
 			TeleporterHelpString:SetPoint("RIGHT", TeleporterParentFrame, "RIGHT", -buttonInset, 0)
-			TeleporterHelpString:SetHeight( helpTextHeight )	
+			TeleporterHelpString:SetHeight( helpTextHeight )
 		else
 			helpTextHeight = 0
 		end
@@ -2895,9 +2896,9 @@ function TeleporterOpenFrame(isSearching)
 			if numColumns < 2 then
 				numColumns = 2
 			end
-			
-			AddItemButton:SetWidth((numColumns * buttonWidth) / 2)			
-			AddSpellButton:SetWidth((numColumns * buttonWidth) / 2)			
+
+			AddItemButton:SetWidth((numColumns * buttonWidth) / 2)
+			AddSpellButton:SetWidth((numColumns * buttonWidth) / 2)
 			addRemoveButtonsHeight = buttonInset + buttonHeight
 			
 			AddItemButton:Show()
@@ -2912,14 +2913,14 @@ function TeleporterOpenFrame(isSearching)
 		
 	end
 
-	TeleporterUpdateAllButtons()	
+	TeleporterUpdateAllButtons()
 	TeleporterParentFrame:Show()
 end
 
 
 function TeleporterRestoreEquipment()
 	ShouldNotBeEquiped = {}
-	for slot,item in pairs(OldItems) do		
+	for slot,item in pairs(OldItems) do
 		ShouldNotBeEquiped[slot] = GetInventoryItemID("player", slot)
 		ShouldBeEquiped[slot] = item
 		RemoveItem[slot](item)
@@ -2931,7 +2932,7 @@ end
 function TeleporterCheckItemsWereEquiped()
 	-- Sometimes equipping after casting fails. If that happens
 	-- then try equipping after the next teleport.
-	if GetTime() < EquipTime + 60 then 
+	if GetTime() < EquipTime + 60 then
 		for slot, item in pairs(ShouldNotBeEquiped) do
 			if IsEquippedItem ( item ) then
 				RemoveItem[slot](ShouldBeEquiped[slot])
@@ -3004,7 +3005,7 @@ local function PrepareUnequippedSlot(item, itemSlot)
 end
 
 -- This function exists because of a bug in patch 10.2.6 that has now been fixed.
-local function SafeEquipItemByName(item, slot)	
+local function SafeEquipItemByName(item, slot)
 	EquipItemByName(item, slot)
 end
 
@@ -3016,7 +3017,7 @@ local function SaveItem(itemSlot, item)
 			SafeEquipItemByName( newItem, itemSlot )
 		end
 	else
-		PrepareUnequippedSlot(item, itemSlot)				
+		PrepareUnequippedSlot(item, itemSlot)
 	end
 end
 
@@ -3024,18 +3025,18 @@ function TeleporterEquipSlashCmdFunction( item )
 	CastSpell = nil
 
 	if not IsEquippedItem ( item ) then
-		if IsEquippableItem( item ) then 
+		if IsEquippableItem( item ) then
 			local _, _, _, _, _, _, _, _,itemEquipLoc = GetCachedItemInfo(item)
 			local itemSlot = InvTypeToSlot[ itemEquipLoc ]
 			if itemSlot == nil then
 				print( "未识别的可添加物品类型: " .. itemEquipLoc )
 				return
-			end			
+			end
 			SaveItem(itemSlot, item)
 			if itemEquipLoc == "INVTYPE_2HWEAPON" then
 				-- Also need to save offhand
 				SaveItem(17, nil)
-			end		
+			end
 			SafeEquipItemByName( item, itemSlot )
 		end
 	end
@@ -3056,7 +3057,7 @@ function TeleporterUseItemSlashCmdFunction( item )
 end
 
 function TeleporterCastSpellSlashCmdFunction( spell, closeFrame )
-	DoCast(spell, true)	
+	DoCast(spell, true)
 end
 
 function TeleporterCreateMacroSlashCmdFunction( spell )
@@ -3064,7 +3065,7 @@ function TeleporterCreateMacroSlashCmdFunction( spell )
 		local macro
 		local printEquipInfo = false
 
-		if GetCachedItemInfo( spell ) then			
+		if GetCachedItemInfo( spell ) then
 			if IsEquippableItem( spell ) then
 				macro =
 					"#showtooltip " .. spell .. "\n" ..

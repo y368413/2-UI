@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local MISC = M:GetModule("Misc")
+local B, C, L, DB = unpack(ns)
+local M = B:GetModule("Misc")
 
 local format, gsub, strsplit, strfind = string.format, string.gsub, string.split, string.find
 local pairs, wipe, select = pairs, wipe, select
@@ -39,44 +39,44 @@ local instList = {
 	[1651] = 23,	-- M卡拉赞，新午夜
 }
 
-function MISC:SoloInfo_Create()
+function M:SoloInfo_Create()
 	if soloInfo then soloInfo:Show() return end
 
 	soloInfo = CreateFrame("Frame", nil, UIParent)
 	soloInfo:SetPoint("CENTER", 0, 120)
 	soloInfo:SetSize(150, 70)
-	M.SetBD(soloInfo)
+	B.SetBD(soloInfo)
 
-	soloInfo.Text = M.CreateFS(soloInfo, 14, "")
+	soloInfo.Text = B.CreateFS(soloInfo, 14, "")
 	soloInfo.Text:SetWordWrap(true)
 	soloInfo:SetScript("OnMouseUp", function() soloInfo:Hide() end)
 end
 
-function MISC:SoloInfo_Update()
+function M:SoloInfo_Update()
 	local name, instType, diffID, diffName, _, _, _, instID = GetInstanceInfo()
 	if diffID == 8 then return end -- don't alert in mythic+
 
 	if (diffName and diffName ~= "") and instType ~= "none" and diffID ~= 24 and instList[instID] and instList[instID] ~= diffID then
-		MISC:SoloInfo_Create()
-		soloInfo.Text:SetText(I.InfoColor..name..I.MyColor.."\n( "..diffName.." )\n\n"..I.InfoColor..U["Wrong Difficulty"])
+		M:SoloInfo_Create()
+		soloInfo.Text:SetText(DB.InfoColor..name..DB.MyColor.."\n( "..diffName.." )\n\n"..DB.InfoColor..L["Wrong Difficulty"])
 	else
 		if soloInfo then soloInfo:Hide() end
 	end
 end
 
-function MISC:SoloInfo_DelayCheck()
-	C_Timer_After(3, MISC.SoloInfo_Update)
+function M:SoloInfo_DelayCheck()
+	C_Timer_After(3, M.SoloInfo_Update)
 end
 
-function MISC:SoloInfo()
-	if R.db["Misc"]["SoloInfo"] then
-		MISC:SoloInfo_Update()
-		M:RegisterEvent("PLAYER_ENTERING_WORLD", MISC.SoloInfo_DelayCheck)
-		M:RegisterEvent("PLAYER_DIFFICULTY_CHANGED", MISC.SoloInfo_DelayCheck)
+function M:SoloInfo()
+	if C.db["Misc"]["SoloInfo"] then
+		M:SoloInfo_Update()
+		B:RegisterEvent("PLAYER_ENTERING_WORLD", M.SoloInfo_DelayCheck)
+		B:RegisterEvent("PLAYER_DIFFICULTY_CHANGED", M.SoloInfo_DelayCheck)
 	else
 		if soloInfo then soloInfo:Hide() end
-		M:UnregisterEvent("PLAYER_ENTERING_WORLD", MISC.SoloInfo_DelayCheck)
-		M:UnregisterEvent("PLAYER_DIFFICULTY_CHANGED", MISC.SoloInfo_DelayCheck)
+		B:UnregisterEvent("PLAYER_ENTERING_WORLD", M.SoloInfo_DelayCheck)
+		B:UnregisterEvent("PLAYER_DIFFICULTY_CHANGED", M.SoloInfo_DelayCheck)
 	end
 end
 
@@ -105,38 +105,38 @@ local function isUsefulAtlas(info)
 	end
 end
 
-function MISC:RareAlert_UpdateIgnored()
-	M.SplitList(isIgnoredIDs, OrzUISetDB["IgnoredRares"], true)
+function M:RareAlert_UpdateIgnored()
+	B.SplitList(isIgnoredIDs, OrzUISetDB["IgnoredRares"], true)
 
 	for id in pairs(defaultList) do
 		isIgnoredIDs[id] = true
 	end
 end
 
-function MISC:RareAlert_Update(id)
+function M:RareAlert_Update(id)
 	if id and not cache[id] then
 		local info = C_VignetteInfo_GetVignetteInfo(id)
 		if not info or not isUsefulAtlas(info) or isIgnoredIDs[info.vignetteID] then return end
 
 		local atlasInfo = C_Texture_GetAtlasInfo(info.atlasName)
 		if not atlasInfo then return end
-		local tex = M:GetTextureStrByAtlas(atlasInfo)
+		local tex = B:GetTextureStrByAtlas(atlasInfo)
 		if not tex then return end
 
-		--UIErrorsFrame:AddMessage(I.InfoColor..U["Rare Found"]..tex..(info.name or ""))
+		--UIErrorsFrame:AddMessage(DB.InfoColor..L["Rare Found"]..tex..(info.name or ""))
 		RaidNotice_AddMessage(RaidWarningFrame, "----------   "..tex..(info.name or "").."   ----------", ChatTypeInfo["RAID_WARNING"])
-		if R.db["Misc"]["RarePrint"] then
+		if C.db["Misc"]["RarePrint"] then
 			local currrentTime = OrzUISetDB["TimestampFormat"] == 1 and "|cff00ff00["..date("%H:%M:%S").."]|r" or ""
 			local nameString
 			local mapID = C_Map_GetBestMapForUnit("player")
 			local position = mapID and C_VignetteInfo_GetVignettePosition(info.vignetteGUID, mapID)
 			if position then
 				local x, y = position:GetXY()
-				nameString = format(MISC.RareString, mapID, x*10000, y*10000, info.name, x*100, y*100, "") --"ID:"..info.vignetteID
+				nameString = format(M.RareString, mapID, x*10000, y*10000, info.name, x*100, y*100, "") --"ID:"..info.vignetteID
 			end
-			print(currrentTime.." -> "..I.InfoColor..tex..(nameString or info.name or ""))  --.." → "
+			print(currrentTime.." -> "..DB.InfoColor..tex..(nameString or info.name or ""))  --.." → "
 		end
-		if not R.db["Misc"]["RareAlertInWild"] or MISC.RareInstType == "none" then
+		if not C.db["Misc"]["RareAlertInWild"] or M.RareInstType == "none" then
 			PlaySoundFile("Interface\\Addons\\OrzUI\\Media\\Sounds\\Dadongda.ogg", "Master")
 		end
 
@@ -146,27 +146,27 @@ function MISC:RareAlert_Update(id)
 	if #cache > 666 then wipe(cache) end
 end
 
-function MISC:RareAlert_CheckInstance()
+function M:RareAlert_CheckInstance()
 	local _, instanceType, _, _, maxPlayers, _, _, instID = GetInstanceInfo()
 	if (instID and isIgnoredZone[instID]) or (instanceType == "scenario" and (maxPlayers == 3 or maxPlayers == 6)) then
-		M:UnregisterEvent("VIGNETTE_MINIMAP_UPDATED", MISC.RareAlert_Update)
+		B:UnregisterEvent("VIGNETTE_MINIMAP_UPDATED", M.RareAlert_Update)
 	else
-		M:RegisterEvent("VIGNETTE_MINIMAP_UPDATED", MISC.RareAlert_Update)
+		B:RegisterEvent("VIGNETTE_MINIMAP_UPDATED", M.RareAlert_Update)
 	end
-	MISC.RareInstType = instanceType
+	M.RareInstType = instanceType
 end
 
-function MISC:RareAlert()
-	MISC.RareString = "|Hworldmap:%d+:%d+:%d+|h[%s] <%.1f, %.1f>%s|h|r"
+function M:RareAlert()
+	M.RareString = "|Hworldmap:%d+:%d+:%d+|h[%s] <%.1f, %.1f>%s|h|r"
 
-	if R.db["Misc"]["RareAlerter"] then
-		MISC:RareAlert_UpdateIgnored()
-		MISC:RareAlert_CheckInstance()
-		M:RegisterEvent("UPDATE_INSTANCE_INFO", MISC.RareAlert_CheckInstance)
+	if C.db["Misc"]["RareAlerter"] then
+		M:RareAlert_UpdateIgnored()
+		M:RareAlert_CheckInstance()
+		B:RegisterEvent("UPDATE_INSTANCE_INFO", M.RareAlert_CheckInstance)
 	else
 		wipe(cache)
-		M:UnregisterEvent("VIGNETTE_MINIMAP_UPDATED", MISC.RareAlert_Update)
-		M:UnregisterEvent("UPDATE_INSTANCE_INFO", MISC.RareAlert_CheckInstance)
+		B:UnregisterEvent("VIGNETTE_MINIMAP_UPDATED", M.RareAlert_Update)
+		B:UnregisterEvent("UPDATE_INSTANCE_INFO", M.RareAlert_CheckInstance)
 	end
 end
 
@@ -174,7 +174,7 @@ end
 	闭上你的嘴！
 	打断、偷取及驱散法术时的警报
 ]]
-function MISC:GetMsgChannel()
+function M:GetMsgChannel()
 	return IsRandomGroup() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
 end
 
@@ -195,14 +195,14 @@ end
 
 local infoType = {}
 
-function MISC:InterruptAlert_Toggle()
-	infoType["SPELL_STOLEN"] = R.db["Misc"]["DispellAlert"] and U["Steal"]
-	infoType["SPELL_DISPEL"] = R.db["Misc"]["DispellAlert"] and U["Dispel"]
-	infoType["SPELL_INTERRUPT"] = R.db["Misc"]["InterruptAlert"] and U["Interrupt"]
-	infoType["SPELL_AURA_BROKEN_SPELL"] = R.db["Misc"]["BrokenAlert"] and U["BrokenSpell"]
+function M:InterruptAlert_Toggle()
+	infoType["SPELL_STOLEN"] = C.db["Misc"]["DispellAlert"] and L["Steal"]
+	infoType["SPELL_DISPEL"] = C.db["Misc"]["DispellAlert"] and L["Dispel"]
+	infoType["SPELL_INTERRUPT"] = C.db["Misc"]["InterruptAlert"] and L["Interrupt"]
+	infoType["SPELL_AURA_BROKEN_SPELL"] = C.db["Misc"]["BrokenAlert"] and L["BrokenSpell"]
 end
 
-function MISC:InterruptAlert_IsEnabled()
+function M:InterruptAlert_IsEnabled()
 	for _, value in pairs(infoType) do
 		if value then
 			return true
@@ -240,69 +240,69 @@ local blackList = {
 	[378760] = true,	-- 冰霜撕咬
 }
 
-function MISC:IsAllyPet(sourceFlags)
-	if I:IsMyPet(sourceFlags) or sourceFlags == I.PartyPetFlags or sourceFlags == I.RaidPetFlags then
+function M:IsAllyPet(sourceFlags)
+	if DB:IsMyPet(sourceFlags) or sourceFlags == DB.PartyPetFlags or sourceFlags == DB.RaidPetFlags then
 		return true
 	end
 end
 
-function MISC:InterruptAlert_Update(...)
-	if R.db["Misc"]["LeaderOnly"] and not (UnitIsGroupAssistant("player") or UnitIsGroupLeader("player")) then return end -- only alert for leader, needs review
+function M:InterruptAlert_Update(...)
+	if C.db["Misc"]["LeaderOnly"] and not (UnitIsGroupAssistant("player") or UnitIsGroupLeader("player")) then return end -- only alert for leader, needs review
 
 	local _, eventType, _, sourceGUID, sourceName, sourceFlags, _, _, destName, _, _, spellID, _, _, extraskillID, _, _, auraType = ...
 	if not sourceGUID or sourceName == destName then return end
 
-	if UnitInRaid(sourceName) or UnitInParty(sourceName) or MISC:IsAllyPet(sourceFlags) then
+	if UnitInRaid(sourceName) or UnitInParty(sourceName) or M:IsAllyPet(sourceFlags) then
 		local infoText = infoType[eventType]
 		if infoText then
 			local sourceSpellID, destSpellID
-			if infoText == U["BrokenSpell"] then
+			if infoText == L["BrokenSpell"] then
 				if auraType and auraType == AURA_TYPE_BUFF or blackList[spellID] then return end
 				sourceSpellID, destSpellID = extraskillID, spellID
 			    if sourceSpellID and destSpellID then
-				    SendChatMessage(format(infoText, sourceName..GetSpellLink(sourceSpellID), destName..GetSpellLink(destSpellID)), msgChannel())  --MISC:GetMsgChannel()
+				    SendChatMessage(format(infoText, sourceName..GetSpellLink(sourceSpellID), destName..GetSpellLink(destSpellID)), msgChannel())  --M:GetMsgChannel()
 			    end
-			elseif infoText == U["Interrupt"] then
-				if R.db["Misc"]["OwnInterrupt"] and sourceName ~= I.MyName and not I:IsMyPet(sourceFlags) then return end
+			elseif infoText == L["Interrupt"] then
+				if C.db["Misc"]["OwnInterrupt"] and sourceName ~= DB.MyName and not DB:IsMyPet(sourceFlags) then return end
 				sourceSpellID, destSpellID = spellID, extraskillID
 				if sourceSpellID and destSpellID then
 					SendChatMessage(format(infoText, GetSpellLink(destSpellID)), msgChannel())
 				end
 			else
-				if R.db["Misc"]["OwnDispell"] and sourceName ~= I.MyName and not I:IsMyPet(sourceFlags) then return end
+				if C.db["Misc"]["OwnDispell"] and sourceName ~= DB.MyName and not DB:IsMyPet(sourceFlags) then return end
 				sourceSpellID, destSpellID = spellID, extraskillID
 				if sourceSpellID and destSpellID then
 					SendChatMessage(format(infoText, GetSpellLink(destSpellID)), msgChannel())
 				end
 			end
-			if R.db["Misc"]["InterruptSound"] then
+			if C.db["Misc"]["InterruptSound"] then
 				PlaySoundFile("Interface\\Addons\\OrzUI\\Media\\Sounds\\ShutupFool.ogg", "Master")
 			end
 		end
 	end
 end
 
-function MISC:InterruptAlert_CheckGroup()
-	if IsInGroup() and (not R.db["Misc"]["InstAlertOnly"] or (IsInInstance() and not IsRandomGroup())) then
-		M:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.InterruptAlert_Update)
+function M:InterruptAlert_CheckGroup()
+	if IsInGroup() and (not C.db["Misc"]["InstAlertOnly"] or (IsInInstance() and not IsRandomGroup())) then
+		B:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", M.InterruptAlert_Update)
 	else
-		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.InterruptAlert_Update)
+		B:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", M.InterruptAlert_Update)
 	end
 end
 
-function MISC:InterruptAlert()
-	MISC:InterruptAlert_Toggle()
+function M:InterruptAlert()
+	M:InterruptAlert_Toggle()
 
-	if MISC:InterruptAlert_IsEnabled() then
-		MISC:InterruptAlert_CheckGroup()
-		M:RegisterEvent("GROUP_LEFT", MISC.InterruptAlert_CheckGroup)
-		M:RegisterEvent("GROUP_JOINED", MISC.InterruptAlert_CheckGroup)
-		M:RegisterEvent("PLAYER_ENTERING_WORLD", MISC.InterruptAlert_CheckGroup)
+	if M:InterruptAlert_IsEnabled() then
+		M:InterruptAlert_CheckGroup()
+		B:RegisterEvent("GROUP_LEFT", M.InterruptAlert_CheckGroup)
+		B:RegisterEvent("GROUP_JOINED", M.InterruptAlert_CheckGroup)
+		B:RegisterEvent("PLAYER_ENTERING_WORLD", M.InterruptAlert_CheckGroup)
 	else
-		M:UnregisterEvent("GROUP_LEFT", MISC.InterruptAlert_CheckGroup)
-		M:UnregisterEvent("GROUP_JOINED", MISC.InterruptAlert_CheckGroup)
-		M:UnregisterEvent("PLAYER_ENTERING_WORLD", MISC.InterruptAlert_CheckGroup)
-		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", MISC.InterruptAlert_Update)
+		B:UnregisterEvent("GROUP_LEFT", M.InterruptAlert_CheckGroup)
+		B:UnregisterEvent("GROUP_JOINED", M.InterruptAlert_CheckGroup)
+		B:UnregisterEvent("PLAYER_ENTERING_WORLD", M.InterruptAlert_CheckGroup)
+		B:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", M.InterruptAlert_Update)
 	end
 end
 
@@ -372,11 +372,12 @@ local spellList = {
 	[462213] = true,	-- 丰盛的午夜舞会盛宴(战团)
 }
 
-function MISC:ItemAlert_Update(unit, castID, spellID)
-	if R.db["Misc"]["LeaderOnly"] and not (UnitIsGroupAssistant("player") or UnitIsGroupLeader("player")) then return end -- only alert for leader, needs review
+function M:ItemAlert_Update(unit, castID, spellID)
+	if B:IsSecretValue(spellID) then return end
+	if C.db["Misc"]["LeaderOnly"] and not (UnitIsGroupAssistant("player") or UnitIsGroupLeader("player")) then return end -- only alert for leader, needs review
 
 	if groupUnits[unit] and spellList[spellID] and (spellList[spellID] ~= castID) then
-		SendChatMessage(format(U["SpellItemAlertStr"], UnitName(unit), GetSpellLink(spellID) or GetSpellName(spellID)), MISC:GetMsgChannel())
+		SendChatMessage(format(L["SpellItemAlertStr"], UnitName(unit), GetSpellLink(spellID) or GetSpellName(spellID)), M:GetMsgChannel())
 		spellList[spellID] = castID
 	end
 end
@@ -389,143 +390,39 @@ local bloodLustDebuffs = {
 	[390435]  = true, -- 筋疲力尽，龙希尔
 }
 
-function MISC:CheckBloodlustStatus(...)
-	if R.db["Misc"]["LeaderOnly"] and not (UnitIsGroupAssistant("player") or UnitIsGroupLeader("player")) then return end -- only alert for leader, needs review
+function M:CheckBloodlustStatus(...)
+	if C.db["Misc"]["LeaderOnly"] and not (UnitIsGroupAssistant("player") or UnitIsGroupLeader("player")) then return end -- only alert for leader, needs review
 
 	local _, eventType, _, sourceGUID, _, _, _, _, _, _, _, spellID = ...
 	if eventType == "SPELL_AURA_REMOVED" and bloodLustDebuffs[spellID] and sourceGUID == myGUID then
-		SendChatMessage(format(U["BloodlustStr"], GetSpellLink(spellID), MISC.factionSpell), MISC:GetMsgChannel())
+		SendChatMessage(format(L["BloodlustStr"], GetSpellLink(spellID), M.factionSpell), M:GetMsgChannel())
 	end
 end
 
-function MISC:ItemAlert_CheckGroup()
+function M:ItemAlert_CheckGroup()
 	if IsInGroup() then
-		M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", MISC.ItemAlert_Update)
-		M:RegisterEvent("CLEU", MISC.CheckBloodlustStatus)
+		B:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", M.ItemAlert_Update)
+	--	B:RegisterEvent("CLEU", M.CheckBloodlustStatus)
 	else
-		M:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", MISC.ItemAlert_Update)
-		M:UnregisterEvent("CLEU", MISC.CheckBloodlustStatus)
+		B:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", M.ItemAlert_Update)
+	--	B:UnregisterEvent("CLEU", M.CheckBloodlustStatus)
 	end
 end
 
-function MISC:SpellItemAlert()
-	MISC.factionSpell = I.MyFaction == "Alliance" and 32182 or 2825
-	MISC.factionSpell = GetSpellLink(MISC.factionSpell)
+function M:SpellItemAlert()
+	M.factionSpell = DB.MyFaction == "Alliance" and 32182 or 2825
+	M.factionSpell = GetSpellLink(M.factionSpell)
 
-	if R.db["Misc"]["SpellItemAlert"] then
-		MISC:ItemAlert_CheckGroup()
-		M:RegisterEvent("GROUP_LEFT", MISC.ItemAlert_CheckGroup)
-		M:RegisterEvent("GROUP_JOINED", MISC.ItemAlert_CheckGroup)
+	if C.db["Misc"]["SpellItemAlert"] then
+		M:ItemAlert_CheckGroup()
+		B:RegisterEvent("GROUP_LEFT", M.ItemAlert_CheckGroup)
+		B:RegisterEvent("GROUP_JOINED", M.ItemAlert_CheckGroup)
 	else
-		M:UnregisterEvent("GROUP_LEFT", MISC.ItemAlert_CheckGroup)
-		M:UnregisterEvent("GROUP_JOINED", MISC.ItemAlert_CheckGroup)
-		M:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", MISC.ItemAlert_Update)
-		M:UnregisterEvent("CLEU", MISC.CheckBloodlustStatus)
+		B:UnregisterEvent("GROUP_LEFT", M.ItemAlert_CheckGroup)
+		B:UnregisterEvent("GROUP_JOINED", M.ItemAlert_CheckGroup)
+		B:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", M.ItemAlert_Update)
+	--	B:UnregisterEvent("CLEU", M.CheckBloodlustStatus)
 	end
-end
-
--- 大幻象水晶及箱子计数
-function MISC:NVision_Create()
-	if MISC.VisionFrame then MISC.VisionFrame:Show() return end
-
-	local frame = CreateFrame("Frame", nil, UIParent)
-	frame:SetSize(24, 24)
-	frame.bars = {}
-
-	local mover = M.Mover(frame, U["NzothVision"], "NzothVision", {"TOP", PlayerPowerBarAlt, "BOTTOM"}, 216, 24)
-	frame:ClearAllPoints()
-	frame:SetPoint("CENTER", mover)
-
-	local barData = {
-		[1] = {
-			anchorF = "RIGHT", anchorT = "LEFT", offset = -3,
-			texture = 134110,
-			color = {1, .8, 0}, reverse = false, maxValue = 10,
-		},
-		[2] = {
-			anchorF = "LEFT", anchorT = "RIGHT", offset = 3,
-			texture = 2000861,
-			color = {.8, 0, 1}, reverse = true, maxValue = 12,
-		}
-	}
-
-	for i, v in ipairs(barData) do
-		local bar = CreateFrame("StatusBar", nil, frame)
-		bar:SetSize(80, 20)
-		bar:SetPoint(v.anchorF, frame, "CENTER", v.offset, 0)
-		bar:SetMinMaxValues(0, v.maxValue)
-		bar:SetValue(0)
-		bar:SetReverseFill(v.reverse)
-		M:SmoothBar(bar)
-		M.CreateSB(bar, nil, unpack(v.color))
-		bar.text = M.CreateFS(bar, 16, "0/"..v.maxValue, nil, "CENTER", 0, 0)
-
-		local icon = CreateFrame("Frame", nil, bar)
-		icon:SetSize(22, 22)
-		icon:SetPoint(v.anchorF, bar, v.anchorT, v.offset, 0)
-		M.PixelIcon(icon, v.texture)
-		M.CreateSD(icon)
-
-		bar.count = 0
-		bar.__max = v.maxValue
-		frame.bars[i] = bar
-	end
-
-	MISC.VisionFrame = frame
-end
-
-function MISC:NVision_Update(index, reset)
-	local frame = MISC.VisionFrame
-	local bar = frame.bars[index]
-	if reset then bar.count = 0 end
-	bar:SetValue(bar.count)
-	bar.text:SetText(bar.count.."/"..bar.__max)
-end
-
-local castSpellIndex = {[143394] = 1, [306608] = 2}
-function MISC:NVision_OnEvent(unit, _, spellID)
-	local index = castSpellIndex[spellID]
-	if index and (index == 1 or unit == "player") then
-		local frame = MISC.VisionFrame
-		local bar = frame.bars[index]
-		bar.count = bar.count + 1
-		MISC:NVision_Update(index)
-	end
-end
-
-function MISC:NVision_Check()
-	local diffID = select(3, GetInstanceInfo())
-	if diffID == 152 then
-		MISC:NVision_Create()
-		M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", MISC.NVision_OnEvent, "player")
-
-		if not RaidBossEmoteFrame.__isOff then
-			RaidBossEmoteFrame:UnregisterAllEvents()
-			RaidBossEmoteFrame.__isOff = true
-		end
-	else
-		if MISC.VisionFrame then
-			MISC:NVision_Update(1, true)
-			MISC:NVision_Update(2, true)
-			MISC.VisionFrame:Hide()
-			M:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED", MISC.NVision_OnEvent)
-		end
-
-		if RaidBossEmoteFrame.__isOff then
-			if not R.db["Misc"]["HideBossEmote"] then
-				RaidBossEmoteFrame:RegisterEvent("RAID_BOSS_EMOTE")
-				RaidBossEmoteFrame:RegisterEvent("RAID_BOSS_WHISPER")
-				RaidBossEmoteFrame:RegisterEvent("CLEAR_BOSS_EMOTES")
-			end
-			RaidBossEmoteFrame.__isOff = nil
-		end
-	end
-end
-
-function MISC:NVision_Init()
-	if not R.db["Misc"]["NzothVision"] then return end
-	MISC:NVision_Check()
-	M:RegisterEvent("UPDATE_INSTANCE_INFO", MISC.NVision_Check)
 end
 
 -- Incompatible check
@@ -536,8 +433,7 @@ local IncompatibleAddOns = {
 	["DomiRank"] = true, -- NDui Core addon
 	["MDGuildBest"] = true, -- NDui Core addon
 	["Simulationcraft"] = true,
-	["TomeOfTeleportation"] = true,
-	--["SocketHelper"] = true,
+	["TeleportMenu"] = true,
 	["BetterBlizzQueue"] = true,
 	["DialogKey"] = true,
 	["CanOpener"] = true,
@@ -546,14 +442,14 @@ local IncompatibleAddOns = {
 	["FriendGroups"] = true,
 	["ParagonRewards"] = true,
 	["RandomHearthToy"] = true,
-	["DoomCooldownPulse"] = true,
+	--["NiceDamage"] = true,
 	["IncentiveProgram"] = true,
 	["Paragon"] = true,
 	["ParagonReputation"] = true,
 	["SpellActivationText"] = true,
 	["BattlePetBinds"] = true,
 	["WorldMapQuestRewardIcon"] = true,
-	["DamageEx"] = true,
+	--["DamageEx"] = true,
 	["AdventureGuideLockouts"] = true,
 	["BossesKilled"] = true,
 	["ElitismHelper"] = true,
@@ -565,23 +461,21 @@ local IncompatibleAddOns = {
 	["Quester"] = true,
 	["BarrelsOEasy"] = true,
 	["ExtraQuestButton"] = true,
-	--["Disenchanter"] = true,
 	["StatPriority"] = true,
-	--["WQAchievements"] = true,
 	["BetterWorldQuests"] = true,
 	["PlayerFrame_Experience"] = true,
 	["IncentiveProgram"] = true,
 	["CancelPetBattle"] = true,
 	["WorldBossTimers"] = true,
 	["DFCN_Status"] = true,
-	--["VendorFilter"] = true,
-	["AutoSellLowLevelGear"] = true,
-	["RemixArtifactTracker"] = true,
+	["BlizzMove"] = true,
+	--["AutoSellLowLevelGear"] = true,
+	--["RemixArtifactTracker"] = true,
 }
 local AddonDependency = {
 	["BigFoot"] = "!!!Libs",
 }
-function MISC:CheckIncompatible()
+function M:CheckIncompatible()
 	local IncompatibleList = {}
 	for addon in pairs(IncompatibleAddOns) do
 		if C_AddOns.IsAddOnLoaded(addon) then
@@ -593,23 +487,23 @@ function MISC:CheckIncompatible()
 		local frame = CreateFrame("Frame", nil, UIParent)
 		frame:SetPoint("TOP", 0, -200)
 		frame:SetFrameStrata("HIGH")
-		M.CreateMF(frame)
-		M.SetBD(frame)
-		M.CreateFS(frame, 18, U["FoundIncompatibleAddon"], true, "TOPLEFT", 10, -10)
-		M.CreateWatermark(frame)
+		B.CreateMF(frame)
+		B.SetBD(frame)
+		B.CreateFS(frame, 18, L["FoundIncompatibleAddon"], true, "TOPLEFT", 10, -10)
+		B.CreateWatermark(frame)
 
 		local offset = 0
 		for _, addon in pairs(IncompatibleList) do
-			M.CreateFS(frame, 14, addon, false, "TOPLEFT", 10, -(50 + offset))
+			B.CreateFS(frame, 14, addon, false, "TOPLEFT", 10, -(50 + offset))
 			offset = offset + 24
 		end
 		frame:SetSize(300, 100 + offset)
 
-		local close = M.CreateButton(frame, 16, 16, true, I.closeTex)
+		local close = B.CreateButton(frame, 16, 16, true, DB.closeTex)
 		close:SetPoint("TOPRIGHT", -10, -10)
 		close:SetScript("OnClick", function() frame:Hide() end)
 
-		local disable = M.CreateButton(frame, 150, 25, U["DisableIncompatibleAddon"])
+		local disable = B.CreateButton(frame, 150, 25, L["DisableIncompatibleAddon"])
 		disable:SetPoint("BOTTOM", 0, 10)
 		disable.text:SetTextColor(1, .8, 0)
 		disable:SetScript("OnClick", function()
@@ -634,7 +528,7 @@ local function GetRemainTime(second)
 end
 
 local lastCDSend = 0
-function MISC:SendCurrentSpell(thisTime, spellID)
+function M:SendCurrentSpell(thisTime, spellID)
 	local spellLink = GetSpellLink(spellID)
 	local chargeInfo = C_Spell.GetSpellCharges(spellID)
 	local charges = chargeInfo and chargeInfo.currentCharges
@@ -645,9 +539,9 @@ function MISC:SendCurrentSpell(thisTime, spellID)
 	if charges and maxCharges then
 		if charges ~= maxCharges then
 			local remain = chargeStart + chargeDuration - thisTime
-			SendChatMessage(format(U["ChargesRemaining"], spellLink, charges, maxCharges, GetRemainTime(remain)), MISC:GetMsgChannel())
+			SendChatMessage(format(L["ChargesRemaining"], spellLink, charges, maxCharges, GetRemainTime(remain)), M:GetMsgChannel())
 		else
-			SendChatMessage(format(U["ChargesCompleted"], spellLink, charges, maxCharges), MISC:GetMsgChannel())
+			SendChatMessage(format(L["ChargesCompleted"], spellLink, charges, maxCharges), M:GetMsgChannel())
 		end
 	else
 		local cooldownInfo = C_Spell.GetSpellCooldown(spellID)
@@ -656,27 +550,28 @@ function MISC:SendCurrentSpell(thisTime, spellID)
 
 		if start and duration > 0 then
 			local remain = start + duration - thisTime
-			SendChatMessage(format(U["CooldownRemaining"], spellLink, GetRemainTime(remain)), MISC:GetMsgChannel())
+			SendChatMessage(format(L["CooldownRemaining"], spellLink, GetRemainTime(remain)), M:GetMsgChannel())
 		else
-			SendChatMessage(format(U["CooldownCompleted"], spellLink), MISC:GetMsgChannel())
+			SendChatMessage(format(L["CooldownCompleted"], spellLink), M:GetMsgChannel())
 		end
 	end
 end
 
-function MISC:SendCurrentItem(thisTime, itemID, itemLink, itemCount)
+function M:SendCurrentItem(thisTime, itemID, itemLink, itemCount)
 	local start, duration = C_Item.GetItemCooldown(itemID)
 	if start and duration > 0 then
 		local remain = start + duration - thisTime
-		SendChatMessage(format(U["CooldownRemaining"], itemLink.." x"..itemCount, GetRemainTime(remain)), MISC:GetMsgChannel())
+		SendChatMessage(format(L["CooldownRemaining"], itemLink.." x"..itemCount, GetRemainTime(remain)), M:GetMsgChannel())
 	else
-		SendChatMessage(format(U["CooldownCompleted"], itemLink.." x"..itemCount), MISC:GetMsgChannel())
+		SendChatMessage(format(L["CooldownCompleted"], itemLink.." x"..itemCount), M:GetMsgChannel())
 	end
 end
 
-function MISC:AnalyzeButtonCooldown()
+function M:AnalyzeButtonCooldown()
 	if not self._state_action then return end -- no action for pet actionbar
-	if not R.db["Misc"]["SendActionCD"] then return end
+	if not C.db["Misc"]["SendActionCD"] then return end
 	if not IsInGroup() then return end
+	if InCombatLockdown() then return end
 
 	local thisTime = GetTime()
 	if thisTime - lastCDSend < 1.5 then return end
@@ -685,43 +580,42 @@ function MISC:AnalyzeButtonCooldown()
 	local spellType, id, subType = GetActionInfo(self._state_action)
 	local itemCount = GetActionCount(self._state_action)
 	if spellType == "spell" then
-		MISC:SendCurrentSpell(thisTime, id)
+		M:SendCurrentSpell(thisTime, id)
 	elseif spellType == "item" then
 		local itemName, itemLink = C_Item.GetItemInfo(id)
-		MISC:SendCurrentItem(thisTime, id, itemLink or itemName, itemCount)
+		M:SendCurrentItem(thisTime, id, itemLink or itemName, itemCount)
 	elseif spellType == "macro" then
 		local spellID = subType == "spell" and id or GetMacroSpell(id)
 		local _, itemLink = GetMacroItem(id)
 		local itemID = itemLink and GetItemInfoFromHyperlink(itemLink)
 		if spellID then
-			MISC:SendCurrentSpell(thisTime, spellID)
+			M:SendCurrentSpell(thisTime, spellID)
 		elseif itemID then
-			MISC:SendCurrentItem(thisTime, itemID, itemLink, itemCount)
+			M:SendCurrentItem(thisTime, itemID, itemLink, itemCount)
 		end
 	end
 end
 
-function MISC:SendCDStatus()
-	if not R.db["Actionbar"]["Enable"] then return end
+function M:SendCDStatus()
+	if not C.db["Actionbar"]["Enable"] then return end
 
-	local Bar = M:GetModule("Actionbar")
+	local Bar = B:GetModule("Actionbar")
 	if not Bar then return end
 	for _, button in pairs(Bar.buttons) do
-		button:HookScript("OnMouseWheel", MISC.AnalyzeButtonCooldown)
+		button:HookScript("OnMouseWheel", M.AnalyzeButtonCooldown)
 	end
 end
 
 -- Init
-function MISC:AddAlerts()
-	MISC:SoloInfo()
-	MISC:RareAlert()
-	MISC:InterruptAlert()
-	MISC:SpellItemAlert()
-	MISC:NVision_Init()
-	MISC:CheckIncompatible()
-	MISC:SendCDStatus()
+function M:AddAlerts()
+	M:SoloInfo()
+	M:RareAlert()
+	--M:InterruptAlert()
+	M:SpellItemAlert()
+	M:CheckIncompatible()
+	M:SendCDStatus()
 end
-MISC:RegisterMisc("Notifications", MISC.AddAlerts)
+M:RegisterMisc("Notifications", M.AddAlerts)
 
 --[[## Author: Nick Melancon  ## Version: 0.1
 local JaniFailedBonusRoll = CreateFrame("FRAME");

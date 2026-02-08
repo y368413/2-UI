@@ -1,8 +1,8 @@
 local _, ns = ...
-local _, R = unpack(ns)
+local _, C = unpack(ns)
 
 -- 法术白名单
-R.WhiteList = {
+C.WhiteList = {
 	[268756] = true,	-- 望远镜饰品
 	-- Buffs
 	[642]    = true,	-- 圣盾术
@@ -53,7 +53,7 @@ R.WhiteList = {
 }
 
 -- 法术黑名单
-R.BlackList = {
+C.BlackList = {
 	[15407]  = true,	-- 精神鞭笞
 	[51714]  = true,	-- 锋锐之霜
 	[199721] = true,	-- 腐烂光环
@@ -65,7 +65,7 @@ R.BlackList = {
 }
 
 -- 特殊单位的染色列表
-R.CustomUnits = {
+C.CustomUnits = {
 	-- Corruption
 	[162290] = true, -- 腐化的觅血鲨
 	[162247] = true, -- 腐化的狱卒
@@ -103,7 +103,7 @@ R.CustomUnits = {
 }
 
 -- 显示能量值的单位
-R.PowerUnits = {
+C.PowerUnits = {
 	[56792] = true,		-- 青龙寺，怀疑臆象
 	[171557] = true,	-- 猎手阿尔迪莫，巴加斯特之影
 	[165556] = true,	-- 赤红深渊，瞬息具象
@@ -112,7 +112,7 @@ R.PowerUnits = {
 }
 
 -- 显示姓名板单位的目标
-R.ShowTargetNPCs = {
+C.ShowTargetNPCs = {
 	--[165251] = true,	-- 仙林狐狸
 	[40357] = true,		-- 格瑞姆巴托火元素
 	[164702] = true,	-- 食腐蛆虫
@@ -120,7 +120,7 @@ R.ShowTargetNPCs = {
 }
 
 -- 无效目标
-R.TrashUnits = {
+C.TrashUnits = {
 	[174773] = true, 	-- 大米，怨毒影魔
 	[190174] = true,	-- 催眠蝙蝠，S4
 	[166589] = true,	-- 活化武器，赤红
@@ -130,7 +130,7 @@ R.TrashUnits = {
 }
 
 -- 重要读条高亮
-R.MajorSpells = {
+C.MajorSpells = {
 	[156718] = true,	-- 骨疽爆裂，影月墓地
 	[156776] = true,	-- 虚空撕裂，影月墓地
 	[398150] = true,	-- 统御，影月墓地

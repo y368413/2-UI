@@ -1,6 +1,6 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-local A = M:GetModule("Auras")
+local B, C, L, DB = unpack(ns)
+local A = B:GetModule("Auras")
 
 local _G = _G
 local GetTotemInfo = GetTotemInfo
@@ -9,9 +9,9 @@ local GetTotemInfo = GetTotemInfo
 local totems = {}
 
 function A:TotemBar_Init()
-	local margin = R.margin
-	local vertical = R.db["Auras"]["VerticalTotems"]
-	local iconSize = R.db["Auras"]["TotemSize"]
+	local margin = C.margin
+	local vertical = C.db["Auras"]["VerticalTotems"]
+	local iconSize = C.db["Auras"]["TotemSize"]
 	local width = vertical and (iconSize + margin*2) or (iconSize*4 + margin*5)
 	local height = vertical and (iconSize*4 + margin*5) or (iconSize + margin*2)
 
@@ -22,7 +22,7 @@ function A:TotemBar_Init()
 	totemBar:SetSize(width, height)
 
 	if not totemBar.mover then
-		totemBar.mover = M.Mover(totemBar, U["Totembar"], "Totems", R.Auras.TotemsPos)
+		totemBar.mover = B.Mover(totemBar, L["Totembar"], "Totems", C.Auras.TotemsPos)
 	end
 	totemBar.mover:SetSize(width, height)
 
@@ -30,7 +30,7 @@ function A:TotemBar_Init()
 		local totem = totems[i]
 		if not totem then
 			totem = CreateFrame("Frame", nil, totemBar)
-			M.AuraIcon(totem)
+			B.AuraIcon(totem)
 			totem:SetAlpha(0)
 			totems[i] = totem
 		end
@@ -53,9 +53,9 @@ function A:TotemBar_Update()
 	for button in _G.TotemFrame.totemPool:EnumerateActive() do
 		activeTotems = activeTotems + 1
 
-		local haveTotem, _, start, dur, icon = GetTotemInfo(button.slot)
+		local _, _, start, dur, icon = GetTotemInfo(button.slot)
 		local totem = totems[activeTotems]
-		if haveTotem and dur > 0 then
+		if start then
 			totem.Icon:SetTexture(icon)
 			totem.CD:SetCooldown(start, dur)
 			totem.CD:Show()
@@ -82,7 +82,7 @@ function A:TotemBar_Update()
 end
 
 function A:Totems()
-	if not R.db["Auras"]["Totems"] then return end
+	if not C.db["Auras"]["Totems"] then return end
 
 	A:TotemBar_Init()
 	hooksecurefunc(TotemFrame, "Update", A.TotemBar_Update)

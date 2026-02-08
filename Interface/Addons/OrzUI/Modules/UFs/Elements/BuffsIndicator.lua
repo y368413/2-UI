@@ -1,7 +1,7 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 local oUF = ns.oUF
-local UF = M:GetModule("UnitFrames")
+local UF = B:GetModule("UnitFrames")
 
 local SpellGetVisibilityInfo, SpellIsSelfBuff = SpellGetVisibilityInfo, SpellIsSelfBuff
 
@@ -9,7 +9,7 @@ UF.RaidBuffsWhite = {}
 function UF:UpdateRaidBuffsWhite()
 	wipe(UF.RaidBuffsWhite)
 
-	for spellID in pairs(R.RaidBuffsWhite) do
+	for spellID in pairs(C.RaidBuffsWhite) do
 		local name = C_Spell.GetSpellName(spellID)
 		if name then
 			if OrzUISetDB["RaidBuffsWhite"][spellID] == nil then
@@ -28,22 +28,22 @@ end
 function UF:CreateBuffsIndicator(self)
 	local buffFrame = CreateFrame("Frame", nil, self)
 	buffFrame:SetSize(1, 1)
-	buffFrame:SetPoint("BOTTOMRIGHT", -R.mult, R.mult)
+	buffFrame:SetPoint("BOTTOMRIGHT", -C.mult, C.mult)
 	buffFrame:SetFrameLevel(5)
 
 	buffFrame.buttons = {}
 	local prevBuff
 	for i = 1, 3 do
 		local button = CreateFrame("Frame", nil, buffFrame)
-		M.PixelIcon(button)
+		B.PixelIcon(button)
 		button:SetScript("OnEnter", UF.AuraButton_OnEnter)
-		button:SetScript("OnLeave", M.HideTooltip)
+		button:SetScript("OnLeave", B.HideTooltip)
 		button:Hide()
 
 		local parentFrame = CreateFrame("Frame", nil, button)
 		parentFrame:SetAllPoints()
 		parentFrame:SetFrameLevel(button:GetFrameLevel() + 3)
-		button.count = M.CreateFS(parentFrame, 10, "", false, "BOTTOMRIGHT", 6, -3)
+		button.count = B.CreateFS(parentFrame, 10, "", false, "BOTTOMRIGHT", 6, -3)
 
 		button.cd = CreateFrame("Cooldown", nil, button, "CooldownFrameTemplate")
 		button.cd:SetAllPoints()
@@ -97,7 +97,7 @@ function UF.BuffsIndicator_Filter(raidAuras, aura)
 	local spellID = aura.spellID
 	if aura.isBossAura then
 		return true
-	elseif R.db["UFs"]["AutoBuffs"] then
+	elseif C.db["UFs"]["AutoBuffs"] then
 		local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellID, raidAuras.isInCombat and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
 		if hasCustom then
 			return showForMySpec or (alwaysShowMine and aura.isPlayerAura)
@@ -113,9 +113,9 @@ function UF:BuffsIndicator_UpdateOptions()
 	local buffs = self.BuffsIndicator
 	if not buffs then return end
 
-	buffs.enable = R.db["UFs"]["ShowRaidBuff"]
-	local size = R.db["UFs"]["RaidBuffSize"]
-	local disableMouse = R.db["UFs"]["BuffClickThru"]
+	buffs.enable = C.db["UFs"]["ShowRaidBuff"]
+	local size = C.db["UFs"]["RaidBuffSize"]
+	local disableMouse = C.db["UFs"]["BuffClickThru"]
 
 	for i = 1, 3 do
 		local button = buffs.buttons[i]

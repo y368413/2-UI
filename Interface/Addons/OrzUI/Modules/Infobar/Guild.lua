@@ -1,12 +1,12 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-if not R.Infobar.Guild then return end
+local B, C, L, DB = unpack(ns)
+if not C.Infobar.Guild then return end
 
-local module = M:GetModule("Infobar")
-local info = module:RegisterInfobar("Guild", R.Infobar.GuildPos)
+local module = B:GetModule("Infobar")
+local info = module:RegisterInfobar("Guild", C.Infobar.GuildPos)
 
 info.guildTable = {}
-local r, g, b = I.r, I.g, I.b
+local r, g, b = DB.r, DB.g, DB.b
 local infoFrame, gName, gOnline, gRank, prevTime
 
 local wipe, sort, format, select = table.wipe, table.sort, format, select
@@ -52,16 +52,16 @@ function info:GuildPanel_CreateButton(parent, index)
 	button.HL:SetAllPoints()
 	button.HL:SetColorTexture(r, g, b, .2)
 
-	button.level = M.CreateFS(button, 13, "Level", false)
+	button.level = B.CreateFS(button, 13, "Level", false)
 	button.level:SetPoint("TOP", button, "TOPLEFT", 16, -4)
 	button.class = button:CreateTexture(nil, "ARTWORK")
 	button.class:SetPoint("LEFT", 35, 0)
 	button.class:SetSize(16, 16)
 	button.class:SetTexture("Interface\\GLUES\\CHARACTERCREATE\\UI-CHARACTERCREATE-CLASSES")
-	button.name = M.CreateFS(button, 13, "Name", false, "LEFT", 65, 0)
+	button.name = B.CreateFS(button, 13, "Name", false, "LEFT", 65, 0)
 	button.name:SetPoint("RIGHT", button, "LEFT", 185, 0)
 	button.name:SetJustifyH("LEFT")
-	button.zone = M.CreateFS(button, 13, "Zone", false, "RIGHT", -2, 0)
+	button.zone = B.CreateFS(button, 13, "Zone", false, "RIGHT", -2, 0)
 	button.zone:SetPoint("LEFT", button, "RIGHT", -120, 0)
 	button.zone:SetJustifyH("RIGHT")
 
@@ -75,19 +75,19 @@ function info:GuildPanel_UpdateButton(button)
 	local index = button.index
 	local level, class, name, zone, status, guid = unpack(info.guildTable[index])
 
-	local levelcolor = M.HexRGB(GetQuestDifficultyColor(level))
+	local levelcolor = B.HexRGB(GetQuestDifficultyColor(level))
 	button.level:SetText(levelcolor..level)
 
-	M.ClassIconTexCoord(button.class, class)
+	B.ClassIconTexCoord(button.class, class)
 
-	local namecolor = M.HexRGB(M.ClassColor(class))
+	local namecolor = B.HexRGB(B.ClassColor(class))
 	local isTimerunning = guid and C_ChatInfo.IsTimerunningPlayer(guid)
 	local playerName = isTimerunning and TimerunningUtil.AddSmallIcon(name) or name
 	button.name:SetText(namecolor..playerName..status)
 
-	local zonecolor = I.GreyColor
+	local zonecolor = DB.GreyColor
 	if UnitInRaid(name) or UnitInParty(name) then
-		zonecolor = I.InfoColor
+		zonecolor = DB.InfoColor
 	elseif GetAreaText() == zone then
 		zonecolor = "|cff4cff4c"
 	end
@@ -180,16 +180,16 @@ function info:GuildPanel_Init()
 	updateInfoFrameAnchor(infoFrame)
 	infoFrame:SetClampedToScreen(true)
 	infoFrame:SetFrameStrata("TOOLTIP")
-	local bg = M.SetBD(infoFrame)
+	local bg = B.SetBD(infoFrame)
 	bg:SetBackdropColor(0, 0, 0, .7)
 
 	infoFrame:SetScript("OnLeave", function(self)
 		self:SetScript("OnUpdate", isPanelCanHide)
 	end)
 
-	gName = M.CreateFS(infoFrame, 16, "Guild", true, "TOPLEFT", 15, -10)
-	gOnline = M.CreateFS(infoFrame, 13, "Online", false, "TOPLEFT", 15, -35)
-	gRank = M.CreateFS(infoFrame, 13, "Rank", false, "TOPLEFT", 15, -51)
+	gName = B.CreateFS(infoFrame, 16, "Guild", true, "TOPLEFT", 15, -10)
+	gOnline = B.CreateFS(infoFrame, 13, "Online", false, "TOPLEFT", 15, -35)
+	gRank = B.CreateFS(infoFrame, 13, "Rank", false, "TOPLEFT", 15, -51)
 
 	local bu = {}
 	local width = {30, 35, 126, 126}
@@ -208,18 +208,18 @@ function info:GuildPanel_Init()
 		bu[i].index = i
 		bu[i]:SetScript("OnClick", sortHeaderOnClick)
 	end
-	M.CreateFS(bu[1], 13, LEVEL_ABBR)
-	M.CreateFS(bu[2], 13, CLASS_ABBR)
-	M.CreateFS(bu[3], 13, NAME, false, "LEFT", 5, 0)
-	M.CreateFS(bu[4], 13, ZONE, false, "RIGHT", -5, 0)
+	B.CreateFS(bu[1], 13, LEVEL_ABBR)
+	B.CreateFS(bu[2], 13, CLASS_ABBR)
+	B.CreateFS(bu[3], 13, NAME, false, "LEFT", 5, 0)
+	B.CreateFS(bu[4], 13, ZONE, false, "RIGHT", -5, 0)
 
-	M.CreateFS(infoFrame, 13, I.LineString, false, "BOTTOMRIGHT", -12, 58)
-	local whspInfo = I.InfoColor..I.RightButton..U["Whisper"]
-	M.CreateFS(infoFrame, 13, whspInfo, false, "BOTTOMRIGHT", -15, 42)
-	local invtInfo = I.InfoColor.."ALT +"..I.LeftButton..U["Invite"]
-	M.CreateFS(infoFrame, 13, invtInfo, false, "BOTTOMRIGHT", -15, 26)
-	local copyInfo = I.InfoColor.."SHIFT +"..I.LeftButton..U["Copy Name"]
-	M.CreateFS(infoFrame, 13, copyInfo, false, "BOTTOMRIGHT", -15, 10)
+	B.CreateFS(infoFrame, 13, DB.LineString, false, "BOTTOMRIGHT", -12, 58)
+	local whspInfo = DB.InfoColor..DB.RightButton..L["Whisper"]
+	B.CreateFS(infoFrame, 13, whspInfo, false, "BOTTOMRIGHT", -15, 42)
+	local invtInfo = DB.InfoColor.."ALT +"..DB.LeftButton..L["Invite"]
+	B.CreateFS(infoFrame, 13, invtInfo, false, "BOTTOMRIGHT", -15, 26)
+	local copyInfo = DB.InfoColor.."SHIFT +"..DB.LeftButton..L["Copy Name"]
+	B.CreateFS(infoFrame, 13, copyInfo, false, "BOTTOMRIGHT", -15, 10)
 
 	local scrollFrame = CreateFrame("ScrollFrame", "OrzUIGuildInfobarScrollFrame", infoFrame, "HybridScrollFrameTemplate")
 	scrollFrame:SetSize(305, 320)
@@ -228,7 +228,7 @@ function info:GuildPanel_Init()
 
 	local scrollBar = CreateFrame("Slider", "$parentScrollBar", scrollFrame, "HybridScrollBarTemplate")
 	scrollBar.doNotHide = true
-	M.ReskinScroll(scrollBar)
+	B.ReskinScroll(scrollBar)
 	scrollFrame.scrollBar = scrollBar
 
 	local scrollChild = scrollFrame.scrollChild
@@ -267,8 +267,8 @@ function info:GuildPanel_Refresh()
 	local guildName, guildRank = GetGuildInfo("player")
 
 	gName:SetText("|cff0099ff<"..(guildName or "")..">")
-	gOnline:SetText(format(I.InfoColor.."%s:".." %d/%d", GUILD_ONLINE_LABEL, (allOnline or numOnline), total))
-	gRank:SetText(I.InfoColor..RANK..": "..(guildRank or ""))
+	gOnline:SetText(format(DB.InfoColor.."%s:".." %d/%d", GUILD_ONLINE_LABEL, (allOnline or numOnline), total))
+	gRank:SetText(DB.InfoColor..RANK..": "..(guildRank or ""))
 
 	for i = 1, total do
 		local name, _, _, level, _, zone, _, _, connected, status, class, _, _, mobile, _, _, guid = GetGuildRosterInfo(i)
@@ -284,9 +284,9 @@ function info:GuildPanel_Refresh()
 				end
 			else
 				if status == 1 then
-					status = I.AFKTex
+					status = DB.AFKTex
 				elseif status == 2 then
-					status = I.DNDTex
+					status = DB.DNDTex
 				else
 					status = " "
 				end
@@ -316,7 +316,7 @@ info.eventList = {
 
 info.onEvent = function(self, event, arg1)
 	if not IsInGuild() then
-		self.text:SetText(I.MyColor.."Orz" or "Orz")
+		self.text:SetText(DB.MyColor.."Orz" or "Orz")
 		return
 	end
 
@@ -327,7 +327,7 @@ info.onEvent = function(self, event, arg1)
 	end
 
 	local _, numOnline, allOnline = GetNumGuildMembers()
-	self.text:SetText(I.MyColor..(allOnline or numOnline))
+	self.text:SetText(DB.MyColor..(allOnline or numOnline))
 
 	if infoFrame and infoFrame:IsShown() then
 		info:GuildPanel_Refresh()
@@ -357,7 +357,7 @@ info.onLeave = function()
 end
 
 info.onMouseUp = function()
-	if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
+	if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
 
 	if not IsInGuild() then return end
 	infoFrame:Hide()

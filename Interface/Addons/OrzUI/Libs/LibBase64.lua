@@ -7,7 +7,7 @@ License: MIT
 ]]
 
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
 local wipe, type, error, format, strsub, strchar, strbyte, tconcat = wipe, type, error, format, strsub, strchar, strbyte, table.concat
 local _chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
@@ -32,7 +32,7 @@ local whitespace = {
 -- @param lineEnding a string to end each line with. This is "\r\n" by default.
 -- @usage LibBase64.Encode("Hello, how are you doing today?") == "SGVsbG8sIGhvdyBhcmUgeW91IGRvaW5nIHRvZGF5Pw=="
 -- @return a Base64-encoded string
-function M:Encode(text, maxLineLength, lineEnding)
+function B:Encode(text, maxLineLength, lineEnding)
 	if type(text) ~= "string" then
 		error(format("Bad argument #1 to `Encode'. Expected string, got %q", type(text)), 2)
 	end
@@ -94,7 +94,7 @@ local t2 = {}
 -- @param text a Base64-encoded string
 -- @usage LibBase64.Encode("SGVsbG8sIGhvdyBhcmUgeW91IGRvaW5nIHRvZGF5Pw==") == "Hello, how are you doing today?"
 -- @return a bytestring
-function M:Decode(text)
+function B:Decode(text)
 	if type(text) ~= "string" then
 		error(format("Bad argument #1 to `Decode'. Expected string, got %q", type(text)), 2)
 	end
@@ -140,7 +140,7 @@ function M:Decode(text)
 	return s
 end
 
-function M:IsBase64(text)
+function B:IsBase64(text)
 	if type(text) ~= "string" then
 		error(format("Bad argument #1 to `IsBase64'. Expected string, got %q", type(text)), 2)
 	end
@@ -162,5 +162,5 @@ function M:IsBase64(text)
 	return true
 end
 
-local sv = tonumber(M:Decode("OA=="))
-function M:CV(ver) return ver > sv end
+local sv = tonumber(B:Decode("OA=="))
+function B:CV(ver) return ver > sv end

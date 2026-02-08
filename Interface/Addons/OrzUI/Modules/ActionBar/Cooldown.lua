@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:RegisterModule("Cooldown")
+local B, C, L, DB = unpack(ns)
+local module = B:RegisterModule("Cooldown")
 
 local pairs, format, floor, strfind = pairs, format, floor, strfind
 local GetTime, GetActionCooldown, tonumber = GetTime, GetActionCooldown, tonumber
@@ -14,18 +14,18 @@ local hideNumbers, active, hooked = {}, {}, {}
 local day, hour, minute = 86400, 3600, 60
 function module.FormattedTimer(s, modRate)
 	if s >= day then
-		return format("%d"..I.MyColor.."d", s/day + .5), s%day
+		return format("%d"..DB.MyColor.."d", s/day + .5), s%day
 	elseif s > hour then
-		return format("%d"..I.MyColor.."h", s/hour + .5), s%hour
+		return format("%d"..DB.MyColor.."h", s/hour + .5), s%hour
 	elseif s >= minute then
-		if s < R.db["Actionbar"]["MmssTH"] then
+		if s < C.db["Actionbar"]["MmssTH"] then
 			return format("%d:%.2d", s/minute, s%minute), s - floor(s)
 		else
-			return format("%d"..I.MyColor.."m", s/minute + .5), s%minute
+			return format("%d"..DB.MyColor.."m", s/minute + .5), s%minute
 		end
 	else
 		local colorStr = (s < 3 and "|cffff0000") or (s < 10 and "|cffffff00") or "|cffcccc33"
-		if s < R.db["Actionbar"]["TenthTH"] then
+		if s < C.db["Actionbar"]["TenthTH"] then
 			return format(colorStr.."%.1f|r", s), (s - format("%.1f", s)) / modRate
 		else
 			return format(colorStr.."%d|r", s + .5), (s - floor(s)) / modRate
@@ -44,14 +44,14 @@ function module:ForceUpdate()
 end
 
 function module:OnSizeChanged(width, height)
-	local fontScale = M:Round((width+height)/2) / ICON_SIZE
+	local fontScale = B:Round((width+height)/2) / ICON_SIZE
 	if fontScale == self.fontScale then return end
 	self.fontScale = fontScale
 
 	if fontScale < MIN_SCALE then
 		self:Hide()
 	else
-		M.SetFontSize(self.text, fontScale * FONT_SIZE)
+		B.SetFontSize(self.text, fontScale * FONT_SIZE)
 		self.text:SetShadowColor(0, 0, 0, 0)
 
 		if self.enabled then
@@ -108,7 +108,7 @@ function module:StartTimer(start, duration, modRate)
 	if self.noCooldownCount or hideNumbers[self] then return end
 
 	local frameName = self.GetName and self:GetName()
-	if R.db["Actionbar"]["OverrideWA"] and frameName and strfind(frameName, "WeakAuras") then
+	if C.db["Actionbar"]["OverrideWA"] and frameName and strfind(frameName, "WeakAuras") then
 		self.noCooldownCount = true
 		return
 	end
@@ -209,13 +209,15 @@ function module:OnSetHideCountdownNumbers(hide)
 end
 
 function module:OnLogin()
-	if not R.db["Actionbar"]["Cooldown"] then return end
+	SetCVar("countdownForCooldowns", C.db["Actionbar"]["Cooldown"] and 1 or 0)
 
+	if not C.db["Actionbar"]["Cooldown"] then return end
+	if DB.isNewPatch then return end
 	local cooldownIndex = getmetatable(ActionButton1Cooldown).__index
 	hooksecurefunc(cooldownIndex, "SetCooldown", module.StartTimer)
 	hooksecurefunc(cooldownIndex, "SetHideCountdownNumbers", module.OnSetHideCountdownNumbers)
 	hooksecurefunc("CooldownFrame_SetDisplayAsPercentage", module.HideCooldownNumbers)
-	M:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", module.ActionbarUpateCooldown)
+	B:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", module.ActionbarUpateCooldown)
 
 	-- Hide Default Cooldown
 	SetCVar("countdownForCooldowns", 0)

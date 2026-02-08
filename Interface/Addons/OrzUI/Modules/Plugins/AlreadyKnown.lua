@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local TT = M:GetModule("Tooltip")
+local B, C, L, DB = unpack(ns)
+local TT = B:GetModule("Tooltip")
 
 local mod, strmatch, strfind, format = mod, strmatch, strfind, format
 local SetItemButtonTextureVertexColor = SetItemButtonTextureVertexColor
@@ -74,7 +74,9 @@ local function Hook_UpdateMerchantInfo()
 		local button = _G["MerchantItem"..i.."ItemButton"]
 		local merchantButton = _G["MerchantItem"..i]
 		if button and button:IsShown() then
-			local _, _, _, _, numAvailable, isUsable = GetMerchantItemInfo(index)
+			local info = C_MerchantFrame.GetItemInfo(index)
+			local numAvailable = info and info.numAvailable
+			local isUsable = info and info.isUsable
 			if isUsable and IsAlreadyKnown(GetMerchantItemLink(index)) then
 				local r, g, b = COLOR.r, COLOR.g, COLOR.b
 				if numAvailable == 0 then

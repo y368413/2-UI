@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:GetModule("Chat")
+local B, C, L, DB = unpack(ns)
+local module = B:GetModule("Chat")
 
 local strfind, strmatch, gsub, strrep, format = string.find, string.match, string.gsub, string.rep, string.format
 local pairs, ipairs, tonumber = pairs, ipairs, tonumber
@@ -18,12 +18,12 @@ local msgSymbols = {"`", "～", "＠", "＃", "^", "＊", "！", "？", "。", "
 
 local FilterList = {}
 function module:UpdateFilterList()
-	M.SplitList(FilterList, OrzUISetDB["ChatFilterList"], true)
+	B.SplitList(FilterList, OrzUISetDB["ChatFilterList"], true)
 end
 
 local WhiteFilterList = {}
 function module:UpdateFilterWhiteList()
-	M.SplitList(WhiteFilterList, OrzUISetDB["ChatFilterWhiteList"], true)
+	B.SplitList(WhiteFilterList, OrzUISetDB["ChatFilterWhiteList"], true)
 end
 
 -- ECF strings compare
@@ -45,22 +45,22 @@ function module:CompareStrDiff(sA, sB) -- arrays of bytes
 	return this[len_b+1] / max(len_a, len_b)
 end
 
-R.BadBoys = {} -- debug
+C.BadBoys = {} -- debug
 local chatLines, prevLineID, filterResult = {}, 0, false
 
 function module:GetFilterResult(event, msg, name, flag, guid)
-	if name == I.MyName or (event == "CHAT_MSG_WHISPER" and flag == "GM") or flag == "DEV" then
+	if name == DB.MyName or (event == "CHAT_MSG_WHISPER" and flag == "GM") or flag == "DEV" then
 		return
 	elseif guid and (IsGuildMember(guid) or C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGUIDInGroup(guid)) then
 		return
 	end
 
-	if R.db["Chat"]["BlockStranger"] and event == "CHAT_MSG_WHISPER" then -- Block strangers
+	if C.db["Chat"]["BlockStranger"] and event == "CHAT_MSG_WHISPER" then -- Block strangers
 		module.MuteCache[name] = GetTime()
 		return true
 	end
 
-	if R.db["Chat"]["BlockSpammer"] and R.BadBoys[name] and R.BadBoys[name] >= 5 then return true end
+	if C.db["Chat"]["BlockSpammer"] and C.BadBoys[name] and C.BadBoys[name] >= 5 then return true end
 
 	local filterMsg = gsub(msg, "|H.-|h(.-)|h", "%1")
 	filterMsg = gsub(filterMsg, "|c%x%x%x%x%x%x%x%x", "")
@@ -98,7 +98,7 @@ function module:GetFilterResult(event, msg, name, flag, guid)
 		end
 	end
 
-	if matches >= R.db["Chat"]["Matches"] then
+	if matches >= C.db["Chat"]["Matches"] then
 		return true
 	end
 
@@ -127,7 +127,7 @@ function module:UpdateChatFilter(event, msg, author, _, _, _, flag, _, _, _, _, 
 		local name = Ambiguate(author, "none")
 		filterResult = module:GetFilterResult(event, msg, name, flag, guid)
 		if filterResult and filterResult ~= 0 then
-			R.BadBoys[name] = (R.BadBoys[name] or 0) + 1
+			C.BadBoys[name] = (C.BadBoys[name] or 0) + 1
 		end
 		if filterResult == 0 then filterResult = true end
 	end
@@ -190,7 +190,7 @@ end
 local function isItemHasLevel(link)
 	local name, _, rarity, level, _, _, _, _, _, _, _, classID = GetItemInfo(link)
 	if name and level and rarity > 1 and (classID == Enum.ItemClass.Weapon or classID == Enum.ItemClass.Armor) then
-		local itemLevel = M.GetItemLevel(link)
+		local itemLevel = B.GetItemLevel(link)
 		return name, itemLevel
 	end
 end
@@ -254,7 +254,7 @@ function module.ReplaceChatHyperlink(link, linkType, value)
 			end
 		return link
 	elseif linkType == "dungeonScore" then
-		return value and gsub(link, "|h%[(.-)%]|h", "|h["..format(U["MythicScore"], GetDungeonScoreInColor(value)).."]|h")
+		return value and gsub(link, "|h%[(.-)%]|h", "|h["..format(L["MythicScore"], GetDungeonScoreInColor(value)).."]|h")
 	end
 end
 
@@ -298,8 +298,8 @@ local function isPlayerOnIslands()
 end
 
 function module:ChatFilter()
-	if R.db["Chat"]["ChatItemLevel"] then
-		local TT = M:GetModule("Tooltip")
+	if C.db["Chat"]["ChatItemLevel"] then
+		local TT = B:GetModule("Tooltip")
 		GetDungeonScoreInColor = TT and TT.GetDungeonScore
 
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", self.UpdateChatItemLevel)
@@ -323,7 +323,7 @@ function module:ChatFilter()
 
 	if C_AddOns.IsAddOnLoaded("EnhancedChatFilter") then return end
 
-	if R.db["Chat"]["EnableFilter"] then
+	if C.db["Chat"]["EnableFilter"] then
 		self:UpdateFilterList()
 		self:UpdateFilterWhiteList()
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateChatFilter)
@@ -334,7 +334,7 @@ function module:ChatFilter()
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_TEXT_EMOTE", self.UpdateChatFilter)
 	end
 
-	if R.db["Chat"]["BlockAddonAlert"] then
+	if C.db["Chat"]["BlockAddonAlert"] then
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", self.UpdateAddOnBlocker)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", self.UpdateAddOnBlocker)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", self.UpdateAddOnBlocker)
@@ -347,5 +347,5 @@ function module:ChatFilter()
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateAddOnBlocker)
 	end
 
-	M:RegisterEvent("PLAYER_ENTERING_WORLD", isPlayerOnIslands) -- filter azerite msg
+	B:RegisterEvent("PLAYER_ENTERING_WORLD", isPlayerOnIslands) -- filter azerite msg
 end

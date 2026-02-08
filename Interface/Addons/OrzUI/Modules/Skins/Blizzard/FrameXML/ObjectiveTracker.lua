@@ -1,7 +1,7 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
-local r, g, b = I.r, I.g, I.b
+local r, g, b = DB.r, DB.g, DB.b
 local select, pairs = select, pairs
 
 local function reskinQuestIcon(button)
@@ -14,7 +14,7 @@ local function reskinQuestIcon(button)
 		button:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
 		local icon = button.icon or button.Icon
 		if icon then
-			button.bg = M.ReskinIcon(icon, true)
+			button.bg = B.ReskinIcon(icon, true)
 		end
 
 		button.styled = true
@@ -45,10 +45,10 @@ end
 local function reskinBarTemplate(bar)
 	if bar.bg then return end
 
-	M.StripTextures(bar)
-	bar:SetStatusBarTexture(I.normTex)
+	B.StripTextures(bar)
+	bar:SetStatusBarTexture(DB.normTex)
 	bar:SetStatusBarColor(r, g, b)
-	bar.bg = M.SetBD(bar)
+	bar.bg = B.SetBD(bar)
 end
 
 local function reskinBar(self, key)
@@ -63,7 +63,7 @@ local function reskinBar(self, key)
 	if icon then
 		if not icon.bg then			
 			icon:SetMask("")
-			icon.bg = M.ReskinIcon(icon, true)
+			icon.bg = B.ReskinIcon(icon, true)
 			icon:ClearAllPoints()
 			icon:SetPoint("TOPLEFT", bar, "TOPRIGHT", 5, 0)
 			icon:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 25, 0)
@@ -90,7 +90,7 @@ local function updateMinimizeButton(button, collapsed)
 end
 
 local function reskinMinimizeButton(button, header)
-	M.ReskinCollapse(button)
+	B.ReskinCollapse(button)
 	button:GetNormalTexture():SetAlpha(0)
 	button:GetPushedTexture():SetAlpha(0)
 	button.__texture:DoCollapse(false)
@@ -134,17 +134,17 @@ local function blockList_Hide(self)
 end
 
 local function ReskinMawBuffsContainer(container)
-	M.StripTextures(container)
+	B.StripTextures(container)
 	container:GetPushedTexture():SetAlpha(0)
 	container:GetHighlightTexture():SetAlpha(0)
-	local bg = M.SetBD(container, 0, 13, -11, -3, 11)
-	M.CreateGradient(bg)
+	local bg = B.SetBD(container, 0, 13, -11, -3, 11)
+	B.CreateGradient(bg)
 	container:HookScript("OnClick", container_OnClick)
 
 	local blockList = container.List
-	M.StripTextures(blockList)
+	B.StripTextures(blockList)
 	blockList.__bg = bg
-	local bg = M.SetBD(blockList)
+	local bg = B.SetBD(blockList)
 	bg:SetPoint("TOPLEFT", 7, -12)
 	bg:SetPoint("BOTTOMRIGHT", -7, 12)
 
@@ -152,13 +152,13 @@ local function ReskinMawBuffsContainer(container)
 	blockList:HookScript("OnHide", blockList_Hide)
 end
 
-tinsert(R.defaultThemes, function()
-	if not R.db["Skins"]["QuestTracker"] then return end
+tinsert(C.defaultThemes, function()
+	if not C.db["Skins"]["QuestTracker"] then return end
 	if C_AddOns.IsAddOnLoaded("!KalielsTracker") then return end
 
 	-- Reskin Headers
 	local mainHeader = ObjectiveTrackerFrame.Header
-	M.StripTextures(mainHeader) -- main header looks simple this way
+	B.StripTextures(mainHeader) -- main header looks simple this way
 
 	-- Minimize Button
 	local mainMinimize = mainHeader.MinimizeButton
@@ -188,7 +188,7 @@ tinsert(R.defaultThemes, function()
 	hooksecurefunc(ScenarioObjectiveTracker.StageBlock, "UpdateStageBlock", function(block)
 		block.NormalBG:SetTexture("")
 		if not block.bg then
-			block.bg = M.SetBD(block.GlowTexture, nil, 0, -2, 4, 2)
+			block.bg = B.SetBD(block.GlowTexture, nil, 0, -2, 4, 2)
 		end
 	end)
 
@@ -200,13 +200,13 @@ tinsert(R.defaultThemes, function()
 
 				local bar = widgetFrame.TimerBar
 				if bar and not bar.bg then
-					bar.bg = M.CreateBDFrame(bar, .25)
+					bar.bg = B.CreateBDFrame(bar, .25)
 				end
 
 				if widgetFrame.CurrencyContainer then
 					for currencyFrame in widgetFrame.currencyPool:EnumerateActive() do
 						if not currencyFrame.bg then
-							currencyFrame.bg = M.ReskinIcon(currencyFrame.Icon)
+							currencyFrame.bg = B.ReskinIcon(currencyFrame.Icon)
 						end
 					end
 				end
@@ -219,7 +219,7 @@ tinsert(R.defaultThemes, function()
 			frame.Border:SetTexture(nil)
 			frame.Portrait:SetTexture(nil)
 			if not frame.bg then
-				frame.bg = M.ReskinIcon(frame.Portrait)
+				frame.bg = B.ReskinIcon(frame.Portrait)
 			end
 
 			if frame.info then
@@ -235,16 +235,16 @@ tinsert(R.defaultThemes, function()
 		if not block.bg then
 			block.TimerBG:Hide()
 			block.TimerBGBack:Hide()
-			block.timerbg = M.CreateBDFrame(block.TimerBGBack, .3)
+			block.timerbg = B.CreateBDFrame(block.TimerBGBack, .3)
 			block.timerbg:SetPoint("TOPLEFT", block.TimerBGBack, 6, -2)
 			block.timerbg:SetPoint("BOTTOMRIGHT", block.TimerBGBack, -6, -5)
 
-			block.StatusBar:SetStatusBarTexture(I.normTex)
+			block.StatusBar:SetStatusBarTexture(DB.normTex)
 			block.StatusBar:SetStatusBarColor(r, g, b)
 			block.StatusBar:SetHeight(10)
 
 			select(3, block:GetRegions()):Hide()
-			block.bg = M.SetBD(block, nil, 4, -2, -4, 0)
+			block.bg = B.SetBD(block, nil, 4, -2, -4, 0)
 		end
 	end)
 
@@ -252,7 +252,7 @@ tinsert(R.defaultThemes, function()
 		for spellFrame in self.spellFramePool:EnumerateActive() do
 			local spellButton = spellFrame.SpellButton
 			if spellButton and not spellButton.styled then
-				local bg = M.ReskinIcon(spellButton.Icon)
+				local bg = B.ReskinIcon(spellButton.Icon)
 				spellButton:SetNormalTexture(0)
 				spellButton:SetPushedTexture(0)
 				local hl = spellButton:GetHighlightTexture()

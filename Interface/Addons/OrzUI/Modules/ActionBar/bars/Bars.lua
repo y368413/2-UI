@@ -1,15 +1,15 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local Bar = M:RegisterModule("Actionbar")
+local B, C, L, DB = unpack(ns)
+local Bar = B:RegisterModule("Actionbar")
 local LAB = LibStub("LibActionButton-1.0-OrzUI")
 
 local _G = _G
 local tinsert, next = tinsert, next
 local GetActionTexture = GetActionTexture
-local margin, padding = R.Bars.margin, R.Bars.padding
+local margin, padding = C.Bars.margin, C.Bars.padding
 
 function Bar:UpdateAllSize()
-	if not R.db["Actionbar"]["Enable"] then return end
+	if not C.db["Actionbar"]["Enable"] then return end
 	Bar:UpdateActionSize("Bar1")
 	Bar:UpdateActionSize("Bar2")
 	Bar:UpdateActionSize("Bar3")
@@ -24,19 +24,19 @@ function Bar:UpdateAllSize()
 end
 
 function Bar:UpdateFontSize(button, fontSize)
-	M.SetFontSize(button.Name, fontSize)
-	M.SetFontSize(button.Count, fontSize)
-	M.SetFontSize(button.HotKey, fontSize)
+	B.SetFontSize(button.Name, fontSize)
+	B.SetFontSize(button.Count, fontSize)
+	B.SetFontSize(button.HotKey, fontSize)
 end
 
 function Bar:UpdateActionSize(name)
 	local frame = _G["OrzUI_Action"..name]
 	if not frame then return end
 
-	local size = R.db["Actionbar"][name.."Size"]
-	local fontSize = R.db["Actionbar"][name.."Font"]
-	local num = R.db["Actionbar"][name.."Num"]
-	local perRow = R.db["Actionbar"][name.."PerRow"]
+	local size = C.db["Actionbar"][name.."Size"]
+	local fontSize = C.db["Actionbar"][name.."Font"]
+	local num = C.db["Actionbar"][name.."Num"]
+	local perRow = C.db["Actionbar"][name.."PerRow"]
 	if name == "BarPet" then num = 10 end
 
 	--[[if num == 0 then
@@ -108,14 +108,14 @@ function Bar:UpdateButtonConfig(i)
 		}
 	end
 	self.buttonConfig.clickOnDown = GetCVarBool("ActionButtonUseKeyDown")
-	self.buttonConfig.showGrid = R.db["Actionbar"]["Grid"]
-	self.buttonConfig.flyoutDirection = directions[R.db["Actionbar"]["Bar"..i.."Flyout"]]
+	self.buttonConfig.showGrid = C.db["Actionbar"]["Grid"]
+	self.buttonConfig.flyoutDirection = directions[C.db["Actionbar"]["Bar"..i.."Flyout"]]
 	self.buttonConfig.actionButtonUI = true -- rotation highlight
 
 	local hotkey = self.buttonConfig.text.hotkey
-	hotkey.font.font = I.Font[1]
-	hotkey.font.size = R.db["Actionbar"]["Bar"..i.."Font"]
-	hotkey.font.flags = I.Font[3]
+	hotkey.font.font = DB.Font[1]
+	hotkey.font.size = C.db["Actionbar"]["Bar"..i.."Font"]
+	hotkey.font.flags = DB.Font[3]
 	hotkey.position.anchor = "TOPRIGHT"
 	hotkey.position.relAnchor = false
 	hotkey.position.offsetX = 0
@@ -123,9 +123,9 @@ function Bar:UpdateButtonConfig(i)
 	hotkey.justifyH = "RIGHT"
 
 	local count = self.buttonConfig.text.count
-	count.font.font = I.Font[1]
-	count.font.size = R.db["Actionbar"]["Bar"..i.."Font"]
-	count.font.flags = I.Font[3]
+	count.font.font = DB.Font[1]
+	count.font.size = C.db["Actionbar"]["Bar"..i.."Font"]
+	count.font.flags = DB.Font[3]
 	count.position.anchor = "BOTTOMRIGHT"
 	count.position.relAnchor = false
 	count.position.offsetX = -2
@@ -133,9 +133,9 @@ function Bar:UpdateButtonConfig(i)
 	count.justifyH = "RIGHT"
 
 	local macro = self.buttonConfig.text.macro
-	macro.font.font = I.Font[1]
-	macro.font.size = R.db["Actionbar"]["Bar"..i.."Font"]
-	macro.font.flags = I.Font[3]
+	macro.font.font = DB.Font[1]
+	macro.font.size = C.db["Actionbar"]["Bar"..i.."Font"]
+	macro.font.flags = DB.Font[3]
 	macro.position.anchor = "BOTTOM"
 	macro.position.relAnchor = false
 	macro.position.offsetX = 0
@@ -143,11 +143,11 @@ function Bar:UpdateButtonConfig(i)
 	macro.justifyH = "CENTER"
 
 	local hideElements = self.buttonConfig.hideElements
-	hideElements.hotkey = not R.db["Actionbar"]["Hotkeys"]
-	hideElements.macro = not R.db["Actionbar"]["Macro"]
-	hideElements.equipped = not R.db["Actionbar"]["EquipColor"]
+	hideElements.hotkey = not C.db["Actionbar"]["Hotkeys"]
+	hideElements.macro = not C.db["Actionbar"]["Macro"]
+	hideElements.equipped = not C.db["Actionbar"]["EquipColor"]
 
-	local lockBars = R.db["Actionbar"]["ButtonLock"]
+	local lockBars = C.db["Actionbar"]["ButtonLock"]
 	for _, button in next, self.buttons do
 		self.buttonConfig.keyBoundTarget = button.bindName
 		button.keyBoundTarget = self.buttonConfig.keyBoundTarget
@@ -159,8 +159,8 @@ function Bar:UpdateButtonConfig(i)
 		--button:SetAttribute("*unit2", "player")
 		button:UpdateConfig(self.buttonConfig)
 
-		if R.db["Actionbar"]["Classcolor"] then
-			button.__bg:SetBackdropColor(I.r, I.g, I.b, .25)
+		if C.db["Actionbar"]["Classcolor"] then
+			button.__bg:SetBackdropColor(DB.r, DB.g, DB.b, .25)
 		else
 			button.__bg:SetBackdropColor(.2, .2, .2, .25)
 		end
@@ -173,7 +173,7 @@ function Bar:UpdateVisibility()
 	for i = 1, 8 do
 		local frame = _G["OrzUI_ActionBar"..i]
 		if frame then
-			if R.db["Actionbar"]["Bar"..i] then
+			if C.db["Actionbar"]["Bar"..i] then
 				frame:Show()
 				frame.mover.isDisable = false
 				RegisterStateDriver(frame, "visibility", frame.visibility)
@@ -187,7 +187,7 @@ function Bar:UpdateVisibility()
 end
 
 function Bar:UpdateBarConfig()
-	SetCVar("ActionButtonUseKeyDown", R.db["Actionbar"]["KeyDown"] and 1 or 0)
+	SetCVar("ActionButtonUseKeyDown", C.db["Actionbar"]["KeyDown"] and 1 or 0)
 
 	for i = 1, 8 do
 		local frame = _G["OrzUI_ActionBar"..i]
@@ -258,17 +258,17 @@ function Bar:CreateBars()
 		local data = BAR_DATA[index]
 		local frame = Bar.headers[index]
 		--if index == 3 then
-			--frame.mover = M.Mover(frame, U["Actionbar"].."3L", "Bar3L", {"RIGHT", _G.UI_ActionBar1, "TOPLEFT", -margin, -padding/2})
+			--frame.mover = B.Mover(frame, L["Actionbar"].."3L", "Bar3L", {"RIGHT", _G.UI_ActionBar1, "TOPLEFT", -margin, -padding/2})
 			--local child = CreateFrame("Frame", nil, frame)
 			--child:SetSize(1, 1)
-			--child.mover = M.Mover(child, U["Actionbar"].."3R", "Bar3R", {"LEFT", _G.UI_ActionBar1, "TOPRIGHT", margin, -padding/2})
+			--child.mover = B.Mover(child, L["Actionbar"].."3R", "Bar3R", {"LEFT", _G.UI_ActionBar1, "TOPRIGHT", margin, -padding/2})
 			--frame.child = child
 
 			--Bar.movers[mIndex] = frame.mover
 			--Bar.movers[mIndex+1] = child.mover
 			--mIndex = mIndex + 2
 		--else
-			frame.mover = M.Mover(frame, U["Actionbar"]..index, "Bar"..index, data.anchor)
+			frame.mover = B.Mover(frame, L["Actionbar"]..index, "Bar"..index, data.anchor)
 			Bar.movers[mIndex] = frame.mover
 			mIndex = mIndex + 1
 		--end
@@ -320,12 +320,12 @@ function Bar:CreateBars()
 
 	local function delayUpdate()
 		Bar:UpdateBarConfig()
-		M:UnregisterEvent("PLAYER_REGEN_ENABLED", delayUpdate)
+		B:UnregisterEvent("PLAYER_REGEN_ENABLED", delayUpdate)
 	end
-	M:RegisterEvent("CVAR_UPDATE", function(_, var)
+	B:RegisterEvent("CVAR_UPDATE", function(_, var)
 		if var == "lockActionBars" then
 			if InCombatLockdown() then
-				M:RegisterEvent("PLAYER_REGEN_ENABLED", delayUpdate)
+				B:RegisterEvent("PLAYER_REGEN_ENABLED", delayUpdate)
 				return
 			end
 			Bar:UpdateBarConfig()
@@ -337,7 +337,7 @@ function Bar:UpdateOverlays()
 	local eventFrame = LAB.eventFrame
 	if not eventFrame then return end
 
-	if R.db["Actionbar"]["ShowGlow"] then
+	if C.db["Actionbar"]["ShowGlow"] then
 		eventFrame.showGlow = true
 		eventFrame:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW")
 		eventFrame:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE")
@@ -352,7 +352,7 @@ function Bar:OnLogin()
 	Bar.buttons = {}
 	Bar:MicroMenu()
 
-	if not R.db["Actionbar"]["Enable"] then return end
+	if not C.db["Actionbar"]["Enable"] then return end
 
 	Bar.movers = {}
 	Bar:CreateBars()
@@ -373,10 +373,10 @@ function Bar:OnLogin()
 	else
 		Bar:ReassignBindings()
 	end
-	M:RegisterEvent("UPDATE_BINDINGS", Bar.ReassignBindings)
-	M:RegisterEvent("PET_BATTLE_CLOSE", Bar.ReassignBindings)
-	M:RegisterEvent("PET_BATTLE_OPENING_DONE", Bar.ClearBindings)
-	M:RegisterEvent("HOUSE_EDITOR_MODE_CHANGED", Bar.UpdateHousingState)
+	B:RegisterEvent("UPDATE_BINDINGS", Bar.ReassignBindings)
+	B:RegisterEvent("PET_BATTLE_CLOSE", Bar.ReassignBindings)
+	B:RegisterEvent("PET_BATTLE_OPENING_DONE", Bar.ClearBindings)
+	B:RegisterEvent("HOUSE_EDITOR_MODE_CHANGED", Bar.UpdateHousingState)
 
 	if AdiButtonAuras then
 		AdiButtonAuras:RegisterLAB("LibActionButton-1.0-OrzUI")

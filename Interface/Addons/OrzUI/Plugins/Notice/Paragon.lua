@@ -588,7 +588,7 @@ T.reputationItemBoP = {
 	[200071] = "iskaara tuskarr", -- Sacred Tuskarr Totem (15)
 	[200093] = "maruuk centaur", -- Centaur Hunting Trophy (25)
 	[199906] = "valdrakken accord", -- Titan Relic (15)
-	[198790] = "artisan's consortium - dragon isles branch", -- I.O.U. (75)
+	[198790] = "artisan's consortium - dragon isles branch", -- DB.O.L. (75)
 
 	-- Shadowlands
 	[186685] = "the archivists' codex", -- Relic Fragment (0.5)
@@ -1465,8 +1465,8 @@ LL["enUS"] = {
 -- Note that these are not language-specific and should include all available realms, as players may mix realms freely
 -- Only include lowercase, single words that need to be specially acronymed
 
--- I have gone through all English, German and Spanish reams (US, Oceanic and EU) as of 2018-02-17
--- If I missed something you want specially acronymed, please submit a ticket on GitHub to get it added:
+-- DB have gone through all English, German and Spanish reams (US, Oceanic and EU) as of 2018-02-17
+-- If DB missed something you want specially acronymed, please submit a ticket on GitHub to get it added:
 -- https://github.com/leobolin/Paragon/issues
 
 -- To Do:

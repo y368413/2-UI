@@ -9,9 +9,10 @@
         self:RegisterEvent("PLAYER_REGEN_DISABLED");
         self:RegisterEvent("PLAYER_REGEN_ENABLED");
         self:RegisterEvent("ZONE_CHANGED");
-		self:RegisterEvent("ZONE_CHANGED_NEW_AREA");
-		self:RegisterEvent("ZONE_CHANGED_INDOORS");
-		Teleporter_OnLoad();
+        self:RegisterEvent("ZONE_CHANGED_NEW_AREA");
+        self:RegisterEvent("ZONE_CHANGED_INDOORS");
+        self:RegisterEvent("PLAYER_HOUSE_LIST_UPDATED")
+        Teleporter_OnLoad();
       </OnLoad>
       <OnEvent function="Teleporter_OnEvent"/>
       <OnUpdate function="Teleporter_OnUpdate"/>

@@ -1,8 +1,8 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:GetModule("AurasTable")
+local B, C, L, DB = unpack(ns)
+local module = B:GetModule("AurasTable")
 
-if I.MyClass ~= "PALADIN" then return end
+if DB.MyClass ~= "PALADIN" then return end
 
 -- 圣骑士的法术监控
 local list = {

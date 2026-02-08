@@ -1,12 +1,12 @@
 local addonName, ns = ...
-ns[1] = {}			-- M, Basement
-ns[2] = {}			-- R, Config
-ns[3] = {}			-- U, Locales
-ns[4] = {}			-- I, Database
+ns[1] = {}			-- B, Basement
+ns[2] = {}			-- C, Config
+ns[3] = {}			-- L, Locales
+ns[4] = {}			-- DB, Database
 
 OrzUIDB, OrzUISetDB, OrzUIPerDB = {}, {}, {}
 ShiGuangDB, ShiGuangPerDB = {}, {}
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 local pairs, next, tinsert = pairs, next, table.insert
 local min, max = math.min, math.max
 local CombatLogGetCurrentEventInfo, GetPhysicalScreenSize = CombatLogGetCurrentEventInfo, GetPhysicalScreenSize
@@ -25,7 +25,7 @@ host:SetScript("OnEvent", function(_, event, ...)
 	end
 end)
 
-function M:RegisterEvent(event, func, unit1, unit2)
+function B:RegisterEvent(event, func, unit1, unit2)
 	if event == "CLEU" then
 		event = "COMBAT_LOG_EVENT_UNFILTERED"
 	end
@@ -41,7 +41,7 @@ function M:RegisterEvent(event, func, unit1, unit2)
 	events[event][func] = true
 end
 
-function M:UnregisterEvent(event, func)
+function B:UnregisterEvent(event, func)
 	if event == "CLEU" then
 		event = "COMBAT_LOG_EVENT_UNFILTERED"
 	end
@@ -59,7 +59,7 @@ end
 -- Modules
 local modules, initQueue = {}, {}
 
-function M:RegisterModule(name)
+function B:RegisterModule(name)
 	if modules[name] then print("Module <"..name.."> has been registered.") return end
 	local module = {}
 	module.name = name
@@ -69,7 +69,7 @@ function M:RegisterModule(name)
 	return module
 end
 
-function M:GetModule(name)
+function B:GetModule(name)
 	if not modules[name] then print("Module <"..name.."> does not exist.") return end
 
 	return modules[name]
@@ -77,17 +77,17 @@ end
 
 -- Init
 local function GetBestScale()
-	local scale = max(.4, min(1.15, 768 / I.ScreenHeight))
-	return M:Round(scale, 2)
+	local scale = max(.4, min(1.15, 768 / DB.ScreenHeight))
+	return B:Round(scale, 2)
 end
 
-function M:SetupUIScale(init)
+function B:SetupUIScale(init)
 	if OrzUISetDB["LockUIScale"] then OrzUISetDB["UIScale"] = GetBestScale() end
 	local scale = OrzUISetDB["UIScale"]
 	if init then
 		local pixel = 1
-		local ratio = 768 / I.ScreenHeight
-		R.mult = (pixel / scale) - ((pixel - ratio) / scale)
+		local ratio = 768 / DB.ScreenHeight
+		C.mult = (pixel / scale) - ((pixel - ratio) / scale)
 	elseif not InCombatLockdown() then
 		UIParent:SetScale(scale)
 	end
@@ -99,10 +99,10 @@ local function UpdatePixelScale(event)
 	isScaling = true
 
 	if event == "UI_SCALE_CHANGED" then
-		I.ScreenWidth, I.ScreenHeight = GetPhysicalScreenSize()
+		DB.ScreenWidth, DB.ScreenHeight = GetPhysicalScreenSize()
 	end
-	M:SetupUIScale(true)
-	M:SetupUIScale()
+	B:SetupUIScale(true)
+	B:SetupUIScale()
 
 	isScaling = false
 end
@@ -114,21 +114,20 @@ local function IncorrectExpansion()
 	local text = f:CreateFontString()
 	text:SetPoint("CENTER")
 	text:SetFont(STANDARD_TEXT_FONT, 43, "OUTLINE")
-	text:SetText(U["IncorrectExpansion"])
+	text:SetText(L["IncorrectExpansion"])
 end
 
-M:RegisterEvent("PLAYER_LOGIN", function()
+B:RegisterEvent("PLAYER_LOGIN", function()
 	-- Initial
 	SetCVar("ActionButtonUseKeyDown", 1)
-	M:SetupUIScale()
-	M:RegisterEvent("UI_SCALE_CHANGED", UpdatePixelScale)
-	M:SetSmoothingAmount(OrzUISetDB["SmoothAmount"])
-	R.margin = 3
+	B:SetupUIScale()
+	B:RegisterEvent("UI_SCALE_CHANGED", UpdatePixelScale)
+	C.margin = 3
 
 	local LCG = LibStub("LibCustomGlow-1.0-OrzUI")
 	if LCG then
-		M.ShowOverlayGlow = LCG.ShowOverlayGlow
-		M.HideOverlayGlow = LCG.HideOverlayGlow
+		B.ShowOverlayGlow = LCG.ShowOverlayGlow
+		B.HideOverlayGlow = LCG.HideOverlayGlow
 	end
 
 	for _, module in next, initQueue do
@@ -139,9 +138,9 @@ M:RegisterEvent("PLAYER_LOGIN", function()
 		end
 	end
 
-	M.Modules = modules
+	B.Modules = modules
 
-	if M.InitCallback then M:InitCallback() end
+	if B.InitCallback then B:InitCallback() end
 end)
 
 _G[addonName] = ns

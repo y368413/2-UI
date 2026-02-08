@@ -1,10 +1,10 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 local oUF = ns.oUF
-if not R.Infobar.System then return end
+if not C.Infobar.System then return end
 
-local module = M:GetModule("Infobar")
-local info = module:RegisterInfobar("Fps", R.Infobar.SystemPos)
+local module = B:GetModule("Infobar")
+local info = module:RegisterInfobar("Fps", C.Infobar.SystemPos)
 
 local ipairs, tinsert, wipe, sort = ipairs, tinsert, wipe, sort
 local format, floor, min, max = format, floor, min, max
@@ -45,7 +45,7 @@ end
 
 local usageColor = {0, 1, 0, 1, 1, 0, 1, 0, 0}
 local function smoothColor(cur, max)
-	local r, g, b = oUF:RGBColorGradient(cur, max, unpack(usageColor))
+	local r, g, b = B:RGBColorGradient(cur, max, unpack(usageColor))
 	return r, g, b
 end
 
@@ -125,7 +125,7 @@ info.onEnter = function(self)
 
 	if not next(infoTable) then BuildAddonList() end
 	local isShiftKeyDown = IsShiftKeyDown()
-	local maxAddOns = R.db["Misc"]["MaxAddOns"]
+	local maxAddOns = C.db["Misc"]["MaxAddOns"]
 	local maxShown = isShiftKeyDown and #infoTable or min(maxAddOns, #infoTable)
 
 	local _, anchor, offset = module:GetTooltipAnchor(info)
@@ -134,7 +134,7 @@ info.onEnter = function(self)
 
 	if self.showMemory or not scriptProfileStatus then
 		local totalMemory = UpdateMemory()
-		GameTooltip:AddDoubleLine(U["System"], formatMemory(totalMemory), 0,.6,1, .6,.8,1)
+		GameTooltip:AddDoubleLine(L["System"], formatMemory(totalMemory), 0,.6,1, .6,.8,1)
 		GameTooltip:AddLine(" ")
 
 		local numEnabled = 0
@@ -153,12 +153,12 @@ info.onEnter = function(self)
 			for i = (maxAddOns + 1), numEnabled do
 				hiddenMemory = hiddenMemory + infoTable[i][3]
 			end
-			GameTooltip:AddDoubleLine(format(showMoreString, numEnabled - maxAddOns, U["Hidden"], U["Hold Shift"]), formatMemory(hiddenMemory), .6,.8,1, .6,.8,1)
+			GameTooltip:AddDoubleLine(format(showMoreString, numEnabled - maxAddOns, L["Hidden"], L["Hold Shift"]), formatMemory(hiddenMemory), .6,.8,1, .6,.8,1)
 		end
 	else
 		local totalCPU = UpdateCPU()
 		local passedTime = max(1, GetTime() - module.loginTime)
-		GameTooltip:AddDoubleLine(U["System"], format(usageString, totalCPU / passedTime, 0,.6,1, .6,.8,1))
+		GameTooltip:AddDoubleLine(L["System"], format(usageString, totalCPU / passedTime, 0,.6,1, .6,.8,1))
 		GameTooltip:AddLine(" ")
 
 		local numEnabled = 0
@@ -177,16 +177,16 @@ info.onEnter = function(self)
 			for i = (maxAddOns + 1), numEnabled do
 				hiddenUsage = hiddenUsage + infoTable[i][4]
 			end
-			GameTooltip:AddDoubleLine(format(showMoreString, numEnabled - maxAddOns, U["Hidden"], U["Hold Shift"]), format(usageString, hiddenUsage / passedTime), .6,.8,1, .6,.8,1)
+			GameTooltip:AddDoubleLine(format(showMoreString, numEnabled - maxAddOns, L["Hidden"], L["Hold Shift"]), format(usageString, hiddenUsage / passedTime), .6,.8,1, .6,.8,1)
 		end
 	end
 
-	GameTooltip:AddDoubleLine(" ", I.LineString)
-	GameTooltip:AddDoubleLine(" ", I.LeftButton..U["Collect Memory"].." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", DB.LineString)
+	GameTooltip:AddDoubleLine(" ", DB.LeftButton..L["Collect Memory"].." ", 1,1,1, .6,.8,1)
 	if scriptProfileStatus then
-		GameTooltip:AddDoubleLine(" ", I.RightButton..U["SwitchSystemInfo"].." ", 1,1,1, .6,.8,1)
+		GameTooltip:AddDoubleLine(" ", DB.RightButton..L["SwitchSystemInfo"].." ", 1,1,1, .6,.8,1)
 	end
-	GameTooltip:AddDoubleLine(" ", I.ScrollButton..U["CPU Usage"]..": "..(GetCVarBool("scriptProfile") and enableString or disableString).." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", DB.ScrollButton..L["CPU Usage"]..": "..(GetCVarBool("scriptProfile") and enableString or disableString).." ", 1,1,1, .6,.8,1)
 	GameTooltip:Show()
 end
 
@@ -196,7 +196,7 @@ info.onLeave = function()
 end
 
 StaticPopupDialogs["CPUUSAGE"] = {
-	text = U["ReloadUI Required"],
+	text = L["ReloadUI Required"],
 	button1 = APPLY,
 	button2 = CLASS_TRIAL_THANKS_DIALOG_CLOSE_BUTTON,
 	OnAccept = function() ReloadUI() end,
@@ -211,7 +211,7 @@ info.onMouseUp = function(self, btn)
 		end
 		local before = gcinfo()
 		collectgarbage("collect")
-		print(format("|cff66C6FF%s:|r %s", U["Collect Memory"], formatMemory(before - gcinfo())))
+		print(format("|cff66C6FF%s:|r %s", L["Collect Memory"], formatMemory(before - gcinfo())))
 		self:onEnter()
 	elseif btn == "RightButton" and scriptProfileStatus then
 		self.showMemory = not self.showMemory

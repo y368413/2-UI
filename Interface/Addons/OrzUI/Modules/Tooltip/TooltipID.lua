@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local TT = M:GetModule("Tooltip")
+local B, C, L, DB = unpack(ns)
+local TT = B:GetModule("Tooltip")
 
 local strmatch, format, tonumber, select = string.match, string.format, tonumber, select
 local GetUnitName = GetUnitName
@@ -18,7 +18,7 @@ local types = {
 	talent = TALENT.."ID:",
 	achievement = ACHIEVEMENTS.."ID:",
 	currency = CURRENCY.."ID:",
-	azerite = U["Trait"].."ID:",
+	azerite = L["Trait"].."ID:",
 }
 
 function TT:AddLineForID(id, linkType, noadd)
@@ -28,7 +28,7 @@ function TT:AddLineForID(id, linkType, noadd)
 		local line = _G[self:GetName().."TextLeft"..i]
 		if not line then break end
 		local text = line:GetText()
-		if text and text == linkType then return end
+		if text and B:NotSecretValue(text) and text == linkType then return end
 	end
 
 	if self.__isHoverTip and linkType == types.spell and IsPlayerSpell(id) and C_MountJournal_GetMountFromSpell(id) then
@@ -43,16 +43,16 @@ function TT:AddLineForID(id, linkType, noadd)
 		local bankCount = C_Item.GetItemCount(id, true, nil, true, true) - bagCount
 		local itemStackCount = select(8, C_Item.GetItemInfo(id))
 		if bankCount > 0 then
-			self:AddDoubleLine(BAGSLOT.."/"..BANK..":", I.InfoColor..bagCount.."/"..bankCount)
+			self:AddDoubleLine(BAGSLOT.."/"..BANK..":", DB.InfoColor..bagCount.."/"..bankCount)
 		elseif bagCount > 0 then
-			self:AddDoubleLine(BAGSLOT..":", I.InfoColor..bagCount)
+			self:AddDoubleLine(BAGSLOT..":", DB.InfoColor..bagCount)
 		end
 		if itemStackCount and itemStackCount > 1 then
-			self:AddDoubleLine(U["Stack Cap"]..":", I.InfoColor..itemStackCount)
+			self:AddDoubleLine(L["Stack Cap"]..":", DB.InfoColor..itemStackCount)
 		end
 	end
 
-	self:AddDoubleLine(linkType, format(I.InfoColor.."%s|r", id))
+	self:AddDoubleLine(linkType, format(DB.InfoColor.."%s|r", id))
 	self:Show()
 	end
 end
@@ -80,7 +80,7 @@ function TT:SetHyperLinkID(link)
 end
 
 function TT:SetupTooltipID()
-	if R.db["Tooltip"]["HideAllID"] then return end
+	if C.db["Tooltip"]["HideAllID"] then return end
 
 	-- Update all
 	hooksecurefunc(GameTooltip, "SetHyperlink", TT.SetHyperLinkID)
@@ -89,17 +89,17 @@ function TT:SetupTooltipID()
 	-- Spells
 	hooksecurefunc(GameTooltip, "SetUnitAura", function(self, ...)
 		if self:IsForbidden() then return end
-		local auraData = C_UnitAuras.GetAuraDataByIndex(...)
-		if not auraData then return end
-		local caster = auraData.sourceUnit
-		local id = auraData.spellId
+		local data = C_UnitAuras.GetAuraDataByIndex(...)
+		if not data then return end
+
+		local id, caster = data.spellId, data.sourceUnit
 		if id then
 			TT.AddLineForID(self, id, types.spell)
 		end
-		if caster then
+		if caster and B:NotSecretValue(caster) then
 			local name = GetUnitName(caster, true)
-			local hexColor = M.HexRGB(M.UnitColor(caster))
-			self:AddDoubleLine(U["From"]..":", hexColor..name)
+			local hexColor = B.HexRGB(B.UnitColor(caster))
+			self:AddDoubleLine(L["From"]..":", hexColor..name)
 			self:Show()
 		end
 	end)
@@ -112,15 +112,16 @@ function TT:SetupTooltipID()
 		if id then
 			TT.AddLineForID(self, id, types.spell)
 		end
-		if caster then
+		if caster and B:NotSecretValue(caster) then
 			local name = GetUnitName(caster, true)
-			local hexColor = M.HexRGB(M.UnitColor(caster))
-			self:AddDoubleLine(U["From"]..":", hexColor..name)
+			local hexColor = B.HexRGB(B.UnitColor(caster))
+			self:AddDoubleLine(L["From"]..":", hexColor..name)
 			self:Show()
 		end
 	end
 	hooksecurefunc(GameTooltip, "SetUnitBuffByAuraInstanceID", UpdateAuraTip)
 	hooksecurefunc(GameTooltip, "SetUnitDebuffByAuraInstanceID", UpdateAuraTip)
+	hooksecurefunc(GameTooltip, "SetUnitAuraByAuraInstanceID", UpdateAuraTip)
 
 	hooksecurefunc("SetItemRef", function(link)
 		local id = tonumber(strmatch(link, "spell:(%d+)"))

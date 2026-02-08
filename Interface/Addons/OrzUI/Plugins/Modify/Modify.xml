@@ -2,10 +2,12 @@
 	<Script file="MacroMr.lua"/>
 	<Script file="AutoPotion.lua"/>
 	<Script file="ColorFrames.lua"/>
+	<Script file="TeleportMenu.lua"/>
 	<Script file="WallpaperKit.lua"/>
 	<Script file="ParagonRewards.lua"/>
 	<Script file="AlterCurrencies.lua"/>
 	<Script file="RandomHearthToy.lua"/>
+	<Script file="AppearanceTooltip.lua"/>
 	<Script file="Killauctionlowprice.lua"/>
 	<Script file="AuctionCorruptionInfo.lua"/>
 	<Script file="OneClickDisenchanting.lua"/>

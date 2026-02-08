@@ -28,7 +28,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
 local unusedOverlayGlows, numOverlays = {}, 0
 local tinsert, tremove, tostring = table.insert, table.remove, tostring
@@ -197,7 +197,7 @@ local function getOverlayGlow()
 	return overlay
 end
 
-function M:ShowOverlayGlow()
+function B:ShowOverlayGlow()
 	if self.__overlay then
 		if self.__overlay.animOut:IsPlaying() then
 			self.__overlay.animOut:Stop()
@@ -218,7 +218,7 @@ function M:ShowOverlayGlow()
 	end
 end
 
-function M:HideOverlayGlow()
+function B:HideOverlayGlow()
 	if self.__overlay then
 		if self.__overlay.animIn:IsPlaying() then
 			self.__overlay.animIn:Stop()

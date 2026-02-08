@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local MISC = M:GetModule("Misc")
+local B, C, L, DB = unpack(ns)
+local M = B:GetModule("Misc")
 
 local pairs, unpack, tinsert, select = pairs, unpack, tinsert, select
 local GetSpellBookItemInfo = C_SpellBook and C_SpellBook.GetSpellBookItemInfo or GetSpellBookItemInfo
@@ -27,14 +27,14 @@ local onlyPrimary = {
 	[393] = true, -- Skinning
 }
 
-function MISC:UpdateProfessions()
+function M:UpdateProfessions()
 	local prof1, prof2, _, fish, cook = GetProfessions()
 	local profs = {prof1, prof2, fish, cook}
 
-	if I.MyClass == "DEATHKNIGHT" then
-		MISC:TradeTabs_Create(RUNEFORGING_ID)
-	elseif I.MyClass == "ROGUE" and IsPlayerSpell(PICK_LOCK) then
-		MISC:TradeTabs_Create(PICK_LOCK)
+	if DB.MyClass == "DEATHKNIGHT" then
+		M:TradeTabs_Create(RUNEFORGING_ID)
+	elseif DB.MyClass == "ROGUE" and IsPlayerSpell(PICK_LOCK) then
+		M:TradeTabs_Create(PICK_LOCK)
 	end
 
 	local isCook
@@ -49,9 +49,9 @@ function MISC:UpdateProfessions()
 				if not C_SpellBook.IsSpellBookItemPassive(slotID, BOOKTYPE_PROFESSION) then
 					local spellID = GetSpellBookItemInfo(slotID, BOOKTYPE_PROFESSION).spellID
 					if i == 1 then
-						MISC:TradeTabs_Create(spellID)
+						M:TradeTabs_Create(spellID)
 					else
-						MISC:TradeTabs_Create(spellID)
+						M:TradeTabs_Create(spellID)
 					end
 				end
 			end
@@ -59,14 +59,14 @@ function MISC:UpdateProfessions()
 	end
 
 	if isCook and PlayerHasToy(CHEF_HAT) then
-		MISC:TradeTabs_Create(nil, CHEF_HAT)
+		M:TradeTabs_Create(nil, CHEF_HAT)
 	end
 	if C_Item.GetItemCount(THERMAL_ANVIL) > 0 then
-		MISC:TradeTabs_Create(nil, nil, THERMAL_ANVIL)
+		M:TradeTabs_Create(nil, nil, THERMAL_ANVIL)
 	end
 end
 
-function MISC:TradeTabs_Update()
+function M:TradeTabs_Update()
 	for _, tab in pairs(tabList) do
 		local spellID = tab.spellID
 		local itemID = tab.itemID
@@ -87,14 +87,14 @@ function MISC:TradeTabs_Update()
 			start = cooldownInfo and cooldownInfo.startTime
 			duration = cooldownInfo and cooldownInfo.duration
 		end
-		if start and duration and duration > 1.5 then
+		if start then
 			tab.CD:SetCooldown(start, duration)
 		end
 	end
 end
 
 local index = 1
-function MISC:TradeTabs_Create(spellID, toyID, itemID)
+function M:TradeTabs_Create(spellID, toyID, itemID)
 	local name, _, texture
 	if toyID then
 		_, name, texture = C_ToyBox_GetToyInfo(toyID)
@@ -120,7 +120,7 @@ function MISC:TradeTabs_Create(spellID, toyID, itemID)
 		tab:SetAttribute(tab.type, spellID or name)
 	end
 	tab:SetNormalTexture(texture)
-	tab:SetHighlightTexture(I.bdTex)
+	tab:SetHighlightTexture(DB.bdTex)
 	tab:GetHighlightTexture():SetVertexColor(1, 1, 1, .25)
 	tab:Show()
 
@@ -136,7 +136,7 @@ function MISC:TradeTabs_Create(spellID, toyID, itemID)
 	index = index + 1
 end
 
-function MISC:TradeTabs_FilterIcons()
+function M:TradeTabs_FilterIcons()
 	local buttonList = {
 		[1] = {"Atlas:bags-greenarrow", TRADESKILL_FILTER_HAS_SKILL_UP, C_TradeSkillUI_GetOnlyShowSkillUpRecipes, C_TradeSkillUI_SetOnlyShowSkillUpRecipes},
 		[2] = {"Atlas:common-icon-checkmark", CRAFT_IS_MAKEABLE, C_TradeSkillUI_GetOnlyShowMakeableRecipes, C_TradeSkillUI_SetOnlyShowMakeableRecipes},
@@ -146,7 +146,7 @@ function MISC:TradeTabs_FilterIcons()
 		local value = self.__value
 		if value[3]() then
 			value[4](false)
-			M.SetBorderColor(self.bg)
+			B.SetBorderColor(self.bg)
 		else
 			value[4](true)
 			self.bg:SetBackdropBorderColor(1, .8, 0)
@@ -158,8 +158,8 @@ function MISC:TradeTabs_FilterIcons()
 		local bu = CreateFrame("Button", nil, ProfessionsFrame.CraftingPage.RecipeList, "BackdropTemplate")
 		bu:SetSize(22, 22)
 		bu:SetPoint("BOTTOMRIGHT", ProfessionsFrame.CraftingPage.RecipeList.FilterDropdown, "TOPRIGHT", -(index-1)*26 + 7, 10)
-		M.PixelIcon(bu, value[1], true)
-		M.AddTooltip(bu, "ANCHOR_TOP", value[2])
+		B.PixelIcon(bu, value[1], true)
+		B.AddTooltip(bu, "ANCHOR_TOP", value[2])
 		bu.__value = value
 		bu:SetScript("OnClick", filterClick)
 
@@ -171,47 +171,47 @@ function MISC:TradeTabs_FilterIcons()
 			if value[3]() then
 				buttons[index].bg:SetBackdropBorderColor(1, .8, 0)
 			else
-				M.SetBorderColor(buttons[index].bg)
+				B.SetBorderColor(buttons[index].bg)
 			end
 		end
 	end
-	M:RegisterEvent("TRADE_SKILL_LIST_UPDATE", updateFilterStatus)
+	B:RegisterEvent("TRADE_SKILL_LIST_UPDATE", updateFilterStatus)
 end
 
 local init
-function MISC:TradeTabs_OnLoad()
+function M:TradeTabs_OnLoad()
 	init = true
 
-	MISC:UpdateProfessions()
+	M:UpdateProfessions()
 
-	MISC:TradeTabs_Update()
-	M:RegisterEvent("TRADE_SKILL_SHOW", MISC.TradeTabs_Update)
-	M:RegisterEvent("TRADE_SKILL_CLOSE", MISC.TradeTabs_Update)
-	M:RegisterEvent("CURRENT_SPELL_CAST_CHANGED", MISC.TradeTabs_Update)
-	MISC:TradeTabs_FilterIcons()
+	M:TradeTabs_Update()
+	B:RegisterEvent("TRADE_SKILL_SHOW", M.TradeTabs_Update)
+	B:RegisterEvent("TRADE_SKILL_CLOSE", M.TradeTabs_Update)
+	B:RegisterEvent("CURRENT_SPELL_CAST_CHANGED", M.TradeTabs_Update)
+	M:TradeTabs_FilterIcons()
 
-	M:UnregisterEvent("PLAYER_REGEN_ENABLED", MISC.TradeTabs_OnLoad)
+	B:UnregisterEvent("PLAYER_REGEN_ENABLED", M.TradeTabs_OnLoad)
 end
 
 local function LoadTradeTabs()
 	if init then return end
 	if InCombatLockdown() then
-		M:RegisterEvent("PLAYER_REGEN_ENABLED", MISC.TradeTabs_OnLoad)
+		B:RegisterEvent("PLAYER_REGEN_ENABLED", M.TradeTabs_OnLoad)
 	else
-		MISC:TradeTabs_OnLoad()
+		M:TradeTabs_OnLoad()
 	end
 end
 
-function MISC:TradeTabs()
-	if not R.db["Misc"]["TradeTabs"] then return end
+function M:TradeTabs()
+	if not C.db["Misc"]["TradeTabs"] then return end
 	if ProfessionsFrame then
 		ProfessionsFrame:HookScript("OnShow", LoadTradeTabs)
 	else
-		M:RegisterEvent("ADDON_LOADED", function(_, addon)
+		B:RegisterEvent("ADDON_LOADED", function(_, addon)
 			if addon == "Blizzard_Professions" then
 				LoadTradeTabs()
 			end
 		end)
 	end
 end
-MISC:RegisterMisc("TradeTabs", MISC.TradeTabs)
+M:RegisterMisc("TradeTabs", M.TradeTabs)

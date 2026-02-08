@@ -1,9 +1,9 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:GetModule("AurasTable")
+local B, C, L, DB = unpack(ns)
+local module = B:GetModule("AurasTable")
 
 -- 角标的相关法术 [spellID] = {anchor, {r, g, b}, ALL}
-R.CornerBuffs = {
+C.CornerBuffs = {
 	["PRIEST"] = {
 		[194384] = {"TOPRIGHT", {1, 1, .66}},			-- 救赎
 		[214206] = {"TOPRIGHT", {1, 1, .66}},			-- 救赎(PvP)
@@ -100,14 +100,14 @@ function module:RegisterSeasonSpells(tier, instance)
 end
 
 -- 团队框体减益指示器黑名单
-R.RaidDebuffsBlack = {
+C.RaidDebuffsBlack = {
 	[206151] = true, -- 挑战者的负担
 	[296847] = true, -- 压迫光环
 	[338906] = true, -- 典狱长之链
 }
 
 -- 团队框体增益指示器白名单
-R.RaidBuffsWhite = {
+C.RaidBuffsWhite = {
 	[642] = true,		-- 圣盾术
 	[871] = true,		-- 盾墙
 	[1022] = true,		-- 保护祝福

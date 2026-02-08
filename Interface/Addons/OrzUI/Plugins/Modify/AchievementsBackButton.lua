@@ -1,4 +1,4 @@
---## Version: 1.6.3 ## Title: Achievements Back Button ## Author: LudiusMaximus
+--## Version: 1.6.5 ## Title: Achievements Back Button ## Author: LudiusMaximus
 local started = false
 
 local history = {}

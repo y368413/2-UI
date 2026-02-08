@@ -1,8 +1,8 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
-tinsert(R.defaultThemes, function()
-	if not R.db["Skins"]["BlizzardSkins"] then return end
+tinsert(C.defaultThemes, function()
+	if not C.db["Skins"]["BlizzardSkins"] then return end
 
 	InboxFrameBg:Hide()
 	ItemTextPrevPageButton:GetRegions():Hide()
@@ -12,11 +12,11 @@ tinsert(R.defaultThemes, function()
 	ItemTextMaterialBotLeft:SetAlpha(0)
 	ItemTextMaterialBotRight:SetAlpha(0)
 
-	M.ReskinPortraitFrame(ItemTextFrame)
-	M.ReskinTrimScroll(ItemTextScrollFrame.ScrollBar)
-	M.ReskinArrow(ItemTextPrevPageButton, "left")
-	M.ReskinArrow(ItemTextNextPageButton, "right")
+	B.ReskinPortraitFrame(ItemTextFrame)
+	B.ReskinTrimScroll(ItemTextScrollFrame.ScrollBar)
+	B.ReskinArrow(ItemTextPrevPageButton, "left")
+	B.ReskinArrow(ItemTextNextPageButton, "right")
 	ItemTextFramePageBg:SetAlpha(0)
 	ItemTextPageText:SetTextColor("P", 1, 1, 1)
-	ItemTextPageText.SetTextColor = M.Dummy
+	ItemTextPageText.SetTextColor = B.Dummy
 end)

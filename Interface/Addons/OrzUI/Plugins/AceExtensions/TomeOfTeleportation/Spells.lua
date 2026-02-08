@@ -459,7 +459,6 @@ CreateDestination(
 		CreateItem(168907),				-- Holographic Digitalization Hearthstone 全息数字化炉石
 		CreateItem(165669),				-- Lunar Elder's Hearthstone  春节长者的炉石 285362
 		CreateItem(165670),				-- Peddlefeet's Lovely Hearthstone  小匹德菲特的可爱炉石
-		--CreateItem(169064),				-- Mountebank's Colorful Cloak
 		CreateItem(172179),				-- Eternal Traveler's Hearthstone  永恒旅者的炉石
 		-- I don't know how to check if a covenant hearthstone can be used. To work
 		-- around this, only make them available for other covenants when not using
@@ -854,10 +853,10 @@ end
 CreateDestination(
 	GetLocalizedCategoryName("House"),
 	{
-		TeleporterCreateTeleportHome(2351, CanTeleportToHouse(2351)),		-- Teleport Home (Horde)
-		TeleporterCreateTeleportHome(2352, CanTeleportToHouse(2352)),		-- Teleport Home (Alliance)
-		-- This is currently broken
-		TeleporterCreateTeleportHome(nil, function() return false end)		-- Return from Home
+		--Currently only the Blizzard UI can teleportto houses.
+		--TeleporterCreateTeleportHome(2351, CanTeleportToHouse(2351)),		-- Teleport Home (Horde)
+		--TeleporterCreateTeleportHome(2352, CanTeleportToHouse(2352)),		-- Teleport Home (Alliance)
+		--TeleporterCreateTeleportHome(nil, function() return false end)		-- Return from Home
 	}).SetExpansion(ExpansionMidnight)
 
 CreateDestination(

@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local TT = M:GetModule("Tooltip")
+local B, C, L, DB = unpack(ns)
+local TT = B:GetModule("Tooltip")
 
 local _G = getfenv(0)
 local format, tinsert, ipairs, select = string.format, table.insert, ipairs, select
@@ -92,7 +92,7 @@ function TT:Azerite_UpdateItem()
 
 		if tooltipText ~= "" then
 			local line = _G[self:GetName().."TextLeft"..lineIndex]
-			if R.db["Tooltip"]["OnlyArmorIcons"] then
+			if C.db["Tooltip"]["OnlyArmorIcons"] then
 				line:SetText(tooltipText)
 				_G[self:GetName().."TextLeft"..lineIndex+1]:SetText("")
 			else
@@ -105,7 +105,7 @@ function TT:Azerite_UpdateItem()
 end
 
 function TT:AzeriteArmor()
-	if not R.db["Tooltip"]["AzeriteArmor"] then return end
+	if not C.db["Tooltip"]["AzeriteArmor"] then return end
 	if C_AddOns.IsAddOnLoaded("AzeriteTooltip") then return end
 
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, TT.Azerite_UpdateItem)

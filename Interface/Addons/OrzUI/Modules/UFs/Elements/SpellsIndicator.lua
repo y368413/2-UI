@@ -1,7 +1,7 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 local oUF = ns.oUF
-local UF = M:GetModule("UnitFrames")
+local UF = B:GetModule("UnitFrames")
 
 local counterOffsets = {
 	["TOPLEFT"] = {{6, 1}, {"LEFT", "RIGHT", -2, 0}},
@@ -15,22 +15,22 @@ local counterOffsets = {
 }
 
 function UF:SpellsIndicator_OnUpdate(elapsed)
-	M.CooldownOnUpdate(self, elapsed, true)
+	B.CooldownOnUpdate(self, elapsed, true)
 end
 
 UF.CornerSpells = {}
 function UF:UpdateCornerSpells()
 	wipe(UF.CornerSpells)
 
-	for spellID, value in pairs(R.CornerBuffs[I.MyClass]) do
-		local modData = OrzUISetDB["CornerSpells"][I.MyClass]
+	for spellID, value in pairs(C.CornerBuffs[DB.MyClass]) do
+		local modData = OrzUISetDB["CornerSpells"][DB.MyClass]
 		if not (modData and modData[spellID]) then
 			local r, g, b = unpack(value[2])
 			UF.CornerSpells[spellID] = {value[1], {r, g, b}, value[3]}
 		end
 	end
 
-	for spellID, value in pairs(OrzUISetDB["CornerSpells"][I.MyClass]) do
+	for spellID, value in pairs(OrzUISetDB["CornerSpells"][DB.MyClass]) do
 		if next(value) then
 			local r, g, b = unpack(value[2])
 			UF.CornerSpells[spellID] = {value[1], {r, g, b}, value[3]}
@@ -41,7 +41,7 @@ end
 local anchors = {"TOPLEFT", "TOP", "TOPRIGHT", "LEFT", "RIGHT", "BOTTOMLEFT", "BOTTOM", "BOTTOMRIGHT"}
 
 function UF:CreateSpellsIndicator(self)
-	local spellSize = R.db["UFs"]["RaidSpellSize"] or 10
+	local spellSize = C.db["UFs"]["RaidSpellSize"] or 10
 
 	local buttons = {}
 	for _, anchor in pairs(anchors) do
@@ -53,15 +53,15 @@ function UF:CreateSpellsIndicator(self)
 
 		button.icon = button:CreateTexture(nil, "BORDER")
 		button.icon:SetAllPoints()
-		button.bg = M.ReskinIcon(button.icon)
+		button.bg = B.ReskinIcon(button.icon)
 
 		button.cd = CreateFrame("Cooldown", nil, button, "CooldownFrameTemplate")
 		button.cd:SetAllPoints()
 		button.cd:SetReverse(true)
 		button.cd:SetHideCountdownNumbers(true)
 
-		button.timer = M.CreateFS(button, 12, "", false, "CENTER", -counterOffsets[anchor][2][3], 0)
-		button.count = M.CreateFS(button, 12, "")
+		button.timer = B.CreateFS(button, 12, "", false, "CENTER", -counterOffsets[anchor][2][3], 0)
+		button.count = B.CreateFS(button, 12, "")
 
 		button.anchor = anchor
 		buttons[anchor] = button
@@ -75,7 +75,7 @@ function UF:CreateSpellsIndicator(self)
 end
 
 function UF:SpellsIndicator_UpdateButton(button, aura, r, g, b)
-	if R.db["UFs"]["BuffIndicatorType"] == 3 then
+	if C.db["UFs"]["BuffIndicatorType"] == 3 then
 		if aura.duration and aura.duration > 0 then
 			button.expiration = aura.expiration
 			button:SetScript("OnUpdate", UF.SpellsIndicator_OnUpdate)
@@ -90,7 +90,7 @@ function UF:SpellsIndicator_UpdateButton(button, aura, r, g, b)
 		else
 			button.cd:Hide()
 		end
-		if R.db["UFs"]["BuffIndicatorType"] == 1 then
+		if C.db["UFs"]["BuffIndicatorType"] == 1 then
 			button.icon:SetVertexColor(r, g, b)
 		else
 			button.icon:SetTexture(aura.texture)
@@ -108,7 +108,7 @@ function UF:SpellsIndicator_HideButtons()
 end
 
 function UF:RefreshBuffIndicator(bu)
-	if R.db["UFs"]["BuffIndicatorType"] == 3 then
+	if C.db["UFs"]["BuffIndicatorType"] == 3 then
 		local point, anchorPoint, x, y = unpack(counterOffsets[bu.anchor][2])
 		bu.timer:Show()
 		bu.count:ClearAllPoints()
@@ -121,8 +121,8 @@ function UF:RefreshBuffIndicator(bu)
 		bu.timer:Hide()
 		bu.count:ClearAllPoints()
 		bu.count:SetPoint("CENTER", unpack(counterOffsets[bu.anchor][1]))
-		if R.db["UFs"]["BuffIndicatorType"] == 1 then
-			bu.icon:SetTexture(I.bdTex)
+		if C.db["UFs"]["BuffIndicatorType"] == 1 then
+			bu.icon:SetTexture(DB.bdTex)
 		else
 			bu.icon:SetVertexColor(1, 1, 1)
 		end
@@ -137,7 +137,7 @@ function UF:SpellsIndicator_UpdateOptions()
 	if not spells then return end
 
 	for anchor, button in pairs(spells) do
-		button:SetScale(R.db["UFs"]["BuffIndicatorScale"])
+		button:SetScale(C.db["UFs"]["BuffIndicatorScale"])
 		UF:RefreshBuffIndicator(button)
 	end
 end

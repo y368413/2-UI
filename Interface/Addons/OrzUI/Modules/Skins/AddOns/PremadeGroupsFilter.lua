@@ -1,11 +1,11 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local S = M:GetModule("Skins")
-local TT = M:GetModule("Tooltip")
+local B, C, L, DB = unpack(ns)
+local S = B:GetModule("Skins")
+local TT = B:GetModule("Tooltip")
 
 function S:PGFSkin()
-	if not R.db["Skins"]["BlizzardSkins"] then return end
-	if not R.db["Skins"]["PGFSkin"] then return end
+	if not C.db["Skins"]["BlizzardSkins"] then return end
+	if not C.db["Skins"]["PGFSkin"] then return end
 	if not C_AddOns.IsAddOnLoaded("PremadeGroupsFilter") then return end
 
 	local DungeonPanel = _G.PremadeGroupsFilterDungeonPanel
@@ -21,16 +21,16 @@ function S:PGFSkin()
 	local names = {"Difficulty", "MPRating", "Members", "Tanks", "Heals", "DPS", "Partyfit", "BLFit", "BRFit", "Defeated", "MatchingId", "PvPRating", "NotDeclined", "NeedsBL"}
 
 	local function handleDropdown(drop)
-		M.StripTextures(drop)
+		B.StripTextures(drop)
 
-		local bg = M.CreateBDFrame(drop, 0, true)
+		local bg = B.CreateBDFrame(drop, 0, true)
 		bg:SetPoint("TOPLEFT", 16, -4)
 		bg:SetPoint("BOTTOMRIGHT", -18, 8)
 
 		local down = drop.Button
 		down:ClearAllPoints()
 		down:SetPoint("RIGHT", bg, -2, 0)
-		M.ReskinArrow(down, "down")
+		B.ReskinArrow(down, "down")
 	end
 
 	local function handleGroup(panel)
@@ -41,12 +41,12 @@ function S:PGFSkin()
 				if check then
 					check:SetSize(26, 26)
 					check:SetPoint("TOPLEFT", 5, -1)
-					M.ReskinCheck(check)
+					B.ReskinCheck(check)
 				end
 				local input = frame.Min
 				if input then
-					M.ReskinInput(input)
-					M.ReskinInput(frame.Max)
+					B.ReskinInput(input)
+					B.ReskinInput(frame.Max)
 				end
 				if frame.DropDown then
 					handleDropdown(frame.DropDown)
@@ -54,7 +54,7 @@ function S:PGFSkin()
 			end
 		end
 
-		M.ReskinInput(panel.Advanced.Expression)
+		B.ReskinInput(panel.Advanced.Expression)
 	end
 
 	local styled
@@ -62,21 +62,21 @@ function S:PGFSkin()
 		if styled then return end
 		styled = true
 
-		M.StripTextures(self)
-		M.SetBD(self):SetAllPoints()
-		M.ReskinClose(self.CloseButton)
-		M.Reskin(self.ResetButton)
-		M.Reskin(self.RefreshButton)
+		B.StripTextures(self)
+		B.SetBD(self):SetAllPoints()
+		B.ReskinClose(self.CloseButton)
+		B.Reskin(self.ResetButton)
+		B.Reskin(self.RefreshButton)
 
-		M.ReskinInput(MiniPanel.Advanced.Expression)
-		M.ReskinInput(MiniPanel.Sorting.Expression)
+		B.ReskinInput(MiniPanel.Advanced.Expression)
+		B.ReskinInput(MiniPanel.Sorting.Expression)
 
 		local button = self.MaxMinButtonFrame
 		if button.MinimizeButton then
-			M.ReskinArrow(button.MinimizeButton, "down")
+			B.ReskinArrow(button.MinimizeButton, "down")
 			button.MinimizeButton:ClearAllPoints()
 			button.MinimizeButton:SetPoint("RIGHT", self.CloseButton, "LEFT", -3, 0)
-			M.ReskinArrow(button.MaximizeButton, "up")
+			B.ReskinArrow(button.MaximizeButton, "up")
 			button.MaximizeButton:ClearAllPoints()
 			button.MaximizeButton:SetPoint("RIGHT", self.CloseButton, "LEFT", -3, 0)
 		end
@@ -93,7 +93,7 @@ function S:PGFSkin()
 			if check then
 				check:SetSize(26, 26)
 				check:SetPoint("TOPLEFT", 5, -1)
-				M.ReskinCheck(check)
+				B.ReskinCheck(check)
 			end
 		end
 	end)
@@ -120,16 +120,16 @@ function S:PGFSkin()
 ]]
 	local button = UsePGFButton
 	if button then
-		M.ReskinCheck(button)
+		B.ReskinCheck(button)
 		button.text:SetWidth(35)
 	end
 
 	local popup = PremadeGroupsFilterStaticPopup
 	if popup then
-		M.StripTextures(popup)
-		M.SetBD(popup)
-		M.ReskinInput(popup.EditBox)
-		M.Reskin(popup.Button1)
-		M.Reskin(popup.Button2)
+		B.StripTextures(popup)
+		B.SetBD(popup)
+		B.ReskinInput(popup.EditBox)
+		B.Reskin(popup.Button1)
+		B.Reskin(popup.Button2)
 	end
 end

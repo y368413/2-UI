@@ -1,5 +1,5 @@
 local _, ns = ...
-local _, R = unpack(ns)
+local _, C = unpack(ns)
 
 --[[
 	左键 LeftMouseButton LMB
@@ -19,7 +19,7 @@ local _, R = unpack(ns)
 	CTRL-SHIFT-
 	ALT-CTRL-SHIFT-
 ]]
-R.ClickCastList = {
+C.ClickCastList = {
 	["DRUID"] = {
 		["MWU"] = 88423,		-- 自然之愈
 		["MWD"] = 2782,			-- 清除腐蚀

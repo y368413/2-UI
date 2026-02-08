@@ -1,20 +1,20 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
 local function NoTaintArrow(self, direction) -- needs review
-	M.StripTextures(self)
+	B.StripTextures(self)
 
 	local tex = self:CreateTexture(nil, "ARTWORK")
 	tex:SetAllPoints()
-	M.SetupArrow(tex, direction)
+	B.SetupArrow(tex, direction)
 	self.__texture = tex
 
-	self:HookScript("OnEnter", M.Texture_OnEnter)
-	self:HookScript("OnLeave", M.Texture_OnLeave)
+	self:HookScript("OnEnter", B.Texture_OnEnter)
+	self:HookScript("OnLeave", B.Texture_OnLeave)
 end
 
-tinsert(R.defaultThemes, function()
-	local r, g, b = I.r, I.g, I.b
+tinsert(C.defaultThemes, function()
+	local r, g, b = DB.r, DB.g, DB.b
 	-- [[ Item buttons ]]
 	local function colourPopout(self)
 		local aR, aG, aB
@@ -78,10 +78,10 @@ tinsert(R.defaultThemes, function()
 		local arrow = popout:CreateTexture(nil, "OVERLAY")
 		arrow:SetSize(14, 14)
 		if slot.verticalFlyout then
-			M.SetupArrow(arrow, "down")
+			B.SetupArrow(arrow, "down")
 			arrow:SetPoint("TOP", slot, "BOTTOM", 0, 1)
 		else
-			M.SetupArrow(arrow, "right")
+			B.SetupArrow(arrow, "right")
 			arrow:SetPoint("LEFT", slot, "RIGHT", -1, 0)
 		end
 		popout.arrow = arrow

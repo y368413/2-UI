@@ -9,6 +9,8 @@
 	<Script file="ItemTextFrame.lua"/>
 	<Script file="ObjectiveTracker.lua"/>
 	<Script file="PetBattleUI.lua"/>
+	<!--Script file="PetitionFrame.lua"/>
+	<Script file="SplashFrame.lua"/-->
 	<Script file="TimeManager.lua"/>
 	<Script file="UIWidgets.lua"/>
 </Ui>

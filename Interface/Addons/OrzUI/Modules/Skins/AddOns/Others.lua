@@ -1,11 +1,11 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local S = M:GetModule("Skins")
+local B, C, L, DB = unpack(ns)
+local S = B:GetModule("Skins")
 
 local _G = _G
 local strfind = strfind
 local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
-local cr, cg, cb = I.r, I.g, I.b
+local cr, cg, cb = DB.r, DB.g, DB.b
 
 function S:FriendGroups()
 	--if not IsAddOnLoaded("FriendGroups") then return end
@@ -26,7 +26,7 @@ function S:FriendGroups()
 
 		hooksecurefunc("FriendGroups_UpdateFriendButton", function(button)
 			if not button.styled then
-				local bg = M.CreateBDFrame(button.status, .25)
+				local bg = B.CreateBDFrame(button.status, .25)
 				bg:SetInside(button.status, 3, 3)
 				button.status.bg = bg
 				hooksecurefunc(button.status, "SetTexture", replaceButtonStatus)
@@ -41,16 +41,16 @@ function S:PostalSkin()
 	if not IsAddOnLoaded("Postal") then return end
 	if not PostalOpenAllButton then return end -- outdate postal
 
-	M.Reskin(PostalSelectOpenButton)
-	M.Reskin(PostalSelectReturnButton)
-	M.Reskin(PostalOpenAllButton)
-	M.Reskin(PostalForwardButton)
-	M.ReskinArrow(Postal_ModuleMenuButton, "down")
-	M.ReskinArrow(Postal_OpenAllMenuButton, "down")
+	B.Reskin(PostalSelectOpenButton)
+	B.Reskin(PostalSelectReturnButton)
+	B.Reskin(PostalOpenAllButton)
+	B.Reskin(PostalForwardButton)
+	B.ReskinArrow(Postal_ModuleMenuButton, "down")
+	B.ReskinArrow(Postal_OpenAllMenuButton, "down")
 	for i = 1, 7 do
 		local cb = _G["PostalInboxCB"..i]
 		if cb then
-			M.ReskinCheck(cb)
+			B.ReskinCheck(cb)
 		end
 	end
 
@@ -59,7 +59,7 @@ function S:PostalSkin()
 	Postal_OpenAllMenuButton:SetPoint("LEFT", PostalOpenAllButton, "RIGHT", 2, 0)
 
 	if Postal_BlackBookButton then
-		M.ReskinArrow(Postal_BlackBookButton, "down")
+		B.ReskinArrow(Postal_BlackBookButton, "down")
 		Postal_BlackBookButton:SetPoint("LEFT", SendMailNameEditBox, "RIGHT", 2, 0)
 	end
 
@@ -69,7 +69,7 @@ function S:PostalSkin()
 			button:GetNormalTexture():SetAlpha(0)
 			button:GetPushedTexture():SetAlpha(0)
 			button:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
-			M.ReskinIcon(button.icon)
+			B.ReskinIcon(button.icon)
 		end
 	end
 end
@@ -80,13 +80,13 @@ function S:SoulbindsTalents()
 	hooksecurefunc("PanelTemplates_SetNumTabs", function(frame, num)
 		if frame == _G.PlayerTalentFrame and num == 4 then
 			if _G.PlayerTalentFrameTab4 then
-				M.ReskinTab(_G.PlayerTalentFrameTab4)
+				B.ReskinTab(_G.PlayerTalentFrameTab4)
 			end
 		elseif frame == _G.SoulbindAnchor then
 			for i = 1, 4 do
 				local tab = _G["SoulbindViewerTab"..i]
 				if tab then
-					M.ReskinTab(tab)
+					B.ReskinTab(tab)
 				end
 			end
 		end
@@ -102,13 +102,13 @@ local function restyleMRTWidget(self)
 	local offset = 3
 
 	if not self.styled then
-		M.SetBD(iconTexture)
-		self.__bg = M.SetBD(bar)
+		B.SetBD(iconTexture)
+		self.__bg = B.SetBD(bar)
 		self.background:SetAllPoints(bar)
 
 		self.styled = true
 	end
-	iconTexture:SetTexCoord(unpack(I.TexCoord))
+	iconTexture:SetTexCoord(unpack(DB.TexCoord))
 	self.__bg:SetShown(parent.optionAlphaTimeLine ~= 0)
 
 	if parent.optionIconPosition == 3 or parent.optionIconTitles then
@@ -174,7 +174,7 @@ function S:MRT_Skin()
 			local button = buttons[i]
 			local icon = button and button.texture
 			if icon then
-				M.ReskinIcon(icon)
+				B.ReskinIcon(icon)
 			end
 		end
 	end
@@ -185,12 +185,12 @@ local function updateSoulshapeButtons(self)
 	for i = 1, #buttons do
 		local bu = buttons[i]
 		if not bu.bg then
-			local bg = M.CreateBDFrame(bu, .25)
+			local bg = B.CreateBDFrame(bu, .25)
 			bg:SetPoint("TOPLEFT", 3, -1)
 			bg:SetPoint("BOTTOMRIGHT", 0, 1)
 			bu.bg = bg
 
-			M.ReskinIcon(bu.icon)
+			B.ReskinIcon(bu.icon)
 			bu.selectedTexture:SetAlpha(0)
 			bu.background:SetTexture(nil)
 			bu:SetHighlightTexture(0)
@@ -215,7 +215,7 @@ function S:ReskinSecureTabs()
 		local tab = _G["CollectionsJournalSecureTab"..i]
 		if not tab then break end
 		if not tab.styled then
-			M.ReskinTab(tab)
+			B.ReskinTab(tab)
 			tab.styled = true
 		end
 	end
@@ -233,20 +233,20 @@ function S:SoulshapeJournal()
 		if styled then return end
 		styled = true
 
-		M.StripTextures(frame)
-		M.SetBD(frame, 1) -- on top of mount journal
-		M.ReskinClose(frame.CloseButton)
-		M.ReskinScroll(frame.ScrollFrame.ScrollBar)
-		M.ReskinArrow(frame.SoulshapeDisplay.ModelScene.RotateLeftButton, "left")
-		M.ReskinArrow(frame.SoulshapeDisplay.ModelScene.RotateRightButton, "right")
-		M.StripTextures(SoulshapeCollectionPanelCount)
-		M.CreateBDFrame(SoulshapeCollectionPanelCount, .25)
+		B.StripTextures(frame)
+		B.SetBD(frame, 1) -- on top of mount journal
+		B.ReskinClose(frame.CloseButton)
+		B.ReskinScroll(frame.ScrollFrame.ScrollBar)
+		B.ReskinArrow(frame.SoulshapeDisplay.ModelScene.RotateLeftButton, "left")
+		B.ReskinArrow(frame.SoulshapeDisplay.ModelScene.RotateRightButton, "right")
+		B.StripTextures(SoulshapeCollectionPanelCount)
+		B.CreateBDFrame(SoulshapeCollectionPanelCount, .25)
 
 		local searchBox, _, filterButton = select(11, frame:GetChildren())
-		M.ReskinInput(searchBox)
+		B.ReskinInput(searchBox)
 		filterButton.Icon = select(12, filterButton:GetRegions())
 		if filterButton.Icon then
-			M.ReskinFilterButton(filterButton)
+			B.ReskinFilterButton(filterButton)
 		end
 
 		hooksecurefunc(frame.ScrollFrame, "update", updateSoulshapeButtons)
@@ -263,9 +263,9 @@ function S:ATT()
 	local function reskinATTWindow(frame)
 		if not frame or frame.styled then return end
 
-		M.SetBD(frame, nil, 2, -2, -2, 2)
-		M.ReskinClose(frame.CloseButton, nil, -4, -4)
-		M.ReskinScroll(frame.ScrollBar)
+		B.SetBD(frame, nil, 2, -2, -2, 2)
+		B.ReskinClose(frame.CloseButton, nil, -4, -4)
+		B.ReskinScroll(frame.ScrollBar)
 		frame.Grip:SetTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Up]])
 		local up = frame.ScrollBar:GetChildren()
 		up:ClearAllPoints()
@@ -288,8 +288,8 @@ function S:TrinketMenu()
 
 	local function reskinFrame(frame)
 		if not frame then return end
-		M.StripTextures(frame)
-		M.SetBD(frame):SetInside(nil, 3, 3)
+		B.StripTextures(frame)
+		B.SetBD(frame):SetInside(nil, 3, 3)
 	end
 
 	local function reskinButton(name)
@@ -297,13 +297,13 @@ function S:TrinketMenu()
 		if not button then return end
 
 		button:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
-		button:SetPushedTexture(I.pushedTex)
+		button:SetPushedTexture(DB.pushedTex)
 		button:GetCheckedTexture():SetColorTexture(1, .8, 0, .5)
 		_G[name.."NormalTexture"]:SetAlpha(0)
-		M.ReskinIcon(_G[name.."Icon"])
+		B.ReskinIcon(_G[name.."Icon"])
 
 		local queue = _G[name.."Queue"]
-		if queue then queue:SetTexCoord(unpack(I.TexCoord)) end
+		if queue then queue:SetTexCoord(unpack(DB.TexCoord)) end
 	end
 
 	reskinFrame(TrinketMenu_MainFrame)
@@ -320,7 +320,7 @@ function S:ERT()
 	if not IsAddOnLoaded("EchoRaidTools") then return end
 
 	local function reskinTab(tab)
-		local bg = M.SetBD(tab)
+		local bg = B.SetBD(tab)
 		bg:SetInside(tab, 2, 2)
 
 		tab:SetNormalTexture(0)
@@ -340,7 +340,7 @@ function S:ERT()
 		local ERTTab, ERTFrame = encounterInfo.waJournalTab, encounterInfo.waJournal
 
 		reskinTab(ERTTab)
-		M.ReskinTrimScroll(ERTFrame.scrollframe.ScrollBar)
+		B.ReskinTrimScroll(ERTFrame.scrollframe.ScrollBar)
 
 		local scrollChild = ERTFrame.scrollframe:GetScrollChild()
 
@@ -351,14 +351,14 @@ function S:ERT()
 					for i = 5, 19 do
 						select(i, header.button:GetRegions()):SetTexture("")
 					end
-					M.Reskin(header.button)
+					B.Reskin(header.button)
 					header.descriptionBG:SetAlpha(0)
 					header.descriptionBGBottom:SetAlpha(0)
 					header.description:SetTextColor(1, 1, 1)
 					header.button.label:SetTextColor(1, 1, 1)
-					header.button.label.SetTextColor = M.Dummy
+					header.button.label.SetTextColor = B.Dummy
 					header.button.expandIcon:SetWidth(20) -- don't wrap the text
-					header.button.waIconbg = M.ReskinIcon(header.button.waIcon)
+					header.button.waIconbg = B.ReskinIcon(header.button.waIcon)
 					header.glowAnimation.__button = header.button
 					header.glowAnimation:HookScript("OnPlay", resetButtonBG)
 
@@ -375,16 +375,16 @@ function S:PSFJ()
 	if not IsAddOnLoaded("ProtoformSynthesisFieldJournal") then return end
 
 	local frame = _G.ProtoformSynthesisFieldJournal
-	M.StripTextures(frame)
-	M.SetBD(frame)
+	B.StripTextures(frame)
+	B.SetBD(frame)
 
-	M.ReskinClose(frame.CloseButton)
-	M.ReskinTab(frame.PanelTabs.PetTab)
-	M.ReskinTab(frame.PanelTabs.MountTab)
-	M.ReskinTab(frame.PanelTabs.SettingsTab)
+	B.ReskinClose(frame.CloseButton)
+	B.ReskinTab(frame.PanelTabs.PetTab)
+	B.ReskinTab(frame.PanelTabs.MountTab)
+	B.ReskinTab(frame.PanelTabs.SettingsTab)
 
 	local function handlePSFJScroll(scrollBar)
-		M.ReskinScroll(scrollBar)
+		B.ReskinScroll(scrollBar)
 		S.ReskinScrollEnd(scrollBar.TopButton, "up")
 		S.ReskinScrollEnd(scrollBar.BottomButton, "down")
 	end
@@ -409,7 +409,7 @@ function S:PSFJ()
 				local button = buttons[i]
 				if not button.styled then
 					button:HideBackdrop()
-					button.bg = M.CreateBDFrame(button, .25)
+					button.bg = B.CreateBDFrame(button, .25)
 					button.bg:SetInside(nil, 2, 2)
 					button:HookScript("OnEnter", onEnter)
 					button:HookScript("OnLeave", onLeave)
@@ -429,7 +429,7 @@ function S:PSFJ()
 		for i = 1, #buttons do
 			local button = buttons[i]
 			if button.CheckButton then
-				M.ReskinCheck(button.CheckButton)
+				B.ReskinCheck(button.CheckButton)
 			end
 		end
 	end)
@@ -442,32 +442,32 @@ function S:TLDR()
 		for i = 1, frame:GetNumChildren() do
 			local child = select(i, frame:GetChildren())
 			if child:IsObjectType("CheckButton") then
-				M.ReskinCheck(child)
+				B.ReskinCheck(child)
 				child:SetSize(24, 24)
 			elseif child:IsObjectType("Button") then
-				M.Reskin(child)
+				B.Reskin(child)
 			elseif child:IsObjectType("Slider") then
-				M.ReskinSlider(child)
+				B.ReskinSlider(child)
 			elseif child:IsObjectType("EditBox") then
-				M.ReskinEditBox(child)
+				B.ReskinEditBox(child)
 			elseif child:IsObjectType("Frame") and child.Button then
-				M.StripTextures(child)
-				M.ReskinArrow(child.Button, "down")
+				B.StripTextures(child)
+				B.ReskinArrow(child.Button, "down")
 			end
 		end
 	end
 
-	M.StripTextures(TLDRMissionsFrame)
-	M.ReskinClose(TLDRMissionsFrame.CloseButton)
-	M.SetBD(TLDRMissionsFrame):SetInside(nil, 2, 2)
-	M.Reskin(TLDRMissionsToggleButton)
+	B.StripTextures(TLDRMissionsFrame)
+	B.ReskinClose(TLDRMissionsFrame.CloseButton)
+	B.SetBD(TLDRMissionsFrame):SetInside(nil, 2, 2)
+	B.Reskin(TLDRMissionsToggleButton)
 
 	reskinUIElements(TLDRMissionsFrameMainPanel)
 	reskinUIElements(TLDRMissionsFrameAdvancedPanel)
 
-	M.ReskinTab(TLDRMissionsFrameTab1)
-	M.ReskinTab(TLDRMissionsFrameTab2)
-	M.ReskinTab(TLDRMissionsFrameTab3)
+	B.ReskinTab(TLDRMissionsFrameTab1)
+	B.ReskinTab(TLDRMissionsFrameTab2)
+	B.ReskinTab(TLDRMissionsFrameTab3)
 end
 
 local function handleJournal()
@@ -480,16 +480,16 @@ local function handleJournal()
 		progressBar.border:Hide()
 		progressBar:DisableDrawLayer("BACKGROUND")
 		progressBar.text:SetPoint("CENTER", 0, 1)
-		progressBar:SetStatusBarTexture(I.bdTex)
-		M.CreateBDFrame(progressBar, 1)
+		progressBar:SetStatusBarTexture(DB.bdTex)
+		B.CreateBDFrame(progressBar, 1)
 	end
 
-	M.StripTextures(frame.iconsFrame)
-	M.CreateBDFrame(frame, 1)
-	M.ReskinEditBox(frame.SearchBox)
-	M.ReskinFilterButton(frame.FilterButton)
-	M.ReskinArrow(frame.PagingFrame.PrevPageButton, "left")
-	M.ReskinArrow(frame.PagingFrame.NextPageButton, "right")
+	B.StripTextures(frame.iconsFrame)
+	B.CreateBDFrame(frame, 1)
+	B.ReskinEditBox(frame.SearchBox)
+	B.ReskinFilterButton(frame.FilterButton)
+	B.ReskinArrow(frame.PagingFrame.PrevPageButton, "left")
+	B.ReskinArrow(frame.PagingFrame.NextPageButton, "right")
 	S:ReskinSecureTabs()
 	if CollectionsJournalCoverTab then
 		CollectionsJournalCoverTab:SetAlpha(0)
@@ -503,8 +503,8 @@ local function handleJournal()
 			button:SetPushedTexture(0)
 			button:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
 			button:GetHighlightTexture():SetAllPoints(icon)
-			button.iconTextureUncollected:SetTexCoord(unpack(I.TexCoord))
-			button.bg = M.ReskinIcon(icon)
+			button.iconTextureUncollected:SetTexCoord(unpack(DB.TexCoord))
+			button.bg = B.ReskinIcon(icon)
 		end
 	end)
 end
@@ -523,7 +523,7 @@ function S:ManuscriptsJournal()
 end
 
 function S:OtherSkins()
-	if not R.db["Skins"]["BlizzardSkins"] then return end
+	if not C.db["Skins"]["BlizzardSkins"] then return end
 
 	S:FriendGroups()
 	C_Timer.After(1, S.PostalSkin)

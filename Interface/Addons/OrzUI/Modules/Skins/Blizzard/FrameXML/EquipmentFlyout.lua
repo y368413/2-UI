@@ -1,8 +1,8 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
-tinsert(R.defaultThemes, function()
-	if not R.db["Skins"]["BlizzardSkins"] then return end
+tinsert(C.defaultThemes, function()
+	if not C.db["Skins"]["BlizzardSkins"] then return end
 
 	hooksecurefunc("EquipmentFlyout_CreateButton", function()
 		local button = EquipmentFlyoutFrame.buttons[#EquipmentFlyoutFrame.buttons]
@@ -10,8 +10,8 @@ tinsert(R.defaultThemes, function()
 		button:SetNormalTexture(0)
 		button:SetPushedTexture(0)
 		button:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
-		button.bg = M.ReskinIcon(button.icon)
-		M.ReskinIconBorder(button.IconBorder)
+		button.bg = B.ReskinIcon(button.icon)
+		B.ReskinIconBorder(button.IconBorder)
 	end)
 
 	hooksecurefunc("EquipmentFlyout_DisplayButton", function(button)
@@ -25,7 +25,7 @@ tinsert(R.defaultThemes, function()
 	hooksecurefunc("EquipmentFlyout_UpdateItems", function()
 		local frame = EquipmentFlyoutFrame.buttonFrame
 		if not frame.bg then
-			frame.bg = M.SetBD(EquipmentFlyoutFrame.buttonFrame)
+			frame.bg = B.SetBD(EquipmentFlyoutFrame.buttonFrame)
 		end
 		frame:SetWidth(frame:GetWidth()+3)
 	end)
@@ -34,10 +34,10 @@ tinsert(R.defaultThemes, function()
 	EquipmentFlyoutFrameButtons:DisableDrawLayer("ARTWORK")
 
 	local navigationFrame = EquipmentFlyoutFrame.NavigationFrame
-	M.SetBD(navigationFrame)
+	B.SetBD(navigationFrame)
 	navigationFrame:SetPoint("TOPLEFT", EquipmentFlyoutFrameButtons, "BOTTOMLEFT", 0, -3)
 	navigationFrame:SetPoint("TOPRIGHT", EquipmentFlyoutFrameButtons, "BOTTOMRIGHT", 0, -3)
-	M.ReskinArrow(navigationFrame.PrevButton, "left")
-	M.ReskinArrow(navigationFrame.NextButton, "right")
+	B.ReskinArrow(navigationFrame.PrevButton, "left")
+	B.ReskinArrow(navigationFrame.NextButton, "right")
 	navigationFrame.BottomBackground:Hide()
 end)

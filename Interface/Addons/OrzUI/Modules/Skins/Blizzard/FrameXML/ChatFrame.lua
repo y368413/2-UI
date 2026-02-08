@@ -1,26 +1,26 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local r, g, b = I.r, I.g, I.b
+local B, C, L, DB = unpack(ns)
+local r, g, b = DB.r, DB.g, DB.b
 
 local function ReskinChatScroll(self)
-	M.ReskinTrimScroll(self.ScrollBar)
+	B.ReskinTrimScroll(self.ScrollBar)
 
-	M.StripTextures(self.ScrollToBottomButton)
+	B.StripTextures(self.ScrollToBottomButton)
 	local flash = self.ScrollToBottomButton.Flash
-	M.SetupArrow(flash, "down")
+	B.SetupArrow(flash, "down")
 	flash:SetVertexColor(1, .8, 0)
 end
 
-tinsert(R.defaultThemes, function()
+tinsert(C.defaultThemes, function()
 	TimeAlertFrame:SetBackdrop(nil)
-	M.SetBD(TimeAlertFrame)
+	B.SetBD(TimeAlertFrame)
 
 	-- ChatFrame
-	M.Reskin(ChatFrameChannelButton)
+	B.Reskin(ChatFrameChannelButton)
 	ChatFrameChannelButton:SetSize(20, 20)
-	M.Reskin(ChatFrameToggleVoiceDeafenButton)
+	B.Reskin(ChatFrameToggleVoiceDeafenButton)
 	ChatFrameToggleVoiceDeafenButton:SetSize(20, 20)
-	M.Reskin(ChatFrameToggleVoiceMuteButton)
+	B.Reskin(ChatFrameToggleVoiceMuteButton)
 	ChatFrameToggleVoiceMuteButton:SetSize(20, 20)
 	--ChatFrameMenuButton:SetSize(20, 20)
 	--ChatFrameMenuButton:SetNormalTexture(homeTex)
@@ -30,16 +30,16 @@ tinsert(R.defaultThemes, function()
 		ReskinChatScroll(_G["ChatFrame"..i])
 	end
 
-	M.SetBD(VoiceChatPromptActivateChannel)
-	M.Reskin(VoiceChatPromptActivateChannel.AcceptButton)
+	B.SetBD(VoiceChatPromptActivateChannel)
+	B.Reskin(VoiceChatPromptActivateChannel.AcceptButton)
 	VoiceChatChannelActivatedNotification:SetBackdrop(nil)
-	M.SetBD(VoiceChatChannelActivatedNotification)
+	B.SetBD(VoiceChatChannelActivatedNotification)
 
 	-- VoiceActivityManager
 	hooksecurefunc(VoiceActivityManager, "LinkFrameNotificationAndGuid", function(_, _, notification, guid)
 		local class = select(2, GetPlayerInfoByGUID(guid))
 		if class then
-			local color = I.ClassColors[class]
+			local color = DB.ClassColors[class]
 			if notification.Name then
 				notification.Name:SetTextColor(color.r, color.g, color.b)
 			end

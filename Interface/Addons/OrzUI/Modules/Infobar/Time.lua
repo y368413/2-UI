@@ -1,10 +1,10 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-if not R.Infobar.Time then return end
+local B, C, L, DB = unpack(ns)
+if not C.Infobar.Time then return end
 
-local module = M:GetModule("Infobar")
-local info = module:RegisterInfobar("Time", R.Infobar.TimePos)
-info.text:SetFont(unpack(R.Infobar.TimeFonts))
+local module = B:GetModule("Infobar")
+local info = module:RegisterInfobar("Time", C.Infobar.TimePos)
+info.text:SetFont(unpack(C.Infobar.TimeFonts))
 local time, date = time, date
 local strfind, format, floor, strmatch = strfind, format, floor, strmatch
 local mod, tonumber, pairs, ipairs = mod, tonumber, pairs, ipairs
@@ -35,7 +35,7 @@ local function updateTimerFormat(color, hour, minute)
 	if GetCVarBool("timeMgrUseMilitaryTime") then
 		return format(color..TIMEMANAGER_TICKER_24HOUR, hour, minute)
 	else
-		local timerUnit = I.MyColor..(hour < 12 and "|cffffffff^|r" or "|cffffffff.|")
+		local timerUnit = DB.MyColor..(hour < 12 and "|cffffffff^|r" or "|cffffffff.|r")
 		if hour > 12 then hour = hour - 12 end
 		return format(color..TIMEMANAGER_TICKER_12HOUR..timerUnit, hour, minute)
 	end
@@ -77,9 +77,9 @@ local function checkTimeWalker(event)
 			break
 		end
 	end
-	M:UnregisterEvent(event, checkTimeWalker)
+	B:UnregisterEvent(event, checkTimeWalker)
 end
-M:RegisterEvent("PLAYER_ENTERING_WORLD", checkTimeWalker)
+B:RegisterEvent("PLAYER_ENTERING_WORLD", checkTimeWalker)
 
 local function checkTexture(texture)
 	if not walkerTexture then return end
@@ -89,15 +89,15 @@ local function checkTexture(texture)
 end
 
 local questlist = {
-	{name = U["Mean One"], id = 6983},
-	{name = U["Blingtron"], id = 34774},
-	{name = U["Timewarped"], id = 83285, texture = 6006158},	-- Vanilla
-	{name = U["Timewarped"], id = 40168, texture = 1129674},	-- TBC
-	{name = U["Timewarped"], id = 40173, texture = 1129686},	-- WotLK
-	{name = U["Timewarped"], id = 40786, texture = 1304688},	-- Cata
-	{name = U["Timewarped"], id = 45563, texture = 1530590},	-- MoP
-	{name = U["Timewarped"], id = 55499, texture = 1129683},	-- WoD
-	{name = U["Timewarped"], id = 64710, texture = 1467047},	-- Legion
+	{name = L["Mean One"], id = 6983},
+	{name = L["Blingtron"], id = 34774},
+	{name = L["Timewarped"], id = 83285, texture = 6006158},	-- Vanilla
+	{name = L["Timewarped"], id = 40168, texture = 1129674},	-- TBC
+	{name = L["Timewarped"], id = 40173, texture = 1129686},	-- WotLK
+	{name = L["Timewarped"], id = 40786, texture = 1304688},	-- Cata
+	{name = L["Timewarped"], id = 45563, texture = 1530590},	-- MoP
+	{name = L["Timewarped"], id = 55499, texture = 1129683},	-- WoD
+	{name = L["Timewarped"], id = 64710, texture = 1467047},	-- Legion
 	{name = C_Spell.GetSpellName(388945), id = 70866},	-- SoDK
 	{name = "", id = 70906, itemID = 200468},	-- Grand hunt
 	{name = "", id = 70893, questName = true},	-- Community feast
@@ -126,8 +126,8 @@ local bfaZoneTime = {
 }
 
 local invIndex = {
-	[1] = {title = U["Legion Invasion"], duration = 52200, maps = {630, 641, 650, 634}, timeTable = {}, baseTime = legionZoneTime[region] or legionZoneTime["CN"]},
-	[2] = {title = U["BfA Invasion"], duration = 68400, maps = {862, 863, 864, 896, 942, 895}, timeTable = {4, 1, 6, 2, 5, 3}, baseTime = bfaZoneTime[region] or bfaZoneTime["CN"]},
+	[1] = {title = L["Legion Invasion"], duration = 52200, maps = {630, 641, 650, 634}, timeTable = {}, baseTime = legionZoneTime[region] or legionZoneTime["CN"]},
+	[2] = {title = L["BfA Invasion"], duration = 68400, maps = {862, 863, 864, 896, 942, 895}, timeTable = {4, 1, 6, 2, 5, 3}, baseTime = bfaZoneTime[region] or bfaZoneTime["CN"]},
 }
 
 local mapAreaPoiIDs = {
@@ -216,7 +216,7 @@ local function GetElementalType(element) -- 获取入侵类型图标
 	if not str then
 		local info = C_Texture.GetAtlasInfo("ElementalStorm-Lesser-"..element)
 		if info then
-			str = M:GetTextureStrByAtlas(info, 16, 16)
+			str = B:GetTextureStrByAtlas(info, 16, 16)
 			atlasCache[element] = str
 		end
 	end
@@ -291,8 +291,8 @@ info.onEnter = function(self)
 	local w, m, d, y = today.weekday, today.month, today.monthDay, today.year
 	GameTooltip:AddLine(format(FULLDATE, CALENDAR_WEEKDAY_NAMES[w], CALENDAR_FULLDATE_MONTH_NAMES[m], d, y), 0,.6,1)
 	GameTooltip:AddLine(" ")
-	GameTooltip:AddDoubleLine(U["Local Time"], GameTime_GetLocalTime(true), .6,.8,1 ,1,1,1)
-	GameTooltip:AddDoubleLine(U["Realm Time"], GameTime_GetGameTime(true), .6,.8,1 ,1,1,1)
+	GameTooltip:AddDoubleLine(L["Local Time"], GameTime_GetLocalTime(true), .6,.8,1 ,1,1,1)
+	GameTooltip:AddDoubleLine(L["Realm Time"], GameTime_GetGameTime(true), .6,.8,1 ,1,1,1)
 
 	-- World bosses
 	title = false
@@ -332,7 +332,7 @@ info.onEnter = function(self)
 	title = false
 	for _, v in pairs(questlist) do
 		if v.name and IsQuestFlaggedCompleted(v.id) then
-			if v.name == U["Timewarped"] and isTimeWalker and checkTexture(v.texture) or v.name ~= U["Timewarped"] then
+			if v.name == L["Timewarped"] and isTimeWalker and checkTexture(v.texture) or v.name ~= L["Timewarped"] then
 				addTitle(QUESTS_LABEL)
 				GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, QUEST_COMPLETE, 1,1,1, 1,0,0)
 			end
@@ -421,28 +421,28 @@ info.onEnter = function(self)
 			if timeLeft then
 				timeLeft = timeLeft/60
 				if timeLeft < 60 then r,g,b = 1,0,0 else r,g,b = 0,1,0 end
-				GameTooltip:AddDoubleLine(U["Current Invasion"]..zoneName, GetFormattedTimeLeft(timeLeft), 1,1,1, r,g,b)
+				GameTooltip:AddDoubleLine(L["Current Invasion"]..zoneName, GetFormattedTimeLeft(timeLeft), 1,1,1, r,g,b)
 			end
 			local nextLocation = GetNextLocation(nextTime, index)
-			GameTooltip:AddDoubleLine(U["Next Invasion"]..nextLocation, date("%m/%d %H:%MISC", nextTime), 1,1,1, 1,1,1)
+			GameTooltip:AddDoubleLine(L["Next Invasion"]..nextLocation, date("%m/%d %H:%M", nextTime), 1,1,1, 1,1,1)
 		end
 	--else
 		--GameTooltip:AddLine(" ")
-		--GameTooltip:AddLine(U["Hold Shift"], .6,.8,1)
+		--GameTooltip:AddLine(L["Hold Shift"], .6,.8,1)
 	--end
 
 	-- Help Info
-	GameTooltip:AddDoubleLine(" ", I.LineString)
-	GameTooltip:AddDoubleLine(" ",I.LeftButton..U["Toggle Calendar"].."|cffFF0000--|r"..I.ScrollButton..RATED_PVP_WEEKLY_VAULT.."|cffFF0000--|r"..I.RightButton..U["Toggle Clock"],1,1,1,.6,.8,1)
+	GameTooltip:AddDoubleLine(" ", DB.LineString)
+	GameTooltip:AddDoubleLine(" ",DB.LeftButton..L["Toggle Calendar"].."|cffFF0000--|r"..DB.ScrollButton..RATED_PVP_WEEKLY_VAULT.."|cffFF0000--|r"..DB.RightButton..L["Toggle Clock"],1,1,1,.6,.8,1)
 	GameTooltip:Show()
 
-	M:RegisterEvent("MODIFIER_STATE_CHANGED", info.onShiftDown)
+	B:RegisterEvent("MODIFIER_STATE_CHANGED", info.onShiftDown)
 end
 
 info.onLeave = function(self)
 	self.entered = true
-	M.HideTooltip()
-	M:UnregisterEvent("MODIFIER_STATE_CHANGED", info.onShiftDown)
+	B.HideTooltip()
+	B:UnregisterEvent("MODIFIER_STATE_CHANGED", info.onShiftDown)
 end
 
 info.onMouseUp = function(_, btn)
@@ -451,7 +451,7 @@ info.onMouseUp = function(_, btn)
 	elseif btn == "MiddleButton" then
 		if not WeeklyRewardsFrame then C_AddOns.LoadAddOn("Blizzard_WeeklyRewards") end
 		if InCombatLockdown() then
-			M:TogglePanel(WeeklyRewardsFrame)
+			B:TogglePanel(WeeklyRewardsFrame)
 		else
 			ToggleFrame(WeeklyRewardsFrame)
 		end
@@ -460,7 +460,7 @@ info.onMouseUp = function(_, btn)
 			dialog:Hide()
 		end
 	else
-		if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
+		if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
 		ToggleCalendar()
 	end
 end

@@ -1,4 +1,4 @@
---## Author: Bodify ## Version: 1.1.0
+--## Author: Bodify ## Version: 1.1.0 ## SavedVariables: BetterBlizzQueueDB ## IconAtlas: gmchat-icon-blizz
 local bgId
 local updateFrame
 local proposalTimeLeft = 40

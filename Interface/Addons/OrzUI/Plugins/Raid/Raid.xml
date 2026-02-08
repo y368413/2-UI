@@ -1,10 +1,10 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="TankHappy.lua"/>
-	<Script file="PremadeSort.lua"/>
 	<Script file="BossesKilled.lua"/>
-	<Script file="ElitismHelper.lua"/>
+	<!--Script file="ElitismHelper.lua"/-->
 	<Script file="LFR_of_the_past.lua"/>
 	<Script file="BetterBlizzQueue.lua"/>
+	<Script file="PremadeGroupSort.lua"/>
 	<Script file="AdventureGuideLockouts.lua"/>
-	<Include file="DamageEx\DamageEx.xml"/>
+	<!--Include file="DamageEx\DamageEx.xml"/-->
 </Ui>

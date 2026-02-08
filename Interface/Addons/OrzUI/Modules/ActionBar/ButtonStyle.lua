@@ -1,6 +1,6 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-local Bar = M:GetModule("Actionbar")
+local B, C, L, DB = unpack(ns)
+local Bar = B:GetModule("Actionbar")
 
 local keyButton = gsub(KEY_BUTTON4, "%d", "")
 local keyNumpad = gsub(KEY_NUMPAD1, "%d", "")
@@ -105,16 +105,16 @@ function Bar:StyleActionButton(button)
 	if icon then
 		icon:SetInside()
 		if not icon.__lockdown then
-			icon:SetTexCoord(unpack(I.TexCoord))
+			icon:SetTexCoord(unpack(DB.TexCoord))
 		end
-		button.__bg = M.SetBD(icon, .25)
+		button.__bg = B.SetBD(icon, .25)
 	end
 	if cooldown then
 		cooldown:SetAllPoints()
 	end
 	if pushed then
 		pushed:SetInside()
-		pushed:SetTexture(I.pushedTex)
+		pushed:SetTexture(DB.pushedTex)
 	end
 	if checked then
 		checked:SetInside()

@@ -1,15 +1,15 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
 local bit_band, bit_bor = bit.band, bit.bor
 local COMBATLOG_OBJECT_AFFILIATION_MINE = COMBATLOG_OBJECT_AFFILIATION_MINE or 0x00000001
 local GetSpecialization, GetSpecializationInfo = GetSpecialization, GetSpecializationInfo
 
-I.Version = C_AddOns.GetAddOnMetadata("OrzUI", "Version")
-I.Support = C_AddOns.GetAddOnMetadata("OrzUI", "X-Support")
-I.Client = GetLocale()
-I.ScreenWidth, I.ScreenHeight = GetPhysicalScreenSize()
-I.isNewPatch = select(4, GetBuildInfo()) >= 110207 -- 11.2.7
+DB.Version = C_AddOns.GetAddOnMetadata("OrzUI", "Version")
+DB.Support = C_AddOns.GetAddOnMetadata("OrzUI", "X-Support")
+DB.Client = GetLocale()
+DB.ScreenWidth, DB.ScreenHeight = GetPhysicalScreenSize()
+DB.isNewPatch = select(4, GetBuildInfo()) >= 120000 -- 12.0.0
 
 -- Deprecated
 do
@@ -33,91 +33,92 @@ do
 end
 
 -- Colors
-I.MyName = UnitName("player")
-I.MyRealm = GetRealmName()
-I.MyFullName = I.MyName.."-"..I.MyRealm
-I.MyClass = select(2, UnitClass("player"))
-I.MyFaction = UnitFactionGroup("player")
-I.ClassList = {}
+DB.MyName = UnitName("player")
+DB.MyRealm = GetRealmName()
+DB.MyFullName = DB.MyName.."-"..DB.MyRealm
+DB.MyClass = select(2, UnitClass("player"))
+DB.MyFaction = UnitFactionGroup("player")
+DB.ClassList = {}
 for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
-	I.ClassList[v] = k
+	DB.ClassList[v] = k
 end
 for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do
-	I.ClassList[v] = k
+	DB.ClassList[v] = k
 end
-I.ClassColors = {}
+DB.ClassColors = {}
 local colors = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
 for class, value in pairs(colors) do
-	I.ClassColors[class] = {}
-	I.ClassColors[class].r = value.r
-	I.ClassColors[class].g = value.g
-	I.ClassColors[class].b = value.b
-	I.ClassColors[class].colorStr = value.colorStr
+	DB.ClassColors[class] = {}
+	DB.ClassColors[class].r = value.r
+	DB.ClassColors[class].g = value.g
+	DB.ClassColors[class].b = value.b
+	DB.ClassColors[class].colorStr = value.colorStr
 end
-I.r, I.g, I.b = I.ClassColors[I.MyClass].r, I.ClassColors[I.MyClass].g, I.ClassColors[I.MyClass].b
-I.MyColor = format("|cff%02x%02x%02x", I.r*255, I.g*255, I.b*255)
-I.InfoColor = "|cff99ccff" --.6,.8,1
-I.GreyColor = "|cff7b8489"  --cff808080
-I.QualityColors = {}
+DB.r, DB.g, DB.b = DB.ClassColors[DB.MyClass].r, DB.ClassColors[DB.MyClass].g, DB.ClassColors[DB.MyClass].b
+DB.MyColor = format("|cff%02x%02x%02x", DB.r*255, DB.g*255, DB.b*255)
+DB.InfoColor = "|cff99ccff" --.6,.8,1
+DB.GreyColor = "|cff7b8489"  --cff808080
+DB.QualityColors = {}
 local qualityColors = BAG_ITEM_QUALITY_COLORS
 for index, value in pairs(qualityColors) do
-	I.QualityColors[index] = {r = value.r, g = value.g, b = value.b}
+	DB.QualityColors[index] = {r = value.r, g = value.g, b = value.b}
 end
-I.QualityColors[-1] = {r = 0, g = 0, b = 0}
-I.QualityColors[Enum.ItemQuality.Poor] = {r = COMMON_GRAY_COLOR.r, g = COMMON_GRAY_COLOR.g, b = COMMON_GRAY_COLOR.b}
-I.QualityColors[Enum.ItemQuality.Common] = {r = 0, g = 0, b = 0}
-I.QualityColors[99] = {r = 1, g = 0, b = 0}
+DB.QualityColors[-1] = {r = 0, g = 0, b = 0}
+DB.QualityColors[Enum.ItemQuality.Poor] = {r = COMMON_GRAY_COLOR.r, g = COMMON_GRAY_COLOR.g, b = COMMON_GRAY_COLOR.b}
+DB.QualityColors[Enum.ItemQuality.Common] = {r = 0, g = 0, b = 0}
+DB.QualityColors[99] = {r = 1, g = 0, b = 0}
 
 -- Fonts
-I.Font = {STANDARD_TEXT_FONT, 12, "OUTLINE"}
-I.LineString = I.GreyColor.."---------------"
-I.OrzUIString = "|cff0080ffOrzUI:|r"
+DB.Font = {STANDARD_TEXT_FONT, 12, "OUTLINE"}
+DB.LineString = DB.GreyColor.."---------------"
+DB.OrzUIString = "|cff0080ffOrzUI:|r"
 
 -- Textures
 local Media = "Interface\\Addons\\OrzUI\\Media\\"
-I.bdTex = "Interface\\ChatFrame\\ChatFrameBackground"
-I.glowTex = Media.."glowTex"
-I.normTex = Media.."normTex"
-I.gradTex = Media.."gradTex"
-I.flatTex = Media.."flatTex"
-I.bgTex = Media.."bgTex"
-I.pushedTex = Media.."pushed"
-I.arrowTex = Media.."Modules\\Raid\\Arrow"  --"Interface\\BUTTONS\\UI-MicroStream-Red.blp"
-I.starTex = Media.."Hutu\\star"
-I.flagTex = Media.."Hutu\\flag"
-I.MicroTex = Media.."Hutu\\"
-I.chatLogo = Media.."2UI.blp"
-I.logoTex = Media.."2UI.blp"
-I.closeTex = Media.."Hutu\\close"
-I.ArrowUp = Media.."Modules\\Raid\\ArrowLarge"
-I.afdianTex = Media.."Hutu\\Afdian"
-I.patreonTex = Media.."Hutu\\Patreon"
-I.curseforgeTex = Media.."Hutu\\CURSEFORGE"
-I.boxTex = Media.."Hutu\\Box"
-I.mailTex = "Interface\\Minimap\\Tracking\\Mailbox"
-I.gearTex = "Interface\\WorldMap\\Gear_64"
-I.eyeTex = "Interface\\Minimap\\Raid_Icon"		-- blue: \\Dungeon_Icon
-I.garrTex = "Interface\\HelpFrame\\HelpIcon-ReportLag"
-I.copyTex = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up"
-I.binTex = "Interface\\HelpFrame\\ReportLagIcon-Loot"
-I.questTex = "adventureguide-microbutton-alert"
-I.objectTex = "Warfronts-BaseMapIcons-Horde-Barracks-Minimap"
-I.creditTex = "Interface\\HelpFrame\\HelpIcon-KnowledgeBase"
-I.newItemFlash = "Interface\\Cooldown\\star4"
-I.sparkTex = "Interface\\CastingBar\\UI-CastingBar-Spark"
-I.TexCoord = {.08, .92, .08, .92}
-I.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
-I.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:410|t "
-I.ScrollButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:127:204|t "
-I.AFKTex = "|T"..FRIENDS_TEXTURE_AFK..":14:14:0:0:16:16:1:15:1:15|t"
-I.DNDTex = "|T"..FRIENDS_TEXTURE_DND..":14:14:0:0:16:16:1:15:1:15|t"
+DB.bdTex = "Interface\\ChatFrame\\ChatFrameBackground"
+DB.glowTex = Media.."glowTex"
+DB.normTex = Media.."normTex"
+DB.gradTex = Media.."gradTex"
+DB.flatTex = Media.."flatTex"
+DB.bgTex = Media.."bgTex"
+DB.pushedTex = Media.."pushed"
+DB.arrowTex = Media.."Modules\\Raid\\Arrow"  --"Interface\\BUTTONS\\UI-MicroStream-Red.blp"
+DB.barArrow = Media.."Modules\\Raid\\ArrowLarge"  --"Arrows.png"
+DB.starTex = Media.."Hutu\\star"
+DB.flagTex = Media.."Hutu\\flag"
+DB.MicroTex = Media.."Hutu\\"
+DB.chatLogo = Media.."2UI.blp"
+DB.logoTex = Media.."2UI.blp"
+DB.closeTex = Media.."Hutu\\close"
+DB.ArrowUp = Media.."Modules\\Raid\\ArrowLarge"
+DB.afdianTex = Media.."Hutu\\Afdian"
+DB.patreonTex = Media.."Hutu\\Patreon"
+DB.curseforgeTex = Media.."Hutu\\CURSEFORGE"
+DB.boxTex = Media.."Hutu\\Box"
+DB.mailTex = "Interface\\Minimap\\Tracking\\Mailbox"
+DB.gearTex = "Interface\\WorldMap\\Gear_64"
+DB.eyeTex = "Interface\\Minimap\\Raid_Icon"		-- blue: \\Dungeon_Icon
+DB.garrTex = "Interface\\HelpFrame\\HelpIcon-ReportLag"
+DB.copyTex = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up"
+DB.binTex = "Interface\\HelpFrame\\ReportLagIcon-Loot"
+DB.questTex = "adventureguide-microbutton-alert"
+DB.objectTex = "Warfronts-BaseMapIcons-Horde-Barracks-Minimap"
+DB.creditTex = "Interface\\HelpFrame\\HelpIcon-KnowledgeBase"
+DB.newItemFlash = "Interface\\Cooldown\\star4"
+DB.sparkTex = "Interface\\CastingBar\\UI-CastingBar-Spark"
+DB.TexCoord = {.08, .92, .08, .92}
+DB.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
+DB.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:410|t "
+DB.ScrollButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:127:204|t "
+DB.AFKTex = "|T"..FRIENDS_TEXTURE_AFK..":14:14:0:0:16:16:1:15:1:15|t"
+DB.DNDTex = "|T"..FRIENDS_TEXTURE_DND..":14:14:0:0:16:16:1:15:1:15|t"
 
 -- Flags
-function I:IsMyPet(flags)
+function DB:IsMyPet(flags)
 	return bit_band(flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0
 end
-I.PartyPetFlags = bit_bor(COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_CONTROL_PLAYER, COMBATLOG_OBJECT_TYPE_PET)
-I.RaidPetFlags = bit_bor(COMBATLOG_OBJECT_AFFILIATION_RAID, COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_CONTROL_PLAYER, COMBATLOG_OBJECT_TYPE_PET)
+DB.PartyPetFlags = bit_bor(COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_CONTROL_PLAYER, COMBATLOG_OBJECT_TYPE_PET)
+DB.RaidPetFlags = bit_bor(COMBATLOG_OBJECT_AFFILIATION_RAID, COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_CONTROL_PLAYER, COMBATLOG_OBJECT_TYPE_PET)
 
 -- RoleUpdater
 local function CheckRole()
@@ -125,22 +126,22 @@ local function CheckRole()
 	if not tree then return end
 	local _, _, _, _, role, stat = GetSpecializationInfo(tree)
 	if role == "TANK" then
-		I.Role = "Tank"
+		DB.Role = "Tank"
 	elseif role == "HEALER" then
-		I.Role = "Healer"
+		DB.Role = "Healer"
 	elseif role == "DAMAGER" then
 		if stat == 4 then	--1力量，2敏捷，4智力
-			I.Role = "Caster"
+			DB.Role = "Caster"
 		else
-			I.Role = "Melee"
+			DB.Role = "Melee"
 		end
 	end
 end
-M:RegisterEvent("PLAYER_LOGIN", CheckRole)
-M:RegisterEvent("PLAYER_TALENT_UPDATE", CheckRole)
+B:RegisterEvent("PLAYER_LOGIN", CheckRole)
+B:RegisterEvent("PLAYER_TALENT_UPDATE", CheckRole)
 
 -- Raidbuff Checklist
-I.BuffList = {
+DB.BuffList = {
 	[1] = {		-- 合剂
 		431971,	-- 淬火侵攻合剂
 		431972,	-- 淬火矫健合剂
@@ -170,7 +171,7 @@ I.BuffList = {
 }
 
 -- Reminder Buffs Checklist
-I.ReminderBuffs = {
+DB.ReminderBuffs = {
 	ITEMS = {
 		{	itemID = 190384, -- 9.0永久属性符文
 			spells = {

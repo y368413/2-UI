@@ -1,4 +1,4 @@
-﻿--## Author: Vladinator  ## Version: 11.2.5.251025
+﻿--## Author: Vladinator  ## Version: 12.0.0.260119
 local CandyBuckets = {}
 CandyBuckets.modules = CandyBuckets.modules or {}
 CandyBuckets.modules["brewfest"] = {
@@ -971,7 +971,7 @@ do
 			local options = {
 				from = "[CandyBuckets]",
 				quest = poi.quest,
-				title = format("%s (%s, %d)", poi.name, mapInfo.name or ("Map " .. childUiMapID), poi.quest.quest),
+				title = format("%s (%s, %d)", poi.name, mapInfo.name or format("Map %d", childUiMapID), poi.quest.quest),
 				minimap = true,
 				crazy = true,
 			}
@@ -991,7 +991,7 @@ do
 							local options = {
 								from = "[CandyBuckets]",
 								quest = quest,
-								title = format("%s (%s, %d)", name, mapInfo.name or ("Map " .. uiMapID), quest.quest),
+								title = format("%s (%s, %d)", name, mapInfo.name or format("Map %d", uiMapID), quest.quest),
 								minimap = true,
 								crazy = true,
 							}
@@ -1053,7 +1053,7 @@ do
 				mapID = childUiMapID,
 				x = childX,
 				y = childY,
-				title = format("%s (%s, %d)", poi.name, mapInfo.name or ("Map " .. childUiMapID), poi.quest.quest),
+				title = format("%s (%s, %d)", poi.name, mapInfo.name or format("Map %d", childUiMapID), poi.quest.quest),
 				setTracked = true,
 			})
 			return true
@@ -1072,7 +1072,7 @@ do
 								mapID = uiMapID,
 								x = coords[1]/100,
 								y = coords[2]/100,
-								title = format("%s (%s, %d)", name, mapInfo.name or ("Map " .. uiMapID), quest.quest),
+								title = format("%s (%s, %d)", name, mapInfo.name or format("Map %d", uiMapID), quest.quest),
 								setTracked = true,
 							})
 						end
@@ -1270,7 +1270,7 @@ function CandyBucketsDataProviderMixin:RefreshAllData(fromOnShow)
 				poi = quest[childUiMapID] ---@type Vector2DMixin?
 
 				if poi then
-					local translateKey = uiMapID .. "," .. childUiMapID
+					local translateKey = format("%s,%s", uiMapID, childUiMapID)
 
 					if poi[translateKey] ~= nil then
 						poi = poi[translateKey]
@@ -1393,7 +1393,7 @@ function CandyBucketsPinMixin:OnMouseEnter()
 	if self.description and self.description ~= "" then
 		GameTooltip_AddNormalLine(GameTooltip, self.description, true)
 	end
-	--GameTooltip_AddNormalLine(GameTooltip, "Quest ID: " .. self.quest.quest, false)
+	--GameTooltip_AddNormalLine(GameTooltip, format("Quest ID: %s", self.quest.quest), false)
 	--if CandyBuckets:GetWaypointAddon() then
 		--GameTooltip_AddNormalLine(GameTooltip, "<Click to show waypoint.>", false)
 	--end

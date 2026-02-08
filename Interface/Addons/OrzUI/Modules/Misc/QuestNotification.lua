@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local MISC = M:GetModule("Misc")
+local B, C, L, DB = unpack(ns)
+local M = B:GetModule("Misc")
 
 local strmatch, strfind, gsub, format, floor = strmatch, strfind, gsub, format, floor
 local wipe, mod, tonumber, pairs, print = wipe, mod, tonumber, pairs, print
@@ -40,7 +40,7 @@ local function completeText(questID)
 end
 
 local function sendQuestMsg(msg)
-	if R.db["Misc"]["OnlyCompleteRing"] then return end
+	if C.db["Misc"]["OnlyCompleteRing"] then return end
 
 	if (IsPartyLFG() or C_PartyInfo.IsPartyWalkIn()) then
 		SendChatMessage(msg, "INSTANCE_CHAT")
@@ -68,9 +68,9 @@ local questMatches = {
 	["QuestFailed"] = getPattern(ERR_QUEST_FAILED_S),
 }
 
-function MISC:FindQuestProgress(_, msg)
-	if not R.db["Misc"]["QuestProgress"] then return end
-	if R.db["Misc"]["OnlyCompleteRing"] then return end
+function M:FindQuestProgress(_, msg)
+	if not C.db["Misc"]["QuestProgress"] then return end
+	if C.db["Misc"]["OnlyCompleteRing"] then return end
 
 	for _, pattern in pairs(questMatches) do
 		if strmatch(msg, pattern) then
@@ -89,7 +89,7 @@ function MISC:FindQuestProgress(_, msg)
 end
 
 local WQcache = {}
-function MISC:FindQuestAccept(questID)
+function M:FindQuestAccept(questID)
 	if not questID then return end
 	if C_QuestLog_IsWorldQuest(questID) and WQcache[questID] then return end
 	WQcache[questID] = true
@@ -106,7 +106,7 @@ function MISC:FindQuestAccept(questID)
 	end
 end
 
-function MISC:FindQuestComplete()
+function M:FindQuestComplete()
 	for i = 1, C_QuestLog_GetNumQuestLogEntries() do
 		local questID = C_QuestLog_GetQuestIDForLogIndex(i)
 		local isComplete = questID and C_QuestLog_IsComplete(questID)
@@ -120,7 +120,7 @@ function MISC:FindQuestComplete()
 	initComplete = true
 end
 
-function MISC:FindWorldQuestComplete(questID)
+function M:FindWorldQuestComplete(questID)
 	if C_QuestLog_IsWorldQuest(questID) then
 		if questID and not completedQuest[questID] then
 			sendQuestMsg(completeText(questID))
@@ -137,26 +137,26 @@ local glyphAchievements = {
 	[16578] = true, -- 索德拉苏斯
 }
 
-function MISC:FindDragonGlyph(achievementID, criteriaString)
+function M:FindDragonGlyph(achievementID, criteriaString)
 	if glyphAchievements[achievementID] then
 		sendQuestMsg(criteriaString.." "..COLLECTED)
 	end
 end
 
-function MISC:QuestNotification()
-	if R.db["Misc"]["QuestNotification"] then
-		M:RegisterEvent("QUEST_ACCEPTED", MISC.FindQuestAccept)
-		M:RegisterEvent("QUEST_LOG_UPDATE", MISC.FindQuestComplete)
-		M:RegisterEvent("QUEST_TURNED_IN", MISC.FindWorldQuestComplete)
-		M:RegisterEvent("UI_INFO_MESSAGE", MISC.FindQuestProgress)
-		M:RegisterEvent("CRITERIA_EARNED", MISC.FindDragonGlyph)
+function M:QuestNotification()
+	if C.db["Misc"]["QuestNotification"] then
+		B:RegisterEvent("QUEST_ACCEPTED", M.FindQuestAccept)
+		B:RegisterEvent("QUEST_LOG_UPDATE", M.FindQuestComplete)
+		B:RegisterEvent("QUEST_TURNED_IN", M.FindWorldQuestComplete)
+		B:RegisterEvent("UI_INFO_MESSAGE", M.FindQuestProgress)
+		B:RegisterEvent("CRITERIA_EARNED", M.FindDragonGlyph)
 	else
 		wipe(completedQuest)
-		M:UnregisterEvent("QUEST_ACCEPTED", MISC.FindQuestAccept)
-		M:UnregisterEvent("QUEST_LOG_UPDATE", MISC.FindQuestComplete)
-		M:UnregisterEvent("QUEST_TURNED_IN", MISC.FindWorldQuestComplete)
-		M:UnregisterEvent("UI_INFO_MESSAGE", MISC.FindQuestProgress)
-		M:UnregisterEvent("CRITERIA_EARNED", MISC.FindDragonGlyph)
+		B:UnregisterEvent("QUEST_ACCEPTED", M.FindQuestAccept)
+		B:UnregisterEvent("QUEST_LOG_UPDATE", M.FindQuestComplete)
+		B:UnregisterEvent("QUEST_TURNED_IN", M.FindWorldQuestComplete)
+		B:UnregisterEvent("UI_INFO_MESSAGE", M.FindQuestProgress)
+		B:UnregisterEvent("CRITERIA_EARNED", M.FindDragonGlyph)
 	end
 end
-MISC:RegisterMisc("QuestNotification", MISC.QuestNotification)
+M:RegisterMisc("QuestNotification", M.QuestNotification)

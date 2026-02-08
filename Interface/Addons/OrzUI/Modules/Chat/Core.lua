@@ -1,12 +1,12 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:RegisterModule("Chat")
-local cr, cg, cb = I.r, I.g, I.b
+local B, C, L, DB = unpack(ns)
+local module = B:RegisterModule("Chat")
+local cr, cg, cb = DB.r, DB.g, DB.b
 
 local _G = _G
 local pairs, ipairs, strsub, strlower = pairs, ipairs, string.sub, string.lower
 local IsInGroup, IsInRaid, IsInGuild, IsShiftKeyDown, IsControlKeyDown = IsInGroup, IsInRaid, IsInGuild, IsShiftKeyDown, IsControlKeyDown
-local ChatEdit_UpdateHeader, GetCVar, SetCVar, Ambiguate, GetTime = ChatEdit_UpdateHeader, GetCVar, SetCVar, Ambiguate, GetTime
+local ChatEdit_UpdateHeader, SetCVar, Ambiguate, GetTime = ChatEdit_UpdateHeader, SetCVar, Ambiguate, GetTime
 local GetNumGuildMembers, GetGuildRosterInfo, IsGuildMember, UnitIsGroupLeader, UnitIsGroupAssistant = GetNumGuildMembers, GetGuildRosterInfo, IsGuildMember, UnitIsGroupLeader, UnitIsGroupAssistant
 local CanCooperateWithGameAccount, BNInviteFriend, PlaySound = CanCooperateWithGameAccount, BNInviteFriend, PlaySound
 local C_GuildInfo_IsGuildOfficer = C_GuildInfo.IsGuildOfficer
@@ -15,7 +15,6 @@ local InviteToGroup = C_PartyInfo.InviteUnit
 local GeneralDockManager = GeneralDockManager
 local messageSoundID = SOUNDKIT.TELL_MESSAGE
 
-local maxLines = 2048
 local fontFile, fontOutline
 module.MuteCache = {}
 
@@ -26,18 +25,18 @@ function module:TabSetAlpha(alpha)
 end
 
 local function updateChatAnchor(self, _, _, _, x, y)
-	if not R.db["Chat"]["Lock"] then return end
+	if not C.db["Chat"]["Lock"] then return end
 	if not (x == 0 and y == 21) then
 		self:ClearAllPoints()
 		self:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 21)
-		self:SetWidth(R.db["Chat"]["ChatWidth"])
-		self:SetHeight(R.db["Chat"]["ChatHeight"])
+		self:SetWidth(C.db["Chat"]["ChatWidth"])
+		self:SetHeight(C.db["Chat"]["ChatHeight"])
 	end
 end
 
 local isScaling = false
 function module:UpdateChatSize()
-	if not R.db["Chat"]["Lock"] then return end
+	if not C.db["Chat"]["Lock"] then return end
 	if isScaling then return end
 	isScaling = true
 
@@ -49,15 +48,15 @@ function module:UpdateChatSize()
 	end
 	ChatFrame1:ClearAllPoints()
 	ChatFrame1:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 21)
-	ChatFrame1:SetWidth(R.db["Chat"]["ChatWidth"])
-	ChatFrame1:SetHeight(R.db["Chat"]["ChatHeight"])
+	ChatFrame1:SetWidth(C.db["Chat"]["ChatWidth"])
+	ChatFrame1:SetHeight(C.db["Chat"]["ChatHeight"])
 
 	isScaling = false
 end
 
 local function BlackBackground(self)
-	local frame = M.SetBD(self.Background)
-	frame:SetShown(R.db["Chat"]["ChatBGType"] == 2)
+	local frame = B.SetBD(self.Background)
+	frame:SetShown(C.db["Chat"]["ChatBGType"] == 2)
 
 	return frame
 end
@@ -66,11 +65,11 @@ local function GradientBackground(self)
 	local frame = CreateFrame("Frame", nil, self)
 	frame:SetOutside(self.Background)
 	frame:SetFrameLevel(0)
-	frame:SetShown(R.db["Chat"]["ChatBGType"] == 3)
+	frame:SetShown(C.db["Chat"]["ChatBGType"] == 3)
 
-	local tex = M.SetGradient(frame, "H", 0, 0, 0, .5, 0)
+	local tex = B.SetGradient(frame, "H", 0, 0, 0, .5, 0)
 	tex:SetOutside()
-	local line = M.SetGradient(frame, "H", cr, cg, cb, .5, 0, nil, R.mult)
+	local line = B.SetGradient(frame, "H", cr, cg, cb, .5, 0, nil, C.mult)
 	line:SetPoint("BOTTOMLEFT", frame, "TOPLEFT")
 	line:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT")
 
@@ -81,7 +80,7 @@ local chatEditboxes = {}
 local function UpdateEditBoxAnchor(eb)
 	local parent = eb.__owner
 	eb:ClearAllPoints()
-	if R.db["Chat"]["BottomBox"] then
+	if C.db["Chat"]["BottomBox"] then
 		eb:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 2, -8)
 		eb:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -12, -26)
 	else
@@ -91,8 +90,8 @@ local function UpdateEditBoxAnchor(eb)
 end
 
 local function UpdateEditboxFont(editbox)
-	editbox:SetFont(I.Font[1], R.db["Chat"]["EditFont"], "")
-	editbox.header:SetFont(I.Font[1], R.db["Chat"]["EditFont"], "")
+	editbox:SetFont(DB.Font[1], C.db["Chat"]["EditFont"], "")
+	editbox.header:SetFont(DB.Font[1], C.db["Chat"]["EditFont"], "")
 end
 
 function module:ToggleEditBoxAnchor()
@@ -106,20 +105,15 @@ function module:SkinChat()
 	if not self or self.styled then return end
 
 	local name = self:GetName()
-	local fontStyle, fontSize, _= self:GetFont()
-	--self:SetClampRectInsets(0, 0, 0, 0)
-	if R.db["Chat"]["Outline"] then
-	  self:SetFont(fontFile or fontStyle, fontSize, "OUTLINE")
+	local font, fontSize = self:GetFont()
+	if C.db["Chat"]["Outline"] then
+	  self:SetFont(fontFile or font, fontSize, "OUTLINE")
 	  self:SetShadowColor(0, 0, 0, 0)
 	else
-	  self:SetFont(fontFile or fontStyle, fontSize, "")
-	  --self:SetShadowOffset(1, -1)
+	  self:SetFont(fontFile or font, fontSize, "")
 	end
 	self:SetClampRectInsets(0, 0, 0, 0)
 	self:SetClampedToScreen(false)
-	if self:GetMaxLines() < maxLines then
-		self:SetMaxLines(maxLines)
-	end
 
 	self.__background = BlackBackground(self)
 	self.__gradient = GradientBackground(self)
@@ -129,8 +123,8 @@ function module:SkinChat()
 	eb:SetClampedToScreen(true)
 	eb.__owner = self
 	UpdateEditBoxAnchor(eb)
-	M.StripTextures(eb, 2)
-	M.SetBD(eb)
+	B.StripTextures(eb, 2)
+	B.SetBD(eb)
 	UpdateEditboxFont(eb)
 	tinsert(chatEditboxes, eb)
 
@@ -138,18 +132,18 @@ function module:SkinChat()
 	lang:GetRegions():SetAlpha(0)
 	lang:SetPoint("TOPLEFT", eb, "TOPRIGHT", 2, 0)
 	lang:SetPoint("BOTTOMRIGHT", eb, "BOTTOMRIGHT", 21, 0)
-	M.SetBD(lang)
+	B.SetBD(lang)
 	
 	local tab = _G[name.."Tab"]
 	tab:SetAlpha(1)
-	tab.Text:SetFont(fontFile or font, I.Font[2]+2, fontOutline)
+	tab.Text:SetFont(fontFile or font, DB.Font[2]+2, fontOutline)
 	tab.Text:SetShadowColor(0, 0, 0, 0)
-	M.StripTextures(tab, 0)
+	B.StripTextures(tab, 0)
 	hooksecurefunc(tab, "SetAlpha", module.TabSetAlpha)
 
 	local minimize = self.buttonFrame.minimizeButton
 	if minimize then
-		M.ReskinCollapse(minimize)
+		B.ReskinCollapse(minimize)
 		minimize:GetNormalTexture():SetAlpha(0)
 		minimize:GetPushedTexture():SetAlpha(0)
 		minimize.__texture:DoCollapse(false)
@@ -157,7 +151,7 @@ function module:SkinChat()
 		minimize:SetScale(UIParent:GetScale())
 	end
 
-	M.HideOption(self.buttonFrame)
+	B.HideOption(self.buttonFrame)
 	module:ToggleChatFrameTextures(self)
 
 	self.oldAlpha = self.oldAlpha or 0 -- fix blizz error
@@ -175,7 +169,7 @@ function module:SkinChat()
 end
 
 function module:ToggleChatFrameTextures(frame)
-	if R.db["Chat"]["ChatBGType"] == 1 then
+	if C.db["Chat"]["ChatBGType"] == 1 then
 		frame:EnableDrawLayer("BORDER")
 		frame:EnableDrawLayer("BACKGROUND")
 	else
@@ -188,10 +182,10 @@ function module:ToggleChatBackground()
 	for _, chatFrameName in ipairs(CHAT_FRAMES) do
 		local frame = _G[chatFrameName]
 		if frame.__background then
-			frame.__background:SetShown(R.db["Chat"]["ChatBGType"] == 2)
+			frame.__background:SetShown(C.db["Chat"]["ChatBGType"] == 2)
 		end
 		if frame.__gradient then
-			frame.__gradient:SetShown(R.db["Chat"]["ChatBGType"] == 3)
+			frame.__gradient:SetShown(C.db["Chat"]["ChatBGType"] == 3)
 		end
 		module:ToggleChatFrameTextures(frame)
 	end
@@ -251,10 +245,10 @@ hooksecurefunc("ChatEdit_CustomTabPressed", module.UpdateTabChannelSwitch)
 
 -- Quick Scroll
 local chatScrollInfo = {
-	text = U["ChatScrollHelp"],
+	text = L["ChatScrollHelp"],
 	buttonStyle = HelpTip.ButtonStyle.GotIt,
 	targetPoint = HelpTip.Point.RightEdgeCenter,
-	onAcknowledgeCallback = M.HelpInfoAcknowledge,
+	onAcknowledgeCallback = B.HelpInfoAcknowledge,
 	callbackArg = "ChatScroll",
 }
 
@@ -283,7 +277,7 @@ end
 -- Autoinvite by whisper
 local whisperList = {}
 function module:UpdateWhisperList()
-	M.SplitList(whisperList, R.db["Chat"]["Keyword"], true)
+	B.SplitList(whisperList, C.db["Chat"]["Keyword"], true)
 end
 
 function module:IsUnitInGuild(unitName)
@@ -300,6 +294,7 @@ end
 
 function module.OnChatWhisper(event, ...)
 	local msg, author, _, _, _, _, _, _, _, _, _, guid, presenceID = ...
+	if B:IsSecretValue(author) then return end
 	for word in pairs(whisperList) do
 		if (not IsInGroup() or UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")) and strlower(msg) == strlower(word) then
 			if event == "CHAT_MSG_BN_WHISPER" then
@@ -310,13 +305,13 @@ function module.OnChatWhisper(event, ...)
 					if gameID then
 						local charName = gameAccountInfo.characterName
 						local realmName = gameAccountInfo.realmName
-						if CanCooperateWithGameAccount(accountInfo) and (not R.db["Chat"]["GuildInvite"] or module:IsUnitInGuild(charName.."-"..realmName)) then
+						if CanCooperateWithGameAccount(accountInfo) and (not C.db["Chat"]["GuildInvite"] or module:IsUnitInGuild(charName.."-"..realmName)) then
 							BNInviteFriend(gameID)
 						end
 					end
 				end
 			else
-				if not R.db["Chat"]["GuildInvite"] or IsGuildMember(guid) then
+				if not C.db["Chat"]["GuildInvite"] or IsGuildMember(guid) then
 					InviteToGroup(author)
 				end
 			end
@@ -325,15 +320,15 @@ function module.OnChatWhisper(event, ...)
 end
 
 function module:WhisperInvite()
-	if not R.db["Chat"]["Invite"] then return end
+	if not C.db["Chat"]["Invite"] then return end
 	module:UpdateWhisperList()
-	M:RegisterEvent("CHAT_MSG_WHISPER", module.OnChatWhisper)
-	M:RegisterEvent("CHAT_MSG_BN_WHISPER", module.OnChatWhisper)
+	B:RegisterEvent("CHAT_MSG_WHISPER", module.OnChatWhisper)
+	B:RegisterEvent("CHAT_MSG_BN_WHISPER", module.OnChatWhisper)
 end
 
 -- Sticky whisper
 function module:ChatWhisperSticky()
-	if R.db["Chat"]["Sticky"] then
+	if C.db["Chat"]["Sticky"] then
 		ChatTypeInfo["WHISPER"].sticky = 1
 		ChatTypeInfo["BN_WHISPER"].sticky = 1
 	else
@@ -377,8 +372,9 @@ local whisperEvents = {
 	["CHAT_MSG_BN_WHISPER"] = true,
 }
 function module:PlayWhisperSound(event, _, author)
-	if not R.db["Chat"]["WhisperSound"] then return end
+	if not C.db["Chat"]["WhisperSound"] then return end
 
+	if B:IsSecretValue(author) then return end
 	if whisperEvents[event] then
 		local name = Ambiguate(author, "none")
 		local currentTime = GetTime()
@@ -391,56 +387,16 @@ function module:PlayWhisperSound(event, _, author)
 	end
 end
 
--- ProfanityFilter
-local sideEffectFixed
-local function FixLanguageFilterSideEffects()
-	if sideEffectFixed then return end
-	sideEffectFixed = true
-
-	local OLD_GetFriendGameAccountInfo = C_BattleNet.GetFriendGameAccountInfo
-	function C_BattleNet.GetFriendGameAccountInfo(...)
-		local gameAccountInfo = OLD_GetFriendGameAccountInfo(...)
-		if gameAccountInfo then
-			gameAccountInfo.isInCurrentRegion = true
-		end
-		return gameAccountInfo
-	end
-
-	local OLD_GetFriendAccountInfo = C_BattleNet.GetFriendAccountInfo
-	function C_BattleNet.GetFriendAccountInfo(...)
-		local accountInfo = OLD_GetFriendAccountInfo(...)
-		if accountInfo and accountInfo.gameAccountInfo then
-			accountInfo.gameAccountInfo.isInCurrentRegion = true
-		end
-		return accountInfo
-	end
-end
-
-function module:ToggleLanguageFilter()
-	if R.db["Chat"]["Freedom"] then
-		if GetCVar("portal") == "CN" then
-			ConsoleExec("portal TW")
-			FixLanguageFilterSideEffects()
-		end
-		SetCVar("profanityFilter", 0)
-	else
-		if sideEffectFixed then
-			ConsoleExec("portal CN")
-		end
-		SetCVar("profanityFilter", 1)
-	end
-end
-
 function module:HandleMinimizedFrame()
 	local minFrame = self.minFrame
 	if minFrame and not minFrame.styled then
-		M.StripTextures(minFrame)
-		M.Reskin(minFrame)
+		B.StripTextures(minFrame)
+		B.Reskin(minFrame)
 		minFrame.__bg:SetInside(nil, 5, 5)
 
 		local maximizeButton = _G[minFrame:GetName().."MaximizeButton"]
 		if maximizeButton then
-			M.ReskinCollapse(maximizeButton)
+			B.ReskinCollapse(maximizeButton)
 			maximizeButton.__texture:DoCollapse(true)
 		end
 
@@ -449,8 +405,8 @@ function module:HandleMinimizedFrame()
 end
 
 function module:OnLogin()
-	fontFile = not R.db["Chat"]["SysFont"] and I.Font[1]
-	fontOutline = R.db["Skins"]["FontOutline"] and "OUTLINE" or ""
+	fontFile = not C.db["Chat"]["SysFont"] and DB.Font[1]
+	fontOutline = C.db["Skins"]["FontOutline"] and "OUTLINE" or ""
 
 	for i = 1, NUM_CHAT_WINDOWS do
 		local chatframe = _G["ChatFrame"..i]
@@ -482,18 +438,17 @@ function module:OnLogin()
 	-- Add Elements
 	module:ChatWhisperSticky()
 	module:ChatFilter()
-	module:ChannelRename()
+	--module:ChannelRename()
 	module:Chatbar()
 	module:ChatCopy()
-	module:UrlCopy()
+	--module:UrlCopy()
 	module:WhisperInvite()
-	--module:ToggleLanguageFilter()
-	DEFAULT_CHATFRAME_ALPHA = 0
+	--DEFAULT_CHATFRAME_ALPHA = 0
 
 	-- Lock chatframe
-	if R.db["Chat"]["Lock"] then
+	if C.db["Chat"]["Lock"] then
 		module:UpdateChatSize()
-		M:RegisterEvent("UI_SCALE_CHANGED", module.UpdateChatSize)
+		B:RegisterEvent("UI_SCALE_CHANGED", module.UpdateChatSize)
 		hooksecurefunc(ChatFrame1, "SetPoint", updateChatAnchor)
 		FCF_SavePositionAndDimensions(ChatFrame1)
 	end
@@ -511,7 +466,7 @@ function module:OnLogin()
 		end
 
 		Menu.ModifyMenu("MENU_FCF_TAB", function(self, rootDescription, data)
-			local fontSizeSubmenu = rootDescription:CreateButton(I.InfoColor..U["MoreFontSize"])
+			local fontSizeSubmenu = rootDescription:CreateButton(DB.InfoColor..L["MoreFontSize"])
 			for i = 8, 21 do
 				fontSizeSubmenu:CreateRadio((format(FONT_SIZE_TEMPLATE, i)), IsSelected, SetSelected, i)
 			end

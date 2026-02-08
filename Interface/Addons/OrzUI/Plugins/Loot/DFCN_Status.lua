@@ -1636,9 +1636,9 @@ function DFCN_Status:UpdateUI()
 			
 			local fullTimestamp = GetPreciseTime() + secondsNeeded
 			if locale == "zhCN" or locale == "zhTW" then
-				fullTimeText = date("%m-%d %H:%M", fullTimestamp)
+				fullTimeText = date("%m-%d %H:%B", fullTimestamp)
 			else
-				fullTimeText = date("%d/%m %H:%M", fullTimestamp)
+				fullTimeText = date("%d/%m %H:%B", fullTimestamp)
 			end
 		else
 			fullTimeText = DFCNSL["CONCENTRATION_FULL"]
@@ -1652,9 +1652,9 @@ function DFCN_Status:UpdateUI()
 		GameTooltip:AddLine(" ")
 		local lastUpdatedFormat
 		if locale == "zhCN" or locale == "zhTW" then
-			lastUpdatedFormat = date("%m-%d %H:%M", lastUpdated)
+			lastUpdatedFormat = date("%m-%d %H:%B", lastUpdated)
 		else
-			lastUpdatedFormat = date("%d/%m %H:%M", lastUpdated)
+			lastUpdatedFormat = date("%d/%m %H:%B", lastUpdated)
 		end
 		GameTooltip:AddLine(DFCNSL["LAST_LOGIN_TIME"] .. ": " .. lastUpdatedFormat, 0.6, 0.6, 0.6)
 		GameTooltip:Show()
@@ -2239,7 +2239,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
         DFCN_Status.db = DFCN_StatusDB
         DFCN_Status:CheckAllCharactersReset()        
         DFCN_Status:CreateMiniMapButton()
-		DFCN_Status:CreateOptionsPanel()
+		--DFCN_Status:CreateOptionsPanel()
     elseif event == "PLAYER_LOGIN" then
         local serverTime = GetServerTime()
         local localTime = time()

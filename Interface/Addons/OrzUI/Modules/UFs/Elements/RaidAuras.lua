@@ -1,13 +1,13 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 local oUF = ns.oUF
-local UF = M:GetModule("UnitFrames")
+local UF = B:GetModule("UnitFrames")
 
 local invalidPrio = -1
 
 function UF:CreateRaidAuras(self)
 	-- Indicators
-	UF:CreateAurasIndicator(self)
+	--UF:CreateAurasIndicator(self)
 	UF:CreateSpellsIndicator(self)
 	UF:CreateBuffsIndicator(self)
 	UF:CreateDebuffsIndicator(self)
@@ -28,14 +28,14 @@ function UF.RaidAurasPostUpdate(element, unit)
 	local debuffs = self.DebuffsIndicator
 	local buffs = self.BuffsIndicator
 
-	local enableSpells = R.db["UFs"]["RaidBuffIndicator"]
+	local enableSpells = C.db["UFs"]["RaidBuffIndicator"]
 	local auraIndex, debuffIndex, buffIndex = 0, 0, 0
 	local numBuffs = element.buffList.num
 	local numDebuffs = element.debuffList.num
 
 	element.isInCombat = UnitAffectingCombat("player")
 
-	if R.db["UFs"]["DispellType"] ~= 3 or R.db["UFs"]["InstanceAuras"] then
+	--[[if C.db["UFs"]["DispellType"] ~= 3 or C.db["UFs"]["InstanceAuras"] then
 		UF.AurasIndicator_UpdatePriority(self, numDebuffs, unit)
 		UF.AurasIndicator_HideButtons(self)
 
@@ -49,13 +49,13 @@ function UF.RaidAurasPostUpdate(element, unit)
 				UF:AurasIndicator_UpdateButton(button, aura)
 			end
 		end
-	end
+	end]]
 
 	UF.SpellsIndicator_HideButtons(self)
 
 	for i = auraIndex+1, numDebuffs do
 		local aura = element.debuffList[i]
-		local value = enableSpells and UF.CornerSpells[aura.spellID]
+		local value = enableSpells and B:NotSecretValue(aura.spellID) and UF.CornerSpells[aura.spellID]
 		if value and (value[3] or aura.isPlayerAura) then
 			local button = spells[value[1]]
 			if button then
@@ -71,7 +71,7 @@ function UF.RaidAurasPostUpdate(element, unit)
 
 	for i = 1, numBuffs do
 		local aura = element.buffList[i]
-		local value = enableSpells and UF.CornerSpells[aura.spellID]
+		local value = enableSpells and B:NotSecretValue(aura.spellID) and UF.CornerSpells[aura.spellID]
 		if value and (value[3] or aura.isPlayerAura) then
 			local button = spells[value[1]]
 			if button then
@@ -89,7 +89,7 @@ end
 function UF:RaidAuras_UpdateOptions()
 	for _, frame in pairs(oUF.objects) do
 		if frame.mystyle == "raid" then
-			UF.AurasIndicator_UpdateOptions(frame)
+			--UF.AurasIndicator_UpdateOptions(frame)
 			UF.SpellsIndicator_UpdateOptions(frame)
 			UF.DebuffsIndicator_UpdateOptions(frame)
 			UF.BuffsIndicator_UpdateOptions(frame)

@@ -1,5 +1,5 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 local zrMM = {}
 
 -- load config
@@ -124,13 +124,13 @@ function zrMM:CreateButtonFrame()
 	
 	local function loadCustomButtons()
 		local numbuttons = 0
-		for i,v in pairs(R.db["Map"]["zrMMcustombuttons"]) do 
+		for i,v in pairs(C.db["Map"]["zrMMcustombuttons"]) do 
 			numbuttons = numbuttons + 1
 		end
 		if numbuttons >= 0 then
-			for k,v in pairs(R.db["Map"]["zrMMcustombuttons"]) do
+			for k,v in pairs(C.db["Map"]["zrMMcustombuttons"]) do
 				if Minimap.manualTarget[k] ~= nil then
-					R.db["Map"]["zrMMcustombuttons"][k] = nil
+					C.db["Map"]["zrMMcustombuttons"][k] = nil
 				else
 					Minimap.manualTarget[k] = v
 				end
@@ -143,16 +143,16 @@ function zrMM:CreateButtonFrame()
 		local n = frame:GetName()
 		if Minimap.manualTarget[n] == nil and zrButtonFrame.frameTable[n] == nil then
 			Minimap.manualTarget[n] = true
-			if R.db["Map"]["zrMMcustombuttons"][n] ~= true then
-				R.db["Map"]["zrMMcustombuttons"][n] = true
+			if C.db["Map"]["zrMMcustombuttons"][n] ~= true then
+				C.db["Map"]["zrMMcustombuttons"][n] = true
 			end
 		end
 	end
 	
 	function zrMM:RemoveMinimapButton(frame)
 		local n = frame:GetName()
-		if R.db["Map"]["zrMMcustombuttons"][n] ~= nil then
-			R.db["Map"]["zrMMcustombuttons"][n] = nil
+		if C.db["Map"]["zrMMcustombuttons"][n] ~= nil then
+			C.db["Map"]["zrMMcustombuttons"][n] = nil
 			Minimap.manualTarget[n] = nil
 		end
 	end
@@ -167,81 +167,81 @@ function zrMM:CreateButtonFrame()
 		
 		if zrMM.buttonPosChanged == true then
 			Minimap.buttonFrame:ClearAllPoints()
-            if (R.db["Map"]["zrMMbuttonpos"] == 1) then
-                Minimap.buttonFrame:SetSize(Minimap:GetWidth(),R.db["Map"]["zrMMbuttonsize"])
+            if (C.db["Map"]["zrMMbuttonpos"] == 1) then
+                Minimap.buttonFrame:SetSize(Minimap:GetWidth(),C.db["Map"]["zrMMbuttonsize"])
                 Minimap.buttonFrame:SetPoint("BOTTOMLEFT", Minimap, "TOPLEFT", 2, 3)
-            elseif (R.db["Map"]["zrMMbuttonpos"] == 4) then
-                Minimap.buttonFrame:SetSize(R.db["Map"]["zrMMbuttonsize"],Minimap:GetHeight())
+            elseif (C.db["Map"]["zrMMbuttonpos"] == 4) then
+                Minimap.buttonFrame:SetSize(C.db["Map"]["zrMMbuttonsize"],Minimap:GetHeight())
                 Minimap.buttonFrame:SetPoint("TOPLEFT", Minimap, "TOPRIGHT", 3, -1)
-            elseif (R.db["Map"]["zrMMbuttonpos"] == 2) then
-                Minimap.buttonFrame:SetSize(Minimap:GetWidth(),R.db["Map"]["zrMMbuttonsize"])
+            elseif (C.db["Map"]["zrMMbuttonpos"] == 2) then
+                Minimap.buttonFrame:SetSize(Minimap:GetWidth(),C.db["Map"]["zrMMbuttonsize"])
                 Minimap.buttonFrame:SetPoint("TOPRIGHT", Minimap, "BOTTOMRIGHT", -3, -6)
-            elseif (R.db["Map"]["zrMMbuttonpos"] == 3) then
-                Minimap.buttonFrame:SetSize(R.db["Map"]["zrMMbuttonsize"],Minimap:GetHeight())
+            elseif (C.db["Map"]["zrMMbuttonpos"] == 3) then
+                Minimap.buttonFrame:SetSize(C.db["Map"]["zrMMbuttonsize"],Minimap:GetHeight())
                 Minimap.buttonFrame:SetPoint("TOPRIGHT", Minimap, "TOPLEFT", -3, -1)
             end
             zrMM.buttonPosChanged = false
         end
 
         for k, f in pairs(zrButtonFrame.frameTable) do
-            f:SetWidth(R.db["Map"]["zrMMbuttonsize"])
-            f:SetHeight(R.db["Map"]["zrMMbuttonsize"])
+            f:SetWidth(C.db["Map"]["zrMMbuttonsize"])
+            f:SetHeight(C.db["Map"]["zrMMbuttonsize"])
             f:ClearAllPoints()
             if (hideButtons[f:GetName()]) then
                 f:Hide()
                 f:SetAlpha(0)
             end
 			if (f:IsShown()) then
-                if (R.db["Map"]["zrMMbuttonpos"] == 1) then
+                if (C.db["Map"]["zrMMbuttonpos"] == 1) then
                     if (last) then
                         if buttonCount == 9 then
-                            f:SetPoint("BOTTOMLEFT", lineFirst or first, "TOPLEFT", 0, R.db["Map"]["zrMMbordersize"]*2)
+                            f:SetPoint("BOTTOMLEFT", lineFirst or first, "TOPLEFT", 0, C.db["Map"]["zrMMbordersize"]*2)
                             lineFirst = f
                             buttonCount = 0
                         else
-                            f:SetPoint("BOTTOMLEFT", last, "BOTTOMRIGHT", R.db["Map"]["zrMMbordersize"]*2, 0)
+                            f:SetPoint("BOTTOMLEFT", last, "BOTTOMRIGHT", C.db["Map"]["zrMMbordersize"]*2, 0)
                         end
                     else
                         f:SetPoint("BOTTOMLEFT", Minimap.buttonFrame, "BOTTOMLEFT", -2, 0)
                         first = f
                         lineFirst = first
                     end
-                elseif (R.db["Map"]["zrMMbuttonpos"] == 2) then
+                elseif (C.db["Map"]["zrMMbuttonpos"] == 2) then
                     if (last) then
                         if buttonCount == 9 then
-                            f:SetPoint("TOPRIGHT", lineFirst or first, "BOTTOMRIGHT", 0, -R.db["Map"]["zrMMbordersize"]*2)
+                            f:SetPoint("TOPRIGHT", lineFirst or first, "BOTTOMRIGHT", 0, -C.db["Map"]["zrMMbordersize"]*2)
                             lineFirst = f
                             buttonCount = 0
                         else
-                            f:SetPoint("TOPRIGHT", last, "TOPLEFT", -R.db["Map"]["zrMMbordersize"]*2, 0)
+                            f:SetPoint("TOPRIGHT", last, "TOPLEFT", -C.db["Map"]["zrMMbordersize"]*2, 0)
                         end
                     else
                         f:SetPoint("TOPRIGHT", Minimap.buttonFrame, "TOPRIGHT", 2, 0)
                         first = f
                         lineFirst = first
                     end
-                elseif (R.db["Map"]["zrMMbuttonpos"] == 4) then
+                elseif (C.db["Map"]["zrMMbuttonpos"] == 4) then
                     if (last) then
                         if buttonCount == 9 then
-                            f:SetPoint("TOPLEFT", lineFirst or first, "TOPRIGHT", R.db["Map"]["zrMMbordersize"]*2, 0)
+                            f:SetPoint("TOPLEFT", lineFirst or first, "TOPRIGHT", C.db["Map"]["zrMMbordersize"]*2, 0)
                             lineFirst = f
                             buttonCount = 0
                         else
-                            f:SetPoint("TOPLEFT", last, "BOTTOMLEFT", 0, -R.db["Map"]["zrMMbordersize"]*2)
+                            f:SetPoint("TOPLEFT", last, "BOTTOMLEFT", 0, -C.db["Map"]["zrMMbordersize"]*2)
                         end
                     else
                         f:SetPoint("TOPLEFT", Minimap.buttonFrame, "TOPLEFT", 0, 0)
                         first = f
                         lineFirst = first
                     end
-                elseif (R.db["Map"]["zrMMbuttonpos"] == 3) then
+                elseif (C.db["Map"]["zrMMbuttonpos"] == 3) then
                     if (last) then
                         if buttonCount == 9 then
-                            f:SetPoint("TOPRIGHT", lineFirst or first, "TOPLEFT", -R.db["Map"]["zrMMbordersize"]*2, 0)
+                            f:SetPoint("TOPRIGHT", lineFirst or first, "TOPLEFT", -C.db["Map"]["zrMMbordersize"]*2, 0)
                             lineFirst = f
                             buttonCount = 0
                         else
-                            f:SetPoint("TOPRIGHT", last, "BOTTOMRIGHT", 0, -R.db["Map"]["zrMMbordersize"]*2)
+                            f:SetPoint("TOPRIGHT", last, "BOTTOMRIGHT", 0, -C.db["Map"]["zrMMbordersize"]*2)
                         end
                     else
                         f:SetPoint("TOPRIGHT", Minimap.buttonFrame, "TOPRIGHT", 0, 0)

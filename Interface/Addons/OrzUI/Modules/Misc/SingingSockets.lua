@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local MISC = M:GetModule("Misc")
+local B, C, L, DB = unpack(ns)
+local M = B:GetModule("Misc")
 
 local iconSize = 36
 
@@ -20,7 +20,7 @@ local function GetGemLink(gemID)
 	return info
 end
 
-function MISC:Socket_OnEnter()
+function M:Socket_OnEnter()
 	local info = GetGemLink(self.gemID)
 	if not info then return end
 	GameTooltip:ClearLines()
@@ -29,7 +29,7 @@ function MISC:Socket_OnEnter()
 	GameTooltip:Show()
 end
 
-function MISC:Socket_OnClick()
+function M:Socket_OnClick()
 	for bagID = 0, 4 do
 		for slotID = 1, C_Container.GetContainerNumSlots(bagID) do
 			if C_Container.GetContainerItemID(bagID, slotID) == self.gemID then
@@ -42,27 +42,27 @@ function MISC:Socket_OnClick()
 	end
 end
 
-function MISC:CreateSingingSockets()
-	if MISC.SingingFrames then return end
-	MISC.SingingFrames = {}
+function M:CreateSingingSockets()
+	if M.SingingFrames then return end
+	M.SingingFrames = {}
 
 	for i = 1, 3 do
 		local frame = CreateFrame("Frame", "OrzUISingingSocket"..i, ItemSocketingFrame)
 		frame:SetSize(iconSize*2, iconSize*2)
 		frame:SetPoint("TOP", ItemSocketingFrame.SocketingContainer.SocketFrames[i], "BOTTOM", 0, -50)
-		M.SetBD(frame)
-		MISC.SingingFrames[i] = frame
+		B.SetBD(frame)
+		M.SingingFrames[i] = frame
 
 		local index = 0
 		for _, gemID in next, gemsInfo[i] do
-			local button = M.CreateButton(frame, iconSize, iconSize, true, C_Item.GetItemIconByID(gemID))
+			local button = B.CreateButton(frame, iconSize, iconSize, true, C_Item.GetItemIconByID(gemID))
 			button:SetPoint("TOPLEFT", mod(index, 2)*iconSize, -(index>1 and iconSize or 0))
 			index = index + 1
 
 			button.socketID = i
 			button.gemID = gemID
-			button:SetScript("OnEnter", MISC.Socket_OnEnter)
-			button:SetScript("OnClick", MISC.Socket_OnClick)
+			button:SetScript("OnEnter", M.Socket_OnEnter)
+			button:SetScript("OnClick", M.Socket_OnClick)
 			button:SetScript("OnLeave", GameTooltip_Hide)
 		end
 	end
@@ -70,54 +70,54 @@ end
 
 local fiberSockets = {238044, 238046, 238045, 238042, 238040, 238037, 238039, 238041}
 
-function MISC:CreateFiberSockets()
-	if MISC.FiberSockets then return end
+function M:CreateFiberSockets()
+	if M.FiberSockets then return end
 
-	local locales = {U["Crit"], U["Mastery"], U["Haste"], U["Versa"]}
+	local locales = {L["Crit"], L["Mastery"], L["Haste"], L["Versa"]}
 
-	local frame = CreateFrame("Frame", "NDuiFiberSockets", ItemSocketingFrame)
+	local frame = CreateFrame("Frame", "OrzUIFiberSockets", ItemSocketingFrame)
 	frame:SetSize(iconSize*4, iconSize*2)
 	frame:SetPoint("TOP", ItemSocketingFrame.SocketingContainer.Socket1, "BOTTOM", 0, -50)
-	M.SetBD(frame)
+	B.SetBD(frame)
 
 	for index, gemID in pairs(fiberSockets)  do
-		local button = M.CreateButton(frame, iconSize, iconSize, true, C_Item.GetItemIconByID(gemID))
+		local button = B.CreateButton(frame, iconSize, iconSize, true, C_Item.GetItemIconByID(gemID))
 		button:SetPoint("TOPLEFT", mod(index-1, 4)*(iconSize+5), -(index>4 and (iconSize+5) or 0))
-		local colors = I.QualityColors[index <= 4 and 4 or 3]
+		local colors = DB.QualityColors[index <= 4 and 4 or 3]
 		button.bg:SetBackdropBorderColor(colors.r, colors.g, colors.b)
 		button.socketID = 1
 		button.gemID = gemID
-		button:SetScript("OnEnter", MISC.Socket_OnEnter)
-		button:SetScript("OnClick", MISC.Socket_OnClick)
+		button:SetScript("OnEnter", M.Socket_OnEnter)
+		button:SetScript("OnClick", M.Socket_OnClick)
 		button:SetScript("OnLeave", GameTooltip_Hide)
-		M.CreateFS(button, 14, locales[mod(index-1,4)+1], "system")
+		B.CreateFS(button, 14, locales[mod(index-1,4)+1], "system")
 	end
 
-	MISC.FiberSockets = frame
+	M.FiberSockets = frame
 end
 
-function MISC:SetupSingingSockets()
-	if not R.db["Misc"]["SingingSocket"] then return end
+function M:SetupSingingSockets()
+	if not C.db["Misc"]["SingingSocket"] then return end
 
 	hooksecurefunc("ItemSocketingFrame_LoadUI", function()
 		if not ItemSocketingFrame then return end
 
-		if MISC.SingingFrames then
-			for i = 1, 3 do MISC.SingingFrames[i]:Hide() end
+		if M.SingingFrames then
+			for i = 1, 3 do M.SingingFrames[i]:Hide() end
 		end
-		if MISC.FiberSockets then MISC.FiberSockets:Hide() end
+		if M.FiberSockets then M.FiberSockets:Hide() end
 
 		local socketType = C_ItemSocketInfo.GetSocketTypes(1)
 		if socketType == "SingingThunder" then
-			MISC:CreateSingingSockets()
+			M:CreateSingingSockets()
 			for i = 1, 3 do
-				MISC.SingingFrames[i]:SetShown(not C_ItemSocketInfo.GetExistingSocketInfo(i))
+				M.SingingFrames[i]:SetShown(not C_ItemSocketInfo.GetExistingSocketInfo(i))
 			end
 		elseif socketType == "Fiber" then
-			MISC:CreateFiberSockets()
-			MISC.FiberSockets:SetShown(not C_ItemSocketInfo.GetExistingSocketInfo(1))
+			M:CreateFiberSockets()
+			M.FiberSockets:SetShown(not C_ItemSocketInfo.GetExistingSocketInfo(1))
 		end
 	end)
 end
 
-MISC:RegisterMisc("SingingSockets", MISC.SetupSingingSockets)
+M:RegisterMisc("SingingSockets", M.SetupSingingSockets)

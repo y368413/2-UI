@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local MISC = M:GetModule("Misc")
+local B, C, L, DB = unpack(ns)
+local M = B:GetModule("Misc")
 
 local pairs, strfind = pairs, strfind
 local UnitGUID = UnitGUID
@@ -23,7 +23,7 @@ local questNPCs = {
 	[174498] = true, -- Shimmersod
 }
 
-function MISC:QuestTool_Init()
+function M:QuestTool_Init()
 	for questID, value in pairs(watchQuests) do
 		if C_QuestLog_GetLogIndexForQuestID(questID) then
 			activeQuests[questID] = value
@@ -31,13 +31,13 @@ function MISC:QuestTool_Init()
 	end
 end
 
-function MISC:QuestTool_Accept(questID)
+function M:QuestTool_Accept(questID)
 	if watchQuests[questID] then
 		activeQuests[questID] = watchQuests[questID]
 	end
 end
 
-function MISC:QuestTool_Remove(questID)
+function M:QuestTool_Remove(questID)
 	if watchQuests[questID] then
 		activeQuests[questID] = nil
 	end
@@ -51,76 +51,76 @@ local function isActionMatch(msg, text)
 	return text and strfind(msg, text)
 end
 
-function MISC:QuestTool_SetGlow(msg)
+function M:QuestTool_SetGlow(msg)
 	if GetOverrideBarSkin() and (activeQuests[59585] or activeQuests[64271]) then
 		for i = 1, 3 do
 			local button = _G["ActionButton"..i]
 			local _, spellID = GetActionInfo(button.action)
 			local name = spellID and C_Spell.GetSpellName(spellID)
 			if fixedStrings[name] and isActionMatch(msg, fixedStrings[name]) or isActionMatch(msg, name) then
-				M.ShowOverlayGlow(button)
+				B.ShowOverlayGlow(button)
 			else
-				M.HideOverlayGlow(button)
+				B.HideOverlayGlow(button)
 			end
 		end
-		MISC.isGlowing = true
+		M.isGlowing = true
 	else
-		MISC:QuestTool_ClearGlow()
+		M:QuestTool_ClearGlow()
 	end
 end
 
-function MISC:QuestTool_ClearGlow()
-	if MISC.isGlowing then
-		MISC.isGlowing = nil
+function M:QuestTool_ClearGlow()
+	if M.isGlowing then
+		M.isGlowing = nil
 		for i = 1, 3 do
-			M.HideOverlayGlow(_G["ActionButton"..i])
+			B.HideOverlayGlow(_G["ActionButton"..i])
 		end
 	end
 end
 
-function MISC:QuestTool_SetQuestUnit()
+function M:QuestTool_SetQuestUnit()
 	if not activeQuests[60739] and not activeQuests[62453] then return end
 
 	local guid = UnitGUID("mouseover")
-	local npcID = guid and M.GetNPCID(guid)
+	local npcID = guid and B.GetNPCID(guid)
 	if questNPCs[npcID] then
-		self:AddLine(U["NPCisTrue"])
+		self:AddLine(L["NPCisTrue"])
 	end
 end
 
-function MISC:QuestTool()
-	if not R.db["Misc"]["QuestTool"] then return end
+function M:QuestTool()
+	if not C.db["Misc"]["QuestTool"] then return end
 
 	local handler = CreateFrame("Frame", nil, UIParent)
-	MISC.QuestHandler = handler
+	M.QuestHandler = handler
 
-	local text = M.CreateFS(handler, 20)
+	local text = B.CreateFS(handler, 20)
 	text:ClearAllPoints()
 	text:SetPoint("TOP", UIParent, 0, -200)
 	text:SetWidth(800)
 	text:SetWordWrap(true)
 	text:Hide()
-	MISC.QuestTip = text
+	M.QuestTip = text
 
 	-- Check existing quests
-	MISC:QuestTool_Init()
-	M:RegisterEvent("QUEST_ACCEPTED", MISC.QuestTool_Accept)
-	M:RegisterEvent("QUEST_REMOVED", MISC.QuestTool_Remove)
+	M:QuestTool_Init()
+	B:RegisterEvent("QUEST_ACCEPTED", M.QuestTool_Accept)
+	B:RegisterEvent("QUEST_REMOVED", M.QuestTool_Remove)
 
 	-- Override button quests
-	if R.db["Actionbar"]["Enable"] then
-		M:RegisterEvent("CHAT_MSG_MONSTER_SAY", MISC.QuestTool_SetGlow)
-		M:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", MISC.QuestTool_ClearGlow)
+	if C.db["Actionbar"]["Enable"] then
+		B:RegisterEvent("CHAT_MSG_MONSTER_SAY", M.QuestTool_SetGlow)
+		B:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", M.QuestTool_ClearGlow)
 	end
 
 	-- Check npc in quests
-	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, MISC.QuestTool_SetQuestUnit)
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, M.QuestTool_SetQuestUnit)
 
 	-- Auto gossip
 	local firstStep
-	M:RegisterEvent("GOSSIP_SHOW", function()
+	B:RegisterEvent("GOSSIP_SHOW", function()
 		local guid = UnitGUID("npc")
-		local npcID = guid and M.GetNPCID(guid)
+		local npcID = guid and B.GetNPCID(guid)
 		if npcID == 174498 then
 			C_GossipInfo_SelectOption(3)
 		elseif npcID == 174371 then
@@ -136,4 +136,4 @@ function MISC:QuestTool()
 	end)
 end
 
-MISC:RegisterMisc("QuestTool", MISC.QuestTool)
+M:RegisterMisc("QuestTool", M.QuestTool)

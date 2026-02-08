@@ -1,7 +1,7 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local MISC = M:GetModule("Misc")
-local TT = M:GetModule("Tooltip")
+local B, C, L, DB = unpack(ns)
+local M = B:GetModule("Misc")
+local TT = B:GetModule("Tooltip")
 
 local pairs, select, next, type, unpack = pairs, select, next, type, unpack
 local UnitGUID, GetItemInfo = UnitGUID, C_Item.GetItemInfo
@@ -14,7 +14,7 @@ local GetTradePlayerItemLink, GetTradeTargetItemLink = GetTradePlayerItemLink, G
 local inspectSlots = {
 	"Head", "Neck", "Shoulder", "Shirt", "Chest", "Waist", "Legs", "Feet", "Wrist", "Hands", "Finger0", "Finger1", "Trinket0", "Trinket1", "Back", "MainHand", "SecondaryHand",
 }
-function MISC:GetSlotAnchor(index)
+function M:GetSlotAnchor(index)
 	if not index then return end
 	if index <= 5 or index == 9 or index == 15 then
 		return "BOTTOMLEFT", 46, 21
@@ -27,38 +27,38 @@ function MISC:GetSlotAnchor(index)
 	end
 end
 
-function MISC:CreateItemTexture(slot, relF, x, y)
+function M:CreateItemTexture(slot, relF, x, y)
 	local icon = slot:CreateTexture()
 	icon:SetPoint(relF, x, y)
 	icon:SetSize(14, 14)
-	icon:SetTexCoord(unpack(I.TexCoord))
-	icon.bg = M.ReskinIcon(icon)
+	icon:SetTexCoord(unpack(DB.TexCoord))
+	icon.bg = B.ReskinIcon(icon)
 	icon.bg:SetFrameLevel(3)
 	icon.bg:Hide()
 
 	return icon
 end
 
-function MISC:ItemString_Expand()
+function M:ItemString_Expand()
 	self:SetWidth(0)
 end
 
-function MISC:ItemString_Collapse()
+function M:ItemString_Collapse()
 	self:SetWidth(100)
 end
 
-function MISC:CreateItemString(frame, strType)
+function M:CreateItemString(frame, strType)
 	if frame.fontCreated then return end
 
 	for index, slot in pairs(inspectSlots) do
 		if index ~= 4 then
 			local slotFrame = _G[strType..slot.."Slot"]
-			local relF, x, y = MISC:GetSlotAnchor(index)
-			slotFrame.iLvlText = M.CreateFS(slotFrame, I.Font[2]+1)
+			local relF, x, y = M:GetSlotAnchor(index)
+			slotFrame.iLvlText = B.CreateFS(slotFrame, DB.Font[2]+1)
 			slotFrame.iLvlText:ClearAllPoints()
 			slotFrame.iLvlText:SetPoint(relF, slotFrame, x, y)  --"BOTTOM", slotFrame, 1, 1
-			--local relF, x, y = MISC:GetSlotAnchor(index)
-			slotFrame.enchantText = M.CreateFS(slotFrame, I.Font[2]-3)
+			--local relF, x, y = M:GetSlotAnchor(index)
+			slotFrame.enchantText = B.CreateFS(slotFrame, DB.Font[2]-3)
 			slotFrame.enchantText:ClearAllPoints()
 			slotFrame.enchantText:SetPoint(relF, slotFrame, x, y-10)
 			slotFrame.enchantText:SetTextColor(0, 1, 0)
@@ -66,15 +66,15 @@ function MISC:CreateItemString(frame, strType)
 			slotFrame.enchantText:SetJustifyH(strsub(relF, 7))
 			slotFrame.enchantText:SetWidth(100)
 			slotFrame.enchantText:EnableMouse(true)
-			slotFrame.enchantText:HookScript("OnEnter", MISC.ItemString_Expand)
-			slotFrame.enchantText:HookScript("OnLeave", MISC.ItemString_Collapse)
-			slotFrame.enchantText:HookScript("OnShow", MISC.ItemString_Collapse)
+			slotFrame.enchantText:HookScript("OnEnter", M.ItemString_Expand)
+			slotFrame.enchantText:HookScript("OnLeave", M.ItemString_Collapse)
+			slotFrame.enchantText:HookScript("OnShow", M.ItemString_Collapse)
 
 			for i = 1, 10 do
 				local offset = (i-1)*18 + 5
 				local iconX = x > 0 and x+offset or x-offset
 				local iconY = index > 15 and 20 or 2
-				slotFrame["textureIcon"..i] = MISC:CreateItemTexture(slotFrame, relF, iconX, iconY-5)
+				slotFrame["textureIcon"..i] = M:CreateItemTexture(slotFrame, relF, iconX, iconY-5)
 			end
 		end
 	end
@@ -100,8 +100,8 @@ local function GetSlotItemLocation(id)
 	return itemLocation
 end
 
-function MISC:ItemLevel_UpdateTraits(button, id, link)
-	if not R.db["Misc"]["AzeriteTraits"] then return end
+function M:ItemLevel_UpdateTraits(button, id, link)
+	if not C.db["Misc"]["AzeriteTraits"] then return end
 
 	local empoweredItemLocation = GetSlotItemLocation(id)
 	if not empoweredItemLocation then return end
@@ -128,7 +128,7 @@ function MISC:ItemLevel_UpdateTraits(button, id, link)
 	end
 end
 
-function MISC:ItemLevel_UpdateInfo(index, slotFrame, info, quality)
+function M:ItemLevel_UpdateInfo(index, slotFrame, info, quality)
 	local infoType = type(info)
 	local level
 	if infoType == "table" then
@@ -138,7 +138,7 @@ function MISC:ItemLevel_UpdateInfo(index, slotFrame, info, quality)
 	end
 
 	if level and level > 1 and quality and quality > 1 then
-		local color = I.QualityColors[quality]
+		local color = DB.QualityColors[quality]
 		slotFrame.iLvlText:SetText(level)
 		slotFrame.iLvlText:SetTextColor(1, 0.8, 0)  --color.r, color.g, color.b
 	end
@@ -190,19 +190,19 @@ function MISC:ItemLevel_UpdateInfo(index, slotFrame, info, quality)
 	end
 end
 
-function MISC:ItemLevel_RefreshInfo(link, unit, index, slotFrame)
+function M:ItemLevel_RefreshInfo(link, unit, index, slotFrame)
 	C_Timer.After(.1, function()
 		local quality = select(3, GetItemInfo(link))
-		local info = M.GetItemLevel(link, unit, index, R.db["Misc"]["GemNEnchant"])
+		local info = B.GetItemLevel(link, unit, index, C.db["Misc"]["GemNEnchant"])
 		if info == "tooSoon" then return end
-		MISC:ItemLevel_UpdateInfo(index, slotFrame, info, quality)
+		M:ItemLevel_UpdateInfo(index, slotFrame, info, quality)
 	end)
 end
 
-function MISC:ItemLevel_SetupLevel(frame, strType, unit)
+function M:ItemLevel_SetupLevel(frame, strType, unit)
 	if not UnitExists(unit) then return end
 
-	MISC:CreateItemString(frame, strType)
+	M:CreateItemString(frame, strType)
 
 	for index, slot in pairs(inspectSlots) do
 		if index ~= 4 then
@@ -218,35 +218,35 @@ function MISC:ItemLevel_SetupLevel(frame, strType, unit)
 			local link = GetInventoryItemLink(unit, index)
 			if link then
 				local quality = select(3, GetItemInfo(link))
-				local info = M.GetItemLevel(link, unit, index, R.db["Misc"]["GemNEnchant"])
+				local info = B.GetItemLevel(link, unit, index, C.db["Misc"]["GemNEnchant"])
 				if info == "tooSoon" then
-					MISC:ItemLevel_RefreshInfo(link, unit, index, slotFrame)
+					M:ItemLevel_RefreshInfo(link, unit, index, slotFrame)
 				else
-					MISC:ItemLevel_UpdateInfo(index, slotFrame, info, quality)
+					M:ItemLevel_UpdateInfo(index, slotFrame, info, quality)
 				end
 
 				if strType == "Character" then
-					MISC:ItemLevel_UpdateTraits(slotFrame, index, link)
+					M:ItemLevel_UpdateTraits(slotFrame, index, link)
 				end
 			end
 		end
 	end
 end
 
-function MISC:ItemLevel_UpdatePlayer()
-	MISC:ItemLevel_SetupLevel(CharacterFrame, "Character", "player")
+function M:ItemLevel_UpdatePlayer()
+	M:ItemLevel_SetupLevel(CharacterFrame, "Character", "player")
 end
 
-function MISC:ItemLevel_UpdateInspect(...)
+function M:ItemLevel_UpdateInspect(...)
 	local guid = ...
 	if InspectFrame and InspectFrame.unit and UnitGUID(InspectFrame.unit) == guid then
-		MISC:ItemLevel_SetupLevel(InspectFrame, "Inspect", InspectFrame.unit)
+		M:ItemLevel_SetupLevel(InspectFrame, "Inspect", InspectFrame.unit)
 	end
 end
 
-function MISC:ItemLevel_FlyoutUpdate(bag, slot, quality)
+function M:ItemLevel_FlyoutUpdate(bag, slot, quality)
 	if not self.iLvl then
-		self.iLvl = M.CreateFS(self, I.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
+		self.iLvl = B.CreateFS(self, DB.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
 	end
 
 	if quality and quality <= 1 then return end
@@ -254,18 +254,18 @@ function MISC:ItemLevel_FlyoutUpdate(bag, slot, quality)
 	local link, level
 	if bag then
 		link = GetContainerItemLink(bag, slot)
-		level = M.GetItemLevel(link, bag, slot)
+		level = B.GetItemLevel(link, bag, slot)
 	else
 		link = GetInventoryItemLink("player", slot)
-		level = M.GetItemLevel(link, "player", slot)
+		level = B.GetItemLevel(link, "player", slot)
 	end
 
-	local color = I.QualityColors[quality or 0]
+	local color = DB.QualityColors[quality or 0]
 	self.iLvl:SetText(level)
 	self.iLvl:SetTextColor(1, 0.8, 0)  --color.r, color.g, color.b
 end
 
-function MISC:ItemLevel_FlyoutSetup()
+function M:ItemLevel_FlyoutSetup()
 	if self.iLvl then self.iLvl:SetText("") end
 
 	local location = self.location
@@ -274,30 +274,30 @@ function MISC:ItemLevel_FlyoutSetup()
 	if tonumber(location) then
 		if location >= EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION then return end
 
-		local _, _, bags, voidStorage, slot, bag = EquipmentManager_UnpackLocation(location)
-		if voidStorage then return end
+		local locationData = EquipmentManager_GetLocationData(location)
+		local bags, slot, bag = locationData.isBags, locationData.slot, locationData.bag
 		local quality = select(13, EquipmentManager_GetItemInfoByLocation(location))
 		if bags then
-			MISC.ItemLevel_FlyoutUpdate(self, bag, slot, quality)
+			M.ItemLevel_FlyoutUpdate(self, bag, slot, quality)
 		else
-			MISC.ItemLevel_FlyoutUpdate(self, nil, slot, quality)
+			M.ItemLevel_FlyoutUpdate(self, nil, slot, quality)
 		end
 	else
 		local itemLocation = self:GetItemLocation()
 		local quality = itemLocation and C_Item.GetItemQuality(itemLocation)
 		if itemLocation:IsBagAndSlot() then
 			local bag, slot = itemLocation:GetBagAndSlot()
-			MISC.ItemLevel_FlyoutUpdate(self, bag, slot, quality)
+			M.ItemLevel_FlyoutUpdate(self, bag, slot, quality)
 		elseif itemLocation:IsEquipmentSlot() then
 			local slot = itemLocation:GetEquipmentSlot()
-			MISC.ItemLevel_FlyoutUpdate(self, nil, slot, quality)
+			M.ItemLevel_FlyoutUpdate(self, nil, slot, quality)
 		end
 	end
 end
 
-function MISC:ItemLevel_ScrappingUpdate()
+function M:ItemLevel_ScrappingUpdate()
 	if not self.iLvl then
-		self.iLvl = M.CreateFS(self, I.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
+		self.iLvl = B.CreateFS(self, DB.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
 	end
 	if not self.itemLink then self.iLvl:SetText("") return end
 
@@ -305,36 +305,36 @@ function MISC:ItemLevel_ScrappingUpdate()
 	if self.itemLocation and not self.item:IsItemEmpty() and self.item:GetItemName() then
 		quality = self.item:GetItemQuality()
 	end
-	local level = M.GetItemLevel(self.itemLink)
-	local color = I.QualityColors[quality]
+	local level = B.GetItemLevel(self.itemLink)
+	local color = DB.QualityColors[quality]
 	self.iLvl:SetText(level)
 	self.iLvl:SetTextColor(color.r, color.g, color.b)
 end
 
-function MISC:ItemLevel_ScrappingSetup()
+function M:ItemLevel_ScrappingSetup()
 	for button in self.ItemSlots.scrapButtons:EnumerateActive() do
 		if button and not button.iLvl then
-			hooksecurefunc(button, "RefreshIcon", MISC.ItemLevel_ScrappingUpdate)
+			hooksecurefunc(button, "RefreshIcon", M.ItemLevel_ScrappingUpdate)
 		end
 	end
 end
 
-function MISC.ItemLevel_ScrappingShow(event, addon)
+function M.ItemLevel_ScrappingShow(event, addon)
 	if addon == "Blizzard_ScrappingMachineUI" then
-		hooksecurefunc(ScrappingMachineFrame, "SetupScrapButtonPool", MISC.ItemLevel_ScrappingSetup)
+		hooksecurefunc(ScrappingMachineFrame, "UpdateScrapButtonState", M.ItemLevel_ScrappingSetup)
 
-		M:UnregisterEvent(event, MISC.ItemLevel_ScrappingShow)
+		B:UnregisterEvent(event, M.ItemLevel_ScrappingShow)
 	end
 end
 
-function MISC:ItemLevel_UpdateMerchant(link)
+function M:ItemLevel_UpdateMerchant(link)
 	if not self.iLvl then
-		self.iLvl = M.CreateFS(_G[self:GetName().."ItemButton"], I.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
+		self.iLvl = B.CreateFS(_G[self:GetName().."ItemButton"], DB.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
 	end
 	local quality = link and select(3, GetItemInfo(link)) or nil
 	if quality and quality > 1 then
-		local level = M.GetItemLevel(link)
-		local color = I.QualityColors[quality]
+		local level = B.GetItemLevel(link)
+		local color = DB.QualityColors[quality]
 		self.iLvl:SetText(level)
 		self.iLvl:SetTextColor(color.r, color.g, color.b)
 	else
@@ -342,27 +342,27 @@ function MISC:ItemLevel_UpdateMerchant(link)
 	end
 end
 
-function MISC.ItemLevel_UpdateTradePlayer(index)
+function M.ItemLevel_UpdateTradePlayer(index)
 	local button = _G["TradePlayerItem"..index]
 	local link = GetTradePlayerItemLink(index)
-	MISC.ItemLevel_UpdateMerchant(button, link)
+	M.ItemLevel_UpdateMerchant(button, link)
 end
 
-function MISC.ItemLevel_UpdateTradeTarget(index)
+function M.ItemLevel_UpdateTradeTarget(index)
 	local button = _G["TradeRecipientItem"..index]
 	local link = GetTradeTargetItemLink(index)
-	MISC.ItemLevel_UpdateMerchant(button, link)
+	M.ItemLevel_UpdateMerchant(button, link)
 end
 
 local itemCache = {}
-local CHAT = M:GetModule("Chat")
+local CHAT = B:GetModule("Chat")
 
-function MISC.ItemLevel_ReplaceItemLink(link, name)
+function M.ItemLevel_ReplaceItemLink(link, name)
 	if not link then return end
 
 	local modLink = itemCache[link]
 	if not modLink then
-		local itemLevel = M.GetItemLevel(link)
+		local itemLevel = B.GetItemLevel(link)
 		if itemLevel then
 			modLink = gsub(link, "|h%[(.-)%]|h", "|h("..itemLevel..CHAT.IsItemHasGem(link)..")"..name.."|h")
 			itemCache[link] = modLink
@@ -371,7 +371,7 @@ function MISC.ItemLevel_ReplaceItemLink(link, name)
 	return modLink
 end
 
-function MISC:GuildNewsButtonOnClick(btn)
+function M:GuildNewsButtonOnClick(btn)
 	if self.isEvent or not self.playerName then return end
 	if btn == "LeftButton" and IsShiftKeyDown() then
 		if MailFrame:IsShown() then
@@ -388,33 +388,33 @@ function MISC:GuildNewsButtonOnClick(btn)
 	end
 end
 
-function MISC:ItemLevel_ReplaceGuildNews(_, _, playerName)
+function M:ItemLevel_ReplaceGuildNews(_, _, playerName)
 	self.playerName = playerName
 
-	local newText = gsub(self.text:GetText(), "(|Hitem:%d+:.-|h%[(.-)%]|h)", MISC.ItemLevel_ReplaceItemLink)
+	local newText = gsub(self.text:GetText(), "(|Hitem:%d+:.-|h%[(.-)%]|h)", M.ItemLevel_ReplaceItemLink)
 	if newText then
 		self.text:SetText(newText)
 	end
 
 	if not self.hooked then
 		self.text:SetFontObject(Game13Font)
-		self:HookScript("OnClick", MISC.GuildNewsButtonOnClick) -- copy name by key shift
+		self:HookScript("OnClick", M.GuildNewsButtonOnClick) -- copy name by key shift
 		self.hooked = true
 	end
 end
 
-function MISC:ItemLevel_UpdateLoot()
+function M:ItemLevel_UpdateLoot()
 	for i = 1, self.ScrollTarget:GetNumChildren() do
 		local button = select(i, self.ScrollTarget:GetChildren())
 		if button and button.Item and button.GetElementData then
 			if not button.iLvl then
-				button.iLvl = M.CreateFS(button.Item, I.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
+				button.iLvl = B.CreateFS(button.Item, DB.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
 			end
 			local slotIndex = button:GetSlotIndex()
 			local quality = select(5, GetLootSlotInfo(slotIndex))
 			if quality and quality > 1 then
-				local level = M.GetItemLevel(GetLootSlotLink(slotIndex))
-				local color = I.QualityColors[quality]
+				local level = B.GetItemLevel(GetLootSlotLink(slotIndex))
+				local color = DB.QualityColors[quality]
 				button.iLvl:SetText(level)
 				button.iLvl:SetTextColor(color.r, color.g, color.b)
 			else
@@ -424,10 +424,10 @@ function MISC:ItemLevel_UpdateLoot()
 	end
 end
 
-function MISC:ItemLevel_UpdateBag()
+function M:ItemLevel_UpdateBag()
 	local button = self.__owner
 	if not button.iLvl then
-		button.iLvl = M.CreateFS(button, I.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
+		button.iLvl = B.CreateFS(button, DB.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
 	end
 
 	local bagID = button.GetBankTabID and button:GetBankTabID() or button:GetBagID()
@@ -436,8 +436,8 @@ function MISC:ItemLevel_UpdateBag()
 	local link = info and info.hyperlink
 	local quality = info and info.quality
 	if quality and quality > 1 then
-		local level = M.GetItemLevel(link, bagID, slotID)
-		local color = I.QualityColors[quality]
+		local level = B.GetItemLevel(link, bagID, slotID)
+		local color = DB.QualityColors[quality]
 		button.iLvl:SetText(level)
 		button.iLvl:SetTextColor(color.r, color.g, color.b)
 	else
@@ -445,65 +445,65 @@ function MISC:ItemLevel_UpdateBag()
 	end
 end
 
-function MISC:ItemLevel_HandleSlots()
+function M:ItemLevel_HandleSlots()
 	for button in self.itemButtonPool:EnumerateActive() do
 		if not button.hooked then
 			button.IconBorder.__owner = button
-			hooksecurefunc(button.IconBorder, "SetShown", MISC.ItemLevel_UpdateBag)
+			hooksecurefunc(button.IconBorder, "SetShown", M.ItemLevel_UpdateBag)
 			button.hooked = true
 		end
 	end
 end
 
-function MISC:ItemLevel_Containers()
-	--if R.db["Bags"]["Enable"] then return end
+function M:ItemLevel_Containers()
+	--if C.db["Bags"]["Enable"] then return end
 
 	for i = 1, 13 do
 		local frame = _G["ContainerFrame"..i]
 		if frame then
-			hooksecurefunc(frame, "UpdateItemSlots", MISC.ItemLevel_HandleSlots)
+			hooksecurefunc(frame, "UpdateItemSlots", M.ItemLevel_HandleSlots)
 		end
 	end
-	hooksecurefunc(ContainerFrameCombinedBags, "UpdateItemSlots", MISC.ItemLevel_HandleSlots)
-	hooksecurefunc(BankFrame.BankPanel, "GenerateItemSlotsForSelectedTab", MISC.ItemLevel_HandleSlots)
+	hooksecurefunc(ContainerFrameCombinedBags, "UpdateItemSlots", M.ItemLevel_HandleSlots)
+	hooksecurefunc(BankFrame.BankPanel, "GenerateItemSlotsForSelectedTab", M.ItemLevel_HandleSlots)
 end
 
-function MISC:ShowItemLevel()
-	if not R.db["Misc"]["ItemLevel"] then return end
+function M:ShowItemLevel()
+	if not C.db["Misc"]["ItemLevel"] then return end
 
 	-- iLvl on CharacterFrame
-	CharacterFrame:HookScript("OnShow", MISC.ItemLevel_UpdatePlayer)
-	M:RegisterEvent("PLAYER_EQUIPMENT_CHANGED", MISC.ItemLevel_UpdatePlayer)
+	CharacterFrame:HookScript("OnShow", M.ItemLevel_UpdatePlayer)
+	B:RegisterEvent("PLAYER_EQUIPMENT_CHANGED", M.ItemLevel_UpdatePlayer)
 
 	-- iLvl on InspectFrame
-	M:RegisterEvent("INSPECT_READY", MISC.ItemLevel_UpdateInspect)
+	B:RegisterEvent("INSPECT_READY", M.ItemLevel_UpdateInspect)
 
 	-- iLvl on FlyoutButtons
 	hooksecurefunc("EquipmentFlyout_UpdateItems", function()
 		for _, button in pairs(EquipmentFlyoutFrame.buttons) do
 			if button:IsShown() then
-				MISC.ItemLevel_FlyoutSetup(button)
+				M.ItemLevel_FlyoutSetup(button)
 			end
 		end
 	end)
 
 	-- iLvl on ScrappingMachineFrame
-	M:RegisterEvent("ADDON_LOADED", MISC.ItemLevel_ScrappingShow)
+	B:RegisterEvent("ADDON_LOADED", M.ItemLevel_ScrappingShow)
 
 	-- iLvl on MerchantFrame
-	hooksecurefunc("MerchantFrameItem_UpdateQuality", MISC.ItemLevel_UpdateMerchant)
+	hooksecurefunc("MerchantFrameItem_UpdateQuality", M.ItemLevel_UpdateMerchant)
 
 	-- iLvl on TradeFrame
-	hooksecurefunc("TradeFrame_UpdatePlayerItem", MISC.ItemLevel_UpdateTradePlayer)
-	hooksecurefunc("TradeFrame_UpdateTargetItem", MISC.ItemLevel_UpdateTradeTarget)
+	hooksecurefunc("TradeFrame_UpdatePlayerItem", M.ItemLevel_UpdateTradePlayer)
+	hooksecurefunc("TradeFrame_UpdateTargetItem", M.ItemLevel_UpdateTradeTarget)
 
 	-- iLvl on GuildNews
-	hooksecurefunc("GuildNewsButton_SetText", MISC.ItemLevel_ReplaceGuildNews)
+	hooksecurefunc("GuildNewsButton_SetText", M.ItemLevel_ReplaceGuildNews)
 
 	-- iLvl on LootFrame
-	hooksecurefunc(LootFrame.ScrollBox, "Update", MISC.ItemLevel_UpdateLoot)
+	hooksecurefunc(LootFrame.ScrollBox, "Update", M.ItemLevel_UpdateLoot)
 
 	-- iLvl on default Container
-	MISC:ItemLevel_Containers()
+	M:ItemLevel_Containers()
 end
-MISC:RegisterMisc("GearInfo", MISC.ShowItemLevel)
+M:RegisterMisc("GearInfo", M.ShowItemLevel)

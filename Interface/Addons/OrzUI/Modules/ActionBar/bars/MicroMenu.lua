@@ -1,14 +1,14 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local Bar = M:GetModule("Actionbar")
+local B, C, L, DB = unpack(ns)
+local Bar = B:GetModule("Actionbar")
 
 local _G = getfenv(0)
 local tinsert, pairs, type = table.insert, pairs, type
 local buttonList, menubar = {}
 
 function Bar:MicroButton_SetupTexture(icon, texture)
-	local r, g, b = I.r, I.g, I.b
-	--if not R.db["Skins"]["ClassLine"] then r, g, b = 0, 0, 0 end
+	local r, g, b = DB.r, DB.g, DB.b
+	--if not C.db["Skins"]["ClassLine"] then r, g, b = 0, 0, 0 end
 	icon:SetOutside(nil, 3, 3)
 	icon:SetTexture("Interface\\BUTTONS\\"..texture)
 	icon:SetVertexColor(r, g, b)
@@ -49,7 +49,7 @@ function Bar:MicroButton_Create(parent, data)
 		--button:SetPushedTexture(0)
 		--button:SetDisabledTexture(0)
 		--button:SetHighlightTexture(0) -- 10.1.5
-		if tooltip then M.AddTooltip(button, "ANCHOR_RIGHT", tooltip) end
+		if tooltip then B.AddTooltip(button, "ANCHOR_RIGHT", tooltip) end
 
 		--[[local hl = button:GetHighlightTexture()
 		Bar:MicroButton_SetupTexture(hl, texture)
@@ -57,15 +57,15 @@ function Bar:MicroButton_Create(parent, data)
 			button:SetHighlightTexture("Interface\\BUTTONS\\"..texture)
 			hl:SetBlendMode("ADD")
 		end)
-		--if not R.db["Skins"]["ClassLine"] then hl:SetVertexColor(1, 1, 1) end
+		--if not C.db["Skins"]["ClassLine"] then hl:SetVertexColor(1, 1, 1) end
 
 		local flash = button.FlashBorder
 		if flash then
 			Bar:MicroButton_SetupTexture(flash, texture)
-			--if not R.db["Skins"]["ClassLine"] then flash:SetVertexColor(1, 1, 1) end
+			--if not C.db["Skins"]["ClassLine"] then flash:SetVertexColor(1, 1, 1) end
 		end]]
 		if button.FlashContent then button.FlashContent:SetAlpha(0) end
-		--if button.Portrait then button.Portrait:Hide() end
+		if button.Portrait then button.Portrait:Hide() end
 		if button.Background then button.Background:SetAlpha(0) end
 		if button.PushedBackground then button.PushedBackground:SetAlpha(0) end
 		if texture == "player" then
@@ -80,21 +80,21 @@ function Bar:MicroButton_Create(parent, data)
 		end
 	else
 		bu:SetScript("OnMouseUp", method)
-		M.AddTooltip(bu, "ANCHOR_RIGHT", tooltip)
+		B.AddTooltip(bu, "ANCHOR_RIGHT", tooltip)
 
 		local hl = bu:CreateTexture(nil, "HIGHLIGHT")
 		hl:SetBlendMode("ADD")
 		Bar:MicroButton_SetupTexture(hl, texture)
-		--if not R.db["Skins"]["ClassLine"] then hl:SetVertexColor(1, 1, 1) end
+		--if not C.db["Skins"]["ClassLine"] then hl:SetVertexColor(1, 1, 1) end
 	end
 end
 
 function Bar:MicroMenu_Setup()
 	if not menubar then return end
 
-	local size = R.db["Actionbar"]["MBSize"]
-	local perRow = R.db["Actionbar"]["MBPerRow"]
-	local margin = R.db["Actionbar"]["MBSpacing"]
+	local size = C.db["Actionbar"]["MBSize"]
+	local perRow = C.db["Actionbar"]["MBPerRow"]
+	local margin = C.db["Actionbar"]["MBSpacing"]
 
 	for i = 1, #buttonList do
 		local button = buttonList[i]
@@ -121,11 +121,11 @@ end
 function Bar:MicroMenu()
 	BagsBar:Hide()
 	BagsBar:UnregisterAllEvents()
-	if not R.db["Actionbar"]["MicroMenu"] then return end
+	if not C.db["Actionbar"]["MicroMenu"] then return end
 
 	menubar = CreateFrame("Frame", nil, UIParent)
 	menubar:SetSize(310, 21)
-	menubar.mover = M.Mover(menubar, U["Menubar"], "Menubar", R.Skins.MicroMenuPos)
+	menubar.mover = B.Mover(menubar, L["Menubar"], "Menubar", C.Skins.MicroMenuPos)
 
 	-- Generate Buttons
 	local buttonInfo = {
@@ -152,15 +152,15 @@ function Bar:MicroMenu()
 
 	-- Default elements
 	if MainMenuMicroButton.MainMenuBarPerformanceBar then
-		M.HideObject(MainMenuMicroButton.MainMenuBarPerformanceBar)
+		B.HideObject(MainMenuMicroButton.MainMenuBarPerformanceBar)
 	end
-	M.HideObject(HelpOpenWebTicketButton)
+	B.HideObject(HelpOpenWebTicketButton)
 	MainMenuMicroButton:SetScript("OnUpdate", nil)
 
 	MicroButtonAndBagsBar:Hide()
 	MicroButtonAndBagsBar:UnregisterAllEvents()
 
-	if R.db["Map"]["DisableMinimap"] then
+	if C.db["Map"]["DisableMinimap"] then
 		QueueStatusButton:SetParent(Minimap)
 		QueueStatusButton:ClearAllPoints()
 		QueueStatusButton:SetPoint("BOTTOMLEFT", Minimap, "BOTTOMLEFT", 30, -10)
@@ -169,6 +169,6 @@ function Bar:MicroMenu()
 	end
 
 	if MicroMenu and MicroMenu.UpdateHelpTicketButtonAnchor then
-		MicroMenu.UpdateHelpTicketButtonAnchor = M.Dummy
+		MicroMenu.UpdateHelpTicketButtonAnchor = B.Dummy
 	end
 end

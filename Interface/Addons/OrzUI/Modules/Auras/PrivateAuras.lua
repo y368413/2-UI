@@ -1,7 +1,7 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local PA = M:RegisterModule("PrivateAuras")
-local A = M:GetModule("Auras")
+local B, C, L, DB = unpack(ns)
+local PA = B:RegisterModule("PrivateAuras")
+local A = B:GetModule("Auras")
 
 local MAX_PRIVATE_AURAS = 2
 local AddPrivateAuraAnchor = C_UnitAuras.AddPrivateAuraAnchor
@@ -83,7 +83,7 @@ function PA:CreateAura(parent, unit, index, db)
 	local reverse = db.ReversePrivate
 	local rel1 = reverse and "LEFT" or "RIGHT"
 	local rel2 = reverse and "RIGHT" or "LEFT"
-	local margin = reverse and R.margin or -R.margin
+	local margin = reverse and C.margin or -C.margin
 
 	aura:ClearAllPoints()
 	if index == 1 then
@@ -99,7 +99,7 @@ function PA:CreateAura(parent, unit, index, db)
 end
 
 function PA:SetupPrivateAuras(db, parent, unit)
-	if not db then db = R.db["Auras"] end
+	if not db then db = C.db["Auras"] end
 
 	if not parent then parent = UIParent end
 	if not parent.auraIcons then
@@ -118,11 +118,11 @@ function PA:Update()
 end
 
 function PA:OnLogin()
-	if not R.db["Auras"]["BuffFrame"] then return end
+	if not C.db["Auras"]["BuffFrame"] then return end
 
 	PA.Auras = CreateFrame("Frame", "OrzUI_PrivateAuras", UIParent)
 	PA.Auras:SetSize(30, 30)
-	PA.Auras.mover = M.Mover(PA.Auras, "PrivateAuras", "PrivateAuras", {"TOPRIGHT", A.DebuffFrame.mover, "BOTTOMRIGHT", 0, -12})
+	PA.Auras.mover = B.Mover(PA.Auras, "PrivateAuras", "PrivateAuras", {"TOPRIGHT", A.DebuffFrame.mover, "BOTTOMRIGHT", 0, -12})
 
 	PA:Update()
 end

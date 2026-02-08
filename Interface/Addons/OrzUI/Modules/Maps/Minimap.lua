@@ -1,20 +1,20 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 local oUF = ns.oUF
-local module = M:GetModule("Maps")
+local module = B:GetModule("Maps")
 
 local _G = _G
 local select, pairs, unpack, next, tinsert = select, pairs, unpack, next, tinsert
 local strmatch, strfind, strupper = strmatch, strfind, strupper
 local UIFrameFadeOut, UIFrameFadeIn = UIFrameFadeOut, UIFrameFadeIn
 local C_Timer_After = C_Timer.After
-local cr, cg, cb = I.r, I.g, I.b
+local cr, cg, cb = DB.r, DB.g, DB.b
 
 function module:CreatePulse()
-	local bg = M.SetBD(Minimap)
+	local bg = B.SetBD(Minimap)
 	bg:SetFrameStrata("BACKGROUND")
 
-	if not R.db["Map"]["CombatPulse"] then return end
+	if not C.db["Map"]["CombatPulse"] then return end
 
 	local MinimapMailFrame = MinimapCluster.IndicatorFrame.MailFrame
 	local anim = bg:CreateAnimationGroup()
@@ -39,10 +39,10 @@ function module:CreatePulse()
 			end
 		end
 	end
-	M:RegisterEvent("PLAYER_REGEN_ENABLED", updateMinimapAnim)
-	M:RegisterEvent("PLAYER_REGEN_DISABLED", updateMinimapAnim)
-	M:RegisterEvent("CALENDAR_UPDATE_PENDING_INVITES", updateMinimapAnim)
-	M:RegisterEvent("UPDATE_PENDING_MAIL", updateMinimapAnim)
+	B:RegisterEvent("PLAYER_REGEN_ENABLED", updateMinimapAnim)
+	B:RegisterEvent("PLAYER_REGEN_DISABLED", updateMinimapAnim)
+	B:RegisterEvent("CALENDAR_UPDATE_PENDING_INVITES", updateMinimapAnim)
+	B:RegisterEvent("UPDATE_PENDING_MAIL", updateMinimapAnim)
 
 	MinimapMailFrame:HookScript("OnHide", function()
 		if InCombatLockdown() then return end
@@ -52,9 +52,9 @@ function module:CreatePulse()
 end
 
 local function ToggleLandingPage(_, ...)
-	if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
+	if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
 	if not C_Garrison.HasGarrison(...) then
-		UIErrorsFrame:AddMessage(I.InfoColor..CONTRIBUTION_TOOLTIP_UNLOCKED_WHEN_ACTIVE)
+		UIErrorsFrame:AddMessage(DB.InfoColor..CONTRIBUTION_TOOLTIP_UNLOCKED_WHEN_ACTIVE)
 		return
 	end
 	ShowGarrisonLandingPage(...)
@@ -69,17 +69,17 @@ function module:ReskinRegions()
 			self:ClearAllPoints()
 			self:SetPoint("BOTTOMRIGHT", Minimap, 6, -6)
 		--self:SetScale(0.6)
-		--self:GetNormalTexture():SetTexture("Interface\\AddOns\\OrzUI\\Media\\2UI")
-		--self:GetPushedTexture():SetTexture("Interface\\AddOns\\OrzUI\\Media\\2UI")
-		--self:GetHighlightTexture():SetTexture("Interface\\AddOns\\OrzUI\\Media\\2UI")
+			self:GetNormalTexture():SetTexture(DB.garrTex)
+			self:GetPushedTexture():SetTexture(DB.garrTex)
+			self:GetHighlightTexture():SetTexture(DB.garrTex)
 			self:SetSize(30, 30)
 
 			if self:IsShown() and not binSettled then
 				if RecycleBinToggleButton then
 					RecycleBinToggleButton:SetPoint("BOTTOMRIGHT", -15, -6)
-				--else
-					--AddonCompartmentFrame:ClearAllPoints()
-					--AddonCompartmentFrame:SetPoint("BOTTOMRIGHT", Minimap, -26, 2)
+				else
+					AddonCompartmentFrame:ClearAllPoints()
+					AddonCompartmentFrame:SetPoint("BOTTOMRIGHT", Minimap, 2, 0)
 				end
 				binSettled = true
 			end
@@ -102,14 +102,14 @@ function module:ReskinRegions()
 				if _G.ExpansionLandingPage and _G.ExpansionLandingPage:IsShown() then
 					HideUIPanel(_G.ExpansionLandingPage)
 				end
-				EasyMenu(menuList, M.EasyMenu, self, -80, 0, "MENU", 1)
+				EasyMenu(menuList, B.EasyMenu, self, -80, 0, "MENU", 1)
 			end
 		end)
 		garrMinimapButton:SetScript("OnEnter", function(self)
 			GameTooltip:SetOwner(self, "ANCHOR_LEFT")
 			GameTooltip:SetText(self.title, 1, 1, 1)
 			GameTooltip:AddLine(self.description, nil, nil, nil, true)
-			GameTooltip:AddLine(U["SwitchGarrisonType"], nil, nil, nil, true)
+			GameTooltip:AddLine(L["SwitchGarrisonType"], nil, nil, nil, true)
 			GameTooltip:Show();
 		end)
 	end
@@ -135,6 +135,7 @@ function module:ReskinRegions()
 	queueIcon:SetPoint("CENTER", QueueStatusButton)
 	queueIcon:SetSize(50, 50)
 	queueIcon:SetAtlas("Raid")
+
 	local anim = queueIcon:CreateAnimationGroup()
 	anim:SetLooping("REPEAT")
 	anim.rota = anim:CreateAnimation("Rotation")
@@ -162,7 +163,7 @@ function module:ReskinRegions()
 		hooksecurefunc(instDifficulty, "SetPoint", updateFlagAnchor)
 
 		local function replaceFlag(self)
-			self:SetTexture(I.flagTex)
+			self:SetTexture(DB.flagTex)
 		end
 		local function reskinDifficulty(frame)
 			if not frame then return end
@@ -197,8 +198,8 @@ function module:ReskinRegions()
 	Invt:SetPoint("TOPRIGHT", Minimap, "BOTTOMLEFT", -20, -20)
 	Invt:SetSize(250, 80)
 	Invt:Hide()
-	M.SetBD(Invt)
-	M.CreateFS(Invt, 16, I.InfoColor..GAMETIME_TOOLTIP_CALENDAR_INVITES)
+	B.SetBD(Invt)
+	B.CreateFS(Invt, 16, DB.InfoColor..GAMETIME_TOOLTIP_CALENDAR_INVITES)
 
 	local lastInv = 0
 	local function updateInviteVisibility()
@@ -208,8 +209,8 @@ function module:ReskinRegions()
 			Invt:SetShown(C_Calendar.GetNumPendingInvites() > 0)
 		end
 	end
-	M:RegisterEvent("CALENDAR_UPDATE_PENDING_INVITES", updateInviteVisibility)
-	M:RegisterEvent("PLAYER_ENTERING_WORLD", updateInviteVisibility)
+	B:RegisterEvent("CALENDAR_UPDATE_PENDING_INVITES", updateInviteVisibility)
+	B:RegisterEvent("PLAYER_ENTERING_WORLD", updateInviteVisibility)
 
 	Invt:SetScript("OnClick", function(_, btn)
 		Invt:Hide()
@@ -217,26 +218,26 @@ function module:ReskinRegions()
 		--if btn == "LeftButton" then
 			ToggleCalendar()
 		end
-		M:UnregisterEvent("CALENDAR_UPDATE_PENDING_INVITES", updateInviteVisibility)
-		M:UnregisterEvent("PLAYER_ENTERING_WORLD", updateInviteVisibility)
+		B:UnregisterEvent("CALENDAR_UPDATE_PENDING_INVITES", updateInviteVisibility)
+		B:UnregisterEvent("PLAYER_ENTERING_WORLD", updateInviteVisibility)
 	end)
 end
 
 function module:BlizzardACF()
 	local frame = AddonCompartmentFrame
-	--if R.db["Map"]["ShowRecycleBin"] then
-		M.HideObject(frame)
+	--if C.db["Map"]["ShowRecycleBin"] then
+		B.HideObject(frame)
 	--else
 		--frame:ClearAllPoints()
-		--frame:SetPoint("BOTTOMRIGHT", Minimap, -26, 2)
+		--frame:SetPoint("BOTTOMRIGHT", Minimap, 2, 2)
 		--frame:SetFrameLevel(999)
-		--M.StripTextures(frame)
-		--M.SetBD(frame)
+		--B.StripTextures(frame)
+		--B.SetBD(frame)
 	--end
 end
 
 function module:RecycleBin()
-	if not R.db["Map"]["ShowRecycleBin"] then return end
+	if not C.db["Map"]["ShowRecycleBin"] then return end
 
 	local blackList = {
 		["GameTimeFrame"] = true,
@@ -255,36 +256,36 @@ function module:RecycleBin()
 	}
 
 	local function updateRecycleTip(bu)
-		bu.text = I.RightButton..U["AutoHide"]..": "..(OrzUISetDB["AutoRecycle"] and "|cff55ff55"..VIDEO_OPTIONS_ENABLED or "|cffff5555"..VIDEO_OPTIONS_DISABLED)
+		bu.text = DB.RightButton..L["AutoHide"]..": "..(OrzUISetDB["AutoRecycle"] and "|cff55ff55"..VIDEO_OPTIONS_ENABLED or "|cffff5555"..VIDEO_OPTIONS_DISABLED)
 	end
 
 	local bu = CreateFrame("Button", "RecycleBinToggleButton", Minimap)
-	bu:SetSize(30, 30)
-	bu:SetPoint("BOTTOMRIGHT", 4, -6)
+	bu:SetSize(21, 21)
+	bu:SetPoint("BOTTOMRIGHT", Minimap, "BOTTOMRIGHT", 0, 0)
 	bu:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 	bu.Icon = bu:CreateTexture(nil, "ARTWORK")
 	bu.Icon:SetAllPoints()
-	bu.Icon:SetTexture(I.binTex)
-	bu:SetHighlightTexture(I.binTex)
-	bu.title = I.InfoColor..U["Minimap RecycleBin"]
+	bu.Icon:SetTexture("Interface\\AddOns\\OrzUI\\Media\\2UI")
+	bu:SetHighlightTexture("Interface\\AddOns\\OrzUI\\Media\\2UI")
+	bu.title = DB.InfoColor..L["Minimap RecycleBin"]
 	bu:SetFrameLevel(999)
-	M.AddTooltip(bu, "ANCHOR_LEFT")
+	B.AddTooltip(bu, "ANCHOR_LEFT")
 	updateRecycleTip(bu)
 
-	local width, height, alpha = 220, 40, .5
+	local width, height, alpha = 220, 20, .5
 	local bin = CreateFrame("Frame", "RecycleBinFrame", UIParent)
-	bin:SetPoint("BOTTOMRIGHT", bu, "BOTTOMLEFT", -3, 10)
+	bin:SetPoint("TOPRIGHT", bu, "BOTTOMRIGHT", 3, 3)
 	bin:SetSize(width, height)
 	bin:Hide()
 
-	local tex = M.SetGradient(bin, "H", 0, 0, 0, 0, alpha, width, height)
+	--[[local tex = B.SetGradient(bin, "H", 0, 0, 0, 0, alpha, width, height)
 	tex:SetPoint("CENTER")
-	local topLine = M.SetGradient(bin, "H", cr, cg, cb, 0, alpha, width, R.mult)
+	local topLine = B.SetGradient(bin, "H", cr, cg, cb, 0, alpha, width, C.mult)
 	topLine:SetPoint("BOTTOM", bin, "TOP")
-	local bottomLine = M.SetGradient(bin, "H", cr, cg, cb, 0, alpha, width, R.mult)
+	local bottomLine = B.SetGradient(bin, "H", cr, cg, cb, 0, alpha, width, C.mult)
 	bottomLine:SetPoint("TOP", bin, "BOTTOM")
-	local rightLine = M.SetGradient(bin, "V", cr, cg, cb, alpha, alpha, R.mult, height + R.mult*2)
-	rightLine:SetPoint("LEFT", bin, "RIGHT")
+	local rightLine = B.SetGradient(bin, "V", cr, cg, cb, alpha, alpha, C.mult, height + C.mult*2)
+	rightLine:SetPoint("LEFT", bin, "RIGHT")]]
 
 	local function hideBinButton()
 		bin:Hide()
@@ -301,7 +302,7 @@ function module:RecycleBin()
 		["HandyNotes.-Pin"] = true,
 		["TTMinimapButton"] = true,
 	}
-	M.SplitList(ignoredButtons, OrzUISetDB["IgnoredButtons"])
+	B.SplitList(ignoredButtons, OrzUISetDB["IgnoredButtons"])
 
 	local function isButtonIgnored(name)
 		for addonName in pairs(ignoredButtons) do
@@ -338,11 +339,11 @@ function module:RecycleBin()
 					region:SetAllPoints()
 				end
 				if not isGoodLookingIcon[name] then
-					region:SetTexCoord(unpack(I.TexCoord))
+					region:SetTexCoord(unpack(DB.TexCoord))
 				end
 			end
-			child:SetSize(34, 34)
-			M.CreateSD(child, 3, 3)
+			child:SetSize(21, 21)
+			B.CreateSD(child, 3, 3)
 		end
 
 		tinsert(buttons, child)
@@ -357,7 +358,7 @@ function module:RecycleBin()
 				if child:HasScript("OnClick") then child:HookScript("OnClick", clickFunc) end
 
 				if child:IsObjectType("Button") then
-					child:SetHighlightTexture(I.bdTex) -- prevent nil function
+					child:SetHighlightTexture(DB.bdTex) -- prevent nil function
 					child:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
 				elseif child:IsObjectType("Frame") then
 					child.highlight = child:CreateTexture(nil, "HIGHLIGHT")
@@ -373,9 +374,9 @@ function module:RecycleBin()
 				elseif name == "BagSync_MinimapButton" then
 					child:HookScript("OnMouseUp", clickFunc)
 				elseif name == "WIM3MinimapButton" then
-					child.SetParent = M.Dummy
+					child.SetParent = B.Dummy
 					child:SetFrameStrata("DIALOG")
-					child.SetFrameStrata = M.Dummy
+					child.SetFrameStrata = B.Dummy
 				end
 
 				child.styled = true
@@ -420,11 +421,11 @@ function module:RecycleBin()
 		end
 
 		local numShown = #shownButtons
-		local row = numShown == 0 and 1 or M:Round((numShown + rowMult) / iconsPerRow)
+		local row = numShown == 0 and 1 or B:Round((numShown + rowMult) / iconsPerRow)
 		local newHeight = row*37 + 3
 		bin:SetHeight(newHeight)
-		tex:SetHeight(newHeight)
-		rightLine:SetHeight(newHeight + 2*R.mult)
+		--tex:SetHeight(newHeight)
+		--rightLine:SetHeight(newHeight + 2*C.mult)
 
 		for index, button in pairs(shownButtons) do
 			button:ClearAllPoints()
@@ -456,10 +457,10 @@ function module:RecycleBin()
 	CollectRubbish()
 end
 function module:WhoPingsMyMap()
-	if not R.db["Map"]["WhoPings"] then return end
+	if not C.db["Map"]["WhoPings"] then return end
 	local f = CreateFrame("Frame", nil, Minimap)
 	f:SetAllPoints()
-	f.text = M.CreateFS(f, 14, "", false, "TOP", 0, -3)
+	f.text = B.CreateFS(f, 14, "", false, "TOP", 0, -3)
 	local anim = f:CreateAnimationGroup()
 	anim:SetScript("OnPlay", function() f:SetAlpha(1) end)
 	anim:SetScript("OnFinished", function() f:SetAlpha(0) end)
@@ -470,20 +471,20 @@ function module:WhoPingsMyMap()
 	anim.fader:SetSmoothing("OUT")
 	anim.fader:SetStartDelay(3)
 
-	M:RegisterEvent("MINIMAP_PING", function(_, unit)
+	B:RegisterEvent("MINIMAP_PING", function(_, unit)
 		if UnitIsUnit(unit, "player") then return end -- ignore player ping
 		anim:Stop()
 		f.text:SetText(GetUnitName(unit))
-		f.text:SetTextColor(M.ClassColor(select(2, UnitClass(unit))))
+		f.text:SetTextColor(B.ClassColor(select(2, UnitClass(unit))))
 		anim:Play()
 	end)
 end
 
 function module:UpdateMinimapScale()
-	if R.db["Map"]["DisableMinimap"] then return end
+	if C.db["Map"]["DisableMinimap"] then return end
 
-	local size = R.db["Map"]["MinimapSize"]
-	local scale = R.db["Map"]["MinimapScale"]
+	local size = C.db["Map"]["MinimapSize"]
+	local scale = C.db["Map"]["MinimapScale"]
 	Minimap:SetSize(size, size)
 	Minimap:SetScale(scale)
 	if Minimap.mover then
@@ -491,7 +492,7 @@ function module:UpdateMinimapScale()
 	end
 end
 
-function M:GetMinimapShape()
+function B:GetMinimapShape()
 	if not module.initialized then
 		module:UpdateMinimapScale()
 		module.initialized = true
@@ -500,14 +501,14 @@ function M:GetMinimapShape()
 end
 
 function module:ShowMinimapClock()
-	if R.db["Map"]["Clock"] then
+	if C.db["Map"]["Clock"] then
 		if not TimeManagerClockButton then LoadAddOn("Blizzard_TimeManager") end
 		if not TimeManagerClockButton.styled then
 			TimeManagerClockButton:DisableDrawLayer("BORDER")
 			TimeManagerClockButton:ClearAllPoints()
 			TimeManagerClockButton:SetPoint("BOTTOM", Minimap, "BOTTOM", 0, -2)
 			TimeManagerClockButton:SetFrameLevel(10)
-			TimeManagerClockTicker:SetFont(unpack(I.Font))
+			TimeManagerClockTicker:SetFont(unpack(DB.Font))
 			TimeManagerClockTicker:SetTextColor(1, 1, 1)
 
 			TimeManagerClockButton.styled = true
@@ -519,7 +520,7 @@ function module:ShowMinimapClock()
 end
 
 function module:ShowCalendar()
-	if R.db["Map"]["Calendar"] then
+	if C.db["Map"]["Calendar"] then
 		if not GameTimeFrame.styled then
 			GameTimeFrame:SetSize(18, 18)
 			GameTimeFrame:SetParent(Minimap)
@@ -531,7 +532,7 @@ function module:ShowCalendar()
 				local region = select(i, GameTimeFrame:GetRegions())
 				if region.SetTextColor then
 					region:SetTextColor(cr, cg, cb)
-					region:SetFont(unpack(I.Font))
+					region:SetFont(unpack(DB.Font))
 					break
 				end
 			end
@@ -545,21 +546,21 @@ function module:ShowCalendar()
 end
 
 local function GetVolumeColor(cur)
-	local r, g, b = oUF:RGBColorGradient(cur, 100, 1, 1, 1, 1, .8, 0, 1, 0, 0)
+	local r, g, b = B:RGBColorGradient(cur, 100, 1, 1, 1, 1, .8, 0, 1, 0, 0)
 	return r, g, b
 end
 
 local function GetCurrentVolume()
-	return M:Round(GetCVar("Sound_MasterVolume") * 100)
+	return B:Round(GetCVar("Sound_MasterVolume") * 100)
 end
 
 function module:SoundVolume()
-	if not R.db["Map"]["EasyVolume"] then return end
+	if not C.db["Map"]["EasyVolume"] then return end
 
 	local f = CreateFrame("Frame", nil, Minimap)
 	f:SetAllPoints()
 	f:SetFrameLevel(999)
-	local text = M.CreateFS(f, 30)
+	local text = B.CreateFS(f, 30)
 
 	local anim = f:CreateAnimationGroup()
 	anim:SetScript("OnPlay", function() f:SetAlpha(1) end)
@@ -599,8 +600,8 @@ end
 
 function module:Minimap_OnMouseUp(btn)
 	if btn == "MiddleButton" then
-		if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
-		ToggleFrame(ObjectiveTrackerFrame)  --M:DropDown(MapMicromenu, MapMenuFrame, 0, 0) --鼠标中键显示系统菜单
+		if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
+		ToggleFrame(ObjectiveTrackerFrame)  --B:DropDown(MapMicromenu, MapMenuFrame, 0, 0) --鼠标中键显示系统菜单
 	elseif btn == "RightButton" then
 		local button = MinimapCluster.Tracking.Button
 		if button then
@@ -612,7 +613,7 @@ function module:Minimap_OnMouseUp(btn)
 		end
 	else
 			if IsShiftKeyDown() or IsAltKeyDown() or IsControlKeyDown() then 
-			    ToggleCalendar() --if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end 
+			    ToggleCalendar() --if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end 
 			else
 			    Minimap:OnClick()--鼠标左键点击小地图显示Ping位置提示
 			end
@@ -628,15 +629,15 @@ end
 function module:HybridMinimapOnLoad(addon)
 	if addon == "Blizzard_HybridMinimap" then
 		module:SetupHybridMinimap()
-		M:UnregisterEvent(self, module.HybridMinimapOnLoad)
+		B:UnregisterEvent(self, module.HybridMinimapOnLoad)
 	end
 end
 
 local minimapInfo = {
-	text = U["MinimapHelp"],
+	text = L["MinimapHelp"],
 	buttonStyle = HelpTip.ButtonStyle.GotIt,
 	targetPoint = HelpTip.Point.LeftEdgeCenter,
-	onAcknowledgeCallback = M.HelpInfoAcknowledge,
+	onAcknowledgeCallback = B.HelpInfoAcknowledge,
 	callbackArg = "MinimapInfo",
 	alignment = 3,
 }
@@ -650,15 +651,15 @@ function module:ShowMinimapHelpInfo()
 end
 
 function module:SetupMinimap()
-	if C_AddOns.IsAddOnLoaded("SexyMap") then R.db["Map"]["DisableMinimap"] = true end
-	if R.db["Map"]["DisableMinimap"] then return end
+	if C_AddOns.IsAddOnLoaded("SexyMap") then C.db["Map"]["DisableMinimap"] = true end
+	if C.db["Map"]["DisableMinimap"] then return end
 
 	-- Shape and Position
 	Minimap:SetFrameLevel(10)
 	Minimap:SetMaskTexture("Interface\\Buttons\\WHITE8X8")
 	DropDownList1:SetClampedToScreen(true)
 
-	local mover = M.Mover(Minimap, U["Minimap"], "Minimap", R.Minimap.Pos)
+	local mover = B.Mover(Minimap, L["Minimap"], "Minimap", C.Minimap.Pos)
 	Minimap:ClearAllPoints()
 	Minimap:SetPoint("TOPRIGHT", mover)
 	hooksecurefunc(Minimap, "SetPoint", function(frame, _, _, _, _, _, force)
@@ -684,14 +685,18 @@ function module:SetupMinimap()
 	MinimapCluster.ZoneTextButton:Hide()
 	Minimap:SetArchBlobRingScalar(0)
 	Minimap:SetQuestBlobRingScalar(0)
-	M.HideObject(Minimap.ZoomIn)
-	M.HideObject(Minimap.ZoomOut)
-	M.HideObject(MinimapCompassTexture)
-	MinimapCluster:KillEditMode()
+	B.HideObject(Minimap.ZoomIn)
+	B.HideObject(Minimap.ZoomOut)
+	B.HideObject(MinimapCompassTexture)
 
 	_G.MinimapCluster.Tracking:SetAlpha(0)
 	_G.MinimapCluster.Tracking:SetScale(0.0001)
 
+	-- Housing overlay
+	if MinimapBackdrop.StaticOverlayTexture then
+		MinimapBackdrop.StaticOverlayTexture:SetInside(Minimap)
+		MinimapBackdrop.StaticOverlayTexture:SetTexCoord(.2, .8, .2, .8)
+	end
 
 	-- Add Elements
 	self:CreatePulse()
@@ -703,5 +708,5 @@ function module:SetupMinimap()
 	self:SoundVolume()
 
 	-- HybridMinimap
-	M:RegisterEvent("ADDON_LOADED", module.HybridMinimapOnLoad)
+	B:RegisterEvent("ADDON_LOADED", module.HybridMinimapOnLoad)
 end

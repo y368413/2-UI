@@ -1,25 +1,25 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local MISC = M:GetModule("Misc")
+local B, C, L, DB = unpack(ns)
+local M = B:GetModule("Misc")
 
 local unitName
-local noteString = "|T"..I.copyTex..":12|t %s"
+local noteString = "|T"..DB.copyTex..":12|t %s"
 
 local function GetButtonName(button)
 	local name = button.name:GetText()
 	if not name then return end
 	if not strmatch(name, "-") then
-		name = name.."-"..I.MyRealm
+		name = name.."-"..DB.MyRealm
 	end
 	return name
 end
 
-function MISC:IgnoreButton_OnClick()
+function M:IgnoreButton_OnClick()
 	unitName = GetButtonName(self)
 	StaticPopup_Show("ORZUI_IGNORE_NOTE", unitName)
 end
 
-function MISC:IgnoreButton_OnEnter()
+function M:IgnoreButton_OnEnter()
 	local name = GetButtonName(self)
 	local savedNote = OrzUISetDB["IgnoreNotes"][name]
 	if savedNote then
@@ -32,18 +32,18 @@ function MISC:IgnoreButton_OnEnter()
 	end
 end
 
-function MISC:IgnoreButton_Hook()
+function M:IgnoreButton_Hook()
 	if self.Title then return end
 
 	if not self.hooked then
 		self.name:SetFontObject(Game14Font)
-		self:HookScript("OnDoubleClick", MISC.IgnoreButton_OnClick)
-		self:HookScript("OnEnter", MISC.IgnoreButton_OnEnter)
-		self:HookScript("OnLeave", M.HideTooltip)
+		self:HookScript("OnDoubleClick", M.IgnoreButton_OnClick)
+		self:HookScript("OnEnter", M.IgnoreButton_OnEnter)
+		self:HookScript("OnLeave", B.HideTooltip)
 	
 		self.noteTex = self:CreateTexture()
 		self.noteTex:SetSize(16, 16)
-		self.noteTex:SetTexture(I.copyTex)
+		self.noteTex:SetTexture(DB.copyTex)
 		self.noteTex:SetPoint("RIGHT", -5, 0)
 	
 		self.hooked = true
@@ -88,12 +88,12 @@ StaticPopupDialogs["ORZUI_IGNORE_NOTE"] = {
 	editBoxWidth = 250,
 }
 
-function MISC:IgnoreNote()
+function M:IgnoreNote()
 	local ignoreHelpInfo = {
-		text = U["IgnoreNoteHelp"],
+		text = L["IgnoreNoteHelp"],
 		buttonStyle = HelpTip.ButtonStyle.GotIt,
 		targetPoint = HelpTip.Point.RightEdgeCenter,
-		onAcknowledgeCallback = M.HelpInfoAcknowledge,
+		onAcknowledgeCallback = B.HelpInfoAcknowledge,
 		callbackArg = "IgnoreNote",
 	}
 
@@ -106,14 +106,14 @@ function MISC:IgnoreNote()
 		end)
 
 		hooksecurefunc(ignoreWindow.ScrollBox, "Update", function(self)
-			self:ForEachFrame(MISC.IgnoreButton_Hook)
+			self:ForEachFrame(M.IgnoreButton_Hook)
 		end)
 
 		ignoreWindow.UnignorePlayerButton:HookScript("OnClick", function()
 			local name = C_FriendList.GetIgnoreName(C_FriendList.GetSelectedIgnore())
 			if name then
 				if not strmatch(name, "-") then
-					name = name.."-"..I.MyRealm
+					name = name.."-"..DB.MyRealm
 				end
 				OrzUISetDB["IgnoreNotes"][name] = nil
 			end
@@ -121,4 +121,4 @@ function MISC:IgnoreNote()
 	end
 end
 
-MISC:RegisterMisc("IgnoreNote", MISC.IgnoreNote)
+M:RegisterMisc("IgnoreNote", M.IgnoreNote)

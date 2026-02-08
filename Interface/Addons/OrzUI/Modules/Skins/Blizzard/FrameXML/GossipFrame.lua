@@ -1,5 +1,5 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
 local gsub, strmatch = gsub, strmatch
 
@@ -36,13 +36,13 @@ local function replaceTextColor(text, r)
 	end
 end
 
-tinsert(R.defaultThemes, function()
-	if not R.db["Skins"]["BlizzardSkins"] then return end
+tinsert(C.defaultThemes, function()
+	if not C.db["Skins"]["BlizzardSkins"] then return end
 
 	QuestFont:SetTextColor(1, 1, 1)
 
-	M.Reskin(GossipFrame.GreetingPanel.GoodbyeButton)
-	M.ReskinTrimScroll(GossipFrame.GreetingPanel.ScrollBar)
+	B.Reskin(GossipFrame.GreetingPanel.GoodbyeButton)
+	B.ReskinTrimScroll(GossipFrame.GreetingPanel.ScrollBar)
 
 	hooksecurefunc(GossipFrame.GreetingPanel.ScrollBox, "Update", function(self)
 		for i = 1, self.ScrollTarget:GetNumChildren() do
@@ -71,14 +71,14 @@ tinsert(R.defaultThemes, function()
 		local notch = GossipFrame.FriendshipStatusBar["Notch"..i]
 		if notch then
 			notch:SetColorTexture(0, 0, 0)
-			notch:SetSize(R.mult, 16)
+			notch:SetSize(C.mult, 16)
 		end
 	end
 	GossipFrame.FriendshipStatusBar.BarBorder:Hide()
 
 	GossipFrameInset:Hide()
 	if GossipFrame.Background then GossipFrame.Background:Hide() end
-	M.ReskinPortraitFrame(GossipFrame)
+	B.ReskinPortraitFrame(GossipFrame)
 
 	-- Text on QuestFrame
 	QuestFrameGreetingPanel:HookScript("OnShow", function(self)

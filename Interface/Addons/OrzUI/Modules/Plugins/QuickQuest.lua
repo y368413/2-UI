@@ -1,6 +1,6 @@
 ﻿---------------------------- QuickQuest, by P3lim  -- NDui MOD  -- y368413 DIY --------------------------
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
 local next, ipairs, select = next, ipairs, select
 local IsAltKeyDown = IsAltKeyDown
@@ -32,8 +32,8 @@ QuickQuestCheckButton:SetPoint("TOPRIGHT", QuestObjectiveTracker.Header, -20, -5
 QuickQuestCheckButton:SetSize(21, 21)
 QuickQuestCheckButton:SetHitRectInsets(0, -10, 0, 0)
 QuickQuestCheckButton:RegisterEvent("PLAYER_LOGIN")
-QuickQuestCheckButton:SetScript("OnEvent", function(self) self:SetChecked(R.db["Misc"]["AutoQuest"]) end)
-QuickQuestCheckButton:SetScript("OnClick", function(self) R.db["Misc"]["AutoQuest"] = self:GetChecked() end)
+QuickQuestCheckButton:SetScript("OnEvent", function(self) self:SetChecked(C.db["Misc"]["AutoQuest"]) end)
+QuickQuestCheckButton:SetScript("OnClick", function(self) C.db["Misc"]["AutoQuest"] = self:GetChecked() end)
 
 -- Main
 local QuickQuest = CreateFrame("Frame")
@@ -42,14 +42,14 @@ QuickQuest:SetScript("OnEvent", function(self, event, ...) self[event](...) end)
 function QuickQuest:Register(event, func)
 	self:RegisterEvent(event)
 	self[event] = function(...)
-		if R.db["Misc"]["AutoQuest"] and not IsShiftKeyDown() then
+		if C.db["Misc"]["AutoQuest"] and not IsShiftKeyDown() then
 			func(...)
 		end
 	end
 end
 
 local function GetNPCID()
-	return M.GetNPCID(UnitGUID("npc"))
+	return B.GetNPCID(UnitGUID("npc"))
 end
 
 local function IsAccountCompleted(questID)
@@ -98,11 +98,11 @@ local ignoreQuestNPC = {
 	[195935] = true,	-- 塔薇欧，海象人钓鱼道具
 }
 
-R.IgnoreQuestNPC = {}
+C.IgnoreQuestNPC = {}
 
 QuickQuest:Register("QUEST_GREETING", function()
 	local npcID = GetNPCID()
-	if R.IgnoreQuestNPC[npcID] then return end
+	if C.IgnoreQuestNPC[npcID] then return end
 
 	local active = GetNumActiveQuests()
 	if active > 0 then
@@ -215,7 +215,7 @@ local QUEST_STRING = "cFF0000FF.-"..TRANSMOG_SOURCE_2
 
 QuickQuest:Register("GOSSIP_SHOW", function()
 	local npcID = GetNPCID()
-	if R.IgnoreQuestNPC[npcID] then return end
+	if C.IgnoreQuestNPC[npcID] then return end
 
 	local active = C_GossipInfo_GetNumActiveQuests()
 	if active > 0 then
@@ -292,7 +292,7 @@ QuickQuest:Register("QUEST_DETAIL", function()
 	elseif QuestGetAutoAccept() then
 		AcknowledgeAutoAcceptQuest()
 	elseif not C_QuestLog_IsQuestTrivial(GetQuestID()) or C_Minimap.IsTrackingHiddenQuests() then
-		if not R.IgnoreQuestNPC[GetNPCID()] then
+		if not C.IgnoreQuestNPC[GetNPCID()] then
 			AcceptQuest()
 		end
 	end
@@ -374,7 +374,7 @@ QuickQuest:Register("QUEST_PROGRESS", function()
 		if info and (info.tagID == 153 or info.worldQuestType) then return end
 
 		local npcID = GetNPCID()
-		if R.IgnoreQuestNPC[npcID] then return end
+		if C.IgnoreQuestNPC[npcID] then return end
 
 		local requiredItems = GetNumQuestItems()
 		if requiredItems > 0 then
@@ -485,17 +485,17 @@ QuickQuest:Register("QUEST_LOG_UPDATE", AttemptAutoComplete)
 
 -- Handle ignore list
 local function UpdateIgnoreList()
-	wipe(R.IgnoreQuestNPC)
+	wipe(C.IgnoreQuestNPC)
 
 	for npcID, value in pairs(ignoreQuestNPC) do
-		R.IgnoreQuestNPC[npcID] = value
+		C.IgnoreQuestNPC[npcID] = value
 	end
 
-	for npcID, value in pairs(R.db["Misc"]["IgnoreQuestNPC"]) do
+	for npcID, value in pairs(C.db["Misc"]["IgnoreQuestNPC"]) do
 		if value and ignoreQuestNPC[npcID] then
-			R.db["Misc"]["IgnoreQuestNPC"][npcID] = nil
+			C.db["Misc"]["IgnoreQuestNPC"][npcID] = nil
 		else
-			R.IgnoreQuestNPC[npcID] = value
+			C.IgnoreQuestNPC[npcID] = value
 		end
 	end
 end
@@ -505,8 +505,8 @@ local function UnitQuickQuestStatus(self)
 		local frame = CreateFrame("Frame", nil, self)
 		frame:SetSize(100, 14)
 		frame:SetPoint("TOP", self, "BOTTOM", 0, -2)
-		M.AddTooltip(frame, "ANCHOR_RIGHT", U["AutoQuestIgnoreTip"], "info", true)
-		M.CreateFS(frame, 14, IGNORED):SetTextColor(1, 0, 0)
+		B.AddTooltip(frame, "ANCHOR_RIGHT", L["AutoQuestIgnoreTip"], "info", true)
+		B.CreateFS(frame, 14, IGNORED):SetTextColor(1, 0, 0)
 
 		self.__ignore = frame
 
@@ -514,28 +514,28 @@ local function UnitQuickQuestStatus(self)
 	end
 
 	local npcID = GetNPCID()
-	local isIgnored = R.db["Misc"]["AutoQuest"] and npcID and R.IgnoreQuestNPC[npcID]
+	local isIgnored = C.db["Misc"]["AutoQuest"] and npcID and C.IgnoreQuestNPC[npcID]
 	self.__ignore:SetShown(isIgnored)
 end
 
 local function ToggleQuickQuestStatus(self)
 	if not self.__ignore then return end
-	if not R.db["Misc"]["AutoQuest"] then return end
+	if not C.db["Misc"]["AutoQuest"] then return end
 	if not IsAltKeyDown() then return end
 
 	self.__ignore:SetShown(not self.__ignore:IsShown())
 	local npcID = GetNPCID()
 	if self.__ignore:IsShown() then
 		if ignoreQuestNPC[npcID] then
-			R.db["Misc"]["IgnoreQuestNPC"][npcID] = nil
+			C.db["Misc"]["IgnoreQuestNPC"][npcID] = nil
 		else
-			R.db["Misc"]["IgnoreQuestNPC"][npcID] = true
+			C.db["Misc"]["IgnoreQuestNPC"][npcID] = true
 		end
 	else
 		if ignoreQuestNPC[npcID] then
-			R.db["Misc"]["IgnoreQuestNPC"][npcID] = false
+			C.db["Misc"]["IgnoreQuestNPC"][npcID] = false
 		else
-			R.db["Misc"]["IgnoreQuestNPC"][npcID] = nil
+			C.db["Misc"]["IgnoreQuestNPC"][npcID] = nil
 		end
 	end
 

@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local Bar = M:GetModule("Actionbar")
+local B, C, L, DB = unpack(ns)
+local Bar = B:GetModule("Actionbar")
 
 local LAB = LibStub("LibActionButton-1.0-OrzUI")
 local ActionButtons = LAB.actionButtons
@@ -41,9 +41,9 @@ function Bar:FinisherGlow_Update()
 	local spellId = self:GetSpellId()
 	if spellId and Bar.Finishers[spellId] then
 		if UnitPower("player", Enum.PowerType.ComboPoints) == Bar.MaxComboPoints then
-			M.ShowOverlayGlow(self)
+			B.ShowOverlayGlow(self)
 		else
-			M.HideOverlayGlow(self)
+			B.HideOverlayGlow(self)
 		end
 	end
 end
@@ -66,11 +66,11 @@ end
 function Bar:FinisherGlow()
 	--if not Bar.db["FinisherGlow"] then return end
 
-	Bar.Finishers = FinisherSpells[I.MyClass]
+	Bar.Finishers = FinisherSpells[DB.MyClass]
 	if not Bar.Finishers then return end
 
 	Bar:UpdateMaxPoints()
-	M:RegisterEvent("UNIT_MAXPOWER", Bar.UpdateMaxPoints)
-	M:RegisterEvent("UNIT_POWER_UPDATE", Bar.FinisherGlow_OnEvent)
+	B:RegisterEvent("UNIT_MAXPOWER", Bar.UpdateMaxPoints)
+	B:RegisterEvent("UNIT_POWER_UPDATE", Bar.FinisherGlow_OnEvent)
 	LAB:RegisterCallback("OnButtonUpdate", Bar.FinisherGlow_OnButtonUpdate)
 end

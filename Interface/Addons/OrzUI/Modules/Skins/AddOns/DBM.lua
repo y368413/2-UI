@@ -1,7 +1,7 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local S = M:GetModule("Skins")
-local TT = M:GetModule("Tooltip")
+local B, C, L, DB = unpack(ns)
+local S = B:GetModule("Skins")
+local TT = B:GetModule("Tooltip")
 
 local strfind, strmatch, gsub = string.find, string.match, string.gsub
 
@@ -11,13 +11,13 @@ local function ReskinDBMIcon(icon, frame)
 	if not icon then return end
 	if not icon.styled then
 		icon:SetSize(buttonsize, buttonsize)
-		icon.SetSize = M.Dummy
+		icon.SetSize = B.Dummy
 
-		local bg = M.ReskinIcon(icon, true)
+		local bg = B.ReskinIcon(icon, true)
 		bg.icon = bg:CreateTexture(nil, "ARTWORK")
 		bg.icon:SetInside()
 		bg.icon:SetTexture(icon:GetTexture())
-		bg.icon:SetTexCoord(unpack(I.TexCoord))
+		bg.icon:SetTexCoord(unpack(DB.TexCoord))
 
 		icon.styled = true
 	end
@@ -28,8 +28,8 @@ end
 local function ReskinDBMBar(bar, frame)
 	if not bar then return end
 	if not bar.styled then
-		M.StripTextures(bar)
-		M.CreateSB(bar, true)
+		B.StripTextures(bar)
+		B.CreateSB(bar, true)
 
 		bar.styled = true
 	end
@@ -66,19 +66,19 @@ local function ApplyDBMStyle(self)
 	ReskinDBMIcon(icon1, frame)
 	ReskinDBMIcon(icon2, frame)
 	ReskinDBMBar(tbar, frame)
-	if texture then texture:SetTexture(I.normTex) end
+	if texture then texture:SetTexture(DB.normTex) end
 
 	name:ClearAllPoints()
 	name:SetPoint("LEFT", frame, "LEFT", 2, 8)
 	name:SetPoint("RIGHT", frame, "LEFT", tbar:GetWidth()*.85, 8)
-	M.SetFontSize(name, 14)
+	B.SetFontSize(name, 14)
 	name:SetJustifyH("LEFT")
 	name:SetWordWrap(false)
 	name:SetShadowColor(0, 0, 0, 0)
 
 	timer:ClearAllPoints()
 	timer:SetPoint("RIGHT", frame, "RIGHT", -2, 8)
-	M.SetFontSize(timer, 14)
+	B.SetFontSize(timer, 14)
 	timer:SetJustifyH("RIGHT")
 	timer:SetShadowColor(0, 0, 0, 0)
 end
@@ -102,7 +102,7 @@ function S:DBMSkin()
 	end
 
 	if not C_AddOns.IsAddOnLoaded("DBM-Core") then return end
-	if not R.db["Skins"]["DBM"] then return end
+	if not C.db["Skins"]["DBM"] then return end
 
 	hooksecurefunc(DBT, "CreateBar", function(self)
 		for bar in self:GetBarIterator() do

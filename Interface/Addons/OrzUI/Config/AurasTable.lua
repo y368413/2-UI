@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:RegisterModule("AurasTable")
+local B, C, L, DB = unpack(ns)
+local module = B:RegisterModule("AurasTable")
 
 local pairs, next, format, wipe, unpack = pairs, next, format, wipe, unpack
 local GetSpellName = C_Spell.GetSpellName
@@ -10,19 +10,19 @@ local EJ_GetInstanceInfo = EJ_GetInstanceInfo
 local AuraWatchList = {}
 local groups = {
 	-- groups name = direction, interval, mode, iconsize, position, barwidth
-	["ClassBar"] = {"RIGHT", 6, "ICON", 36, R.Auras.ClassBarPos},
-	["Player Aura"] = {"UP", 2, "BAR2", 21, R.Auras.PlayerAuraPos, 60},
-	["Target Aura"] = {"UP", 2, "BAR", 28, R.Auras.TargetAuraPos, 80},
-	["Special Aura"] = {"UP", 2, "BAR2", 28, R.Auras.SpecialPos, 80},
-	["Focus Aura"] = {"UP", 2, "BAR", 21, R.Auras.FocusPos, 60},
-	["Spell Cooldown"] = {"LEFT", 2, "ICON", 32, R.Auras.CDPos},
-	["Enchant Aura"] = {"UP", 2, "ICON", 32, R.Auras.EnchantPos},	
-	["Raid Buff"] = {"UP", 2, "ICON", 36, R.Auras.RaidBuffPos},
-	["Raid Debuff"] = {"UP", 2, "ICON", 36, R.Auras.RaidDebuffPos},
-	["Warning"] = {"UP", 2, "ICON", 32, R.Auras.WarningPos},
-	["InternalCD"] = {"DOWN", 2, "BAR2", 16, R.Auras.InternalPos, 120},
-	["Absorb"] = {"DOWN", 2, "TEXT", 21, R.Auras.AbsorbPos},
-	["Shield"] = {"DOWN", 2, "TEXT", 21, R.Auras.ShieldPos},
+	["ClassBar"] = {"RIGHT", 6, "ICON", 36, C.Auras.ClassBarPos},
+	["Player Aura"] = {"UP", 2, "BAR2", 21, C.Auras.PlayerAuraPos, 60},
+	["Target Aura"] = {"UP", 2, "BAR", 28, C.Auras.TargetAuraPos, 80},
+	["Special Aura"] = {"UP", 2, "BAR2", 28, C.Auras.SpecialPos, 80},
+	["Focus Aura"] = {"UP", 2, "BAR", 21, C.Auras.FocusPos, 60},
+	["Spell Cooldown"] = {"LEFT", 2, "ICON", 32, C.Auras.CDPos},
+	["Enchant Aura"] = {"UP", 2, "ICON", 32, C.Auras.EnchantPos},	
+	["Raid Buff"] = {"UP", 2, "ICON", 36, C.Auras.RaidBuffPos},
+	["Raid Debuff"] = {"UP", 2, "ICON", 36, C.Auras.RaidDebuffPos},
+	["Warning"] = {"UP", 2, "ICON", 32, C.Auras.WarningPos},
+	["InternalCD"] = {"DOWN", 2, "BAR2", 16, C.Auras.InternalPos, 120},
+	["Absorb"] = {"DOWN", 2, "TEXT", 21, C.Auras.AbsorbPos},
+	["Shield"] = {"DOWN", 2, "TEXT", 21, C.Auras.ShieldPos},
 }
 
 local function newAuraFormat(value)
@@ -44,13 +44,13 @@ function module:AddNewAuraWatch(class, list)
 				local name = GetSpellName(spellID)
 				if not name and not v.Disabled then
 					wipe(v)
-					if I.isDeveloper then print(format("|cffFF0000XXX:|r '%s' %s", class, spellID)) end
+					if DB.isDeveloper then print(format("|cffFF0000XXX:|r '%s' %s", class, spellID)) end
 				end
 			end
 		end
 	end
 
-	if class ~= "ALL" and class ~= I.MyClass then return end
+	if class ~= "ALL" and class ~= DB.MyClass then return end
 	if not AuraWatchList[class] then AuraWatchList[class] = {} end
 
 	for name, v in pairs(list) do
@@ -69,8 +69,8 @@ function module:AddNewAuraWatch(class, list)
 end
 
 function module:AddDeprecatedGroup()
-	if R.db["AuraWatch"]["DeprecatedAuras"] then
-		for name, value in pairs(R.DeprecatedAuras) do
+	if C.db["AuraWatch"]["DeprecatedAuras"] then
+		for name, value in pairs(C.DeprecatedAuras) do
 			for _, list in pairs(AuraWatchList["ALL"]) do
 				if list.Name == name then
 					local newTable = newAuraFormat(value)
@@ -81,7 +81,7 @@ function module:AddDeprecatedGroup()
 			end
 		end
 	end
-	wipe(R.DeprecatedAuras)
+	wipe(C.DeprecatedAuras)
 end
 
 -- RaidFrame debuffs
@@ -89,7 +89,7 @@ local RaidDebuffs = {}
 function module:RegisterDebuff(tierID, instID, _, spellID, level)
 	local instName = EJ_GetInstanceInfo(instID)
 	if not instName then
-		if I.isDeveloper then print("Invalid instance ID: "..instID) end
+		if DB.isDeveloper then print("Invalid instance ID: "..instID) end
 		return
 	end
 
@@ -101,38 +101,38 @@ function module:RegisterDebuff(tierID, instID, _, spellID, level)
 end
 
 function module:CheckCornerSpells()
-	if not OrzUISetDB["CornerSpells"][I.MyClass] then OrzUISetDB["CornerSpells"][I.MyClass] = {} end
-	local data = R.CornerBuffs[I.MyClass]
+	if not OrzUISetDB["CornerSpells"][DB.MyClass] then OrzUISetDB["CornerSpells"][DB.MyClass] = {} end
+	local data = C.CornerBuffs[DB.MyClass]
 	if not data then return end
 
 	for spellID in pairs(data) do
 		local name = GetSpellName(spellID)
 		if not name then
-			if I.isDeveloper then print("Invalid cornerspell ID: "..spellID) end
+			if DB.isDeveloper then print("Invalid cornerspell ID: "..spellID) end
 		end
 	end
 
-	for spellID, value in pairs(OrzUISetDB["CornerSpells"][I.MyClass]) do
-		if not next(value) and R.CornerBuffs[I.MyClass][spellID] == nil then
-			OrzUISetDB["CornerSpells"][I.MyClass][spellID] = nil
+	for spellID, value in pairs(OrzUISetDB["CornerSpells"][DB.MyClass]) do
+		if not next(value) and C.CornerBuffs[DB.MyClass][spellID] == nil then
+			OrzUISetDB["CornerSpells"][DB.MyClass][spellID] = nil
 		end
 	end
 end
 
 function module:CheckMajorSpells()
-	for spellID in pairs(R.MajorSpells) do
+	for spellID in pairs(C.MajorSpells) do
 		local name = GetSpellName(spellID)
 		if name then
 			if OrzUISetDB["MajorSpells"][spellID] then
 				OrzUISetDB["MajorSpells"][spellID] = nil
 			end
 		else
-			if I.isDeveloper then print("Invalid majorspells ID: "..spellID) end
+			if DB.isDeveloper then print("Invalid majorspells ID: "..spellID) end
 		end
 	end
 
 	for spellID, value in pairs(OrzUISetDB["MajorSpells"]) do
-		if value == false and R.MajorSpells[spellID] == nil then
+		if value == false and C.MajorSpells[spellID] == nil then
 			OrzUISetDB["MajorSpells"][spellID] = nil
 		end
 	end
@@ -146,7 +146,7 @@ local function CheckNameplateFilter(list, key)
 				OrzUISetDB[key][spellID] = nil
 			end
 		else
-			if I.isDeveloper then print("Invalid nameplate filter ID: "..spellID) end
+			if DB.isDeveloper then print("Invalid nameplate filter ID: "..spellID) end
 		end
 	end
 
@@ -158,21 +158,21 @@ local function CheckNameplateFilter(list, key)
 end
 
 local function cleanupNameplateUnits(VALUE)
-	for npcID in pairs(R[VALUE]) do
-		if R.db["Nameplate"][VALUE][npcID] then
-			R.db["Nameplate"][VALUE][npcID] = nil
+	for npcID in pairs(C[VALUE]) do
+		if C.db["Nameplate"][VALUE][npcID] then
+			C.db["Nameplate"][VALUE][npcID] = nil
 		end
 	end
-	for npcID, value in pairs(R.db["Nameplate"][VALUE]) do
-		if value == false and R[VALUE][npcID] == nil then
-			R.db["Nameplate"][VALUE][npcID] = nil
+	for npcID, value in pairs(C.db["Nameplate"][VALUE]) do
+		if value == false and C[VALUE][npcID] == nil then
+			C.db["Nameplate"][VALUE][npcID] = nil
 		end
 	end
 end
 
 function module:CheckNameplateFilters()
-	CheckNameplateFilter(R.WhiteList, "NameplateWhite")
-	CheckNameplateFilter(R.BlackList, "NameplateBlack")
+	CheckNameplateFilter(C.WhiteList, "NameplateWhite")
+	CheckNameplateFilter(C.BlackList, "NameplateBlack")
 	cleanupNameplateUnits("CustomUnits")
 	cleanupNameplateUnits("PowerUnits")
 end
@@ -193,8 +193,8 @@ function module:OnLogin()
 
 	RaidDebuffs[0] = {} -- OTHER spells
 	module:AddDeprecatedGroup()
-	R.AuraWatchList = AuraWatchList
-	R.RaidDebuffs = RaidDebuffs
+	C.AuraWatchList = AuraWatchList
+	C.RaidDebuffs = RaidDebuffs
 
 	module:CheckCornerSpells()
 	module:CheckMajorSpells()

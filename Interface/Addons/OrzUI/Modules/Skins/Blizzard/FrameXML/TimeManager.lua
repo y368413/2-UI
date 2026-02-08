@@ -1,29 +1,29 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
-tinsert(R.defaultThemes, function()
-	if not R.db["Skins"]["BlizzardSkins"] then return end
+tinsert(C.defaultThemes, function()
+	if not C.db["Skins"]["BlizzardSkins"] then return end
 
 	TimeManagerGlobe:Hide()
-	TimeManagerStopwatchCheck:GetNormalTexture():SetTexCoord(unpack(I.TexCoord))
+	TimeManagerStopwatchCheck:GetNormalTexture():SetTexCoord(unpack(DB.TexCoord))
 	TimeManagerStopwatchCheck:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
-	TimeManagerStopwatchCheck:SetCheckedTexture(I.pushedTex)
-	M.CreateBDFrame(TimeManagerStopwatchCheck)
+	TimeManagerStopwatchCheck:SetCheckedTexture(DB.pushedTex)
+	B.CreateBDFrame(TimeManagerStopwatchCheck)
 
-	M.ReskinDropDown(TimeManagerAlarmTimeFrame.HourDropdown)
-	M.ReskinDropDown(TimeManagerAlarmTimeFrame.MinuteDropdown)
-	M.ReskinDropDown(TimeManagerAlarmTimeFrame.AMPMDropdown)
+	B.ReskinDropDown(TimeManagerAlarmTimeFrame.HourDropdown)
+	B.ReskinDropDown(TimeManagerAlarmTimeFrame.MinuteDropdown)
+	B.ReskinDropDown(TimeManagerAlarmTimeFrame.AMPMDropdown)
 
-	M.ReskinPortraitFrame(TimeManagerFrame)
-	M.ReskinInput(TimeManagerAlarmMessageEditBox)
-	M.ReskinCheck(TimeManagerAlarmEnabledButton)
-	M.ReskinCheck(TimeManagerMilitaryTimeCheck)
-	M.ReskinCheck(TimeManagerLocalTimeCheck)
+	B.ReskinPortraitFrame(TimeManagerFrame)
+	B.ReskinInput(TimeManagerAlarmMessageEditBox)
+	B.ReskinCheck(TimeManagerAlarmEnabledButton)
+	B.ReskinCheck(TimeManagerMilitaryTimeCheck)
+	B.ReskinCheck(TimeManagerLocalTimeCheck)
 
-	M.StripTextures(StopwatchFrame)
-	M.StripTextures(StopwatchTabFrame)
-	M.SetBD(StopwatchFrame)
-	M.ReskinClose(StopwatchCloseButton, StopwatchFrame, -2, -2)
+	B.StripTextures(StopwatchFrame)
+	B.StripTextures(StopwatchTabFrame)
+	B.SetBD(StopwatchFrame)
+	B.ReskinClose(StopwatchCloseButton, StopwatchFrame, -2, -2)
 
 	local reset = StopwatchResetButton
 	reset:GetNormalTexture():SetTexCoord(.25, .75, .27, .75)

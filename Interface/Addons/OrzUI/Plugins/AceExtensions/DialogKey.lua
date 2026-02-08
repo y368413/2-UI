@@ -1,4 +1,4 @@
---- @class DialogKeyNS ## Version: v1.2.41 ## Author: Numy (previous verions by: Foxthorn, N01ch, FuriousProgrammer)
+--- @class DialogKeyNS ## Version: v1.2.43 ## Author: Numy (previous verions by: Foxthorn, N01ch, FuriousProgrammer)
 local DialogKeyNS = {}
 
 if GetLocale() == "zhCN" then
@@ -168,6 +168,10 @@ function DialogKeyNS:RegisterOptions()
 end
 
 function DialogKeyNS:OpenConfig()
+    if C_SettingsUtil and C_SettingsUtil.OpenSettingsPanel and InCombatLockdown() then
+        LibStub("AceConfigDialog-3.0"):Open(self.configPanelName);
+        return;
+    end
     Settings.OpenToCategory(self.categoryID)
 end
 
@@ -245,8 +249,8 @@ function DialogKeyNS:GetOptionsTable()
                     },
                     ignoreInProgressQuests = {
                         order = increment(),
-                        name = wrapName("Ignore In-Progress Quests"),
-                        desc = "Gossip options for in-progress quests are ignored, and only completed or unaccepted quests are clicked",
+                        name = wrapName("忽略进行中的任务"),
+                        desc = "忽略进行中任务的对话选项，只点击已完成或未接受的任务",
                         descStyle = "inline", width = "full", type = "toggle",
                     },
                     numKeysForGossip = {
@@ -257,9 +261,9 @@ function DialogKeyNS:GetOptionsTable()
                     },
                     riskyNumKeysForGossip = {
                         order = increment(),
-                        name = wrapName("Number keys for Gossip - Risky"),
+                        name = wrapName("为对话选项设置数字键 - 风险模式"),
                         disabled = function() return not db.numKeysForGossip end,
-                        desc = "Ensure scrollbar is enabled if the text becomes too long. This may taint objective frame buttons. If you encounter issues, just disable this option.",
+                        desc = "如果文本过长则确保滚动条启用。这可能会污染目标框架按钮。如果遇到问题，请禁用此选项。",
                         descStyle = "inline", width = "full", type = "toggle",
                     },
                     numKeysForQuestRewards = {
@@ -298,7 +302,7 @@ function DialogKeyNS:GetOptionsTable()
                     handleSpecFrame = {
                         order = increment(),
                         name = wrapName(SPECIALIZATION),
-                        desc = "Use the number keys (1 -> 4) to select a specialization while the specialization tab is open",
+                        desc = "当专精标签页打开时，使用数字键（1到4）选择专精",
                         descStyle = "inline", width = "full", type = "toggle",
                         hidden = WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE,
                     },
@@ -358,20 +362,20 @@ function DialogKeyNS:GetOptionsTable()
                     },
                     dontAcceptInstanceLocks = {
                         order = increment(),
-                        name = wrapName("Don't Accept Instance Lockouts"),
-                        desc = "Don't allow DialogKey to accept/\"save\" Instance Lockouts",
+                        name = wrapName("不接受副本锁定"),
+                        desc = "不允许快捷点击接受/\"保存\"副本锁定",
                         width = 1.2, type = "toggle",
                     },
                     dontAcceptAbandonVote = {
                         order = increment(),
-                        name = wrapName("Don't Accept M+ Abandon Key Votes"),
-                        desc = "Don't allow DialogKey to vote to abandon a m+ key",
+                        name = wrapName("不接受大秘境放弃钥匙投票"),
+                        desc = "不允许快捷点击对放弃大秘境钥匙进行投票",
                         width = 1.2, type = "toggle",
                     },
                     dontAcceptVoteKick = {
                         order = increment(),
-                        name = wrapName("Don't Accept Vote Kicks"),
-                        desc = "Don't allow DialogKey to vote in Vote Kicks",
+                        name = wrapName("不接受投票踢出"),
+                        desc = "不允许快捷点击参与投票踢出",
                         width = 1.2, type = "toggle",
                     },
                     dontClickSummons = {
@@ -1219,8 +1223,8 @@ end
 
 -- Glow Functions --
 --- @param frame Frame
---- @param speedModifier number # increasing this number will speed up the fade out of the glow
---- @param forceShow boolean # if true, the glow will be shown regardless of the showGlow setting
+--- @param speedModifier number? # increasing this number will speed up the fade out of the glow
+--- @param forceShow boolean? # if true, the glow will be shown regardless of the showGlow setting
 function DialogKey:Glow(frame, speedModifier, forceShow)
     if self.db.showGlow or forceShow then
         self.glowFrame:SetAllPoints(frame)

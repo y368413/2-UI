@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local Bar = M:GetModule("Actionbar")
+local B, C, L, DB = unpack(ns)
+local Bar = B:GetModule("Actionbar")
 
 local _G = _G
 local pairs, tonumber, print, strfind, strupper = pairs, tonumber, print, strfind, strupper
@@ -57,7 +57,7 @@ function Bar:Bind_Create()
 	frame:EnableMouse(true)
 	frame:EnableKeyboard(true)
 	frame:EnableMouseWheel(true)
-	M.CreateBD(frame, 1)
+	B.CreateBD(frame, 1)
 	frame:SetBackdropColor(1, .8, 0, .25)
 	frame:SetBackdropBorderColor(1, .8, 0)
 	frame:Hide()
@@ -71,11 +71,11 @@ function Bar:Bind_Create()
 			GameTooltip:AddLine(NOT_BOUND, 1,0,0)
 			GameTooltip:AddLine(PRESS_KEY_TO_BIND)
 		else
-			GameTooltip:AddDoubleLine(U["KeyIndex"], U["KeyBinding"], .6,.6,.6, .6,.6,.6)
+			GameTooltip:AddDoubleLine(L["KeyIndex"], L["KeyBinding"], .6,.6,.6, .6,.6,.6)
 			for i = 1, #frame.bindings do
 				GameTooltip:AddDoubleLine(i, frame.bindings[i], 1,1,1, 0,1,0)
 			end
-			GameTooltip:AddLine(U["UnbindTip"], 1,.8,0, 1)
+			GameTooltip:AddLine(L["UnbindTip"], 1,.8,0, 1)
 		end
 		GameTooltip:Show()
 	end)
@@ -195,7 +195,7 @@ function Bar:Bind_Listener(key)
 				SetBinding(frame.bindings[i])
 			end
 		end
-		print(format(U["Clear binds"], frame.tipName or frame.name))
+		print(format(L["Clear binds"], frame.tipName or frame.name))
 
 		Bar:Bind_Update(frame.button, frame.spellmacro)
 		return
@@ -217,7 +217,7 @@ function Bar:Bind_Listener(key)
 	else
 		SetBinding(alt..ctrl..shift..meta..key, frame.spellmacro.." "..frame.name)
 	end
-	print((frame.tipName or frame.name).." |cff00ff00"..U["KeyBoundTo"].."|r "..alt..ctrl..shift..meta..key)
+	print((frame.tipName or frame.name).." |cff00ff00"..L["KeyBoundTo"].."|r "..alt..ctrl..shift..meta..key)
 
 	Bar:Bind_Update(frame.button, frame.spellmacro)
 end
@@ -231,21 +231,21 @@ end
 
 function Bar:Bind_Activate()
 	Bar.keybindFrame.enabled = true
-	M:RegisterEvent("PLAYER_REGEN_DISABLED", Bar.Bind_Deactivate)
+	B:RegisterEvent("PLAYER_REGEN_DISABLED", Bar.Bind_Deactivate)
 end
 
 function Bar:Bind_Deactivate(save)
 	if save == true then
-		SaveBindings(R.db["Actionbar"]["BindType"])
-		print(I.OrzUIString.." |cff00ff00"..U["Save keybinds"].."|r")
+		SaveBindings(C.db["Actionbar"]["BindType"])
+		print(DB.OrzUIString.." |cff00ff00"..L["Save keybinds"].."|r")
 	else
-		LoadBindings(R.db["Actionbar"]["BindType"])
-		print(I.OrzUIString.." |cffffff00"..U["Discard keybinds"].."|r")
+		LoadBindings(C.db["Actionbar"]["BindType"])
+		print(DB.OrzUIString.." |cffffff00"..L["Discard keybinds"].."|r")
 	end
 
 	Bar:Bind_HideFrame()
 	Bar.keybindFrame.enabled = false
-	M:UnregisterEvent("PLAYER_REGEN_DISABLED", Bar.Bind_Deactivate)
+	B:UnregisterEvent("PLAYER_REGEN_DISABLED", Bar.Bind_Deactivate)
 	Bar.keybindDialog:Hide()
 end
 
@@ -256,26 +256,26 @@ function Bar:Bind_CreateDialog()
 	local frame = CreateFrame("Frame", nil, UIParent)
 	frame:SetSize(320, 100)
 	frame:SetPoint("TOP", 0, -135)
-	M.SetBD(frame)
-	M.CreateFS(frame, 16, QUICK_KEYBIND_MODE, false, "TOP", 0, -10)
+	B.SetBD(frame)
+	B.CreateFS(frame, 16, QUICK_KEYBIND_MODE, false, "TOP", 0, -10)
 
-	local helpInfo = M.CreateHelpInfo(frame, "|n"..QUICK_KEYBIND_DESCRIPTION.."|n|n"..U["KeybindingTip"])
+	local helpInfo = B.CreateHelpInfo(frame, "|n"..QUICK_KEYBIND_DESCRIPTION.."|n|n"..L["KeybindingTip"])
 	helpInfo:SetPoint("TOPRIGHT", 2, -2)
 
-	local text = M.CreateFS(frame, 14, CHARACTER_SPECIFIC_KEYBINDINGS, "system", "TOP", 0, -40)
-	local box = M.CreateCheckBox(frame)
-	box:SetChecked(R.db["Actionbar"]["BindType"] == 2)
+	local text = B.CreateFS(frame, 14, CHARACTER_SPECIFIC_KEYBINDINGS, "system", "TOP", 0, -40)
+	local box = B.CreateCheckBox(frame)
+	box:SetChecked(C.db["Actionbar"]["BindType"] == 2)
 	box:SetPoint("RIGHT", text, "LEFT", -5, -0)
 	box:SetScript("OnClick", function(self)
-		R.db["Actionbar"]["BindType"] = self:GetChecked() and 2 or 1
+		C.db["Actionbar"]["BindType"] = self:GetChecked() and 2 or 1
 	end)
 
-	local button1 = M.CreateButton(frame, 120, 25, APPLY, 14)
+	local button1 = B.CreateButton(frame, 120, 25, APPLY, 14)
 	button1:SetPoint("BOTTOMLEFT", 25, 10)
 	button1:SetScript("OnClick", function()
 		Bar:Bind_Deactivate(true)
 	end)
-	local button2 = M.CreateButton(frame, 120, 25, CANCEL, 14)
+	local button2 = B.CreateButton(frame, 120, 25, CANCEL, 14)
 	button2:SetPoint("BOTTOMRIGHT", -25, 10)
 	button2:SetScript("OnClick", function()
 		Bar:Bind_Deactivate()
@@ -285,7 +285,7 @@ function Bar:Bind_CreateDialog()
 end
 
 SlashCmdList["ORZUI_KEYBIND"] = function()
-	if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
+	if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end
 
 	Bar:Bind_Create()
 	Bar:Bind_Activate()

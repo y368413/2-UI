@@ -1,10 +1,10 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local Bar = M:GetModule("Actionbar")
+local B, C, L, DB = unpack(ns)
+local Bar = B:GetModule("Actionbar")
 
 local _G = _G
 local tinsert = tinsert
-local margin = R.Bars.margin
+local margin = C.Bars.margin
 
 local function hasPetActionHighlightMark(index)
 	return PET_ACTION_HIGHLIGHT_MARKS[index];
@@ -140,7 +140,7 @@ function Bar:CreatePetbar()
 	local buttonList = {}
 
 	local frame = CreateFrame("Frame", "OrzUI_ActionBarPet", UIParent, "SecureHandlerStateTemplate")
-	frame.mover = M.Mover(frame, U["Pet Actionbar"], "PetBar", {"BOTTOMRIGHT", _G.OrzUI_ActionBar3, "TOPRIGHT", 0, -margin})
+	frame.mover = B.Mover(frame, L["Pet Actionbar"], "PetBar", {"BOTTOMRIGHT", _G.OrzUI_ActionBar3, "TOPRIGHT", 0, -margin})
 	Bar.movers[10] = frame.mover
 
 	for i = 1, num do
@@ -161,16 +161,16 @@ function Bar:CreatePetbar()
 
 	-- Fix pet bar updating
 	Bar:PetBarOnEvent()
-	M:RegisterEvent("UNIT_PET", Bar.PetBarOnEvent)
-	M:RegisterEvent("UNIT_FLAGS", Bar.PetBarOnEvent)
-	M:RegisterEvent("PET_UI_UPDATE", Bar.PetBarOnEvent)
-	M:RegisterEvent("PET_BAR_UPDATE", Bar.PetBarOnEvent)
-	M:RegisterEvent("PLAYER_CONTROL_LOST", Bar.PetBarOnEvent)
-	M:RegisterEvent("PLAYER_CONTROL_GAINED", Bar.PetBarOnEvent)
-	M:RegisterEvent("PLAYER_TARGET_CHANGED", Bar.PetBarOnEvent)
-	M:RegisterEvent("PET_BAR_UPDATE_USABLE", Bar.PetBarOnEvent)
-	M:RegisterEvent("PET_BAR_UPDATE_COOLDOWN", Bar.PetBarOnEvent)
-	M:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR", Bar.PetBarOnEvent)
-	M:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED", Bar.PetBarOnEvent)
-	M:RegisterEvent("PLAYER_FARSIGHT_FOCUS_CHANGED", Bar.PetBarOnEvent)
+	B:RegisterEvent("UNIT_PET", Bar.PetBarOnEvent)
+	B:RegisterEvent("UNIT_FLAGS", Bar.PetBarOnEvent)
+	B:RegisterEvent("PET_UI_UPDATE", Bar.PetBarOnEvent)
+	B:RegisterEvent("PET_BAR_UPDATE", Bar.PetBarOnEvent)
+	B:RegisterEvent("PLAYER_CONTROL_LOST", Bar.PetBarOnEvent)
+	B:RegisterEvent("PLAYER_CONTROL_GAINED", Bar.PetBarOnEvent)
+	B:RegisterEvent("PLAYER_TARGET_CHANGED", Bar.PetBarOnEvent)
+	B:RegisterEvent("PET_BAR_UPDATE_USABLE", Bar.PetBarOnEvent)
+	B:RegisterEvent("PET_BAR_UPDATE_COOLDOWN", Bar.PetBarOnEvent)
+	B:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR", Bar.PetBarOnEvent)
+	B:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED", Bar.PetBarOnEvent)
+	B:RegisterEvent("PLAYER_FARSIGHT_FOCUS_CHANGED", Bar.PetBarOnEvent)
 end

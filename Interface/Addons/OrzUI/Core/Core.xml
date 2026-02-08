@@ -2,7 +2,6 @@
 	<Include file="BaudErrorFrame\BaudErrorFrame.xml"/>
 	<Script file="Database.lua"/>
 	<Script file="Functions.lua"/>
-	<Script file="Smooth.lua"/>
 	<Script file="Mover.lua"/>
 	<Script file="DevTools.lua"/>
 	<Script file="GUI.lua"/>

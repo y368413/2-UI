@@ -1,11 +1,11 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 local oUF = ns.oUF
-local UF = M:GetModule("UnitFrames")
+local UF = B:GetModule("UnitFrames")
 
 local invalidPrio = -1
 
-local class, instName = I.MyClass
+local class, instName = DB.MyClass
 local function checkInstance()
 	instName = IsInInstance() and GetInstanceInfo()
 end
@@ -81,7 +81,7 @@ UF.DebuffList = {}
 
 function UF:UpdateRaidDebuffs()
 	wipe(UF.DebuffList)
-	for instName, value in pairs(R.RaidDebuffs) do
+	for instName, value in pairs(C.RaidDebuffs) do
 		for spell, priority in pairs(value) do
 			if not (OrzUISetDB["RaidDebuffs"][instName] and OrzUISetDB["RaidDebuffs"][instName][spell]) then
 				if not UF.DebuffList[instName] then UF.DebuffList[instName] = {} end
@@ -101,9 +101,9 @@ end
 
 function UF:UpdateRaidInfo()
 	checkInstance()
-	M:RegisterEvent("PLAYER_ENTERING_WORLD", checkInstance)
+	B:RegisterEvent("PLAYER_ENTERING_WORLD", checkInstance)
 	checkSpecs()
-	M:RegisterEvent("PLAYER_TALENT_UPDATE", checkSpecs)
+	B:RegisterEvent("PLAYER_TALENT_UPDATE", checkSpecs)
 	UF:UpdateRaidDebuffs()
 end
 
@@ -121,8 +121,8 @@ function UF:CreateAurasIndicator(self)
 	local auraFrame = CreateFrame("Frame", nil, self)
 	auraFrame:SetSize(1, 1)
 	auraFrame:SetPoint("RIGHT", -15, 0)
-	auraFrame.instAura = R.db["UFs"]["InstanceAuras"]
-	auraFrame.dispellType = R.db["UFs"]["DispellType"]
+	auraFrame.instAura = C.db["UFs"]["InstanceAuras"]
+	auraFrame.dispellType = C.db["UFs"]["DispellType"]
 
 	auraFrame.buttons = {}
 	local prevAura
@@ -130,20 +130,20 @@ function UF:CreateAurasIndicator(self)
 		local button = CreateFrame("Frame", nil, auraFrame)
 		button:SetSize(auraSize, auraSize)
 		button:SetFrameLevel(self:GetFrameLevel() + 3)
-		M.PixelIcon(button)
-		M.CreateSD(button, 3, true)
+		B.PixelIcon(button)
+		B.CreateSD(button, 3, true)
 		button.__shadow:SetFrameLevel(self:GetFrameLevel() + 2)
 		button:Hide()
 
 		button:SetScript("OnEnter", UF.AuraButton_OnEnter)
-		button:SetScript("OnLeave", M.HideTooltip)
+		button:SetScript("OnLeave", B.HideTooltip)
 
 		local parentFrame = CreateFrame("Frame", nil, button)
 		parentFrame:SetAllPoints()
 		parentFrame:SetFrameLevel(button:GetFrameLevel() + 6)
-		button.count = M.CreateFS(parentFrame, 12, "", false, "BOTTOMRIGHT", 6, -3)
-		button.timer = M.CreateFS(button, 12, "", false, "CENTER", 1, 0)
-		button.glowFrame = M.CreateGlowFrame(button, auraSize)
+		button.count = B.CreateFS(parentFrame, 12, "", false, "BOTTOMRIGHT", 6, -3)
+		button.timer = B.CreateFS(button, 12, "", false, "CENTER", 1, 0)
+		button.glowFrame = B.CreateGlowFrame(button, auraSize)
 
 		if not prevAura then
 			button:SetPoint("RIGHT")
@@ -213,7 +213,7 @@ function UF:AurasIndicator_UpdateButton(button, aura)
 		button.duration = duration
 		if duration and duration > 0 then
 			button.expiration = expiration
-			button:SetScript("OnUpdate", M.CooldownOnUpdate)
+			button:SetScript("OnUpdate", B.CooldownOnUpdate)
 			button.timer:Show()
 		else
 			button:SetScript("OnUpdate", nil)
@@ -234,9 +234,9 @@ function UF:AurasIndicator_UpdateButton(button, aura)
 	end
 	if button.glowFrame then
 		if aura.priority == 6 then
-			M.ShowOverlayGlow(button.glowFrame)
+			B.ShowOverlayGlow(button.glowFrame)
 		else
-			M.HideOverlayGlow(button.glowFrame)
+			B.HideOverlayGlow(button.glowFrame)
 		end
 	end
 	button:Show()
@@ -254,10 +254,10 @@ function UF:AurasIndicator_UpdateOptions()
 	local auras = self.AurasIndicator
 	if not auras then return end
 
-	auras.instAura = R.db["UFs"]["InstanceAuras"]
-	auras.dispellType = R.db["UFs"]["DispellType"]
-	local scale = R.db["UFs"]["RaidDebuffScale"]
-	local disableMouse = R.db["UFs"]["AuraClickThru"]
+	auras.instAura = C.db["UFs"]["InstanceAuras"]
+	auras.dispellType = C.db["UFs"]["DispellType"]
+	local scale = C.db["UFs"]["RaidDebuffScale"]
+	local disableMouse = C.db["UFs"]["AuraClickThru"]
 
 	for i = 1, 2 do
 		local button = auras.buttons[i]

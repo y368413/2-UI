@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local MISC = M:GetModule("Misc")
+local B, C, L, DB = unpack(ns)
+local M = B:GetModule("Misc")
 
 local MapList = {
 	-- 大地的裂变
@@ -96,7 +96,7 @@ local MapList = {
 }
 
 local SpellList = {}
-function MISC:MDEnhance_UpdateList()
+function M:MDEnhance_UpdateList()
 	for mapID, spellIDs in pairs(MapList) do
 		local spellID = self:MDEnhance_SelectID(spellIDs)
 		if spellID then SpellList[spellID] = mapID end
@@ -105,12 +105,12 @@ end
 
 do
 	-- 频道选择
-	function M.GetMSGChannel()
+	function B.GetMSGChannel()
 		return ((IsPartyLFG() or C_PartyInfo.IsPartyWalkIn()) and "INSTANCE_CHAT") or (IsInRaid() and "RAID") or "PARTY"
 	end
 end
 
-function MISC:MDEnhance_SelectID(spellIDs)
+function M:MDEnhance_SelectID(spellIDs)
 	if not spellIDs then return end
 
 	if #spellIDs > 1 then
@@ -132,8 +132,8 @@ local function Button_OnEnter(parent, spellID)
 	if dungeonIcon_OnEnter then dungeonIcon_OnEnter(dungeonIcon) end
 
 	local _, _, timeLimit = C_ChallengeMode.GetMapUIInfo(dungeonIcon.mapID)
-	GameTooltip:AddLine(U["+2timeLimit"]..SecondsToClock(timeLimit*.8), 1, 1, 0)
-	GameTooltip:AddLine(U["+3timeLimit"]..SecondsToClock(timeLimit*.6), 0, 1, 0)
+	GameTooltip:AddLine(L["+2timeLimit"]..SecondsToClock(timeLimit*.8), 1, 1, 0)
+	GameTooltip:AddLine(L["+3timeLimit"]..SecondsToClock(timeLimit*.6), 0, 1, 0)
 	--GameTooltip:AddLine(" ")
 
 	if spellID then
@@ -154,7 +154,7 @@ local function Button_OnEnter(parent, spellID)
 	end
 
 	--GameTooltip:AddLine(" ")
-	if IsShiftKeyDown() then GameTooltip:AddLine(U["MapID"]..dungeonIcon.mapID, 1, 1, 1) end
+	if IsShiftKeyDown() then GameTooltip:AddLine(L["MapID"]..dungeonIcon.mapID, 1, 1, 1) end
 
 	GameTooltip:Show()
 end
@@ -163,7 +163,7 @@ local function Button_OnLeave(parent)
 	GameTooltip:Hide()
 end
 
-function MISC:MDEnhance_UpdateEnhance(parent, spellIDs)
+function M:MDEnhance_UpdateEnhance(parent, spellIDs)
 	if not parent then return end
 	parent.BScore:SetText("")
 
@@ -189,7 +189,7 @@ function MISC:MDEnhance_UpdateEnhance(parent, spellIDs)
 ]]
 end
 
-function MISC:MDEnhance_CreateEnhance(parent)
+function M:MDEnhance_CreateEnhance(parent)
 	if not parent then return end
 
 	local TButton = CreateFrame("Button", nil, parent, "InsecureActionButtonTemplate")
@@ -197,64 +197,64 @@ function MISC:MDEnhance_CreateEnhance(parent)
 	TButton:RegisterForClicks("AnyDown")
 
 	parent.TButton = TButton
-	parent.BScore = M.CreateFS(parent, 18, "", false, "BOTTOM", 0, 0)
-	--parent.FScore = M.CreateFS(parent, 16, "", false, "BOTTOMLEFT", 0, 0)
-	--parent.TScore = M.CreateFS(parent, 16, "", false, "BOTTOMRIGHT", 0, 0)
+	parent.BScore = B.CreateFS(parent, 18, "", false, "BOTTOM", 0, 0)
+	--parent.FScore = B.CreateFS(parent, 16, "", false, "BOTTOMLEFT", 0, 0)
+	--parent.TScore = B.CreateFS(parent, 16, "", false, "BOTTOMRIGHT", 0, 0)
 end
 
-function MISC.MDEnhance_OnUpdate()
+function M.MDEnhance_OnUpdate()
 	if InCombatLockdown() or not ChallengesFrame or not ChallengesFrame.DungeonIcons then return end
 
 	for _, dungeonIcon in pairs(ChallengesFrame.DungeonIcons) do
 		if not dungeonIcon.TButton then
-			MISC:MDEnhance_CreateEnhance(dungeonIcon)
+			M:MDEnhance_CreateEnhance(dungeonIcon)
 		end
-		MISC:MDEnhance_UpdateEnhance(dungeonIcon, MapList[dungeonIcon.mapID])
+		M:MDEnhance_UpdateEnhance(dungeonIcon, MapList[dungeonIcon.mapID])
 	end
 end
 
-function MISC.MDEnhance_OnCreate()
-	hooksecurefunc(ChallengesFrame, "Update", MISC.MDEnhance_OnUpdate)
+function M.MDEnhance_OnCreate()
+	hooksecurefunc(ChallengesFrame, "Update", M.MDEnhance_OnUpdate)
 end
 
-function MISC:MDEnhance_Notification(unit, casterID, spellID)
+function M:MDEnhance_Notification(unit, casterID, spellID)
 	if unit == "player" and SpellList[spellID] then
-		C_ChatInfo.SendChatMessage(format(U["CastAlertInfo"], C_Spell.GetSpellLink(spellID) or C_Spell.GetSpellName(spellID), C_ChallengeMode.GetMapUIInfo(SpellList[spellID])), M.GetMSGChannel())
+		C_ChatInfo.SendChatMessage(format(L["CastAlertInfo"], C_Spell.GetSpellLink(spellID) or C_Spell.GetSpellName(spellID), C_ChallengeMode.GetMapUIInfo(SpellList[spellID])), B.GetMSGChannel())
 	end
 end
 
-function MISC:MDEnhance_CheckGroup()
+function M:MDEnhance_CheckGroup()
 	if IsInGroup() and not IsInInstance() then
-		M:RegisterEvent("UNIT_SPELLCAST_START", MISC.MDEnhance_Notification)
+		B:RegisterEvent("UNIT_SPELLCAST_START", M.MDEnhance_Notification)
 	else
-		M:UnregisterEvent("UNIT_SPELLCAST_START", MISC.MDEnhance_Notification)
+		B:UnregisterEvent("UNIT_SPELLCAST_START", M.MDEnhance_Notification)
 	end
 end
 
-	function M:LoadAddOns(name, func)
+	function B:LoadAddOns(name, func)
 		local function loadFunc(event, addon)
 			if event == "PLAYER_ENTERING_WORLD" then
-				M:UnregisterEvent(event, loadFunc)
+				B:UnregisterEvent(event, loadFunc)
 
 				local isLoaded, isFinished = C_AddOns.IsAddOnLoaded(name)
 				if isLoaded and isFinished then
 					xpcall(func, geterrorhandler())
-					M:UnregisterEvent("ADDON_LOADED", loadFunc)
+					B:UnregisterEvent("ADDON_LOADED", loadFunc)
 				end
 			elseif event == "ADDON_LOADED" and addon == name then
 				xpcall(func, geterrorhandler())
-				M:UnregisterEvent(event, loadFunc)
+				B:UnregisterEvent(event, loadFunc)
 			end
 		end
 
-		M:RegisterEvent("PLAYER_ENTERING_WORLD", loadFunc)
-		M:RegisterEvent("ADDON_LOADED", loadFunc)
+		B:RegisterEvent("PLAYER_ENTERING_WORLD", loadFunc)
+		B:RegisterEvent("ADDON_LOADED", loadFunc)
 	end
 	
-function MISC:MDEnhance()
-	MISC:MDEnhance_UpdateList()
-	MISC:MDEnhance_CheckGroup()
+function M:MDEnhance()
+	M:MDEnhance_UpdateList()
+	M:MDEnhance_CheckGroup()
 
-	M:LoadAddOns("Blizzard_ChallengesUI", MISC.MDEnhance_OnCreate)
-	M:RegisterEvent("GROUP_ROSTER_UPDATE", MISC.MDEnhance_CheckGroup)
+	B:LoadAddOns("Blizzard_ChallengesUI", M.MDEnhance_OnCreate)
+	B:RegisterEvent("GROUP_ROSTER_UPDATE", M.MDEnhance_CheckGroup)
 end

@@ -1,10 +1,10 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 local oUF = ns.oUF
-if not R.Infobar.Durability then return end
+if not C.Infobar.Durability then return end
 
-local module = M:GetModule("Infobar")
-local info = module:RegisterInfobar("Dura", R.Infobar.DurabilityPos)
+local module = B:GetModule("Infobar")
+local info = module:RegisterInfobar("Dura", C.Infobar.DurabilityPos)
 
 local format, sort, floor, select = string.format, table.sort, math.floor, select
 local GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture = GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture
@@ -38,7 +38,7 @@ local function hideAlertWhileCombat()
 end
 
 local lowDurabilityInfo = {
-	text = U["Low Durability"],
+	text = L["Low Durability"],
 	buttonStyle = HelpTip.ButtonStyle.Okay,
 	targetPoint = HelpTip.Point.TopEdgeCenter,
 	onAcknowledgeCallback = hideAlertWhileCombat,
@@ -80,7 +80,7 @@ local function isLowDurability()
 end
 
 local function getDurabilityColor(cur, max)
-	local r, g, b = oUF:RGBColorGradient(cur, max, 1, 0, 0, 1, 1, 0, 0, 1, 0)
+	local r, g, b = B:RGBColorGradient(cur, max, 1, 0, 0, 1, 1, 0, 0, 1, 0)
 	return r, g, b
 end
 
@@ -99,9 +99,9 @@ info.onEvent = function(self, event)
 	else
 		if UpdateAllSlots() > 0 then
 			local r, g, b = getDurabilityColor(floor(localSlots[1][3]*100), 100)
-			self.text:SetFormattedText("%s%%|r", M.HexRGB(r, g, b)..floor(localSlots[1][3]*100))
+			self.text:SetFormattedText("%s%%|r", B.HexRGB(r, g, b)..floor(localSlots[1][3]*100))
 		else
-			self.text:SetText(I.MyColor..NONE)
+			self.text:SetText(DB.MyColor..NONE)
 		end
 	end
 
@@ -109,7 +109,7 @@ info.onEvent = function(self, event)
 		HelpTip:Show(info, lowDurabilityInfo)
 		needToRepair = true
 	else
-		HelpTip:Hide(info, U["Low Durability"])
+		HelpTip:Hide(info, L["Low Durability"])
 		needToRepair = false
 	end
 end
@@ -119,7 +119,7 @@ info.onMouseUp = function(self, btn)
 		OrzUISetDB["RepairType"] = mod(OrzUISetDB["RepairType"] + 1, 3)
 		self:onEnter()
 	else
-		if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
+		if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
 		ToggleCharacter("PaperDollFrame")
 	end
 end
@@ -127,7 +127,7 @@ end
 local repairlist = {
 	[0] = "|cffff5555"..VIDEO_OPTIONS_DISABLED,
 	[1] = "|cff55ff55"..VIDEO_OPTIONS_ENABLED,
-	[2] = "|cffffff55"..U["NFG"]
+	[2] = "|cffffff55"..L["NFG"]
 }
 
 info.onEnter = function(self)
@@ -158,12 +158,12 @@ info.onEnter = function(self)
 		GameTooltip:AddDoubleLine(repairCostString, module:GetMoneyString(totalCost), .6,.8,1, 1,1,1)
 	end
 
-	GameTooltip:AddDoubleLine(" ", I.LineString)
-	GameTooltip:AddDoubleLine(" ", U["Auto Repair"]..": "..repairlist[OrzUISetDB["RepairType"]].." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", DB.LineString)
+	GameTooltip:AddDoubleLine(" ", L["Auto Repair"]..": "..repairlist[OrzUISetDB["RepairType"]].." ", 1,1,1, .6,.8,1)
 	GameTooltip:Show()
 end
 
-info.onLeave = M.HideTooltip
+info.onLeave = B.HideTooltip
 
 -- Auto repair
 local isShown, isBankEmpty, autoRepair, repairAllCost, canRepair
@@ -172,7 +172,7 @@ local function delayFunc()
 	if isBankEmpty then
 		autoRepair(true)
 	else
-		print(format(I.InfoColor.."%s|r%s", U["Guild repair"], module:GetMoneyString(repairAllCost, true)))
+		print(format(DB.InfoColor.."%s|r%s", L["Guild repair"], module:GetMoneyString(repairAllCost, true)))
 	end
 end
 
@@ -190,10 +190,10 @@ function autoRepair(override)
 		else
 			if myMoney > repairAllCost then
 				RepairAllItems()
-				print(format(I.InfoColor.."%s|r%s", U["Repair cost"], module:GetMoneyString(repairAllCost, true)))
+				print(format(DB.InfoColor.."%s|r%s", L["Repair cost"], module:GetMoneyString(repairAllCost, true)))
 				return
 			else
-				print(I.InfoColor..U["Repair error"])
+				print(DB.InfoColor..L["Repair error"])
 				return
 			end
 		end
@@ -210,15 +210,15 @@ end
 
 local function merchantClose()
 	isShown = false
-	M:UnregisterEvent("UI_ERROR_MESSAGE", checkBankFund)
-	M:UnregisterEvent("MERCHANT_CLOSED", merchantClose)
+	B:UnregisterEvent("UI_ERROR_MESSAGE", checkBankFund)
+	B:UnregisterEvent("MERCHANT_CLOSED", merchantClose)
 end
 
 local autoRepairInfo = {
-	text = U["AutoRepairInfo"],
+	text = L["AutoRepairInfo"],
 	buttonStyle = HelpTip.ButtonStyle.GotIt,
 	targetPoint = HelpTip.Point.RightEdgeCenter,
-	onAcknowledgeCallback = M.HelpInfoAcknowledge,
+	onAcknowledgeCallback = B.HelpInfoAcknowledge,
 	callbackArg = "AutoRepair",
 }
 
@@ -229,16 +229,16 @@ local function merchantShow()
 
 	if IsShiftKeyDown() or OrzUISetDB["RepairType"] == 0 or not CanMerchantRepair() then return end
 	autoRepair()
-	M:RegisterEvent("UI_ERROR_MESSAGE", checkBankFund)
-	M:RegisterEvent("MERCHANT_CLOSED", merchantClose)
+	B:RegisterEvent("UI_ERROR_MESSAGE", checkBankFund)
+	B:RegisterEvent("MERCHANT_CLOSED", merchantClose)
 end
-M:RegisterEvent("MERCHANT_SHOW", merchantShow)
+B:RegisterEvent("MERCHANT_SHOW", merchantShow)
 
 local repairGossipIDs = {
 	[37005] = true, -- 基维斯
 	[44982] = true, -- 里弗斯
 }
-M:RegisterEvent("GOSSIP_SHOW", function()
+B:RegisterEvent("GOSSIP_SHOW", function()
 	if IsShiftKeyDown() then return end
 	if not needToRepair then return end
 

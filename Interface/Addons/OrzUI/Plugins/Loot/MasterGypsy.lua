@@ -256,7 +256,7 @@ end
 
 function Gypsy.isWearable(item)
 	local itemInfo = {GetItemInfo(item)}
-	if (Gypsy.getItemSlot ~= "MISC") then
+	if (Gypsy.getItemSlot ~= "M") then
 		--wearables
 		if itemInfo[13] == Gypsy.Itemclass or itemInfo[13] == 0 or (itemInfo[13] == 1 and (itemInfo[9] == "INVTYPE_BACK" or itemInfo[9] == "INVTYPE_CLOAK")) then return true end
 		-- weapons
@@ -305,10 +305,10 @@ function Gypsy.getItemSlot(item)
 		if string.len(snipper) > 2 then 
 			return snipper
 		else
-			return "MISC"
+			return "M"
 		end
 	else
-		return "MISC"
+		return "M"
 	end
 end
 
@@ -568,7 +568,7 @@ function Gypsy.getItemClass()
 	if UC[2] == "EVOKER" then return 2 end
 end
 
---function Gypsy.createCondition(con1, operator, con2, item, looter) -- not finished. Not sure if I'm going to implement the dynamic system again.
+--function Gypsy.createCondition(con1, operator, con2, item, looter) -- not finished. Not sure if DB'm going to implement the dynamic system again.
 	
 --	local con1 = Gypsy.conditionManager(con1, item, looter)
 --	local con2 = Gypsy.conditionManager(con2, item, looter)

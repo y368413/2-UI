@@ -1,6 +1,6 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-local INFO = M:RegisterModule("Infobar")
+local B, C, L, DB = unpack(ns)
+local INFO = B:RegisterModule("Infobar")
 
 local tinsert, pairs, unpack = table.insert, pairs, unpack
 local GOLD_AMOUNT_SYMBOL = "|cffffd700●|r"--format("|cffffd700%s|r", GOLD_AMOUNT_SYMBOL)
@@ -36,9 +36,9 @@ end
 function INFO:RegisterInfobar(name, point)
 	local info = CreateFrame("Frame", nil, UIParent)
 	info:SetHitRectInsets(0, 0, -10, -10)
-	info.text = M.CreateFS(info, 13)
+	info.text = B.CreateFS(info, 13)
 	info.text:ClearAllPoints()
-	if R.Infobar.CustomAnchor then
+	if C.Infobar.CustomAnchor then
 		info.text:SetPoint(unpack(point))
 		info.isActive = true
 	end
@@ -51,7 +51,7 @@ end
 
 function INFO:UpdateInfobarSize()
 	for _, info in pairs(INFO.modules) do
-		M.SetFontSize(info.text, R.db["Misc"]["InfoSize"])
+		B.SetFontSize(info.text, C.db["Misc"]["InfoSize"])
 	end
 end
 
@@ -83,7 +83,7 @@ end
 
 function INFO:BackgroundLines()
 	local cr, cg, cb = 0, 0, 0
-	if R.db["Skins"]["ClassLine"] then cr, cg, cb = I.r, I.g, I.b end
+	if C.db["Skins"]["ClassLine"] then cr, cg, cb = DB.r, DB.g, DB.b end
 
 	local parent = UIParent
 	local width, height = 460, 18
@@ -95,14 +95,14 @@ function INFO:BackgroundLines()
 		local frame = CreateFrame("Frame", "OrzUI"..v[5], parent)
 		frame:SetSize(width, height)
 		frame:SetFrameStrata("BACKGROUND")
-		M.Mover(frame, U[v[5]], v[5], {v[1], parent, v[1], 0, v[2]})
+		B.Mover(frame, L[v[5]], v[5], {v[1], parent, v[1], 0, v[2]})
 
-		if R.db["Skins"]["InfobarLine"] then
-			local tex = M.SetGradient(frame, "H", 0, 0, 0, v[3], v[4], width, height)
+		if C.db["Skins"]["InfobarLine"] then
+			local tex = B.SetGradient(frame, "H", 0, 0, 0, v[3], v[4], width, height)
 			tex:SetPoint("CENTER")
-			local bottomLine = M.SetGradient(frame, "H", cr, cg, cb, v[3], v[4], width, R.mult)
+			local bottomLine = B.SetGradient(frame, "H", cr, cg, cb, v[3], v[4], width, C.mult)
 			bottomLine:SetPoint("TOP", frame, "BOTTOM")
-			local topLine = M.SetGradient(frame, "H", cr, cg, cb, v[3], v[4], width, R.mult)
+			local topLine = B.SetGradient(frame, "H", cr, cg, cb, v[3], v[4], width, C.mult)
 			topLine:SetPoint("BOTTOM", frame, "TOP")
 		end
 	end
@@ -112,7 +112,7 @@ function INFO:Infobar_UpdateValues()
 	local modules = INFO.modules
 
 	wipe(INFO.leftModules)
-	for name in gmatch(R.db["Misc"]["InfoStrLeft"], "%[(%w+)%]") do
+	for name in gmatch(C.db["Misc"]["InfoStrLeft"], "%[(%w+)%]") do
 		if modules[name] and not modules[name].isActive then
 			modules[name].isActive = true
 			tinsert(INFO.leftModules, name) -- left to right
@@ -120,7 +120,7 @@ function INFO:Infobar_UpdateValues()
 	end
 
 	wipe(INFO.rightModules)
-	for name in gmatch(R.db["Misc"]["InfoStrRight"], "%[(%w+)%]") do
+	for name in gmatch(C.db["Misc"]["InfoStrRight"], "%[(%w+)%]") do
 		if modules[name] and not modules[name].isActive then
 			modules[name].isActive = true
 			tinsert(INFO.rightModules, 1, name) -- right to left
@@ -129,7 +129,7 @@ function INFO:Infobar_UpdateValues()
 end
 
 function INFO:Infobar_UpdateAnchor()
-	if R.Infobar.CustomAnchor then return end
+	if C.Infobar.CustomAnchor then return end
 
 	for _, info in pairs(INFO.modules) do
 		info:Hide()
@@ -179,7 +179,7 @@ function INFO:GetTooltipAnchor(info)
 end
 
 StaticPopupDialogs["CPUUSAGE_WARNING"] = {
-	text = U["CPU Usage Warning"],
+	text = L["CPU Usage Warning"],
 	button1 = DISABLE,
 	button2 = CONTINUE,
 	OnAccept = function() SetCVar("scriptProfile", 0) ReloadUI() end,
@@ -203,4 +203,6 @@ function INFO:OnLogin()
 	if GetCVarBool("scriptProfile") then
 		StaticPopup_Show("CPUUSAGE_WARNING")
 	end
+	
+	SetCVar("timeMgrUseMilitaryTime", OrzUISetDB["MilitaryTime"] and "1" or "0")
 end

@@ -1,17 +1,17 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local Bar = M:GetModule("Actionbar")
+local B, C, L, DB = unpack(ns)
+local Bar = B:GetModule("Actionbar")
 
 local _G = _G
 local tinsert = tinsert
 local UnitOnTaxi, TaxiRequestEarlyLanding, VehicleExit = UnitOnTaxi, TaxiRequestEarlyLanding, VehicleExit
-local padding = R.Bars.padding
+local padding = C.Bars.padding
 
 function Bar:UpdateVehicleButton()
 	local frame = _G["OrzUI_ActionBarExit"]
 	if not frame then return end
 
-	local size = R.db["Actionbar"]["VehButtonSize"]
+	local size = C.db["Actionbar"]["VehButtonSize"]
 	local framSize = size + 2*padding
 	frame.buttons[1]:SetSize(size, size)
 	frame:SetSize(framSize, framSize)
@@ -22,7 +22,7 @@ function Bar:CreateLeaveVehicle()
 	local buttonList = {}
 
 	local frame = CreateFrame("Frame", "OrzUI_ActionBarExit", UIParent, "SecureHandlerStateTemplate")
-	frame.mover = M.Mover(frame, U["LeaveVehicle"], "LeaveVehicle", {"BOTTOM", UIParent, "BOTTOM", 310, 100})
+	frame.mover = B.Mover(frame, L["LeaveVehicle"], "LeaveVehicle", {"BOTTOM", UIParent, "BOTTOM", 310, 100})
 
 	local button = CreateFrame("CheckButton", "OrzUI_LeaveVehicleButton", frame, "ActionButtonTemplate, SecureHandlerClickTemplate")
 	tinsert(buttonList, button)
@@ -35,7 +35,7 @@ function Bar:CreateLeaveVehicle()
 	if button.Arrow then button.Arrow:SetAlpha(0) end
 
 	button:SetScript("OnEnter", MainMenuBarVehicleLeaveButton.OnEnter)
-	button:SetScript("OnLeave", M.HideTooltip)
+	button:SetScript("OnLeave", B.HideTooltip)
 	button:SetScript("OnClick", function(self)
 		if UnitOnTaxi("player") then
 			TaxiRequestEarlyLanding()

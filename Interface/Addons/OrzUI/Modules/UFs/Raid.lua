@@ -1,7 +1,7 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 local oUF = ns.oUF
-local UF = M:GetModule("UnitFrames")
+local UF = B:GetModule("UnitFrames")
 
 local strmatch, format, wipe = strmatch, format, wipe
 local pairs, ipairs, next, tonumber, unpack, gsub = pairs, ipairs, next, tonumber, unpack, gsub
@@ -48,7 +48,7 @@ function UF:UpdateTargetBorder()
 end
 
 function UF:CreateTargetBorder(self)
-	local border = M.CreateBDFrame(self, 0)
+	local border = B.CreateBDFrame(self, 0)
 	border:SetBackdropBorderColor(.9, .9, .9)
 	border:Hide()
 
@@ -64,8 +64,8 @@ function UF:UpdateThreatBorder(_, unit)
 	local status = UnitThreatSituation(unit)
 
 	if status and status > 1 then
-		local r, g, b = unpack(oUF.colors.threat[status])
-		element:SetBackdropBorderColor(r, g, b)
+		local color = oUF.colors.threat[status]
+		element:SetBackdropBorderColor(color:GetRGB())
 		element:Show()
 	else
 		element:Hide()
@@ -73,8 +73,8 @@ function UF:UpdateThreatBorder(_, unit)
 end
 
 function UF:CreateThreatBorder(self)
-	local threatIndicator = M.CreateSD(self.backdrop, 4, true)
-	threatIndicator:SetOutside(self, 4+R.mult, 4+R.mult)
+	local threatIndicator = B.CreateSD(self.backdrop, 4, true)
+	threatIndicator:SetOutside(self, 4+C.mult, 4+C.mult)
 	self.backdrop.__shadow = nil
 
 	self.ThreatIndicator = threatIndicator
@@ -107,12 +107,10 @@ for keyIndex, keyString in pairs(wheelGroupIndex) do
 end
 
 function UF:DefaultClickSets()
-	if not OrzUISetDB["ClickSets"][I.MyClass] then OrzUISetDB["ClickSets"][I.MyClass] = {} end
-	if not next(OrzUISetDB["ClickSets"][I.MyClass]) then
-		--if R.ClickCastList[I.MyClass] then
-			for fullkey, spellID in pairs(R.ClickCastList[I.MyClass]) do
-				OrzUISetDB["ClickSets"][I.MyClass][fullkey] = spellID
-			--end
+	if not OrzUISetDB["ClickSets"][DB.MyClass] then OrzUISetDB["ClickSets"][DB.MyClass] = {} end
+	if not next(OrzUISetDB["ClickSets"][DB.MyClass]) then
+		for fullkey, spellID in pairs(C.ClickCastList[DB.MyClass]) do
+			OrzUISetDB["ClickSets"][DB.MyClass][fullkey] = spellID
 		end
 	end
 end
@@ -126,7 +124,7 @@ local onMouseString = "if not self:IsUnderMouse(false) then self:ClearBindings()
 
 local function setupMouseWheelCast(self)
 	local found
-	for fullkey in pairs(OrzUISetDB["ClickSets"][I.MyClass]) do
+	for fullkey in pairs(OrzUISetDB["ClickSets"][DB.MyClass]) do
 		if strmatch(fullkey, "MW%w") then
 			found = true
 			break
@@ -138,7 +136,7 @@ local function setupMouseWheelCast(self)
 		local tooltipOnEnter = ""
 		local tooltipOnLeave = ""
 		
-		if R.db["UFs"]["RaidClickSets"] and R.db["UFs"]["RaidClickSetsTooltips"] then
+		if C.db["UFs"]["RaidClickSets"] and C.db["UFs"]["RaidClickSetsTooltips"] then
 			tooltipOnEnter = "if UF and UF.ShowClickCastTooltip then UF:ShowClickCastTooltip(self); if _G.ClickCastTooltip then _G.ClickCastTooltip.currentFrame = self; end; end;"
 			tooltipOnLeave = "if UF and UF.HideClickCastTooltip then UF:HideClickCastTooltip(); if _G.ClickCastTooltip then _G.ClickCastTooltip.currentFrame = nil; end; end;"
 		end
@@ -147,7 +145,7 @@ local function setupMouseWheelCast(self)
 		self:SetAttribute("clickcast_onleave", onLeaveString .. tooltipOnLeave)
 		self:SetAttribute("_onshow", onLeaveString)
 		self:SetAttribute("_onhide", onLeaveString)
-		self:SetAttribute("_onmousedown", onMouseString)
+	--	self:SetAttribute("_onmousedown", onMouseString)
 	end
 end
 
@@ -158,13 +156,15 @@ local fixedSpells = {
 local function setupClickSets(self)
 	if self.clickCastRegistered then return end
 
-	for fullkey, value in pairs(OrzUISetDB["ClickSets"][I.MyClass]) do
+	for fullkey, value in pairs(OrzUISetDB["ClickSets"][DB.MyClass]) do
 		if fullkey == "SHIFT-LMB" then self.focuser = true end
 
 		local keyIndex = keyList[fullkey]
 		if keyIndex then
 			if tonumber(value) then
 				value = fixedSpells[value] or value
+				--self:SetAttribute(format(keyIndex, "type"), "spell")
+				--self:SetAttribute(format(keyIndex, "spell"), value)
 				local spellName = GetSpellName(value)
 				if spellName then
 					self:SetAttribute(format(keyIndex, "type"), "macro")
@@ -188,9 +188,9 @@ local function setupClickSets(self)
 	setupMouseWheelCast(self)
 
 	-- 如果没有滚轮绑定但启用了提示功能，单独设置提示事件
-	if R.db["UFs"]["RaidClickSets"] and R.db["UFs"]["RaidClickSetsTooltips"] then
+	if C.db["UFs"]["RaidClickSets"] and C.db["UFs"]["RaidClickSetsTooltips"] then
 		local hasWheelBinding = false
-		for fullkey in pairs(OrzUISetDB["ClickSets"][I.MyClass]) do
+		for fullkey in pairs(OrzUISetDB["ClickSets"][DB.MyClass]) do
 			if strmatch(fullkey, "MW%w") then
 				hasWheelBinding = true
 				break
@@ -224,7 +224,7 @@ end
 
 local pendingFrames = {}
 function UF:CreateClickSets(self)
-	if not R.db["UFs"]["RaidClickSets"] then return end
+	if not C.db["UFs"]["RaidClickSets"] then return end
 
 	if InCombatLockdown() then
 		pendingFrames[self] = true
@@ -243,20 +243,20 @@ function UF:DelayClickSets()
 end
 
 function UF:AddClickSetsListener()
-	if not R.db["UFs"]["RaidClickSets"] then return end
+	if not C.db["UFs"]["RaidClickSets"] then return end
 
-	M:RegisterEvent("PLAYER_REGEN_ENABLED", UF.DelayClickSets)
+	B:RegisterEvent("PLAYER_REGEN_ENABLED", UF.DelayClickSets)
 end
 
 local function UpdateAltPowerAnchor(element)
-	if R.db["UFs"]["PartyAltPower"] then
+	if C.db["UFs"]["PartyAltPower"] then
 		local self = element.__owner
-		local horizon = R.db["UFs"]["PartyDirec"] > 2
+		local horizon = C.db["UFs"]["PartyDirec"] > 2
 		local relF = horizon and "TOP" or "LEFT"
 		local relT = horizon and "BOTTOM" or "RIGHT"
 		local xOffset = horizon and 0 or 5
 		local yOffset = horizon and -5 or 0
-		local otherSide = R.db["UFs"]["PWOnRight"]
+		local otherSide = C.db["UFs"]["PWOnRight"]
 		if otherSide then
 			xOffset = horizon and 0 or -5
 			yOffset = horizon and 5 or 0
@@ -276,7 +276,7 @@ local function UpdateAltPowerAnchor(element)
 end
 
 function UF:CreatePartyAltPower(self)
-	local altPower = M.CreateFS(self, 16, "")
+	local altPower = B.CreateFS(self, 16, "")
 	self:Tag(altPower, "[altpower]")
 	altPower.__owner = self
 	UpdateAltPowerAnchor(altPower)
@@ -297,7 +297,7 @@ end
 
 -- 创建点击施法配置按钮
 function UF:CreateClickCastConfigButton(self)
-	 if not R.db["UFs"]["RaidClickSets"] then return end
+	 if not C.db["UFs"]["RaidClickSets"] then return end
 	 -- 创建按钮（始终显示，不受RaidClickSets配置影响）
 	local button = CreateFrame("Button", nil, self, "BackdropTemplate")
 	button:SetSize(6, 6) -- 更小的矩形
@@ -341,7 +341,7 @@ function UF:CreateClickCastConfigButton(self)
 	-- 点击事件
 	button:SetScript("OnClick", function(self)
 		-- 获取GUI模块并打开点击施法配置界面
-		local G = M:GetModule("GUI")
+		local G = B:GetModule("GUI")
 		if G and G.SetupClickCast then
 			-- 传递按钮的父级框架，这样配置界面可以正确定位
 			G:SetupClickCast(button:GetParent())

@@ -1,21 +1,11 @@
--- List of (localized) messages for faction increases ## Author: Atair ## Version: 1.2.4
--- Note: We don't set faction for reputation decreases, because if this happens there's usually a second faction with an increase, so we pick the latter.
-local factionIncreaseStrings = {
-    FACTION_STANDING_INCREASED,
-    FACTION_STANDING_INCREASED_ACCOUNT_WIDE,
-    FACTION_STANDING_INCREASED_ACH_BONUS,
-    FACTION_STANDING_INCREASED_ACH_BONUS_ACCOUNT_WIDE,
-    FACTION_STANDING_INCREASED_BONUS,
-    FACTION_STANDING_INCREASED_DOUBLE_BONUS,
-    FACTION_STANDING_INCREASED_GENERIC,
-    FACTION_STANDING_INCREASED_GENERIC_ACCOUNT_WIDE
-};
+--## Author: Atair ## Version: 1.2.4
+local reputationWatcher = {}
 
-local isRussian = GetLocale() == "ruRU";
+reputationWatcher.factionStandings = {};
+reputationWatcher.isRussian = GetLocale() == "ruRU";
 
 
 function ReputationWatcher_OnLoad(self)
-    self.factionStandings = {};
     self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE");
     self:RegisterEvent("VARIABLES_LOADED");
 end
@@ -28,6 +18,41 @@ function ReputationWatcher_OnEvent(self, event, ...)
         ReputationWatcher_InitializeFactionStandings(self);
     end
 end
+
+
+function ReputationWatcher_TryGetFaction(message, factionString)
+    -- Escape all "magic characters" (except %) in case of modifications to the global string by another addon
+    local pattern = string.gsub(factionString, "[%^%$%(%)%.%[%]%*%+%-%?]", "%%%0");
+
+    -- Replace digit format placeholder by search pattern for amount, i.e. %d => %d+
+    pattern = string.gsub(pattern, "%%d", "(%%d+)");
+
+    -- Replace float format placeholder by search pattern for bonus, i.e. %.1f => %%.1f => %d+%.%d
+    pattern = string.gsub(pattern, "%%%%%.1f", "%%d+%%.%%d");
+
+    -- Replace string format placeholder by capturing search pattern for faction name, i.e. %s => (.+)
+    if reputationWatcher.isRussian then
+        -- Additionally remove Russian grammer case prefix "|3-7" since it is not contained in the message
+        pattern = string.gsub(pattern, "|3%-7%(%%s%)", "(.+)");
+    else
+        pattern = string.gsub(pattern, "%%s", "(.+)");
+    end
+
+    return strmatch(message, pattern);
+end
+
+-- List of (localized) messages for faction increases
+-- Note: We don't set faction for reputation decreases, because if this happens there's usually a second faction with an increase, so we pick the latter.
+local factionIncreaseStrings = {
+    FACTION_STANDING_INCREASED,
+    FACTION_STANDING_INCREASED_ACCOUNT_WIDE,
+    FACTION_STANDING_INCREASED_ACH_BONUS,
+    FACTION_STANDING_INCREASED_ACH_BONUS_ACCOUNT_WIDE,
+    FACTION_STANDING_INCREASED_BONUS,
+    FACTION_STANDING_INCREASED_DOUBLE_BONUS,
+    FACTION_STANDING_INCREASED_GENERIC,
+    FACTION_STANDING_INCREASED_GENERIC_ACCOUNT_WIDE
+};
 
 
 function ReputationWather_OnFactionChangedMessage(self, message)
@@ -74,7 +99,7 @@ function ReputationWather_OnFactionChangedMessage(self, message)
             end
 
             -- Compare faction name against faction name from list, and in case of Russian also against its grammar case as used in the message
-            if (faction and not foundIndex and (factionData.name == faction or isRussian and format("|3-7(%s)", factionData.name) == faction)) then
+            if (faction and not foundIndex and (factionData.name == faction or reputationWatcher.isRussian and format("|3-7(%s)", factionData.name) == faction)) then
                 if C_Reputation.IsFactionActive(i) and not factionData.isWatched then
                     -- This is the faction name from the event message
                     foundIndex = i;
@@ -116,33 +141,11 @@ function ReputationWatcher_InitializeFactionStandings(self)
 end
 
 
-function ReputationWatcher_TryGetFaction(message, factionString)
-    -- Escape all "magic characters" (except %) in case of modifications to the global string by another addon
-    local pattern = string.gsub(factionString, "[%^%$%(%)%.%[%]%*%+%-%?]", "%%%0");
-
-    -- Replace digit format placeholder by search pattern for amount, i.e. %d => %d+
-    pattern = string.gsub(pattern, "%%d", "%%d+");
-
-    -- Replace float format placeholder by search pattern for bonus, i.e. %.1f => %%.1f => %d+%.%d
-    pattern = string.gsub(pattern, "%%%%%.1f", "%%d+%%.%%d");
-
-    -- Replace string format placeholder by capturing search pattern for faction name, i.e. %s => (.+)
-    if isRussian then
-        -- Additionally remove Russian grammer case prefix "|3-7" since it is not contained in the message
-        pattern = string.gsub(pattern, "|3%-7%(%%s%)", "(.+)");
-    else
-        pattern = string.gsub(pattern, "%%s", "(.+)");
-    end
-
-    return strmatch(message, pattern);
-end
-
-
 function ReputationWatcher_UpdateFactionStanding(self, factionData)
     local factionID = factionData.factionID;
 
     -- Find stored faction data or create it
-    local factionInfo = self.factionStandings[factionID];
+    local factionInfo = reputationWatcher.factionStandings[factionID];
     local factionType, friendshipData, isNew;
     if factionInfo then
         factionType = factionInfo.type;
@@ -157,7 +160,7 @@ function ReputationWatcher_UpdateFactionStanding(self, factionData)
             factionType = "standard";
         end
         factionInfo = { type = factionType };
-        self.factionStandings[factionID] = factionInfo;
+        reputationWatcher.factionStandings[factionID] = factionInfo;
         isNew = true;
     end
 
@@ -195,6 +198,7 @@ function ReputationWatcher_UpdateFactionStanding(self, factionData)
     if standing == factionInfo.standing then
         return false; -- unchanged
     end
+
     factionInfo.standing = standing;
     return not isNew; -- changed
 end

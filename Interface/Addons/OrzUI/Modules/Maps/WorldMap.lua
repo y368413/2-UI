@@ -1,6 +1,6 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:RegisterModule("Maps")
+local B, C, L, DB = unpack(ns)
+local module = B:RegisterModule("Maps")
 
 local select, wipe, strmatch, gmatch, tinsert, pairs = select, wipe, strmatch, gmatch, tinsert, pairs
 local tonumber, format, ceil, mod = tonumber, format, ceil, mod
@@ -48,7 +48,7 @@ end
 
 local function CoordsFormat(owner, none)
 	local text = none and ": |cffff0000^-^|r" or ": %.1f, %.1f"
-	return owner..I.MyColor..text
+	return owner..DB.MyColor..text
 end
 
 function module:UpdateCoords(elapsed)
@@ -91,11 +91,11 @@ function module:SetupCoords()
 	textParent:SetPoint("BOTTOMLEFT", WorldMapFrame.ScrollContainer)
 	textParent:SetSize(1, 18)
 	textParent:SetFrameLevel(5)
-	M.SetGradient(textParent, "H", 0,0,0, .5, 0, 450, 18):SetPoint("LEFT")
+	B.SetGradient(textParent, "H", 0,0,0, .5, 0, 450, 18):SetPoint("LEFT")
 
-	playerCoords = M.CreateFS(textParent, 13, "", false, "LEFT", 5, 0)
+	playerCoords = B.CreateFS(textParent, 13, "", false, "LEFT", 5, 0)
 	playerCoords:SetJustifyH("LEFT")
-	cursorCoords = M.CreateFS(textParent, 13, "", false, "LEFT", 180, 0)
+	cursorCoords = B.CreateFS(textParent, 13, "", false, "LEFT", 180, 0)
 	cursorCoords:SetJustifyH("LEFT")
 	WorldMapFrame.BorderFrame.Tutorial:SetPoint("TOPLEFT", WorldMapFrame, "TOPLEFT", -12, -12)
 
@@ -107,20 +107,20 @@ function module:SetupCoords()
 end
 
 function module:UpdateMapScale()
-	if self.isMaximized and self:GetScale() ~= R.db["Map"]["MaxMapScale"] then
-		self:SetScale(R.db["Map"]["MaxMapScale"])
-	elseif not self.isMaximized and self:GetScale() ~= R.db["Map"]["MapScale"] then
-		self:SetScale(R.db["Map"]["MapScale"])
+	if self.isMaximized and self:GetScale() ~= C.db["Map"]["MaxMapScale"] then
+		self:SetScale(C.db["Map"]["MaxMapScale"])
+	elseif not self.isMaximized and self:GetScale() ~= C.db["Map"]["MapScale"] then
+		self:SetScale(C.db["Map"]["MapScale"])
 	end
 end
 
 function module:UpdateMapAnchor()
 	module.UpdateMapScale(self)
-	M.RestoreMF(self)
+	B.RestoreMF(self)
 end
 
 function module:WorldMapScale()
-	M.CreateMF(WorldMapFrame, nil, true)
+	B.CreateMF(WorldMapFrame, nil, true)
 	WorldMapFrame:HookScript("OnShow", self.UpdateMapAnchor)
 	hooksecurefunc(WorldMapFrame, "SynchronizeDisplayState", self.UpdateMapAnchor)
 end
@@ -221,8 +221,8 @@ function module:MapData_RefreshOverlays(fullUpdate)
 					texture:SetPoint("TOPLEFT", offsetX + (TILE_SIZE_WIDTH * (k-1)), -(offsetY + (TILE_SIZE_HEIGHT * (j - 1))))
 					texture:SetTexture(fileDataIDs[((j - 1) * numTexturesWide) + k], nil, nil, "TRILINEAR")
 
-					if R.db["Map"]["MapReveal"] then
-						if R.db["Map"]["MapRevealGlow"] then
+					if C.db["Map"]["MapReveal"] then
+						if C.db["Map"]["MapRevealGlow"] then
 							texture:SetVertexColor(.7, .7, .7)
 						else
 							texture:SetVertexColor(1, 1, 1)
@@ -251,9 +251,9 @@ function module:RemoveMapFog()
 	bu:SetHitRectInsets(-5, -5, -5, -5)
 	bu:SetPoint("BOTTOMLEFT", WorldMapFrameHomeButton, "TOPLEFT", -4, 0)
 	bu:SetSize(26, 26)
-	M.ReskinCheck(bu)
-	bu:SetChecked(R.db["Map"]["MapReveal"])
-	bu.text = M.CreateFS(bu, 14, U["Map Reveal"], false, "LEFT", 25, 0)
+	B.ReskinCheck(bu)
+	bu:SetChecked(C.db["Map"]["MapReveal"])
+	bu.text = B.CreateFS(bu, 14, L["Map Reveal"], false, "LEFT", 25, 0)
 
 	for pin in WorldMapFrame:EnumeratePinsByTemplate("MapExplorationPinTemplate") do
 		hooksecurefunc(pin, "RefreshOverlays", module.MapData_RefreshOverlays)
@@ -261,16 +261,16 @@ function module:RemoveMapFog()
 	end
 
 	bu:SetScript("OnClick", function(self)
-		R.db["Map"]["MapReveal"] = self:GetChecked()
+		C.db["Map"]["MapReveal"] = self:GetChecked()
 
 		for i = 1, #shownMapCache do
-			shownMapCache[i]:SetShown(R.db["Map"]["MapReveal"])
+			shownMapCache[i]:SetShown(C.db["Map"]["MapReveal"])
 		end
 	end)
 end
 
 function module:SetupWorldMap()
-	if R.db["Map"]["DisableMap"] then return end
+	if C.db["Map"]["DisableMap"] then return end
 	if C_AddOns.IsAddOnLoaded("Mapster") then return end
 
 	-- Remove from frame manager
@@ -292,11 +292,11 @@ function module:MapFunc()
 	WorldMapFrame:SetAttribute("UIPanelLayout-enabled", false)
 	WorldMapFrame:SetAttribute("UIPanelLayout-allowOtherPanels", true)
 	tinsert(UISpecialFrames, "WorldMapFrame")
-	M:UnregisterEvent("PLAYER_ENTERING_WORLD", self.MapFunc)
+	B:UnregisterEvent("PLAYER_ENTERING_WORLD", self.MapFunc)
 end
 
 function module:OnLogin()
 	self:SetupWorldMap()
 	self:SetupMinimap()
-	M:RegisterEvent("PLAYER_ENTERING_WORLD", self.MapFunc)
+	B:RegisterEvent("PLAYER_ENTERING_WORLD", self.MapFunc)
 end

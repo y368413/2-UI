@@ -1,5 +1,5 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
 local MAX_SPEED = 1024;
 local SPEED_DECAY = 2048;
@@ -25,7 +25,7 @@ CursorHappy.texture:SetTexture([[Interface\Cooldown\star4]]);
 CursorHappy.texture:SetBlendMode("ADD");
 CursorHappy.texture:Show(); -- Ensure the texture is not hidden by default
 CursorHappy:SetScript("OnUpdate", function(_, elapsed)
-  if not R.db["Tooltip"]["CursorHappy"] then return end
+  if not C.db["Tooltip"]["CursorHappy"] then return end
   lastUpdate = lastUpdate + elapsed
   if lastUpdate < 0.01 then return end -- Update every 0.01 seconds
   lastUpdate = 0

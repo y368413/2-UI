@@ -1,10 +1,10 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local Bar = M:GetModule("Actionbar")
+local B, C, L, DB = unpack(ns)
+local Bar = B:GetModule("Actionbar")
 
 local _G = _G
 local tinsert = tinsert
-local padding = R.Bars.padding
+local padding = C.Bars.padding
 
 function Bar:CreateExtrabar()
 	local buttonList = {}
@@ -14,13 +14,12 @@ function Bar:CreateExtrabar()
 	local frame = CreateFrame("Frame", "OrzUI_ActionBarExtra", UIParent, "SecureHandlerStateTemplate")
 	frame:SetWidth(size + 2*padding)
 	frame:SetHeight(size + 2*padding)
-	frame.mover = M.Mover(frame, U["Extrabar"], "Extrabar", {"BOTTOM", UIParent, "BOTTOM", 0, 210})
+	frame.mover = B.Mover(frame, L["Extrabar"], "Extrabar", {"BOTTOM", UIParent, "BOTTOM", 0, 210})
 
 	ExtraAbilityContainer:SetScript("OnShow", nil)
 	ExtraAbilityContainer:SetScript("OnUpdate", nil)
 	ExtraAbilityContainer.OnUpdate = nil -- remove BaseLayoutMixin.OnUpdate
 	ExtraAbilityContainer.IsLayoutFrame = nil -- dont let it get readded
-	ExtraAbilityContainer:KillEditMode()
 
 	ExtraActionBarFrame:EnableMouse(false)
 	ExtraActionBarFrame:ClearAllPoints()
@@ -41,7 +40,7 @@ function Bar:CreateExtrabar()
 	local zoneFrame = CreateFrame("Frame", "OrzUI_ActionBarZone", UIParent)
 	zoneFrame:SetWidth(size + 2*padding)
 	zoneFrame:SetHeight(size + 2*padding)
-	zoneFrame.mover = M.Mover(zoneFrame, U["Zone Ability"], "ZoneAbility", {"BOTTOM", UIParent, "BOTTOM", -360, 100})
+	zoneFrame.mover = B.Mover(zoneFrame, L["Zone Ability"], "ZoneAbility", {"BOTTOM", UIParent, "BOTTOM", -360, 100})
 
 	ZoneAbilityFrame:SetParent(zoneFrame)
 	ZoneAbilityFrame:ClearAllPoints()
@@ -53,11 +52,11 @@ function Bar:CreateExtrabar()
 		for spellButton in self.SpellButtonContainer:EnumerateActive() do
 			if spellButton and not spellButton.styled then
 				spellButton.NormalTexture:SetAlpha(0)
-				spellButton:SetPushedTexture(I.pushedTex) --force it to gain a texture
+				spellButton:SetPushedTexture(DB.pushedTex) --force it to gain a texture
 				spellButton:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
 				spellButton:GetHighlightTexture():SetInside()
 				spellButton.Icon:SetInside()
-				M.ReskinIcon(spellButton.Icon, true)
+				B.ReskinIcon(spellButton.Icon, true)
 				spellButton.styled = true
 			end
 		end

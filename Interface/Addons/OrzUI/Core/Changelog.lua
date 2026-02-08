@@ -1,28 +1,24 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-if I.Client ~= "zhCN" then return end
+local B, C, L, DB = unpack(ns)
+if DB.Client ~= "zhCN" then return end
 
 local strsplit, pairs = string.split, pairs
 
 local UIQuestsandHelp = {
    "|cff00ff00更多设置请按|r|cff69ccf0 Esc - 2UI |r|cff00ff00按钮|r",
  	 "1、任何你不喜欢的，请你控制台关了它.|cff3399FF                  自己去下载自己喜欢的",
- 	 "2、|cFFFF0000头像样式一就仅只有你看到这些|r.                        |cff3399FF要更多就去用头像二",
-	 "3、我找不到在哪|cFFFF0000关闭自动交接任务|r.                        |cff3399FF任务追踪栏上 框里的勾",
-	 "4、我缩放完了UI，系统头像位置变了.                     |cff3399FF编辑模式挪动下",
-	 "5、我用的简易头像,右键解锁挪不动啊.|cff3399FF                     /bht",
-	 "6、为何没有Buff或者Debuff ID显示啊.|cff3399FF                    按着你的Shift再看",
-	 "7、按住功能键点击聊天框角色名称:               |cff3399FFShift-密语 Ctrl-邀请工会 Alt-组队邀请",
+ 	 "2、我找不到在哪|cFFFF0000关闭自动交接任务|r.                        |cff3399FF任务追踪栏上 框里的勾",
+	 "3、我缩放完了UI，系统头像位置变了.                     |cff3399FF编辑模式挪动下",
+	 "4、为何没有Buff或者Debuff ID显示啊.|cff3399FF                    按着你的Shift再看",
+	 "5、按住功能键点击聊天框角色名称:               |cff3399FFShift-密语 Ctrl-邀请工会 Alt-组队邀请",
    "|cffff7d0a[Tips]控制台设置后的 红色齿轮 可以点击后设置更多|r",
    "|cffff7d0a[Tips]使用多功能团框的话，记得控制台别勾选“简易模式框体”|r",
    "|cFF00DDFF如需改进和反馈，可以回帖或者在讨论组(n9PnFl0o)告诉我，谢谢。",
    "----------------------------------------------------------------------"..C_AddOns.GetAddOnMetadata("OrzUI", "X-StatsVersion"),
-   "【重要】2UI核心包发布在CurseForge，名称叫Orz-UI",
-   "【重要】2ui基础包发布2ui官网网盘、新手盒子和WOWInterface",
-   "【重要】核心包只有核心功能，基础包包括背包等常用功能",
-   "【更新】适配11.2.5版本",
-   "【更新】感谢小天天天天天天…，/as命令可以设置一键出售装备配置",
-   "【更新】感谢河河、Woo_Sphinx、Vanish总能发现莫名其妙的bug，并帮忙内测",
+   "【重要】2UI发布在CurseForge，名称叫Orz-UI",
+   "【重要】2026年开始，2UI只提供核心包，不再发布整合包",
+   "【更新】适配12.0.0版本",
+   "【更新】感谢河河、Woo_Sphinx、Vanish帮忙内测",
    "------------------------------ For "..C_AddOns.GetAddOnMetadata("OrzUI", "X-Support"),
 }
 local story = {
@@ -64,17 +60,17 @@ local function Helplist()
 	f:SetPoint("TOPLEFT", 260, -60)
 	f:SetScale(1.1)
 	f:SetFrameStrata("HIGH")
-	M.CreateMF(f)
-	M.SetBD(f)
-	M.CreateFS(f, 30, "2 UI", true, "TOPLEFT", 43, 16)
-	M.CreateFS(f, 16, I.Version, true, "TOPLEFT", 112, 6)
+	B.CreateMF(f)
+	B.SetBD(f)
+	B.CreateFS(f, 30, "2 UI", true, "TOPLEFT", 43, 16)
+	B.CreateFS(f, 16, DB.Version, true, "TOPLEFT", 112, 6)
 	local offset = 0
 	for n, t in pairs(UIQuestsandHelp) do
-		M.CreateFS(f, 14, t, false, "TOPLEFT", 21, -(21 + offset))  --n..": "..
+		B.CreateFS(f, 14, t, false, "TOPLEFT", 21, -(21 + offset))  --n..": "..
 		offset = offset + 21
 	end
 	f:SetSize(600, 36 + offset)
-	local close = M.CreateButton(f, 21, 21, "X")
+	local close = B.CreateButton(f, 21, 21, "X")
 	close:SetPoint("TOPRIGHT", -8, 8)
 	close:SetScript("OnClick", function() f:Hide() end)
 end
@@ -87,17 +83,17 @@ local function lovewow()
 	f:SetPoint("CENTER")
 	f:SetScale(1.1)
 	f:SetFrameStrata("HIGH")
-	M.CreateMF(f)
-	M.SetBD(f)
-	M.CreateFS(f, 30, "总会有毛人", true, "TOPLEFT", 21, 16)
-	M.CreateFS(f, 16, "We Love WOW", true, "TOPLEFT", 180, 9)
+	B.CreateMF(f)
+	B.SetBD(f)
+	B.CreateFS(f, 30, "总会有毛人", true, "TOPLEFT", 21, 16)
+	B.CreateFS(f, 16, "We Love WOW", true, "TOPLEFT", 180, 9)
 	local offset = 0
 	for n, t in pairs(story) do
-		M.CreateFS(f, 14, t, false, "TOPLEFT", 21, -(21 + offset))
+		B.CreateFS(f, 14, t, false, "TOPLEFT", 21, -(21 + offset))
 		offset = offset + 21
 	end
 	f:SetSize(1024, 43 + offset)
-	local close = M.CreateButton(f, 16, 16, true, I.closeTex)
+	local close = B.CreateButton(f, 16, 16, true, DB.closeTex)
 	close:SetPoint("TOPRIGHT", -8, 8)
 	close:SetScript("OnClick", function() f:Hide() end)
 end
@@ -106,15 +102,15 @@ local function compareToShow(event)
 	if OrzUI_Tutorial then return end
 
 	local old1, old2 = strsplit(".", OrzUISetDB["Changelog"].Version or "")
-	local cur1, cur2 = strsplit(".", I.Version)
+	local cur1, cur2 = strsplit(".", DB.Version)
 	if old1 ~= cur1 or old2 ~= cur2 then
 		Helplist()
-		OrzUISetDB["Changelog"].Version = I.Version
+		OrzUISetDB["Changelog"].Version = DB.Version
 	end
 
-	M:UnregisterEvent(event, compareToShow)
+	B:UnregisterEvent(event, compareToShow)
 end
-M:RegisterEvent("PLAYER_ENTERING_WORLD", compareToShow)
+B:RegisterEvent("PLAYER_ENTERING_WORLD", compareToShow)
 
 SlashCmdList["HELPLIST"] = Helplist
 SLASH_HELPLIST1 = '/MrHelp'

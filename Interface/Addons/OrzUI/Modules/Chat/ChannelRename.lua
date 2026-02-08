@@ -1,6 +1,6 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:GetModule("Chat")
+local B, C, L, DB = unpack(ns)
+local module = B:GetModule("Chat")
 
 local gsub, strfind, strmatch = string.gsub, string.find, string.match
 local BetterDate, time, date, GetCVarBool = BetterDate, time, date, GetCVarBool
@@ -8,10 +8,10 @@ local INTERFACE_ACTION_BLOCKED = INTERFACE_ACTION_BLOCKED
 local C_DateAndTime_GetCurrentCalendarTime = C_DateAndTime.GetCurrentCalendarTime
 
 local timestampFormat = {
-	[2] = "[%I:%M %p]",
-	[3] = "[%I:%M:%S %p]",
-	[4] = "[%H:%M]",
-	[5] = "[%H:%M:%S]",
+	[2] = "[%I:%M %p] ",
+	[3] = "[%I:%M:%S %p] ",
+	[4] = "[%H:%M] ",
+	[5] = "[%H:%M:%S] ",
 }
 
 local function GetCurrentTime()
@@ -28,17 +28,17 @@ local function GetCurrentTime()
 end
 
 function module:UpdateChannelNames(text, ...)
-	if strfind(text, INTERFACE_ACTION_BLOCKED) and not I.isDeveloper then return end
+	if strfind(text, INTERFACE_ACTION_BLOCKED) and not DB.isDeveloper then return end
 
 	local r, g, b = ...
-	if R.db["Chat"]["WhisperColor"] and strfind(text, U["Tell"].." |H[BN]*player.+%]") then
+	if C.db["Chat"]["WhisperColor"] and strfind(text, L["Tell"].." |H[BN]*player.+%]") then
 		r, g, b = r*.7, g*.7, b*.7
 	end
 
 	-- Dev logo
 	local unitName = strmatch(text, "|Hplayer:([^|:]+)")
-	if unitName and I.Devs[unitName] then
-		text = gsub(text, "(|Hplayer.+)", "|T"..I.chatLogo..":12:12|t%1")
+	if unitName and DB.Devs[unitName] then
+		text = gsub(text, "(|Hplayer.+)", "|T"..DB.chatLogo..":12:12|t%1")
 	end
 
 	-- Timestamp
@@ -50,7 +50,7 @@ function module:UpdateChannelNames(text, ...)
 		if oldTimeStamp then
 			text = gsub(text, oldTimeStamp, "")
 		end
-		local timeStamp = BetterDate(I.GreyColor..timestampFormat[OrzUISetDB["TimestampFormat"]].."|r", realmTime or locTime)
+		local timeStamp = BetterDate(DB.GreyColor..timestampFormat[OrzUISetDB["TimestampFormat"]].."|r", realmTime or locTime)
 		text = timeStamp..text
 	end
 	

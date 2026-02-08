@@ -1,4 +1,4 @@
---## Version: 3.11.5 ## Author: ollidiemaus
+--## Version: 3.12.2 ## Author: ollidiemaus
 
 local hamL = {}
 if GetLocale() == "zhCN" then
@@ -125,7 +125,8 @@ end
 ham.crimsonVialSpell = ham.Spell.new(185311)
 ham.renewal = ham.Spell.new(108238)
 ham.exhilaration = ham.Spell.new(109304)
-ham.fortitudeOfTheBear = ham.Spell.new(388035)
+---Fortitude of the Bear became a passive in 12.0
+--ham.fortitudeOfTheBear = ham.Spell.new(388035)
 ham.lastStand = ham.Spell.new(12975)
 ham.bitterImmunity = ham.Spell.new(383762)
 ham.desperatePrayer = ham.Spell.new(19236)
@@ -156,7 +157,7 @@ table.insert(ham.supportedSpells, ham.recuperate)
 table.insert(ham.supportedSpells, ham.crimsonVialSpell)
 table.insert(ham.supportedSpells, ham.renewal)
 table.insert(ham.supportedSpells, ham.exhilaration)
-table.insert(ham.supportedSpells, ham.fortitudeOfTheBear)
+--table.insert(ham.supportedSpells, ham.fortitudeOfTheBear)
 table.insert(ham.supportedSpells, ham.lastStand)
 table.insert(ham.supportedSpells, ham.bitterImmunity)
 table.insert(ham.supportedSpells, ham.desperatePrayer)
@@ -212,7 +213,7 @@ ham.defaults = {
     cavedwellerDelight = true,
     heartseekingInjector = false,
     activatedSpells = { ham.recuperate.getId(), ham.crimsonVialSpell.getId(), ham.renewal.getId(),
-        ham.exhilaration.getId(), ham.fortitudeOfTheBear.getId(), ham.lastStand.getId(), ham.bitterImmunity.getId(),
+        ham.exhilaration.getId(), ham.lastStand.getId(), ham.bitterImmunity.getId(),
         ham.desperatePrayer.getId(), ham.healingElixir.getId(), ham.darkPact.getId(), ham.giftOfTheNaaruDK.getId(),
         ham.giftOfTheNaaruHunter.getId(), ham.giftOfTheNaaruMage.getId(), ham.giftOfTheNaaruMageWarlock.getId(),
         ham.giftOfTheNaaruMonk.getId(), ham.giftOfTheNaaruPaladin.getId(), ham.giftOfTheNaaruPriest.getId(),
@@ -249,6 +250,7 @@ end
 
 local isRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
 local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
+local isTBC = (WOW_PROJECT_ID == 5) -- TBC Anniversary / BCC
 local isWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
 local isCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC)
 local isMop = (WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC)
@@ -305,11 +307,12 @@ ham.mythical = ham.Item.new(57191, "Mythical Healing Potion")
 ham.crazy_alch = ham.Item.new(40077, "Crazy Alchemist's Potion")
 ham.runic_inject = ham.Item.new(41166, "Runic Healing Injector")
 ham.runic = ham.Item.new(33447, "Runic Healing Potion")
-ham.superreju = ham.Item.new(22850, "Super Rejuvenation Potion")
 ham.endless = ham.Item.new(43569, "Endless Healing Potion")
 ham.injector = ham.Item.new(33092, "Healing Potion Injector")
 ham.resurgent = ham.Item.new(39671, "Resurgent Healing Potion")
 ham.argent = ham.Item.new(43531, "Argent Healing Potion")
+--TBC/Classic
+ham.superreju = ham.Item.new(22850, "Super Rejuvenation Potion")
 ham.auchenai = ham.Item.new(32947, "Auchenai Healing Potion")
 ham.super = ham.Item.new(22829, "Super Healing Potion")
 ham.major = ham.Item.new(13446, "Major Healing Potion")
@@ -473,6 +476,32 @@ function ham.getPots()
     return pots
   end
 
+  if isTBC then
+    local pots = {
+      ham.superreju,
+      ham.auchenai,
+      ham.super,
+      ham.major,
+      ham.combat,
+      ham.superior,
+      ham.greater,
+      ham.healingPotion,
+      ham.lesser,
+      ham.minor
+    }
+
+    -- If in a PvP battleground, prioritize battleground draughts
+    local inInstance, instanceType = IsInInstance()
+    local isInBattleground = inInstance and instanceType == "pvp"
+    if isInBattleground then
+      -- Insert in reverse order so final priority is Major then Superior
+      table.insert(pots, 1, ham.superiorHealingDraught)
+      table.insert(pots, 1, ham.majorHealingDraught)
+    end
+
+    return pots
+  end
+
   if isWrath then
     return {
       ham.crazy_alch,
@@ -540,6 +569,9 @@ function ham.getPots()
       ham.minor
     }
   end
+
+  -- Fallback: return empty table if no version matches
+  return {}
 end
 
 function ham.getHealthstonesClassic()
@@ -654,6 +686,33 @@ function ham.getHealthstonesClassic()
       ham.minor0
     }
   end
+
+  if isTBC then
+    -- TBC uses the same healthstones as Classic
+    return {
+      ham.major2,
+      ham.major1,
+      ham.major0,
+      ham.greater2,
+      ham.greater1,
+      ham.greater0,
+      ham.wipperRootTuber,
+      ham.healtsthone2,
+      ham.healtsthone1,
+      ham.lilyRoot,
+      ham.healtsthone0,
+      ham.crystalFlakeThroatLozenge,
+      ham.lesser2,
+      ham.lesser1,
+      ham.lesser0,
+      ham.minor2,
+      ham.minor1,
+      ham.minor0
+    }
+  end
+
+  -- Fallback: return empty table if no version matches
+  return {}
 end
 
 
@@ -715,9 +774,15 @@ ham.denseEmbersilkBandage = ham.Item.new(53051, "Dense Embersilk Bandage")
 ham.windwoolBandage = ham.Item.new(72985, "Windwool Bandage")
 ham.heavyWindwoolBandage = ham.Item.new(72986, "Heavy Windwool Bandage")
 
--- Retail (Dragonflight)
-ham.wilderclothBandage = ham.Item.new(194041, "Wildercloth Bandage")
-ham.denseWilderclothBandage = ham.Item.new(194207, "Dense Wildercloth Bandage")
+-- Dragonflight
+ham.wilderclothBandageR3 = ham.Item.new(194050, "Wildercloth Bandage")
+ham.wilderclothBandageR2 = ham.Item.new(194049, "Wildercloth Bandage")
+ham.wilderclothBandageR1 = ham.Item.new(194048, "Wildercloth Bandage")
+
+-- The War Within
+ham.weaverclothBandageR3 = ham.Item.new(224442, "Weavercloth Bandage")
+ham.weaverclothBandageR2 = ham.Item.new(224441, "Weavercloth Bandage")
+ham.weaverclothBandageR1 = ham.Item.new(224440, "Weavercloth Bandage")
 
 -- Return a prioritized list of bandage items for the current client
 function ham.getBandages()
@@ -860,8 +925,12 @@ function ham.getBandages()
 
   -- Retail (include modern first, then legacy in case they exist)
   return {
-    ham.denseWilderclothBandage,
-    ham.wilderclothBandage,
+    ham.weaverclothBandageR3,
+    ham.weaverclothBandageR2,
+    ham.weaverclothBandageR1,
+    ham.wilderclothBandageR3,
+    ham.wilderclothBandageR2,
+    ham.wilderclothBandageR1,
     ham.heavyWindwoolBandage,
     ham.windwoolBandage,
     ham.denseEmbersilkBandage,

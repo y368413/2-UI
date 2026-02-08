@@ -1167,7 +1167,7 @@ function ParagonReputation:CreateBarOverlay(bar)
 	overlay.edge:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
 	overlay.edge:SetPoint("CENTER",overlay.bar,"RIGHT")
 	overlay.edge:SetBlendMode("ADD")
-	overlay.edge:SetSize(38,38) --Arbitrary value, I hope there isn't an AddOn that skins the bar and the glow doesnt look right with this size.
+	overlay.edge:SetSize(38,38) --Arbitrary value, DB hope there isn't an AddOn that skins the bar and the glow doesnt look right with this size.
 	bar.ParagonOverlay = overlay
 end
 

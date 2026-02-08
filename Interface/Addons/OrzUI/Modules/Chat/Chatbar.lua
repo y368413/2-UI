@@ -1,9 +1,9 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:GetModule("Chat")
+local B, C, L, DB = unpack(ns)
+local module = B:GetModule("Chat")
 local tinsert, pairs = tinsert, pairs
 local C_GuildInfo_IsGuildOfficer = C_GuildInfo.IsGuildOfficer
-local gsub, gmatch, ipairs, select= string.gsub, string.gmatch, ipairs, select
+--local gsub, gmatch= string.gsub, string.gmatch
 
 ------------------------------------------------------------------------------------- 属性通报 ----------------------------------------
 local function Talent()  -- 本地化专精
@@ -123,7 +123,7 @@ function StatReport()  -- 属性收集
 	return StatInfo
 end
 ------------------------------------------------------------------------------------- 属性通报 End ----------------------------------------
- --[[------------------------------------- 聊天表情-- Author:M-------------------------------------
+ --[[------------------------------------- 聊天表情-- Author:B-------------------------------------
 -- key為圖片名
 local emotes = {
         --表情
@@ -288,13 +288,13 @@ local chatEvents = {
     editBox:SetText(editBox:GetText():gsub("{$","") .. self.emote)
     if (button == "LeftButton") then self:GetParent():Hide() end
   end]]
- --------------------------------------- 聊天表情-- Author:M  end -------------------------------------
+ --------------------------------------- 聊天表情-- Author:B  end -------------------------------------
 local chatSwitchInfo = {
-	text = U["ChatSwitchHelp"],
+	text = L["ChatSwitchHelp"],
 	buttonStyle = HelpTip.ButtonStyle.GotIt,
 	targetPoint = HelpTip.Point.TopEdgeCenter,
 	offsetY = 50,
-	onAcknowledgeCallback = M.HelpInfoAcknowledge,
+	onAcknowledgeCallback = B.HelpInfoAcknowledge,
 	callbackArg = "ChatSwitch",
 }
 
@@ -304,12 +304,8 @@ local function chatSwitchTip()
 	end
 end
 
-local function ResetChatAlertJustify(frame)
-	frame:SetJustification("LEFT")
-end
-
 function module:Chatbar()
-	if not R.db["Chat"]["Chatbar"] then return end
+	if not C.db["Chat"]["Chatbar"] then return end
 
 	local chatFrame = SELECTED_DOCK_FRAME
 	local editBox = chatFrame.editBox
@@ -321,10 +317,10 @@ function module:Chatbar()
 	local function AddButton(r, g, b, text, func)
 		local bu = CreateFrame("Button", nil, Chatbar, "SecureActionButtonTemplate, BackdropTemplate")
 		bu:SetSize(width, height)
-		M.CreateFS(bu, 15, text, "Chatbar", "CENTER", 0, 0, r, g, b)
+		B.CreateFS(bu, 15, text, "Chatbar", "CENTER", 0, 0, r, g, b)
 		bu:SetHitRectInsets(0, 0, -8, -8)
 		bu:RegisterForClicks("AnyUp")
-		--if text then M.AddTooltip(bu, "ANCHOR_TOP", M.HexRGB(r, g, b)..text) end
+		--if text then B.AddTooltip(bu, "ANCHOR_TOP", B.HexRGB(r, g, b)..text) end
 		if func then
 			bu:SetScript("OnClick", func)
 			bu:HookScript("OnClick", chatSwitchTip)
@@ -363,7 +359,7 @@ function module:Chatbar()
 	-- WORLD CHANNEL
 	if GetCVar("portal") == "CN" then
 		local channelName = WORLD_CHANNEL_NAME
-		local wcButton = AddButton(255/255, 200/255, 150/255, "世")  --U["World Channel"]
+		local wcButton = AddButton(255/255, 200/255, 150/255, "世")  --L["World Channel"]
 
 		local function updateChannelInfo()
 			local id = GetChannelName(channelName)
@@ -382,22 +378,22 @@ function module:Chatbar()
 			C_Timer.After(.2, updateChannelInfo)
 		end
 		checkChannelStatus()
-		M:RegisterEvent("CHANNEL_UI_UPDATE", checkChannelStatus)
+		B:RegisterEvent("CHANNEL_UI_UPDATE", checkChannelStatus)
 		hooksecurefunc("ChatConfigChannelSettings_UpdateCheckboxes", checkChannelStatus) -- toggle in chatconfig
 
 		wcButton:SetScript("OnClick", function(_, btn)
 			if module.InWorldChannel then
 				if btn == "RightButton" then
 					LeaveChannelByName(channelName)
-					print("<<<|cffFF7F50"..QUIT.."|r "..I.InfoColor..U["World Channel"])
+					print("<<<|cffFF7F50"..QUIT.."|r "..DB.InfoColor..L["World Channel"])
 					module.InWorldChannel = false
 				elseif module.WorldChannelID then
-					ChatFrame_OpenChat("/"..module.WorldChannelID, chatFrame)
+					ChatFrameUtil.OpenChat("/"..module.WorldChannelID, chatFrame)
 				end
 			else
 				JoinPermanentChannel(channelName, nil, 1)
-				ChatFrame_AddChannel(ChatFrame1, channelName)
-				print(">>>|cff00C957"..JOIN.."|r "..I.InfoColor..U["World Channel"])
+				ChatFrame1:AddChannel(channelName)
+				print(">>>|cff00C957"..JOIN.."|r "..DB.InfoColor..L["World Channel"])
 				module.InWorldChannel = true
 			end
 		end)
@@ -414,7 +410,7 @@ function module:Chatbar()
 	
 	-- Mover
 	local width = (#buttonList-1)*(padding+width) + width
-	local mover = M.Mover(Chatbar, U["Chatbar"], "Chatbar", {"BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 0}, width, 20)
+	local mover = B.Mover(Chatbar, L["Chatbar"], "Chatbar", {"BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 0}, width, 20)
 	Chatbar:ClearAllPoints()
 	Chatbar:SetPoint("BOTTOMLEFT", mover, 0, 0)
 
@@ -422,22 +418,22 @@ function module:Chatbar()
 end
 
 function module:ChatBarBackground()
-	if not R.db["Skins"]["ChatbarLine"] then return end
+	if not C.db["Skins"]["ChatbarLine"] then return end
 
 	local cr, cg, cb = 0, 0, 0
-	if R.db["Skins"]["ClassLine"] then cr, cg, cb = I.r, I.g, I.b end
+	if C.db["Skins"]["ClassLine"] then cr, cg, cb = DB.r, DB.g, DB.b end
 
-	local parent = _G["Orzui_ChatBar"]
+	local parent = _G["OrzUI_ChatBar"]
 	local width, height, alpha = 450, 18, .5
 	local frame = CreateFrame("Frame", nil, parent)
 	frame:SetPoint("LEFT", parent, "LEFT", -5, 0)
 	frame:SetSize(width, height)
 
-	local tex = M.SetGradient(frame, "H", 0, 0, 0, alpha, 0, width, height)
+	local tex = B.SetGradient(frame, "H", 0, 0, 0, alpha, 0, width, height)
 	tex:SetPoint("CENTER")
-	local bottomLine = M.SetGradient(frame, "H", cr, cg, cb, alpha, 0, width, R.mult)
+	local bottomLine = B.SetGradient(frame, "H", cr, cg, cb, alpha, 0, width, C.mult)
 	bottomLine:SetPoint("TOP", frame, "BOTTOM")
-	local topLine = M.SetGradient(frame, "H", cr, cg, cb, alpha, 0, width, R.mult)
+	local topLine = B.SetGradient(frame, "H", cr, cg, cb, alpha, 0, width, C.mult)
 	topLine:SetPoint("BOTTOM", frame, "TOP")
 end
 

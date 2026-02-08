@@ -1,460 +1,465 @@
 --## Title: |c000EEE00地下堡助手|r|cFFFFA500 By|r|c000EEEEE DFCN ## Notes: DFCN的地下堡助手，提供自动选择层数，自动进入地下堡，宿敌及藏宝图监控等功能。 ## Author: DFCN
-local DFCNL = {}
-if GetLocale() == "zhCN" then
-    DFCNL["SCOREBOARD_TITLE"] = "地下堡监控"
-    DFCNL["SCENARIO"] = "场景"
-    DFCNL["DIFFICULTY_LEVEL"] = "难度等级"
-    DFCNL["REMAINING_LIVES"] = "剩余生命"
-    DFCNL["REMAINING_ENEMIES"] = "剩余宿敌"
-    DFCNL["TOTAL_TIME"] = "总用时"
-    DFCNL["FLASHING_DOOR"] = "闪烁之门"
-    DFCNL["BIGWIGS_FLASHING_DOOR_SPAWN"] = "一扇闪烁之门出现在其中"
-    DFCNL["BIGWIGS_FLASHING_DOOR_COMPLETE"] = "完成地下堡会出现"
-    DFCNL["FLASHING_DOOR_USED"] = "已使用"
-    DFCNL["BRANN_ROLE"] = "铜须职责"
-    DFCNL["COMBAT_TRINKET"] = "战斗珍玩"
-    DFCNL["UTILITY_TRINKET"] = "效能珍玩"
-    DFCNL["NOT_SET"] = "未设置"
-    DFCNL["MAP"] = "地图"
-    DFCNL["DELVE"] = "地下堡"
-    DFCNL["SPECIAL_DELVE_NAME"] = "虚空之锋庇护所"
-    DFCNL["STORY_VARIANT"] = "故事变种"
-    DFCNL["STORY_VARIANT_PATTERN"] = "故事变种：%s*(.+)"
-    DFCNL["GOLDEN_CREST_PATTERN"] = "鎏金.-纹章"
-    DFCNL["SPECIAL_FOOTBOMB_TREASURE"] = "损坏的自动化足球炸弹分发器"
-    DFCNL["UNKNOWN_MAP"] = "未知地图"
-    DFCNL["UNKNOWN"] = "未知"
-    DFCNL["DELVE_SCENARIO_NAME"] = "地下堡"
-    DFCNL["BACKGROUND_TRANSPARENCY"] = "背景透明度"
-    DFCNL["CLICK_TO_EXIT"] = "点击立刻离开地下堡"
-    DFCNL["BANK_STATUS"] = "银行状态"
-    DFCNL["BANK_AVAILABLE"] = "当前该角色可正常访问战团银行"
-    DFCNL["BANK_UNAVAILABLE"] = "当前该角色无法访问战团银行，请勿使用战团银行技能！"
-    DFCNL["DWARVEN_MEDICINE"] = "矮人药品"
-    DFCNL["STACKS"] = "层"
-    DFCNL["ENABLED"] = "开启"
-    DFCNL["DISABLED"] = "关闭"
-    DFCNL["SETTINGS_TITLE"] = "助手设置"
-    DFCNL["AUTO_ENTER"] = "自动进入地下堡"
-    DFCNL["AUTO_ACTIVATE"] = "自动与NPC对话"
-    DFCNL["SHOW_SCOREBOARD"] = "显示地下堡监控"
-    DFCNL["TREASURE_MAP_ALERT"] = "自动检测藏宝图"
-    DFCNL["AUTO_PET_CAGE"] = "自动打包战斗宠物"
-    DFCNL["AUTO_TOKEN_EXCHANGE"] = "自动确认兑换纹章"
-    DFCNL["DIFFICULTY_LABEL"] = "难度："
-    DFCNL["FAST_EXIT_MODE"] = "速刷模式"
-    DFCNL["VIEW_MERCHANT"] = "查看地下堡商人"
-    DFCNL["VIEW_DELVE_INFO"] = "查看地下堡信息"
-    DFCNL["CLOSE"] = "关闭"
-    DFCNL["DIFFICULTY_LEVEL_FORMAT"] = "难度 %d"
-    DFCNL["SPECIAL_DIFFICULTY_PATTERN"] = "难度 %？"
-    DFCNL["SELECT_BUTTON_PATTERN"] = "选择"
-    DFCNL["REMAINING_ENEMIES_PATTERN"] = "剩余敌群"
-    DFCNL["ENCHANTED_ITEM_PATTERN"] = "附魔"
-    DFCNL["MATRIX_ITEM_PATTERN"] = "矩阵"
-    DFCNL["CREST_PATTERN"] = "纹章"
-    DFCNL["INFO"] = "信息"
-    DFCNL["WARNING"] = "警告"
-    DFCNL["NOTICE"] = "注意"
-    DFCNL["SETTING_CHANGED"] = "设置修改"
-    DFCNL["AUTO_ENTER_ENABLED"] = "自动进入地下堡功能已启用"
-    DFCNL["AUTO_ENTER_DISABLED"] = "自动进入地下堡功能已禁用"
-    DFCNL["FAST_EXIT_ENABLED"] = "速刷模式已启用，现在进出地下堡无CD"
-    DFCNL["FAST_EXIT_DISABLED"] = "速刷模式已禁用，离开地下堡5秒后才再次触发自动进入"
-    DFCNL["DIFFICULTY_SET"] = "已设置自动选择难度等级为 %d"
-    DFCNL["DIFFICULTY_UNSET"] = "已关闭自动选择难度等级，自动进入地下堡功能已禁用"
-    DFCNL["SCOREBOARD_ENABLED"] = "地下堡监控已启用，进入地下堡后自动显示监控面板"
-    DFCNL["SCOREBOARD_DISABLED"] = "地下堡监控功能已禁用"
-    DFCNL["TREASURE_MAP_ENABLED"] = "自动检测藏宝图功能已启用"
-    DFCNL["TREASURE_MAP_DISABLED"] = "自动检测藏宝图功能已禁用"
-    DFCNL["AUTO_ACTIVATE_ENABLED"] = "自动与NPC对话功能已启用"
-    DFCNL["AUTO_ACTIVATE_DISABLED"] = "自动与NPC对话功能已禁用"
-    DFCNL["AUTO_PET_CAGE_ENABLED"] = "自动打包战斗宠物功能已启用"
-    DFCNL["AUTO_PET_CAGE_DISABLED"] = "自动打包战斗宠物功能已禁用"
-    DFCNL["AUTO_TOKEN_EXCHANGE_ENABLED"] = "自动确认兑换纹章功能已启用，仅自动确认45低级纹章换15高级纹章。"
-    DFCNL["AUTO_TOKEN_EXCHANGE_DISABLED"] = "自动确认兑换纹章功能已禁用"
-    DFCNL["SPECIAL_DELVE_WARNING"] = "当前为特殊地下堡，自动进入已取消"
-    DFCNL["AUTO_ENTER_MESSAGE"] = "自动进入地下堡：%s（%d层）"
-    DFCNL["SELECT_DIFFICULTY_WARNING"] = "请先在设置中选择自动进入的难度等级"
-    DFCNL["TOKEN_EXCHANGE_CONFIRMED"] = "自动确认纹章兑换"
-    DFCNL["ADVANCED_TOKEN_WARNING"] = "你正在使用高级纹章兑换低级纹章，请谨慎操作！"
-    DFCNL["PET_CAGED"] = "已自动打包，请再次使用该宠物以加入宠物手册"
-    DFCNL["PET_NOT_FOUND"] = "未找到打包的战斗宠物，请手动打包"
-    DFCNL["PET_CAGE_ERROR"] = "宠物自动打包遇到未知错误，请手动打包"
-    DFCNL["NPC_MARKED"] = "已自动标记需救助的NPC"
-    DFCNL["BRANN_CONFIG_UPDATED"] = "布莱恩·铜须配置已更新"
-    DFCNL["MINIMAP_SHOWN"] = "小地图图标已显示"
-    DFCNL["MINIMAP_HIDDEN"] = "小地图图标已隐藏"
-    DFCNL["ADDON_DESCRIPTION"] = "|cff33ff99[便捷]|r地下堡"
-    DFCNL["TOOLTIP_LEFT_CLICK"] = "左键: 打开/关闭设置面板"
-    DFCNL["TOOLTIP_COMMAND"] = "宏命令: /dfcndelve"
-    DFCNL["TOOLTIP_MINIMAP"] = "小地图图标: /dfcndelve minimap on/off"
-    DFCNL["TOOLTIP_ESC"] = "面板打开时按ESC可关闭"
-    DFCNL["AUTO_ENTER_TOOLTIP"] = "自动进入地下堡"
-    DFCNL["AUTO_ENTER_TOOLTIP_DETAIL1"] = "靠近地下堡入口时，自动进入预设层数的地下堡"
-    DFCNL["AUTO_ENTER_TOOLTIP_DETAIL2"] = "速刷模式关闭时，离开地下堡不会马上再次进入（5S CD）"
-    DFCNL["FAST_EXIT_TOOLTIP"] = "速刷模式"
-    DFCNL["FAST_EXIT_TOOLTIP_DETAIL1"] = "退出地下堡后立刻进入地下堡（0S CD）"
-    DFCNL["FAST_EXIT_TOOLTIP_DETAIL2"] = "推荐仅在需要快速反复进出相同地下堡时才打开"
-    DFCNL["SCOREBOARD_TOOLTIP"] = "显示地下堡监控"
-    DFCNL["SCOREBOARD_TOOLTIP_DETAIL1"] = "进入地下堡后，会自动显示监控面板"
-    DFCNL["SCOREBOARD_TOOLTIP_DETAIL2"] = "面板的U/L标识锁定和未锁定状态T为透明度调节"
-    DFCNL["SCOREBOARD_TOOLTIP_DETAIL3"] = "离开地下堡后，监控面板会自动关闭"
-    DFCNL["TREASURE_MAP_TOOLTIP"] = "自动检测藏宝图"
-    DFCNL["TREASURE_MAP_TOOLTIP_DETAIL1"] = "当获取到地下堡藏宝图后自动提醒使用"
-    DFCNL["TREASURE_MAP_TOOLTIP_DETAIL2"] = "非11层地下堡使用自动提醒地下堡层数错误"
-    DFCNL["AUTO_ACTIVATE_TOOLTIP"] = "自动与NPC对话"
-    DFCNL["AUTO_ACTIVATE_TOOLTIP_DETAIL1"] = "鼠标右键点击NPC或物品时"
-    DFCNL["AUTO_ACTIVATE_TOOLTIP_DETAIL2"] = "会自动选择对话项推动地下堡进程"
-    DFCNL["AUTO_PET_CAGE_TOOLTIP"] = "自动打包战斗宠物"
-    DFCNL["AUTO_PET_CAGE_TOOLTIP_DETAIL1"] = "可直接鼠标右键使用战斗小宠物"
-    DFCNL["AUTO_PET_CAGE_TOOLTIP_DETAIL2"] = "如果系统提示无法获取更多该类宠物，则自动打包该宠物"
-    DFCNL["AUTO_PET_CAGE_TOOLTIP_DETAIL3"] = "由于游戏限制，自动打包后仍需再次手动使用该宠物加入宠物手册"
-    DFCNL["AUTO_TOKEN_EXCHANGE_TOOLTIP"] = "自动确认兑换纹章"
-    DFCNL["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL1"] = "45个低级纹章兑换15个高级纹章自动确认"
-    DFCNL["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL2"] = "15个高级纹章兑换15个低级纹章提醒警告"
-    DFCNL["GOLDEN_CACHE_WARNING"] = "注意：鎏金纹章尚未全部拾取！"
-    DFCNL["TREASURE_BUFF_WRONG_LEVEL"] = "注意：藏宝图已激活，当前不是11层地下堡！"
-    DFCNL["TREASURE_MAP_REMINDER"] = "注意：请使用背包中的地下堡藏宝图！"
-    DFCNL["NGA_RECOMMENDED_STORY"] = "NGA地堡侠推荐故事"
-    DFCNL["NGA_RECOMMENDED_DETAIL"] = "本故事变种难度简单适合速刷"
-    DFCNL["BRANN_SAYS"] = "布莱恩·铜须说："
-    DFCNL["BRANN_GOLDEN_CACHE_ALERT"] = "藏宝室里有鎏金纹章，你可瞅仔细啦！"
-    DFCNL["BRANN_TREASURE_WARNING"] = "清醒一点，老兄！这里不是十一层地下堡，你确认要在这里使用藏宝图吗？"
-    DFCNL["BRANN_TREASURE_REMINDER"] = "你包里是地下堡藏宝图吗？你可千万别忘记使用它。"
-    DFCNL["BRANN_FLASHING_DOOR"] = "闪烁之门？让我们赶紧去探索吧！"
-    DFCNL["BRANN_FOOTBOMB"] = "这真是好东西，炸弹足球！让我也来踢一脚。"
-    DFCNL["BRANN_GOLDEN_CREST"] = "鎏金纹章都进了你的背包，这下我就放心了。"
-    DFCNL["LEAVE_FOLLOWER_DIFFICULTY"] = "已自动退队离开破晨号（追随者难度）"
-    DFCNL["DRILL_TO_ANDERMORE"] = "已自动搭乘钻机前往安德麦"
-    DFCNL["DRILL_TO_NOISY_CAVERN"] = "已自动搭乘钻机前往喧鸣深窟"
-    DFCNL["DRILL_TO_ZULDAZAR"] = "已自动搭乘钻机前往祖达萨"
-    DFCNL["UNKNOWN_TREASURE"] = "未知珍玩"
-    DFCNL["RETRY_COUNT"] = "重试：%d/3"
-    DFCNL["ADDON_LOADED"] = "地下堡助手已加载"
-    DFCNL["ADDON_STATUS"] = "自动进入: %s | 难度等级: %s | 速刷模式: %s"
-    DFCNL["AUTO_NPC_INTERACTION"] = "自动与NPC对话: %s"
-    DFCNL["AUTO_SELECT_TREASURE"] = "自动选择珍玩宝藏：%s"
-    DFCNL["REFRESH_TIME"] = "7:00刷新"
-    DFCNL["CURRENT_DATE"] = "当前：%02d-%02d"
-    DFCNL["UNKNOWN_ITEM"] = "未知物品"
-    DFCNL["UNKNOWN_DELVE"] = "未知地下堡"
-    DFCNL["SLASH_COMMAND"] = "/dfcndelve - 打开设置面板"
-    DFCNL["SLASH_MINIMAP_ON"] = "/dfcndelve minimap on - 显示小地图图标"
-    DFCNL["SLASH_MINIMAP_OFF"] = "/dfcndelve minimap off - 隐藏小地图图标"
-    DFCNL["MINIMAP_CHECKBOX"] = "显示小地图图标"
-    DFCNL["OPEN_SETTINGS"] = "打开助手设置面板"
-    DFCNL["CLOSE_SETTINGS"] = "关闭助手设置面板"
-    DFCNL["COMMAND_TIP"] = "宏调用指令: /dfcndelve"
-    DFCNL["DOWNLOAD_LABEL"] = "原始发布地址："
-    DFCNL["COPY_TIP"] = "点击选中网址，按Ctrl+C复制"
-    DFCNL["TIME_FORMAT_COMPLETED_HMS"] = "%d:%02d:%02d（已完成）"
-    DFCNL["TIME_FORMAT_COMPLETED_MS"] = "%02d:%02d（已完成）";
-elseif GetLocale() == "zhTW" then
+DFCN_L_zhCN = {
+
+    ["SCOREBOARD_TITLE"] = "地下堡监控",
+    ["SCENARIO"] = "场景",
+    ["DIFFICULTY_LEVEL"] = "难度等级",
+    ["REMAINING_LIVES"] = "剩余生命",
+    ["REMAINING_ENEMIES"] = "剩余宿敌",
+    ["TOTAL_TIME"] = "总用时",
+    ["FLASHING_DOOR"] = "闪烁之门",
+    ["BIGWIGS_FLASHING_DOOR_SPAWN"] = "一扇闪烁之门出现在其中",
+    ["BIGWIGS_FLASHING_DOOR_COMPLETE"] = "完成地下堡会出现",
+    ["FLASHING_DOOR_USED"] = "已使用",
+    ["BRANN_ROLE"] = "铜须职责",
+    ["COMBAT_TRINKET"] = "战斗珍玩",
+    ["UTILITY_TRINKET"] = "效能珍玩",
+    ["NOT_SET"] = "未设置",
+    ["MAP"] = "地图",
+    ["DELVE"] = "地下堡",
+    ["SPECIAL_DELVE_NAME"] = "虚空之锋庇护所",
+    ["STORY_VARIANT"] = "故事变种",
+    ["STORY_VARIANT_PATTERN"] = "故事变种：%s*(.+)",
+    ["GOLDEN_CREST_PATTERN"] = "鎏金.-纹章",
+    ["SPECIAL_FOOTBOMB_TREASURE"] = "损坏的自动化足球炸弹分发器",
+    ["UNKNOWN_MAP"] = "未知地图",
+    ["UNKNOWN"] = "未知",
+    ["DELVE_SCENARIO_NAME"] = "地下堡",
+    ["BACKGROUND_TRANSPARENCY"] = "背景透明度",
+    ["CLICK_TO_EXIT"] = "点击立刻离开地下堡",
+    ["BANK_STATUS"] = "银行状态",
+    ["BANK_AVAILABLE"] = "当前该角色可正常访问战团银行",
+    ["BANK_UNAVAILABLE"] = "当前该角色无法访问战团银行，请勿使用战团银行技能！",
+    ["DWARVEN_MEDICINE"] = "矮人药品",
+    ["STACKS"] = "层",
+    ["ENABLED"] = "开启",
+    ["DISABLED"] = "关闭",
+    ["SETTINGS_TITLE"] = "助手设置",
+    ["AUTO_ENTER"] = "自动进入地下堡",
+    ["AUTO_ACTIVATE"] = "自动与NPC对话",
+    ["SHOW_SCOREBOARD"] = "显示地下堡监控",
+    ["TREASURE_MAP_ALERT"] = "自动检测藏宝图",
+    ["AUTO_PET_CAGE"] = "自动打包战斗宠物",
+    ["AUTO_TOKEN_EXCHANGE"] = "自动确认兑换纹章",
+    ["DIFFICULTY_LABEL"] = "难度：",
+    ["FAST_EXIT_MODE"] = "速刷模式",
+    ["VIEW_MERCHANT"] = "查看地下堡商人",
+    ["VIEW_DELVE_INFO"] = "查看地下堡信息",
+    ["CLOSE"] = "关闭",
+    ["DIFFICULTY_LEVEL_FORMAT"] = "难度 %d",
+    ["SPECIAL_DIFFICULTY_PATTERN"] = "难度 %？",
+    ["SELECT_BUTTON_PATTERN"] = "选择",
+    ["REMAINING_ENEMIES_PATTERN"] = "剩余敌群",
+    ["ENCHANTED_ITEM_PATTERN"] = "附魔",
+    ["MATRIX_ITEM_PATTERN"] = "矩阵",
+    ["CREST_PATTERN"] = "纹章",
+    ["INFO"] = "信息",
+    ["WARNING"] = "警告",
+    ["NOTICE"] = "注意",
+    ["SETTING_CHANGED"] = "设置修改",
+    ["AUTO_ENTER_ENABLED"] = "自动进入地下堡功能已启用",
+    ["AUTO_ENTER_DISABLED"] = "自动进入地下堡功能已禁用",
+    ["FAST_EXIT_ENABLED"] = "速刷模式已启用，现在进出地下堡无CD",
+    ["FAST_EXIT_DISABLED"] = "速刷模式已禁用，离开地下堡5秒后才再次触发自动进入",
+    ["DIFFICULTY_SET"] = "已设置自动选择难度等级为 %d",
+    ["DIFFICULTY_UNSET"] = "已关闭自动选择难度等级，自动进入地下堡功能已禁用",
+    ["SCOREBOARD_ENABLED"] = "地下堡监控已启用，进入地下堡后自动显示监控面板",
+    ["SCOREBOARD_DISABLED"] = "地下堡监控功能已禁用",
+    ["TREASURE_MAP_ENABLED"] = "自动检测藏宝图功能已启用",
+    ["TREASURE_MAP_DISABLED"] = "自动检测藏宝图功能已禁用",
+    ["AUTO_ACTIVATE_ENABLED"] = "自动与NPC对话功能已启用",
+    ["AUTO_ACTIVATE_DISABLED"] = "自动与NPC对话功能已禁用",
+    ["AUTO_PET_CAGE_ENABLED"] = "自动打包战斗宠物功能已启用",
+    ["AUTO_PET_CAGE_DISABLED"] = "自动打包战斗宠物功能已禁用",
+    ["AUTO_TOKEN_EXCHANGE_ENABLED"] = "自动确认兑换纹章功能已启用，仅自动确认45低级纹章换15高级纹章。",
+    ["AUTO_TOKEN_EXCHANGE_DISABLED"] = "自动确认兑换纹章功能已禁用",
+    ["SPECIAL_DELVE_WARNING"] = "当前为特殊地下堡，自动进入已取消",
+    ["AUTO_ENTER_MESSAGE"] = "自动进入地下堡：%s（%d层）",
+    ["SELECT_DIFFICULTY_WARNING"] = "请先在设置中选择自动进入的难度等级",
+    ["TOKEN_EXCHANGE_CONFIRMED"] = "自动确认纹章兑换",
+    ["ADVANCED_TOKEN_WARNING"] = "你正在使用高级纹章兑换低级纹章，请谨慎操作！",
+    ["PET_CAGED"] = "已自动打包，请再次使用该宠物以加入宠物手册",
+    ["PET_NOT_FOUND"] = "未找到打包的战斗宠物，请手动打包",
+    ["PET_CAGE_ERROR"] = "宠物自动打包遇到未知错误，请手动打包",
+    ["NPC_MARKED"] = "已自动标记需救助的NPC",
+    ["BRANN_CONFIG_UPDATED"] = "布莱恩·铜须配置已更新",
+    ["MINIMAP_SHOWN"] = "小地图图标已显示",
+    ["MINIMAP_HIDDEN"] = "小地图图标已隐藏",
+    ["ADDON_DESCRIPTION"] = "|cff33ff99[便捷]|r地下堡",
+    ["TOOLTIP_LEFT_CLICK"] = "左键: 打开/关闭面板",
+    ["TOOLTIP_COMMAND"] = "宏命令: |cFFFFFF00/dfcndelve|r",
+    ["TOOLTIP_MINIMAP"] = "小地图图标: |cFFFFFF00/dfcndelve minimap on/off|r",
+    ["TOOLTIP_ESC"] = "面板打开时按ESC可关闭",
+    ["AUTO_ENTER_TOOLTIP"] = "自动进入地下堡",
+    ["AUTO_ENTER_TOOLTIP_DETAIL1"] = "靠近地下堡入口时，自动进入预设层数的地下堡",
+    ["AUTO_ENTER_TOOLTIP_DETAIL2"] = "速刷模式关闭时，离开地下堡不会马上再次进入（5S CD）",
+    ["FAST_EXIT_TOOLTIP"] = "速刷模式",
+    ["FAST_EXIT_TOOLTIP_DETAIL1"] = "退出地下堡后立刻进入地下堡（0S CD）",
+    ["FAST_EXIT_TOOLTIP_DETAIL2"] = "推荐仅在需要快速反复进出相同地下堡时才打开",
+    ["SCOREBOARD_TOOLTIP"] = "显示地下堡监控",
+    ["SCOREBOARD_TOOLTIP_DETAIL1"] = "进入地下堡后，会自动显示监控面板",
+    ["SCOREBOARD_TOOLTIP_DETAIL2"] = "面板的U/L标识锁定和未锁定状态,T为透明度调节",
+    ["SCOREBOARD_TOOLTIP_DETAIL3"] = "离开地下堡后，监控面板会自动关闭",
+    ["TREASURE_MAP_TOOLTIP"] = "自动检测藏宝图",
+    ["TREASURE_MAP_TOOLTIP_DETAIL1"] = "当获取到地下堡藏宝图后自动提醒使用",
+    ["TREASURE_MAP_TOOLTIP_DETAIL2"] = "非11层地下堡使用自动提醒地下堡层数错误",
+    ["AUTO_ACTIVATE_TOOLTIP"] = "自动与NPC对话",
+    ["AUTO_ACTIVATE_TOOLTIP_DETAIL1"] = "鼠标右键点击NPC或物品时",
+    ["AUTO_ACTIVATE_TOOLTIP_DETAIL2"] = "会自动选择对话项推动地下堡进程",
+    ["AUTO_PET_CAGE_TOOLTIP"] = "自动打包战斗宠物",
+    ["AUTO_PET_CAGE_TOOLTIP_DETAIL1"] = "可直接鼠标右键使用战斗小宠物",
+    ["AUTO_PET_CAGE_TOOLTIP_DETAIL2"] = "如果系统提示无法获取更多该类宠物，则自动打包该宠物",
+    ["AUTO_PET_CAGE_TOOLTIP_DETAIL3"] = "由于游戏限制，自动打包后仍需再次手动使用该宠物加入宠物手册",
+    ["AUTO_TOKEN_EXCHANGE_TOOLTIP"] = "自动确认兑换纹章",
+    ["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL1"] = "45个低级纹章兑换15个高级纹章自动确认",
+    ["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL2"] = "15个高级纹章兑换15个低级纹章提醒警告",
+    ["GOLDEN_CACHE_WARNING"] = "注意：鎏金纹章尚未全部拾取！",
+    ["TREASURE_BUFF_WRONG_LEVEL"] = "注意：藏宝图已激活，当前不是11层地下堡！",
+    ["TREASURE_MAP_REMINDER"] = "注意：请使用背包中的地下堡藏宝图！",
+    ["NGA_RECOMMENDED_STORY"] = "NGA地堡侠推荐故事",
+    ["NGA_RECOMMENDED_DETAIL"] = "本故事变种难度简单适合速刷",
+    ["BRANN_SAYS"] = "布莱恩·铜须说：",
+    ["BRANN_GOLDEN_CACHE_ALERT"] = "藏宝室里有鎏金纹章，你可瞅仔细啦！",
+    ["BRANN_TREASURE_WARNING"] = "清醒一点，老兄！这里不是十一层地下堡，你确认要在这里使用藏宝图吗？",
+    ["BRANN_TREASURE_REMINDER"] = "你包里是地下堡藏宝图吗？你可千万别忘记使用它。",
+    ["BRANN_FLASHING_DOOR"] = "闪烁之门？让我们赶紧去探索吧！",
+    ["BRANN_FOOTBOMB"] = "这真是好东西，炸弹足球！让我也来踢一脚。",
+    ["BRANN_GOLDEN_CREST"] = "鎏金纹章都进了你的背包，这下我就放心了。",
+    ["LEAVE_FOLLOWER_DIFFICULTY"] = "已自动退队离开破晨号（追随者难度）",
+    ["DRILL_TO_ANDERMORE"] = "已自动搭乘钻机前往安德麦",
+    ["DRILL_TO_NOISY_CAVERN"] = "已自动搭乘钻机前往喧鸣深窟",
+    ["DRILL_TO_ZULDAZAR"] = "已自动搭乘钻机前往祖达萨",
+    ["UNKNOWN_TREASURE"] = "未知珍玩",
+    ["RETRY_COUNT"] = "重试：%d/3",
+    ["ADDON_LOADED"] = "地下堡助手已加载",
+    ["ADDON_STATUS"] = "自动进入: %s | 难度等级: %s | 速刷模式: %s",
+    ["AUTO_NPC_INTERACTION"] = "自动与NPC对话: %s",
+    ["AUTO_SELECT_TREASURE"] = "自动选择珍玩宝藏：%s",
+    ["REFRESH_TIME"] = "7:00刷新",
+    ["CURRENT_DATE"] = "当前：%s",
+    ["UNKNOWN_ITEM"] = "未知物品",
+    ["UNKNOWN_DELVE"] = "未知地下堡",
+    ["SLASH_COMMAND"] = "/dfcndelve - 打开设置面板",
+    ["SLASH_MINIMAP_ON"] = "/dfcndelve minimap on - 显示小地图图标",
+    ["SLASH_MINIMAP_OFF"] = "/dfcndelve minimap off - 隐藏小地图图标",
+    ["MINIMAP_CHECKBOX"] = "显示小地图图标",
+    ["OPEN_SETTINGS"] = "打开助手设置面板",
+    ["CLOSE_SETTINGS"] = "关闭助手设置面板",
+    ["COMMAND_TIP"] = "宏命令: |cFFFFFF00/dfcndelve|r", 
+    ["DOWNLOAD_LABEL"] = "原始发布地址：",
+    ["COPY_TIP"] = "点击选中网址，按Ctrl+C复制",
+    ["TIME_FORMAT_COMPLETED_HMS"] = "%d:%02d:%02d（已完成）",
+    ["TIME_FORMAT_COMPLETED_MS"] = "%02d:%02d（已完成）",
+}
+
+DFCN_L_zhTW = {
     --This text has been translated by AI:DeepSeek
-    DFCNL["SCOREBOARD_TITLE"] = "探究記分板"
-    DFCNL["SCENARIO"] = "場景"
-    DFCNL["DIFFICULTY_LEVEL"] = "難度級別"
-    DFCNL["REMAINING_LIVES"] = "剩餘生命"
-    DFCNL["REMAINING_ENEMIES"] = "剩餘敵群"
-    DFCNL["TOTAL_TIME"] = "總用時"
-    DFCNL["FLASHING_DOOR"] = "閃爍大門"
-    DFCNL["BIGWIGS_FLASHING_DOOR_SPAWN"] = "閃爍大門在裡頭現形" 
-    DFCNL["BIGWIGS_FLASHING_DOOR_COMPLETE"] = "探究通關後出現"
-    DFCNL["FLASHING_DOOR_USED"] = "已使用"
-    DFCNL["BRANN_ROLE"] = "戰鬥角色"
-    DFCNL["COMBAT_TRINKET"] = "戰鬥珍品"
-    DFCNL["UTILITY_TRINKET"] = "通用珍品"
-    DFCNL["NOT_SET"] = "未設定"
-    DFCNL["MAP"] = "地圖"
-    DFCNL["DELVE"] = "探究"
-    DFCNL["SPECIAL_DELVE_NAME"] = "虛無剃刀庇護所"
-    DFCNL["STORY_VARIANT"] = "故事變化"
-    DFCNL["STORY_VARIANT_PATTERN"] = "故事變化：%s*(.+)"
-    DFCNL["GOLDEN_CREST_PATTERN"] = "鍍金.-紋章"
-    DFCNL["SPECIAL_FOOTBOMB_TREASURE"] = "受損的足球炸彈自動發射器"
-    DFCNL["UNKNOWN_MAP"] = "未知地圖"
-    DFCNL["UNKNOWN"] = "未知"
-    DFCNL["DELVE_SCENARIO_NAME"] = "探究"
-    DFCNL["BACKGROUND_TRANSPARENCY"] = "背景透明度"
-    DFCNL["CLICK_TO_EXIT"] = "點擊立刻離開探究"
-    DFCNL["BANK_STATUS"] = "銀行狀態"
-    DFCNL["BANK_AVAILABLE"] = "目前該角色可正常訪問戰隊銀行"
-    DFCNL["BANK_UNAVAILABLE"] = "目前該角色無法訪問戰隊銀行，請勿使用戰隊銀行技能！"
-    DFCNL["DWARVEN_MEDICINE"] = "矮人藥品"
-    DFCNL["STACKS"] = "層"
-    DFCNL["ENABLED"] = "開啟"
-    DFCNL["DISABLED"] = "關閉"
-    DFCNL["SETTINGS_TITLE"] = "助手設定"
-    DFCNL["AUTO_ENTER"] = "自動進入探究"
-    DFCNL["AUTO_ACTIVATE"] = "自動與NPC對話"
-    DFCNL["SHOW_SCOREBOARD"] = "顯示探究記分板"
-    DFCNL["TREASURE_MAP_ALERT"] = "自動檢測藏寶圖"
-    DFCNL["AUTO_PET_CAGE"] = "自動裝籠戰鬥寵物"
-    DFCNL["AUTO_TOKEN_EXCHANGE"] = "自動確認兌換紋章"
-    DFCNL["DIFFICULTY_LABEL"] = "難度："
-    DFCNL["FAST_EXIT_MODE"] = "速刷模式"
-    DFCNL["VIEW_MERCHANT"] = "查看探究商人"
-    DFCNL["VIEW_DELVE_INFO"] = "查看探究資訊"
-    DFCNL["CLOSE"] = "關閉"
-    DFCNL["DIFFICULTY_LEVEL_FORMAT"] = "難度 %d"
-    DFCNL["SPECIAL_DIFFICULTY_PATTERN"] = "級別%?"
-    DFCNL["SELECT_BUTTON_PATTERN"] = "選擇"
-    DFCNL["REMAINING_ENEMIES_PATTERN"] = "剩餘敵群"
-    DFCNL["ENCHANTED_ITEM_PATTERN"] = "附魔"
-    DFCNL["MATRIX_ITEM_PATTERN"] = "矩陣"
-    DFCNL["CREST_PATTERN"] = "紋章"
-    DFCNL["INFO"] = "資訊"
-    DFCNL["WARNING"] = "警告"
-    DFCNL["NOTICE"] = "注意"
-    DFCNL["SETTING_CHANGED"] = "設定修改"
-    DFCNL["AUTO_ENTER_ENABLED"] = "自動進入探究功能已啟用"
-    DFCNL["AUTO_ENTER_DISABLED"] = "自動進入探究功能已禁用"
-    DFCNL["FAST_EXIT_ENABLED"] = "速刷模式模式已啟用，現在進出探究無CD"
-    DFCNL["FAST_EXIT_DISABLED"] = "速刷模式已禁用，離開探究5秒後才再次觸發自動進入"
-    DFCNL["DIFFICULTY_SET"] = "已設定自動選擇難度級別為 %d"
-    DFCNL["DIFFICULTY_UNSET"] = "已關閉自動選擇難度級別，自動進入探究功能已禁用"
-    DFCNL["SCOREBOARD_ENABLED"] = "探究記分板已啟用，進入探究後自動顯示記分板"
-    DFCNL["SCOREBOARD_DISABLED"] = "探究記分板功能已禁用"
-    DFCNL["TREASURE_MAP_ENABLED"] = "自動檢測藏寶圖功能已啟用"
-    DFCNL["TREASURE_MAP_DISABLED"] = "自動檢測藏寶圖功能已禁用"
-    DFCNL["AUTO_ACTIVATE_ENABLED"] = "自動與NPC對話功能已啟用"
-    DFCNL["AUTO_ACTIVATE_DISABLED"] = "自動與NPC對話功能已禁用"
-    DFCNL["AUTO_PET_CAGE_ENABLED"] = "自動裝籠戰鬥寵物功能已啟用"
-    DFCNL["AUTO_PET_CAGE_DISABLED"] = "自動裝籠戰鬥寵物功能已禁用"
-    DFCNL["AUTO_TOKEN_EXCHANGE_ENABLED"] = "自動確認兌換紋章功能已啟用，僅自動確認45低級紋章換15高級紋章。"
-    DFCNL["AUTO_TOKEN_EXCHANGE_DISABLED"] = "自動確認兌換紋章功能已禁用"
-    DFCNL["SPECIAL_DELVE_WARNING"] = "目前為特殊探究，自動進入已取消"
-    DFCNL["AUTO_ENTER_MESSAGE"] = "自動進入探究：%s（級別%d）"
-    DFCNL["SELECT_DIFFICULTY_WARNING"] = "請先在設定中選擇自動進入的難度級別"
-    DFCNL["TOKEN_EXCHANGE_CONFIRMED"] = "自動確認紋章兌換"
-    DFCNL["ADVANCED_TOKEN_WARNING"] = "你正在使用高級紋章兌換低級紋章，請謹慎操作！"
-    DFCNL["PET_CAGED"] = "已自動裝籠，請再次使用該寵物以加入寵物手冊"
-    DFCNL["PET_NOT_FOUND"] = "未找到裝籠的戰鬥寵物，請手動裝籠"
-    DFCNL["PET_CAGE_ERROR"] = "寵物自動裝籠遇到未知錯誤，請手動裝籠"
-    DFCNL["NPC_MARKED"] = "已自動標記需救助的NPC"
-    DFCNL["BRANN_CONFIG_UPDATED"] = "布萊恩·銅鬚配置已更新"
-    DFCNL["MINIMAP_SHOWN"] = "小地圖圖標已顯示"
-    DFCNL["MINIMAP_HIDDEN"] = "小地圖圖標已隱藏"
-    DFCNL["ADDON_DESCRIPTION"] = "|cff33ff99[便捷]|r探究助手"
-    DFCNL["TOOLTIP_LEFT_CLICK"] = "左鍵: 打開/關閉設定面板"
-    DFCNL["TOOLTIP_COMMAND"] = "巨集指令: /dfcndelve"
-    DFCNL["TOOLTIP_MINIMAP"] = "小地圖圖標: /dfcndelve minimap on/off"
-    DFCNL["TOOLTIP_ESC"] = "面板打開時按ESC可關閉"
-    DFCNL["AUTO_ENTER_TOOLTIP"] = "自動進入探究"
-    DFCNL["AUTO_ENTER_TOOLTIP_DETAIL1"] = "靠近探究入口時，自動進入預設級別的探究"
-    DFCNL["AUTO_ENTER_TOOLTIP_DETAIL2"] = "速刷模式關閉時，離開探究不會馬上再次進入（5S CD）"
-    DFCNL["FAST_EXIT_TOOLTIP"] = "速刷模式"
-    DFCNL["FAST_EXIT_TOOLTIP_DETAIL1"] = "退出探究後立刻進入探究（0S CD）"
-    DFCNL["FAST_EXIT_TOOLTIP_DETAIL2"] = "推薦僅在需要快速反復進出相同探究時才打開"
-    DFCNL["SCOREBOARD_TOOLTIP"] = "顯示探究記分板"
-    DFCNL["SCOREBOARD_TOOLTIP_DETAIL1"] = "進入探究後，會自動顯示記分板"
-    DFCNL["SCOREBOARD_TOOLTIP_DETAIL2"] = "面板的U/L標識鎖定和未鎖定狀態T為透明度調節"
-    DFCNL["SCOREBOARD_TOOLTIP_DETAIL3"] = "離開探究後，記分板會自動關閉"
-    DFCNL["TREASURE_MAP_TOOLTIP"] = "自動檢測藏寶圖"
-    DFCNL["TREASURE_MAP_TOOLTIP_DETAIL1"] = "當獲取到探究藏寶圖後自動提醒使用"
-    DFCNL["TREASURE_MAP_TOOLTIP_DETAIL2"] = "非11級探究使用自動提醒探究級別錯誤"
-    DFCNL["AUTO_ACTIVATE_TOOLTIP"] = "自動與NPC對話"
-    DFCNL["AUTO_ACTIVATE_TOOLTIP_DETAIL1"] = "鼠標右鍵點擊NPC或物品時"
-    DFCNL["AUTO_ACTIVATE_TOOLTIP_DETAIL2"] = "會自動選擇對話項推動探究進程"
-    DFCNL["AUTO_PET_CAGE_TOOLTIP"] = "自動裝籠戰鬥寵物"
-    DFCNL["AUTO_PET_CAGE_TOOLTIP_DETAIL1"] = "可直接鼠標右鍵使用戰鬥小寵物"
-    DFCNL["AUTO_PET_CAGE_TOOLTIP_DETAIL2"] = "如果系統提示無法獲取更多該類寵物，則自動裝籠該寵物"
-    DFCNL["AUTO_PET_CAGE_TOOLTIP_DETAIL3"] = "由於遊戲限制，自動裝籠後仍需再次手動使用該寵物加入寵物手冊"
-    DFCNL["AUTO_TOKEN_EXCHANGE_TOOLTIP"] = "自動確認兌換紋章"
-    DFCNL["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL1"] = "45個低級紋章兌換15個高級紋章自動確認"
-    DFCNL["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL2"] = "15個高級紋章兌換15個低級紋章提醒警告"
-    DFCNL["GOLDEN_CACHE_WARNING"] = "注意：鎏金紋章尚未全部拾取！"
-    DFCNL["TREASURE_BUFF_WRONG_LEVEL"] = "注意：藏寶圖已激活，目前不是11級探究！"
-    DFCNL["TREASURE_MAP_REMINDER"] = "注意：請使用背包中的探究藏寶圖！"
-    DFCNL["NGA_RECOMMENDED_STORY"] = "NGA地堡俠推薦故事"
-    DFCNL["NGA_RECOMMENDED_DETAIL"] = "本故事變化難度簡單適合速刷"
-    DFCNL["BRANN_SAYS"] = "布萊恩·銅鬚說："
-    DFCNL["BRANN_GOLDEN_CACHE_ALERT"] = "藏寶室裡有鎏金紋章，你可瞅仔細啦！"
-    DFCNL["BRANN_TREASURE_WARNING"] = "清醒一點，老兄！這裡不是十一級探究，你確認要在這裡使用藏寶圖嗎？"
-    DFCNL["BRANN_TREASURE_REMINDER"] = "你包裡是探究藏寶圖嗎？你可千萬別忘記使用它。"
-    DFCNL["BRANN_FLASHING_DOOR"] = "閃爍之門？讓我們趕緊去探索吧！"
-    DFCNL["BRANN_FOOTBOMB"] = "這真是好東西，炸彈足球！讓我也來踢一腳。"
-    DFCNL["BRANN_GOLDEN_CREST"] = "鎏金紋章都進了你的背包，這下我就放心了。"
-    DFCNL["LEAVE_FOLLOWER_DIFFICULTY"] = "已自動退隊離開破晨號（追隨者難度）"
-    DFCNL["DRILL_TO_ANDERMORE"] = "已自動搭乘鑽機前往安德麥"
-    DFCNL["DRILL_TO_NOISY_CAVERN"] = "已自動搭乘鑽機前往喧鳴深窟"
-    DFCNL["DRILL_TO_ZULDAZAR"] = "已自動搭乘鑽機前往祖達薩"
-    DFCNL["UNKNOWN_TREASURE"] = "未知珍品"
-    DFCNL["RETRY_COUNT"] = "重試：%d/3"
-    DFCNL["ADDON_LOADED"] = "探究助手已加載"
-    DFCNL["ADDON_STATUS"] = "自動進入: %s | 難度級別: %s | 速刷模式: %s"
-    DFCNL["AUTO_NPC_INTERACTION"] = "自動與NPC對話: %s"
-    DFCNL["AUTO_SELECT_TREASURE"] = "自動選擇珍品寶藏：%s"
-    DFCNL["REFRESH_TIME"] = "7:00刷新"
-    DFCNL["CURRENT_DATE"] = "目前：%02d-%02d"
-    DFCNL["UNKNOWN_ITEM"] = "未知物品"
-    DFCNL["UNKNOWN_DELVE"] = "未知探究"
-    DFCNL["SLASH_COMMAND"] = "/dfcndelve - 打開設定面板"
-    DFCNL["SLASH_MINIMAP_ON"] = "/dfcndelve minimap on - 顯示小地圖圖標"
-    DFCNL["SLASH_MINIMAP_OFF"] = "/dfcndelve minimap off - 隱藏小地圖圖標"
-    DFCNL["MINIMAP_CHECKBOX"] = "顯示小地圖圖標"
-    DFCNL["OPEN_SETTINGS"] = "打開助手設定面板"
-    DFCNL["CLOSE_SETTINGS"] = "關閉助手設定面板"
-    DFCNL["COMMAND_TIP"] = "巨集指令: /dfcndelve"
-    DFCNL["DOWNLOAD_LABEL"] = "原始發布地址："
-    DFCNL["COPY_TIP"] = "點擊選中網址，按Ctrl+C複製"
-    DFCNL["TIME_FORMAT_COMPLETED_HMS"] = "%d:%02d:%02d（已完成）"
-    DFCNL["TIME_FORMAT_COMPLETED_MS"] = "%02d:%02d（已完成）";
-else
+    ["SCOREBOARD_TITLE"] = "探究記分板",
+    ["SCENARIO"] = "場景",
+    ["DIFFICULTY_LEVEL"] = "難度級別",
+    ["REMAINING_LIVES"] = "剩餘生命",
+    ["REMAINING_ENEMIES"] = "剩餘敵群",
+    ["TOTAL_TIME"] = "總用時",
+    ["FLASHING_DOOR"] = "閃爍大門",
+    ["BIGWIGS_FLASHING_DOOR_SPAWN"] = "閃爍大門在裡頭現形", 
+    ["BIGWIGS_FLASHING_DOOR_COMPLETE"] = "探究通關後出現",
+    ["FLASHING_DOOR_USED"] = "已使用",
+    ["BRANN_ROLE"] = "戰鬥角色",
+    ["COMBAT_TRINKET"] = "戰鬥珍品",
+    ["UTILITY_TRINKET"] = "通用珍品",
+    ["NOT_SET"] = "未設定",
+    ["MAP"] = "地圖",
+    ["DELVE"] = "探究",
+    ["SPECIAL_DELVE_NAME"] = "虛無剃刀庇護所",
+    ["STORY_VARIANT"] = "故事變化",
+    ["STORY_VARIANT_PATTERN"] = "故事變化：%s*(.+)",
+    ["GOLDEN_CREST_PATTERN"] = "鍍金.-紋章",
+    ["SPECIAL_FOOTBOMB_TREASURE"] = "受損的足球炸彈自動發射器",
+    ["UNKNOWN_MAP"] = "未知地圖",
+    ["UNKNOWN"] = "未知",
+    ["DELVE_SCENARIO_NAME"] = "探究",
+    ["BACKGROUND_TRANSPARENCY"] = "背景透明度",
+    ["CLICK_TO_EXIT"] = "點擊立刻離開探究",
+    ["BANK_STATUS"] = "銀行狀態",
+    ["BANK_AVAILABLE"] = "目前該角色可正常訪問戰隊銀行",
+    ["BANK_UNAVAILABLE"] = "目前該角色無法訪問戰隊銀行，請勿使用戰隊銀行技能！",
+    ["DWARVEN_MEDICINE"] = "矮人藥品",
+    ["STACKS"] = "層",
+    ["ENABLED"] = "開啟",
+    ["DISABLED"] = "關閉",
+    ["SETTINGS_TITLE"] = "助手設定",
+    ["AUTO_ENTER"] = "自動進入探究",
+    ["AUTO_ACTIVATE"] = "自動與NPC對話",
+    ["SHOW_SCOREBOARD"] = "顯示探究記分板",
+    ["TREASURE_MAP_ALERT"] = "自動檢測藏寶圖",
+    ["AUTO_PET_CAGE"] = "自動裝籠戰鬥寵物",
+    ["AUTO_TOKEN_EXCHANGE"] = "自動確認兌換紋章",
+    ["DIFFICULTY_LABEL"] = "難度：",
+    ["FAST_EXIT_MODE"] = "速刷模式",
+    ["VIEW_MERCHANT"] = "查看探究商人",
+    ["VIEW_DELVE_INFO"] = "查看探究資訊",
+    ["CLOSE"] = "關閉",
+    ["DIFFICULTY_LEVEL_FORMAT"] = "難度 %d",
+    ["SPECIAL_DIFFICULTY_PATTERN"] = "級別%?",
+    ["SELECT_BUTTON_PATTERN"] = "選擇",
+    ["REMAINING_ENEMIES_PATTERN"] = "剩餘敵群",
+    ["ENCHANTED_ITEM_PATTERN"] = "附魔",
+    ["MATRIX_ITEM_PATTERN"] = "矩陣",
+    ["CREST_PATTERN"] = "紋章",
+    ["INFO"] = "資訊",
+    ["WARNING"] = "警告",
+    ["NOTICE"] = "注意",
+    ["SETTING_CHANGED"] = "設定修改",
+    ["AUTO_ENTER_ENABLED"] = "自動進入探究功能已啟用",
+    ["AUTO_ENTER_DISABLED"] = "自動進入探究功能已禁用",
+    ["FAST_EXIT_ENABLED"] = "速刷模式模式已啟用，現在進出探究無CD",
+    ["FAST_EXIT_DISABLED"] = "速刷模式已禁用，離開探究5秒後才再次觸發自動進入",
+    ["DIFFICULTY_SET"] = "已設定自動選擇難度級別為 %d",
+    ["DIFFICULTY_UNSET"] = "已關閉自動選擇難度級別，自動進入探究功能已禁用",
+    ["SCOREBOARD_ENABLED"] = "探究記分板已啟用，進入探究後自動顯示記分板",
+    ["SCOREBOARD_DISABLED"] = "探究記分板功能已禁用",
+    ["TREASURE_MAP_ENABLED"] = "自動檢測藏寶圖功能已啟用",
+    ["TREASURE_MAP_DISABLED"] = "自動檢測藏寶圖功能已禁用",
+    ["AUTO_ACTIVATE_ENABLED"] = "自動與NPC對話功能已啟用",
+    ["AUTO_ACTIVATE_DISABLED"] = "自動與NPC對話功能已禁用",
+    ["AUTO_PET_CAGE_ENABLED"] = "自動裝籠戰鬥寵物功能已啟用",
+    ["AUTO_PET_CAGE_DISABLED"] = "自動裝籠戰鬥寵物功能已禁用",
+    ["AUTO_TOKEN_EXCHANGE_ENABLED"] = "自動確認兌換紋章功能已啟用，僅自動確認45低級紋章換15高級紋章。",
+    ["AUTO_TOKEN_EXCHANGE_DISABLED"] = "自動確認兌換紋章功能已禁用",
+    ["SPECIAL_DELVE_WARNING"] = "目前為特殊探究，自動進入已取消",
+    ["AUTO_ENTER_MESSAGE"] = "自動進入探究：%s（級別%d）",
+    ["SELECT_DIFFICULTY_WARNING"] = "請先在設定中選擇自動進入的難度級別",
+    ["TOKEN_EXCHANGE_CONFIRMED"] = "自動確認紋章兌換",
+    ["ADVANCED_TOKEN_WARNING"] = "你正在使用高級紋章兌換低級紋章，請謹慎操作！",
+    ["PET_CAGED"] = "已自動裝籠，請再次使用該寵物以加入寵物手冊",
+    ["PET_NOT_FOUND"] = "未找到裝籠的戰鬥寵物，請手動裝籠",
+    ["PET_CAGE_ERROR"] = "寵物自動裝籠遇到未知錯誤，請手動裝籠",
+    ["NPC_MARKED"] = "已自動標記需救助的NPC",
+    ["BRANN_CONFIG_UPDATED"] = "布萊恩·銅鬚配置已更新",
+    ["MINIMAP_SHOWN"] = "小地圖圖標已顯示",
+    ["MINIMAP_HIDDEN"] = "小地圖圖標已隱藏",
+    ["ADDON_DESCRIPTION"] = "|cff33ff99[便捷]|r探究助手",
+    ["TOOLTIP_LEFT_CLICK"] = "左鍵: 打開/關閉面板",
+    ["TOOLTIP_COMMAND"] = "巨集指令: |cFFFFFF00/dfcndelve|r",
+    ["TOOLTIP_MINIMAP"] = "小地圖圖標: |cFFFFFF00/dfcndelve minimap on/off|r",
+    ["TOOLTIP_ESC"] = "面板打開時按ESC可關閉",
+    ["AUTO_ENTER_TOOLTIP"] = "自動進入探究",
+    ["AUTO_ENTER_TOOLTIP_DETAIL1"] = "靠近探究入口時，自動進入預設級別的探究",
+    ["AUTO_ENTER_TOOLTIP_DETAIL2"] = "速刷模式關閉時，離開探究不會馬上再次進入（5S CD）",
+    ["FAST_EXIT_TOOLTIP"] = "速刷模式",
+    ["FAST_EXIT_TOOLTIP_DETAIL1"] = "退出探究後立刻進入探究（0S CD）",
+    ["FAST_EXIT_TOOLTIP_DETAIL2"] = "推薦僅在需要快速反復進出相同探究時才打開",
+    ["SCOREBOARD_TOOLTIP"] = "顯示探究記分板",
+    ["SCOREBOARD_TOOLTIP_DETAIL1"] = "進入探究後，會自動顯示記分板",
+    ["SCOREBOARD_TOOLTIP_DETAIL2"] = "面板的U/L標識鎖定和未鎖定狀態,T為透明度調節",
+    ["SCOREBOARD_TOOLTIP_DETAIL3"] = "離開探究後，記分板會自動關閉",
+    ["TREASURE_MAP_TOOLTIP"] = "自動檢測藏寶圖",
+    ["TREASURE_MAP_TOOLTIP_DETAIL1"] = "當獲取到探究藏寶圖後自動提醒使用",
+    ["TREASURE_MAP_TOOLTIP_DETAIL2"] = "非11級探究使用自動提醒探究級別錯誤",
+    ["AUTO_ACTIVATE_TOOLTIP"] = "自動與NPC對話",
+    ["AUTO_ACTIVATE_TOOLTIP_DETAIL1"] = "鼠標右鍵點擊NPC或物品時",
+    ["AUTO_ACTIVATE_TOOLTIP_DETAIL2"] = "會自動選擇對話項推動探究進程",
+    ["AUTO_PET_CAGE_TOOLTIP"] = "自動裝籠戰鬥寵物",
+    ["AUTO_PET_CAGE_TOOLTIP_DETAIL1"] = "可直接鼠標右鍵使用戰鬥小寵物",
+    ["AUTO_PET_CAGE_TOOLTIP_DETAIL2"] = "如果系統提示無法獲取更多該類寵物，則自動裝籠該寵物",
+    ["AUTO_PET_CAGE_TOOLTIP_DETAIL3"] = "由於遊戲限制，自動裝籠後仍需再次手動使用該寵物加入寵物手冊",
+    ["AUTO_TOKEN_EXCHANGE_TOOLTIP"] = "自動確認兌換紋章",
+    ["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL1"] = "45個低級紋章兌換15個高級紋章自動確認",
+    ["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL2"] = "15個高級紋章兌換15個低級紋章提醒警告",
+    ["GOLDEN_CACHE_WARNING"] = "注意：鎏金紋章尚未全部拾取！",
+    ["TREASURE_BUFF_WRONG_LEVEL"] = "注意：藏寶圖已激活，目前不是11級探究！",
+    ["TREASURE_MAP_REMINDER"] = "注意：請使用背包中的探究藏寶圖！",
+    ["NGA_RECOMMENDED_STORY"] = "NGA地堡俠推薦故事",
+    ["NGA_RECOMMENDED_DETAIL"] = "本故事變化難度簡單適合速刷",
+    ["BRANN_SAYS"] = "布萊恩·銅鬚說：",
+    ["BRANN_GOLDEN_CACHE_ALERT"] = "藏寶室裡有鎏金紋章，你可瞅仔細啦！",
+    ["BRANN_TREASURE_WARNING"] = "清醒一點，老兄！這裡不是十一級探究，你確認要在這裡使用藏寶圖嗎？",
+    ["BRANN_TREASURE_REMINDER"] = "你包裡是探究藏寶圖嗎？你可千萬別忘記使用它。",
+    ["BRANN_FLASHING_DOOR"] = "閃爍之門？讓我們趕緊去探索吧！",
+    ["BRANN_FOOTBOMB"] = "這真是好東西，炸彈足球！讓我也來踢一腳。",
+    ["BRANN_GOLDEN_CREST"] = "鎏金紋章都進了你的背包，這下我就放心了。",
+    ["LEAVE_FOLLOWER_DIFFICULTY"] = "已自動退隊離開破晨號（追隨者難度）",
+    ["DRILL_TO_ANDERMORE"] = "已自動搭乘鑽機前往安德麥",
+    ["DRILL_TO_NOISY_CAVERN"] = "已自動搭乘鑽機前往喧鳴深窟",
+    ["DRILL_TO_ZULDAZAR"] = "已自動搭乘鑽機前往祖達薩",
+    ["UNKNOWN_TREASURE"] = "未知珍品",
+    ["RETRY_COUNT"] = "重試：%d/3",
+    ["ADDON_LOADED"] = "探究助手已加載",
+    ["ADDON_STATUS"] = "自動進入: %s | 難度級別: %s | 速刷模式: %s",
+    ["AUTO_NPC_INTERACTION"] = "自動與NPC對話: %s",
+    ["AUTO_SELECT_TREASURE"] = "自動選擇珍品寶藏：%s",
+    ["REFRESH_TIME"] = "7:00刷新",
+    ["CURRENT_DATE"] = "目前：%s",
+    ["UNKNOWN_ITEM"] = "未知物品",
+    ["UNKNOWN_DELVE"] = "未知探究",
+    ["SLASH_COMMAND"] = "/dfcndelve - 打開設定面板",
+    ["SLASH_MINIMAP_ON"] = "/dfcndelve minimap on - 顯示小地圖圖標",
+    ["SLASH_MINIMAP_OFF"] = "/dfcndelve minimap off - 隱藏小地圖圖標",
+    ["MINIMAP_CHECKBOX"] = "顯示小地圖圖標",
+    ["OPEN_SETTINGS"] = "打開助手設定面板",
+    ["CLOSE_SETTINGS"] = "關閉助手設定面板",
+    ["COMMAND_TIP"] = "巨集指令: |cFFFFFF00/dfcndelve|r",
+    ["DOWNLOAD_LABEL"] = "原始發布地址：",
+    ["COPY_TIP"] = "點擊選中網址，按Ctrl+C複製",
+    ["TIME_FORMAT_COMPLETED_HMS"] = "%d:%02d:%02d（已完成）",
+    ["TIME_FORMAT_COMPLETED_MS"] = "%02d:%02d（已完成）",
+}
+
+DFCN_L_enUS = { 
     --This text has been translated by AI:DeepSeek
-    DFCNL["SCOREBOARD_TITLE"] = "Dashboard"
-    DFCNL["SCENARIO"] = "Scenario"
-    DFCNL["DIFFICULTY_LEVEL"] = "Tier"
-    DFCNL["REMAINING_LIVES"] = "Lives Remaining"
-    DFCNL["REMAINING_ENEMIES"] = "Enemy Groups"
-    DFCNL["TOTAL_TIME"] = "Total Time"
-    DFCNL["FLASHING_DOOR"] = "Flickergate"
-    DFCNL["BIGWIGS_FLASHING_DOOR_SPAWN"] = "A Flickergate Has Manifested Within"
-    DFCNL["BIGWIGS_FLASHING_DOOR_COMPLETE"] = "Flickering Spoils Will Manifest Upon Delve Completion"
-    DFCNL["FLASHING_DOOR_USED"] = "Used"
-    DFCNL["BRANN_ROLE"] = "Brann's Role"
-    DFCNL["COMBAT_TRINKET"] = "Combat Curio"
-    DFCNL["UTILITY_TRINKET"] = "Utility Curio"
-    DFCNL["NOT_SET"] = "Not Set"
-    DFCNL["MAP"] = "Map"
-    DFCNL["DELVE"] = "Delve"
-    DFCNL["SPECIAL_DELVE_NAME"] = "Voidrazor Sanctuary"
-    DFCNL["STORY_VARIANT"] = "Story Variant"
-    DFCNL["STORY_VARIANT_PATTERN"] = "Story Variant:%s*(.+)"
-    DFCNL["GOLDEN_CREST_PATTERN"] = "Gilded.-Crest"
-    DFCNL["SPECIAL_FOOTBOMB_TREASURE"] = "Damaged Automatic Footbomb Dispenser"
-    DFCNL["UNKNOWN_MAP"] = "Unknown Map"
-    DFCNL["UNKNOWN"] = "Unknown"
-    DFCNL["DELVE_SCENARIO_NAME"] = "Delves"
-    DFCNL["BACKGROUND_TRANSPARENCY"] = "Background Transparency"
-    DFCNL["CLICK_TO_EXIT"] = "Click to exit delve immediately"
-    DFCNL["BANK_STATUS"] = "Warband Bank Status"
-    DFCNL["BANK_AVAILABLE"] = "Warband Bank access available"
-    DFCNL["BANK_UNAVAILABLE"] = "Warband Bank unavailable - do not use Warband Bank skills!"
-    DFCNL["DWARVEN_MEDICINE"] = "Dwarven Medicine"
-    DFCNL["STACKS"] = "Stacks"
-    DFCNL["ENABLED"] = "Enabled"
-    DFCNL["DISABLED"] = "Disabled"
-    DFCNL["SETTINGS_TITLE"] = "Settings"
-    DFCNL["AUTO_ENTER"] = "Auto-Enter Delves"
-    DFCNL["AUTO_ACTIVATE"] = "Auto-Interact"
-    DFCNL["SHOW_SCOREBOARD"] = "Delves Dashboard"
-    DFCNL["TREASURE_MAP_ALERT"] = "Bounty Monitoring"
-    DFCNL["AUTO_PET_CAGE"] = "Auto-Cage Battle Pets"
-    DFCNL["AUTO_TOKEN_EXCHANGE"] = "Crest Conversion"
-    DFCNL["DIFFICULTY_LABEL"] = "Tier:"
-    DFCNL["FAST_EXIT_MODE"] = "Rush Mode"
-    DFCNL["VIEW_MERCHANT"] = "View Delves Merchant"
-    DFCNL["VIEW_DELVE_INFO"] = "View Delves Info"
-    DFCNL["CLOSE"] = "Close"
-    DFCNL["DIFFICULTY_LEVEL_FORMAT"] = "Tier %d"
-    DFCNL["SPECIAL_DIFFICULTY_PATTERN"] = "Tier %?"
-    DFCNL["SELECT_BUTTON_PATTERN"] = "Choose"
-    DFCNL["REMAINING_ENEMIES_PATTERN"] = "Enemy groups remaining"
-    DFCNL["ENCHANTED_ITEM_PATTERN"] = "Enchanted"
-    DFCNL["MATRIX_ITEM_PATTERN"] = "Matrix"
-    DFCNL["CREST_PATTERN"] = "Crest"
-    DFCNL["INFO"] = "Info"
-    DFCNL["WARNING"] = "Warning"
-    DFCNL["NOTICE"] = "Notice"
-    DFCNL["SETTING_CHANGED"] = "Setting Updated"
-    DFCNL["AUTO_ENTER_ENABLED"] = "Auto-enter delves enabled"
-    DFCNL["AUTO_ENTER_DISABLED"] = "Auto-enter delves disabled"
-    DFCNL["FAST_EXIT_ENABLED"] = "Rush Mode enabled: No cooldown when entering/exiting delve"
-    DFCNL["FAST_EXIT_DISABLED"] = "Rush Mode disabled: 5s cooldown before auto-reentering"
-    DFCNL["DIFFICULTY_SET"] = "Auto-select tier set to %d"
-    DFCNL["DIFFICULTY_UNSET"] = "Auto-select tier disabled - auto-enter disabled"
-    DFCNL["SCOREBOARD_ENABLED"] = "Delves dashboard enabled - will automatically show when entering delves"
-    DFCNL["SCOREBOARD_DISABLED"] = "Delves dashboard disabled"
-    DFCNL["TREASURE_MAP_ENABLED"] = "Bounty monitoring enabled"
-    DFCNL["TREASURE_MAP_DISABLED"] = "Bounty monitoring disabled"
-    DFCNL["AUTO_ACTIVATE_ENABLED"] = "Auto-interact enabled"
-    DFCNL["AUTO_ACTIVATE_DISABLED"] = "Auto-interact disabled"
-    DFCNL["AUTO_PET_CAGE_ENABLED"] = "Auto-cage battle pets enabled"
-    DFCNL["AUTO_PET_CAGE_DISABLED"] = "Auto-cage battle pets disabled"
-    DFCNL["AUTO_TOKEN_EXCHANGE_ENABLED"] = "Crest conversion enabled (45 low-level -> 15 high-level crests only)"
-    DFCNL["AUTO_TOKEN_EXCHANGE_DISABLED"] = "Crest conversion disabled"
-    DFCNL["SPECIAL_DELVE_WARNING"] = "Special delve detected - auto-enter cancelled"
-    DFCNL["AUTO_ENTER_MESSAGE"] = "Auto-entering: %s (Tier %d)"
-    DFCNL["SELECT_DIFFICULTY_WARNING"] = "Please set auto-enter tier in settings first"
-    DFCNL["TOKEN_EXCHANGE_CONFIRMED"] = "Crest exchange auto-confirmed"
-    DFCNL["ADVANCED_TOKEN_WARNING"] = "Warning: Exchanging advanced crests for lower-tier crests!"
-    DFCNL["PET_CAGED"] = "has been caged - use again to add to journal"
-    DFCNL["PET_NOT_FOUND"] = "Battle pet not found - please cage manually"
-    DFCNL["PET_CAGE_ERROR"] = "Auto-cage error - please cage manually"
-    DFCNL["NPC_MARKED"] = "Auto-marked rescue target"
-    DFCNL["BRANN_CONFIG_UPDATED"] = "Brann Bronzebeard configuration updated"
-    DFCNL["MINIMAP_SHOWN"] = "Minimap icon shown"
-    DFCNL["MINIMAP_HIDDEN"] = "Minimap icon hidden"
-    DFCNL["ADDON_DESCRIPTION"] = "Delves Helper"
-    DFCNL["TOOLTIP_LEFT_CLICK"] = "Left Click: Open/Close Settings"
-    DFCNL["TOOLTIP_COMMAND"] = "Macro: /dfcndelve"
-    DFCNL["TOOLTIP_MINIMAP"] = "Minimap: /dfcndelve minimap on/off"
-    DFCNL["TOOLTIP_ESC"] = "ESC: Close Panel"
-    DFCNL["AUTO_ENTER_TOOLTIP"] = "Auto-Enter Delves"
-    DFCNL["AUTO_ENTER_TOOLTIP_DETAIL1"] = "Automatically enter delves at preset tier when approaching entrance"
-    DFCNL["AUTO_ENTER_TOOLTIP_DETAIL2"] = "Without Rush Mode: 5s cooldown after leaving delve"
-    DFCNL["FAST_EXIT_TOOLTIP"] = "Rush Mode"
-    DFCNL["FAST_EXIT_TOOLTIP_DETAIL1"] = "Instantly re-enter delves after exiting (no cooldown)"
-    DFCNL["FAST_EXIT_TOOLTIP_DETAIL2"] = "Recommended for farming the same delve repeatedly"
-    DFCNL["SCOREBOARD_TOOLTIP"] = "Delves Dashboard"
-    DFCNL["SCOREBOARD_TOOLTIP_DETAIL1"] = "Show dashboard when entering delves"
-    DFCNL["SCOREBOARD_TOOLTIP_DETAIL2"] = "U/L: Lock/Unlock | T: Adjust transparency"
-    DFCNL["SCOREBOARD_TOOLTIP_DETAIL3"] = "Panel auto-closes when leaving delves"
-    DFCNL["TREASURE_MAP_TOOLTIP"] = "Bounty Monitoring"
-    DFCNL["TREASURE_MAP_TOOLTIP_DETAIL1"] = "Auto-remind to use Delver's Bounty when obtained"
-    DFCNL["TREASURE_MAP_TOOLTIP_DETAIL2"] = "Warn if used in non-Tier 11 delves"
-    DFCNL["AUTO_ACTIVATE_TOOLTIP"] = "Auto-Interact"
-    DFCNL["AUTO_ACTIVATE_TOOLTIP_DETAIL1"] = "When right-clicking NPCs or objects"
-    DFCNL["AUTO_ACTIVATE_TOOLTIP_DETAIL2"] = "Automatically select dialogue options to advance delve progress"
-    DFCNL["AUTO_PET_CAGE_TOOLTIP"] = "Auto-Cage Battle Pets"
-    DFCNL["AUTO_PET_CAGE_TOOLTIP_DETAIL1"] = "Right-click to use battle pets directly"
-    DFCNL["AUTO_PET_CAGE_TOOLTIP_DETAIL2"] = "Auto-cage pets when system indicates maximum capacity"
-    DFCNL["AUTO_PET_CAGE_TOOLTIP_DETAIL3"] = "Note: After auto-caging manually reuse pet to add to journal"
-    DFCNL["AUTO_TOKEN_EXCHANGE_TOOLTIP"] = "Crest Conversion"
-    DFCNL["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL1"] = "Auto-confirm 45 low-level -> 15 high-level crest exchange"
-    DFCNL["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL2"] = "Warns against exchanging 15 high-level -> 15 low-level crests"
-    DFCNL["GOLDEN_CACHE_WARNING"] = "Notice: Gilded Crests remaining!"
-    DFCNL["TREASURE_BUFF_WRONG_LEVEL"] = "Notice: Delver's Bounty active but this is not Tier 11!"
-    DFCNL["TREASURE_MAP_REMINDER"] = "Notice: Use the Delver's Bounty in your bags!"
-    DFCNL["NGA_RECOMMENDED_STORY"] = "NGACN Presents: Delves Defender's Picks"
-    DFCNL["NGA_RECOMMENDED_DETAIL"] = "Simple difficulty - ideal for speed running"
-    DFCNL["BRANN_SAYS"] = "Brann Bronzebeard says:"
-    DFCNL["BRANN_GOLDEN_CACHE_ALERT"] = " Gilded Crests in the treasure room! Keep your eyes peeled lad!"
-    DFCNL["BRANN_TREASURE_WARNING"] = " By my beard! This isn't Tier 11! You sure you want to waste that Delver's Bounty here?"
-    DFCNL["BRANN_TREASURE_REMINDER"] = " You've got a Delver's Bounty in your pack! Don't let it gather dust!"
-    DFCNL["BRANN_FLASHING_DOOR"] = " A Flickergate! Let's see where this leads quickly now!"
-    DFCNL["BRANN_FOOTBOMB"] = " By my beard! Only goblins would make football explosive! Magnificent! Let me have a boot at it!"
-    DFCNL["BRANN_GOLDEN_CREST"] = " All Gilded Crests accounted for! That's a weight off my mind."
-    DFCNL["LEAVE_FOLLOWER_DIFFICULTY"] = "Auto-left party and The Dawnbreaker (Follower Dungeons)"
-    DFCNL["DRILL_TO_ANDERMORE"] = "Took drill to Undermine"
-    DFCNL["DRILL_TO_NOISY_CAVERN"] = "Took drill to Ringing Deeps"
-    DFCNL["DRILL_TO_ZULDAZAR"] = "Took drill to Zuldazar"
-    DFCNL["UNKNOWN_TREASURE"] = "Unknown Treasure"
-    DFCNL["RETRY_COUNT"] = "Retry: %d/3"
-    DFCNL["ADDON_LOADED"] = "Delves Helper loaded"
-    DFCNL["ADDON_STATUS"] = "Auto-Enter: %s | Tier: %s | Rush Mode: %s"
-    DFCNL["AUTO_NPC_INTERACTION"] = "Auto NPC interaction: %s"
-    DFCNL["AUTO_SELECT_TREASURE"] = "Auto select treasure: %s"
-    DFCNL["REFRESH_TIME"] = "7:00 reset"
-    DFCNL["CURRENT_DATE"] = "Current: %02d-%02d"
-    DFCNL["UNKNOWN_ITEM"] = "Unknown Item"
-    DFCNL["UNKNOWN_DELVE"] = "Unknown Delve"
-    DFCNL["SLASH_COMMAND"] = "/dfcndelve - Open settings"
-    DFCNL["SLASH_MINIMAP_ON"] = "/dfcndelve minimap on - Show minimap icon"
-    DFCNL["SLASH_MINIMAP_OFF"] = "/dfcndelve minimap off - Hide minimap icon"
-    DFCNL["MINIMAP_CHECKBOX"] = "Show Minimap Icon"
-    DFCNL["OPEN_SETTINGS"] = "Open Settings"
-    DFCNL["CLOSE_SETTINGS"] = "Close Settings"
-    DFCNL["COMMAND_TIP"] = "Macro: /dfcndelve"
-    DFCNL["DOWNLOAD_LABEL"] = "Original Release:"
-    DFCNL["COPY_TIP"] = "Click to select Ctrl+C to copy"
-    DFCNL["TIME_FORMAT_COMPLETED_HMS"] = "%d:%02d:%02d (Completed)"
-    DFCNL["TIME_FORMAT_COMPLETED_MS"] = "%02d:%02d (Completed)";
-end
-local DFCN =  {
-    version = "1.65",
+    ["SCOREBOARD_TITLE"] = "Dashboard",
+    ["SCENARIO"] = "Scenario",
+    ["DIFFICULTY_LEVEL"] = "Tier",
+    ["REMAINING_LIVES"] = "Lives Remaining",
+    ["REMAINING_ENEMIES"] = "Enemy Groups",
+    ["TOTAL_TIME"] = "Total Time",
+    ["FLASHING_DOOR"] = "Flickergate",
+    ["BIGWIGS_FLASHING_DOOR_SPAWN"] = "A Flickergate Has Manifested Within",
+    ["BIGWIGS_FLASHING_DOOR_COMPLETE"] = "Flickering Spoils Will Manifest Upon Delve Completion",
+    ["FLASHING_DOOR_USED"] = "Used",
+    ["BRANN_ROLE"] = "Brann's Role",
+    ["COMBAT_TRINKET"] = "Combat Curio",
+    ["UTILITY_TRINKET"] = "Utility Curio",
+    ["NOT_SET"] = "Not Set",
+    ["MAP"] = "Map",
+    ["DELVE"] = "Delve",
+    ["SPECIAL_DELVE_NAME"] = "Voidrazor Sanctuary",
+    ["STORY_VARIANT"] = "Story Variant",
+    ["STORY_VARIANT_PATTERN"] = "Story Variant:%s*(.+)",
+    ["GOLDEN_CREST_PATTERN"] = "Gilded.-Crest",
+    ["SPECIAL_FOOTBOMB_TREASURE"] = "Damaged Automatic Footbomb Dispenser",
+    ["UNKNOWN_MAP"] = "Unknown Map",
+    ["UNKNOWN"] = "Unknown",
+    ["DELVE_SCENARIO_NAME"] = "Delves",
+    ["BACKGROUND_TRANSPARENCY"] = "Background Transparency",
+    ["CLICK_TO_EXIT"] = "Click to exit delve immediately",
+    ["BANK_STATUS"] = "Warband Bank Status",
+    ["BANK_AVAILABLE"] = "Warband Bank access available",
+    ["BANK_UNAVAILABLE"] = "Warband Bank unavailable - do not use Warband Bank skills!",
+    ["DWARVEN_MEDICINE"] = "Dwarven Medicine",
+    ["STACKS"] = "Stacks",
+    ["ENABLED"] = "Enabled",
+    ["DISABLED"] = "Disabled",
+    ["SETTINGS_TITLE"] = "Settings",
+    ["AUTO_ENTER"] = "Auto-Enter Delves",
+    ["AUTO_ACTIVATE"] = "Auto-Interact",
+    ["SHOW_SCOREBOARD"] = "Delves Dashboard",
+    ["TREASURE_MAP_ALERT"] = "Bounty Monitoring",
+    ["AUTO_PET_CAGE"] = "Auto-Cage Battle Pets",
+    ["AUTO_TOKEN_EXCHANGE"] = "Crest Conversion",
+    ["DIFFICULTY_LABEL"] = "Tier:",
+    ["FAST_EXIT_MODE"] = "Rush Mode",
+    ["VIEW_MERCHANT"] = "View Delves Merchant",
+    ["VIEW_DELVE_INFO"] = "View Delves Info",
+    ["CLOSE"] = "Close",
+    ["DIFFICULTY_LEVEL_FORMAT"] = "Tier %d",
+    ["SPECIAL_DIFFICULTY_PATTERN"] = "Tier %?",
+    ["SELECT_BUTTON_PATTERN"] = "Choose",
+    ["REMAINING_ENEMIES_PATTERN"] = "Enemy groups remaining",
+    ["ENCHANTED_ITEM_PATTERN"] = "Enchanted",
+    ["MATRIX_ITEM_PATTERN"] = "Matrix",
+    ["CREST_PATTERN"] = "Crest",
+    ["INFO"] = "Info",
+    ["WARNING"] = "Warning",
+    ["NOTICE"] = "Notice",
+    ["SETTING_CHANGED"] = "Setting Updated",
+    ["AUTO_ENTER_ENABLED"] = "Auto-enter delves enabled",
+    ["AUTO_ENTER_DISABLED"] = "Auto-enter delves disabled",
+    ["FAST_EXIT_ENABLED"] = "Rush Mode enabled: No cooldown when entering/exiting delve",
+    ["FAST_EXIT_DISABLED"] = "Rush Mode disabled: 5s cooldown before auto-reentering",
+    ["DIFFICULTY_SET"] = "Auto-select tier set to %d",
+    ["DIFFICULTY_UNSET"] = "Auto-select tier disabled - auto-enter disabled",
+    ["SCOREBOARD_ENABLED"] = "Delves dashboard enabled - will automatically show when entering delves",
+    ["SCOREBOARD_DISABLED"] = "Delves dashboard disabled",
+    ["TREASURE_MAP_ENABLED"] = "Bounty monitoring enabled",
+    ["TREASURE_MAP_DISABLED"] = "Bounty monitoring disabled",
+    ["AUTO_ACTIVATE_ENABLED"] = "Auto-interact enabled",
+    ["AUTO_ACTIVATE_DISABLED"] = "Auto-interact disabled",
+    ["AUTO_PET_CAGE_ENABLED"] = "Auto-cage battle pets enabled",
+    ["AUTO_PET_CAGE_DISABLED"] = "Auto-cage battle pets disabled",
+    ["AUTO_TOKEN_EXCHANGE_ENABLED"] = "Crest conversion enabled (45 low-level -> 15 high-level crests only)",
+    ["AUTO_TOKEN_EXCHANGE_DISABLED"] = "Crest conversion disabled",
+    ["SPECIAL_DELVE_WARNING"] = "Special delve detected - auto-enter cancelled",
+    ["AUTO_ENTER_MESSAGE"] = "Auto-entering: %s (Tier %d)",
+    ["SELECT_DIFFICULTY_WARNING"] = "Please set auto-enter tier in settings first",
+    ["TOKEN_EXCHANGE_CONFIRMED"] = "Crest exchange auto-confirmed",
+    ["ADVANCED_TOKEN_WARNING"] = "Warning: Exchanging advanced crests for lower-tier crests!",
+    ["PET_CAGED"] = "has been caged - use again to add to journal",
+    ["PET_NOT_FOUND"] = "Battle pet not found - please cage manually",
+    ["PET_CAGE_ERROR"] = "Auto-cage error - please cage manually",
+    ["NPC_MARKED"] = "Auto-marked rescue target",
+    ["BRANN_CONFIG_UPDATED"] = "Brann Bronzebeard configuration updated",
+    ["MINIMAP_SHOWN"] = "Minimap icon shown",
+    ["MINIMAP_HIDDEN"] = "Minimap icon hidden",
+    ["ADDON_DESCRIPTION"] = "Delves Helper",
+    ["TOOLTIP_LEFT_CLICK"] = "Left Click: Open/Close Settings",
+    ["TOOLTIP_COMMAND"] = "Macro: |cFFFFFF00/dfcndelve|r",
+    ["TOOLTIP_MINIMAP"] = "Minimap icon: |cFFFFFF00/dfcndelve minimap on/off|r",
+    ["TOOLTIP_ESC"] = "ESC: Close Panel",
+    ["AUTO_ENTER_TOOLTIP"] = "Auto-Enter Delves",
+    ["AUTO_ENTER_TOOLTIP_DETAIL1"] = "Automatically enter delves at preset tier when approaching entrance",
+    ["AUTO_ENTER_TOOLTIP_DETAIL2"] = "Without Rush Mode: 5s cooldown after leaving delve",
+    ["FAST_EXIT_TOOLTIP"] = "Rush Mode",
+    ["FAST_EXIT_TOOLTIP_DETAIL1"] = "Instantly re-enter delves after exiting (no cooldown)",
+    ["FAST_EXIT_TOOLTIP_DETAIL2"] = "Recommended for farming the same delve repeatedly",
+    ["SCOREBOARD_TOOLTIP"] = "Delves Dashboard",
+    ["SCOREBOARD_TOOLTIP_DETAIL1"] = "Show dashboard when entering delves",
+    ["SCOREBOARD_TOOLTIP_DETAIL2"] = "U/L: Lock/Unlock | T: Adjust transparency",
+    ["SCOREBOARD_TOOLTIP_DETAIL3"] = "Panel auto-closes when leaving delves",
+    ["TREASURE_MAP_TOOLTIP"] = "Bounty Monitoring",
+    ["TREASURE_MAP_TOOLTIP_DETAIL1"] = "Auto-remind to use Delver's Bounty when obtained",
+    ["TREASURE_MAP_TOOLTIP_DETAIL2"] = "Warn if used in non-Tier 11 delves",
+    ["AUTO_ACTIVATE_TOOLTIP"] = "Auto-Interact",
+    ["AUTO_ACTIVATE_TOOLTIP_DETAIL1"] = "When right-clicking NPCs or objects",
+    ["AUTO_ACTIVATE_TOOLTIP_DETAIL2"] = "Automatically select dialogue options to advance delve progress",
+    ["AUTO_PET_CAGE_TOOLTIP"] = "Auto-Cage Battle Pets",
+    ["AUTO_PET_CAGE_TOOLTIP_DETAIL1"] = "Right-click to use battle pets directly",
+    ["AUTO_PET_CAGE_TOOLTIP_DETAIL2"] = "Auto-cage pets when system indicates maximum capacity",
+    ["AUTO_PET_CAGE_TOOLTIP_DETAIL3"] = "Note: After auto-caging, manually reuse pet to add to journal",
+    ["AUTO_TOKEN_EXCHANGE_TOOLTIP"] = "Crest Conversion",
+    ["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL1"] = "Auto-confirm 45 low-level -> 15 high-level crest exchange",
+    ["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL2"] = "Warns against exchanging 15 high-level -> 15 low-level crests",
+    ["GOLDEN_CACHE_WARNING"] = "Notice: Gilded Crests remaining!",
+    ["TREASURE_BUFF_WRONG_LEVEL"] = "Notice: Delver's Bounty active, but this is not Tier 11!",
+    ["TREASURE_MAP_REMINDER"] = "Notice: Use the Delver's Bounty in your bags!",
+    ["NGA_RECOMMENDED_STORY"] = "NGACN Presents: Delves Defender's Picks",
+    ["NGA_RECOMMENDED_DETAIL"] = "Simple difficulty - ideal for speed running",
+    ["BRANN_SAYS"] = "Brann Bronzebeard says:",
+    ["BRANN_GOLDEN_CACHE_ALERT"] = " Gilded Crests in the treasure room! Keep your eyes peeled, lad!",
+    ["BRANN_TREASURE_WARNING"] = " By my beard! This isn't Tier 11! You sure you want to waste that Delver's Bounty here?",
+    ["BRANN_TREASURE_REMINDER"] = " You've got a Delver's Bounty in your pack! Don't let it gather dust!",
+    ["BRANN_FLASHING_DOOR"] = " A Flickergate! Let's see where this leads, quickly now!",
+    ["BRANN_FOOTBOMB"] = " By my beard! Only goblins would make football explosive! Magnificent! Let me have a boot at it!",
+    ["BRANN_GOLDEN_CREST"] = " All Gilded Crests accounted for! That's a weight off my mind.",
+    ["LEAVE_FOLLOWER_DIFFICULTY"] = "Auto-left party and The Dawnbreaker (Follower Dungeons)",
+    ["DRILL_TO_ANDERMORE"] = "Took drill to Undermine",
+    ["DRILL_TO_NOISY_CAVERN"] = "Took drill to Ringing Deeps",
+    ["DRILL_TO_ZULDAZAR"] = "Took drill to Zuldazar",
+    ["UNKNOWN_TREASURE"] = "Unknown Treasure",
+    ["RETRY_COUNT"] = "Retry: %d/3",
+    ["ADDON_LOADED"] = "Delves Helper loaded",
+    ["ADDON_STATUS"] = "Auto-Enter: %s | Tier: %s | Rush Mode: %s",
+    ["AUTO_NPC_INTERACTION"] = "Auto NPC interaction: %s",
+    ["AUTO_SELECT_TREASURE"] = "Auto select treasure: %s",
+    ["REFRESH_TIME"] = "7:00 reset",
+    ["CURRENT_DATE"] = "Current: %s",
+    ["UNKNOWN_ITEM"] = "Unknown Item",
+    ["UNKNOWN_DELVE"] = "Unknown Delve",
+    ["SLASH_COMMAND"] = "/dfcndelve - Open settings",
+    ["SLASH_MINIMAP_ON"] = "/dfcndelve minimap on - Show minimap icon",
+    ["SLASH_MINIMAP_OFF"] = "/dfcndelve minimap off - Hide minimap icon",
+    ["MINIMAP_CHECKBOX"] = "Show Minimap Icon",
+    ["OPEN_SETTINGS"] = "Open Settings",
+    ["CLOSE_SETTINGS"] = "Close Settings",
+    ["COMMAND_TIP"] = "Macro: |cFFFFFF00/dfcndelve|r",
+    ["DOWNLOAD_LABEL"] = "Original Release:",
+    ["COPY_TIP"] = "Click to select, Ctrl+C to copy",
+    ["TIME_FORMAT_COMPLETED_HMS"] = "%d:%02d:%02d (Completed)",
+    ["TIME_FORMAT_COMPLETED_MS"] = "%02d:%02d (Completed)",
+}
+
+local DFCN = {
+    version = "1.66",
     scoreboardUpdateTimer = nil,
     isAbundant = nil,
     delveTimer = nil,
@@ -482,9 +487,6 @@ local DFCN =  {
     goldenPickupCount = 0,
     requireTwoPickups = false,
     brannConfigID = nil,
-    targetNPCs = {219718},
-    mouseoverFrame = nil,
-    lastUsedMark = 0,
 }
 
 DFCN_DelveHelperDB = DFCN_DelveHelperDB or {
@@ -507,49 +509,65 @@ DFCN_DelveHelperDB = DFCN_DelveHelperDB or {
     autoPetCage = true,
 }
 
+local locale = GetLocale()
+local L
+if locale == "zhCN" then
+    L = DFCN_L_zhCN or {}
+elseif locale == "zhTW" then
+    L = DFCN_L_zhTW or {}
+else
+    L = DFCN_L_enUS or {}
+end
+setmetatable(L, {
+    __index = function(self, key)
+        return "[" .. key .. "]"
+    end
+})
+
 local AUTO_CONFIRM_NPC_IDS = {
     [223594] = {
         gossipOptionID = 124142,
         checkInstance = true,
         difficultyID = 205,
         leaveParty = true,
-        printText = string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[%s] %s|r", DFCNL["INFO"], DFCNL["LEAVE_FOLLOWER_DIFFICULTY"])
+        printText = string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[%s] %s|r", L["INFO"], L["LEAVE_FOLLOWER_DIFFICULTY"])
     },
     [229022] = {
         gossipOptionID = 125434,
         checkInstance = false,
-        printText = string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[%s] %s|r", DFCNL["INFO"], DFCNL["DRILL_TO_ANDERMORE"])
+        printText = string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[%s] %s|r", L["INFO"], L["DRILL_TO_ANDERMORE"])
     },
     [233626] = {
         gossipOptionID = 125433,
         checkInstance = false,
-        printText = string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[%s] %s|r", DFCNL["INFO"], DFCNL["DRILL_TO_NOISY_CAVERN"])
+        printText = string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[%s] %s|r", L["INFO"], L["DRILL_TO_NOISY_CAVERN"])
     },
     [233719] = {
         gossipOptionID = 125429,
         checkInstance = false,
-        printText = string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[%s] %s|r", DFCNL["INFO"], DFCNL["DRILL_TO_ANDERMORE"])
+        printText = string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[%s] %s|r", L["INFO"], L["DRILL_TO_ANDERMORE"])
     },
     [233625] = {
         gossipOptionID = 125409,
         checkInstance = false,
-        printText = string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[%s] %s|r", DFCNL["INFO"], DFCNL["DRILL_TO_ZULDAZAR"])
+        printText = string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[%s] %s|r", L["INFO"], L["DRILL_TO_ZULDAZAR"])
     }
 }
 
+local HERO = "::::::::80:66::110:4:6652:13444:1589:10255:1:28:2462:::::"
 local MERCHANT_ITEMS = {
-    {itemID = 238386, schedule = {2, 3}, offset = 0, suffix = "::::::::80:66::110:4:6652:12355:1582:10255:1:28:2462:::::"},
-    {itemID = 238390, schedule = {2, 3}, offset = 2, suffix = "::::::::80:66::110:4:6652:12355:1582:10255:1:28:2462:::::"},
-    {itemID = 240213, schedule = {3, 2}, offset = 1, suffix = "::::::::80:66::110:4:6652:12355:3239:10255:1:28:2462:::::"},
-    {itemID = 242867, schedule = {3, 2}, offset = 1, suffix = "::::::::80:66::110:4:6652:12355:1572:10255:1:28:2462:::::"},
-    {itemID = 246824, schedule = {1}, offset = 0, suffix = "::::::::80:66::110:4:6652:12355:1572:10255:1:28:2462:::::"},
-    {itemID = 246825, schedule = {1}, offset = 0, suffix = "::::::::80:66::110:4:6652:12355:1572:10255:1:28:2462:::::"},
-    {itemID = 246939, schedule = {3, 2}, offset = 0, suffix = "::::::::80:66::110:4:6652:12355:1572:10255:1:28:2462:::::"},
-    {itemID = 246940, schedule = {3, 2}, offset = 1, suffix = "::::::::80:66::110:4:6652:12355:1572:10255:1:28:2462:::::"},
-    {itemID = 246941, schedule = {3, 2}, offset = 0, suffix = "::::::::80:66::110:4:6652:12355:1572:10255:1:28:2462:::::"},
-    {itemID = 246944, schedule = {3, 2}, offset = 0, suffix = "::::::::80:66::110:4:6652:12355:1572:10255:1:28:2462:::::"},
-    {itemID = 246945, schedule = {2, 3}, offset = 1, suffix = "::::::::80:66::110:4:6652:12355:1572:10255:1:28:2462:::::"},
-    {itemID = 246947, schedule = {3, 2}, offset = 0, suffix = "::::::::80:66::110:4:6652:12355:1572:10255:1:28:2462:::::"}
+    {itemID = 238386, schedule = {2, 3}, offset = 0, suffix = HERO},
+    {itemID = 238390, schedule = {2, 3}, offset = 2, suffix = HERO},
+    {itemID = 240213, schedule = {3, 2}, offset = 1, suffix = HERO},
+    {itemID = 242867, schedule = {3, 2}, offset = 1, suffix = HERO},
+    {itemID = 246824, schedule = {1}, offset = 0, suffix = HERO},
+    {itemID = 246825, schedule = {1}, offset = 0, suffix = HERO},
+    {itemID = 246939, schedule = {3, 2}, offset = 0, suffix = HERO},
+    {itemID = 246940, schedule = {3, 2}, offset = 1, suffix = HERO},
+    {itemID = 246941, schedule = {3, 2}, offset = 0, suffix = HERO},
+    {itemID = 246944, schedule = {3, 2}, offset = 0, suffix = HERO},
+    {itemID = 246945, schedule = {2, 3}, offset = 1, suffix = HERO},
+    {itemID = 246947, schedule = {3, 2}, offset = 0, suffix = HERO}
 }
 
 local function GetLocalizedDate(day, month)
@@ -563,7 +581,7 @@ end
 
 local function IsInDelvesScenario()
     local scenarioName = select(1, C_Scenario.GetInfo())
-    return scenarioName == DFCNL["DELVE_SCENARIO_NAME"]
+    return scenarioName == L["DELVE_SCENARIO_NAME"]
 end
 
 local function GetCharacterKey()
@@ -588,7 +606,7 @@ function DFCN.GetGoldenCacheStatus()
 end
 
 function DFCN.BrannSay(message)
-    local fullMessage = DFCNL["BRANN_SAYS"] .. message
+    local fullMessage = L["BRANN_SAYS"] .. message
     local color = { r = 1.0, g = 1.0, b = 0.62 }
     DEFAULT_CHAT_FRAME:AddMessage(fullMessage, color.r, color.g, color.b)
 end
@@ -641,7 +659,7 @@ function DFCN.ShowGoldenCacheAlert()
         
         alert.text = alert:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
         alert.text:SetPoint("CENTER")
-        alert.text:SetText("|T5872049:14:14|t |cFFFF0000" .. DFCNL["GOLDEN_CACHE_WARNING"] .. "|r")
+        alert.text:SetText("|T5872049:14:14|t |cFFFF0000" .. L["GOLDEN_CACHE_WARNING"] .. "|r")
         
         alert:Hide()
         DFCN.goldenCacheAlert = alert
@@ -652,7 +670,7 @@ function DFCN.ShowGoldenCacheAlert()
             DFCN.goldenCacheAlertTimer = C_Timer.NewTimer(12, function()
                 DFCN.goldenCacheAlertTimer = nil
                 DFCN.PlayCustomSound("goldenCacheAlert.ogg")
-                DFCN.BrannSay(DFCNL["BRANN_GOLDEN_CACHE_ALERT"])
+                DFCN.BrannSay(L["BRANN_GOLDEN_CACHE_ALERT"])
             end)
         end
     end
@@ -746,13 +764,13 @@ local function FormatTime(seconds, completed)
     
     if hours > 0 then
         if completed then
-            return format(DFCNL["TIME_FORMAT_COMPLETED_HMS"], hours, minutes, seconds)
+            return format(L["TIME_FORMAT_COMPLETED_HMS"], hours, minutes, seconds)
         else
             return format("%d:%02d:%02d", hours, minutes, seconds)
         end
     else
         if completed then
-            return format(DFCNL["TIME_FORMAT_COMPLETED_MS"], minutes, seconds)
+            return format(L["TIME_FORMAT_COMPLETED_MS"], minutes, seconds)
         else
             return format("%02d:%02d", minutes, seconds)
         end
@@ -774,7 +792,7 @@ local function GetDelveInfo()
     end
     
     local delveName = info.headerText
-    local isSpecialDelve = delveName == DFCNL["SPECIAL_DELVE_NAME"]
+    local isSpecialDelve = delveName == L["SPECIAL_DELVE_NAME"]
     
     local isAbundant = false
     if info.spells then
@@ -813,11 +831,11 @@ function DFCN.UpdateBankIconVisibility()
     if isBankAvailable then
         DFCN.scoreboardFrame.bankIcon.icon:SetTexture("Interface\\MINIMAP\\TRACKING\\Banker")
         DFCN.scoreboardFrame.bankIcon:Show()
-        DFCN.scoreboardFrame.bankIcon.tooltipText = "|cFF00FF00" .. DFCNL["BANK_AVAILABLE"] .. "|r"
+        DFCN.scoreboardFrame.bankIcon.tooltipText = "|cFF00FF00" .. L["BANK_AVAILABLE"] .. "|r"
     else
         DFCN.scoreboardFrame.bankIcon.icon:SetTexture("Interface\\Common\\Icon-noloot")
         DFCN.scoreboardFrame.bankIcon:Show()
-        DFCN.scoreboardFrame.bankIcon.tooltipText = "|cFFFF0000" .. DFCNL["BANK_UNAVAILABLE"] .. "|r"
+        DFCN.scoreboardFrame.bankIcon.tooltipText = "|cFFFF0000" .. L["BANK_UNAVAILABLE"] .. "|r"
     end
 end
 
@@ -878,7 +896,7 @@ function DFCN.CreateScoreboard()
     frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     frame.title:SetPoint("TOP", 0, -15)
 	frame.title:SetFont(GameFontNormal:GetFont(), 16)
-    frame.title:SetText(DFCNL["SCOREBOARD_TITLE"])
+    frame.title:SetText(L["SCOREBOARD_TITLE"])
     frame.title:SetTextColor(0.95, 0.95, 0.32)
     
     frame.lockBtn = CreateFrame("Button", nil, frame)
@@ -941,7 +959,7 @@ function DFCN.CreateScoreboard()
     
     frame.bgAlphaSlider.Low:SetText("0")
     frame.bgAlphaSlider.High:SetText("1")
-    frame.bgAlphaSlider.Text:SetText(DFCNL["BACKGROUND_TRANSPARENCY"])
+    frame.bgAlphaSlider.Text:SetText(L["BACKGROUND_TRANSPARENCY"])
     
     frame.transparencyBtn:SetScript("OnClick", function()
         if frame.bgAlphaSlider:IsShown() then
@@ -973,7 +991,7 @@ function DFCN.CreateScoreboard()
     frame.exitBtn.icon:SetAllPoints()
     frame.exitBtn.icon:SetTexture("interface\\vehicles\\ui-vehicles-button-exit-up")    
     frame.exitBtn.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-    frame.exitBtn.tooltipText = DFCNL["CLICK_TO_EXIT"]
+    frame.exitBtn.tooltipText = L["CLICK_TO_EXIT"]
 
     frame.exitBtn:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_TOP")
@@ -1001,7 +1019,7 @@ function DFCN.CreateScoreboard()
 
 	frame.bankIcon:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_TOP")
-		GameTooltip:SetText(self.tooltipText or DFCNL["BANK_STATUS"], 0, 1, 0)
+		GameTooltip:SetText(self.tooltipText or L["BANK_STATUS"], 0, 1, 0)
 		GameTooltip:Show()
 	end)
 
@@ -1019,7 +1037,7 @@ function DFCN.CreateScoreboard()
             frame.closeBtn:EnableMouse(true)
             frame.exitBtn:EnableMouse(true)
         else
-            frame.lockBtn.text:SetText("U")
+            frame.lockBtn.text:SetText("L")
             frame.lockBtn.text:SetTextColor(0.2, 1, 0.2)
             
             frame:EnableMouse(true)
@@ -1057,11 +1075,11 @@ function DFCN.CreateScoreboard()
         return line
     end
 
-	frame.delveName = CreateInfoLineWithIcon(frame, -65, " " .. DFCNL["SCENARIO"], "Interface\\icons\\ui_delves")
-	frame.difficultyLevel = CreateInfoLineWithIcon(frame, -87, " " .. DFCNL["DIFFICULTY_LEVEL"], "Interface\\icons\\achievement_garrisonfollower_levelup")
-	frame.remainingLives = CreateInfoLineWithIcon(frame, -109, " " .. DFCNL["REMAINING_LIVES"], "Interface\\icons\\delves-scenario-heart-icon")
-	frame.remainingEnemies = CreateInfoLineWithIcon(frame, -131, " " .. DFCNL["REMAINING_ENEMIES"], "Interface\\delves\\delves-scenario-treasure-available")
-	frame.duration = CreateInfoLineWithIcon(frame, -153, " " .. DFCNL["TOTAL_TIME"], "Interface\\icons\\spell_holy_borrowedtime")
+	frame.delveName = CreateInfoLineWithIcon(frame, -65, " " .. L["SCENARIO"], "Interface\\icons\\ui_delves")
+	frame.difficultyLevel = CreateInfoLineWithIcon(frame, -87, " " .. L["DIFFICULTY_LEVEL"], "Interface\\icons\\achievement_garrisonfollower_levelup")
+	frame.remainingLives = CreateInfoLineWithIcon(frame, -109, " " .. L["REMAINING_LIVES"], "Interface\\icons\\delves-scenario-heart-icon")
+	frame.remainingEnemies = CreateInfoLineWithIcon(frame, -131, " " .. L["REMAINING_ENEMIES"], "Interface\\delves\\delves-scenario-treasure-available")
+	frame.duration = CreateInfoLineWithIcon(frame, -153, " " .. L["TOTAL_TIME"], "Interface\\icons\\spell_holy_borrowedtime")
 
     frame.companionIcons = CreateFrame("Frame", nil, frame)
     frame.companionIcons:SetSize(80, 22)
@@ -1082,7 +1100,7 @@ function DFCN.CreateScoreboard()
     frame.flashingDoorText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.flashingDoorText:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -20, -45)
     frame.flashingDoorText:SetFont(GameFontNormal:GetFont(), 14)
-    frame.flashingDoorText:SetText(" " .. DFCNL["FLASHING_DOOR"])
+    frame.flashingDoorText:SetText(" " .. L["FLASHING_DOOR"])
     frame.flashingDoorText:Hide()
 
     frame.flashingDoorIcon = frame:CreateTexture(nil, "OVERLAY")
@@ -1099,11 +1117,11 @@ function DFCN.CreateScoreboard()
         frame.flashingDoorText:Show()
         
         if charData.flashingDoorActivated then
-            frame.flashingDoorText:SetText(" " .. DFCNL["FLASHING_DOOR_USED"])
+            frame.flashingDoorText:SetText(" " .. L["FLASHING_DOOR_USED"])
             frame.flashingDoorText:SetTextColor(0.5, 0.5, 0.5)
             frame.flashingDoorIcon:SetTexture("Interface\\Icons\\INV_112_Achievement_Zone_Karesh")
         else
-            frame.flashingDoorText:SetText(" " .. DFCNL["FLASHING_DOOR"])
+            frame.flashingDoorText:SetText(" " .. L["FLASHING_DOOR"])
             frame.flashingDoorText:SetTextColor(0.1, 0.4, 0.9)
             frame.flashingDoorIcon:SetTexture("Interface\\Icons\\INV_112_RaidTrinkets_BlobOfSwirlingVoid_purple")
         end
@@ -1130,11 +1148,11 @@ function DFCN.CreateScoreboard()
             frame.flashingDoorText:Show()
             
             if charData.flashingDoorActivated then
-                frame.flashingDoorText:SetText(" " .. DFCNL["FLASHING_DOOR_USED"])
+                frame.flashingDoorText:SetText(" " .. L["FLASHING_DOOR_USED"])
                 frame.flashingDoorText:SetTextColor(0.5, 0.5, 0.5)
                 frame.flashingDoorIcon:SetTexture("Interface\\Icons\\INV_112_Achievement_Zone_Karesh")
             else
-                frame.flashingDoorText:SetText(" " .. DFCNL["FLASHING_DOOR"])
+                frame.flashingDoorText:SetText(" " .. L["FLASHING_DOOR"])
                 frame.flashingDoorText:SetTextColor(0.1, 0.4, 0.9)
                 frame.flashingDoorIcon:SetTexture("Interface\\Icons\\INV_112_RaidTrinkets_BlobOfSwirlingVoid_purple")
             end
@@ -1148,65 +1166,83 @@ function DFCN.CreateScoreboard()
 end
 
 function GetBrannCurrentSetup()
-    local companionInfoID = C_DelvesUI.GetCompanionInfoForActivePlayer()    
-    local treeID = C_DelvesUI.GetTraitTreeForCompanion(companionInfoID)    
-    local configID = C_Traits.GetConfigIDByTreeID(treeID)
-    local roleNodeID = C_DelvesUI.GetRoleNodeForCompanion(companionInfoID)    
-    local roleName = DFCNL["NOT_SET"]
-    local roleIcon = "Interface\\Icons\\INV_Misc_QuestionMark"
+    local validCompanionIDs = {1}  --暴雪BUG临时修复：C_DelvesUI.GetCompanionInfoForActivePlayer()反馈铜须ID为10，实际正确为1
+    
+    for _, companionID in ipairs(validCompanionIDs) do
+        local treeID = C_DelvesUI.GetTraitTreeForCompanion(companionID)
+        if treeID and treeID > 0 then
+            local configID = C_Traits.GetConfigIDByTreeID(treeID)
+            if configID then
+                local roleNodeID = C_DelvesUI.GetRoleNodeForCompanion(companionID)
+                local roleName = L["NOT_SET"]
+                local roleIcon = "Interface\\Icons\\INV_Misc_QuestionMark"
 
-    if roleNodeID then
-        local roleNodeInfo = C_Traits.GetNodeInfo(configID, roleNodeID)
-        if roleNodeInfo and roleNodeInfo.activeEntry then
-            local entryInfo = C_Traits.GetEntryInfo(configID, roleNodeInfo.activeEntry.entryID)
-            if entryInfo then
-                local subTreeInfo = C_Traits.GetSubTreeInfo(configID, entryInfo.subTreeID)
-                if subTreeInfo then
-                    roleName = subTreeInfo.name
-                    roleIcon = subTreeInfo.iconElementID and CreateAtlasMarkup(subTreeInfo.iconElementID, 20, 20) or roleIcon
+                if roleNodeID then
+                    local roleNodeInfo = C_Traits.GetNodeInfo(configID, roleNodeID)
+                    if roleNodeInfo and roleNodeInfo.activeEntry then
+                        local entryInfo = C_Traits.GetEntryInfo(configID, roleNodeInfo.activeEntry.entryID)
+                        if entryInfo then
+                            local subTreeInfo = C_Traits.GetSubTreeInfo(configID, entryInfo.subTreeID)
+                            if subTreeInfo then
+                                roleName = subTreeInfo.name
+                                roleIcon = subTreeInfo.iconElementID and CreateAtlasMarkup(subTreeInfo.iconElementID, 20, 20) or roleIcon
+                            end
+                        end
+                    end
                 end
+
+                local combatNodeID = C_DelvesUI.GetCurioNodeForCompanion(Enum.CurioType.Combat, companionID)
+                local utilityNodeID = C_DelvesUI.GetCurioNodeForCompanion(Enum.CurioType.Utility, companionID)
+                
+                local combatNodeInfo = combatNodeID and C_Traits.GetNodeInfo(configID, combatNodeID)
+                local utilityNodeInfo = utilityNodeID and C_Traits.GetNodeInfo(configID, utilityNodeID)
+                
+                local function ProcessTrinketNode(nodeInfo)
+                    if not nodeInfo or not nodeInfo.activeEntry then
+                        return L["NOT_SET"], "Interface\\Icons\\INV_Misc_QuestionMark", nil
+                    end
+                    
+                    local entryInfo = C_Traits.GetEntryInfo(configID, nodeInfo.activeEntry.entryID)
+                    if not entryInfo then
+                        return L["NOT_SET"], "Interface\\Icons\\INV_Misc_QuestionMark", nil
+                    end
+                    
+                    local definitionInfo = C_Traits.GetDefinitionInfo(entryInfo.definitionID)
+                    if not definitionInfo then
+                        return L["NOT_SET"], "Interface\\Icons\\INV_Misc_QuestionMark", nil
+                    end
+                    
+                    local spellID = definitionInfo.overriddenSpellID or definitionInfo.spellID
+                    local spellInfo = C_Spell.GetSpellInfo(spellID)
+                    if not spellInfo then
+                        return L["NOT_SET"], "Interface\\Icons\\INV_Misc_QuestionMark", nil
+                    end
+                    
+                    return C_Spell.GetSpellLink(spellID) or spellInfo.name, spellInfo.iconID, spellID
+                end
+
+                local combatTrinket, combatIcon, combatSpellID = ProcessTrinketNode(combatNodeInfo)
+                local utilityTrinket, utilityIcon, utilitySpellID = ProcessTrinketNode(utilityNodeInfo)
+                
+                return {
+                    role = {name = roleName, icon = roleIcon},
+                    combat = {name = combatTrinket, icon = combatIcon, spellID = combatSpellID},
+                    utility = {name = utilityTrinket, icon = utilityIcon, spellID = utilitySpellID},
+                    hash = tostring(roleName) .. "|" .. tostring(combatSpellID) .. "|" .. tostring(utilitySpellID),
+                    configID = configID,
+                    companionID = companionID
+                }
             end
         end
     end
-
-    local combatNodeID = C_DelvesUI.GetCurioNodeForCompanion(Enum.CurioType.Combat, companionInfoID)
-    local utilityNodeID = C_DelvesUI.GetCurioNodeForCompanion(Enum.CurioType.Utility, companionInfoID)    
-    local combatNodeInfo = combatNodeID and C_Traits.GetNodeInfo(configID, combatNodeID)
-    local utilityNodeInfo = utilityNodeID and C_Traits.GetNodeInfo(configID, utilityNodeID)
-    
-    local function ProcessTrinketNode(nodeInfo)
-        if not nodeInfo or not nodeInfo.activeEntry then
-            return DFCNL["NOT_SET"], "Interface\\Icons\\INV_Misc_QuestionMark", nil
-        end
-        
-        local entryInfo = C_Traits.GetEntryInfo(configID, nodeInfo.activeEntry.entryID)
-        if not entryInfo then
-            return DFCNL["NOT_SET"], "Interface\\Icons\\INV_Misc_QuestionMark", nil
-        end
-        
-        local definitionInfo = C_Traits.GetDefinitionInfo(entryInfo.definitionID)
-        if not definitionInfo then
-            return DFCNL["NOT_SET"], "Interface\\Icons\\INV_Misc_QuestionMark", nil
-        end
-        
-        local spellID = definitionInfo.overriddenSpellID or definitionInfo.spellID
-        local spellInfo = C_Spell.GetSpellInfo(spellID)
-        if not spellInfo then
-            return DFCNL["NOT_SET"], "Interface\\Icons\\INV_Misc_QuestionMark", nil
-        end
-        
-        return C_Spell.GetSpellLink(spellID) or spellInfo.name, spellInfo.iconID, spellID
-    end
-
-    local combatTrinket, combatIcon, combatSpellID = ProcessTrinketNode(combatNodeInfo)
-    local utilityTrinket, utilityIcon, utilitySpellID = ProcessTrinketNode(utilityNodeInfo)
     
     return {
-        role = {name = roleName, icon = roleIcon},
-        combat = {name = combatTrinket, icon = combatIcon, spellID = combatSpellID},
-        utility = {name = utilityTrinket, icon = utilityIcon, spellID = utilitySpellID},
-        hash = tostring(roleName) .. "|" .. tostring(combatSpellID) .. "|" .. tostring(utilitySpellID),
-        configID = configID
+        role = {name = L["NOT_SET"], icon = "Interface\\Icons\\INV_Misc_QuestionMark"},
+        combat = {name = L["NOT_SET"], icon = "Interface\\Icons\\INV_Misc_QuestionMark", spellID = nil},
+        utility = {name = L["NOT_SET"], icon = "Interface\\Icons\\INV_Misc_QuestionMark", spellID = nil},
+        hash = "no_valid_companion",
+        configID = nil,
+        companionID = nil
     }
 end
 
@@ -1257,7 +1293,7 @@ function DFCN.UpdateCompanionIcons(forceUpdate)
     
     DFCN.scoreboardFrame.roleIcon:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:SetText(DFCNL["BRANN_ROLE"] .. ": "..setup.role.name, 1, 1, 1)
+        GameTooltip:SetText(L["BRANN_ROLE"] .. ": "..setup.role.name, 1, 1, 1)
         GameTooltip:Show()
     end)
     DFCN.scoreboardFrame.roleIcon:SetScript("OnLeave", GameTooltip_Hide)
@@ -1267,7 +1303,7 @@ function DFCN.UpdateCompanionIcons(forceUpdate)
 		if setup.combat.spellID then
 			GameTooltip:SetSpellByID(setup.combat.spellID)
 		else
-			GameTooltip:SetText(DFCNL["COMBAT_TRINKET"] .. ": "..setup.combat.name, 1, 1, 1)
+			GameTooltip:SetText(L["COMBAT_TRINKET"] .. ": "..setup.combat.name, 1, 1, 1)
 		end
 		GameTooltip:Show()
 	end)
@@ -1277,7 +1313,7 @@ function DFCN.UpdateCompanionIcons(forceUpdate)
 		if setup.utility.spellID then
 			GameTooltip:SetSpellByID(setup.utility.spellID)
 		else
-			GameTooltip:SetText(DFCNL["UTILITY_TRINKET"] .. ": "..setup.utility.name, 1, 1, 1)
+			GameTooltip:SetText(L["UTILITY_TRINKET"] .. ": "..setup.utility.name, 1, 1, 1)
 		end
 		GameTooltip:Show()
 	end)
@@ -1340,8 +1376,8 @@ function DFCN:UpdatemedicineBar()
     if auraInfo then
         bar:Show()
         local applications = auraInfo.applications or 1
-        bar.stackText:SetText(applications .. DFCNL["STACKS"])
-        bar.nameText:SetText(auraInfo.name or DFCNL["DWARVEN_MEDICINE"])
+        bar.stackText:SetText(applications .. L["STACKS"])
+        bar.nameText:SetText(auraInfo.name or L["DWARVEN_MEDICINE"])
         bar.duration = auraInfo.duration or 10
         bar.expirationTime = auraInfo.expirationTime or 0
         if not bar:GetScript("OnUpdate") then
@@ -1441,7 +1477,7 @@ local function ExtractEnemiesFromTooltip()
     for _, line in ipairs(tooltipData.lines) do
         local leftText = line.leftText or ""
         
-        if leftText and leftText:find(DFCNL["REMAINING_ENEMIES_PATTERN"]) then
+        if leftText and leftText:find(L["REMAINING_ENEMIES_PATTERN"]) then
             local lineText = leftText
             local lineNumbers = {}
             for num in lineText:gmatch("%d+") do
@@ -1587,7 +1623,7 @@ function DFCN.UpdateScoreboard()
 			DFCN.scoreboardFrame.difficultyLevel.value:SetTextColor(0, 1, 0)
 		end
 	else
-		DFCN.scoreboardFrame.difficultyLevel.value:SetText(DFCNL["UNKNOWN"])
+		DFCN.scoreboardFrame.difficultyLevel.value:SetText(L["UNKNOWN"])
 		DFCN.scoreboardFrame.difficultyLevel.value:SetTextColor(1, 1, 1)
 	end
 
@@ -1596,7 +1632,7 @@ function DFCN.UpdateScoreboard()
         DFCN.scoreboardFrame.remainingLives.value:SetTextColor(0, 1, 0.5)
     else
         if remainingLives == nil then
-            DFCN.scoreboardFrame.remainingLives.value:SetText(DFCNL["UNKNOWN"])
+            DFCN.scoreboardFrame.remainingLives.value:SetText(L["UNKNOWN"])
             DFCN.scoreboardFrame.remainingLives.value:SetTextColor(1, 1, 1)
         else
             DFCN.scoreboardFrame.remainingLives.value:SetText(tostring(remainingLives))
@@ -1671,7 +1707,7 @@ function DFCN.UpdateScoreboard()
                 end
             elseif retryCount < maxRetries then
                 retryCount = retryCount + 1
-                DFCN.scoreboardFrame.remainingEnemies.value:SetText(string.format(DFCNL["RETRY_COUNT"], retryCount))
+                DFCN.scoreboardFrame.remainingEnemies.value:SetText(string.format(L["RETRY_COUNT"], retryCount))
                 DFCN.scoreboardFrame.remainingEnemies.value:SetTextColor(1, 1, 1)
                 C_Timer.After(2, TryGetEnemies)
                 return
@@ -1698,11 +1734,11 @@ function DFCN.UpdateScoreboard()
             DFCN.scoreboardFrame.flashingDoorText:Show()
             
             if charData.flashingDoorActivated then
-                DFCN.scoreboardFrame.flashingDoorText:SetText(" " .. DFCNL["FLASHING_DOOR_USED"])
+                DFCN.scoreboardFrame.flashingDoorText:SetText(" " .. L["FLASHING_DOOR_USED"])
                 DFCN.scoreboardFrame.flashingDoorText:SetTextColor(0.5, 0.5, 0.5)
                 DFCN.scoreboardFrame.flashingDoorIcon:SetTexture("Interface\\Icons\\INV_112_Achievement_Zone_Karesh")
             else
-                DFCN.scoreboardFrame.flashingDoorText:SetText(" " .. DFCNL["FLASHING_DOOR"])
+                DFCN.scoreboardFrame.flashingDoorText:SetText(" " .. L["FLASHING_DOOR"])
                 DFCN.scoreboardFrame.flashingDoorText:SetTextColor(0.1, 0.4, 0.9)
                 DFCN.scoreboardFrame.flashingDoorIcon:SetTexture("Interface\\Icons\\INV_112_RaidTrinkets_BlobOfSwirlingVoid_purple")
             end
@@ -1735,7 +1771,7 @@ local function CreateLDBObject()
     
     local ldb = LDB:NewDataObject("DFCN_DelveHelper", {
         type = "data source",
-        text = DFCNL["ADDON_DESCRIPTION"],
+        text = L["ADDON_DESCRIPTION"],
         icon = "Interface\\ICONS\\UI_Delves",
         OnClick = function(self, button)
             if button == "LeftButton" then
@@ -1743,12 +1779,12 @@ local function CreateLDBObject()
             end
         end,
         OnTooltipShow = function(tooltip)
-            tooltip:AddLine("|c000EEE00" .. DFCNL["ADDON_DESCRIPTION"] .. "|r|cFFFFA500 By|r|c000EEEEE DFCN")
+            tooltip:AddLine("|c000EEE00" .. L["ADDON_DESCRIPTION"] .. "|r|cFFFFA500 By|r|c000EEEEE DFCN")
             tooltip:AddLine(" ")
-			tooltip:AddLine(DFCNL["TOOLTIP_LEFT_CLICK"], 1, 1, 1)
-			tooltip:AddLine(DFCNL["TOOLTIP_COMMAND"], 0.5, 1, 1)
-			tooltip:AddLine(DFCNL["TOOLTIP_MINIMAP"], 0.5, 1, 1)
-			tooltip:AddLine(DFCNL["TOOLTIP_ESC"], 0.8, 0.8, 0.8)
+			tooltip:AddLine(L["TOOLTIP_LEFT_CLICK"], 1, 1, 1)
+			tooltip:AddLine(L["TOOLTIP_COMMAND"], 0.5, 1, 1)
+			tooltip:AddLine(L["TOOLTIP_MINIMAP"], 0.5, 1, 1)
+			tooltip:AddLine(L["TOOLTIP_ESC"], 0.8, 0.8, 0.8)
         end,
     })
     
@@ -1824,19 +1860,19 @@ function DFCN.CreateDelveInfoFrame()
 
     frame.header.mapText = frame.header:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.header.mapText:SetPoint("LEFT", 0, 0)
-    frame.header.mapText:SetText(DFCNL["MAP"])
+    frame.header.mapText:SetText(L["MAP"])
     frame.header.mapText:SetTextColor(1, 1, 0.8)
     frame.header.mapText:SetFont(GameFontNormal:GetFont(), 14)
 
     frame.header.nameText = frame.header:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.header.nameText:SetPoint("LEFT", 110, 0)
-    frame.header.nameText:SetText(DFCNL["DELVE"])
+    frame.header.nameText:SetText(L["DELVE"])
     frame.header.nameText:SetTextColor(1, 1, 0.8)
     frame.header.nameText:SetFont(GameFontNormal:GetFont(), 14)
     
     frame.header.variantText = frame.header:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.header.variantText:SetPoint("LEFT", 240, 0)
-    frame.header.variantText:SetText(DFCNL["STORY_VARIANT"])
+    frame.header.variantText:SetText(L["STORY_VARIANT"])
     frame.header.variantText:SetTextColor(1, 1, 0.8)
     frame.header.variantText:SetFont(GameFontNormal:GetFont(), 14)
 
@@ -1857,7 +1893,7 @@ end
 
 local function GetMapName(uiMapID)
     local mapInfo = C_Map.GetMapInfo(uiMapID)
-    return mapInfo and mapInfo.name or DFCNL["UNKNOWN_MAP"]
+    return mapInfo and mapInfo.name or L["UNKNOWN_MAP"]
 end
 
 if not tContains then
@@ -1877,7 +1913,7 @@ end
 local function ParseStoryVariant(widgetSetID)
     local widgets = C_UIWidgetManager.GetAllWidgetsBySetID(widgetSetID)
     if not widgets or #widgets == 0 then
-        return DFCNL["UNKNOWN"], false
+        return L["UNKNOWN"], false
     end
     
     for _, widgetData in ipairs(widgets) do
@@ -1885,7 +1921,7 @@ local function ParseStoryVariant(widgetSetID)
             local widgetInfo = C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo(widgetData.widgetID)
             if widgetInfo and widgetInfo.text then
                 local text = StripColorCodes(widgetInfo.text)                
-                local variant = text:match(DFCNL["STORY_VARIANT_PATTERN"])
+                local variant = text:match(L["STORY_VARIANT_PATTERN"])
                 if variant then
                     local starWidgetIDs = {6902, 6905, 6907, 6909, 6912, 6913, 6915, 6916, 6917, 6927, 6939, 6943, 6947, 6948, 6950, 6951, 6953, 6964, 6965, 6966, 6968, 6969, 6971}
                     local hasStar = false
@@ -1908,7 +1944,7 @@ local function ParseStoryVariant(widgetSetID)
         end
     end
     
-    return DFCNL["UNKNOWN"], false
+    return L["UNKNOWN"], false
 end
 
 local CORRECT_DELVE_MAPPING = {
@@ -1950,7 +1986,7 @@ function DFCN.UpdateDelveInfo()
 				if correctDelves and tContains(correctDelves, delveID) then
 					local poiInfo = C_AreaPoiInfo.GetAreaPOIInfo(uiMapID, delveID)
 					if poiInfo and poiInfo.name then
-						local storyVariant, hasStar = DFCNL["UNKNOWN"], false
+						local storyVariant, hasStar = L["UNKNOWN"], false
 						if poiInfo.tooltipWidgetSet then
 							storyVariant, hasStar = ParseStoryVariant(poiInfo.tooltipWidgetSet)
 						end
@@ -2028,9 +2064,9 @@ function DFCN.UpdateDelveInfo()
 			row:SetScript("OnEnter", function(self)
 				GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 				GameTooltip:ClearLines()
-				GameTooltip:AddLine(DFCNL["NGA_RECOMMENDED_STORY"], 0.5, 0.5, 1)
+				GameTooltip:AddLine(L["NGA_RECOMMENDED_STORY"], 0.5, 0.5, 1)
 				GameTooltip:AddLine(" ")
-				GameTooltip:AddLine(DFCNL["NGA_RECOMMENDED_DETAIL"], 1, 1, 1)
+				GameTooltip:AddLine(L["NGA_RECOMMENDED_DETAIL"], 1, 1, 1)
 				GameTooltip:Show()
 			end)
 
@@ -2117,7 +2153,7 @@ function DFCN.CreateSettingsFrame()
     frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     frame.title:SetPoint("TOP", 0, -18)
 	frame.title:SetFont(GameFontNormal:GetFont(), 16)
-    frame.title:SetText("|TInterface\\icons\\ui_delves:16:16|t  " .. DFCNL["SETTINGS_TITLE"])
+    frame.title:SetText("|TInterface\\icons\\ui_delves:16:16|t  " .. L["SETTINGS_TITLE"])
     frame.title:SetTextColor(0.95, 0.95, 0.32) 
 
     frame.versionText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -2162,18 +2198,18 @@ function DFCN.CreateSettingsFrame()
         DFCN_DelveHelperDB.autoEnter = self:GetChecked()
         
         if DFCN_DelveHelperDB.autoEnter then
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["AUTO_ENTER_ENABLED"] .. "|r")
+            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["AUTO_ENTER_ENABLED"] .. "|r")
         else
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["AUTO_ENTER_DISABLED"] .. "|r")
+            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["AUTO_ENTER_DISABLED"] .. "|r")
         end
     end)
 
 	autoEnterCheckbox:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:SetText(DFCNL["AUTO_ENTER"])
+		GameTooltip:SetText(L["AUTO_ENTER"])
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(DFCNL["AUTO_ENTER_TOOLTIP_DETAIL1"])
-		GameTooltip:AddLine(DFCNL["AUTO_ENTER_TOOLTIP_DETAIL2"])
+		GameTooltip:AddLine(L["AUTO_ENTER_TOOLTIP_DETAIL1"])
+		GameTooltip:AddLine(L["AUTO_ENTER_TOOLTIP_DETAIL2"])
 		GameTooltip:Show()
 	end)
 
@@ -2184,7 +2220,7 @@ function DFCN.CreateSettingsFrame()
     autoEnterCheckbox.text = autoEnterCheckbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     autoEnterCheckbox.text:SetPoint("LEFT", autoEnterCheckbox, "RIGHT", 5, 0)
 	autoEnterCheckbox.text:SetFont(GameFontNormal:GetFont(), 14)
-    autoEnterCheckbox.text:SetText(DFCNL["AUTO_ENTER"])
+    autoEnterCheckbox.text:SetText(L["AUTO_ENTER"])
     autoEnterCheckbox.text:SetTextColor(1, 1, 1) 
     
     DFCN.autoEnterCheckbox = autoEnterCheckbox    
@@ -2192,7 +2228,7 @@ function DFCN.CreateSettingsFrame()
     local difficultyLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     difficultyLabel:SetPoint("TOPLEFT", 35, -85)
 	difficultyLabel:SetFont(GameFontNormal:GetFont(), 14)
-    difficultyLabel:SetText(DFCNL["DIFFICULTY_LABEL"])
+    difficultyLabel:SetText(L["DIFFICULTY_LABEL"])
     difficultyLabel:SetTextColor(1, 1, 1) 
 
     local fastExitCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
@@ -2203,18 +2239,18 @@ function DFCN.CreateSettingsFrame()
         UpdateExitCooldownDuration()
         
         if self:GetChecked() then
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["FAST_EXIT_ENABLED"] .. "|r")
+            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["FAST_EXIT_ENABLED"] .. "|r")
         else
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["FAST_EXIT_DISABLED"] .. "|r")
+            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["FAST_EXIT_DISABLED"] .. "|r")
         end
     end)
 
 	fastExitCheckbox:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:SetText(DFCNL["FAST_EXIT_MODE"])
+		GameTooltip:SetText(L["FAST_EXIT_MODE"])
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(DFCNL["FAST_EXIT_TOOLTIP_DETAIL1"])
-		GameTooltip:AddLine(DFCNL["FAST_EXIT_TOOLTIP_DETAIL2"], 1, 0, 0)
+		GameTooltip:AddLine(L["FAST_EXIT_TOOLTIP_DETAIL1"])
+		GameTooltip:AddLine(L["FAST_EXIT_TOOLTIP_DETAIL2"], 1, 0, 0)
 		GameTooltip:Show()
 	end)
 
@@ -2225,7 +2261,7 @@ function DFCN.CreateSettingsFrame()
 	fastExitCheckbox.text = fastExitCheckbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	fastExitCheckbox.text:SetPoint("LEFT", fastExitCheckbox, "RIGHT", 5, 0)
 	fastExitCheckbox.text:SetFont(GameFontNormal:GetFont(), 13, "")
-	fastExitCheckbox.text:SetText(DFCNL["FAST_EXIT_MODE"])
+	fastExitCheckbox.text:SetText(L["FAST_EXIT_MODE"])
 	fastExitCheckbox.text:SetTextColor(1, 1, 1)
 
 	local font13 = CreateFont("DFCN_DelveHelperDifficultyFont13")
@@ -2234,17 +2270,17 @@ function DFCN.CreateSettingsFrame()
 	local dropdown = CreateFrame("Frame", "DFCN_DelveHelperDifficultyDropdown", frame, "UIDropDownMenuTemplate")
 	dropdown:SetPoint("TOPLEFT", difficultyLabel, "BOTTOMLEFT", -20, -10)
 	UIDropDownMenu_SetWidth(dropdown, 140) 
-	UIDropDownMenu_SetText(dropdown, DFCN_DelveHelperDB.difficultyLevel and string.format(DFCNL["DIFFICULTY_LEVEL_FORMAT"], DFCN_DelveHelperDB.difficultyLevel) or DFCNL["CLOSE"])
+	UIDropDownMenu_SetText(dropdown, DFCN_DelveHelperDB.difficultyLevel and string.format(L["DIFFICULTY_LEVEL_FORMAT"], DFCN_DelveHelperDB.difficultyLevel) or L["CLOSE"])
 	dropdown.Text:SetFontObject(font13)
 
 	local function Difficulty_OnClick(self, arg1, arg2, checked)
 		DFCN_DelveHelperDB.difficultyLevel = arg1
-		UIDropDownMenu_SetText(dropdown, arg1 and string.format(DFCNL["DIFFICULTY_LEVEL_FORMAT"], arg1) or DFCNL["CLOSE"])
+		UIDropDownMenu_SetText(dropdown, arg1 and string.format(L["DIFFICULTY_LEVEL_FORMAT"], arg1) or L["CLOSE"])
 		
 		if arg1 then
-			print(string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["DIFFICULTY_SET"] .. "|r", arg1))
+			print(string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["DIFFICULTY_SET"] .. "|r", arg1))
 		else
-			print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["DIFFICULTY_UNSET"] .. "|r")
+			print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["DIFFICULTY_UNSET"] .. "|r")
 		end
 	end
 
@@ -2252,7 +2288,7 @@ function DFCN.CreateSettingsFrame()
 		UIDropDownMenu_SetWidth(self, 140)
 		
 		local info = UIDropDownMenu_CreateInfo()
-		info.text = DFCNL["CLOSE"]
+		info.text = L["CLOSE"]
 		info.arg1 = nil
 		info.func = Difficulty_OnClick
 		info.minWidth = 130
@@ -2263,7 +2299,7 @@ function DFCN.CreateSettingsFrame()
 		
 		for i = 1, 11 do
 			info = UIDropDownMenu_CreateInfo()
-			info.text = string.format(DFCNL["DIFFICULTY_LEVEL_FORMAT"], i)
+			info.text = string.format(L["DIFFICULTY_LEVEL_FORMAT"], i)
 			info.arg1 = i
 			info.func = Difficulty_OnClick
 			info.minWidth = 130
@@ -2286,7 +2322,7 @@ function DFCN.CreateSettingsFrame()
 		DFCN_DelveHelperDB.scoreboardEnabled = self:GetChecked()
 		if self:GetChecked() then
             DFCN.CreateScoreboard()
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["SCOREBOARD_ENABLED"] .. "|r")
+            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["SCOREBOARD_ENABLED"] .. "|r")
 			if IsInDelvesScenario() then
 				DFCN.scoreboardFrame:Show()
 			end
@@ -2294,17 +2330,17 @@ function DFCN.CreateSettingsFrame()
             if DFCN.scoreboardFrame then
                 DFCN.scoreboardFrame:Hide()
             end
-			print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["SCOREBOARD_DISABLED"] .. "|r")
+			print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["SCOREBOARD_DISABLED"] .. "|r")
 		end
 	end)
 
 	scoreboardCheckbox:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:SetText(DFCNL["SHOW_SCOREBOARD"])
+		GameTooltip:SetText(L["SHOW_SCOREBOARD"])
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(DFCNL["SCOREBOARD_TOOLTIP_DETAIL1"])
-		GameTooltip:AddLine(DFCNL["SCOREBOARD_TOOLTIP_DETAIL2"])
-		GameTooltip:AddLine(DFCNL["SCOREBOARD_TOOLTIP_DETAIL3"])
+		GameTooltip:AddLine(L["SCOREBOARD_TOOLTIP_DETAIL1"])
+		GameTooltip:AddLine(L["SCOREBOARD_TOOLTIP_DETAIL2"])
+		GameTooltip:AddLine(L["SCOREBOARD_TOOLTIP_DETAIL3"])
 		GameTooltip:Show()
 	end)
 
@@ -2315,7 +2351,7 @@ function DFCN.CreateSettingsFrame()
 	scoreboardCheckbox.text = scoreboardCheckbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	scoreboardCheckbox.text:SetPoint("LEFT", scoreboardCheckbox, "RIGHT", 5, 0)
 	scoreboardCheckbox.text:SetFont(GameFontNormal:GetFont(), 14)
-	scoreboardCheckbox.text:SetText(DFCNL["SHOW_SCOREBOARD"])
+	scoreboardCheckbox.text:SetText(L["SHOW_SCOREBOARD"])
 	scoreboardCheckbox.text:SetTextColor(1, 1, 1)
 
     local treasureMapCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
@@ -2324,18 +2360,18 @@ function DFCN.CreateSettingsFrame()
     treasureMapCheckbox:SetScript("OnClick", function(self)
         DFCN_DelveHelperDB.treasureMapAlertEnabled = self:GetChecked()
         if self:GetChecked() then
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["TREASURE_MAP_ENABLED"] .. "|r")
+            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["TREASURE_MAP_ENABLED"] .. "|r")
         else
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["TREASURE_MAP_DISABLED"] .. "|r")
+            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["TREASURE_MAP_DISABLED"] .. "|r")
         end
     end)
 
 	treasureMapCheckbox:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:SetText(DFCNL["TREASURE_MAP_ALERT"])
+		GameTooltip:SetText(L["TREASURE_MAP_ALERT"])
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(DFCNL["TREASURE_MAP_TOOLTIP_DETAIL1"])
-		GameTooltip:AddLine(DFCNL["TREASURE_MAP_TOOLTIP_DETAIL2"])
+		GameTooltip:AddLine(L["TREASURE_MAP_TOOLTIP_DETAIL1"])
+		GameTooltip:AddLine(L["TREASURE_MAP_TOOLTIP_DETAIL2"])
 		GameTooltip:Show()
 	end)
 
@@ -2346,7 +2382,7 @@ function DFCN.CreateSettingsFrame()
     treasureMapCheckbox.text = treasureMapCheckbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     treasureMapCheckbox.text:SetPoint("LEFT", treasureMapCheckbox, "RIGHT", 5, 0)
 	treasureMapCheckbox.text:SetFont(GameFontNormal:GetFont(), 14)
-    treasureMapCheckbox.text:SetText(DFCNL["TREASURE_MAP_ALERT"])
+    treasureMapCheckbox.text:SetText(L["TREASURE_MAP_ALERT"])
     treasureMapCheckbox.text:SetTextColor(1, 1, 1)
 
     local autoActivateCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
@@ -2355,18 +2391,18 @@ function DFCN.CreateSettingsFrame()
     autoActivateCheckbox:SetScript("OnClick", function(self)
         DFCN_DelveHelperDB.autoActivateDelve = self:GetChecked()
         if self:GetChecked() then
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["AUTO_ACTIVATE_ENABLED"] .. "|r")
+            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["AUTO_ACTIVATE_ENABLED"] .. "|r")
         else
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["AUTO_ACTIVATE_DISABLED"] .. "|r")
+            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["AUTO_ACTIVATE_DISABLED"] .. "|r")
         end
     end)
 
 	autoActivateCheckbox:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:SetText(DFCNL["AUTO_ACTIVATE"])
+		GameTooltip:SetText(L["AUTO_ACTIVATE"])
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(DFCNL["AUTO_ACTIVATE_TOOLTIP_DETAIL1"])
-		GameTooltip:AddLine(DFCNL["AUTO_ACTIVATE_TOOLTIP_DETAIL2"])
+		GameTooltip:AddLine(L["AUTO_ACTIVATE_TOOLTIP_DETAIL1"])
+		GameTooltip:AddLine(L["AUTO_ACTIVATE_TOOLTIP_DETAIL2"])
 		GameTooltip:Show()
 	end)
 
@@ -2377,7 +2413,7 @@ function DFCN.CreateSettingsFrame()
     autoActivateCheckbox.text = autoActivateCheckbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     autoActivateCheckbox.text:SetPoint("LEFT", autoActivateCheckbox, "RIGHT", 5, 0)
 	autoActivateCheckbox.text:SetFont(GameFontNormal:GetFont(), 14)
-    autoActivateCheckbox.text:SetText(DFCNL["AUTO_ACTIVATE"])
+    autoActivateCheckbox.text:SetText(L["AUTO_ACTIVATE"])
     autoActivateCheckbox.text:SetTextColor(1, 1, 1)
     
 	local autoPetCageCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
@@ -2386,20 +2422,20 @@ function DFCN.CreateSettingsFrame()
 	autoPetCageCheckbox:SetScript("OnClick", function(self)
 		DFCN_DelveHelperDB.autoPetCage = self:GetChecked()
 		if self:GetChecked() then
-			print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["AUTO_PET_CAGE_ENABLED"] .. "|r")
+			print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["AUTO_PET_CAGE_ENABLED"] .. "|r")
 			DFCN.InitPetAutoCage()
 		else
-			print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["AUTO_PET_CAGE_DISABLED"] .. "|r")
+			print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["AUTO_PET_CAGE_DISABLED"] .. "|r")
 		end
 	end)
 
 	autoPetCageCheckbox:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:SetText(DFCNL["AUTO_PET_CAGE"])
+		GameTooltip:SetText(L["AUTO_PET_CAGE"])
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(DFCNL["AUTO_PET_CAGE_TOOLTIP_DETAIL1"])
-		GameTooltip:AddLine(DFCNL["AUTO_PET_CAGE_TOOLTIP_DETAIL2"])
-		GameTooltip:AddLine(DFCNL["AUTO_PET_CAGE_TOOLTIP_DETAIL3"])
+		GameTooltip:AddLine(L["AUTO_PET_CAGE_TOOLTIP_DETAIL1"])
+		GameTooltip:AddLine(L["AUTO_PET_CAGE_TOOLTIP_DETAIL2"])
+		GameTooltip:AddLine(L["AUTO_PET_CAGE_TOOLTIP_DETAIL3"])
 		GameTooltip:Show()
 	end)
 
@@ -2410,7 +2446,7 @@ function DFCN.CreateSettingsFrame()
 	autoPetCageCheckbox.text = autoPetCageCheckbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	autoPetCageCheckbox.text:SetPoint("LEFT", autoPetCageCheckbox, "RIGHT", 5, 0)
 	autoPetCageCheckbox.text:SetFont(GameFontNormal:GetFont(), 14)
-	autoPetCageCheckbox.text:SetText(DFCNL["AUTO_PET_CAGE"])
+	autoPetCageCheckbox.text:SetText(L["AUTO_PET_CAGE"])
 	autoPetCageCheckbox.text:SetTextColor(1, 1, 1)
 
     local autoTokenConfirmCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
@@ -2419,18 +2455,18 @@ function DFCN.CreateSettingsFrame()
     autoTokenConfirmCheckbox:SetScript("OnClick", function(self)
         DFCN_DelveHelperDB.autoTokenExchange = self:GetChecked()
         if self:GetChecked() then
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["AUTO_TOKEN_EXCHANGE_ENABLED"] .. "|r")
+            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["AUTO_TOKEN_EXCHANGE_ENABLED"] .. "|r")
         else
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["SETTING_CHANGED"] .. "] " .. DFCNL["AUTO_TOKEN_EXCHANGE_DISABLED"] .. "|r")
+            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["SETTING_CHANGED"] .. "] " .. L["AUTO_TOKEN_EXCHANGE_DISABLED"] .. "|r")
         end
     end)
 
 	autoTokenConfirmCheckbox:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:SetText(DFCNL["AUTO_TOKEN_EXCHANGE"])
+		GameTooltip:SetText(L["AUTO_TOKEN_EXCHANGE"])
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(DFCNL["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL1"])
-		GameTooltip:AddLine(DFCNL["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL2"])
+		GameTooltip:AddLine(L["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL1"])
+		GameTooltip:AddLine(L["AUTO_TOKEN_EXCHANGE_TOOLTIP_DETAIL2"])
 		GameTooltip:Show()
 	end)
 
@@ -2441,7 +2477,7 @@ function DFCN.CreateSettingsFrame()
     autoTokenConfirmCheckbox.text = autoTokenConfirmCheckbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     autoTokenConfirmCheckbox.text:SetPoint("LEFT", autoTokenConfirmCheckbox, "RIGHT", 5, 0)
 	autoTokenConfirmCheckbox.text:SetFont(GameFontNormal:GetFont(), 14)
-    autoTokenConfirmCheckbox.text:SetText(DFCNL["AUTO_TOKEN_EXCHANGE"])
+    autoTokenConfirmCheckbox.text:SetText(L["AUTO_TOKEN_EXCHANGE"])
     autoTokenConfirmCheckbox.text:SetTextColor(1, 1, 1)
 
     local merchantBtn = CreateFrame("Button", nil, frame)
@@ -2475,7 +2511,7 @@ function DFCN.CreateSettingsFrame()
     merchantBtn.text = merchantBtn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     merchantBtn.text:SetPoint("CENTER")
 	merchantBtn.text:SetFont(GameFontNormal:GetFont(), 13)
-    merchantBtn.text:SetText(DFCNL["VIEW_MERCHANT"])
+    merchantBtn.text:SetText(L["VIEW_MERCHANT"])
     merchantBtn.text:SetTextColor(1, 1, 1)
 
     merchantBtn:SetScript("OnMouseDown", function(self)
@@ -2543,7 +2579,7 @@ function DFCN.CreateSettingsFrame()
 	delveInfoBtn.text = delveInfoBtn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	delveInfoBtn.text:SetPoint("CENTER")
 	delveInfoBtn.text:SetFont(GameFontNormal:GetFont(), 13)
-	delveInfoBtn.text:SetText(DFCNL["VIEW_DELVE_INFO"])
+	delveInfoBtn.text:SetText(L["VIEW_DELVE_INFO"])
 	delveInfoBtn.text:SetTextColor(1, 1, 1)
 
 	delveInfoBtn:SetScript("OnMouseDown", function(self)
@@ -2606,7 +2642,7 @@ function DFCN.CreateMerchantFrame()
 	frame.dateLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.dateLabel:SetPoint("TOPLEFT", 10, -18)
 	frame.dateLabel:SetFont(GameFontNormal:GetFont(), 14)
-	frame.dateLabel:SetText(DFCNL["REFRESH_TIME"])
+	frame.dateLabel:SetText(L["REFRESH_TIME"])
 	frame.dateLabel:SetTextColor(1, 1, 1)
 
 	frame.datePicker = CreateFrame("Frame", "DFCN_DelveHelperMerchantDatePicker", frame, "UIDropDownMenuTemplate")
@@ -2620,7 +2656,8 @@ function DFCN.CreateMerchantFrame()
 		local today = date("*t")
 		local info = UIDropDownMenu_CreateInfo()
 		
-		local todayText = format(DFCNL["CURRENT_DATE"], today.month, today.day)
+		local todayDateStr = GetLocalizedDate(today.day, today.month)
+		local todayText = format(L["CURRENT_DATE"], todayDateStr)
 		info.text = todayText
 		info.arg1 = today
 		info.fontObject = font13
@@ -2654,7 +2691,8 @@ function DFCN.CreateMerchantFrame()
 	end)
 
 	local today = date("*t")
-	UIDropDownMenu_SetText(frame.datePicker, format(DFCNL["CURRENT_DATE"], today.month, today.day))
+	local todayDateStr = GetLocalizedDate(today.day, today.month)
+	UIDropDownMenu_SetText(frame.datePicker, format(L["CURRENT_DATE"], todayDateStr))
 	frame.datePicker.Text:SetFontObject(font13)
 	frame.itemsFrame = CreateFrame("Frame", nil, frame)
 	frame.itemsFrame:SetPoint("TOPLEFT", 10, -40)
@@ -2694,7 +2732,7 @@ function DFCN.CreateMerchantFrame()
 end
 
 local function CreateFullItemLink(itemID, suffix)
-    local itemName = C_Item.GetItemInfo(itemID) or DFCNL["UNKNOWN_ITEM"]
+    local itemName = C_Item.GetItemInfo(itemID) or L["UNKNOWN_ITEM"]
     return format("|cnIQ4:|Hitem:%d%s|h[%s]|h|r", 
                  itemID, 
                  suffix, 
@@ -2771,7 +2809,7 @@ local function FindAndClickSelectButton()
         
         if frame:GetObjectType() == "Button" and frame:IsVisible() and frame:IsEnabled() and frame.GetText then
             local text = frame:GetText()
-            if text and text:find(DFCNL["SELECT_BUTTON_PATTERN"]) then
+            if text and text:find(L["SELECT_BUTTON_PATTERN"]) then
                 frame:Click()
 
                 if PlayerChoiceFrame and PlayerChoiceFrame:IsShown() then
@@ -2813,7 +2851,7 @@ local function AutoSelectAndEnter()
     
     local gossipOptions = C_GossipInfo.GetOptions()
     local gossipText = C_GossipInfo.GetText()
-    local DelvesName = DFCNL["UNKNOWN_DELVE"]
+    local DelvesName = L["UNKNOWN_DELVE"]
     
     if gossipText and gossipText ~= "" then
         DelvesName = gossipText
@@ -2824,7 +2862,7 @@ local function AutoSelectAndEnter()
     if gossipOptions then
         for _, option in ipairs(gossipOptions) do
             local optionText = StripColorCodes(option.name or "")
-            if optionText:find(DFCNL["SPECIAL_DIFFICULTY_PATTERN"]) then
+            if optionText:find(L["SPECIAL_DIFFICULTY_PATTERN"]) then
                 hasSpecialDifficulty = true
                 break
             end
@@ -2832,7 +2870,7 @@ local function AutoSelectAndEnter()
     end
     
     if hasSpecialDifficulty then
-        print("|TInterface\\icons\\ui_delves:14:14|t |cFFFFA500[" .. DFCNL["WARNING"] .. "] " .. DFCNL["SPECIAL_DELVE_WARNING"] .. "|r")
+        print("|TInterface\\icons\\ui_delves:14:14|t |cFFFFA500[" .. L["WARNING"] .. "] " .. L["SPECIAL_DELVE_WARNING"] .. "|r")
         return
     end
     
@@ -2841,9 +2879,9 @@ local function AutoSelectAndEnter()
         local targetOrderIndex = level - 1        
         C_GossipInfo.SelectOptionByIndex(targetOrderIndex)
 		
-        print(string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "] " .. DFCNL["AUTO_ENTER_MESSAGE"] .. "|r", DelvesName, level))
+        print(string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "] " .. L["AUTO_ENTER_MESSAGE"] .. "|r", DelvesName, level))
     else
-        print("|TInterface\\icons\\ui_delves:14:14|t |cFFFFA500[" .. DFCNL["WARNING"] .. "] " .. DFCNL["SELECT_DIFFICULTY_WARNING"] .. "|r")
+        print("|TInterface\\icons\\ui_delves:14:14|t |cFFFFA500[" .. L["WARNING"] .. "] " .. L["SELECT_DIFFICULTY_WARNING"] .. "|r")
     end
 end
 
@@ -2949,7 +2987,7 @@ function DFCN.CreateTreasureBuffAlert()
     
     alert.text = alert:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
     alert.text:SetPoint("CENTER")
-    alert.text:SetText("|T1064187:14:14|t |cFFFF0000" .. DFCNL["TREASURE_BUFF_WRONG_LEVEL"] .. "|r")
+    alert.text:SetText("|T1064187:14:14|t |cFFFF0000" .. L["TREASURE_BUFF_WRONG_LEVEL"] .. "|r")
        
     alert:Hide()
     DFCN.treasureBuffAlert = alert
@@ -2962,7 +3000,7 @@ function DFCN.CreateTreasureBuffAlert()
         originalShow(self, ...)
         C_Timer.After(3, function()
             DFCN.PlayCustomSound("TreasureBuffAlert.ogg")
-            DFCN.BrannSay(DFCNL["BRANN_TREASURE_WARNING"])
+            DFCN.BrannSay(L["BRANN_TREASURE_WARNING"])
         end)        
     end
 end
@@ -2995,11 +3033,11 @@ local function HandleTokenExchange(popupName, ...)
         actualItemName = itemInfo.name
     end
     
-    if actualItemName:find(DFCNL["ENCHANTED_ITEM_PATTERN"]) or actualItemName:find(DFCNL["MATRIX_ITEM_PATTERN"]) then
+    if actualItemName:find(L["ENCHANTED_ITEM_PATTERN"]) or actualItemName:find(L["MATRIX_ITEM_PATTERN"]) then
         return
     end
     
-    local isTokenExchange = itemName:find(DFCNL["CREST_PATTERN"]) ~= nil
+    local isTokenExchange = itemName:find(L["CREST_PATTERN"]) ~= nil
     
     if not isTokenExchange then
         return
@@ -3013,10 +3051,10 @@ local function HandleTokenExchange(popupName, ...)
         local confirmButton = _G["StaticPopup1Button1"]
         if confirmButton and confirmButton:IsEnabled() then
             confirmButton:Click()
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "] " .. DFCNL["TOKEN_EXCHANGE_CONFIRMED"] .. "|r")
+            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "] " .. L["TOKEN_EXCHANGE_CONFIRMED"] .. "|r")
         end
     elseif itemName:match("15") then
-        print("|TInterface\\icons\\ui_delves:14:14|t |cFFFFA500[" .. DFCNL["WARNING"] .. "] " .. DFCNL["ADVANCED_TOKEN_WARNING"] .. "|r")      
+        print("|TInterface\\icons\\ui_delves:14:14|t |cFFFFA500[" .. L["WARNING"] .. "] " .. L["ADVANCED_TOKEN_WARNING"] .. "|r")      
     end
 end
 
@@ -3039,7 +3077,7 @@ function DFCN.CheckAndShowTreasureMapAlert()
         
         DFCN.treasureMapAlert.text = DFCN.treasureMapAlert:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
         DFCN.treasureMapAlert.text:SetPoint("CENTER")
-        DFCN.treasureMapAlert.text:SetText("|T1064187:14:14|t |cFFFF0000" .. DFCNL["TREASURE_MAP_REMINDER"] .. "|r") 
+        DFCN.treasureMapAlert.text:SetText("|T1064187:14:14|t |cFFFF0000" .. L["TREASURE_MAP_REMINDER"] .. "|r") 
         
         DFCN.treasureMapAlert:Hide()
     end
@@ -3053,7 +3091,7 @@ function DFCN.CheckAndShowTreasureMapAlert()
             DFCN.inDelveWithMap = true
             C_Timer.After(2, function()
                 DFCN.PlayCustomSound("TreasureMapAlert.ogg")
-                DFCN.BrannSay(DFCNL["BRANN_TREASURE_REMINDER"])
+                DFCN.BrannSay(L["BRANN_TREASURE_REMINDER"])
             end)            
         elseif (mapCount == 0 and DFCN.inDelveWithMap) or (difficultyLevel ~= 11 and DFCN.inDelveWithMap) then
             DFCN.treasureMapAlert:Hide()
@@ -3071,7 +3109,7 @@ local function SetupBigWigsMessageListener()
     end
 
     BigWigsLoader.RegisterMessage(DFCN, "BigWigs_Message", function(event, sender, nilParam, message, color, icon, nilParam2, duration, ...)
-        if message and message:find(DFCNL["BIGWIGS_FLASHING_DOOR_SPAWN"]) then
+        if message and message:find(L["BIGWIGS_FLASHING_DOOR_SPAWN"]) then
             local key = GetCharacterKey()
             DFCN_DelveHelperDB.characters[key] = DFCN_DelveHelperDB.characters[key] or {}            
 
@@ -3086,7 +3124,7 @@ local function SetupBigWigsMessageListener()
 				DFCN.scoreboardFrame:Show()
                 DFCN.scoreboardFrame.flashingDoorIcon:Show()
                 DFCN.scoreboardFrame.flashingDoorText:Show()
-				DFCN.scoreboardFrame.flashingDoorText:SetText(" " .. DFCNL["FLASHING_DOOR"])
+				DFCN.scoreboardFrame.flashingDoorText:SetText(" " .. L["FLASHING_DOOR"])
                 DFCN.scoreboardFrame.flashingDoorText:SetTextColor(0.1, 0.4, 0.9)
                 DFCN.scoreboardFrame.flashingDoorIcon:SetTexture("Interface\\Icons\\INV_112_RaidTrinkets_BlobOfSwirlingVoid_purple")
             end
@@ -3096,12 +3134,12 @@ local function SetupBigWigsMessageListener()
             
             if not DFCN_DelveHelperDB.characters[key].flashingDoorDetected and not DFCN.isAbundant then
                 DFCN.PlayCustomSound("flashingdoor.ogg")
-                DFCN.BrannSay(DFCNL["BRANN_FLASHING_DOOR"])
+                DFCN.BrannSay(L["BRANN_FLASHING_DOOR"])
             end
 
 			DFCN_DelveHelperDB.characters[key].flashingDoorDetected = true
             
-        elseif message and message:find(DFCNL["BIGWIGS_FLASHING_DOOR_COMPLETE"]) then
+        elseif message and message:find(L["BIGWIGS_FLASHING_DOOR_COMPLETE"]) then
             local key = GetCharacterKey()
             DFCN_DelveHelperDB.characters[key] = DFCN_DelveHelperDB.characters[key] or {}
             DFCN_DelveHelperDB.characters[key].flashingDoorDetected = true
@@ -3110,7 +3148,7 @@ local function SetupBigWigsMessageListener()
             if DFCN_DelveHelperDB.scoreboardEnabled and DFCN.scoreboardFrame then
                 DFCN.scoreboardFrame.flashingDoorIcon:Show()
                 DFCN.scoreboardFrame.flashingDoorText:Show()
-                DFCN.scoreboardFrame.flashingDoorText:SetText(" " .. DFCNL["FLASHING_DOOR_USED"])
+                DFCN.scoreboardFrame.flashingDoorText:SetText(" " .. L["FLASHING_DOOR_USED"])
                 DFCN.scoreboardFrame.flashingDoorText:SetTextColor(0.5, 0.5, 0.5)
                 DFCN.scoreboardFrame.flashingDoorIcon:SetTexture("Interface\\Icons\\INV_112_Achievement_Zone_Karesh")
             end
@@ -3184,12 +3222,12 @@ function DFCN.InitPetAutoCage()
                 
                 if petGUID then
                     C_PetJournal.CagePetByID(petGUID)
-                    print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "] " .. itemLink .. " " .. DFCNL["PET_CAGED"] .. "|r")
+                    print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "] " .. itemLink .. " " .. L["PET_CAGED"] .. "|r")
                 else
-                    print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "] " .. itemLink .. " " .. DFCNL["PET_NOT_FOUND"] .. "|r")
+                    print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "] " .. itemLink .. " " .. L["PET_NOT_FOUND"] .. "|r")
                 end
             else
-                print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "] " .. DFCNL["PET_CAGE_ERROR"] .. "|r")
+                print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "] " .. L["PET_CAGE_ERROR"] .. "|r")
             end
             
             DFCN_LastRightClickItem = nil
@@ -3197,63 +3235,12 @@ function DFCN.InitPetAutoCage()
     end)
 end
 
-function DFCN.CheckDelvesAndInit()
-    if IsInDelvesScenario() then
-        if not DFCN.mouseoverFrame then
-            DFCN.InitMouseoverDetection()
-        end
-    end
-end
-
-function DFCN.InitMouseoverDetection()
-    local frame = CreateFrame("Frame")
-    frame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")    
-    frame:SetScript("OnEvent", function(self, event, ...)
-        if not IsInDelvesScenario() then 
-            return 
-        end        
-        if event == "UPDATE_MOUSEOVER_UNIT" then
-            DFCN.CheckMouseoverNPC()
-        end
-    end)    
-    DFCN.mouseoverFrame = frame
-end
-
-function DFCN.IsTargetNPC(npcID)
-    for _, id in ipairs(DFCN.targetNPCs) do
-        if tostring(id) == npcID then
-            return true
-        end
-    end
-    return false
-end
-
-function DFCN.CheckMouseoverNPC()
-    local unitToken = "mouseover"    
-    if not UnitExists(unitToken) then return end    
-    local npcID = DFCN.GetNPCID(unitToken)    
-    if npcID and DFCN.IsTargetNPC(npcID) then
-        if not GetRaidTargetIndex(unitToken) then
-            DFCN.lastUsedMark = (DFCN.lastUsedMark % 8) + 1
-            SetRaidTarget(unitToken, DFCN.lastUsedMark)
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "] " .. DFCNL["NPC_MARKED"] .. "|r")
-        end
-    end
-end
-
-function DFCN.GetNPCID(unitToken)
-    local guid = UnitGUID(unitToken)
-    if not guid then return nil end    
-    local npcID = select(6, strsplit("-", guid))
-    return npcID
-end
-
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("SCENARIO_UPDATE")
 frame:RegisterEvent("SCENARIO_COMPLETED")
-frame:RegisterEvent("BAG_UPDATE")
+frame:RegisterEvent("BAG_UPDATE_DELAYED")
 frame:RegisterEvent("UNIT_AURA")
 frame:RegisterEvent("PLAYER_CHOICE_UPDATE")
 frame:RegisterEvent("PLAYER_CHOICE_CLOSE")
@@ -3275,7 +3262,6 @@ frame:SetScript("OnEvent", function(self, event, ...)
             UpdateExitCooldownDuration()
             DFCN.CheckGoldenCacheStatus()
 			SetupBigWigsMessageListener()
-			DFCN.CheckDelvesAndInit()
             if DFCN_DelveHelperDB.autoPetCage then
                 DFCN.InitPetAutoCage()
             end
@@ -3286,18 +3272,18 @@ frame:SetScript("OnEvent", function(self, event, ...)
 				DFCN_DelveHelperDB.autoPetCage = true
 			end
             CheckForExistingDelveTimer()
-			DFCN.CreateOptionsPanel()
+			--DFCN.CreateOptionsPanel()
 			local key = GetCharacterKey()
 			DFCN_DelveHelperDB.characters[key] = DFCN_DelveHelperDB.characters[key] or {}
 			local charData = DFCN_DelveHelperDB.characters[key]
 			charData.goldenCacheAlertShown = charData.goldenCacheAlertShown or false
 
-            local levelInfo = DFCN_DelveHelperDB.difficultyLevel and string.format("|cFF00FF00%d|r", DFCN_DelveHelperDB.difficultyLevel) or "|cFFFF0000" .. DFCNL["NOT_SET"] .. "|r"            
-            local autoStatus = DFCN_DelveHelperDB.autoEnter and "|cFF00FF00" .. DFCNL["ENABLED"] .. "|r" or "|cFFFF0000" .. DFCNL["DISABLED"] .. "|r"
-            local fastExitStatus = DFCN_DelveHelperDB.fastExitMode and "|cFF00FF00" .. DFCNL["ENABLED"] .. "|r" or "|cFFFF0000" .. DFCNL["DISABLED"] .. "|r"
+            local levelInfo = DFCN_DelveHelperDB.difficultyLevel and string.format("|cFF00FF00%d|r", DFCN_DelveHelperDB.difficultyLevel) or "|cFFFF0000" .. L["NOT_SET"] .. "|r"            
+            local autoStatus = DFCN_DelveHelperDB.autoEnter and "|cFF00FF00" .. L["ENABLED"] .. "|r" or "|cFFFF0000" .. L["DISABLED"] .. "|r"
+            local fastExitStatus = DFCN_DelveHelperDB.fastExitMode and "|cFF00FF00" .. L["ENABLED"] .. "|r" or "|cFFFF0000" .. L["DISABLED"] .. "|r"
             
-            --print(string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "]|r|cFF00FF00 " .. DFCNL["ADDON_DESCRIPTION"] .. "|cFFFFA500 By|r|c000EEEEE DFCN|r |c000EEE00" .. DFCNL["ADDON_LOADED"] .. "|r"))
-            --print(string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "]|r|cFF00FF00 " .. DFCNL["ADDON_STATUS"] .. "|r", autoStatus, levelInfo, fastExitStatus))
+            print(string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "]|r|cFF00FF00 " .. L["ADDON_DESCRIPTION"] .. "|cFFFFA500 By|r|c000EEEEE DFCN|r |c000EEE00" .. L["ADDON_LOADED"] .. "|r"))
+            print(string.format("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "]|r|cFF00FF00 " .. L["ADDON_STATUS"] .. "|r", autoStatus, levelInfo, fastExitStatus))
             DFCN.lastScenario = select(1, C_Scenario.GetInfo())
 			if IsInDelvesScenario() then
 				DFCN.checkTreasureMapPending = true
@@ -3327,8 +3313,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
             end)
         end
     elseif event == "SCENARIO_UPDATE" then
-		DFCN.CheckDelvesAndInit()
-		if DFCN.lastScenario == DFCNL["DELVE_SCENARIO_NAME"] and not IsInDelvesScenario() then
+		if DFCN.lastScenario == L["DELVE_SCENARIO_NAME"] and not IsInDelvesScenario() then
 			DFCN.exitCooldown = true
 			DFCN.exitTime = GetTime()
 			C_Timer.After(DFCN.exitCooldownDuration, function()
@@ -3347,7 +3332,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 				return
 			end
 
-            if DFCN.lastScenario == DFCNL["DELVE_SCENARIO_NAME"] and not isInDelves then
+            if DFCN.lastScenario == L["DELVE_SCENARIO_NAME"] and not isInDelves then
                 DFCN.exitCooldown = true
                 DFCN.exitTime = GetTime()
 				local retryCount = 0
@@ -3453,7 +3438,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 						if option.name and option.name:find("^|cFF0000FF") then
 							local success = pcall(C_GossipInfo.SelectOption, option.gossipOptionID)
 							if success then
-								print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "] " .. string.format(DFCNL["AUTO_NPC_INTERACTION"], StripColorCodes(option.name)) .. "|r")
+								print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "] " .. string.format(L["AUTO_NPC_INTERACTION"], StripColorCodes(option.name)) .. "|r")
 								return
 							end
 						end
@@ -3478,7 +3463,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 										break
 									end
 								end
-								print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "] " .. string.format(DFCNL["AUTO_NPC_INTERACTION"], StripColorCodes(optionName)) .. "|r")
+								print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "] " .. string.format(L["AUTO_NPC_INTERACTION"], StripColorCodes(optionName)) .. "|r")
 								return
 							end
 						end
@@ -3534,7 +3519,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 				end
 			end
         end
-	elseif event == "BAG_UPDATE" then
+	elseif event == "BAG_UPDATE_DELAYED" then
 		if DFCN_DelveHelperDB.treasureMapAlertEnabled then
 			if IsInDelvesScenario() then
 				local mapCount = GetItemCount(248142)				
@@ -3570,7 +3555,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
         end
         
         DFCN.playerChoiceTicker = C_Timer.NewTicker(0.1, function()
-            local treasureName = DFCNL["UNKNOWN_TREASURE"]
+            local treasureName = L["UNKNOWN_TREASURE"]
             local treasureLink = treasureName
             local rarityColor = "ffffffff"
             local choiceInfo = C_PlayerChoice.GetCurrentPlayerChoiceInfo()
@@ -3580,7 +3565,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
                 treasureName = option.header or treasureName
                 treasureName = StripColorCodes(treasureName)
                 
-                if treasureName == DFCNL["SPECIAL_FOOTBOMB_TREASURE"] then
+                if treasureName == L["SPECIAL_FOOTBOMB_TREASURE"] then
                     rarityColor = "ffff8000"
                 else
                     if option.rarity then
@@ -3606,14 +3591,14 @@ frame:SetScript("OnEvent", function(self, event, ...)
             end
 
             if FindAndClickSelectButton() then
-                if treasureName == DFCNL["SPECIAL_FOOTBOMB_TREASURE"] then
-                    print("|TInterface\\icons\\ui_delves:14:14|t |cFFFF8000[" .. DFCNL["INFO"] .. "] " .. string.format(DFCNL["AUTO_SELECT_TREASURE"], treasureLink) .. "|r")
+                if treasureName == L["SPECIAL_FOOTBOMB_TREASURE"] then
+                    print("|TInterface\\icons\\ui_delves:14:14|t |cFFFF8000[" .. L["INFO"] .. "] " .. string.format(L["AUTO_SELECT_TREASURE"], treasureLink) .. "|r")
                     C_Timer.After(1.5, function()
                         DFCN.PlayCustomSound("boomfootball.ogg")
-                        DFCN.BrannSay(DFCNL["BRANN_FOOTBOMB"])
+                        DFCN.BrannSay(L["BRANN_FOOTBOMB"])
                     end)						
                 else
-                    print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "] " .. string.format(DFCNL["AUTO_SELECT_TREASURE"], treasureLink) .. "|r")
+                    print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "] " .. string.format(L["AUTO_SELECT_TREASURE"], treasureLink) .. "|r")
                 end
                 return
             end
@@ -3646,7 +3631,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 				C_Timer.After(0.1, function()
 					if IsInDelvesScenario() and DFCN.scoreboardFrame and DFCN.scoreboardFrame:IsShown() then
 						DFCN.UpdateCompanionIcons(true)
-						print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "] " .. DFCNL["BRANN_CONFIG_UPDATED"] .. "|r")
+						print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "] " .. L["BRANN_CONFIG_UPDATED"] .. "|r")
 					end
 				end)
 			end
@@ -3726,7 +3711,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 	elseif event == "CHAT_MSG_CURRENCY" and IsInDelvesScenario() then
 		local text = ...
 		
-		if text and (text:match(DFCNL["GOLDEN_CREST_PATTERN"])) then
+		if text and (text:match(L["GOLDEN_CREST_PATTERN"])) then
 			DFCN.goldenPickupCount = DFCN.goldenPickupCount + 1
 			local shouldHide = false
 			
@@ -3740,7 +3725,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 			
 			if shouldHide then
 				DFCN.PlayCustomSound("lootover.ogg")
-				DFCN.BrannSay(DFCNL["BRANN_GOLDEN_CREST"])
+				DFCN.BrannSay(L["BRANN_GOLDEN_CREST"])
 				DFCN.HideGoldenCacheAlert()
 				DFCN.goldenPickupCount = 0
 				DFCN.requireTwoPickups = false
@@ -3797,11 +3782,11 @@ frame:SetScript("OnEvent", function(self, event, ...)
 						DFCN.scoreboardFrame.flashingDoorText:Show()
 						
 						if DFCN_DelveHelperDB.characters[key].flashingDoorActivated then
-							DFCN.scoreboardFrame.flashingDoorText:SetText(" " .. DFCNL["FLASHING_DOOR_USED"])
+							DFCN.scoreboardFrame.flashingDoorText:SetText(" " .. L["FLASHING_DOOR_USED"])
 							DFCN.scoreboardFrame.flashingDoorText:SetTextColor(0.5, 0.5, 0.5)
 							DFCN.scoreboardFrame.flashingDoorIcon:SetTexture("Interface\\Icons\\INV_112_RaidTrinkets_BlobOfSwirlingVoid_terra")
 						else
-							DFCN.scoreboardFrame.flashingDoorText:SetText(" " .. DFCNL["FLASHING_DOOR"])
+							DFCN.scoreboardFrame.flashingDoorText:SetText(" " .. L["FLASHING_DOOR"])
 							DFCN.scoreboardFrame.flashingDoorText:SetTextColor(0.1, 0.4, 0.9)
 							DFCN.scoreboardFrame.flashingDoorIcon:SetTexture("Interface\\Icons\\INV_112_RaidTrinkets_BlobOfSwirlingVoid_purple")
 						end
@@ -3812,7 +3797,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 					
 					if not DFCN_DelveHelperDB.characters[key].flashingDoorDetected and not DFCN.isAbundant then
 						DFCN.PlayCustomSound("flashingdoor.ogg")
-						DFCN.BrannSay(DFCNL["BRANN_FLASHING_DOOR"])
+						DFCN.BrannSay(L["BRANN_FLASHING_DOOR"])
 					end
 
 					DFCN_DelveHelperDB.characters[key].flashingDoorDetected = true
@@ -3837,7 +3822,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 						DFCN.scoreboardFrame:Show()
 						DFCN.scoreboardFrame.flashingDoorIcon:Show()
 						DFCN.scoreboardFrame.flashingDoorText:Show()
-						DFCN.scoreboardFrame.flashingDoorText:SetText(" " .. DFCNL["FLASHING_DOOR_USED"])
+						DFCN.scoreboardFrame.flashingDoorText:SetText(" " .. L["FLASHING_DOOR_USED"])
 						DFCN.scoreboardFrame.flashingDoorText:SetTextColor(0.5, 0.5, 0.5)
 						DFCN.scoreboardFrame.flashingDoorIcon:SetTexture("Interface\\Icons\\INV_112_RaidTrinkets_BlobOfSwirlingVoid_terra")
 					end                
@@ -3873,31 +3858,31 @@ SlashCmdList["DFCN_DELVEHELPER"] = function(msg)
         if LibDBIcon then
             LibDBIcon:Show("DFCN_DelveHelper")
             DFCN_DelveHelperDB.minimapIconShown = true
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "] " .. DFCNL["MINIMAP_SHOWN"] .. "|r")
+            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "] " .. L["MINIMAP_SHOWN"] .. "|r")
         end
     elseif msg == "minimap off" then
         if LibDBIcon then
             LibDBIcon:Hide("DFCN_DelveHelper")
             DFCN_DelveHelperDB.minimapIconShown = false
-            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "] " .. DFCNL["MINIMAP_HIDDEN"] .. "|r")
+            print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "] " .. L["MINIMAP_HIDDEN"] .. "|r")
         end
     elseif msg == "" then
         DFCN.ToggleSettingsFrame()
     else
-		print(DFCNL["SLASH_COMMAND"])
-		print(DFCNL["SLASH_MINIMAP_ON"])
-		print(DFCNL["SLASH_MINIMAP_OFF"])
+		print(L["SLASH_COMMAND"])
+		print(L["SLASH_MINIMAP_ON"])
+		print(L["SLASH_MINIMAP_OFF"])
     end
 end
 
 function DFCN.CreateOptionsPanel()
     local panel = CreateFrame("Frame")
-    panel.name = DFCNL["ADDON_DESCRIPTION"] .. "|TInterface\\icons\\ui_delves:16:16|t"
+    panel.name = "|TInterface\\icons\\ui_delves:16:16|t |cFF00FF00" .. L["ADDON_DESCRIPTION"] .. " |cFFFFA500DFCN|r"
 
     local title = panel:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
 	title:SetFont(GameFontNormal:GetFont(), 16)
     title:SetPoint("TOPLEFT", 16, -16)
-    title:SetText("|TInterface\\icons\\ui_delves:18:18|t " .. DFCNL["ADDON_DESCRIPTION"] .. " |cFFFFA500DFCN|r")
+    title:SetText("|TInterface\\icons\\ui_delves:18:18|t " .. L["ADDON_DESCRIPTION"])
     
     local minimapCheckbox = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
     minimapCheckbox:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -30)
@@ -3907,10 +3892,10 @@ function DFCN.CreateOptionsPanel()
         if LibDBIcon then
             if self:GetChecked() then
                 LibDBIcon:Show("DFCN_DelveHelper")
-                print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "] " .. DFCNL["MINIMAP_SHOWN"] .. "|r")
+                print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "] " .. L["MINIMAP_SHOWN"] .. "|r")
             else
                 LibDBIcon:Hide("DFCN_DelveHelper")
-                print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. DFCNL["INFO"] .. "] " .. DFCNL["MINIMAP_HIDDEN"] .. "|r")
+                print("|TInterface\\icons\\ui_delves:14:14|t |cFF00BFFF[" .. L["INFO"] .. "] " .. L["MINIMAP_HIDDEN"] .. "|r")
             end
         end
     end)
@@ -3918,7 +3903,7 @@ function DFCN.CreateOptionsPanel()
     minimapCheckbox.text = minimapCheckbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     minimapCheckbox.text:SetPoint("LEFT", minimapCheckbox, "RIGHT", 5, 0)
 	minimapCheckbox.text:SetFont(GameFontNormal:GetFont(), 16)
-    minimapCheckbox.text:SetText(DFCNL["MINIMAP_CHECKBOX"])
+    minimapCheckbox.text:SetText(L["MINIMAP_CHECKBOX"])
     
     local openSettingsBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     openSettingsBtn:SetPoint("TOPLEFT", minimapCheckbox, "BOTTOMLEFT", 0, -20)
@@ -3926,9 +3911,9 @@ function DFCN.CreateOptionsPanel()
 
     local function UpdateButtonText()
         if DFCN.settingsFrame and DFCN.settingsFrame:IsShown() then
-            openSettingsBtn:SetText(DFCNL["CLOSE_SETTINGS"])
+            openSettingsBtn:SetText(L["CLOSE_SETTINGS"])
         else
-            openSettingsBtn:SetText(DFCNL["OPEN_SETTINGS"])
+            openSettingsBtn:SetText(L["OPEN_SETTINGS"])
         end
     end
 
@@ -3953,12 +3938,12 @@ function DFCN.CreateOptionsPanel()
 
     local commandTip = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     commandTip:SetPoint("TOPLEFT", openSettingsBtn, "BOTTOMLEFT", 0, -10)
-    commandTip:SetText(DFCNL["COMMAND_TIP"])
+    commandTip:SetText(L["COMMAND_TIP"])
     commandTip:SetTextColor(0.8, 0.8, 0.8)
 
     local downloadLabel = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     downloadLabel:SetPoint("TOPLEFT", commandTip, "BOTTOMLEFT", 0, -20)
-    downloadLabel:SetText(DFCNL["DOWNLOAD_LABEL"])
+    downloadLabel:SetText(L["DOWNLOAD_LABEL"])
     downloadLabel:SetTextColor(1, 1, 1)
     
     local downloadEditBox = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
@@ -3970,7 +3955,7 @@ function DFCN.CreateOptionsPanel()
     
     local copyTip = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     copyTip:SetPoint("TOPLEFT", downloadEditBox, "BOTTOMLEFT", 0, -5)
-    copyTip:SetText(DFCNL["COPY_TIP"])
+    copyTip:SetText(L["COPY_TIP"])
     copyTip:SetTextColor(0.7, 0.7, 0.7)
     
     downloadEditBox:SetScript("OnEscapePressed", function(self)

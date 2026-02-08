@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local TT = M:GetModule("Tooltip")
+local B, C, L, DB = unpack(ns)
+local TT = B:GetModule("Tooltip")
 
 local strmatch, strsplit, tonumber = string.match, string.split, tonumber
 local INSTANCE, BOSS = INSTANCE, BOSS
@@ -56,7 +56,7 @@ function TT:HyperLink_SetJournal(link)
 		local info = TT:HyperLink_GetSectionInfo(id)
 		name, description, icon = info.title, info.description, info.abilityIcon
 		name = icon and "|T"..icon..":20:20:0:0:64:64:5:59:5:59:20|t "..name or name
-		idString = U["Section"].."ID:"
+		idString = L["Section"].."ID:"
 	end
 	if not name then return end
 
@@ -64,7 +64,7 @@ function TT:HyperLink_SetJournal(link)
 	GameTooltip:AddDoubleLine(name, GetDifficultyInfo(diffID))
 	GameTooltip:AddLine(description, 1,1,1, 1)
 	GameTooltip:AddLine(" ")
-	GameTooltip:AddDoubleLine(idString, I.InfoColor..id)
+	GameTooltip:AddDoubleLine(idString, DB.InfoColor..id)
 	GameTooltip:Show()
 end
 
@@ -113,11 +113,11 @@ end
 local function hookCommunitiesFrame(event, addon)
 	if addon == "Blizzard_Communities" then
 		hookMessageFrame()
-		M:UnregisterEvent(event, hookCommunitiesFrame)
+		B:UnregisterEvent(event, hookCommunitiesFrame)
 	end
 end
 if C_AddOns.IsAddOnLoaded("Blizzard_Communities") then
 	hookMessageFrame()
 else
-	M:RegisterEvent("ADDON_LOADED", hookCommunitiesFrame)
+	B:RegisterEvent("ADDON_LOADED", hookCommunitiesFrame)
 end

@@ -1,9 +1,9 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-if not R.Infobar.Gold then return end
+local B, C, L, DB = unpack(ns)
+if not C.Infobar.Gold then return end
 
-local module = M:GetModule("Infobar")
-local info = module:RegisterInfobar("Gold", R.Infobar.GoldPos)
+local module = B:GetModule("Infobar")
+local info = module:RegisterInfobar("Gold", C.Infobar.GoldPos)
 
 local format, pairs, wipe, unpack = string.format, pairs, table.wipe, unpack
 local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
@@ -17,27 +17,27 @@ local C_Container_UseContainerItem = C_Container.UseContainerItem
 local C_Container_GetContainerNumSlots = C_Container.GetContainerNumSlots
 local C_Container_GetContainerItemInfo = C_Container.GetContainerItemInfo
 
-local slotString = U["Bags"]..": %s%d"
+local slotString = L["Bags"]..": %s%d"
 local showGoldGap = 100 * 1e4
 
 local profit, spent, oldMoney = 0, 0, 0
-local myName, myRealm = I.MyName, I.MyRealm
+local myName, myRealm = DB.MyName, DB.MyRealm
 myRealm = gsub(myRealm, "%s", "") -- fix for multi words realm name
 
 StaticPopupDialogs["RESETGOLD"] = {
-	text = U["Are you sure to reset the gold count?"],
+	text = L["Are you sure to reset the gold count?"],
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function()
 		wipe(OrzUISetDB["totalGold"])
 		if not OrzUISetDB["totalGold"][myRealm] then OrzUISetDB["totalGold"][myRealm] = {} end
-		OrzUISetDB["totalGold"][myRealm][myName] = {GetMoney(), I.MyClass}
+		OrzUISetDB["totalGold"][myRealm][myName] = {GetMoney(), DB.MyClass}
 	end,
 	whileDead = 1,
 }
 
 local menuList = {
-	{text = M.HexRGB(1, .8, 0)..REMOVE_WORLD_MARKERS.."!!!", notCheckable = true, func = function() StaticPopup_Show("RESETGOLD") end},
+	{text = B.HexRGB(1, .8, 0)..REMOVE_WORLD_MARKERS.."!!!", notCheckable = true, func = function() StaticPopup_Show("RESETGOLD") end},
 }
 
 local function getClassIcon(class)
@@ -93,7 +93,7 @@ info.onEvent = function(self, event, arg1)
 	if not OrzUISetDB["totalGold"][myRealm] then OrzUISetDB["totalGold"][myRealm] = {} end
 	if not OrzUISetDB["totalGold"][myRealm][myName] then OrzUISetDB["totalGold"][myRealm][myName] = {} end
 	OrzUISetDB["totalGold"][myRealm][myName][1] = GetMoney()
-	OrzUISetDB["totalGold"][myRealm][myName][2] = I.MyClass
+	OrzUISetDB["totalGold"][myRealm][myName][2] = DB.MyClass
 
 	oldMoney = newMoney
 end
@@ -117,7 +117,7 @@ function RebuildCharList()
 			if not (realm == myRealm and name == myName) then
 				index = index + 1
 				if not menuList[index] then menuList[index] = {} end
-				menuList[index].text = M.HexRGB(M.ClassColor(value[2]))..Ambiguate(name.."-"..realm, "none")
+				menuList[index].text = B.HexRGB(B.ClassColor(value[2]))..Ambiguate(name.."-"..realm, "none")
 				menuList[index].notCheckable = true
 				menuList[index].arg1 = realm
 				menuList[index].arg2 = name
@@ -134,7 +134,7 @@ info.onMouseUp = function(self, btn)
 				RebuildCharList()
 				menuList[1].created = true
 			end
-			EasyMenu(menuList, M.EasyMenu, self, -80, 100, "MENU", 1)
+			EasyMenu(menuList, B.EasyMenu, self, -80, 100, "MENU", 1)
 		--else
 			--OrzUISetDB["ShowSlots"] = not OrzUISetDB["ShowSlots"]
 			--if OrzUISetDB["ShowSlots"] then
@@ -151,7 +151,7 @@ info.onMouseUp = function(self, btn)
 		--if OrzUISetDB["ShowSlots"] then
 			--ToggleAllBags()
 		--else
-			--if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
+			--if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
 			ToggleCharacter("TokenFrame")
 		--end
 	end
@@ -166,25 +166,25 @@ info.onEnter = function(self)
 	GameTooltip:AddLine(CURRENCY, 0,.6,1)
 	GameTooltip:AddLine(" ")
 
-	GameTooltip:AddLine(U["Session"], .6,.8,1)
-	GameTooltip:AddDoubleLine(U["Earned"], module:GetMoneyString(profit, true), 1,1,1, 1,1,1)
-	GameTooltip:AddDoubleLine(U["Spent"], module:GetMoneyString(spent, true), 1,1,1, 1,1,1)
+	GameTooltip:AddLine(L["Session"], .6,.8,1)
+	GameTooltip:AddDoubleLine(L["Earned"], module:GetMoneyString(profit, true), 1,1,1, 1,1,1)
+	GameTooltip:AddDoubleLine(L["Spent"], module:GetMoneyString(spent, true), 1,1,1, 1,1,1)
 	if profit < spent then
-		GameTooltip:AddDoubleLine(U["Deficit"], module:GetMoneyString(spent-profit, true), 1,0,0, 1,1,1)
+		GameTooltip:AddDoubleLine(L["Deficit"], module:GetMoneyString(spent-profit, true), 1,0,0, 1,1,1)
 	elseif profit > spent then
-		GameTooltip:AddDoubleLine(U["Profit"], module:GetMoneyString(profit-spent, true), 0,1,0, 1,1,1)
+		GameTooltip:AddDoubleLine(L["Profit"], module:GetMoneyString(profit-spent, true), 0,1,0, 1,1,1)
 	end
 	GameTooltip:AddLine(" ")
 
 	local totalGold = 0
-	GameTooltip:AddLine(U["RealmCharacter"], .6,.8,1)
+	GameTooltip:AddLine(L["RealmCharacter"], .6,.8,1)
 
 	if OrzUISetDB["totalGold"][myRealm] then
 		for k, v in pairs(OrzUISetDB["totalGold"][myRealm]) do
 			local gold, class = unpack(v)
 			local name = Ambiguate(k.."-"..myRealm, "none")
 			if gold > showGoldGap or UnitIsUnit(name, "player") then
-				local r, g, b = M.ClassColor(class)
+				local r, g, b = B.ClassColor(class)
 				GameTooltip:AddDoubleLine(getClassIcon(class)..name, module:GetMoneyString(gold), r,g,b, 1,1,1)
 				totalGold = totalGold + gold
 			end
@@ -199,7 +199,7 @@ info.onEnter = function(self)
 				if gold > showGoldGap then
 					if isShiftKeyDown then -- show other realms while holding shift
 						local name = Ambiguate(k.."-"..realm, "none")
-						local r, g, b = M.ClassColor(class)
+						local r, g, b = B.ClassColor(class)
 						GameTooltip:AddDoubleLine(getClassIcon(class)..name, module:GetMoneyString(gold), r,g,b, 1,1,1)
 					end
 					totalGold = totalGold + gold
@@ -208,7 +208,7 @@ info.onEnter = function(self)
 		end
 	end
 	if not isShiftKeyDown then
-		GameTooltip:AddLine(U["Hold Shift"], .6,.8,1)
+		GameTooltip:AddLine(L["Hold Shift"], .6,.8,1)
 	end
 
 	local accountmoney = C_Bank.FetchDepositedMoney(Enum.BankType.Account)
@@ -247,12 +247,12 @@ info.onEnter = function(self)
 		end
 	end
   GameTooltip:AddDoubleLine(" ","--------------",1,1,1,0.5,0.5,0.5)
-	GameTooltip:AddDoubleLine(" ", I.ScrollButton..U["AutoSell Junk"]..": "..(OrzUISetDB["AutoSell"] and "|cff55ff55"..VIDEO_OPTIONS_ENABLED or "|cffff5555"..VIDEO_OPTIONS_DISABLED).." ", 1,1,1, .6,.8,1)
-	GameTooltip:AddDoubleLine(" ", I.RightButton..U["Reset Gold"].." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", DB.ScrollButton..L["AutoSell Junk"]..": "..(OrzUISetDB["AutoSell"] and "|cff55ff55"..VIDEO_OPTIONS_ENABLED or "|cffff5555"..VIDEO_OPTIONS_DISABLED).." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", DB.RightButton..L["Reset Gold"].." ", 1,1,1, .6,.8,1)
 	GameTooltip:Show()
 end
 
-info.onLeave = M.HideTooltip
+info.onLeave = B.HideTooltip
 
 -- Auto selljunk
 local stop, cache = true, {}
@@ -267,7 +267,7 @@ local function startSelling()
 			if info then
 				if not cache["b"..bag.."s"..slot] and info.hyperlink and not info.hasNoValue
 				and (info.quality == 0 or OrzUISetDB["CustomJunkList"][info.itemID])
-				and (not C_TransmogCollection_GetItemInfo(info.hyperlink) or not M.IsUnknownTransmog(bag, slot)) then
+				and (not C_TransmogCollection_GetItemInfo(info.hyperlink) or not B.IsUnknownTransmog(bag, slot)) then
 					cache["b"..bag.."s"..slot] = true
 					C_Container_UseContainerItem(bag, slot)
 					C_Timer_After(.1, startSelling)
@@ -287,10 +287,10 @@ local function updateSelling(event, ...)
 		stop = false
 		wipe(cache)
 		startSelling()
-		M:RegisterEvent("UI_ERROR_MESSAGE", updateSelling)
+		B:RegisterEvent("UI_ERROR_MESSAGE", updateSelling)
 	elseif event == "UI_ERROR_MESSAGE" and arg == errorText or event == "MERCHANT_CLOSED" then
 		stop = true
 	end
 end
-M:RegisterEvent("MERCHANT_SHOW", updateSelling)
-M:RegisterEvent("MERCHANT_CLOSED", updateSelling)
+B:RegisterEvent("MERCHANT_SHOW", updateSelling)
+B:RegisterEvent("MERCHANT_CLOSED", updateSelling)

@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local S = M:GetModule("Skins")
+local B, C, L, DB = unpack(ns)
+local S = B:GetModule("Skins")
 
 local function removeStyle(bar)
 	bar.candyBarBackdrop:Hide()
@@ -30,11 +30,11 @@ local function styleBar(bar)
 	bar:SetHeight(height/2)
 	bar.candyBarBackdrop:Hide()
 	if not bar.styled then
-		M.StripTextures(bar.candyBarBar, true)
-		M.SetBD(bar.candyBarBar)
+		B.StripTextures(bar.candyBarBar, true)
+		B.SetBD(bar.candyBarBar)
 		bar.styled = true
 	end
-	bar:SetTexture(I.normTex)
+	bar:SetTexture(DB.normTex)
 
 	local tex = bar:GetIcon()
 	if tex then
@@ -52,7 +52,7 @@ local function styleBar(bar)
 		bar.candyBarIconFrameBackdrop:Hide()
 
 		if not icon.styled then
-			M.SetBD(icon)
+			B.SetBD(icon)
 			icon.styled = true
 		end
 	end
@@ -78,7 +78,7 @@ local styleData = {
 }
 
 function S:RegisterBWStyle()
-	if not R.db["Skins"]["Bigwigs"] then return end
+	if not C.db["Skins"]["Bigwigs"] then return end
 	if not BigWigsAPI then return end
 
 	BigWigsAPI:RegisterBarStyle("NDui", styleData)
@@ -93,14 +93,14 @@ function S:RegisterBWStyle()
 end
 
 function S:BigWigsSkin()
-	if not R.db["Skins"]["Bigwigs"] then return end
+	if not C.db["Skins"]["Bigwigs"] then return end
 
 	if BigWigsLoader and BigWigsLoader.RegisterMessage then
 		BigWigsLoader.RegisterMessage(_, "BigWigs_FrameCreated", function(_, frame, name)
 			if frame and (name == "QueueTimer") and not frame.styled then
-				M.StripTextures(frame)
-				frame:SetStatusBarTexture(I.normTex)
-				M.SetBD(frame)
+				B.StripTextures(frame)
+				frame:SetStatusBarTexture(DB.normTex)
+				B.SetBD(frame)
 
 				frame.styled = true
 			end

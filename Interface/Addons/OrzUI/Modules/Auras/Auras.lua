@@ -1,13 +1,16 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 local oUF = ns.oUF
-local A = M:RegisterModule("Auras")
+local A = B:RegisterModule("Auras")
 
 local _G = getfenv(0)
 local format, floor, strmatch, select, unpack, tonumber = format, floor, strmatch, select, unpack, tonumber
 local GetTime = GetTime
 local GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo = GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo
-local C_UnitAuras_GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex
+local GetAuraApplicationDisplayCount = C_UnitAuras.GetAuraApplicationDisplayCount
+local GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex
+local GetAuraDuration = C_UnitAuras.GetAuraDuration
+local MIN_SPELL_COUNT, MAX_SPELL_COUNT = 2, 999
 
 function A:OnLogin()
 	A:HideBlizBuff()
@@ -17,46 +20,54 @@ function A:OnLogin()
 end
 
 function A:HideBlizBuff()
-	if not R.db["Auras"]["BuffFrame"] and not R.db["Auras"]["HideBlizBuff"] then return end
+	if not C.db["Auras"]["BuffFrame"] and not C.db["Auras"]["HideBlizBuff"] then return end
 
-	M:RegisterEvent("PLAYER_ENTERING_WORLD", function(_, isLogin, isReload)
+	B:RegisterEvent("PLAYER_ENTERING_WORLD", function(_, isLogin, isReload)
 		if isLogin or isReload then
-			M.HideObject(_G.BuffFrame)
-			M.HideObject(_G.DebuffFrame)
+			B.HideObject(_G.BuffFrame)
+			B.HideObject(_G.DebuffFrame)
 			BuffFrame.numHideableBuffs = 0 -- fix error when on editmode
 		end
 	end)
 end
 
 function A:BuildBuffFrame()
-	if not R.db["Auras"]["BuffFrame"] then return end
+	if not C.db["Auras"]["BuffFrame"] then return end
 
 	-- Config
 	A.settings = {
 		Buffs = {
 			offset = 12,
-			size = R.db["Auras"]["BuffSize"],
-			wrapAfter = R.db["Auras"]["BuffsPerRow"],
+			size = C.db["Auras"]["BuffSize"],
+			wrapAfter = C.db["Auras"]["BuffsPerRow"],
 			maxWraps = 3,
-			reverseGrow = R.db["Auras"]["ReverseBuff"],
+			reverseGrow = C.db["Auras"]["ReverseBuff"],
 		},
 		Debuffs = {
 			offset = 12,
-			size = R.db["Auras"]["DebuffSize"],
-			wrapAfter = R.db["Auras"]["DebuffsPerRow"],
+			size = C.db["Auras"]["DebuffSize"],
+			wrapAfter = C.db["Auras"]["DebuffsPerRow"],
 			maxWraps = 1,
-			reverseGrow = R.db["Auras"]["ReverseDebuff"],
+			reverseGrow = C.db["Auras"]["ReverseDebuff"],
 		},
 	}
 
+	A.DispelColorCurve = C_CurveUtil.CreateColorCurve()
+	A.DispelColorCurve:SetType(Enum.LuaCurveType.Step)
+	for _, dispelIndex in next, oUF.Enum.DispelType do
+		if(oUF.colors.dispel[dispelIndex]) then
+			A.DispelColorCurve:AddPoint(dispelIndex, oUF.colors.dispel[dispelIndex])
+		end
+	end
+
 	-- Movers
 	A.BuffFrame = A:CreateAuraHeader("HELPFUL")
-	A.BuffFrame.mover = M.Mover(A.BuffFrame, "Buffs", "BuffAnchor", R.Auras.BuffPos)
+	A.BuffFrame.mover = B.Mover(A.BuffFrame, "Buffs", "BuffAnchor", C.Auras.BuffPos)
 	A.BuffFrame:ClearAllPoints()
 	A.BuffFrame:SetPoint("TOPRIGHT", A.BuffFrame.mover)
 
 	A.DebuffFrame = A:CreateAuraHeader("HARMFUL")
-	A.DebuffFrame.mover = M.Mover(A.DebuffFrame, "Debuffs", "DebuffAnchor", {"TOPRIGHT", A.BuffFrame.mover, "BOTTOMRIGHT", 0, -12})
+	A.DebuffFrame.mover = B.Mover(A.DebuffFrame, "Debuffs", "DebuffAnchor", {"TOPRIGHT", A.BuffFrame.mover, "BOTTOMRIGHT", 0, -12})
 	A.DebuffFrame:ClearAllPoints()
 	A.DebuffFrame:SetPoint("TOPRIGHT", A.DebuffFrame.mover)
 end
@@ -64,15 +75,15 @@ end
 local day, hour, minute = 86400, 3600, 60
 function A:FormatAuraTime(s)
 	if s >= day then
-		return format("%d"..I.MyColor.."d", s/day + .5), s%day
+		return format("%d"..DB.MyColor.."d", s/day + .5), s%day
 	elseif s >= 2*hour then
-		return format("%d"..I.MyColor.."h", s/hour + .5), s%hour
+		return format("%d"..DB.MyColor.."h", s/hour + .5), s%hour
 	elseif s >= 10*minute then
-		return format("%d"..I.MyColor.."m", s/minute + .5), s%minute
+		return format("%d"..DB.MyColor.."m", s/minute + .5), s%minute
 	elseif s >= minute then
 		return format("%d:%.2d", s/minute, s%minute), s - floor(s)
 	elseif s > 10 then
-		return format("%d"..I.MyColor.."s", s + .5), s - floor(s)
+		return format("%d"..DB.MyColor.."s", s + .5), s - floor(s)
 	elseif s > 5 then
 		return format("|cffffff00%.1f|r", s), s - format("%.1f", s)
 	else
@@ -110,17 +121,12 @@ function A:UpdateTimer(elapsed)
 	if onTooltip then A:Button_SetTooltip(self) end
 end
 
-function A:GetSpellStat(arg16, arg17, arg18)
-	if not arg16 then return end
-	return (arg16 > 0 and U["Versa"]) or (arg17 > 0 and U["Mastery"]) or (arg18 > 0 and U["Haste"]) or U["Crit"]
-end
-
 function A:UpdateAuras(button, index)
 	local unit, filter = button.header:GetAttribute("unit"), button.filter
-	local auraData = C_UnitAuras_GetAuraDataByIndex(unit, index, filter)
+	local auraData = GetAuraDataByIndex(unit, index, filter)
 	if not auraData then return end
-
-	if auraData.duration > 0 and auraData.expirationTime then
+--[[
+	if auraData.duration and auraData.expirationTime then
 		local timeLeft = auraData.expirationTime - GetTime()
 		if not button.timeLeft then
 			button.nextUpdate = -1
@@ -135,36 +141,42 @@ function A:UpdateAuras(button, index)
 		button.timeLeft = nil
 		button.timer:SetText("|cff00ff00^-^|r")
 	end
+]]
+	local auraDuration = unit and GetAuraDuration(unit, auraData.auraInstanceID)
+	if auraDuration then
+		button.Cooldown:SetCooldownFromDurationObject(auraDuration)
+		button.Cooldown:Show()
+	else
+		button.Cooldown:Hide()
+	end
 
 	local count = auraData.applications
-	if count and count > 1 then
-		button.count:SetText(count)
+	if B:IsSecretValue(count) then
+		button.count:SetText(GetAuraApplicationDisplayCount(unit, auraData.auraInstanceID, MIN_SPELL_COUNT, MAX_SPELL_COUNT))
 	else
-		button.count:SetText("")
+		local hideCount = not count or (count < MIN_SPELL_COUNT or count > MAX_SPELL_COUNT)
+		button.count:SetText(hideCount and "" or count)
 	end
 
 	if filter == "HARMFUL" then
-		local color = oUF.colors.debuff[auraData.dispelName or "none"]
-		button:SetBackdropBorderColor(color[1], color[2], color[3])
+		local color = C_UnitAuras.GetAuraDispelTypeColor(unit, auraData.auraInstanceID, A.DispelColorCurve)
+		button:SetBackdropBorderColor(color:GetRGB())
 	else
 		button:SetBackdropBorderColor(0, 0, 0)
-	end
-
-	-- Show spell stat for 'Soleahs Secret Technique'
-	if auraData.spellId == 368512 then
-		button.count:SetText(A:GetSpellStat(unpack(auraData.points)))
 	end
 
 	button.spellID = auraData.spellId
 	button.icon:SetTexture(auraData.icon)
 	button.expiration = nil
+	button.timeLeft = nil
+	button.timer:SetText("") --button.timer:SetText("|cff00ff00^-^|r")
 end
 
 function A:UpdateTempEnchant(button, index)
 	local expirationTime = select(button.enchantOffset, GetWeaponEnchantInfo())
 	if expirationTime then
 		local quality = GetInventoryItemQuality("player", index)
-		local color = I.QualityColors[quality or 1]
+		local color = DB.QualityColors[quality or 1]
 		button:SetBackdropBorderColor(color.r, color.g, color.b)
 		button.icon:SetTexture(GetInventoryItemTexture("player", index))
 
@@ -189,12 +201,12 @@ function A:OnAttributeChanged(attribute, value)
 end
 
 function A:UpdateOptions()
-	A.settings.Buffs.size = R.db["Auras"]["BuffSize"]
-	A.settings.Buffs.wrapAfter = R.db["Auras"]["BuffsPerRow"]
-	A.settings.Buffs.reverseGrow = R.db["Auras"]["ReverseBuff"]
-	A.settings.Debuffs.size = R.db["Auras"]["DebuffSize"]
-	A.settings.Debuffs.wrapAfter = R.db["Auras"]["DebuffsPerRow"]
-	A.settings.Debuffs.reverseGrow = R.db["Auras"]["ReverseDebuff"]
+	A.settings.Buffs.size = C.db["Auras"]["BuffSize"]
+	A.settings.Buffs.wrapAfter = C.db["Auras"]["BuffsPerRow"]
+	A.settings.Buffs.reverseGrow = C.db["Auras"]["ReverseBuff"]
+	A.settings.Debuffs.size = C.db["Auras"]["DebuffSize"]
+	A.settings.Debuffs.wrapAfter = C.db["Auras"]["DebuffsPerRow"]
+	A.settings.Debuffs.reverseGrow = C.db["Auras"]["ReverseDebuff"]
 end
 
 function A:UpdateHeader(header)
@@ -211,9 +223,9 @@ function A:UpdateHeader(header)
 	header:SetAttribute("wrapAfter", cfg.wrapAfter)
 	header:SetAttribute("maxWraps", cfg.maxWraps)
 	header:SetAttribute("point", cfg.reverseGrow and "TOPLEFT" or "TOPRIGHT")
-	header:SetAttribute("minWidth", (cfg.size + R.margin)*cfg.wrapAfter)
+	header:SetAttribute("minWidth", (cfg.size + C.margin)*cfg.wrapAfter)
 	header:SetAttribute("minHeight", (cfg.size + cfg.offset)*cfg.maxWraps)
-	header:SetAttribute("xOffset", (cfg.reverseGrow and 1 or -1) * (cfg.size + R.margin))
+	header:SetAttribute("xOffset", (cfg.reverseGrow and 1 or -1) * (cfg.size + C.margin))
 	header:SetAttribute("yOffset", 0)
 	header:SetAttribute("wrapXOffset", 0)
 	header:SetAttribute("wrapYOffset", -(cfg.size + cfg.offset))
@@ -227,8 +239,9 @@ function A:UpdateHeader(header)
 			child:SetSize(cfg.size, cfg.size)
 		end
 
-		M.SetFontSize(child.count, fontSize)
-		M.SetFontSize(child.timer, fontSize)
+		B.SetFontSize(child.count, fontSize)
+		B.SetFontSize(child.timer, fontSize)
+		B.SetFontSize(child.CooldownText, fontSize)
 
 		--Blizzard bug fix, icons arent being hidden when you reduce the amount of maximum buttons
 		if index > (cfg.maxWraps * cfg.wrapAfter) and child:IsShown() then
@@ -275,9 +288,9 @@ function A:CreateAuraHeader(filter)
 end
 
 function A:RemoveSpellFromIgnoreList()
-	if IsAltKeyDown() and IsControlKeyDown() and self.spellID and R.db["AuraWatchList"]["IgnoreSpells"][self.spellID] then
-		R.db["AuraWatchList"]["IgnoreSpells"][self.spellID] = nil
-		print(format(U["RemoveFromIgnoreList"], I.OrzUIString, self.spellID))
+	if IsAltKeyDown() and IsControlKeyDown() and self.spellID and C.db["AuraWatchList"]["IgnoreSpells"][self.spellID] then
+		C.db["AuraWatchList"]["IgnoreSpells"][self.spellID] = nil
+		print(format(L["RemoveFromIgnoreList"], DB.OrzUIString, self.spellID))
 	end
 end
 
@@ -313,26 +326,39 @@ function A:CreateAuraIcon(button)
 
 	button.icon = button:CreateTexture(nil, "BORDER")
 	button.icon:SetInside()
-	button.icon:SetTexCoord(unpack(I.TexCoord))
+	button.icon:SetTexCoord(unpack(DB.TexCoord))
 
 	button.count = button:CreateFontString(nil, "ARTWORK")
 	button.count:SetPoint("TOPRIGHT", -1, -3)
-	M.SetFontSize(button.count, fontSize)
+	B.SetFontSize(button.count, fontSize)
 
 	button.timer = button:CreateFontString(nil, "ARTWORK")
 	button.timer:SetPoint("TOP", button, "BOTTOM", 1, 2)
-	M.SetFontSize(button.timer, fontSize)
+	B.SetFontSize(button.timer, fontSize)
 
 	button.highlight = button:CreateTexture(nil, "HIGHLIGHT")
 	button.highlight:SetColorTexture(1, 1, 1, .25)
 	button.highlight:SetInside()
 
-	M.CreateBD(button, .25)
-	M.CreateSD(button)
+	local cd = CreateFrame("Cooldown", "$parentCooldown", button, "CooldownFrameTemplate")
+	cd:SetReverse(true)
+	cd:SetEdgeTexture(DB.bgTex)
+	cd:SetDrawSwipe(C.db["Auras"]["CDAnimation"])
+	cd:SetDrawBling(false)
+	button.Cooldown = cd
+
+	local text = cd:GetRegions()
+	B.SetFontSize(text, fontSize)
+	text:ClearAllPoints()
+	text:SetPoint("TOP", button, "BOTTOM", 1, 2)
+	button.CooldownText = text
+
+	B.CreateBD(button, .25)
+	B.CreateSD(button)
 
 	--button:RegisterForClicks("RightButtonUp", "RightButtonDown")
 	button:SetScript("OnAttributeChanged", A.OnAttributeChanged)
-	button:HookScript("OnMouseDown", A.RemoveSpellFromIgnoreList)
+	--button:HookScript("OnMouseDown", A.RemoveSpellFromIgnoreList)
 	button:SetScript("OnEnter", A.Button_OnEnter)
-	button:SetScript("OnLeave", M.HideTooltip)
+	button:SetScript("OnLeave", B.HideTooltip)
 end

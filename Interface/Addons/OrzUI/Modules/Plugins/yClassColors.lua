@@ -1,5 +1,5 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 local oUF = ns.oUF
 ----------------------------
 -- yClassColors, by yleaf
@@ -12,8 +12,8 @@ local C_BattleNet_GetFriendAccountInfo = C_BattleNet.GetFriendAccountInfo
 
 -- Colors
 local function classColor(class, showRGB)
-	local color = I.ClassColors[I.ClassList[class] or class]
-	if not color then color = I.ClassColors["PRIEST"] end
+	local color = DB.ClassColors[DB.ClassList[class] or class]
+	if not color then color = DB.ClassColors["PRIEST"] end
 
 	if showRGB then
 		return color.r, color.g, color.b
@@ -23,7 +23,7 @@ local function classColor(class, showRGB)
 end
 
 local function diffColor(level)
-	return M.HexRGB(GetQuestDifficultyColor(level))
+	return B.HexRGB(GetQuestDifficultyColor(level))
 end
 
 local rankColor = {
@@ -41,8 +41,8 @@ local repColor = {
 }
 
 local function smoothColor(cur, max, color)
-	local r, g, b = oUF:RGBColorGradient(cur, max, unpack(color))
-	return M.HexRGB(r, g, b)
+	local r, g, b = B:RGBColorGradient(cur, max, unpack(color))
+	return B.HexRGB(r, g, b)
 end
 
 -- Guild
@@ -94,9 +94,9 @@ local function updateGuildUI(event, addon)
 	hooksecurefunc("GuildRoster_Update", updateGuildView)
 	hooksecurefunc(GuildRosterContainer, "update", updateGuildView)
 
-	M:UnregisterEvent(event, updateGuildUI)
+	B:UnregisterEvent(event, updateGuildUI)
 end
-M:RegisterEvent("ADDON_LOADED", updateGuildUI)
+B:RegisterEvent("ADDON_LOADED", updateGuildUI)
 
 --[[ Friends
 local FRIENDS_LEVEL_TEMPLATE = FRIENDS_LEVEL_TEMPLATE:gsub("%%d", "%%s")

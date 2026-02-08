@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:GetModule("Chat")
+local B, C, L, DB = unpack(ns)
+local module = B:GetModule("Chat")
 
 local _G = getfenv(0)
 local gsub, format, tconcat, tostring = string.gsub, string.format, table.concat, tostring
@@ -18,7 +18,7 @@ local function isMessageProtected(msg)
 end
 
 local function replaceMessage(msg, r, g, b)
-	local hexRGB = M.HexRGB(r, g, b)
+	local hexRGB = B.HexRGB(r, g, b)
 	--msg = gsub(msg, "|T(.-):.-|t", "%1") -- accept texture path or id
 	--msg = gsub(msg, "|A(.-):.-|a", "%1") -- accept atlas path or id, needs review
 	msg = gsub(msg, "|T(.-):.-|t", "")
@@ -30,7 +30,7 @@ function module:GetChatLines()
 	local index = 1
 	for i = 1, self:GetNumMessages() do
 		local msg, r, g, b = self:GetMessageInfo(i)
-		if msg and not isMessageProtected(msg) then
+		if msg and B:NotSecretValue(msg) and not isMessageProtected(msg) then
 			r, g, b = r or 1, g or 1, b or 1
 			msg = replaceMessage(msg, r, g, b)
 			lines[index] = tostring(msg)
@@ -57,8 +57,8 @@ function module:ChatCopy_OnClick(btn)
 			frame:Hide()
 		end
 	--elseif btn == "RightButton" then
-		--M:TogglePanel(menu)
-		--R.db["Chat"]["ChatMenu"] = menu:IsShown()
+		--B:TogglePanel(menu)
+		--C.db["Chat"]["ChatMenu"] = menu:IsShown()
 	--end
 end
 
@@ -70,7 +70,7 @@ function module:ChatCopy_CreateMenu()
 	menu = CreateFrame("Frame", nil, UIParent)
 	menu:SetSize(25, 100)
 	menu:SetPoint("TOPLEFT", _G.ChatFrame1, "TOPRIGHT", 15, 0)
-	menu:SetShown(R.db["Chat"]["ChatMenu"])
+	menu:SetShown(C.db["Chat"]["ChatMenu"])
 
 	_G.ChatFrameMenuButton:ClearAllPoints()
 	_G.ChatFrameMenuButton:SetPoint("TOP", menu)
@@ -94,8 +94,8 @@ function module:ChatCopy_Create()
 	frame:SetSize(700, 400)
 	frame:Hide()
 	frame:SetFrameStrata("DIALOG")
-	M.CreateMF(frame)
-	M.SetBD(frame)
+	B.CreateMF(frame)
+	B.SetBD(frame)
 	frame.close = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
 	frame.close:SetPoint("TOPRIGHT", frame)
 
@@ -108,7 +108,7 @@ function module:ChatCopy_Create()
 	editBox:SetMaxLetters(99999)
 	editBox:EnableMouse(true)
 	editBox:SetAutoFocus(false)
-	editBox:SetFont(I.Font[1], 12, "")
+	editBox:SetFont(DB.Font[1], 12, "")
 	editBox:SetWidth(scrollArea:GetWidth())
 	editBox:SetHeight(scrollArea:GetHeight())
 	editBox:SetScript("OnEscapePressed", function() frame:Hide() end)
@@ -131,16 +131,16 @@ function module:ChatCopy_Create()
 	copy:SetAlpha(.5)
 	copy.Icon = copy:CreateTexture(nil, "ARTWORK")
 	copy.Icon:SetAllPoints()
-	copy.Icon:SetTexture(I.copyTex)
+	copy.Icon:SetTexture(DB.copyTex)
 	copy:RegisterForClicks("AnyUp")
 	copy:SetScript("OnClick", self.ChatCopy_OnClick)
-	local copyStr = format(U["Chat Copy"], I.LeftButton, I.RightButton)
-	M.AddTooltip(copy, "ANCHOR_RIGHT", copyStr)
+	local copyStr = format(L["Chat Copy"], DB.LeftButton, DB.RightButton)
+	B.AddTooltip(copy, "ANCHOR_RIGHT", copyStr)
 	copy:HookScript("OnEnter", function() copy:SetAlpha(1) end)
 	copy:HookScript("OnLeave", function() copy:SetAlpha(.5) end)
 
-	M.ReskinClose(frame.close)
-	M.ReskinScroll(ChatCopyScrollFrameScrollBar)
+	B.ReskinClose(frame.close)
+	B.ReskinScroll(ChatCopyScrollFrameScrollBar)
 end
 
 function module:ChatCopy()

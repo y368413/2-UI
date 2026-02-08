@@ -1,9 +1,11 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
-tinsert(R.defaultThemes, function()
-	--if not R.db["Skins"]["FontOutline"] then return end
+tinsert(C.defaultThemes, function()
+	--if not C.db["Skins"]["FontOutline"] then return end
 	-- Refont RaidFrame Health
+	if DB.isNewPatch then return end
+
 	hooksecurefunc("CompactUnitFrame_UpdateStatusText", function(frame)
 		if frame:IsForbidden() then return end
 		if not frame.statusText then return end

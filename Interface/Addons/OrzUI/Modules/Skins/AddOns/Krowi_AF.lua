@@ -1,26 +1,26 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local S = M:GetModule("Skins")
+local B, C, L, DB = unpack(ns)
+local S = B:GetModule("Skins")
 
 local _G = _G
 local strfind = strfind
-local cr, cg, cb = I.r, I.g, I.b
+local cr, cg, cb = DB.r, DB.g, DB.b
 
 local function SetupButtonHighlight(button, bg)
 	if button.Highlight then
-		M.StripTextures(button.Highlight)
+		B.StripTextures(button.Highlight)
 	end
-	button:SetHighlightTexture(I.bdTex)
+	button:SetHighlightTexture(DB.bdTex)
 	local hl = button:GetHighlightTexture()
 	hl:SetVertexColor(cr, cg, cb, .25)
 	hl:SetInside(bg)
 end
 
 local function SetupStatusbar(bar)
-	M.StripTextures(bar)
-	bar:SetStatusBarTexture(I.bdTex)
+	B.StripTextures(bar)
+	bar:SetStatusBarTexture(DB.bdTex)
 	bar:GetStatusBarTexture():SetGradient("VERTICAL", CreateColor(0, .4, 0, 1), CreateColor(0, .6, 0, 1))
-	M.CreateBDFrame(bar, .25)
+	B.CreateBDFrame(bar, .25)
 end
 
 local function updateAchievementLabel(frame)
@@ -48,11 +48,11 @@ end
 
 local function SetupAchivementButton(button)
 	if button.styled then return end
-	M.StripTextures(button, true)
+	B.StripTextures(button, true)
 	button.Icon.Border:Hide()
-	M.ReskinIcon(button.Icon.Texture)
+	B.ReskinIcon(button.Icon.Texture)
 	if button.Tracked then
-		M.ReskinCheck(button.Tracked)
+		B.ReskinCheck(button.Tracked)
 		button.Tracked:SetSize(20, 20)
 		button.Check:SetAlpha(0)
 	end
@@ -62,7 +62,7 @@ local function SetupAchivementButton(button)
 		updateAchievementLabel(plusMinus)
 		hooksecurefunc(plusMinus, "SetTexCoord", updateAchievementLabel)
 	end
-	local bg = M.CreateBDFrame(button, .25)
+	local bg = B.CreateBDFrame(button, .25)
 	bg:SetInside()
 	SetupButtonHighlight(button, bg)
 
@@ -80,8 +80,8 @@ end
 
 local function SetupCategory(button)
 	if not button.styled then
-		M.StripTextures(button)
-		local bg = M.CreateBDFrame(button, .25)
+		B.StripTextures(button)
+		local bg = B.CreateBDFrame(button, .25)
 		bg:SetPoint("TOPLEFT", 0, -1)
 		bg:SetPoint("BOTTOMRIGHT")
 		SetupButtonHighlight(button, bg)
@@ -92,7 +92,7 @@ end
 local function ReskinCalendarAchievement(self)
 	for _, bu in pairs(self.AchievementButtons) do
 		if not bu.styled then
-			M.ReskinIcon(bu.Texture)
+			B.ReskinIcon(bu.Texture)
 			bu.styled = true
 		end
 	end
@@ -104,19 +104,19 @@ function S:KrowiAF()
 	for i = 4, 8 do
 		local tab = _G["AchievementFrameTab"..i]
 		if tab and not tab.bg then
-			M.ReskinTab(tab)
+			B.ReskinTab(tab)
 		end
 	end
 
-	M.ReskinFilterButton(KrowiAF_AchievementFrameFilterButton)
+	B.ReskinFilterButton(KrowiAF_AchievementFrameFilterButton)
 	KrowiAF_AchievementFrameFilterButton:SetPoint("TOPLEFT", 24, 0)
-	M.ReskinEditBox(KrowiAF_SearchBoxFrame)
+	B.ReskinEditBox(KrowiAF_SearchBoxFrame)
 	KrowiAF_SearchOptionsMenuButton:DisableDrawLayer("BACKGROUND")
 
 	local frame = KrowiAF_CategoriesFrame
 	if frame then
-		M.StripTextures(frame)
-		M.ReskinTrimScroll(frame.ScrollBar)
+		B.StripTextures(frame)
+		B.ReskinTrimScroll(frame.ScrollBar)
 
 		hooksecurefunc(frame.ScrollBox, "Update", function(self)
 			self:ForEachFrame(SetupCategory)
@@ -125,29 +125,29 @@ function S:KrowiAF()
 
 	local frame = KrowiAF_AchievementFrameSummaryFrame or KrowiAF_SummaryFrame
 	if frame then
-		M.StripTextures(frame)
+		B.StripTextures(frame)
 		frame:GetChildren():Hide()
 		frame.AchievementsFrame.Border:Hide()
-		M.ReskinTrimScroll(frame.AchievementsFrame.ScrollBar)
+		B.ReskinTrimScroll(frame.AchievementsFrame.ScrollBar)
 
 		hooksecurefunc(frame.AchievementsFrame.ScrollBox, "Update", function(self)
 			self:ForEachFrame(SetupAchivementButton)
 		end)
 
 		local function skinProgressBar(bar)
-			M.StripTextures(bar)
+			B.StripTextures(bar)
 			if i ~= 1 then
 				bar.BorderLeftTop:SetPoint("TOPLEFT", -1, 10)
 			end
-			local bg = M.CreateBDFrame(bar.Background, .25)
+			local bg = B.CreateBDFrame(bar.Background, .25)
 			if bar.Button then
-				M.StripTextures(bar.Button)
+				B.StripTextures(bar.Button)
 				SetupButtonHighlight(bar.Button, bg)
 			end
 			for _, fill in next, bar.Fill do
-				fill:SetTexture(I.bdTex)
+				fill:SetTexture(DB.bdTex)
 			end
-			bar:SetColors({R = 0, G = .4, M = 0}, {R = 0, G = .6, M = 0})
+			bar:SetColors({R = 0, G = .4, B = 0}, {R = 0, G = .6, B = 0})
 		end
 
 		local numFrames = 1
@@ -163,8 +163,8 @@ function S:KrowiAF()
 
 	local frame = KrowiAF_AchievementsFrame
 	if frame then
-		M.StripTextures(frame)
-		M.ReskinTrimScroll(frame.ScrollBar)
+		B.StripTextures(frame)
+		B.ReskinTrimScroll(frame.ScrollBar)
 
 		hooksecurefunc(frame.ScrollBox, "Update", function(self)
 			self:ForEachFrame(SetupAchivementButton)
@@ -209,8 +209,8 @@ function S:KrowiAF()
 			if not button.bg then
 				button.Background:SetTexture("")
 				button.Icon.Overlay:SetTexture("")
-				M.ReskinIcon(button.Icon.Texture)
-				button.bg = M.SetBD(button)
+				B.ReskinIcon(button.Icon.Texture)
+				button.bg = B.SetBD(button)
 				button.bg:SetPoint("TOPLEFT", 6, -9)
 				button.bg:SetPoint("BOTTOMRIGHT", 2, 12)
 			end
@@ -219,10 +219,10 @@ function S:KrowiAF()
 
 	local button = KrowiAF_AchievementCalendarButton
 	if button then
-		M.StripTextures(button)
+		B.StripTextures(button)
 		local icon = button:CreateTexture()
 		icon:SetAllPoints()
-		icon:SetTexture(I.garrTex)
+		icon:SetTexture(DB.garrTex)
 
 		button:ClearAllPoints()
 		button:SetPoint("TOPLEFT", AchievementFrame, -12, 12)
@@ -230,19 +230,19 @@ function S:KrowiAF()
 
 	local frame = KrowiAF_AchievementCalendarFrame
 	if frame then
-		M.StripTextures(frame)
-		M.SetBD(frame)
-		M.ReskinArrow(frame.PrevMonthButton, "left")
-		M.ReskinArrow(frame.NextMonthButton, "right")
-		M.ReskinClose(frame.CloseButton)
+		B.StripTextures(frame)
+		B.SetBD(frame)
+		B.ReskinArrow(frame.PrevMonthButton, "left")
+		B.ReskinArrow(frame.NextMonthButton, "right")
+		B.ReskinClose(frame.CloseButton)
 
 		for i = 1, 42 do
 			local button = frame.DayButtons[i]
 			if button then
 				button:DisableDrawLayer("BACKGROUND")
 				button.DarkFrame:SetAlpha(.5)
-				button:SetHighlightTexture(I.bdTex)
-				local bg = M.CreateBDFrame(button, .25)
+				button:SetHighlightTexture(DB.bdTex)
+				local bg = B.CreateBDFrame(button, .25)
 				bg:SetInside()
 				local hl = button:GetHighlightTexture()
 				hl:SetVertexColor(cr, cg, cb, .25)
@@ -253,22 +253,22 @@ function S:KrowiAF()
 		end
 
 		frame.TodayFrame:SetSize(90, 90)
-		M.StripTextures(frame.TodayFrame)
-		local bg = M.CreateBDFrame(frame.TodayFrame, 0)
+		B.StripTextures(frame.TodayFrame)
+		local bg = B.CreateBDFrame(frame.TodayFrame, 0)
 		bg:SetInside()
 		bg:SetBackdropBorderColor(cr, cg, cb)
 
 		local sideFrame = frame.SideFrame
 		if sideFrame then
-			M.StripTextures(sideFrame)
-			M.StripTextures(sideFrame.Header)
-			M.SetBD(sideFrame)
-			M.ReskinClose(sideFrame.CloseButton)
+			B.StripTextures(sideFrame)
+			B.StripTextures(sideFrame.Header)
+			B.SetBD(sideFrame)
+			B.ReskinClose(sideFrame.CloseButton)
 	
 			local achesFrame = sideFrame.AchievementsFrame
 			if achesFrame then
-				M.StripTextures(achesFrame)
-				M.ReskinTrimScroll(achesFrame.ScrollBar)
+				B.StripTextures(achesFrame)
+				B.ReskinTrimScroll(achesFrame.ScrollBar)
 		
 				hooksecurefunc(achesFrame.ScrollBox, "Update", function(self)
 					self:ForEachFrame(SetupAchivementButton)
@@ -279,46 +279,46 @@ function S:KrowiAF()
 
 	local container = KrowiAF_SearchPreviewContainer
 	if container then
-		M.StripTextures(container)
+		B.StripTextures(container)
 		for i = 1, 5 do
 			local preview = _G["KrowiAF_SearchPreview"..i]
 			if preview then
-				M.StyleSearchButton(preview)
+				B.StyleSearchButton(preview)
 			end
 		end
 
 		local showAllResults = container.ShowFullSearchResultsButton
-		local bg = M.SetBD(container)
+		local bg = B.SetBD(container)
 		bg:SetPoint("TOPLEFT", -3, 3)
 		bg:SetPoint("BOTTOMRIGHT", showAllResults, 3, -3)
-		M.StyleSearchButton(showAllResults)
+		B.StyleSearchButton(showAllResults)
 	end
 
 	if KrowiAF_AchievementFrameBrowsingHistoryPrevAchievementButton then
-		M.ReskinArrow(KrowiAF_AchievementFrameBrowsingHistoryPrevAchievementButton, "left")
+		B.ReskinArrow(KrowiAF_AchievementFrameBrowsingHistoryPrevAchievementButton, "left")
 	end
 	if KrowiAF_AchievementFrameBrowsingHistoryNextAchievementButton then
-		M.ReskinArrow(KrowiAF_AchievementFrameBrowsingHistoryNextAchievementButton, "right")
+		B.ReskinArrow(KrowiAF_AchievementFrameBrowsingHistoryNextAchievementButton, "right")
 	end
 
 	if KrowiAF_DataManagerFrame then
-		M.ReskinPortraitFrame(KrowiAF_DataManagerFrame)
-		M.Reskin(KrowiAF_DataManagerFrame.Import)
+		B.ReskinPortraitFrame(KrowiAF_DataManagerFrame)
+		B.Reskin(KrowiAF_DataManagerFrame.Import)
 
 		local characterList = KrowiAF_DataManagerFrame.CharacterList
 		if characterList then
 			local columnDisplay = characterList.ColumnDisplay
 			if columnDisplay then
-				M.StripTextures(columnDisplay)
+				B.StripTextures(columnDisplay)
 				for i = 1, columnDisplay:GetNumChildren() do
 					local child = select(i, columnDisplay:GetChildren())
-					M.StripTextures(child)
+					B.StripTextures(child)
 		
-					local bg = M.CreateBDFrame(child, .25)
+					local bg = B.CreateBDFrame(child, .25)
 					bg:SetPoint("TOPLEFT", 4, -2)
 					bg:SetPoint("BOTTOMRIGHT", 0, 2)
 		
-					child:SetHighlightTexture(I.bdTex)
+					child:SetHighlightTexture(DB.bdTex)
 					local hl = child:GetHighlightTexture()
 					hl:SetVertexColor(cr, cg, cb, .25)
 					hl:SetInside(bg)
@@ -329,16 +329,16 @@ function S:KrowiAF()
 				for i = 1, self.ScrollTarget:GetNumChildren() do
 					local button = select(i, self.ScrollTarget:GetChildren())
 					if not button.styled then
-						M.ReskinCheck(button.HeaderTooltip)
-						M.ReskinCheck(button.EarnedByAchievementTooltip)
-						M.ReskinCheck(button.MostProgressAchievementTooltip)
-						M.ReskinCheck(button.IgnoreCharacter)
+						B.ReskinCheck(button.HeaderTooltip)
+						B.ReskinCheck(button.EarnedByAchievementTooltip)
+						B.ReskinCheck(button.MostProgressAchievementTooltip)
+						B.ReskinCheck(button.IgnoreCharacter)
 	
 						button.styled = true
 					end
 				end
 			end)
-			M.ReskinTrimScroll(characterList.ScrollBar)
+			B.ReskinTrimScroll(characterList.ScrollBar)
 		end
 	end
 end

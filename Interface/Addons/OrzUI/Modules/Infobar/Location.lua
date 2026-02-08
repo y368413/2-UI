@@ -1,11 +1,11 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-if not R.Infobar.Location then return end
+local B, C, L, DB = unpack(ns)
+if not C.Infobar.Location then return end
 
-local module = M:GetModule("Infobar")
-local info = module:RegisterInfobar("Zone", R.Infobar.LocationPos)
-local mapModule = M:GetModule("Maps")
-info.text:SetFont(unpack(R.Infobar.TTFonts))
+local module = B:GetModule("Infobar")
+local info = module:RegisterInfobar("Zone", C.Infobar.LocationPos)
+local mapModule = B:GetModule("Maps")
+info.text:SetFont(unpack(C.Infobar.TTFonts))
 local format, unpack = string.format, unpack
 local WorldMapFrame, SELECTED_DOCK_FRAME, ChatFrame_OpenChat = WorldMapFrame, SELECTED_DOCK_FRAME, ChatFrame_OpenChat
 local GetZonePVPInfo = C_PvP and C_PvP.GetZonePVPInfo or GetZonePVPInfo
@@ -78,9 +78,9 @@ info.onEnter = function(self)
 		GameTooltip:AddLine(format(zoneInfo[pvpType][1], faction or ""), r, g, b)
 	end
 
-	GameTooltip:AddDoubleLine(" ", I.LineString)
-	GameTooltip:AddDoubleLine(" ", I.LeftButton..U["WorldMap"].." ", 1,1,1, .6,.8,1)
-	GameTooltip:AddDoubleLine(" ", I.RightButton..U["Send My Pos"].." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", DB.LineString)
+	GameTooltip:AddDoubleLine(" ", DB.LeftButton..L["WorldMap"].." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", DB.RightButton..L["Send My Pos"].." ", 1,1,1, .6,.8,1)
 	GameTooltip:Show()
 end
 
@@ -94,12 +94,12 @@ local zoneString = "|cffffff00|Hworldmap:%d+:%d+:%d+|h[|A:Waypoint-MapPin-ChatIc
 
 info.onMouseUp = function(_, btn)
 	if btn == "LeftButton" then
-		if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
+		if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
 		ToggleFrame(WorldMapFrame)
 	elseif btn == "RightButton" then
 		local mapID = C_Map_GetBestMapForUnit("player")
 		local hasUnit = UnitExists("target") and not UnitIsPlayer("target")
 		local unitName = hasUnit and UnitName("target") or ""
-		print(format(zoneString, mapID, coordX*10000, coordY*10000, U["My Position"], zone, formatCoords(), unitName))
+		print(format(zoneString, mapID, coordX*10000, coordY*10000, L["My Position"], zone, formatCoords(), unitName))
 	end
 end]]

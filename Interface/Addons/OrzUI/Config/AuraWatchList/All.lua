@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local module = M:GetModule("AurasTable")
+local B, C, L, DB = unpack(ns)
+local module = B:GetModule("AurasTable")
 --[[
 	>>>自定义添加时，要注意格式，注意逗号，注意字母大小写<<<
 	ALL下面是对全职业通用的设置，其他情况请在自己职业下添加。当你添加时，要注意是否重复。
@@ -64,12 +64,12 @@ local list = {
 		{AuraID = 227261, UnitID = "player"},	--枯法者
 		{AuraID = 216695, UnitID = "player"}, 	--被折磨的灵魂
 		-- DZ六骰子
-		{AuraID = 193356, UnitID = "player", Text = U["Combo"]},	-- 强势连击，骰子
-		{AuraID = 193357, UnitID = "player", Text = U["Crit"]},	-- 暗鲨涌动，骰子
-		{AuraID = 193358, UnitID = "player", Text = U["AttackSpeed"]},	-- 大乱斗，骰子
-		{AuraID = 193359, UnitID = "player", Text = U["CD"]},	-- 双巧手，骰子
-		{AuraID = 199603, UnitID = "player", Text = U["Strike"]},	-- 骷髅黑帆，骰子
-		{AuraID = 199600, UnitID = "player", Text = U["Power"]},	-- 埋藏的宝藏，骰子
+		{AuraID = 193356, UnitID = "player", Text = L["Combo"]},	-- 强势连击，骰子
+		{AuraID = 193357, UnitID = "player", Text = L["Crit"]},	-- 暗鲨涌动，骰子
+		{AuraID = 193358, UnitID = "player", Text = L["AttackSpeed"]},	-- 大乱斗，骰子
+		{AuraID = 193359, UnitID = "player", Text = L["CD"]},	-- 双巧手，骰子
+		{AuraID = 199603, UnitID = "player", Text = L["Strike"]},	-- 骷髅黑帆，骰子
+		{AuraID = 199600, UnitID = "player", Text = L["Power"]},	-- 埋藏的宝藏，骰子
 	},
 	["Absorb"] = {		-- 吸收
 		{AuraID = 190456, UnitID = "player", Value = true}, 	--无视痛苦	
@@ -77,7 +77,7 @@ local list = {
 		{AuraID = 209388, UnitID = "player", Value = true},		--秩序堡垒
 		{AuraID =  11426, UnitID = "player", Value = true},		--寒冰护体
 		{AuraID = 235313, UnitID = "player", Value = true},		--烈焰护体
-		{AuraID = 157504, UnitID = "player", Value = true},		--暴雨图腾
+		--{AuraID = 157504, UnitID = "player", Value = true},		--暴雨图腾
 		{AuraID = 132639, UnitID = "player", Value = true},		--搏击排队
 	},
 	["Shield"] = {		-- 护盾
@@ -127,8 +127,8 @@ local list = {
 		{AuraID = 445560, UnitID = "player"},	-- 紫蛋
 		{AuraID = 449954, UnitID = "player"},	-- 奸邪发射机
 		{AuraID = 449947, UnitID = "player", Text = NPE_JUMP},	-- 奸邪发射机，跳3下
-		{AuraID = 1213433, UnitID = "player", Text = U["Crit"]},	-- 哈哈棱镜
-		{AuraID = 1213434, UnitID = "player", Text = U["Haste"]},	-- 哈哈棱镜
+		{AuraID = 1213433, UnitID = "player", Text = L["Crit"]},	-- 哈哈棱镜
+		{AuraID = 1213434, UnitID = "player", Text = L["Haste"]},	-- 哈哈棱镜
 		{AuraID = 466681, UnitID = "player"},	-- 纸牌屋
 		{AuraID = 1241806, UnitID = "player"},	-- 被诅咒的雕像
 		{AuraID = 1239675, UnitID = "player", Combat = true},	-- 棱镜，叠层
@@ -139,10 +139,10 @@ local list = {
 		{AuraID = 383941, UnitID = "player"},	-- 崩坏之力
 		{AuraID = 383781, UnitID = "player"},	-- 谜题盒
 		{AuraID = 214980, UnitID = "player", Flash = true},	-- 切割漩涡
-		{AuraID = 381954, UnitID = "player", Text = U["Crit"]},	-- 奈萨鲁斯战利品
-		{AuraID = 381955, UnitID = "player", Text = U["Haste"]},	-- 奈萨鲁斯战利品
-		{AuraID = 381956, UnitID = "player", Text = U["Mastery"]},	-- 奈萨鲁斯战利品
-		{AuraID = 381957, UnitID = "player", Text = U["Versa"]},	-- 奈萨鲁斯战利品
+		{AuraID = 381954, UnitID = "player", Text = L["Crit"]},	-- 奈萨鲁斯战利品
+		{AuraID = 381955, UnitID = "player", Text = L["Haste"]},	-- 奈萨鲁斯战利品
+		{AuraID = 381956, UnitID = "player", Text = L["Mastery"]},	-- 奈萨鲁斯战利品
+		{AuraID = 381957, UnitID = "player", Text = L["Versa"]},	-- 奈萨鲁斯战利品
 		{AuraID = 382126, UnitID = "player"},	-- 威能窃取
 		{AuraID = 395175, UnitID = "player", Value = true},	-- 树木的溃烂裂木
 		{AuraID = 397399, UnitID = "player"},	-- 虚空篡改者的暗影宝石
@@ -160,8 +160,8 @@ local list = {
 		{AuraID = 394456, UnitID = "player", Value = true},	-- 巢穴守护者的屏障
 		-- 盟约，TODO: 部分已被整合进天赋，待整理
 		{AuraID = 331937, UnitID = "player", Flash = true},	-- 沉醉
-		{AuraID = 354053, UnitID = "player", Flash = true, Text = U["Crit"]}, -- 致命缺陷，暴击
-		{AuraID = 354054, UnitID = "player", Flash = true, Text = U["Versa"]}, -- 致命缺陷，全能
+		{AuraID = 354053, UnitID = "player", Flash = true, Text = L["Crit"]}, -- 致命缺陷，暴击
+		{AuraID = 354054, UnitID = "player", Flash = true, Text = L["Versa"]}, -- 致命缺陷，全能
 		{AuraID = 323546, UnitID = "player"},	-- 饕餮狂乱
 		{AuraID = 326860, UnitID = "player"},	-- 陨落僧众
 		{AuraID = 310143, UnitID = "player", Combat = true},-- 灵魂变形
@@ -324,7 +324,7 @@ local list = {
 		{AuraID = 257407, UnitID = "player"},	-- 追踪，阿塔达萨
 		{AuraID = 250585, UnitID = "player", Flash = true},	-- 剧毒之池，阿塔达萨
 		{AuraID = 258723, UnitID = "player", Flash = true},	-- 怪诞之池，阿塔达萨
-		{AuraID = 268086, UnitID = "player", Text = U["Move"]},	-- 恐怖光环，庄园
+		{AuraID = 268086, UnitID = "player", Text = L["Move"]},	-- 恐怖光环，庄园
 		{AuraID = 427513, UnitID = "player", Flash = true},	-- 剧毒释放，永茂林地
 		-- Raids
 		{AuraID = 407406, UnitID = "player", Flash = true},	-- 腐蚀，萨卡雷斯
@@ -458,7 +458,7 @@ local list = {
 		{AuraID = 204018, UnitID = "target", Flash = true},	-- 破咒祝福
 		{AuraID = 205191, UnitID = "target"},	-- 以眼还眼 惩戒
 		{AuraID = 104773, UnitID = "target"},	-- 不灭决心
-		{AuraID = 199754, UnitID = "target"},	-- 还击
+		--{AuraID = 199754, UnitID = "target"},	-- 还击
 		{AuraID = 120954, UnitID = "target"},	-- 壮胆酒
 		{AuraID = 122278, UnitID = "target"},	-- 躯不坏
 		{AuraID = 122783, UnitID = "target"},	-- 散魔功

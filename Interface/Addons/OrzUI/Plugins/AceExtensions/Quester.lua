@@ -539,8 +539,8 @@ function Quester:OnInitialize()
 	self.eventFrame = CreateFrame("Frame", "QuesterEventFrame")
 	self.eventFrame:SetScript("OnEvent", function(frame, event, ...) Quester:HandleEvent(event, ...) end)
 
-	TooltipDataProcessor.AddLinePostCall(Enum.TooltipDataLineType.QuestTitle, self.TooltipLineProcessorQuestTitle)
-	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, self.TooltipProcessorItem)
+	--TooltipDataProcessor.AddLinePostCall(Enum.TooltipDataLineType.QuestTitle, self.TooltipLineProcessorQuestTitle)
+	--TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, self.TooltipProcessorItem)    --Fix for 12.0 by y368413
 end
 
 function Quester:RegisterEvent(event)

@@ -3,7 +3,7 @@
 -- NDui MOD
 --------------------------------
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 local oUF = ns.oUF
 local GetSpellName = C_Spell.GetSpellName
 
@@ -59,15 +59,15 @@ end
 local function setupAttribute(self)
 	if InCombatLockdown() then return end
 
-	if classList[I.MyClass] and not C_AddOns.IsAddOnLoaded("Clique") then
+	if classList[DB.MyClass] and not C_AddOns.IsAddOnLoaded("Clique") then
 		self:SetAttribute("*type3", "macro")
-		self:SetAttribute("macrotext3", macroBody(I.MyClass))
+		self:SetAttribute("macrotext3", macroBody(DB.MyClass))
 		self:UnregisterEvent("PLAYER_REGEN_ENABLED", setupAttribute)
 	end
 end
 
 local function Enable(self)
-	if not R.db["UFs"]["AutoRes"] then return end
+	if not C.db["UFs"]["AutoRes"] then return end
 
 	if InCombatLockdown() then
 		self:RegisterEvent("PLAYER_REGEN_ENABLED", setupAttribute, true)
@@ -77,7 +77,7 @@ local function Enable(self)
 end
 
 local function Disable(self)
-	if R.db["UFs"]["AutoRes"] then return end
+	if C.db["UFs"]["AutoRes"] then return end
 
 	self:SetAttribute("*type3", nil)
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED", setupAttribute)

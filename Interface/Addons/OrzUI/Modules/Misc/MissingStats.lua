@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local MISC = M:GetModule("Misc")
+local B, C, L, DB = unpack(ns)
+local M = B:GetModule("Misc")
 
 local format, max = string.format, math.max
 local BreakUpLargeNumbers, GetMeleeHaste, UnitAttackSpeed = BreakUpLargeNumbers, GetMeleeHaste, UnitAttackSpeed
@@ -9,8 +9,8 @@ local PaperDollFrame_SetLabelAndText = PaperDollFrame_SetLabelAndText
 local STAT_HASTE = STAT_HASTE
 local HIGHLIGHT_FONT_COLOR_CODE, FONT_COLOR_CODE_CLOSE = HIGHLIGHT_FONT_COLOR_CODE, FONT_COLOR_CODE_CLOSE
 
-function MISC:MissingStats()
-	if not R.db["Misc"]["MissingStats"] then return end
+function M:MissingStats()
+	if not C.db["Misc"]["MissingStats"] then return end
 	if C_AddOns.IsAddOnLoaded("DejaCharacterStats") then return end
 
 	local statPanel = CreateFrame("Frame", nil, CharacterFrameInsetRight)
@@ -20,7 +20,7 @@ function MISC:MissingStats()
 	local scrollFrame = CreateFrame("ScrollFrame", nil, statPanel, "UIPanelScrollFrameTemplate")
 	scrollFrame:SetAllPoints()
 	scrollFrame.ScrollBar:Hide()
-	scrollFrame.ScrollBar.Show = M.Dummy
+	scrollFrame.ScrollBar.Show = B.Dummy
 	local stat = CreateFrame("Frame", nil, scrollFrame)
 	stat:SetSize(200, 1)
 	scrollFrame:SetScrollChild(stat)
@@ -135,4 +135,4 @@ function MISC:MissingStats()
 		end
 	end)
 end
-MISC:RegisterMisc("MissingStats", MISC.MissingStats)
+M:RegisterMisc("MissingStats", M.MissingStats)

@@ -1,17 +1,17 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-local S = M:RegisterModule("Skins")
+local B, C, L, DB = unpack(ns)
+local S = B:RegisterModule("Skins")
 
 local pairs, wipe = pairs, wipe
 local xpcall = xpcall
 local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 
-R.defaultThemes = {}
-R.themes = {}
-R.otherSkins = {}
+C.defaultThemes = {}
+C.themes = {}
+C.otherSkins = {}
 
 function S:RegisterSkin(addonName, func)
-	R.otherSkins[addonName] = func
+	C.otherSkins[addonName] = func
 end
 
 function S:LoadSkins(list)
@@ -30,36 +30,36 @@ function S:LoadAddOnSkins()
 	if IsAddOnLoaded("AuroraClassic") or IsAddOnLoaded("Aurora") then return end
 
 	-- Reskin Blizzard UIs
-	for _, func in pairs(R.defaultThemes) do
+	for _, func in pairs(C.defaultThemes) do
 		xpcall(func, geterrorhandler())
 	end
-	wipe(R.defaultThemes)
+	wipe(C.defaultThemes)
 
-	--if not R.db["Skins"]["BlizzardSkins"] then
+	--if not C.db["Skins"]["BlizzardSkins"] then
 		--wipe(C.themes)
 	--end
 
-	S:LoadSkins(R.themes) -- blizzard ui
-	S:LoadSkins(R.otherSkins) -- other addons
+	S:LoadSkins(C.themes) -- blizzard ui
+	S:LoadSkins(C.otherSkins) -- other addons
 
-	M:RegisterEvent("ADDON_LOADED", function(_, addonName)
-		local func = R.themes[addonName]
+	B:RegisterEvent("ADDON_LOADED", function(_, addonName)
+		local func = C.themes[addonName]
 		if func then
 			xpcall(func, geterrorhandler())
-			R.themes[addonName] = nil
+			C.themes[addonName] = nil
 		end
 
-		local func = R.otherSkins[addonName]
+		local func = C.otherSkins[addonName]
 		if func then
 			xpcall(func, geterrorhandler())
-			R.otherSkins[addonName] = nil
+			C.otherSkins[addonName] = nil
 		end
 	end)
 end
 
 function S:OnLogin()
    ----BOTTOM
-   if R.db["Skins"]["InfobarLine"] then
+   if C.db["Skins"]["InfobarLine"] then
    local Bottomline = CreateFrame("Frame", nil, UIParent) 
    Bottomline:SetFrameLevel(0) 
    Bottomline:SetFrameStrata("BACKGROUND")
@@ -79,7 +79,7 @@ function S:OnLogin()
 	-- Register skin
 	local media = LibStub and LibStub("LibSharedMedia-3.0", true)
 	if media then
-		media:Register("statusbar", "normTex", I.normTex)
+		media:Register("statusbar", "normTex", DB.normTex)
 		media:Register("statusbar", "ShiGuang", [[Interface\Addons\OrzUI\Media\Modules\Skada\ColorBar]])
 		media:Register("statusbar", "HalfStyle", [[Interface\Addons\OrzUI\Media\Modules\Skada\YaSkada05]])
 		media:Register("statusbar", "AtlzSkada", [[Interface\Addons\OrzUI\Media\Modules\Skada\AtlzSkada]])
@@ -106,11 +106,11 @@ function S:OnLogin()
 	     frame:UnregisterAllEvents()
 	     frame:Hide()
     end
-	if R.db["Skins"]["CastBarstyle"] then DisableBlzFrame(TargetFrameSpellBar) DisableBlzFrame(FocusFrameSpellBar) DisableBlzFrame(PetCastingBarFrame) return end --CastingBarFrame]]
+	if C.db["Skins"]["CastBarstyle"] then DisableBlzFrame(TargetFrameSpellBar) DisableBlzFrame(FocusFrameSpellBar) DisableBlzFrame(PetCastingBarFrame) return end --CastingBarFrame]]
 end
 
 function S:GetToggleDirection()
-	local direc = R.db["Skins"]["ToggleDirection"]
+	local direc = C.db["Skins"]["ToggleDirection"]
 	if direc == 1 then
 		return ">", "<", "RIGHT", "LEFT", -2, 0, 20, 80
 	elseif direc == 2 then
@@ -127,7 +127,7 @@ local toggleFrames = {}
 local function CreateToggleButton(parent)
 	local bu = CreateFrame("Button", nil, parent)
 	bu:SetSize(20, 80)
-	bu.text = M.CreateFS(bu, 18, nil, true)
+	bu.text = B.CreateFS(bu, 18, nil, true)
 
 	return bu
 end
@@ -165,7 +165,7 @@ function S:SetToggleDirection(frame)
 	open:SetPoint(rel1, parent, rel1, -x, -y)
 	open:SetSize(width, height)
 
-	if R.db["Skins"]["ToggleDirection"] == 5 then
+	if C.db["Skins"]["ToggleDirection"] == 5 then
 		close:SetScale(.001)
 		close:SetAlpha(0)
 		open:SetScale(.001)

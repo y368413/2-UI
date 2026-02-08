@@ -1,4 +1,4 @@
--- Author: Theck, navv_, seriallos  Version: 12.0.0-02
+-- Author: Theck, navv_, seriallos  Version: 12.0.0-05
 local Simulationcraft = {}
 
 Simulationcraft.RoleTable = {
@@ -13,7 +13,7 @@ Simulationcraft.RoleTable = {
   [102] = 'spell',
   [103] = 'attack',
   [104] = 'tank',
-  [105] = 'attack',
+  [1480] = 'spell',
   -- Evoker
   [1467] = 'spell',
   [1468] = 'attack',
@@ -93,7 +93,8 @@ Simulationcraft.SpecNames = {
 -- Demon Hunter
   [577] = 'Havoc',
   [581] = 'Vengeance',
--- Druid 
+  [1480] = 'Devourer',
+-- Druid
   [102] = 'Balance',
   [103] = 'Feral',
   [104] = 'Guardian',
@@ -1279,7 +1280,7 @@ end --adler32()
 
 function Simulationcraft:GetSimcProfile(debugOutput, noBags, showMerchant, links)
   -- addon metadata
-  local versionComment = '# SimC Addon ' .. '12.0.0-02'
+  local versionComment = '# SimC Addon ' .. '12.0.0-05'
   local wowVersion, wowBuild, _, wowToc = GetBuildInfo()
   local wowVersionComment = '# WoW ' .. wowVersion .. '.' .. wowBuild .. ', TOC ' .. wowToc
   local simcVersionWarning = '# Requires SimulationCraft 1000-01 or newer'

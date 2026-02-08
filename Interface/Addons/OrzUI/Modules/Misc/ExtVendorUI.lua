@@ -1,13 +1,13 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local MISC = M:GetModule("Misc")
+local B, C, L, DB = unpack(ns)
+local M = B:GetModule("Misc")
 --local S = P:GetModule("Skins")
 --------------------------------
 -- Credit: Extended Vendor UI
 --------------------------------
 local OLD_MERCHANT_ITEMS_PER_PAGE = 10
 
-function MISC:ExtVendor_UpdateMerchantPositions()
+function M:ExtVendor_UpdateMerchantPositions()
 	for i = 1, _G.MERCHANT_ITEMS_PER_PAGE do
 		local button = _G["MerchantItem"..i]
 		button:Show()
@@ -34,7 +34,7 @@ function MISC:ExtVendor_UpdateMerchantPositions()
 	end
 end
 
-function MISC:ExtVendor_UpdateBuybackPositions()
+function M:ExtVendor_UpdateBuybackPositions()
 	for i = 1, _G.MERCHANT_ITEMS_PER_PAGE do
 		local button = _G["MerchantItem"..i]
 		button:ClearAllPoints()
@@ -55,10 +55,10 @@ function MISC:ExtVendor_UpdateBuybackPositions()
 	end
 end
 
-function MISC:ExtVendorUI()
+function M:ExtVendorUI()
 	if C_AddOns.IsAddOnLoaded("Krowi_ExtendedVendorUI") then return end
 	if C_AddOns.IsAddOnLoaded("CompactVendor") then return end
-	--if not MISC.db["ExtVendorUI"] then return end
+	--if not M.db["ExtVendorUI"] then return end
 
 	_G.MERCHANT_ITEMS_PER_PAGE = 20
 	_G.MerchantFrame:SetWidth(690)
@@ -79,8 +79,8 @@ function MISC:ExtVendorUI()
 	_G.MerchantNextPageButton:ClearAllPoints()
 	_G.MerchantNextPageButton:SetPoint("CENTER", _G.MerchantFrame, "BOTTOM", 290, 55)
 
-	hooksecurefunc("MerchantFrame_UpdateMerchantInfo", MISC.ExtVendor_UpdateMerchantPositions)
-	hooksecurefunc("MerchantFrame_UpdateBuybackInfo", MISC.ExtVendor_UpdateBuybackPositions)
+	hooksecurefunc("MerchantFrame_UpdateMerchantInfo", M.ExtVendor_UpdateMerchantPositions)
+	hooksecurefunc("MerchantFrame_UpdateBuybackInfo", M.ExtVendor_UpdateBuybackPositions)
 end
 
-MISC:RegisterMisc("ExtVendorUI", MISC.ExtVendorUI)  	--MISC:RegisterPreload("ExtVendorUI", MISC.ExtVendorUI)
+M:RegisterMisc("ExtVendorUI", M.ExtVendorUI)  	--M:RegisterPreload("ExtVendorUI", M.ExtVendorUI)

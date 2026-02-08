@@ -1,15 +1,15 @@
 ﻿-- Configure 配置页面
 local _, ns = ...
-local _, R = unpack(ns)
+local _, C = unpack(ns)
 
 -- 动作条
-R.Bars = {
+C.Bars = {
 	margin = 2,															-- 按键间距
 	padding = 2,														-- 边缘间距
 }
 
 -- BUFF/DEBUFF相关
-R.Auras = {
+C.Auras = {
 	BuffPos			= {"TOPRIGHT", Minimap, "TOPLEFT", -21, -3},		-- BUFF默认位置
 	TotemsPos		= {"CENTER", UIParent, "CENTER", 0, -260},		  -- 图腾助手默认位置
 	
@@ -30,10 +30,14 @@ R.Auras = {
 }
 
 -- 头像相关
-R.UFs = {
+C.UFs = {
 	Playercb		= {"CENTER", UIParent, "CENTER", 0, -265},			-- 玩家施法条默认位置
 	Targetcb		= {"CENTER", UIParent, "CENTER", 0, -145},			-- 目标施法条默认位置
 	Focuscb			= {"CENTER", UIParent, "CENTER", 0, -130},			-- 焦点施法条默认位置
+	PlayerPos		= {"TOPRIGHT", UIParent, "BOTTOM", -200, 300},		-- 玩家框体默认位置
+	TargetPos		= {"TOPLEFT", UIParent, "BOTTOM", 200, 300},		-- 目标框体默认位置
+	ToTPos			= {"BOTTOM", UIParent, "BOTTOM", 136, 250},			-- 目标的目标框体默认位置
+	PetPos			= {"BOTTOM", UIParent, "BOTTOM", -136, 250},		-- 宠物框体默认位置
 	FocusPos		= {"LEFT", UIParent, "LEFT", 150, -150},			-- 焦点框体默认位置
 	PlayerPlate		= {"CENTER", UIParent, "CENTER", 0, -188},			-- 玩家姓名板默认位置
 	BarPoint		= {"CENTER", UIParent, "CENTER", 0, -175},			-- 资源条位置（以自身头像为基准）
@@ -41,23 +45,23 @@ R.UFs = {
 }
 
 -- 小地图
-R.Minimap = {
+C.Minimap = {
 	Pos				= {"TOPRIGHT", UIParent, "TOPRIGHT", 0, 0},	-- 小地图位置
 }
 
 -- 美化及皮肤
-R.Skins = {
+C.Skins = {
 	MicroMenuPos 	= {"TOPRIGHT", Minimap, "TOPLEFT", -1, -3},			-- 微型菜单默认坐标
 	RMPos  			= {"TOP", UIParent, "TOP", -430, 8},					-- 团队工具默认坐标
 }
 
 -- 鼠标提示框
-R.Tooltips = {
+C.Tooltips = {
 	TipPos 	= {"BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -55, 210},		-- 鼠标提示框默认位置
 }
 
 -- 信息条
-R.Infobar = {
+C.Infobar = {
 	CustomAnchor	= false,											-- 自定义位置
 	Guild	 		= true,												-- 公会信息
 	GuildPos 		= {"TOPLEFT", UIParent, "TOPLEFT", 95, -3},			-- 公会信息位置

@@ -1,4 +1,4 @@
---## Author: Yuyuli ## Version: 1.0.41
+--## Author: Yuyuli ## Version: 1.0.46
 local NPCTime = CreateFrame('frame')
 local timeFormat = "%H:%M, %d.%m"
 local band = bit.band
@@ -35,10 +35,12 @@ end
 function NPCTime:ShowTime(self)
   if not IsModifierKeyDown() then return end
   local _, unit = self:GetUnit()
-  local guid = UnitGUID(unit or "none") --[[@as string]]
   if issecretvalue then
-      if issecretvalue(guid) then return end
+    if issecretvalue(unit) then return end
   end
+  if not unit then return end
+  local guid = UnitGUID(unit) --[[@as string]]
+  if not guid then return end
 
   local unitType, _, serverID, _, layerUID, unitID = strsplit("-", guid)
   local timeRaw = tonumber(strsub(guid, -6), 16)
@@ -54,6 +56,7 @@ function NPCTime:ShowTime(self)
       spawnTime = spawnTime - ((2^23) - 1)
     end
     AddColoredDoubleLine(self, serverID.."-"..layerUID, timeFormatter:Format((serverTime-spawnTime), false).." ("..date(timeFormat, spawnTime)..")")
+      --AddColoredDoubleLine(self, "ID", unitID)
       --if spawnIndex > 0 then
         --AddColoredDoubleLine(self, "Index", spawnIndex)
       --end
@@ -68,13 +71,7 @@ function NPCTime:OnLoad()
   if C_TooltipInfo and TooltipDataProcessor then
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip, tooltipData)
       if tooltip ~= GameTooltip then return end
-      if GetRestrictedActionStatus then
-        if not GetRestrictedActionStatus(1) then
-          self:ShowTime(tooltip)
-        end
-      else
-        self:ShowTime(tooltip)
-      end
+      self:ShowTime(tooltip)
     end)
   else
     GameTooltip:HookScript("OnTooltipSetUnit", function(...) self:ShowTime(...) end)

@@ -1,4 +1,4 @@
--- Author: Simca@Malfurion   ## Version: v2.34.0
+-- Author: Simca@Malfurion   ## Version: v2.35.0 ## SavedVariables: BPBindOptions
 local BattlePetBinds = {}
 local SOBC = _G.SetOverrideBindingClick
 local BattlePetBinds_find = string.find
@@ -39,8 +39,8 @@ function BattlePetBinds.BPB_Shorten(binding)
 		if BattlePetBinds_find(text, "PAGEDOWN") then text = "Dwn" modifiers = modifiers .. "P" end
 		
 		-- handle MOUSEWHEELUP and MOUSEWHEELDOWN
-		if BattlePetBinds_find(text, "MOUSEWHEELUP") then text = "Up" modifiers = "M" end
-		if BattlePetBinds_find(text, "MOUSEWHEELDOWN") then text = "Dwn" modifiers = "M" end
+		if BattlePetBinds_find(text, "MOUSEWHEELUP") then text = "Up" modifiers = "B" end
+		if BattlePetBinds_find(text, "MOUSEWHEELDOWN") then text = "Dwn" modifiers = "B" end
 		
 		-- handle obscure NUMPAD operators
 		if BattlePetBinds_find(text, "PLUS") then text = "+" end
@@ -223,7 +223,6 @@ local function BattlePetBinds_OnEvent(self, event, ...)
 	if (event == "ADDON_LOADED") and (... == "OrzUI") then
 		
 		-- create SavedVariables table using default values if not already found
-		--if (not ShiGuangDB) then ShiGuangDB = {} end
 		if (not ShiGuangDB.ForfeitCheck) then ShiGuangDB.ForfeitCheck = false end
 		if (not ShiGuangDB.Bind) then
 			ShiGuangDB.Bind = {
@@ -367,7 +366,7 @@ end
 
 local title = CreateFont("GameFontNormalLarge", properName)
 title:SetPoint("TOPLEFT", 16, -16)
-local ver = CreateFont("GameFontNormalSmall", "版本 v2.33.0")
+local ver = CreateFont("GameFontNormalSmall", "版本 v2.35.0")
 ver:SetPoint("BOTTOMLEFT", title, "BOTTOMRIGHT", 4, 0)
 local auth = CreateFont("GameFontNormalSmall", "来自于 Simca")
 auth:SetPoint("BOTTOMLEFT", ver, "BOTTOMRIGHT", 3, 0)

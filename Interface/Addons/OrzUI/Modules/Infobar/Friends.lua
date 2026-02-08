@@ -1,9 +1,9 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-if not R.Infobar.Friends then return end
+local B, C, L, DB = unpack(ns)
+if not C.Infobar.Friends then return end
 
-local module = M:GetModule("Infobar")
-local info = module:RegisterInfobar("Friend", R.Infobar.FriendsPos)
+local module = B:GetModule("Infobar")
+local info = module:RegisterInfobar("Friend", C.Infobar.FriendsPos)
 
 local strfind, format, sort, wipe, unpack, tinsert = string.find, string.format, table.sort, table.wipe, unpack, table.insert
 local C_Timer_After = C_Timer.After
@@ -27,17 +27,15 @@ local WOW_PROJECT_60 = WOW_PROJECT_CLASSIC or 2
 local WOW_PROJECT_CATA = WOW_PROJECT_CATACLYSM_CLASSIC or 14
 local CLIENT_WOW_DIFF = "WoV" -- for sorting
 
-local r, g, b = I.r, I.g, I.b
+local r, g, b = DB.r, DB.g, DB.b
 local infoFrame, updateRequest, prevTime
 local friendTable, bnetTable = {}, {}
-local activeZone, inactiveZone = "|cff4cff4c", I.GreyColor
-local noteString = "|T"..I.copyTex..":12|t %s"
+local activeZone, inactiveZone = "|cff4cff4c", DB.GreyColor
+local noteString = "|T"..DB.copyTex..":12|t %s"
 local broadcastString = "|TInterface\\FriendsFrame\\BroadcastIcon:12|t %s (%s)"
-local onlineString = gsub(ERR_FRIEND_ONLINE_SS, ".+h", "")
-local offlineString = gsub(ERR_FRIEND_OFFLINE_S, "%%s", "")
 
 local menuList = {
-	[1] = {text = U["Join or Invite"], isTitle = true, notCheckable = true}
+	[1] = {text = L["Join or Invite"], isTitle = true, notCheckable = true}
 }
 
 local function sortFriends(a, b)
@@ -58,7 +56,7 @@ local function buildFriendTable(num)
 			elseif info.dnd then
 				status = FRIENDS_TEXTURE_DND
 			end
-			local class = I.ClassList[info.className]
+			local class = DB.ClassList[info.className]
 			tinsert(friendTable, {info.name, info.level, class, info.area, status, info.notes})
 		end
 	end
@@ -67,7 +65,7 @@ local function buildFriendTable(num)
 end
 
 local function sortBNFriends(a, b)
-	if I.MyFaction == "Alliance" then
+	if DB.MyFaction == "Alliance" then
 		return a[5] == b[5] and a[4] < b[4] or a[5] > b[5]
 	else
 		return a[5] == b[5] and a[4] > b[4] or a[5] > b[5]
@@ -126,7 +124,7 @@ local function buildBNetTable(num)
 				local timerunningSeasonID = gameAccountInfo.timerunningSeasonID
 
 				charName = FriendsFrame_GetFormattedCharacterName(charName, battleTag, client, timerunningSeasonID)
-				class = I.ClassList[class]
+				class = DB.ClassList[class]
 
 				local status = FRIENDS_TEXTURE_ONLINE
 				if isAFK or isGameAFK then
@@ -186,15 +184,15 @@ function info:FriendsPanel_Init()
 	updateInfoFrameAnchor(infoFrame)
 	infoFrame:SetClampedToScreen(true)
 	infoFrame:SetFrameStrata("DIALOG")
-	local bg = M.SetBD(infoFrame)
+	local bg = B.SetBD(infoFrame)
 	bg:SetBackdropColor(0, 0, 0, .7)
 
 	infoFrame:SetScript("OnLeave", function(self)
 		self:SetScript("OnUpdate", isPanelCanHide)
 	end)
 
-	M.CreateFS(infoFrame, 16, "|cff0099ff"..FRIENDS_LIST, nil, "TOPLEFT", 15, -10)
-	infoFrame.friendCountText = M.CreateFS(infoFrame, 14, "-/-", nil, "TOPRIGHT", -15, -12)
+	B.CreateFS(infoFrame, 16, "|cff0099ff"..FRIENDS_LIST, nil, "TOPLEFT", 15, -10)
+	infoFrame.friendCountText = B.CreateFS(infoFrame, 14, "-/-", nil, "TOPRIGHT", -15, -12)
 	infoFrame.friendCountText:SetTextColor(0, .6, 1)
 
 	local scrollFrame = CreateFrame("ScrollFrame", "OrzUIFriendsInfobarScrollFrame", infoFrame, "HybridScrollFrameTemplate")
@@ -204,7 +202,7 @@ function info:FriendsPanel_Init()
 
 	local scrollBar = CreateFrame("Slider", "$parentScrollBar", scrollFrame, "HybridScrollBarTemplate")
 	scrollBar.doNotHide = true
-	M.ReskinScroll(scrollBar)
+	B.ReskinScroll(scrollBar)
 	scrollFrame.scrollBar = scrollBar
 
 	local scrollChild = scrollFrame.scrollChild
@@ -225,11 +223,11 @@ function info:FriendsPanel_Init()
 	scrollBar:SetMinMaxValues(0, numButtons * buttonHeight)
 	scrollBar:SetValue(0)
 
-	M.CreateFS(infoFrame, 13, I.LineString, false, "BOTTOMRIGHT", -12, 42)
-	--local whspInfo = I.InfoColor..I.RightButton..U["Whisper"]
-	--M.CreateFS(infoFrame, 13, whspInfo, false, "BOTTOMRIGHT", -15, 26)
-	local invtInfo = I.InfoColor..I.RightButton..U["Whisper"].."   "..I.InfoColor.."ALT +"..I.LeftButton..U["Invite"]
-	M.CreateFS(infoFrame, 13, invtInfo, false, "BOTTOMRIGHT", -15, 10)
+	B.CreateFS(infoFrame, 13, DB.LineString, false, "BOTTOMRIGHT", -12, 42)
+	--local whspInfo = DB.InfoColor..DB.RightButton..L["Whisper"]
+	--B.CreateFS(infoFrame, 13, whspInfo, false, "BOTTOMRIGHT", -15, 26)
+	local invtInfo = DB.InfoColor..DB.RightButton..L["Whisper"].."   "..DB.InfoColor.."ALT +"..DB.LeftButton..L["Invite"]
+	B.CreateFS(infoFrame, 13, invtInfo, false, "BOTTOMRIGHT", -15, 10)
 end
 
 local function inviteFunc(_, bnetIDGameAccount, guid)
@@ -247,14 +245,14 @@ local inviteTypeToButtonText = {
 
 local function GetButtonTexFromInviteType(guid, factionName)
 	local inviteType = GetDisplayedInviteType(guid)
-	if factionName and factionName ~= I.MyFaction then
+	if factionName and factionName ~= DB.MyFaction then
 		inviteType = inviteType.."_CROSS_FACTION"
 	end
 	return inviteTypeToButtonText[inviteType]
 end
 
 local function GetNameAndInviteType(class, charName, guid, factionName)
-	return format("%s%s|r %s", M.HexRGB(M.ClassColor(I.ClassList[class])), charName, GetButtonTexFromInviteType(guid, factionName))
+	return format("%s%s|r %s", B.HexRGB(B.ClassColor(DB.ClassList[class])), charName, GetButtonTexFromInviteType(guid, factionName))
 end
 
 local function buttonOnClick(self, btn)
@@ -267,7 +265,7 @@ local function buttonOnClick(self, btn)
 						wipe(menuList[i])
 					end
 				end
-				menuList[1].text = I.InfoColor..self.data[2]
+				menuList[1].text = DB.InfoColor..self.data[2]
 
 				local numGameAccounts = C_BattleNet_GetFriendNumGameAccounts(self.data[1])
 				if numGameAccounts > 0 then
@@ -294,7 +292,7 @@ local function buttonOnClick(self, btn)
 				end
 
 				if index == 2 then return end
-				EasyMenu(menuList, M.EasyMenu, self, 0, 0, "MENU", 1)
+				EasyMenu(menuList, B.EasyMenu, self, 0, 0, "MENU", 1)
 			else
 				InviteToGroup(self.data[1])
 			end
@@ -316,10 +314,8 @@ local function buttonOnClick(self, btn)
 		end
 	else
 		if self.isBNet then
-			--ChatFrame_SendBNetTell(self.data[2])
 			ChatFrameUtil.SendBNetTell(self.data[2])
 		else
-			--ChatFrame_SendTell(self.data[1], SELECTED_DOCK_FRAME)
 			ChatFrameUtil.SendTell(self.data[1], SELECTED_DOCK_FRAME)
 		end
 	end
@@ -330,7 +326,7 @@ local function buttonOnEnter(self)
 	GameTooltip:SetPoint("TOPLEFT", infoFrame, "TOPRIGHT", 5, 0)
 	GameTooltip:ClearLines()
 	if self.isBNet then
-		GameTooltip:AddLine(U["BN"], 0,.6,1)
+		GameTooltip:AddLine(L["BN"], 0,.6,1)
 		GameTooltip:AddLine(" ")
 
 		local index, accountName, _, _, _, _, _, _, _, note, broadcastText, broadcastTime = unpack(self.data)
@@ -353,7 +349,7 @@ local function buttonOnEnter(self)
 					if timerunningSeasonID then
 						charName = TimerunningUtil.AddSmallIcon(charName) -- add timerunning tag on name
 					end
-					realmName = (I.MyRealm == realmName or realmName == "") and "" or "-"..realmName
+					realmName = (DB.MyRealm == realmName or realmName == "") and "" or "-"..realmName
 
 					-- Get TBC realm name from richPresence
 					if wowProjectID == WOW_PROJECT_CATA then
@@ -363,8 +359,8 @@ local function buttonOnEnter(self)
 						end
 					end
 
-					class = I.ClassList[class]
-					local classColor = M.HexRGB(M.ClassColor(class))
+					class = DB.ClassList[class]
+					local classColor = B.HexRGB(B.ClassColor(class))
 					if faction == "Horde" then
 						clientString = "|TInterface\\FriendsFrame\\PlusManz-Horde:16:|t"
 					elseif faction == "Alliance" then
@@ -400,10 +396,10 @@ local function buttonOnEnter(self)
 			GameTooltip:AddLine(format(broadcastString, broadcastText, FriendsFrame_GetLastOnline(broadcastTime)), .3,.6,.8, 1)
 		end
 	else
-		GameTooltip:AddLine(U["WoW"], 1,.8,0)
+		GameTooltip:AddLine(L["WoW"], 1,.8,0)
 		GameTooltip:AddLine(" ")
 		local name, level, class, area, _, note = unpack(self.data)
-		local classColor = M.HexRGB(M.ClassColor(class))
+		local classColor = B.HexRGB(B.ClassColor(class))
 		GameTooltip:AddLine(format("%s %s%s", level, classColor, name))
 		GameTooltip:AddLine(format("%s%s", inactiveZone, area))
 
@@ -426,12 +422,12 @@ function info:FriendsPanel_CreateButton(parent, index)
 	button.status:SetPoint("LEFT", button, 5, 0)
 	button.status:SetSize(16, 16)
 
-	button.name = M.CreateFS(button, 13, "Tag (name)", false, "LEFT", 25, 0)
+	button.name = B.CreateFS(button, 13, "Tag (name)", false, "LEFT", 25, 0)
 	button.name:SetPoint("RIGHT", button, "LEFT", 230, 0)
 	button.name:SetJustifyH("LEFT")
 	button.name:SetTextColor(.5, .7, 1)
 
-	button.zone = M.CreateFS(button, 13, "Zone", false, "RIGHT", -28, 0)
+	button.zone = B.CreateFS(button, 13, "Zone", false, "RIGHT", -28, 0)
 	button.zone:SetPoint("LEFT", button, "RIGHT", -130, 0)
 	button.zone:SetJustifyH("RIGHT")
 
@@ -439,12 +435,12 @@ function info:FriendsPanel_CreateButton(parent, index)
 	button.gameIcon:SetPoint("RIGHT", button, -8, 0)
 	button.gameIcon:SetSize(16, 16)
 	--button.gameIcon:SetTexCoord(.17, .83, .17, .83)
-	--M.CreateBDFrame(button.gameIcon)
+	--B.CreateBDFrame(button.gameIcon)
 
 	button:RegisterForClicks("AnyUp")
 	button:SetScript("OnClick", buttonOnClick)
 	button:SetScript("OnEnter", buttonOnEnter)
-	button:SetScript("OnLeave", M.HideTooltip)
+	button:SetScript("OnLeave", B.HideTooltip)
 
 	return button
 end
@@ -457,9 +453,9 @@ function info:FriendsPanel_UpdateButton(button)
 		local name, level, class, area, status = unpack(friendTable[index])
 		button.status:SetTexture(status)
 		local zoneColor = GetAreaText() == area and activeZone or inactiveZone
-		local levelColor = M.HexRGB(GetQuestDifficultyColor(level))
-		local classColor = I.ClassColors[class] or levelColor
-		button.name:SetText(format("%s%s|r %s%s", levelColor, level, M.HexRGB(classColor), name))
+		local levelColor = B.HexRGB(GetQuestDifficultyColor(level))
+		local classColor = DB.ClassColors[class] or levelColor
+		button.name:SetText(format("%s%s|r %s%s", levelColor, level, B.HexRGB(classColor), name))
 		button.zone:SetText(format("%s%s", zoneColor, area))
 		C_Texture.SetTitleIconTexture(button.gameIcon, BNET_CLIENT_WOW, Enum.TitleIconVersion.Medium)
 
@@ -473,11 +469,11 @@ function info:FriendsPanel_UpdateButton(button)
 		local zoneColor = inactiveZone
 		local name = inactiveZone..charName
 		if client == BNET_CLIENT_WOW then
-			local color = I.ClassColors[class] or GetQuestDifficultyColor(1)
-			name = M.HexRGB(color)..charName.." "..level
+			local color = DB.ClassColors[class] or GetQuestDifficultyColor(1)
+			name = B.HexRGB(color)..charName.." "..level
 			zoneColor = GetAreaText() == infoText and activeZone or inactiveZone
 		end
-		button.name:SetText(format("%s%s|r (%s|r)", I.InfoColor, accountName, name))
+		button.name:SetText(format("%s%s|r (%s|r)", DB.InfoColor, accountName, name))
 		button.zone:SetText(format("%s%s", zoneColor, infoText))
 		if client == CLIENT_WOW_DIFF then
 			C_Texture.SetTitleIconTexture(button.gameIcon, BNET_CLIENT_WOW, Enum.TitleIconVersion.Medium)
@@ -551,13 +547,9 @@ info.eventList = {
 	"CHAT_MSG_SYSTEM",
 }
 
-info.onEvent = function(self, event, arg1)
-	if event == "CHAT_MSG_SYSTEM" then
-		if not strfind(arg1, onlineString) and not strfind(arg1, offlineString) then return end
-	end
-
+info.onEvent = function(self)
 	info:FriendsPanel_Refresh()
-	self.text:SetText(format("%d"..I.MyColor.."%s", info.totalOnline, "^-^"))
+	self.text:SetText(format("%d"..DB.MyColor.."%s", info.totalOnline, "^-^"))
 
 	updateRequest = false
 	if infoFrame and infoFrame:IsShown() then
@@ -583,7 +575,7 @@ info.onEnter = function(self)
 		GameTooltip:ClearLines()
 		GameTooltip:AddDoubleLine(FRIENDS_LIST, format("%s: %s/%s", GUILD_ONLINE_LABEL, totalOnline, totalFriends), 0,.6,1, 0,.6,1)
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(U["No Online"], 1,1,1)
+		GameTooltip:AddLine(L["No Online"], 1,1,1)
 		GameTooltip:Show()
 		return
 	end
@@ -615,7 +607,7 @@ info.onLeave = function()
 end
 
 info.onMouseUp = function(_, btn)
-	if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
+	if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
 
 	if btn ~= "LeftButton" then return end
 	if infoFrame then infoFrame:Hide() end

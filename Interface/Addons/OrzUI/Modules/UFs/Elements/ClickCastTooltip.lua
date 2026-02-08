@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local UF = M:GetModule("UnitFrames")
+local B, C, L, DB = unpack(ns)
+local UF = B:GetModule("UnitFrames")
 
 -- 点击施法提示窗口
 local ClickCastTooltip = CreateFrame("Frame", "OrzUI_ClickCastTooltip", UIParent, "BackdropTemplate")
@@ -291,14 +291,14 @@ end
 -- 显示点击施法提示
 function UF:ShowClickCastTooltip(frame)
 	-- 安全检查：确保数据库已初始化
-	if not R or not R.db or not R.db["UFs"] or not R.db["UFs"]["RaidClickSets"] then 
+	if not C or not C.db or not C.db["UFs"] or not C.db["UFs"]["RaidClickSets"] then 
 		return 
 	end
-	if not OrzUISetDB or not OrzUISetDB["ClickSets"] or not OrzUISetDB["ClickSets"][I.MyClass] then 
+	if not OrzUISetDB or not OrzUISetDB["ClickSets"] or not OrzUISetDB["ClickSets"][DB.MyClass] then 
 		return 
 	end
 	
-	local clickSets = OrzUISetDB["ClickSets"][I.MyClass]
+	local clickSets = OrzUISetDB["ClickSets"][DB.MyClass]
 	if not next(clickSets) then 
 		return 
 	end

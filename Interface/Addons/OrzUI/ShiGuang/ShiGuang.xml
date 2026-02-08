@@ -8,9 +8,9 @@
 	<Script file="ChangeDifficult.lua"/>
 	<Script file="DFCN_DelveHelper.lua"/>
 	<Script file="AutoDestroysItems.lua"/>
-	<Script file="SmartQuestTracker.lua"/>
+	<Script file="AutoQuestTracker_MkIII.lua"/>
 	<Script file="ConsoleVariableManager.lua"/>
 	<!--Script file="Loot\kAutoOpen.lua"/>
-	<Script file="Loot\SimpleMinimapBlip.lua"/-->
-	<Script file="!SpellFlash.lua"/>
+	<Script file="Loot\SimpleMinimapBlip.lua"/>
+	<Script file="!SpellFlash.lua"/-->
 </Ui>

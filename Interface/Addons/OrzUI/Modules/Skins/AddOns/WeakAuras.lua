@@ -1,9 +1,9 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local S = M:GetModule("Skins")
+local B, C, L, DB = unpack(ns)
+local S = B:GetModule("Skins")
 
 local pairs = pairs
-local x1, x2, y1, y2 = unpack(I.TexCoord)
+local x1, x2, y1, y2 = unpack(DB.TexCoord)
 
 local function UpdateIconBgAlpha(icon, _, _, _, alpha)
 	icon.bg:SetAlpha(alpha)
@@ -38,7 +38,7 @@ end
 local function ReskinWAIcon(icon)
 	UpdateIconTexCoord(icon)
 	hooksecurefunc(icon, "SetTexCoord", UpdateIconTexCoord)
-	icon.bg = M.SetBD(icon, 0)
+	icon.bg = B.SetBD(icon, 0)
 	icon.bg:SetFrameLevel(0)
 	hooksecurefunc(icon, "SetVertexColor", UpdateIconBgAlpha)
 end
@@ -55,7 +55,7 @@ local function Skin_WeakAuras(f, fType)
 		end
 	elseif fType == "aurabar" then
 		if not f.styled then
-			f.bg = M.SetBD(f.bar, 0)
+			f.bg = B.SetBD(f.bar, 0)
 			f.bg:SetFrameLevel(0)
 			ReskinWAIcon(f.icon)
 			hooksecurefunc(f, "SetFrameStrata", ResetBGLevel)
@@ -67,7 +67,7 @@ local function Skin_WeakAuras(f, fType)
 end
 
 local function ReskinWA()
-	if not R.db["Skins"]["WeakAuras"] then return end
+	if not C.db["Skins"]["WeakAuras"] then return end
 
 	if not WeakAuras or not WeakAuras.Private then
 		return

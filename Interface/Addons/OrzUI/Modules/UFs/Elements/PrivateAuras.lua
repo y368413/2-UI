@@ -1,8 +1,8 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 local oUF = ns.oUF
-local UF = M:GetModule("UnitFrames")
-local PA = M:GetModule("PrivateAuras")
+local UF = B:GetModule("UnitFrames")
+local PA = B:GetModule("PrivateAuras")
 
 function UF:CreatePrivateAuras(frame)
 	frame.PrivateAuras = CreateFrame("Frame", frame:GetName().."PrivateAuras", frame)
@@ -13,7 +13,7 @@ function UF.UpdatePrivateAuras(frame)
 	if frame.PrivateAuras then
 		PA:RemoveAuras(frame.PrivateAuras)
 
-		local db = R.db["UFs"]
+		local db = C.db["UFs"]
 		if db then
 			PA:SetupPrivateAuras(db, frame.PrivateAuras, frame.unit)
 			frame.PrivateAuras:ClearAllPoints()

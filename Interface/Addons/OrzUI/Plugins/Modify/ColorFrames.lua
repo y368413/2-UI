@@ -123,7 +123,7 @@ Event:SetScript("OnEvent", function(self, event, ...)
         OnPlayerLogin(self, event, ...)
     end
 end)]]
---[[--�������
+--[[--字体描边
 for i = 1, 7 do
    local m, r = _G["ChatFrame"..i]:GetFont()
    _G["ChatFrame"..i]:SetFont(m, r, "OUTLINE")
@@ -267,6 +267,13 @@ local function ColorFrames()
 		}) do
 		texture:SetVertexColor(daftFrameHue_classcolor.r, daftFrameHue_classcolor.g, daftFrameHue_classcolor.b, 1);
 	end;
+--[[自带伤害统计部分框体元素自定义调整
+DamageMeterSessionWindow1.Header:SetAlpha(0) --顶部栏背景
+DamageMeterSessionWindow1.SettingsDropdown.Icon:SetAlpha(0.1) --顶部栏右侧设置齿轮
+DamageMeterSessionWindow1.DamageMeterTypeDropdown.Arrow:SetAlpha(0.1) --顶部栏左侧下拉按钮
+DamageMeterSessionWindow1.DamageMeterTypeDropdown.TypeName:SetAlpha(0.1) --顶部栏左侧下拉按钮
+DamageMeterSessionWindow1.SessionDropdown.Background:SetAlpha(0) --隐藏当前总体背景框
+DamageMeterSessionWindow1.SessionDropdown:SetAlpha(0.1) --隐藏当前总体背景框]]
 end;
 
 daftFrameHue:SetScript("OnEvent", function(self, event) 	

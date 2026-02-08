@@ -1,10 +1,10 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local Bar = M:GetModule("Actionbar")
+local B, C, L, DB = unpack(ns)
+local Bar = B:GetModule("Actionbar")
 
 local _G = _G
 local tinsert, mod, min, ceil = tinsert, mod, min, ceil
-local margin, padding = R.Bars.margin, R.Bars.padding
+local margin, padding = C.Bars.margin, C.Bars.padding
 
 local num = NUM_STANCE_SLOTS or 10
 
@@ -14,9 +14,9 @@ function Bar:UpdateStanceBar()
 	local frame = _G["OrzUI_ActionBarStance"]
 	if not frame then return end
 
-	local size = R.db["Actionbar"]["BarStanceSize"]
-	local fontSize = R.db["Actionbar"]["BarStanceFont"]
-	local perRow = R.db["Actionbar"]["BarStancePerRow"]
+	local size = C.db["Actionbar"]["BarStanceSize"]
+	local fontSize = C.db["Actionbar"]["BarStanceFont"]
+	local perRow = C.db["Actionbar"]["BarStancePerRow"]
 
 	for i = 1, num do
 		local button = frame.buttons[i]
@@ -87,13 +87,13 @@ end
 function Bar:CreateStancebar()
 	local buttonList = {}
 	local frame = CreateFrame("Frame", "OrzUI_ActionBarStance", UIParent, "SecureHandlerStateTemplate")
-	frame.mover = M.Mover(frame, U["StanceBar"], "StanceBar", {"BOTTOMLEFT", _G.OrzUI_ActionBar4, "TOPLEFT", 0, margin})
+	frame.mover = B.Mover(frame, L["StanceBar"], "StanceBar", {"BOTTOMLEFT", _G.OrzUI_ActionBar4, "TOPLEFT", 0, margin})
 	Bar.movers[11] = frame.mover
 
 	-- StanceBar
-	StanceBar:SetParent(frame)
-	StanceBar:EnableMouse(false)
-	StanceBar:UnregisterAllEvents()
+	--StanceBar:SetParent(frame)
+	--StanceBar:EnableMouse(false)
+	--StanceBar:UnregisterAllEvents()
 
 	for i = 1, num do
 		local button = _G["StanceButton"..i]
@@ -105,11 +105,11 @@ function Bar:CreateStancebar()
 
 	-- Fix stance bar updating
 	Bar:StanceBarOnEvent()
-	M:RegisterEvent("UPDATE_SHAPESHIFT_FORM", Bar.StanceBarOnEvent)
-	M:RegisterEvent("UPDATE_SHAPESHIFT_FORMS", Bar.StanceBarOnEvent)
-	M:RegisterEvent("UPDATE_SHAPESHIFT_USABLE", Bar.StanceBarOnEvent)
-	M:RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN", Bar.StanceBarOnEvent)
+	B:RegisterEvent("UPDATE_SHAPESHIFT_FORM", Bar.StanceBarOnEvent)
+	B:RegisterEvent("UPDATE_SHAPESHIFT_FORMS", Bar.StanceBarOnEvent)
+	B:RegisterEvent("UPDATE_SHAPESHIFT_USABLE", Bar.StanceBarOnEvent)
+	B:RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN", Bar.StanceBarOnEvent)
 
 	frame.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show"
-	RegisterStateDriver(frame, "visibility", not R.db["Actionbar"]["ShowStance"] and "hide" or frame.frameVisibility)
+	RegisterStateDriver(frame, "visibility", not C.db["Actionbar"]["ShowStance"] and "hide" or frame.frameVisibility)
 end

@@ -1,5 +1,5 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 ---------------------------------- ExtraQuestButton, by p3lim-- NDui MOD--------------------------------
 local _G = _G
 local next, type, sqrt, GetTime, format = next, type, sqrt, GetTime, format
@@ -276,7 +276,7 @@ function ExtraQuestButton:PLAYER_LOGIN()
 
 	self:SetSize(ExtraActionButton1:GetSize())
 	self:SetScale(ExtraActionButton1:GetScale())
-	self:SetScript("OnLeave", M.HideTooltip)
+	self:SetScript("OnLeave", B.HideTooltip)
 	self:SetClampedToScreen(true)
 	self:SetToplevel(true)
 
@@ -284,21 +284,21 @@ function ExtraQuestButton:PLAYER_LOGIN()
 		if _G.OrzUI_ActionBarExtra then
 			self:SetPoint("CENTER", _G.OrzUI_ActionBarExtra)
 		else
-			M.Mover(self, U["ExtraQuestButton"], "Extrabar", {"BOTTOM", UIParent, "BOTTOM", 250, 100})
+			B.Mover(self, L["ExtraQuestButton"], "Extrabar", {"BOTTOM", UIParent, "BOTTOM", 250, 100})
 		end
 	end
 
 	self.updateTimer = 0
 	self.rangeTimer = 0
 
-	self:SetPushedTexture(I.pushedTex)
+	self:SetPushedTexture(DB.pushedTex)
 	local push = self:GetPushedTexture()
 	push:SetBlendMode("ADD")
 	push:SetInside()
 
 	local Icon = self:CreateTexture("$parentIcon", "ARTWORK")
 	Icon:SetInside()
-	M.ReskinIcon(Icon, true)
+	B.ReskinIcon(Icon, true)
 	self.HL = self:CreateTexture(nil, "HIGHLIGHT")
 	self.HL:SetColorTexture(1, 1, 1, .25)
 	self.HL:SetAllPoints(Icon)
@@ -321,7 +321,7 @@ function ExtraQuestButton:PLAYER_LOGIN()
 	local Artwork = self:CreateTexture("$parentArtwork", "OVERLAY")
 	Artwork:SetPoint("BOTTOMLEFT", -1, -3)
 	Artwork:SetSize(20, 20)
-	Artwork:SetAtlas(I.questTex)
+	Artwork:SetAtlas(DB.questTex)
 	self.Artwork = Artwork
 
 	self:RegisterEvent("UPDATE_BINDINGS")
@@ -428,7 +428,7 @@ function ExtraQuestButton:SetItem(itemLink)
 		else
 			HotKey:Hide()
 		end
-		M:GetModule("Actionbar").UpdateHotKey(HotKey)
+		B:GetModule("Actionbar").UpdateHotKey(HotKey)
 
 		self:UpdateAttributes()
 		self:UpdateCount()

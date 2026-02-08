@@ -1,9 +1,9 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-if not R.Infobar.Bags then return end
+local B, C, L, DB = unpack(ns)
+if not C.Infobar.Bags then return end
 
-local module = M:GetModule("Infobar")
-local info = module:RegisterInfobar("Bag", R.Infobar.BagsPos)
+local module = B:GetModule("Infobar")
+local info = module:RegisterInfobar("Bags", C.Infobar.BagsPos)
 		
 info.eventList = {
 	"BAG_UPDATE",
@@ -27,10 +27,10 @@ info.onEnter = function(self)
 	GameTooltip:ClearAllPoints()
 	GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 1)
 	GameTooltip:ClearLines()
-	GameTooltip:AddLine(U["Bags"].." : "..used.."/"..total,0,.6,1)
+	GameTooltip:AddLine(L["Bags"].." : "..used.."/"..total,0,.6,1)
 	--GameTooltip:AddLine()
-	--GameTooltip:AddDoubleLine(U["Total"]..":",,.6,.8,1, 1, 1, 1)
-	--GameTooltip:AddDoubleLine(U["Used"]..":",,.6,.8,1, 1, 1, 1)
+	--GameTooltip:AddDoubleLine(L["Total"]..":",,.6,.8,1, 1, 1, 1)
+	--GameTooltip:AddDoubleLine(L["Used"]..":",,.6,.8,1, 1, 1, 1)
 	GameTooltip:Show()
 end
 

@@ -1,5 +1,5 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 ---------------------------- DragEmAll, by emelio-- NDui MOD--------------------------
 local _G, pairs, type = getfenv(0), pairs, type
 
@@ -13,6 +13,7 @@ local BlzFrames = {
 	["ChannelFrame"] = false,
 	["ChatConfigFrame"] = false,
 	["CommunitiesFrame"] = false, -- needs review
+	["CooldownViewerSettings"] = false,
 	["DressUpFrame"] = false,
 	["FriendsFrame"] = false,
 	["GossipFrame"] = false,
@@ -37,7 +38,7 @@ local BlzFrames = {
 	["TabardFrame"] = false,
 	["TaxiFrame"] = false,
 	["TokenFrame"] = true,
-	["TradeFrame"] = false,
+	--["TradeFrame"] = false,
 	["TutorialFrame"] = false,
 	["SettingsPanel"] = false,
 	-- Other AddOns
@@ -49,7 +50,7 @@ local BlzFrames = {
 local function IsFrameExists()
 	for k in pairs(BlzFrames) do
 		local name = _G[k]
-		if not name and I.isDeveloper then print("XXX:", k) end
+		if not name and DB.isDeveloper then print("XXX:", k) end
 	end
 end
 
@@ -192,5 +193,5 @@ local function AddonLoaded(_, name)
 		HookFrames(frameList)
 	end
 end
-M:RegisterEvent("PLAYER_LOGIN", InitSetup)
-M:RegisterEvent("ADDON_LOADED", AddonLoaded)
+B:RegisterEvent("PLAYER_LOGIN", InitSetup)
+B:RegisterEvent("ADDON_LOADED", AddonLoaded)

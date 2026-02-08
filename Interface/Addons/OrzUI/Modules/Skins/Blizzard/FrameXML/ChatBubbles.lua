@@ -1,5 +1,5 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
 local pairs, GetCVarBool = pairs, GetCVarBool
 local C_ChatBubbles_GetAllChatBubbles = C_ChatBubbles.GetAllChatBubbles
@@ -9,7 +9,7 @@ local function reskinChatBubble(chatbubble)
 
 	local frame = chatbubble:GetChildren()
 	if frame and not frame:IsForbidden() then
-		local bg = M.SetBD(frame)
+		local bg = B.SetBD(frame)
 		bg:SetScale(UIParent:GetEffectiveScale())
 		bg:SetInside(frame, 6, 6)
 
@@ -20,7 +20,7 @@ local function reskinChatBubble(chatbubble)
 	chatbubble.styled = true
 end
 
-tinsert(R.defaultThemes, function()
+tinsert(C.defaultThemes, function()
 
 	local events = {
 		CHAT_MSG_SAY = "chatBubbles",

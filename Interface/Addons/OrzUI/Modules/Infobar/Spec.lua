@@ -1,10 +1,10 @@
 ﻿local _, ns = ...
-local M, R, U, I = unpack(ns)
-if not R.Infobar.Spec then return end
+local B, C, L, DB = unpack(ns)
+if not C.Infobar.Spec then return end
 
-local module = M:GetModule("Infobar")
-local info = module:RegisterInfobar("Spec", R.Infobar.SpecPos)
-info.text:SetFont(unpack(R.Infobar.TTFonts))
+local module = B:GetModule("Infobar")
+local info = module:RegisterInfobar("Spec", C.Infobar.SpecPos)
+info.text:SetFont(unpack(C.Infobar.TTFonts))
 local format, wipe, select, next = string.format, table.wipe, select, next
 local SPECIALIZATION, TALENTS_BUTTON, MAX_TALENT_TIERS = SPECIALIZATION, TALENTS_BUTTON, MAX_TALENT_TIERS
 local PVP_TALENTS, LOOT_SPECIALIZATION_DEFAULT = PVP_TALENTS, LOOT_SPECIALIZATION_DEFAULT
@@ -39,9 +39,9 @@ info.onEvent = function(self)
 		else
 			icon = addIcon(select(4, GetSpecializationInfoByID(currentLootIndex)))
 		end
-		self.text:SetText(I.MyColor..icon)  --I.MyColor..name..icon
+		self.text:SetText(DB.MyColor..icon)  --DB.MyColor..name..icon
 	else
-		self.text:SetText(SPECIALIZATION..": "..I.MyColor..NONE)
+		self.text:SetText(SPECIALIZATION..": "..DB.MyColor..NONE)
 	end
 end
 
@@ -92,13 +92,13 @@ info.onEnter = function(self)
 		wipe(pvpTalents)
 	end
 
-	GameTooltip:AddDoubleLine(" ", I.LineString)
-	GameTooltip:AddDoubleLine(" ", I.LeftButton..U["SpecPanel"].." ", 1,1,1, .6,.8,1)
-	GameTooltip:AddDoubleLine(" ", I.RightButton..U["Change Spec"].." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", DB.LineString)
+	GameTooltip:AddDoubleLine(" ", DB.LeftButton..L["SpecPanel"].." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", DB.RightButton..L["Change Spec"].." ", 1,1,1, .6,.8,1)
 	GameTooltip:Show()
 end
 
-info.onLeave = M.HideTooltip
+info.onLeave = B.HideTooltip
 
 local function selectSpec(_, specIndex)
 	if currentSpecIndex == specIndex then return end
@@ -126,7 +126,7 @@ local function refreshDefaultLootSpec()
 end
 
 local function selectCurrentConfig(_, configID, specID)
-	if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
+	if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end
 	if configID == STARTER_BUILD then
 		C_ClassTalents.SetStarterBuildActive(true)
 	else
@@ -210,23 +210,23 @@ local function BuildSpecMenu()
 	numLocal = #newMenu
 
 	refreshDefaultLootSpec()
-	M:RegisterEvent("ACTIVE_PLAYER_SPECIALIZATION_CHANGED", refreshDefaultLootSpec)
+	B:RegisterEvent("ACTIVE_PLAYER_SPECIALIZATION_CHANGED", refreshDefaultLootSpec)
 
 	refreshAllTraits()
-	M:RegisterEvent("TRAIT_CONFIG_DELETED", refreshAllTraits)
-	M:RegisterEvent("TRAIT_CONFIG_UPDATED", refreshAllTraits)
-	M:RegisterEvent("ACTIVE_PLAYER_SPECIALIZATION_CHANGED", refreshAllTraits)
+	B:RegisterEvent("TRAIT_CONFIG_DELETED", refreshAllTraits)
+	B:RegisterEvent("TRAIT_CONFIG_UPDATED", refreshAllTraits)
+	B:RegisterEvent("ACTIVE_PLAYER_SPECIALIZATION_CHANGED", refreshAllTraits)
 end
 
 info.onMouseUp = function(self, btn)
 	if not currentSpecIndex or currentSpecIndex == 5 then return end
 
 	if btn == "LeftButton" then
-		if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
+		if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
 		PlayerSpellsUtil.ToggleClassTalentOrSpecFrame()
 	else
 		BuildSpecMenu()
-		EasyMenu(newMenu, M.EasyMenu, self, -80, 100, "MENU", 1)
+		EasyMenu(newMenu, B.EasyMenu, self, -80, 100, "MENU", 1)
 		GameTooltip:Hide()
 	end
 end

@@ -1,6 +1,6 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
-local TT = M:GetModule("Tooltip")
+local B, C, L, DB = unpack(ns)
+local TT = B:GetModule("Tooltip")
 
 local gsub, unpack, select = gsub, unpack, select
 local C_MountJournal_GetMountInfoByID = C_MountJournal.GetMountInfoByID
@@ -9,7 +9,7 @@ local newString = "0:0:64:64:5:59:5:59"
 function TT:SetupTooltipIcon(icon)
 	local title = icon and _G[self:GetName().."TextLeft1"]
 	local titleText = title and title:GetText()
-	if titleText and not strfind(titleText, ":16:16:") then
+	if titleText and B:NotSecretValue(titleText) and not strfind(titleText, ":16:16:") then
 		title:SetFormattedText("|T%s:16:16:"..newString..":%d|t %s", icon, 16, titleText)
 	end
 
@@ -17,7 +17,7 @@ function TT:SetupTooltipIcon(icon)
 		local line = _G[self:GetName().."TextLeft"..i]
 		if not line then break end
 		local text = line:GetText()
-		if text and text ~= " " then
+		if text and B:NotSecretValue(text) and text ~= " " then
 			local newText, count = gsub(text, "|T([^:]-):[%d+:]+|t", "|T%1:14:14:"..newString.."|t")
 			if count > 0 then line:SetText(newText) end
 		end
@@ -33,9 +33,9 @@ function TT:HookTooltipMethod()
 end
 
 function TT:ReskinRewardIcon()
-	self.Icon:SetTexCoord(unpack(I.TexCoord))
-	self.bg = M.CreateBDFrame(self.Icon, 0)
-	M.ReskinIconBorder(self.IconBorder)
+	self.Icon:SetTexCoord(unpack(DB.TexCoord))
+	self.bg = B.CreateBDFrame(self.Icon, 0)
+	B.ReskinIconBorder(self.IconBorder)
 end
 
 local GetTooltipTextureByType = {

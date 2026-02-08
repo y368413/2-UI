@@ -1,5 +1,5 @@
 local _, ns = ...
-local M, R, U, I = unpack(ns)
+local B, C, L, DB = unpack(ns)
 
 --[[
 	OrzUI DevTools:
@@ -20,7 +20,7 @@ local IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
 local GetSpellDescription = C_Spell.GetSpellDescription
 local GetSpellName = C_Spell.GetSpellName
 
-I.Devs = {
+DB.Devs = {
 	["烂柯人-时光之穴"] = true,
 	["Yichen-贫瘠之地"] = true,
 	["Helements-贫瘠之地"] = true,
@@ -32,7 +32,7 @@ I.Devs = {
 	["曾經滄海-主宰之剑"] = true,
 	["璐米娜丝-金色平原"] = true,
 }
-I.DevsID = {
+DB.DevsID = {
 	["ShiGuang#51562"] = true,
 	["河河#5769"] = true,
 	["贝戎#52863"] = true,
@@ -41,14 +41,14 @@ I.DevsID = {
 	["WooSphinx#5211"] = true,
 }
 local function isDeveloper()
-	local rawName = gsub(I.MyFullName, "%s", "")
-	return I.Devs[rawName]
+	local rawName = gsub(DB.MyFullName, "%s", "")
+	return DB.Devs[rawName]
 end
 local function isFriends()
 	local bnetID = select(2, BNGetInfo())
-	return I.DevsID[bnetID]
+	return DB.DevsID[bnetID]
 end
-I.isDeveloper = isDeveloper() or isFriends()
+DB.isDeveloper = isDeveloper() or isFriends()
 
 SlashCmdList["ORZUI_ENUMTIP"] = function()
 	local enumf = EnumerateFrames()
@@ -77,9 +77,9 @@ SlashCmdList["ORZUI_DUMPSPELL"] = function(arg)
 	if not name then return end
 	local des = GetSpellDescription(arg)
 	print("|cff70C0F5------------------------")
-	print(" \124T"..C_Spell.GetSpellTexture(arg)..":16:16:::64:64:5:59:5:59\124t", I.InfoColor..arg)
-	print(NAME, I.InfoColor..(name or "nil"))
-	print(DESCRIPTION, I.InfoColor..(des or "nil"))
+	print(" \124T"..C_Spell.GetSpellTexture(arg)..":16:16:::64:64:5:59:5:59\124t", DB.InfoColor..arg)
+	print(NAME, DB.InfoColor..(name or "nil"))
+	print(DESCRIPTION, DB.InfoColor..(des or "nil"))
 	print("|cff70C0F5------------------------")
 end
 SLASH_ORZUI_DUMPSPELL1 = "/ns"
@@ -94,8 +94,8 @@ SlashCmdList["ORZUI_NPCID"] = function()
 	local name = UnitName("target")
 	local guid = UnitGUID("target")
 	if name and guid then
-		local npcID = M.GetNPCID(guid)
-		print(name, I.InfoColor..(npcID or "nil"))
+		local npcID = B.GetNPCID(guid)
+		print(name, DB.InfoColor..(npcID or "nil"))
 	end
 end
 SLASH_ORZUI_NPCID1 = "/getnpc"
@@ -119,8 +119,8 @@ SlashCmdList["ORZUI_GET_INSTANCES"] = function()
 	if not EncounterJournal then return end
 	local tierID = EJ_GetCurrentTier()
 	print("local _, ns = ...")
-	print("local M, R, U, I = unpack(ns)")
-	print("local module = M:GetModule(\"AurasTable\")")
+	print("local B, C, L, DB = unpack(ns)")
+	print("local module = B:GetModule(\"AurasTable\")")
 	print("local TIER = "..tierID)
 	print("local INSTANCE")
 	local i = 0
@@ -140,8 +140,8 @@ SlashCmdList["ORZUI_GET_ENCOUNTERS"] = function()
 	EJ_SelectInstance(instID)
 	local instName = EJ_GetInstanceInfo()
 	print("local _, ns = ...")
-	print("local M, R, U, I = unpack(ns)")
-	print("local module = M:GetModule(\"AurasTable\")")
+	print("local B, C, L, DB = unpack(ns)")
+	print("local module = B:GetModule(\"AurasTable\")")
 	print("local TIER = "..tierID)
 	print("local INSTANCE = "..instID.." -- "..instName)
 	print("local BOSS")
